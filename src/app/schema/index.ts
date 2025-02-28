@@ -5,6 +5,11 @@ export const SUPPORTED_CURRENCIES = ["EUR", "USD", "GBP", "PLN"] as const;
 export const SUPPORTED_LANGUAGES = ["en", "pl"] as const;
 export type SupportedLanguages = (typeof SUPPORTED_LANGUAGES)[number];
 
+export const LANGUAGE_TO_LABEL = {
+  en: "English",
+  pl: "Polish",
+} as const satisfies Record<SupportedLanguages, string>;
+
 export const SUPPORTED_DATE_FORMATS = [
   "YYYY-MM-DD", // 2024-03-20
   "DD/MM/YYYY", // 20/03/2024
@@ -15,22 +20,6 @@ export const SUPPORTED_DATE_FORMATS = [
   "DD-MM-YYYY", // 20-03-2024
   "YYYY.MM.DD", // 2024.03.20
 ] as const;
-
-export const DEFAULT_SELLER_DATA = {
-  name: "Seller name",
-  address: "Seller address",
-
-  vatNo: "Seller vat number",
-  vatNoFieldIsVisible: true,
-
-  email: "seller@email.com",
-
-  accountNumber: "Seller account number",
-  accountNumberFieldIsVisible: true,
-
-  swiftBic: "Seller swift bic",
-  swiftBicFieldIsVisible: true,
-} as const satisfies SellerData;
 
 export type SupportedDateFormat = (typeof SUPPORTED_DATE_FORMATS)[number];
 
@@ -244,3 +233,41 @@ export type InvoiceData = z.infer<typeof invoiceSchema>;
 //     })
 //     .transform((value) => (value === null ? 0 : Number(value)))
 //     .pipe(zodPipe);
+
+export const DEFAULT_SELLER_DATA = {
+  name: "Seller name",
+  address: "Seller address",
+
+  vatNo: "Seller vat number",
+  vatNoFieldIsVisible: true,
+
+  email: "seller@email.com",
+
+  accountNumber: "Seller account number",
+  accountNumberFieldIsVisible: true,
+
+  swiftBic: "Seller swift bic",
+  swiftBicFieldIsVisible: true,
+} as const satisfies SellerData;
+
+/**
+ * Accordion state schema
+ *
+ * This schema is used to store the state of the accordion in the local storage
+ *
+ * The accordion is used to collapse/expand the sections of the invoice form
+ *
+ *
+ */
+export const accordionSchema = z
+  .object({
+    general: z.boolean(),
+    seller: z.boolean(),
+    buyer: z.boolean(),
+    invoiceItems: z.boolean(),
+  })
+  .strict();
+
+export type AccordionState = z.infer<typeof accordionSchema>;
+
+export const ACCORDION_STATE_LOCAL_STORAGE_KEY = "EASY_INVOICE_ACCORDION_STATE";

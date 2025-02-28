@@ -1,4 +1,6 @@
 import {
+  ACCORDION_STATE_LOCAL_STORAGE_KEY,
+  accordionSchema,
   invoiceItemSchema,
   invoiceSchema,
   SUPPORTED_CURRENCIES,
@@ -8,6 +10,12 @@ import {
   type InvoiceItemData,
 } from "@/app/schema";
 import { SellerManagement } from "@/components/seller-management";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { ButtonHelper } from "@/components/ui/button-helper";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
@@ -21,23 +29,17 @@ import { SelectNative } from "@/components/ui/select-native";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { getAmountInWords, getNumberFractionalPart } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useOpenPanel } from "@openpanel/nextjs";
 import dayjs from "dayjs";
 import { AlertTriangle, Plus, Trash2 } from "lucide-react";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 
 export const PDF_DATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_DATA";
 export const PDF_DATA_FORM_ID = "pdfInvoiceForm";
@@ -114,6 +116,12 @@ const Legend = ({ children }: { children: React.ReactNode }) => {
 const AlertIcon = () => {
   return <AlertTriangle className="mr-1 inline-block h-3 w-3 text-amber-500" />;
 };
+
+type AccordionKeys = Array<(typeof DEFAULT_ACCORDION_VALUES)[number]>;
+
+type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
 
 interface InvoiceFormProps {
   invoiceData: InvoiceData;
@@ -276,6 +284,65 @@ export function InvoiceForm({
     onInvoiceDataChange(data);
   };
 
+  /**
+   * All open accordion sections will be in the array of strings
+   * ['general', 'seller', 'invoiceItems'] -> means that general, seller and invoiceItems accordion sections are open
+   * [] -> means that all accordion sections are closed
+   */
+  const [accordionValues, setAccordionValues] = useState<
+    Prettify<AccordionKeys>
+  >(() => {
+    // Try to load from localStorage
+    try {
+      const savedState = localStorage.getItem(
+        ACCORDION_STATE_LOCAL_STORAGE_KEY
+      );
+
+      if (savedState) {
+        const parsedState = JSON.parse(savedState);
+
+        const validatedState = accordionSchema.safeParse(parsedState);
+
+        if (validatedState.success) {
+          const arrayOfOpenSections = Object.entries(validatedState.data)
+            .filter(([_, isOpen]) => isOpen)
+            .map(([section]) => section) as Prettify<AccordionKeys>;
+
+          return arrayOfOpenSections;
+        }
+      }
+    } catch (error) {
+      console.error("Error loading accordion state:", error);
+    }
+
+    // Default to all sections open if no valid state found
+    return DEFAULT_ACCORDION_VALUES as NonReadonly<
+      typeof DEFAULT_ACCORDION_VALUES
+    >;
+  });
+
+  // Save accordion state changes to localStorage
+  const handleAccordionValueChange = (value: Prettify<AccordionKeys>) => {
+    setAccordionValues(value);
+
+    try {
+      // parse the value to the accordion schema
+      const stateToSave = accordionSchema.parse({
+        general: value.includes(ACCORDION_GENERAL),
+        seller: value.includes(ACCORDION_SELLER),
+        buyer: value.includes(ACCORDION_BUYER),
+        invoiceItems: value.includes(ACCORDION_ITEMS),
+      });
+
+      localStorage.setItem(
+        ACCORDION_STATE_LOCAL_STORAGE_KEY,
+        JSON.stringify(stateToSave)
+      );
+    } catch (error) {
+      console.error("Error saving accordion state:", error);
+    }
+  };
+
   return (
     <>
       <form
@@ -342,11 +409,8 @@ export function InvoiceForm({
       >
         <Accordion
           type="multiple"
-          defaultValue={
-            DEFAULT_ACCORDION_VALUES as NonReadonly<
-              typeof DEFAULT_ACCORDION_VALUES
-            >
-          }
+          value={accordionValues}
+          onValueChange={handleAccordionValueChange}
           className="space-y-4"
         >
           {/* General Information */}
@@ -1745,113 +1809,135 @@ export function InvoiceForm({
           </AccordionItem>
         </Accordion>
 
-        {/* Total field (with currency) */}
-        <div className="">
-          <div className="mt-5" />
-          <Label htmlFor="total" className="mb-1">
-            Total
-          </Label>
-          <div className="relative mt-1 rounded-md shadow-sm">
-            <Controller
-              name="total"
-              control={control}
-              render={({ field }) => (
-                <ReadOnlyMoneyInput
-                  {...field}
-                  id="total"
-                  currency={currency}
-                  value={field.value.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                />
-              )}
-            />
-          </div>
-          {errors.total ? (
-            <ErrorMessage>{errors.total.message}</ErrorMessage>
-          ) : (
-            <InputHelperMessage>
-              Calculated automatically based on (Net Amount + VAT Amount) *
-              Number of invoice items
-            </InputHelperMessage>
-          )}
-        </div>
-
-        {/* Payment Method */}
-        <div>
-          <div className="relative mb-2 mt-6 flex items-center justify-between">
-            <Label htmlFor="paymentMethod" className="">
-              Payment Method
+        {/* Final section */}
+        <div className="space-y-4">
+          <div className="">
+            {/* Total field (with currency) */}
+            <div className="mt-5" />
+            <Label htmlFor="total" className="mb-1">
+              Total
             </Label>
-
-            {/* Show/hide Payment Method field in PDF switch */}
-            <div className="inline-flex items-center gap-2">
+            <div className="relative mt-1 rounded-md shadow-sm">
               <Controller
-                name={`paymentMethodFieldIsVisible`}
+                name="total"
                 control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
+                render={({ field }) => (
+                  <ReadOnlyMoneyInput
                     {...field}
-                    id={`paymentMethodFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    id="total"
+                    currency={currency}
+                    value={field.value.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   />
                 )}
               />
-              <CustomTooltip
-                trigger={
-                  <Label htmlFor={`paymentMethodFieldIsVisible`}>
-                    Show in PDF
-                  </Label>
-                }
-                content='Show/Hide the "Payment Method" Field in the PDF'
-              />
             </div>
+            {errors.total ? (
+              <ErrorMessage>{errors.total.message}</ErrorMessage>
+            ) : (
+              <InputHelperMessage>
+                Calculated automatically based on (Net Amount + VAT Amount) *
+                Number of invoice items
+              </InputHelperMessage>
+            )}
           </div>
 
-          <Controller
-            name="paymentMethod"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                id="paymentMethod"
-                type="text"
-                className="mt-1"
-              />
-            )}
-          />
-          {errors.paymentMethod && (
-            <ErrorMessage>{errors.paymentMethod.message}</ErrorMessage>
-          )}
-        </div>
+          {/* Payment Method */}
+          <div>
+            <div className="relative mb-2 mt-6 flex items-center justify-between">
+              <Label htmlFor="paymentMethod" className="">
+                Payment Method
+              </Label>
 
-        {/* Payment Due */}
-        <div>
-          <div className="mb-6">
-            <Label htmlFor="paymentDue" className="mb-1">
-              Payment Due
-            </Label>
+              {/* Show/hide Payment Method field in PDF switch */}
+              <div className="inline-flex items-center gap-2">
+                <Controller
+                  name={`paymentMethodFieldIsVisible`}
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Switch
+                      {...field}
+                      id={`paymentMethodFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    />
+                  )}
+                />
+                <CustomTooltip
+                  trigger={
+                    <Label htmlFor={`paymentMethodFieldIsVisible`}>
+                      Show in PDF
+                    </Label>
+                  }
+                  content='Show/Hide the "Payment Method" Field in the PDF'
+                />
+              </div>
+            </div>
+
             <Controller
-              name="paymentDue"
+              name="paymentMethod"
               control={control}
               render={({ field }) => (
-                <Input {...field} id="paymentDue" type="date" className="" />
+                <Input
+                  {...field}
+                  id="paymentMethod"
+                  type="text"
+                  className="mt-1"
+                />
               )}
             />
-            {errors.paymentDue && (
-              <ErrorMessage>{errors.paymentDue.message}</ErrorMessage>
+            {errors.paymentMethod && (
+              <ErrorMessage>{errors.paymentMethod.message}</ErrorMessage>
             )}
-            {!errors.paymentDue && isPaymentDueBeforeDateOfIssue ? (
-              <InputHelperMessage>
-                <span className="flex items-center text-balance">
-                  <AlertIcon />
-                  Payment due date is before date of issue (
-                  {dayjs(dateOfIssue).format("DD.MM.YYYY")})
-                </span>
+          </div>
+
+          {/* Payment Due */}
+          <div>
+            <div className="mb-6">
+              <Label htmlFor="paymentDue" className="mb-1">
+                Payment Due
+              </Label>
+              <Controller
+                name="paymentDue"
+                control={control}
+                render={({ field }) => (
+                  <Input {...field} id="paymentDue" type="date" className="" />
+                )}
+              />
+              {errors.paymentDue && (
+                <ErrorMessage>{errors.paymentDue.message}</ErrorMessage>
+              )}
+              {!errors.paymentDue && isPaymentDueBeforeDateOfIssue ? (
+                <InputHelperMessage>
+                  <span className="flex items-center text-balance">
+                    <AlertIcon />
+                    Payment due date is before date of issue (
+                    {dayjs(dateOfIssue).format("DD.MM.YYYY")})
+                  </span>
+                  <ButtonHelper
+                    onClick={() => {
+                      const newPaymentDue = dayjs(dateOfIssue)
+                        .add(14, "days")
+                        .format("YYYY-MM-DD");
+
+                      setValue("paymentDue", newPaymentDue);
+                    }}
+                  >
+                    Click to set payment due date 14 days after the date of
+                    issue (
+                    {dayjs(dateOfIssue).add(14, "days").format("DD/MM/YYYY")})
+                  </ButtonHelper>
+                </InputHelperMessage>
+              ) : null}
+              {/* If there are no errors and the payment due date is not before the date of issue and the payment due date is not 14 days after the date of issue, show the button to set the payment due date to 14 days after the date of issue (probably a bit better UX) */}
+              {!errors.paymentDue &&
+              !isPaymentDueBeforeDateOfIssue &&
+              !isPaymentDue14DaysFromDateOfIssue ? (
                 <ButtonHelper
+                  className="whitespace-normal"
                   onClick={() => {
                     const newPaymentDue = dayjs(dateOfIssue)
                       .add(14, "days")
@@ -1863,115 +1949,97 @@ export function InvoiceForm({
                   Click to set payment due date 14 days after the date of issue
                   ({dayjs(dateOfIssue).add(14, "days").format("DD/MM/YYYY")})
                 </ButtonHelper>
-              </InputHelperMessage>
-            ) : null}
-            {/* If there are no errors and the payment due date is not before the date of issue and the payment due date is not 14 days after the date of issue, show the button to set the payment due date to 14 days after the date of issue (probably a bit better UX) */}
-            {!errors.paymentDue &&
-            !isPaymentDueBeforeDateOfIssue &&
-            !isPaymentDue14DaysFromDateOfIssue ? (
-              <ButtonHelper
-                className="whitespace-normal"
-                onClick={() => {
-                  const newPaymentDue = dayjs(dateOfIssue)
-                    .add(14, "days")
-                    .format("YYYY-MM-DD");
-
-                  setValue("paymentDue", newPaymentDue);
-                }}
-              >
-                Click to set payment due date 14 days after the date of issue (
-                {dayjs(dateOfIssue).add(14, "days").format("DD/MM/YYYY")})
-              </ButtonHelper>
-            ) : null}
-          </div>
-        </div>
-
-        {/* Notes */}
-        <div className="">
-          <div className="relative mb-2 flex items-center justify-between">
-            <Label htmlFor="notes" className="">
-              Notes
-            </Label>
-
-            {/* Show/hide Notes field in PDF switch */}
-            <div className="inline-flex items-center gap-2">
-              <Controller
-                name={`notesFieldIsVisible`}
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`notesFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                  />
-                )}
-              />
-              <CustomTooltip
-                trigger={
-                  <Label htmlFor={`notesFieldIsVisible`}>Show in PDF</Label>
-                }
-                content='Show/Hide the "Notes" Field in the PDF'
-              />
+              ) : null}
             </div>
           </div>
-          <Controller
-            name="notes"
-            control={control}
-            render={({ field }) => (
-              <Textarea {...field} id="notes" rows={3} className="" />
+
+          {/* Notes */}
+          <div className="">
+            <div className="relative mb-2 flex items-center justify-between">
+              <Label htmlFor="notes" className="">
+                Notes
+              </Label>
+
+              {/* Show/hide Notes field in PDF switch */}
+              <div className="inline-flex items-center gap-2">
+                <Controller
+                  name={`notesFieldIsVisible`}
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Switch
+                      {...field}
+                      id={`notesFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    />
+                  )}
+                />
+                <CustomTooltip
+                  trigger={
+                    <Label htmlFor={`notesFieldIsVisible`}>Show in PDF</Label>
+                  }
+                  content='Show/Hide the "Notes" Field in the PDF'
+                />
+              </div>
+            </div>
+            <Controller
+              name="notes"
+              control={control}
+              render={({ field }) => (
+                <Textarea {...field} id="notes" rows={3} className="" />
+              )}
+            />
+            {errors?.notes && (
+              <ErrorMessage>{errors?.notes?.message}</ErrorMessage>
             )}
-          />
-          {errors?.notes && (
-            <ErrorMessage>{errors?.notes?.message}</ErrorMessage>
-          )}
-        </div>
+          </div>
 
-        <div>
-          <div className="relative mt-5 space-y-4">
-            {/* Show/hide Person Authorized to Receive field in PDF switch */}
-            <div className="flex items-center justify-between">
-              <Label htmlFor={`personAuthorizedToReceiveFieldIsVisible`}>
-                Show &quot;Person Authorized to Receive&quot; Signature Field in
-                the PDF
-              </Label>
+          <div>
+            <div className="relative mt-5 space-y-4">
+              {/* Show/hide Person Authorized to Receive field in PDF switch */}
+              <div className="flex items-center justify-between">
+                <Label htmlFor={`personAuthorizedToReceiveFieldIsVisible`}>
+                  Show &quot;Person Authorized to Receive&quot; Signature Field
+                  in the PDF
+                </Label>
 
-              <Controller
-                name={`personAuthorizedToReceiveFieldIsVisible`}
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`personAuthorizedToReceiveFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                  />
-                )}
-              />
-            </div>
+                <Controller
+                  name={`personAuthorizedToReceiveFieldIsVisible`}
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Switch
+                      {...field}
+                      id={`personAuthorizedToReceiveFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    />
+                  )}
+                />
+              </div>
 
-            {/* Show/hide Person Authorized to Issue field in PDF switch */}
-            <div className="flex items-center justify-between">
-              <Label htmlFor={`personAuthorizedToIssueFieldIsVisible`}>
-                Show &quot;Person Authorized to Issue&quot; Signature Field in
-                the PDF
-              </Label>
+              {/* Show/hide Person Authorized to Issue field in PDF switch */}
+              <div className="flex items-center justify-between">
+                <Label htmlFor={`personAuthorizedToIssueFieldIsVisible`}>
+                  Show &quot;Person Authorized to Issue&quot; Signature Field in
+                  the PDF
+                </Label>
 
-              <Controller
-                name={`personAuthorizedToIssueFieldIsVisible`}
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`personAuthorizedToIssueFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                  />
-                )}
-              />
+                <Controller
+                  name={`personAuthorizedToIssueFieldIsVisible`}
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Switch
+                      {...field}
+                      id={`personAuthorizedToIssueFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    />
+                  )}
+                />
+              </div>
             </div>
           </div>
         </div>
