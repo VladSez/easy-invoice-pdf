@@ -36,7 +36,7 @@ export function InvoicePDFDownloadLink({
     if (pdfLoading) {
       setIsLoading(true);
     } else {
-      // wait for 0.5 second before hiding the loader
+      // wait before hiding the loader to avoid flickering
       const timer = setTimeout(() => {
         setIsLoading(false);
       }, LOADING_BUTTON_TIMEOUT);
@@ -86,6 +86,9 @@ export function InvoicePDFDownloadLink({
           if (!isLoading && url) {
             openPanel.track("download_invoice");
             umamiTrackEvent("download_invoice");
+
+            // dismiss any existing toast for better UX
+            toast.dismiss();
 
             // Show donation toast after 3 seconds
             setTimeout(() => {
