@@ -30,6 +30,7 @@ import { Label } from "./ui/label";
 import { useOpenPanel } from "@openpanel/nextjs";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { useLogger } from "next-axiom";
 
 export const SELLERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_SELLERS";
 
@@ -51,6 +52,7 @@ export function SellerManagement({
 
   const openPanel = useOpenPanel();
   const sellerSelectId = useId();
+  const log = useLogger();
 
   const isEditMode = Boolean(editingSeller);
 
@@ -79,6 +81,12 @@ export function SellerManagement({
       setSelectedSellerIndex(selectedSeller?.id ?? "");
     } catch (error) {
       console.error("Failed to load sellers:", error);
+
+      log.error("error_loading_sellers", {
+        data: {
+          error: error,
+        },
+      });
     }
   }, [invoiceData.seller?.id]);
 
@@ -117,6 +125,8 @@ export function SellerManagement({
         richColors: true,
       });
 
+      log.info("add_seller_success");
+
       // analytics track event
       openPanel.track("add_seller_success");
       umamiTrackEvent("add_seller_success");
@@ -125,6 +135,12 @@ export function SellerManagement({
 
       toast.error("Failed to add seller", {
         closeButton: true,
+      });
+
+      log.error("add_seller_failed", {
+        data: {
+          error: error,
+        },
       });
     }
   };
@@ -151,6 +167,8 @@ export function SellerManagement({
         richColors: true,
       });
 
+      log.info("edit_seller_success");
+
       // analytics track event
       openPanel.track("edit_seller_success");
       umamiTrackEvent("edit_seller_success");
@@ -159,6 +177,12 @@ export function SellerManagement({
 
       toast.error("Failed to edit seller", {
         closeButton: true,
+      });
+
+      log.error("edit_seller_failed", {
+        data: {
+          error: error,
+        },
       });
     }
   };
@@ -180,6 +204,8 @@ export function SellerManagement({
       setSelectedSellerIndex("");
       setValue("seller", DEFAULT_SELLER_DATA);
     }
+
+    log.info("change_seller");
 
     // analytics track event
     openPanel.track("change_seller");
@@ -211,6 +237,8 @@ export function SellerManagement({
         richColors: true,
       });
 
+      log.info("delete_seller_success");
+
       // analytics track event
       openPanel.track("delete_seller_success");
       umamiTrackEvent("delete_seller_success");
@@ -219,6 +247,12 @@ export function SellerManagement({
 
       toast.error("Failed to delete seller", {
         closeButton: true,
+      });
+
+      log.error("delete_seller_failed", {
+        data: {
+          error: error,
+        },
       });
     }
   };

@@ -35,6 +35,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useOpenPanel } from "@openpanel/nextjs";
 import dayjs from "dayjs";
 import { AlertTriangle, Plus, Trash2 } from "lucide-react";
+import { useLogger } from "next-axiom";
 import React, { useCallback, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
@@ -133,6 +134,7 @@ export function InvoiceForm({
   onInvoiceDataChange,
 }: InvoiceFormProps) {
   const openPanel = useOpenPanel();
+  const log = useLogger();
 
   const {
     control,
@@ -248,6 +250,12 @@ export function InvoiceForm({
           localStorage.setItem(PDF_DATA_LOCAL_STORAGE_KEY, stringifiedData);
         } catch (error) {
           console.error("Error saving to local storage:", error);
+
+          log.error("error_saving_to_local_storage", {
+            data: {
+              error: error,
+            },
+          });
         }
       }
     },
@@ -269,6 +277,7 @@ export function InvoiceForm({
     (index: number) => {
       remove(index);
 
+      log.info("remove_invoice_item");
       // analytics track event
       openPanel.track("remove_invoice_item");
       umamiTrackEvent("remove_invoice_item");
@@ -313,6 +322,12 @@ export function InvoiceForm({
       }
     } catch (error) {
       console.error("Error loading accordion state:", error);
+
+      log.error("error_loading_accordion_state", {
+        data: {
+          error: error,
+        },
+      });
     }
 
     // Default to all sections open if no valid state found
@@ -340,6 +355,12 @@ export function InvoiceForm({
       );
     } catch (error) {
       console.error("Error saving accordion state:", error);
+
+      log.error("error_saving_accordion_state", {
+        data: {
+          error: error,
+        },
+      });
     }
   };
 
@@ -1775,9 +1796,6 @@ export function InvoiceForm({
               <button
                 type="button"
                 onClick={() => {
-                  // analytics track event
-                  openPanel.track("add_invoice_item");
-
                   append({
                     invoiceItemNumberIsVisible: true,
                     name: "",
@@ -1799,6 +1817,12 @@ export function InvoiceForm({
                     typeOfGTU: "",
                     typeOfGTUFieldIsVisible: true,
                   });
+
+                  log.info("add_invoice_item");
+
+                  // analytics track event
+                  openPanel.track("add_invoice_item");
+                  umamiTrackEvent("add_invoice_item");
                 }}
                 className="mb-1 flex items-center text-sm font-medium text-gray-700 hover:text-black"
               >

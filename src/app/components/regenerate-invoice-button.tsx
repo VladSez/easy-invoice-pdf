@@ -11,10 +11,11 @@ import { InvoicePdfTemplate } from "./invoice-pdf-template";
 import { usePDF } from "@react-pdf/renderer";
 import type { InvoiceData } from "../schema";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { useOpenPanel } from "@openpanel/nextjs";
+import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
+import { useLogger } from "next-axiom";
 
 export function RegenerateInvoiceButton({
   invoiceData,
@@ -26,6 +27,7 @@ export function RegenerateInvoiceButton({
   });
   const [isLoading, setIsLoading] = useState(false);
   const openPanel = useOpenPanel();
+  const log = useLogger();
 
   useEffect(() => {
     if (pdfLoading) {
@@ -41,7 +43,24 @@ export function RegenerateInvoiceButton({
 
   useEffect(() => {
     if (error) {
-      toast.error("Error generating document link");
+      ErrorGeneratingPdfToast();
+
+      log.error("error_generating_pdf_regenerate_button", {
+        data: {
+          error: error,
+        },
+      });
+
+      openPanel.track("error_generating_pdf_regenerate_button", {
+        data: {
+          error: error,
+        },
+      });
+      umamiTrackEvent("error_generating_pdf_regenerate_button", {
+        data: {
+          error: error,
+        },
+      });
     }
   }, [error]);
 
@@ -55,6 +74,8 @@ export function RegenerateInvoiceButton({
           className="mt-2 w-full"
           disabled={isLoading}
           onClick={() => {
+            log.info("regenerate_invoice");
+
             // analytics events
             openPanel.track("regenerate_invoice");
             umamiTrackEvent("regenerate_invoice");

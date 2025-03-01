@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { OpenPanelComponent } from "@openpanel/nextjs";
 import Script from "next/script";
+import { AxiomWebVitals } from "next-axiom";
 
 import "./globals.css";
 import { Toaster } from "sonner";
@@ -59,6 +60,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={`antialiased`}>
         <NuqsAdapter>{children}</NuqsAdapter>
+
+        {/* https://sonner.emilkowal.ski/ */}
+        <Toaster visibleToasts={1} richColors />
+
+        <AxiomWebVitals />
+
         {/* https://openpanel.dev/docs */}
         {process.env.NODE_ENV === "production" && (
           <OpenPanelComponent
@@ -66,8 +73,7 @@ export default function RootLayout({
             trackScreenViews={true}
           />
         )}
-        {/* https://sonner.emilkowal.ski/ */}
-        <Toaster visibleToasts={1} richColors />
+
         {process.env.NODE_ENV === "production" && (
           <Script
             // we proxy umami check next.config.mjs rewrites

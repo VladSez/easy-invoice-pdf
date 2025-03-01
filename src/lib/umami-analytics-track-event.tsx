@@ -46,5 +46,13 @@ export const umamiTrackEvent = (
     window.umami?.track(eventName, options);
   } catch (error) {
     console.error("Failed to track event:", error);
+
+    if (error instanceof Error) {
+      umamiTrackEvent("error_tracking_umami_event", {
+        data: {
+          error: error.message,
+        },
+      });
+    }
   }
 };
