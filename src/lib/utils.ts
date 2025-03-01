@@ -4,6 +4,7 @@ import n2words from "n2words";
 import { toast } from "sonner";
 import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "@/app/schema";
 import { z } from "zod";
+import { umamiTrackEvent } from "./umami-analytics-track-event";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -46,6 +47,14 @@ export function getAmountInWords({
   } catch (error) {
     console.error("Failed to convert number to words:", error);
     toast.error("Failed to convert number to words");
+
+    if (error instanceof Error) {
+      umamiTrackEvent("error_converting_number_to_words", {
+        data: {
+          error: error?.message ?? "Unknown error",
+        },
+      });
+    }
 
     amountInWords = Math.floor(amount ?? 0).toString();
   }

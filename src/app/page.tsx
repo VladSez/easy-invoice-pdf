@@ -25,6 +25,7 @@ import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { FileTextIcon, PencilIcon } from "lucide-react";
+import { useLogger } from "next-axiom";
 
 const InvoicePDFViewer = dynamic(
   () =>
@@ -55,6 +56,7 @@ export default function Home() {
   const searchParams = useSearchParams();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const openPanel = useOpenPanel();
+  const log = useLogger();
 
   const [invoiceDataState, setInvoiceDataState] = useState<InvoiceData | null>(
     null
@@ -78,6 +80,12 @@ export default function Home() {
         // fallback to local storage
         console.error("Failed to parse URL data:", error);
         loadFromLocalStorage();
+
+        log.error("failed_to_parse_url_data", {
+          data: {
+            error: error,
+          },
+        });
       }
     } else {
       // if no data in url, load from local storage
@@ -102,6 +110,12 @@ export default function Home() {
       console.error("Failed to load saved invoice data:", error);
 
       setInvoiceDataState(INITIAL_INVOICE_DATA);
+
+      log.error("failed_to_load_saved_invoice_data", {
+        data: {
+          error: error,
+        },
+      });
     }
   };
 
@@ -155,11 +169,23 @@ export default function Home() {
             }
           } catch (error) {
             console.error("Failed to compare with URL data:", error);
+
+            log.error("failed_to_compare_with_url_data", {
+              data: {
+                error: error,
+              },
+            });
           }
         }
       } catch (error) {
         console.error("Failed to save invoice data:", error);
         toast.error("Failed to save invoice data");
+
+        log.error("failed_to_save_invoice_data", {
+          data: {
+            error: error,
+          },
+        });
       }
     }
   }, [invoiceDataState, router, searchParams]);
@@ -186,12 +212,20 @@ export default function Home() {
             "Share this link to let others view and edit this invoice",
         });
 
+        log.info("share_invoice_link");
+
         // analytics track event
         openPanel.track("share_invoice_link");
         umamiTrackEvent("share_invoice_link");
       } catch (error) {
         console.error("Failed to share invoice:", error);
         toast.error("Failed to generate shareable link");
+
+        log.error("share_invoice_link_failed", {
+          data: {
+            error: error,
+          },
+        });
       }
     }
   };
@@ -286,7 +320,7 @@ export default function Home() {
                   </div>
                 </TabsContent>
                 {/* Action buttons visible in both tabs */}
-                <div className="sticky bottom-0 mt-4 flex flex-col gap-3 bg-white pb-2">
+                <div className="sticky bottom-0 mt-4 flex flex-col gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 pt-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
                   <RegenerateInvoiceButton invoiceData={invoiceDataState} />
                   <InvoicePDFDownloadLink invoiceData={invoiceDataState} />
                 </div>
@@ -301,7 +335,7 @@ export default function Home() {
                   onInvoiceDataChange={handleInvoiceDataChange}
                 />
               </div>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 border-t border-gray-200 bg-white">
                 <RegenerateInvoiceButton invoiceData={invoiceDataState} />
               </div>
             </div>
