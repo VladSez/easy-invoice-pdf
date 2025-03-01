@@ -8,7 +8,8 @@ import { PDF_DATA_LOCAL_STORAGE_KEY } from "./components/invoice-form";
 import { INITIAL_INVOICE_DATA } from "./constants";
 import { useOpenPanel } from "@openpanel/nextjs";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { useLogger } from "next-axiom";
+import { LogLevel, useLogger } from "next-axiom";
+import { usePathname } from "next/navigation";
 
 export default function Error({
   error,
@@ -18,7 +19,27 @@ export default function Error({
   reset: () => void;
 }) {
   const openPanel = useOpenPanel();
-  const log = useLogger();
+
+  const pathname = usePathname();
+  const log = useLogger({ source: "error.tsx" });
+  let status = error.message == "Invalid URL" ? 404 : 500;
+
+  // https://github.com/axiomhq/next-axiom
+  log.logHttpRequest(
+    LogLevel.error,
+    error.message,
+    {
+      host: window.location.href,
+      path: pathname,
+      statusCode: status,
+    },
+    {
+      error: error.name,
+      cause: error.cause,
+      stack: error.stack,
+      digest: error.digest,
+    }
+  );
 
   useEffect(() => {
     // Log the error to an error reporting service
