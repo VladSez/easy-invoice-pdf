@@ -152,10 +152,10 @@ export default function Home() {
                   </span>{" "}
                   Your changes have modified this invoice from its shared
                   version. Click{" "}
-                  <span className="font-semibold underline">
+                  <span className="font-semibold">
                     &apos;Generate a link to invoice&apos;
                   </span>{" "}
-                  to create an updated shareable link.
+                  button to create an updated shareable link.
                 </p>,
                 {
                   duration: 10000,

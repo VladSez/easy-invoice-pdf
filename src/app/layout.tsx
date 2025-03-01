@@ -67,14 +67,14 @@ export default function RootLayout({
         <AxiomWebVitals />
 
         {/* https://openpanel.dev/docs */}
-        {process.env.NODE_ENV === "production" && (
+        {process.env.VERCEL_ENV === "production" && (
           <OpenPanelComponent
             clientId="34cab0b1-c372-4d2d-9646-9a4cea67faf9"
             trackScreenViews={true}
           />
         )}
 
-        {process.env.NODE_ENV === "production" && (
+        {process.env.VERCEL_ENV === "production" && (
           <Script
             // we proxy umami check next.config.mjs rewrites
             src="/stats/script.js"
