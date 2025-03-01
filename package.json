@@ -27,6 +27,7 @@
     "@radix-ui/react-tooltip": "1.1.8",
     "@react-pdf/layout": "4.2.2",
     "@react-pdf/renderer": "4.2.1",
+    "@sentry/nextjs": "9.3.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "cmdk": "1.0.0",
