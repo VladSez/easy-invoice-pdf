@@ -989,7 +989,7 @@ export function InvoiceForm({
                       <Plus className="ml-1 h-3 w-3" />
                     </Button>
                   }
-                  content={"Work in progress"}
+                  content={"Coming soon"}
                 />
               </div>
               <div className="space-y-4">
