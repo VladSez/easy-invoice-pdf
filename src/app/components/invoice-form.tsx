@@ -976,21 +976,34 @@ export function InvoiceForm({
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4">
               <div className="relative flex items-end justify-end gap-2">
-                {/* New Buyer TEMPORARY Placeholder Button */}
-                <CustomTooltip
-                  trigger={
-                    <Button
-                      _variant="outline"
-                      _size="sm"
-                      aria-disabled={true}
-                      className={"cursor-not-allowed opacity-40"}
-                    >
-                      New Buyer
-                      <Plus className="ml-1 h-3 w-3" />
-                    </Button>
-                  }
-                  content={"Coming soon"}
-                />
+                {/* New Buyer TEMPORARY Placeholder Button (will be replaced with a real button when the feature is implemented)*/}
+                <div className="flex flex-col items-start gap-0.5">
+                  <CustomTooltip
+                    trigger={
+                      <Button
+                        _variant="outline"
+                        _size="sm"
+                        aria-disabled={true}
+                        className="cursor-not-allowed bg-gray-50 opacity-40 transition-all hover:bg-gray-100 dark:bg-gray-900"
+                      >
+                        New Buyer
+                        <Plus className="ml-1.5 h-3 w-3 text-gray-500" />
+                      </Button>
+                    }
+                    content={
+                      <span className="flex items-center gap-1">
+                        <span>Coming soon</span>
+                        <span className="text-sm">✨</span>
+                      </span>
+                    }
+                  />
+                  <div className="flex items-center gap-1 xl:hidden">
+                    <span className="pl-1 text-xs font-medium tracking-wide text-gray-700">
+                      Coming soon
+                    </span>
+                    <span className="text-sm">✨</span>
+                  </div>
+                </div>
               </div>
               <div className="space-y-4">
                 <div>
