@@ -16,6 +16,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import { ButtonHelper } from "@/components/ui/button-helper";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
@@ -974,6 +975,23 @@ export function InvoiceForm({
               <Legend>Buyer Information</Legend>
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4">
+              <div className="relative flex items-end justify-end gap-2">
+                {/* New Buyer TEMPORARY Placeholder Button */}
+                <CustomTooltip
+                  trigger={
+                    <Button
+                      _variant="outline"
+                      _size="sm"
+                      aria-disabled={true}
+                      className={"cursor-not-allowed opacity-40"}
+                    >
+                      New Buyer
+                      <Plus className="ml-1 h-3 w-3" />
+                    </Button>
+                  }
+                  content={"Coming soon"}
+                />
+              </div>
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="buyerName" className="mb-1">

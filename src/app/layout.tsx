@@ -15,9 +15,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Free PDF Invoice Generator with Live Preview",
+  title: "Free Invoice Generator with Live Preview | No Sign-Up",
   description:
-    "Generate professional PDF invoices instantly with Live Preview. Free and open-source. No signup required.",
+    "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
   keywords:
     "invoice generator, pdf invoice generator, free invoice maker, business invoice template, professional invoice, digital invoice, online invoice generator, invoice software, small business invoice, freelancer invoice, tax invoice, electronic invoice, invoice creation tool, billing software, accounting tools,",
   authors: [{ name: "Uladzislau Sazonau" }],
@@ -28,17 +28,17 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Free PDF Invoice Generator with Live Preview",
+    title: "Free Invoice Generator with Live Preview | No Sign-Up",
     description:
-      "Generate professional PDF invoices instantly with Live Preview. Free and open-source. No signup required.",
+      "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free PDF Invoice Generator with Live Preview",
+    title: "Free Invoice Generator with Live Preview | No Sign-Up",
     description:
-      "Generate professional PDF invoices instantly with Live Preview. Free and open-source. No signup required.",
+      "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
     creator: "@vlad_sazon",
   },
   robots: {
