@@ -15,8 +15,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title:
-    "Free & Open-Source Invoice Generator | Live Preview, No Sign-Up, Runs in Your Browser",
+  title: "Free Invoice Generator with Live Preview | No Sign-Up",
   description:
     "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
   keywords:
@@ -29,8 +28,7 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title:
-      "Free & Open-Source Invoice Generator | Live Preview, No Sign-Up, Runs in Your Browser",
+    title: "Free Invoice Generator with Live Preview | No Sign-Up",
     description:
       "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
     locale: "en_US",
@@ -38,8 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title:
-      "Free & Open-Source Invoice Generator | Live Preview, No Sign-Up, Runs in Your Browser",
+    title: "Free Invoice Generator with Live Preview | No Sign-Up",
     description:
       "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
     creator: "@vlad_sazon",
