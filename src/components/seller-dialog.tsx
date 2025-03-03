@@ -30,9 +30,10 @@ import { toast } from "sonner";
 import { SELLERS_LOCAL_STORAGE_KEY } from "./seller-management";
 import { z } from "zod";
 import { useState } from "react";
-import { useLogger } from "next-axiom";
 import * as Sentry from "@sentry/nextjs";
+
 const SELLER_FORM_ID = "seller-form";
+
 interface SellerDialogProps {
   isOpen: boolean;
   onClose: React.Dispatch<React.SetStateAction<boolean>>;
@@ -55,8 +56,6 @@ export function SellerDialog({
   initialData,
   isEditMode,
 }: SellerDialogProps) {
-  const log = useLogger();
-
   const form = useForm<SellerData>({
     resolver: zodResolver(sellerSchema),
     defaultValues: {
@@ -152,12 +151,6 @@ export function SellerDialog({
       toast.error("Failed to save seller", {
         description: "Please try again",
         richColors: true,
-      });
-
-      log.error("error_saving_seller", {
-        data: {
-          error: error,
-        },
       });
 
       Sentry.captureException(error);

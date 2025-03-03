@@ -15,7 +15,6 @@ import { Loader2 } from "lucide-react";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { useOpenPanel } from "@openpanel/nextjs";
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
-import { useLogger } from "next-axiom";
 import * as Sentry from "@sentry/nextjs";
 
 export function RegenerateInvoiceButton({
@@ -28,7 +27,6 @@ export function RegenerateInvoiceButton({
   });
   const [isLoading, setIsLoading] = useState(false);
   const openPanel = useOpenPanel();
-  const log = useLogger();
 
   useEffect(() => {
     if (pdfLoading) {
@@ -46,12 +44,6 @@ export function RegenerateInvoiceButton({
     if (error) {
       ErrorGeneratingPdfToast();
 
-      log.error("error_generating_pdf_regenerate_button", {
-        data: {
-          error: error,
-        },
-      });
-
       openPanel.track("error_generating_pdf_regenerate_button", {
         data: {
           error: error,
@@ -65,7 +57,7 @@ export function RegenerateInvoiceButton({
 
       Sentry.captureException(error);
     }
-  }, [error, log, openPanel]);
+  }, [error, openPanel]);
 
   return (
     <CustomTooltip

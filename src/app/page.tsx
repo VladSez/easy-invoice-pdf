@@ -25,7 +25,6 @@ import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { FileTextIcon, PencilIcon } from "lucide-react";
-import { useLogger } from "next-axiom";
 import * as Sentry from "@sentry/nextjs";
 
 const InvoicePDFViewer = dynamic(
@@ -57,7 +56,6 @@ export default function Home() {
   const searchParams = useSearchParams();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const openPanel = useOpenPanel();
-  const log = useLogger();
 
   const [invoiceDataState, setInvoiceDataState] = useState<InvoiceData | null>(
     null
@@ -81,12 +79,6 @@ export default function Home() {
         // fallback to local storage
         console.error("Failed to parse URL data:", error);
         loadFromLocalStorage();
-
-        log.error("failed_to_parse_url_data", {
-          data: {
-            error: error,
-          },
-        });
 
         Sentry.captureException(error);
       }
@@ -113,12 +105,6 @@ export default function Home() {
       console.error("Failed to load saved invoice data:", error);
 
       setInvoiceDataState(INITIAL_INVOICE_DATA);
-
-      log.error("failed_to_load_saved_invoice_data", {
-        data: {
-          error: error,
-        },
-      });
 
       Sentry.captureException(error);
     }
@@ -175,12 +161,6 @@ export default function Home() {
           } catch (error) {
             console.error("Failed to compare with URL data:", error);
 
-            log.error("failed_to_compare_with_url_data", {
-              data: {
-                error: error,
-              },
-            });
-
             Sentry.captureException(error);
           }
         }
@@ -188,16 +168,10 @@ export default function Home() {
         console.error("Failed to save invoice data:", error);
         toast.error("Failed to save invoice data");
 
-        log.error("failed_to_save_invoice_data", {
-          data: {
-            error: error,
-          },
-        });
-
         Sentry.captureException(error);
       }
     }
-  }, [invoiceDataState, log, router, searchParams]);
+  }, [invoiceDataState, router, searchParams]);
 
   const handleInvoiceDataChange = (updatedData: InvoiceData) => {
     setInvoiceDataState(updatedData);

@@ -30,7 +30,6 @@ import { Label } from "./ui/label";
 import { useOpenPanel } from "@openpanel/nextjs";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { useLogger } from "next-axiom";
 import * as Sentry from "@sentry/nextjs";
 
 export const SELLERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_SELLERS";
@@ -53,7 +52,6 @@ export function SellerManagement({
 
   const openPanel = useOpenPanel();
   const sellerSelectId = useId();
-  const log = useLogger();
 
   const isEditMode = Boolean(editingSeller);
 
@@ -83,15 +81,9 @@ export function SellerManagement({
     } catch (error) {
       console.error("Failed to load sellers:", error);
 
-      log.error("error_loading_sellers", {
-        data: {
-          error: error,
-        },
-      });
-
       Sentry.captureException(error);
     }
-  }, [invoiceData?.seller?.id, log]);
+  }, [invoiceData?.seller?.id]);
 
   // Update sellers when a new one is added
   const handleSellerAdd = (

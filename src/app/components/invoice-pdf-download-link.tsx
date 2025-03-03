@@ -11,8 +11,8 @@ import { toast } from "sonner";
 import { useOpenPanel } from "@openpanel/nextjs";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
-import { useLogger } from "next-axiom";
 import * as Sentry from "@sentry/nextjs";
+
 export function InvoicePDFDownloadLink({
   invoiceData,
 }: {
@@ -23,7 +23,6 @@ export function InvoicePDFDownloadLink({
   }-${invoiceData.invoiceNumber.replace("/", "-")}.pdf`;
 
   const openPanel = useOpenPanel();
-  const log = useLogger();
 
   const [{ loading: pdfLoading, url, error }, updatePdfInstance] = usePDF();
 
@@ -51,12 +50,6 @@ export function InvoicePDFDownloadLink({
     if (error) {
       ErrorGeneratingPdfToast();
 
-      log.error("error_generating_document_link", {
-        data: {
-          error: error,
-        },
-      });
-
       openPanel.track("error_generating_document_link", {
         data: {
           error: error,
@@ -70,7 +63,7 @@ export function InvoicePDFDownloadLink({
 
       Sentry.captureException(error);
     }
-  }, [error, log, openPanel]);
+  }, [error, openPanel]);
 
   return (
     <>
