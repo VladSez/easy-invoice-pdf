@@ -31,6 +31,7 @@ import { useOpenPanel } from "@openpanel/nextjs";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { useLogger } from "next-axiom";
+import * as Sentry from "@sentry/nextjs";
 
 export const SELLERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_SELLERS";
 
@@ -87,8 +88,10 @@ export function SellerManagement({
           error: error,
         },
       });
+
+      Sentry.captureException(error);
     }
-  }, [invoiceData.seller?.id]);
+  }, [invoiceData?.seller?.id, log]);
 
   // Update sellers when a new one is added
   const handleSellerAdd = (
@@ -125,8 +128,6 @@ export function SellerManagement({
         richColors: true,
       });
 
-      log.info("add_seller_success");
-
       // analytics track event
       openPanel.track("add_seller_success");
       umamiTrackEvent("add_seller_success");
@@ -142,6 +143,8 @@ export function SellerManagement({
           error: error,
         },
       });
+
+      Sentry.captureException(error);
     }
   };
 
@@ -167,8 +170,6 @@ export function SellerManagement({
         richColors: true,
       });
 
-      log.info("edit_seller_success");
-
       // analytics track event
       openPanel.track("edit_seller_success");
       umamiTrackEvent("edit_seller_success");
@@ -184,6 +185,8 @@ export function SellerManagement({
           error: error,
         },
       });
+
+      Sentry.captureException(error);
     }
   };
 
@@ -204,8 +207,6 @@ export function SellerManagement({
       setSelectedSellerIndex("");
       setValue("seller", DEFAULT_SELLER_DATA);
     }
-
-    log.info("change_seller");
 
     // analytics track event
     openPanel.track("change_seller");
@@ -237,8 +238,6 @@ export function SellerManagement({
         richColors: true,
       });
 
-      log.info("delete_seller_success");
-
       // analytics track event
       openPanel.track("delete_seller_success");
       umamiTrackEvent("delete_seller_success");
@@ -254,6 +253,8 @@ export function SellerManagement({
           error: error,
         },
       });
+
+      Sentry.captureException(error);
     }
   };
 

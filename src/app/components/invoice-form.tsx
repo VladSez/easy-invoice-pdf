@@ -42,7 +42,7 @@ import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
-
+import * as Sentry from "@sentry/nextjs";
 export const PDF_DATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_DATA";
 export const PDF_DATA_FORM_ID = "pdfInvoiceForm";
 export const DEBOUNCE_TIMEOUT = 500;
@@ -257,6 +257,8 @@ export function InvoiceForm({
               error: error,
             },
           });
+
+          Sentry.captureException(error);
         }
       }
     },
@@ -278,7 +280,6 @@ export function InvoiceForm({
     (index: number) => {
       remove(index);
 
-      log.info("remove_invoice_item");
       // analytics track event
       openPanel.track("remove_invoice_item");
       umamiTrackEvent("remove_invoice_item");
@@ -329,6 +330,8 @@ export function InvoiceForm({
           error: error,
         },
       });
+
+      Sentry.captureException(error);
     }
 
     // Default to all sections open if no valid state found
@@ -362,6 +365,8 @@ export function InvoiceForm({
           error: error,
         },
       });
+
+      Sentry.captureException(error);
     }
   };
 
@@ -1848,8 +1853,6 @@ export function InvoiceForm({
                     typeOfGTU: "",
                     typeOfGTUFieldIsVisible: true,
                   });
-
-                  log.info("add_invoice_item");
 
                   // analytics track event
                   openPanel.track("add_invoice_item");

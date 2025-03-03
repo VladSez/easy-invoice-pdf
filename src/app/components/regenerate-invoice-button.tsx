@@ -16,6 +16,7 @@ import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { useOpenPanel } from "@openpanel/nextjs";
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
 import { useLogger } from "next-axiom";
+import * as Sentry from "@sentry/nextjs";
 
 export function RegenerateInvoiceButton({
   invoiceData,
@@ -61,8 +62,10 @@ export function RegenerateInvoiceButton({
           error: error,
         },
       });
+
+      Sentry.captureException(error);
     }
-  }, [error]);
+  }, [error, log, openPanel]);
 
   return (
     <CustomTooltip
@@ -74,8 +77,6 @@ export function RegenerateInvoiceButton({
           className="mt-2 w-full"
           disabled={isLoading}
           onClick={() => {
-            log.info("regenerate_invoice");
-
             // analytics events
             openPanel.track("regenerate_invoice");
             umamiTrackEvent("regenerate_invoice");

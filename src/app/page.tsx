@@ -26,6 +26,7 @@ import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { FileTextIcon, PencilIcon } from "lucide-react";
 import { useLogger } from "next-axiom";
+import * as Sentry from "@sentry/nextjs";
 
 const InvoicePDFViewer = dynamic(
   () =>
@@ -86,6 +87,8 @@ export default function Home() {
             error: error,
           },
         });
+
+        Sentry.captureException(error);
       }
     } else {
       // if no data in url, load from local storage
@@ -116,6 +119,8 @@ export default function Home() {
           error: error,
         },
       });
+
+      Sentry.captureException(error);
     }
   };
 
@@ -175,6 +180,8 @@ export default function Home() {
                 error: error,
               },
             });
+
+            Sentry.captureException(error);
           }
         }
       } catch (error) {
@@ -186,9 +193,11 @@ export default function Home() {
             error: error,
           },
         });
+
+        Sentry.captureException(error);
       }
     }
-  }, [invoiceDataState, router, searchParams]);
+  }, [invoiceDataState, log, router, searchParams]);
 
   const handleInvoiceDataChange = (updatedData: InvoiceData) => {
     setInvoiceDataState(updatedData);
@@ -212,8 +221,6 @@ export default function Home() {
             "Share this link to let others view and edit this invoice",
         });
 
-        log.info("share_invoice_link");
-
         // analytics track event
         openPanel.track("share_invoice_link");
         umamiTrackEvent("share_invoice_link");
@@ -226,6 +233,8 @@ export default function Home() {
             error: error,
           },
         });
+
+        Sentry.captureException(error);
       }
     }
   };

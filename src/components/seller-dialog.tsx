@@ -31,7 +31,7 @@ import { SELLERS_LOCAL_STORAGE_KEY } from "./seller-management";
 import { z } from "zod";
 import { useState } from "react";
 import { useLogger } from "next-axiom";
-
+import * as Sentry from "@sentry/nextjs";
 const SELLER_FORM_ID = "seller-form";
 interface SellerDialogProps {
   isOpen: boolean;
@@ -159,6 +159,8 @@ export function SellerDialog({
           error: error,
         },
       });
+
+      Sentry.captureException(error);
     }
   }
 
