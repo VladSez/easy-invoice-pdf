@@ -8,8 +8,7 @@ import { PDF_DATA_LOCAL_STORAGE_KEY } from "./components/invoice-form";
 import { INITIAL_INVOICE_DATA } from "./constants";
 import { useOpenPanel } from "@openpanel/nextjs";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { LogLevel, useLogger } from "next-axiom";
-import { usePathname } from "next/navigation";
+import * as Sentry from "@sentry/nextjs";
 
 export default function Error({
   error,
@@ -20,30 +19,11 @@ export default function Error({
 }) {
   const openPanel = useOpenPanel();
 
-  const pathname = usePathname();
-  const log = useLogger({ source: "error.tsx" });
-  let status = error.message == "Invalid URL" ? 404 : 500;
-
-  // https://github.com/axiomhq/next-axiom
-  log.logHttpRequest(
-    LogLevel.error,
-    error.message,
-    {
-      host: window.location.href,
-      path: pathname,
-      statusCode: status,
-    },
-    {
-      error: error.name,
-      cause: error.cause,
-      stack: error.stack,
-      digest: error.digest,
-    }
-  );
-
   useEffect(() => {
     // Log the error to an error reporting service
     console.error(error);
+
+    Sentry.captureException(error);
 
     toast.error(
       "Something went wrong! Please try to refresh the page or contact support.",
@@ -77,12 +57,6 @@ export default function Error({
             () => {
               reset();
 
-              log.error("error_button_try_again_clicked", {
-                data: {
-                  error: error,
-                },
-              });
-
               openPanel.track("error_button_try_again_clicked");
               umamiTrackEvent("error_button_try_again_clicked");
             }
@@ -108,12 +82,6 @@ export default function Error({
                 richColors: true,
               });
 
-              log.info("error_button_start_from_scratch_clicked", {
-                data: {
-                  error: error,
-                },
-              });
-
               openPanel.track("error_button_start_from_scratch_clicked");
               umamiTrackEvent("error_button_start_from_scratch_clicked");
             } catch (error) {
@@ -124,11 +92,7 @@ export default function Error({
                 richColors: true,
               });
 
-              log.error("error_button_start_from_scratch_failed", {
-                data: {
-                  error: error,
-                },
-              });
+              Sentry.captureException(error);
             }
           }}
         >

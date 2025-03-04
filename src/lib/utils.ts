@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "@/app/schema";
 import { z } from "zod";
 import { umamiTrackEvent } from "./umami-analytics-track-event";
-
+import * as Sentry from "@sentry/nextjs";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -54,6 +54,8 @@ export function getAmountInWords({
           error: error?.message ?? "Unknown error",
         },
       });
+
+      Sentry.captureException(error);
     }
 
     amountInWords = Math.floor(amount ?? 0).toString();

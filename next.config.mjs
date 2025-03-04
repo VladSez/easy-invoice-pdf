@@ -1,5 +1,4 @@
 import { withSentryConfig } from "@sentry/nextjs";
-import { withAxiom } from "next-axiom";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -20,7 +19,7 @@ const nextConfig = {
   },
 };
 
-export default withSentryConfig(withAxiom(nextConfig), {
+export default withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 

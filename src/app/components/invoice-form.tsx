@@ -36,12 +36,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useOpenPanel } from "@openpanel/nextjs";
 import dayjs from "dayjs";
 import { AlertTriangle, Plus, Trash2 } from "lucide-react";
-import { useLogger } from "next-axiom";
 import React, { useCallback, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 export const PDF_DATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_DATA";
 export const PDF_DATA_FORM_ID = "pdfInvoiceForm";
@@ -135,7 +135,6 @@ export function InvoiceForm({
   onInvoiceDataChange,
 }: InvoiceFormProps) {
   const openPanel = useOpenPanel();
-  const log = useLogger();
 
   const {
     control,
@@ -252,11 +251,7 @@ export function InvoiceForm({
         } catch (error) {
           console.error("Error saving to local storage:", error);
 
-          log.error("error_saving_to_local_storage", {
-            data: {
-              error: error,
-            },
-          });
+          Sentry.captureException(error);
         }
       }
     },
@@ -278,7 +273,6 @@ export function InvoiceForm({
     (index: number) => {
       remove(index);
 
-      log.info("remove_invoice_item");
       // analytics track event
       openPanel.track("remove_invoice_item");
       umamiTrackEvent("remove_invoice_item");
@@ -324,11 +318,7 @@ export function InvoiceForm({
     } catch (error) {
       console.error("Error loading accordion state:", error);
 
-      log.error("error_loading_accordion_state", {
-        data: {
-          error: error,
-        },
-      });
+      Sentry.captureException(error);
     }
 
     // Default to all sections open if no valid state found
@@ -357,11 +347,7 @@ export function InvoiceForm({
     } catch (error) {
       console.error("Error saving accordion state:", error);
 
-      log.error("error_saving_accordion_state", {
-        data: {
-          error: error,
-        },
-      });
+      Sentry.captureException(error);
     }
   };
 
@@ -1848,8 +1834,6 @@ export function InvoiceForm({
                     typeOfGTU: "",
                     typeOfGTUFieldIsVisible: true,
                   });
-
-                  log.info("add_invoice_item");
 
                   // analytics track event
                   openPanel.track("add_invoice_item");
