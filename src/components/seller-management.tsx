@@ -130,12 +130,6 @@ export function SellerManagement({
         closeButton: true,
       });
 
-      log.error("add_seller_failed", {
-        data: {
-          error: error,
-        },
-      });
-
       Sentry.captureException(error);
     }
   };
@@ -170,12 +164,6 @@ export function SellerManagement({
 
       toast.error("Failed to edit seller", {
         closeButton: true,
-      });
-
-      log.error("edit_seller_failed", {
-        data: {
-          error: error,
-        },
       });
 
       Sentry.captureException(error);
@@ -238,12 +226,6 @@ export function SellerManagement({
 
       toast.error("Failed to delete seller", {
         closeButton: true,
-      });
-
-      log.error("delete_seller_failed", {
-        data: {
-          error: error,
-        },
       });
 
       Sentry.captureException(error);

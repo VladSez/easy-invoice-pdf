@@ -57,12 +57,6 @@ export default function Error({
             () => {
               reset();
 
-              log.error("error_button_try_again_clicked", {
-                data: {
-                  error: error,
-                },
-              });
-
               openPanel.track("error_button_try_again_clicked");
               umamiTrackEvent("error_button_try_again_clicked");
             }
@@ -96,12 +90,6 @@ export default function Error({
               toast.error("Error clearing the invoice data", {
                 closeButton: true,
                 richColors: true,
-              });
-
-              log.error("error_button_start_from_scratch_failed", {
-                data: {
-                  error: error,
-                },
               });
 
               Sentry.captureException(error);
