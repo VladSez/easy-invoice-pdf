@@ -274,6 +274,9 @@ export function SellerManagement({
                         _size="sm"
                         onClick={() => {
                           if (activeSeller) {
+                            // dismiss any existing toast for better UX
+                            toast.dismiss();
+
                             setEditingSeller(activeSeller);
                             setIsSellerDialogOpen(true);
                           }
@@ -291,6 +294,9 @@ export function SellerManagement({
                         _variant="destructive"
                         _size="sm"
                         onClick={() => {
+                          // dismiss any existing toast for better UX
+                          toast.dismiss();
+
                           setIsDeleteDialogOpen(true);
                         }}
                         className="h-8 px-2"
@@ -313,6 +319,10 @@ export function SellerManagement({
               _size="sm"
               onClick={() => {
                 if (isLocalStorageAvailable) {
+                  // dismiss any existing toast for better UX
+                  toast.dismiss();
+
+                  // open seller dialog
                   setIsSellerDialogOpen(true);
                 }
               }}

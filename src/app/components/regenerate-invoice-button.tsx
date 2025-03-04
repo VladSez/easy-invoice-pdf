@@ -2,11 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import {
-  LOADING_BUTTON_TEXT,
-  LOADING_BUTTON_TIMEOUT,
-  PDF_DATA_FORM_ID,
-} from "./invoice-form";
+import { LOADING_BUTTON_TEXT, LOADING_BUTTON_TIMEOUT } from "./invoice-form";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 import { usePDF } from "@react-pdf/renderer";
 import type { InvoiceData } from "../schema";
@@ -16,11 +12,14 @@ import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { useOpenPanel } from "@openpanel/nextjs";
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
 import * as Sentry from "@sentry/nextjs";
+import type { FormPrefixId } from ".";
 
 export function RegenerateInvoiceButton({
   invoiceData,
+  formPrefixId,
 }: {
   invoiceData: InvoiceData;
+  formPrefixId: FormPrefixId;
 }) {
   const [{ loading: pdfLoading, error }] = usePDF({
     document: <InvoicePdfTemplate invoiceData={invoiceData} />,
@@ -64,7 +63,7 @@ export function RegenerateInvoiceButton({
       trigger={
         <Button
           type="submit"
-          form={PDF_DATA_FORM_ID}
+          form={formPrefixId}
           _variant="outline"
           className="mt-2 w-full"
           disabled={isLoading}
