@@ -193,7 +193,7 @@ export const InvoicePdfTemplate = ({
   const language = invoiceData.language;
   const t = translations[language];
 
-  const invoiceDocTitle = `https://easyinvoicepdf.com - ${t.invoiceNumber} ${invoiceData.invoiceNumber}`;
+  const invoiceDocTitle = `${t.invoiceNumber} ${invoiceData.invoiceNumber} | Created with https://easyinvoicepdf.com`;
 
   const signatureSectionIsVisible =
     invoiceData.personAuthorizedToReceiveFieldIsVisible ||
