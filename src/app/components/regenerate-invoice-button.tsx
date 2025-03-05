@@ -2,11 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import {
-  LOADING_BUTTON_TEXT,
-  LOADING_BUTTON_TIMEOUT,
-  PDF_DATA_FORM_ID,
-} from "./invoice-form";
+import { LOADING_BUTTON_TEXT, LOADING_BUTTON_TIMEOUT } from "./invoice-form";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 import { usePDF } from "@react-pdf/renderer";
 import type { InvoiceData } from "../schema";
@@ -15,19 +11,21 @@ import { Loader2 } from "lucide-react";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { useOpenPanel } from "@openpanel/nextjs";
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
-import { useLogger } from "next-axiom";
+import * as Sentry from "@sentry/nextjs";
+import type { FormPrefixId } from ".";
 
 export function RegenerateInvoiceButton({
   invoiceData,
+  formPrefixId,
 }: {
   invoiceData: InvoiceData;
+  formPrefixId: FormPrefixId;
 }) {
   const [{ loading: pdfLoading, error }] = usePDF({
     document: <InvoicePdfTemplate invoiceData={invoiceData} />,
   });
   const [isLoading, setIsLoading] = useState(false);
   const openPanel = useOpenPanel();
-  const log = useLogger();
 
   useEffect(() => {
     if (pdfLoading) {
@@ -45,12 +43,6 @@ export function RegenerateInvoiceButton({
     if (error) {
       ErrorGeneratingPdfToast();
 
-      log.error("error_generating_pdf_regenerate_button", {
-        data: {
-          error: error,
-        },
-      });
-
       openPanel.track("error_generating_pdf_regenerate_button", {
         data: {
           error: error,
@@ -61,21 +53,21 @@ export function RegenerateInvoiceButton({
           error: error,
         },
       });
+
+      Sentry.captureException(error);
     }
-  }, [error]);
+  }, [error, openPanel]);
 
   return (
     <CustomTooltip
       trigger={
         <Button
           type="submit"
-          form={PDF_DATA_FORM_ID}
+          form={formPrefixId}
           _variant="outline"
           className="mt-2 w-full"
           disabled={isLoading}
           onClick={() => {
-            log.info("regenerate_invoice");
-
             // analytics events
             openPanel.track("regenerate_invoice");
             umamiTrackEvent("regenerate_invoice");

@@ -30,7 +30,7 @@ import { Label } from "./ui/label";
 import { useOpenPanel } from "@openpanel/nextjs";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { useLogger } from "next-axiom";
+import * as Sentry from "@sentry/nextjs";
 
 export const SELLERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_SELLERS";
 
@@ -52,7 +52,6 @@ export function SellerManagement({
 
   const openPanel = useOpenPanel();
   const sellerSelectId = useId();
-  const log = useLogger();
 
   const isEditMode = Boolean(editingSeller);
 
@@ -82,13 +81,9 @@ export function SellerManagement({
     } catch (error) {
       console.error("Failed to load sellers:", error);
 
-      log.error("error_loading_sellers", {
-        data: {
-          error: error,
-        },
-      });
+      Sentry.captureException(error);
     }
-  }, [invoiceData.seller?.id]);
+  }, [invoiceData?.seller?.id]);
 
   // Update sellers when a new one is added
   const handleSellerAdd = (
@@ -125,8 +120,6 @@ export function SellerManagement({
         richColors: true,
       });
 
-      log.info("add_seller_success");
-
       // analytics track event
       openPanel.track("add_seller_success");
       umamiTrackEvent("add_seller_success");
@@ -137,11 +130,7 @@ export function SellerManagement({
         closeButton: true,
       });
 
-      log.error("add_seller_failed", {
-        data: {
-          error: error,
-        },
-      });
+      Sentry.captureException(error);
     }
   };
 
@@ -167,8 +156,6 @@ export function SellerManagement({
         richColors: true,
       });
 
-      log.info("edit_seller_success");
-
       // analytics track event
       openPanel.track("edit_seller_success");
       umamiTrackEvent("edit_seller_success");
@@ -179,11 +166,7 @@ export function SellerManagement({
         closeButton: true,
       });
 
-      log.error("edit_seller_failed", {
-        data: {
-          error: error,
-        },
-      });
+      Sentry.captureException(error);
     }
   };
 
@@ -204,8 +187,6 @@ export function SellerManagement({
       setSelectedSellerIndex("");
       setValue("seller", DEFAULT_SELLER_DATA);
     }
-
-    log.info("change_seller");
 
     // analytics track event
     openPanel.track("change_seller");
@@ -237,8 +218,6 @@ export function SellerManagement({
         richColors: true,
       });
 
-      log.info("delete_seller_success");
-
       // analytics track event
       openPanel.track("delete_seller_success");
       umamiTrackEvent("delete_seller_success");
@@ -249,11 +228,7 @@ export function SellerManagement({
         closeButton: true,
       });
 
-      log.error("delete_seller_failed", {
-        data: {
-          error: error,
-        },
-      });
+      Sentry.captureException(error);
     }
   };
 
@@ -299,6 +274,9 @@ export function SellerManagement({
                         _size="sm"
                         onClick={() => {
                           if (activeSeller) {
+                            // dismiss any existing toast for better UX
+                            toast.dismiss();
+
                             setEditingSeller(activeSeller);
                             setIsSellerDialogOpen(true);
                           }
@@ -316,6 +294,9 @@ export function SellerManagement({
                         _variant="destructive"
                         _size="sm"
                         onClick={() => {
+                          // dismiss any existing toast for better UX
+                          toast.dismiss();
+
                           setIsDeleteDialogOpen(true);
                         }}
                         className="h-8 px-2"
@@ -338,6 +319,10 @@ export function SellerManagement({
               _size="sm"
               onClick={() => {
                 if (isLocalStorageAvailable) {
+                  // dismiss any existing toast for better UX
+                  toast.dismiss();
+
+                  // open seller dialog
                   setIsSellerDialogOpen(true);
                 }
               }}

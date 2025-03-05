@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { OpenPanelComponent } from "@openpanel/nextjs";
 import Script from "next/script";
-import { AxiomWebVitals } from "next-axiom";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import "./globals.css";
 import { Toaster } from "sonner";
@@ -61,10 +61,11 @@ export default function RootLayout({
       <body className={`antialiased`}>
         <NuqsAdapter>{children}</NuqsAdapter>
 
+        {/* https://vercel.com/vladsazon27s-projects/pdf-invoice-generator/speed-insights */}
+        <SpeedInsights />
+
         {/* https://sonner.emilkowal.ski/ */}
         <Toaster visibleToasts={1} richColors />
-
-        <AxiomWebVitals />
 
         {/* https://openpanel.dev/docs */}
         {process.env.VERCEL_ENV === "production" && (

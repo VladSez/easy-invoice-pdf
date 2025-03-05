@@ -36,15 +36,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useOpenPanel } from "@openpanel/nextjs";
 import dayjs from "dayjs";
 import { AlertTriangle, Plus, Trash2 } from "lucide-react";
-import { useLogger } from "next-axiom";
 import React, { useCallback, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
+import type { FormPrefixId } from ".";
 
 export const PDF_DATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_DATA";
-export const PDF_DATA_FORM_ID = "pdfInvoiceForm";
+export const INVOICE_PDF_HTML_FORM_ID = "pdfInvoiceForm";
 export const DEBOUNCE_TIMEOUT = 500;
 export const LOADING_BUTTON_TIMEOUT = 400;
 export const LOADING_BUTTON_TEXT = "Generating Document...";
@@ -128,14 +129,25 @@ type Prettify<T> = {
 interface InvoiceFormProps {
   invoiceData: InvoiceData;
   onInvoiceDataChange: (updatedData: InvoiceData) => void;
+  /**
+   * we need this to generate unique ids for the form fields for mobile and desktop views
+   * otherwise the ids will be the same and the form will not work correctly + accessibility issues
+   */
+  formPrefixId: FormPrefixId;
 }
 
 export function InvoiceForm({
   invoiceData,
   onInvoiceDataChange,
+  formPrefixId,
 }: InvoiceFormProps) {
   const openPanel = useOpenPanel();
-  const log = useLogger();
+
+  const form = useForm<InvoiceData>({
+    resolver: zodResolver(invoiceSchema),
+    defaultValues: invoiceData,
+    mode: "onChange",
+  });
 
   const {
     control,
@@ -143,11 +155,7 @@ export function InvoiceForm({
     setValue,
     formState: { errors },
     watch,
-  } = useForm<InvoiceData>({
-    resolver: zodResolver(invoiceSchema),
-    defaultValues: invoiceData,
-    mode: "onChange",
-  });
+  } = form;
 
   const currency = useWatch({ control, name: "currency" });
   const invoiceItems = useWatch({ control, name: "items" });
@@ -235,7 +243,7 @@ export function InvoiceForm({
   // regenerate pdf on every input change with debounce
   const debouncedRegeneratePdfOnFormChange = useDebouncedCallback(
     (data) => {
-      // regenerate pdf and run validations
+      // submit form e.g. regenerates pdf and run form validations
       handleSubmit(onSubmit)(data);
 
       // validate with zod and save to local storage
@@ -252,11 +260,7 @@ export function InvoiceForm({
         } catch (error) {
           console.error("Error saving to local storage:", error);
 
-          log.error("error_saving_to_local_storage", {
-            data: {
-              error: error,
-            },
-          });
+          Sentry.captureException(error);
         }
       }
     },
@@ -278,7 +282,6 @@ export function InvoiceForm({
     (index: number) => {
       remove(index);
 
-      log.info("remove_invoice_item");
       // analytics track event
       openPanel.track("remove_invoice_item");
       umamiTrackEvent("remove_invoice_item");
@@ -290,6 +293,7 @@ export function InvoiceForm({
     [remove, openPanel, watch, debouncedRegeneratePdfOnFormChange]
   );
 
+  // TODO: refactor this and debouncedRegeneratePdfOnFormChange(), so data is saved to local storage, basically copy everything from debouncedRegeneratePdfOnFormChange() and use this onSubmit function in two places
   const onSubmit = (data: InvoiceData) => {
     onInvoiceDataChange(data);
   };
@@ -315,6 +319,7 @@ export function InvoiceForm({
 
         if (validatedState.success) {
           const arrayOfOpenSections = Object.entries(validatedState.data)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             .filter(([_, isOpen]) => isOpen)
             .map(([section]) => section) as Prettify<AccordionKeys>;
 
@@ -324,11 +329,7 @@ export function InvoiceForm({
     } catch (error) {
       console.error("Error loading accordion state:", error);
 
-      log.error("error_loading_accordion_state", {
-        data: {
-          error: error,
-        },
-      });
+      Sentry.captureException(error);
     }
 
     // Default to all sections open if no valid state found
@@ -357,17 +358,15 @@ export function InvoiceForm({
     } catch (error) {
       console.error("Error saving accordion state:", error);
 
-      log.error("error_saving_accordion_state", {
-        data: {
-          error: error,
-        },
-      });
+      Sentry.captureException(error);
     }
   };
 
   return (
     <>
       <form
+        id={formPrefixId}
+        className="mb-4 space-y-3.5"
         onSubmit={handleSubmit(onSubmit, (errors) => {
           console.error("Form validation errors:", errors);
           toast.error(
@@ -426,8 +425,6 @@ export function InvoiceForm({
             }
           );
         })}
-        className="mb-4 space-y-3.5"
-        id={PDF_DATA_FORM_ID}
       >
         <Accordion
           type="multiple"
@@ -447,14 +444,18 @@ export function InvoiceForm({
               <div className="space-y-4">
                 {/* Language PDF Select */}
                 <div>
-                  <Label htmlFor="language" className="mb-1">
+                  <Label htmlFor={`${formPrefixId}-language`} className="mb-1">
                     Invoice PDF Language
                   </Label>
                   <Controller
                     name="language"
                     control={control}
                     render={({ field }) => (
-                      <SelectNative {...field} id="language" className="block">
+                      <SelectNative
+                        {...field}
+                        id={`${formPrefixId}-language`}
+                        className="block"
+                      >
                         {SUPPORTED_LANGUAGES.map((lang) => (
                           <option key={lang} value={lang}>
                             {lang === "en" ? "English" : "Polish"}
@@ -474,7 +475,7 @@ export function InvoiceForm({
 
                 {/* Currency Select */}
                 <div>
-                  <Label htmlFor="currency" className="mb-1">
+                  <Label htmlFor={`${formPrefixId}-currency`} className="mb-1">
                     Currency
                   </Label>
                   <Controller
@@ -484,7 +485,7 @@ export function InvoiceForm({
                       return (
                         <SelectNative
                           {...field}
-                          id="currency"
+                          id={`${formPrefixId}-currency`}
                           className="block"
                         >
                           {SUPPORTED_CURRENCIES.map((currency) => {
@@ -517,7 +518,10 @@ export function InvoiceForm({
 
                 {/* Date Format */}
                 <div>
-                  <Label htmlFor="dateFormat" className="mb-1">
+                  <Label
+                    htmlFor={`${formPrefixId}-dateFormat`}
+                    className="mb-1"
+                  >
                     Date Format
                   </Label>
                   <Controller
@@ -526,7 +530,7 @@ export function InvoiceForm({
                     render={({ field }) => (
                       <SelectNative
                         {...field}
-                        id="dateFormat"
+                        id={`${formPrefixId}-dateFormat`}
                         className="block"
                       >
                         {SUPPORTED_DATE_FORMATS.map((format) => {
@@ -556,7 +560,10 @@ export function InvoiceForm({
 
                 {/* Invoice Number */}
                 <div>
-                  <Label htmlFor="invoiceNumber" className="mb-1">
+                  <Label
+                    htmlFor={`${formPrefixId}-invoiceNumber`}
+                    className="mb-1"
+                  >
                     Invoice Number
                   </Label>
                   <Controller
@@ -566,7 +573,7 @@ export function InvoiceForm({
                       <Input
                         {...field}
                         type="text"
-                        id="invoiceNumber"
+                        id={`${formPrefixId}-invoiceNumber`}
                         className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm"
                       />
                     )}
@@ -596,7 +603,10 @@ export function InvoiceForm({
 
                 {/* Date of Issue */}
                 <div>
-                  <Label htmlFor="dateOfIssue" className="mb-1">
+                  <Label
+                    htmlFor={`${formPrefixId}-dateOfIssue`}
+                    className="mb-1"
+                  >
                     Date of Issue
                   </Label>
                   <Controller
@@ -606,7 +616,7 @@ export function InvoiceForm({
                       <Input
                         {...field}
                         type="date"
-                        id="dateOfIssue"
+                        id={`${formPrefixId}-dateOfIssue`}
                         className=""
                       />
                     )}
@@ -637,7 +647,10 @@ export function InvoiceForm({
 
                 {/* Date of Service */}
                 <div>
-                  <Label htmlFor="dateOfService" className="mb-1">
+                  <Label
+                    htmlFor={`${formPrefixId}-dateOfService`}
+                    className="mb-1"
+                  >
                     Date of Service
                   </Label>
                   <Controller
@@ -647,7 +660,7 @@ export function InvoiceForm({
                       <Input
                         {...field}
                         type="date"
-                        id="dateOfService"
+                        id={`${formPrefixId}-dateOfService`}
                         className=""
                       />
                     )}
@@ -682,7 +695,7 @@ export function InvoiceForm({
                 {/* Invoice Type */}
                 <div>
                   <div className="relative mb-2 flex items-center justify-between">
-                    <Label htmlFor="invoiceType" className="">
+                    <Label htmlFor={`${formPrefixId}-invoiceType`} className="">
                       Invoice Type
                     </Label>
 
@@ -694,7 +707,7 @@ export function InvoiceForm({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`invoiceTypeFieldIsVisible`}
+                            id={`${formPrefixId}-invoiceTypeFieldIsVisible`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -703,7 +716,9 @@ export function InvoiceForm({
                       />
                       <CustomTooltip
                         trigger={
-                          <Label htmlFor={`invoiceTypeFieldIsVisible`}>
+                          <Label
+                            htmlFor={`${formPrefixId}-invoiceTypeFieldIsVisible`}
+                          >
                             Show in PDF
                           </Label>
                         }
@@ -718,7 +733,7 @@ export function InvoiceForm({
                     render={({ field }) => (
                       <Textarea
                         {...field}
-                        id="invoiceType"
+                        id={`${formPrefixId}-invoiceType`}
                         rows={2}
                         className=""
                         placeholder="Enter invoice type"
@@ -750,7 +765,10 @@ export function InvoiceForm({
               </div>
               <div className="mt-5 space-y-4">
                 <div>
-                  <Label htmlFor="sellerName" className="mb-1">
+                  <Label
+                    htmlFor={`${formPrefixId}-sellerName`}
+                    className="mb-1"
+                  >
                     Name
                   </Label>
                   <Controller
@@ -759,7 +777,7 @@ export function InvoiceForm({
                     render={({ field }) => (
                       <Textarea
                         {...field}
-                        id="sellerName"
+                        id={`${formPrefixId}-sellerName`}
                         rows={3}
                         className=""
                       />
@@ -771,7 +789,10 @@ export function InvoiceForm({
                 </div>
 
                 <div>
-                  <Label htmlFor="sellerAddress" className="mb-1">
+                  <Label
+                    htmlFor={`${formPrefixId}-sellerAddress`}
+                    className="mb-1"
+                  >
                     Address
                   </Label>
                   <Controller
@@ -780,7 +801,7 @@ export function InvoiceForm({
                     render={({ field }) => (
                       <Textarea
                         {...field}
-                        id="sellerAddress"
+                        id={`${formPrefixId}-sellerAddress`}
                         rows={3}
                         className=""
                       />
@@ -793,7 +814,7 @@ export function InvoiceForm({
 
                 <div>
                   <div className="relative mb-2 flex items-center justify-between">
-                    <Label htmlFor="sellerVatNo" className="">
+                    <Label htmlFor={`${formPrefixId}-sellerVatNo`} className="">
                       VAT Number
                     </Label>
 
@@ -805,7 +826,7 @@ export function InvoiceForm({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`sellerVatNoFieldIsVisible`}
+                            id={`${formPrefixId}-sellerVatNoFieldIsVisible`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -814,7 +835,9 @@ export function InvoiceForm({
                       />
                       <CustomTooltip
                         trigger={
-                          <Label htmlFor={`sellerVatNoFieldIsVisible`}>
+                          <Label
+                            htmlFor={`${formPrefixId}-sellerVatNoFieldIsVisible`}
+                          >
                             Show in PDF
                           </Label>
                         }
@@ -828,7 +851,7 @@ export function InvoiceForm({
                     render={({ field }) => (
                       <Input
                         {...field}
-                        id="sellerVatNo"
+                        id={`${formPrefixId}-sellerVatNo`}
                         type="text"
                         className=""
                       />
@@ -840,7 +863,10 @@ export function InvoiceForm({
                 </div>
 
                 <div>
-                  <Label htmlFor="sellerEmail" className="mb-1">
+                  <Label
+                    htmlFor={`${formPrefixId}-sellerEmail`}
+                    className="mb-1"
+                  >
                     Email
                   </Label>
                   <Controller
@@ -849,7 +875,7 @@ export function InvoiceForm({
                     render={({ field }) => (
                       <Input
                         {...field}
-                        id="sellerEmail"
+                        id={`${formPrefixId}-sellerEmail`}
                         type="email"
                         className=""
                       />
@@ -863,7 +889,10 @@ export function InvoiceForm({
                 {/* Account Number */}
                 <div>
                   <div className="relative mb-2 flex items-center justify-between">
-                    <Label htmlFor="sellerAccountNumber" className="">
+                    <Label
+                      htmlFor={`${formPrefixId}-sellerAccountNumber`}
+                      className=""
+                    >
                       Account Number
                     </Label>
 
@@ -875,7 +904,7 @@ export function InvoiceForm({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`sellerAccountNumberFieldIsVisible`}
+                            id={`${formPrefixId}-sellerAccountNumberFieldIsVisible`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -884,7 +913,9 @@ export function InvoiceForm({
                       />
                       <CustomTooltip
                         trigger={
-                          <Label htmlFor={`sellerAccountNumberFieldIsVisible`}>
+                          <Label
+                            htmlFor={`${formPrefixId}-sellerAccountNumberFieldIsVisible`}
+                          >
                             Show in PDF
                           </Label>
                         }
@@ -914,7 +945,10 @@ export function InvoiceForm({
                 {/* SWIFT/BIC */}
                 <div>
                   <div className="relative mb-2 flex items-center justify-between">
-                    <Label htmlFor="sellerSwiftBic" className="">
+                    <Label
+                      htmlFor={`${formPrefixId}-sellerSwiftBic`}
+                      className=""
+                    >
                       SWIFT/BIC
                     </Label>
 
@@ -926,7 +960,7 @@ export function InvoiceForm({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`sellerSwiftBicFieldIsVisible`}
+                            id={`${formPrefixId}-sellerSwiftBicFieldIsVisible`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -935,7 +969,9 @@ export function InvoiceForm({
                       />
                       <CustomTooltip
                         trigger={
-                          <Label htmlFor={`sellerSwiftBicFieldIsVisible`}>
+                          <Label
+                            htmlFor={`${formPrefixId}-sellerSwiftBicFieldIsVisible`}
+                          >
                             Show in PDF
                           </Label>
                         }
@@ -1007,7 +1043,7 @@ export function InvoiceForm({
               </div>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="buyerName" className="mb-1">
+                  <Label htmlFor={`${formPrefixId}-buyerName`} className="mb-1">
                     Name
                   </Label>
                   <Controller
@@ -1016,7 +1052,7 @@ export function InvoiceForm({
                     render={({ field }) => (
                       <Textarea
                         {...field}
-                        id="buyerName"
+                        id={`${formPrefixId}-buyerName`}
                         rows={3}
                         className=""
                       />
@@ -1028,7 +1064,10 @@ export function InvoiceForm({
                 </div>
 
                 <div>
-                  <Label htmlFor="buyerAddress" className="mb-1">
+                  <Label
+                    htmlFor={`${formPrefixId}-buyerAddress`}
+                    className="mb-1"
+                  >
                     Address
                   </Label>
                   <Controller
@@ -1037,7 +1076,7 @@ export function InvoiceForm({
                     render={({ field }) => (
                       <Textarea
                         {...field}
-                        id="buyerAddress"
+                        id={`${formPrefixId}-buyerAddress`}
                         rows={3}
                         className=""
                       />
@@ -1051,7 +1090,7 @@ export function InvoiceForm({
                 {/* Buyer VAT Number */}
                 <div>
                   <div className="relative mb-2 flex items-center justify-between">
-                    <Label htmlFor="buyerVatNo" className="">
+                    <Label htmlFor={`${formPrefixId}-buyerVatNo`} className="">
                       VAT Number
                     </Label>
 
@@ -1063,7 +1102,7 @@ export function InvoiceForm({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`buyerVatNoFieldIsVisible`}
+                            id={`${formPrefixId}-buyerVatNoFieldIsVisible`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -1072,7 +1111,9 @@ export function InvoiceForm({
                       />
                       <CustomTooltip
                         trigger={
-                          <Label htmlFor={`buyerVatNoFieldIsVisible`}>
+                          <Label
+                            htmlFor={`${formPrefixId}-buyerVatNoFieldIsVisible`}
+                          >
                             Show in PDF
                           </Label>
                         }
@@ -1099,7 +1140,10 @@ export function InvoiceForm({
                 </div>
 
                 <div>
-                  <Label htmlFor="buyerEmail" className="mb-1">
+                  <Label
+                    htmlFor={`${formPrefixId}-buyerEmail`}
+                    className="mb-1"
+                  >
                     Email
                   </Label>
                   <Controller
@@ -1108,7 +1152,7 @@ export function InvoiceForm({
                     render={({ field }) => (
                       <Input
                         {...field}
-                        id="buyerEmail"
+                        id={`${formPrefixId}-buyerEmail`}
                         type="email"
                         className=""
                       />
@@ -1134,7 +1178,9 @@ export function InvoiceForm({
               <div className="mb-3 space-y-4">
                 {/* Show Number column on PDF switch */}
                 <div className="relative flex items-center justify-between">
-                  <Label htmlFor={`itemInvoiceItemNumberIsVisible0`}>
+                  <Label
+                    htmlFor={`${formPrefixId}-itemInvoiceItemNumberIsVisible0`}
+                  >
                     Show &quot;Number&quot; Column in the Invoice Items Table
                   </Label>
 
@@ -1144,7 +1190,7 @@ export function InvoiceForm({
                     render={({ field: { value, onChange, ...field } }) => (
                       <Switch
                         {...field}
-                        id={`itemInvoiceItemNumberIsVisible0`}
+                        id={`${formPrefixId}-itemInvoiceItemNumberIsVisible0`}
                         checked={value}
                         onCheckedChange={onChange}
                         className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -1155,7 +1201,7 @@ export function InvoiceForm({
 
                 {/* Show VAT Table Summary in PDF switch */}
                 <div className="relative flex items-center justify-between">
-                  <Label htmlFor={`vatTableSummaryIsVisible`}>
+                  <Label htmlFor={`${formPrefixId}-vatTableSummaryIsVisible`}>
                     Show &quot;VAT Table Summary&quot; in the PDF
                   </Label>
 
@@ -1165,7 +1211,7 @@ export function InvoiceForm({
                     render={({ field: { value, onChange, ...field } }) => (
                       <Switch
                         {...field}
-                        id={`vatTableSummaryIsVisible`}
+                        id={`${formPrefixId}-vatTableSummaryIsVisible`}
                         checked={value}
                         onCheckedChange={onChange}
                         className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -1206,7 +1252,10 @@ export function InvoiceForm({
                       <div>
                         {/* Invoice Item Name */}
                         <div className="mb-2 flex items-center justify-between">
-                          <Label htmlFor={`itemName${index}`} className="">
+                          <Label
+                            htmlFor={`${formPrefixId}-itemName${index}`}
+                            className=""
+                          >
                             Name
                           </Label>
 
@@ -1221,7 +1270,7 @@ export function InvoiceForm({
                                 }) => (
                                   <Switch
                                     {...field}
-                                    id={`itemNameFieldIsVisible${index}`}
+                                    id={`${formPrefixId}-itemNameFieldIsVisible${index}`}
                                     checked={value}
                                     onCheckedChange={onChange}
                                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -1231,7 +1280,7 @@ export function InvoiceForm({
                               <CustomTooltip
                                 trigger={
                                   <Label
-                                    htmlFor={`itemNameFieldIsVisible${index}`}
+                                    htmlFor={`${formPrefixId}-itemNameFieldIsVisible${index}`}
                                   >
                                     Show in PDF
                                   </Label>
@@ -1250,7 +1299,7 @@ export function InvoiceForm({
                             <Textarea
                               {...field}
                               rows={4}
-                              id={`itemName${index}`}
+                              id={`${formPrefixId}-itemName${index}`}
                               className=""
                             />
                           )}
@@ -1265,7 +1314,10 @@ export function InvoiceForm({
                       {/* Invoice Item Type of GTU */}
                       <div>
                         <div className="mb-2 flex items-center justify-between">
-                          <Label htmlFor={`itemTypeOfGTU${index}`} className="">
+                          <Label
+                            htmlFor={`${formPrefixId}-itemTypeOfGTU${index}`}
+                            className=""
+                          >
                             Type of GTU
                           </Label>
 
@@ -1280,7 +1332,7 @@ export function InvoiceForm({
                                 }) => (
                                   <Switch
                                     {...field}
-                                    id={`itemTypeOfGTUFieldIsVisible${index}`}
+                                    id={`${formPrefixId}-itemTypeOfGTUFieldIsVisible${index}`}
                                     checked={value}
                                     onCheckedChange={onChange}
                                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -1290,7 +1342,7 @@ export function InvoiceForm({
                               <CustomTooltip
                                 trigger={
                                   <Label
-                                    htmlFor={`itemTypeOfGTUFieldIsVisible${index}`}
+                                    htmlFor={`${formPrefixId}-itemTypeOfGTUFieldIsVisible${index}`}
                                   >
                                     Show in PDF
                                   </Label>
@@ -1308,7 +1360,7 @@ export function InvoiceForm({
                           render={({ field }) => (
                             <Input
                               {...field}
-                              id={`itemTypeOfGTU${index}`}
+                              id={`${formPrefixId}-itemTypeOfGTU${index}`}
                               className=""
                               type="text"
                             />
@@ -1324,7 +1376,10 @@ export function InvoiceForm({
                       {/* Invoice Item Amount */}
                       <div>
                         <div className="mb-2 flex items-center justify-between">
-                          <Label htmlFor={`itemAmount${index}`} className="">
+                          <Label
+                            htmlFor={`${formPrefixId}-itemAmount${index}`}
+                            className=""
+                          >
                             Amount
                           </Label>
 
@@ -1339,7 +1394,7 @@ export function InvoiceForm({
                                 }) => (
                                   <Switch
                                     {...field}
-                                    id={`itemAmountFieldIsVisible${index}`}
+                                    id={`${formPrefixId}-itemAmountFieldIsVisible${index}`}
                                     checked={value}
                                     onCheckedChange={onChange}
                                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -1349,7 +1404,7 @@ export function InvoiceForm({
                               <CustomTooltip
                                 trigger={
                                   <Label
-                                    htmlFor={`itemAmountFieldIsVisible${index}`}
+                                    htmlFor={`${formPrefixId}-itemAmountFieldIsVisible${index}`}
                                   >
                                     Show in PDF
                                   </Label>
@@ -1376,7 +1431,7 @@ export function InvoiceForm({
                               <>
                                 <Input
                                   {...field}
-                                  id={`itemAmount${index}`}
+                                  id={`${formPrefixId}-itemAmount${index}`}
                                   type="number"
                                   step="0.01"
                                   min="0"
@@ -1401,7 +1456,10 @@ export function InvoiceForm({
                       {/* Invoice Item Unit */}
                       <div>
                         <div className="mb-2 flex items-center justify-between">
-                          <Label htmlFor={`itemUnit${index}`} className="">
+                          <Label
+                            htmlFor={`${formPrefixId}-itemUnit${index}`}
+                            className=""
+                          >
                             Unit
                           </Label>
 
@@ -1416,7 +1474,7 @@ export function InvoiceForm({
                                 }) => (
                                   <Switch
                                     {...field}
-                                    id={`itemUnitFieldIsVisible${index}`}
+                                    id={`${formPrefixId}-itemUnitFieldIsVisible${index}`}
                                     checked={value}
                                     onCheckedChange={onChange}
                                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -1426,7 +1484,7 @@ export function InvoiceForm({
                               <CustomTooltip
                                 trigger={
                                   <Label
-                                    htmlFor={`itemUnitFieldIsVisible${index}`}
+                                    htmlFor={`${formPrefixId}-itemUnitFieldIsVisible${index}`}
                                   >
                                     Show in PDF
                                   </Label>
@@ -1444,7 +1502,7 @@ export function InvoiceForm({
                           render={({ field }) => (
                             <Input
                               {...field}
-                              id={`itemUnit${index}`}
+                              id={`${formPrefixId}-itemUnit${index}`}
                               type="text"
                             />
                           )}
@@ -1459,7 +1517,10 @@ export function InvoiceForm({
                       {/* Invoice Item Net Price */}
                       <div>
                         <div className="mb-2 flex items-center justify-between">
-                          <Label htmlFor={`itemNetPrice${index}`} className="">
+                          <Label
+                            htmlFor={`${formPrefixId}-itemNetPrice${index}`}
+                            className=""
+                          >
                             Net Price
                           </Label>
 
@@ -1474,7 +1535,7 @@ export function InvoiceForm({
                                 }) => (
                                   <Switch
                                     {...field}
-                                    id={`itemNetPriceFieldIsVisible${index}`}
+                                    id={`${formPrefixId}-itemNetPriceFieldIsVisible${index}`}
                                     checked={value}
                                     onCheckedChange={onChange}
                                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -1484,7 +1545,7 @@ export function InvoiceForm({
                               <CustomTooltip
                                 trigger={
                                   <Label
-                                    htmlFor={`itemNetPriceFieldIsVisible${index}`}
+                                    htmlFor={`${formPrefixId}-itemNetPriceFieldIsVisible${index}`}
                                   >
                                     Show in PDF
                                   </Label>
@@ -1523,7 +1584,7 @@ export function InvoiceForm({
                                 <div className="flex w-full flex-col">
                                   <MoneyInput
                                     {...field}
-                                    id={`itemNetPrice${index}`}
+                                    id={`${formPrefixId}-itemNetPrice${index}`}
                                     currency={currency}
                                     type="number"
                                     step="0.01"
@@ -1552,7 +1613,10 @@ export function InvoiceForm({
                       {/* Invoice Item VAT */}
                       <div>
                         <div className="mb-2 flex items-center justify-between">
-                          <Label htmlFor={`itemVat${index}`} className="">
+                          <Label
+                            htmlFor={`${formPrefixId}-itemVat${index}`}
+                            className=""
+                          >
                             VAT
                           </Label>
 
@@ -1567,7 +1631,7 @@ export function InvoiceForm({
                                 }) => (
                                   <Switch
                                     {...field}
-                                    id={`itemVatFieldIsVisible${index}`}
+                                    id={`${formPrefixId}-itemVatFieldIsVisible${index}`}
                                     checked={value}
                                     onCheckedChange={onChange}
                                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -1577,7 +1641,7 @@ export function InvoiceForm({
                               <CustomTooltip
                                 trigger={
                                   <Label
-                                    htmlFor={`itemVatFieldIsVisible${index}`}
+                                    htmlFor={`${formPrefixId}-itemVatFieldIsVisible${index}`}
                                   >
                                     Show in PDF
                                   </Label>
@@ -1595,7 +1659,7 @@ export function InvoiceForm({
                           render={({ field }) => (
                             <Input
                               {...field}
-                              id={`itemVat${index}`}
+                              id={`${formPrefixId}-itemVat${index}`}
                               type="text"
                               className=""
                             />
@@ -1616,7 +1680,10 @@ export function InvoiceForm({
                       {/* Invoice Item Net Amount */}
                       <div>
                         <div className="mb-2 flex items-center justify-between">
-                          <Label htmlFor={`itemNetAmount${index}`} className="">
+                          <Label
+                            htmlFor={`${formPrefixId}-itemNetAmount${index}`}
+                            className=""
+                          >
                             Net Amount
                           </Label>
 
@@ -1631,7 +1698,7 @@ export function InvoiceForm({
                                 }) => (
                                   <Switch
                                     {...field}
-                                    id={`itemNetAmountFieldIsVisible${index}`}
+                                    id={`${formPrefixId}-itemNetAmountFieldIsVisible${index}`}
                                     checked={value}
                                     onCheckedChange={onChange}
                                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -1641,7 +1708,7 @@ export function InvoiceForm({
                               <CustomTooltip
                                 trigger={
                                   <Label
-                                    htmlFor={`itemNetAmountFieldIsVisible${index}`}
+                                    htmlFor={`${formPrefixId}-itemNetAmountFieldIsVisible${index}`}
                                   >
                                     Show in PDF
                                   </Label>
@@ -1660,7 +1727,7 @@ export function InvoiceForm({
                             return (
                               <ReadOnlyMoneyInput
                                 {...field}
-                                id={`itemNetAmount${index}`}
+                                id={`${formPrefixId}-itemNetAmount${index}`}
                                 currency={currency}
                                 value={field.value.toLocaleString("en-US", {
                                   minimumFractionDigits: 2,
@@ -1686,7 +1753,10 @@ export function InvoiceForm({
                       {/* Invoice Item VAT Amount (calculated automatically) */}
                       <div>
                         <div className="mb-2 flex items-center justify-between">
-                          <Label htmlFor={`itemVatAmount${index}`} className="">
+                          <Label
+                            htmlFor={`${formPrefixId}-itemVatAmount${index}`}
+                            className=""
+                          >
                             VAT Amount
                           </Label>
 
@@ -1701,7 +1771,7 @@ export function InvoiceForm({
                                 }) => (
                                   <Switch
                                     {...field}
-                                    id={`itemVatAmountFieldIsVisible${index}`}
+                                    id={`${formPrefixId}-itemVatAmountFieldIsVisible${index}`}
                                     checked={value}
                                     onCheckedChange={onChange}
                                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -1711,7 +1781,7 @@ export function InvoiceForm({
                               <CustomTooltip
                                 trigger={
                                   <Label
-                                    htmlFor={`itemVatAmountFieldIsVisible${index}`}
+                                    htmlFor={`${formPrefixId}-itemVatAmountFieldIsVisible${index}`}
                                   >
                                     Show in PDF
                                   </Label>
@@ -1729,7 +1799,7 @@ export function InvoiceForm({
                           render={({ field }) => (
                             <ReadOnlyMoneyInput
                               {...field}
-                              id={`itemVatAmount${index}`}
+                              id={`${formPrefixId}-itemVatAmount${index}`}
                               currency={currency}
                               value={field.value.toLocaleString("en-US", {
                                 minimumFractionDigits: 2,
@@ -1754,7 +1824,7 @@ export function InvoiceForm({
                       <div>
                         <div className="mb-2 flex items-center justify-between">
                           <Label
-                            htmlFor={`itemPreTaxAmount${index}`}
+                            htmlFor={`${formPrefixId}-itemPreTaxAmount${index}`}
                             className=""
                           >
                             Pre-tax Amount
@@ -1771,7 +1841,7 @@ export function InvoiceForm({
                                 }) => (
                                   <Switch
                                     {...field}
-                                    id={`itemPreTaxAmountFieldIsVisible${index}`}
+                                    id={`${formPrefixId}-itemPreTaxAmountFieldIsVisible${index}`}
                                     checked={value}
                                     onCheckedChange={onChange}
                                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -1781,7 +1851,7 @@ export function InvoiceForm({
                               <CustomTooltip
                                 trigger={
                                   <Label
-                                    htmlFor={`itemPreTaxAmountFieldIsVisible${index}`}
+                                    htmlFor={`${formPrefixId}-itemPreTaxAmountFieldIsVisible${index}`}
                                   >
                                     Show in PDF
                                   </Label>
@@ -1799,7 +1869,7 @@ export function InvoiceForm({
                           render={({ field }) => (
                             <ReadOnlyMoneyInput
                               {...field}
-                              id={`itemPreTaxAmount${index}`}
+                              id={`${formPrefixId}-itemPreTaxAmount${index}`}
                               currency={currency}
                               value={field.value.toLocaleString("en-US", {
                                 minimumFractionDigits: 2,
@@ -1849,8 +1919,6 @@ export function InvoiceForm({
                     typeOfGTUFieldIsVisible: true,
                   });
 
-                  log.info("add_invoice_item");
-
                   // analytics track event
                   openPanel.track("add_invoice_item");
                   umamiTrackEvent("add_invoice_item");
@@ -1869,7 +1937,7 @@ export function InvoiceForm({
           <div className="">
             {/* Total field (with currency) */}
             <div className="mt-5" />
-            <Label htmlFor="total" className="mb-1">
+            <Label htmlFor={`${formPrefixId}-total`} className="mb-1">
               Total
             </Label>
             <div className="relative mt-1 rounded-md shadow-sm">
@@ -1879,7 +1947,7 @@ export function InvoiceForm({
                 render={({ field }) => (
                   <ReadOnlyMoneyInput
                     {...field}
-                    id="total"
+                    id={`${formPrefixId}-total`}
                     currency={currency}
                     value={field.value.toLocaleString("en-US", {
                       minimumFractionDigits: 2,
@@ -1902,7 +1970,7 @@ export function InvoiceForm({
           {/* Payment Method */}
           <div>
             <div className="relative mb-2 mt-6 flex items-center justify-between">
-              <Label htmlFor="paymentMethod" className="">
+              <Label htmlFor={`${formPrefixId}-paymentMethod`} className="">
                 Payment Method
               </Label>
 
@@ -1914,7 +1982,7 @@ export function InvoiceForm({
                   render={({ field: { value, onChange, ...field } }) => (
                     <Switch
                       {...field}
-                      id={`paymentMethodFieldIsVisible`}
+                      id={`${formPrefixId}-paymentMethodFieldIsVisible`}
                       checked={value}
                       onCheckedChange={onChange}
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -1923,7 +1991,9 @@ export function InvoiceForm({
                 />
                 <CustomTooltip
                   trigger={
-                    <Label htmlFor={`paymentMethodFieldIsVisible`}>
+                    <Label
+                      htmlFor={`${formPrefixId}-paymentMethodFieldIsVisible`}
+                    >
                       Show in PDF
                     </Label>
                   }
@@ -1938,7 +2008,7 @@ export function InvoiceForm({
               render={({ field }) => (
                 <Input
                   {...field}
-                  id="paymentMethod"
+                  id={`${formPrefixId}-paymentMethod`}
                   type="text"
                   className="mt-1"
                 />
@@ -1952,14 +2022,19 @@ export function InvoiceForm({
           {/* Payment Due */}
           <div>
             <div className="mb-6">
-              <Label htmlFor="paymentDue" className="mb-1">
+              <Label htmlFor={`${formPrefixId}-paymentDue`} className="mb-1">
                 Payment Due
               </Label>
               <Controller
                 name="paymentDue"
                 control={control}
                 render={({ field }) => (
-                  <Input {...field} id="paymentDue" type="date" className="" />
+                  <Input
+                    {...field}
+                    id={`${formPrefixId}-paymentDue`}
+                    type="date"
+                    className=""
+                  />
                 )}
               />
               {errors.paymentDue && (
@@ -2011,7 +2086,7 @@ export function InvoiceForm({
           {/* Notes */}
           <div className="">
             <div className="relative mb-2 flex items-center justify-between">
-              <Label htmlFor="notes" className="">
+              <Label htmlFor={`${formPrefixId}-notes`} className="">
                 Notes
               </Label>
 
@@ -2023,7 +2098,7 @@ export function InvoiceForm({
                   render={({ field: { value, onChange, ...field } }) => (
                     <Switch
                       {...field}
-                      id={`notesFieldIsVisible`}
+                      id={`${formPrefixId}-notesFieldIsVisible`}
                       checked={value}
                       onCheckedChange={onChange}
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -2032,7 +2107,9 @@ export function InvoiceForm({
                 />
                 <CustomTooltip
                   trigger={
-                    <Label htmlFor={`notesFieldIsVisible`}>Show in PDF</Label>
+                    <Label htmlFor={`${formPrefixId}-notesFieldIsVisible`}>
+                      Show in PDF
+                    </Label>
                   }
                   content='Show/Hide the "Notes" Field in the PDF'
                 />
@@ -2042,7 +2119,12 @@ export function InvoiceForm({
               name="notes"
               control={control}
               render={({ field }) => (
-                <Textarea {...field} id="notes" rows={3} className="" />
+                <Textarea
+                  {...field}
+                  id={`${formPrefixId}-notes`}
+                  rows={3}
+                  className=""
+                />
               )}
             />
             {errors?.notes && (
@@ -2054,7 +2136,9 @@ export function InvoiceForm({
             <div className="relative mt-5 space-y-4">
               {/* Show/hide Person Authorized to Receive field in PDF switch */}
               <div className="flex items-center justify-between">
-                <Label htmlFor={`personAuthorizedToReceiveFieldIsVisible`}>
+                <Label
+                  htmlFor={`${formPrefixId}-personAuthorizedToReceiveFieldIsVisible`}
+                >
                   Show &quot;Person Authorized to Receive&quot; Signature Field
                   in the PDF
                 </Label>
@@ -2065,7 +2149,7 @@ export function InvoiceForm({
                   render={({ field: { value, onChange, ...field } }) => (
                     <Switch
                       {...field}
-                      id={`personAuthorizedToReceiveFieldIsVisible`}
+                      id={`${formPrefixId}-personAuthorizedToReceiveFieldIsVisible`}
                       checked={value}
                       onCheckedChange={onChange}
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -2076,7 +2160,9 @@ export function InvoiceForm({
 
               {/* Show/hide Person Authorized to Issue field in PDF switch */}
               <div className="flex items-center justify-between">
-                <Label htmlFor={`personAuthorizedToIssueFieldIsVisible`}>
+                <Label
+                  htmlFor={`${formPrefixId}-personAuthorizedToIssueFieldIsVisible`}
+                >
                   Show &quot;Person Authorized to Issue&quot; Signature Field in
                   the PDF
                 </Label>
@@ -2087,7 +2173,7 @@ export function InvoiceForm({
                   render={({ field: { value, onChange, ...field } }) => (
                     <Switch
                       {...field}
-                      id={`personAuthorizedToIssueFieldIsVisible`}
+                      id={`${formPrefixId}-personAuthorizedToIssueFieldIsVisible`}
                       checked={value}
                       onCheckedChange={onChange}
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
