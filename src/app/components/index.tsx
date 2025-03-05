@@ -90,12 +90,15 @@ export function InvoiceClientPage({
           </TabsContent>
           {/* Action buttons visible based on active tab */}
           <div className="sticky bottom-0 mt-4 flex flex-col gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 pt-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
-            {activeTab === TAB_INVOICE_FORM && (
-              <RegenerateInvoiceButton
-                invoiceData={invoiceDataState}
-                formPrefixId={FORM_PREFIX_IDS.MOBILE}
-              />
-            )}
+            <RegenerateInvoiceButton
+              invoiceData={invoiceDataState}
+              formPrefixId={
+                // we need to pass the correct form prefix id based on the active tab, because on invoice preview tab, the mobile form is not rendered
+                activeTab === TAB_INVOICE_FORM
+                  ? FORM_PREFIX_IDS.MOBILE
+                  : FORM_PREFIX_IDS.DESKTOP
+              }
+            />
             <InvoicePDFDownloadLink invoiceData={invoiceDataState} />
           </div>
         </Tabs>

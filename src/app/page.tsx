@@ -187,7 +187,7 @@ export default function Home() {
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 sm:p-4">
         <div className="mb-4 w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6">
           <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
-            <div className="relative bottom-2 mt-2 flex flex-col items-center justify-center lg:mt-0">
+            <div className="relative bottom-2 mb-3 mt-3 flex flex-col items-center justify-center sm:mb-2 sm:mt-0 lg:mb-8 xl:mb-0">
               <div className="flex items-center">
                 <ProjectLogo className="h-8 w-8" />
                 <h1 className="text-balance text-center text-xl font-bold text-slate-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
@@ -200,7 +200,7 @@ export default function Home() {
                   </a>
                 </h1>
               </div>
-              <p className="relative bottom-1.5 left-14 text-[12px] text-slate-700">
+              <p className="relative bottom-1.5 left-[49px] text-[12px] text-slate-700">
                 Invoice PDF generator with live preview
               </p>
             </div>
