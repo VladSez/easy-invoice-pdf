@@ -15,7 +15,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Free Invoice Generator with Live Preview | No Sign-Up",
+  title: "Invoice PDF Generator with Live Preview | No Sign-Up",
   description:
     "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
   keywords:
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Free Invoice Generator with Live Preview | No Sign-Up",
+    title: "Invoice PDF Generator with Live Preview | No Sign-Up",
     description:
       "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
     locale: "en_US",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free Invoice Generator with Live Preview | No Sign-Up",
+    title: "Invoice PDF Generator with Live Preview | No Sign-Up",
     description:
       "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
     creator: "@vlad_sazon",
@@ -62,7 +62,7 @@ export default function RootLayout({
         <NuqsAdapter>{children}</NuqsAdapter>
 
         {/* https://vercel.com/vladsazon27s-projects/pdf-invoice-generator/speed-insights */}
-        <SpeedInsights />
+        {process.env.VERCEL_ENV === "production" && <SpeedInsights />}
 
         {/* https://sonner.emilkowal.ski/ */}
         <Toaster visibleToasts={1} richColors />
