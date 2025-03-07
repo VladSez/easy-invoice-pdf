@@ -2,9 +2,10 @@
 
 [EasyInvoicePDF](https://easyinvoicepdf.com) – Free & Open-Source Invoice Generator | Live Preview, No Sign-Up, Runs in Your Browser.
 
-If you find this project useful, consider supporting it: https://buymeacoffee.com/vladsazon
+If you found this project helpful, you can support my work here: [Buy Me a Coffee](https://buymeacoffee.com/vladsazon). Every contribution is greatly appreciated!
 
-<img width="1440" alt="image" src="https://github.com/user-attachments/assets/a8b14dbb-234d-4506-9f59-232750dec642" />
+<img width="1440" alt="image" src="https://github.com/user-attachments/assets/9bc70941-4c2b-4c13-b264-38e3483a82c4" />
+
 
 ## Technologies we use
 
