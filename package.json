@@ -2,6 +2,11 @@
   "name": "pdf-invoice-generator",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.5.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.5.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
