@@ -248,7 +248,17 @@ export const DEFAULT_SELLER_DATA = {
 
   swiftBic: "Seller swift bic",
   swiftBicFieldIsVisible: true,
-} as const satisfies SellerData;
+} as const satisfies Omit<SellerData, "id">;
+
+export const DEFAULT_BUYER_DATA = {
+  name: "Buyer name",
+  address: "Buyer address",
+
+  vatNo: "Buyer vat number",
+  vatNoFieldIsVisible: true,
+
+  email: "buyer@email.com",
+} as const satisfies Omit<BuyerData, "id">;
 
 /**
  * Accordion state schema
