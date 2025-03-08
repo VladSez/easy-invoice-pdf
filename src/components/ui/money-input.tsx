@@ -35,7 +35,7 @@ const MoneyInput = React.forwardRef<
           )}
           placeholder="0.00"
         />
-        <span className="border-input text-muted-foreground inline-flex items-center rounded-e-lg border bg-background px-3 text-sm">
+        <span className="inline-flex items-center rounded-e-lg border border-gray-300 bg-background px-3 text-sm text-slate-950 shadow-sm shadow-black/5 transition-shadow">
           {shownCurrencyText}
         </span>
       </div>
@@ -73,7 +73,7 @@ const ReadOnlyMoneyInput = React.forwardRef<
           readOnly
           title="This field is read-only"
         />
-        <span className="inline-flex cursor-default items-center rounded-e-lg border border-gray-300 bg-gray-100 px-3 text-sm">
+        <span className="inline-flex cursor-default items-center rounded-e-lg border border-gray-300 bg-gray-100 px-3 text-sm text-slate-950 shadow-sm shadow-black/5 transition-shadow">
           {shownCurrencyText}
         </span>
       </div>

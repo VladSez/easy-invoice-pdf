@@ -2,6 +2,10 @@
   "name": "pdf-invoice-generator",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.5.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -25,8 +29,7 @@
     "@radix-ui/react-switch": "1.1.3",
     "@radix-ui/react-tabs": "1.1.3",
     "@radix-ui/react-tooltip": "1.1.8",
-    "@react-pdf/layout": "4.3.1",
-    "@react-pdf/renderer": "4.2.4",
+    "@react-pdf/renderer": "4.3.0",
     "@sentry/nextjs": "9.3.0",
     "@vercel/speed-insights": "1.2.0",
     "class-variance-authority": "0.7.1",

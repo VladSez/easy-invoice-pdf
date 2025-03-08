@@ -20,6 +20,7 @@ import { PDF_DATA_LOCAL_STORAGE_KEY } from "./components/invoice-form";
 import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
 import { INITIAL_INVOICE_DATA } from "./constants";
 import { cn } from "@/lib/utils";
+import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 export default function Home() {
   const router = useRouter();
@@ -241,6 +242,13 @@ export default function Home() {
               {isDesktop ? (
                 <InvoicePDFDownloadLink invoiceData={invoiceDataState} />
               ) : null}
+
+              {/* TODO: add later when PRO version is released, this is PRO FEATURE =) */}
+              {/* {isDesktop ? (
+                <InvoicePDFDownloadMultipleLanguages
+                  invoiceData={invoiceDataState}
+                />
+              ) : null} */}
             </div>
           </div>
           <div className="mb-4 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-0">
