@@ -66,8 +66,9 @@ export function BuyerDialog({
     },
   });
 
+  // by default, we want to apply the new buyer to the current invoice
   const [shouldApplyNewBuyerToInvoice, setShouldApplyNewBuyerToInvoice] =
-    useState(false);
+    useState(true);
 
   function onSubmit(formValues: BuyerData) {
     try {
@@ -149,7 +150,15 @@ export function BuyerDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose(false);
+          form.reset();
+        }
+      }}
+    >
       <DialogContent className="flex flex-col gap-0 overflow-y-visible p-0 sm:max-w-lg [&>button:last-child]:top-3.5">
         <DialogHeader className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
           <DialogTitle className="text-base">
@@ -205,24 +214,6 @@ export function BuyerDialog({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="email"
-                        placeholder="buyer@email.com"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               {/* VAT Number */}
               <div className="space-y-4">
                 <div className="flex items-end justify-between">
@@ -269,6 +260,24 @@ export function BuyerDialog({
                   </div>
                 </div>
               </div>
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="email"
+                        placeholder="buyer@email.com"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </form>
           </Form>
 
@@ -282,7 +291,7 @@ export function BuyerDialog({
                   id="apply-buyer-to-current-invoice-switch"
                 />
                 <Label htmlFor="apply-buyer-to-current-invoice-switch">
-                  Apply Buyer to current invoice
+                  Apply New Buyer to Current Invoice
                 </Label>
               </div>
             </div>
