@@ -73,8 +73,9 @@ export function SellerDialog({
     },
   });
 
+  // by default, we want to apply the new seller to the current invoice
   const [shouldApplyNewSellerToInvoice, setShouldApplyNewSellerToInvoice] =
-    useState(false);
+    useState(true);
 
   function onSubmit(formValues: SellerData) {
     try {
@@ -158,7 +159,15 @@ export function SellerDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose(false);
+          form.reset();
+        }
+      }}
+    >
       <DialogContent className="flex flex-col gap-0 overflow-y-visible p-0 sm:max-w-lg [&>button:last-child]:top-3.5">
         <DialogHeader className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
           <DialogTitle className="text-base">
@@ -214,6 +223,50 @@ export function SellerDialog({
                 )}
               />
 
+              <div className="flex items-end justify-between">
+                <FormField
+                  control={form.control}
+                  name="vatNo"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>VAT Number</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter VAT number" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Show/Hide VAT Number Field in PDF */}
+                <div className="ml-4 flex items-center gap-2">
+                  <FormField
+                    control={form.control}
+                    name="vatNoFieldIsVisible"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            id="vatNoFieldIsVisible"
+                          />
+                          <CustomTooltip
+                            trigger={
+                              <Label htmlFor="vatNoFieldIsVisible">
+                                Show in PDF
+                              </Label>
+                            }
+                            content='Show/Hide the "VAT Number" field in the PDF'
+                            className="z-[1000]"
+                          />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
               <FormField
                 control={form.control}
                 name="email"
@@ -234,50 +287,6 @@ export function SellerDialog({
 
               {/* VAT Number */}
               <div className="space-y-4">
-                <div className="flex items-end justify-between">
-                  <FormField
-                    control={form.control}
-                    name="vatNo"
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>VAT Number</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter VAT number" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Show/Hide VAT Number Field in PDF */}
-                  <div className="ml-4 flex items-center gap-2">
-                    <FormField
-                      control={form.control}
-                      name="vatNoFieldIsVisible"
-                      render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              id="vatNoFieldIsVisible"
-                            />
-                            <CustomTooltip
-                              trigger={
-                                <Label htmlFor="vatNoFieldIsVisible">
-                                  Show in PDF
-                                </Label>
-                              }
-                              content='Show/Hide the "VAT Number" field in the PDF'
-                              className="z-[1000]"
-                            />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-
                 <div className="flex items-end justify-between">
                   <FormField
                     control={form.control}
@@ -387,7 +396,7 @@ export function SellerDialog({
                   id="apply-seller-to-current-invoice-switch"
                 />
                 <Label htmlFor="apply-seller-to-current-invoice-switch">
-                  Apply Seller to current invoice
+                  Apply New Seller to Current Invoice
                 </Label>
               </div>
             </div>
