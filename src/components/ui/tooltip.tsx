@@ -7,6 +7,11 @@ import { cn } from "@/lib/utils";
 
 const TooltipProvider = React.memo(TooltipPrimitive.Provider);
 
+// Add Provider wrapper for app-wide usage
+function TooltipProviderWrapper({ children }: { children: React.ReactNode }) {
+  return <TooltipProvider delayDuration={0}>{children}</TooltipProvider>;
+}
+
 const Tooltip = React.memo(TooltipPrimitive.Root);
 
 const TooltipTrigger = React.memo(TooltipPrimitive.Trigger);
@@ -38,21 +43,40 @@ const TooltipContent = React.memo(
 );
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
+interface CustomTooltipProps {
+  trigger: React.ReactNode;
+  content: React.ReactNode;
+  className?: string;
+  side?: "top" | "right" | "bottom" | "left";
+  align?: "start" | "center" | "end";
+  delayDuration?: number;
+  showArrow?: boolean;
+}
+
 const CustomTooltip = React.memo(
   ({
     trigger,
     content,
     className,
-  }: {
-    trigger: React.ReactNode;
-    content: React.ReactNode;
-    className?: string;
-  }) => {
+    side = "top",
+    align = "center",
+    delayDuration = 300,
+    showArrow = false,
+  }: CustomTooltipProps) => {
+    // Memoize both trigger and content
+    const memoizedTrigger = React.useMemo(() => trigger, [trigger]);
+    const memoizedContent = React.useMemo(() => content, [content]);
+
     return (
-      <Tooltip>
-        <TooltipTrigger asChild>{trigger}</TooltipTrigger>
-        <TooltipContent className={cn("px-2 py-1 text-xs", className)}>
-          {content}
+      <Tooltip delayDuration={delayDuration}>
+        <TooltipTrigger asChild>{memoizedTrigger}</TooltipTrigger>
+        <TooltipContent
+          side={side}
+          align={align}
+          className={cn("px-2 py-1 text-xs", className)}
+          showArrow={showArrow}
+        >
+          {memoizedContent}
         </TooltipContent>
       </Tooltip>
     );
@@ -66,4 +90,5 @@ export {
   TooltipProvider,
   TooltipTrigger,
   CustomTooltip,
+  TooltipProviderWrapper,
 };
