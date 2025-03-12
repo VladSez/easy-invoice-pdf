@@ -58,6 +58,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      {process.env.VERCEL_ENV === "development" && (
+        <head>
+          {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+          <script
+            crossOrigin="anonymous"
+            src="//unpkg.com/react-scan/dist/auto.global.js"
+          />
+        </head>
+      )}
       <body className={`antialiased`}>
         <NuqsAdapter>{children}</NuqsAdapter>
 

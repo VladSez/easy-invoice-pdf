@@ -1,8 +1,10 @@
-export const InputHelperMessage = ({
+import { memo } from "react";
+
+export const InputHelperMessage = memo(function InputHelperMessage({
   children,
 }: {
   children: React.ReactNode;
-}) => {
+}) {
   return (
     <p
       className="mt-1 text-balance text-xs text-zinc-700/90"
@@ -12,4 +14,4 @@ export const InputHelperMessage = ({
       {children}
     </p>
   );
-};
+});

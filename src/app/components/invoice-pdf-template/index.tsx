@@ -17,6 +17,7 @@ import { InvoicePaymentInfo } from "./invoice-payment-info";
 import { InvoiceVATSummaryTable } from "./invoice-vat-summary-table";
 import { InvoicePaymentTotals } from "./invoice-payment-totals";
 import { translations } from "./translations";
+import { memo, useMemo } from "react";
 
 const PROD_WEBSITE_URL = "https://dub.sh/easy-invoice";
 
@@ -177,27 +178,37 @@ export const styles = StyleSheet.create({
   },
 } as const);
 
-// PDF Document component
-export const InvoicePdfTemplate = ({
+// Memoize the PDF Document component
+export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
   invoiceData,
 }: {
   invoiceData: InvoiceData;
-}) => {
-  const formattedInvoiceTotal = invoiceData?.total
-    .toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-    .replaceAll(",", " ");
+}) {
+  const formattedInvoiceTotal = useMemo(() => {
+    return invoiceData?.total
+      .toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+      .replaceAll(",", " ");
+  }, [invoiceData?.total]);
 
   const language = invoiceData.language;
   const t = translations[language];
 
-  const invoiceDocTitle = `${t.invoiceNumber} ${invoiceData.invoiceNumber} | Created with https://easyinvoicepdf.com`;
+  const invoiceDocTitle = useMemo(() => {
+    return `${t.invoiceNumber} ${invoiceData.invoiceNumber} | Created with https://easyinvoicepdf.com`;
+  }, [t.invoiceNumber, invoiceData.invoiceNumber]);
 
-  const signatureSectionIsVisible =
-    invoiceData.personAuthorizedToReceiveFieldIsVisible ||
-    invoiceData.personAuthorizedToIssueFieldIsVisible;
+  const signatureSectionIsVisible = useMemo(() => {
+    return (
+      invoiceData.personAuthorizedToReceiveFieldIsVisible ||
+      invoiceData.personAuthorizedToIssueFieldIsVisible
+    );
+  }, [
+    invoiceData.personAuthorizedToReceiveFieldIsVisible,
+    invoiceData.personAuthorizedToIssueFieldIsVisible,
+  ]);
 
   const vatTableSummaryIsVisible = invoiceData.vatTableSummaryIsVisible;
 
@@ -290,4 +301,4 @@ export const InvoicePdfTemplate = ({
       </Page>
     </Document>
   );
-};
+});

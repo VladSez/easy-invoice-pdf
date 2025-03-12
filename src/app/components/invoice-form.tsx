@@ -36,7 +36,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useOpenPanel } from "@openpanel/nextjs";
 import dayjs from "dayjs";
 import { AlertTriangle, Plus, Trash2 } from "lucide-react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
@@ -136,7 +136,7 @@ interface InvoiceFormProps {
   formPrefixId: FormPrefixId;
 }
 
-export function InvoiceForm({
+export const InvoiceForm = memo(function InvoiceForm({
   invoiceData,
   onInvoiceDataChange,
   formPrefixId,
@@ -246,22 +246,15 @@ export function InvoiceForm({
       // submit form e.g. regenerates pdf and run form validations
       handleSubmit(onSubmit)(data);
 
-      // validate with zod and save to local storage
-      const result = invoiceSchema.safeParse(data);
+      // data should be already validated
+      const stringifiedData = JSON.stringify(data);
 
-      if (!result.success) {
-        console.error("Invalid data:", result.error);
-      } else {
-        // success validation
-        const stringifiedData = JSON.stringify(result.data);
+      try {
+        localStorage.setItem(PDF_DATA_LOCAL_STORAGE_KEY, stringifiedData);
+      } catch (error) {
+        console.error("Error saving to local storage:", error);
 
-        try {
-          localStorage.setItem(PDF_DATA_LOCAL_STORAGE_KEY, stringifiedData);
-        } catch (error) {
-          console.error("Error saving to local storage:", error);
-
-          Sentry.captureException(error);
-        }
+        Sentry.captureException(error);
       }
     },
     // debounce delay in ms
@@ -2164,4 +2157,4 @@ export function InvoiceForm({
       </form>
     </>
   );
-}
+});
