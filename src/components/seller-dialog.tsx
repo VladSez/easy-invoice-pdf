@@ -29,7 +29,7 @@ import { CustomTooltip } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { SELLERS_LOCAL_STORAGE_KEY } from "./seller-management";
 import { z } from "zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
 
 const SELLER_FORM_ID = "seller-form";
@@ -46,6 +46,7 @@ interface SellerDialogProps {
   handleSellerEdit?: (seller: SellerData) => void;
   initialData: SellerData | null;
   isEditMode: boolean;
+  formValues?: Partial<SellerData>;
 }
 
 export function SellerDialog({
@@ -55,6 +56,7 @@ export function SellerDialog({
   handleSellerEdit,
   initialData,
   isEditMode,
+  formValues,
 }: SellerDialogProps) {
   const form = useForm<SellerData>({
     resolver: zodResolver(sellerSchema),
@@ -76,6 +78,38 @@ export function SellerDialog({
   // by default, we want to apply the new seller to the current invoice
   const [shouldApplyNewSellerToInvoice, setShouldApplyNewSellerToInvoice] =
     useState(true);
+
+  // Add state for applying form values
+  const [shouldApplyFormValues, setShouldApplyFormValues] = useState(false);
+
+  // Effect to update form values when switch is toggled
+  useEffect(() => {
+    // if the switch is on and we have form values, we want to apply the form values to the form
+    if (shouldApplyFormValues && formValues && !isEditMode) {
+      form.reset({
+        ...form.getValues(),
+        ...formValues,
+      });
+    }
+
+    // if the switch is off and we have initial data, we want to apply the initial data to the form
+    else if (!shouldApplyFormValues && !isEditMode) {
+      form.reset(
+        initialData ?? {
+          id: "",
+          name: "",
+          address: "",
+          vatNo: "",
+          email: "",
+          accountNumber: "",
+          swiftBic: "",
+          vatNoFieldIsVisible: true,
+          accountNumberFieldIsVisible: true,
+          swiftBicFieldIsVisible: true,
+        }
+      );
+    }
+  }, [shouldApplyFormValues, formValues, initialData, isEditMode, form]);
 
   function onSubmit(formValues: SellerData) {
     try {
@@ -181,6 +215,29 @@ export function SellerDialog({
         </DialogHeader>
 
         <div className="overflow-y-auto px-6 py-4">
+          {/* Show Use Current Form Values switch only when creating new seller */}
+          {!isEditMode && (
+            <div className="mb-4 flex items-center gap-2">
+              <Switch
+                checked={shouldApplyFormValues}
+                onCheckedChange={setShouldApplyFormValues}
+                id="apply-form-values-switch"
+              />
+              <CustomTooltip
+                trigger={
+                  <Label
+                    htmlFor="apply-form-values-switch"
+                    className="cursor-pointer"
+                  >
+                    Pre-fill with values from the current invoice form
+                  </Label>
+                }
+                content="Use the seller details already entered in the invoice form to pre-fill this dialog"
+                className="z-[1000]"
+              />
+            </div>
+          )}
+
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
@@ -386,21 +443,28 @@ export function SellerDialog({
             </form>
           </Form>
 
-          {/* Apply new seller to current invoice switch */}
-          {!isEditMode ? (
-            <div className="mt-4 flex items-center gap-2">
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={shouldApplyNewSellerToInvoice}
-                  onCheckedChange={setShouldApplyNewSellerToInvoice}
-                  id="apply-seller-to-current-invoice-switch"
-                />
-                <Label htmlFor="apply-seller-to-current-invoice-switch">
-                  Apply New Seller to Current Invoice
-                </Label>
-              </div>
+          {/* Apply to Current Invoice switch remains at the bottom */}
+          {!isEditMode && (
+            <div className="mt-4 flex items-center gap-2 border-t pt-4">
+              <Switch
+                checked={shouldApplyNewSellerToInvoice}
+                onCheckedChange={setShouldApplyNewSellerToInvoice}
+                id="apply-seller-to-current-invoice-switch"
+              />
+              <CustomTooltip
+                trigger={
+                  <Label
+                    htmlFor="apply-seller-to-current-invoice-switch"
+                    className="cursor-pointer"
+                  >
+                    Apply to Current Invoice
+                  </Label>
+                }
+                content="When enabled, the newly created seller will be automatically applied to your current invoice form"
+                className="z-[1000]"
+              />
             </div>
-          ) : null}
+          )}
         </div>
         <DialogFooter className="border-border border-t px-6 py-4">
           <DialogClose asChild>

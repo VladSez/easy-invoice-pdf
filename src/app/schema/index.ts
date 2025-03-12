@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const SUPPORTED_CURRENCIES = ["EUR", "USD", "GBP", "PLN"] as const;
+export type SupportedCurrencies = (typeof SUPPORTED_CURRENCIES)[number];
 
 export const SUPPORTED_LANGUAGES = ["en", "pl"] as const;
 export type SupportedLanguages = (typeof SUPPORTED_LANGUAGES)[number];
