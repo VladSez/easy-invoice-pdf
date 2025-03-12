@@ -46,7 +46,7 @@ interface InvoiceItemsSettingsProps {
   language: SupportedLanguages;
 }
 
-export const InvoiceItemsSettings = memo(function InvoiceItemsSettings({
+export const InvoiceItems = memo(function InvoiceItems({
   control,
   formPrefixId,
   fields,

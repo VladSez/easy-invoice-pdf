@@ -36,7 +36,7 @@ import { z } from "zod";
 import type { FormPrefixId } from "..";
 import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
-import { InvoiceItemsSettings } from "./sections/invoice-items";
+import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
 
 export const PDF_DATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_DATA";
@@ -459,7 +459,7 @@ export const InvoiceForm = memo(function InvoiceForm({
             <Legend>Invoice Items</Legend>
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
-            <InvoiceItemsSettings
+            <InvoiceItems
               control={control}
               formPrefixId={formPrefixId}
               fields={fields}
