@@ -1,7 +1,12 @@
 import { Plus, Trash2, Pencil } from "lucide-react";
 
-// import { Info } from "lucide-react";
-import { useId, useState, useEffect } from "react";
+import {
+  useId,
+  useState,
+  useEffect,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import { CustomTooltip } from "./ui/tooltip";
 import { SelectNative } from "./ui/select-native";
 import { Button } from "./ui/button";
@@ -34,20 +39,28 @@ import * as Sentry from "@sentry/nextjs";
 
 export const SELLERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_SELLERS";
 
+interface SellerManagementProps {
+  setValue: UseFormSetValue<InvoiceData>;
+  invoiceData: InvoiceData;
+  selectedSellerId: string;
+  setSelectedSellerId: Dispatch<SetStateAction<string>>;
+  formValues?: Partial<SellerData>;
+}
+
 export function SellerManagement({
   setValue,
   invoiceData,
-}: {
-  setValue: UseFormSetValue<InvoiceData>;
-  invoiceData: InvoiceData;
-}) {
+  selectedSellerId,
+  setSelectedSellerId,
+  formValues,
+}: SellerManagementProps) {
   const [isSellerDialogOpen, setIsSellerDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const [sellersSelectOptions, setSellersSelectOptions] = useState<
     SellerData[]
   >([]);
-  const [selectedSellerIndex, setSelectedSellerIndex] = useState("");
+  // const [selectedSellerIndex, setSelectedSellerIndex] = useState("");
   const [editingSeller, setEditingSeller] = useState<SellerData | null>(null);
 
   const openPanel = useOpenPanel();
@@ -77,13 +90,13 @@ export function SellerManagement({
       );
 
       setSellersSelectOptions(validationResult.data);
-      setSelectedSellerIndex(selectedSeller?.id ?? "");
+      setSelectedSellerId(selectedSeller?.id ?? "");
     } catch (error) {
       console.error("Failed to load sellers:", error);
 
       Sentry.captureException(error);
     }
-  }, [invoiceData?.seller?.id]);
+  }, [invoiceData?.seller?.id, setSelectedSellerId]);
 
   // Update sellers when a new one is added
   const handleSellerAdd = (
@@ -113,7 +126,7 @@ export function SellerManagement({
       // Apply the new seller to the invoice if the user wants to, otherwise just add it to the list and use it later if needed
       if (shouldApplyNewSellerToInvoice) {
         setValue("seller", newSellerWithId);
-        setSelectedSellerIndex(newSellerWithId?.id);
+        setSelectedSellerId(newSellerWithId?.id);
       }
 
       toast.success("Seller added successfully", {
@@ -174,7 +187,7 @@ export function SellerManagement({
     const id = event.target.value;
 
     if (id) {
-      setSelectedSellerIndex(id);
+      setSelectedSellerId(id);
       const selectedSeller = sellersSelectOptions.find(
         (seller) => seller.id === id
       );
@@ -184,7 +197,7 @@ export function SellerManagement({
       }
     } else {
       // Clear the seller from the form if the user selects the empty option
-      setSelectedSellerIndex("");
+      setSelectedSellerId("");
       setValue("seller", DEFAULT_SELLER_DATA);
     }
 
@@ -197,7 +210,7 @@ export function SellerManagement({
     try {
       setSellersSelectOptions((prevSellers) => {
         const updatedSellers = prevSellers.filter(
-          (seller) => seller.id !== selectedSellerIndex
+          (seller) => seller.id !== selectedSellerId
         );
 
         localStorage.setItem(
@@ -207,7 +220,7 @@ export function SellerManagement({
         return updatedSellers;
       });
       // Clear the selected seller index
-      setSelectedSellerIndex("");
+      setSelectedSellerId("");
       // Clear the seller from the form if it was selected
       setValue("seller", DEFAULT_SELLER_DATA);
 
@@ -233,7 +246,7 @@ export function SellerManagement({
   };
 
   const activeSeller = sellersSelectOptions.find(
-    (seller) => seller.id === selectedSellerIndex
+    (seller) => seller.id === selectedSellerId
   );
 
   return (
@@ -251,10 +264,10 @@ export function SellerManagement({
                 id={sellerSelectId}
                 className={cn(
                   "block h-8 max-w-[200px] text-[12px]",
-                  !selectedSellerIndex && "italic text-gray-700"
+                  !selectedSellerId && "italic text-gray-700"
                 )}
                 onChange={handleSellerChange}
-                value={selectedSellerIndex}
+                value={selectedSellerId}
                 title={activeSeller?.name}
               >
                 <option value="">No seller selected (default)</option>
@@ -265,7 +278,7 @@ export function SellerManagement({
                 ))}
               </SelectNative>
 
-              {selectedSellerIndex ? (
+              {selectedSellerId ? (
                 <div className="flex items-center gap-2">
                   <CustomTooltip
                     trigger={
@@ -355,6 +368,7 @@ export function SellerManagement({
         handleSellerEdit={handleSellerEdit}
         initialData={editingSeller}
         isEditMode={isEditMode}
+        formValues={formValues}
       />
 
       {/* Delete alert seller dialog */}

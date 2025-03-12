@@ -34,20 +34,28 @@ import * as Sentry from "@sentry/nextjs";
 
 export const BUYERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_BUYERS";
 
+interface BuyerManagementProps {
+  setValue: UseFormSetValue<InvoiceData>;
+  invoiceData: InvoiceData;
+  selectedBuyerId: string;
+  setSelectedBuyerId: (id: string) => void;
+  formValues?: Partial<BuyerData>;
+}
+
 export function BuyerManagement({
   setValue,
   invoiceData,
-}: {
-  setValue: UseFormSetValue<InvoiceData>;
-  invoiceData: InvoiceData;
-}) {
+  selectedBuyerId,
+  setSelectedBuyerId,
+  formValues,
+}: BuyerManagementProps) {
   const [isBuyerDialogOpen, setIsBuyerDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const [buyersSelectOptions, setBuyersSelectOptions] = useState<BuyerData[]>(
     []
   );
-  const [selectedBuyerIndex, setSelectedBuyerIndex] = useState("");
+  // const [selectedBuyerId, setSelectedBuyerId] = useState("");
   const [editingBuyer, setEditingBuyer] = useState<BuyerData | null>(null);
 
   const openPanel = useOpenPanel();
@@ -75,13 +83,13 @@ export function BuyerManagement({
       });
 
       setBuyersSelectOptions(validationResult.data);
-      setSelectedBuyerIndex(selectedBuyer?.id ?? "");
+      setSelectedBuyerId(selectedBuyer?.id ?? "");
     } catch (error) {
       console.error("Failed to load buyers:", error);
 
       Sentry.captureException(error);
     }
-  }, [invoiceData?.buyer?.id]);
+  }, [invoiceData?.buyer?.id, setSelectedBuyerId]);
 
   // Update buyers when a new one is added
   const handleBuyerAdd = (
@@ -106,7 +114,7 @@ export function BuyerManagement({
       // Apply the new buyer to the invoice if the user wants to, otherwise just add it to the list and use it later if needed
       if (shouldApplyNewBuyerToInvoice) {
         setValue("buyer", newBuyerWithId);
-        setSelectedBuyerIndex(newBuyerWithId?.id);
+        setSelectedBuyerId(newBuyerWithId?.id);
       }
 
       toast.success("Buyer added successfully", {
@@ -167,7 +175,7 @@ export function BuyerManagement({
     const id = event.target.value;
 
     if (id) {
-      setSelectedBuyerIndex(id);
+      setSelectedBuyerId(id);
       const selectedBuyer = buyersSelectOptions.find(
         (buyer) => buyer.id === id
       );
@@ -177,7 +185,7 @@ export function BuyerManagement({
       }
     } else {
       // Clear the buyer from the form if the user selects the empty option
-      setSelectedBuyerIndex("");
+      setSelectedBuyerId("");
       setValue("buyer", DEFAULT_BUYER_DATA);
     }
 
@@ -190,7 +198,7 @@ export function BuyerManagement({
     try {
       setBuyersSelectOptions((prevBuyers) => {
         const updatedBuyers = prevBuyers.filter(
-          (buyer) => buyer.id !== selectedBuyerIndex
+          (buyer) => buyer.id !== selectedBuyerId
         );
 
         localStorage.setItem(
@@ -200,7 +208,7 @@ export function BuyerManagement({
         return updatedBuyers;
       });
       // Clear the selected buyer index
-      setSelectedBuyerIndex("");
+      setSelectedBuyerId("");
       // Clear the buyer from the form if it was selected
       setValue("buyer", DEFAULT_BUYER_DATA);
 
@@ -226,7 +234,7 @@ export function BuyerManagement({
   };
 
   const activeBuyer = buyersSelectOptions.find(
-    (buyer) => buyer.id === selectedBuyerIndex
+    (buyer) => buyer.id === selectedBuyerId
   );
 
   return (
@@ -244,10 +252,10 @@ export function BuyerManagement({
                 id={buyerSelectId}
                 className={cn(
                   "block h-8 max-w-[200px] text-[12px]",
-                  !selectedBuyerIndex && "italic text-gray-700"
+                  !selectedBuyerId && "italic text-gray-700"
                 )}
                 onChange={handleBuyerChange}
-                value={selectedBuyerIndex}
+                value={selectedBuyerId}
                 title={activeBuyer?.name}
               >
                 <option value="">No buyer selected (default)</option>
@@ -258,7 +266,7 @@ export function BuyerManagement({
                 ))}
               </SelectNative>
 
-              {selectedBuyerIndex ? (
+              {selectedBuyerId ? (
                 <div className="flex items-center gap-2">
                   <CustomTooltip
                     trigger={
@@ -348,6 +356,7 @@ export function BuyerManagement({
         handleBuyerEdit={handleBuyerEdit}
         initialData={editingBuyer}
         isEditMode={isEditMode}
+        formValues={formValues}
       />
 
       {/* Delete alert buyer dialog */}

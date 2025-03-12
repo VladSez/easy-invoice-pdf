@@ -70,14 +70,16 @@ const CustomTooltip = React.memo(
     return (
       <Tooltip delayDuration={delayDuration}>
         <TooltipTrigger asChild>{memoizedTrigger}</TooltipTrigger>
-        <TooltipContent
-          side={side}
-          align={align}
-          className={cn("px-2 py-1 text-xs", className)}
-          showArrow={showArrow}
-        >
-          {memoizedContent}
-        </TooltipContent>
+        {memoizedContent ? (
+          <TooltipContent
+            side={side}
+            align={align}
+            className={cn("px-2 py-1 text-xs", className)}
+            showArrow={showArrow}
+          >
+            {memoizedContent}
+          </TooltipContent>
+        ) : null}
       </Tooltip>
     );
   }
