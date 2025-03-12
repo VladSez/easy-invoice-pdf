@@ -3,6 +3,7 @@ import {
   Controller,
   FieldErrors,
   UseFormSetValue,
+  useWatch,
 } from "react-hook-form";
 import { InvoiceData } from "@/app/schema";
 import {
@@ -37,9 +38,7 @@ interface GeneralInformationProps {
   errors: FieldErrors<InvoiceData>;
   setValue: UseFormSetValue<InvoiceData>;
   formPrefixId: FormPrefixId;
-  isDateOfIssueInCurrentMonth: boolean;
-  isDateOfServiceInCurrentMonth: boolean;
-  isInvoiceNumberInCurrentMonth: boolean;
+  dateOfIssue: string;
 }
 
 export const GeneralInformation = memo(function GeneralInformation({
@@ -47,10 +46,23 @@ export const GeneralInformation = memo(function GeneralInformation({
   errors,
   setValue,
   formPrefixId,
-  isDateOfIssueInCurrentMonth,
-  isDateOfServiceInCurrentMonth,
-  isInvoiceNumberInCurrentMonth,
+  dateOfIssue,
 }: GeneralInformationProps) {
+  const invoiceNumber = useWatch({ control, name: "invoiceNumber" });
+  const dateOfService = useWatch({ control, name: "dateOfService" });
+
+  const isDateOfIssueNotToday = !dayjs(dateOfIssue).isSame(dayjs(), "day");
+
+  const isDateOfServiceEqualsEndOfCurrentMonth = dayjs(dateOfService).isSame(
+    dayjs().endOf("month"),
+    "day"
+  );
+
+  const extractInvoiceMonthAndYear = invoiceNumber?.split("/")?.[1];
+
+  const isInvoiceNumberInCurrentMonth =
+    extractInvoiceMonthAndYear === dayjs().format("MM-YYYY");
+
   return (
     <div className="space-y-4">
       {/* Language PDF Select */}
@@ -223,11 +235,11 @@ export const GeneralInformation = memo(function GeneralInformation({
         {errors.dateOfIssue && (
           <ErrorMessage>{errors.dateOfIssue.message}</ErrorMessage>
         )}
-        {!isDateOfIssueInCurrentMonth && !errors.dateOfIssue ? (
+        {isDateOfIssueNotToday && !errors.dateOfIssue ? (
           <InputHelperMessage>
             <span className="flex items-center">
               <AlertIcon />
-              Date of issue does not match current month
+              Date of issue is not today
             </span>
 
             <ButtonHelper
@@ -264,11 +276,11 @@ export const GeneralInformation = memo(function GeneralInformation({
           <ErrorMessage>{errors.dateOfService.message}</ErrorMessage>
         )}
 
-        {!isDateOfServiceInCurrentMonth && !errors.dateOfService ? (
+        {!isDateOfServiceEqualsEndOfCurrentMonth && !errors.dateOfService ? (
           <InputHelperMessage>
             <span className="flex items-center">
               <AlertIcon />
-              Date of service does not match current month
+              Date of service is not the last day of the current month
             </span>
 
             <ButtonHelper

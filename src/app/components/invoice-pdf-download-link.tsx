@@ -2,7 +2,11 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { usePDF } from "@react-pdf/renderer";
-import type { InvoiceData } from "@/app/schema";
+import {
+  LANGUAGE_TO_LABEL,
+  type InvoiceData,
+  type SupportedLanguages,
+} from "@/app/schema";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
@@ -25,15 +29,26 @@ const DONATION_TOAST_CONFIG = {
 const DONATION_URL = "https://dub.sh/easyinvoice-donate" as const;
 
 // Separate button states into a memoized component
-const ButtonContent = ({ isLoading }: { isLoading: boolean }) =>
-  isLoading ? (
-    <span className="inline-flex items-center">
-      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      <span className="animate-pulse">{LOADING_BUTTON_TEXT}</span>
-    </span>
-  ) : (
-    "Download PDF"
-  );
+const ButtonContent = ({
+  isLoading,
+  language,
+}: {
+  isLoading: boolean;
+  language: SupportedLanguages;
+}) => {
+  if (isLoading) {
+    return (
+      <span className="inline-flex items-center">
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        <span className="animate-pulse">{LOADING_BUTTON_TEXT}</span>
+      </span>
+    );
+  }
+
+  const languageLabel = LANGUAGE_TO_LABEL[language];
+
+  return `Download PDF in ${languageLabel}`;
+};
 
 export function InvoicePDFDownloadLink({
   invoiceData,
@@ -132,7 +147,7 @@ export function InvoicePDFDownloadLink({
         }
       )}
     >
-      <ButtonContent isLoading={isLoading} />
+      <ButtonContent isLoading={isLoading} language={invoiceData.language} />
     </a>
   );
 }

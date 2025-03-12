@@ -61,20 +61,6 @@ type NonReadonly<T> = {
   -readonly [P in keyof T]: T[P] extends object ? NonReadonly<T[P]> : T[P];
 };
 
-const checkIfDateOnInvoiceIsInCurrentMonth = (date: string) => {
-  const today = dayjs();
-
-  if (!date) return false;
-
-  const d2 = dayjs(date);
-
-  if (!d2.isValid()) return false;
-
-  const isSameMonth = today.isSame(d2, "month");
-
-  return isSameMonth;
-};
-
 const calculateItemTotals = (item: InvoiceItemData | null) => {
   if (!item) return null;
 
@@ -155,17 +141,10 @@ export const InvoiceForm = memo(function InvoiceForm({
   const currency = useWatch({ control, name: "currency" });
   const invoiceItems = useWatch({ control, name: "items" });
 
-  const invoiceNumber = useWatch({ control, name: "invoiceNumber" });
   const dateOfIssue = useWatch({ control, name: "dateOfIssue" });
-  const dateOfService = useWatch({ control, name: "dateOfService" });
+
   const paymentDue = useWatch({ control, name: "paymentDue" });
   const language = useWatch({ control, name: "language" });
-
-  const isDateOfIssueInCurrentMonth =
-    checkIfDateOnInvoiceIsInCurrentMonth(dateOfIssue);
-
-  const isDateOfServiceInCurrentMonth =
-    checkIfDateOnInvoiceIsInCurrentMonth(dateOfService);
 
   const isPaymentDueBeforeDateOfIssue = dayjs(paymentDue).isBefore(
     dayjs(dateOfIssue)
@@ -175,11 +154,6 @@ export const InvoiceForm = memo(function InvoiceForm({
   const isPaymentDue14DaysFromDateOfIssue =
     dayjs(paymentDue).isAfter(dayjs(dateOfIssue).add(14, "days")) ||
     dayjs(paymentDue).isSame(dayjs(dateOfIssue).add(14, "days"));
-
-  const extractInvoiceMonthAndYear = invoiceNumber?.split("/")?.[1];
-
-  const isInvoiceNumberInCurrentMonth =
-    extractInvoiceMonthAndYear === dayjs().format("MM-YYYY");
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -433,9 +407,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               errors={errors}
               setValue={setValue}
               formPrefixId={formPrefixId}
-              isDateOfIssueInCurrentMonth={isDateOfIssueInCurrentMonth}
-              isDateOfServiceInCurrentMonth={isDateOfServiceInCurrentMonth}
-              isInvoiceNumberInCurrentMonth={isInvoiceNumberInCurrentMonth}
+              dateOfIssue={dateOfIssue}
             />
           </AccordionContent>
         </AccordionItem>
