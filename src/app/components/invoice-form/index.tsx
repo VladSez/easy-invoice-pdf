@@ -575,7 +575,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                   id={`${formPrefixId}-paymentDue`}
                   type="date"
                   className=""
-                  lang="en"
+                  lang="en-US"
                 />
               )}
             />

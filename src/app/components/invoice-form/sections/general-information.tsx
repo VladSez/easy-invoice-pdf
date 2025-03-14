@@ -229,7 +229,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               type="date"
               id={`${formPrefixId}-dateOfIssue`}
               className=""
-              lang="en"
+              lang="en-US"
             />
           )}
         />
@@ -270,7 +270,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               type="date"
               id={`${formPrefixId}-dateOfService`}
               className=""
-              lang="en"
+              lang="en-US"
             />
           )}
         />
