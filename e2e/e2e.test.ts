@@ -443,10 +443,10 @@ test.describe("Invoice Generator Page", () => {
     // Check for error messages to be hidden
     await expect(
       page.getByText("Invoice number is required", { exact: true })
-    ).not.toBeVisible();
+    ).toBeHidden();
     await expect(
       page.getByText("Date of issue is required", { exact: true })
-    ).not.toBeVisible();
+    ).toBeHidden();
   });
 
   test("handles mobile/desktop views", async ({ page }) => {
@@ -891,17 +891,18 @@ test.describe("Invoice Generator Page", () => {
     await expect(page.getByTestId("notes")).not.toBeVisible();
   });
 
-  // test("handles invoice sharing", async ({ page }) => {
-  //   // Click share button
-  //   await page
-  //     .getByRole("button", { name: "Generate a link to invoice" })
-  //     .click();
+  // TBD
+  test.skip("handles invoice sharing", async ({ page }) => {
+    // Click share button
+    await page
+      .getByRole("button", { name: "Generate a link to invoice" })
+      .click();
 
-  //   // Verify share dialog appears
-  //   await expect(page.getByRole("dialog")).toBeVisible();
-  //   await expect(page.getByText("Share Invoice")).toBeVisible();
+    // Verify share dialog appears
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page.getByText("Share Invoice")).toBeVisible();
 
-  //   // Check copy link button
-  //   await expect(page.getByRole("button", { name: "Copy Link" })).toBeEnabled();
-  // });
+    // Check copy link button
+    await expect(page.getByRole("button", { name: "Copy Link" })).toBeEnabled();
+  });
 });
