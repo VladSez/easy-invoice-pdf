@@ -13,7 +13,6 @@ import {
   type FieldErrors,
   type UseFieldArrayAppend,
 } from "react-hook-form";
-import type { FormPrefixId } from "../..";
 
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
@@ -24,6 +23,7 @@ import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { getAmountInWords, getNumberFractionalPart } from "@/lib/utils";
 import { useOpenPanel } from "@openpanel/nextjs";
 import { Plus, Trash2 } from "lucide-react";
+import type { FORM_PREFIX_IDS } from "../../constants";
 
 const Legend = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -37,7 +37,7 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
 
 interface InvoiceItemsSettingsProps {
   control: Control<InvoiceData>;
-  formPrefixId: FormPrefixId;
+  formPrefixId: (typeof FORM_PREFIX_IDS)[keyof typeof FORM_PREFIX_IDS];
   fields: FieldArrayWithId<InvoiceData, "items", "id">[];
   handleRemoveItem: (index: number) => void;
   append: UseFieldArrayAppend<InvoiceData, "items">;
@@ -121,6 +121,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                       onClick={() => handleRemoveItem(index)}
                       className="flex items-center justify-center rounded-full bg-red-600 p-2 transition-colors hover:bg-red-700"
                     >
+                      <span className="sr-only">
+                        Delete Invoice Item {index + 1}
+                      </span>
                       <Trash2 className="h-4 w-4 text-white" />
                     </button>
                   }
@@ -461,6 +464,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             step="0.01"
                             min="0"
                             className="w-full"
+                            dataTestId={`${formPrefixId}-itemNetPrice${index}`}
                           />
                           {!errors.items?.[index]?.netPrice && (
                             <InputHelperMessage>
@@ -474,6 +478,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     }}
                   />
                 </div>
+
                 {errors.items?.[index]?.netPrice && (
                   <ErrorMessage>
                     {errors.items[index].netPrice.message}
@@ -598,6 +603,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
+                        dataTestId={`${formPrefixId}-itemNetAmount${index}`}
                       />
                     );
                   }}
@@ -658,17 +664,20 @@ export const InvoiceItems = memo(function InvoiceItems({
                 <Controller
                   name={`items.${index}.vatAmount`}
                   control={control}
-                  render={({ field }) => (
-                    <ReadOnlyMoneyInput
-                      {...field}
-                      id={`${formPrefixId}-itemVatAmount${index}`}
-                      currency={currency}
-                      value={field.value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    />
-                  )}
+                  render={({ field }) => {
+                    return (
+                      <ReadOnlyMoneyInput
+                        {...field}
+                        id={`${formPrefixId}-itemVatAmount${index}`}
+                        currency={currency}
+                        value={field.value.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                        data-testid="vat-amount"
+                      />
+                    );
+                  }}
                 />
 
                 {errors.items?.[index]?.vatAmount ? (
@@ -726,17 +735,19 @@ export const InvoiceItems = memo(function InvoiceItems({
                 <Controller
                   name={`items.${index}.preTaxAmount`}
                   control={control}
-                  render={({ field }) => (
-                    <ReadOnlyMoneyInput
-                      {...field}
-                      id={`${formPrefixId}-itemPreTaxAmount${index}`}
-                      currency={currency}
-                      value={field.value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    />
-                  )}
+                  render={({ field }) => {
+                    return (
+                      <ReadOnlyMoneyInput
+                        {...field}
+                        id={`${formPrefixId}-itemPreTaxAmount${index}`}
+                        currency={currency}
+                        value={field.value.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      />
+                    );
+                  }}
                 />
 
                 {errors.items?.[index]?.preTaxAmount ? (

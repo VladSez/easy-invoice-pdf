@@ -12,8 +12,8 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { memo, useState } from "react";
-import type { FormPrefixId } from "../..";
 import { LabelWithEditIcon } from "@/components/label-with-edit-icon";
+import type { FormPrefixId } from "../../constants";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;

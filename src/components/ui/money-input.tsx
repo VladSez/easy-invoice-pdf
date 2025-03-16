@@ -13,14 +13,20 @@ export const CURRENCY_SYMBOLS = {
 const MoneyInput = React.memo(
   React.forwardRef<
     HTMLInputElement,
-    React.ComponentProps<"input"> & { currency: InvoiceData["currency"] }
-  >(({ currency, ...props }, ref) => {
+    React.ComponentProps<"input"> & {
+      currency: InvoiceData["currency"];
+      dataTestId?: string;
+    }
+  >(({ currency, dataTestId, ...props }, ref) => {
     const shownCurrencyText = currency || SUPPORTED_CURRENCIES[0];
     const currencySymbol = CURRENCY_SYMBOLS[shownCurrencyText] || null;
 
     return (
       <div>
-        <div className="relative flex rounded-lg shadow-sm shadow-black/5">
+        <div
+          className="relative flex rounded-lg shadow-sm shadow-black/5"
+          data-testid={dataTestId}
+        >
           {currencySymbol ? (
             <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-sm">
               {currencySymbol}
@@ -49,14 +55,20 @@ MoneyInput.displayName = "MoneyInput";
 const ReadOnlyMoneyInput = React.memo(
   React.forwardRef<
     HTMLInputElement,
-    React.ComponentProps<"input"> & { currency: InvoiceData["currency"] }
-  >(({ currency, ...props }, ref) => {
+    React.ComponentProps<"input"> & {
+      currency: InvoiceData["currency"];
+      dataTestId?: string;
+    }
+  >(({ currency, dataTestId, ...props }, ref) => {
     const shownCurrencyText = currency || SUPPORTED_CURRENCIES[0];
     const currencySymbol = CURRENCY_SYMBOLS[shownCurrencyText] || null;
 
     return (
       <div>
-        <div className="relative flex rounded-lg shadow-sm shadow-black/5">
+        <div
+          className="relative flex rounded-lg shadow-sm shadow-black/5"
+          data-testid={dataTestId}
+        >
           {currencySymbol ? (
             <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-sm">
               {currencySymbol}

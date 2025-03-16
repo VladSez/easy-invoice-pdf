@@ -9,14 +9,7 @@ import { InvoicePdfTemplate } from "./invoice-pdf-template";
 import type { InvoiceData } from "../schema";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-
-export const FORM_PREFIX_IDS = {
-  MOBILE: "mobile-invoice-form",
-  DESKTOP: "desktop-invoice-form",
-} as const satisfies Record<string, string>;
-
-export type FormPrefixId =
-  (typeof FORM_PREFIX_IDS)[keyof typeof FORM_PREFIX_IDS];
+import { FORM_PREFIX_IDS } from "./constants";
 
 const InvoicePDFViewer = dynamic(
   () => import("./invoice-pdf-viewer").then((mod) => mod.InvoicePDFViewer),
@@ -51,7 +44,7 @@ export function InvoiceClientPage({
   return (
     <>
       {/* Mobile View with Tabs START */}
-      <div className="block w-full lg:hidden">
+      <div className="block w-full lg:hidden" data-testid="mobile-view">
         <Tabs defaultValue={TAB_INVOICE_FORM} className="w-full">
           <TabsList className="w-full">
             <TabsTrigger value={TAB_INVOICE_FORM} className="flex-1">
@@ -104,7 +97,7 @@ export function InvoiceClientPage({
       {/* Mobile View with Tabs END */}
 
       {/* Desktop View - Side by Side START */}
-      <div className="hidden lg:col-span-4 lg:block">
+      <div className="hidden lg:col-span-4 lg:block" data-testid="desktop-view">
         <div className="h-[620px] overflow-auto border-b px-3 pl-0">
           <InvoiceForm
             invoiceData={invoiceDataState}

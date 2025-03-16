@@ -33,11 +33,11 @@ import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
-import type { FormPrefixId } from "..";
 import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
+import type { FORM_PREFIX_IDS } from "../constants";
 
 export const PDF_DATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_DATA";
 export const INVOICE_PDF_HTML_FORM_ID = "pdfInvoiceForm";
@@ -91,9 +91,14 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
 };
 
-const Legend = ({ children }: { children: React.ReactNode }) => {
+const Legend = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLLegendElement>) => {
   return (
-    <legend className="text-lg font-semibold text-gray-900">{children}</legend>
+    <legend className="text-lg font-semibold text-gray-900" {...props}>
+      {children}
+    </legend>
   );
 };
 
@@ -114,7 +119,7 @@ interface InvoiceFormProps {
    * we need this to generate unique ids for the form fields for mobile and desktop views
    * otherwise the ids will be the same and the form will not work correctly + accessibility issues
    */
-  formPrefixId: FormPrefixId;
+  formPrefixId: (typeof FORM_PREFIX_IDS)[keyof typeof FORM_PREFIX_IDS];
 }
 
 export const InvoiceForm = memo(function InvoiceForm({
@@ -327,6 +332,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   return (
     <form
       id={formPrefixId}
+      data-testid={`${formPrefixId}`}
       className="mb-4 space-y-3.5"
       onSubmit={handleSubmit(onSubmit, (errors) => {
         console.error("Form validation errors:", errors);
@@ -397,6 +403,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         <AccordionItem
           value={ACCORDION_GENERAL}
           className="rounded-lg border shadow"
+          data-testid={`${formPrefixId}-general-information-section`}
         >
           <AccordionTrigger className="px-4 py-3">
             <Legend>General Information</Legend>
@@ -416,6 +423,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         <AccordionItem
           value={ACCORDION_SELLER}
           className="rounded-lg border shadow"
+          data-testid={`${formPrefixId}-seller-information-section`}
         >
           <AccordionTrigger className="px-4 py-3">
             <Legend>Seller Information</Legend>
@@ -435,6 +443,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         <AccordionItem
           value={ACCORDION_BUYER}
           className="rounded-lg border shadow"
+          data-testid={`${formPrefixId}-buyer-information-section`}
         >
           <AccordionTrigger className="px-4 py-3">
             <Legend>Buyer Information</Legend>
@@ -454,6 +463,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         <AccordionItem
           value={ACCORDION_ITEMS}
           className="rounded-lg border shadow"
+          data-testid={`${formPrefixId}-invoice-items-section`}
         >
           <AccordionTrigger className="px-4 py-3">
             <Legend>Invoice Items</Legend>
@@ -474,7 +484,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       </Accordion>
 
       {/* Final section */}
-      <div className="space-y-4">
+      <div className="space-y-4" data-testid={`${formPrefixId}-final-section`}>
         <div className="">
           {/* Total field (with currency) */}
           <div className="mt-5" />
@@ -664,6 +674,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                 id={`${formPrefixId}-notes`}
                 rows={3}
                 className=""
+                data-testid="notes"
               />
             )}
           />

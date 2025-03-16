@@ -296,6 +296,7 @@ export function SellerManagement({
                         }}
                         className="h-8 px-2"
                       >
+                        <span className="sr-only">Edit seller</span>
                         <Pencil className="h-3 w-3" />
                       </Button>
                     }

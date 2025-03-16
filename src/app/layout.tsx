@@ -58,15 +58,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      {process.env.VERCEL_ENV === "development" && (
+      {/* React-scan is a tool for detecting and fixing issues with React components
+        https://github.com/aidenybai/react-scan#readme
+        Uncomment if needed
+      */}
+      {/* {process.env.VERCEL_ENV === "development" && (
         <head>
-          {/* eslint-disable-next-line @next/next/no-sync-scripts */}
           <script
             crossOrigin="anonymous"
             src="//unpkg.com/react-scan/dist/auto.global.js"
           />
         </head>
-      )}
+      )} */}
       <body className={`antialiased`}>
         <NuqsAdapter>{children}</NuqsAdapter>
 

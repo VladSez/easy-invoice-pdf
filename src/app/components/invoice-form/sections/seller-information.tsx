@@ -12,21 +12,21 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { memo, useState } from "react";
-import type { FormPrefixId } from "../..";
 import { LabelWithEditIcon } from "@/components/label-with-edit-icon";
+import type { FORM_PREFIX_IDS } from "../../constants";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
 };
 
 const SELLER_TOOLTIP_CONTENT =
-  "Click the edit button next to the 'Select Seller' dropdown to modify seller details. Any changes will be automatically saved.";
+  "Seller details are locked. Click the edit button next to the 'Select Seller' dropdown to modify seller details. Any changes will be automatically saved.";
 
 interface SellerInformationProps {
   control: Control<InvoiceData>;
   errors: FieldErrors<InvoiceData>;
   setValue: UseFormSetValue<InvoiceData>;
-  formPrefixId: FormPrefixId;
+  formPrefixId: (typeof FORM_PREFIX_IDS)[keyof typeof FORM_PREFIX_IDS];
   invoiceData: InvoiceData;
 }
 
@@ -39,6 +39,10 @@ export const SellerInformation = memo(function SellerInformation({
 }: SellerInformationProps) {
   const [selectedSellerId, setSelectedSellerId] = useState("");
   const isSellerSelected = !!selectedSellerId;
+
+  const HTML_TITLE_CONTENT = isSellerSelected
+    ? "Seller details are locked. Click the edit seller button to modify."
+    : "";
 
   // Get current form values to pass to SellerManagement
   const currentFormValues = {
@@ -64,7 +68,14 @@ export const SellerInformation = memo(function SellerInformation({
           formValues={currentFormValues}
         />
       </div>
-      <fieldset className="mt-5 space-y-4" disabled={isSellerSelected}>
+      <fieldset
+        className="mt-5 space-y-4"
+        // title={
+        //   isSellerSelected
+        //     ? "Seller details are locked. Click the edit seller button to modify."
+        //     : ""
+        // }
+      >
         <div>
           {isSellerSelected ? (
             <LabelWithEditIcon
@@ -87,6 +98,9 @@ export const SellerInformation = memo(function SellerInformation({
                 id={`${formPrefixId}-sellerName`}
                 rows={3}
                 className=""
+                readOnly={isSellerSelected}
+                aria-readonly={isSellerSelected}
+                title={HTML_TITLE_CONTENT}
               />
             )}
           />
@@ -117,7 +131,9 @@ export const SellerInformation = memo(function SellerInformation({
                 id={`${formPrefixId}-sellerAddress`}
                 rows={3}
                 className=""
-                disabled={!!selectedSellerId}
+                readOnly={isSellerSelected}
+                aria-readonly={isSellerSelected}
+                title={HTML_TITLE_CONTENT}
               />
             )}
           />
@@ -153,6 +169,9 @@ export const SellerInformation = memo(function SellerInformation({
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    disabled={isSellerSelected}
+                    title={HTML_TITLE_CONTENT}
+                    data-testid={`${formPrefixId}-sellerVatNoFieldIsVisible`}
                   />
                 )}
               />
@@ -179,6 +198,9 @@ export const SellerInformation = memo(function SellerInformation({
                 id={`${formPrefixId}-sellerVatNo`}
                 type="text"
                 className=""
+                readOnly={isSellerSelected}
+                aria-readonly={isSellerSelected}
+                title={HTML_TITLE_CONTENT}
               />
             )}
           />
@@ -209,6 +231,9 @@ export const SellerInformation = memo(function SellerInformation({
                 id={`${formPrefixId}-sellerEmail`}
                 type="email"
                 className=""
+                readOnly={isSellerSelected}
+                aria-readonly={isSellerSelected}
+                title={HTML_TITLE_CONTENT}
               />
             )}
           />
@@ -248,6 +273,9 @@ export const SellerInformation = memo(function SellerInformation({
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    disabled={isSellerSelected}
+                    title={HTML_TITLE_CONTENT}
+                    data-testid={`${formPrefixId}-sellerAccountNumberFieldIsVisible`}
                   />
                 )}
               />
@@ -270,14 +298,19 @@ export const SellerInformation = memo(function SellerInformation({
           <Controller
             name="seller.accountNumber"
             control={control}
-            render={({ field }) => (
-              <Textarea
-                {...field}
-                id="sellerAccountNumber"
-                rows={3}
-                className=""
-              />
-            )}
+            render={({ field }) => {
+              return (
+                <Textarea
+                  {...field}
+                  id={`${formPrefixId}-sellerAccountNumber`}
+                  rows={3}
+                  className=""
+                  readOnly={isSellerSelected}
+                  aria-readonly={isSellerSelected}
+                  title={HTML_TITLE_CONTENT}
+                />
+              );
+            }}
           />
           {errors.seller?.accountNumber && (
             <ErrorMessage>{errors.seller.accountNumber.message}</ErrorMessage>
@@ -312,6 +345,9 @@ export const SellerInformation = memo(function SellerInformation({
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    disabled={isSellerSelected}
+                    title={HTML_TITLE_CONTENT}
+                    data-testid={`${formPrefixId}-sellerSwiftBicFieldIsVisible`}
                   />
                 )}
               />
@@ -335,9 +371,19 @@ export const SellerInformation = memo(function SellerInformation({
           <Controller
             name="seller.swiftBic"
             control={control}
-            render={({ field }) => (
-              <Textarea {...field} id="sellerSwiftBic" rows={3} className="" />
-            )}
+            render={({ field }) => {
+              return (
+                <Textarea
+                  {...field}
+                  id={`${formPrefixId}-sellerSwiftBic`}
+                  rows={3}
+                  className=""
+                  readOnly={isSellerSelected}
+                  aria-readonly={isSellerSelected}
+                  title={HTML_TITLE_CONTENT}
+                />
+              );
+            }}
           />
           {errors.seller?.swiftBic && (
             <ErrorMessage>{errors.seller.swiftBic.message}</ErrorMessage>
