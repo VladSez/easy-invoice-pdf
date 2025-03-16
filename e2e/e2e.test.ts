@@ -22,6 +22,59 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
   });
 
+  test("displays correct buttons and links in header", async ({ page }) => {
+    // Check title and branding
+    await expect(page).toHaveTitle(
+      "Invoice PDF Generator with Live Preview | No Sign-Up"
+    );
+    await expect(
+      page.getByRole("link", { name: "EasyInvoicePDF.com" })
+    ).toBeVisible();
+    await expect(
+      page.getByText("Invoice PDF generator with live preview")
+    ).toBeVisible();
+
+    // Check main action buttons
+    await expect(
+      page.getByRole("button", { name: "Support Project" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Generate a link to invoice" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Download PDF in English" })
+    ).toBeVisible();
+
+    // Check footer links
+    await expect(page.getByText("Made by")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Vlad Sazonau" })
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Open Source" })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Share your feedback" })
+    ).toBeVisible();
+
+    // Verify links have correct href attributes
+    await expect(
+      page.getByRole("link", { name: "Vlad Sazonau" })
+    ).toHaveAttribute("href", "https://dub.sh/vldzn.me");
+    await expect(
+      page.getByRole("link", { name: "Open Source" })
+    ).toHaveAttribute(
+      "href",
+      "https://github.com/VladSez/pdf-invoice-generator"
+    );
+
+    // Verify buttons are enabled
+    await expect(
+      page.getByRole("button", { name: "Generate a link to invoice" })
+    ).toBeEnabled();
+    await expect(
+      page.getByRole("link", { name: "Download PDF in English" })
+    ).toBeEnabled();
+  });
+
   test("displays initial form state correctly", async ({ page }) => {
     // **CHECK GENERAL INFORMATION SECTION**
     const generalInfoSection = page.getByTestId(

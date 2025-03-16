@@ -20,7 +20,7 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: 📦 Setup pnpm
         with:
-          version: 8
+          version: 10
 
       - uses: actions/setup-node@v4
         name: 📚 Setup Node.js
@@ -48,23 +48,3 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 5
-
-    #   - name: 📧 Send email
-    #     if: always()
-    #     uses: dawidd6/action-send-mail@v3
-    #     with:
-    #       server_address: smtp.gmail.com
-    #       server_port: 587
-    #       from: GitHub Actions
-    #       to: ${{ secrets.EMAIL_USERNAME }}
-    #       username: ${{ secrets.EMAIL_USERNAME }}
-    #       password: ${{ secrets.EMAIL_PASSWORD }}
-    #       subject: ${{ steps.playwright.outcome == 'success' && '✅ E2E Tests Passed' || '❌ E2E Tests Failed' }} for ${{ github.repository }}
-    #       body: |
-    #         E2E tests for ${{ github.repository }} have completed.
-
-    #         Result: ${{ steps.playwright.outcome == 'success' && '✅ Passed' || '❌ Failed' }}
-
-    #         Environment URL: ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url || inputs.environment_url }}
-
-    #         For more details, please check the GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
