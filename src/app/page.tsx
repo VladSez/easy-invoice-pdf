@@ -186,7 +186,7 @@ export default function Home() {
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 sm:p-4">
-        <div className="mb-4 w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6">
+        <div className="w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6">
           <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
             <div className="relative bottom-3 mt-3 flex flex-col items-center justify-center sm:mt-0">
               <div className="flex items-center">
@@ -227,20 +227,23 @@ export default function Home() {
                   <span>Support Project</span>
                 </span>
               </Button>
-              <CustomTooltip
-                trigger={
-                  <Button
-                    onClick={handleShareInvoice}
-                    _variant="outline"
-                    className="mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
-                  >
-                    Generate a link to invoice
-                  </Button>
-                }
-                content="Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
-              />
+
               {isDesktop ? (
-                <InvoicePDFDownloadLink invoiceData={invoiceDataState} />
+                <>
+                  <CustomTooltip
+                    trigger={
+                      <Button
+                        onClick={handleShareInvoice}
+                        _variant="outline"
+                        className="mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
+                      >
+                        Generate a link to invoice
+                      </Button>
+                    }
+                    content="Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
+                  />
+                  <InvoicePDFDownloadLink invoiceData={invoiceDataState} />
+                </>
               ) : null}
 
               {/* TODO: add later when PRO version is released, this is PRO FEATURE =) */}
@@ -251,7 +254,7 @@ export default function Home() {
               ) : null} */}
             </div>
           </div>
-          <div className="mb-4 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-0">
+          <div className="mb-3 mt-2 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-0">
             <ProjectInfo />
           </div>
 
@@ -259,6 +262,7 @@ export default function Home() {
             <InvoiceClientPage
               invoiceDataState={invoiceDataState}
               handleInvoiceDataChange={handleInvoiceDataChange}
+              handleShareInvoice={handleShareInvoice}
             />
           </div>
         </div>
