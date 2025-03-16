@@ -362,7 +362,7 @@ test.describe("Invoice Generator Page", () => {
       .click();
     await expect(
       invoiceItemsSection.getByText("Item 2", { exact: true })
-    ).not.toBeVisible();
+    ).toBeHidden();
   });
 
   test("calculates totals correctly", async ({ page }) => {
