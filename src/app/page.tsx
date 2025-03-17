@@ -3,7 +3,7 @@
 import { invoiceSchema, type InvoiceData } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { CustomTooltip, TooltipProvider } from "@/components/ui/tooltip";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { useIsDesktop } from "@/hooks/use-media-query";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { useOpenPanel } from "@openpanel/nextjs";
@@ -20,13 +20,16 @@ import { PDF_DATA_LOCAL_STORAGE_KEY } from "./components/invoice-form";
 import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
 import { INITIAL_INVOICE_DATA } from "./constants";
 import { cn } from "@/lib/utils";
-import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
+import { useDeviceContext } from "@/contexts/device-context";
+// import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
+
   const openPanel = useOpenPanel();
+  const { isDesktop } = useDeviceContext();
+  const isMobile = !isDesktop;
 
   const [invoiceDataState, setInvoiceDataState] = useState<InvoiceData | null>(
     null
@@ -263,6 +266,7 @@ export default function Home() {
               invoiceDataState={invoiceDataState}
               handleInvoiceDataChange={handleInvoiceDataChange}
               handleShareInvoice={handleShareInvoice}
+              isMobile={isMobile}
             />
           </div>
         </div>

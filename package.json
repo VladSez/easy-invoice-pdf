@@ -33,6 +33,7 @@
     "@radix-ui/react-tooltip": "1.1.8",
     "@react-pdf/renderer": "4.3.0",
     "@sentry/nextjs": "9.3.0",
+    "@types/ua-parser-js": "0.7.39",
     "@vercel/speed-insights": "1.2.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
@@ -51,6 +52,7 @@
     "sonner": "1.7.4",
     "tailwind-merge": "2.6.0",
     "tailwindcss-animate": "1.0.7",
+    "ua-parser-js": "2.0.3",
     "use-debounce": "10.0.4",
     "zod": "3.24.2"
   },

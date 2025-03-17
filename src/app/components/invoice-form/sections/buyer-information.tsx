@@ -13,7 +13,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { memo, useState } from "react";
 import { LabelWithEditIcon } from "@/components/label-with-edit-icon";
-import type { FormPrefixId } from "../../constants";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
@@ -26,7 +25,6 @@ interface BuyerInformationProps {
   control: Control<InvoiceData>;
   errors: FieldErrors<InvoiceData>;
   setValue: UseFormSetValue<InvoiceData>;
-  formPrefixId: FormPrefixId;
   invoiceData: InvoiceData;
 }
 
@@ -34,7 +32,6 @@ export const BuyerInformation = memo(function BuyerInformation({
   control,
   errors,
   setValue,
-  formPrefixId,
   invoiceData,
 }: BuyerInformationProps) {
   const [selectedBuyerId, setSelectedBuyerId] = useState("");
@@ -64,13 +61,13 @@ export const BuyerInformation = memo(function BuyerInformation({
         <div>
           {isBuyerSelected ? (
             <LabelWithEditIcon
-              htmlFor={`${formPrefixId}-buyerName`}
+              htmlFor={`buyerName`}
               content={BUYER_TOOLTIP_CONTENT}
             >
               Name
             </LabelWithEditIcon>
           ) : (
-            <Label htmlFor={`${formPrefixId}-buyerName`} className="mb-1">
+            <Label htmlFor={`buyerName`} className="mb-1">
               Name
             </Label>
           )}
@@ -78,12 +75,7 @@ export const BuyerInformation = memo(function BuyerInformation({
             name="buyer.name"
             control={control}
             render={({ field }) => (
-              <Textarea
-                {...field}
-                id={`${formPrefixId}-buyerName`}
-                rows={3}
-                className=""
-              />
+              <Textarea {...field} id={`buyerName`} rows={3} className="" />
             )}
           />
           {errors.buyer?.name && (
@@ -94,13 +86,13 @@ export const BuyerInformation = memo(function BuyerInformation({
         <div>
           {isBuyerSelected ? (
             <LabelWithEditIcon
-              htmlFor={`${formPrefixId}-buyerAddress`}
+              htmlFor={`buyerAddress`}
               content={BUYER_TOOLTIP_CONTENT}
             >
               Address
             </LabelWithEditIcon>
           ) : (
-            <Label htmlFor={`${formPrefixId}-buyerAddress`} className="mb-1">
+            <Label htmlFor={`buyerAddress`} className="mb-1">
               Address
             </Label>
           )}
@@ -108,12 +100,7 @@ export const BuyerInformation = memo(function BuyerInformation({
             name="buyer.address"
             control={control}
             render={({ field }) => (
-              <Textarea
-                {...field}
-                id={`${formPrefixId}-buyerAddress`}
-                rows={3}
-                className=""
-              />
+              <Textarea {...field} id={`buyerAddress`} rows={3} className="" />
             )}
           />
           {errors.buyer?.address && (
@@ -125,13 +112,13 @@ export const BuyerInformation = memo(function BuyerInformation({
           <div className="relative mb-2 flex items-center justify-between">
             {isBuyerSelected ? (
               <LabelWithEditIcon
-                htmlFor={`${formPrefixId}-buyerVatNo`}
+                htmlFor={`buyerVatNo`}
                 content={BUYER_TOOLTIP_CONTENT}
               >
                 VAT Number
               </LabelWithEditIcon>
             ) : (
-              <Label htmlFor={`${formPrefixId}-buyerVatNo`} className="">
+              <Label htmlFor={`buyerVatNo`} className="">
                 VAT Number
               </Label>
             )}
@@ -143,7 +130,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                 render={({ field: { value, onChange, ...field } }) => (
                   <Switch
                     {...field}
-                    id={`${formPrefixId}-buyerVatNoFieldIsVisible`}
+                    id={`buyerVatNoFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -152,7 +139,7 @@ export const BuyerInformation = memo(function BuyerInformation({
               />
               <CustomTooltip
                 trigger={
-                  <Label htmlFor={`${formPrefixId}-buyerVatNoFieldIsVisible`}>
+                  <Label htmlFor={`buyerVatNoFieldIsVisible`}>
                     Show in PDF
                   </Label>
                 }
@@ -168,12 +155,7 @@ export const BuyerInformation = memo(function BuyerInformation({
             name="buyer.vatNo"
             control={control}
             render={({ field }) => (
-              <Input
-                {...field}
-                id={`${formPrefixId}-buyerVatNo`}
-                type="text"
-                className=""
-              />
+              <Input {...field} id={`buyerVatNo`} type="text" className="" />
             )}
           />
           {errors.buyer?.vatNo && (
@@ -184,13 +166,13 @@ export const BuyerInformation = memo(function BuyerInformation({
         <div>
           {isBuyerSelected ? (
             <LabelWithEditIcon
-              htmlFor={`${formPrefixId}-buyerEmail`}
+              htmlFor={`buyerEmail`}
               content={BUYER_TOOLTIP_CONTENT}
             >
               Email
             </LabelWithEditIcon>
           ) : (
-            <Label htmlFor={`${formPrefixId}-buyerEmail`} className="mb-1">
+            <Label htmlFor={`buyerEmail`} className="mb-1">
               Email
             </Label>
           )}
@@ -198,12 +180,7 @@ export const BuyerInformation = memo(function BuyerInformation({
             name="buyer.email"
             control={control}
             render={({ field }) => (
-              <Input
-                {...field}
-                id={`${formPrefixId}-buyerEmail`}
-                type="email"
-                className=""
-              />
+              <Input {...field} id={`buyerEmail`} type="email" className="" />
             )}
           />
           {errors.buyer?.email && (

@@ -23,7 +23,6 @@ import { CustomTooltip } from "@/components/ui/tooltip";
 import dayjs from "dayjs";
 import { AlertTriangle } from "lucide-react";
 import { memo } from "react";
-import type { FormPrefixId } from "../..";
 
 const AlertIcon = () => {
   return <AlertTriangle className="mr-1 inline-block h-3 w-3 text-amber-500" />;
@@ -37,7 +36,6 @@ interface GeneralInformationProps {
   control: Control<InvoiceData>;
   errors: FieldErrors<InvoiceData>;
   setValue: UseFormSetValue<InvoiceData>;
-  formPrefixId: FormPrefixId;
   dateOfIssue: string;
 }
 
@@ -45,7 +43,6 @@ export const GeneralInformation = memo(function GeneralInformation({
   control,
   errors,
   setValue,
-  formPrefixId,
   dateOfIssue,
 }: GeneralInformationProps) {
   const invoiceNumber = useWatch({ control, name: "invoiceNumber" });
@@ -67,18 +64,14 @@ export const GeneralInformation = memo(function GeneralInformation({
     <div className="space-y-4">
       {/* Language PDF Select */}
       <div>
-        <Label htmlFor={`${formPrefixId}-language`} className="mb-1">
+        <Label htmlFor={`language`} className="mb-1">
           Invoice PDF Language
         </Label>
         <Controller
           name="language"
           control={control}
           render={({ field }) => (
-            <SelectNative
-              {...field}
-              id={`${formPrefixId}-language`}
-              className="block"
-            >
+            <SelectNative {...field} id={`language`} className="block">
               {SUPPORTED_LANGUAGES.map((lang) => (
                 <option key={lang} value={lang}>
                   {lang === "en" ? "English" : "Polish"}
@@ -98,7 +91,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
       {/* Currency Select */}
       <div>
-        <Label htmlFor={`${formPrefixId}-currency`} className="mb-1">
+        <Label htmlFor={`currency`} className="mb-1">
           Currency
         </Label>
         <Controller
@@ -106,11 +99,7 @@ export const GeneralInformation = memo(function GeneralInformation({
           control={control}
           render={({ field }) => {
             return (
-              <SelectNative
-                {...field}
-                id={`${formPrefixId}-currency`}
-                className="block"
-              >
+              <SelectNative {...field} id={`currency`} className="block">
                 {SUPPORTED_CURRENCIES.map((currency) => {
                   const currencySymbol = CURRENCY_SYMBOLS[currency] || null;
 
@@ -140,18 +129,14 @@ export const GeneralInformation = memo(function GeneralInformation({
 
       {/* Date Format */}
       <div>
-        <Label htmlFor={`${formPrefixId}-dateFormat`} className="mb-1">
+        <Label htmlFor={`dateFormat`} className="mb-1">
           Date Format
         </Label>
         <Controller
           name="dateFormat"
           control={control}
           render={({ field }) => (
-            <SelectNative
-              {...field}
-              id={`${formPrefixId}-dateFormat`}
-              className="block"
-            >
+            <SelectNative {...field} id={`dateFormat`} className="block">
               {SUPPORTED_DATE_FORMATS.map((format) => {
                 const preview = dayjs().format(format);
                 const isDefault = format === SUPPORTED_DATE_FORMATS[0];
@@ -177,7 +162,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
       {/* Invoice Number */}
       <div>
-        <Label htmlFor={`${formPrefixId}-invoiceNumber`} className="mb-1">
+        <Label htmlFor={`invoiceNumber`} className="mb-1">
           Invoice Number
         </Label>
         <Controller
@@ -187,7 +172,7 @@ export const GeneralInformation = memo(function GeneralInformation({
             <Input
               {...field}
               type="text"
-              id={`${formPrefixId}-invoiceNumber`}
+              id={`invoiceNumber`}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm"
             />
           )}
@@ -217,19 +202,14 @@ export const GeneralInformation = memo(function GeneralInformation({
 
       {/* Date of Issue */}
       <div>
-        <Label htmlFor={`${formPrefixId}-dateOfIssue`} className="mb-1">
+        <Label htmlFor={`dateOfIssue`} className="mb-1">
           Date of Issue
         </Label>
         <Controller
           name="dateOfIssue"
           control={control}
           render={({ field }) => (
-            <Input
-              {...field}
-              type="date"
-              id={`${formPrefixId}-dateOfIssue`}
-              className=""
-            />
+            <Input {...field} type="date" id={`dateOfIssue`} className="" />
           )}
         />
         {errors.dateOfIssue && (
@@ -257,19 +237,14 @@ export const GeneralInformation = memo(function GeneralInformation({
 
       {/* Date of Service */}
       <div>
-        <Label htmlFor={`${formPrefixId}-dateOfService`} className="mb-1">
+        <Label htmlFor={`dateOfService`} className="mb-1">
           Date of Service
         </Label>
         <Controller
           name="dateOfService"
           control={control}
           render={({ field }) => (
-            <Input
-              {...field}
-              type="date"
-              id={`${formPrefixId}-dateOfService`}
-              className=""
-            />
+            <Input {...field} type="date" id={`dateOfService`} className="" />
           )}
         />
         {errors.dateOfService && (
@@ -302,7 +277,7 @@ export const GeneralInformation = memo(function GeneralInformation({
       {/* Invoice Type */}
       <div>
         <div className="relative mb-2 flex items-center justify-between">
-          <Label htmlFor={`${formPrefixId}-invoiceType`} className="">
+          <Label htmlFor={`invoiceType`} className="">
             Invoice Type
           </Label>
 
@@ -314,7 +289,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               render={({ field: { value, onChange, ...field } }) => (
                 <Switch
                   {...field}
-                  id={`${formPrefixId}-invoiceTypeFieldIsVisible`}
+                  id={`invoiceTypeFieldIsVisible`}
                   checked={value}
                   onCheckedChange={onChange}
                   className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -323,9 +298,7 @@ export const GeneralInformation = memo(function GeneralInformation({
             />
             <CustomTooltip
               trigger={
-                <Label htmlFor={`${formPrefixId}-invoiceTypeFieldIsVisible`}>
-                  Show in PDF
-                </Label>
+                <Label htmlFor={`invoiceTypeFieldIsVisible`}>Show in PDF</Label>
               }
               content='Show/Hide the "Invoice Type" Field in the PDF'
             />
@@ -338,7 +311,7 @@ export const GeneralInformation = memo(function GeneralInformation({
           render={({ field }) => (
             <Textarea
               {...field}
-              id={`${formPrefixId}-invoiceType`}
+              id={`invoiceType`}
               rows={2}
               className=""
               placeholder="Enter invoice type"

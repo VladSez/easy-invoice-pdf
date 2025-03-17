@@ -23,7 +23,6 @@ import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { getAmountInWords, getNumberFractionalPart } from "@/lib/utils";
 import { useOpenPanel } from "@openpanel/nextjs";
 import { Plus, Trash2 } from "lucide-react";
-import type { FORM_PREFIX_IDS } from "../../constants";
 
 const Legend = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -37,7 +36,6 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
 
 interface InvoiceItemsSettingsProps {
   control: Control<InvoiceData>;
-  formPrefixId: (typeof FORM_PREFIX_IDS)[keyof typeof FORM_PREFIX_IDS];
   fields: FieldArrayWithId<InvoiceData, "items", "id">[];
   handleRemoveItem: (index: number) => void;
   append: UseFieldArrayAppend<InvoiceData, "items">;
@@ -48,7 +46,6 @@ interface InvoiceItemsSettingsProps {
 
 export const InvoiceItems = memo(function InvoiceItems({
   control,
-  formPrefixId,
   fields,
   handleRemoveItem,
   errors,
@@ -62,7 +59,7 @@ export const InvoiceItems = memo(function InvoiceItems({
       <div className="mb-3 space-y-4">
         {/* Show Number column on PDF switch */}
         <div className="relative flex items-center justify-between">
-          <Label htmlFor={`${formPrefixId}-itemInvoiceItemNumberIsVisible0`}>
+          <Label htmlFor={`itemInvoiceItemNumberIsVisible0`}>
             Show &quot;Number&quot; Column in the Invoice Items Table
           </Label>
 
@@ -72,7 +69,7 @@ export const InvoiceItems = memo(function InvoiceItems({
             render={({ field: { value, onChange, ...field } }) => (
               <Switch
                 {...field}
-                id={`${formPrefixId}-itemInvoiceItemNumberIsVisible0`}
+                id={`itemInvoiceItemNumberIsVisible0`}
                 checked={value}
                 onCheckedChange={onChange}
                 className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -83,7 +80,7 @@ export const InvoiceItems = memo(function InvoiceItems({
 
         {/* Show VAT Table Summary in PDF switch */}
         <div className="relative flex items-center justify-between">
-          <Label htmlFor={`${formPrefixId}-vatTableSummaryIsVisible`}>
+          <Label htmlFor={`vatTableSummaryIsVisible`}>
             Show &quot;VAT Table Summary&quot; in the PDF
           </Label>
 
@@ -93,7 +90,7 @@ export const InvoiceItems = memo(function InvoiceItems({
             render={({ field: { value, onChange, ...field } }) => (
               <Switch
                 {...field}
-                id={`${formPrefixId}-vatTableSummaryIsVisible`}
+                id={`vatTableSummaryIsVisible`}
                 checked={value}
                 onCheckedChange={onChange}
                 className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -136,10 +133,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               <div>
                 {/* Invoice Item Name */}
                 <div className="mb-2 flex items-center justify-between">
-                  <Label
-                    htmlFor={`${formPrefixId}-itemName${index}`}
-                    className=""
-                  >
+                  <Label htmlFor={`itemName${index}`} className="">
                     Name
                   </Label>
 
@@ -152,7 +146,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`${formPrefixId}-itemNameFieldIsVisible${index}`}
+                            id={`itemNameFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -161,9 +155,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                       />
                       <CustomTooltip
                         trigger={
-                          <Label
-                            htmlFor={`${formPrefixId}-itemNameFieldIsVisible${index}`}
-                          >
+                          <Label htmlFor={`itemNameFieldIsVisible${index}`}>
                             Show in PDF
                           </Label>
                         }
@@ -181,7 +173,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     <Textarea
                       {...field}
                       rows={4}
-                      id={`${formPrefixId}-itemName${index}`}
+                      id={`itemName${index}`}
                       className=""
                     />
                   )}
@@ -196,10 +188,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               {/* Invoice Item Type of GTU */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <Label
-                    htmlFor={`${formPrefixId}-itemTypeOfGTU${index}`}
-                    className=""
-                  >
+                  <Label htmlFor={`itemTypeOfGTU${index}`} className="">
                     Type of GTU
                   </Label>
 
@@ -212,7 +201,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`${formPrefixId}-itemTypeOfGTUFieldIsVisible${index}`}
+                            id={`itemTypeOfGTUFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -222,7 +211,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <CustomTooltip
                         trigger={
                           <Label
-                            htmlFor={`${formPrefixId}-itemTypeOfGTUFieldIsVisible${index}`}
+                            htmlFor={`itemTypeOfGTUFieldIsVisible${index}`}
                           >
                             Show in PDF
                           </Label>
@@ -240,7 +229,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                   render={({ field }) => (
                     <Input
                       {...field}
-                      id={`${formPrefixId}-itemTypeOfGTU${index}`}
+                      id={`itemTypeOfGTU${index}`}
                       className=""
                       type="text"
                     />
@@ -256,10 +245,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               {/* Invoice Item Amount */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <Label
-                    htmlFor={`${formPrefixId}-itemAmount${index}`}
-                    className=""
-                  >
+                  <Label htmlFor={`itemAmount${index}`} className="">
                     Amount
                   </Label>
 
@@ -272,7 +258,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`${formPrefixId}-itemAmountFieldIsVisible${index}`}
+                            id={`itemAmountFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -281,9 +267,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                       />
                       <CustomTooltip
                         trigger={
-                          <Label
-                            htmlFor={`${formPrefixId}-itemAmountFieldIsVisible${index}`}
-                          >
+                          <Label htmlFor={`itemAmountFieldIsVisible${index}`}>
                             Show in PDF
                           </Label>
                         }
@@ -309,7 +293,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <>
                         <Input
                           {...field}
-                          id={`${formPrefixId}-itemAmount${index}`}
+                          id={`itemAmount${index}`}
                           type="number"
                           step="0.01"
                           min="0"
@@ -334,10 +318,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               {/* Invoice Item Unit */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <Label
-                    htmlFor={`${formPrefixId}-itemUnit${index}`}
-                    className=""
-                  >
+                  <Label htmlFor={`itemUnit${index}`} className="">
                     Unit
                   </Label>
 
@@ -350,7 +331,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`${formPrefixId}-itemUnitFieldIsVisible${index}`}
+                            id={`itemUnitFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -359,9 +340,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                       />
                       <CustomTooltip
                         trigger={
-                          <Label
-                            htmlFor={`${formPrefixId}-itemUnitFieldIsVisible${index}`}
-                          >
+                          <Label htmlFor={`itemUnitFieldIsVisible${index}`}>
                             Show in PDF
                           </Label>
                         }
@@ -376,11 +355,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                   name={`items.${index}.unit`}
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      {...field}
-                      id={`${formPrefixId}-itemUnit${index}`}
-                      type="text"
-                    />
+                    <Input {...field} id={`itemUnit${index}`} type="text" />
                   )}
                 />
                 {errors.items?.[index]?.unit && (
@@ -393,10 +368,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               {/* Invoice Item Net Price */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <Label
-                    htmlFor={`${formPrefixId}-itemNetPrice${index}`}
-                    className=""
-                  >
+                  <Label htmlFor={`itemNetPrice${index}`} className="">
                     Net Price
                   </Label>
 
@@ -409,7 +381,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`${formPrefixId}-itemNetPriceFieldIsVisible${index}`}
+                            id={`itemNetPriceFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -418,9 +390,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                       />
                       <CustomTooltip
                         trigger={
-                          <Label
-                            htmlFor={`${formPrefixId}-itemNetPriceFieldIsVisible${index}`}
-                          >
+                          <Label htmlFor={`itemNetPriceFieldIsVisible${index}`}>
                             Show in PDF
                           </Label>
                         }
@@ -458,13 +428,13 @@ export const InvoiceItems = memo(function InvoiceItems({
                         <div className="flex w-full flex-col">
                           <MoneyInput
                             {...field}
-                            id={`${formPrefixId}-itemNetPrice${index}`}
+                            id={`itemNetPrice${index}`}
                             currency={currency}
                             type="number"
                             step="0.01"
                             min="0"
                             className="w-full"
-                            dataTestId={`${formPrefixId}-itemNetPrice${index}`}
+                            dataTestId={`itemNetPrice${index}`}
                           />
                           {!errors.items?.[index]?.netPrice && (
                             <InputHelperMessage>
@@ -489,10 +459,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               {/* Invoice Item VAT */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <Label
-                    htmlFor={`${formPrefixId}-itemVat${index}`}
-                    className=""
-                  >
+                  <Label htmlFor={`itemVat${index}`} className="">
                     VAT
                   </Label>
 
@@ -505,7 +472,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`${formPrefixId}-itemVatFieldIsVisible${index}`}
+                            id={`itemVatFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -514,9 +481,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                       />
                       <CustomTooltip
                         trigger={
-                          <Label
-                            htmlFor={`${formPrefixId}-itemVatFieldIsVisible${index}`}
-                          >
+                          <Label htmlFor={`itemVatFieldIsVisible${index}`}>
                             Show in PDF
                           </Label>
                         }
@@ -533,7 +498,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                   render={({ field }) => (
                     <Input
                       {...field}
-                      id={`${formPrefixId}-itemVat${index}`}
+                      id={`itemVat${index}`}
                       type="text"
                       className=""
                     />
@@ -552,10 +517,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               {/* Invoice Item Net Amount */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <Label
-                    htmlFor={`${formPrefixId}-itemNetAmount${index}`}
-                    className=""
-                  >
+                  <Label htmlFor={`itemNetAmount${index}`} className="">
                     Net Amount
                   </Label>
 
@@ -568,7 +530,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`${formPrefixId}-itemNetAmountFieldIsVisible${index}`}
+                            id={`itemNetAmountFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -578,7 +540,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <CustomTooltip
                         trigger={
                           <Label
-                            htmlFor={`${formPrefixId}-itemNetAmountFieldIsVisible${index}`}
+                            htmlFor={`itemNetAmountFieldIsVisible${index}`}
                           >
                             Show in PDF
                           </Label>
@@ -597,13 +559,13 @@ export const InvoiceItems = memo(function InvoiceItems({
                     return (
                       <ReadOnlyMoneyInput
                         {...field}
-                        id={`${formPrefixId}-itemNetAmount${index}`}
+                        id={`itemNetAmount${index}`}
                         currency={currency}
                         value={field.value.toLocaleString("en-US", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
-                        dataTestId={`${formPrefixId}-itemNetAmount${index}`}
+                        dataTestId={`itemNetAmount${index}`}
                       />
                     );
                   }}
@@ -623,10 +585,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               {/* Invoice Item VAT Amount (calculated automatically) */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <Label
-                    htmlFor={`${formPrefixId}-itemVatAmount${index}`}
-                    className=""
-                  >
+                  <Label htmlFor={`itemVatAmount${index}`} className="">
                     VAT Amount
                   </Label>
 
@@ -639,7 +598,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`${formPrefixId}-itemVatAmountFieldIsVisible${index}`}
+                            id={`itemVatAmountFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -649,7 +608,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <CustomTooltip
                         trigger={
                           <Label
-                            htmlFor={`${formPrefixId}-itemVatAmountFieldIsVisible${index}`}
+                            htmlFor={`itemVatAmountFieldIsVisible${index}`}
                           >
                             Show in PDF
                           </Label>
@@ -668,7 +627,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     return (
                       <ReadOnlyMoneyInput
                         {...field}
-                        id={`${formPrefixId}-itemVatAmount${index}`}
+                        id={`itemVatAmount${index}`}
                         currency={currency}
                         value={field.value.toLocaleString("en-US", {
                           minimumFractionDigits: 2,
@@ -694,10 +653,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               {/* Pre-tax Amount field */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <Label
-                    htmlFor={`${formPrefixId}-itemPreTaxAmount${index}`}
-                    className=""
-                  >
+                  <Label htmlFor={`itemPreTaxAmount${index}`} className="">
                     Pre-tax Amount
                   </Label>
 
@@ -710,7 +666,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                         render={({ field: { value, onChange, ...field } }) => (
                           <Switch
                             {...field}
-                            id={`${formPrefixId}-itemPreTaxAmountFieldIsVisible${index}`}
+                            id={`itemPreTaxAmountFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -720,7 +676,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <CustomTooltip
                         trigger={
                           <Label
-                            htmlFor={`${formPrefixId}-itemPreTaxAmountFieldIsVisible${index}`}
+                            htmlFor={`itemPreTaxAmountFieldIsVisible${index}`}
                           >
                             Show in PDF
                           </Label>
@@ -739,7 +695,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     return (
                       <ReadOnlyMoneyInput
                         {...field}
-                        id={`${formPrefixId}-itemPreTaxAmount${index}`}
+                        id={`itemPreTaxAmount${index}`}
                         currency={currency}
                         value={field.value.toLocaleString("en-US", {
                           minimumFractionDigits: 2,

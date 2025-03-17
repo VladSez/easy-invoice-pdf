@@ -6,6 +6,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import "./globals.css";
 import { Toaster } from "sonner";
+import { checkDeviceUserAgent } from "@/lib/check-device.server";
+import { DeviceContextProvider } from "@/contexts/device-context";
 
 export const viewport: Viewport = {
   initialScale: 1, // Sets the default zoom level to 1 (100%)
@@ -51,11 +53,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { isDesktop: isDesktopServer } = await checkDeviceUserAgent();
+
   return (
     <html lang="en">
       {/* React-scan is a tool for detecting and fixing issues with React components
@@ -71,7 +75,9 @@ export default function RootLayout({
         </head>
       )} */}
       <body className={`antialiased`}>
-        <NuqsAdapter>{children}</NuqsAdapter>
+        <DeviceContextProvider isDesktop={isDesktopServer}>
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </DeviceContextProvider>
 
         {/* https://vercel.com/vladsazon27s-projects/pdf-invoice-generator/speed-insights */}
         {process.env.VERCEL_ENV === "production" && <SpeedInsights />}

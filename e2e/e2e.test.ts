@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
-import { FORM_PREFIX_IDS } from "@/app/components/constants";
 import dayjs from "dayjs";
 import type { SellerData } from "@/app/schema";
 
@@ -77,9 +76,8 @@ test.describe("Invoice Generator Page", () => {
 
   test("displays initial form state correctly", async ({ page }) => {
     // **CHECK GENERAL INFORMATION SECTION**
-    const generalInfoSection = page.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-general-information-section`
-    );
+    // TODO: we need to test also on mobile viewports and with current implementation it's not possible. Fix this!
+    const generalInfoSection = page.getByTestId(`general-information-section`);
     await expect(
       generalInfoSection.getByText("General Information", { exact: true })
     ).toBeVisible();
@@ -125,9 +123,7 @@ test.describe("Invoice Generator Page", () => {
     ).toBeChecked();
 
     // **CHECK SELLER INFORMATION SECTION**
-    const sellerSection = page.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-seller-information-section`
-    );
+    const sellerSection = page.getByTestId(`seller-information-section`);
     await expect(
       sellerSection.getByText("Seller Information", { exact: true })
     ).toBeVisible();
@@ -177,9 +173,7 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     // **CHECK BUYER INFORMATION SECTION**
-    const buyerSection = page.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-buyer-information-section`
-    );
+    const buyerSection = page.getByTestId(`buyer-information-section`);
     await expect(
       buyerSection.getByText("Buyer Information", { exact: true })
     ).toBeVisible();
@@ -213,9 +207,7 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     // **Check INVOICE ITEMS section**
-    const invoiceItemsSection = page.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-invoice-items-section`
-    );
+    const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
     await expect(
       invoiceItemsSection.getByText("Invoice Items", { exact: true })
     ).toBeVisible();
@@ -337,9 +329,7 @@ test.describe("Invoice Generator Page", () => {
   });
 
   test("can add and remove invoice items", async ({ page }) => {
-    const invoiceItemsSection = page.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-invoice-items-section`
-    );
+    const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
 
     // Add new invoice item
     await invoiceItemsSection
@@ -366,9 +356,7 @@ test.describe("Invoice Generator Page", () => {
   });
 
   test("calculates totals correctly", async ({ page }) => {
-    const invoiceItemsSection = page.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-invoice-items-section`
-    );
+    const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
 
     // Fill in item details
     await invoiceItemsSection
@@ -395,9 +383,7 @@ test.describe("Invoice Generator Page", () => {
       })
     ).toHaveValue("46.00");
 
-    const finalSection = page.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-final-section`
-    );
+    const finalSection = page.getByTestId(`final-section`);
     await expect(
       finalSection.getByRole("textbox", {
         name: "Total",
@@ -452,8 +438,6 @@ test.describe("Invoice Generator Page", () => {
   test("handles mobile/desktop views", async ({ page }) => {
     // Test mobile view
     await page.setViewportSize({ width: 375, height: 667 });
-    await expect(page.getByTestId(FORM_PREFIX_IDS.MOBILE)).toBeVisible();
-    await expect(page.getByTestId(FORM_PREFIX_IDS.DESKTOP)).not.toBeVisible();
 
     // check that tabs are visible in mobile view
     await expect(page.getByRole("tab", { name: "Edit Invoice" })).toBeVisible();
@@ -461,16 +445,10 @@ test.describe("Invoice Generator Page", () => {
 
     // Test desktop view
     await page.setViewportSize({ width: 1280, height: 800 });
-    await expect(page.getByTestId(FORM_PREFIX_IDS.DESKTOP)).toBeVisible();
-    await expect(page.getByTestId(FORM_PREFIX_IDS.MOBILE)).not.toBeVisible();
 
     // check that tabs are not visible in desktop view
-    await expect(
-      page.getByRole("tab", { name: "Edit Invoice" })
-    ).not.toBeVisible();
-    await expect(
-      page.getByRole("tab", { name: "Preview PDF" })
-    ).not.toBeVisible();
+    await expect(page.getByRole("tab", { name: "Edit Invoice" })).toBeHidden();
+    await expect(page.getByRole("tab", { name: "Preview PDF" })).toBeHidden();
   });
 
   test("persists data in local storage", async ({ page }) => {
@@ -595,9 +573,7 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     // Verify all saved details in the Seller Information section form
-    const sellerForm = page.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-seller-information-section`
-    );
+    const sellerForm = page.getByTestId(`seller-information-section`);
 
     // Seller Name
     await expect(
@@ -623,9 +599,7 @@ test.describe("Invoice Generator Page", () => {
       sellerForm.getByRole("textbox", { name: "VAT Number" })
     ).toHaveValue(testData.vatNo);
 
-    const vatNumberSwitch = sellerForm.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-sellerVatNoFieldIsVisible`
-    );
+    const vatNumberSwitch = sellerForm.getByTestId(`sellerVatNoFieldIsVisible`);
     // Verify VAT Number switch is visible
     await expect(vatNumberSwitch).toBeChecked();
     await expect(vatNumberSwitch).toBeDisabled();
@@ -647,7 +621,7 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue(testData.accountNumber);
 
     const accountNumberSwitch = sellerForm.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-sellerAccountNumberFieldIsVisible`
+      `sellerAccountNumberFieldIsVisible`
     );
     // Verify Account Number switch is visible
     await expect(accountNumberSwitch).not.toBeChecked();
@@ -662,7 +636,7 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue(testData.swiftBic);
 
     const swiftBicSwitch = sellerForm.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-sellerSwiftBicFieldIsVisible`
+      `sellerSwiftBicFieldIsVisible`
     );
     // Verify SWIFT/BIC switch is visible
     await expect(swiftBicSwitch).not.toBeChecked();
@@ -709,17 +683,13 @@ test.describe("Invoice Generator Page", () => {
   });
 
   test("handles currency switching", async ({ page }) => {
-    const invoiceItemsSection = page.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-invoice-items-section`
-    );
+    const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
 
-    const netPriceFormElement = invoiceItemsSection.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-itemNetPrice0`
-    );
+    const netPriceFormElement =
+      invoiceItemsSection.getByTestId(`itemNetPrice0`);
 
-    const netAmountFormElement = invoiceItemsSection.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-itemNetAmount0`
-    );
+    const netAmountFormElement =
+      invoiceItemsSection.getByTestId(`itemNetAmount0`);
 
     // Verify initial currency
     await expect(netPriceFormElement).toHaveText("€EUR");
@@ -755,9 +725,7 @@ test.describe("Invoice Generator Page", () => {
       )
     ).toBeVisible();
 
-    const finalSection = page.getByTestId(
-      `${FORM_PREFIX_IDS.DESKTOP}-final-section`
-    );
+    const finalSection = page.getByTestId(`final-section`);
     await expect(
       finalSection.getByRole("textbox", {
         name: "Total",
