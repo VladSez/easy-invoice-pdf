@@ -37,12 +37,11 @@ jobs:
         run: pnpm exec playwright test
         env:
           BASE_URL: ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}
-        continue-on-error: true
 
       - uses: actions/upload-artifact@v4
         name: 🎲 Upload Playwright report
-        if: steps.playwright.outcome == 'success'
+        if: ${{ !cancelled() }}
         with:
           name: playwright-report
           path: playwright-report/
-          retention-days: 5
+          retention-days: 3
