@@ -65,14 +65,7 @@ export const SellerInformation = memo(function SellerInformation({
           formValues={currentFormValues}
         />
       </div>
-      <fieldset
-        className="mt-5 space-y-4"
-        // title={
-        //   isSellerSelected
-        //     ? "Seller details are locked. Click the edit seller button to modify."
-        //     : ""
-        // }
-      >
+      <fieldset className="mt-5 space-y-4">
         <div>
           {isSellerSelected ? (
             <LabelWithEditIcon
@@ -155,7 +148,10 @@ export const SellerInformation = memo(function SellerInformation({
             )}
 
             {/* Show/hide Seller VAT Number field in PDF switch */}
-            <div className="inline-flex items-center gap-2">
+            <div
+              className="inline-flex items-center gap-2"
+              title={HTML_TITLE_CONTENT}
+            >
               <Controller
                 name={`seller.vatNoFieldIsVisible`}
                 control={control}
@@ -167,7 +163,6 @@ export const SellerInformation = memo(function SellerInformation({
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                     disabled={isSellerSelected}
-                    title={HTML_TITLE_CONTENT}
                     data-testid={`sellerVatNoFieldIsVisible`}
                   />
                 )}
@@ -256,7 +251,10 @@ export const SellerInformation = memo(function SellerInformation({
             )}
 
             {/* Show/hide Account Number field in PDF switch */}
-            <div className="inline-flex items-center gap-2">
+            <div
+              className="inline-flex items-center gap-2"
+              title={HTML_TITLE_CONTENT}
+            >
               <Controller
                 name={`seller.accountNumberFieldIsVisible`}
                 control={control}
@@ -268,7 +266,6 @@ export const SellerInformation = memo(function SellerInformation({
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                     disabled={isSellerSelected}
-                    title={HTML_TITLE_CONTENT}
                     data-testid={`sellerAccountNumberFieldIsVisible`}
                   />
                 )}
@@ -326,7 +323,10 @@ export const SellerInformation = memo(function SellerInformation({
             )}
 
             {/* Show/hide SWIFT/BIC field in PDF switch */}
-            <div className="inline-flex items-center gap-2">
+            <div
+              className="inline-flex items-center gap-2"
+              title={HTML_TITLE_CONTENT}
+            >
               <Controller
                 name={`seller.swiftBicFieldIsVisible`}
                 control={control}
@@ -338,7 +338,6 @@ export const SellerInformation = memo(function SellerInformation({
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                     disabled={isSellerSelected}
-                    title={HTML_TITLE_CONTENT}
                     data-testid={`sellerSwiftBicFieldIsVisible`}
                   />
                 )}

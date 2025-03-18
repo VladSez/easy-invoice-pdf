@@ -284,6 +284,7 @@ export function BuyerManagement({
                         }}
                         className="h-8 px-2"
                       >
+                        <span className="sr-only">Edit buyer</span>
                         <Pencil className="h-3 w-3" />
                       </Button>
                     }
@@ -302,6 +303,7 @@ export function BuyerManagement({
                         }}
                         className="h-8 px-2"
                       >
+                        <span className="sr-only">Delete buyer</span>
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     }

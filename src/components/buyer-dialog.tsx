@@ -188,7 +188,10 @@ export function BuyerDialog({
         }
       }}
     >
-      <DialogContent className="flex flex-col gap-0 overflow-y-visible p-0 sm:max-w-lg [&>button:last-child]:top-3.5">
+      <DialogContent
+        className="flex flex-col gap-0 overflow-y-visible p-0 sm:max-w-lg [&>button:last-child]:top-3.5"
+        data-testid={`manage-buyer-dialog`}
+      >
         <DialogHeader className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
           <DialogTitle className="text-base">
             {isEditMode ? "Edit Buyer" : "Add New Buyer"}

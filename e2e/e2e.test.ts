@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
 import dayjs from "dayjs";
-import type { SellerData } from "@/app/schema";
+import type { BuyerData, SellerData } from "@/app/schema";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -487,6 +487,58 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue("Test note");
   });
 
+  test("handles currency switching", async ({ page }) => {
+    const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
+
+    const netPriceFormElement =
+      invoiceItemsSection.getByTestId(`itemNetPrice0`);
+
+    const netAmountFormElement =
+      invoiceItemsSection.getByTestId(`itemNetAmount0`);
+
+    // Verify initial currency
+    await expect(netPriceFormElement).toHaveText("€EUR");
+    await expect(netAmountFormElement).toHaveText("€EUR");
+
+    await expect(
+      invoiceItemsSection.getByText("Preview: €0.00 (zero EUR 00/100)")
+    ).toBeVisible();
+
+    const currencySelect = page.getByRole("combobox", { name: "Currency" });
+
+    // Switch currency
+    await currencySelect.selectOption("USD");
+    await expect(currencySelect).toHaveValue("USD");
+
+    // Verify calculations with new currency
+    await invoiceItemsSection
+      .getByRole("spinbutton", { name: "Amount", exact: true })
+      .fill("2");
+    await invoiceItemsSection
+      .getByRole("spinbutton", { name: "Net Price", exact: true })
+      .fill("100.75");
+
+    await expect(netPriceFormElement).toHaveText("$USD");
+    await expect(netAmountFormElement).toHaveText("$USD");
+
+    await expect(
+      invoiceItemsSection.getByText(
+        "Preview: $100.75 (one hundred USD 75/100)",
+        {
+          exact: true,
+        }
+      )
+    ).toBeVisible();
+
+    const finalSection = page.getByTestId(`final-section`);
+    await expect(
+      finalSection.getByRole("textbox", {
+        name: "Total",
+        exact: true,
+      })
+    ).toHaveValue("201.50");
+  });
+
   test("manages seller information", async ({ page }) => {
     // Open seller management dialog
     await page.getByRole("button", { name: "New Seller" }).click();
@@ -575,13 +627,46 @@ test.describe("Invoice Generator Page", () => {
     // Verify all saved details in the Seller Information section form
     const sellerForm = page.getByTestId(`seller-information-section`);
 
-    // Seller Name
+    // Try to find desktop tooltip icon first
+    const desktopTooltipExists =
+      (await sellerForm
+        .getByTestId("form-section-tooltip-info-icon-desktop")
+        .count()) > 0;
+
+    // If desktop tooltip exists, hover over it; otherwise find and click mobile tooltip
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (desktopTooltipExists) {
+      // Get desktop tooltip icons and hover over the first one because we use tooltip
+      const desktopTooltips = sellerForm.getByTestId(
+        "form-section-tooltip-info-icon-desktop"
+      );
+      await desktopTooltips.first().hover();
+    } else {
+      // Get mobile tooltip icons and click the first one because we use popover
+      const mobileTooltips = sellerForm.getByTestId(
+        "form-section-tooltip-info-icon-mobile"
+      );
+      await mobileTooltips.first().click();
+    }
+
+    // Verify the tooltip content appears
     await expect(
-      sellerForm.getByRole("textbox", { name: "Name" })
-    ).toHaveAttribute("aria-readonly", "true");
-    await expect(sellerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
-      testData.name
+      page.getByText(
+        "Seller details are locked. Click the edit button next to the 'Select Seller' dropdown to modify seller details. Any changes will be automatically saved.",
+        { exact: true }
+      )
+    ).toBeVisible();
+
+    // Check that HTML title attributes contain the tooltip message on input fields
+    const nameInput = sellerForm.getByRole("textbox", { name: "Name" });
+    await expect(nameInput).toHaveAttribute(
+      "title",
+      "Seller details are locked. Click the edit seller button to modify."
     );
+
+    // Seller Name
+    await expect(nameInput).toHaveAttribute("aria-readonly", "true");
+    await expect(nameInput).toHaveValue(testData.name);
 
     // Seller Address
     await expect(
@@ -682,79 +767,189 @@ test.describe("Invoice Generator Page", () => {
     ).not.toBeChecked();
   });
 
-  test("handles currency switching", async ({ page }) => {
-    const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
+  test("manages buyer information", async ({ page }) => {
+    // Open buyer management dialog
+    await page.getByRole("button", { name: "New Buyer" }).click();
 
-    const netPriceFormElement =
-      invoiceItemsSection.getByTestId(`itemNetPrice0`);
+    // Fill in all buyer details
+    const testData = {
+      name: "New Test Client",
+      address: "456 Client Avenue\nClient City, 54321\nClient Country",
 
-    const netAmountFormElement =
-      invoiceItemsSection.getByTestId(`itemNetAmount0`);
+      vatNoFieldIsVisible: true,
+      vatNo: "987654321",
 
-    // Verify initial currency
-    await expect(netPriceFormElement).toHaveText("€EUR");
-    await expect(netAmountFormElement).toHaveText("€EUR");
+      email: "client@example.com",
+    } as const satisfies BuyerData;
 
+    const manageBuyerDialog = page.getByTestId(`manage-buyer-dialog`);
+
+    // Fill in form fields
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill(testData.name);
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill(testData.address);
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "VAT Number" })
+      .fill(testData.vatNo);
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Email" })
+      .fill(testData.email);
+
+    // Verify VAT visibility switch is checked by default
     await expect(
-      invoiceItemsSection.getByText("Preview: €0.00 (zero EUR 00/100)")
-    ).toBeVisible();
+      manageBuyerDialog.getByRole("switch", { name: "Show in PDF" }).nth(0)
+    ).toBeChecked();
 
-    const currencySelect = page.getByRole("combobox", { name: "Currency" });
+    // Toggle VAT visibility switch
+    await manageBuyerDialog
+      .getByRole("switch", { name: "Show in PDF" })
+      .nth(0)
+      .click(); // Toggle VAT Number visibility
 
-    // Switch currency
-    await currencySelect.selectOption("USD");
-    await expect(currencySelect).toHaveValue("USD");
-
-    // Verify calculations with new currency
-    await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount", exact: true })
-      .fill("2");
-    await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Net Price", exact: true })
-      .fill("100.75");
-
-    await expect(netPriceFormElement).toHaveText("$USD");
-    await expect(netAmountFormElement).toHaveText("$USD");
-
+    // Verify "Apply to Current Invoice" switch is checked by default
     await expect(
-      invoiceItemsSection.getByText(
-        "Preview: $100.75 (one hundred USD 75/100)",
-        {
-          exact: true,
-        }
-      )
-    ).toBeVisible();
-
-    const finalSection = page.getByTestId(`final-section`);
-    await expect(
-      finalSection.getByRole("textbox", {
-        name: "Total",
-        exact: true,
+      manageBuyerDialog.getByRole("switch", {
+        name: "Apply to Current Invoice",
       })
-    ).toHaveValue("201.50");
-  });
+    ).toBeChecked();
 
-  // TBD
-  test.skip("manages buyer information", async ({ page }) => {
-    // Open buyer management
-    await page.getByRole("button", { name: "Edit Buyer" }).click();
-
-    // Fill in new buyer details
-    await page
-      .getByRole("textbox", { name: "Buyer Name" })
-      .fill("New Test Client");
-    await page.getByRole("textbox", { name: "VAT Number" }).fill("987654321");
+    // Cancel button is shown
+    await expect(
+      manageBuyerDialog.getByRole("button", { name: "Cancel" })
+    ).toBeVisible();
 
     // Save buyer
-    await page.getByRole("button", { name: "Save" }).click();
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
 
-    // Verify saved details
-    await expect(page.getByRole("textbox", { name: "Buyer Name" })).toHaveValue(
-      "New Test Client"
+    // Verify success toast message is visible
+    await expect(
+      page.getByText("Buyer added successfully", { exact: true })
+    ).toBeVisible();
+
+    // Verify all saved details in the Buyer Information section form
+    const buyerForm = page.getByTestId(`buyer-information-section`);
+
+    // Try to find desktop tooltip icon first
+    const desktopTooltipExists =
+      (await buyerForm
+        .getByTestId("form-section-tooltip-info-icon-desktop")
+        .count()) > 0;
+
+    // If desktop tooltip exists, hover over it; otherwise find and click mobile tooltip
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (desktopTooltipExists) {
+      // Get desktop tooltip icons and hover over the first one because we use tooltip
+      const desktopTooltips = buyerForm.getByTestId(
+        "form-section-tooltip-info-icon-desktop"
+      );
+      await desktopTooltips.first().hover();
+    } else {
+      // Get mobile tooltip icons and click the first one because we use popover
+      const mobileTooltips = buyerForm.getByTestId(
+        "form-section-tooltip-info-icon-mobile"
+      );
+      await mobileTooltips.first().click();
+    }
+
+    // Check that HTML title attributes contain the tooltip message on input fields
+    const nameInput = buyerForm.getByRole("textbox", { name: "Name" });
+    await expect(nameInput).toHaveAttribute(
+      "title",
+      "Buyer details are locked. Click the edit buyer button to modify."
     );
-    await expect(page.getByRole("textbox", { name: "VAT Number" })).toHaveValue(
-      "987654321"
+
+    // Buyer Name
+    await expect(nameInput).toHaveAttribute("aria-readonly", "true");
+    await expect(nameInput).toHaveValue(testData.name);
+
+    // Buyer Address
+    await expect(
+      buyerForm.getByRole("textbox", { name: "Address" })
+    ).toHaveAttribute("aria-readonly", "true");
+    await expect(
+      buyerForm.getByRole("textbox", { name: "Address" })
+    ).toHaveValue(testData.address);
+
+    // Buyer VAT Number
+    await expect(
+      buyerForm.getByRole("textbox", { name: "VAT Number" })
+    ).toHaveAttribute("aria-readonly", "true");
+    await expect(
+      buyerForm.getByRole("textbox", { name: "VAT Number" })
+    ).toHaveValue(testData.vatNo);
+
+    const vatNumberSwitch = buyerForm.getByTestId(`buyerVatNoFieldIsVisible`);
+    // Verify VAT Number switch is not checked as we toggled it off
+    await expect(vatNumberSwitch).not.toBeChecked();
+    await expect(vatNumberSwitch).toBeDisabled();
+
+    // Buyer Email
+    await expect(
+      buyerForm.getByRole("textbox", { name: "Email" })
+    ).toHaveAttribute("aria-readonly", "true");
+    await expect(buyerForm.getByRole("textbox", { name: "Email" })).toHaveValue(
+      testData.email
     );
+
+    // Verify the buyer appears in the dropdown
+    await expect(
+      buyerForm.getByRole("combobox", { name: "Select Buyer" })
+    ).toContainText(testData.name);
+
+    // Test edit functionality
+    await buyerForm.getByRole("button", { name: "Edit buyer" }).click();
+
+    // Verify all fields are populated in edit dialog
+    await expect(
+      manageBuyerDialog.getByRole("textbox", { name: "Name" })
+    ).toHaveValue(testData.name);
+    await expect(
+      manageBuyerDialog.getByRole("textbox", { name: "Address" })
+    ).toHaveValue(testData.address);
+    await expect(
+      manageBuyerDialog.getByRole("textbox", { name: "VAT Number" })
+    ).toHaveValue(testData.vatNo);
+    await expect(
+      manageBuyerDialog.getByRole("textbox", { name: "Email" })
+    ).toHaveValue(testData.email);
+
+    // Verify visibility switch state persisted in edit dialog
+    await expect(
+      manageBuyerDialog.getByRole("switch", { name: "Show in PDF" }).nth(0)
+    ).not.toBeChecked();
+
+    // Update some data in edit mode
+    const updatedName = "Updated Client Corp";
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill(updatedName);
+
+    // Re-enable VAT visibility
+    await manageBuyerDialog
+      .getByRole("switch", { name: "Show in PDF" })
+      .nth(0)
+      .click();
+
+    // Save updated buyer
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
+    // Verify success toast for update
+    await expect(
+      page.getByText("Buyer updated successfully", { exact: true })
+    ).toBeVisible();
+
+    // Verify updated information is displayed
+    await expect(buyerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
+      updatedName
+    );
+
+    // Verify VAT visibility is now enabled
+    await expect(
+      buyerForm.getByTestId(`buyerVatNoFieldIsVisible`)
+    ).toBeChecked();
   });
 
   // TBD

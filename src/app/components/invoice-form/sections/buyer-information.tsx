@@ -19,7 +19,7 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
 };
 
 const BUYER_TOOLTIP_CONTENT =
-  "Click the edit button next to the 'Select Buyer' dropdown to modify buyer details. Any changes will be automatically saved.";
+  "Buyer details are locked. Click the edit button next to the 'Select Buyer' dropdown to modify buyer details. Any changes will be automatically saved.";
 
 interface BuyerInformationProps {
   control: Control<InvoiceData>;
@@ -36,6 +36,10 @@ export const BuyerInformation = memo(function BuyerInformation({
 }: BuyerInformationProps) {
   const [selectedBuyerId, setSelectedBuyerId] = useState("");
   const isBuyerSelected = !!selectedBuyerId;
+
+  const HTML_TITLE_CONTENT = isBuyerSelected
+    ? "Buyer details are locked. Click the edit buyer button to modify."
+    : "";
 
   // Get current form values to pass to BuyerManagement
   const currentFormValues = {
@@ -75,7 +79,15 @@ export const BuyerInformation = memo(function BuyerInformation({
             name="buyer.name"
             control={control}
             render={({ field }) => (
-              <Textarea {...field} id={`buyerName`} rows={3} className="" />
+              <Textarea
+                {...field}
+                id={`buyerName`}
+                rows={3}
+                className=""
+                readOnly={isBuyerSelected}
+                aria-readonly={isBuyerSelected}
+                title={HTML_TITLE_CONTENT}
+              />
             )}
           />
           {errors.buyer?.name && (
@@ -100,7 +112,15 @@ export const BuyerInformation = memo(function BuyerInformation({
             name="buyer.address"
             control={control}
             render={({ field }) => (
-              <Textarea {...field} id={`buyerAddress`} rows={3} className="" />
+              <Textarea
+                {...field}
+                id={`buyerAddress`}
+                rows={3}
+                className=""
+                readOnly={isBuyerSelected}
+                aria-readonly={isBuyerSelected}
+                title={HTML_TITLE_CONTENT}
+              />
             )}
           />
           {errors.buyer?.address && (
@@ -123,7 +143,10 @@ export const BuyerInformation = memo(function BuyerInformation({
               </Label>
             )}
 
-            <div className="inline-flex items-center gap-2">
+            <div
+              className="inline-flex items-center gap-2"
+              title={HTML_TITLE_CONTENT}
+            >
               <Controller
                 name={`buyer.vatNoFieldIsVisible`}
                 control={control}
@@ -134,6 +157,8 @@ export const BuyerInformation = memo(function BuyerInformation({
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    disabled={isBuyerSelected}
+                    data-testid={`buyerVatNoFieldIsVisible`}
                   />
                 )}
               />
@@ -155,7 +180,15 @@ export const BuyerInformation = memo(function BuyerInformation({
             name="buyer.vatNo"
             control={control}
             render={({ field }) => (
-              <Input {...field} id={`buyerVatNo`} type="text" className="" />
+              <Input
+                {...field}
+                id={`buyerVatNo`}
+                type="text"
+                className=""
+                readOnly={isBuyerSelected}
+                aria-readonly={isBuyerSelected}
+                title={HTML_TITLE_CONTENT}
+              />
             )}
           />
           {errors.buyer?.vatNo && (
@@ -180,7 +213,15 @@ export const BuyerInformation = memo(function BuyerInformation({
             name="buyer.email"
             control={control}
             render={({ field }) => (
-              <Input {...field} id={`buyerEmail`} type="email" className="" />
+              <Input
+                {...field}
+                id={`buyerEmail`}
+                type="email"
+                className=""
+                readOnly={isBuyerSelected}
+                aria-readonly={isBuyerSelected}
+                title={HTML_TITLE_CONTENT}
+              />
             )}
           />
           {errors.buyer?.email && (
