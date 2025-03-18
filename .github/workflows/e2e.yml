@@ -30,7 +30,7 @@ jobs:
         run: pnpm install
 
       - name: 📦 Install Playwright browser binaries & OS dependencies
-        run: pnpm exec playwright install --with-deps
+        run: pnpm exec playwright install chromium webkit --with-deps
 
       - name: 🎭 Run Playwright tests
         id: playwright
