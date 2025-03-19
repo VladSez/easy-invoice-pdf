@@ -2,8 +2,10 @@ import { test, expect } from "@playwright/test";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
 import dayjs from "dayjs";
 import {
+  ACCORDION_STATE_LOCAL_STORAGE_KEY,
   DEFAULT_BUYER_DATA,
   DEFAULT_SELLER_DATA,
+  type AccordionState,
   type BuyerData,
   type SellerData,
 } from "@/app/schema";
@@ -1203,9 +1205,155 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue(DEFAULT_BUYER_DATA.vatNo);
   });
 
-  // TBD
-  test.skip("accordion items are visible and collapsible and saved in the local storage", async () => {
-    // Open accordion items
+  test("accordion items are visible, collapsible and saved in the local storage", async ({
+    page,
+  }) => {
+    // Define sections with their labels
+    const sections = [
+      { id: "general-information-section", label: "General Information" },
+      { id: "seller-information-section", label: "Seller Information" },
+      { id: "buyer-information-section", label: "Buyer Information" },
+      { id: "invoice-items-section", label: "Invoice Items" },
+    ] as const;
+
+    // Verify all sections are initially visible and expanded
+    for (const section of sections) {
+      const sectionElement = page.getByTestId(section.id);
+      await expect(sectionElement).toBeVisible();
+      await expect(
+        sectionElement.getByRole("region", { name: section.label })
+      ).toBeVisible();
+    }
+
+    // Collapse specific sections to create mixed state
+    await page
+      .getByTestId("seller-information-section")
+      .getByRole("button", { name: "Seller Information" })
+      .click();
+
+    await page
+      .getByTestId("invoice-items-section")
+      .getByRole("button", { name: "Invoice Items" })
+      .click();
+
+    // Verify mixed state: general and buyer expanded, seller and items collapsed
+    await expect(
+      page
+        .getByTestId("general-information-section")
+        .getByRole("region", { name: "General Information" })
+    ).toBeVisible();
+
+    await expect(
+      page
+        .getByTestId("seller-information-section")
+        .getByRole("region", { name: "Seller Information" })
+    ).toBeHidden();
+
+    await expect(
+      page
+        .getByTestId("buyer-information-section")
+        .getByRole("region", { name: "Buyer Information" })
+    ).toBeVisible();
+
+    await expect(
+      page
+        .getByTestId("invoice-items-section")
+        .getByRole("region", { name: "Invoice Items" })
+    ).toBeHidden();
+
+    // Verify the state is saved in localStorage
+    const storedState = await page.evaluate((key) => {
+      return localStorage.getItem(key);
+    }, ACCORDION_STATE_LOCAL_STORAGE_KEY);
+
+    expect(storedState).toBeTruthy();
+
+    const parsedState = JSON.parse(storedState as string);
+    expect(parsedState).toEqual({
+      general: true,
+      seller: false,
+      buyer: true,
+      invoiceItems: false,
+    } as const satisfies AccordionState);
+
+    // Reload the page and verify state persistence
+    await page.reload();
+
+    // Verify state persists after reload
+    await expect(
+      page
+        .getByTestId("general-information-section")
+        .getByRole("region", { name: "General Information" })
+    ).toBeVisible();
+
+    await expect(
+      page
+        .getByTestId("seller-information-section")
+        .getByRole("region", { name: "Seller Information" })
+    ).toBeHidden();
+
+    await expect(
+      page
+        .getByTestId("buyer-information-section")
+        .getByRole("region", { name: "Buyer Information" })
+    ).toBeVisible();
+
+    await expect(
+      page
+        .getByTestId("invoice-items-section")
+        .getByRole("region", { name: "Invoice Items" })
+    ).toBeHidden();
+
+    // Toggle states after reload
+    await page
+      .getByTestId("general-information-section")
+      .getByRole("button", { name: "General Information" })
+      .click();
+
+    await page
+      .getByTestId("seller-information-section")
+      .getByRole("button", { name: "Seller Information" })
+      .click();
+
+    // Verify new toggled state
+    await expect(
+      page
+        .getByTestId("general-information-section")
+        .getByRole("region", { name: "General Information" })
+    ).toBeHidden();
+
+    await expect(
+      page
+        .getByTestId("seller-information-section")
+        .getByRole("region", { name: "Seller Information" })
+    ).toBeVisible();
+
+    await expect(
+      page
+        .getByTestId("buyer-information-section")
+        .getByRole("region", { name: "Buyer Information" })
+    ).toBeVisible();
+
+    await expect(
+      page
+        .getByTestId("invoice-items-section")
+        .getByRole("region", { name: "Invoice Items" })
+    ).toBeHidden();
+
+    // Verify updated state is saved in localStorage
+    const updatedStoredState = await page.evaluate((key) => {
+      return localStorage.getItem(key);
+    }, ACCORDION_STATE_LOCAL_STORAGE_KEY);
+
+    expect(updatedStoredState).toBeTruthy();
+
+    const updatedParsedState = JSON.parse(updatedStoredState as string);
+    expect(updatedParsedState).toEqual({
+      general: false,
+      seller: true,
+      buyer: true,
+      invoiceItems: false,
+    } as const satisfies AccordionState);
   });
 
   // will be fixed in the future
