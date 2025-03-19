@@ -223,18 +223,11 @@ export const invoiceSchema = z.object({
 
 export type InvoiceData = z.infer<typeof invoiceSchema>;
 
-// https://github.com/colinhacks/zod/discussions/2814#discussioncomment-7121769
-// const zodInputStringPipe = (zodPipe: ZodTypeAny) =>
-//   z
-//     .string()
-//     .transform((value) => (value === "" ? null : value))
-//     .nullable()
-//     .refine((value) => value === null || !isNaN(Number(value)), {
-//       message: "Nombre Invalide",
-//     })
-//     .transform((value) => (value === null ? 0 : Number(value)))
-//     .pipe(zodPipe);
-
+/**
+ * Default seller data
+ *
+ * This is the default data that will be used if the user doesn't provide their own data
+ */
 export const DEFAULT_SELLER_DATA = {
   name: "Seller name",
   address: "Seller address",
@@ -251,6 +244,11 @@ export const DEFAULT_SELLER_DATA = {
   swiftBicFieldIsVisible: true,
 } as const satisfies Omit<SellerData, "id">;
 
+/**
+ * Default buyer data
+ *
+ * This is the default data that will be used if the user doesn't provide their own data
+ */
 export const DEFAULT_BUYER_DATA = {
   name: "Buyer name",
   address: "Buyer address",

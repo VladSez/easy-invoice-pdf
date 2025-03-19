@@ -1,7 +1,12 @@
 import { test, expect } from "@playwright/test";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
 import dayjs from "dayjs";
-import type { BuyerData, SellerData } from "@/app/schema";
+import {
+  DEFAULT_BUYER_DATA,
+  DEFAULT_SELLER_DATA,
+  type BuyerData,
+  type SellerData,
+} from "@/app/schema";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -461,6 +466,7 @@ test.describe("Invoice Generator Page", () => {
       .fill("Test note");
 
     // Wait a moment for any debounced localStorage updates
+    // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(500);
 
     // Verify data is actually saved in localStorage
@@ -469,7 +475,7 @@ test.describe("Invoice Generator Page", () => {
     });
     expect(storedData).toBeTruthy();
 
-    const parsedData = storedData ? JSON.parse(storedData) : null;
+    const parsedData = JSON.parse(storedData as string);
     expect(parsedData).toMatchObject({
       invoiceNumber: "TEST/2024",
       notes: "Test note",
@@ -618,6 +624,30 @@ test.describe("Invoice Generator Page", () => {
     await manageSellerDialog
       .getByRole("button", { name: "Save Seller" })
       .click();
+
+    // Verify seller data is actually saved in localStorage
+    const storedData = await page.evaluate(() => {
+      return localStorage.getItem("EASY_INVOICE_PDF_SELLERS");
+    });
+    expect(storedData).toBeTruthy();
+
+    const parsedData = JSON.parse(storedData as string);
+
+    expect(parsedData[0]).toMatchObject({
+      name: testData.name,
+      address: testData.address,
+
+      vatNo: testData.vatNo,
+      vatNoFieldIsVisible: testData.vatNoFieldIsVisible,
+
+      email: testData.email,
+
+      accountNumber: testData.accountNumber,
+      accountNumberFieldIsVisible: false,
+
+      swiftBic: testData.swiftBic,
+      swiftBicFieldIsVisible: false,
+    } satisfies SellerData);
 
     // Verify success toast message is visible
     await expect(
@@ -829,6 +859,24 @@ test.describe("Invoice Generator Page", () => {
       page.getByText("Buyer added successfully", { exact: true })
     ).toBeVisible();
 
+    // Verify buyer data is actually saved in localStorage
+    const storedData = await page.evaluate(() => {
+      return localStorage.getItem("EASY_INVOICE_PDF_BUYERS");
+    });
+    expect(storedData).toBeTruthy();
+
+    const parsedData = JSON.parse(storedData as string);
+
+    expect(parsedData[0]).toMatchObject({
+      name: testData.name,
+      address: testData.address,
+
+      vatNo: testData.vatNo,
+      vatNoFieldIsVisible: false,
+
+      email: testData.email,
+    } satisfies BuyerData);
+
     // Verify all saved details in the Buyer Information section form
     const buyerForm = page.getByTestId(`buyer-information-section`);
 
@@ -952,6 +1000,224 @@ test.describe("Invoice Generator Page", () => {
     ).toBeChecked();
   });
 
+  test("verifies seller delete functionality", async ({ page }) => {
+    // First add a seller
+    await page.getByRole("button", { name: "New Seller" }).click();
+
+    const testData = {
+      name: "Test Delete Seller",
+      address: "123 Delete Street",
+      email: "delete@test.com",
+
+      vatNoFieldIsVisible: true,
+      vatNo: "123456789",
+
+      accountNumberFieldIsVisible: true,
+      accountNumber: "123456789",
+
+      swiftBicFieldIsVisible: true,
+      swiftBic: "123456789",
+    } as const satisfies SellerData;
+
+    const manageSellerDialog = page.getByTestId(`manage-seller-dialog`);
+
+    // Fill in basic seller details
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill(testData.name);
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill(testData.address);
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Email" })
+      .fill(testData.email);
+
+    // Save seller
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    // Verify seller was added
+    const sellerForm = page.getByTestId(`seller-information-section`);
+    await expect(
+      sellerForm.getByRole("combobox", { name: "Select Seller" })
+    ).toContainText(testData.name);
+
+    // Click delete button
+    await sellerForm.getByRole("button", { name: "Delete seller" }).click();
+
+    // Verify delete confirmation dialog appears
+    await expect(page.getByRole("alertdialog")).toBeVisible();
+
+    // Cancel button is shown
+    await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+
+    // Click cancel button
+    await page.getByRole("button", { name: "Cancel" }).click();
+
+    // Verify dialog is closed
+    await expect(page.getByRole("alertdialog")).toBeHidden();
+
+    // Click delete button once again to open the dialog
+    await sellerForm.getByRole("button", { name: "Delete seller" }).click();
+
+    // Verify delete confirmation dialog appears
+    await expect(page.getByRole("alertdialog")).toBeVisible();
+
+    await expect(
+      page.getByText(
+        `Are you sure you want to delete "${testData.name}" seller?`
+      )
+    ).toBeVisible();
+
+    // Confirm deletion
+    await page.getByRole("button", { name: "Delete" }).click();
+
+    // Verify success message
+    await expect(
+      page.getByText("Seller deleted successfully", { exact: true })
+    ).toBeVisible();
+
+    // Verify seller is removed from dropdown
+    // because we have only one seller, dropdown will be completely hidden
+    await expect(
+      sellerForm.getByRole("combobox", { name: "Select Seller" })
+    ).toBeHidden();
+
+    // Verify form is reset to default values
+    await expect(sellerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
+      DEFAULT_SELLER_DATA.name
+    );
+    await expect(
+      sellerForm.getByRole("textbox", { name: "Address" })
+    ).toHaveValue(DEFAULT_SELLER_DATA.address);
+    await expect(
+      sellerForm.getByRole("textbox", { name: "Email" })
+    ).toHaveValue(DEFAULT_SELLER_DATA.email);
+    await expect(
+      sellerForm.getByRole("textbox", { name: "VAT Number" })
+    ).toHaveValue(DEFAULT_SELLER_DATA.vatNo);
+    await expect(
+      sellerForm.getByRole("textbox", { name: "Account Number" })
+    ).toHaveValue(DEFAULT_SELLER_DATA.accountNumber);
+    await expect(
+      sellerForm.getByRole("textbox", { name: "SWIFT/BIC" })
+    ).toHaveValue(DEFAULT_SELLER_DATA.swiftBic);
+  });
+
+  test("verifies buyer delete functionality", async ({ page }) => {
+    // First add a buyer
+    await page.getByRole("button", { name: "New Buyer" }).click();
+
+    const testData = {
+      name: "Test Delete Buyer",
+      address: "456 Delete Avenue",
+      email: "delete@buyer.com",
+
+      vatNoFieldIsVisible: true,
+      vatNo: "123456789",
+    } as const satisfies BuyerData;
+
+    const manageBuyerDialog = page.getByTestId(`manage-buyer-dialog`);
+
+    // Fill in basic buyer details
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill(testData.name);
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill(testData.address);
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Email" })
+      .fill(testData.email);
+
+    // Save buyer
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
+    // Verify buyer was added
+    const buyerForm = page.getByTestId(`buyer-information-section`);
+    await expect(
+      buyerForm.getByRole("combobox", { name: "Select Buyer" })
+    ).toContainText(testData.name);
+
+    // Click delete button
+    await buyerForm.getByRole("button", { name: "Delete buyer" }).click();
+
+    // Verify delete confirmation dialog appears
+    await expect(page.getByRole("alertdialog")).toBeVisible();
+    await expect(
+      page.getByText(
+        `Are you sure you want to delete "${testData.name}" buyer?`
+      )
+    ).toBeVisible();
+
+    // Cancel button is shown
+    await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+
+    // Click cancel button
+    await page.getByRole("button", { name: "Cancel" }).click();
+
+    // Verify dialog is closed
+    await expect(page.getByRole("alertdialog")).toBeHidden();
+
+    // Click delete button once again to open the dialog
+    await buyerForm.getByRole("button", { name: "Delete buyer" }).click();
+
+    // Verify delete confirmation dialog appears
+    await expect(page.getByRole("alertdialog")).toBeVisible();
+    await expect(
+      page.getByText(
+        `Are you sure you want to delete "${testData.name}" buyer?`
+      )
+    ).toBeVisible();
+
+    // Confirm deletion
+    await page.getByRole("button", { name: "Delete" }).click();
+
+    // Verify success message
+    await expect(
+      page.getByText("Buyer deleted successfully", { exact: true })
+    ).toBeVisible();
+
+    // Verify buyer is removed from dropdown
+    // because we have only one buyer, dropdown will be completely hidden
+    await expect(
+      buyerForm.getByRole("combobox", { name: "Select Buyer" })
+    ).toBeHidden();
+
+    // Verify form is reset to default values
+    await expect(buyerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
+      DEFAULT_BUYER_DATA.name
+    );
+
+    await expect(
+      buyerForm.getByRole("textbox", { name: "Address" })
+    ).toHaveValue(DEFAULT_BUYER_DATA.address);
+
+    await expect(buyerForm.getByRole("textbox", { name: "Email" })).toHaveValue(
+      DEFAULT_BUYER_DATA.email
+    );
+
+    await expect(
+      buyerForm.getByRole("textbox", { name: "VAT Number" })
+    ).toHaveValue(DEFAULT_BUYER_DATA.vatNo);
+  });
+
+  // TBD
+  test.skip("accordion items are visible and collapsible and saved in the local storage", async () => {
+    // Open accordion items
+  });
+
+  // will be fixed in the future
+  test.skip("supports language switching", async ({ page }) => {
+    // Switch to Polish
+    await page.getByRole("combobox", { name: "Language" }).selectOption("pl");
+
+    // Check if UI elements are translated
+    await expect(page.getByText("Faktura nr")).toBeVisible();
+    await expect(page.getByText("Data wystawienia")).toBeVisible();
+  });
+
   // TBD
   test.skip("validates invoice item fields", async ({ page }) => {
     // Try to add invalid values
@@ -1018,16 +1284,6 @@ test.describe("Invoice Generator Page", () => {
         testCase.expected.total
       );
     }
-  });
-
-  // will be fixed in the future
-  test.skip("supports language switching", async ({ page }) => {
-    // Switch to Polish
-    await page.getByRole("combobox", { name: "Language" }).selectOption("pl");
-
-    // Check if UI elements are translated
-    await expect(page.getByText("Faktura nr")).toBeVisible();
-    await expect(page.getByText("Data wystawienia")).toBeVisible();
   });
 
   // will be fixed in the future

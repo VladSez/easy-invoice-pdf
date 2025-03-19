@@ -315,6 +315,7 @@ export function SellerManagement({
                         }}
                         className="h-8 px-2"
                       >
+                        <span className="sr-only">Delete seller</span>
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     }
