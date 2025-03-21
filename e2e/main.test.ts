@@ -693,6 +693,197 @@ test.describe("Invoice Generator Page", () => {
     } as const satisfies AccordionState);
   });
 
+  test("validates amount, net price and VAT fields in invoice items section", async ({
+    page,
+  }) => {
+    const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
+
+    // **AMOUNT FIELD**
+    const amountInput = invoiceItemsSection.getByRole("spinbutton", {
+      name: "Amount",
+    });
+
+    // Test invalid values
+    await amountInput.fill("-1");
+    await expect(page.getByText("Amount must be positive")).toBeVisible();
+
+    await amountInput.fill("0");
+    await expect(page.getByText("Amount must be positive")).toBeVisible();
+
+    await amountInput.fill("1000000000000"); // 1 trillion
+    await expect(
+      page.getByText("Amount must not exceed 9 999 999 999.99")
+    ).toBeVisible();
+
+    // Test valid values
+    await amountInput.fill("1");
+    await expect(page.getByText("Amount must be positive")).toBeHidden();
+    await expect(
+      page.getByText("Amount must not exceed 9 999 999 999.99")
+    ).toBeHidden();
+
+    await amountInput.fill("9999999999.99"); // Maximum valid value
+    await expect(page.getByText("Amount must be positive")).toBeHidden();
+    await expect(
+      page.getByText("Amount must not exceed 9 999 999 999.99")
+    ).toBeHidden();
+
+    // **NET PRICE FIELD**
+
+    const netPriceInput = invoiceItemsSection.getByRole("spinbutton", {
+      name: "Net Price",
+    });
+
+    // Test negative value
+    await netPriceInput.fill("-100");
+    await expect(page.getByText("Net price must be >= 0")).toBeVisible();
+
+    // Test exceeding maximum value
+    await netPriceInput.fill("1000000000000"); // 1 trillion
+    await expect(
+      page.getByText("Net price must not exceed 100 billion")
+    ).toBeVisible();
+
+    // Test zero value
+    await netPriceInput.fill("0");
+    await expect(page.getByText("Net price must be >= 0")).toBeHidden();
+
+    // Test valid value
+    await netPriceInput.fill("1");
+    await expect(page.getByText("Net price must be >= 0")).toBeHidden();
+    await expect(
+      page.getByText("Net price must not exceed 100 billion")
+    ).toBeHidden();
+
+    // **VAT FIELD**
+
+    const vatInput = invoiceItemsSection.getByRole("textbox", {
+      name: "VAT",
+      exact: true,
+    });
+
+    // Try invalid values
+    await vatInput.fill("101");
+    await expect(page.getByText("VAT must be between 0 and 100")).toBeVisible();
+
+    await vatInput.fill("-1");
+    await expect(page.getByText("VAT must be between 0 and 100")).toBeVisible();
+
+    await vatInput.fill("abc");
+    await expect(
+      page.getByText("Must be a valid number (0-100) or NP or OO")
+    ).toBeVisible();
+
+    // Try valid values
+    await vatInput.fill("23");
+    await expect(page.getByText("VAT must be between 0 and 100")).toBeHidden();
+
+    await vatInput.fill("NP");
+    await expect(
+      page.getByText("Must be a valid number (0-100) or NP or OO")
+    ).toBeHidden();
+
+    await vatInput.fill("OO");
+    await expect(
+      page.getByText("Must be a valid number (0-100) or NP or OO")
+    ).toBeHidden();
+  });
+
+  test("handles VAT calculations for different rates", async ({ page }) => {
+    // Test with different VAT rates
+    const testCases = [
+      {
+        vat: "23",
+        amount: "100",
+        netPrice: "100",
+        expected: {
+          net: "10,000.00",
+          vatAmount: "2,300.00",
+          total: "12,300.00",
+        },
+      },
+      {
+        vat: "8",
+        amount: "100",
+        netPrice: "100",
+        expected: { net: "10,000.00", vatAmount: "800.00", total: "10,800.00" },
+      },
+      {
+        vat: "0",
+        amount: "100",
+        netPrice: "100",
+        expected: { net: "10,000.00", vatAmount: "0.00", total: "10,000.00" },
+      },
+      {
+        vat: "NP",
+        amount: "100",
+        netPrice: "100",
+        expected: { net: "10,000.00", vatAmount: "0.00", total: "10,000.00" },
+      },
+      {
+        vat: "OO",
+        amount: "3",
+        netPrice: "100",
+        expected: { net: "300.00", vatAmount: "0.00", total: "300.00" },
+      },
+    ] as const satisfies {
+      vat: string;
+      amount: string;
+      netPrice: string;
+      expected: { net: string; vatAmount: string; total: string };
+    }[];
+
+    const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
+    const amountInput = invoiceItemsSection.getByRole("spinbutton", {
+      name: "Amount",
+      exact: true,
+    });
+    const netPriceInput = invoiceItemsSection.getByRole("spinbutton", {
+      name: "Net Price",
+      exact: true,
+    });
+    const vatInput = invoiceItemsSection.getByRole("textbox", {
+      name: "VAT",
+      exact: true,
+    });
+
+    for (const testCase of testCases) {
+      // Fill in values
+      await amountInput.fill(testCase.amount);
+      await netPriceInput.fill(testCase.netPrice);
+      await vatInput.fill(testCase.vat);
+
+      // Check calculations
+      await expect(
+        invoiceItemsSection.getByRole("textbox", {
+          name: "Net Amount",
+          exact: true,
+        })
+      ).toHaveValue(testCase.expected.net);
+
+      await expect(
+        invoiceItemsSection.getByRole("textbox", {
+          name: "VAT Amount",
+          exact: true,
+        })
+      ).toHaveValue(testCase.expected.vatAmount);
+
+      await expect(
+        invoiceItemsSection.getByRole("textbox", {
+          name: "Pre-tax Amount",
+          exact: true,
+        })
+      ).toHaveValue(testCase.expected.total);
+
+      await expect(
+        page.getByRole("textbox", {
+          name: "Total",
+          exact: true,
+        })
+      ).toHaveValue(testCase.expected.total);
+    }
+  });
+
   // will be fixed in the future
   test.skip("supports language switching", async ({ page }) => {
     // Switch to Polish
@@ -701,74 +892,6 @@ test.describe("Invoice Generator Page", () => {
     // Check if UI elements are translated
     await expect(page.getByText("Faktura nr")).toBeVisible();
     await expect(page.getByText("Data wystawienia")).toBeVisible();
-  });
-
-  // TBD
-  test.skip("validates invoice item fields", async ({ page }) => {
-    // Try to add invalid values
-    await page.getByRole("spinbutton", { name: "Amount" }).fill("-1");
-    await page.getByRole("spinbutton", { name: "Net Price" }).fill("-100");
-
-    // Check error messages
-    await expect(page.getByText("Amount must be positive")).toBeVisible();
-    await expect(page.getByText("Net price must be >= 0")).toBeVisible();
-  });
-
-  // TBD
-  test.skip("handles VAT calculations for different rates", async ({
-    page,
-  }) => {
-    // Test with different VAT rates
-    const testCases = [
-      {
-        vat: "23",
-        amount: "100",
-        netPrice: "100",
-        expected: { net: "10000.00", vatAmount: "2300.00", total: "12300.00" },
-      },
-      {
-        vat: "8",
-        amount: "100",
-        netPrice: "100",
-        expected: { net: "10000.00", vatAmount: "800.00", total: "10800.00" },
-      },
-      {
-        vat: "0",
-        amount: "100",
-        netPrice: "100",
-        expected: { net: "10000.00", vatAmount: "0.00", total: "10000.00" },
-      },
-      {
-        vat: "NP",
-        amount: "100",
-        netPrice: "100",
-        expected: { net: "10000.00", vatAmount: "0.00", total: "10000.00" },
-      },
-    ];
-
-    for (const testCase of testCases) {
-      // Fill in values
-      await page
-        .getByRole("spinbutton", { name: "Amount" })
-        .fill(testCase.amount);
-      await page
-        .getByRole("spinbutton", { name: "Net Price" })
-        .fill(testCase.netPrice);
-      await page
-        .getByRole("combobox", { name: "VAT" })
-        .selectOption(testCase.vat);
-
-      // Check calculations
-      await expect(page.getByTestId("net-amount")).toHaveValue(
-        testCase.expected.net
-      );
-      await expect(page.getByTestId("vat-amount")).toHaveValue(
-        testCase.expected.vatAmount
-      );
-      await expect(page.getByTestId("total")).toHaveValue(
-        testCase.expected.total
-      );
-    }
   });
 
   // will be fixed in the future

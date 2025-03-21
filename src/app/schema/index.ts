@@ -54,7 +54,7 @@ export const invoiceItemSchema = z
         message: "Amount must be positive",
       })
       .refine((val) => val <= 9_999_999_999.99, {
-        message: "Amount must not exceed 9.999.999.999",
+        message: "Amount must not exceed 9 999 999 999.99",
       }),
     amountFieldIsVisible: z.boolean().default(true),
 
