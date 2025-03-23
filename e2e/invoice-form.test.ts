@@ -884,40 +884,6 @@ test.describe("Invoice Generator Page", () => {
     }
   });
 
-  // will be fixed in the future
-  test.skip("supports language switching", async ({ page }) => {
-    // Switch to Polish
-    await page.getByRole("combobox", { name: "Language" }).selectOption("pl");
-
-    // Check if UI elements are translated
-    await expect(page.getByText("Faktura nr")).toBeVisible();
-    await expect(page.getByText("Data wystawienia")).toBeVisible();
-  });
-
-  // will be fixed in the future
-  test.skip("handles PDF preview and download", async ({ page }) => {
-    // Switch to preview tab on mobile
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.getByRole("tab", { name: "Preview PDF" }).click();
-    await expect(page.getByTestId("pdf-preview")).toBeVisible();
-
-    // Check download button
-    await expect(
-      page.getByRole("button", { name: "Download PDF" })
-    ).toBeEnabled();
-  });
-
-  // will be fixed in the future
-  test.skip("supports field visibility toggles", async ({ page }) => {
-    // Toggle VAT field visibility
-    await page.getByRole("switch", { name: "Show VAT Column" }).click();
-    await expect(page.getByTestId("vat-column")).not.toBeVisible();
-
-    // Toggle notes field visibility
-    await page.getByRole("switch", { name: "Show Notes" }).click();
-    await expect(page.getByTestId("notes")).not.toBeVisible();
-  });
-
   // TBD
   test.skip("handles invoice sharing", async ({ page }) => {
     // Click share button

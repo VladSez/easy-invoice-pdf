@@ -45,7 +45,7 @@ export function InvoiceClientPage({
   return (
     <>
       {isMobile ? (
-        <div data-testid="mobile-view">
+        <div>
           <Tabs defaultValue={TAB_INVOICE_FORM} className="w-full">
             <TabsList className="w-full">
               <TabsTrigger value={TAB_INVOICE_FORM} className="flex-1">
@@ -96,7 +96,7 @@ export function InvoiceClientPage({
       ) : (
         // Desktop View
         <>
-          <div className="col-span-4" data-testid="desktop-view">
+          <div className="col-span-4">
             <div className="h-[620px] overflow-auto border-b px-3 pl-0">
               <InvoiceForm
                 invoiceData={invoiceDataState}
