@@ -26,7 +26,7 @@ const DONATION_TOAST_CONFIG = {
   closeButton: true,
 } as const;
 
-const DONATION_URL = "https://dub.sh/easyinvoice-donate" as const;
+const DONATION_URL = "https://dub.sh/easyinvoice-donate";
 
 // Separate button states into a memoized component
 const ButtonContent = ({

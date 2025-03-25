@@ -1,6 +1,7 @@
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   type AccordionState,
+  type InvoiceData,
 } from "@/app/schema";
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
@@ -467,12 +468,12 @@ test.describe("Invoice Generator Page", () => {
     await page.waitForTimeout(500);
 
     // Verify data is actually saved in localStorage
-    const storedData = await page.evaluate(() => {
+    const storedData = (await page.evaluate(() => {
       return localStorage.getItem("EASY_INVOICE_PDF_DATA");
-    });
+    })) as string;
     expect(storedData).toBeTruthy();
 
-    const parsedData = JSON.parse(storedData as string);
+    const parsedData = JSON.parse(storedData) as InvoiceData;
     expect(parsedData).toMatchObject({
       invoiceNumber: "TEST/2024",
       notes: "Test note",
@@ -599,13 +600,14 @@ test.describe("Invoice Generator Page", () => {
     ).toBeHidden();
 
     // Verify the state is saved in localStorage
-    const storedState = await page.evaluate((key) => {
+    const storedState = (await page.evaluate((key) => {
       return localStorage.getItem(key);
-    }, ACCORDION_STATE_LOCAL_STORAGE_KEY);
+    }, ACCORDION_STATE_LOCAL_STORAGE_KEY)) as string;
 
     expect(storedState).toBeTruthy();
 
-    const parsedState = JSON.parse(storedState as string);
+    const parsedState = JSON.parse(storedState) as AccordionState;
+
     expect(parsedState).toEqual({
       general: true,
       seller: false,
@@ -678,13 +680,13 @@ test.describe("Invoice Generator Page", () => {
     ).toBeHidden();
 
     // Verify updated state is saved in localStorage
-    const updatedStoredState = await page.evaluate((key) => {
+    const updatedStoredState = (await page.evaluate((key) => {
       return localStorage.getItem(key);
-    }, ACCORDION_STATE_LOCAL_STORAGE_KEY);
+    }, ACCORDION_STATE_LOCAL_STORAGE_KEY)) as string;
 
     expect(updatedStoredState).toBeTruthy();
 
-    const updatedParsedState = JSON.parse(updatedStoredState as string);
+    const updatedParsedState = JSON.parse(updatedStoredState) as AccordionState;
     expect(updatedParsedState).toEqual({
       general: false,
       seller: true,

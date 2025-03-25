@@ -2,7 +2,7 @@
   "name": "pdf-invoice-generator",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.5.0",
+  "packageManager": "pnpm@10.6.5",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -10,13 +10,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
     "type-check": "tsc --noEmit",
+    "lint": "pnpm eslint .",
     "prettify": "prettier --write --cache '**/*.{ts?(x),json,js,mjs,yml,yaml,md}'",
+    "knip": "knip",
     "update-deps": "pnpm upgrade --interactive --latest",
-    "dedupe": "pnpm dedupe",
     "e2e": "pnpm exec playwright test",
-    "e2e:ui": "pnpm exec playwright test --ui"
+    "e2e:ui": "pnpm exec playwright test --ui",
+    "dedupe": "pnpm dedupe",
+    "lint-stage": "npx lint-staged --verbose",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "3.9.0",
@@ -39,6 +42,7 @@
     "clsx": "2.1.1",
     "cmdk": "1.0.0",
     "dayjs": "1.11.13",
+    "eslint-plugin-react-hooks": "5.2.0",
     "file-saver": "2.0.5",
     "jszip": "3.10.1",
     "lucide-react": "0.477.0",
@@ -58,19 +62,26 @@
     "zod": "3.24.2"
   },
   "devDependencies": {
-    "@playwright/test": "1.51.0",
+    "@eslint/eslintrc": "3.3.1",
+    "@next/eslint-plugin-next": "15.2.3",
+    "@playwright/test": "1.51.1",
     "@types/file-saver": "2.0.7",
     "@types/node": "22.8.1",
     "@types/pdf-parse": "1.1.4",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.15",
+    "autoprefixer": "10.4.21",
+    "eslint": "9.23.0",
+    "eslint-config-next": "15.2.3",
     "eslint-plugin-playwright": "2.2.0",
+    "husky": "9.1.7",
+    "knip": "5.46.0",
+    "lint-staged": "15.5.0",
     "postcss": "^8",
     "prettier": "3.5.3",
     "prettier-plugin-tailwindcss": "0.6.11",
     "tailwindcss": "3.4.14",
-    "typescript": "5.8.2"
+    "typescript": "5.8.2",
+    "typescript-eslint": "8.28.0"
   }
 }

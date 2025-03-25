@@ -67,7 +67,7 @@ export function BuyerManagement({
   useEffect(() => {
     try {
       const savedBuyers = localStorage.getItem(BUYERS_LOCAL_STORAGE_KEY);
-      const parsedBuyers = savedBuyers ? JSON.parse(savedBuyers) : [];
+      const parsedBuyers: unknown = savedBuyers ? JSON.parse(savedBuyers) : [];
 
       // Validate buyers array with Zod
       const buyersSchema = z.array(buyerSchema);

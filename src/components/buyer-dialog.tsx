@@ -105,7 +105,7 @@ export function BuyerDialog({
 
       // Get existing buyers or initialize empty array
       const buyers = localStorage.getItem(BUYERS_LOCAL_STORAGE_KEY);
-      const existingBuyers = buyers ? JSON.parse(buyers) : [];
+      const existingBuyers: unknown = buyers ? JSON.parse(buyers) : [];
 
       // Validate existing buyers array with Zod
       const existingBuyersValidationResult = z
@@ -131,7 +131,7 @@ export function BuyerDialog({
       }
 
       // Validate buyer data against existing buyers
-      const isDuplicateName = existingBuyers.some(
+      const isDuplicateName = existingBuyersValidationResult.data.some(
         (buyer: BuyerData) =>
           buyer.name === formValues.name && buyer.id !== formValues.id
       );

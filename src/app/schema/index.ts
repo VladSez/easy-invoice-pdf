@@ -22,6 +22,14 @@ export const SUPPORTED_DATE_FORMATS = [
   "YYYY.MM.DD", // 2024.03.20
 ] as const;
 
+/**
+ * Supported date formats
+ *
+ * This is the list of date formats that are supported by the invoice form
+ *
+ *
+ *  @lintignore ignore for now in knip
+ */
 export type SupportedDateFormat = (typeof SUPPORTED_DATE_FORMATS)[number];
 
 export const invoiceItemSchema = z

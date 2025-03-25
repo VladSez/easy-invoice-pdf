@@ -1,10 +1,10 @@
 import {
-  Control,
+  type Control,
   Controller,
-  FieldErrors,
-  UseFormSetValue,
+  type FieldErrors,
+  type UseFormSetValue,
 } from "react-hook-form";
-import { InvoiceData, type SellerData } from "@/app/schema";
+import { type InvoiceData, type SellerData } from "@/app/schema";
 import { SellerManagement } from "@/components/seller-management";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

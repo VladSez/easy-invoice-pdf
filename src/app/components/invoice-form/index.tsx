@@ -39,10 +39,9 @@ import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
 
 export const PDF_DATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_DATA";
-export const INVOICE_PDF_HTML_FORM_ID = "pdfInvoiceForm";
-export const DEBOUNCE_TIMEOUT = 500;
 export const LOADING_BUTTON_TIMEOUT = 400;
 export const LOADING_BUTTON_TEXT = "Generating Document...";
+const DEBOUNCE_TIMEOUT = 500;
 
 const DEFAULT_ACCORDION_VALUES = [
   "general",
@@ -209,9 +208,9 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   // regenerate pdf on every input change with debounce
   const debouncedRegeneratePdfOnFormChange = useDebouncedCallback(
-    (data) => {
+    (data: InvoiceData) => {
       // submit form e.g. regenerates pdf and run form validations
-      handleSubmit(onSubmit)(data);
+      void handleSubmit(onSubmit)(data as unknown as React.BaseSyntheticEvent);
 
       // data should be already validated
       const stringifiedData = JSON.stringify(data);
@@ -231,7 +230,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   // subscribe to form changes to regenerate pdf on every input change
   useEffect(() => {
     const subscription = watch((value) => {
-      debouncedRegeneratePdfOnFormChange(value);
+      debouncedRegeneratePdfOnFormChange(value as unknown as InvoiceData);
     });
 
     return () => subscription.unsubscribe();
@@ -273,13 +272,12 @@ export const InvoiceForm = memo(function InvoiceForm({
       );
 
       if (savedState) {
-        const parsedState = JSON.parse(savedState);
+        const parsedState = JSON.parse(savedState) as string;
 
         const validatedState = accordionSchema.safeParse(parsedState);
 
         if (validatedState.success) {
           const arrayOfOpenSections = Object.entries(validatedState.data)
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             .filter(([_, isOpen]) => isOpen)
             .map(([section]) => section) as Prettify<AccordionKeys>;
 
@@ -350,7 +348,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                   if (Array.isArray(error)) {
                     return error.map((item, index) =>
                       Object.entries(
-                        item as Record<string, { message?: string }>
+                        item as { [key: string]: { message?: string } }
                       ).map(([fieldName, fieldError]) => (
                         <li
                           key={`${key}.${index}.${fieldName}`}
@@ -364,13 +362,15 @@ export const InvoiceForm = memo(function InvoiceForm({
 
                   // Handle nested object errors
                   if (error && typeof error === "object") {
-                    return Object.entries(error).map(
-                      ([nestedKey, nestedError]) => (
+                    return Object.entries(
+                      error as { [key: string]: { message?: string } }
+                    ).map(([nestedKey, nestedError]) => {
+                      return (
                         <li key={`${key}.${nestedKey}`} className="text-sm">
                           {nestedError?.message || "Unknown error"}
                         </li>
-                      )
-                    );
+                      );
+                    });
                   }
 
                   return null;

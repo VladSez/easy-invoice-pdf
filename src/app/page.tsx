@@ -3,7 +3,6 @@
 import { invoiceSchema, type InvoiceData } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { CustomTooltip, TooltipProvider } from "@/components/ui/tooltip";
-import { useIsDesktop } from "@/hooks/use-media-query";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { useOpenPanel } from "@openpanel/nextjs";
@@ -45,7 +44,7 @@ export default function Home() {
         const decompressed = decompressFromEncodedURIComponent(
           compressedInvoiceDataInUrl
         );
-        const parsed = JSON.parse(decompressed);
+        const parsed: unknown = JSON.parse(decompressed);
         const validated = invoiceSchema.parse(parsed);
 
         setInvoiceDataState(validated);
@@ -67,7 +66,7 @@ export default function Home() {
     try {
       const savedData = localStorage.getItem(PDF_DATA_LOCAL_STORAGE_KEY);
       if (savedData) {
-        const json = JSON.parse(savedData);
+        const json: unknown = JSON.parse(savedData);
         const parsedData = invoiceSchema.parse(json);
 
         setInvoiceDataState(parsedData);
@@ -102,7 +101,7 @@ export default function Home() {
         if (urlData) {
           try {
             const decompressed = decompressFromEncodedURIComponent(urlData);
-            const urlParsed = JSON.parse(decompressed);
+            const urlParsed: unknown = JSON.parse(decompressed);
 
             const urlValidated = invoiceSchema.parse(urlParsed);
 

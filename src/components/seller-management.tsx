@@ -72,7 +72,9 @@ export function SellerManagement({
   useEffect(() => {
     try {
       const savedSellers = localStorage.getItem(SELLERS_LOCAL_STORAGE_KEY);
-      const parsedSellers = savedSellers ? JSON.parse(savedSellers) : [];
+      const parsedSellers: unknown = savedSellers
+        ? JSON.parse(savedSellers)
+        : [];
 
       // Validate sellers array with Zod
       const sellersSchema = z.array(sellerSchema);

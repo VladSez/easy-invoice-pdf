@@ -1,5 +1,5 @@
 import {
-  InvoiceData,
+  type InvoiceData,
   type SupportedCurrencies,
   type SupportedLanguages,
 } from "@/app/schema";
@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { memo } from "react";
 import {
-  Control,
+  type Control,
   Controller,
   type FieldArrayWithId,
   type FieldErrors,
@@ -54,6 +54,7 @@ export const InvoiceItems = memo(function InvoiceItems({
   append,
 }: InvoiceItemsSettingsProps) {
   const openPanel = useOpenPanel();
+
   return (
     <>
       <div className="mb-3 space-y-4">

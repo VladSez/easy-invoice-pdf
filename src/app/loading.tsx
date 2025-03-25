@@ -8,7 +8,7 @@ export default function Loading() {
 
           {/* Form fields skeleton */}
           <div className="space-y-4">
-            {[...Array(6)].map((_, i) => (
+            {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="space-y-2">
                 <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
                 <div className="h-10 animate-pulse rounded bg-gray-200" />

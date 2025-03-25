@@ -69,12 +69,12 @@ test.describe("Buyer management", () => {
     ).toBeVisible();
 
     // Verify buyer data is actually saved in localStorage
-    const storedData = await page.evaluate(() => {
+    const storedData = (await page.evaluate(() => {
       return localStorage.getItem("EASY_INVOICE_PDF_BUYERS");
-    });
+    })) as string;
     expect(storedData).toBeTruthy();
 
-    const parsedData = JSON.parse(storedData as string);
+    const parsedData = JSON.parse(storedData) as BuyerData[];
 
     expect(parsedData[0]).toMatchObject({
       name: testData.name,

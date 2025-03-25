@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { CheckIcon, XCircle, ChevronDown, XIcon } from "lucide-react";
+import { CheckIcon, XCircle, ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
@@ -236,8 +236,7 @@ export const MultiSelect = React.forwardRef<
                         .slice(0, maxCount)
                         .map((value, index) => {
                           const isLast = index === selectedLanguages.length - 1;
-                          const label =
-                            LANGUAGE_TO_LABEL[value as SupportedLanguages];
+                          const label = LANGUAGE_TO_LABEL[value];
 
                           return (
                             <React.Fragment key={value}>

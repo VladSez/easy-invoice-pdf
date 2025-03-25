@@ -1,11 +1,11 @@
 import {
-  Control,
+  type Control,
   Controller,
-  FieldErrors,
-  UseFormSetValue,
+  type FieldErrors,
+  type UseFormSetValue,
   useWatch,
 } from "react-hook-form";
-import { InvoiceData } from "@/app/schema";
+import { type InvoiceData } from "@/app/schema";
 import {
   SUPPORTED_CURRENCIES,
   SUPPORTED_DATE_FORMATS,
