@@ -45,3 +45,6 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright-output/
+
+# eslint
+.eslintcache
