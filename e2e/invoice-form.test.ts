@@ -886,18 +886,96 @@ test.describe("Invoice Generator Page", () => {
     }
   });
 
-  // TBD
-  test.skip("handles invoice sharing", async ({ page }) => {
-    // Click share button
+  test("shares invoice data via URL and can be loaded in new tab", async ({
+    page,
+    context,
+  }) => {
+    // Fill in some test data
+    await page
+      .getByRole("textbox", { name: "Invoice Number" })
+      .fill("SHARE-TEST-001");
+    await page
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill("Test note for sharing");
+
+    // Fill in seller information
+    const sellerSection = page.getByTestId("seller-information-section");
+    await sellerSection
+      .getByRole("textbox", { name: "Name" })
+      .fill("Test Seller");
+    await sellerSection
+      .getByRole("textbox", { name: "Address" })
+      .fill("123 Test St");
+    await sellerSection
+      .getByRole("textbox", { name: "Email" })
+      .fill("seller@test.com");
+
+    // Fill in an invoice item
+    const invoiceItemsSection = page.getByTestId("invoice-items-section");
+    await invoiceItemsSection
+      .getByRole("spinbutton", { name: "Amount" })
+      .fill("5");
+    await invoiceItemsSection
+      .getByRole("spinbutton", { name: "Net Price" })
+      .fill("100");
+    await invoiceItemsSection
+      .getByRole("textbox", { name: "VAT", exact: true })
+      .fill("23");
+
+    // wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
+
+    // Generate share link
     await page
       .getByRole("button", { name: "Generate a link to invoice" })
       .click();
 
-    // Verify share dialog appears
-    await expect(page.getByRole("dialog")).toBeVisible();
-    await expect(page.getByText("Share Invoice")).toBeVisible();
+    // Wait for URL to update with share data
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(100);
 
-    // Check copy link button
-    await expect(page.getByRole("button", { name: "Copy Link" })).toBeEnabled();
+    // Get the current URL which should now contain the share data
+    const sharedUrl = page.url();
+    expect(sharedUrl).toContain("?data=");
+
+    // Open URL in new tab
+    const newPage = await context.newPage();
+    await newPage.goto(sharedUrl);
+
+    // Verify data is loaded in new tab
+    await expect(
+      newPage.getByRole("textbox", { name: "Invoice Number" })
+    ).toHaveValue("SHARE-TEST-001");
+    await expect(
+      newPage.getByRole("textbox", { name: "Notes", exact: true })
+    ).toHaveValue("Test note for sharing");
+
+    // Verify seller information
+    const newSellerSection = newPage.getByTestId("seller-information-section");
+    await expect(
+      newSellerSection.getByRole("textbox", { name: "Name" })
+    ).toHaveValue("Test Seller");
+    await expect(
+      newSellerSection.getByRole("textbox", { name: "Address" })
+    ).toHaveValue("123 Test St");
+    await expect(
+      newSellerSection.getByRole("textbox", { name: "Email" })
+    ).toHaveValue("seller@test.com");
+
+    // Verify invoice item
+    const newInvoiceItemsSection = newPage.getByTestId("invoice-items-section");
+    await expect(
+      newInvoiceItemsSection.getByRole("spinbutton", { name: "Amount" })
+    ).toHaveValue("5");
+    await expect(
+      newInvoiceItemsSection.getByRole("spinbutton", { name: "Net Price" })
+    ).toHaveValue("100");
+    await expect(
+      newInvoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true })
+    ).toHaveValue("23");
+
+    // Close the new page
+    await newPage.close();
   });
 });

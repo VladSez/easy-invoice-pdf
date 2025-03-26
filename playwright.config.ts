@@ -38,7 +38,11 @@ export default defineConfig({
   timeout: TIMEOUT,
 
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: "html",
+  reporter: [["html", { outputFolder: "playwright-output/report" }]],
+
+  /* Output directory for test artifacts */
+  outputDir: "playwright-output/test-results",
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     // Use baseURL so to make navigations relative.
@@ -47,6 +51,12 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
+
+    /* Screenshot configuration */
+    screenshot: "only-on-failure",
+
+    /* Video configuration */
+    video: "retain-on-failure",
   },
 
   /* Configure projects for major browsers */
