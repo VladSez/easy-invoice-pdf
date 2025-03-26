@@ -5,6 +5,7 @@ import {
   accordionSchema,
   invoiceItemSchema,
   invoiceSchema,
+  type AccordionState,
   type InvoiceData,
   type InvoiceItemData,
 } from "@/app/schema";
@@ -272,7 +273,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       );
 
       if (savedState) {
-        const parsedState = JSON.parse(savedState) as string;
+        const parsedState = JSON.parse(savedState) as AccordionState;
 
         const validatedState = accordionSchema.safeParse(parsedState);
 

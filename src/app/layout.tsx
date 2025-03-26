@@ -79,27 +79,27 @@ export default async function RootLayout({
           <NuqsAdapter>{children}</NuqsAdapter>
         </DeviceContextProvider>
 
-        {/* https://vercel.com/vladsazon27s-projects/pdf-invoice-generator/speed-insights */}
-        {process.env.VERCEL_ENV === "production" && <SpeedInsights />}
-
         {/* https://sonner.emilkowal.ski/ */}
         <Toaster visibleToasts={1} richColors />
 
-        {/* https://openpanel.dev/docs */}
+        {/* should only be enabled in production */}
         {process.env.VERCEL_ENV === "production" && (
-          <OpenPanelComponent
-            clientId="34cab0b1-c372-4d2d-9646-9a4cea67faf9"
-            trackScreenViews={true}
-          />
-        )}
-
-        {process.env.VERCEL_ENV === "production" && (
-          <Script
-            // we proxy umami check next.config.mjs rewrites
-            src="/stats/script.js"
-            data-website-id="1914352c-5ebb-4806-bfc3-f494712bb4a4"
-            defer
-          />
+          <>
+            {/* https://vercel.com/vladsazon27s-projects/pdf-invoice-generator/speed-insights */}
+            <SpeedInsights />
+            {/* https://openpanel.dev/docs */}
+            <OpenPanelComponent
+              clientId="34cab0b1-c372-4d2d-9646-9a4cea67faf9"
+              trackScreenViews={true}
+            />
+            {/* https://eu.umami.is/dashboard */}
+            <Script
+              // we proxy umami check next.config.mjs rewrites
+              src="/stats/script.js"
+              data-website-id="1914352c-5ebb-4806-bfc3-f494712bb4a4"
+              defer
+            />
+          </>
         )}
       </body>
     </html>
