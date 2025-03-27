@@ -6,6 +6,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import "./globals.css";
 import { Toaster } from "sonner";
+import { checkDeviceUserAgent } from "@/lib/check-device.server";
+import { DeviceContextProvider } from "@/contexts/device-context";
 
 export const viewport: Viewport = {
   initialScale: 1, // Sets the default zoom level to 1 (100%)
@@ -51,46 +53,53 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { isDesktop: isDesktopServer } = await checkDeviceUserAgent();
+
   return (
     <html lang="en">
-      {process.env.VERCEL_ENV === "development" && (
+      {/* React-scan is a tool for detecting and fixing issues with React components
+        https://github.com/aidenybai/react-scan#readme
+        Uncomment if needed
+      */}
+      {/* {process.env.VERCEL_ENV === "development" && (
         <head>
-          {/* eslint-disable-next-line @next/next/no-sync-scripts */}
           <script
             crossOrigin="anonymous"
             src="//unpkg.com/react-scan/dist/auto.global.js"
           />
         </head>
-      )}
+      )} */}
       <body className={`antialiased`}>
-        <NuqsAdapter>{children}</NuqsAdapter>
-
-        {/* https://vercel.com/vladsazon27s-projects/pdf-invoice-generator/speed-insights */}
-        {process.env.VERCEL_ENV === "production" && <SpeedInsights />}
+        <DeviceContextProvider isDesktop={isDesktopServer}>
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </DeviceContextProvider>
 
         {/* https://sonner.emilkowal.ski/ */}
         <Toaster visibleToasts={1} richColors />
 
-        {/* https://openpanel.dev/docs */}
+        {/* should only be enabled in production */}
         {process.env.VERCEL_ENV === "production" && (
-          <OpenPanelComponent
-            clientId="34cab0b1-c372-4d2d-9646-9a4cea67faf9"
-            trackScreenViews={true}
-          />
-        )}
-
-        {process.env.VERCEL_ENV === "production" && (
-          <Script
-            // we proxy umami check next.config.mjs rewrites
-            src="/stats/script.js"
-            data-website-id="1914352c-5ebb-4806-bfc3-f494712bb4a4"
-            defer
-          />
+          <>
+            {/* https://vercel.com/vladsazon27s-projects/pdf-invoice-generator/speed-insights */}
+            <SpeedInsights />
+            {/* https://openpanel.dev/docs */}
+            <OpenPanelComponent
+              clientId="34cab0b1-c372-4d2d-9646-9a4cea67faf9"
+              trackScreenViews={true}
+            />
+            {/* https://eu.umami.is/dashboard */}
+            <Script
+              // we proxy umami check next.config.mjs rewrites
+              src="/stats/script.js"
+              data-website-id="1914352c-5ebb-4806-bfc3-f494712bb4a4"
+              defer
+            />
+          </>
         )}
       </body>
     </html>

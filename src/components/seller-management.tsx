@@ -72,7 +72,9 @@ export function SellerManagement({
   useEffect(() => {
     try {
       const savedSellers = localStorage.getItem(SELLERS_LOCAL_STORAGE_KEY);
-      const parsedSellers = savedSellers ? JSON.parse(savedSellers) : [];
+      const parsedSellers: unknown = savedSellers
+        ? JSON.parse(savedSellers)
+        : [];
 
       // Validate sellers array with Zod
       const sellersSchema = z.array(sellerSchema);
@@ -296,6 +298,7 @@ export function SellerManagement({
                         }}
                         className="h-8 px-2"
                       >
+                        <span className="sr-only">Edit seller</span>
                         <Pencil className="h-3 w-3" />
                       </Button>
                     }
@@ -314,6 +317,7 @@ export function SellerManagement({
                         }}
                         className="h-8 px-2"
                       >
+                        <span className="sr-only">Delete seller</span>
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     }

@@ -1,10 +1,10 @@
 import {
-  Control,
+  type Control,
   Controller,
-  FieldErrors,
-  UseFormSetValue,
+  type FieldErrors,
+  type UseFormSetValue,
 } from "react-hook-form";
-import { InvoiceData, type BuyerData } from "@/app/schema";
+import { type InvoiceData, type BuyerData } from "@/app/schema";
 import { BuyerManagement } from "@/components/buyer-management";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +12,6 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { memo, useState } from "react";
-import type { FormPrefixId } from "../..";
 import { LabelWithEditIcon } from "@/components/label-with-edit-icon";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
@@ -20,13 +19,12 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
 };
 
 const BUYER_TOOLTIP_CONTENT =
-  "Click the edit button next to the 'Select Buyer' dropdown to modify buyer details. Any changes will be automatically saved.";
+  "Buyer details are locked. Click the edit button next to the 'Select Buyer' dropdown to modify buyer details. Any changes will be automatically saved.";
 
 interface BuyerInformationProps {
   control: Control<InvoiceData>;
   errors: FieldErrors<InvoiceData>;
   setValue: UseFormSetValue<InvoiceData>;
-  formPrefixId: FormPrefixId;
   invoiceData: InvoiceData;
 }
 
@@ -34,11 +32,14 @@ export const BuyerInformation = memo(function BuyerInformation({
   control,
   errors,
   setValue,
-  formPrefixId,
   invoiceData,
 }: BuyerInformationProps) {
   const [selectedBuyerId, setSelectedBuyerId] = useState("");
   const isBuyerSelected = !!selectedBuyerId;
+
+  const HTML_TITLE_CONTENT = isBuyerSelected
+    ? "Buyer details are locked. Click the edit buyer button to modify."
+    : "";
 
   // Get current form values to pass to BuyerManagement
   const currentFormValues = {
@@ -64,13 +65,13 @@ export const BuyerInformation = memo(function BuyerInformation({
         <div>
           {isBuyerSelected ? (
             <LabelWithEditIcon
-              htmlFor={`${formPrefixId}-buyerName`}
+              htmlFor={`buyerName`}
               content={BUYER_TOOLTIP_CONTENT}
             >
               Name
             </LabelWithEditIcon>
           ) : (
-            <Label htmlFor={`${formPrefixId}-buyerName`} className="mb-1">
+            <Label htmlFor={`buyerName`} className="mb-1">
               Name
             </Label>
           )}
@@ -80,9 +81,12 @@ export const BuyerInformation = memo(function BuyerInformation({
             render={({ field }) => (
               <Textarea
                 {...field}
-                id={`${formPrefixId}-buyerName`}
+                id={`buyerName`}
                 rows={3}
                 className=""
+                readOnly={isBuyerSelected}
+                aria-readonly={isBuyerSelected}
+                title={HTML_TITLE_CONTENT}
               />
             )}
           />
@@ -94,13 +98,13 @@ export const BuyerInformation = memo(function BuyerInformation({
         <div>
           {isBuyerSelected ? (
             <LabelWithEditIcon
-              htmlFor={`${formPrefixId}-buyerAddress`}
+              htmlFor={`buyerAddress`}
               content={BUYER_TOOLTIP_CONTENT}
             >
               Address
             </LabelWithEditIcon>
           ) : (
-            <Label htmlFor={`${formPrefixId}-buyerAddress`} className="mb-1">
+            <Label htmlFor={`buyerAddress`} className="mb-1">
               Address
             </Label>
           )}
@@ -110,9 +114,12 @@ export const BuyerInformation = memo(function BuyerInformation({
             render={({ field }) => (
               <Textarea
                 {...field}
-                id={`${formPrefixId}-buyerAddress`}
+                id={`buyerAddress`}
                 rows={3}
                 className=""
+                readOnly={isBuyerSelected}
+                aria-readonly={isBuyerSelected}
+                title={HTML_TITLE_CONTENT}
               />
             )}
           />
@@ -125,34 +132,39 @@ export const BuyerInformation = memo(function BuyerInformation({
           <div className="relative mb-2 flex items-center justify-between">
             {isBuyerSelected ? (
               <LabelWithEditIcon
-                htmlFor={`${formPrefixId}-buyerVatNo`}
+                htmlFor={`buyerVatNo`}
                 content={BUYER_TOOLTIP_CONTENT}
               >
                 VAT Number
               </LabelWithEditIcon>
             ) : (
-              <Label htmlFor={`${formPrefixId}-buyerVatNo`} className="">
+              <Label htmlFor={`buyerVatNo`} className="">
                 VAT Number
               </Label>
             )}
 
-            <div className="inline-flex items-center gap-2">
+            <div
+              className="inline-flex items-center gap-2"
+              title={HTML_TITLE_CONTENT}
+            >
               <Controller
                 name={`buyer.vatNoFieldIsVisible`}
                 control={control}
                 render={({ field: { value, onChange, ...field } }) => (
                   <Switch
                     {...field}
-                    id={`${formPrefixId}-buyerVatNoFieldIsVisible`}
+                    id={`buyerVatNoFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    disabled={isBuyerSelected}
+                    data-testid={`buyerVatNoFieldIsVisible`}
                   />
                 )}
               />
               <CustomTooltip
                 trigger={
-                  <Label htmlFor={`${formPrefixId}-buyerVatNoFieldIsVisible`}>
+                  <Label htmlFor={`buyerVatNoFieldIsVisible`}>
                     Show in PDF
                   </Label>
                 }
@@ -170,9 +182,12 @@ export const BuyerInformation = memo(function BuyerInformation({
             render={({ field }) => (
               <Input
                 {...field}
-                id={`${formPrefixId}-buyerVatNo`}
+                id={`buyerVatNo`}
                 type="text"
                 className=""
+                readOnly={isBuyerSelected}
+                aria-readonly={isBuyerSelected}
+                title={HTML_TITLE_CONTENT}
               />
             )}
           />
@@ -184,13 +199,13 @@ export const BuyerInformation = memo(function BuyerInformation({
         <div>
           {isBuyerSelected ? (
             <LabelWithEditIcon
-              htmlFor={`${formPrefixId}-buyerEmail`}
+              htmlFor={`buyerEmail`}
               content={BUYER_TOOLTIP_CONTENT}
             >
               Email
             </LabelWithEditIcon>
           ) : (
-            <Label htmlFor={`${formPrefixId}-buyerEmail`} className="mb-1">
+            <Label htmlFor={`buyerEmail`} className="mb-1">
               Email
             </Label>
           )}
@@ -200,9 +215,12 @@ export const BuyerInformation = memo(function BuyerInformation({
             render={({ field }) => (
               <Input
                 {...field}
-                id={`${formPrefixId}-buyerEmail`}
+                id={`buyerEmail`}
                 type="email"
                 className=""
+                readOnly={isBuyerSelected}
+                aria-readonly={isBuyerSelected}
+                title={HTML_TITLE_CONTENT}
               />
             )}
           />

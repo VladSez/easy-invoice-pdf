@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export interface UseMediaQueryOptions {
+interface UseMediaQueryOptions {
   getInitialValueInEffect: boolean;
 }
 
@@ -36,7 +36,7 @@ function getInitialValue(query: string, initialValue?: boolean) {
   return false;
 }
 
-export function useMediaQuery(
+function useMediaQuery(
   query: string,
   initialValue?: boolean,
   { getInitialValueInEffect }: UseMediaQueryOptions = {
@@ -62,3 +62,7 @@ export function useMediaQuery(
 
   return matches;
 }
+
+export const useIsDesktop = () => {
+  return useMediaQuery("(min-width: 1024px)");
+};

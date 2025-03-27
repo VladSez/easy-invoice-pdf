@@ -65,7 +65,7 @@ export function getAmountInWords({
 }
 
 // Get the fractional part of the total
-export function getNumberFractionalPart(total: number = 0) {
+export function getNumberFractionalPart(total = 0) {
   const schema = z.number().finite().nonnegative("Amount must be non-negative");
 
   const parsedTotal = schema.safeParse(total);

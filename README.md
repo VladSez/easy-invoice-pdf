@@ -6,7 +6,6 @@ If you found this project helpful, you can support my work here: [Buy Me a Coffe
 
 <img width="1440" alt="image" src="https://github.com/user-attachments/assets/9bc70941-4c2b-4c13-b264-38e3483a82c4" />
 
-
 ## Technologies we use
 
 - [React](https://react.dev/)

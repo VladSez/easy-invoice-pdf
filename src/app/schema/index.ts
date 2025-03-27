@@ -22,6 +22,14 @@ export const SUPPORTED_DATE_FORMATS = [
   "YYYY.MM.DD", // 2024.03.20
 ] as const;
 
+/**
+ * Supported date formats
+ *
+ * This is the list of date formats that are supported by the invoice form
+ *
+ *
+ *  @lintignore ignore for now in knip
+ */
 export type SupportedDateFormat = (typeof SUPPORTED_DATE_FORMATS)[number];
 
 export const invoiceItemSchema = z
@@ -54,7 +62,7 @@ export const invoiceItemSchema = z
         message: "Amount must be positive",
       })
       .refine((val) => val <= 9_999_999_999.99, {
-        message: "Amount must not exceed 9.999.999.999",
+        message: "Amount must not exceed 9 999 999 999.99",
       }),
     amountFieldIsVisible: z.boolean().default(true),
 
@@ -223,18 +231,11 @@ export const invoiceSchema = z.object({
 
 export type InvoiceData = z.infer<typeof invoiceSchema>;
 
-// https://github.com/colinhacks/zod/discussions/2814#discussioncomment-7121769
-// const zodInputStringPipe = (zodPipe: ZodTypeAny) =>
-//   z
-//     .string()
-//     .transform((value) => (value === "" ? null : value))
-//     .nullable()
-//     .refine((value) => value === null || !isNaN(Number(value)), {
-//       message: "Nombre Invalide",
-//     })
-//     .transform((value) => (value === null ? 0 : Number(value)))
-//     .pipe(zodPipe);
-
+/**
+ * Default seller data
+ *
+ * This is the default data that will be used if the user doesn't provide their own data
+ */
 export const DEFAULT_SELLER_DATA = {
   name: "Seller name",
   address: "Seller address",
@@ -251,6 +252,11 @@ export const DEFAULT_SELLER_DATA = {
   swiftBicFieldIsVisible: true,
 } as const satisfies Omit<SellerData, "id">;
 
+/**
+ * Default buyer data
+ *
+ * This is the default data that will be used if the user doesn't provide their own data
+ */
 export const DEFAULT_BUYER_DATA = {
   name: "Buyer name",
   address: "Buyer address",

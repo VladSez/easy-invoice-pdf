@@ -8,6 +8,14 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  compiler: {
+    removeConsole: process.env.VERCEL_ENV === "production",
+  },
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
   async rewrites() {
     return [
       {

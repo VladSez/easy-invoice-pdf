@@ -117,7 +117,7 @@ export function SellerDialog({
 
       // Get existing sellers or initialize empty array
       const sellers = localStorage.getItem(SELLERS_LOCAL_STORAGE_KEY);
-      const existingSellers = sellers ? JSON.parse(sellers) : [];
+      const existingSellers: unknown = sellers ? JSON.parse(sellers) : [];
 
       // Validate existing sellers array with Zod
       const existingSellersValidationResult = z
@@ -145,7 +145,7 @@ export function SellerDialog({
       // we don't need to validate the name if we are editing an existing seller
 
       // Validate seller data against existing sellers
-      const isDuplicateName = existingSellers.some(
+      const isDuplicateName = existingSellersValidationResult.data.some(
         (seller: SellerData) =>
           seller.name === formValues.name && seller.id !== formValues.id
       );
@@ -202,7 +202,10 @@ export function SellerDialog({
         }
       }}
     >
-      <DialogContent className="flex flex-col gap-0 overflow-y-visible p-0 sm:max-w-lg [&>button:last-child]:top-3.5">
+      <DialogContent
+        className="flex flex-col gap-0 overflow-y-visible p-0 sm:max-w-lg [&>button:last-child]:top-3.5"
+        data-testid={`manage-seller-dialog`}
+      >
         <DialogHeader className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
           <DialogTitle className="text-base">
             {isEditMode ? "Edit Seller" : "Add New Seller"}

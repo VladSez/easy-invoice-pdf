@@ -5,6 +5,7 @@ import {
   accordionSchema,
   invoiceItemSchema,
   invoiceSchema,
+  type AccordionState,
   type InvoiceData,
   type InvoiceItemData,
 } from "@/app/schema";
@@ -33,17 +34,15 @@ import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
-import type { FormPrefixId } from "..";
 import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
 
 export const PDF_DATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_DATA";
-export const INVOICE_PDF_HTML_FORM_ID = "pdfInvoiceForm";
-export const DEBOUNCE_TIMEOUT = 500;
 export const LOADING_BUTTON_TIMEOUT = 400;
 export const LOADING_BUTTON_TEXT = "Generating Document...";
+const DEBOUNCE_TIMEOUT = 500;
 
 const DEFAULT_ACCORDION_VALUES = [
   "general",
@@ -91,9 +90,14 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
 };
 
-const Legend = ({ children }: { children: React.ReactNode }) => {
+const Legend = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLLegendElement>) => {
   return (
-    <legend className="text-lg font-semibold text-gray-900">{children}</legend>
+    <legend className="text-lg font-semibold text-gray-900" {...props}>
+      {children}
+    </legend>
   );
 };
 
@@ -110,17 +114,11 @@ type Prettify<T> = {
 interface InvoiceFormProps {
   invoiceData: InvoiceData;
   onInvoiceDataChange: (updatedData: InvoiceData) => void;
-  /**
-   * we need this to generate unique ids for the form fields for mobile and desktop views
-   * otherwise the ids will be the same and the form will not work correctly + accessibility issues
-   */
-  formPrefixId: FormPrefixId;
 }
 
 export const InvoiceForm = memo(function InvoiceForm({
   invoiceData,
   onInvoiceDataChange,
-  formPrefixId,
 }: InvoiceFormProps) {
   const openPanel = useOpenPanel();
 
@@ -211,9 +209,9 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   // regenerate pdf on every input change with debounce
   const debouncedRegeneratePdfOnFormChange = useDebouncedCallback(
-    (data) => {
+    (data: InvoiceData) => {
       // submit form e.g. regenerates pdf and run form validations
-      handleSubmit(onSubmit)(data);
+      void handleSubmit(onSubmit)(data as unknown as React.BaseSyntheticEvent);
 
       // data should be already validated
       const stringifiedData = JSON.stringify(data);
@@ -233,7 +231,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   // subscribe to form changes to regenerate pdf on every input change
   useEffect(() => {
     const subscription = watch((value) => {
-      debouncedRegeneratePdfOnFormChange(value);
+      debouncedRegeneratePdfOnFormChange(value as unknown as InvoiceData);
     });
 
     return () => subscription.unsubscribe();
@@ -275,13 +273,12 @@ export const InvoiceForm = memo(function InvoiceForm({
       );
 
       if (savedState) {
-        const parsedState = JSON.parse(savedState);
+        const parsedState = JSON.parse(savedState) as AccordionState;
 
         const validatedState = accordionSchema.safeParse(parsedState);
 
         if (validatedState.success) {
           const arrayOfOpenSections = Object.entries(validatedState.data)
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             .filter(([_, isOpen]) => isOpen)
             .map(([section]) => section) as Prettify<AccordionKeys>;
 
@@ -326,7 +323,6 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   return (
     <form
-      id={formPrefixId}
       className="mb-4 space-y-3.5"
       onSubmit={handleSubmit(onSubmit, (errors) => {
         console.error("Form validation errors:", errors);
@@ -353,7 +349,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                   if (Array.isArray(error)) {
                     return error.map((item, index) =>
                       Object.entries(
-                        item as Record<string, { message?: string }>
+                        item as { [key: string]: { message?: string } }
                       ).map(([fieldName, fieldError]) => (
                         <li
                           key={`${key}.${index}.${fieldName}`}
@@ -367,13 +363,15 @@ export const InvoiceForm = memo(function InvoiceForm({
 
                   // Handle nested object errors
                   if (error && typeof error === "object") {
-                    return Object.entries(error).map(
-                      ([nestedKey, nestedError]) => (
+                    return Object.entries(
+                      error as { [key: string]: { message?: string } }
+                    ).map(([nestedKey, nestedError]) => {
+                      return (
                         <li key={`${key}.${nestedKey}`} className="text-sm">
                           {nestedError?.message || "Unknown error"}
                         </li>
-                      )
-                    );
+                      );
+                    });
                   }
 
                   return null;
@@ -397,6 +395,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         <AccordionItem
           value={ACCORDION_GENERAL}
           className="rounded-lg border shadow"
+          data-testid={`general-information-section`}
         >
           <AccordionTrigger className="px-4 py-3">
             <Legend>General Information</Legend>
@@ -406,7 +405,6 @@ export const InvoiceForm = memo(function InvoiceForm({
               control={control}
               errors={errors}
               setValue={setValue}
-              formPrefixId={formPrefixId}
               dateOfIssue={dateOfIssue}
             />
           </AccordionContent>
@@ -416,6 +414,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         <AccordionItem
           value={ACCORDION_SELLER}
           className="rounded-lg border shadow"
+          data-testid={`seller-information-section`}
         >
           <AccordionTrigger className="px-4 py-3">
             <Legend>Seller Information</Legend>
@@ -425,7 +424,6 @@ export const InvoiceForm = memo(function InvoiceForm({
               control={control}
               errors={errors}
               setValue={setValue}
-              formPrefixId={formPrefixId}
               invoiceData={invoiceData}
             />
           </AccordionContent>
@@ -435,6 +433,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         <AccordionItem
           value={ACCORDION_BUYER}
           className="rounded-lg border shadow"
+          data-testid={`buyer-information-section`}
         >
           <AccordionTrigger className="px-4 py-3">
             <Legend>Buyer Information</Legend>
@@ -444,7 +443,6 @@ export const InvoiceForm = memo(function InvoiceForm({
               control={control}
               errors={errors}
               setValue={setValue}
-              formPrefixId={formPrefixId}
               invoiceData={invoiceData}
             />
           </AccordionContent>
@@ -454,6 +452,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         <AccordionItem
           value={ACCORDION_ITEMS}
           className="rounded-lg border shadow"
+          data-testid={`invoice-items-section`}
         >
           <AccordionTrigger className="px-4 py-3">
             <Legend>Invoice Items</Legend>
@@ -461,7 +460,6 @@ export const InvoiceForm = memo(function InvoiceForm({
           <AccordionContent className="px-4 pb-4">
             <InvoiceItems
               control={control}
-              formPrefixId={formPrefixId}
               fields={fields}
               handleRemoveItem={handleRemoveItem}
               errors={errors}
@@ -474,11 +472,11 @@ export const InvoiceForm = memo(function InvoiceForm({
       </Accordion>
 
       {/* Final section */}
-      <div className="space-y-4">
+      <div className="space-y-4" data-testid={`final-section`}>
         <div className="">
           {/* Total field (with currency) */}
           <div className="mt-5" />
-          <Label htmlFor={`${formPrefixId}-total`} className="mb-1">
+          <Label htmlFor={`total`} className="mb-1">
             Total
           </Label>
           <div className="relative mt-1 rounded-md shadow-sm">
@@ -488,7 +486,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               render={({ field }) => (
                 <ReadOnlyMoneyInput
                   {...field}
-                  id={`${formPrefixId}-total`}
+                  id={`total`}
                   currency={currency}
                   value={field.value.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
@@ -511,7 +509,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         {/* Payment Method */}
         <div>
           <div className="relative mb-2 mt-6 flex items-center justify-between">
-            <Label htmlFor={`${formPrefixId}-paymentMethod`} className="">
+            <Label htmlFor={`paymentMethod`} className="">
               Payment Method
             </Label>
 
@@ -523,7 +521,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                 render={({ field: { value, onChange, ...field } }) => (
                   <Switch
                     {...field}
-                    id={`${formPrefixId}-paymentMethodFieldIsVisible`}
+                    id={`paymentMethodFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -532,9 +530,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               />
               <CustomTooltip
                 trigger={
-                  <Label
-                    htmlFor={`${formPrefixId}-paymentMethodFieldIsVisible`}
-                  >
+                  <Label htmlFor={`paymentMethodFieldIsVisible`}>
                     Show in PDF
                   </Label>
                 }
@@ -549,7 +545,7 @@ export const InvoiceForm = memo(function InvoiceForm({
             render={({ field }) => (
               <Input
                 {...field}
-                id={`${formPrefixId}-paymentMethod`}
+                id={`paymentMethod`}
                 type="text"
                 className="mt-1"
               />
@@ -563,19 +559,14 @@ export const InvoiceForm = memo(function InvoiceForm({
         {/* Payment Due */}
         <div>
           <div className="mb-6">
-            <Label htmlFor={`${formPrefixId}-paymentDue`} className="mb-1">
+            <Label htmlFor={`paymentDue`} className="mb-1">
               Payment Due
             </Label>
             <Controller
               name="paymentDue"
               control={control}
               render={({ field }) => (
-                <Input
-                  {...field}
-                  id={`${formPrefixId}-paymentDue`}
-                  type="date"
-                  className=""
-                />
+                <Input {...field} id={`paymentDue`} type="date" className="" />
               )}
             />
             {errors.paymentDue && (
@@ -626,7 +617,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         {/* Notes */}
         <div className="">
           <div className="relative mb-2 flex items-center justify-between">
-            <Label htmlFor={`${formPrefixId}-notes`} className="">
+            <Label htmlFor={`notes`} className="">
               Notes
             </Label>
 
@@ -638,7 +629,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                 render={({ field: { value, onChange, ...field } }) => (
                   <Switch
                     {...field}
-                    id={`${formPrefixId}-notesFieldIsVisible`}
+                    id={`notesFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -647,9 +638,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               />
               <CustomTooltip
                 trigger={
-                  <Label htmlFor={`${formPrefixId}-notesFieldIsVisible`}>
-                    Show in PDF
-                  </Label>
+                  <Label htmlFor={`notesFieldIsVisible`}>Show in PDF</Label>
                 }
                 content='Show/Hide the "Notes" Field in the PDF'
               />
@@ -661,9 +650,10 @@ export const InvoiceForm = memo(function InvoiceForm({
             render={({ field }) => (
               <Textarea
                 {...field}
-                id={`${formPrefixId}-notes`}
+                id={`notes`}
                 rows={3}
                 className=""
+                data-testid="notes"
               />
             )}
           />
@@ -676,9 +666,7 @@ export const InvoiceForm = memo(function InvoiceForm({
           <div className="relative mt-5 space-y-4">
             {/* Show/hide Person Authorized to Receive field in PDF switch */}
             <div className="flex items-center justify-between">
-              <Label
-                htmlFor={`${formPrefixId}-personAuthorizedToReceiveFieldIsVisible`}
-              >
+              <Label htmlFor={`personAuthorizedToReceiveFieldIsVisible`}>
                 Show &quot;Person Authorized to Receive&quot; Signature Field in
                 the PDF
               </Label>
@@ -689,7 +677,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                 render={({ field: { value, onChange, ...field } }) => (
                   <Switch
                     {...field}
-                    id={`${formPrefixId}-personAuthorizedToReceiveFieldIsVisible`}
+                    id={`personAuthorizedToReceiveFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
@@ -700,9 +688,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
             {/* Show/hide Person Authorized to Issue field in PDF switch */}
             <div className="flex items-center justify-between">
-              <Label
-                htmlFor={`${formPrefixId}-personAuthorizedToIssueFieldIsVisible`}
-              >
+              <Label htmlFor={`personAuthorizedToIssueFieldIsVisible`}>
                 Show &quot;Person Authorized to Issue&quot; Signature Field in
                 the PDF
               </Label>
@@ -713,7 +699,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                 render={({ field: { value, onChange, ...field } }) => (
                   <Switch
                     {...field}
-                    id={`${formPrefixId}-personAuthorizedToIssueFieldIsVisible`}
+                    id={`personAuthorizedToIssueFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"

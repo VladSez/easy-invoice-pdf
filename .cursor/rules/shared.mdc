@@ -1,6 +1,7 @@
 ---
 description: Shared rules across the project
 globs: **/*
+alwaysApply: false
 ---
 
 You are an expert in TypeScript, Node.js, Next.js App Router, React, Shadcn UI, Radix UI and Tailwind.
@@ -45,5 +46,7 @@ Key Conventions
 - Limit 'use client':
 - Favor server components and Next.js SSR.
 - Use only for Web API access in small components.
+- Use pnpm
+- Use `console.log({})` syntax for debugging
 
 Follow Next.js docs for Data Fetching, Rendering, and Routing.

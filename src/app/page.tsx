@@ -3,7 +3,6 @@
 import { invoiceSchema, type InvoiceData } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { CustomTooltip, TooltipProvider } from "@/components/ui/tooltip";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { useOpenPanel } from "@openpanel/nextjs";
@@ -20,13 +19,16 @@ import { PDF_DATA_LOCAL_STORAGE_KEY } from "./components/invoice-form";
 import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
 import { INITIAL_INVOICE_DATA } from "./constants";
 import { cn } from "@/lib/utils";
-import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
+import { useDeviceContext } from "@/contexts/device-context";
+// import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
+
   const openPanel = useOpenPanel();
+  const { isDesktop } = useDeviceContext();
+  const isMobile = !isDesktop;
 
   const [invoiceDataState, setInvoiceDataState] = useState<InvoiceData | null>(
     null
@@ -42,7 +44,7 @@ export default function Home() {
         const decompressed = decompressFromEncodedURIComponent(
           compressedInvoiceDataInUrl
         );
-        const parsed = JSON.parse(decompressed);
+        const parsed: unknown = JSON.parse(decompressed);
         const validated = invoiceSchema.parse(parsed);
 
         setInvoiceDataState(validated);
@@ -64,7 +66,7 @@ export default function Home() {
     try {
       const savedData = localStorage.getItem(PDF_DATA_LOCAL_STORAGE_KEY);
       if (savedData) {
-        const json = JSON.parse(savedData);
+        const json: unknown = JSON.parse(savedData);
         const parsedData = invoiceSchema.parse(json);
 
         setInvoiceDataState(parsedData);
@@ -99,7 +101,7 @@ export default function Home() {
         if (urlData) {
           try {
             const decompressed = decompressFromEncodedURIComponent(urlData);
-            const urlParsed = JSON.parse(decompressed);
+            const urlParsed: unknown = JSON.parse(decompressed);
 
             const urlValidated = invoiceSchema.parse(urlParsed);
 
@@ -186,7 +188,7 @@ export default function Home() {
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 sm:p-4">
-        <div className="mb-4 w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6">
+        <div className="w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6">
           <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
             <div className="relative bottom-3 mt-3 flex flex-col items-center justify-center sm:mt-0">
               <div className="flex items-center">
@@ -227,20 +229,23 @@ export default function Home() {
                   <span>Support Project</span>
                 </span>
               </Button>
-              <CustomTooltip
-                trigger={
-                  <Button
-                    onClick={handleShareInvoice}
-                    _variant="outline"
-                    className="mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
-                  >
-                    Generate a link to invoice
-                  </Button>
-                }
-                content="Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
-              />
+
               {isDesktop ? (
-                <InvoicePDFDownloadLink invoiceData={invoiceDataState} />
+                <>
+                  <CustomTooltip
+                    trigger={
+                      <Button
+                        onClick={handleShareInvoice}
+                        _variant="outline"
+                        className="mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
+                      >
+                        Generate a link to invoice
+                      </Button>
+                    }
+                    content="Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
+                  />
+                  <InvoicePDFDownloadLink invoiceData={invoiceDataState} />
+                </>
               ) : null}
 
               {/* TODO: add later when PRO version is released, this is PRO FEATURE =) */}
@@ -251,7 +256,7 @@ export default function Home() {
               ) : null} */}
             </div>
           </div>
-          <div className="mb-4 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-0">
+          <div className="mb-3 mt-2 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-0">
             <ProjectInfo />
           </div>
 
@@ -259,6 +264,8 @@ export default function Home() {
             <InvoiceClientPage
               invoiceDataState={invoiceDataState}
               handleInvoiceDataChange={handleInvoiceDataChange}
+              handleShareInvoice={handleShareInvoice}
+              isMobile={isMobile}
             />
           </div>
         </div>
