@@ -886,7 +886,7 @@ test.describe("Invoice Generator Page", () => {
     }
   });
 
-  test("shares invoice data via URL and can be loaded in new tab", async ({
+  test("generates shareable URL that persists invoice data between tabs", async ({
     page,
     context,
   }) => {
@@ -932,8 +932,7 @@ test.describe("Invoice Generator Page", () => {
       .click();
 
     // Wait for URL to update with share data
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(100);
+    await page.waitForURL((url) => url.searchParams.has("data"));
 
     // Get the current URL which should now contain the share data
     const sharedUrl = page.url();
