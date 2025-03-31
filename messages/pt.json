@@ -1,0 +1,59 @@
+{
+  "LandingPage": {
+    "title": "Gerador de Faturas PDF",
+    "subtitle": "Gere faturas profissionais instantaneamente",
+    "description": "Nosso Gerador de Faturas PDF ajuda você a criar, gerenciar e enviar faturas profissionais em segundos. Economize tempo e receba pagamentos mais rapidamente com a criação automatizada de faturas.",
+    "features": {
+      "title": "Recursos",
+      "items": [
+        {
+          "title": "Modelos Profissionais",
+          "description": "Escolha entre uma variedade de modelos projetados profissionalmente"
+        },
+        {
+          "title": "Geração Rápida",
+          "description": "Crie faturas em segundos com nossa interface intuitiva"
+        },
+        {
+          "title": "Armazenamento na Nuvem",
+          "description": "Acesse suas faturas em qualquer lugar, a qualquer momento"
+        },
+        {
+          "title": "Cálculos Automáticos",
+          "description": "Cálculos automáticos de impostos e totais"
+        }
+      ]
+    },
+    "cta": "Comece a Criar Faturas",
+    "subscribe": {
+      "title": "Mantenha-se Atualizado",
+      "description": "Inscreva-se em nossa newsletter para receber os recursos e atualizações mais recentes",
+      "placeholder": "Digite seu e-mail",
+      "button": "Inscrever-se",
+      "success": "Obrigado por se inscrever!",
+      "error": "Algo deu errado. Por favor, tente novamente."
+    }
+  },
+  "Navigation": {
+    "home": "Início",
+    "features": "Recursos",
+    "pricing": "Preços",
+    "app": "Ir para o Aplicativo",
+    "language": "Idioma"
+  },
+  "Footer": {
+    "copyright": "© 2023 Gerador de Faturas PDF. Todos os direitos reservados.",
+    "links": {
+      "privacy": "Política de Privacidade",
+      "terms": "Termos de Serviço",
+      "contact": "Contate-nos"
+    }
+  },
+  "Metadata": {
+    "about": {
+      "title": "Gerador de Faturas PDF com Pré-visualização ao Vivo | Sem Cadastro",
+      "description": "Crie e baixe faturas PDF profissionais instantaneamente com pré-visualização em tempo real. Gratuito e de código aberto. Não é necessário cadastro.",
+      "keywords": "ferramenta de faturamento, gerador de faturas grátis, faturas PDF, criador de faturas, software de faturamento"
+    }
+  }
+}

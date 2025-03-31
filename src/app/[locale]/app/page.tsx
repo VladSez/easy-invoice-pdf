@@ -14,12 +14,13 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { InvoiceClientPage } from "./components";
-import { PDF_DATA_LOCAL_STORAGE_KEY } from "./components/invoice-form";
-import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
-import { INITIAL_INVOICE_DATA } from "./constants";
+import { InvoiceClientPage } from "../../components";
+import { PDF_DATA_LOCAL_STORAGE_KEY } from "../../components/invoice-form";
+import { InvoicePDFDownloadLink } from "../../components/invoice-pdf-download-link";
+import { INITIAL_INVOICE_DATA } from "../../constants";
 import { cn } from "@/lib/utils";
 import { useDeviceContext } from "@/contexts/device-context";
+import { Link } from "@/i18n/navigation";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 export default function Home() {
@@ -307,6 +308,13 @@ function ProjectInfo() {
         >
           Share your feedback
         </a>
+        {" | "}
+        <Link
+          href="/about"
+          className="transition-colors hover:text-blue-600 hover:underline"
+        >
+          About
+        </Link>
       </span>
     </>
   );

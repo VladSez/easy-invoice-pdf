@@ -1,0 +1,59 @@
+{
+  "LandingPage": {
+    "title": "Generador de Facturas PDF",
+    "subtitle": "Genera facturas profesionales al instante",
+    "description": "Nuestro Generador de Facturas PDF te ayuda a crear, gestionar y enviar facturas profesionales en segundos. Ahorra tiempo y recibe pagos más rápido con la creación automatizada de facturas.",
+    "features": {
+      "title": "Características",
+      "items": [
+        {
+          "title": "Plantillas Profesionales",
+          "description": "Elige entre una variedad de plantillas diseñadas profesionalmente"
+        },
+        {
+          "title": "Generación Rápida",
+          "description": "Crea facturas en segundos con nuestra interfaz intuitiva"
+        },
+        {
+          "title": "Almacenamiento en la Nube",
+          "description": "Accede a tus facturas en cualquier lugar y momento"
+        },
+        {
+          "title": "Cálculos Automáticos",
+          "description": "Cálculos automáticos de impuestos y totales"
+        }
+      ]
+    },
+    "cta": "Comienza a Crear Facturas",
+    "subscribe": {
+      "title": "Mantente Actualizado",
+      "description": "Suscríbete a nuestro boletín para conocer las últimas características y actualizaciones",
+      "placeholder": "Ingresa tu correo electrónico",
+      "button": "Suscribirse",
+      "success": "¡Gracias por suscribirte!",
+      "error": "Algo salió mal. Por favor, inténtalo de nuevo."
+    }
+  },
+  "Navigation": {
+    "home": "Inicio",
+    "features": "Características",
+    "pricing": "Precios",
+    "app": "Ir a la Aplicación",
+    "language": "Idioma"
+  },
+  "Footer": {
+    "copyright": "© 2023 Generador de Facturas PDF. Todos los derechos reservados.",
+    "links": {
+      "privacy": "Política de Privacidad",
+      "terms": "Términos de Servicio",
+      "contact": "Contáctanos"
+    }
+  },
+  "Metadata": {
+    "about": {
+      "title": "Generador de Facturas PDF con Vista Previa en Vivo | Sin Registro",
+      "description": "Crea y descarga facturas PDF profesionales al instante con vista previa en tiempo real. Gratis y de código abierto. No requiere registro.",
+      "keywords": "herramienta de facturación, generador de facturas gratuito, facturas PDF, creador de facturas, software de facturación"
+    }
+  }
+}

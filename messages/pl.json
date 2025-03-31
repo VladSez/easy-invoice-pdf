@@ -1,0 +1,59 @@
+{
+  "LandingPage": {
+    "title": "Generator Faktur PDF",
+    "subtitle": "Generuj profesjonalne faktury natychmiast",
+    "description": "Nasz Generator Faktur PDF pomaga tworzyć, zarządzać i wysyłać profesjonalne faktury w kilka sekund. Oszczędzaj czas i otrzymuj płatności szybciej dzięki automatycznemu tworzeniu faktur.",
+    "features": {
+      "title": "Funkcje",
+      "items": [
+        {
+          "title": "Profesjonalne Szablony",
+          "description": "Wybieraj spośród różnych profesjonalnie zaprojektowanych szablonów"
+        },
+        {
+          "title": "Szybkie Generowanie",
+          "description": "Twórz faktury w kilka sekund dzięki intuicyjnemu interfejsowi"
+        },
+        {
+          "title": "Przechowywanie w Chmurze",
+          "description": "Dostęp do faktur w dowolnym miejscu i czasie"
+        },
+        {
+          "title": "Automatyczne Obliczenia",
+          "description": "Automatyczne obliczenia podatków i sum"
+        }
+      ]
+    },
+    "cta": "Zacznij Tworzyć Faktury",
+    "subscribe": {
+      "title": "Bądź na Bieżąco",
+      "description": "Zapisz się do naszego newslettera, aby otrzymywać najnowsze funkcje i aktualizacje",
+      "placeholder": "Wprowadź swój email",
+      "button": "Zapisz się",
+      "success": "Dziękujemy za subskrypcję!",
+      "error": "Coś poszło nie tak. Spróbuj ponownie."
+    }
+  },
+  "Navigation": {
+    "home": "Strona Główna",
+    "features": "Funkcje",
+    "pricing": "Cennik",
+    "app": "Przejdź do Aplikacji",
+    "language": "Język"
+  },
+  "Footer": {
+    "copyright": "© 2023 Generator Faktur PDF. Wszelkie prawa zastrzeżone.",
+    "links": {
+      "privacy": "Polityka Prywatności",
+      "terms": "Warunki Korzystania",
+      "contact": "Kontakt"
+    }
+  },
+  "Metadata": {
+    "about": {
+      "title": "Generator Faktur PDF z Podglądem na Żywo | Bez Rejestracji",
+      "description": "Twórz i pobieraj profesjonalne faktury PDF natychmiast z podglądem w czasie rzeczywistym. Darmowe i open-source. Bez wymaganej rejestracji.",
+      "keywords": "narzędzie do fakturowania, darmowy generator faktur, faktury PDF, kreator faktur, oprogramowanie do fakturowania"
+    }
+  }
+}
