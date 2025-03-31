@@ -25,7 +25,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useOpenPanel } from "@openpanel/nextjs";
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
 import { AlertTriangle } from "lucide-react";
@@ -120,8 +119,6 @@ export const InvoiceForm = memo(function InvoiceForm({
   invoiceData,
   onInvoiceDataChange,
 }: InvoiceFormProps) {
-  const openPanel = useOpenPanel();
-
   const form = useForm<InvoiceData>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: invoiceData,
@@ -243,14 +240,13 @@ export const InvoiceForm = memo(function InvoiceForm({
       remove(index);
 
       // analytics track event
-      openPanel.track("remove_invoice_item");
       umamiTrackEvent("remove_invoice_item");
 
       // Manually trigger form submission after removal
       const currentFormData = watch();
       debouncedRegeneratePdfOnFormChange(currentFormData);
     },
-    [remove, openPanel, watch, debouncedRegeneratePdfOnFormChange]
+    [remove, watch, debouncedRegeneratePdfOnFormChange]
   );
 
   // TODO: refactor this and debouncedRegeneratePdfOnFormChange(), so data is saved to local storage, basically copy everything from debouncedRegeneratePdfOnFormChange() and use this onSubmit function in two places

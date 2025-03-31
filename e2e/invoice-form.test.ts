@@ -886,7 +886,7 @@ test.describe("Invoice Generator Page", () => {
     }
   });
 
-  test("generates shareable URL that persists invoice data between tabs", async ({
+  test("can share invoice and data is persisted in new tab", async ({
     page,
     context,
   }) => {

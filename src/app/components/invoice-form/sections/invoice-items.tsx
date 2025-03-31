@@ -21,7 +21,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { getAmountInWords, getNumberFractionalPart } from "@/lib/utils";
-import { useOpenPanel } from "@openpanel/nextjs";
 import { Plus, Trash2 } from "lucide-react";
 
 const Legend = ({ children }: { children: React.ReactNode }) => {
@@ -53,8 +52,6 @@ export const InvoiceItems = memo(function InvoiceItems({
   language,
   append,
 }: InvoiceItemsSettingsProps) {
-  const openPanel = useOpenPanel();
-
   return (
     <>
       <div className="mb-3 space-y-4">
@@ -747,7 +744,6 @@ export const InvoiceItems = memo(function InvoiceItems({
           });
 
           // analytics track event
-          openPanel.track("add_invoice_item");
           umamiTrackEvent("add_invoice_item");
         }}
         className="mb-1 flex items-center text-sm font-medium text-gray-700 hover:text-black"

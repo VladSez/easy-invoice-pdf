@@ -6,7 +6,6 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { PDF_DATA_LOCAL_STORAGE_KEY } from "./components/invoice-form";
 import { INITIAL_INVOICE_DATA } from "./constants";
-import { useOpenPanel } from "@openpanel/nextjs";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
 
@@ -17,8 +16,6 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const openPanel = useOpenPanel();
-
   useEffect(() => {
     // Log the error to an error reporting service
     console.error(error);
@@ -57,7 +54,6 @@ export default function Error({
             () => {
               reset();
 
-              openPanel.track("error_button_try_again_clicked");
               umamiTrackEvent("error_button_try_again_clicked");
             }
           }
@@ -82,7 +78,6 @@ export default function Error({
                 richColors: true,
               });
 
-              openPanel.track("error_button_start_from_scratch_clicked");
               umamiTrackEvent("error_button_start_from_scratch_clicked");
             } catch (error) {
               console.error(error);

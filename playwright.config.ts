@@ -57,7 +57,10 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        permissions: ["clipboard-read", "clipboard-write"],
+      },
     },
     // {
     //   name: "webkit",
@@ -67,11 +70,17 @@ export default defineConfig({
     // /* Test against mobile viewports. */
     {
       name: "Mobile Chrome",
-      use: { ...devices["Pixel 5"] },
+      use: {
+        ...devices["Pixel 5"],
+        permissions: ["clipboard-read", "clipboard-write"],
+      },
     },
     {
       name: "Mobile Safari",
-      use: { ...devices["iPhone 12"] },
+      use: {
+        ...devices["iPhone 12"],
+        // on iOS we don't need to grant clipboard permissions
+      },
     },
 
     /* Test against branded browsers. */
