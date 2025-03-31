@@ -91,7 +91,7 @@ export default async function RootLayout({
       {/* </DeviceContextProvider> */}
 
       {/* https://sonner.emilkowal.ski/ */}
-      <Toaster visibleToasts={1} richColors />
+      <Toaster visibleToasts={1} richColors closeButton />
       {/* </NextIntlClientProvider> */}
 
       {/* should only be enabled in production */}
@@ -99,11 +99,6 @@ export default async function RootLayout({
         <>
           {/* https://vercel.com/vladsazon27s-projects/pdf-invoice-generator/speed-insights */}
           <SpeedInsights />
-          {/* https://openpanel.dev/docs */}
-          <OpenPanelComponent
-            clientId="34cab0b1-c372-4d2d-9646-9a4cea67faf9"
-            trackScreenViews={true}
-          />
           {/* https://eu.umami.is/dashboard */}
           <Script
             // we proxy umami check next.config.mjs rewrites

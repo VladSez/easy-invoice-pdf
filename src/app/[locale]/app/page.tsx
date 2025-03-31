@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { CustomTooltip, TooltipProvider } from "@/components/ui/tooltip";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { useOpenPanel } from "@openpanel/nextjs";
 import * as Sentry from "@sentry/nextjs";
 import {
   compressToEncodedURIComponent,
@@ -27,7 +26,6 @@ export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const openPanel = useOpenPanel();
   const { isDesktop } = useDeviceContext();
   const isMobile = !isDesktop;
 
@@ -170,7 +168,6 @@ export default function Home() {
         });
 
         // analytics track event
-        openPanel.track("share_invoice_link");
         umamiTrackEvent("share_invoice_link");
       } catch (error) {
         console.error("Failed to share invoice:", error);
@@ -221,7 +218,6 @@ export default function Home() {
                   );
 
                   // analytics track event
-                  openPanel.track("donate_to_project_button_clicked_header");
                   umamiTrackEvent("donate_to_project_button_clicked_header");
                 }}
               >

@@ -15,7 +15,7 @@ Sentry.init({
 
   // Recommended production settings
   debug: false,
-  enabled: process.env.VERCEL_ENV === "production",
+  enabled: process.env.NODE_ENV === "production",
 
   // Performance settings
   replaysSessionSampleRate: 0.1, // Sample 10% of sessions
