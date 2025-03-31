@@ -27,7 +27,6 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Label } from "./ui/label";
-import { useOpenPanel } from "@openpanel/nextjs";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
@@ -58,7 +57,6 @@ export function BuyerManagement({
   // const [selectedBuyerId, setSelectedBuyerId] = useState("");
   const [editingBuyer, setEditingBuyer] = useState<BuyerData | null>(null);
 
-  const openPanel = useOpenPanel();
   const buyerSelectId = useId();
 
   const isEditMode = Boolean(editingBuyer);
@@ -122,7 +120,6 @@ export function BuyerManagement({
       });
 
       // analytics track event
-      openPanel.track("add_buyer_success");
       umamiTrackEvent("add_buyer_success");
     } catch (error) {
       console.error("Failed to add buyer:", error);
@@ -158,7 +155,6 @@ export function BuyerManagement({
       });
 
       // analytics track event
-      openPanel.track("edit_buyer_success");
       umamiTrackEvent("edit_buyer_success");
     } catch (error) {
       console.error("Failed to edit buyer:", error);
@@ -190,7 +186,6 @@ export function BuyerManagement({
     }
 
     // analytics track event
-    openPanel.track("change_buyer");
     umamiTrackEvent("change_buyer");
   };
 
@@ -220,7 +215,6 @@ export function BuyerManagement({
       });
 
       // analytics track event
-      openPanel.track("delete_buyer_success");
       umamiTrackEvent("delete_buyer_success");
     } catch (error) {
       console.error("Failed to delete buyer:", error);

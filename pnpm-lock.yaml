@@ -10,9 +10,6 @@ importers:
       "@hookform/resolvers":
         specifier: 3.9.0
         version: 3.9.0(react-hook-form@7.53.1(react@18.3.1))
-      "@openpanel/nextjs":
-        specifier: 1.0.7
-        version: 1.0.7(next@14.2.15(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.51.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       "@radix-ui/react-accordion":
         specifier: 1.2.3
         version: 1.2.3(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -692,28 +689,6 @@ packages:
         integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==,
       }
     engines: { node: ">=12.4.0" }
-
-  "@openpanel/nextjs@1.0.7":
-    resolution:
-      {
-        integrity: sha512-XygTPiVlxUkcnZ3DYYwnWiogDgCL1hFK5G8nxokdrFKKuM0XQ+9mFElW/+dKgnVfmV2QiP1aAscudHAlRSUQhg==,
-      }
-    peerDependencies:
-      next: ^12.0.0 || ^13.0.0 || ^14.0.0 || ^15.0.0
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-
-  "@openpanel/sdk@1.0.0":
-    resolution:
-      {
-        integrity: sha512-FNmmfjdXoC/VHEjA+WkrQ4lyM5lxEmV7xDd57uj4E+lIS0sU3DLG2mV/dpS8AscnZbUvuMn3kPhiLCqYzuv/gg==,
-      }
-
-  "@openpanel/web@1.0.1":
-    resolution:
-      {
-        integrity: sha512-cVZ7Kr9SicczJ/RDIfEtZs8+1iGDzwkabVA/j3NqSl8VSucsC8m1+LVbjmCDzCJNnK4yVn6tEcc9PJRi2rtllw==,
-      }
 
   "@opentelemetry/api-logs@0.57.2":
     resolution:
@@ -6743,19 +6718,6 @@ snapshots:
       fastq: 1.17.1
 
   "@nolyfill/is-core-module@1.0.39": {}
-
-  "@openpanel/nextjs@1.0.7(next@14.2.15(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.51.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)":
-    dependencies:
-      "@openpanel/web": 1.0.1
-      next: 14.2.15(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.51.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-
-  "@openpanel/sdk@1.0.0": {}
-
-  "@openpanel/web@1.0.1":
-    dependencies:
-      "@openpanel/sdk": 1.0.0
 
   "@opentelemetry/api-logs@0.57.2":
     dependencies:

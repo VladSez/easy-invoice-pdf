@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import { LOADING_BUTTON_TEXT, LOADING_BUTTON_TIMEOUT } from "./invoice-form";
 import { toast } from "sonner";
-import { useOpenPanel } from "@openpanel/nextjs";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
 import * as Sentry from "@sentry/nextjs";
@@ -55,8 +54,6 @@ export function InvoicePDFDownloadLink({
 }: {
   invoiceData: InvoiceData;
 }) {
-  const openPanel = useOpenPanel();
-
   // Memoize static values
   const filename = useMemo(
     () =>
@@ -72,17 +69,16 @@ export function InvoicePDFDownloadLink({
   // Combine loading states
   const [{ loading: pdfLoading, url, error }, updatePdfInstance] = usePDF();
   const [isLoading, setIsLoading] = useState(false);
+  const [errorShown, setErrorShown] = useState(false);
 
   // Memoize tracking functions
   const trackDownload = useCallback(() => {
-    openPanel.track("download_invoice");
     umamiTrackEvent("download_invoice");
-  }, [openPanel]);
+  }, []);
 
   const trackDonationClick = useCallback(() => {
-    openPanel.track("donate_button_clicked_download_pdf_toast");
     umamiTrackEvent("donate_button_clicked_download_pdf_toast");
-  }, [openPanel]);
+  }, []);
 
   const showDonationToast = useCallback(() => {
     toast(DONATION_TOAST_CONFIG.title, {
@@ -124,13 +120,14 @@ export function InvoicePDFDownloadLink({
 
   // Handle errors
   useEffect(() => {
-    if (error) {
+    if (error && !errorShown) {
       ErrorGeneratingPdfToast();
-      openPanel.track("error_generating_document_link", { data: { error } });
+      setErrorShown(true);
+
       umamiTrackEvent("error_generating_document_link", { data: { error } });
       Sentry.captureException(error);
     }
-  }, [error, openPanel]);
+  }, [error, errorShown]);
 
   return (
     <a

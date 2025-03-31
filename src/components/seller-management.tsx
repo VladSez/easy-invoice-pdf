@@ -32,7 +32,6 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Label } from "./ui/label";
-import { useOpenPanel } from "@openpanel/nextjs";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
@@ -63,7 +62,6 @@ export function SellerManagement({
   // const [selectedSellerIndex, setSelectedSellerIndex] = useState("");
   const [editingSeller, setEditingSeller] = useState<SellerData | null>(null);
 
-  const openPanel = useOpenPanel();
   const sellerSelectId = useId();
 
   const isEditMode = Boolean(editingSeller);
@@ -136,7 +134,6 @@ export function SellerManagement({
       });
 
       // analytics track event
-      openPanel.track("add_seller_success");
       umamiTrackEvent("add_seller_success");
     } catch (error) {
       console.error("Failed to add seller:", error);
@@ -172,7 +169,6 @@ export function SellerManagement({
       });
 
       // analytics track event
-      openPanel.track("edit_seller_success");
       umamiTrackEvent("edit_seller_success");
     } catch (error) {
       console.error("Failed to edit seller:", error);
@@ -204,7 +200,6 @@ export function SellerManagement({
     }
 
     // analytics track event
-    openPanel.track("change_seller");
     umamiTrackEvent("change_seller");
   };
 
@@ -234,7 +229,6 @@ export function SellerManagement({
       });
 
       // analytics track event
-      openPanel.track("delete_seller_success");
       umamiTrackEvent("delete_seller_success");
     } catch (error) {
       console.error("Failed to delete seller:", error);

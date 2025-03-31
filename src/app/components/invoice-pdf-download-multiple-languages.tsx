@@ -1,7 +1,6 @@
 "use client";
 
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { useOpenPanel } from "@openpanel/nextjs";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
@@ -40,8 +39,6 @@ export function InvoicePDFDownloadMultipleLanguages({
     SupportedLanguages[]
   >([language]);
 
-  const openPanel = useOpenPanel();
-
   useEffect(() => {
     if (language) {
       setSelectedLanguages([language]);
@@ -66,7 +63,6 @@ export function InvoicePDFDownloadMultipleLanguages({
       const pdfBlobs = await Promise.all(pdfPromises);
 
       // Track analytics
-      openPanel.track("generate_multiple_pdfs_zip");
       umamiTrackEvent("generate_multiple_pdfs_zip");
 
       // If only one language is selected, download directly without zipping
