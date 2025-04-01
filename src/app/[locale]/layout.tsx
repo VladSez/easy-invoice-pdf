@@ -1,4 +1,3 @@
-import { OpenPanelComponent } from "@openpanel/nextjs";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
@@ -7,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import { hasLocale, type Locale } from "next-intl";
 import { notFound } from "next/navigation";
 import { Toaster } from "sonner";
+import { APP_URL } from "@/config";
 
 export const viewport: Viewport = {
   initialScale: 1, // Sets the default zoom level to 1 (100%)
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Uladzislau Sazonau" }],
   creator: "Uladzislau Sazonau",
   publisher: "Uladzislau Sazonau",
-  metadataBase: new URL("https://easyinvoicepdf.com"),
+  metadataBase: new URL(APP_URL),
   alternates: {
     canonical: "/",
   },

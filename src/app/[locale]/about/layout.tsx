@@ -4,6 +4,7 @@ import { routing } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import type EnMessages from "../../../../messages/en.json";
+import { APP_URL } from "@/config";
 
 // Add metadata to make sure search engines can index the page
 export const generateMetadata = async ({
@@ -20,9 +21,7 @@ export const generateMetadata = async ({
     title: messages.Metadata.about.title,
     description: messages.Metadata.about.description,
     keywords: messages.Metadata.about.keywords,
-    metadataBase: new URL(
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-    ),
+    metadataBase: new URL(APP_URL),
     alternates: {
       canonical: `/${params.locale}/about`,
       languages: {

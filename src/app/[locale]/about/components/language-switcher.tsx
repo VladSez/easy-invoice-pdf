@@ -3,10 +3,10 @@
 import { SelectNative } from "@/components/ui/select-native";
 import { GlobeIcon } from "lucide-react";
 import { useTransition } from "react";
-import { type Locale } from "next-intl";
 import { type ChangeEvent } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import type { Locale } from "next-intl";
 
 const MAP_LOCALE_TO_LABEL = {
   en: "English",
@@ -16,24 +16,23 @@ const MAP_LOCALE_TO_LABEL = {
   pt: "Português",
 } as const satisfies Record<Locale, string>;
 
+type SupportedLocale = keyof typeof MAP_LOCALE_TO_LABEL;
+type LanguageLabel = (typeof MAP_LOCALE_TO_LABEL)[SupportedLocale];
+
 interface LanguageSwitcherProps {
-  locale: string;
+  locale: SupportedLocale;
 }
 
 export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
   const [isPending, startTransition] = useTransition();
-
   const router = useRouter();
   const pathname = usePathname();
 
   const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const nextLocale = e.target.value as Locale;
+    const nextLocale = e.target.value as SupportedLocale;
 
     startTransition(() => {
-      // Get the base pathname without locale prefix
       const pathnameWithoutLocale = pathname.replace(`/${locale}`, "");
-
-      // Navigate to the same route with the new locale
       router.replace(pathnameWithoutLocale || "/", { locale: nextLocale });
     });
   };
@@ -52,13 +51,15 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
         className="block w-full"
         disabled={isPending}
       >
-        {Object.entries(MAP_LOCALE_TO_LABEL).map(([locale, label]) => {
-          return (
-            <option key={locale} value={locale}>
-              {label}
-            </option>
-          );
-        })}
+        {(
+          Object.entries(MAP_LOCALE_TO_LABEL) as Array<
+            [SupportedLocale, LanguageLabel]
+          >
+        ).map(([locale, label]) => (
+          <option key={locale} value={locale}>
+            {label}
+          </option>
+        ))}
       </SelectNative>
     </div>
   );
