@@ -5,7 +5,7 @@ import {
   type UseFormSetValue,
   useWatch,
 } from "react-hook-form";
-import { type InvoiceData } from "@/app/schema";
+import { LANGUAGE_TO_LABEL, type InvoiceData } from "@/app/schema";
 import {
   SUPPORTED_CURRENCIES,
   SUPPORTED_DATE_FORMATS,
@@ -72,11 +72,19 @@ export const GeneralInformation = memo(function GeneralInformation({
           control={control}
           render={({ field }) => (
             <SelectNative {...field} id={`language`} className="block">
-              {SUPPORTED_LANGUAGES.map((lang) => (
-                <option key={lang} value={lang}>
-                  {lang === "en" ? "English" : "Polish"}
-                </option>
-              ))}
+              {SUPPORTED_LANGUAGES.map((lang) => {
+                // we support only en and pl for now
+                if (lang === "en" || lang === "pl") {
+                  const languageName = LANGUAGE_TO_LABEL[lang];
+
+                  return (
+                    <option key={lang} value={lang}>
+                      {languageName}
+                    </option>
+                  );
+                }
+                return null;
+              })}
             </SelectNative>
           )}
         />
