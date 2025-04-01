@@ -55,5 +55,10 @@
       "description": "Twórz i pobieraj profesjonalne faktury PDF natychmiast z podglądem w czasie rzeczywistym. Darmowe i open-source. Bez wymaganej rejestracji.",
       "keywords": "narzędzie do fakturowania, darmowy generator faktur, faktury PDF, kreator faktur, oprogramowanie do fakturowania"
     }
+  },
+  "NotFound": {
+    "error": "404",
+    "message": "Nie znaleziono strony.",
+    "returnHome": "Wróć do strony głównej"
   }
 }

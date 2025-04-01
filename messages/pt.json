@@ -55,5 +55,10 @@
       "description": "Crie e baixe faturas PDF profissionais instantaneamente com pré-visualização em tempo real. Gratuito e de código aberto. Não é necessário cadastro.",
       "keywords": "ferramenta de faturamento, gerador de faturas grátis, faturas PDF, criador de faturas, software de faturamento"
     }
+  },
+  "NotFound": {
+    "error": "404",
+    "message": "Página não encontrada.",
+    "returnHome": "Voltar à página inicial"
   }
 }

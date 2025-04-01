@@ -52,6 +52,11 @@ declare const messages: {
       "contact": "Contact Us"
     }
   },
+  "NotFound": {
+    "error": "404",
+    "message": "This page could not be found.",
+    "returnHome": "Return to homepage"
+  },
   "Metadata": {
     "about": {
       "title": "Invoice PDF Generator with Live Preview | No Sign-Up",

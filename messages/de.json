@@ -55,5 +55,10 @@
       "description": "Erstellen und laden Sie professionelle PDF-Rechnungen sofort mit Echtzeit-Vorschau herunter. Kostenlos und Open-Source. Keine Anmeldung erforderlich.",
       "keywords": "Rechnungstool, kostenloser Rechnungsgenerator, PDF-Rechnungen, Rechnungsersteller, Fakturierungssoftware"
     }
+  },
+  "NotFound": {
+    "error": "404",
+    "message": "Diese Seite wurde nicht gefunden.",
+    "returnHome": "Zurück zur Startseite"
   }
 }
