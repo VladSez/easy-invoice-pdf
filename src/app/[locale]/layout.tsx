@@ -85,14 +85,11 @@ export default async function RootLayout({
           />
         </head>
       )} */}
-      {/* <NextIntlClientProvider> */}
-      {/* <DeviceContextProvider isDesktop={isDesktopServer}> */}
+
       {children}
-      {/* </DeviceContextProvider> */}
 
       {/* https://sonner.emilkowal.ski/ */}
       <Toaster visibleToasts={1} richColors closeButton />
-      {/* </NextIntlClientProvider> */}
 
       {/* should only be enabled in production */}
       {process.env.VERCEL_ENV === "production" && (

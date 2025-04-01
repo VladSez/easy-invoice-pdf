@@ -1,4 +1,4 @@
-import { hasLocale } from "next-intl";
+import { hasLocale, type Locale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
@@ -10,7 +10,7 @@ import { APP_URL } from "@/config";
 export const generateMetadata = async ({
   params,
 }: {
-  params: { locale: string };
+  params: { locale: Locale };
 }): Promise<Metadata> => {
   // Load the messages for the requested locale
   const messages = await import(
@@ -65,7 +65,7 @@ export default async function AboutLocaleLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: { locale: Locale };
 }) {
   // Ensure that the incoming `locale` is valid
   const { locale } = params;
