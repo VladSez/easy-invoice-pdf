@@ -74,16 +74,17 @@ export const GeneralInformation = memo(function GeneralInformation({
             <SelectNative {...field} id={`language`} className="block">
               {SUPPORTED_LANGUAGES.map((lang) => {
                 // we support only en and pl for now
-                if (lang === "en" || lang === "pl") {
-                  const languageName = LANGUAGE_TO_LABEL[lang];
+                const languageName = LANGUAGE_TO_LABEL[lang];
 
-                  return (
-                    <option key={lang} value={lang}>
-                      {languageName}
-                    </option>
-                  );
+                if (!languageName) {
+                  return null;
                 }
-                return null;
+
+                return (
+                  <option key={lang} value={lang}>
+                    {languageName}
+                  </option>
+                );
               })}
             </SelectNative>
           )}

@@ -141,6 +141,7 @@ export function InvoicePDFDownloadLink({
         "dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 lg:mb-0 lg:w-[210px]",
         {
           "pointer-events-none opacity-70": isLoading,
+          "lg:w-[240px]": invoiceData.language === "pt",
         }
       )}
     >

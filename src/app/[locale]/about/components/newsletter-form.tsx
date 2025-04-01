@@ -35,19 +35,7 @@ export function NewsletterForm() {
   async function onSubmit(_data: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
 
-    try {
-      // This would be connected to an actual API in production
-      // Simulating API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      toast.success(t("success"));
-
-      form.reset();
-    } catch (_) {
-      toast.error(t("error"));
-    } finally {
-      setIsSubmitting(false);
-    }
+    toast("Coming soon!");
   }
 
   return (

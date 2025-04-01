@@ -8,7 +8,7 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import type { Locale } from "next-intl";
 
-const MAP_LOCALE_TO_LABEL = {
+const MAP_LOCALE_TO_LANGUAGE = {
   en: "English",
   pl: "Polski",
   de: "Deutsch",
@@ -18,8 +18,8 @@ const MAP_LOCALE_TO_LABEL = {
   uk: "Українська",
 } as const satisfies Record<Locale, string>;
 
-type SupportedLocale = keyof typeof MAP_LOCALE_TO_LABEL;
-type LanguageLabel = (typeof MAP_LOCALE_TO_LABEL)[SupportedLocale];
+type SupportedLocale = keyof typeof MAP_LOCALE_TO_LANGUAGE;
+type LanguageLabel = (typeof MAP_LOCALE_TO_LANGUAGE)[SupportedLocale];
 
 interface LanguageSwitcherProps {
   locale: SupportedLocale;
@@ -54,7 +54,7 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
         disabled={isPending}
       >
         {(
-          Object.entries(MAP_LOCALE_TO_LABEL) as Array<
+          Object.entries(MAP_LOCALE_TO_LANGUAGE) as Array<
             [SupportedLocale, LanguageLabel]
           >
         ).map(([locale, label]) => (
