@@ -3,7 +3,15 @@ import { z } from "zod";
 export const SUPPORTED_CURRENCIES = ["EUR", "USD", "GBP", "PLN"] as const;
 export type SupportedCurrencies = (typeof SUPPORTED_CURRENCIES)[number];
 
-export const SUPPORTED_LANGUAGES = ["en", "pl", "de", "es", "pt"] as const;
+export const SUPPORTED_LANGUAGES = [
+  "en",
+  "pl",
+  "de",
+  "es",
+  "pt",
+  "ru",
+  "uk",
+] as const;
 export type SupportedLanguages = (typeof SUPPORTED_LANGUAGES)[number];
 
 export const LANGUAGE_TO_LABEL = {
@@ -12,6 +20,8 @@ export const LANGUAGE_TO_LABEL = {
   de: "German",
   es: "Spanish",
   pt: "Portuguese",
+  ru: "Russian",
+  uk: "Ukrainian",
 } as const satisfies Record<SupportedLanguages, string>;
 
 export const SUPPORTED_DATE_FORMATS = [

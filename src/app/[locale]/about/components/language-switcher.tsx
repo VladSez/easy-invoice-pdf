@@ -14,6 +14,8 @@ const MAP_LOCALE_TO_LABEL = {
   de: "Deutsch",
   es: "Español",
   pt: "Português",
+  ru: "Русский",
+  uk: "Українська",
 } as const satisfies Record<Locale, string>;
 
 type SupportedLocale = keyof typeof MAP_LOCALE_TO_LABEL;

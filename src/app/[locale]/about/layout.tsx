@@ -30,6 +30,8 @@ export const generateMetadata = async ({
         de: `/de/about`,
         es: `/es/about`,
         pt: `/pt/about`,
+        ru: `/ru/about`,
+        uk: `/uk/about`,
       },
     },
     openGraph: {
