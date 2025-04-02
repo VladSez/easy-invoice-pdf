@@ -1,59 +1,89 @@
-import type { SupportedLanguages } from "@/app/schema/index";
+import { z } from "zod";
+import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "./index";
 
-// Add this interface before the translations object
-interface TranslationSchema {
-  invoiceNumber: string;
-  dateOfIssue: string;
-  dateOfService: string;
-  invoiceType: string;
-  seller: {
-    name: string;
-    vatNo: string;
-    email: string;
-    accountNumber: string;
-    swiftBic: string;
-  };
-  buyer: {
-    name: string;
-    vatNo: string;
-    email: string;
-  };
-  invoiceItemsTable: {
-    no: string;
-    nameOfGoodsService: string;
-    typeOfGTU: string;
-    amount: string;
-    unit: string;
-    netPrice: string;
-    vat: string;
-    netAmount: string;
-    vatAmount: string;
-    preTaxAmount: string;
-    sum: string;
-  };
-  paymentInfo: {
-    paymentMethod: string;
-    paymentDate: string;
-  };
-  vatSummaryTable: {
-    vatRate: string;
-    net: string;
-    vat: string;
-    preTax: string;
-    total: string;
-  };
-  paymentTotals: {
-    toPay: string;
-    paid: string;
-    leftToPay: string;
-    amountInWords: string;
-  };
-  personAuthorizedToReceive: string;
-  personAuthorizedToIssue: string;
-}
+// Schema for seller translations
+const sellerTranslationSchema = z.object({
+  name: z.string(),
+  vatNo: z.string(),
+  email: z.string(),
+  accountNumber: z.string(),
+  swiftBic: z.string(),
+});
 
-// Update the type assertion
-export const translations = {
+// Schema for buyer translations
+const buyerTranslationSchema = z.object({
+  name: z.string(),
+  vatNo: z.string(),
+  email: z.string(),
+});
+
+// Schema for invoice items table translations
+const invoiceItemsTableTranslationSchema = z.object({
+  no: z.string(),
+  nameOfGoodsService: z.string(),
+  typeOfGTU: z.string(),
+  amount: z.string(),
+  unit: z.string(),
+  netPrice: z.string(),
+  vat: z.string(),
+  netAmount: z.string(),
+  vatAmount: z.string(),
+  preTaxAmount: z.string(),
+  sum: z.string(),
+});
+
+// Schema for payment info translations
+const paymentInfoTranslationSchema = z.object({
+  paymentMethod: z.string(),
+  paymentDate: z.string(),
+});
+
+// Schema for VAT summary table translations
+const vatSummaryTableTranslationSchema = z.object({
+  vatRate: z.string(),
+  net: z.string(),
+  vat: z.string(),
+  preTax: z.string(),
+  total: z.string(),
+});
+
+// Schema for payment totals translations
+const paymentTotalsTranslationSchema = z.object({
+  toPay: z.string(),
+  paid: z.string(),
+  leftToPay: z.string(),
+  amountInWords: z.string(),
+});
+
+// Main translation schema
+export const translationSchema = z.object({
+  invoiceNumber: z.string(),
+  dateOfIssue: z.string(),
+  dateOfService: z.string(),
+  invoiceType: z.string(),
+  seller: sellerTranslationSchema,
+  buyer: buyerTranslationSchema,
+  invoiceItemsTable: invoiceItemsTableTranslationSchema,
+  paymentInfo: paymentInfoTranslationSchema,
+  vatSummaryTable: vatSummaryTableTranslationSchema,
+  paymentTotals: paymentTotalsTranslationSchema,
+  personAuthorizedToReceive: z.string(),
+  personAuthorizedToIssue: z.string(),
+});
+
+// Schema for all translations
+export const translationsSchema = z.record(
+  z.enum(SUPPORTED_LANGUAGES),
+  translationSchema
+);
+
+// Type for a single language translation
+export type TranslationSchema = z.infer<typeof translationSchema>;
+
+// Type for all translations
+export type TranslationsSchema = z.infer<typeof translationsSchema>;
+
+export const TRANSLATIONS = {
   en: {
     invoiceNumber: "Invoice No. of",
     dateOfIssue: "Date of issue",

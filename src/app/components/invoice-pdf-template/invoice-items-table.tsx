@@ -1,7 +1,7 @@
 import { Text, View } from "@react-pdf/renderer";
 import { styles } from ".";
 import type { InvoiceData } from "@/app/schema";
-import { translations } from "./translations";
+import { TRANSLATIONS } from "@/app/schema/translations";
 
 export function InvoiceItemsTable({
   invoiceData,
@@ -11,7 +11,7 @@ export function InvoiceItemsTable({
   formattedInvoiceTotal: string;
 }) {
   const language = invoiceData.language;
-  const t = translations[language];
+  const t = TRANSLATIONS[language];
 
   // we need to check only the first row, because all next rows are the same
   const isInvoiceItemNumberVisible =

@@ -1,7 +1,7 @@
 import { Text, View } from "@react-pdf/renderer";
 import { styles } from ".";
 import type { InvoiceData } from "@/app/schema";
-import { translations } from "./translations";
+import { TRANSLATIONS } from "@/app/schema/translations";
 
 export function InvoiceSellerBuyerInfo({
   invoiceData,
@@ -9,7 +9,7 @@ export function InvoiceSellerBuyerInfo({
   invoiceData: InvoiceData;
 }) {
   const language = invoiceData.language;
-  const t = translations[language];
+  const t = TRANSLATIONS[language];
 
   const swiftBicFieldIsVisible = invoiceData.seller.swiftBicFieldIsVisible;
   const sellerVatNoFieldIsVisible = invoiceData.seller.vatNoFieldIsVisible;

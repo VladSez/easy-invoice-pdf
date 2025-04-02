@@ -1,12 +1,12 @@
 import { Text, View } from "@react-pdf/renderer";
 import { styles } from ".";
 import { type InvoiceData } from "@/app/schema";
-import { translations } from "./translations";
 import dayjs from "dayjs";
+import { TRANSLATIONS } from "@/app/schema/translations";
 
 export function InvoiceHeader({ invoiceData }: { invoiceData: InvoiceData }) {
   const language = invoiceData.language;
-  const t = translations[language];
+  const t = TRANSLATIONS[language];
 
   const dateOfIssue = dayjs(invoiceData.dateOfIssue).format(
     invoiceData.dateFormat

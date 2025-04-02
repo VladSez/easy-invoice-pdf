@@ -1,9 +1,9 @@
 import { View, Text } from "@react-pdf/renderer";
 import { styles } from ".";
 import type { InvoiceData } from "@/app/schema";
-import { translations } from "./translations";
 
 import { getAmountInWords, getNumberFractionalPart } from "@/lib/utils";
+import { TRANSLATIONS } from "@/app/schema/translations";
 
 export function InvoicePaymentTotals({
   invoiceData,
@@ -13,7 +13,7 @@ export function InvoicePaymentTotals({
   formattedInvoiceTotal: string;
 }) {
   const language = invoiceData.language;
-  const t = translations[language];
+  const t = TRANSLATIONS[language];
 
   const invoiceTotalInWords = getAmountInWords({
     amount: invoiceData?.total ?? 0,

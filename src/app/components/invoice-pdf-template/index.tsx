@@ -16,8 +16,8 @@ import { InvoiceItemsTable } from "./invoice-items-table";
 import { InvoicePaymentInfo } from "./invoice-payment-info";
 import { InvoiceVATSummaryTable } from "./invoice-vat-summary-table";
 import { InvoicePaymentTotals } from "./invoice-payment-totals";
-import { translations } from "./translations";
 import { memo, useMemo } from "react";
+import { TRANSLATIONS } from "@/app/schema/translations";
 
 const PROD_WEBSITE_URL = "https://dub.sh/easy-invoice";
 
@@ -194,7 +194,7 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
   }, [invoiceData?.total]);
 
   const language = invoiceData.language;
-  const t = translations[language];
+  const t = TRANSLATIONS[language];
 
   const invoiceDocTitle = useMemo(() => {
     return `${t.invoiceNumber} ${invoiceData.invoiceNumber} | Created with https://easyinvoicepdf.com`;

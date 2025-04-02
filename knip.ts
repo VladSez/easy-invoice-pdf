@@ -19,7 +19,7 @@ const config: KnipConfig = {
     "src/app/components/invoice-pdf-download-multiple-languages.tsx",
     "src/components/ui/**/*.tsx",
     "global.ts",
-    "messages/**/*",
+    "i18n-messages/**/*",
     "src/i18n/**/*",
   ],
   includeEntryExports: true,

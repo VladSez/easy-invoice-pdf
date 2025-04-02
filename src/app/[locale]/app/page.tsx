@@ -17,7 +17,6 @@ import { InvoiceClientPage } from "../../components";
 import { PDF_DATA_LOCAL_STORAGE_KEY } from "../../components/invoice-form";
 import { InvoicePDFDownloadLink } from "../../components/invoice-pdf-download-link";
 import { INITIAL_INVOICE_DATA } from "../../constants";
-import { cn } from "@/lib/utils";
 import { useDeviceContext } from "@/contexts/device-context";
 import { Link } from "@/i18n/navigation";
 import { ProjectLogo } from "@/components/etc/project-logo";
