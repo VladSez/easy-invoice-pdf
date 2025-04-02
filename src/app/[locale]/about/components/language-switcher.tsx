@@ -7,6 +7,7 @@ import { type ChangeEvent } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import type { Locale } from "next-intl";
+import { Label } from "@/components/ui/label";
 
 const MAP_LOCALE_TO_LANGUAGE = {
   en: "English",
@@ -40,29 +41,35 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
   };
 
   return (
-    <div
-      className={cn(
-        "flex items-center gap-1",
-        isPending && "transition-opacity [&:disabled]:opacity-30"
-      )}
-    >
-      <GlobeIcon className="h-4 w-4" />
-      <SelectNative
-        value={locale}
-        onChange={handleChange}
-        className="block w-full"
-        disabled={isPending}
+    <div className="flex flex-col">
+      <Label htmlFor="language-select" className="sr-only">
+        Select language
+      </Label>
+      <div
+        className={cn(
+          "flex items-center gap-1",
+          isPending && "transition-opacity [&:disabled]:opacity-30"
+        )}
       >
-        {(
-          Object.entries(MAP_LOCALE_TO_LANGUAGE) as Array<
-            [SupportedLocale, LanguageLabel]
-          >
-        ).map(([locale, label]) => (
-          <option key={locale} value={locale}>
-            {label}
-          </option>
-        ))}
-      </SelectNative>
+        <GlobeIcon className="h-4 w-4" />
+        <SelectNative
+          id="language-select"
+          value={locale}
+          onChange={handleChange}
+          className="block w-full"
+          disabled={isPending}
+        >
+          {(
+            Object.entries(MAP_LOCALE_TO_LANGUAGE) as Array<
+              [SupportedLocale, LanguageLabel]
+            >
+          ).map(([locale, label]) => (
+            <option key={locale} value={locale}>
+              {label}
+            </option>
+          ))}
+        </SelectNative>
+      </div>
     </div>
   );
 }

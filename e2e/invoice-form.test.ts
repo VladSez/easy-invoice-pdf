@@ -259,7 +259,7 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue(firstItem.typeOfGTU);
     await expect(
       invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(1)
-    ).toBeChecked();
+    ).not.toBeChecked(); // we don't want to show this in PDF by default
 
     // Amount field and visibility toggle
     await expect(
