@@ -21,6 +21,7 @@ const config: KnipConfig = {
     "global.ts",
     "i18n-messages/**/*",
     "src/i18n/**/*",
+    "src/app/schema/**/*",
   ],
   includeEntryExports: true,
   // ignore tags

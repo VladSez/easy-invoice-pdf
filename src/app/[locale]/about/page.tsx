@@ -71,18 +71,18 @@ function HeroSection() {
                 {t("hero.description")}
               </p>
             </div>
-            <div className="flex flex-col gap-2 min-[400px]:flex-row">
+            <div className="flex flex-col gap-2 md:flex-row">
               <GoToAppButton />
-              <Link
-                href="https://github.com/VladSez/easy-invoice-pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button _size="lg" _variant="outline" className="w-full px-8">
+              <Button _size="lg" _variant="outline" className="px-8" asChild>
+                <Link
+                  href="https://github.com/VladSez/easy-invoice-pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <GithubIcon className="mr-2 h-5 w-5" />
                   {t("buttons.viewOnGithub")}
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
             <p className="text-sm font-bold text-slate-500">
               {t("hero.noSignup")}
@@ -94,6 +94,8 @@ function HeroSection() {
             src="/hero.webp"
             alt="EasyInvoicePDF interface showing invoice creation with live preview"
             className="h-full w-full rounded-xl border-none object-cover shadow-md"
+            width={1000}
+            height={1000}
           />
         </div>
       </div>
@@ -195,22 +197,23 @@ function CtaSection() {
               {t("cta.description")}
             </p>
           </div>
-          <div className="flex w-full flex-col justify-center gap-2 min-[400px]:flex-row">
+          <div className="flex w-full flex-col justify-center gap-2 md:flex-row">
             <GoToAppButton className="border-slate-600 bg-white text-slate-950 hover:bg-white/90" />
 
-            <Link
-              href="https://github.com/VladSez/easy-invoice-pdf"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Button
+              _size="lg"
+              className="bg-slate-700 px-8 text-white hover:bg-slate-700/90"
+              asChild
             >
-              <Button
-                _size="lg"
-                className="w-full bg-slate-700 px-8 text-white hover:bg-slate-700/90"
+              <Link
+                href="https://github.com/VladSez/easy-invoice-pdf"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <GithubIcon className="mr-2 h-5 w-5 fill-white" />
                 {t("buttons.viewOnGithub")}
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
           <p className="text-sm text-slate-400">{t("cta.noSignup")}</p>
         </div>
@@ -327,17 +330,13 @@ function GoToAppButton({ className }: { className?: string }) {
   const t = useTranslations("About");
 
   return (
-    <Link href="/app">
-      <Button
-        _size="lg"
-        className={cn(
-          "w-full bg-slate-950 px-8 hover:bg-slate-950/85",
-          className
-        )}
-      >
-        {t("buttons.goToApp")}
-      </Button>
-    </Link>
+    <Button
+      _size="lg"
+      className={cn("bg-slate-950 px-8 hover:bg-slate-950/85", className)}
+      asChild
+    >
+      <Link href="/app">{t("buttons.goToApp")}</Link>
+    </Button>
   );
 }
 

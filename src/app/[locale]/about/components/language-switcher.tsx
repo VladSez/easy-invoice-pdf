@@ -56,7 +56,7 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
           id="language-select"
           value={locale}
           onChange={handleChange}
-          className="block w-full"
+          className="block h-[40px] w-full"
           disabled={isPending}
         >
           {(

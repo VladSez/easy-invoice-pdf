@@ -209,23 +209,24 @@ export default function Home() {
 
             <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
               <Button
+                asChild
                 className="mx-2 w-full bg-blue-500 text-white transition-all hover:scale-105 hover:bg-blue-600 hover:no-underline lg:mx-0 lg:w-auto"
                 _variant="link"
                 onClick={() => {
-                  window.open(
-                    "https://dub.sh/easyinvoice-donate",
-                    "_blank",
-                    "noopener noreferrer"
-                  );
-
                   // analytics track event
                   umamiTrackEvent("donate_to_project_button_clicked_header");
                 }}
               >
-                <span className="flex items-center space-x-1.5">
-                  <span className="animate-heartbeat">❤️</span>
-                  <span>Support Project</span>
-                </span>
+                <Link
+                  href="https://dub.sh/easyinvoice-donate"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="flex items-center space-x-1.5">
+                    <span className="animate-heartbeat">❤️</span>
+                    <span>Support Project</span>
+                  </span>
+                </Link>
               </Button>
 
               {isDesktop ? (
