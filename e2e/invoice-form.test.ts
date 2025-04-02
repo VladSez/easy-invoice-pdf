@@ -39,7 +39,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Check main action buttons
     await expect(
-      page.getByRole("button", { name: "Support Project" })
+      page.getByRole("link", { name: "Support Project" })
     ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Generate a link to invoice" })
