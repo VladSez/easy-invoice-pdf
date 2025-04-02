@@ -1,54 +1,4 @@
 {
-  "LandingPage": {
-    "title": "Generator Faktur PDF",
-    "subtitle": "Generuj profesjonalne faktury natychmiast",
-    "description": "Nasz Generator Faktur PDF pomaga tworzyć, zarządzać i wysyłać profesjonalne faktury w kilka sekund. Oszczędzaj czas i otrzymuj płatności szybciej dzięki automatycznemu tworzeniu faktur.",
-    "features": {
-      "title": "Funkcje",
-      "items": [
-        {
-          "title": "Profesjonalne Szablony",
-          "description": "Wybieraj spośród różnych profesjonalnie zaprojektowanych szablonów"
-        },
-        {
-          "title": "Szybkie Generowanie",
-          "description": "Twórz faktury w kilka sekund dzięki intuicyjnemu interfejsowi"
-        },
-        {
-          "title": "Przechowywanie w Chmurze",
-          "description": "Dostęp do faktur w dowolnym miejscu i czasie"
-        },
-        {
-          "title": "Automatyczne Obliczenia",
-          "description": "Automatyczne obliczenia podatków i sum"
-        }
-      ]
-    },
-    "cta": "Zacznij Tworzyć Faktury",
-    "subscribe": {
-      "title": "Bądź na Bieżąco",
-      "description": "Zapisz się do naszego newslettera, aby otrzymywać najnowsze funkcje i aktualizacje",
-      "placeholder": "Wprowadź swój email",
-      "button": "Zapisz się",
-      "success": "Dziękujemy za subskrypcję!",
-      "error": "Coś poszło nie tak. Spróbuj ponownie."
-    }
-  },
-  "Navigation": {
-    "home": "Strona Główna",
-    "features": "Funkcje",
-    "pricing": "Cennik",
-    "app": "Przejdź do Aplikacji",
-    "language": "Język"
-  },
-  "Footer": {
-    "copyright": "© 2023 Generator Faktur PDF. Wszelkie prawa zastrzeżone.",
-    "links": {
-      "privacy": "Polityka Prywatności",
-      "terms": "Warunki Korzystania",
-      "contact": "Kontakt"
-    }
-  },
   "Metadata": {
     "about": {
       "title": "Generator Faktur PDF z Podglądem na Żywo | Bez Rejestracji",
@@ -60,5 +10,67 @@
     "error": "404",
     "message": "Nie znaleziono strony.",
     "returnHome": "Wróć do strony głównej"
+  },
+  "About": {
+    "meta": {
+      "title": "Generator faktur PDF z podglądem na żywo | Bez rejestracji",
+      "description": "Twórz i pobieraj profesjonalne faktury PDF natychmiast z podglądem w czasie rzeczywistym. Darmowe i open-source. Bez rejestracji.",
+      "keywords": "narzędzie do faktur, darmowy generator faktur, faktury PDF, kreator faktur, oprogramowanie do fakturowania"
+    },
+    "hero": {
+      "title": "Twórz profesjonalne faktury w kilka sekund",
+      "description": "EasyInvoicePDF to darmowe narzędzie open-source, które pozwala tworzyć, dostosowywać i pobierać profesjonalne faktury PDF z podglądem w czasie rzeczywistym.",
+      "noSignup": "Bez rejestracji. W 100% darmowe i open-source."
+    },
+    "features": {
+      "badge": "Funkcje",
+      "title": "Wszystko, czego potrzebujesz do profesjonalnego fakturowania",
+      "description": "Nasz prosty, ale potężny generator faktur zawiera wszystkie funkcje potrzebne do szybkiego tworzenia profesjonalnych faktur.",
+      "items": {
+        "livePreview": {
+          "title": "Podgląd na żywo",
+          "description": "Zobacz, jak faktura aktualizuje się w czasie rzeczywistym podczas wprowadzania zmian, zapewniając dokładnie taki wygląd, jakiego oczekujesz."
+        },
+        "shareableLinks": {
+          "title": "Linki do udostępniania",
+          "description": "Generuj linki, aby udostępniać faktury bezpośrednio klientom bez wysyłania załączników."
+        },
+        "instantDownload": {
+          "title": "Natychmiastowe pobieranie",
+          "description": "Pobierz fakturę jako plik PDF jednym kliknięciem, gotową do wysłania lub wydrukowania."
+        },
+        "multiLanguage": {
+          "title": "Wiele języków i walut",
+          "description": "Twórz faktury w siedmiu językach z obsługą wszystkich głównych walut i automatycznym formatowaniem."
+        },
+        "vatSupport": {
+          "title": "Obsługa VAT",
+          "description": "Automatycznie obliczaj stawki i sumy VAT z obsługą różnych jurysdykcji podatkowych."
+        },
+        "openSource": {
+          "title": "Open Source",
+          "description": "Całkowicie darmowe i open-source. Używaj online lub hostuj samodzielnie z pełnym dostępem do kodu."
+        }
+      }
+    },
+    "cta": {
+      "title": "Gotowy uprościć fakturowanie?",
+      "description": "Zacznij tworzyć profesjonalne faktury w kilka sekund za pomocą naszego darmowego narzędzia open-source.",
+      "noSignup": "Bez rejestracji. W 100% darmowe i open-source."
+    },
+    "footer": {
+      "description": "Darmowe narzędzie open-source do tworzenia profesjonalnych faktur PDF z podglądem w czasie rzeczywistym.",
+      "product": "Produkt",
+      "links": {
+        "features": "Funkcje",
+        "github": "GitHub"
+      },
+      "copyright": "© {year} EasyInvoicePDF.com",
+      "createdBy": "Stworzone przez"
+    },
+    "buttons": {
+      "goToApp": "Przejdź do aplikacji",
+      "viewOnGithub": "Zobacz na GitHub"
+    }
   }
 }

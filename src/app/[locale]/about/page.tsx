@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-// import { LanguageSwitcher } from "./components/language-switcher";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { cn } from "@/lib/utils";
@@ -15,23 +14,11 @@ import {
 } from "lucide-react";
 import { LanguageSwitcher } from "./components/language-switcher";
 
-interface Feature {
-  title: string;
-  description: string;
-}
-
 export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const { locale } = params;
 
   // Enable static rendering
   setRequestLocale(locale);
-
-  const t = useTranslations("LandingPage");
-  const navT = useTranslations("Navigation");
-  const footerT = useTranslations("Footer");
-
-  // Get features as a properly typed array
-  const features = t.raw("features.items") as Feature[];
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
@@ -66,22 +53,22 @@ function Header({ locale }: { locale: Locale }) {
 }
 
 function HeroSection() {
+  const t = useTranslations("About");
+
   return (
     <section
       id="hero"
       className="flex w-full items-center justify-center bg-white py-12 md:py-24 lg:py-32"
     >
       <div className="container px-4 md:px-6">
-        <div className="grid gap-6 lg:grid-cols-[1fr_600px] lg:gap-12 xl:grid-cols-[1fr_800px]">
+        <div className="grid gap-6 lg:grid-cols-[1fr_600px] lg:gap-12">
           <div className="flex flex-col justify-center space-y-4">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tighter text-slate-900 sm:text-5xl xl:text-6xl/none">
-                Create professional invoices in seconds
+              <h1 className="text-balance pb-3 text-3xl font-bold tracking-tighter text-slate-900 sm:text-5xl xl:text-6xl/none">
+                {t("hero.title")}
               </h1>
-              <p className="max-w-[600px] text-slate-600 md:text-xl">
-                EasyInvoicePDF is a free, open-source tool that lets you create,
-                customize, and download professional PDF invoices with real-time
-                preview.
+              <p className="max-w-[500px] text-balance text-slate-600 md:text-lg">
+                {t("hero.description")}
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -93,12 +80,12 @@ function HeroSection() {
               >
                 <Button _size="lg" _variant="outline" className="w-full px-8">
                   <GithubIcon className="mr-2 h-5 w-5" />
-                  View on GitHub
+                  {t("buttons.viewOnGithub")}
                 </Button>
               </Link>
             </div>
             <p className="text-sm font-bold text-slate-500">
-              No sign-up required. 100% free and open-source.
+              {t("hero.noSignup")}
             </p>
           </div>
 
@@ -115,44 +102,34 @@ function HeroSection() {
 }
 
 function FeaturesSection() {
-  const features = [
+  const t = useTranslations("About");
+
+  const FEATURES_CARDS = [
     {
-      title: "Live Preview",
-      description:
-        "See your invoice update in real-time as you make changes, ensuring it looks exactly how you want.",
+      key: "livePreview",
       icon: <FileText className="h-10 w-10 text-slate-700" />,
     },
     {
-      title: "Shareable Links",
-      description:
-        "Generate links to share your invoices directly with clients without sending attachments.",
+      key: "shareableLinks",
       icon: <Share2 className="h-10 w-10 text-slate-700" />,
     },
     {
-      title: "Instant Download",
-      description:
-        "Download your invoice as a PDF file with one click, ready to be sent or printed.",
+      key: "instantDownload",
       icon: <Download className="h-10 w-10 text-slate-700" />,
     },
     {
-      title: "Multiple Languages & Currencies",
-      description:
-        "Create invoices in seven languages with support for all major currencies and automatic formatting.",
+      key: "multiLanguage",
       icon: <GlobeIcon className="h-10 w-10 text-slate-700" />,
     },
     {
-      title: "VAT Support",
-      description:
-        "Automatically calculate VAT rates and totals with support for different tax jurisdictions.",
+      key: "vatSupport",
       icon: <CalculatorIcon className="h-10 w-10 text-slate-700" />,
     },
     {
-      title: "Open Source",
-      description:
-        "Completely free and open-source. Use it online or host it yourself with full access to the code.",
+      key: "openSource",
       icon: <GithubIcon className="h-10 w-10 text-slate-700" />,
     },
-  ];
+  ] as const;
 
   return (
     <section
@@ -175,18 +152,21 @@ function FeaturesSection() {
           </div>
         </div>
         <div className="mx-auto grid max-w-5xl items-center gap-6 pt-10 md:grid-cols-2 md:gap-10 lg:grid-cols-3">
-          {features.map((feature, index) => {
+          {FEATURES_CARDS.map((feature) => {
+            const title = t(`features.items.${feature.key}.title`);
+            const description = t(`features.items.${feature.key}.description`);
+
             return (
               <div
-                key={index}
+                key={feature.key}
                 className="flex h-full flex-col items-start gap-4 rounded-lg border border-slate-100 bg-white p-6 shadow-sm"
               >
                 {feature.icon}
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">
-                    {feature.title}
+                  <h3 className="text-balance pb-2 text-xl font-bold text-slate-900">
+                    {title}
                   </h3>
-                  <p className="text-slate-600">{feature.description}</p>
+                  <p className="text-balance text-slate-600">{description}</p>
                 </div>
               </div>
             );
@@ -198,6 +178,8 @@ function FeaturesSection() {
 }
 
 function CtaSection() {
+  const t = useTranslations("About");
+
   return (
     <section
       id="cta"
@@ -207,17 +189,16 @@ function CtaSection() {
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <h2 className="text-3xl font-bold tracking-tighter text-white md:text-4xl/tight">
-              Ready to simplify your invoicing?
+              {t("cta.title")}
             </h2>
             <p className="max-w-[600px] text-slate-300 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Start creating professional invoices in seconds with our free,
-              open-source tool.
+              {t("cta.description")}
             </p>
           </div>
           <div className="flex w-full flex-col justify-center gap-2 min-[400px]:flex-row">
             <GoToAppButton className="border-slate-600 bg-white text-slate-950 hover:bg-white/90" />
 
-            <a
+            <Link
               href="https://github.com/VladSez/easy-invoice-pdf"
               target="_blank"
               rel="noopener noreferrer"
@@ -227,13 +208,11 @@ function CtaSection() {
                 className="w-full bg-slate-700 px-8 text-white hover:bg-slate-700/90"
               >
                 <GithubIcon className="mr-2 h-5 w-5 fill-white" />
-                View on GitHub
+                {t("buttons.viewOnGithub")}
               </Button>
-            </a>
+            </Link>
           </div>
-          <p className="text-sm text-slate-400">
-            No sign-up required. 100% free and open-source.
-          </p>
+          <p className="text-sm text-slate-400">{t("cta.noSignup")}</p>
         </div>
       </div>
     </section>
@@ -241,6 +220,8 @@ function CtaSection() {
 }
 
 function Footer() {
+  const t = useTranslations("About");
+
   return (
     <footer
       id="footer"
@@ -250,11 +231,7 @@ function Footer() {
         <div className="flex flex-col gap-10 md:flex-row">
           <div className="space-y-4 md:w-1/3">
             <Logo />
-
-            <p className="text-sm text-slate-500">
-              A free, open-source tool for creating professional PDF invoices
-              with real-time preview.
-            </p>
+            <p className="text-sm text-slate-500">{t("footer.description")}</p>
             <div className="flex gap-4">
               <Link
                 href="https://github.com/VladSez/easy-invoice-pdf"
@@ -293,29 +270,20 @@ function Footer() {
                 <span className="sr-only">Twitter</span>
               </Link>
             </div>
-            <div className="mt-6">
-              {/* TODO: Add newsletter form */}
-              {/* <h3 className="mb-2 text-sm font-medium text-slate-900">
-                Subscribe to updates
-              </h3> */}
-              {/* <EmailForm
-                type="newsletter"
-                buttonText="Subscribe"
-                placeholder="Your email address"
-              /> */}
-            </div>
           </div>
           <div className="grid grid-cols-1 sm:gap-10 md:flex-1 md:grid-cols-2">
             <div className="space-y-3"></div>
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-slate-900">Product</h3>
+              <h3 className="text-sm font-medium text-slate-900">
+                {t("footer.product")}
+              </h3>
               <ul className="space-y-2">
                 <li>
                   <Link
                     href="#features"
                     className="text-sm text-slate-500 hover:text-slate-900"
                   >
-                    Features
+                    {t("footer.links.features")}
                   </Link>
                 </li>
                 <li>
@@ -325,7 +293,7 @@ function Footer() {
                     rel="noopener noreferrer"
                     className="text-sm text-slate-500 hover:text-slate-900"
                   >
-                    GitHub
+                    {t("footer.links.github")}
                   </Link>
                 </li>
               </ul>
@@ -334,10 +302,12 @@ function Footer() {
         </div>
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
           <p className="text-xs text-slate-500">
-            &copy; {new Date().getFullYear()} EasyInvoicePDF.com
+            {t("footer.copyright", {
+              year: String(new Date().getFullYear()),
+            })}
           </p>
           <p className="text-xs text-slate-500">
-            Created by{" "}
+            {t("footer.createdBy")}{" "}
             <Link
               href="https://github.com/VladSez"
               target="_blank"
@@ -354,6 +324,8 @@ function Footer() {
 }
 
 function GoToAppButton({ className }: { className?: string }) {
+  const t = useTranslations("About");
+
   return (
     <Link href="/app">
       <Button
@@ -363,7 +335,7 @@ function GoToAppButton({ className }: { className?: string }) {
           className
         )}
       >
-        Go to app
+        {t("buttons.goToApp")}
       </Button>
     </Link>
   );

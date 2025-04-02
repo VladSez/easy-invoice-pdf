@@ -1,54 +1,67 @@
 {
-  "LandingPage": {
-    "title": "PDF Invoice Generator",
-    "subtitle": "Generate professional invoices instantly",
-    "description": "Our PDF Invoice Generator helps you create, manage, and send professional invoices in seconds. Save time and get paid faster with automated invoice creation.",
-    "features": {
-      "title": "Features",
-      "items": [
-        {
-          "title": "Professional Templates",
-          "description": "Choose from a variety of professionally designed templates"
-        },
-        {
-          "title": "Quick Generation",
-          "description": "Create invoices in seconds with our intuitive interface"
-        },
-        {
-          "title": "Cloud Storage",
-          "description": "Access your invoices anywhere, anytime"
-        },
-        {
-          "title": "Automated Calculations",
-          "description": "Automatic tax and total calculations"
-        }
-      ]
+  "About": {
+    "meta": {
+      "title": "Invoice PDF Generator with Live Preview | No Sign-Up",
+      "description": "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
+      "keywords": "invoice tool, free invoice generator, PDF invoices, invoice creator, billing software"
     },
-    "cta": "Start Creating Invoices",
-    "subscribe": {
-      "title": "Stay Updated",
-      "description": "Subscribe to our newsletter for the latest features and updates",
-      "placeholder": "Enter your email",
-      "button": "Subscribe",
-      "success": "Thank you for subscribing!",
-      "error": "Something went wrong. Please try again."
+    "hero": {
+      "title": "Create professional invoices in seconds",
+      "description": "EasyInvoicePDF is a free, open-source tool that lets you create, customize, and download professional PDF invoices with real-time preview.",
+      "noSignup": "No sign-up required. 100% free and open-source."
+    },
+    "features": {
+      "badge": "Features",
+      "title": "Everything you need for professional invoicing",
+      "description": "Our simple yet powerful invoice generator includes all the features you need to create professional invoices quickly.",
+      "items": {
+        "livePreview": {
+          "title": "Live Preview",
+          "description": "See your invoice update in real-time as you make changes, ensuring it looks exactly how you want."
+        },
+        "shareableLinks": {
+          "title": "Shareable Links",
+          "description": "Generate links to share your invoices directly with clients without sending attachments."
+        },
+        "instantDownload": {
+          "title": "Instant Download",
+          "description": "Download your invoice as a PDF file with one click, ready to be sent or printed."
+        },
+        "multiLanguage": {
+          "title": "Multiple Languages & Currencies",
+          "description": "Create invoices in seven languages with support for all major currencies and automatic formatting."
+        },
+        "vatSupport": {
+          "title": "VAT Support",
+          "description": "Automatically calculate VAT rates and totals with support for different tax jurisdictions."
+        },
+        "openSource": {
+          "title": "Open Source",
+          "description": "Completely free and open-source. Use it online or host it yourself with full access to the code."
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to simplify your invoicing?",
+      "description": "Start creating professional invoices in seconds with our free, open-source tool.",
+      "noSignup": "No sign-up required. 100% free and open-source."
+    },
+    "footer": {
+      "description": "A free, open-source tool for creating professional PDF invoices with real-time preview.",
+      "product": "Product",
+      "links": {
+        "features": "Features",
+        "github": "GitHub"
+      },
+      "copyright": "© {year} EasyInvoicePDF.com",
+      "createdBy": "Created by"
+    },
+    "buttons": {
+      "goToApp": "Go to app",
+      "viewOnGithub": "View on GitHub"
     }
   },
-  "Navigation": {
-    "home": "Home",
-    "features": "Features",
-    "pricing": "Pricing",
-    "app": "Go to App",
-    "language": "Language"
-  },
-  "Footer": {
-    "copyright": "© PDF Invoice Generator. All rights reserved.",
-    "links": {
-      "privacy": "Privacy Policy",
-      "terms": "Terms of Service",
-      "contact": "Contact Us"
-    }
-  },
+
   "NotFound": {
     "error": "404",
     "message": "This page could not be found.",

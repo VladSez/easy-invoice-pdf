@@ -1,6 +1,17 @@
 import { z } from "zod";
 
-export const SUPPORTED_CURRENCIES = ["EUR", "USD", "GBP", "PLN"] as const;
+export const SUPPORTED_CURRENCIES = [
+  "EUR", // Euro
+  "USD", // US Dollar
+  "GBP", // British Pound
+  "PLN", // Polish Złoty
+  "RUB", // Russian Ruble
+  "UAH", // Ukrainian Hryvnia
+  "BYN", // Belarusian Ruble
+  "BRL", // Brazilian Real
+  "MXN", // Mexican Peso
+  "ARS", // Argentine Peso
+] as const;
 export type SupportedCurrencies = (typeof SUPPORTED_CURRENCIES)[number];
 
 export const SUPPORTED_LANGUAGES = [

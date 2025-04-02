@@ -60,5 +60,67 @@
     "error": "404",
     "message": "Diese Seite wurde nicht gefunden.",
     "returnHome": "Zurück zur Startseite"
+  },
+  "About": {
+    "meta": {
+      "title": "PDF-Rechnungsgenerator mit Live-Vorschau | Keine Anmeldung",
+      "description": "Erstellen und laden Sie professionelle PDF-Rechnungen sofort mit Echtzeit-Vorschau herunter. Kostenlos und Open-Source. Keine Anmeldung erforderlich.",
+      "keywords": "Rechnungstool, kostenloser Rechnungsgenerator, PDF-Rechnungen, Rechnungsersteller, Abrechnungssoftware"
+    },
+    "hero": {
+      "title": "Erstellen Sie professionelle Rechnungen in Sekunden",
+      "description": "EasyInvoicePDF ist ein kostenloses Open-Source-Tool, mit dem Sie professionelle PDF-Rechnungen mit Echtzeit-Vorschau erstellen, anpassen und herunterladen können.",
+      "noSignup": "Keine Anmeldung erforderlich. 100% kostenlos und Open-Source."
+    },
+    "features": {
+      "badge": "Funktionen",
+      "title": "Alles, was Sie für professionelle Rechnungsstellung brauchen",
+      "description": "Unser einfacher, aber leistungsstarker Rechnungsgenerator enthält alle Funktionen, die Sie für die schnelle Erstellung professioneller Rechnungen benötigen.",
+      "items": {
+        "livePreview": {
+          "title": "Live-Vorschau",
+          "description": "Sehen Sie, wie sich Ihre Rechnung in Echtzeit aktualisiert, während Sie Änderungen vornehmen, und stellen Sie sicher, dass sie genau so aussieht, wie Sie es möchten."
+        },
+        "shareableLinks": {
+          "title": "Teilbare Links",
+          "description": "Generieren Sie Links, um Ihre Rechnungen direkt mit Kunden zu teilen, ohne Anhänge senden zu müssen."
+        },
+        "instantDownload": {
+          "title": "Sofortiger Download",
+          "description": "Laden Sie Ihre Rechnung mit einem Klick als PDF-Datei herunter, bereit zum Versenden oder Drucken."
+        },
+        "multiLanguage": {
+          "title": "Mehrere Sprachen & Währungen",
+          "description": "Erstellen Sie Rechnungen in sieben Sprachen mit Unterstützung für alle wichtigen Währungen und automatischer Formatierung."
+        },
+        "vatSupport": {
+          "title": "MwSt.-Unterstützung",
+          "description": "Berechnen Sie automatisch MwSt.-Sätze und Summen mit Unterstützung für verschiedene Steuerjurisdiktionen."
+        },
+        "openSource": {
+          "title": "Open Source",
+          "description": "Völlig kostenlos und Open-Source. Nutzen Sie es online oder hosten Sie es selbst mit vollem Zugriff auf den Code."
+        }
+      }
+    },
+    "cta": {
+      "title": "Bereit, Ihre Rechnungsstellung zu vereinfachen?",
+      "description": "Beginnen Sie jetzt mit der Erstellung professioneller Rechnungen in Sekunden mit unserem kostenlosen Open-Source-Tool.",
+      "noSignup": "Keine Anmeldung erforderlich. 100% kostenlos und Open-Source."
+    },
+    "footer": {
+      "description": "Ein kostenloses Open-Source-Tool zur Erstellung professioneller PDF-Rechnungen mit Live-Vorschau.",
+      "product": "Produkt",
+      "links": {
+        "features": "Funktionen",
+        "github": "GitHub"
+      },
+      "copyright": "© {year} EasyInvoicePDF.com",
+      "createdBy": "Erstellt von"
+    },
+    "buttons": {
+      "goToApp": "Zur App",
+      "viewOnGithub": "Auf GitHub ansehen"
+    }
   }
 }

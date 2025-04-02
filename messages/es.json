@@ -1,53 +1,8 @@
 {
-  "LandingPage": {
-    "title": "Generador de Facturas PDF",
-    "subtitle": "Genera facturas profesionales al instante",
-    "description": "Nuestro Generador de Facturas PDF te ayuda a crear, gestionar y enviar facturas profesionales en segundos. Ahorra tiempo y recibe pagos más rápido con la creación automatizada de facturas.",
-    "features": {
-      "title": "Características",
-      "items": [
-        {
-          "title": "Plantillas Profesionales",
-          "description": "Elige entre una variedad de plantillas diseñadas profesionalmente"
-        },
-        {
-          "title": "Generación Rápida",
-          "description": "Crea facturas en segundos con nuestra interfaz intuitiva"
-        },
-        {
-          "title": "Almacenamiento en la Nube",
-          "description": "Accede a tus facturas en cualquier lugar y momento"
-        },
-        {
-          "title": "Cálculos Automáticos",
-          "description": "Cálculos automáticos de impuestos y totales"
-        }
-      ]
-    },
-    "cta": "Comienza a Crear Facturas",
-    "subscribe": {
-      "title": "Mantente Actualizado",
-      "description": "Suscríbete a nuestro boletín para conocer las últimas características y actualizaciones",
-      "placeholder": "Ingresa tu correo electrónico",
-      "button": "Suscribirse",
-      "success": "¡Gracias por suscribirte!",
-      "error": "Algo salió mal. Por favor, inténtalo de nuevo."
-    }
-  },
-  "Navigation": {
-    "home": "Inicio",
-    "features": "Características",
-    "pricing": "Precios",
-    "app": "Ir a la Aplicación",
-    "language": "Idioma"
-  },
-  "Footer": {
-    "copyright": "© 2023 Generador de Facturas PDF. Todos los derechos reservados.",
-    "links": {
-      "privacy": "Política de Privacidad",
-      "terms": "Términos de Servicio",
-      "contact": "Contáctanos"
-    }
+  "NotFound": {
+    "error": "404",
+    "message": "No se encontró la página.",
+    "returnHome": "Volver a la página principal"
   },
   "Metadata": {
     "about": {
@@ -56,9 +11,66 @@
       "keywords": "herramienta de facturación, generador de facturas gratuito, facturas PDF, creador de facturas, software de facturación"
     }
   },
-  "NotFound": {
-    "error": "404",
-    "message": "No se encontró la página.",
-    "returnHome": "Volver a la página principal"
+  "About": {
+    "meta": {
+      "title": "Generador de Facturas PDF con Vista Previa en Vivo | Sin Registro",
+      "description": "Cree y descargue facturas PDF profesionales al instante con vista previa en tiempo real. Gratuito y de código abierto. No requiere registro.",
+      "keywords": "herramienta de facturación, generador de facturas gratis, facturas PDF, creador de facturas, software de facturación"
+    },
+    "hero": {
+      "title": "Cree facturas profesionales en segundos",
+      "description": "EasyInvoicePDF es una herramienta gratuita de código abierto que le permite crear, personalizar y descargar facturas PDF profesionales con vista previa en tiempo real.",
+      "noSignup": "No requiere registro. 100% gratuito y de código abierto."
+    },
+    "features": {
+      "badge": "Características",
+      "title": "Todo lo que necesita para facturación profesional",
+      "description": "Nuestro generador de facturas simple pero potente incluye todas las funciones que necesita para crear facturas profesionales rápidamente.",
+      "items": {
+        "livePreview": {
+          "title": "Vista Previa en Vivo",
+          "description": "Vea cómo se actualiza su factura en tiempo real mientras realiza cambios, asegurándose de que se vea exactamente como desea."
+        },
+        "shareableLinks": {
+          "title": "Enlaces Compartibles",
+          "description": "Genere enlaces para compartir sus facturas directamente con los clientes sin enviar archivos adjuntos."
+        },
+        "instantDownload": {
+          "title": "Descarga Instantánea",
+          "description": "Descargue su factura como archivo PDF con un clic, lista para enviar o imprimir."
+        },
+        "multiLanguage": {
+          "title": "Múltiples Idiomas y Monedas",
+          "description": "Cree facturas en siete idiomas con soporte para todas las principales monedas y formato automático."
+        },
+        "vatSupport": {
+          "title": "Soporte de IVA",
+          "description": "Calcule automáticamente las tasas y totales de IVA con soporte para diferentes jurisdicciones fiscales."
+        },
+        "openSource": {
+          "title": "Código Abierto",
+          "description": "Completamente gratuito y de código abierto. Úselo en línea o alójelo usted mismo con acceso completo al código."
+        }
+      }
+    },
+    "cta": {
+      "title": "¿Listo para simplificar su facturación?",
+      "description": "Comience a crear facturas profesionales en segundos con nuestra herramienta gratuita de código abierto.",
+      "noSignup": "No requiere registro. 100% gratuito y de código abierto."
+    },
+    "footer": {
+      "description": "Una herramienta gratuita de código abierto para crear facturas PDF profesionales con vista previa en tiempo real.",
+      "product": "Producto",
+      "links": {
+        "features": "Características",
+        "github": "GitHub"
+      },
+      "copyright": "© {year} EasyInvoicePDF.com",
+      "createdBy": "Creado por"
+    },
+    "buttons": {
+      "goToApp": "Ir a la aplicación",
+      "viewOnGithub": "Ver en GitHub"
+    }
   }
 }

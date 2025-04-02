@@ -4,10 +4,16 @@ import { SUPPORTED_CURRENCIES, type InvoiceData } from "@/app/schema";
 import { cn } from "@/lib/utils";
 
 export const CURRENCY_SYMBOLS = {
-  [SUPPORTED_CURRENCIES[0]]: "€",
-  [SUPPORTED_CURRENCIES[1]]: "$",
-  [SUPPORTED_CURRENCIES[2]]: "£",
-  [SUPPORTED_CURRENCIES[3]]: "zł",
+  [SUPPORTED_CURRENCIES[0]]: "€", // Euro
+  [SUPPORTED_CURRENCIES[1]]: "$", // US Dollar
+  [SUPPORTED_CURRENCIES[2]]: "£", // British Pound
+  [SUPPORTED_CURRENCIES[3]]: "zł", // Polish Złoty
+  [SUPPORTED_CURRENCIES[4]]: "₽", // Russian Ruble
+  [SUPPORTED_CURRENCIES[5]]: "₴", // Ukrainian Hryvnia
+  [SUPPORTED_CURRENCIES[6]]: "Br", // Belarusian Ruble
+  [SUPPORTED_CURRENCIES[7]]: "R$", // Brazilian Real
+  [SUPPORTED_CURRENCIES[8]]: "$", // Mexican Peso
+  [SUPPORTED_CURRENCIES[9]]: "$", // Argentine Peso
 } as const satisfies Record<InvoiceData["currency"], string>;
 
 const MoneyInput = React.memo(
@@ -37,7 +43,11 @@ const MoneyInput = React.memo(
             ref={ref}
             className={cn(
               "-me-px rounded-e-none ps-6 shadow-none",
-              currencySymbol ? "ps-6" : "ps-3",
+              currencySymbol === "Br" || currencySymbol === "R$"
+                ? "ps-8"
+                : currencySymbol
+                  ? "ps-6"
+                  : "ps-3",
               props.className
             )}
             placeholder="0.00"
@@ -79,7 +89,11 @@ const ReadOnlyMoneyInput = React.memo(
             ref={ref}
             className={cn(
               "-me-px block w-full cursor-not-allowed rounded-md rounded-e-none border border-gray-300 bg-gray-100 px-3 py-2 ps-6",
-              currencySymbol ? "ps-6" : "ps-3",
+              currencySymbol === "Br" || currencySymbol === "R$"
+                ? "ps-8"
+                : currencySymbol
+                  ? "ps-6"
+                  : "ps-3",
               "focus-visible:border-indigo-500 focus-visible:ring focus-visible:ring-indigo-200 focus-visible:ring-opacity-50",
               props.className
             )}
