@@ -141,15 +141,15 @@ function FeaturesSection() {
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <div className="inline-block rounded-lg bg-slate-100 px-3 py-1 text-sm font-medium text-slate-800">
-              Features
+            <div className="inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-sm transition-colors">
+              {t("features.badge")}
             </div>
+
             <h2 className="text-3xl font-bold tracking-tighter text-slate-900 md:text-4xl/tight">
-              Everything you need for professional invoicing
+              {t("features.title")}
             </h2>
             <p className="max-w-[900px] text-slate-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Our simple yet powerful invoice generator includes all the
-              features you need to create professional invoices quickly.
+              {t("features.description")}
             </p>
           </div>
         </div>

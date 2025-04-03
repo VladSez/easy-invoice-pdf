@@ -2,74 +2,88 @@ import { z } from "zod";
 import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "./index";
 
 // Schema for seller translations
-const sellerTranslationSchema = z.object({
-  name: z.string(),
-  vatNo: z.string(),
-  email: z.string(),
-  accountNumber: z.string(),
-  swiftBic: z.string(),
-});
+const sellerTranslationSchema = z
+  .object({
+    name: z.string(),
+    vatNo: z.string(),
+    email: z.string(),
+    accountNumber: z.string(),
+    swiftBic: z.string(),
+  })
+  .strict();
 
 // Schema for buyer translations
-const buyerTranslationSchema = z.object({
-  name: z.string(),
-  vatNo: z.string(),
-  email: z.string(),
-});
+const buyerTranslationSchema = z
+  .object({
+    name: z.string(),
+    vatNo: z.string(),
+    email: z.string(),
+  })
+  .strict();
 
 // Schema for invoice items table translations
-const invoiceItemsTableTranslationSchema = z.object({
-  no: z.string(),
-  nameOfGoodsService: z.string(),
-  typeOfGTU: z.string(),
-  amount: z.string(),
-  unit: z.string(),
-  netPrice: z.string(),
-  vat: z.string(),
-  netAmount: z.string(),
-  vatAmount: z.string(),
-  preTaxAmount: z.string(),
-  sum: z.string(),
-});
+const invoiceItemsTableTranslationSchema = z
+  .object({
+    no: z.string(),
+    nameOfGoodsService: z.string(),
+    typeOfGTU: z.string(),
+    amount: z.string(),
+    unit: z.string(),
+    netPrice: z.string(),
+    vat: z.string(),
+    netAmount: z.string(),
+    vatAmount: z.string(),
+    preTaxAmount: z.string(),
+    sum: z.string(),
+  })
+  .strict();
 
 // Schema for payment info translations
-const paymentInfoTranslationSchema = z.object({
-  paymentMethod: z.string(),
-  paymentDate: z.string(),
-});
+const paymentInfoTranslationSchema = z
+  .object({
+    paymentMethod: z.string(),
+    paymentDate: z.string(),
+  })
+  .strict();
 
 // Schema for VAT summary table translations
-const vatSummaryTableTranslationSchema = z.object({
-  vatRate: z.string(),
-  net: z.string(),
-  vat: z.string(),
-  preTax: z.string(),
-  total: z.string(),
-});
+const vatSummaryTableTranslationSchema = z
+  .object({
+    vatRate: z.string(),
+    net: z.string(),
+    vat: z.string(),
+    preTax: z.string(),
+    total: z.string(),
+  })
+  .strict();
 
 // Schema for payment totals translations
-const paymentTotalsTranslationSchema = z.object({
-  toPay: z.string(),
-  paid: z.string(),
-  leftToPay: z.string(),
-  amountInWords: z.string(),
-});
+const paymentTotalsTranslationSchema = z
+  .object({
+    toPay: z.string(),
+    paid: z.string(),
+    leftToPay: z.string(),
+    amountInWords: z.string(),
+  })
+  .strict();
 
 // Main translation schema
-export const translationSchema = z.object({
-  invoiceNumber: z.string(),
-  dateOfIssue: z.string(),
-  dateOfService: z.string(),
-  invoiceType: z.string(),
-  seller: sellerTranslationSchema,
-  buyer: buyerTranslationSchema,
-  invoiceItemsTable: invoiceItemsTableTranslationSchema,
-  paymentInfo: paymentInfoTranslationSchema,
-  vatSummaryTable: vatSummaryTableTranslationSchema,
-  paymentTotals: paymentTotalsTranslationSchema,
-  personAuthorizedToReceive: z.string(),
-  personAuthorizedToIssue: z.string(),
-});
+export const translationSchema = z
+  .object({
+    invoiceNumber: z.string(),
+    dateOfIssue: z.string(),
+    dateOfService: z.string(),
+    invoiceType: z.string(),
+    seller: sellerTranslationSchema,
+    buyer: buyerTranslationSchema,
+    invoiceItemsTable: invoiceItemsTableTranslationSchema,
+    paymentInfo: paymentInfoTranslationSchema,
+    vatSummaryTable: vatSummaryTableTranslationSchema,
+    paymentTotals: paymentTotalsTranslationSchema,
+    personAuthorizedToReceive: z.string(),
+    personAuthorizedToIssue: z.string(),
+  })
+  .strict();
 
 // Schema for all translations
 export const translationsSchema = z.record(
