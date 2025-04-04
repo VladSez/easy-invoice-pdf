@@ -1,5 +1,10 @@
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
+  CURRENCY_SYMBOLS,
+  LANGUAGE_TO_LABEL,
+  SUPPORTED_CURRENCIES,
+  SUPPORTED_DATE_FORMATS,
+  SUPPORTED_LANGUAGES,
   type AccordionState,
   type InvoiceData,
 } from "@/app/schema";
@@ -101,20 +106,58 @@ test.describe("Invoice Generator Page", () => {
       generalInfoSection.getByText("General Information", { exact: true })
     ).toBeVisible();
 
+    // Check all supported languages are available as options with correct labels
+    const languageSelect = generalInfoSection.getByRole("combobox", {
+      name: "Invoice PDF Language",
+    });
+
     // Language selection
-    await expect(
-      generalInfoSection.getByRole("combobox", { name: "Invoice PDF Language" })
-    ).toHaveValue(INITIAL_INVOICE_DATA.language);
+    await expect(languageSelect).toHaveValue(INITIAL_INVOICE_DATA.language);
+
+    // Verify all supported languages are available as options with correct labels
+    for (const lang of SUPPORTED_LANGUAGES) {
+      const languageName = LANGUAGE_TO_LABEL[lang];
+
+      await expect(
+        languageSelect.locator(`option[value="${lang}"]`)
+      ).toHaveText(languageName);
+    }
 
     // Currency selection
-    await expect(
-      generalInfoSection.getByRole("combobox", { name: "Currency" })
-    ).toHaveValue(INITIAL_INVOICE_DATA.currency);
+    const currencySelect = generalInfoSection.getByRole("combobox", {
+      name: "Currency",
+    });
+
+    await expect(currencySelect).toHaveValue(INITIAL_INVOICE_DATA.currency);
+
+    // Verify all supported currencies are available as options with correct labels
+    for (const currency of SUPPORTED_CURRENCIES) {
+      const currencySymbol = CURRENCY_SYMBOLS[currency];
+      const expectedLabel = `${currency} ${currencySymbol}`.trim();
+
+      await expect(
+        currencySelect.locator(`option[value="${currency}"]`)
+      ).toHaveText(expectedLabel);
+    }
 
     // Date Format selection
-    await expect(
-      generalInfoSection.getByRole("combobox", { name: "Date Format" })
-    ).toHaveValue(INITIAL_INVOICE_DATA.dateFormat);
+    const dateFormatSelect = generalInfoSection.getByRole("combobox", {
+      name: "Date Format",
+    });
+
+    await expect(dateFormatSelect).toHaveValue(INITIAL_INVOICE_DATA.dateFormat);
+
+    // Verify all supported date formats are available as options with correct labels
+    for (const dateFormat of SUPPORTED_DATE_FORMATS) {
+      const preview = dayjs().format(dateFormat);
+      const isDefault = dateFormat === SUPPORTED_DATE_FORMATS[0];
+
+      await expect(
+        dateFormatSelect.locator(`option[value="${dateFormat}"]`)
+      ).toHaveText(
+        `${dateFormat} (Preview: ${preview}) ${isDefault ? "(default)" : ""}`
+      );
+    }
 
     // Invoice Number
     await expect(

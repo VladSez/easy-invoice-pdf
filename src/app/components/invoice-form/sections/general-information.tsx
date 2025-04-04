@@ -5,7 +5,11 @@ import {
   type UseFormSetValue,
   useWatch,
 } from "react-hook-form";
-import { LANGUAGE_TO_LABEL, type InvoiceData } from "@/app/schema";
+import {
+  CURRENCY_SYMBOLS,
+  LANGUAGE_TO_LABEL,
+  type InvoiceData,
+} from "@/app/schema";
 import {
   SUPPORTED_CURRENCIES,
   SUPPORTED_DATE_FORMATS,
@@ -15,7 +19,6 @@ import { ButtonHelper } from "@/components/ui/button-helper";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
 import { Label } from "@/components/ui/label";
-import { CURRENCY_SYMBOLS } from "@/components/ui/money-input";
 import { SelectNative } from "@/components/ui/select-native";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";

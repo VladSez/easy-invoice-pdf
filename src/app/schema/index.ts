@@ -14,6 +14,19 @@ export const SUPPORTED_CURRENCIES = [
 ] as const;
 export type SupportedCurrencies = (typeof SUPPORTED_CURRENCIES)[number];
 
+export const CURRENCY_SYMBOLS = {
+  EUR: "€", // Euro
+  USD: "$", // US Dollar
+  GBP: "£", // British Pound
+  PLN: "zł", // Polish Złoty
+  RUB: "₽", // Russian Ruble
+  UAH: "₴", // Ukrainian Hryvnia
+  BYN: "Br", // Belarusian Ruble
+  BRL: "R$", // Brazilian Real
+  MXN: "$", // Mexican Peso
+  ARS: "$", // Argentine Peso
+} as const satisfies Record<SupportedCurrencies, string>;
+
 export const SUPPORTED_LANGUAGES = [
   "en",
   "pl",

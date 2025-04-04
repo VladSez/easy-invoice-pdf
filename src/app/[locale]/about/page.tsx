@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { useTranslations, type Locale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { cn } from "@/lib/utils";
@@ -16,9 +15,6 @@ import { LanguageSwitcher } from "./components/language-switcher";
 
 export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const { locale } = params;
-
-  // Enable static rendering
-  setRequestLocale(locale);
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
@@ -41,7 +37,7 @@ function Header({ locale }: { locale: Locale }) {
           <div className="flex h-full flex-col items-start justify-between sm:flex-row sm:items-center sm:justify-between">
             <Logo />
 
-            <div className="mt-2 flex items-center gap-3 sm:mt-0 sm:gap-4">
+            <div className="mt-2 flex items-center gap-1 sm:mt-0 sm:gap-2">
               <LanguageSwitcher locale={locale} />
               <GoToAppButton />
             </div>
@@ -58,16 +54,16 @@ function HeroSection() {
   return (
     <section
       id="hero"
-      className="flex w-full items-center justify-center bg-white py-12 md:py-24 lg:py-32"
+      className="flex w-full items-center justify-center bg-white py-12 md:py-24 lg:py-32 lg:pb-44"
     >
       <div className="container px-4 md:px-6">
-        <div className="grid gap-6 lg:grid-cols-[1fr_600px] lg:gap-12">
+        <div className="grid gap-6 lg:grid-cols-2">
           <div className="flex flex-col justify-center space-y-4">
             <div className="space-y-2">
-              <h1 className="text-balance pb-3 text-3xl font-bold tracking-tighter text-slate-900 sm:text-5xl xl:text-6xl/none">
+              <h1 className="text-balance pb-3 text-3xl font-bold tracking-tighter text-slate-900 sm:text-[54px]/[1]">
                 {t("hero.title")}
               </h1>
-              <p className="max-w-[500px] text-balance text-slate-600 md:text-lg">
+              <p className="max-w-[450px] text-balance text-slate-600 md:text-lg">
                 {t("hero.description")}
               </p>
             </div>
@@ -136,12 +132,12 @@ function FeaturesSection() {
   return (
     <section
       id="features"
-      className="flex w-full items-center justify-center bg-slate-50 py-12 md:py-24 lg:py-32"
+      className="flex w-full items-center justify-center bg-slate-50 py-12 md:py-24"
     >
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <div className="inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-sm transition-colors">
+            <div className="mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-sm transition-colors">
               {t("features.badge")}
             </div>
 

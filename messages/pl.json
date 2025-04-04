@@ -8,8 +8,16 @@
   },
   "NotFound": {
     "error": "404",
-    "message": "Nie znaleziono strony.",
+    "message": "Nie można znaleźć tej strony.",
     "returnHome": "Wróć do strony głównej"
+  },
+  "Error": {
+    "title": "Coś poszło nie tak",
+    "description": "Spróbuj odświeżyć stronę lub zgłoś błąd",
+    "bugReport": "tutaj",
+    "tryAgain": "Spróbuj ponownie",
+    "goBack": "Wróć",
+    "toastMessage": "Coś poszło nie tak! Spróbuj odświeżyć stronę lub zgłoś błąd."
   },
   "About": {
     "meta": {

@@ -8,7 +8,7 @@
   },
   "NotFound": {
     "error": "404",
-    "message": "Página não encontrada.",
+    "message": "Esta página não pôde ser encontrada.",
     "returnHome": "Voltar à página inicial"
   },
   "About": {
@@ -72,5 +72,13 @@
       "goToApp": "Ir para o aplicativo",
       "viewOnGithub": "Ver no GitHub"
     }
+  },
+  "Error": {
+    "title": "Algo deu errado",
+    "description": "Por favor, tente atualizar a página ou reportar o erro",
+    "bugReport": "aqui",
+    "tryAgain": "Tentar novamente",
+    "goBack": "Voltar",
+    "toastMessage": "Algo deu errado! Por favor, tente atualizar a página ou reportar o erro."
   }
 }

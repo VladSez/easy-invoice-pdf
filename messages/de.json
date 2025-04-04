@@ -8,8 +8,8 @@
   },
   "NotFound": {
     "error": "404",
-    "message": "Diese Seite wurde nicht gefunden.",
-    "returnHome": "Zurück zur Startseite"
+    "message": "Diese Seite konnte nicht gefunden werden.",
+    "returnHome": "Zur Startseite zurückkehren"
   },
   "About": {
     "meta": {
@@ -72,5 +72,13 @@
       "goToApp": "Zur App",
       "viewOnGithub": "Auf GitHub ansehen"
     }
+  },
+  "Error": {
+    "title": "Etwas ist schief gelaufen",
+    "description": "Bitte versuchen Sie, die Seite zu aktualisieren oder einen Fehlerbericht zu erstellen",
+    "bugReport": "hier",
+    "tryAgain": "Erneut versuchen",
+    "goBack": "Zurück",
+    "toastMessage": "Etwas ist schief gelaufen! Bitte versuchen Sie, die Seite zu aktualisieren oder einen Fehlerbericht zu erstellen."
   }
 }

@@ -1,13 +1,13 @@
 "use client"; // Error boundaries must be Client Components
 
 import { Button } from "@/components/ui/button";
-import { CircleAlert } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { PDF_DATA_LOCAL_STORAGE_KEY } from "./components/invoice-form";
-import { INITIAL_INVOICE_DATA } from "./constants";
+import { PDF_DATA_LOCAL_STORAGE_KEY } from "../../components/invoice-form";
+import { INITIAL_INVOICE_DATA } from "../../constants";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
+import { ErrorMessage } from "@/components/etc/error-message";
 
 export default function Error({
   error,
@@ -17,13 +17,10 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error);
-
     Sentry.captureException(error);
 
     toast.error(
-      "Something went wrong! Please try to refresh the page or contact support.",
+      "Something went wrong! Please try to refresh the page or fill a bug report.",
       {
         closeButton: true,
         richColors: true,
@@ -42,10 +39,6 @@ export default function Error({
             className="underline"
           >
             here
-          </a>{" "}
-          or contact support via this{" "}
-          <a href="mailto:vladsazon27@gmail.com" className="underline">
-            link
           </a>
         </ErrorMessage>
         <Button
@@ -91,25 +84,9 @@ export default function Error({
             }
           }}
         >
-          Clear the Invoice Data and Start from Scratch
+          Reset Invoice Data and Start From Scratch
         </Button>
       </div>
-    </div>
-  );
-}
-
-function ErrorMessage({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mx-5 rounded-lg border border-red-500/50 px-4 py-3 text-red-600">
-      <p className="text-sm">
-        <CircleAlert
-          className="-mt-0.5 me-2 inline-flex opacity-60"
-          size={16}
-          strokeWidth={2}
-          aria-hidden="true"
-        />
-        {children}
-      </p>
     </div>
   );
 }

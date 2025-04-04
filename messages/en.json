@@ -67,6 +67,14 @@
     "message": "This page could not be found.",
     "returnHome": "Return to homepage"
   },
+  "Error": {
+    "title": "Something went wrong",
+    "description": "Please try to refresh the page or fill a bug report",
+    "bugReport": "here",
+    "tryAgain": "Try again",
+    "goBack": "Go back",
+    "toastMessage": "Something went wrong! Please try to refresh the page or fill a bug report."
+  },
   "Metadata": {
     "about": {
       "title": "Invoice PDF Generator with Live Preview | No Sign-Up",

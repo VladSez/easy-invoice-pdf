@@ -206,7 +206,6 @@ export default function Home() {
                 Invoice PDF generator with live preview
               </p>
             </div>
-
             <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
               <Button
                 asChild

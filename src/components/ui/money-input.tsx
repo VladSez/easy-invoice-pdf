@@ -1,20 +1,11 @@
 import * as React from "react";
 import { Input } from "./input";
-import { SUPPORTED_CURRENCIES, type InvoiceData } from "@/app/schema";
+import {
+  CURRENCY_SYMBOLS,
+  SUPPORTED_CURRENCIES,
+  type InvoiceData,
+} from "@/app/schema";
 import { cn } from "@/lib/utils";
-
-export const CURRENCY_SYMBOLS = {
-  [SUPPORTED_CURRENCIES[0]]: "€", // Euro
-  [SUPPORTED_CURRENCIES[1]]: "$", // US Dollar
-  [SUPPORTED_CURRENCIES[2]]: "£", // British Pound
-  [SUPPORTED_CURRENCIES[3]]: "zł", // Polish Złoty
-  [SUPPORTED_CURRENCIES[4]]: "₽", // Russian Ruble
-  [SUPPORTED_CURRENCIES[5]]: "₴", // Ukrainian Hryvnia
-  [SUPPORTED_CURRENCIES[6]]: "Br", // Belarusian Ruble
-  [SUPPORTED_CURRENCIES[7]]: "R$", // Brazilian Real
-  [SUPPORTED_CURRENCIES[8]]: "$", // Mexican Peso
-  [SUPPORTED_CURRENCIES[9]]: "$", // Argentine Peso
-} as const satisfies Record<InvoiceData["currency"], string>;
 
 const MoneyInput = React.memo(
   React.forwardRef<
@@ -25,7 +16,7 @@ const MoneyInput = React.memo(
     }
   >(({ currency, dataTestId, ...props }, ref) => {
     const shownCurrencyText = currency || SUPPORTED_CURRENCIES[0];
-    const currencySymbol = CURRENCY_SYMBOLS[shownCurrencyText] || null;
+    const currencySymbol = CURRENCY_SYMBOLS[shownCurrencyText];
 
     return (
       <div>

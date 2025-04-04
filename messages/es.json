@@ -1,8 +1,16 @@
 {
   "NotFound": {
     "error": "404",
-    "message": "No se encontró la página.",
+    "message": "No se pudo encontrar esta página.",
     "returnHome": "Volver a la página principal"
+  },
+  "Error": {
+    "title": "Algo salió mal",
+    "description": "Por favor, intenta actualizar la página o reporta el error",
+    "bugReport": "aquí",
+    "tryAgain": "Intentar de nuevo",
+    "goBack": "Volver",
+    "toastMessage": "¡Algo salió mal! Por favor, intenta actualizar la página o reporta el error."
   },
   "Metadata": {
     "about": {
