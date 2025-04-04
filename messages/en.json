@@ -29,7 +29,7 @@
         },
         "multiLanguage": {
           "title": "Multiple Languages & Currencies",
-          "description": "Create invoices in seven languages with support for all major currencies and automatic formatting."
+          "description": "Create invoices in ten languages (English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, Dutch) with support for all major currencies and automatic formatting."
         },
         "vatSupport": {
           "title": "VAT Support",

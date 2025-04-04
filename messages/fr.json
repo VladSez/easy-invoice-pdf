@@ -1,0 +1,84 @@
+{
+  "About": {
+    "meta": {
+      "title": "Générateur de Factures PDF avec Aperçu en Direct | Sans Inscription",
+      "description": "Créez et téléchargez des factures PDF professionnelles instantanément avec aperçu en temps réel. Gratuit et open-source. Aucune inscription requise.",
+      "keywords": "outil de facturation, générateur de factures gratuit, factures PDF, créateur de factures, logiciel de facturation"
+    },
+    "hero": {
+      "title": "Créez des factures professionnelles en quelques secondes",
+      "description": "EasyInvoicePDF est un outil gratuit et open-source qui vous permet de créer, personnaliser et télécharger des factures PDF professionnelles avec aperçu en temps réel.",
+      "noSignup": "Aucune inscription requise. 100% gratuit et open-source."
+    },
+    "features": {
+      "badge": "Fonctionnalités",
+      "title": "Tout ce dont vous avez besoin pour une facturation professionnelle",
+      "description": "Notre générateur de factures simple mais puissant inclut toutes les fonctionnalités nécessaires pour créer rapidement des factures professionnelles.",
+      "items": {
+        "livePreview": {
+          "title": "Aperçu en Direct",
+          "description": "Visualisez votre facture se mettre à jour en temps réel pendant vos modifications, assurant qu'elle apparaît exactement comme vous le souhaitez."
+        },
+        "shareableLinks": {
+          "title": "Liens Partageables",
+          "description": "Générez des liens pour partager vos factures directement avec vos clients sans envoyer de pièces jointes."
+        },
+        "instantDownload": {
+          "title": "Téléchargement Instantané",
+          "description": "Téléchargez votre facture au format PDF en un clic, prête à être envoyée ou imprimée."
+        },
+        "multiLanguage": {
+          "title": "Langues et Devises Multiples",
+          "description": "Créez des factures en dix langues (anglais, polonais, allemand, espagnol, portugais, russe, ukrainien, français, italien, néerlandais) avec prise en charge de toutes les principales devises et formatage automatique."
+        },
+        "vatSupport": {
+          "title": "Support TVA",
+          "description": "Calculez automatiquement les taux et totaux de TVA avec prise en charge des différentes juridictions fiscales."
+        },
+        "openSource": {
+          "title": "Open Source",
+          "description": "Entièrement gratuit et open-source. Utilisez-le en ligne ou hébergez-le vous-même avec un accès complet au code."
+        }
+      }
+    },
+    "cta": {
+      "title": "Prêt à simplifier votre facturation ?",
+      "description": "Commencez à créer des factures professionnelles en quelques secondes avec notre outil gratuit et open-source.",
+      "noSignup": "Aucune inscription requise. 100% gratuit et open-source."
+    },
+    "footer": {
+      "description": "Un outil gratuit et open-source pour créer des factures PDF professionnelles avec aperçu en temps réel.",
+      "product": "Produit",
+      "links": {
+        "features": "Fonctionnalités",
+        "github": "GitHub"
+      },
+      "copyright": "© {year} EasyInvoicePDF.com",
+      "createdBy": "Créé par"
+    },
+    "buttons": {
+      "goToApp": "Accéder à l'application",
+      "viewOnGithub": "Voir sur GitHub"
+    }
+  },
+  "NotFound": {
+    "error": "404",
+    "message": "Cette page est introuvable.",
+    "returnHome": "Retour à l'accueil"
+  },
+  "Error": {
+    "title": "Une erreur s'est produite",
+    "description": "Veuillez essayer de rafraîchir la page ou signaler un bug",
+    "bugReport": "ici",
+    "tryAgain": "Réessayer",
+    "goBack": "Retour",
+    "toastMessage": "Une erreur s'est produite ! Veuillez essayer de rafraîchir la page ou signaler un bug."
+  },
+  "Metadata": {
+    "about": {
+      "title": "Générateur de Factures PDF avec Aperçu en Direct | Sans Inscription",
+      "description": "Créez et téléchargez des factures PDF professionnelles instantanément avec aperçu en temps réel. Gratuit et open-source. Aucune inscription requise.",
+      "keywords": "outil de facturation, générateur de factures gratuit, factures PDF, créateur de factures, logiciel de facturation"
+    }
+  }
+}

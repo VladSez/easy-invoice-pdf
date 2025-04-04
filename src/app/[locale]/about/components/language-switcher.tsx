@@ -1,13 +1,18 @@
 "use client";
 
-import { SelectNative } from "@/components/ui/select-native";
-import { GlobeIcon } from "lucide-react";
-import { useTransition } from "react";
-import { type ChangeEvent } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
-import { cn } from "@/lib/utils";
+import { GlobeIcon } from "lucide-react";
 import type { Locale } from "next-intl";
-import { Label } from "@/components/ui/label";
+import { useTransition } from "react";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 const MAP_LOCALE_TO_LANGUAGE = {
   en: "English",
@@ -17,6 +22,9 @@ const MAP_LOCALE_TO_LANGUAGE = {
   pt: "Português",
   ru: "Русский",
   uk: "Українська",
+  fr: "Français",
+  it: "Italiano",
+  nl: "Nederlands",
 } as const satisfies Record<Locale, string>;
 
 type SupportedLocale = keyof typeof MAP_LOCALE_TO_LANGUAGE;
@@ -31,45 +39,50 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const nextLocale = e.target.value as SupportedLocale;
-
-    startTransition(() => {
-      const pathnameWithoutLocale = pathname.replace(`/${locale}`, "");
-      router.replace(pathnameWithoutLocale || "/", { locale: nextLocale });
-    });
-  };
-
   return (
-    <div className="flex flex-col">
-      <Label htmlFor="language-select" className="sr-only">
-        Select language
-      </Label>
-      <div
-        className={cn(
-          "flex items-center gap-1",
-          isPending && "transition-opacity [&:disabled]:opacity-30"
-        )}
-      >
-        <GlobeIcon className="h-4 w-4" />
-        <SelectNative
-          id="language-select"
-          value={locale}
-          onChange={handleChange}
-          className="block h-[40px] w-full"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          _size="icon"
+          _variant="ghost"
+          className="rounded-full shadow-none"
+          aria-label="Switch language"
           disabled={isPending}
+          title={"Switch language"}
         >
-          {(
-            Object.entries(MAP_LOCALE_TO_LANGUAGE) as Array<
-              [SupportedLocale, LanguageLabel]
+          <GlobeIcon size={16} aria-hidden="true" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent loop>
+        {(
+          Object.entries(MAP_LOCALE_TO_LANGUAGE) as Array<
+            [SupportedLocale, LanguageLabel]
+          >
+        ).map(([itemLocale, label]) => {
+          const isCurrentLocale = itemLocale === locale;
+
+          return (
+            <DropdownMenuItem
+              key={itemLocale}
+              onClick={() => {
+                startTransition(() => {
+                  const pathnameWithoutLocale = pathname.replace(
+                    `/${locale}`,
+                    ""
+                  );
+
+                  router.replace(pathnameWithoutLocale || "/", {
+                    locale: itemLocale,
+                  });
+                });
+              }}
+              className={cn(isCurrentLocale && "bg-slate-200 font-medium")}
             >
-          ).map(([locale, label]) => (
-            <option key={locale} value={locale}>
               {label}
-            </option>
-          ))}
-        </SelectNative>
-      </div>
-    </div>
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

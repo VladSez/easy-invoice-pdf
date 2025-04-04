@@ -35,6 +35,9 @@ export const SUPPORTED_LANGUAGES = [
   "pt",
   "ru",
   "uk",
+  "fr",
+  "it",
+  "nl",
 ] as const;
 export type SupportedLanguages = (typeof SUPPORTED_LANGUAGES)[number];
 
@@ -46,6 +49,9 @@ export const LANGUAGE_TO_LABEL = {
   pt: "Portuguese",
   ru: "Russian",
   uk: "Ukrainian",
+  fr: "French",
+  it: "Italian",
+  nl: "Dutch",
 } as const satisfies Record<SupportedLanguages, string>;
 
 export const SUPPORTED_DATE_FORMATS = [
