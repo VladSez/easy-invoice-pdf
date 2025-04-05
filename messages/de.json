@@ -70,7 +70,8 @@
     },
     "buttons": {
       "goToApp": "Zur App",
-      "viewOnGithub": "Auf GitHub ansehen"
+      "viewOnGithub": "Auf GitHub ansehen",
+      "switchLanguage": "Sprache wechseln"
     }
   },
   "Error": {

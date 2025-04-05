@@ -98,6 +98,7 @@ const aboutSchema = z
       .object({
         goToApp: z.string(),
         viewOnGithub: z.string(),
+        switchLanguage: z.string(),
       })
       .strict(),
   })

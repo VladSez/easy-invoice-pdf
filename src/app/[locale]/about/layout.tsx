@@ -12,48 +12,57 @@ export const generateMetadata = async ({
 }: {
   params: { locale: Locale };
 }): Promise<Metadata> => {
-  // Load the messages for the requested locale
-  const messages = await import(
-    `../../../../messages/${params.locale}.json`
-  ).then((module: { default: typeof EnMessages }) => module.default);
+  try {
+    // Load the messages for the requested locale
+    const messages = await import(
+      `../../../../messages/${params.locale}.json`
+    ).then((module: { default: typeof EnMessages }) => module.default);
 
-  return {
-    title: messages.Metadata.about.title,
-    description: messages.Metadata.about.description,
-    keywords: messages.Metadata.about.keywords,
-    metadataBase: new URL(APP_URL),
-    alternates: {
-      canonical: `/${params.locale}/about`,
-      languages: {
-        en: `/en/about`,
-        pl: `/pl/about`,
-        de: `/de/about`,
-        es: `/es/about`,
-        pt: `/pt/about`,
-        ru: `/ru/about`,
-        uk: `/uk/about`,
+    return {
+      title: messages.Metadata.about.title,
+      description: messages.Metadata.about.description,
+      keywords: messages.Metadata.about.keywords,
+      metadataBase: new URL(APP_URL),
+      alternates: {
+        canonical: `/${params.locale}/about`,
+        languages: {
+          en: `/en/about`,
+          pl: `/pl/about`,
+          de: `/de/about`,
+          es: `/es/about`,
+          pt: `/pt/about`,
+          ru: `/ru/about`,
+          uk: `/uk/about`,
+          fr: `/fr/about`,
+          it: `/it/about`,
+          nl: `/nl/about`,
+        } satisfies Record<Locale, string>,
       },
-    },
-    openGraph: {
-      title: messages.Metadata.about.title,
-      description: messages.Metadata.about.description,
-      locale: params.locale,
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: messages.Metadata.about.title,
-      description: messages.Metadata.about.description,
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
+      openGraph: {
+        title: messages.Metadata.about.title,
+        description: messages.Metadata.about.description,
+        locale: params.locale,
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: messages.Metadata.about.title,
+        description: messages.Metadata.about.description,
+      },
+      robots: {
         index: true,
         follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+        },
       },
-    },
-  };
+    };
+  } catch (error) {
+    console.error("Error generating metadata:", error);
+
+    throw error;
+  }
 };
 
 export function generateStaticParams() {

@@ -4,7 +4,6 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { GlobeIcon } from "lucide-react";
 import type { Locale } from "next-intl";
 import { useTransition } from "react";
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +11,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 const MAP_LOCALE_TO_LANGUAGE = {
@@ -32,27 +37,39 @@ type LanguageLabel = (typeof MAP_LOCALE_TO_LANGUAGE)[SupportedLocale];
 
 interface LanguageSwitcherProps {
   locale: SupportedLocale;
+  buttonText: string;
 }
 
-export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
+export function LanguageSwitcher({
+  locale,
+  buttonText,
+}: LanguageSwitcherProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const pathname = usePathname();
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          _size="icon"
-          _variant="ghost"
-          className="rounded-full shadow-none"
-          aria-label="Switch language"
-          disabled={isPending}
-          title={"Switch language"}
-        >
-          <GlobeIcon size={16} aria-hidden="true" />
-        </Button>
-      </DropdownMenuTrigger>
+      <TooltipProvider>
+        <Tooltip delayDuration={300}>
+          <DropdownMenuTrigger asChild>
+            <TooltipTrigger asChild>
+              <Button
+                _size="icon"
+                _variant="ghost"
+                className="rounded-full shadow-none"
+                aria-label={buttonText}
+                disabled={isPending}
+              >
+                <GlobeIcon size={16} aria-hidden="true" />
+              </Button>
+            </TooltipTrigger>
+          </DropdownMenuTrigger>
+          <TooltipContent key={locale}>
+            <p>{buttonText}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <DropdownMenuContent loop>
         {(
           Object.entries(MAP_LOCALE_TO_LANGUAGE) as Array<
@@ -71,14 +88,14 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
                     ""
                   );
 
-                  router.replace(pathnameWithoutLocale || "/", {
+                  router.push(pathnameWithoutLocale || "/", {
                     locale: itemLocale,
                   });
                 });
               }}
               className={cn(isCurrentLocale && "bg-slate-200 font-medium")}
             >
-              {label}
+              {label} {itemLocale}
             </DropdownMenuItem>
           );
         })}

@@ -78,7 +78,8 @@
     },
     "buttons": {
       "goToApp": "Перейти в приложение",
-      "viewOnGithub": "Посмотреть на GitHub"
+      "viewOnGithub": "Посмотреть на GitHub",
+      "switchLanguage": "Сменить язык"
     }
   }
 }

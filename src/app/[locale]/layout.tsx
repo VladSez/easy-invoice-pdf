@@ -60,16 +60,12 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: { locale: Locale };
 }>) {
-  // const { isDesktop: isDesktopServer } = await checkDeviceUserAgent();
-
   // Ensure that the incoming `locale` is valid
   const { locale } = params;
+
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
-
-  // Enable static rendering
-  // setRequestLocale(locale);
 
   return (
     <>

@@ -10,7 +10,7 @@ import fs from "node:fs";
 
 const loadTsFileViaJiti = createJiti(fileURLToPath(import.meta.url));
 
-// Validate translations object against schema
+// Validate translations object against schema, that is used to translate pdf fields
 async function validateTranslations() {
   try {
     // Import the translations schema using jiti
@@ -30,7 +30,7 @@ async function validateTranslations() {
   }
 }
 
-// Validate all i18n files
+// Validate all i18n files, that are used to translate the /about page
 async function validatei18n() {
   const messagesDir = path.join(process.cwd(), "messages");
 

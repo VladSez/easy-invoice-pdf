@@ -78,7 +78,8 @@
     },
     "buttons": {
       "goToApp": "Ir a la aplicación",
-      "viewOnGithub": "Ver en GitHub"
+      "viewOnGithub": "Ver en GitHub",
+      "switchLanguage": "Cambiar idioma"
     }
   }
 }

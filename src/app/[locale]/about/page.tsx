@@ -30,6 +30,8 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
 }
 
 function Header({ locale }: { locale: Locale }) {
+  const t = useTranslations("About.buttons");
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
       <div className="flex items-center justify-center">
@@ -38,7 +40,10 @@ function Header({ locale }: { locale: Locale }) {
             <Logo />
 
             <div className="mt-2 flex items-center gap-1 sm:mt-0 sm:gap-2">
-              <LanguageSwitcher locale={locale} />
+              <LanguageSwitcher
+                locale={locale}
+                buttonText={t("switchLanguage")}
+              />
               <GoToAppButton />
             </div>
           </div>

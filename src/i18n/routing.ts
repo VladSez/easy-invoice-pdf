@@ -13,7 +13,7 @@ export const routing = defineRouting({
   // Add locales to the matcher to support specific patterns
   // Configure which paths are not localized
   // For the about page, we'll use locale prefixes (handled by pathnames in routing)
-  localePrefix: "as-needed",
+  localePrefix: "always",
 
   // Define pathnames for our routes
   // pathnames: {
