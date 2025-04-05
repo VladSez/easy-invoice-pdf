@@ -21,9 +21,12 @@ import { useDeviceContext } from "@/contexts/device-context";
 import { Link } from "@/i18n/navigation";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { GithubIcon } from "@/components/etc/github-logo";
+import type { Locale } from "next-intl";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
-export default function Home() {
+export default function Home({ params }: { params: { locale: Locale } }) {
+  const { locale } = params;
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -255,7 +258,7 @@ export default function Home() {
             </div>
           </div>
           <div className="mb-3 mt-2 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-0">
-            <ProjectInfo />
+            <ProjectInfo locale={locale} />
           </div>
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
@@ -272,7 +275,7 @@ export default function Home() {
   );
 }
 
-function ProjectInfo() {
+function ProjectInfo({ locale }: { locale: Locale }) {
   return (
     <>
       <span className="relative bottom-0 text-center text-sm text-gray-900 lg:bottom-3">
@@ -308,6 +311,7 @@ function ProjectInfo() {
         {" | "}
         <Link
           href="/about"
+          locale={locale}
           className="transition-colors hover:text-blue-600 hover:underline"
         >
           About

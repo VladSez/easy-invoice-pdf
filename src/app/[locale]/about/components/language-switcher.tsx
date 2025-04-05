@@ -95,7 +95,7 @@ export function LanguageSwitcher({
               }}
               className={cn(isCurrentLocale && "bg-slate-200 font-medium")}
             >
-              {label} {itemLocale}
+              {label}
             </DropdownMenuItem>
           );
         })}

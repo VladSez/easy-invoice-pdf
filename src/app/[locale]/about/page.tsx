@@ -36,15 +36,16 @@ function Header({ locale }: { locale: Locale }) {
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
       <div className="flex items-center justify-center">
         <div className="container h-auto px-3 py-2 sm:h-16 sm:py-0">
-          <div className="flex h-full flex-col items-start justify-between sm:flex-row sm:items-center sm:justify-between">
-            <Logo />
-
-            <div className="mt-2 flex items-center gap-1 sm:mt-0 sm:gap-2">
+          <div className="flex h-full flex-row flex-wrap items-center justify-between gap-2">
+            <div className="w-[50%]">
+              <Logo />
+            </div>
+            <div className="flex items-center sm:mt-0 sm:gap-2">
               <LanguageSwitcher
                 locale={locale}
                 buttonText={t("switchLanguage")}
               />
-              <GoToAppButton />
+              <GoToAppButton className="" />
             </div>
           </div>
         </div>
@@ -345,9 +346,9 @@ function Logo() {
   return (
     <div>
       <div className="flex items-center gap-1 sm:gap-2">
-        <ProjectLogo className="h-7 w-7 sm:h-8 sm:w-8" />
+        <ProjectLogo className="h-7 w-7 flex-shrink-0 sm:h-8 sm:w-8" />
         <div className="flex flex-col">
-          <p className="text-balance text-lg font-bold text-slate-800 sm:text-xl lg:text-2xl">
+          <p className="text-balance text-base font-bold text-slate-800 sm:text-xl lg:text-2xl">
             <a
               href="https://easyinvoicepdf.com"
               target="_blank"
@@ -356,7 +357,7 @@ function Logo() {
               EasyInvoicePDF.com
             </a>
           </p>
-          <p className="text-[11px] text-slate-700 sm:text-[12px]">
+          <p className="text-balance text-[11px] text-slate-700 sm:text-[12px]">
             Invoice PDF generator with live preview
           </p>
         </div>
