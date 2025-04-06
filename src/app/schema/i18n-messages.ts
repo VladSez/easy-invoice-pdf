@@ -65,6 +65,7 @@ const aboutSchema = z
         keywords: z.string(),
       })
       .strict(),
+    tagline: z.string(),
     hero: z
       .object({
         title: z.string(),

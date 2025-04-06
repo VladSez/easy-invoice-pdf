@@ -20,6 +20,7 @@
     "e2e:ui": "pnpm exec playwright test --ui",
     "dedupe": "pnpm dedupe",
     "lint-stage": "npx lint-staged --verbose",
+    "check-meta": "pnpx check-site-meta",
     "prepare": "husky"
   },
   "dependencies": {

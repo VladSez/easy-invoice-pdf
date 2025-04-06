@@ -1,10 +1,11 @@
 {
   "About": {
     "meta": {
-      "title": "PDF Factuur Generator met Live Voorbeeld | Geen Registratie",
-      "description": "Maak en download direct professionele PDF-facturen met realtime voorbeeld. Gratis en open-source. Geen registratie vereist.",
-      "keywords": "factuurtool, gratis factuur generator, PDF facturen, factuur maker, facturatie software"
+      "title": "PDF-factuur generator met live preview | Geen registratie",
+      "description": "Maak en download direct professionele PDF-facturen met realtime preview. Gratis en open-source. Geen registratie vereist.",
+      "keywords": "facturatietool, gratis factuur generator, PDF-facturen, factuur maker, facturatiesoftware"
     },
+    "tagline": "PDF-factuur generator met live preview",
     "hero": {
       "title": "Maak professionele facturen in seconden",
       "description": "EasyInvoicePDF is een gratis, open-source tool waarmee je professionele PDF-facturen kunt maken, aanpassen en downloaden met realtime voorbeeld.",

@@ -133,7 +133,10 @@ function FeaturesSection() {
       key: "openSource",
       icon: <GithubIcon className="h-10 w-10 text-slate-700" />,
     },
-  ] as const;
+  ] as const satisfies {
+    key: string;
+    icon: React.ReactNode;
+  }[];
 
   return (
     <section
@@ -343,6 +346,8 @@ function GoToAppButton({ className }: { className?: string }) {
 }
 
 function Logo() {
+  const t = useTranslations("About");
+
   return (
     <div>
       <div className="flex items-center gap-1 sm:gap-2">
@@ -358,7 +363,7 @@ function Logo() {
             </a>
           </p>
           <p className="text-balance text-[11px] text-slate-700 sm:text-[12px]">
-            Invoice PDF generator with live preview
+            {t("tagline")}
           </p>
         </div>
       </div>

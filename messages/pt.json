@@ -13,10 +13,11 @@
   },
   "About": {
     "meta": {
-      "title": "Gerador de Faturas PDF com Pré-visualização em Tempo Real | Sem Cadastro",
-      "description": "Crie e baixe faturas PDF profissionais instantaneamente com pré-visualização em tempo real. Gratuito e de código aberto. Não requer cadastro.",
+      "title": "Gerador de faturas PDF com pré-visualização em tempo real | Sem registro",
+      "description": "Crie e baixe faturas PDF profissionais instantaneamente com pré-visualização em tempo real. Gratuito e de código aberto. Sem necessidade de registro.",
       "keywords": "ferramenta de faturamento, gerador de faturas grátis, faturas PDF, criador de faturas, software de faturamento"
     },
+    "tagline": "Gerador de faturas PDF com pré-visualização em tempo real",
     "hero": {
       "title": "Crie faturas profissionais em segundos",
       "description": "EasyInvoicePDF é uma ferramenta gratuita de código aberto que permite criar, personalizar e baixar faturas PDF profissionais com pré-visualização em tempo real.",

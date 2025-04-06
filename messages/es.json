@@ -21,10 +21,11 @@
   },
   "About": {
     "meta": {
-      "title": "Generador de Facturas PDF con Vista Previa en Vivo | Sin Registro",
-      "description": "Cree y descargue facturas PDF profesionales al instante con vista previa en tiempo real. Gratuito y de código abierto. No requiere registro.",
+      "title": "Generador de facturas PDF con vista previa en vivo | Sin registro",
+      "description": "Crea y descarga facturas PDF profesionales al instante con vista previa en tiempo real. Gratis y de código abierto. No requiere registro.",
       "keywords": "herramienta de facturación, generador de facturas gratis, facturas PDF, creador de facturas, software de facturación"
     },
+    "tagline": "Generador de facturas PDF con vista previa en vivo",
     "hero": {
       "title": "Cree facturas profesionales en segundos",
       "description": "EasyInvoicePDF es una herramienta gratuita de código abierto que le permite crear, personalizar y descargar facturas PDF profesionales con vista previa en tiempo real.",

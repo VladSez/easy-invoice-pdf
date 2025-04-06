@@ -1,10 +1,11 @@
 {
   "About": {
     "meta": {
-      "title": "Generatore di Fatture PDF con Anteprima in Tempo Reale | Senza Registrazione",
+      "title": "Generatore di fatture PDF con anteprima in tempo reale | Senza registrazione",
       "description": "Crea e scarica fatture PDF professionali istantaneamente con anteprima in tempo reale. Gratuito e open-source. Nessuna registrazione richiesta.",
-      "keywords": "strumento fatturazione, generatore fatture gratis, fatture PDF, creatore fatture, software fatturazione"
+      "keywords": "strumento di fatturazione, generatore di fatture gratuito, fatture PDF, creatore di fatture, software di fatturazione"
     },
+    "tagline": "Generatore di fatture PDF con anteprima in tempo reale",
     "hero": {
       "title": "Crea fatture professionali in pochi secondi",
       "description": "EasyInvoicePDF è uno strumento gratuito e open-source che ti permette di creare, personalizzare e scaricare fatture PDF professionali con anteprima in tempo reale.",
