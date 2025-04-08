@@ -3,6 +3,7 @@ import { z } from "zod";
 export const SUPPORTED_CURRENCIES = [
   "EUR", // Euro
   "USD", // US Dollar
+  "CAD", // Canadian Dollar
   "GBP", // British Pound
   "PLN", // Polish Złoty
   "RUB", // Russian Ruble
@@ -17,6 +18,7 @@ export type SupportedCurrencies = (typeof SUPPORTED_CURRENCIES)[number];
 export const CURRENCY_SYMBOLS = {
   EUR: "€", // Euro
   USD: "$", // US Dollar
+  CAD: "$", // Canadian Dollar
   GBP: "£", // British Pound
   PLN: "zł", // Polish Złoty
   RUB: "₽", // Russian Ruble

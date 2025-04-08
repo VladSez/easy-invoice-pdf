@@ -72,7 +72,15 @@
     "buttons": {
       "goToApp": "Zur App",
       "viewOnGithub": "Auf GitHub ansehen",
-      "switchLanguage": "Sprache wechseln"
+      "switchLanguage": "Sprache ändern"
+    },
+    "newsletter": {
+      "title": "Newsletter abonnieren",
+      "description": "Erhalten Sie Updates zu neuen Funktionen und Verbesserungen von EasyInvoicePDF.com",
+      "subscribe": "Abonnieren",
+      "placeholder": "E-Mail eingeben",
+      "success": "Vielen Dank für Ihr Abonnement!",
+      "error": "Abonnement fehlgeschlagen. Bitte versuchen Sie es erneut."
     }
   },
   "Error": {

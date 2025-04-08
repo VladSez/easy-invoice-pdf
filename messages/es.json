@@ -81,6 +81,14 @@
       "goToApp": "Ir a la aplicación",
       "viewOnGithub": "Ver en GitHub",
       "switchLanguage": "Cambiar idioma"
+    },
+    "newsletter": {
+      "title": "Suscríbete a nuestro boletín",
+      "description": "Recibe actualizaciones sobre nuevas funciones y mejoras de EasyInvoicePDF.com",
+      "subscribe": "Suscribirse",
+      "placeholder": "Introduce tu email",
+      "success": "¡Gracias por suscribirte!",
+      "error": "Error al suscribirse. Por favor, inténtalo de nuevo."
     }
   }
 }

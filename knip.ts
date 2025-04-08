@@ -13,6 +13,7 @@ const config: KnipConfig = {
     "@types/file-saver",
     "eslint-config-next",
     "@ianvs/prettier-plugin-sort-imports",
+    "react-email",
   ],
   ignore: [
     "lint-staged.config.js",

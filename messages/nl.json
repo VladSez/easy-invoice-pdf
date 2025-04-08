@@ -58,9 +58,17 @@
       "createdBy": "Gemaakt door"
     },
     "buttons": {
-      "goToApp": "Ga naar app",
+      "goToApp": "Ga naar de applicatie",
       "viewOnGithub": "Bekijk op GitHub",
-      "switchLanguage": "Wijzig taal"
+      "switchLanguage": "Verander taal"
+    },
+    "newsletter": {
+      "title": "Abonneer je op onze nieuwsbrief",
+      "description": "Ontvang updates over nieuwe functies en verbeteringen van EasyInvoicePDF.com",
+      "subscribe": "Abonneren",
+      "placeholder": "Voer je e-mail in",
+      "success": "Bedankt voor je aanmelding!",
+      "error": "Aanmelding mislukt. Probeer het opnieuw."
     }
   },
   "NotFound": {

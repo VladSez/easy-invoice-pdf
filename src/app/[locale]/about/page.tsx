@@ -12,6 +12,7 @@ import {
   Share2,
 } from "lucide-react";
 import { LanguageSwitcher } from "./components/language-switcher";
+import { SubscribeInput } from "@/components/subscribe-input";
 
 export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const { locale } = params;
@@ -22,9 +23,10 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
       <main>
         <HeroSection />
         <FeaturesSection />
+        <SubscribeSection locale={locale} />
         <CtaSection />
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }
@@ -184,6 +186,47 @@ function FeaturesSection() {
   );
 }
 
+function SubscribeSection({ locale }: { locale: Locale }) {
+  const tNewsletter = useTranslations("About.newsletter");
+
+  const newsletterTitle = tNewsletter("title");
+  const newsletterDescription = tNewsletter("description");
+  const newsletterSubscribe = tNewsletter("subscribe");
+  const newsletterPlaceholder = tNewsletter("placeholder");
+  const newsletterSuccessMessage = tNewsletter("success");
+  const newsletterErrorMessage = tNewsletter("error");
+
+  return (
+    <section className="flex w-full items-center justify-center bg-white py-12 md:py-24">
+      <div className="container px-4 md:px-6">
+        <div className="flex flex-col items-center justify-center space-y-4 text-center">
+          <div className="space-y-2">
+            <h2 className="text-3xl font-bold tracking-tighter text-slate-900 md:text-4xl/tight">
+              {tNewsletter("title")}
+            </h2>
+            <p className="max-w-[600px] text-slate-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              {tNewsletter("description")}
+            </p>
+          </div>
+          <div className="w-full max-w-md">
+            <SubscribeInput
+              translations={{
+                title: newsletterTitle,
+                description: newsletterDescription,
+                subscribe: newsletterSubscribe,
+                placeholder: newsletterPlaceholder,
+                success: newsletterSuccessMessage,
+                error: newsletterErrorMessage,
+              }}
+              locale={locale}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CtaSection() {
   const t = useTranslations("About");
 
@@ -202,23 +245,24 @@ function CtaSection() {
               {t("cta.description")}
             </p>
           </div>
-          <div className="flex w-full flex-col justify-center gap-2 md:flex-row">
-            <GoToAppButton className="border-slate-600 bg-white text-slate-950 hover:bg-white/90" />
-
-            <Button
-              _size="lg"
-              className="bg-slate-700 px-8 text-white hover:bg-slate-700/90"
-              asChild
-            >
-              <Link
-                href="https://github.com/VladSez/easy-invoice-pdf"
-                target="_blank"
-                rel="noopener noreferrer"
+          <div className="flex w-full flex-col items-center justify-center gap-6">
+            <div className="flex w-full flex-col justify-center gap-2 md:flex-row">
+              <GoToAppButton className="border-slate-600 bg-white text-slate-950 hover:bg-white/90" />
+              <Button
+                _size="lg"
+                className="bg-slate-700 px-8 text-white hover:bg-slate-700/90"
+                asChild
               >
-                <GithubIcon className="mr-2 h-5 w-5 fill-white" />
-                {t("buttons.viewOnGithub")}
-              </Link>
-            </Button>
+                <Link
+                  href="https://github.com/VladSez/easy-invoice-pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <GithubIcon className="mr-2 h-5 w-5 fill-white" />
+                  {t("buttons.viewOnGithub")}
+                </Link>
+              </Button>
+            </div>
           </div>
           <p className="text-sm text-slate-400">{t("cta.noSignup")}</p>
         </div>
@@ -227,8 +271,16 @@ function CtaSection() {
   );
 }
 
-function Footer() {
+function Footer({ locale }: { locale: Locale }) {
   const t = useTranslations("About");
+  const tNewsletter = useTranslations("About.newsletter");
+
+  const newsletterTitle = tNewsletter("title");
+  const newsletterDescription = tNewsletter("description");
+  const newsletterSubscribe = tNewsletter("subscribe");
+  const newsletterPlaceholder = tNewsletter("placeholder");
+  const newsletterSuccessMessage = tNewsletter("success");
+  const newsletterErrorMessage = tNewsletter("error");
 
   return (
     <footer
@@ -267,6 +319,7 @@ function Footer() {
                 rel="noopener noreferrer"
                 className="text-slate-400 hover:text-slate-800"
               >
+                <span className="sr-only">Twitter</span>
                 <svg
                   className="h-5 w-5"
                   fill="currentColor"
@@ -277,6 +330,22 @@ function Footer() {
                 </svg>
                 <span className="sr-only">Twitter</span>
               </Link>
+            </div>
+            <div className="max-w-md space-y-2">
+              <p className="text-sm font-medium text-slate-900">
+                {tNewsletter("title")}
+              </p>
+              <SubscribeInput
+                translations={{
+                  title: newsletterTitle,
+                  description: newsletterDescription,
+                  subscribe: newsletterSubscribe,
+                  placeholder: newsletterPlaceholder,
+                  success: newsletterSuccessMessage,
+                  error: newsletterErrorMessage,
+                }}
+                locale={locale}
+              />
             </div>
           </div>
           <div className="grid grid-cols-1 sm:gap-10 md:flex-1 md:grid-cols-2">

@@ -102,6 +102,16 @@ const aboutSchema = z
         switchLanguage: z.string(),
       })
       .strict(),
+    newsletter: z
+      .object({
+        title: z.string(),
+        description: z.string(),
+        subscribe: z.string(),
+        placeholder: z.string(),
+        success: z.string(),
+        error: z.string(),
+      })
+      .strict(),
   })
   .strict();
 

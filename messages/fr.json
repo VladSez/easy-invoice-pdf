@@ -58,9 +58,17 @@
       "createdBy": "Créé par"
     },
     "buttons": {
-      "goToApp": "Accéder à l'application",
+      "goToApp": "Aller à l'application",
       "viewOnGithub": "Voir sur GitHub",
       "switchLanguage": "Changer de langue"
+    },
+    "newsletter": {
+      "title": "Abonnez-vous à notre newsletter",
+      "description": "Recevez des mises à jour sur les nouvelles fonctionnalités et améliorations d'EasyInvoicePDF.com",
+      "subscribe": "S'abonner",
+      "placeholder": "Entrez votre email",
+      "success": "Merci de votre abonnement !",
+      "error": "Échec de l'abonnement. Veuillez réessayer."
     }
   },
   "NotFound": {
