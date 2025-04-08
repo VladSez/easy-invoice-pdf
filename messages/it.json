@@ -68,7 +68,8 @@
       "subscribe": "Iscriviti",
       "placeholder": "Inserisci la tua email",
       "success": "Grazie per l'iscrizione!",
-      "error": "Iscrizione fallita. Per favore riprova."
+      "error": "Iscrizione fallita. Per favore riprova.",
+      "emailLanguageInfo": "Tutte le email saranno inviate in inglese"
     }
   },
   "NotFound": {

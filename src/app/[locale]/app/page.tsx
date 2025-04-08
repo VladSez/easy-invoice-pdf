@@ -389,6 +389,7 @@ function Footer({ locale }: { locale: Locale }) {
                   placeholder: "Enter your email",
                   success: "Thank you for subscribing!",
                   error: "Failed to subscribe. Please try again.",
+                  emailLanguageInfo: "All emails will be sent in English",
                 }}
                 locale={locale}
               />

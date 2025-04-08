@@ -110,6 +110,7 @@ const aboutSchema = z
         placeholder: z.string(),
         success: z.string(),
         error: z.string(),
+        emailLanguageInfo: z.string(),
       })
       .strict(),
   })

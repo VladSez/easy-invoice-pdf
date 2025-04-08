@@ -88,7 +88,8 @@
       "subscribe": "Suscribirse",
       "placeholder": "Introduce tu email",
       "success": "¡Gracias por suscribirte!",
-      "error": "Error al suscribirse. Por favor, inténtalo de nuevo."
+      "error": "Error al suscribirse. Por favor, inténtalo de nuevo.",
+      "emailLanguageInfo": "Todos los correos se enviarán en inglés"
     }
   }
 }

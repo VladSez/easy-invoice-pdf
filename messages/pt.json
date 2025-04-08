@@ -75,12 +75,13 @@
       "switchLanguage": "Mudar idioma"
     },
     "newsletter": {
-      "title": "Assine nossa newsletter",
+      "title": "Inscreva-se em nossa newsletter",
       "description": "Receba atualizações sobre novos recursos e melhorias do EasyInvoicePDF.com",
-      "subscribe": "Assinar",
+      "subscribe": "Inscrever-se",
       "placeholder": "Digite seu email",
       "success": "Obrigado por se inscrever!",
-      "error": "Falha na inscrição. Por favor, tente novamente."
+      "error": "Falha na inscrição. Por favor, tente novamente.",
+      "emailLanguageInfo": "Todos os emails serão enviados em inglês"
     }
   },
   "Error": {

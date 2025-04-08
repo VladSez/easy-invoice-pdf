@@ -80,7 +80,8 @@
       "subscribe": "Abonnieren",
       "placeholder": "E-Mail eingeben",
       "success": "Vielen Dank für Ihr Abonnement!",
-      "error": "Abonnement fehlgeschlagen. Bitte versuchen Sie es erneut."
+      "error": "Abonnement fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "emailLanguageInfo": "Alle E-Mails werden in englischer Sprache versendet"
     }
   },
   "Error": {

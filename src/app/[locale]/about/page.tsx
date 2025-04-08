@@ -195,6 +195,7 @@ function SubscribeSection({ locale }: { locale: Locale }) {
   const newsletterPlaceholder = tNewsletter("placeholder");
   const newsletterSuccessMessage = tNewsletter("success");
   const newsletterErrorMessage = tNewsletter("error");
+  const newsletterEmailLanguageInfo = tNewsletter("emailLanguageInfo");
 
   return (
     <section className="flex w-full items-center justify-center bg-white py-12 md:py-24">
@@ -217,6 +218,7 @@ function SubscribeSection({ locale }: { locale: Locale }) {
                 placeholder: newsletterPlaceholder,
                 success: newsletterSuccessMessage,
                 error: newsletterErrorMessage,
+                emailLanguageInfo: newsletterEmailLanguageInfo,
               }}
               locale={locale}
             />
@@ -281,7 +283,7 @@ function Footer({ locale }: { locale: Locale }) {
   const newsletterPlaceholder = tNewsletter("placeholder");
   const newsletterSuccessMessage = tNewsletter("success");
   const newsletterErrorMessage = tNewsletter("error");
-
+  const newsletterEmailLanguageInfo = tNewsletter("emailLanguageInfo");
   return (
     <footer
       id="footer"
@@ -343,6 +345,7 @@ function Footer({ locale }: { locale: Locale }) {
                   placeholder: newsletterPlaceholder,
                   success: newsletterSuccessMessage,
                   error: newsletterErrorMessage,
+                  emailLanguageInfo: newsletterEmailLanguageInfo,
                 }}
                 locale={locale}
               />

@@ -53,6 +53,7 @@ export function SubscribeInput({
     placeholder: string;
     success: string;
     error: string;
+    emailLanguageInfo: string;
   };
   locale: Locale;
 }) {
@@ -121,6 +122,9 @@ export function SubscribeInput({
           </form>
         )}
       </div>
+      <p className="mt-2 text-sm text-slate-600">
+        {translations.emailLanguageInfo}
+      </p>
     </div>
   );
 }

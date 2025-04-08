@@ -64,11 +64,12 @@
     },
     "newsletter": {
       "title": "Abonnez-vous à notre newsletter",
-      "description": "Recevez des mises à jour sur les nouvelles fonctionnalités et améliorations d'EasyInvoicePDF.com",
+      "description": "Recevez des mises à jour sur les nouvelles fonctionnalités et améliorations de EasyInvoicePDF.com",
       "subscribe": "S'abonner",
       "placeholder": "Entrez votre email",
       "success": "Merci de votre abonnement !",
-      "error": "Échec de l'abonnement. Veuillez réessayer."
+      "error": "Échec de l'abonnement. Veuillez réessayer.",
+      "emailLanguageInfo": "Tous les emails seront envoyés en anglais"
     }
   },
   "NotFound": {
