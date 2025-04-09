@@ -161,6 +161,10 @@ function FeaturesSection() {
             <p className="max-w-[900px] text-slate-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
               {t("features.description")}
             </p>
+
+            <div className="inline-flex items-center rounded-md border border-amber-200 bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-900 shadow-sm transition-colors">
+              {t("features.comingSoon")}
+            </div>
           </div>
         </div>
         <div className="mx-auto grid max-w-5xl items-center gap-6 pt-10 md:grid-cols-2 md:gap-10 lg:grid-cols-3">

@@ -17,29 +17,21 @@ test.describe("Invoice Generator Page", () => {
     await page.goto("/");
   });
 
-  test("has correct title and branding", async ({ page }) => {
-    await expect(page).toHaveTitle(
-      "Invoice PDF Generator with Live Preview | No Sign-Up"
-    );
-    await expect(
-      page.getByRole("link", { name: "EasyInvoicePDF.com" })
-    ).toBeVisible();
-
-    await expect(
-      page.getByText("Invoice PDF generator with live preview")
-    ).toBeVisible();
-  });
-
   test("displays correct buttons and links in header", async ({ page }) => {
     // Check title and branding
     await expect(page).toHaveTitle(
       "Invoice PDF Generator with Live Preview | No Sign-Up"
     );
+
+    const header = page.getByTestId("header");
+    await expect(header).toBeVisible();
+
     await expect(
-      page.getByRole("link", { name: "EasyInvoicePDF.com" })
+      header.getByRole("link", { name: "EasyInvoicePDF.com" })
     ).toBeVisible();
+
     await expect(
-      page.getByText("Invoice PDF generator with live preview")
+      header.getByText("Invoice PDF generator with live preview")
     ).toBeVisible();
 
     // Check main action buttons
@@ -53,22 +45,23 @@ test.describe("Invoice Generator Page", () => {
       page.getByRole("link", { name: "Download PDF in English" })
     ).toBeVisible();
 
-    // Check footer links
-    await expect(page.getByText("Made by")).toBeVisible();
+    await expect(header.getByText("Made by")).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Vlad Sazonau" })
+      header.getByRole("link", { name: "Vlad Sazonau" })
     ).toBeVisible();
-    await expect(page.getByRole("link", { name: "Open Source" })).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Share your feedback" })
+      header.getByRole("link", { name: "Open Source" })
+    ).toBeVisible();
+    await expect(
+      header.getByRole("link", { name: "Share your feedback" })
     ).toBeVisible();
 
     // Verify links have correct href attributes
     await expect(
-      page.getByRole("link", { name: "Vlad Sazonau" })
+      header.getByRole("link", { name: "Vlad Sazonau" })
     ).toHaveAttribute("href", "https://dub.sh/vldzn.me");
     await expect(
-      page.getByRole("link", { name: "Open Source" })
+      header.getByRole("link", { name: "Open Source" })
     ).toHaveAttribute(
       "href",
       "https://github.com/VladSez/pdf-invoice-generator"

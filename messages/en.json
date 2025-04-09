@@ -15,6 +15,7 @@
       "badge": "Features",
       "title": "Everything you need for professional invoicing",
       "description": "Our simple yet powerful invoice generator includes all the features you need to create professional invoices quickly.",
+      "comingSoon": "Pro version and API coming soon",
       "items": {
         "livePreview": {
           "title": "Live Preview",

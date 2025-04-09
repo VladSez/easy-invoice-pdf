@@ -43,6 +43,7 @@ const aboutFeaturesSchema = z
     badge: z.string(),
     title: z.string(),
     description: z.string(),
+    comingSoon: z.string(),
     items: z
       .object({
         livePreview: aboutFeaturesItemSchema,

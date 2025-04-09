@@ -4,6 +4,7 @@ export const SUPPORTED_CURRENCIES = [
   "EUR", // Euro
   "USD", // US Dollar
   "CAD", // Canadian Dollar
+  "AUD", // Australian Dollar
   "GBP", // British Pound
   "PLN", // Polish Złoty
   "RUB", // Russian Ruble
@@ -12,6 +13,8 @@ export const SUPPORTED_CURRENCIES = [
   "BRL", // Brazilian Real
   "MXN", // Mexican Peso
   "ARS", // Argentine Peso
+  "INR", // Indian Rupee
+  "CHF", // Swiss Franc
 ] as const;
 export type SupportedCurrencies = (typeof SUPPORTED_CURRENCIES)[number];
 
@@ -19,6 +22,7 @@ export const CURRENCY_SYMBOLS = {
   EUR: "€", // Euro
   USD: "$", // US Dollar
   CAD: "$", // Canadian Dollar
+  AUD: "$", // Australian Dollar
   GBP: "£", // British Pound
   PLN: "zł", // Polish Złoty
   RUB: "₽", // Russian Ruble
@@ -27,6 +31,8 @@ export const CURRENCY_SYMBOLS = {
   BRL: "R$", // Brazilian Real
   MXN: "$", // Mexican Peso
   ARS: "$", // Argentine Peso
+  INR: "₹", // Indian Rupee
+  CHF: "Fr", // Swiss Franc
 } as const satisfies Record<SupportedCurrencies, string>;
 
 export const SUPPORTED_LANGUAGES = [

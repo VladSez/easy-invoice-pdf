@@ -192,76 +192,77 @@ export default function Home({ params }: { params: { locale: Locale } }) {
     <TooltipProvider delayDuration={0}>
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 sm:p-4">
         <div className="w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6">
-          <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
-            <div className="relative bottom-3 mt-3 flex flex-col items-center justify-center sm:mt-0">
-              <div className="flex items-center">
-                <ProjectLogo className="h-8 w-8" />
-                <p className="text-balance text-center text-xl font-bold text-slate-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
-                  <a
-                    href="https://easyinvoicepdf.com"
+          <div data-testid="header">
+            <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
+              <div className="relative bottom-3 mt-3 flex flex-col items-center justify-center sm:mt-0">
+                <div className="flex items-center">
+                  <ProjectLogo className="h-8 w-8" />
+                  <p className="text-balance text-center text-xl font-bold text-slate-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
+                    <a
+                      href="https://easyinvoicepdf.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      EasyInvoicePDF.com
+                    </a>
+                  </p>
+                </div>
+                <p className="relative bottom-1.5 left-[49px] text-[12px] text-slate-700">
+                  Invoice PDF generator with live preview
+                </p>
+              </div>
+              <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
+                <Button
+                  asChild
+                  className="mx-2 w-full bg-blue-500 text-white transition-all hover:scale-105 hover:bg-blue-600 hover:no-underline lg:mx-0 lg:w-auto"
+                  _variant="link"
+                  onClick={() => {
+                    // analytics track event
+                    umamiTrackEvent("donate_to_project_button_clicked_header");
+                  }}
+                >
+                  <Link
+                    href="https://dub.sh/easyinvoice-donate"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    EasyInvoicePDF.com
-                  </a>
-                </p>
-              </div>
-              <p className="relative bottom-1.5 left-[49px] text-[12px] text-slate-700">
-                Invoice PDF generator with live preview
-              </p>
-            </div>
-            <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
-              <Button
-                asChild
-                className="mx-2 w-full bg-blue-500 text-white transition-all hover:scale-105 hover:bg-blue-600 hover:no-underline lg:mx-0 lg:w-auto"
-                _variant="link"
-                onClick={() => {
-                  // analytics track event
-                  umamiTrackEvent("donate_to_project_button_clicked_header");
-                }}
-              >
-                <Link
-                  href="https://dub.sh/easyinvoice-donate"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span className="flex items-center space-x-1.5">
-                    <span className="animate-heartbeat">❤️</span>
-                    <span>Support Project</span>
-                  </span>
-                </Link>
-              </Button>
+                    <span className="flex items-center space-x-1.5">
+                      <span className="animate-heartbeat">❤️</span>
+                      <span>Support Project</span>
+                    </span>
+                  </Link>
+                </Button>
 
-              {isDesktop ? (
-                <>
-                  <CustomTooltip
-                    trigger={
-                      <Button
-                        onClick={handleShareInvoice}
-                        _variant="outline"
-                        className="mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
-                      >
-                        Generate a link to invoice
-                      </Button>
-                    }
-                    content="Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
-                  />
-                  <InvoicePDFDownloadLink invoiceData={invoiceDataState} />
-                </>
-              ) : null}
+                {isDesktop ? (
+                  <>
+                    <CustomTooltip
+                      trigger={
+                        <Button
+                          onClick={handleShareInvoice}
+                          _variant="outline"
+                          className="mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
+                        >
+                          Generate a link to invoice
+                        </Button>
+                      }
+                      content="Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
+                    />
+                    <InvoicePDFDownloadLink invoiceData={invoiceDataState} />
+                  </>
+                ) : null}
 
-              {/* TODO: add later when PRO version is released, this is PRO FEATURE =) */}
-              {/* {isDesktop ? (
+                {/* TODO: add later when PRO version is released, this is PRO FEATURE =) */}
+                {/* {isDesktop ? (
                 <InvoicePDFDownloadMultipleLanguages
                   invoiceData={invoiceDataState}
                 />
               ) : null} */}
+              </div>
+            </div>
+            <div className="mb-3 mt-2 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-0">
+              <ProjectInfo />
             </div>
           </div>
-          <div className="mb-3 mt-2 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-0">
-            <ProjectInfo />
-          </div>
-
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
             <InvoiceClientPage
               invoiceDataState={invoiceDataState}

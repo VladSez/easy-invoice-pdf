@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import pdf from "pdf-parse";
 
-const TEST_DOWNLOADS_DIR = "test-downloads";
+const getDownloadDir = (browserName: string) => `test-downloads-${browserName}`;
 
 /**
  * We can't test the PDF preview because it's not supported in Playwright.
@@ -13,10 +13,13 @@ const TEST_DOWNLOADS_DIR = "test-downloads";
  * we download pdf file and parse the content to verify the invoice data
  */
 test.describe("PDF Preview", () => {
-  test.beforeAll(async () => {
-    // Ensure test-downloads directory exists
+  let downloadDir: string;
+
+  test.beforeAll(async ({ browserName }) => {
+    downloadDir = getDownloadDir(browserName);
+    // Ensure browser-specific test-downloads directory exists
     try {
-      await fs.promises.mkdir(TEST_DOWNLOADS_DIR);
+      await fs.promises.mkdir(downloadDir);
     } catch (error) {
       // Handle specific error cases if needed
       if ((error as NodeJS.ErrnoException).code !== "EEXIST") {
@@ -26,14 +29,12 @@ test.describe("PDF Preview", () => {
   });
 
   test.afterEach(async () => {
-    // Clean up all files in test-downloads directory
+    // Clean up all files in browser-specific test-downloads directory
     try {
-      const files = await fs.promises.readdir(TEST_DOWNLOADS_DIR);
+      const files = await fs.promises.readdir(downloadDir);
 
       await Promise.all(
-        files.map((file) =>
-          fs.promises.unlink(path.join(TEST_DOWNLOADS_DIR, file))
-        )
+        files.map((file) => fs.promises.unlink(path.join(downloadDir, file)))
       );
     } catch (error) {
       // Handle specific error cases if needed
@@ -45,9 +46,9 @@ test.describe("PDF Preview", () => {
   });
 
   test.afterAll(async () => {
-    // Remove the test-downloads directory itself
+    // Remove the browser-specific test-downloads directory itself
     try {
-      await fs.promises.rmdir(TEST_DOWNLOADS_DIR);
+      await fs.promises.rmdir(downloadDir);
     } catch (error) {
       // Handle specific error cases if needed
       // ENOENT means "no such file or directory" - ignore this expected error
@@ -61,7 +62,10 @@ test.describe("PDF Preview", () => {
     await page.goto("/");
   });
 
-  test("downloads PDF in English and verifies content", async ({ page }) => {
+  test("downloads PDF in English and verifies content", async ({
+    page,
+    browserName,
+  }) => {
     // Set up download handler
     const downloadPromise = page.waitForEvent("download");
 
@@ -81,8 +85,8 @@ test.describe("PDF Preview", () => {
     // Get the suggested filename
     const suggestedFilename = download.suggestedFilename();
 
-    // Save the file to a temporary location
-    const tmpPath = path.join(TEST_DOWNLOADS_DIR, suggestedFilename);
+    // Save the file to a browser-specific temporary location
+    const tmpPath = path.join(getDownloadDir(browserName), suggestedFilename);
     await download.saveAs(tmpPath);
 
     // Read and verify PDF content using pdf-parse
@@ -139,7 +143,7 @@ Created with https://easyinvoicepdf.com`);
     const suggestedFilename = download.suggestedFilename();
 
     // Save the file to a temporary location
-    const tmpPath = path.join(TEST_DOWNLOADS_DIR, suggestedFilename);
+    const tmpPath = path.join(downloadDir, suggestedFilename);
     await download.saveAs(tmpPath);
 
     // Read and verify PDF content using pdf-parse
@@ -168,7 +172,10 @@ Kwota słownie: zero EUR 00/100`);
     expect(pdfData.text).toContain("Created with https://easyinvoicepdf.com");
   });
 
-  test("update pdf when invoice data changes", async ({ page }) => {
+  test("update pdf when invoice data changes", async ({
+    page,
+    browserName,
+  }) => {
     // Switch to another currency
     await page.getByRole("combobox", { name: "Currency" }).selectOption("GBP");
 
@@ -261,8 +268,8 @@ Kwota słownie: zero EUR 00/100`);
     // Get the suggested filename
     const suggestedFilename = download.suggestedFilename();
 
-    // Save the file to a temporary location
-    const tmpPath = path.join(TEST_DOWNLOADS_DIR, suggestedFilename);
+    // Save the file to a browser-specific temporary location
+    const tmpPath = path.join(getDownloadDir(browserName), suggestedFilename);
     await download.saveAs(tmpPath);
 
     // Read and verify PDF content using pdf-parse
@@ -305,6 +312,7 @@ Created with https://easyinvoicepdf.com`);
 
   test("completes full invoice flow on mobile: tabs navigation, form editing and PDF download", async ({
     page,
+    browserName,
   }) => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
@@ -387,8 +395,8 @@ Created with https://easyinvoicepdf.com`);
     // Get the suggested filename
     const suggestedFilename = download.suggestedFilename();
 
-    // Save the file to a temporary location
-    const tmpPath = path.join(TEST_DOWNLOADS_DIR, suggestedFilename);
+    // Save the file to a browser-specific temporary location
+    const tmpPath = path.join(getDownloadDir(browserName), suggestedFilename);
     await download.saveAs(tmpPath);
 
     // Read and verify PDF content using pdf-parse
