@@ -151,7 +151,10 @@ function FeaturesSection() {
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <div className="mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-sm transition-colors">
+            <div
+              className="mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-sm transition-colors"
+              data-testid="features-badge"
+            >
               {t("features.badge")}
             </div>
 
@@ -161,10 +164,12 @@ function FeaturesSection() {
             <p className="max-w-[900px] text-slate-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
               {t("features.description")}
             </p>
-
-            <div className="inline-flex items-center rounded-md border border-amber-200 bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-900 shadow-sm transition-colors">
-              {t("features.comingSoon")}
-            </div>
+          </div>
+          <div
+            className="inline-flex items-center rounded-md border border-amber-200 bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-900 shadow-sm transition-colors"
+            data-testid="features-coming-soon"
+          >
+            {t("features.comingSoon")}
           </div>
         </div>
         <div className="mx-auto grid max-w-5xl items-center gap-6 pt-10 md:grid-cols-2 md:gap-10 lg:grid-cols-3">
@@ -301,7 +306,10 @@ function Footer({ locale }: { locale: Locale }) {
           <div className="space-y-4 md:w-1/3">
             <Logo />
             <p className="text-sm text-slate-500">{t("footer.description")}</p>
-            <div className="flex gap-4">
+            <div
+              className="flex gap-4"
+              data-testid="about-page-footer-social-links"
+            >
               <Link
                 href="https://github.com/VladSez/easy-invoice-pdf"
                 target="_blank"
@@ -364,7 +372,7 @@ function Footer({ locale }: { locale: Locale }) {
               <h3 className="text-sm font-medium text-slate-900">
                 {t("footer.product")}
               </h3>
-              <ul className="space-y-2">
+              <ul className="space-y-2" data-testid="about-page-footer-links">
                 <li>
                   <Link
                     href="#features"

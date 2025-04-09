@@ -77,6 +77,7 @@ export function SubscribeInput({
           </div>
         ) : (
           <form
+            data-testid="subscribe-form"
             action={async (formData) => {
               const result = await subscribeAction(formData, locale);
 

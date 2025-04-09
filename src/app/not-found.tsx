@@ -1,5 +1,5 @@
 "use client";
-// page needs to be "use client" here
+// page needs to be "use client" here to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
 
 import { useTranslations } from "next-intl";
 import Link from "next/link";
