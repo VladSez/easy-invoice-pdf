@@ -299,7 +299,9 @@ test.describe("Invoice Generator Page", () => {
 
     // Amount field and visibility toggle
     await expect(
-      invoiceItemsSection.getByRole("spinbutton", { name: "Amount" })
+      invoiceItemsSection.getByRole("spinbutton", {
+        name: "Amount (Quantity)",
+      })
     ).toHaveValue(firstItem.amount.toString());
     await expect(
       invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(2)
@@ -315,7 +317,9 @@ test.describe("Invoice Generator Page", () => {
 
     // Net Price field and visibility toggle
     await expect(
-      invoiceItemsSection.getByRole("spinbutton", { name: "Net Price" })
+      invoiceItemsSection.getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
     ).toHaveValue(firstItem.netPrice.toString());
     await expect(
       invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(4)
@@ -415,10 +419,13 @@ test.describe("Invoice Generator Page", () => {
 
     // Fill in item details
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount", exact: true })
+      .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
       .fill("2");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Net Price", exact: true })
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+        exact: true,
+      })
       .fill("100");
     await invoiceItemsSection
       .getByRole("textbox", { name: "VAT", exact: true })
@@ -552,10 +559,13 @@ test.describe("Invoice Generator Page", () => {
 
     // Verify calculations with new currency
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount", exact: true })
+      .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
       .fill("2");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Net Price", exact: true })
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+        exact: true,
+      })
       .fill("100.75");
 
     await expect(netPriceFormElement).toHaveText("$USD");
@@ -738,7 +748,7 @@ test.describe("Invoice Generator Page", () => {
 
     // **AMOUNT FIELD**
     const amountInput = invoiceItemsSection.getByRole("spinbutton", {
-      name: "Amount",
+      name: "Amount (Quantity)",
     });
 
     // Test invalid values
@@ -873,11 +883,11 @@ test.describe("Invoice Generator Page", () => {
 
     const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
     const amountInput = invoiceItemsSection.getByRole("spinbutton", {
-      name: "Amount",
+      name: "Amount (Quantity)",
       exact: true,
     });
     const netPriceInput = invoiceItemsSection.getByRole("spinbutton", {
-      name: "Net Price",
+      name: "Net Price (Rate or Unit Price)",
       exact: true,
     });
     const vatInput = invoiceItemsSection.getByRole("textbox", {
@@ -949,10 +959,12 @@ test.describe("Invoice Generator Page", () => {
     // Fill in an invoice item
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount" })
+      .getByRole("spinbutton", { name: "Amount (Quantity)" })
       .fill("5");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Net Price" })
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
       .fill("100");
     await invoiceItemsSection
       .getByRole("textbox", { name: "VAT", exact: true })
@@ -1001,10 +1013,14 @@ test.describe("Invoice Generator Page", () => {
     // Verify invoice item
     const newInvoiceItemsSection = newPage.getByTestId("invoice-items-section");
     await expect(
-      newInvoiceItemsSection.getByRole("spinbutton", { name: "Amount" })
+      newInvoiceItemsSection.getByRole("spinbutton", {
+        name: "Amount (Quantity)",
+      })
     ).toHaveValue("5");
     await expect(
-      newInvoiceItemsSection.getByRole("spinbutton", { name: "Net Price" })
+      newInvoiceItemsSection.getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
     ).toHaveValue("100");
     await expect(
       newInvoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true })

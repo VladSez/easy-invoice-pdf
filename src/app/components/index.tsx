@@ -16,7 +16,7 @@ const InvoicePDFViewer = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px]">
+      <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
         <div className="text-center">
           <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
           <p className="text-gray-600">Loading PDF viewer...</p>
@@ -62,7 +62,7 @@ export function InvoiceClientPage({
               </TabsTrigger>
             </TabsList>
             <TabsContent value={TAB_INVOICE_FORM} className="mt-1">
-              <div className="h-[460px] overflow-auto rounded-lg border-b px-3 shadow-sm">
+              <div className="h-[480px] overflow-auto rounded-lg border-b px-3 shadow-sm">
                 <InvoiceForm
                   invoiceData={invoiceDataState}
                   onInvoiceDataChange={handleInvoiceDataChange}
@@ -70,7 +70,7 @@ export function InvoiceClientPage({
               </div>
             </TabsContent>
             <TabsContent value={TAB_INVOICE_PREVIEW} className="mt-1">
-              <div className="h-[445px] w-full">
+              <div className="h-[480px] w-full">
                 <InvoicePDFViewer>
                   <InvoicePdfTemplate invoiceData={invoiceDataState} />
                 </InvoicePDFViewer>
@@ -97,14 +97,14 @@ export function InvoiceClientPage({
         // Desktop View
         <>
           <div className="col-span-4">
-            <div className="h-[620px] overflow-auto border-b px-3 pl-0">
+            <div className="h-[620px] overflow-auto border-b px-3 pl-0 2xl:h-[700px]">
               <InvoiceForm
                 invoiceData={invoiceDataState}
                 onInvoiceDataChange={handleInvoiceDataChange}
               />
             </div>
           </div>
-          <div className="col-span-8 h-[620px] w-full max-w-full">
+          <div className="col-span-8 h-[620px] w-full max-w-full 2xl:h-[700px]">
             <InvoicePDFViewer>
               <InvoicePdfTemplate invoiceData={invoiceDataState} />
             </InvoicePDFViewer>

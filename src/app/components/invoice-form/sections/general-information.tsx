@@ -58,7 +58,8 @@ export const GeneralInformation = memo(function GeneralInformation({
     "day"
   );
 
-  const extractInvoiceMonthAndYear = invoiceNumber?.split("/")?.[1];
+  // extract the month and year from the invoice number (e.g. 01-2025)
+  const extractInvoiceMonthAndYear = /(\d{2}-\d{4})/.exec(invoiceNumber)?.[1];
 
   const isInvoiceNumberInCurrentMonth =
     extractInvoiceMonthAndYear === dayjs().format("MM-YYYY");
@@ -195,8 +196,7 @@ export const GeneralInformation = memo(function GeneralInformation({
         {!isInvoiceNumberInCurrentMonth && !errors.invoiceNumber ? (
           <InputHelperMessage>
             <span className="flex items-center text-balance">
-              <AlertIcon />
-              Invoice number does not match current month
+              Looks like the invoice number does not match current month
             </span>
 
             <ButtonHelper

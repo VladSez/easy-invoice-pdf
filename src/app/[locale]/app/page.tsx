@@ -190,8 +190,8 @@ export default function Home({ params }: { params: { locale: Locale } }) {
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 sm:p-4">
-        <div className="w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6">
+      <div className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
+        <div className="w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 2xl:max-w-[1680px]">
           <div data-testid="header">
             <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
               <div className="relative bottom-3 mt-3 flex flex-col items-center justify-center sm:mt-0">

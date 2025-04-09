@@ -233,11 +233,15 @@ Kwota słownie: zero EUR 00/100`);
     const invoiceSection = page.getByTestId(`invoice-items-section`);
 
     // Amount field
-    await invoiceSection.getByRole("spinbutton", { name: "Amount" }).fill("3");
+    await invoiceSection
+      .getByRole("spinbutton", { name: "Amount (Quantity)" })
+      .fill("3");
 
     // Net price field
     await invoiceSection
-      .getByRole("spinbutton", { name: "Net price" })
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
       .fill("1000");
 
     // Toggle VAT Table Summary visibility off
@@ -355,10 +359,12 @@ Created with https://easyinvoicepdf.com`);
     // Fill in an invoice item
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount" })
+      .getByRole("spinbutton", { name: "Amount (Quantity)" })
       .fill("3");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Net Price" })
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
       .fill("50");
     await invoiceItemsSection
       .getByRole("textbox", { name: "VAT", exact: true })
@@ -450,10 +456,14 @@ Pozostało do zapłaty: 184.50 EUR`);
 
     // Verify invoice item persists
     await expect(
-      invoiceItemsSection.getByRole("spinbutton", { name: "Amount" })
+      invoiceItemsSection.getByRole("spinbutton", {
+        name: "Amount (Quantity)",
+      })
     ).toHaveValue("3");
     await expect(
-      invoiceItemsSection.getByRole("spinbutton", { name: "Net Price" })
+      invoiceItemsSection.getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
     ).toHaveValue("50");
     await expect(
       invoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true })

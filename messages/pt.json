@@ -46,8 +46,8 @@
           "description": "Crie faturas em sete idiomas com suporte para todas as principais moedas e formatação automática."
         },
         "vatSupport": {
-          "title": "Suporte a IVA",
-          "description": "Calcule automaticamente taxas e totais de IVA com suporte para diferentes jurisdições fiscais."
+          "title": "Suporte a VAT Europeu",
+          "description": "Calcule automaticamente taxas e totais de VAT com suporte para jurisdições fiscais europeias."
         },
         "openSource": {
           "title": "Código Aberto",

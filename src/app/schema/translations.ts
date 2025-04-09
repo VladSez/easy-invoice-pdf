@@ -82,6 +82,7 @@ export const translationSchema = z
     paymentTotals: paymentTotalsTranslationSchema,
     personAuthorizedToReceive: z.string(),
     personAuthorizedToIssue: z.string(),
+    createdWith: z.string(),
   })
   .strict();
 
@@ -147,6 +148,7 @@ export const TRANSLATIONS = {
     },
     personAuthorizedToReceive: "Person authorized to receive",
     personAuthorizedToIssue: "Person authorized to issue",
+    createdWith: "Created with",
   },
   pl: {
     invoiceNumber: "Faktura nr",
@@ -197,6 +199,7 @@ export const TRANSLATIONS = {
     },
     personAuthorizedToReceive: "Osoba upoważniona do odbioru",
     personAuthorizedToIssue: "Osoba upoważniona do wystawienia",
+    createdWith: "Utworzono za pomocą",
   },
   de: {
     invoiceNumber: "Rechnungsnummer",
@@ -247,6 +250,7 @@ export const TRANSLATIONS = {
     },
     personAuthorizedToReceive: "Empfangsberechtigte Person",
     personAuthorizedToIssue: "Ausstellungsberechtigte Person",
+    createdWith: "Erstellt mit",
   },
   es: {
     invoiceNumber: "Factura N°",
@@ -297,6 +301,7 @@ export const TRANSLATIONS = {
     },
     personAuthorizedToReceive: "Persona autorizada para recibir",
     personAuthorizedToIssue: "Persona autorizada para emitir",
+    createdWith: "Creado con",
   },
   pt: {
     invoiceNumber: "Fatura N°",
@@ -347,6 +352,7 @@ export const TRANSLATIONS = {
     },
     personAuthorizedToReceive: "Pessoa autorizada a receber",
     personAuthorizedToIssue: "Pessoa autorizada a emitir",
+    createdWith: "Criado com",
   },
   ru: {
     invoiceNumber: "Инвойс №",
@@ -397,6 +403,7 @@ export const TRANSLATIONS = {
     },
     personAuthorizedToReceive: "Уполномоченное лицо на получение",
     personAuthorizedToIssue: "Уполномоченное лицо на выставление",
+    createdWith: "Создано с помощью",
   },
   uk: {
     invoiceNumber: "Рахунок-фактура №",
@@ -447,6 +454,7 @@ export const TRANSLATIONS = {
     },
     personAuthorizedToReceive: "Уповноважена особа на отримання",
     personAuthorizedToIssue: "Уповноважена особа на виставлення",
+    createdWith: "Створено за допомогою",
   },
   fr: {
     invoiceNumber: "Facture N°",
@@ -497,6 +505,7 @@ export const TRANSLATIONS = {
     },
     personAuthorizedToReceive: "Personne autorisée à recevoir",
     personAuthorizedToIssue: "Personne autorisée à émettre",
+    createdWith: "Créé avec",
   },
   it: {
     invoiceNumber: "Fattura N°",
@@ -547,6 +556,7 @@ export const TRANSLATIONS = {
     },
     personAuthorizedToReceive: "Persona autorizzata a ricevere",
     personAuthorizedToIssue: "Persona autorizzata a emettere",
+    createdWith: "Creato con",
   },
   nl: {
     invoiceNumber: "Factuurnummer",
@@ -597,5 +607,6 @@ export const TRANSLATIONS = {
     },
     personAuthorizedToReceive: "Persoon gemachtigd voor ontvangst",
     personAuthorizedToIssue: "Persoon gemachtigd voor uitgifte",
+    createdWith: "Gemaakt met",
   },
 } as const satisfies Record<SupportedLanguages, TranslationSchema>;

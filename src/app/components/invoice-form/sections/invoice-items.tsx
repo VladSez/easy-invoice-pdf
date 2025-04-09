@@ -244,7 +244,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               <div>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemAmount${index}`} className="">
-                    Amount
+                    Amount (Quantity)
                   </Label>
 
                   {/* Show/hide Amount field in PDF switch */}
@@ -367,7 +367,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               <div>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemNetPrice${index}`} className="">
-                    Net Price
+                    Net Price (Rate or Unit Price)
                   </Label>
 
                   {/* Show/hide Net Price field in PDF switch */}

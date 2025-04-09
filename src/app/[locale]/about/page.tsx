@@ -212,7 +212,7 @@ function SubscribeSection({ locale }: { locale: Locale }) {
             <h2 className="text-3xl font-bold tracking-tighter text-slate-900 md:text-4xl/tight">
               {tNewsletter("title")}
             </h2>
-            <p className="max-w-[600px] text-slate-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+            <p className="max-w-[600px] text-slate-600 lg:text-base/relaxed xl:text-xl/relaxed">
               {tNewsletter("description")}
             </p>
           </div>

@@ -184,6 +184,9 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
 }: {
   invoiceData: InvoiceData;
 }) {
+  const language = invoiceData.language;
+  const t = TRANSLATIONS[language];
+
   const formattedInvoiceTotal = useMemo(() => {
     return invoiceData?.total
       .toLocaleString("en-US", {
@@ -192,9 +195,6 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
       })
       .replaceAll(",", " ");
   }, [invoiceData?.total]);
-
-  const language = invoiceData.language;
-  const t = TRANSLATIONS[language];
 
   const invoiceDocTitle = useMemo(() => {
     return `${t.invoiceNumber} ${invoiceData.invoiceNumber} | Created with https://easyinvoicepdf.com`;
@@ -282,7 +282,7 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
         {/* Footer  */}
         <View style={styles.footer}>
           <Text style={[styles.fontSize9]}>
-            Created with{" "}
+            {t.createdWith}{" "}
             <Link
               style={[styles.fontSize9, { color: "blue" }]}
               src={PROD_WEBSITE_URL}
