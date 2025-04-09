@@ -1,11 +1,17 @@
-"use client";
-// page needs to be "use client" here
-
-import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { hasLocale, useTranslations, type Locale } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
+import { routing } from "@/i18n/routing";
 
-export default function NotFound() {
+export default function NotFound({ params }: { params?: { locale: Locale } }) {
   const t = useTranslations("NotFound");
+
+  const locale = params?.locale;
+
+  if (hasLocale(routing.locales, locale)) {
+    // Enables static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
+    setRequestLocale(locale);
+  }
 
   return (
     <div className="flex h-screen w-full items-center justify-center font-sans">

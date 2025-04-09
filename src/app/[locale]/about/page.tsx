@@ -17,7 +17,7 @@ import { setRequestLocale } from "next-intl/server";
 export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const { locale } = params;
 
-  // Enable static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
+  // Enables static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
   setRequestLocale(locale);
 
   return (
