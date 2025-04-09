@@ -13,9 +13,12 @@ import {
 } from "lucide-react";
 import { LanguageSwitcher } from "./components/language-switcher";
 import { SubscribeInput } from "@/components/subscribe-input";
-
+import { setRequestLocale } from "next-intl/server";
 export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const { locale } = params;
+
+  // Enable static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
+  setRequestLocale(locale);
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">

@@ -63,6 +63,8 @@ export default async function RootLayout({
   // Ensure that the incoming `locale` is valid
   const { locale } = params;
 
+  // Validate that the locale from the URL params exists in our supported locales
+  // If not found, redirect to the 404 page using Next.js notFound() function
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }

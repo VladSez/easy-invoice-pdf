@@ -83,7 +83,7 @@ export default async function AboutLocaleLayout({
     notFound();
   }
 
-  // Enable static rendering
+  // Enable static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
   setRequestLocale(locale);
 
   // return children;

@@ -1,7 +1,21 @@
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { hasLocale, useTranslations, type Locale } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
+import { routing } from "@/i18n/routing";
 
-export default function NotFound() {
+export default function NotFound({ params }: { params?: { locale: Locale } }) {
+  // Default to 'en' if no locale provided
+  const locale = params?.locale || "en";
+
+  // Validate locale before setting
+  if (!hasLocale(routing.locales, locale)) {
+    // If invalid locale, default to 'en'
+    setRequestLocale("en");
+  } else {
+    // Enable static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
+    setRequestLocale(locale);
+  }
+
   const t = useTranslations("NotFound");
 
   return (
