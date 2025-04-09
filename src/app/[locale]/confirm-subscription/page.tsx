@@ -2,6 +2,7 @@ import { verifySubscriptionToken } from "@/utils/subscription-token";
 import { resend } from "@/utils/resend";
 import { redirect } from "next/navigation";
 import { Link } from "@/i18n/navigation";
+import { headers } from "next/headers";
 
 interface PageProps {
   searchParams: { token?: string };
@@ -16,7 +17,11 @@ export default async function ConfirmSubscriptionPage({
     redirect("/");
   }
 
-  const { email, isValid } = await verifySubscriptionToken(token);
+  // Get IP address for rate limiting
+  const forwardedFor = headers().get("x-forwarded-for");
+  const ip = forwardedFor?.split(",")[0] || "127.0.0.1";
+
+  const { email, isValid, error } = await verifySubscriptionToken(token, ip);
 
   if (!isValid) {
     return (
@@ -24,11 +29,15 @@ export default async function ConfirmSubscriptionPage({
         <h1 className="text-2xl font-bold text-red-600">
           Invalid or Expired Link
         </h1>
-        <Text>
-          This confirmation link is invalid or has expired. Please try
-          subscribing again on the{" "}
-          <CustomEmailLink href="/about">about page</CustomEmailLink>
-        </Text>
+        {error ? (
+          <Text>{error}</Text>
+        ) : (
+          <Text>
+            This confirmation link is invalid or has expired. Please try
+            subscribing again on the{" "}
+            <CustomEmailLink href="/about">about page</CustomEmailLink>
+          </Text>
+        )}
       </div>
     );
   }

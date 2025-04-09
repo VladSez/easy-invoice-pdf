@@ -1,7 +1,17 @@
 import { randomBytes } from "crypto";
 import { redis } from "./redis";
+import { Ratelimit } from "@upstash/ratelimit";
 
 const TOKEN_EXPIRY = 24 * 60 * 60; // 24 hours in seconds
+
+// Rate limiter for token verification attempts
+// 5 attempts per hour per IP
+const tokenVerificationLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, "1 h"),
+  analytics: true,
+  prefix: "ratelimit:token_verification",
+});
 
 /**
  * Generate a subscription token for a given email
@@ -25,13 +35,33 @@ export async function generateSubscriptionToken(
 /**
  * Verify a subscription token
  * @param token - The token to verify
- * @returns The email and validity of the token
+ * @param ip - The IP address of the requester
+ * @returns The email and validity of the token, or an error message
  */
-export async function verifySubscriptionToken(token: string): Promise<{
+export async function verifySubscriptionToken(
+  token: string,
+  ip: string
+): Promise<{
   email: string;
   isValid: boolean;
+  error?: string;
 }> {
   try {
+    // Validate token format
+    if (!/^[a-f0-9]{64}$/.test(token)) {
+      return { email: "", isValid: false, error: "Invalid token format" };
+    }
+
+    // Check rate limit
+    const { success: isWithinLimit } = await tokenVerificationLimiter.limit(ip);
+    if (!isWithinLimit) {
+      return {
+        email: "",
+        isValid: false,
+        error: "Too many verification attempts. Please try again later.",
+      };
+    }
+
     // Check if token exists in Redis
     const email = (await redis.get(`subscription_token:${token}`)) as string;
 
@@ -43,7 +73,12 @@ export async function verifySubscriptionToken(token: string): Promise<{
     await redis.del(`subscription_token:${token}`);
 
     return { email, isValid: true };
-  } catch {
-    return { email: "", isValid: false };
+  } catch (error) {
+    console.error("Token verification error:", error);
+    return {
+      email: "",
+      isValid: false,
+      error: "An error occurred while verifying the token",
+    };
   }
 }
