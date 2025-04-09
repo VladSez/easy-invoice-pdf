@@ -21,7 +21,7 @@
     "dedupe": "pnpm dedupe",
     "lint-stage": "npx lint-staged --verbose",
     "check-meta": "pnpx check-site-meta",
-    "dev:email": "email dev",
+    "dev:email": "email dev --dir src/emails",
     "prepare": "husky"
   },
   "dependencies": {
