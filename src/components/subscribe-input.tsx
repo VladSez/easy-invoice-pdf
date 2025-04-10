@@ -60,7 +60,7 @@ export function SubscribeInput({
   const [isSubmitted, setSubmitted] = useState(false);
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full">
       <div className="relative">
         {isSubmitted ? (
           <div

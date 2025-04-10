@@ -377,24 +377,6 @@ function Footer({ locale }: { locale: Locale }) {
                 <span className="sr-only">Twitter</span>
               </Link>
             </div>
-            <div className="max-w-md space-y-2">
-              <p className="text-sm font-medium text-slate-900">
-                Subscribe to our newsletter
-              </p>
-              <SubscribeInput
-                translations={{
-                  title: "Subscribe to our newsletter",
-                  description:
-                    "Get the latest updates and news from EasyInvoicePDF.com",
-                  subscribe: "Subscribe",
-                  placeholder: "Enter your email",
-                  success: "Thank you for subscribing!",
-                  error: "Failed to subscribe. Please try again.",
-                  emailLanguageInfo: "All emails will be sent in English",
-                }}
-                locale={locale}
-              />
-            </div>
           </div>
           <div className="grid grid-cols-1 sm:gap-10 md:flex-1 md:grid-cols-2">
             <div className="space-y-3"></div>
@@ -433,6 +415,24 @@ function Footer({ locale }: { locale: Locale }) {
               </ul>
             </div>
           </div>
+        </div>
+        <div className="my-5 max-w-lg space-y-2">
+          <p className="text-sm font-medium text-slate-900">
+            Subscribe to our newsletter
+          </p>
+          <SubscribeInput
+            translations={{
+              title: "Subscribe to our newsletter",
+              description:
+                "Get the latest updates and news from EasyInvoicePDF.com",
+              subscribe: "Subscribe",
+              placeholder: "Enter your email",
+              success: "Thank you for subscribing!",
+              error: "Failed to subscribe. Please try again.",
+              emailLanguageInfo: "All emails will be sent in English",
+            }}
+            locale={locale}
+          />
         </div>
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
           <p className="text-xs text-slate-500">

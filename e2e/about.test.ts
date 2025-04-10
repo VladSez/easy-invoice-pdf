@@ -65,6 +65,44 @@ test.describe("About page", () => {
       featuresSection.getByText("Pro version and API coming soon")
     ).toBeVisible();
 
+    // check subscribe form section
+    const subscribeFormSection = page.locator("#newsletter");
+    await expect(subscribeFormSection).toBeVisible();
+
+    await expect(
+      subscribeFormSection.getByRole("heading", {
+        level: 2,
+        name: "Subscribe to our newsletter",
+      })
+    ).toBeVisible();
+
+    await expect(
+      subscribeFormSection.getByText(
+        "Get updates on new features and improvements from EasyInvoicePDF.com"
+      )
+    ).toBeVisible();
+
+    const subscribeForm = subscribeFormSection.getByTestId("subscribe-form");
+    await expect(subscribeForm).toBeVisible();
+
+    const subscribeFormEmailInput =
+      subscribeForm.getByPlaceholder("Enter your email");
+
+    await expect(subscribeFormEmailInput).toBeVisible();
+    await expect(subscribeFormEmailInput).toHaveAttribute("type", "email");
+    await expect(subscribeFormEmailInput).toHaveAttribute("required");
+    await expect(subscribeFormEmailInput).toHaveAttribute(
+      "autocomplete",
+      "email"
+    );
+
+    const subscribeFormButton = subscribeForm.getByRole("button", {
+      name: "Subscribe",
+    });
+
+    await expect(subscribeFormButton).toBeVisible();
+    await expect(subscribeFormButton).toHaveAttribute("type", "submit");
+
     // Check footer
     const footer = page.getByRole("contentinfo");
     await expect(footer).toBeVisible();
@@ -73,12 +111,27 @@ test.describe("About page", () => {
       "about-page-footer-social-links"
     );
 
-    await expect(
-      footerSocialLinks.getByRole("link", { name: "GitHub" })
-    ).toBeVisible();
-    await expect(
-      footerSocialLinks.getByRole("link", { name: "Twitter" })
-    ).toBeVisible();
+    const githubSocialLink = footerSocialLinks.getByRole("link", {
+      name: "GitHub",
+    });
+
+    await expect(githubSocialLink).toBeVisible();
+    await expect(githubSocialLink).toHaveAttribute(
+      "href",
+      "https://github.com/VladSez/easy-invoice-pdf"
+    );
+    await expect(githubSocialLink).toHaveAttribute("target", "_blank");
+
+    const twitterSocialLink = footerSocialLinks.getByRole("link", {
+      name: "Twitter",
+    });
+
+    await expect(twitterSocialLink).toBeVisible();
+    await expect(twitterSocialLink).toHaveAttribute(
+      "href",
+      "https://x.com/vlad_sazon"
+    );
+    await expect(twitterSocialLink).toHaveAttribute("target", "_blank");
 
     // Check newsletter subscription form
     await expect(footer.getByText("Subscribe to our newsletter")).toBeVisible();
@@ -100,12 +153,41 @@ test.describe("About page", () => {
 
     const footerLinks = footer.getByTestId("about-page-footer-links");
 
-    await expect(
-      footerLinks.getByRole("link", { name: "Features" })
-    ).toBeVisible();
-    await expect(
-      footerLinks.getByRole("link", { name: "GitHub" })
-    ).toBeVisible();
+    const appLink = footerLinks.getByRole("link", { name: "App" });
+
+    await expect(appLink).toBeVisible();
+    await expect(appLink).toHaveAttribute("href", "/en/app");
+    await expect(appLink).not.toHaveAttribute("target", "_blank");
+
+    const featuresLink = footerLinks.getByRole("link", {
+      name: "Features",
+    });
+
+    await expect(featuresLink).toBeVisible();
+    await expect(featuresLink).toHaveAttribute("href", "#features");
+    await expect(featuresLink).not.toHaveAttribute("target", "_blank");
+
+    const shareFeedbackLink = footerLinks.getByRole("link", {
+      name: "Share feedback",
+    });
+
+    await expect(shareFeedbackLink).toBeVisible();
+    await expect(shareFeedbackLink).toHaveAttribute(
+      "href",
+      "https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
+    );
+    await expect(shareFeedbackLink).toHaveAttribute("target", "_blank");
+
+    const githubLink = footerLinks.getByRole("link", {
+      name: "GitHub",
+    });
+
+    await expect(githubLink).toBeVisible();
+    await expect(githubLink).toHaveAttribute(
+      "href",
+      "https://github.com/VladSez/easy-invoice-pdf"
+    );
+    await expect(githubLink).toHaveAttribute("target", "_blank");
   });
 
   test("should display about page content in French", async ({ page }) => {
@@ -164,6 +246,23 @@ test.describe("About page", () => {
       })
     ).toBeVisible();
 
+    // check subscribe form section in French
+    const subscribeFormSection = page.locator("#newsletter");
+    await expect(subscribeFormSection).toBeVisible();
+
+    await expect(
+      subscribeFormSection.getByRole("heading", {
+        level: 2,
+        name: "Abonnez-vous à notre newsletter",
+      })
+    ).toBeVisible();
+
+    await expect(
+      subscribeFormSection.getByText(
+        "Recevez des mises à jour sur les nouvelles fonctionnalités et améliorations de EasyInvoicePDF.com"
+      )
+    ).toBeVisible();
+
     // Check footer in French
     const footer = page.getByRole("contentinfo");
     await expect(footer).toBeVisible();
@@ -186,9 +285,19 @@ test.describe("About page", () => {
     ).toBeVisible();
 
     const footerLinks = footer.getByTestId("about-page-footer-links");
-    await expect(
-      footerLinks.getByRole("link", { name: "Fonctionnalités" })
-    ).toBeVisible();
+
+    const appLink = footerLinks.getByRole("link", { name: "App" });
+
+    await expect(appLink).toBeVisible();
+    await expect(appLink).toHaveAttribute("href", "/fr/app");
+    await expect(appLink).not.toHaveAttribute("target", "_blank");
+
+    const featuresLink = footerLinks.getByRole("link", {
+      name: "Fonctionnalités",
+    });
+
+    await expect(featuresLink).toBeVisible();
+    await expect(featuresLink).toHaveAttribute("href", "#features");
   });
 
   test("should display about page content in German", async ({ page }) => {

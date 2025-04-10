@@ -59,9 +59,11 @@
       "createdBy": "Creato da"
     },
     "buttons": {
-      "goToApp": "Vai all'applicazione",
+      "goToApp": "Vai all'app",
       "viewOnGithub": "Vedi su GitHub",
-      "switchLanguage": "Cambia lingua"
+      "switchLanguage": "Cambia lingua",
+      "shareFeedback": "Condividi feedback",
+      "app": "App"
     },
     "newsletter": {
       "title": "Iscriviti alla nostra newsletter",

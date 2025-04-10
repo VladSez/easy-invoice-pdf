@@ -59,9 +59,11 @@
       "createdBy": "Gemaakt door"
     },
     "buttons": {
-      "goToApp": "Ga naar de applicatie",
+      "goToApp": "Ga naar app",
       "viewOnGithub": "Bekijk op GitHub",
-      "switchLanguage": "Verander taal"
+      "switchLanguage": "Taal wijzigen",
+      "shareFeedback": "Deel feedback",
+      "app": "App"
     },
     "newsletter": {
       "title": "Abonneer op onze nieuwsbrief",

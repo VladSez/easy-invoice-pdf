@@ -81,7 +81,9 @@
     "buttons": {
       "goToApp": "Перейти до додатку",
       "viewOnGithub": "Переглянути на GitHub",
-      "switchLanguage": "Змінити мову"
+      "switchLanguage": "Змінити мову",
+      "shareFeedback": "Поділитися відгуком",
+      "app": "Додаток"
     },
     "newsletter": {
       "title": "Підпишіться на нашу розсилку",

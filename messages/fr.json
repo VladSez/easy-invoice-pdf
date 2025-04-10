@@ -61,7 +61,9 @@
     "buttons": {
       "goToApp": "Aller à l'application",
       "viewOnGithub": "Voir sur GitHub",
-      "switchLanguage": "Changer de langue"
+      "switchLanguage": "Changer de langue",
+      "shareFeedback": "Partager un avis",
+      "app": "Application"
     },
     "newsletter": {
       "title": "Abonnez-vous à notre newsletter",

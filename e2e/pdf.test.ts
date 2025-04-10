@@ -316,7 +316,7 @@ Amount in words: three thousand GBP 00/100`);
 Created with https://easyinvoicepdf.com`);
   });
 
-  test("completes full invoice flow on mobile: tabs navigation, form editing and PDF download", async ({
+  test("completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French", async ({
     page,
     browserName,
   }) => {
@@ -336,10 +336,13 @@ Created with https://easyinvoicepdf.com`);
     // Wait for download button to be enabled
     await expect(downloadButtonEnglish).toBeEnabled();
 
-    // Switch to Polish
+    // Switch to French
     await page
       .getByRole("combobox", { name: "Invoice PDF Language" })
-      .selectOption("pl");
+      .selectOption("fr");
+
+    // Switch currency to GBP
+    await page.getByRole("combobox", { name: "Currency" }).selectOption("GBP");
 
     // Fill in some invoice data
     await page
@@ -373,12 +376,12 @@ Created with https://easyinvoicepdf.com`);
       .fill("23");
 
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
-    const downloadButtonPolish = page.getByRole("link", {
-      name: "Download PDF in Polish",
+    const downloadButtonFrench = page.getByRole("link", {
+      name: "Download PDF in French",
     });
     // Wait for download button to be visible and enabled
-    await expect(downloadButtonPolish).toBeVisible();
-    await expect(downloadButtonPolish).toBeEnabled();
+    await expect(downloadButtonFrench).toBeVisible();
+    await expect(downloadButtonFrench).toBeEnabled();
 
     // Switch to preview tab
     await page.getByRole("tab", { name: "Preview PDF" }).click();
@@ -395,7 +398,7 @@ Created with https://easyinvoicepdf.com`);
     const downloadPromise = page.waitForEvent("download");
 
     // Click the download button
-    await downloadButtonPolish.click();
+    await downloadButtonFrench.click();
 
     // Wait for the download to start
     const download = await downloadPromise;
@@ -412,22 +415,33 @@ Created with https://easyinvoicepdf.com`);
     const pdfData = await pdf(dataBuffer);
 
     // Verify PDF content in Polish
-    expect(pdfData.text).toContain("Faktura nr");
-    expect(pdfData.text).toContain("Data wystawienia");
-    expect(pdfData.text).toContain("Sprzedawca");
-    expect(pdfData.text).toContain("Nabywca");
+    expect(pdfData.text).toContain("Facture N°");
+    expect(pdfData.text).toContain("Date d'émission");
+
+    expect(pdfData.text).toContain("Vendeur");
+    expect(pdfData.text).toContain("Acheteur");
     expect(pdfData.text).toContain("Mobile Test Seller");
     expect(pdfData.text).toContain("456 Mobile St");
 
     const lastDayOfCurrentMonth = dayjs().endOf("month").format("YYYY-MM-DD");
     expect(pdfData.text).toContain(
-      `Data sprzedaży / wykonania usługi: ${lastDayOfCurrentMonth}`
+      `Date de vente/prestation de service: ${lastDayOfCurrentMonth}`
     );
 
     // Verify calculations in Polish
-    expect(pdfData.text).toContain(`Razem do zapłaty: 184.50 EUR
-Wpłacono: 0.00 EUR
-Pozostało do zapłaty: 184.50 EUR`);
+    expect(pdfData.text).toContain(`Total à payer: 184.50 GBP
+Payé: 0.00 GBP
+Reste à payer: 184.50 GBP
+Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
+
+    // Verify toast appears after download
+    await expect(page.getByText("Consider Supporting Us!")).toBeVisible();
+    await expect(
+      page.getByText(
+        "If you find this tool helpful, please consider making a small donation to support our work."
+      )
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Donate" })).toBeVisible();
 
     // Switch back to form tab
     await page.getByRole("tab", { name: "Edit Invoice" }).click();

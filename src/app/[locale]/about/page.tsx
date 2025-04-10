@@ -210,7 +210,10 @@ function SubscribeSection({ locale }: { locale: Locale }) {
   const newsletterEmailLanguageInfo = tNewsletter("emailLanguageInfo");
 
   return (
-    <section className="flex w-full items-center justify-center bg-white py-12 md:py-24">
+    <section
+      id="newsletter"
+      className="flex w-full items-center justify-center bg-white py-12 md:py-24"
+    >
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
@@ -348,23 +351,6 @@ function Footer({ locale }: { locale: Locale }) {
                 <span className="sr-only">Twitter</span>
               </Link>
             </div>
-            <div className="max-w-md space-y-2">
-              <p className="text-sm font-medium text-slate-900">
-                {tNewsletter("title")}
-              </p>
-              <SubscribeInput
-                translations={{
-                  title: newsletterTitle,
-                  description: newsletterDescription,
-                  subscribe: newsletterSubscribe,
-                  placeholder: newsletterPlaceholder,
-                  success: newsletterSuccessMessage,
-                  error: newsletterErrorMessage,
-                  emailLanguageInfo: newsletterEmailLanguageInfo,
-                }}
-                locale={locale}
-              />
-            </div>
           </div>
           <div className="grid grid-cols-1 sm:gap-10 md:flex-1 md:grid-cols-2">
             <div className="space-y-3"></div>
@@ -375,10 +361,28 @@ function Footer({ locale }: { locale: Locale }) {
               <ul className="space-y-2" data-testid="about-page-footer-links">
                 <li>
                   <Link
+                    href="/app"
+                    className="text-sm text-slate-500 hover:text-slate-900"
+                  >
+                    {t("buttons.app")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="#features"
                     className="text-sm text-slate-500 hover:text-slate-900"
                   >
                     {t("footer.links.features")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-slate-500 hover:text-slate-900"
+                  >
+                    {t("buttons.shareFeedback")}
                   </Link>
                 </li>
                 <li>
@@ -394,6 +398,23 @@ function Footer({ locale }: { locale: Locale }) {
               </ul>
             </div>
           </div>
+        </div>
+        <div className="my-5 max-w-lg space-y-2">
+          <p className="text-sm font-medium text-slate-900">
+            {tNewsletter("title")}
+          </p>
+          <SubscribeInput
+            translations={{
+              title: newsletterTitle,
+              description: newsletterDescription,
+              subscribe: newsletterSubscribe,
+              placeholder: newsletterPlaceholder,
+              success: newsletterSuccessMessage,
+              error: newsletterErrorMessage,
+              emailLanguageInfo: newsletterEmailLanguageInfo,
+            }}
+            locale={locale}
+          />
         </div>
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
           <p className="text-xs text-slate-500">

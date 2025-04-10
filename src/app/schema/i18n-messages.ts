@@ -101,6 +101,8 @@ const aboutSchema = z
         goToApp: z.string(),
         viewOnGithub: z.string(),
         switchLanguage: z.string(),
+        shareFeedback: z.string(),
+        app: z.string(),
       })
       .strict(),
     newsletter: z
