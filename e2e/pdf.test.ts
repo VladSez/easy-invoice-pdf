@@ -169,7 +169,9 @@ Wpłacono: 0.00 EUR
 Pozostało do zapłaty: 0.00 EUR
 Kwota słownie: zero EUR 00/100`);
 
-    expect(pdfData.text).toContain("Created with https://easyinvoicepdf.com");
+    expect(pdfData.text).toContain(
+      "Utworzono za pomocą https://easyinvoicepdf.com"
+    );
   });
 
   test("update pdf when invoice data changes", async ({
