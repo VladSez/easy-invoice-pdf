@@ -7,6 +7,7 @@ import {
   SUPPORTED_DATE_FORMATS,
   type InvoiceData,
 } from "../schema";
+import { TRANSLATIONS } from "../schema/translations";
 import dayjs from "dayjs";
 
 const today = dayjs().format("YYYY-MM-DD");
@@ -21,7 +22,7 @@ const DEFAULT_DATE_FORMAT = SUPPORTED_DATE_FORMATS[0];
 export const INITIAL_INVOICE_DATA = {
   language: EN,
   currency: EUR,
-  invoiceNumber: `1/${invoiceCurrentMonthAndYear}`,
+  invoiceNumber: `${TRANSLATIONS[EN].invoiceNumber}: 1/${invoiceCurrentMonthAndYear}`,
 
   dateOfIssue: today,
   dateOfService: lastDayOfMonth,

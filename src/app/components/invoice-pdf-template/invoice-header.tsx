@@ -26,9 +26,7 @@ export function InvoiceHeader({ invoiceData }: { invoiceData: InvoiceData }) {
       }}
     >
       <View>
-        <Text style={[styles.header]}>
-          {t.invoiceNumber}: {invoiceData?.invoiceNumber}
-        </Text>
+        <Text style={[styles.header]}>{invoiceData?.invoiceNumber}</Text>
 
         {invoiceData?.invoiceType && invoiceData.invoiceTypeFieldIsVisible && (
           <Text

@@ -240,7 +240,11 @@ export const invoiceSchema = z.object({
   dateFormat: z.enum(SUPPORTED_DATE_FORMATS).default("YYYY-MM-DD"),
   currency: z.enum(SUPPORTED_CURRENCIES).default("EUR"),
 
-  invoiceNumber: z.string().min(1, "Invoice number is required").trim(),
+  invoiceNumber: z
+    .string()
+    .min(1, "Invoice number is required")
+    .max(500, "Invoice number must not exceed 500 characters")
+    .trim(),
   dateOfIssue: z.string().min(1, "Date of issue is required").trim(),
   dateOfService: z.string().min(1, "Date of service is required").trim(),
 
