@@ -287,42 +287,6 @@ export const invoiceSchema = z.object({
 export type InvoiceData = z.infer<typeof invoiceSchema>;
 
 /**
- * Default seller data
- *
- * This is the default data that will be used if the user doesn't provide their own data
- */
-export const DEFAULT_SELLER_DATA = {
-  name: "Seller name",
-  address: "Seller address",
-
-  vatNo: "Seller vat number",
-  vatNoFieldIsVisible: true,
-
-  email: "seller@email.com",
-
-  accountNumber: "Seller account number",
-  accountNumberFieldIsVisible: true,
-
-  swiftBic: "Seller swift bic",
-  swiftBicFieldIsVisible: true,
-} as const satisfies Omit<SellerData, "id">;
-
-/**
- * Default buyer data
- *
- * This is the default data that will be used if the user doesn't provide their own data
- */
-export const DEFAULT_BUYER_DATA = {
-  name: "Buyer name",
-  address: "Buyer address",
-
-  vatNo: "Buyer vat number",
-  vatNoFieldIsVisible: true,
-
-  email: "buyer@email.com",
-} as const satisfies Omit<BuyerData, "id">;
-
-/**
  * Accordion state schema
  *
  * This schema is used to store the state of the accordion in the local storage

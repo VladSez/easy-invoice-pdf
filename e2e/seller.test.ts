@@ -1,4 +1,5 @@
-import { DEFAULT_SELLER_DATA, type SellerData } from "@/app/schema";
+import { DEFAULT_SELLER_DATA } from "@/app/constants";
+import { type SellerData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
 
 test.describe("Seller management", () => {

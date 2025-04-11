@@ -1,4 +1,5 @@
-import { DEFAULT_BUYER_DATA, type BuyerData } from "@/app/schema";
+import { DEFAULT_BUYER_DATA } from "@/app/constants";
+import { type BuyerData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
 
 test.describe("Buyer management", () => {

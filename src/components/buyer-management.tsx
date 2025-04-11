@@ -17,12 +17,7 @@ import {
   AlertDialogTitle,
 } from "./ui/alert-dialog";
 import type { UseFormSetValue } from "react-hook-form";
-import {
-  DEFAULT_BUYER_DATA,
-  buyerSchema,
-  type InvoiceData,
-  type BuyerData,
-} from "@/app/schema";
+import { buyerSchema, type InvoiceData, type BuyerData } from "@/app/schema";
 import { z } from "zod";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -30,6 +25,7 @@ import { Label } from "./ui/label";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
+import { DEFAULT_BUYER_DATA } from "@/app/constants";
 
 export const BUYERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_BUYERS";
 
