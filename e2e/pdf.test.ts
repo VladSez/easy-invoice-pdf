@@ -1,10 +1,18 @@
+import { INITIAL_INVOICE_DATA } from "@/app/constants";
+import { TRANSLATIONS } from "@/app/schema/translations";
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import fs from "fs";
 import path from "path";
 import pdf from "pdf-parse";
 
-const getDownloadDir = (browserName: string) => `test-downloads-${browserName}`;
+const PLAYWRIGHT_TEST_DOWNLOADS_DIR = "playwright-test-downloads";
+
+const getDownloadDir = ({ browserName }: { browserName: string }) => {
+  const name = `pdf-downloads-${browserName}`;
+
+  return path.join(PLAYWRIGHT_TEST_DOWNLOADS_DIR, name);
+};
 
 /**
  * We can't test the PDF preview because it's not supported in Playwright.
@@ -16,10 +24,11 @@ test.describe("PDF Preview", () => {
   let downloadDir: string;
 
   test.beforeAll(async ({ browserName }) => {
-    downloadDir = getDownloadDir(browserName);
+    downloadDir = getDownloadDir({ browserName });
+
     // Ensure browser-specific test-downloads directory exists
     try {
-      await fs.promises.mkdir(downloadDir);
+      await fs.promises.mkdir(downloadDir, { recursive: true });
     } catch (error) {
       // Handle specific error cases if needed
       if ((error as NodeJS.ErrnoException).code !== "EEXIST") {
@@ -28,27 +37,14 @@ test.describe("PDF Preview", () => {
     }
   });
 
-  test.afterEach(async () => {
-    // Clean up all files in browser-specific test-downloads directory
-    try {
-      const files = await fs.promises.readdir(downloadDir);
-
-      await Promise.all(
-        files.map((file) => fs.promises.unlink(path.join(downloadDir, file)))
-      );
-    } catch (error) {
-      // Handle specific error cases if needed
-      // ENOENT means "no such file or directory" - ignore this expected error
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-        throw error;
-      }
-    }
-  });
-
+  //
   test.afterAll(async () => {
-    // Remove the browser-specific test-downloads directory itself
+    // Remove the parent playwright-test-downloads directory
     try {
-      await fs.promises.rmdir(downloadDir);
+      await fs.promises.rm(PLAYWRIGHT_TEST_DOWNLOADS_DIR, {
+        recursive: true,
+        force: true,
+      });
     } catch (error) {
       // Handle specific error cases if needed
       // ENOENT means "no such file or directory" - ignore this expected error
@@ -86,7 +82,10 @@ test.describe("PDF Preview", () => {
     const suggestedFilename = download.suggestedFilename();
 
     // Save the file to a browser-specific temporary location
-    const tmpPath = path.join(getDownloadDir(browserName), suggestedFilename);
+    const tmpPath = path.join(
+      getDownloadDir({ browserName }),
+      suggestedFilename
+    );
     await download.saveAs(tmpPath);
 
     // Read and verify PDF content using pdf-parse
@@ -275,7 +274,10 @@ Kwota słownie: zero EUR 00/100`);
     const suggestedFilename = download.suggestedFilename();
 
     // Save the file to a browser-specific temporary location
-    const tmpPath = path.join(getDownloadDir(browserName), suggestedFilename);
+    const tmpPath = path.join(
+      getDownloadDir({ browserName }),
+      suggestedFilename
+    );
     await download.saveAs(tmpPath);
 
     // Read and verify PDF content using pdf-parse
@@ -407,7 +409,10 @@ Created with https://easyinvoicepdf.com`);
     const suggestedFilename = download.suggestedFilename();
 
     // Save the file to a browser-specific temporary location
-    const tmpPath = path.join(getDownloadDir(browserName), suggestedFilename);
+    const tmpPath = path.join(
+      getDownloadDir({ browserName }),
+      suggestedFilename
+    );
     await download.saveAs(tmpPath);
 
     // Read and verify PDF content using pdf-parse
@@ -415,7 +420,7 @@ Created with https://easyinvoicepdf.com`);
     const pdfData = await pdf(dataBuffer);
 
     // Verify PDF content in Polish
-    expect(pdfData.text).toContain("Facture N°");
+    expect(pdfData.text).toContain("MOBILE-TEST-001");
     expect(pdfData.text).toContain("Date d'émission");
 
     expect(pdfData.text).toContain("Vendeur");
@@ -504,5 +509,111 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
         exact: true,
       })
     ).toHaveValue("184.50");
+  });
+
+  test("should display and persist invoice number in different languages", async ({
+    page,
+  }) => {
+    const CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
+
+    const generalInfoSection = page.getByTestId("general-information-section");
+
+    const invoiceNumberInput = generalInfoSection.getByRole("textbox", {
+      name: "Invoice Number",
+    });
+
+    await expect(invoiceNumberInput).toHaveValue(
+      INITIAL_INVOICE_DATA.invoiceNumber
+    );
+
+    const languageSelect = page.getByRole("combobox", {
+      name: "Invoice PDF Language",
+    });
+
+    await languageSelect.selectOption("pl");
+
+    await expect(invoiceNumberInput).toHaveValue(
+      `${TRANSLATIONS.pl.invoiceNumber}: 1/${CURRENT_MONTH_AND_YEAR}`
+    );
+
+    // I can fill in a new invoice number
+    await invoiceNumberInput.fill("Faktura TEST: 1/2025");
+
+    // check that warning message appears
+    const switchToDefaultFormatButton = page.getByRole("button", {
+      name: `Switch to default format (Faktura nr: 1/${CURRENT_MONTH_AND_YEAR})`,
+    });
+
+    await expect(switchToDefaultFormatButton).toBeVisible();
+
+    // switch to default format
+    await switchToDefaultFormatButton.click();
+
+    // check that the invoice number is updated to the default format
+    await expect(invoiceNumberInput).toHaveValue(
+      `Faktura nr: 1/${CURRENT_MONTH_AND_YEAR}`
+    );
+
+    // check that the switch to default format button is hidden
+    await expect(switchToDefaultFormatButton).toBeHidden();
+
+    // fill once again the invoice number
+    await invoiceNumberInput.fill("Faktura TEST: 1/2025");
+
+    // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
+
+    // we reload the page to test that the invoice number is persisted after page reload
+    await page.reload();
+
+    // Verify that the invoice number is persisted after page reload
+    await expect(invoiceNumberInput).toHaveValue("Faktura TEST: 1/2025");
+
+    await languageSelect.selectOption("pt");
+
+    await expect(invoiceNumberInput).toHaveValue(
+      `${TRANSLATIONS.pt.invoiceNumber}: 1/${CURRENT_MONTH_AND_YEAR}`
+    );
+
+    await invoiceNumberInput.fill("Fatura TEST PORTUGUESE N°: 1/04-2025");
+
+    await expect(
+      page.getByRole("button", {
+        name: `Switch to default format (Fatura N°: 1/${CURRENT_MONTH_AND_YEAR})`,
+      })
+    ).toBeVisible();
+
+    // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
+    const downloadButton = page.getByRole("link", {
+      name: "Download PDF in Portuguese",
+    });
+
+    await expect(downloadButton).toBeVisible();
+    await expect(downloadButton).toBeEnabled();
+
+    // Set up download handler
+    const downloadPromise = page.waitForEvent("download");
+
+    // Click the download button
+    await downloadButton.click();
+
+    // Wait for the download to start
+    const download = await downloadPromise;
+
+    // Get the suggested filename
+    const suggestedFilename = download.suggestedFilename();
+
+    // Save the file to a temporary location
+    const tmpPath = path.join(downloadDir, suggestedFilename);
+    await download.saveAs(tmpPath);
+
+    // Read and verify PDF content using pdf-parse
+    const dataBuffer = await fs.promises.readFile(tmpPath);
+    const pdfData = await pdf(dataBuffer);
+
+    // Verify PDF content
+    expect(pdfData.text).toContain("Fatura TEST PORTUGUESE N°: 1/04-2025");
+    expect(pdfData.text).toContain("Data de emissão");
   });
 });

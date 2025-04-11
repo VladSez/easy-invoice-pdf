@@ -55,11 +55,16 @@ export function InvoicePDFDownloadLink({
   invoiceData: InvoiceData;
 }) {
   // Memoize static values
-  const filename = useMemo(
-    () =>
-      `invoice-${invoiceData.language}-${invoiceData.invoiceNumber.replace("/", "-")}.pdf`,
-    [invoiceData.language, invoiceData.invoiceNumber]
-  );
+  const filename = useMemo(() => {
+    // Extract invoice number pattern like "1/04-2025"
+    const invoiceNumber =
+      /\d+\/\d{2}-\d{4}/.exec(invoiceData.invoiceNumber)?.[0] ||
+      invoiceData?.invoiceNumber;
+
+    const name = `invoice-${invoiceData.language}-${invoiceNumber}.pdf`;
+
+    return name;
+  }, [invoiceData.language, invoiceData.invoiceNumber]);
 
   const PdfDocument = useMemo(
     () => <InvoicePdfTemplate invoiceData={invoiceData} />,
