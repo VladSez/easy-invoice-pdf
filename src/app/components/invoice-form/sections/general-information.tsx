@@ -123,7 +123,7 @@ export const GeneralInformation = memo(function GeneralInformation({
   );
 
   // "Invoice Number: 1/MM-YYYY" -> ["Invoice Number", "1/MM-YYYY"]
-  const splittedInvoiceNumber = invoiceNumber?.split(":");
+  const splittedInvoiceNumber = invoiceNumber?.split(": ");
   // "Invoice Number"
   const invoiceNumberPrefix = splittedInvoiceNumber?.[0];
   // "1/MM-YYYY"
@@ -160,7 +160,9 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                 // Update invoice number when language changes
                 const newLanguage = e.target.value as keyof typeof TRANSLATIONS;
-                const newInvoiceNumber = `${TRANSLATIONS[newLanguage].invoiceNumber}: 1/${CURRENT_MONTH_AND_YEAR}`;
+
+                // we need to keep the invoice number suffix (e.g. 1/MM-YYYY) for better user experience, when switching language
+                const newInvoiceNumber = `${TRANSLATIONS[newLanguage].invoiceNumber}: ${invoiceNumberSuffix}`;
 
                 setValue("invoiceNumber", newInvoiceNumber);
               }}
