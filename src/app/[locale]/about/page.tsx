@@ -100,6 +100,7 @@ function HeroSection() {
           <Video
             src="/easy-invoice-demo.mp4"
             fallbackImg="/easy-invoice-hero.webp"
+            testId="hero-about-page-video"
           />
         </div>
       </div>

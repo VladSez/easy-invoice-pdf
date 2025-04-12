@@ -34,11 +34,22 @@ test.describe("About page", () => {
       heroSection.getByText("No sign-up required. 100% free and open-source.")
     ).toBeVisible();
 
-    await expect(
-      heroSection.getByRole("img", {
-        name: "EasyInvoicePDF interface showing invoice creation with live preview",
-      })
-    ).toBeVisible();
+    const video = heroSection.getByTestId("hero-about-page-video");
+
+    await expect(video).toBeVisible();
+    await expect(video).toHaveAttribute("poster", "/easy-invoice-hero.webp");
+    await expect(video).toHaveAttribute("muted");
+    await expect(video).toHaveAttribute("loop");
+    await expect(video).toHaveAttribute("playsinline");
+    await expect(video).toHaveAttribute("preload", "auto");
+    await expect(video).toHaveAttribute("autoplay");
+
+    const videoSource = video.locator("source");
+    await expect(videoSource).toHaveAttribute(
+      "src",
+      "/easy-invoice-demo.mp4#t=0.001"
+    );
+    await expect(videoSource).toHaveAttribute("type", "video/mp4");
 
     // Check Features section
     const featuresSection = page.locator("#features");

@@ -6,9 +6,10 @@ import { useCallback, useEffect, useRef } from "react";
 interface VideoProps {
   src: string;
   fallbackImg: string;
+  testId?: string;
 }
 
-export const Video = ({ src, fallbackImg }: VideoProps) => {
+export const Video = ({ src, fallbackImg, testId = "" }: VideoProps) => {
   const [inViewRef, inView] = useInView({
     threshold: 0.5,
   });
@@ -25,7 +26,9 @@ export const Video = ({ src, fallbackImg }: VideoProps) => {
       if (node) {
         node.addEventListener("click", function () {
           if (this.paused) {
-            void this.play();
+            void this.play().catch(() => {
+              // Ignore play errors - they are expected when the video is removed
+            });
           } else {
             void this.pause();
           }
@@ -36,16 +39,35 @@ export const Video = ({ src, fallbackImg }: VideoProps) => {
   );
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
-    if (!videoRef || !videoRef.current) {
-      return;
-    }
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    let playPromise: Promise<void> | undefined;
 
     if (inView) {
-      void videoRef.current.play();
+      playPromise = videoElement.play();
+      // Handle the play promise to catch any errors
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Ignore play errors - they are expected when the video is removed
+        });
+      }
     } else {
-      void videoRef.current.pause();
+      videoElement.pause();
     }
+
+    // Cleanup function
+    return () => {
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            videoElement.pause();
+          })
+          .catch(() => {
+            // Ignore cleanup errors
+          });
+      }
+    };
   }, [inView]);
 
   return (
@@ -66,6 +88,7 @@ export const Video = ({ src, fallbackImg }: VideoProps) => {
         ref={setRefs}
         poster={fallbackImg}
         aria-label="EasyInvoicePDF interface showing invoice creation with live preview"
+        data-testid={testId}
       >
         {/* #t=0.001 is needed to show thumbnail on ios devices */}
         <source src={`${src}#t=0.001`} type="video/mp4" />
