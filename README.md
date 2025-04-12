@@ -19,4 +19,4 @@ If you found this project helpful, you can support my work here: [Buy Me a Coffe
 ## other tools we use
 
 - Generate beautiful OG images: https://og.new
-- Analytics: https://eu.umami.is/dashboard
+- Analytics: https://umami.is/

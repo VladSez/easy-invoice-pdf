@@ -23,6 +23,13 @@ import { ProjectLogo } from "@/components/etc/project-logo";
 import { GithubIcon } from "@/components/etc/github-logo";
 import type { Locale } from "next-intl";
 import { SubscribeInput } from "@/components/subscribe-input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 export default function Home({ params }: { params: { locale: Locale } }) {
@@ -279,23 +286,21 @@ export default function Home({ params }: { params: { locale: Locale } }) {
 }
 
 function ProjectInfo() {
+  const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
+
+  const handleWatchDemoClick = () => {
+    setIsVideoDialogOpen(true);
+    umamiTrackEvent("watch_demo_button_clicked");
+  };
+
   return (
     <>
       <span className="relative bottom-0 text-center text-sm text-gray-900 lg:bottom-3">
-        Made by{" "}
-        <a
-          href="https://dub.sh/vldzn.me"
-          className="underline transition-colors hover:text-blue-600"
-          target="_blank"
-        >
-          Vlad Sazonau
-        </a>
-        {" | "}
         <a
           href="https://github.com/VladSez/pdf-invoice-generator"
           target="_blank"
           rel="noopener noreferrer"
-          className="group inline-flex items-center gap-2"
+          className="group inline-flex items-center gap-1"
           title="View on GitHub"
         >
           <span className="transition-all group-hover:text-blue-600 group-hover:underline">
@@ -311,7 +316,37 @@ function ProjectInfo() {
         >
           Share your feedback
         </a>
+        {" | "}
+        <button
+          onClick={handleWatchDemoClick}
+          className="inline-flex items-center gap-1.5 transition-colors hover:text-blue-600 hover:underline"
+        >
+          <span>How it works</span>
+        </button>
       </span>
+
+      <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
+        <DialogContent className="max-h-[calc(100vh-2rem)] gap-0 overflow-hidden p-0 sm:max-w-[800px]">
+          <DialogHeader className="p-6 pb-3">
+            <DialogTitle>How EasyInvoicePDF Works</DialogTitle>
+            <DialogDescription>
+              Watch this quick demo to learn how to create and customize your
+              invoices.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="aspect-video w-full overflow-hidden">
+            <video
+              src="/easy-invoice-demo.mp4"
+              muted
+              controls
+              autoPlay
+              playsInline
+              className="h-full w-full object-cover"
+              data-testid="how-it-works-video"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

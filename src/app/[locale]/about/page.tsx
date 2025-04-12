@@ -14,6 +14,7 @@ import {
 import { LanguageSwitcher } from "./components/language-switcher";
 import { SubscribeInput } from "@/components/subscribe-input";
 import { setRequestLocale } from "next-intl/server";
+import { Video } from "@/components/video";
 export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const { locale } = params;
 
@@ -96,13 +97,9 @@ function HeroSection() {
             </p>
           </div>
 
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/hero.webp"
-            alt="EasyInvoicePDF interface showing invoice creation with live preview"
-            className="h-full w-full rounded-xl border-none object-cover shadow-md"
-            width={1000}
-            height={1000}
+          <Video
+            src="/easy-invoice-demo.mp4"
+            fallbackImg="/easy-invoice-hero.webp"
           />
         </div>
       </div>

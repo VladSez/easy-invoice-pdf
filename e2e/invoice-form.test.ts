@@ -45,10 +45,6 @@ test.describe("Invoice Generator Page", () => {
       page.getByRole("link", { name: "Download PDF in English" })
     ).toBeVisible();
 
-    await expect(header.getByText("Made by")).toBeVisible();
-    await expect(
-      header.getByRole("link", { name: "Vlad Sazonau" })
-    ).toBeVisible();
     await expect(
       header.getByRole("link", { name: "Open Source" })
     ).toBeVisible();
@@ -56,10 +52,43 @@ test.describe("Invoice Generator Page", () => {
       header.getByRole("link", { name: "Share your feedback" })
     ).toBeVisible();
 
-    // Verify links have correct href attributes
+    const howItWorksButton = header.getByRole("button", {
+      name: "How it works",
+    });
+    await expect(howItWorksButton).toBeVisible();
+    await expect(howItWorksButton).toBeEnabled();
+
+    // open How it works dialog
+    await howItWorksButton.click();
+
     await expect(
-      header.getByRole("link", { name: "Vlad Sazonau" })
-    ).toHaveAttribute("href", "https://dub.sh/vldzn.me");
+      page.getByRole("heading", { name: "How EasyInvoicePDF Works" })
+    ).toBeVisible();
+
+    await expect(
+      page.getByText(
+        "Watch this quick demo to learn how to create and customize your invoices."
+      )
+    ).toBeVisible();
+
+    // Check that video is displayed in dialog
+    const video = page.getByTestId("how-it-works-video");
+
+    await expect(video).toBeVisible();
+
+    await expect(video).toHaveAttribute("src", "/easy-invoice-demo.mp4");
+    await expect(video).toHaveAttribute("autoplay", "");
+    await expect(video).toHaveAttribute("controls", "");
+    await expect(video).toHaveAttribute("playsInline", "");
+
+    await expect(page.getByRole("button", { name: "Close" })).toBeVisible();
+
+    await page.getByRole("button", { name: "Close" }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "How EasyInvoicePDF Works" })
+    ).toBeHidden();
+
     await expect(
       header.getByRole("link", { name: "Open Source" })
     ).toHaveAttribute(
