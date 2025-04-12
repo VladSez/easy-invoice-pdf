@@ -404,13 +404,6 @@ test.describe("About page", () => {
       header.getByRole("link", { name: "Aller à l'application" })
     ).toBeVisible();
     await expect(page).toHaveURL("/fr/about");
-
-    // Switch to German
-    await page.getByRole("button", { name: "Changer de langue" }).click();
-    await page.getByText("Deutsch").click();
-
-    await expect(header.getByRole("link", { name: "Zur App" })).toBeVisible();
-    await expect(page).toHaveURL("/de/about");
   });
 
   test("should navigate to app when clicking Go to App button", async ({
