@@ -573,7 +573,7 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     await languageSelect.selectOption("pt");
 
     await expect(invoiceNumberInput).toHaveValue(
-      `${TRANSLATIONS.pt.invoiceNumber}: 1/${CURRENT_MONTH_AND_YEAR}`
+      `${TRANSLATIONS.pt.invoiceNumber}: 1/2025`
     );
 
     await invoiceNumberInput.fill("Fatura TEST PORTUGUESE N°: 1/04-2025");

@@ -127,7 +127,8 @@ export const GeneralInformation = memo(function GeneralInformation({
   // "Invoice Number"
   const invoiceNumberPrefix = splittedInvoiceNumber?.[0];
   // "1/MM-YYYY"
-  const invoiceNumberSuffix = splittedInvoiceNumber?.[1];
+  const invoiceNumberSuffix =
+    splittedInvoiceNumber?.[1] ?? `1/${CURRENT_MONTH_AND_YEAR}`;
 
   // extract the month and year from the invoice number (e.g. 01-2025)
   const extractInvoiceMonthAndYear = /(\d{2}-\d{4})/.exec(
