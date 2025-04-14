@@ -1,10 +1,5 @@
 {
   "About": {
-    "meta": {
-      "title": "Generatore di fatture PDF con anteprima in tempo reale | Senza registrazione",
-      "description": "Crea e scarica fatture PDF professionali istantaneamente con anteprima in tempo reale. Gratuito e open-source. Nessuna registrazione richiesta.",
-      "keywords": "strumento di fatturazione, generatore di fatture gratuito, fatture PDF, creatore di fatture, software di fatturazione"
-    },
     "tagline": "Generatore di fatture PDF con anteprima in tempo reale",
     "hero": {
       "title": "Crea fatture professionali in pochi secondi",
@@ -34,8 +29,8 @@
           "description": "Crea fatture in dieci lingue (inglese, polacco, tedesco, spagnolo, portoghese, russo, ucraino, francese, italiano, olandese) con supporto per tutte le principali valute e formattazione automatica."
         },
         "vatSupport": {
-          "title": "Supporto IVA",
-          "description": "Calcola automaticamente le aliquote e i totali IVA con supporto per diverse giurisdizioni fiscali."
+          "title": "Supporto VAT Europea",
+          "description": "Calcola automaticamente le aliquote e i totali VAT europei per le tue fatture."
         },
         "openSource": {
           "title": "Open Source",
@@ -90,7 +85,7 @@
   },
   "Metadata": {
     "about": {
-      "title": "Generatore di Fatture PDF con Anteprima in Tempo Reale | Senza Registrazione",
+      "title": "Chi siamo | Generatore di Fatture PDF con Anteprima in Tempo Reale | Senza Registrazione",
       "description": "Crea e scarica fatture PDF professionali istantaneamente con anteprima in tempo reale. Gratuito e open-source. Nessuna registrazione richiesta.",
       "keywords": "strumento fatturazione, generatore fatture gratis, fatture PDF, creatore fatture, software fatturazione"
     }

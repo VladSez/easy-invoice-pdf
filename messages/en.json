@@ -1,10 +1,5 @@
 {
   "About": {
-    "meta": {
-      "title": "Invoice PDF Generator with Live Preview | No Sign-Up",
-      "description": "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
-      "keywords": "invoice tool, free invoice generator, PDF invoices, invoice creator, billing software"
-    },
     "tagline": "Invoice PDF generator with live preview",
     "hero": {
       "title": "Create professional invoices in seconds",
@@ -34,8 +29,8 @@
           "description": "Create invoices in ten languages (English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, Dutch) with support for all major currencies and automatic formatting."
         },
         "vatSupport": {
-          "title": "VAT Support",
-          "description": "Automatically calculate VAT rates and totals with support for different tax jurisdictions."
+          "title": "European VAT Support",
+          "description": "Automatically calculate European VAT rates and totals for your invoices."
         },
         "openSource": {
           "title": "Open Source",
@@ -91,7 +86,7 @@
   },
   "Metadata": {
     "about": {
-      "title": "Invoice PDF Generator with Live Preview | No Sign-Up",
+      "title": "About | Invoice PDF Generator with Live Preview | No Sign-Up",
       "description": "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
       "keywords": "invoice tool, free invoice generator, PDF invoices, invoice creator, billing software"
     }

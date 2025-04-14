@@ -1,10 +1,5 @@
 {
   "About": {
-    "meta": {
-      "title": "PDF-factuur generator met live preview | Geen registratie",
-      "description": "Maak en download direct professionele PDF-facturen met realtime preview. Gratis en open-source. Geen registratie vereist.",
-      "keywords": "facturatietool, gratis factuur generator, PDF-facturen, factuur maker, facturatiesoftware"
-    },
     "tagline": "PDF-factuur generator met live preview",
     "hero": {
       "title": "Maak professionele facturen in seconden",
@@ -34,8 +29,8 @@
           "description": "Maak facturen in tien talen (Engels, Pools, Duits, Spaans, Portugees, Russisch, Oekraïens, Frans, Italiaans, Nederlands) met ondersteuning voor alle belangrijke valuta's en automatische opmaak."
         },
         "vatSupport": {
-          "title": "BTW Ondersteuning",
-          "description": "Bereken automatisch BTW-tarieven en totalen met ondersteuning voor verschillende belastingjurisdicties."
+          "title": "Europese VAT-ondersteuning",
+          "description": "Automatische berekening van Europese VAT-tarieven en totalen voor uw facturen."
         },
         "openSource": {
           "title": "Open Source",
@@ -90,7 +85,7 @@
   },
   "Metadata": {
     "about": {
-      "title": "PDF Factuur Generator met Live Voorbeeld | Geen Registratie",
+      "title": "Over ons | PDF Factuur Generator met Live Voorbeeld | Geen Registratie",
       "description": "Maak en download direct professionele PDF-facturen met realtime voorbeeld. Gratis en open-source. Geen registratie vereist.",
       "keywords": "factuurtool, gratis factuur generator, PDF facturen, factuur maker, facturatie software"
     }

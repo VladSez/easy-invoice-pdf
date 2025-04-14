@@ -59,13 +59,6 @@ const aboutFeaturesSchema = z
 
 const aboutSchema = z
   .object({
-    meta: z
-      .object({
-        title: z.string(),
-        description: z.string(),
-        keywords: z.string(),
-      })
-      .strict(),
     tagline: z.string(),
     hero: z
       .object({

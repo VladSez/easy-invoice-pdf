@@ -14,17 +14,12 @@
   },
   "Metadata": {
     "about": {
-      "title": "Generador de Facturas PDF con Vista Previa en Vivo | Sin Registro",
+      "title": "Acerca de | Generador de Facturas PDF con Vista Previa en Vivo | Sin Registro",
       "description": "Crea y descarga facturas PDF profesionales al instante con vista previa en tiempo real. Gratis y de código abierto. No requiere registro.",
       "keywords": "herramienta de facturación, generador de facturas gratuito, facturas PDF, creador de facturas, software de facturación"
     }
   },
   "About": {
-    "meta": {
-      "title": "Generador de facturas PDF con vista previa en vivo | Sin registro",
-      "description": "Crea y descarga facturas PDF profesionales al instante con vista previa en tiempo real. Gratis y de código abierto. No requiere registro.",
-      "keywords": "herramienta de facturación, generador de facturas gratis, facturas PDF, creador de facturas, software de facturación"
-    },
     "tagline": "Generador de facturas PDF con vista previa en vivo",
     "hero": {
       "title": "Cree facturas profesionales en segundos",
@@ -54,8 +49,8 @@
           "description": "Cree facturas en siete idiomas con soporte para todas las principales monedas y formato automático."
         },
         "vatSupport": {
-          "title": "Soporte de IVA",
-          "description": "Calcule automáticamente las tasas y totales de IVA con soporte para diferentes jurisdicciones fiscales."
+          "title": "Soporte de VAT Europeo",
+          "description": "Calcula automáticamente las tasas y totales del VAT europeo para tus facturas."
         },
         "openSource": {
           "title": "Código Abierto",

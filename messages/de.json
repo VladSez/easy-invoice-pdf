@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "about": {
-      "title": "PDF-Rechnungsgenerator mit Live-Vorschau | Keine Anmeldung",
+      "title": "Über uns | PDF-Rechnungsgenerator mit Live-Vorschau | Keine Anmeldung",
       "description": "Erstellen und laden Sie professionelle PDF-Rechnungen sofort mit Echtzeit-Vorschau herunter. Kostenlos und Open-Source. Keine Anmeldung erforderlich.",
       "keywords": "Rechnungstool, kostenloser Rechnungsgenerator, PDF-Rechnungen, Rechnungsersteller, Fakturierungssoftware"
     }
@@ -12,11 +12,6 @@
     "returnHome": "Zur Startseite zurückkehren"
   },
   "About": {
-    "meta": {
-      "title": "Rechnungs-PDF-Generator mit Live-Vorschau | Keine Anmeldung",
-      "description": "Erstellen und laden Sie professionelle PDF-Rechnungen sofort mit Echtzeit-Vorschau herunter. Kostenlos und Open-Source. Keine Anmeldung erforderlich.",
-      "keywords": "Rechnungstool, kostenloser Rechnungsgenerator, PDF-Rechnungen, Rechnungsersteller, Abrechnungssoftware"
-    },
     "tagline": "Rechnungs-PDF-Generator mit Live-Vorschau",
     "hero": {
       "title": "Erstellen Sie professionelle Rechnungen in Sekunden",
@@ -46,8 +41,8 @@
           "description": "Erstellen Sie Rechnungen in sieben Sprachen mit Unterstützung für alle wichtigen Währungen und automatischer Formatierung."
         },
         "vatSupport": {
-          "title": "MwSt.-Unterstützung",
-          "description": "Berechnen Sie automatisch MwSt.-Sätze und Summen mit Unterstützung für verschiedene Steuerjurisdiktionen."
+          "title": "Europäische VAT-Unterstützung",
+          "description": "Automatische Berechnung europäischer VAT-Sätze und Gesamtbeträge für Ihre Rechnungen."
         },
         "openSource": {
           "title": "Open Source",

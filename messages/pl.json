@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "about": {
-      "title": "Generator Faktur PDF z Podglądem na Żywo | Bez Rejestracji",
+      "title": "O nas | Generator Faktur PDF z Podglądem na Żywo | Bez Rejestracji",
       "description": "Twórz i pobieraj profesjonalne faktury PDF natychmiast z podglądem w czasie rzeczywistym. Darmowe i open-source. Bez wymaganej rejestracji.",
       "keywords": "narzędzie do fakturowania, darmowy generator faktur, faktury PDF, kreator faktur, oprogramowanie do fakturowania"
     }
@@ -20,11 +20,6 @@
     "toastMessage": "Coś poszło nie tak! Spróbuj odświeżyć stronę lub zgłoś błąd."
   },
   "About": {
-    "meta": {
-      "title": "Generator faktur PDF z podglądem na żywo | Bez rejestracji",
-      "description": "Twórz i pobieraj profesjonalne faktury PDF natychmiast z podglądem w czasie rzeczywistym. Darmowe i open-source. Bez rejestracji.",
-      "keywords": "narzędzie do faktur, darmowy generator faktur, faktury PDF, kreator faktur, oprogramowanie do fakturowania"
-    },
     "tagline": "Generator faktur PDF z podglądem na żywo",
     "hero": {
       "title": "Twórz profesjonalne faktury w kilka sekund",
@@ -54,8 +49,8 @@
           "description": "Twórz faktury w siedmiu językach z obsługą wszystkich głównych walut i automatycznym formatowaniem."
         },
         "vatSupport": {
-          "title": "Obsługa VAT",
-          "description": "Automatycznie obliczaj stawki i sumy VAT z obsługą różnych jurysdykcji podatkowych."
+          "title": "Obsługa Europejskiego VAT",
+          "description": "Automatyczne obliczanie stawek i sum VAT dla faktur w Unii Europejskiej."
         },
         "openSource": {
           "title": "Open Source",

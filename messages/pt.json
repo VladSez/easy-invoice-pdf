@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "about": {
-      "title": "Gerador de Faturas PDF com Pré-visualização ao Vivo | Sem Cadastro",
+      "title": "Sobre | Gerador de Faturas PDF com Pré-visualização ao Vivo | Sem Cadastro",
       "description": "Crie e baixe faturas PDF profissionais instantaneamente com pré-visualização em tempo real. Gratuito e de código aberto. Não é necessário cadastro.",
       "keywords": "ferramenta de faturamento, gerador de faturas grátis, faturas PDF, criador de faturas, software de faturamento"
     }
@@ -12,11 +12,6 @@
     "returnHome": "Voltar à página inicial"
   },
   "About": {
-    "meta": {
-      "title": "Gerador de faturas PDF com pré-visualização em tempo real | Sem registro",
-      "description": "Crie e baixe faturas PDF profissionais instantaneamente com pré-visualização em tempo real. Gratuito e de código aberto. Sem necessidade de registro.",
-      "keywords": "ferramenta de faturamento, gerador de faturas grátis, faturas PDF, criador de faturas, software de faturamento"
-    },
     "tagline": "Gerador de faturas PDF com pré-visualização em tempo real",
     "hero": {
       "title": "Crie faturas profissionais em segundos",
@@ -46,8 +41,8 @@
           "description": "Crie faturas em sete idiomas com suporte para todas as principais moedas e formatação automática."
         },
         "vatSupport": {
-          "title": "Suporte a VAT Europeu",
-          "description": "Calcule automaticamente taxas e totais de VAT com suporte para jurisdições fiscais europeias."
+          "title": "Suporte ao VAT Europeu",
+          "description": "Cálculo automático de taxas e totais do VAT europeu para suas faturas."
         },
         "openSource": {
           "title": "Código Aberto",

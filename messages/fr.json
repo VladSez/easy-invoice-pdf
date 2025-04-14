@@ -1,10 +1,5 @@
 {
   "About": {
-    "meta": {
-      "title": "Générateur de factures PDF avec aperçu en direct | Sans inscription",
-      "description": "Créez et téléchargez des factures PDF professionnelles instantanément avec aperçu en temps réel. Gratuit et open-source. Pas d'inscription requise.",
-      "keywords": "outil de facturation, générateur de factures gratuit, factures PDF, créateur de factures, logiciel de facturation"
-    },
     "tagline": "Générateur de factures PDF avec aperçu en direct",
     "hero": {
       "title": "Créez des factures professionnelles en quelques secondes",
@@ -34,8 +29,8 @@
           "description": "Créez des factures en dix langues (anglais, polonais, allemand, espagnol, portugais, russe, ukrainien, français, italien, néerlandais) avec prise en charge de toutes les principales devises et formatage automatique."
         },
         "vatSupport": {
-          "title": "Support TVA",
-          "description": "Calculez automatiquement les taux et totaux de TVA avec prise en charge des différentes juridictions fiscales."
+          "title": "Support VAT Européenne",
+          "description": "Calcul automatique des taux et totaux de VAT européenne pour vos factures."
         },
         "openSource": {
           "title": "Open Source",
@@ -90,7 +85,7 @@
   },
   "Metadata": {
     "about": {
-      "title": "Générateur de Factures PDF avec Aperçu en Direct | Sans Inscription",
+      "title": "À propos | Générateur de Factures PDF avec Aperçu en Direct | Sans Inscription",
       "description": "Créez et téléchargez des factures PDF professionnelles instantanément avec aperçu en temps réel. Gratuit et open-source. Aucune inscription requise.",
       "keywords": "outil de facturation, générateur de factures gratuit, factures PDF, créateur de factures, logiciel de facturation"
     }
