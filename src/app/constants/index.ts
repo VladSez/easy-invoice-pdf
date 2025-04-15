@@ -54,10 +54,18 @@ export const DEFAULT_BUYER_DATA = {
   email: "buyer@email.com",
 } as const satisfies Omit<BuyerData, "id">;
 
+/**
+ * Initial invoice data
+ *
+ * This is the initial data that will be used when the user first opens the app or clears the invoice data
+ */
 export const INITIAL_INVOICE_DATA = {
   language: EN,
   currency: EUR,
-  invoiceNumber: `${TRANSLATIONS[EN].invoiceNumber}: 1/${invoiceCurrentMonthAndYear}`,
+  invoiceNumberObject: {
+    label: `${TRANSLATIONS[EN].invoiceNumber}:`,
+    value: `1/${invoiceCurrentMonthAndYear}`,
+  },
 
   dateOfIssue: today,
   dateOfService: lastDayOfMonth,

@@ -14,6 +14,8 @@ const getDownloadDir = ({ browserName }: { browserName: string }) => {
   return path.join(PLAYWRIGHT_TEST_DOWNLOADS_DIR, name);
 };
 
+const CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
+
 /**
  * We can't test the PDF preview because it's not supported in Playwright.
  * https://github.com/microsoft/playwright/issues/7822
@@ -346,10 +348,21 @@ Created with https://easyinvoicepdf.com`);
     // Switch currency to GBP
     await page.getByRole("combobox", { name: "Currency" }).selectOption("GBP");
 
-    // Fill in some invoice data
-    await page
-      .getByRole("textbox", { name: "Invoice Number" })
-      .fill("MOBILE-TEST-001");
+    const invoiceNumberFieldset = page.getByRole("group", {
+      name: "Invoice Number",
+    });
+
+    const invoiceNumberLabelInput = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Label",
+    });
+
+    const invoiceNumberValueInput = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Value",
+    });
+
+    await invoiceNumberLabelInput.fill("MOBILE-TEST-001:");
+    await invoiceNumberValueInput.fill("2/05-2024");
+
     await page
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Mobile test note");
@@ -420,7 +433,7 @@ Created with https://easyinvoicepdf.com`);
     const pdfData = await pdf(dataBuffer);
 
     // Verify PDF content in Polish
-    expect(pdfData.text).toContain("MOBILE-TEST-001");
+    expect(pdfData.text).toContain("MOBILE-TEST-001: 2/05-2024");
     expect(pdfData.text).toContain("Date d'émission");
 
     expect(pdfData.text).toContain("Vendeur");
@@ -460,9 +473,9 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     ).toBeHidden();
 
     // Verify form data persists
-    await expect(
-      page.getByRole("textbox", { name: "Invoice Number" })
-    ).toHaveValue("MOBILE-TEST-001");
+    await expect(invoiceNumberLabelInput).toHaveValue("MOBILE-TEST-001:");
+    await expect(invoiceNumberValueInput).toHaveValue("2/05-2024");
+
     await expect(
       page.getByRole("textbox", { name: "Notes", exact: true })
     ).toHaveValue("Mobile test note");
@@ -514,16 +527,26 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
   test("should display and persist invoice number in different languages", async ({
     page,
   }) => {
-    const CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
-
     const generalInfoSection = page.getByTestId("general-information-section");
 
-    const invoiceNumberInput = generalInfoSection.getByRole("textbox", {
+    const invoiceNumberFieldset = generalInfoSection.getByRole("group", {
       name: "Invoice Number",
     });
 
-    await expect(invoiceNumberInput).toHaveValue(
-      INITIAL_INVOICE_DATA.invoiceNumber
+    const invoiceNumberLabelInput = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Label",
+    });
+
+    const invoiceNumberValueInput = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Value",
+    });
+
+    await expect(invoiceNumberLabelInput).toHaveValue(
+      INITIAL_INVOICE_DATA.invoiceNumberObject.label
+    );
+
+    await expect(invoiceNumberValueInput).toHaveValue(
+      INITIAL_INVOICE_DATA.invoiceNumberObject.value
     );
 
     const languageSelect = page.getByRole("combobox", {
@@ -532,16 +555,20 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
 
     await languageSelect.selectOption("pl");
 
-    await expect(invoiceNumberInput).toHaveValue(
-      `${TRANSLATIONS.pl.invoiceNumber}: 1/${CURRENT_MONTH_AND_YEAR}`
+    await expect(invoiceNumberLabelInput).toHaveValue(
+      `${TRANSLATIONS.pl.invoiceNumber}:`
+    );
+
+    await expect(invoiceNumberValueInput).toHaveValue(
+      `1/${CURRENT_MONTH_AND_YEAR}`
     );
 
     // I can fill in a new invoice number
-    await invoiceNumberInput.fill("Faktura TEST: 1/2025");
+    await invoiceNumberLabelInput.fill("Faktura TEST:");
 
     // check that warning message appears
     const switchToDefaultFormatButton = page.getByRole("button", {
-      name: `Switch to default format (Faktura nr: 1/${CURRENT_MONTH_AND_YEAR})`,
+      name: `Switch to default label ("Faktura nr:")`,
     });
 
     await expect(switchToDefaultFormatButton).toBeVisible();
@@ -550,15 +577,13 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     await switchToDefaultFormatButton.click();
 
     // check that the invoice number is updated to the default format
-    await expect(invoiceNumberInput).toHaveValue(
-      `Faktura nr: 1/${CURRENT_MONTH_AND_YEAR}`
-    );
+    await expect(invoiceNumberLabelInput).toHaveValue(`Faktura nr:`);
 
     // check that the switch to default format button is hidden
     await expect(switchToDefaultFormatButton).toBeHidden();
 
     // fill once again the invoice number
-    await invoiceNumberInput.fill("Faktura TEST: 1/2025");
+    await invoiceNumberLabelInput.fill("Faktura TEST:");
 
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
     // eslint-disable-next-line playwright/no-wait-for-timeout
@@ -568,19 +593,19 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     await page.reload();
 
     // Verify that the invoice number is persisted after page reload
-    await expect(invoiceNumberInput).toHaveValue("Faktura TEST: 1/2025");
+    await expect(invoiceNumberLabelInput).toHaveValue("Faktura TEST:");
 
     await languageSelect.selectOption("pt");
 
-    await expect(invoiceNumberInput).toHaveValue(
-      `${TRANSLATIONS.pt.invoiceNumber}: 1/2025`
+    await expect(invoiceNumberLabelInput).toHaveValue(
+      `${TRANSLATIONS.pt.invoiceNumber}:`
     );
 
-    await invoiceNumberInput.fill("Fatura TEST PORTUGUESE N°: 1/04-2025");
+    await invoiceNumberLabelInput.fill("Fatura TEST PORTUGUESE N°:");
 
     await expect(
       page.getByRole("button", {
-        name: `Switch to default format (Fatura N°: 1/${CURRENT_MONTH_AND_YEAR})`,
+        name: `Switch to default label ("Fatura N°:")`,
       })
     ).toBeVisible();
 

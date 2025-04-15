@@ -3,7 +3,6 @@ import { styles } from ".";
 import { type InvoiceData } from "@/app/schema";
 import dayjs from "dayjs";
 import { TRANSLATIONS } from "@/app/schema/translations";
-
 export function InvoiceHeader({ invoiceData }: { invoiceData: InvoiceData }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
@@ -14,6 +13,12 @@ export function InvoiceHeader({ invoiceData }: { invoiceData: InvoiceData }) {
   const dateOfService = dayjs(invoiceData.dateOfService).format(
     invoiceData.dateFormat
   );
+
+  const invoiceNumberLabel = invoiceData?.invoiceNumberObject?.label;
+
+  const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
+
+  const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`;
 
   return (
     <View
@@ -26,7 +31,7 @@ export function InvoiceHeader({ invoiceData }: { invoiceData: InvoiceData }) {
       }}
     >
       <View>
-        <Text style={[styles.header]}>{invoiceData?.invoiceNumber}</Text>
+        <Text style={[styles.header]}>{invoiceNumber}</Text>
 
         {invoiceData?.invoiceType && invoiceData.invoiceTypeFieldIsVisible && (
           <Text

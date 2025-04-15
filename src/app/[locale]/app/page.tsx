@@ -1,6 +1,10 @@
 "use client";
 
-import { invoiceSchema, type InvoiceData } from "@/app/schema";
+import {
+  invoiceSchema,
+  SUPPORTED_LANGUAGES,
+  type InvoiceData,
+} from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { CustomTooltip, TooltipProvider } from "@/components/ui/tooltip";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
@@ -30,7 +34,65 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { z } from "zod";
+import { TRANSLATIONS } from "@/app/schema/translations";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
+
+/**
+ * This function handles the breaking change of the invoice number field.
+ * It removes the old "invoiceNumber" field and adds the new "invoiceNumberObject" field with label and value.
+ * @param json - The JSON object to handle the breaking change.
+ * @returns The updated JSON object.
+ */
+function handleInvoiceNumberBreakingChange(json: unknown) {
+  // check if the invoice number is in the json
+  if (
+    typeof json === "object" &&
+    json !== null &&
+    "invoiceNumber" in json &&
+    typeof json.invoiceNumber === "string" &&
+    "language" in json
+  ) {
+    umamiTrackEvent("breaking_change_detected");
+
+    let lang: keyof typeof TRANSLATIONS;
+
+    const invoiceLanguage = z
+      .enum(SUPPORTED_LANGUAGES)
+      .safeParse(json.language);
+
+    if (!invoiceLanguage.success) {
+      console.error("Invalid invoice language:", invoiceLanguage.error);
+
+      // fallback to default language
+      lang = SUPPORTED_LANGUAGES[0];
+    } else {
+      lang = invoiceLanguage.data;
+    }
+
+    const invoiceNumberLabel = TRANSLATIONS[lang].invoiceNumber;
+
+    // Create new object without invoiceNumber and with invoiceNumberObject
+    const newJson = {
+      ...json,
+      // assign invoiceNumber to invoiceNumberObject.value
+      invoiceNumberObject: {
+        label: `${invoiceNumberLabel}:`,
+        value: json.invoiceNumber,
+      },
+    };
+
+    // remove deprecated invoiceNumber from json
+    delete (newJson as Record<string, unknown>).invoiceNumber;
+
+    // update json
+    json = newJson;
+
+    return json;
+  }
+
+  return json;
+}
 
 export default function Home({ params }: { params: { locale: Locale } }) {
   const { locale } = params;
@@ -55,8 +117,12 @@ export default function Home({ params }: { params: { locale: Locale } }) {
         const decompressed = decompressFromEncodedURIComponent(
           compressedInvoiceDataInUrl
         );
-        const parsed: unknown = JSON.parse(decompressed);
-        const validated = invoiceSchema.parse(parsed);
+        const parsedJSON: unknown = JSON.parse(decompressed);
+
+        // this should happen before parsing the data with zod
+        const updatedJson = handleInvoiceNumberBreakingChange(parsedJSON);
+
+        const validated = invoiceSchema.parse(updatedJson);
 
         setInvoiceDataState(validated);
       } catch (error) {
@@ -78,7 +144,11 @@ export default function Home({ params }: { params: { locale: Locale } }) {
       const savedData = localStorage.getItem(PDF_DATA_LOCAL_STORAGE_KEY);
       if (savedData) {
         const json: unknown = JSON.parse(savedData);
-        const parsedData = invoiceSchema.parse(json);
+
+        // this should happen before parsing the data with zod
+        const updatedJson = handleInvoiceNumberBreakingChange(json);
+
+        const parsedData = invoiceSchema.parse(updatedJson);
 
         setInvoiceDataState(parsedData);
       } else {
@@ -89,6 +159,15 @@ export default function Home({ params }: { params: { locale: Locale } }) {
       console.error("Failed to load saved invoice data:", error);
 
       setInvoiceDataState(INITIAL_INVOICE_DATA);
+
+      toast.error(
+        "Unable to load your saved invoice data. For your convenience, we've reset the form to default values. Please try creating a new invoice.",
+        {
+          duration: 7000,
+          closeButton: true,
+          richColors: true,
+        }
+      );
 
       Sentry.captureException(error);
     }

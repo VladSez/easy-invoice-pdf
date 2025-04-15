@@ -187,6 +187,12 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
 
+  const invoiceNumberLabel = invoiceData?.invoiceNumberObject?.label;
+
+  const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
+
+  const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`;
+
   const formattedInvoiceTotal = useMemo(() => {
     return invoiceData?.total
       .toLocaleString("en-US", {
@@ -197,8 +203,8 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
   }, [invoiceData?.total]);
 
   const invoiceDocTitle = useMemo(() => {
-    return `${t.invoiceNumber} ${invoiceData.invoiceNumber} | Created with https://easyinvoicepdf.com`;
-  }, [t.invoiceNumber, invoiceData.invoiceNumber]);
+    return `${invoiceNumber} | Created with https://easyinvoicepdf.com`;
+  }, [invoiceNumber]);
 
   const signatureSectionIsVisible = useMemo(() => {
     return (

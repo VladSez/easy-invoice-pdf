@@ -37,6 +37,7 @@ import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
+import { Legend } from "@/components/legend";
 
 export const PDF_DATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_DATA";
 export const LOADING_BUTTON_TIMEOUT = 400;
@@ -87,17 +88,6 @@ const calculateItemTotals = (item: InvoiceItemData | null) => {
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
-};
-
-const Legend = ({
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLLegendElement>) => {
-  return (
-    <legend className="text-lg font-semibold text-gray-900" {...props}>
-      {children}
-    </legend>
-  );
 };
 
 const AlertIcon = () => {

@@ -235,16 +235,29 @@ export const buyerSchema = z
 
 export type BuyerData = z.infer<typeof buyerSchema>;
 
+/**
+ * Invoice schema
+ *
+ * This schema is used to validate the invoice data
+ */
 export const invoiceSchema = z.object({
   language: z.enum(SUPPORTED_LANGUAGES).default("en"),
   dateFormat: z.enum(SUPPORTED_DATE_FORMATS).default("YYYY-MM-DD"),
   currency: z.enum(SUPPORTED_CURRENCIES).default("EUR"),
 
-  invoiceNumber: z
-    .string()
-    .min(1, "Invoice number is required")
-    .max(500, "Invoice number must not exceed 500 characters")
-    .trim(),
+  invoiceNumberObject: z
+    .object({
+      label: z
+        .string()
+        .max(250, "Invoice number label must not exceed 250 characters")
+        .trim(),
+      value: z
+        .string()
+        .max(100, "Invoice number must not exceed 100 characters")
+        .trim(),
+    })
+    .optional(),
+
   dateOfIssue: z.string().min(1, "Date of issue is required").trim(),
   dateOfService: z.string().min(1, "Date of service is required").trim(),
 

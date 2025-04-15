@@ -22,12 +22,7 @@ import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { getAmountInWords, getNumberFractionalPart } from "@/lib/utils";
 import { Plus, Trash2 } from "lucide-react";
-
-const Legend = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <legend className="text-lg font-semibold text-gray-900">{children}</legend>
-  );
-};
+import { Legend } from "@/components/legend";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;

@@ -182,9 +182,17 @@ test.describe("Invoice Generator Page", () => {
     }
 
     // Invoice Number
+    const invoiceNumberFieldset = page.getByRole("group", {
+      name: "Invoice Number",
+    });
+
     await expect(
-      generalInfoSection.getByRole("textbox", { name: "Invoice Number" })
-    ).toHaveValue(INITIAL_INVOICE_DATA.invoiceNumber);
+      invoiceNumberFieldset.getByRole("textbox", { name: "Label" })
+    ).toHaveValue(INITIAL_INVOICE_DATA.invoiceNumberObject.label);
+
+    await expect(
+      invoiceNumberFieldset.getByRole("textbox", { name: "Value" })
+    ).toHaveValue(INITIAL_INVOICE_DATA.invoiceNumberObject.value);
 
     // Date of Issue
     await expect(
@@ -485,26 +493,47 @@ test.describe("Invoice Generator Page", () => {
 
   test("handles form validation", async ({ page }) => {
     // Clear required fields
-    await page.getByRole("textbox", { name: "Invoice Number" }).clear();
     await page.getByRole("textbox", { name: "Date of Issue" }).clear();
 
-    // Try to generate PDF
-    await page.getByRole("link", { name: "Download PDF in English" }).click();
+    // Clear name field on the seller section
+    const sellerSection = page.getByTestId(`seller-information-section`);
+    await sellerSection.getByRole("textbox", { name: "Name" }).clear();
 
-    // Check for error messages
-    await expect(
-      page.getByText("Invoice number is required", { exact: true })
-    ).toBeVisible();
+    const buyerSection = page.getByTestId(`buyer-information-section`);
+    await buyerSection.getByRole("textbox", { name: "Name" }).clear();
+
+    // Clear name field on the first invoice item
+    const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
+    await invoiceItemsSection.getByRole("textbox", { name: "Name" }).clear();
+
     await expect(
       page.getByText("Date of issue is required", { exact: true })
     ).toBeVisible();
 
+    await expect(
+      page.getByText("Seller name is required", { exact: true })
+    ).toBeVisible();
+
+    await expect(
+      page.getByText("Buyer name is required", { exact: true })
+    ).toBeVisible();
+
+    await expect(
+      page.getByText("Item name is required", { exact: true })
+    ).toBeVisible();
+
     const dateOfIssue = dayjs().format("YYYY-MM-DD");
 
-    // Fill in required fields
-    await page
-      .getByRole("textbox", { name: "Invoice Number" })
-      .fill("1/03-2025");
+    const invoiceNumberFieldset = page.getByRole("group", {
+      name: "Invoice Number",
+    });
+
+    const invoiceNumberValueField = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Value",
+    });
+
+    await invoiceNumberValueField.fill("1/03-2025");
+
     await page
       .getByRole("textbox", { name: "Date of Issue" })
       .fill(dateOfIssue);
@@ -514,23 +543,42 @@ test.describe("Invoice Generator Page", () => {
       page.getByRole("textbox", { name: "Date of Issue" })
     ).toHaveValue(dateOfIssue);
 
-    // Try to generate PDF again
-    await page.getByRole("link", { name: "Download PDF in English" }).click();
+    // Fill in seller name
+    await sellerSection
+      .getByRole("textbox", { name: "Name" })
+      .fill("Test Seller");
+
+    // Fill in buyer name
+    await buyerSection
+      .getByRole("textbox", { name: "Name" })
+      .fill("Test Buyer");
 
     // Check for error messages to be hidden
     await expect(
-      page.getByText("Invoice number is required", { exact: true })
-    ).toBeHidden();
-    await expect(
       page.getByText("Date of issue is required", { exact: true })
+    ).toBeHidden();
+
+    await expect(
+      page.getByText("Seller name is required", { exact: true })
+    ).toBeHidden();
+
+    await expect(
+      page.getByText("Buyer name is required", { exact: true })
     ).toBeHidden();
   });
 
   test("persists data in local storage", async ({ page }) => {
     // Fill in some data
-    await page
-      .getByRole("textbox", { name: "Invoice Number" })
-      .fill("TEST/2024");
+    const invoiceNumberFieldset = page.getByRole("group", {
+      name: "Invoice Number",
+    });
+
+    const invoiceNumberValueField = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Value",
+    });
+
+    await invoiceNumberValueField.fill("TEST/2024");
+
     await page
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Test note");
@@ -547,17 +595,29 @@ test.describe("Invoice Generator Page", () => {
 
     const parsedData = JSON.parse(storedData) as InvoiceData;
     expect(parsedData).toMatchObject({
-      invoiceNumber: "TEST/2024",
+      invoiceNumberObject: {
+        label: "Invoice No. of:",
+        value: "TEST/2024",
+      },
       notes: "Test note",
-    });
+    } satisfies Pick<InvoiceData, "notes" | "invoiceNumberObject">);
 
     // Reload page
     await page.reload();
 
     // Check if data persists in UI
-    await expect(
-      page.getByRole("textbox", { name: "Invoice Number" })
-    ).toHaveValue("TEST/2024");
+    const invoiceNumberFieldset2 = page.getByRole("group", {
+      name: "Invoice Number",
+    });
+
+    const invoiceNumberValueField2 = invoiceNumberFieldset2.getByRole(
+      "textbox",
+      {
+        name: "Value",
+      }
+    );
+    await expect(invoiceNumberValueField2).toHaveValue("TEST/2024");
+
     await expect(
       page.getByRole("textbox", { name: "Notes", exact: true })
     ).toHaveValue("Test note");
@@ -966,9 +1026,16 @@ test.describe("Invoice Generator Page", () => {
     context,
   }) => {
     // Fill in some test data
-    await page
-      .getByRole("textbox", { name: "Invoice Number" })
-      .fill("SHARE-TEST-001");
+    const invoiceNumberFieldset = page.getByRole("group", {
+      name: "Invoice Number",
+    });
+
+    const invoiceNumberValueField = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Value",
+    });
+
+    await invoiceNumberValueField.fill("SHARE-TEST-001");
+
     await page
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Test note for sharing");
@@ -1021,8 +1088,9 @@ test.describe("Invoice Generator Page", () => {
 
     // Verify data is loaded in new tab
     await expect(
-      newPage.getByRole("textbox", { name: "Invoice Number" })
+      invoiceNumberFieldset.getByRole("textbox", { name: "Value" })
     ).toHaveValue("SHARE-TEST-001");
+
     await expect(
       newPage.getByRole("textbox", { name: "Notes", exact: true })
     ).toHaveValue("Test note for sharing");
