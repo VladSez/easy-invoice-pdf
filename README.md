@@ -4,8 +4,11 @@
 
 If you found this project helpful, you can support my work here: [Buy Me a Coffee](https://buymeacoffee.com/vladsazon). Every contribution is greatly appreciated!
 
-https://github.com/user-attachments/assets/9e3194e0-3072-4c95-ae99-e66db1301dc6
+![easy-invoice-hero](https://github.com/user-attachments/assets/ad4baaae-4bf2-44a2-9bd6-389b7fe3f748)
 
+## Demo
+
+https://github.com/user-attachments/assets/9e3194e0-3072-4c95-ae99-e66db1301dc6
 
 ## Technologies we use
 
