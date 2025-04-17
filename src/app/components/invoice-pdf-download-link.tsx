@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { usePDF } from "@react-pdf/renderer";
+import { usePDF } from "@react-pdf/renderer/lib/react-pdf.browser";
 import {
   LANGUAGE_TO_LABEL,
   type InvoiceData,

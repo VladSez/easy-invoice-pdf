@@ -1,4 +1,4 @@
-import { Text, View } from "@react-pdf/renderer";
+import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { styles } from ".";
 import { type InvoiceData } from "@/app/schema";
 import dayjs from "dayjs";

@@ -1,4 +1,4 @@
-import { View, Text } from "@react-pdf/renderer";
+import { View, Text } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { styles } from ".";
 import type { InvoiceData } from "@/app/schema";
 

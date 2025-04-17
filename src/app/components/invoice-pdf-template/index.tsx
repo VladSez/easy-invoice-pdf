@@ -9,7 +9,7 @@ import {
   StyleSheet,
   Text,
   View,
-} from "@react-pdf/renderer";
+} from "@react-pdf/renderer/lib/react-pdf.browser";
 import { InvoiceHeader } from "./invoice-header";
 import { InvoiceSellerBuyerInfo } from "./invoice-seller-buyer-info";
 import { InvoiceItemsTable } from "./invoice-items-table";

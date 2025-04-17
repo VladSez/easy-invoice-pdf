@@ -15,6 +15,7 @@ import { LanguageSwitcher } from "./components/language-switcher";
 import { SubscribeInput } from "@/components/subscribe-input";
 import { setRequestLocale } from "next-intl/server";
 import { Video } from "@/components/video";
+
 export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const { locale } = params;
 

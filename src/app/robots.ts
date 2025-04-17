@@ -7,18 +7,27 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        // Allow only /about routes in all languages /en/about, /pl/about, etc. (we want to index them)
-        allow: SUPPORTED_LANGUAGES.map((locale) => {
-          return `/${locale}/about`;
-        }),
+        allow: [
+          // Allow root
+          "/",
+          // Allow about pages in all languages
+          ...SUPPORTED_LANGUAGES.map((locale) => `/${locale}/about`),
+          // Allow main app page (/en/app) for now
+          "/en/app",
+        ],
         disallow: [
-          "/app",
+          // Disallow shared invoice URLs, like /en/app?data=*
+          "/*app?data=*",
+          "/*app?*data=*",
+          // Disallow subscription confirmation pages with and without tokens
           "/confirm-subscription",
-          // Disallow all app routes in all languages /en/app, /pl/app, etc. (we don't want to index them)
-          ...SUPPORTED_LANGUAGES.map((locale) => `/${locale}/app`),
-          ...SUPPORTED_LANGUAGES.map(
-            (locale) => `/${locale}/confirm-subscription`
-          ),
+          "/confirm-subscription?*",
+          ...SUPPORTED_LANGUAGES.flatMap((locale) => [
+            `/${locale}/confirm-subscription`,
+            `/${locale}/confirm-subscription?*`,
+          ]),
+          // Disallow any other query parameters
+          "/*?*",
         ],
       },
     ],

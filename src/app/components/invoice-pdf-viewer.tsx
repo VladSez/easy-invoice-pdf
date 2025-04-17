@@ -1,4 +1,6 @@
-import { PDFViewer } from "@react-pdf/renderer";
+"use client";
+
+import { PDFViewer } from "@react-pdf/renderer/lib/react-pdf.browser";
 
 export function InvoicePDFViewer({ children }: { children: React.ReactNode }) {
   return (

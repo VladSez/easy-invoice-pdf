@@ -4,14 +4,13 @@ import { routing } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import type EnMessages from "../../../../messages/en.json";
-import { APP_URL } from "@/config";
 
 // Add metadata to make sure search engines can index the page
-export const generateMetadata = async ({
+export async function generateMetadata({
   params,
 }: {
   params: { locale: Locale };
-}): Promise<Metadata> => {
+}): Promise<Metadata> {
   try {
     // Load the messages for the requested locale
     const messages = await import(
@@ -22,7 +21,6 @@ export const generateMetadata = async ({
       title: messages.Metadata.about.title,
       description: messages.Metadata.about.description,
       keywords: messages.Metadata.about.keywords,
-      metadataBase: new URL(APP_URL),
       alternates: {
         canonical: `/${params.locale}/about`,
         languages: {
@@ -48,6 +46,7 @@ export const generateMetadata = async ({
         card: "summary_large_image",
         title: messages.Metadata.about.title,
         description: messages.Metadata.about.description,
+        creator: "@vlad_sazon",
       },
       robots: {
         index: true,
@@ -63,7 +62,7 @@ export const generateMetadata = async ({
 
     throw error;
   }
-};
+}
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));

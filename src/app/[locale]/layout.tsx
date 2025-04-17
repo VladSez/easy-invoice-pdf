@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import { hasLocale, type Locale } from "next-intl";
 import { notFound } from "next/navigation";
 import { Toaster } from "sonner";
+
 import { APP_URL } from "@/config";
 
 export const viewport: Viewport = {
@@ -16,6 +17,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: "Invoice PDF Generator with Live Preview | No Sign-Up",
   description:
     "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
@@ -24,10 +26,6 @@ export const metadata: Metadata = {
   authors: [{ name: "Uladzislau Sazonau" }],
   creator: "Uladzislau Sazonau",
   publisher: "Uladzislau Sazonau",
-  metadataBase: new URL(APP_URL),
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     title: "Invoice PDF Generator with Live Preview | No Sign-Up",
     description:
@@ -41,15 +39,6 @@ export const metadata: Metadata = {
     description:
       "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
     creator: "@vlad_sazon",
-  },
-  // we don't want to index this page
-  robots: {
-    index: false,
-    follow: false,
-    googleBot: {
-      index: false,
-      follow: false,
-    },
   },
 };
 

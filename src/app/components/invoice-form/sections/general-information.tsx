@@ -280,21 +280,25 @@ export const GeneralInformation = memo(function GeneralInformation({
               {!isInvoiceNumberInCurrentMonth &&
                 !errors.invoiceNumberObject?.value && (
                   <InputHelperMessage>
-                    <span className="flex items-center text-balance">
-                      Looks like the invoice number does not match current month
-                    </span>
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="flex items-center text-pretty">
+                        Looks like the invoice number does not match current
+                        month
+                      </span>
 
-                    <ButtonHelper
-                      onClick={() => {
-                        setValue(
-                          "invoiceNumberObject.value",
-                          `1/${CURRENT_MONTH_AND_YEAR}`
-                        );
-                      }}
-                    >
-                      Click to set the invoice number to the current month (
-                      {`1/${CURRENT_MONTH_AND_YEAR}`})
-                    </ButtonHelper>
+                      <ButtonHelper
+                        className="text-pretty"
+                        onClick={() => {
+                          setValue(
+                            "invoiceNumberObject.value",
+                            `1/${CURRENT_MONTH_AND_YEAR}`
+                          );
+                        }}
+                      >
+                        Click to set the invoice number to the current month (
+                        {`1/${CURRENT_MONTH_AND_YEAR}`})
+                      </ButtonHelper>
+                    </div>
                   </InputHelperMessage>
                 )}
             </div>

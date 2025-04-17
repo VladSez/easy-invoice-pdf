@@ -1,7 +1,7 @@
 "use client";
 
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { pdf } from "@react-pdf/renderer";
+import { pdf } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import { toast } from "sonner";

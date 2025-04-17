@@ -19,7 +19,7 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
 };
 
 const SELLER_TOOLTIP_CONTENT =
-  "Seller details are locked. Click the edit button next to the 'Select Seller' dropdown to modify seller details. Any changes will be automatically saved.";
+  "Seller details are locked. Click the edit button next to the 'Select Seller' dropdown to modify seller details.";
 
 interface SellerInformationProps {
   control: Control<InvoiceData>;

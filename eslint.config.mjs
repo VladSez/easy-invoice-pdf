@@ -40,6 +40,19 @@ export default tseslint.config(
       "@typescript-eslint/unbound-method": "off",
       "@typescript-eslint/consistent-indexed-object-style": "off",
       "@typescript-eslint/non-nullable-type-assertion-style": "off",
+      "no-restricted-imports": [
+        "error",
+        {
+          // https://github.com/diegomura/react-pdf/issues/2890#issuecomment-2443831013
+          paths: [
+            {
+              name: "@react-pdf/renderer",
+              message:
+                "Please use @react-pdf/renderer/lib/react-pdf.browser instead. Check https://github.com/diegomura/react-pdf/issues/2890#issuecomment-2443831013 for more details.",
+            },
+          ],
+        },
+      ],
     },
   },
   {

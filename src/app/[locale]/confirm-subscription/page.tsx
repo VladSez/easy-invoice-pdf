@@ -4,6 +4,13 @@ import { redirect } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { headers } from "next/headers";
 
+export const metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 interface PageProps {
   searchParams: { token?: string };
 }

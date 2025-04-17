@@ -143,8 +143,8 @@ const nextConfig = {
     return [
       {
         source: "/",
-        destination: "/app",
-        permanent: false,
+        destination: "/en/app",
+        permanent: true,
       },
     ];
   },
