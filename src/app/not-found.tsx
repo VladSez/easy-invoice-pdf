@@ -1,7 +1,9 @@
 "use client";
+
 // page needs to be "use client" here to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
 
 import { useTranslations } from "next-intl";
+// eslint-disable-next-line no-restricted-imports
 import Link from "next/link";
 
 export default function NotFound() {
@@ -17,7 +19,7 @@ export default function NotFound() {
           <div>
             <h2 className="text-base font-normal">{t("message")}</h2>
             <Link
-              href="/"
+              href="/app"
               className="mt-4 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
             >
               {t("returnHome")}

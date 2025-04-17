@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { hasLocale, useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 
 export default function NotFound({ params }: { params?: { locale: Locale } }) {
   const t = useTranslations("NotFound");
@@ -23,7 +23,7 @@ export default function NotFound({ params }: { params?: { locale: Locale } }) {
           <div>
             <h2 className="text-base font-normal">{t("message")}</h2>
             <Link
-              href="/"
+              href="/app"
               className="mt-4 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
             >
               {t("returnHome")}

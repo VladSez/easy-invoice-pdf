@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ErrorMessage } from "@/components/etc/error-message";
 import { toast } from "sonner";
 
@@ -42,7 +42,7 @@ export default function Error({ error, reset }: Props) {
         {t("tryAgain")}
       </Button>
       <Button asChild>
-        <Link href="/">{t("goBack")}</Link>
+        <Link href="/about">{t("goBack")}</Link>
       </Button>
     </div>
   );

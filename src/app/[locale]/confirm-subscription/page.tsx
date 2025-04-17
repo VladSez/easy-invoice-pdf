@@ -1,5 +1,6 @@
 import { verifySubscriptionToken } from "@/utils/subscription-token";
 import { resend } from "@/utils/resend";
+// eslint-disable-next-line no-restricted-imports
 import { redirect } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { headers } from "next/headers";
@@ -21,7 +22,7 @@ export default async function ConfirmSubscriptionPage({
   const token = searchParams.token;
 
   if (!token) {
-    redirect("/");
+    redirect("/en/about");
   }
 
   // Get IP address for rate limiting

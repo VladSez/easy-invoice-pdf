@@ -43,12 +43,28 @@ export default tseslint.config(
       "no-restricted-imports": [
         "error",
         {
-          // https://github.com/diegomura/react-pdf/issues/2890#issuecomment-2443831013
           paths: [
             {
+              // https://github.com/diegomura/react-pdf/issues/2890#issuecomment-2443831013
               name: "@react-pdf/renderer",
               message:
                 "Please use @react-pdf/renderer/lib/react-pdf.browser instead. Check https://github.com/diegomura/react-pdf/issues/2890#issuecomment-2443831013 for more details.",
+            },
+          ],
+          patterns: [
+            {
+              group: ["next/link"],
+              message: "Please import from `@/i18n/navigation` instead.",
+            },
+            {
+              group: ["next/navigation"],
+              importNames: [
+                "redirect",
+                "permanentRedirect",
+                "useRouter",
+                "usePathname",
+              ],
+              message: "Please import from `@/i18n/navigation` instead.",
             },
           ],
         },
