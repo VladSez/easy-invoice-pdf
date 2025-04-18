@@ -65,7 +65,7 @@ jobs:
         id: duration
         run: |
           end_time=$(date +%s)
-          duration=$((end_time - ${{ steps.start-time.outputs.job_start_time }}))
+          duration=$((end_time - $job_start_time))
           minutes=$((duration / 60))
           seconds=$((duration % 60))
           echo "total_duration_formatted=${minutes}m ${seconds}s" >> "$GITHUB_OUTPUT"
