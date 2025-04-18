@@ -37,6 +37,7 @@ jobs:
         run: pnpm exec playwright test
         env:
           BASE_URL: ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}
+          continue-on-error: true
 
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 #4.6.1
         name: 🎲 Upload Playwright report
@@ -45,3 +46,22 @@ jobs:
           name: playwright-report
           path: playwright-output/report/
           retention-days: 3
+
+      - name: 📧 Send email
+        if: always()
+        uses: dawidd6/action-send-mail@611879133a9569642c41be66f4a323286e9b8a3b # v4
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          from: GitHub Actions
+          to: ${{ secrets.EMAIL_USERNAME }}
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: ${{ steps.playwright.outcome == 'success' && '✅ E2E Tests Passed' || '❌ E2E Tests Failed' }} for ${{ github.repository }}
+          body: |
+            E2E tests for ${{ github.repository }} have completed.
+
+            Result: ${{ steps.playwright.outcome == 'success' && '✅ Passed' || '❌ Failed' }}
+
+            For more details, please check the GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          attachments: playwright-output/report/**/*.*

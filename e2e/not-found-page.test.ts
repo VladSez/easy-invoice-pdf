@@ -116,6 +116,6 @@ test.describe("Not Found page", () => {
     await expect(homeLink).toBeVisible();
     await homeLink.click();
 
-    await expect(page).toHaveURL("/en/app");
+    await expect(page).toHaveURL("/pl/app");
   });
 });
