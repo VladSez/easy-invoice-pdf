@@ -34,7 +34,15 @@ jobs:
 
       - name: 🎭 Run Playwright tests
         id: playwright
-        run: pnpm exec playwright test
+        # calculate duration of the job and runs playwright test
+        run: |
+          start_time=$(date +%s)
+          pnpm exec playwright test
+          end_time=$(date +%s)
+          duration=$((end_time - start_time))
+          minutes=$((duration / 60))
+          seconds=$((duration % 60))
+          echo "duration_formatted=${minutes}m ${seconds}s" >> "$GITHUB_OUTPUT"
         env:
           BASE_URL: ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}
           continue-on-error: true
@@ -62,6 +70,7 @@ jobs:
             E2E tests for ${{ github.repository }} have completed.
 
             Result: ${{ steps.playwright.outcome == 'success' && '✅ Passed' || '❌ Failed' }}
+            Duration: ${{ steps.playwright.outputs.duration_formatted }}
 
             For more details, please check the GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          attachments: playwright-output/report/**/*.*
+          attachments: playwright-output/report/index.html
