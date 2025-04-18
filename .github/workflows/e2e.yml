@@ -11,6 +11,11 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
+      - name: Set job start time
+        id: start-time
+        run: |
+          echo "job_start_time=$(date +%s)" >> "$GITHUB_ENV"
+
       - run: |
           echo "Environment URL - ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}"
       # we use pinned versions because there are safer to use: https://x.com/paulmillr/status/1900948425325031448
@@ -55,6 +60,16 @@ jobs:
           path: playwright-output/report/
           retention-days: 3
 
+      - name: Calculate total job duration
+        if: always()
+        id: duration
+        run: |
+          end_time=$(date +%s)
+          duration=$((end_time - ${{ steps.start-time.outputs.job_start_time }}))
+          minutes=$((duration / 60))
+          seconds=$((duration % 60))
+          echo "total_duration_formatted=${minutes}m ${seconds}s" >> "$GITHUB_OUTPUT"
+
       - name: 📧 Send email
         if: always()
         uses: dawidd6/action-send-mail@611879133a9569642c41be66f4a323286e9b8a3b # v4
@@ -70,7 +85,8 @@ jobs:
             E2E tests for ${{ github.repository }} have completed.
 
             Result: ${{ steps.playwright.outcome == 'success' && '✅ Passed' || '❌ Failed' }}
-            Duration: ${{ steps.playwright.outputs.duration_formatted }}
+            Playwright Tests Duration: ${{ steps.playwright.outputs.duration_formatted }}
+            Total Job Duration: ${{ steps.duration.outputs.total_duration_formatted }}
 
             For more details, please check the GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           attachments: playwright-output/report/index.html
