@@ -1,9 +1,9 @@
 "use server";
 
 import { z } from "zod";
-import { resend } from "@/utils/resend";
+import { resend } from "@/lib/resend";
 import { generateSubscriptionToken } from "@/utils/subscription-token";
-import { checkRateLimit, ipLimiter, emailLimiter } from "@/utils/rate-limit";
+import { checkRateLimit, ipLimiter, emailLimiter } from "@/lib/rate-limit";
 import { headers } from "next/headers";
 import ConfirmSubscriptionEmail from "@/emails/confirm-subscription";
 import type { Locale } from "next-intl";

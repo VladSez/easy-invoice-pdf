@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import { redis } from "./redis";
+import { redis } from "@/lib/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 
 const TOKEN_EXPIRY = 24 * 60 * 60; // 24 hours in seconds

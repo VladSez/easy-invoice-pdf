@@ -20,9 +20,12 @@ import { MoneyInput, ReadOnlyMoneyInput } from "@/components/ui/money-input";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { getAmountInWords, getNumberFractionalPart } from "@/lib/utils";
 import { Plus, Trash2 } from "lucide-react";
 import { Legend } from "@/components/legend";
+import {
+  getAmountInWords,
+  getNumberFractionalPart,
+} from "@/utils/invoice.utils";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;

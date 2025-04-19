@@ -2,8 +2,11 @@ import { View, Text } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { styles } from ".";
 import type { InvoiceData } from "@/app/schema";
 
-import { getAmountInWords, getNumberFractionalPart } from "@/lib/utils";
 import { TRANSLATIONS } from "@/app/schema/translations";
+import {
+  getAmountInWords,
+  getNumberFractionalPart,
+} from "@/utils/invoice.utils";
 
 export function InvoicePaymentTotals({
   invoiceData,
