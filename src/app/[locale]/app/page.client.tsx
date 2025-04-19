@@ -225,6 +225,29 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
           } catch (error) {
             console.error("Failed to compare with URL data:", error);
 
+            toast.error("The shared invoice URL appears to be incorrect", {
+              description: (
+                <div className="flex flex-col gap-2">
+                  <p className="">
+                    Please verify that you have copied the complete invoice URL.
+                    The link may be truncated or corrupted.
+                  </p>
+                  <Button
+                    _variant="outline"
+                    _size="sm"
+                    onClick={() => {
+                      router.replace("/");
+                      toast.dismiss();
+                    }}
+                  >
+                    Clear URL
+                  </Button>
+                </div>
+              ),
+              duration: 20000,
+              closeButton: true,
+            });
+
             Sentry.captureException(error);
           }
         }
