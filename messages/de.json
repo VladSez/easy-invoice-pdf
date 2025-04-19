@@ -89,5 +89,36 @@
     "tryAgain": "Erneut versuchen",
     "goBack": "Zurück",
     "toastMessage": "Etwas ist schief gelaufen! Bitte versuchen Sie, die Seite zu aktualisieren oder einen Fehlerbericht zu erstellen."
+  },
+  "FAQ": {
+    "title": "Häufig gestellte Fragen",
+    "description": "Finden Sie Antworten auf häufige Fragen zu EasyInvoicePDF",
+    "badge": "FAQ",
+    "items": {
+      "whatIs": {
+        "question": "Was ist EasyInvoicePDF?",
+        "answer": "EasyInvoicePDF ist ein kostenloses, Open-Source-Tool, mit dem Sie sofort professionelle PDF-Rechnungen erstellen können. Es bietet eine Echtzeit-Vorschau, anpassbare Vorlagen und unterstützt mehrere Sprachen und Währungen."
+      },
+      "isFree": {
+        "question": "Ist es wirklich kostenlos?",
+        "answer": "Ja, EasyInvoicePDF ist völlig kostenlos. Das gesamte Projekt ist Open-Source und auf GitHub verfügbar."
+      },
+      "accountNeeded": {
+        "question": "Muss ich ein Konto erstellen?",
+        "answer": "Nein, Sie müssen kein Konto erstellen oder sich registrieren. Sie können sofort ohne Registrierungsprozess mit der Erstellung von Rechnungen beginnen."
+      },
+      "customization": {
+        "question": "Kann ich die Rechnungsvorlage anpassen?",
+        "answer": "Ja, Sie können verschiedene Aspekte Ihrer Rechnung anpassen, einschließlich Firmendetails, Logo, Farben, Währung und Sprache. Weitere Anpassungsoptionen werden regelmäßig hinzugefügt."
+      },
+      "dataSecurity": {
+        "question": "Sind meine Daten sicher?",
+        "answer": "Ihre Privatsphäre ist uns wichtig. Alle Rechnungsdaten werden vollständig in Ihrem Browser verarbeitet - wir speichern keine Ihrer Informationen auf unseren Servern. Sie können das Tool nach dem Laden sogar offline nutzen."
+      },
+      "sharing": {
+        "question": "Kann ich Rechnungen mit anderen teilen?",
+        "answer": "Ja, Sie können teilbare Links für Ihre Rechnungen generieren, die andere ansehen und herunterladen können. Diese Links sind sicher und nur für Personen zugänglich, mit denen Sie sie teilen."
+      }
+    }
   }
 }

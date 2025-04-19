@@ -15,6 +15,13 @@ import { LanguageSwitcher } from "./components/language-switcher";
 import { SubscribeInput } from "@/components/subscribe-input";
 import { setRequestLocale } from "next-intl/server";
 import { Video } from "@/components/video";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const { locale } = params;
@@ -23,16 +30,19 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
   setRequestLocale(locale);
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
-      <Header locale={locale} />
-      <main>
-        <HeroSection />
-        <FeaturesSection />
-        <SubscribeSection locale={locale} />
-        <CtaSection />
-      </main>
-      <Footer locale={locale} />
-    </div>
+    <TooltipProvider>
+      <div className="flex min-h-screen flex-col bg-slate-50">
+        <Header locale={locale} />
+        <main>
+          <HeroSection />
+          <FeaturesSection />
+          <FaqSection />
+          <SubscribeSection locale={locale} />
+          <CtaSection />
+        </main>
+        <Footer locale={locale} />
+      </div>
+    </TooltipProvider>
   );
 }
 
@@ -114,31 +124,31 @@ function FeaturesSection() {
 
   const FEATURES_CARDS = [
     {
-      key: "livePreview",
+      translationKey: "livePreview",
       icon: <FileText className="h-10 w-10 text-slate-700" />,
     },
     {
-      key: "shareableLinks",
+      translationKey: "shareableLinks",
       icon: <Share2 className="h-10 w-10 text-slate-700" />,
     },
     {
-      key: "instantDownload",
+      translationKey: "instantDownload",
       icon: <Download className="h-10 w-10 text-slate-700" />,
     },
     {
-      key: "multiLanguage",
+      translationKey: "multiLanguage",
       icon: <GlobeIcon className="h-10 w-10 text-slate-700" />,
     },
     {
-      key: "vatSupport",
+      translationKey: "vatSupport",
       icon: <CalculatorIcon className="h-10 w-10 text-slate-700" />,
     },
     {
-      key: "openSource",
+      translationKey: "openSource",
       icon: <GithubIcon className="h-10 w-10 text-slate-700" />,
     },
   ] as const satisfies {
-    key: string;
+    translationKey: string;
     icon: React.ReactNode;
   }[];
 
@@ -173,12 +183,14 @@ function FeaturesSection() {
         </div>
         <div className="mx-auto grid max-w-5xl items-center gap-6 pt-10 md:grid-cols-2 md:gap-10 lg:grid-cols-3">
           {FEATURES_CARDS.map((feature) => {
-            const title = t(`features.items.${feature.key}.title`);
-            const description = t(`features.items.${feature.key}.description`);
+            const title = t(`features.items.${feature.translationKey}.title`);
+            const description = t(
+              `features.items.${feature.translationKey}.description`
+            );
 
             return (
               <div
-                key={feature.key}
+                key={feature.translationKey}
                 className="flex h-full flex-col items-start gap-4 rounded-lg border border-slate-100 bg-white p-6 shadow-sm"
               >
                 {feature.icon}
@@ -191,6 +203,78 @@ function FeaturesSection() {
               </div>
             );
           })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FaqSection() {
+  const t = useTranslations("FAQ");
+
+  const FAQ_ITEMS = [
+    {
+      translationKey: "whatIs",
+    },
+    {
+      translationKey: "isFree",
+    },
+    {
+      translationKey: "accountNeeded",
+    },
+    {
+      translationKey: "customization",
+    },
+    {
+      translationKey: "dataSecurity",
+    },
+    {
+      translationKey: "sharing",
+    },
+  ] as const satisfies {
+    translationKey: string;
+  }[];
+
+  return (
+    <section
+      id="faq"
+      className="flex w-full items-center justify-center bg-white py-12 md:py-24"
+    >
+      <div className="container px-4 md:px-6">
+        <div className="flex flex-col items-center justify-center space-y-4 text-center">
+          <div className="space-y-2">
+            <div className="mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-sm transition-colors">
+              {t("badge")}
+            </div>
+            <h2 className="text-3xl font-bold tracking-tighter text-slate-900 md:text-4xl/tight">
+              {t("title")}
+            </h2>
+            <p className="max-w-[900px] text-slate-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              {t("description")}
+            </p>
+          </div>
+        </div>
+        <div className="mx-auto mt-8 max-w-3xl">
+          <Accordion type="multiple" className="w-full">
+            {FAQ_ITEMS.map((item, index) => {
+              const question = t(`items.${item.translationKey}.question`);
+              const answer = t(`items.${item.translationKey}.answer`);
+
+              return (
+                <AccordionItem
+                  key={item.translationKey}
+                  value={`item-${index}`}
+                >
+                  <AccordionTrigger className="text-left">
+                    {question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-slate-600">
+                    {answer}
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
         </div>
       </div>
     </section>
@@ -289,6 +373,7 @@ function CtaSection() {
 
 function Footer({ locale }: { locale: Locale }) {
   const t = useTranslations("About");
+  const tFaq = useTranslations("FAQ");
   const tNewsletter = useTranslations("About.newsletter");
 
   const newsletterTitle = tNewsletter("title");
@@ -372,6 +457,14 @@ function Footer({ locale }: { locale: Locale }) {
                     className="text-sm text-slate-500 hover:text-slate-900"
                   >
                     {t("footer.links.features")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#faq"
+                    className="text-sm text-slate-500 hover:text-slate-900"
+                  >
+                    {tFaq("badge")}
                   </Link>
                 </li>
                 <li>

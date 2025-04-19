@@ -89,5 +89,36 @@
       "description": "Maak en download direct professionele PDF-facturen met realtime voorbeeld. Gratis en open-source. Geen registratie vereist.",
       "keywords": "factuurtool, gratis factuur generator, PDF facturen, factuur maker, facturatie software"
     }
+  },
+  "FAQ": {
+    "title": "Veelgestelde Vragen",
+    "description": "Vind antwoorden op veelgestelde vragen over EasyInvoicePDF",
+    "badge": "FAQ",
+    "items": {
+      "whatIs": {
+        "question": "Wat is EasyInvoicePDF?",
+        "answer": "EasyInvoicePDF is een gratis, open-source tool die je helpt om direct professionele PDF-facturen te maken. Het biedt een live preview, aanpasbare sjablonen en ondersteunt meerdere talen en valuta's."
+      },
+      "isFree": {
+        "question": "Is het echt gratis?",
+        "answer": "Ja, EasyInvoicePDF is volledig gratis. Het hele project is open-source en beschikbaar op GitHub."
+      },
+      "accountNeeded": {
+        "question": "Moet ik een account aanmaken?",
+        "answer": "Nee, je hoeft geen account aan te maken of je te registreren. Je kunt direct beginnen met het maken van facturen zonder registratieproces."
+      },
+      "customization": {
+        "question": "Kan ik de factuursjabloon aanpassen?",
+        "answer": "Ja, je kunt verschillende aspecten van je factuur aanpassen, waaronder bedrijfsgegevens, logo, kleuren, valuta en taal. Er worden regelmatig nieuwe aanpassingsopties toegevoegd."
+      },
+      "dataSecurity": {
+        "question": "Zijn mijn gegevens veilig?",
+        "answer": "Je privacy is belangrijk voor ons. Alle factuurgegevens worden volledig in je browser verwerkt - we slaan geen informatie op onze servers op. Je kunt de tool zelfs offline gebruiken zodra deze is geladen."
+      },
+      "sharing": {
+        "question": "Kan ik facturen delen met anderen?",
+        "answer": "Ja, je kunt deelbare links genereren voor je facturen die anderen kunnen bekijken en downloaden. Deze links zijn veilig en alleen toegankelijk voor mensen met wie je ze deelt."
+      }
+    }
   }
 }

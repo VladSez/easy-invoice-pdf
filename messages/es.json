@@ -89,5 +89,36 @@
       "error": "Error al suscribirse. Por favor, inténtalo de nuevo.",
       "emailLanguageInfo": "Todos los correos se enviarán en inglés"
     }
+  },
+  "FAQ": {
+    "title": "Preguntas Frecuentes",
+    "description": "Encuentra respuestas a preguntas comunes sobre EasyInvoicePDF",
+    "badge": "FAQ",
+    "items": {
+      "whatIs": {
+        "question": "¿Qué es EasyInvoicePDF?",
+        "answer": "EasyInvoicePDF es una herramienta gratuita y de código abierto que te ayuda a crear facturas PDF profesionales al instante. Cuenta con vista previa en tiempo real, plantillas personalizables y soporte para múltiples idiomas y monedas."
+      },
+      "isFree": {
+        "question": "¿Es realmente gratis?",
+        "answer": "Sí, EasyInvoicePDF es completamente gratuito. Todo el proyecto es de código abierto y está disponible en GitHub."
+      },
+      "accountNeeded": {
+        "question": "¿Necesito crear una cuenta?",
+        "answer": "No, no necesitas crear una cuenta ni registrarte. Puedes comenzar a crear facturas inmediatamente sin ningún proceso de registro."
+      },
+      "customization": {
+        "question": "¿Puedo personalizar la plantilla de la factura?",
+        "answer": "Sí, puedes personalizar varios aspectos de tu factura, incluyendo detalles de la empresa, logotipo, colores, moneda e idioma. Se están agregando más opciones de personalización regularmente."
+      },
+      "dataSecurity": {
+        "question": "¿Mis datos están seguros?",
+        "answer": "Tu privacidad es importante para nosotros. Todos los datos de las facturas se procesan completamente en tu navegador - no almacenamos ninguna información en nuestros servidores. Incluso puedes usar la herramienta sin conexión una vez cargada."
+      },
+      "sharing": {
+        "question": "¿Puedo compartir facturas con otros?",
+        "answer": "Sí, puedes generar enlaces compartibles para tus facturas que otros pueden ver y descargar. Estos enlaces son seguros y solo accesibles para las personas con quienes los compartes."
+      }
+    }
   }
 }

@@ -89,5 +89,36 @@
     "tryAgain": "Tentar novamente",
     "goBack": "Voltar",
     "toastMessage": "Algo deu errado! Por favor, tente atualizar a página ou reportar o erro."
+  },
+  "FAQ": {
+    "title": "Perguntas Frequentes",
+    "description": "Encontre respostas para perguntas comuns sobre o EasyInvoicePDF",
+    "badge": "FAQ",
+    "items": {
+      "whatIs": {
+        "question": "O que é o EasyInvoicePDF?",
+        "answer": "EasyInvoicePDF é uma ferramenta gratuita e de código aberto que ajuda você a criar faturas PDF profissionais instantaneamente. Possui visualização em tempo real, modelos personalizáveis e suporta múltiplos idiomas e moedas."
+      },
+      "isFree": {
+        "question": "É realmente gratuito?",
+        "answer": "Sim, o EasyInvoicePDF é completamente gratuito. Todo o projeto é de código aberto e está disponível no GitHub."
+      },
+      "accountNeeded": {
+        "question": "Preciso criar uma conta?",
+        "answer": "Não, você não precisa criar uma conta ou se registrar. Você pode começar a criar faturas imediatamente sem nenhum processo de registro."
+      },
+      "customization": {
+        "question": "Posso personalizar o modelo da fatura?",
+        "answer": "Sim, você pode personalizar vários aspectos da sua fatura, incluindo detalhes da empresa, logotipo, cores, moeda e idioma. Mais opções de personalização estão sendo adicionadas regularmente."
+      },
+      "dataSecurity": {
+        "question": "Meus dados estão seguros?",
+        "answer": "Sua privacidade é importante para nós. Todos os dados das faturas são processados inteiramente no seu navegador - não armazenamos nenhuma informação em nossos servidores. Você pode até usar a ferramenta offline depois de carregada."
+      },
+      "sharing": {
+        "question": "Posso compartilhar faturas com outros?",
+        "answer": "Sim, você pode gerar links compartilháveis para suas faturas que outros podem visualizar e baixar. Esses links são seguros e acessíveis apenas para pessoas com quem você compartilha."
+      }
+    }
   }
 }

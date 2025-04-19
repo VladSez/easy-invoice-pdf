@@ -76,6 +76,20 @@ test.describe("About page", () => {
       featuresSection.getByText("Pro version and API coming soon")
     ).toBeVisible();
 
+    // check FAQ section
+    const faqSection = page.locator("#faq");
+    await expect(faqSection).toBeVisible();
+
+    await expect(
+      faqSection.getByRole("heading", {
+        level: 2,
+        name: "Frequently Asked Questions",
+      })
+    ).toBeVisible();
+
+    await expect(faqSection.getByText("What is EasyInvoicePDF?")).toBeVisible();
+    await expect(faqSection.getByText("Is it really free?")).toBeVisible();
+
     // check subscribe form section
     const subscribeFormSection = page.locator("#newsletter");
     await expect(subscribeFormSection).toBeVisible();
@@ -177,6 +191,14 @@ test.describe("About page", () => {
     await expect(featuresLink).toBeVisible();
     await expect(featuresLink).toHaveAttribute("href", "#features");
     await expect(featuresLink).not.toHaveAttribute("target", "_blank");
+
+    const faqLink = footerLinks.getByRole("link", {
+      name: "FAQ",
+    });
+
+    await expect(faqLink).toBeVisible();
+    await expect(faqLink).toHaveAttribute("href", "#faq");
+    await expect(faqLink).not.toHaveAttribute("target", "_blank");
 
     const shareFeedbackLink = footerLinks.getByRole("link", {
       name: "Share feedback",

@@ -112,12 +112,49 @@ const aboutSchema = z
   })
   .strict();
 
+const faqSchema = z
+  .object({
+    title: z.string(),
+    description: z.string(),
+    badge: z.string(),
+    items: z
+      .object({
+        whatIs: z.object({
+          question: z.string(),
+          answer: z.string(),
+        }),
+        isFree: z.object({
+          question: z.string(),
+          answer: z.string(),
+        }),
+        accountNeeded: z.object({
+          question: z.string(),
+          answer: z.string(),
+        }),
+        customization: z.object({
+          question: z.string(),
+          answer: z.string(),
+        }),
+        dataSecurity: z.object({
+          question: z.string(),
+          answer: z.string(),
+        }),
+        sharing: z.object({
+          question: z.string(),
+          answer: z.string(),
+        }),
+      })
+      .strict(),
+  })
+  .strict();
+
 export const messagesSchema = z
   .object({
     About: aboutSchema,
     NotFound: notFoundSchema,
     Error: errorSchema,
     Metadata: metadataSchema,
+    FAQ: faqSchema,
   })
   .strict();
 

@@ -90,5 +90,36 @@
       "description": "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
       "keywords": "invoice tool, free invoice generator, PDF invoices, invoice creator, billing software"
     }
+  },
+  "FAQ": {
+    "title": "Frequently Asked Questions",
+    "description": "Find answers to common questions about EasyInvoicePDF",
+    "badge": "FAQ",
+    "items": {
+      "whatIs": {
+        "question": "What is EasyInvoicePDF?",
+        "answer": "EasyInvoicePDF is a free, open-source tool that helps you create professional PDF invoices instantly. It features a live preview, customizable templates, and supports multiple languages and currencies."
+      },
+      "isFree": {
+        "question": "Is it really free?",
+        "answer": "Yes, EasyInvoicePDF is completely free to use. The entire project is open-source and available on GitHub."
+      },
+      "accountNeeded": {
+        "question": "Do I need to create an account?",
+        "answer": "No, you don't need to create an account or sign up. You can start creating invoices immediately without any registration process."
+      },
+      "customization": {
+        "question": "Can I customize the invoice template?",
+        "answer": "Yes, you can customize various aspects of your invoice including company details, logo, colors, currency, and language. More customization options are being added regularly."
+      },
+      "dataSecurity": {
+        "question": "Is my data secure?",
+        "answer": "Your privacy is important to us. All invoice data is processed entirely in your browser - we don't store any of your information on our servers. You can even use the tool offline once loaded."
+      },
+      "sharing": {
+        "question": "Can I share invoices with others?",
+        "answer": "Yes, you can generate shareable links for your invoices that others can view and download. These links are secure and only accessible to people you share them with."
+      }
+    }
   }
 }

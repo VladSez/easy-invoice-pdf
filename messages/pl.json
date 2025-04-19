@@ -89,5 +89,36 @@
       "error": "Nie udało się zapisać. Spróbuj ponownie.",
       "emailLanguageInfo": "Wszystkie wiadomości będą wysyłane w języku angielskim"
     }
+  },
+  "FAQ": {
+    "title": "Często Zadawane Pytania",
+    "description": "Znajdź odpowiedzi na często zadawane pytania o EasyInvoicePDF",
+    "badge": "FAQ",
+    "items": {
+      "whatIs": {
+        "question": "Czym jest EasyInvoicePDF?",
+        "answer": "EasyInvoicePDF to darmowe narzędzie open-source, które pomaga tworzyć profesjonalne faktury PDF. Oferuje podgląd na żywo, konfigurowalne szablony oraz obsługuje wiele języków i walut."
+      },
+      "isFree": {
+        "question": "Czy to naprawdę jest darmowe?",
+        "answer": "Tak, EasyInvoicePDF jest całkowicie darmowy. Cały projekt jest open-source i dostępny na GitHubie."
+      },
+      "accountNeeded": {
+        "question": "Czy muszę założyć konto?",
+        "answer": "Nie, nie musisz zakładać konta ani się rejestrować. Możesz od razu zacząć tworzyć faktury bez procesu rejestracji."
+      },
+      "customization": {
+        "question": "Czy mogę dostosować szablon faktury?",
+        "answer": "Tak, możesz dostosować różne aspekty swojej faktury, w tym dane firmy, logo, kolory, walutę i język. Regularnie dodawane są nowe opcje personalizacji."
+      },
+      "dataSecurity": {
+        "question": "Czy moje dane są bezpieczne?",
+        "answer": "Twoja prywatność jest dla nas ważna. Wszystkie dane faktur są przetwarzane wyłącznie w Twojej przeglądarce - nie przechowujemy żadnych informacji na naszych serwerach. Możesz nawet korzystać z narzędzia offline po załadowaniu."
+      },
+      "sharing": {
+        "question": "Czy mogę udostępniać faktury innym?",
+        "answer": "Tak, możesz generować linki do udostępniania swoich faktur, które inni mogą przeglądać i pobierać. Te linki są bezpieczne i dostępne tylko dla osób, którym je udostępnisz."
+      }
+    }
   }
 }
