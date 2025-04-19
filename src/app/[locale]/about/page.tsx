@@ -1,8 +1,16 @@
-import { Button } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
-import { useTranslations, type Locale } from "next-intl";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { ProjectLogo } from "@/components/etc/project-logo";
+import { SubscribeInput } from "@/components/subscribe-input";
+import { Button } from "@/components/ui/button";
+import {
+  Disclosure,
+  DisclosureGroup,
+  DisclosurePanel,
+  DisclosureTrigger,
+} from "@/components/ui/disclosure";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Video } from "@/components/video";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import {
   CalculatorIcon,
@@ -11,17 +19,9 @@ import {
   GlobeIcon,
   Share2,
 } from "lucide-react";
-import { LanguageSwitcher } from "./components/language-switcher";
-import { SubscribeInput } from "@/components/subscribe-input";
+import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import { Video } from "@/components/video";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { LanguageSwitcher } from "./components/language-switcher";
 
 export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const { locale } = params;
@@ -155,7 +155,7 @@ function FeaturesSection() {
   return (
     <section
       id="features"
-      className="flex w-full items-center justify-center bg-slate-50 py-12 md:py-24"
+      className="flex w-full items-center justify-center bg-slate-50 py-12 md:py-20"
     >
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -238,7 +238,7 @@ function FaqSection() {
   return (
     <section
       id="faq"
-      className="flex w-full items-center justify-center bg-white py-12 md:py-24"
+      className="flex w-full items-center justify-center bg-white py-12 md:py-20"
     >
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -255,26 +255,19 @@ function FaqSection() {
           </div>
         </div>
         <div className="mx-auto mt-8 max-w-3xl">
-          <Accordion type="multiple" className="w-full">
-            {FAQ_ITEMS.map((item, index) => {
+          <DisclosureGroup allowsMultipleExpanded>
+            {FAQ_ITEMS.map((item) => {
               const question = t(`items.${item.translationKey}.question`);
               const answer = t(`items.${item.translationKey}.answer`);
 
               return (
-                <AccordionItem
-                  key={item.translationKey}
-                  value={`item-${index}`}
-                >
-                  <AccordionTrigger className="text-left">
-                    {question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-slate-600">
-                    {answer}
-                  </AccordionContent>
-                </AccordionItem>
+                <Disclosure key={item.translationKey} id={item.translationKey}>
+                  <DisclosureTrigger>{question}</DisclosureTrigger>
+                  <DisclosurePanel>{answer}</DisclosurePanel>
+                </Disclosure>
               );
             })}
-          </Accordion>
+          </DisclosureGroup>
         </div>
       </div>
     </section>
