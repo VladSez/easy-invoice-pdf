@@ -38,7 +38,7 @@
         },
         "multiLanguage": {
           "title": "Múltiplos Idiomas e Moedas",
-          "description": "Crie faturas em sete idiomas com suporte para todas as principais moedas e formatação automática."
+          "description": "Crie faturas em dez idiomas (inglês, polonês, alemão, espanhol, português, russo, ucraniano, francês, italiano, holandês) com suporte para todas as principais moedas e formatação automática."
         },
         "vatSupport": {
           "title": "Suporte ao VAT Europeu",
@@ -109,7 +109,7 @@
       },
       "customization": {
         "question": "Posso personalizar o modelo da fatura?",
-        "answer": "Sim, você pode personalizar vários aspectos da sua fatura, incluindo detalhes da empresa, logotipo, cores, moeda e idioma. Mais opções de personalização estão sendo adicionadas regularmente."
+        "answer": "Sim, você pode personalizar vários aspectos da sua fatura, incluindo detalhes da empresa, moeda e idioma. Mais opções de personalização estão sendo adicionadas regularmente."
       },
       "dataSecurity": {
         "question": "Meus dados estão seguros?",

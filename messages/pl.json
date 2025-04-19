@@ -46,7 +46,7 @@
         },
         "multiLanguage": {
           "title": "Wiele języków i walut",
-          "description": "Twórz faktury w siedmiu językach z obsługą wszystkich głównych walut i automatycznym formatowaniem."
+          "description": "Twórz faktury w dziesięciu językach (angielski, polski, niemiecki, hiszpański, portugalski, rosyjski, ukraiński, francuski, włoski, holenderski) z obsługą wszystkich głównych walut i automatycznym formatowaniem."
         },
         "vatSupport": {
           "title": "Obsługa Europejskiego VAT",
@@ -109,7 +109,7 @@
       },
       "customization": {
         "question": "Czy mogę dostosować szablon faktury?",
-        "answer": "Tak, możesz dostosować różne aspekty swojej faktury, w tym dane firmy, logo, kolory, walutę i język. Regularnie dodawane są nowe opcje personalizacji."
+        "answer": "Tak, możesz dostosować różne aspekty swojej faktury, w tym dane firmy, walutę i język. Regularnie dodawane są nowe opcje personalizacji."
       },
       "dataSecurity": {
         "question": "Czy moje dane są bezpieczne?",

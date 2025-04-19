@@ -38,7 +38,7 @@
         },
         "multiLanguage": {
           "title": "Mehrere Sprachen & Währungen",
-          "description": "Erstellen Sie Rechnungen in sieben Sprachen mit Unterstützung für alle wichtigen Währungen und automatischer Formatierung."
+          "description": "Erstellen Sie Rechnungen in zehn Sprachen (Englisch, Polnisch, Deutsch, Spanisch, Portugiesisch, Russisch, Ukrainisch, Französisch, Italienisch, Niederländisch) mit Unterstützung für alle wichtigen Währungen und automatischer Formatierung."
         },
         "vatSupport": {
           "title": "Europäische VAT-Unterstützung",
@@ -109,7 +109,7 @@
       },
       "customization": {
         "question": "Kann ich die Rechnungsvorlage anpassen?",
-        "answer": "Ja, Sie können verschiedene Aspekte Ihrer Rechnung anpassen, einschließlich Firmendetails, Logo, Farben, Währung und Sprache. Weitere Anpassungsoptionen werden regelmäßig hinzugefügt."
+        "answer": "Ja, Sie können verschiedene Aspekte Ihrer Rechnung anpassen, einschließlich Firmendetails, Währung und Sprache. Weitere Anpassungsoptionen werden regelmäßig hinzugefügt."
       },
       "dataSecurity": {
         "question": "Sind meine Daten sicher?",

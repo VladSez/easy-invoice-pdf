@@ -110,7 +110,7 @@
       },
       "customization": {
         "question": "Can I customize the invoice template?",
-        "answer": "Yes, you can customize various aspects of your invoice including company details, logo, colors, currency, and language. More customization options are being added regularly."
+        "answer": "Yes, you can customize various aspects of your invoice including company details, currency, and language. More customization options are being added regularly."
       },
       "dataSecurity": {
         "question": "Is my data secure?",

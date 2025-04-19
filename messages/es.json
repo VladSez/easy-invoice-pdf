@@ -46,7 +46,7 @@
         },
         "multiLanguage": {
           "title": "Múltiples Idiomas y Monedas",
-          "description": "Cree facturas en siete idiomas con soporte para todas las principales monedas y formato automático."
+          "description": "Cree facturas en diez idiomas (inglés, polaco, alemán, español, portugués, ruso, ucraniano, francés, italiano, holandés) con soporte para todas las principales monedas y formato automático."
         },
         "vatSupport": {
           "title": "Soporte de VAT Europeo",
@@ -109,7 +109,7 @@
       },
       "customization": {
         "question": "¿Puedo personalizar la plantilla de la factura?",
-        "answer": "Sí, puedes personalizar varios aspectos de tu factura, incluyendo detalles de la empresa, logotipo, colores, moneda e idioma. Se están agregando más opciones de personalización regularmente."
+        "answer": "Sí, puedes personalizar varios aspectos de tu factura, incluyendo detalles de la empresa, moneda e idioma. Se están agregando más opciones de personalización regularmente."
       },
       "dataSecurity": {
         "question": "¿Mis datos están seguros?",
