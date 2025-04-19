@@ -1,0 +1,124 @@
+{
+  "Metadata": {
+    "about": {
+      "title": "Sobre | Gerador de Faturas PDF com Pré-visualização ao Vivo | Sem Cadastro",
+      "description": "Crie e baixe faturas PDF profissionais instantaneamente com pré-visualização em tempo real. Gratuito e de código aberto. Não é necessário cadastro.",
+      "keywords": "ferramenta de faturamento, gerador de faturas grátis, faturas PDF, criador de faturas, software de faturamento"
+    }
+  },
+  "NotFound": {
+    "error": "404",
+    "message": "Esta página não pôde ser encontrada.",
+    "returnHome": "Voltar à página inicial"
+  },
+  "About": {
+    "tagline": "Gerador de faturas PDF com pré-visualização em tempo real",
+    "hero": {
+      "title": "Crie faturas profissionais em segundos",
+      "description": "EasyInvoicePDF é uma ferramenta gratuita de código aberto que permite criar, personalizar e baixar faturas PDF profissionais com pré-visualização em tempo real.",
+      "noSignup": "Não requer cadastro. 100% gratuito e de código aberto."
+    },
+    "features": {
+      "badge": "Recursos",
+      "title": "Tudo que você precisa para faturamento profissional",
+      "description": "Nosso gerador de faturas simples mas poderoso inclui todos os recursos necessários para criar faturas profissionais rapidamente.",
+      "comingSoon": "Versão Pro e API em breve",
+      "items": {
+        "livePreview": {
+          "title": "Pré-visualização em Tempo Real",
+          "description": "Veja como sua fatura é atualizada em tempo real enquanto faz alterações, garantindo que fique exatamente como você deseja."
+        },
+        "shareableLinks": {
+          "title": "Links Compartilháveis",
+          "description": "Gere links para compartilhar suas faturas diretamente com os clientes sem enviar anexos."
+        },
+        "instantDownload": {
+          "title": "Download Instantâneo",
+          "description": "Baixe sua fatura como arquivo PDF com um clique, pronta para enviar ou imprimir."
+        },
+        "multiLanguage": {
+          "title": "Múltiplos Idiomas e Moedas",
+          "description": "Crie faturas em dez idiomas (inglês, polonês, alemão, espanhol, português, russo, ucraniano, francês, italiano, holandês) com suporte para todas as principais moedas e formatação automática."
+        },
+        "vatSupport": {
+          "title": "Suporte ao VAT Europeu",
+          "description": "Cálculo automático de taxas e totais do VAT europeu para suas faturas."
+        },
+        "openSource": {
+          "title": "Código Aberto",
+          "description": "Totalmente gratuito e de código aberto. Use online ou hospede você mesmo com acesso completo ao código."
+        }
+      }
+    },
+    "cta": {
+      "title": "Pronto para simplificar seu faturamento?",
+      "description": "Comece a criar faturas profissionais em segundos com nossa ferramenta gratuita de código aberto.",
+      "noSignup": "Não requer cadastro. 100% gratuito e de código aberto."
+    },
+    "footer": {
+      "description": "Uma ferramenta gratuita de código aberto para criar faturas PDF profissionais com pré-visualização em tempo real.",
+      "product": "Produto",
+      "links": {
+        "features": "Recursos",
+        "github": "GitHub"
+      },
+      "copyright": "© {year} EasyInvoicePDF.com",
+      "createdBy": "Criado por"
+    },
+    "buttons": {
+      "goToApp": "Ir para o aplicativo",
+      "viewOnGithub": "Ver no GitHub",
+      "switchLanguage": "Mudar idioma",
+      "shareFeedback": "Compartilhar feedback",
+      "app": "Aplicativo"
+    },
+    "newsletter": {
+      "title": "Inscreva-se em nossa newsletter",
+      "description": "Receba atualizações sobre novos recursos e melhorias do EasyInvoicePDF.com",
+      "subscribe": "Inscrever-se",
+      "placeholder": "Digite seu email",
+      "success": "Obrigado por se inscrever!",
+      "error": "Falha na inscrição. Por favor, tente novamente.",
+      "emailLanguageInfo": "Todos os emails serão enviados em inglês"
+    }
+  },
+  "Error": {
+    "title": "Algo deu errado",
+    "description": "Por favor, tente atualizar a página ou reportar o erro",
+    "bugReport": "aqui",
+    "tryAgain": "Tentar novamente",
+    "goBack": "Voltar",
+    "toastMessage": "Algo deu errado! Por favor, tente atualizar a página ou reportar o erro."
+  },
+  "FAQ": {
+    "title": "Perguntas Frequentes",
+    "description": "Encontre respostas para perguntas comuns sobre o EasyInvoicePDF",
+    "badge": "FAQ",
+    "items": {
+      "whatIs": {
+        "question": "O que é o EasyInvoicePDF?",
+        "answer": "EasyInvoicePDF é uma ferramenta gratuita e de código aberto que ajuda você a criar faturas PDF profissionais instantaneamente. Possui visualização em tempo real, modelos personalizáveis e suporta múltiplos idiomas e moedas."
+      },
+      "isFree": {
+        "question": "É realmente gratuito?",
+        "answer": "Sim, o EasyInvoicePDF é completamente gratuito. Todo o projeto é de código aberto e está disponível no GitHub."
+      },
+      "accountNeeded": {
+        "question": "Preciso criar uma conta?",
+        "answer": "Não, você não precisa criar uma conta ou se registrar. Você pode começar a criar faturas imediatamente sem nenhum processo de registro."
+      },
+      "customization": {
+        "question": "Posso personalizar o modelo da fatura?",
+        "answer": "Sim, você pode personalizar vários aspectos da sua fatura, incluindo detalhes da empresa, moeda e idioma. Mais opções de personalização estão sendo adicionadas regularmente."
+      },
+      "dataSecurity": {
+        "question": "Meus dados estão seguros?",
+        "answer": "Sua privacidade é importante para nós. Todos os dados das faturas são processados inteiramente no seu navegador - não armazenamos nenhuma informação em nossos servidores. Você pode até usar a ferramenta offline depois de carregada."
+      },
+      "sharing": {
+        "question": "Posso compartilhar faturas com outros?",
+        "answer": "Sim, você pode gerar links compartilháveis para suas faturas que outros podem visualizar e baixar. Esses links são seguros e acessíveis apenas para pessoas com quem você compartilha."
+      }
+    }
+  }
+}

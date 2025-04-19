@@ -1,14 +1,65 @@
 import { z } from "zod";
 
-export const SUPPORTED_CURRENCIES = ["EUR", "USD", "GBP", "PLN"] as const;
+export const SUPPORTED_CURRENCIES = [
+  "EUR", // Euro
+  "USD", // US Dollar
+  "CAD", // Canadian Dollar
+  "AUD", // Australian Dollar
+  "GBP", // British Pound
+  "PLN", // Polish Złoty
+  "RUB", // Russian Ruble
+  "UAH", // Ukrainian Hryvnia
+  "BYN", // Belarusian Ruble
+  "BRL", // Brazilian Real
+  "MXN", // Mexican Peso
+  "ARS", // Argentine Peso
+  "INR", // Indian Rupee
+  "CHF", // Swiss Franc
+] as const;
 export type SupportedCurrencies = (typeof SUPPORTED_CURRENCIES)[number];
 
-export const SUPPORTED_LANGUAGES = ["en", "pl"] as const;
+export const CURRENCY_SYMBOLS = {
+  EUR: "€", // Euro
+  USD: "$", // US Dollar
+  CAD: "$", // Canadian Dollar
+  AUD: "$", // Australian Dollar
+  GBP: "£", // British Pound
+  PLN: "zł", // Polish Złoty
+  RUB: "₽", // Russian Ruble
+  UAH: "₴", // Ukrainian Hryvnia
+  BYN: "Br", // Belarusian Ruble
+  BRL: "R$", // Brazilian Real
+  MXN: "$", // Mexican Peso
+  ARS: "$", // Argentine Peso
+  INR: "₹", // Indian Rupee
+  CHF: "Fr", // Swiss Franc
+} as const satisfies Record<SupportedCurrencies, string>;
+
+export const SUPPORTED_LANGUAGES = [
+  "en",
+  "pl",
+  "de",
+  "es",
+  "pt",
+  "ru",
+  "uk",
+  "fr",
+  "it",
+  "nl",
+] as const;
 export type SupportedLanguages = (typeof SUPPORTED_LANGUAGES)[number];
 
 export const LANGUAGE_TO_LABEL = {
   en: "English",
   pl: "Polish",
+  de: "German",
+  es: "Spanish",
+  pt: "Portuguese",
+  ru: "Russian",
+  uk: "Ukrainian",
+  fr: "French",
+  it: "Italian",
+  nl: "Dutch",
 } as const satisfies Record<SupportedLanguages, string>;
 
 export const SUPPORTED_DATE_FORMATS = [
@@ -184,12 +235,29 @@ export const buyerSchema = z
 
 export type BuyerData = z.infer<typeof buyerSchema>;
 
+/**
+ * Invoice schema
+ *
+ * This schema is used to validate the invoice data
+ */
 export const invoiceSchema = z.object({
   language: z.enum(SUPPORTED_LANGUAGES).default("en"),
   dateFormat: z.enum(SUPPORTED_DATE_FORMATS).default("YYYY-MM-DD"),
   currency: z.enum(SUPPORTED_CURRENCIES).default("EUR"),
 
-  invoiceNumber: z.string().min(1, "Invoice number is required").trim(),
+  invoiceNumberObject: z
+    .object({
+      label: z
+        .string()
+        .max(250, "Invoice number label must not exceed 250 characters")
+        .trim(),
+      value: z
+        .string()
+        .max(100, "Invoice number must not exceed 100 characters")
+        .trim(),
+    })
+    .optional(),
+
   dateOfIssue: z.string().min(1, "Date of issue is required").trim(),
   dateOfService: z.string().min(1, "Date of service is required").trim(),
 
@@ -230,42 +298,6 @@ export const invoiceSchema = z.object({
 });
 
 export type InvoiceData = z.infer<typeof invoiceSchema>;
-
-/**
- * Default seller data
- *
- * This is the default data that will be used if the user doesn't provide their own data
- */
-export const DEFAULT_SELLER_DATA = {
-  name: "Seller name",
-  address: "Seller address",
-
-  vatNo: "Seller vat number",
-  vatNoFieldIsVisible: true,
-
-  email: "seller@email.com",
-
-  accountNumber: "Seller account number",
-  accountNumberFieldIsVisible: true,
-
-  swiftBic: "Seller swift bic",
-  swiftBicFieldIsVisible: true,
-} as const satisfies Omit<SellerData, "id">;
-
-/**
- * Default buyer data
- *
- * This is the default data that will be used if the user doesn't provide their own data
- */
-export const DEFAULT_BUYER_DATA = {
-  name: "Buyer name",
-  address: "Buyer address",
-
-  vatNo: "Buyer vat number",
-  vatNoFieldIsVisible: true,
-
-  email: "buyer@email.com",
-} as const satisfies Omit<BuyerData, "id">;
 
 /**
  * Accordion state schema

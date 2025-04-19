@@ -1,7 +1,7 @@
 "use client";
 
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { pdf } from "@react-pdf/renderer";
+import { pdf } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import { toast } from "sonner";
@@ -65,21 +65,26 @@ export function InvoicePDFDownloadMultipleLanguages({
       // Track analytics
       umamiTrackEvent("generate_multiple_pdfs_zip");
 
+      const invoiceNumber = `${invoiceData?.invoiceNumberObject?.label} ${invoiceData?.invoiceNumberObject?.value}`;
+
       // If only one language is selected, download directly without zipping
       if (pdfBlobs.length === 1) {
-        const fileName = `invoice-${selectedLanguages[0]}-${invoiceData.invoiceNumber.replace("/", "-")}.pdf`;
+        const fileName = `invoice-${selectedLanguages[0]}-${invoiceNumber.replace("/", "-")}.pdf`;
         saveAs(pdfBlobs[0], fileName);
         return;
       }
 
-      const invoiceNumber = invoiceData.invoiceNumber.replace("/", "-");
+      const invoiceNumberFormatted = invoiceNumber.replace("/", "-");
 
       // Create zip file for multiple languages
       const zip = new JSZip();
 
       // Add each PDF to the zip
       selectedLanguages.forEach((lang, index) => {
-        zip.file(`invoice-${lang}-${invoiceNumber}.pdf`, pdfBlobs[index]);
+        zip.file(
+          `invoice-${lang}-${invoiceNumberFormatted}.pdf`,
+          pdfBlobs[index]
+        );
       });
 
       // 'en-de-fr'

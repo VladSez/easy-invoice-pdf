@@ -1,10 +1,12 @@
-import { PDFViewer } from "@react-pdf/renderer";
+"use client";
+
+import { PDFViewer } from "@react-pdf/renderer/lib/react-pdf.browser";
 
 export function InvoicePDFViewer({ children }: { children: React.ReactNode }) {
   return (
     <PDFViewer
       width="100%"
-      className="mb-4 h-full w-full lg:h-[620px]"
+      className="mb-4 h-full w-full"
       title="Invoice PDF Viewer"
       data-testid="pdf-preview"
     >

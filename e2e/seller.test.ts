@@ -1,4 +1,5 @@
-import { DEFAULT_SELLER_DATA, type SellerData } from "@/app/schema";
+import { DEFAULT_SELLER_DATA } from "@/app/constants";
+import { type SellerData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
 
 test.describe("Seller management", () => {
@@ -117,36 +118,6 @@ test.describe("Seller management", () => {
 
     // Verify all saved details in the Seller Information section form
     const sellerForm = page.getByTestId(`seller-information-section`);
-
-    // Try to find desktop tooltip icon first
-    const desktopTooltipExists =
-      (await sellerForm
-        .getByTestId("form-section-tooltip-info-icon-desktop")
-        .count()) > 0;
-
-    // If desktop tooltip exists, hover over it; otherwise find and click mobile tooltip
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    if (desktopTooltipExists) {
-      // Get desktop tooltip icons and hover over the first one because we use tooltip
-      const desktopTooltips = sellerForm.getByTestId(
-        "form-section-tooltip-info-icon-desktop"
-      );
-      await desktopTooltips.first().hover();
-    } else {
-      // Get mobile tooltip icons and click the first one because we use popover
-      const mobileTooltips = sellerForm.getByTestId(
-        "form-section-tooltip-info-icon-mobile"
-      );
-      await mobileTooltips.first().click();
-    }
-
-    // Verify the tooltip content appears
-    await expect(
-      page.getByText(
-        "Seller details are locked. Click the edit button next to the 'Select Seller' dropdown to modify seller details. Any changes will be automatically saved.",
-        { exact: true }
-      )
-    ).toBeVisible();
 
     // Check that HTML title attributes contain the tooltip message on input fields
     const nameInput = sellerForm.getByRole("textbox", { name: "Name" });

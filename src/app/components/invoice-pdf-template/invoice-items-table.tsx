@@ -1,7 +1,7 @@
-import { Text, View } from "@react-pdf/renderer";
+import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { styles } from ".";
 import type { InvoiceData } from "@/app/schema";
-import { translations } from "./translations";
+import { TRANSLATIONS } from "@/app/schema/translations";
 
 export function InvoiceItemsTable({
   invoiceData,
@@ -11,7 +11,7 @@ export function InvoiceItemsTable({
   formattedInvoiceTotal: string;
 }) {
   const language = invoiceData.language;
-  const t = translations[language];
+  const t = TRANSLATIONS[language];
 
   // we need to check only the first row, because all next rows are the same
   const isInvoiceItemNumberVisible =
@@ -52,7 +52,7 @@ export function InvoiceItemsTable({
           {isTypeOfGTUFieldVisible ? (
             <View style={[styles.tableCol, styles.colGTU, styles.center]}>
               <Text style={styles.tableCellBold}>
-                {t.invoiceItemsTable.typeOfGTU}
+                {t.invoiceItemsTable.typeOfGTU.split("")}
               </Text>
             </View>
           ) : null}
@@ -61,7 +61,8 @@ export function InvoiceItemsTable({
           {isAmountFieldVisible ? (
             <View style={[styles.tableCol, styles.colAmount, styles.center]}>
               <Text style={[styles.tableCellBold]}>
-                {t.invoiceItemsTable.amount}
+                {/* https://github.com/diegomura/react-pdf/issues/2243#issuecomment-1778554041 */}
+                {t.invoiceItemsTable.amount.split("")}
               </Text>
             </View>
           ) : null}
@@ -70,7 +71,7 @@ export function InvoiceItemsTable({
           {isUnitFieldVisible ? (
             <View style={[styles.tableCol, styles.colUnit, styles.center]}>
               <Text style={styles.tableCellBold}>
-                {t.invoiceItemsTable.unit}
+                {t.invoiceItemsTable.unit.split("")}
               </Text>
             </View>
           ) : null}

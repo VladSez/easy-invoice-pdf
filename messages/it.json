@@ -1,0 +1,124 @@
+{
+  "About": {
+    "tagline": "Generatore di fatture PDF con anteprima in tempo reale",
+    "hero": {
+      "title": "Crea fatture professionali in pochi secondi",
+      "description": "EasyInvoicePDF è uno strumento gratuito e open-source che ti permette di creare, personalizzare e scaricare fatture PDF professionali con anteprima in tempo reale.",
+      "noSignup": "Nessuna registrazione richiesta. 100% gratuito e open-source."
+    },
+    "features": {
+      "badge": "Funzionalità",
+      "title": "Tutto ciò di cui hai bisogno per una fatturazione professionale",
+      "description": "Il nostro generatore di fatture semplice ma potente include tutte le funzionalità necessarie per creare rapidamente fatture professionali.",
+      "comingSoon": "Versione Pro e API in arrivo",
+      "items": {
+        "livePreview": {
+          "title": "Anteprima in Tempo Reale",
+          "description": "Visualizza l'aggiornamento della tua fattura in tempo reale mentre apporti modifiche, assicurandoti che appaia esattamente come desideri."
+        },
+        "shareableLinks": {
+          "title": "Link Condivisibili",
+          "description": "Genera link per condividere le tue fatture direttamente con i clienti senza inviare allegati."
+        },
+        "instantDownload": {
+          "title": "Download Istantaneo",
+          "description": "Scarica la tua fattura in formato PDF con un clic, pronta per essere inviata o stampata."
+        },
+        "multiLanguage": {
+          "title": "Lingue e Valute Multiple",
+          "description": "Crea fatture in dieci lingue (inglese, polacco, tedesco, spagnolo, portoghese, russo, ucraino, francese, italiano, olandese) con supporto per tutte le principali valute e formattazione automatica."
+        },
+        "vatSupport": {
+          "title": "Supporto VAT Europea",
+          "description": "Calcola automaticamente le aliquote e i totali VAT europei per le tue fatture."
+        },
+        "openSource": {
+          "title": "Open Source",
+          "description": "Completamente gratuito e open-source. Usalo online o ospitalo tu stesso con accesso completo al codice."
+        }
+      }
+    },
+    "cta": {
+      "title": "Pronto a semplificare la tua fatturazione?",
+      "description": "Inizia a creare fatture professionali in pochi secondi con il nostro strumento gratuito e open-source.",
+      "noSignup": "Nessuna registrazione richiesta. 100% gratuito e open-source."
+    },
+    "footer": {
+      "description": "Uno strumento gratuito e open-source per creare fatture PDF professionali con anteprima in tempo reale.",
+      "product": "Prodotto",
+      "links": {
+        "features": "Funzionalità",
+        "github": "GitHub"
+      },
+      "copyright": "© {year} EasyInvoicePDF.com",
+      "createdBy": "Creato da"
+    },
+    "buttons": {
+      "goToApp": "Vai all'app",
+      "viewOnGithub": "Vedi su GitHub",
+      "switchLanguage": "Cambia lingua",
+      "shareFeedback": "Condividi feedback",
+      "app": "App"
+    },
+    "newsletter": {
+      "title": "Iscriviti alla nostra newsletter",
+      "description": "Ricevi aggiornamenti sulle nuove funzionalità e i miglioramenti di EasyInvoicePDF.com",
+      "subscribe": "Iscriviti",
+      "placeholder": "Inserisci la tua email",
+      "success": "Grazie per l'iscrizione!",
+      "error": "Iscrizione fallita. Per favore riprova.",
+      "emailLanguageInfo": "Tutte le email saranno inviate in inglese"
+    }
+  },
+  "NotFound": {
+    "error": "404",
+    "message": "Questa pagina non è stata trovata.",
+    "returnHome": "Torna alla homepage"
+  },
+  "Error": {
+    "title": "Qualcosa è andato storto",
+    "description": "Per favore prova ad aggiornare la pagina o segnala un bug",
+    "bugReport": "qui",
+    "tryAgain": "Riprova",
+    "goBack": "Torna indietro",
+    "toastMessage": "Qualcosa è andato storto! Per favore prova ad aggiornare la pagina o segnala un bug."
+  },
+  "Metadata": {
+    "about": {
+      "title": "Chi siamo | Generatore di Fatture PDF con Anteprima in Tempo Reale | Senza Registrazione",
+      "description": "Crea e scarica fatture PDF professionali istantaneamente con anteprima in tempo reale. Gratuito e open-source. Nessuna registrazione richiesta.",
+      "keywords": "strumento fatturazione, generatore fatture gratis, fatture PDF, creatore fatture, software fatturazione"
+    }
+  },
+  "FAQ": {
+    "title": "Domande Frequenti",
+    "description": "Trova risposte alle domande comuni su EasyInvoicePDF",
+    "badge": "FAQ",
+    "items": {
+      "whatIs": {
+        "question": "Cos'è EasyInvoicePDF?",
+        "answer": "EasyInvoicePDF è uno strumento gratuito e open-source che ti aiuta a creare fatture PDF professionali istantaneamente. Offre un'anteprima in tempo reale, modelli personalizzabili e supporta più lingue e valute."
+      },
+      "isFree": {
+        "question": "È davvero gratuito?",
+        "answer": "Sì, EasyInvoicePDF è completamente gratuito. L'intero progetto è open-source e disponibile su GitHub."
+      },
+      "accountNeeded": {
+        "question": "Devo creare un account?",
+        "answer": "No, non devi creare un account o registrarti. Puoi iniziare a creare fatture immediatamente senza alcun processo di registrazione."
+      },
+      "customization": {
+        "question": "Posso personalizzare il modello della fattura?",
+        "answer": "Sì, puoi personalizzare vari aspetti della tua fattura, inclusi i dettagli dell'azienda, la valuta e la lingua. Nuove opzioni di personalizzazione vengono aggiunte regolarmente."
+      },
+      "dataSecurity": {
+        "question": "I miei dati sono sicuri?",
+        "answer": "La tua privacy è importante per noi. Tutti i dati delle fatture vengono elaborati interamente nel tuo browser - non memorizziamo alcuna informazione sui nostri server. Puoi persino utilizzare lo strumento offline una volta caricato."
+      },
+      "sharing": {
+        "question": "Posso condividere le fatture con altri?",
+        "answer": "Sì, puoi generare link condivisibili per le tue fatture che altri possono visualizzare e scaricare. Questi link sono sicuri e accessibili solo alle persone con cui li condividi."
+      }
+    }
+  }
+}

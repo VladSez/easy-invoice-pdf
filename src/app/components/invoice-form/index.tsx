@@ -9,6 +9,7 @@ import {
   type InvoiceData,
   type InvoiceItemData,
 } from "@/app/schema";
+import { Legend } from "@/components/legend";
 import {
   Accordion,
   AccordionContent,
@@ -24,15 +25,18 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import type { NonReadonly, Prettify } from "@/types";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
-import { AlertTriangle } from "lucide-react";
 import React, { memo, useCallback, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
+
+import { AlertIcon, ErrorMessage } from "./common";
 import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
 import { InvoiceItems } from "./sections/invoice-items";
@@ -55,60 +59,7 @@ const ACCORDION_SELLER = DEFAULT_ACCORDION_VALUES[1];
 const ACCORDION_BUYER = DEFAULT_ACCORDION_VALUES[2];
 const ACCORDION_ITEMS = DEFAULT_ACCORDION_VALUES[3];
 
-type NonReadonly<T> = {
-  -readonly [P in keyof T]: T[P] extends object ? NonReadonly<T[P]> : T[P];
-};
-
-const calculateItemTotals = (item: InvoiceItemData | null) => {
-  if (!item) return null;
-
-  const amount = Number(item.amount) || 0;
-  const netPrice = Number(item.netPrice) || 0;
-  const calculatedNetAmount = amount * netPrice;
-  const formattedNetAmount = Number(calculatedNetAmount.toFixed(2));
-
-  let vatAmount = 0;
-  if (item.vat && item.vat !== "NP" && item.vat !== "OO") {
-    vatAmount = (formattedNetAmount * Number(item.vat)) / 100;
-  }
-
-  const formattedVatAmount = Number(vatAmount.toFixed(2));
-  const formattedPreTaxAmount = Number(
-    (formattedNetAmount + formattedVatAmount).toFixed(2)
-  );
-
-  return {
-    ...item,
-    netAmount: formattedNetAmount,
-    vatAmount: formattedVatAmount,
-    preTaxAmount: formattedPreTaxAmount,
-  };
-};
-
-const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
-  return <p className="mt-1 text-xs text-red-600">{children}</p>;
-};
-
-const Legend = ({
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLLegendElement>) => {
-  return (
-    <legend className="text-lg font-semibold text-gray-900" {...props}>
-      {children}
-    </legend>
-  );
-};
-
-const AlertIcon = () => {
-  return <AlertTriangle className="mr-1 inline-block h-3 w-3 text-amber-500" />;
-};
-
 type AccordionKeys = Array<(typeof DEFAULT_ACCORDION_VALUES)[number]>;
-
-type Prettify<T> = {
-  [K in keyof T]: T[K];
-} & {};
 
 interface InvoiceFormProps {
   invoiceData: InvoiceData;
@@ -709,3 +660,29 @@ export const InvoiceForm = memo(function InvoiceForm({
     </form>
   );
 });
+
+const calculateItemTotals = (item: InvoiceItemData | null) => {
+  if (!item) return null;
+
+  const amount = Number(item.amount) || 0;
+  const netPrice = Number(item.netPrice) || 0;
+  const calculatedNetAmount = amount * netPrice;
+  const formattedNetAmount = Number(calculatedNetAmount.toFixed(2));
+
+  let vatAmount = 0;
+  if (item.vat && item.vat !== "NP" && item.vat !== "OO") {
+    vatAmount = (formattedNetAmount * Number(item.vat)) / 100;
+  }
+
+  const formattedVatAmount = Number(vatAmount.toFixed(2));
+  const formattedPreTaxAmount = Number(
+    (formattedNetAmount + formattedVatAmount).toFixed(2)
+  );
+
+  return {
+    ...item,
+    netAmount: formattedNetAmount,
+    vatAmount: formattedVatAmount,
+    preTaxAmount: formattedPreTaxAmount,
+  };
+};

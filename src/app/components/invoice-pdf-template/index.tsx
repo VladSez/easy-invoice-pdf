@@ -9,15 +9,15 @@ import {
   StyleSheet,
   Text,
   View,
-} from "@react-pdf/renderer";
+} from "@react-pdf/renderer/lib/react-pdf.browser";
 import { InvoiceHeader } from "./invoice-header";
 import { InvoiceSellerBuyerInfo } from "./invoice-seller-buyer-info";
 import { InvoiceItemsTable } from "./invoice-items-table";
 import { InvoicePaymentInfo } from "./invoice-payment-info";
 import { InvoiceVATSummaryTable } from "./invoice-vat-summary-table";
 import { InvoicePaymentTotals } from "./invoice-payment-totals";
-import { translations } from "./translations";
 import { memo, useMemo } from "react";
+import { TRANSLATIONS } from "@/app/schema/translations";
 
 const PROD_WEBSITE_URL = "https://dub.sh/easy-invoice";
 
@@ -184,6 +184,15 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
 }: {
   invoiceData: InvoiceData;
 }) {
+  const language = invoiceData.language;
+  const t = TRANSLATIONS[language];
+
+  const invoiceNumberLabel = invoiceData?.invoiceNumberObject?.label;
+
+  const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
+
+  const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`;
+
   const formattedInvoiceTotal = useMemo(() => {
     return invoiceData?.total
       .toLocaleString("en-US", {
@@ -193,12 +202,9 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
       .replaceAll(",", " ");
   }, [invoiceData?.total]);
 
-  const language = invoiceData.language;
-  const t = translations[language];
-
   const invoiceDocTitle = useMemo(() => {
-    return `${t.invoiceNumber} ${invoiceData.invoiceNumber} | Created with https://easyinvoicepdf.com`;
-  }, [t.invoiceNumber, invoiceData.invoiceNumber]);
+    return `${invoiceNumber} | Created with https://easyinvoicepdf.com`;
+  }, [invoiceNumber]);
 
   const signatureSectionIsVisible = useMemo(() => {
     return (
@@ -282,7 +288,7 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
         {/* Footer  */}
         <View style={styles.footer}>
           <Text style={[styles.fontSize9]}>
-            Created with{" "}
+            {t.createdWith}{" "}
             <Link
               style={[styles.fontSize9, { color: "blue" }]}
               src={PROD_WEBSITE_URL}

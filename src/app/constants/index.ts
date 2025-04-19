@@ -1,12 +1,12 @@
-"use client";
-
 import {
-  DEFAULT_SELLER_DATA,
   SUPPORTED_CURRENCIES,
   SUPPORTED_LANGUAGES,
   SUPPORTED_DATE_FORMATS,
   type InvoiceData,
+  type SellerData,
+  type BuyerData,
 } from "../schema";
+import { TRANSLATIONS } from "../schema/translations";
 import dayjs from "dayjs";
 
 const today = dayjs().format("YYYY-MM-DD");
@@ -18,10 +18,54 @@ const EUR = SUPPORTED_CURRENCIES[0];
 const EN = SUPPORTED_LANGUAGES[0];
 const DEFAULT_DATE_FORMAT = SUPPORTED_DATE_FORMATS[0];
 
+/**
+ * Default seller data
+ *
+ * This is the default data that will be used if the user doesn't provide their own data
+ */
+export const DEFAULT_SELLER_DATA = {
+  name: "Seller name",
+  address: "Seller address",
+
+  vatNo: "Seller vat number",
+  vatNoFieldIsVisible: true,
+
+  email: "seller@email.com",
+
+  accountNumber: "Seller account number",
+  accountNumberFieldIsVisible: true,
+
+  swiftBic: "Seller swift bic",
+  swiftBicFieldIsVisible: true,
+} as const satisfies Omit<SellerData, "id">;
+
+/**
+ * Default buyer data
+ *
+ * This is the default data that will be used if the user doesn't provide their own data
+ */
+export const DEFAULT_BUYER_DATA = {
+  name: "Buyer name",
+  address: "Buyer address",
+
+  vatNo: "Buyer vat number",
+  vatNoFieldIsVisible: true,
+
+  email: "buyer@email.com",
+} as const satisfies Omit<BuyerData, "id">;
+
+/**
+ * Initial invoice data
+ *
+ * This is the initial data that will be used when the user first opens the app or clears the invoice data
+ */
 export const INITIAL_INVOICE_DATA = {
   language: EN,
   currency: EUR,
-  invoiceNumber: `1/${invoiceCurrentMonthAndYear}`,
+  invoiceNumberObject: {
+    label: `${TRANSLATIONS[EN].invoiceNumber}:`,
+    value: `1/${invoiceCurrentMonthAndYear}`,
+  },
 
   dateOfIssue: today,
   dateOfService: lastDayOfMonth,
@@ -31,13 +75,8 @@ export const INITIAL_INVOICE_DATA = {
   invoiceTypeFieldIsVisible: true,
 
   seller: DEFAULT_SELLER_DATA,
-  buyer: {
-    name: "Buyer name",
-    address: "Buyer address",
-    vatNo: "Buyer vat number",
-    vatNoFieldIsVisible: true,
-    email: "buyer@email.com",
-  },
+  buyer: DEFAULT_BUYER_DATA,
+
   items: [
     {
       invoiceItemNumberIsVisible: true,
@@ -46,7 +85,7 @@ export const INITIAL_INVOICE_DATA = {
       nameFieldIsVisible: true,
 
       typeOfGTU: "",
-      typeOfGTUFieldIsVisible: true,
+      typeOfGTUFieldIsVisible: false,
 
       amount: 1,
       amountFieldIsVisible: true,

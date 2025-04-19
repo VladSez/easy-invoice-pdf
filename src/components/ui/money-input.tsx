@@ -1,14 +1,11 @@
 import * as React from "react";
 import { Input } from "./input";
-import { SUPPORTED_CURRENCIES, type InvoiceData } from "@/app/schema";
+import {
+  CURRENCY_SYMBOLS,
+  SUPPORTED_CURRENCIES,
+  type InvoiceData,
+} from "@/app/schema";
 import { cn } from "@/lib/utils";
-
-export const CURRENCY_SYMBOLS = {
-  [SUPPORTED_CURRENCIES[0]]: "€",
-  [SUPPORTED_CURRENCIES[1]]: "$",
-  [SUPPORTED_CURRENCIES[2]]: "£",
-  [SUPPORTED_CURRENCIES[3]]: "zł",
-} as const satisfies Record<InvoiceData["currency"], string>;
 
 const MoneyInput = React.memo(
   React.forwardRef<
@@ -19,7 +16,7 @@ const MoneyInput = React.memo(
     }
   >(({ currency, dataTestId, ...props }, ref) => {
     const shownCurrencyText = currency || SUPPORTED_CURRENCIES[0];
-    const currencySymbol = CURRENCY_SYMBOLS[shownCurrencyText] || null;
+    const currencySymbol = CURRENCY_SYMBOLS[shownCurrencyText];
 
     return (
       <div>
@@ -37,7 +34,11 @@ const MoneyInput = React.memo(
             ref={ref}
             className={cn(
               "-me-px rounded-e-none ps-6 shadow-none",
-              currencySymbol ? "ps-6" : "ps-3",
+              currencySymbol === "Br" || currencySymbol === "R$"
+                ? "ps-8"
+                : currencySymbol
+                  ? "ps-6"
+                  : "ps-3",
               props.className
             )}
             placeholder="0.00"
@@ -79,7 +80,11 @@ const ReadOnlyMoneyInput = React.memo(
             ref={ref}
             className={cn(
               "-me-px block w-full cursor-not-allowed rounded-md rounded-e-none border border-gray-300 bg-gray-100 px-3 py-2 ps-6",
-              currencySymbol ? "ps-6" : "ps-3",
+              currencySymbol === "Br" || currencySymbol === "R$"
+                ? "ps-8"
+                : currencySymbol
+                  ? "ps-6"
+                  : "ps-3",
               "focus-visible:border-indigo-500 focus-visible:ring focus-visible:ring-indigo-200 focus-visible:ring-opacity-50",
               props.className
             )}

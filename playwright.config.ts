@@ -14,7 +14,7 @@ const PORT = process.env.PORT ?? 3000;
 // Set webServer.url and use.baseURL with the location of the WebServer respecting the correct set port
 const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
 
-const TIMEOUT = 70 * 1000;
+const TIMEOUT = 60 * 1000;
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -31,7 +31,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   /* timeout for expect assertions */
   expect: {
-    timeout: TIMEOUT,
+    timeout: 15_000,
   },
 
   // /* timeout for test execution */
@@ -50,7 +50,7 @@ export default defineConfig({
     baseURL: BASE_URL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: "on-first-retry",
+    trace: "retain-on-failure",
   },
 
   /* Configure projects for major browsers */

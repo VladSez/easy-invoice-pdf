@@ -1,4 +1,118 @@
+// @ts-check
+
 import { withSentryConfig } from "@sentry/nextjs";
+import createNextIntlPlugin from "next-intl/plugin";
+import { createJiti } from "jiti";
+
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import fs from "node:fs";
+
+const loadTsFileViaJiti = createJiti(fileURLToPath(import.meta.url));
+
+// Validate translations object against schema, that is used to translate pdf fields
+async function validateTranslations() {
+  try {
+    // Import the translations schema using jiti
+    // @ts-ignore
+    const { translationsSchema, TRANSLATIONS } = await loadTsFileViaJiti.import(
+      "./src/app/schema/translations.ts"
+    );
+
+    const result = translationsSchema.safeParse(TRANSLATIONS);
+    if (!result.success) {
+      console.error("❌ Invalid translations:", result.error.message);
+      process.exit(1);
+    }
+  } catch (error) {
+    console.error("❌ Error validating translations:", error);
+    process.exit(1);
+  }
+}
+
+// Validate all i18n files, that are used to translate the /about page
+async function validatei18n() {
+  const messagesDir = path.join(process.cwd(), "messages");
+
+  // Validate translations first
+  await validateTranslations();
+
+  // Import the messages schema using jiti
+  // @ts-ignore
+  const { messagesSchema } = await loadTsFileViaJiti.import(
+    "./src/app/schema/i18n-messages.ts"
+  );
+
+  // Validate messages
+  const is18nJSONMessageFiles = fs
+    .readdirSync(messagesDir)
+    .filter((file) => file.endsWith(".json"));
+
+  const validationPromises = is18nJSONMessageFiles.map(async (file) => {
+    try {
+      const messages = JSON.parse(
+        await fs.promises.readFile(path.join(messagesDir, file), "utf8")
+      );
+
+      const result = messagesSchema.safeParse(messages);
+
+      if (!result.success) {
+        return {
+          file,
+          success: false,
+          error: result.error.message,
+        };
+      }
+
+      return {
+        file,
+        success: true,
+      };
+    } catch (error) {
+      return {
+        file,
+        success: false,
+        error: `Error reading/parsing file: ${error}`,
+      };
+    }
+  });
+
+  const results = await Promise.allSettled(validationPromises);
+
+  const hasErrors = results.some(
+    (result) =>
+      result.status === "rejected" ||
+      (result.status === "fulfilled" && !result.value.success)
+  );
+
+  if (hasErrors) {
+    results.forEach((result) => {
+      if (result.status === "rejected") {
+        console.error(`❌ Unexpected error:`, result.reason);
+      } else if (!result.value.success) {
+        console.error(
+          `❌ Invalid i18n messages in ${result.value.file}:`,
+          result.value.error
+        );
+      }
+    });
+
+    console.error("❌ Message validation failed");
+    process.exit(1);
+  }
+}
+
+// Since the function is now async, we need to handle it properly
+validatei18n().catch((error) => {
+  console.error("❌ Fatal error during validation:", error);
+  process.exit(1);
+});
+
+const withNextIntl = createNextIntlPlugin({
+  experimental: {
+    createMessagesDeclaration: "./messages/en.json",
+  },
+});
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -25,9 +139,18 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/en/app",
+        permanent: true,
+      },
+    ];
+  },
 };
 
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(withNextIntl(nextConfig), {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 

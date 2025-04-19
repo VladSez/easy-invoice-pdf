@@ -1,10 +1,20 @@
+import { INITIAL_INVOICE_DATA } from "@/app/constants";
+import { TRANSLATIONS } from "@/app/schema/translations";
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import fs from "fs";
 import path from "path";
 import pdf from "pdf-parse";
 
-const TEST_DOWNLOADS_DIR = "test-downloads";
+const PLAYWRIGHT_TEST_DOWNLOADS_DIR = "playwright-test-downloads";
+
+const getDownloadDir = ({ browserName }: { browserName: string }) => {
+  const name = `pdf-downloads-${browserName}`;
+
+  return path.join(PLAYWRIGHT_TEST_DOWNLOADS_DIR, name);
+};
+
+const CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
 
 /**
  * We can't test the PDF preview because it's not supported in Playwright.
@@ -13,10 +23,14 @@ const TEST_DOWNLOADS_DIR = "test-downloads";
  * we download pdf file and parse the content to verify the invoice data
  */
 test.describe("PDF Preview", () => {
-  test.beforeAll(async () => {
-    // Ensure test-downloads directory exists
+  let downloadDir: string;
+
+  test.beforeAll(async ({ browserName }) => {
+    downloadDir = getDownloadDir({ browserName });
+
+    // Ensure browser-specific test-downloads directory exists
     try {
-      await fs.promises.mkdir(TEST_DOWNLOADS_DIR);
+      await fs.promises.mkdir(downloadDir, { recursive: true });
     } catch (error) {
       // Handle specific error cases if needed
       if ((error as NodeJS.ErrnoException).code !== "EEXIST") {
@@ -25,29 +39,14 @@ test.describe("PDF Preview", () => {
     }
   });
 
-  test.afterEach(async () => {
-    // Clean up all files in test-downloads directory
-    try {
-      const files = await fs.promises.readdir(TEST_DOWNLOADS_DIR);
-
-      await Promise.all(
-        files.map((file) =>
-          fs.promises.unlink(path.join(TEST_DOWNLOADS_DIR, file))
-        )
-      );
-    } catch (error) {
-      // Handle specific error cases if needed
-      // ENOENT means "no such file or directory" - ignore this expected error
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-        throw error;
-      }
-    }
-  });
-
+  //
   test.afterAll(async () => {
-    // Remove the test-downloads directory itself
+    // Remove the parent playwright-test-downloads directory
     try {
-      await fs.promises.rmdir(TEST_DOWNLOADS_DIR);
+      await fs.promises.rm(PLAYWRIGHT_TEST_DOWNLOADS_DIR, {
+        recursive: true,
+        force: true,
+      });
     } catch (error) {
       // Handle specific error cases if needed
       // ENOENT means "no such file or directory" - ignore this expected error
@@ -61,7 +60,10 @@ test.describe("PDF Preview", () => {
     await page.goto("/");
   });
 
-  test("downloads PDF in English and verifies content", async ({ page }) => {
+  test("downloads PDF in English and verifies content", async ({
+    page,
+    browserName,
+  }) => {
     // Set up download handler
     const downloadPromise = page.waitForEvent("download");
 
@@ -81,8 +83,11 @@ test.describe("PDF Preview", () => {
     // Get the suggested filename
     const suggestedFilename = download.suggestedFilename();
 
-    // Save the file to a temporary location
-    const tmpPath = path.join(TEST_DOWNLOADS_DIR, suggestedFilename);
+    // Save the file to a browser-specific temporary location
+    const tmpPath = path.join(
+      getDownloadDir({ browserName }),
+      suggestedFilename
+    );
     await download.saveAs(tmpPath);
 
     // Read and verify PDF content using pdf-parse
@@ -139,7 +144,7 @@ Created with https://easyinvoicepdf.com`);
     const suggestedFilename = download.suggestedFilename();
 
     // Save the file to a temporary location
-    const tmpPath = path.join(TEST_DOWNLOADS_DIR, suggestedFilename);
+    const tmpPath = path.join(downloadDir, suggestedFilename);
     await download.saveAs(tmpPath);
 
     // Read and verify PDF content using pdf-parse
@@ -165,10 +170,15 @@ Wpłacono: 0.00 EUR
 Pozostało do zapłaty: 0.00 EUR
 Kwota słownie: zero EUR 00/100`);
 
-    expect(pdfData.text).toContain("Created with https://easyinvoicepdf.com");
+    expect(pdfData.text).toContain(
+      "Utworzono za pomocą https://easyinvoicepdf.com"
+    );
   });
 
-  test("update pdf when invoice data changes", async ({ page }) => {
+  test("update pdf when invoice data changes", async ({
+    page,
+    browserName,
+  }) => {
     // Switch to another currency
     await page.getByRole("combobox", { name: "Currency" }).selectOption("GBP");
 
@@ -226,11 +236,15 @@ Kwota słownie: zero EUR 00/100`);
     const invoiceSection = page.getByTestId(`invoice-items-section`);
 
     // Amount field
-    await invoiceSection.getByRole("spinbutton", { name: "Amount" }).fill("3");
+    await invoiceSection
+      .getByRole("spinbutton", { name: "Amount (Quantity)" })
+      .fill("3");
 
     // Net price field
     await invoiceSection
-      .getByRole("spinbutton", { name: "Net price" })
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
       .fill("1000");
 
     // Toggle VAT Table Summary visibility off
@@ -261,8 +275,11 @@ Kwota słownie: zero EUR 00/100`);
     // Get the suggested filename
     const suggestedFilename = download.suggestedFilename();
 
-    // Save the file to a temporary location
-    const tmpPath = path.join(TEST_DOWNLOADS_DIR, suggestedFilename);
+    // Save the file to a browser-specific temporary location
+    const tmpPath = path.join(
+      getDownloadDir({ browserName }),
+      suggestedFilename
+    );
     await download.saveAs(tmpPath);
 
     // Read and verify PDF content using pdf-parse
@@ -303,8 +320,9 @@ Amount in words: three thousand GBP 00/100`);
 Created with https://easyinvoicepdf.com`);
   });
 
-  test("completes full invoice flow on mobile: tabs navigation, form editing and PDF download", async ({
+  test("completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French", async ({
     page,
+    browserName,
   }) => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
@@ -322,15 +340,29 @@ Created with https://easyinvoicepdf.com`);
     // Wait for download button to be enabled
     await expect(downloadButtonEnglish).toBeEnabled();
 
-    // Switch to Polish
+    // Switch to French
     await page
       .getByRole("combobox", { name: "Invoice PDF Language" })
-      .selectOption("pl");
+      .selectOption("fr");
 
-    // Fill in some invoice data
-    await page
-      .getByRole("textbox", { name: "Invoice Number" })
-      .fill("MOBILE-TEST-001");
+    // Switch currency to GBP
+    await page.getByRole("combobox", { name: "Currency" }).selectOption("GBP");
+
+    const invoiceNumberFieldset = page.getByRole("group", {
+      name: "Invoice Number",
+    });
+
+    const invoiceNumberLabelInput = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Label",
+    });
+
+    const invoiceNumberValueInput = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Value",
+    });
+
+    await invoiceNumberLabelInput.fill("MOBILE-TEST-001:");
+    await invoiceNumberValueInput.fill("2/05-2024");
+
     await page
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Mobile test note");
@@ -347,22 +379,24 @@ Created with https://easyinvoicepdf.com`);
     // Fill in an invoice item
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount" })
+      .getByRole("spinbutton", { name: "Amount (Quantity)" })
       .fill("3");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Net Price" })
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
       .fill("50");
     await invoiceItemsSection
       .getByRole("textbox", { name: "VAT", exact: true })
       .fill("23");
 
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
-    const downloadButtonPolish = page.getByRole("link", {
-      name: "Download PDF in Polish",
+    const downloadButtonFrench = page.getByRole("link", {
+      name: "Download PDF in French",
     });
     // Wait for download button to be visible and enabled
-    await expect(downloadButtonPolish).toBeVisible();
-    await expect(downloadButtonPolish).toBeEnabled();
+    await expect(downloadButtonFrench).toBeVisible();
+    await expect(downloadButtonFrench).toBeEnabled();
 
     // Switch to preview tab
     await page.getByRole("tab", { name: "Preview PDF" }).click();
@@ -379,7 +413,7 @@ Created with https://easyinvoicepdf.com`);
     const downloadPromise = page.waitForEvent("download");
 
     // Click the download button
-    await downloadButtonPolish.click();
+    await downloadButtonFrench.click();
 
     // Wait for the download to start
     const download = await downloadPromise;
@@ -387,8 +421,11 @@ Created with https://easyinvoicepdf.com`);
     // Get the suggested filename
     const suggestedFilename = download.suggestedFilename();
 
-    // Save the file to a temporary location
-    const tmpPath = path.join(TEST_DOWNLOADS_DIR, suggestedFilename);
+    // Save the file to a browser-specific temporary location
+    const tmpPath = path.join(
+      getDownloadDir({ browserName }),
+      suggestedFilename
+    );
     await download.saveAs(tmpPath);
 
     // Read and verify PDF content using pdf-parse
@@ -396,22 +433,33 @@ Created with https://easyinvoicepdf.com`);
     const pdfData = await pdf(dataBuffer);
 
     // Verify PDF content in Polish
-    expect(pdfData.text).toContain("Faktura nr");
-    expect(pdfData.text).toContain("Data wystawienia");
-    expect(pdfData.text).toContain("Sprzedawca");
-    expect(pdfData.text).toContain("Nabywca");
+    expect(pdfData.text).toContain("MOBILE-TEST-001: 2/05-2024");
+    expect(pdfData.text).toContain("Date d'émission");
+
+    expect(pdfData.text).toContain("Vendeur");
+    expect(pdfData.text).toContain("Acheteur");
     expect(pdfData.text).toContain("Mobile Test Seller");
     expect(pdfData.text).toContain("456 Mobile St");
 
     const lastDayOfCurrentMonth = dayjs().endOf("month").format("YYYY-MM-DD");
     expect(pdfData.text).toContain(
-      `Data sprzedaży / wykonania usługi: ${lastDayOfCurrentMonth}`
+      `Date de vente/prestation de service: ${lastDayOfCurrentMonth}`
     );
 
     // Verify calculations in Polish
-    expect(pdfData.text).toContain(`Razem do zapłaty: 184.50 EUR
-Wpłacono: 0.00 EUR
-Pozostało do zapłaty: 184.50 EUR`);
+    expect(pdfData.text).toContain(`Total à payer: 184.50 GBP
+Payé: 0.00 GBP
+Reste à payer: 184.50 GBP
+Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
+
+    // Verify toast appears after download
+    await expect(page.getByText("Consider Supporting Us!")).toBeVisible();
+    await expect(
+      page.getByText(
+        "If you find this tool helpful, please consider making a small donation to support our work."
+      )
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Donate" })).toBeVisible();
 
     // Switch back to form tab
     await page.getByRole("tab", { name: "Edit Invoice" }).click();
@@ -425,9 +473,9 @@ Pozostało do zapłaty: 184.50 EUR`);
     ).toBeHidden();
 
     // Verify form data persists
-    await expect(
-      page.getByRole("textbox", { name: "Invoice Number" })
-    ).toHaveValue("MOBILE-TEST-001");
+    await expect(invoiceNumberLabelInput).toHaveValue("MOBILE-TEST-001:");
+    await expect(invoiceNumberValueInput).toHaveValue("2/05-2024");
+
     await expect(
       page.getByRole("textbox", { name: "Notes", exact: true })
     ).toHaveValue("Mobile test note");
@@ -442,10 +490,14 @@ Pozostało do zapłaty: 184.50 EUR`);
 
     // Verify invoice item persists
     await expect(
-      invoiceItemsSection.getByRole("spinbutton", { name: "Amount" })
+      invoiceItemsSection.getByRole("spinbutton", {
+        name: "Amount (Quantity)",
+      })
     ).toHaveValue("3");
     await expect(
-      invoiceItemsSection.getByRole("spinbutton", { name: "Net Price" })
+      invoiceItemsSection.getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
     ).toHaveValue("50");
     await expect(
       invoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true })
@@ -470,5 +522,123 @@ Pozostało do zapłaty: 184.50 EUR`);
         exact: true,
       })
     ).toHaveValue("184.50");
+  });
+
+  test("should display and persist invoice number in different languages", async ({
+    page,
+  }) => {
+    const generalInfoSection = page.getByTestId("general-information-section");
+
+    const invoiceNumberFieldset = generalInfoSection.getByRole("group", {
+      name: "Invoice Number",
+    });
+
+    const invoiceNumberLabelInput = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Label",
+    });
+
+    const invoiceNumberValueInput = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Value",
+    });
+
+    await expect(invoiceNumberLabelInput).toHaveValue(
+      INITIAL_INVOICE_DATA.invoiceNumberObject.label
+    );
+
+    await expect(invoiceNumberValueInput).toHaveValue(
+      INITIAL_INVOICE_DATA.invoiceNumberObject.value
+    );
+
+    const languageSelect = page.getByRole("combobox", {
+      name: "Invoice PDF Language",
+    });
+
+    await languageSelect.selectOption("pl");
+
+    await expect(invoiceNumberLabelInput).toHaveValue(
+      `${TRANSLATIONS.pl.invoiceNumber}:`
+    );
+
+    await expect(invoiceNumberValueInput).toHaveValue(
+      `1/${CURRENT_MONTH_AND_YEAR}`
+    );
+
+    // I can fill in a new invoice number
+    await invoiceNumberLabelInput.fill("Faktura TEST:");
+
+    // check that warning message appears
+    const switchToDefaultFormatButton = page.getByRole("button", {
+      name: `Switch to default label ("Faktura nr:")`,
+    });
+
+    await expect(switchToDefaultFormatButton).toBeVisible();
+
+    // switch to default format
+    await switchToDefaultFormatButton.click();
+
+    // check that the invoice number is updated to the default format
+    await expect(invoiceNumberLabelInput).toHaveValue(`Faktura nr:`);
+
+    // check that the switch to default format button is hidden
+    await expect(switchToDefaultFormatButton).toBeHidden();
+
+    // fill once again the invoice number
+    await invoiceNumberLabelInput.fill("Faktura TEST:");
+
+    // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
+
+    // we reload the page to test that the invoice number is persisted after page reload
+    await page.reload();
+
+    // Verify that the invoice number is persisted after page reload
+    await expect(invoiceNumberLabelInput).toHaveValue("Faktura TEST:");
+
+    await languageSelect.selectOption("pt");
+
+    await expect(invoiceNumberLabelInput).toHaveValue(
+      `${TRANSLATIONS.pt.invoiceNumber}:`
+    );
+
+    await invoiceNumberLabelInput.fill("Fatura TEST PORTUGUESE N°:");
+
+    await expect(
+      page.getByRole("button", {
+        name: `Switch to default label ("Fatura N°:")`,
+      })
+    ).toBeVisible();
+
+    // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
+    const downloadButton = page.getByRole("link", {
+      name: "Download PDF in Portuguese",
+    });
+
+    await expect(downloadButton).toBeVisible();
+    await expect(downloadButton).toBeEnabled();
+
+    // Set up download handler
+    const downloadPromise = page.waitForEvent("download");
+
+    // Click the download button
+    await downloadButton.click();
+
+    // Wait for the download to start
+    const download = await downloadPromise;
+
+    // Get the suggested filename
+    const suggestedFilename = download.suggestedFilename();
+
+    // Save the file to a temporary location
+    const tmpPath = path.join(downloadDir, suggestedFilename);
+    await download.saveAs(tmpPath);
+
+    // Read and verify PDF content using pdf-parse
+    const dataBuffer = await fs.promises.readFile(tmpPath);
+    const pdfData = await pdf(dataBuffer);
+
+    // Verify PDF content
+    expect(pdfData.text).toContain("Fatura TEST PORTUGUESE N°: 1/04-2025");
+    expect(pdfData.text).toContain("Data de emissão");
   });
 });

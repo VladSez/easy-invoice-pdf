@@ -1,7 +1,7 @@
-import { Text, View } from "@react-pdf/renderer";
+import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { styles } from ".";
 import type { InvoiceData } from "@/app/schema";
-import { translations } from "./translations";
+import { TRANSLATIONS } from "@/app/schema/translations";
 
 export function InvoiceVATSummaryTable({
   invoiceData,
@@ -11,7 +11,7 @@ export function InvoiceVATSummaryTable({
   formattedInvoiceTotal: string;
 }) {
   const language = invoiceData.language;
-  const t = translations[language];
+  const t = TRANSLATIONS[language];
 
   const sortedItems = [...invoiceData?.items].sort((a, b) => {
     // Handle cases where either value is a string (NP or OO)

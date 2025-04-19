@@ -5,7 +5,11 @@ import {
   type UseFormSetValue,
   useWatch,
 } from "react-hook-form";
-import { type InvoiceData } from "@/app/schema";
+import {
+  CURRENCY_SYMBOLS,
+  LANGUAGE_TO_LABEL,
+  type InvoiceData,
+} from "@/app/schema";
 import {
   SUPPORTED_CURRENCIES,
   SUPPORTED_DATE_FORMATS,
@@ -15,11 +19,11 @@ import { ButtonHelper } from "@/components/ui/button-helper";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
 import { Label } from "@/components/ui/label";
-import { CURRENCY_SYMBOLS } from "@/components/ui/money-input";
 import { SelectNative } from "@/components/ui/select-native";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
+import { TRANSLATIONS } from "@/app/schema/translations";
 import dayjs from "dayjs";
 import { AlertTriangle } from "lucide-react";
 import { memo } from "react";
@@ -31,6 +35,8 @@ const AlertIcon = () => {
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
 };
+
+const CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
 
 interface GeneralInformationProps {
   control: Control<InvoiceData>;
@@ -45,8 +51,21 @@ export const GeneralInformation = memo(function GeneralInformation({
   setValue,
   dateOfIssue,
 }: GeneralInformationProps) {
-  const invoiceNumber = useWatch({ control, name: "invoiceNumber" });
+  const invoiceNumberLabel = useWatch({
+    control,
+    name: "invoiceNumberObject.label",
+  });
+
+  const invoiceNumberValue = useWatch({
+    control,
+    name: "invoiceNumberObject.value",
+  });
+
   const dateOfService = useWatch({ control, name: "dateOfService" });
+  const language = useWatch({ control, name: "language" });
+
+  const t = TRANSLATIONS[language];
+  const defaultInvoiceNumber = `${t.invoiceNumber}:`;
 
   const isDateOfIssueNotToday = !dayjs(dateOfIssue).isSame(dayjs(), "day");
 
@@ -55,10 +74,16 @@ export const GeneralInformation = memo(function GeneralInformation({
     "day"
   );
 
-  const extractInvoiceMonthAndYear = invoiceNumber?.split("/")?.[1];
+  const isDefaultInvoiceNumberLabel =
+    invoiceNumberLabel === defaultInvoiceNumber;
+
+  // extract the month and year from the invoice number (i.e. 1/04-2025 -> 04-2025)
+  const extractInvoiceMonthAndYear = /(\d{2}-\d{4})/.exec(
+    invoiceNumberValue ?? ""
+  )?.[1];
 
   const isInvoiceNumberInCurrentMonth =
-    extractInvoiceMonthAndYear === dayjs().format("MM-YYYY");
+    extractInvoiceMonthAndYear === CURRENT_MONTH_AND_YEAR;
 
   return (
     <div className="space-y-4">
@@ -71,12 +96,40 @@ export const GeneralInformation = memo(function GeneralInformation({
           name="language"
           control={control}
           render={({ field }) => (
-            <SelectNative {...field} id={`language`} className="block">
-              {SUPPORTED_LANGUAGES.map((lang) => (
-                <option key={lang} value={lang}>
-                  {lang === "en" ? "English" : "Polish"}
-                </option>
-              ))}
+            <SelectNative
+              {...field}
+              id={`language`}
+              className="block"
+              onChange={(e) => {
+                field.onChange(e);
+
+                // Update invoice number when language changes
+                const newLanguage = e.target.value as keyof typeof TRANSLATIONS;
+
+                const newInvoiceNumberLabel =
+                  TRANSLATIONS[newLanguage].invoiceNumber;
+
+                // we need to keep the invoice number suffix (e.g. 1/MM-YYYY) for better user experience, when switching language
+                setValue(
+                  "invoiceNumberObject.label",
+                  `${newInvoiceNumberLabel}:`
+                );
+                setValue("invoiceNumberObject.value", invoiceNumberValue);
+              }}
+            >
+              {SUPPORTED_LANGUAGES.map((lang) => {
+                const languageName = LANGUAGE_TO_LABEL[lang];
+
+                if (!languageName) {
+                  return null;
+                }
+
+                return (
+                  <option key={lang} value={lang}>
+                    {languageName}
+                  </option>
+                );
+              })}
             </SelectNative>
           )}
         />
@@ -162,42 +215,94 @@ export const GeneralInformation = memo(function GeneralInformation({
 
       {/* Invoice Number */}
       <div>
-        <Label htmlFor={`invoiceNumber`} className="mb-1">
-          Invoice Number
-        </Label>
-        <Controller
-          name="invoiceNumber"
-          control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              type="text"
-              id={`invoiceNumber`}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm"
-            />
-          )}
-        />
-        {errors.invoiceNumber && (
-          <ErrorMessage>{errors.invoiceNumber.message}</ErrorMessage>
-        )}
-        {!isInvoiceNumberInCurrentMonth && !errors.invoiceNumber ? (
-          <InputHelperMessage>
-            <span className="flex items-center text-balance">
-              <AlertIcon />
-              Invoice number does not match current month
-            </span>
+        <fieldset className="rounded-md border p-4">
+          <legend className="px-2 text-sm">Invoice Number</legend>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="invoiceNumberLabel">Label</Label>
+              <Controller
+                name="invoiceNumberObject.label"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text"
+                    id="invoiceNumberLabel"
+                    placeholder="Enter invoice number label"
+                    className="mt-1 block w-full"
+                  />
+                )}
+              />
+              {errors.invoiceNumberObject?.label && (
+                <ErrorMessage>
+                  {errors.invoiceNumberObject.label.message}
+                </ErrorMessage>
+              )}
+              {!isDefaultInvoiceNumberLabel &&
+                !errors.invoiceNumberObject?.label && (
+                  <InputHelperMessage>
+                    <ButtonHelper
+                      onClick={() => {
+                        setValue(
+                          "invoiceNumberObject.label",
+                          defaultInvoiceNumber
+                        );
+                      }}
+                    >
+                      Switch to default label (&quot;{defaultInvoiceNumber}
+                      &quot;)
+                    </ButtonHelper>
+                  </InputHelperMessage>
+                )}
+            </div>
 
-            <ButtonHelper
-              onClick={() => {
-                const currentMonth = dayjs().format("MM-YYYY");
-                setValue("invoiceNumber", `1/${currentMonth}`);
-              }}
-            >
-              Click to set the invoice number to the current month (
-              {dayjs().format("MM-YYYY")})
-            </ButtonHelper>
-          </InputHelperMessage>
-        ) : null}
+            <div>
+              <Label htmlFor="invoiceNumberValue">Value</Label>
+              <Controller
+                name="invoiceNumberObject.value"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="text"
+                    id="invoiceNumberValue"
+                    placeholder="Enter invoice number value"
+                    className="mt-1 block w-full"
+                  />
+                )}
+              />
+              {errors.invoiceNumberObject?.value && (
+                <ErrorMessage>
+                  {errors.invoiceNumberObject.value.message}
+                </ErrorMessage>
+              )}
+
+              {!isInvoiceNumberInCurrentMonth &&
+                !errors.invoiceNumberObject?.value && (
+                  <InputHelperMessage>
+                    <div className="flex flex-col items-start">
+                      <span className="mb-2 flex items-center md:mb-0 lg:mb-2">
+                        <AlertIcon />
+                        Invoice number does not match current month
+                      </span>
+
+                      <ButtonHelper
+                        onClick={() => {
+                          setValue(
+                            "invoiceNumberObject.value",
+                            `1/${CURRENT_MONTH_AND_YEAR}`
+                          );
+                        }}
+                      >
+                        Click to set the invoice number to the current month (
+                        {`1/${CURRENT_MONTH_AND_YEAR}`})
+                      </ButtonHelper>
+                    </div>
+                  </InputHelperMessage>
+                )}
+            </div>
+          </div>
+        </fieldset>
       </div>
 
       {/* Date of Issue */}

@@ -1,8 +1,8 @@
-import { Text, View } from "@react-pdf/renderer";
+import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { styles } from ".";
 import type { InvoiceData } from "@/app/schema";
-import { translations } from "./translations";
 import dayjs from "dayjs";
+import { TRANSLATIONS } from "@/app/schema/translations";
 
 export function InvoicePaymentInfo({
   invoiceData,
@@ -10,7 +10,7 @@ export function InvoicePaymentInfo({
   invoiceData: InvoiceData;
 }) {
   const language = invoiceData.language;
-  const t = translations[language];
+  const t = TRANSLATIONS[language];
 
   const paymentDate = dayjs(invoiceData.paymentDue).format(
     invoiceData.dateFormat

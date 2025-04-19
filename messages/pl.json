@@ -1,0 +1,124 @@
+{
+  "Metadata": {
+    "about": {
+      "title": "O nas | Generator Faktur PDF z Podglądem na Żywo | Bez Rejestracji",
+      "description": "Twórz i pobieraj profesjonalne faktury PDF natychmiast z podglądem w czasie rzeczywistym. Darmowe i open-source. Bez wymaganej rejestracji.",
+      "keywords": "narzędzie do fakturowania, darmowy generator faktur, faktury PDF, kreator faktur, oprogramowanie do fakturowania"
+    }
+  },
+  "NotFound": {
+    "error": "404",
+    "message": "Nie można znaleźć tej strony.",
+    "returnHome": "Wróć do strony głównej"
+  },
+  "Error": {
+    "title": "Coś poszło nie tak",
+    "description": "Spróbuj odświeżyć stronę lub zgłoś błąd",
+    "bugReport": "tutaj",
+    "tryAgain": "Spróbuj ponownie",
+    "goBack": "Wróć",
+    "toastMessage": "Coś poszło nie tak! Spróbuj odświeżyć stronę lub zgłoś błąd."
+  },
+  "About": {
+    "tagline": "Generator faktur PDF z podglądem na żywo",
+    "hero": {
+      "title": "Twórz profesjonalne faktury w kilka sekund",
+      "description": "EasyInvoicePDF to darmowe narzędzie open-source, które pozwala tworzyć, dostosowywać i pobierać profesjonalne faktury PDF z podglądem w czasie rzeczywistym.",
+      "noSignup": "Bez rejestracji. W 100% darmowe i open-source."
+    },
+    "features": {
+      "badge": "Funkcje",
+      "title": "Wszystko, czego potrzebujesz do profesjonalnego fakturowania",
+      "description": "Nasz prosty, ale potężny generator faktur zawiera wszystkie funkcje potrzebne do szybkiego tworzenia profesjonalnych faktur.",
+      "comingSoon": "Wersja Pro i API już wkrótce",
+      "items": {
+        "livePreview": {
+          "title": "Podgląd na żywo",
+          "description": "Zobacz, jak faktura aktualizuje się w czasie rzeczywistym podczas wprowadzania zmian, zapewniając dokładnie taki wygląd, jakiego oczekujesz."
+        },
+        "shareableLinks": {
+          "title": "Linki do udostępniania",
+          "description": "Generuj linki, aby udostępniać faktury bezpośrednio klientom bez wysyłania załączników."
+        },
+        "instantDownload": {
+          "title": "Natychmiastowe pobieranie",
+          "description": "Pobierz fakturę jako plik PDF jednym kliknięciem, gotową do wysłania lub wydrukowania."
+        },
+        "multiLanguage": {
+          "title": "Wiele języków i walut",
+          "description": "Twórz faktury w dziesięciu językach (angielski, polski, niemiecki, hiszpański, portugalski, rosyjski, ukraiński, francuski, włoski, holenderski) z obsługą wszystkich głównych walut i automatycznym formatowaniem."
+        },
+        "vatSupport": {
+          "title": "Obsługa Europejskiego VAT",
+          "description": "Automatyczne obliczanie stawek i sum VAT dla faktur w Unii Europejskiej."
+        },
+        "openSource": {
+          "title": "Open Source",
+          "description": "Całkowicie darmowe i open-source. Używaj online lub hostuj samodzielnie z pełnym dostępem do kodu."
+        }
+      }
+    },
+    "cta": {
+      "title": "Gotowy uprościć fakturowanie?",
+      "description": "Zacznij tworzyć profesjonalne faktury w kilka sekund za pomocą naszego darmowego narzędzia open-source.",
+      "noSignup": "Bez rejestracji. W 100% darmowe i open-source."
+    },
+    "footer": {
+      "description": "Darmowe narzędzie open-source do tworzenia profesjonalnych faktur PDF z podglądem w czasie rzeczywistym.",
+      "product": "Produkt",
+      "links": {
+        "features": "Funkcje",
+        "github": "GitHub"
+      },
+      "copyright": "© {year} EasyInvoicePDF.com",
+      "createdBy": "Stworzone przez"
+    },
+    "buttons": {
+      "goToApp": "Przejdź do aplikacji",
+      "viewOnGithub": "Zobacz na GitHub",
+      "switchLanguage": "Zmień język",
+      "shareFeedback": "Podziel się opinią",
+      "app": "Aplikacja"
+    },
+    "newsletter": {
+      "title": "Zapisz się do newslettera",
+      "description": "Otrzymuj aktualizacje o nowych funkcjach i ulepszeniach EasyInvoicePDF.com",
+      "subscribe": "Zapisz się",
+      "placeholder": "Wpisz swój email",
+      "success": "Dziękujemy za subskrypcję!",
+      "error": "Nie udało się zapisać. Spróbuj ponownie.",
+      "emailLanguageInfo": "Wszystkie wiadomości będą wysyłane w języku angielskim"
+    }
+  },
+  "FAQ": {
+    "title": "Często Zadawane Pytania",
+    "description": "Znajdź odpowiedzi na często zadawane pytania o EasyInvoicePDF",
+    "badge": "FAQ",
+    "items": {
+      "whatIs": {
+        "question": "Czym jest EasyInvoicePDF?",
+        "answer": "EasyInvoicePDF to darmowe narzędzie open-source, które pomaga tworzyć profesjonalne faktury PDF. Oferuje podgląd na żywo, konfigurowalne szablony oraz obsługuje wiele języków i walut."
+      },
+      "isFree": {
+        "question": "Czy to naprawdę jest darmowe?",
+        "answer": "Tak, EasyInvoicePDF jest całkowicie darmowy. Cały projekt jest open-source i dostępny na GitHubie."
+      },
+      "accountNeeded": {
+        "question": "Czy muszę założyć konto?",
+        "answer": "Nie, nie musisz zakładać konta ani się rejestrować. Możesz od razu zacząć tworzyć faktury bez procesu rejestracji."
+      },
+      "customization": {
+        "question": "Czy mogę dostosować szablon faktury?",
+        "answer": "Tak, możesz dostosować różne aspekty swojej faktury, w tym dane firmy, walutę i język. Regularnie dodawane są nowe opcje personalizacji."
+      },
+      "dataSecurity": {
+        "question": "Czy moje dane są bezpieczne?",
+        "answer": "Twoja prywatność jest dla nas ważna. Wszystkie dane faktur są przetwarzane wyłącznie w Twojej przeglądarce - nie przechowujemy żadnych informacji na naszych serwerach. Możesz nawet korzystać z narzędzia offline po załadowaniu."
+      },
+      "sharing": {
+        "question": "Czy mogę udostępniać faktury innym?",
+        "answer": "Tak, możesz generować linki do udostępniania swoich faktur, które inni mogą przeglądać i pobierać. Te linki są bezpieczne i dostępne tylko dla osób, którym je udostępnisz."
+      }
+    }
+  }
+}

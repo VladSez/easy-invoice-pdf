@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { usePDF } from "@react-pdf/renderer";
+import { usePDF } from "@react-pdf/renderer/lib/react-pdf.browser";
 import {
   LANGUAGE_TO_LABEL,
   type InvoiceData,
@@ -55,11 +55,13 @@ export function InvoicePDFDownloadLink({
   invoiceData: InvoiceData;
 }) {
   // Memoize static values
-  const filename = useMemo(
-    () =>
-      `invoice-${invoiceData.language}-${invoiceData.invoiceNumber.replace("/", "-")}.pdf`,
-    [invoiceData.language, invoiceData.invoiceNumber]
-  );
+  const filename = useMemo(() => {
+    const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
+
+    const name = `invoice-${invoiceData.language}-${invoiceNumberValue}.pdf`;
+
+    return name;
+  }, [invoiceData.language, invoiceData.invoiceNumberObject]);
 
   const PdfDocument = useMemo(
     () => <InvoicePdfTemplate invoiceData={invoiceData} />,
@@ -141,6 +143,7 @@ export function InvoicePDFDownloadLink({
         "dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 lg:mb-0 lg:w-[210px]",
         {
           "pointer-events-none opacity-70": isLoading,
+          "lg:w-[240px]": invoiceData.language === "pt",
         }
       )}
     >

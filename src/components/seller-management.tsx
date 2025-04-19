@@ -22,12 +22,7 @@ import {
   AlertDialogTitle,
 } from "./ui/alert-dialog";
 import type { UseFormSetValue } from "react-hook-form";
-import {
-  DEFAULT_SELLER_DATA,
-  sellerSchema,
-  type InvoiceData,
-  type SellerData,
-} from "@/app/schema";
+import { sellerSchema, type InvoiceData, type SellerData } from "@/app/schema";
 import { z } from "zod";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -35,6 +30,7 @@ import { Label } from "./ui/label";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
+import { DEFAULT_SELLER_DATA } from "@/app/constants";
 
 export const SELLERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_SELLERS";
 

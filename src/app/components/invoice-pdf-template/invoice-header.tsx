@@ -1,12 +1,11 @@
-import { Text, View } from "@react-pdf/renderer";
+import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { styles } from ".";
 import { type InvoiceData } from "@/app/schema";
-import { translations } from "./translations";
 import dayjs from "dayjs";
-
+import { TRANSLATIONS } from "@/app/schema/translations";
 export function InvoiceHeader({ invoiceData }: { invoiceData: InvoiceData }) {
   const language = invoiceData.language;
-  const t = translations[language];
+  const t = TRANSLATIONS[language];
 
   const dateOfIssue = dayjs(invoiceData.dateOfIssue).format(
     invoiceData.dateFormat
@@ -14,6 +13,12 @@ export function InvoiceHeader({ invoiceData }: { invoiceData: InvoiceData }) {
   const dateOfService = dayjs(invoiceData.dateOfService).format(
     invoiceData.dateFormat
   );
+
+  const invoiceNumberLabel = invoiceData?.invoiceNumberObject?.label;
+
+  const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
+
+  const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`;
 
   return (
     <View
@@ -26,9 +31,7 @@ export function InvoiceHeader({ invoiceData }: { invoiceData: InvoiceData }) {
       }}
     >
       <View>
-        <Text style={[styles.header]}>
-          {t.invoiceNumber}: {invoiceData?.invoiceNumber}
-        </Text>
+        <Text style={[styles.header]}>{invoiceNumber}</Text>
 
         {invoiceData?.invoiceType && invoiceData.invoiceTypeFieldIsVisible && (
           <Text

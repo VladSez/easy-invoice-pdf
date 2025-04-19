@@ -45,6 +45,10 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright-output/
+/playwright-test-downloads/
 
 # eslint
 .eslintcache
+
+# i18n
+messages/en.d.json.ts

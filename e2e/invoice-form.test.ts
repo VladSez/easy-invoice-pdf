@@ -1,5 +1,10 @@
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
+  CURRENCY_SYMBOLS,
+  LANGUAGE_TO_LABEL,
+  SUPPORTED_CURRENCIES,
+  SUPPORTED_DATE_FORMATS,
+  SUPPORTED_LANGUAGES,
   type AccordionState,
   type InvoiceData,
 } from "@/app/schema";
@@ -12,34 +17,26 @@ test.describe("Invoice Generator Page", () => {
     await page.goto("/");
   });
 
-  test("has correct title and branding", async ({ page }) => {
-    await expect(page).toHaveTitle(
-      "Invoice PDF Generator with Live Preview | No Sign-Up"
-    );
-    await expect(
-      page.getByRole("link", { name: "EasyInvoicePDF.com" })
-    ).toBeVisible();
-
-    await expect(
-      page.getByText("Invoice PDF generator with live preview")
-    ).toBeVisible();
-  });
-
   test("displays correct buttons and links in header", async ({ page }) => {
     // Check title and branding
     await expect(page).toHaveTitle(
       "Invoice PDF Generator with Live Preview | No Sign-Up"
     );
+
+    const header = page.getByTestId("header");
+    await expect(header).toBeVisible();
+
     await expect(
-      page.getByRole("link", { name: "EasyInvoicePDF.com" })
+      header.getByRole("link", { name: "EasyInvoicePDF.com" })
     ).toBeVisible();
+
     await expect(
-      page.getByText("Invoice PDF generator with live preview")
+      header.getByText("Invoice PDF generator with live preview")
     ).toBeVisible();
 
     // Check main action buttons
     await expect(
-      page.getByRole("button", { name: "Support Project" })
+      page.getByRole("link", { name: "Support Project" })
     ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Generate a link to invoice" })
@@ -48,22 +45,52 @@ test.describe("Invoice Generator Page", () => {
       page.getByRole("link", { name: "Download PDF in English" })
     ).toBeVisible();
 
-    // Check footer links
-    await expect(page.getByText("Made by")).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Vlad Sazonau" })
+      header.getByRole("link", { name: "Open Source" })
     ).toBeVisible();
-    await expect(page.getByRole("link", { name: "Open Source" })).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Share your feedback" })
+      header.getByRole("link", { name: "Share your feedback" })
     ).toBeVisible();
 
-    // Verify links have correct href attributes
+    const howItWorksButton = header.getByRole("button", {
+      name: "How it works",
+    });
+    await expect(howItWorksButton).toBeVisible();
+    await expect(howItWorksButton).toBeEnabled();
+
+    // open How it works dialog
+    await howItWorksButton.click();
+
     await expect(
-      page.getByRole("link", { name: "Vlad Sazonau" })
-    ).toHaveAttribute("href", "https://dub.sh/vldzn.me");
+      page.getByRole("heading", { name: "How EasyInvoicePDF Works" })
+    ).toBeVisible();
+
     await expect(
-      page.getByRole("link", { name: "Open Source" })
+      page.getByText(
+        "Watch this quick demo to learn how to create and customize your invoices."
+      )
+    ).toBeVisible();
+
+    // Check that video is displayed in dialog
+    const video = page.getByTestId("how-it-works-video");
+
+    await expect(video).toBeVisible();
+
+    await expect(video).toHaveAttribute("src", "/easy-invoice-demo.mp4");
+    await expect(video).toHaveAttribute("autoplay", "");
+    await expect(video).toHaveAttribute("controls", "");
+    await expect(video).toHaveAttribute("playsInline", "");
+
+    await expect(page.getByRole("button", { name: "Close" })).toBeVisible();
+
+    await page.getByRole("button", { name: "Close" }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "How EasyInvoicePDF Works" })
+    ).toBeHidden();
+
+    await expect(
+      header.getByRole("link", { name: "Open Source" })
     ).toHaveAttribute(
       "href",
       "https://github.com/VladSez/pdf-invoice-generator"
@@ -101,25 +128,71 @@ test.describe("Invoice Generator Page", () => {
       generalInfoSection.getByText("General Information", { exact: true })
     ).toBeVisible();
 
+    // Check all supported languages are available as options with correct labels
+    const languageSelect = generalInfoSection.getByRole("combobox", {
+      name: "Invoice PDF Language",
+    });
+
     // Language selection
-    await expect(
-      generalInfoSection.getByRole("combobox", { name: "Invoice PDF Language" })
-    ).toHaveValue(INITIAL_INVOICE_DATA.language);
+    await expect(languageSelect).toHaveValue(INITIAL_INVOICE_DATA.language);
+
+    // Verify all supported languages are available as options with correct labels
+    for (const lang of SUPPORTED_LANGUAGES) {
+      const languageName = LANGUAGE_TO_LABEL[lang];
+
+      await expect(
+        languageSelect.locator(`option[value="${lang}"]`)
+      ).toHaveText(languageName);
+    }
 
     // Currency selection
-    await expect(
-      generalInfoSection.getByRole("combobox", { name: "Currency" })
-    ).toHaveValue(INITIAL_INVOICE_DATA.currency);
+    const currencySelect = generalInfoSection.getByRole("combobox", {
+      name: "Currency",
+    });
+
+    await expect(currencySelect).toHaveValue(INITIAL_INVOICE_DATA.currency);
+
+    // Verify all supported currencies are available as options with correct labels
+    for (const currency of SUPPORTED_CURRENCIES) {
+      const currencySymbol = CURRENCY_SYMBOLS[currency];
+      const expectedLabel = `${currency} ${currencySymbol}`.trim();
+
+      await expect(
+        currencySelect.locator(`option[value="${currency}"]`)
+      ).toHaveText(expectedLabel);
+    }
 
     // Date Format selection
-    await expect(
-      generalInfoSection.getByRole("combobox", { name: "Date Format" })
-    ).toHaveValue(INITIAL_INVOICE_DATA.dateFormat);
+    const dateFormatSelect = generalInfoSection.getByRole("combobox", {
+      name: "Date Format",
+    });
+
+    await expect(dateFormatSelect).toHaveValue(INITIAL_INVOICE_DATA.dateFormat);
+
+    // Verify all supported date formats are available as options with correct labels
+    for (const dateFormat of SUPPORTED_DATE_FORMATS) {
+      const preview = dayjs().format(dateFormat);
+      const isDefault = dateFormat === SUPPORTED_DATE_FORMATS[0];
+
+      await expect(
+        dateFormatSelect.locator(`option[value="${dateFormat}"]`)
+      ).toHaveText(
+        `${dateFormat} (Preview: ${preview}) ${isDefault ? "(default)" : ""}`
+      );
+    }
 
     // Invoice Number
+    const invoiceNumberFieldset = page.getByRole("group", {
+      name: "Invoice Number",
+    });
+
     await expect(
-      generalInfoSection.getByRole("textbox", { name: "Invoice Number" })
-    ).toHaveValue(INITIAL_INVOICE_DATA.invoiceNumber);
+      invoiceNumberFieldset.getByRole("textbox", { name: "Label" })
+    ).toHaveValue(INITIAL_INVOICE_DATA.invoiceNumberObject.label);
+
+    await expect(
+      invoiceNumberFieldset.getByRole("textbox", { name: "Value" })
+    ).toHaveValue(INITIAL_INVOICE_DATA.invoiceNumberObject.value);
 
     // Date of Issue
     await expect(
@@ -259,11 +332,13 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue(firstItem.typeOfGTU);
     await expect(
       invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(1)
-    ).toBeChecked();
+    ).not.toBeChecked(); // we don't want to show this in PDF by default
 
     // Amount field and visibility toggle
     await expect(
-      invoiceItemsSection.getByRole("spinbutton", { name: "Amount" })
+      invoiceItemsSection.getByRole("spinbutton", {
+        name: "Amount (Quantity)",
+      })
     ).toHaveValue(firstItem.amount.toString());
     await expect(
       invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(2)
@@ -279,7 +354,9 @@ test.describe("Invoice Generator Page", () => {
 
     // Net Price field and visibility toggle
     await expect(
-      invoiceItemsSection.getByRole("spinbutton", { name: "Net Price" })
+      invoiceItemsSection.getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
     ).toHaveValue(firstItem.netPrice.toString());
     await expect(
       invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(4)
@@ -379,10 +456,13 @@ test.describe("Invoice Generator Page", () => {
 
     // Fill in item details
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount", exact: true })
+      .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
       .fill("2");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Net Price", exact: true })
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+        exact: true,
+      })
       .fill("100");
     await invoiceItemsSection
       .getByRole("textbox", { name: "VAT", exact: true })
@@ -413,26 +493,47 @@ test.describe("Invoice Generator Page", () => {
 
   test("handles form validation", async ({ page }) => {
     // Clear required fields
-    await page.getByRole("textbox", { name: "Invoice Number" }).clear();
     await page.getByRole("textbox", { name: "Date of Issue" }).clear();
 
-    // Try to generate PDF
-    await page.getByRole("link", { name: "Download PDF in English" }).click();
+    // Clear name field on the seller section
+    const sellerSection = page.getByTestId(`seller-information-section`);
+    await sellerSection.getByRole("textbox", { name: "Name" }).clear();
 
-    // Check for error messages
-    await expect(
-      page.getByText("Invoice number is required", { exact: true })
-    ).toBeVisible();
+    const buyerSection = page.getByTestId(`buyer-information-section`);
+    await buyerSection.getByRole("textbox", { name: "Name" }).clear();
+
+    // Clear name field on the first invoice item
+    const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
+    await invoiceItemsSection.getByRole("textbox", { name: "Name" }).clear();
+
     await expect(
       page.getByText("Date of issue is required", { exact: true })
     ).toBeVisible();
 
+    await expect(
+      page.getByText("Seller name is required", { exact: true })
+    ).toBeVisible();
+
+    await expect(
+      page.getByText("Buyer name is required", { exact: true })
+    ).toBeVisible();
+
+    await expect(
+      page.getByText("Item name is required", { exact: true })
+    ).toBeVisible();
+
     const dateOfIssue = dayjs().format("YYYY-MM-DD");
 
-    // Fill in required fields
-    await page
-      .getByRole("textbox", { name: "Invoice Number" })
-      .fill("1/03-2025");
+    const invoiceNumberFieldset = page.getByRole("group", {
+      name: "Invoice Number",
+    });
+
+    const invoiceNumberValueField = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Value",
+    });
+
+    await invoiceNumberValueField.fill("1/03-2025");
+
     await page
       .getByRole("textbox", { name: "Date of Issue" })
       .fill(dateOfIssue);
@@ -442,23 +543,42 @@ test.describe("Invoice Generator Page", () => {
       page.getByRole("textbox", { name: "Date of Issue" })
     ).toHaveValue(dateOfIssue);
 
-    // Try to generate PDF again
-    await page.getByRole("link", { name: "Download PDF in English" }).click();
+    // Fill in seller name
+    await sellerSection
+      .getByRole("textbox", { name: "Name" })
+      .fill("Test Seller");
+
+    // Fill in buyer name
+    await buyerSection
+      .getByRole("textbox", { name: "Name" })
+      .fill("Test Buyer");
 
     // Check for error messages to be hidden
     await expect(
-      page.getByText("Invoice number is required", { exact: true })
-    ).toBeHidden();
-    await expect(
       page.getByText("Date of issue is required", { exact: true })
+    ).toBeHidden();
+
+    await expect(
+      page.getByText("Seller name is required", { exact: true })
+    ).toBeHidden();
+
+    await expect(
+      page.getByText("Buyer name is required", { exact: true })
     ).toBeHidden();
   });
 
   test("persists data in local storage", async ({ page }) => {
     // Fill in some data
-    await page
-      .getByRole("textbox", { name: "Invoice Number" })
-      .fill("TEST/2024");
+    const invoiceNumberFieldset = page.getByRole("group", {
+      name: "Invoice Number",
+    });
+
+    const invoiceNumberValueField = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Value",
+    });
+
+    await invoiceNumberValueField.fill("TEST/2024");
+
     await page
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Test note");
@@ -475,17 +595,29 @@ test.describe("Invoice Generator Page", () => {
 
     const parsedData = JSON.parse(storedData) as InvoiceData;
     expect(parsedData).toMatchObject({
-      invoiceNumber: "TEST/2024",
+      invoiceNumberObject: {
+        label: "Invoice No. of:",
+        value: "TEST/2024",
+      },
       notes: "Test note",
-    });
+    } satisfies Pick<InvoiceData, "notes" | "invoiceNumberObject">);
 
     // Reload page
     await page.reload();
 
     // Check if data persists in UI
-    await expect(
-      page.getByRole("textbox", { name: "Invoice Number" })
-    ).toHaveValue("TEST/2024");
+    const invoiceNumberFieldset2 = page.getByRole("group", {
+      name: "Invoice Number",
+    });
+
+    const invoiceNumberValueField2 = invoiceNumberFieldset2.getByRole(
+      "textbox",
+      {
+        name: "Value",
+      }
+    );
+    await expect(invoiceNumberValueField2).toHaveValue("TEST/2024");
+
     await expect(
       page.getByRole("textbox", { name: "Notes", exact: true })
     ).toHaveValue("Test note");
@@ -516,10 +648,13 @@ test.describe("Invoice Generator Page", () => {
 
     // Verify calculations with new currency
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount", exact: true })
+      .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
       .fill("2");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Net Price", exact: true })
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+        exact: true,
+      })
       .fill("100.75");
 
     await expect(netPriceFormElement).toHaveText("$USD");
@@ -702,7 +837,7 @@ test.describe("Invoice Generator Page", () => {
 
     // **AMOUNT FIELD**
     const amountInput = invoiceItemsSection.getByRole("spinbutton", {
-      name: "Amount",
+      name: "Amount (Quantity)",
     });
 
     // Test invalid values
@@ -837,11 +972,11 @@ test.describe("Invoice Generator Page", () => {
 
     const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
     const amountInput = invoiceItemsSection.getByRole("spinbutton", {
-      name: "Amount",
+      name: "Amount (Quantity)",
       exact: true,
     });
     const netPriceInput = invoiceItemsSection.getByRole("spinbutton", {
-      name: "Net Price",
+      name: "Net Price (Rate or Unit Price)",
       exact: true,
     });
     const vatInput = invoiceItemsSection.getByRole("textbox", {
@@ -891,9 +1026,16 @@ test.describe("Invoice Generator Page", () => {
     context,
   }) => {
     // Fill in some test data
-    await page
-      .getByRole("textbox", { name: "Invoice Number" })
-      .fill("SHARE-TEST-001");
+    const invoiceNumberFieldset = page.getByRole("group", {
+      name: "Invoice Number",
+    });
+
+    const invoiceNumberValueField = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Value",
+    });
+
+    await invoiceNumberValueField.fill("SHARE-TEST-001");
+
     await page
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Test note for sharing");
@@ -913,10 +1055,12 @@ test.describe("Invoice Generator Page", () => {
     // Fill in an invoice item
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount" })
+      .getByRole("spinbutton", { name: "Amount (Quantity)" })
       .fill("5");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Net Price" })
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
       .fill("100");
     await invoiceItemsSection
       .getByRole("textbox", { name: "VAT", exact: true })
@@ -944,8 +1088,9 @@ test.describe("Invoice Generator Page", () => {
 
     // Verify data is loaded in new tab
     await expect(
-      newPage.getByRole("textbox", { name: "Invoice Number" })
+      invoiceNumberFieldset.getByRole("textbox", { name: "Value" })
     ).toHaveValue("SHARE-TEST-001");
+
     await expect(
       newPage.getByRole("textbox", { name: "Notes", exact: true })
     ).toHaveValue("Test note for sharing");
@@ -965,10 +1110,14 @@ test.describe("Invoice Generator Page", () => {
     // Verify invoice item
     const newInvoiceItemsSection = newPage.getByTestId("invoice-items-section");
     await expect(
-      newInvoiceItemsSection.getByRole("spinbutton", { name: "Amount" })
+      newInvoiceItemsSection.getByRole("spinbutton", {
+        name: "Amount (Quantity)",
+      })
     ).toHaveValue("5");
     await expect(
-      newInvoiceItemsSection.getByRole("spinbutton", { name: "Net Price" })
+      newInvoiceItemsSection.getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
     ).toHaveValue("100");
     await expect(
       newInvoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true })

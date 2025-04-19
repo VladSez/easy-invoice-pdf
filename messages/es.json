@@ -1,0 +1,124 @@
+{
+  "NotFound": {
+    "error": "404",
+    "message": "No se pudo encontrar esta página.",
+    "returnHome": "Volver a la página principal"
+  },
+  "Error": {
+    "title": "Algo salió mal",
+    "description": "Por favor, intenta actualizar la página o reporta el error",
+    "bugReport": "aquí",
+    "tryAgain": "Intentar de nuevo",
+    "goBack": "Volver",
+    "toastMessage": "¡Algo salió mal! Por favor, intenta actualizar la página o reporta el error."
+  },
+  "Metadata": {
+    "about": {
+      "title": "Acerca de | Generador de Facturas PDF con Vista Previa en Vivo | Sin Registro",
+      "description": "Crea y descarga facturas PDF profesionales al instante con vista previa en tiempo real. Gratis y de código abierto. No requiere registro.",
+      "keywords": "herramienta de facturación, generador de facturas gratuito, facturas PDF, creador de facturas, software de facturación"
+    }
+  },
+  "About": {
+    "tagline": "Generador de facturas PDF con vista previa en vivo",
+    "hero": {
+      "title": "Cree facturas profesionales en segundos",
+      "description": "EasyInvoicePDF es una herramienta gratuita de código abierto que le permite crear, personalizar y descargar facturas PDF profesionales con vista previa en tiempo real.",
+      "noSignup": "No requiere registro. 100% gratuito y de código abierto."
+    },
+    "features": {
+      "badge": "Características",
+      "title": "Todo lo que necesita para facturación profesional",
+      "description": "Nuestro generador de facturas simple pero potente incluye todas las funciones que necesita para crear facturas profesionales rápidamente.",
+      "comingSoon": "Versión Pro y API próximamente",
+      "items": {
+        "livePreview": {
+          "title": "Vista Previa en Vivo",
+          "description": "Vea cómo se actualiza su factura en tiempo real mientras realiza cambios, asegurándose de que se vea exactamente como desea."
+        },
+        "shareableLinks": {
+          "title": "Enlaces Compartibles",
+          "description": "Genere enlaces para compartir sus facturas directamente con los clientes sin enviar archivos adjuntos."
+        },
+        "instantDownload": {
+          "title": "Descarga Instantánea",
+          "description": "Descargue su factura como archivo PDF con un clic, lista para enviar o imprimir."
+        },
+        "multiLanguage": {
+          "title": "Múltiples Idiomas y Monedas",
+          "description": "Cree facturas en diez idiomas (inglés, polaco, alemán, español, portugués, ruso, ucraniano, francés, italiano, holandés) con soporte para todas las principales monedas y formato automático."
+        },
+        "vatSupport": {
+          "title": "Soporte de VAT Europeo",
+          "description": "Calcula automáticamente las tasas y totales del VAT europeo para tus facturas."
+        },
+        "openSource": {
+          "title": "Código Abierto",
+          "description": "Completamente gratuito y de código abierto. Úselo en línea o alójelo usted mismo con acceso completo al código."
+        }
+      }
+    },
+    "cta": {
+      "title": "¿Listo para simplificar su facturación?",
+      "description": "Comience a crear facturas profesionales en segundos con nuestra herramienta gratuita de código abierto.",
+      "noSignup": "No requiere registro. 100% gratuito y de código abierto."
+    },
+    "footer": {
+      "description": "Una herramienta gratuita de código abierto para crear facturas PDF profesionales con vista previa en tiempo real.",
+      "product": "Producto",
+      "links": {
+        "features": "Características",
+        "github": "GitHub"
+      },
+      "copyright": "© {year} EasyInvoicePDF.com",
+      "createdBy": "Creado por"
+    },
+    "buttons": {
+      "goToApp": "Ir a la aplicación",
+      "viewOnGithub": "Ver en GitHub",
+      "switchLanguage": "Cambiar idioma",
+      "shareFeedback": "Compartir comentarios",
+      "app": "Aplicación"
+    },
+    "newsletter": {
+      "title": "Suscríbete a nuestro boletín",
+      "description": "Recibe actualizaciones sobre nuevas funciones y mejoras de EasyInvoicePDF.com",
+      "subscribe": "Suscribirse",
+      "placeholder": "Introduce tu email",
+      "success": "¡Gracias por suscribirte!",
+      "error": "Error al suscribirse. Por favor, inténtalo de nuevo.",
+      "emailLanguageInfo": "Todos los correos se enviarán en inglés"
+    }
+  },
+  "FAQ": {
+    "title": "Preguntas Frecuentes",
+    "description": "Encuentra respuestas a preguntas comunes sobre EasyInvoicePDF",
+    "badge": "FAQ",
+    "items": {
+      "whatIs": {
+        "question": "¿Qué es EasyInvoicePDF?",
+        "answer": "EasyInvoicePDF es una herramienta gratuita y de código abierto que te ayuda a crear facturas PDF profesionales al instante. Cuenta con vista previa en tiempo real, plantillas personalizables y soporte para múltiples idiomas y monedas."
+      },
+      "isFree": {
+        "question": "¿Es realmente gratis?",
+        "answer": "Sí, EasyInvoicePDF es completamente gratuito. Todo el proyecto es de código abierto y está disponible en GitHub."
+      },
+      "accountNeeded": {
+        "question": "¿Necesito crear una cuenta?",
+        "answer": "No, no necesitas crear una cuenta ni registrarte. Puedes comenzar a crear facturas inmediatamente sin ningún proceso de registro."
+      },
+      "customization": {
+        "question": "¿Puedo personalizar la plantilla de la factura?",
+        "answer": "Sí, puedes personalizar varios aspectos de tu factura, incluyendo detalles de la empresa, moneda e idioma. Se están agregando más opciones de personalización regularmente."
+      },
+      "dataSecurity": {
+        "question": "¿Mis datos están seguros?",
+        "answer": "Tu privacidad es importante para nosotros. Todos los datos de las facturas se procesan completamente en tu navegador - no almacenamos ninguna información en nuestros servidores. Incluso puedes usar la herramienta sin conexión una vez cargada."
+      },
+      "sharing": {
+        "question": "¿Puedo compartir facturas con otros?",
+        "answer": "Sí, puedes generar enlaces compartibles para tus facturas que otros pueden ver y descargar. Estos enlaces son seguros y solo accesibles para las personas con quienes los compartes."
+      }
+    }
+  }
+}
