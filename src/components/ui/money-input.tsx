@@ -3,9 +3,28 @@ import { Input } from "./input";
 import {
   CURRENCY_SYMBOLS,
   SUPPORTED_CURRENCIES,
+  type CurrencySymbols,
   type InvoiceData,
 } from "@/app/schema";
 import { cn } from "@/lib/utils";
+
+function getCurrencyPadding(currencySymbol: CurrencySymbols) {
+  if (!currencySymbol) return "ps-3";
+
+  if (
+    currencySymbol === "Br" ||
+    currencySymbol === "R$" ||
+    currencySymbol === "S$"
+  ) {
+    return "ps-8";
+  }
+
+  if (currencySymbol === "HK$" || currencySymbol === "NT$") {
+    return "ps-10";
+  }
+
+  return "ps-6";
+}
 
 const MoneyInput = React.memo(
   React.forwardRef<
@@ -34,11 +53,7 @@ const MoneyInput = React.memo(
             ref={ref}
             className={cn(
               "-me-px rounded-e-none ps-6 shadow-none",
-              currencySymbol === "Br" || currencySymbol === "R$"
-                ? "ps-8"
-                : currencySymbol
-                  ? "ps-6"
-                  : "ps-3",
+              getCurrencyPadding(currencySymbol),
               props.className
             )}
             placeholder="0.00"
@@ -80,11 +95,7 @@ const ReadOnlyMoneyInput = React.memo(
             ref={ref}
             className={cn(
               "-me-px block w-full cursor-not-allowed rounded-md rounded-e-none border border-gray-300 bg-gray-100 px-3 py-2 ps-6",
-              currencySymbol === "Br" || currencySymbol === "R$"
-                ? "ps-8"
-                : currencySymbol
-                  ? "ps-6"
-                  : "ps-3",
+              getCurrencyPadding(currencySymbol),
               "focus-visible:border-indigo-500 focus-visible:ring focus-visible:ring-indigo-200 focus-visible:ring-opacity-50",
               props.className
             )}
