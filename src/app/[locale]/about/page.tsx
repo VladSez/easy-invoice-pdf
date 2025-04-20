@@ -109,8 +109,8 @@ function HeroSection() {
           </div>
 
           <Video
-            src="/easy-invoice-demo.mp4"
-            fallbackImg="/easy-invoice-hero.webp"
+            src="https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-demo.mp4"
+            fallbackImg="https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-hero.webp"
             testId="hero-about-page-video"
           />
         </div>
