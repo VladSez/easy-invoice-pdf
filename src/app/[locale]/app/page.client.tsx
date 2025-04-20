@@ -439,7 +439,7 @@ function ProjectInfo() {
           </DialogHeader>
           <div className="aspect-video w-full overflow-hidden">
             <video
-              src="/easy-invoice-demo.mp4"
+              src="https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-demo.mp4"
               muted
               controls
               autoPlay

@@ -76,7 +76,10 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(video).toBeVisible();
 
-    await expect(video).toHaveAttribute("src", "/easy-invoice-demo.mp4");
+    await expect(video).toHaveAttribute(
+      "src",
+      "https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-demo.mp4"
+    );
     await expect(video).toHaveAttribute("autoplay", "");
     await expect(video).toHaveAttribute("controls", "");
     await expect(video).toHaveAttribute("playsInline", "");

@@ -37,7 +37,10 @@ test.describe("About page", () => {
     const video = heroSection.getByTestId("hero-about-page-video");
 
     await expect(video).toBeVisible();
-    await expect(video).toHaveAttribute("poster", "/easy-invoice-hero.webp");
+    await expect(video).toHaveAttribute(
+      "poster",
+      "https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-hero.webp"
+    );
     await expect(video).toHaveAttribute("muted");
     await expect(video).toHaveAttribute("loop");
     await expect(video).toHaveAttribute("playsinline");
@@ -47,7 +50,7 @@ test.describe("About page", () => {
     const videoSource = video.locator("source");
     await expect(videoSource).toHaveAttribute(
       "src",
-      "/easy-invoice-demo.mp4#t=0.001"
+      "https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-demo.mp4#t=0.001"
     );
     await expect(videoSource).toHaveAttribute("type", "video/mp4");
 
