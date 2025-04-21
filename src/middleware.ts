@@ -1,9 +1,25 @@
 import createMiddleware from "next-intl/middleware";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
 
-export default createMiddleware({
+const intlMiddleware = createMiddleware({
   ...routing,
 });
+
+export default async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Handle root redirect to /en/app
+  if (pathname === "/") {
+    return NextResponse.redirect(new URL("/en/app", request.url), {
+      status: 308, // permanent redirect
+    });
+  }
+
+  // Handle all other routes with next-intl middleware
+  return intlMiddleware(request);
+}
 
 export const config = {
   // Match all pathnames except for

@@ -139,15 +139,6 @@ const nextConfig = {
       },
     ];
   },
-  async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/en/app",
-        permanent: true,
-      },
-    ];
-  },
 };
 
 export default withSentryConfig(withNextIntl(nextConfig), {
