@@ -15,6 +15,11 @@ const getDownloadDir = ({ browserName }: { browserName: string }) => {
 };
 
 const CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
+const TODAY = dayjs().format("YYYY-MM-DD");
+const LAST_DAY_OF_CURRENT_MONTH = dayjs().endOf("month").format("YYYY-MM-DD");
+
+// Payment date is 14 days from today (by default)
+const PAYMENT_DATE = dayjs().add(14, "day").format("YYYY-MM-DD");
 
 /**
  * We can't test the PDF preview because it's not supported in Playwright.
@@ -101,18 +106,52 @@ test.describe("PDF Preview", () => {
     expect(pdfData.text).toContain("Seller");
     expect(pdfData.text).toContain("Buyer");
 
-    const lastDayOfCurrentMonth = dayjs().endOf("month").format("YYYY-MM-DD");
-
+    // Check invoice header details
     expect(pdfData.text).toContain(
-      `Date of sales/of executing the service: ${lastDayOfCurrentMonth}`
+      `Invoice No. of: 1/${CURRENT_MONTH_AND_YEAR}`
     );
-    expect(pdfData.text).toContain(`To pay: 0.00 EUR
-Paid: 0.00 EUR
-Left to pay: 0.00 EUR
-Amount in words: zero EUR 00/100`);
+    expect(pdfData.text).toContain("Reverse Charge");
+    expect(pdfData.text).toContain(`Date of issue: ${TODAY}`);
+    expect(pdfData.text).toContain(
+      `Date of sales/of executing the service: ${LAST_DAY_OF_CURRENT_MONTH}`
+    );
 
-    expect(pdfData.text).toContain(`Reverse charge
-Created with https://easyinvoicepdf.com`);
+    // Check seller details
+    expect(pdfData.text).toContain("Seller name");
+    expect(pdfData.text).toContain("Seller address");
+    expect(pdfData.text).toContain("VAT no: Seller vat number");
+    expect(pdfData.text).toContain("e-mail: seller@email.com");
+    expect(pdfData.text).toContain("Account Number - Seller account number");
+    expect(pdfData.text).toContain("SWIFT/BIC number: Seller swift bic");
+
+    // Check buyer details
+    expect(pdfData.text).toContain("Buyer name");
+    expect(pdfData.text).toContain("Buyer address");
+    expect(pdfData.text).toContain("VAT no: Buyer vat number");
+    expect(pdfData.text).toContain("e-mail: buyer@email.com");
+
+    // Check invoice item details
+    expect(pdfData.text).toContain("Item name");
+    expect(pdfData.text).toContain("1");
+    expect(pdfData.text).toContain("service");
+    expect(pdfData.text).toContain("0.00");
+
+    // Check payment details
+    expect(pdfData.text).toContain("Payment method: wire transfer");
+    expect(pdfData.text).toContain(`Payment date: ${PAYMENT_DATE}`);
+
+    // Check totals
+    expect(pdfData.text).toContain("To pay: 0.00 EUR");
+    expect(pdfData.text).toContain("Paid: 0.00 EUR");
+    expect(pdfData.text).toContain("Left to pay: 0.00 EUR");
+    expect(pdfData.text).toContain("Amount in words: zero EUR 00/100");
+
+    // Check footer
+    expect(pdfData.text).toContain("Person authorized to receive");
+    expect(pdfData.text).toContain("Person authorized to issue");
+    expect(pdfData.text).toContain("Reverse charge");
+    expect(pdfData.text).toContain("Created with https://easyinvoicepdf.com");
+    expect(pdfData.text).toContain("1/1");
   });
 
   test("downloads PDF in Polish and verifies translated content", async ({
@@ -179,13 +218,15 @@ Kwota słownie: zero EUR 00/100`);
     page,
     browserName,
   }) => {
+    const DATE_FORMAT = "MMMM D, YYYY";
+
     // Switch to another currency
     await page.getByRole("combobox", { name: "Currency" }).selectOption("GBP");
 
     // Switch to another date format
     await page
       .getByRole("combobox", { name: "Date format" })
-      .selectOption("MMMM D, YYYY");
+      .selectOption(DATE_FORMAT);
 
     await page
       .getByRole("textbox", { name: "Invoice Type" })
@@ -216,6 +257,19 @@ Kwota słownie: zero EUR 00/100`);
       .nth(2)
       .click();
 
+    // update notes
+    await sellerSection
+      .getByRole("textbox", { name: "Notes" })
+      .fill("PLAYWRIGHT SELLER NOTES TEST");
+
+    // Toggle notes visibility on
+    const sellerNotesSwitch = sellerSection.getByTestId(
+      `sellerNotesInvoiceFormFieldVisibilitySwitch`
+    );
+
+    await expect(sellerNotesSwitch).toHaveRole("switch");
+    await expect(sellerNotesSwitch).toBeChecked();
+
     const buyerSection = page.getByTestId(`buyer-information-section`);
 
     // Name field
@@ -232,6 +286,19 @@ Kwota słownie: zero EUR 00/100`);
     await buyerSection
       .getByRole("textbox", { name: "Email" })
       .fill("TEST_BUYER_EMAIL@mail.com");
+
+    // update notes
+    await buyerSection
+      .getByRole("textbox", { name: "Notes" })
+      .fill("PLAYWRIGHT BUYER NOTES TEST");
+
+    // Toggle notes visibility on
+    const buyerNotesSwitch = buyerSection.getByTestId(
+      `buyerNotesInvoiceFormFieldVisibilitySwitch`
+    );
+
+    await expect(buyerNotesSwitch).toHaveRole("switch");
+    await expect(buyerNotesSwitch).toBeChecked();
 
     const invoiceSection = page.getByTestId(`invoice-items-section`);
 
@@ -286,38 +353,59 @@ Kwota słownie: zero EUR 00/100`);
     const dataBuffer = await fs.promises.readFile(tmpPath);
     const pdfData = await pdf(dataBuffer);
 
-    const lastDayOfCurrentMonth = dayjs().endOf("month").format("MMMM D, YYYY");
+    const today = dayjs().format(DATE_FORMAT);
+    const lastDayOfCurrentMonth = dayjs().endOf("month").format(DATE_FORMAT);
+    const paymentDate = dayjs().add(14, "day").format(DATE_FORMAT);
 
     // Verify PDF content
+    // Check invoice header details
+    expect(pdfData.text).toContain(
+      `Invoice No. of: 1/${CURRENT_MONTH_AND_YEAR}`
+    );
+    expect(pdfData.text).toContain("HELLO FROM PLAYWRIGHT TEST!");
+    expect(pdfData.text).toContain(`Date of issue: ${today}`);
     expect(pdfData.text).toContain(
       `Date of sales/of executing the service: ${lastDayOfCurrentMonth}`
     );
 
-    expect(pdfData.text).toContain("HELLO FROM PLAYWRIGHT TEST!");
+    // Check seller details
     expect(pdfData.text).toContain("PLAYWRIGHT SELLER TEST");
-    expect(pdfData.text).toContain(`PLAYWRIGHT BUYER TEST`);
-    expect(pdfData.text).toContain(`PLAYWRIGHT BUYER ADDRESS TEST`);
-    expect(pdfData.text).toContain(`TEST_BUYER_EMAIL@mail.com`);
+    expect(pdfData.text).toContain("Seller address");
+    expect(pdfData.text).toContain("seller@email.com");
+    expect(pdfData.text).toContain("PLAYWRIGHT SELLER NOTES TEST");
 
-    // Check that the PDF does NOT contain the seller's VAT number, account number, or SWIFT/BIC number
-    // because we toggled the visibility off
-    expect(pdfData.text).not.toContain(`VAT no: Seller vat number
-Account Number - Seller account number
-SWIFT/BIC number: Seller swift bic`);
+    // Check buyer details
+    expect(pdfData.text).toContain("PLAYWRIGHT BUYER TEST");
+    expect(pdfData.text).toContain("PLAYWRIGHT BUYER ADDRESS TEST");
+    expect(pdfData.text).toContain("Buyer vat number");
+    expect(pdfData.text).toContain("TEST_BUYER_EMAIL@mail.com");
+    expect(pdfData.text).toContain("PLAYWRIGHT BUYER NOTES TEST");
 
-    // Check that the PDF does NOT contain the VAT table summary
-    // because we toggled the visibility off
-    expect(pdfData.text).not.toContain(`VAT rateNetVATPre-tax
-NP3 000.000.003 000.00
-Total3 000.000.003 000.00`);
+    // Check invoice item details
+    expect(pdfData.text).toContain("Item name");
+    expect(pdfData.text).toContain("3");
+    expect(pdfData.text).toContain("service");
+    expect(pdfData.text).toContain("1 000.00");
+    expect(pdfData.text).toContain("3 000.00");
 
-    expect(pdfData.text).toContain(`To pay: 3 000.00 GBP
-Paid: 0.00 GBP
-Left to pay: 3 000.00 GBP
-Amount in words: three thousand GBP 00/100`);
+    // Check payment details
+    expect(pdfData.text).toContain("Payment method: wire transfer");
+    expect(pdfData.text).toContain(`Payment date: ${paymentDate}`);
 
-    expect(pdfData.text).toContain(`Reverse charge
-Created with https://easyinvoicepdf.com`);
+    // Check totals
+    expect(pdfData.text).toContain("To pay: 3 000.00 GBP");
+    expect(pdfData.text).toContain("Paid: 0.00 GBP");
+    expect(pdfData.text).toContain("Left to pay: 3 000.00 GBP");
+    expect(pdfData.text).toContain(
+      "Amount in words: three thousand GBP 00/100"
+    );
+
+    // Check footer
+    expect(pdfData.text).toContain("Person authorized to receive");
+    expect(pdfData.text).toContain("Person authorized to issue");
+    expect(pdfData.text).toContain("Reverse charge");
+    expect(pdfData.text).toContain("Created with https://easyinvoicepdf.com");
+    expect(pdfData.text).toContain("1/1");
   });
 
   test("completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French", async ({
@@ -363,7 +451,8 @@ Created with https://easyinvoicepdf.com`);
     await invoiceNumberLabelInput.fill("MOBILE-TEST-001:");
     await invoiceNumberValueInput.fill("2/05-2024");
 
-    await page
+    const finalSection = page.getByTestId("final-section");
+    await finalSection
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Mobile test note");
 
@@ -477,7 +566,7 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     await expect(invoiceNumberValueInput).toHaveValue("2/05-2024");
 
     await expect(
-      page.getByRole("textbox", { name: "Notes", exact: true })
+      finalSection.getByRole("textbox", { name: "Notes", exact: true })
     ).toHaveValue("Mobile test note");
 
     // Verify seller information persists

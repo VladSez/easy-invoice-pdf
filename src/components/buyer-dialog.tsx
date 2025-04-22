@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -65,6 +63,8 @@ export function BuyerDialog({
       vatNo: initialData?.vatNo ?? "",
       email: initialData?.email ?? "",
       vatNoFieldIsVisible: initialData?.vatNoFieldIsVisible ?? true,
+      notes: initialData?.notes ?? "",
+      notesFieldIsVisible: initialData?.notesFieldIsVisible ?? true,
     },
   });
 
@@ -94,6 +94,8 @@ export function BuyerDialog({
           vatNo: "",
           email: "",
           vatNoFieldIsVisible: true,
+          notes: "",
+          notesFieldIsVisible: true,
         }
       );
     }
@@ -333,6 +335,61 @@ export function BuyerDialog({
                   </FormItem>
                 )}
               />
+
+              {/* Notes */}
+              <div className="space-y-4">
+                <div className="flex items-end justify-between">
+                  <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Notes</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            rows={3}
+                            placeholder="Enter notes (max 750 characters)"
+                            maxLength={750}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Show/Hide Notes Field in PDF */}
+                  <div className="ml-4 flex items-center gap-2">
+                    <FormField
+                      control={form.control}
+                      name="notesFieldIsVisible"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                id="notes-field-visibility"
+                                data-testid={`buyerNotesDialogFieldVisibilitySwitch`}
+                              />
+                            </FormControl>
+                            <CustomTooltip
+                              trigger={
+                                <Label htmlFor="notes-field-visibility">
+                                  Show in PDF
+                                </Label>
+                              }
+                              content="Show/Hide the notes field in the PDF"
+                              className="z-[1000]"
+                            />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
             </form>
           </Form>
 
@@ -368,9 +425,11 @@ export function BuyerDialog({
           <Button
             type="button"
             onClick={async () => {
-              // validate the form
-              const isValid = await form.trigger();
-              if (!isValid) return;
+              // Validate form and focus first error field
+              const result = await form.trigger(undefined, {
+                shouldFocus: true,
+              });
+              if (!result) return;
 
               // submit the form
               onSubmit(form.getValues());

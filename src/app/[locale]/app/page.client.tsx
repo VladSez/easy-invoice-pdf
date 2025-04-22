@@ -2,6 +2,7 @@
 
 import {
   invoiceSchema,
+  PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_LANGUAGES,
   type InvoiceData,
 } from "@/app/schema";
@@ -18,7 +19,6 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/components/invoice-form";
 import { InvoicePDFDownloadLink } from "@/app/components/invoice-pdf-download-link";
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import { useDeviceContext } from "@/contexts/device-context";

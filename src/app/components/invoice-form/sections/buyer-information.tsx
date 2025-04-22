@@ -19,7 +19,7 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
 };
 
 const BUYER_TOOLTIP_CONTENT =
-  "Buyer details are locked. Click the edit button next to the 'Select Buyer' dropdown to modify buyer details. Any changes will be automatically saved.";
+  "Buyer details are locked. Click the Edit Buyer button (Pencil icon) next to the 'Select Buyer' dropdown to modify buyer details. Any changes will be automatically saved.";
 
 interface BuyerInformationProps {
   control: Control<InvoiceData>;
@@ -38,7 +38,7 @@ export const BuyerInformation = memo(function BuyerInformation({
   const isBuyerSelected = !!selectedBuyerId;
 
   const HTML_TITLE_CONTENT = isBuyerSelected
-    ? "Buyer details are locked. Click the edit buyer button to modify."
+    ? "Buyer details are locked. Click the Edit Buyer button (Pencil icon) to modify."
     : "";
 
   // Get current form values to pass to BuyerManagement
@@ -48,6 +48,8 @@ export const BuyerInformation = memo(function BuyerInformation({
     vatNo: invoiceData.buyer.vatNo,
     email: invoiceData.buyer.email,
     vatNoFieldIsVisible: invoiceData.buyer.vatNoFieldIsVisible,
+    notes: invoiceData.buyer.notes,
+    notesFieldIsVisible: invoiceData.buyer.notesFieldIsVisible,
   } satisfies Partial<BuyerData>;
 
   return (
@@ -226,6 +228,80 @@ export const BuyerInformation = memo(function BuyerInformation({
           />
           {errors.buyer?.email && (
             <ErrorMessage>{errors.buyer.email.message}</ErrorMessage>
+          )}
+        </div>
+
+        {/* Notes */}
+        <div>
+          <div className="relative mb-2 flex items-center justify-between">
+            {isBuyerSelected ? (
+              <LabelWithEditIcon
+                htmlFor={`buyerNotes`}
+                content={BUYER_TOOLTIP_CONTENT}
+              >
+                Notes
+              </LabelWithEditIcon>
+            ) : (
+              <Label htmlFor={`buyerNotes`} className="">
+                Notes
+              </Label>
+            )}
+
+            {/* Show/hide Notes field in PDF switch */}
+            <div
+              className="inline-flex items-center gap-2"
+              title={HTML_TITLE_CONTENT}
+            >
+              <Controller
+                name={`buyer.notesFieldIsVisible`}
+                control={control}
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Switch
+                    {...field}
+                    id={`buyerNotesFieldIsVisible`}
+                    checked={value}
+                    onCheckedChange={onChange}
+                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    disabled={isBuyerSelected}
+                    data-testid={`buyerNotesInvoiceFormFieldVisibilitySwitch`}
+                  />
+                )}
+              />
+              <CustomTooltip
+                trigger={
+                  <Label htmlFor={`buyerNotesFieldIsVisible`}>
+                    Show in PDF
+                  </Label>
+                }
+                content={
+                  isBuyerSelected
+                    ? null
+                    : "Show/Hide the 'Notes' Field in the PDF"
+                }
+              />
+            </div>
+          </div>
+
+          <Controller
+            name="buyer.notes"
+            control={control}
+            render={({ field }) => {
+              return (
+                <Textarea
+                  {...field}
+                  id={`buyerNotes`}
+                  rows={3}
+                  className=""
+                  readOnly={isBuyerSelected}
+                  aria-readonly={isBuyerSelected}
+                  title={HTML_TITLE_CONTENT}
+                  placeholder="Additional information about the buyer"
+                />
+              );
+            }}
+          />
+          {errors.buyer?.notes && (
+            <ErrorMessage>{errors.buyer.notes.message}</ErrorMessage>
           )}
         </div>
       </fieldset>

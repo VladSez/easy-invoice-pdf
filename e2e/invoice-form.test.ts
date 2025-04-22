@@ -2,6 +2,7 @@ import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   CURRENCY_SYMBOLS,
   LANGUAGE_TO_LABEL,
+  PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_CURRENCIES,
   SUPPORTED_DATE_FORMATS,
   SUPPORTED_LANGUAGES,
@@ -290,9 +291,13 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       buyerSection.getByRole("textbox", { name: "VAT Number" })
     ).toHaveValue(INITIAL_INVOICE_DATA.buyer.vatNo);
-    await expect(
-      buyerSection.getByRole("switch", { name: /Show in PDF/i })
-    ).toBeChecked();
+
+    const buyerVatNoFieldIsVisibleSwitch = buyerSection.getByTestId(
+      `buyerVatNoFieldIsVisible`
+    );
+
+    await expect(buyerVatNoFieldIsVisibleSwitch).toHaveRole("switch");
+    await expect(buyerVatNoFieldIsVisibleSwitch).toBeChecked();
 
     // Email field
     await expect(
@@ -585,7 +590,9 @@ test.describe("Invoice Generator Page", () => {
 
     await invoiceNumberValueField.fill("TEST/2024");
 
-    await page
+    const finalSection = page.getByTestId(`final-section`);
+
+    await finalSection
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Test note");
 
@@ -594,9 +601,10 @@ test.describe("Invoice Generator Page", () => {
     await page.waitForTimeout(500);
 
     // Verify data is actually saved in localStorage
-    const storedData = (await page.evaluate(() => {
-      return localStorage.getItem("EASY_INVOICE_PDF_DATA");
-    })) as string;
+    const storedData = (await page.evaluate((key) => {
+      return localStorage.getItem(key);
+    }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
+
     expect(storedData).toBeTruthy();
 
     const parsedData = JSON.parse(storedData) as InvoiceData;
@@ -625,7 +633,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(invoiceNumberValueField2).toHaveValue("TEST/2024");
 
     await expect(
-      page.getByRole("textbox", { name: "Notes", exact: true })
+      finalSection.getByRole("textbox", { name: "Notes", exact: true })
     ).toHaveValue("Test note");
   });
 
@@ -1042,7 +1050,9 @@ test.describe("Invoice Generator Page", () => {
 
     await invoiceNumberValueField.fill("SHARE-TEST-001");
 
-    await page
+    const finalSection = page.getByTestId(`final-section`);
+
+    await finalSection
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Test note for sharing");
 
@@ -1097,8 +1107,10 @@ test.describe("Invoice Generator Page", () => {
       invoiceNumberFieldset.getByRole("textbox", { name: "Value" })
     ).toHaveValue("SHARE-TEST-001");
 
+    const newPageFinalSection = newPage.getByTestId(`final-section`);
+
     await expect(
-      newPage.getByRole("textbox", { name: "Notes", exact: true })
+      newPageFinalSection.getByRole("textbox", { name: "Notes", exact: true })
     ).toHaveValue("Test note for sharing");
 
     // Verify seller information

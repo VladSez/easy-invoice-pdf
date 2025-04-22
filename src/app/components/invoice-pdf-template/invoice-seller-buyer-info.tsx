@@ -16,6 +16,8 @@ export function InvoiceSellerBuyerInfo({
   const buyerVatNoFieldIsVisible = invoiceData.buyer.vatNoFieldIsVisible;
   const sellerAccountNumberFieldIsVisible =
     invoiceData.seller.accountNumberFieldIsVisible;
+  const sellerNotesFieldIsVisible = invoiceData.seller.notesFieldIsVisible;
+  const buyerNotesFieldIsVisible = invoiceData.buyer.notesFieldIsVisible;
 
   return (
     <View
@@ -73,6 +75,13 @@ export function InvoiceSellerBuyerInfo({
               </Text>
             </Text>
           )}
+          {sellerNotesFieldIsVisible && invoiceData?.seller.notes && (
+            <View style={{ marginTop: 10 }}>
+              <Text style={[styles.fontSize8]}>
+                {invoiceData?.seller.notes}
+              </Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -104,6 +113,12 @@ export function InvoiceSellerBuyerInfo({
             </Text>
           </Text>
         </View>
+
+        {buyerNotesFieldIsVisible && invoiceData?.buyer.notes && (
+          <View style={{ marginTop: 20 }}>
+            <Text style={[styles.fontSize8]}>{invoiceData?.buyer.notes}</Text>
+          </View>
+        )}
       </View>
     </View>
   );

@@ -19,7 +19,7 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
 };
 
 const SELLER_TOOLTIP_CONTENT =
-  "Seller details are locked. Click the edit button next to the 'Select Seller' dropdown to modify seller details.";
+  "Seller details are locked. Click the Edit Seller button (Pencil icon) next to the 'Select Seller' dropdown to modify seller details.";
 
 interface SellerInformationProps {
   control: Control<InvoiceData>;
@@ -38,7 +38,7 @@ export const SellerInformation = memo(function SellerInformation({
   const isSellerSelected = !!selectedSellerId;
 
   const HTML_TITLE_CONTENT = isSellerSelected
-    ? "Seller details are locked. Click the edit seller button to modify."
+    ? "Seller details are locked. Click the Edit Seller button (Pencil icon) to modify."
     : "";
 
   // Get current form values to pass to SellerManagement
@@ -52,6 +52,8 @@ export const SellerInformation = memo(function SellerInformation({
     vatNoFieldIsVisible: invoiceData.seller.vatNoFieldIsVisible,
     accountNumberFieldIsVisible: invoiceData.seller.accountNumberFieldIsVisible,
     swiftBicFieldIsVisible: invoiceData.seller.swiftBicFieldIsVisible,
+    notes: invoiceData.seller.notes,
+    notesFieldIsVisible: invoiceData.seller.notesFieldIsVisible,
   } satisfies Partial<SellerData>;
 
   return (
@@ -376,6 +378,80 @@ export const SellerInformation = memo(function SellerInformation({
           />
           {errors.seller?.swiftBic && (
             <ErrorMessage>{errors.seller.swiftBic.message}</ErrorMessage>
+          )}
+        </div>
+
+        {/* Notes */}
+        <div>
+          <div className="relative mb-2 flex items-center justify-between">
+            {isSellerSelected ? (
+              <LabelWithEditIcon
+                htmlFor={`sellerNotes`}
+                content={SELLER_TOOLTIP_CONTENT}
+              >
+                Notes
+              </LabelWithEditIcon>
+            ) : (
+              <Label htmlFor={`sellerNotes`} className="">
+                Notes
+              </Label>
+            )}
+
+            {/* Show/hide Notes field in PDF switch */}
+            <div
+              className="inline-flex items-center gap-2"
+              title={HTML_TITLE_CONTENT}
+            >
+              <Controller
+                name={`seller.notesFieldIsVisible`}
+                control={control}
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Switch
+                    {...field}
+                    id={`sellerNotesFieldIsVisible`}
+                    checked={value}
+                    onCheckedChange={onChange}
+                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    disabled={isSellerSelected}
+                    data-testid={`sellerNotesInvoiceFormFieldVisibilitySwitch`}
+                  />
+                )}
+              />
+              <CustomTooltip
+                trigger={
+                  <Label htmlFor={`sellerNotesFieldIsVisible`}>
+                    Show in PDF
+                  </Label>
+                }
+                content={
+                  isSellerSelected
+                    ? null
+                    : "Show/Hide the 'Notes' Field in the PDF"
+                }
+              />
+            </div>
+          </div>
+
+          <Controller
+            name="seller.notes"
+            control={control}
+            render={({ field }) => {
+              return (
+                <Textarea
+                  {...field}
+                  id={`sellerNotes`}
+                  rows={3}
+                  className=""
+                  readOnly={isSellerSelected}
+                  aria-readonly={isSellerSelected}
+                  title={HTML_TITLE_CONTENT}
+                  placeholder="Additional information about the seller"
+                />
+              );
+            }}
+          />
+          {errors.seller?.notes && (
+            <ErrorMessage>{errors.seller.notes.message}</ErrorMessage>
           )}
         </div>
       </fieldset>
