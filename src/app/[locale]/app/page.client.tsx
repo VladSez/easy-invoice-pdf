@@ -164,7 +164,7 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
       toast.error(
         "Unable to load your saved invoice data. For your convenience, we've reset the form to default values. Please try creating a new invoice.",
         {
-          duration: 7000,
+          duration: 20000,
           closeButton: true,
           richColors: true,
         }
