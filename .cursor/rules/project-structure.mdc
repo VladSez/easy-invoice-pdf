@@ -1,0 +1,79 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Project Structure and Architecture Guidelines
+
+Directory Structure:
+```
+├── app/                    # Next.js App Router directory
+│   ├── (auth)/            # Auth-related routes (grouped)
+│   ├── api/               # API routes
+│   └── layout.tsx         # Root layout
+├── components/            # Reusable components
+│   ├── ui/               # Shadcn UI components
+│   └── [feature]/        # Feature-specific components
+├── lib/                   # Shared utilities
+│   ├── utils.ts          # General utilities
+│   └── validations.ts    # Zod schemas
+├── hooks/                # Custom React hooks
+├── styles/               # Global styles
+└── types/                # TypeScript types
+```
+
+Component Organization:
+- Group related components in feature directories
+- Keep components small and focused
+- Extract reusable logic into custom hooks
+- Place shared types in dedicated files
+
+File Naming:
+- Use kebab-case for directories and files
+- Components: PascalCase.tsx
+- Utilities: camelCase.ts
+- Types: PascalCase.types.ts
+
+Component Structure:
+```typescript
+// types.ts
+interface Props {
+  // ... props interface
+}
+
+// helpers.ts
+function helperFunction() {
+  // ... helper logic
+}
+
+// Component.tsx
+import { type Props } from './types';
+import { helperFunction } from './helpers';
+
+export function Component({ prop1, prop2 }: Props) {
+  // ... component logic
+}
+```
+
+Data Fetching:
+- Use Server Components for data fetching
+- Implement proper caching strategies
+- Handle loading and error states
+- Use React Suspense boundaries
+
+Route Organization:
+- Group related routes in directories
+- Use route groups (parentheses) for organization
+- Keep page components lean
+- Extract business logic to separate files
+
+State Management:
+- Use Server Components when possible
+- Keep client state minimal
+- Use React Context sparingly
+
+API Structure:
+- Organize by feature/resource
+- Use consistent error handling
+- Implement proper validation
+- Follow RESTful conventions

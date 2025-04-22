@@ -1,0 +1,80 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Testing Guidelines
+
+Testing Stack:
+- Vitest for unit and integration tests
+- Playwright for E2E testing
+- React Testing Library for component testing
+- MSW for API mocking
+
+Test Organization:
+- Place tests next to implementation files
+- Use descriptive test names
+- Group related tests in describe blocks
+- Follow AAA pattern (Arrange, Act, Assert)
+
+Naming Conventions:
+- Test files: `*.test.ts` or `*.test.tsx`
+- Test suites: describe('ComponentName', () => {})
+- Test cases: it('should do something specific', () => {})
+
+Component Testing Pattern:
+```typescript
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Component } from './Component';
+
+describe('Component', () => {
+  it('should render successfully', () => {
+    render(<Component />);
+    expect(screen.getByRole('button')).toBeInTheDocument();
+  });
+
+  it('should handle user interaction', async () => {
+    const user = userEvent.setup();
+    render(<Component />);
+    
+    await user.click(screen.getByRole('button'));
+    expect(screen.getByText('Clicked')).toBeInTheDocument();
+  });
+});
+```
+
+API Mocking Pattern:
+```typescript
+import { rest } from 'msw';
+import { setupServer } from 'msw/node';
+
+const server = setupServer(
+  rest.get('/api/data', (req, res, ctx) => {
+    return res(ctx.json({ data: 'mocked' }));
+  })
+);
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+```
+
+Testing Guidelines:
+- Test behavior, not implementation
+- Use meaningful assertions
+- Mock external dependencies
+- Test error cases
+- Keep tests isolated
+- Use test data factories
+
+Coverage Requirements:
+- Unit tests: 80% coverage
+- Integration tests: Key user flows
+- E2E tests: Critical paths
+
+Performance Testing:
+- Use Lighthouse CI
+- Monitor Core Web Vitals
+- Test on slow networks
+- Test with different viewport sizes

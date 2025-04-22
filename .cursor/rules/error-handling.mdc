@@ -1,0 +1,91 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Error Handling and Validation Guidelines
+
+Key Principles:
+- Handle errors and edge cases early using guard clauses
+- Model expected errors as return values in Server Actions
+- Use error boundaries for unexpected errors
+- Implement proper error logging with meaningful messages
+- Provide user-friendly error feedback
+
+Form Validation:
+- Use Zod for form validation and type inference
+- Define reusable validation schemas
+- Implement client-side validation for immediate feedback
+- Add server-side validation as a safety net
+
+Error Types and Handling:
+- Expected errors (form validation, API responses):
+  - Handle with try/catch and return typed error objects
+  - Display user-friendly messages
+  - Log only when necessary for debugging
+- Unexpected errors (runtime errors, network issues):
+  - Catch with error boundaries
+  - Log comprehensively
+  - Show generic user-friendly fallback UI
+  - Include error reporting (if configured)
+
+Server Action Error Pattern:
+```typescript
+interface ActionResponse<T> {
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+    field?: string;
+  };
+}
+
+// Example usage
+async function handleSubmit(): Promise<ActionResponse<User>> {
+  try {
+    // ... logic
+    return { data: user };
+  } catch (e) {
+    return {
+      error: {
+        code: 'USER_CREATE_ERROR',
+        message: 'Failed to create user'
+      }
+    };
+  }
+}
+```
+
+Form Validation Pattern:
+```typescript
+import { z } from 'zod';
+
+const userSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+
+type UserFormData = z.infer<typeof userSchema>;
+```
+
+Error Boundary Usage:
+```typescript
+import { ErrorBoundary } from 'react-error-boundary';
+
+function ErrorFallback({ error }: { error: Error }) {
+  return (
+    <div className="p-4 rounded-md bg-red-50">
+      <h2 className="text-red-800">Something went wrong</h2>
+      <pre className="text-sm text-red-600">{error.message}</pre>
+    </div>
+  );
+}
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      {children}
+    </ErrorBoundary>
+  );
+}
+```
