@@ -7,13 +7,6 @@ import * as Sentry from "@sentry/nextjs";
 // we use NEXT_PUBLIC_VERCEL_ENV to check if we are in production because VERCEL_ENV is only available on the server
 const isVercelProd = process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
 
-console.log("client config", {
-  isVercelProd,
-  env: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  vercelPublicEnv: process.env.NEXT_PUBLIC_VERCEL_ENV,
-  vercelEnv: process.env.VERCEL_ENV,
-});
-
 Sentry.init({
   dsn: isVercelProd ? process.env.NEXT_PUBLIC_SENTRY_DSN : "",
   enabled: isVercelProd,

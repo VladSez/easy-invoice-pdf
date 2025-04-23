@@ -6,12 +6,6 @@ import * as Sentry from "@sentry/nextjs";
 
 const isVercelProd = process.env.VERCEL_ENV === "production";
 
-console.log("server config", {
-  isVercelProd,
-  env: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  vercelEnv: process.env.VERCEL_ENV,
-});
-
 Sentry.init({
   dsn: isVercelProd ? process.env.NEXT_PUBLIC_SENTRY_DSN : "",
   enabled: isVercelProd,
