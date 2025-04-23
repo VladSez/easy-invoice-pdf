@@ -2,10 +2,20 @@
 // The config you add here will be used whenever a users loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
+import { APP_URL, isProduction } from "@/config";
 import * as Sentry from "@sentry/nextjs";
 
 // This is the client config, so we need to check the NEXT_PUBLIC_SENTRY_ENABLED environment variable
-const isSentryEnabled = process.env.NEXT_PUBLIC_SENTRY_ENABLED === "true";
+const isSentryEnabled =
+  process.env.NEXT_PUBLIC_SENTRY_ENABLED === "true" && isProduction;
+
+console.log("client config", {
+  isSentryEnabled,
+  isProduction,
+  APP_URL,
+  NEXT_PUBLIC_SENTRY_ENABLED: process.env.NEXT_PUBLIC_SENTRY_ENABLED,
+  SENTRY_ENABLED: process.env.SENTRY_ENABLED,
+});
 
 if (isSentryEnabled) {
   Sentry.init({

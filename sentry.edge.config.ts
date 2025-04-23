@@ -3,9 +3,19 @@
 // Note that this config is unrelated to the Vercel Edge Runtime and is also required when running locally.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
+import { APP_URL, isProduction } from "@/config";
 import * as Sentry from "@sentry/nextjs";
 
-const isSentryEnabled = process.env.SENTRY_ENABLED === "true";
+const isSentryEnabled =
+  process.env.NEXT_PUBLIC_SENTRY_ENABLED === "true" && isProduction;
+
+console.log("edge config", {
+  isSentryEnabled,
+  isProduction,
+  APP_URL,
+  NEXT_PUBLIC_SENTRY_ENABLED: process.env.NEXT_PUBLIC_SENTRY_ENABLED,
+  SENTRY_ENABLED: process.env.SENTRY_ENABLED,
+});
 
 if (isSentryEnabled) {
   Sentry.init({
