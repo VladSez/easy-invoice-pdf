@@ -45,6 +45,11 @@ jobs:
 
       - name: 🎭 Run Playwright tests
         id: playwright
+        env:
+          BASE_URL: ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}
+          SENTRY_ENABLED: false
+          NEXT_PUBLIC_SENTRY_ENABLED: false
+          continue-on-error: true
         # calculate duration of the job and runs playwright test
         run: |
           start_time=$(date +%s)
@@ -57,11 +62,6 @@ jobs:
           seconds=$((duration % 60))
 
           echo "duration_formatted=${minutes}m ${seconds}s" >> "$GITHUB_OUTPUT"
-        env:
-          BASE_URL: ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}
-          NEXT_PUBLIC_SENTRY_DSN: ""
-          NEXT_PUBLIC_VERCEL_ENV: "test"
-          continue-on-error: true
 
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 #4.6.1
         name: 🎲 Upload Playwright report

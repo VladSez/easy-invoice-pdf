@@ -4,19 +4,23 @@
 
 import * as Sentry from "@sentry/nextjs";
 
-const isVercelProd = process.env.VERCEL_ENV === "production";
+const isCI = process.env.CI === "true";
 
-Sentry.init({
-  dsn: isVercelProd ? process.env.NEXT_PUBLIC_SENTRY_DSN : "",
-  enabled: isVercelProd,
+const isSentryEnabled = process.env.SENTRY_ENABLED === "true" && !isCI;
 
-  // Adjust sampling in production for better performance/cost balance
-  tracesSampleRate: 0.15, // Sample 15% of transactions
+if (isSentryEnabled) {
+  Sentry.init({
+    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    enabled: isSentryEnabled,
 
-  // Recommended production settings
-  debug: false,
+    // Adjust sampling in production for better performance/cost balance
+    tracesSampleRate: 0.15, // Sample 15% of transactions
 
-  // Performance settings
-  replaysSessionSampleRate: 0.1, // Sample 10% of sessions
-  replaysOnErrorSampleRate: 1.0, // But capture all sessions with errors
-});
+    // Recommended production settings
+    debug: false,
+
+    // Performance settings
+    replaysSessionSampleRate: 0.1, // Sample 10% of sessions
+    replaysOnErrorSampleRate: 1.0, // But capture all sessions with errors
+  });
+}
