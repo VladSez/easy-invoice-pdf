@@ -4,20 +4,22 @@
 
 import * as Sentry from "@sentry/nextjs";
 
-// we use NEXT_PUBLIC_VERCEL_ENV to check if we are in production because VERCEL_ENV is only available on the server
-const isVercelProd = process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
+// This is the client config, so we need to check the NEXT_PUBLIC_SENTRY_ENABLED environment variable
+const isSentryEnabled = process.env.NEXT_PUBLIC_SENTRY_ENABLED === "true";
 
-Sentry.init({
-  dsn: isVercelProd ? process.env.NEXT_PUBLIC_SENTRY_DSN : "",
-  enabled: isVercelProd,
+if (isSentryEnabled) {
+  Sentry.init({
+    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    enabled: isSentryEnabled,
 
-  // Adjust sampling in production for better performance/cost balance
-  tracesSampleRate: 0.15, // Sample 15% of transactions
+    // Adjust sampling in production for better performance/cost balance
+    tracesSampleRate: 0.15, // Sample 15% of transactions
 
-  // Recommended production settings
-  debug: false,
+    // Recommended production settings
+    debug: false,
 
-  // Performance settings
-  replaysSessionSampleRate: 0.1, // Sample 10% of sessions
-  replaysOnErrorSampleRate: 1.0, // But capture all sessions with errors
-});
+    // Performance settings
+    replaysSessionSampleRate: 0.1, // Sample 10% of sessions
+    replaysOnErrorSampleRate: 1.0, // But capture all sessions with errors
+  });
+}
