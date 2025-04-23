@@ -1,5 +1,3 @@
-"use client";
-
 import { Plus, Trash2, Pencil } from "lucide-react";
 import { useId, useState, useEffect } from "react";
 import { CustomTooltip } from "./ui/tooltip";

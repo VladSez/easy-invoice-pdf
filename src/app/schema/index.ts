@@ -213,6 +213,13 @@ export const sellerSchema = z
       .trim()
       .optional(),
     swiftBicFieldIsVisible: z.boolean().default(true),
+
+    notes: z
+      .string()
+      .max(750, "Notes must not exceed 750 characters")
+      .trim()
+      .optional(),
+    notesFieldIsVisible: z.boolean().default(true),
   })
   .strict();
 
@@ -240,6 +247,13 @@ export const buyerSchema = z
     vatNoFieldIsVisible: z.boolean().default(true),
 
     email: z.string().email("Invalid email address").trim(),
+
+    notes: z
+      .string()
+      .max(750, "Notes must not exceed 750 characters")
+      .trim()
+      .optional(),
+    notesFieldIsVisible: z.boolean().default(true),
   })
   .strict();
 
@@ -308,6 +322,8 @@ export const invoiceSchema = z.object({
 });
 
 export type InvoiceData = z.infer<typeof invoiceSchema>;
+
+export const PDF_DATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_DATA";
 
 /**
  * Accordion state schema

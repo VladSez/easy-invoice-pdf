@@ -2,6 +2,7 @@
 
 import {
   invoiceSchema,
+  PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_LANGUAGES,
   type InvoiceData,
 } from "@/app/schema";
@@ -18,7 +19,6 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/components/invoice-form";
 import { InvoicePDFDownloadLink } from "@/app/components/invoice-pdf-download-link";
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import { useDeviceContext } from "@/contexts/device-context";
@@ -164,7 +164,7 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
       toast.error(
         "Unable to load your saved invoice data. For your convenience, we've reset the form to default values. Please try creating a new invoice.",
         {
-          duration: 7000,
+          duration: 20000,
           closeButton: true,
           richColors: true,
         }

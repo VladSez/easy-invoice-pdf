@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { PDF_DATA_LOCAL_STORAGE_KEY } from "../../components/invoice-form";
 import { INITIAL_INVOICE_DATA } from "../../constants";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
 import { ErrorMessage } from "@/components/etc/error-message";
+import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema";
 
 export default function Error({
   error,

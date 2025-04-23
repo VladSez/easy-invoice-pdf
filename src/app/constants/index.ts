@@ -37,6 +37,10 @@ export const DEFAULT_SELLER_DATA = {
 
   swiftBic: "Seller swift bic",
   swiftBicFieldIsVisible: true,
+
+  // field for additional notes about the seller (not visible by default)
+  notes: "",
+  notesFieldIsVisible: true,
 } as const satisfies Omit<SellerData, "id">;
 
 /**
@@ -52,6 +56,10 @@ export const DEFAULT_BUYER_DATA = {
   vatNoFieldIsVisible: true,
 
   email: "buyer@email.com",
+
+  // field for additional notes about the buyer (not visible by default)
+  notes: "",
+  notesFieldIsVisible: true,
 } as const satisfies Omit<BuyerData, "id">;
 
 /**

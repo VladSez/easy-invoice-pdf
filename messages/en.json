@@ -1,6 +1,6 @@
 {
   "About": {
-    "tagline": "Invoice PDF generator with live preview",
+    "tagline": "Free Invoice Generator with Live PDF Preview",
     "hero": {
       "title": "Create professional invoices in seconds",
       "description": "EasyInvoicePDF is a free, open-source tool that lets you create, customize, and download professional PDF invoices with real-time preview.",
@@ -44,7 +44,7 @@
       "noSignup": "No sign-up required. 100% free and open-source."
     },
     "footer": {
-      "description": "A free, open-source tool for creating professional PDF invoices with real-time preview.",
+      "description": "A free, open-source tool for creating professional invoices with real-time preview.",
       "product": "Product",
       "links": {
         "features": "Features",
@@ -86,8 +86,8 @@
   },
   "Metadata": {
     "about": {
-      "title": "About | Invoice PDF Generator with Live Preview | No Sign-Up",
-      "description": "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
+      "title": "About | Free Invoice Generator – Live Preview, No Sign-Up",
+      "description": "Create and download professional invoices instantly with real-time preview. Free and open-source. No signup required.",
       "keywords": "invoice tool, free invoice generator, PDF invoices, invoice creator, billing software"
     }
   },
@@ -98,7 +98,7 @@
     "items": {
       "whatIs": {
         "question": "What is EasyInvoicePDF?",
-        "answer": "EasyInvoicePDF is a free, open-source tool that helps you create professional PDF invoices instantly. It features a live preview, customizable templates, and supports multiple languages and currencies."
+        "answer": "EasyInvoicePDF is a free, open-source tool that helps you create professional invoices instantly. It features a live preview, customizable templates, and supports multiple languages and currencies."
       },
       "isFree": {
         "question": "Is it really free?",

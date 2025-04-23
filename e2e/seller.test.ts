@@ -25,10 +25,14 @@ test.describe("Seller management", () => {
 
       swiftBicFieldIsVisible: true,
       swiftBic: "TESTBICX",
+
+      notesFieldIsVisible: true,
+      notes: "This is a SELLER test note",
     } as const satisfies SellerData;
 
     const manageSellerDialog = page.getByTestId(`manage-seller-dialog`);
 
+    // ------- TEST SELLER MANAGEMENT DIALOG FORM -------
     // Fill in form fields
     await manageSellerDialog
       .getByRole("textbox", { name: "Name" })
@@ -70,6 +74,20 @@ test.describe("Seller management", () => {
       .nth(2)
       .click(); // Toggle SWIFT/BIC visibility
 
+    // Fill in notes field
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Notes" })
+      .fill(testData.notes);
+
+    const notesSellerSwitch = manageSellerDialog.getByTestId(
+      `sellerNotesDialogFieldVisibilitySwitch`
+    );
+
+    await expect(notesSellerSwitch).toHaveRole("switch");
+
+    // Verify notes visibility switch is CHECKED by default
+    await expect(notesSellerSwitch).toBeChecked();
+
     // Verify "Apply to Current Invoice" switch is checked by default
     await expect(
       manageSellerDialog.getByRole("switch", {
@@ -109,6 +127,9 @@ test.describe("Seller management", () => {
 
       swiftBic: testData.swiftBic,
       swiftBicFieldIsVisible: false,
+
+      notes: testData.notes,
+      notesFieldIsVisible: true,
     } satisfies SellerData);
 
     // Verify success toast message is visible
@@ -116,6 +137,7 @@ test.describe("Seller management", () => {
       page.getByText("Seller added successfully", { exact: true })
     ).toBeVisible();
 
+    // ------- TEST SAVED DETAILS IN INVOICE FORM -------
     // Verify all saved details in the Seller Information section form
     const sellerForm = page.getByTestId(`seller-information-section`);
 
@@ -123,7 +145,7 @@ test.describe("Seller management", () => {
     const nameInput = sellerForm.getByRole("textbox", { name: "Name" });
     await expect(nameInput).toHaveAttribute(
       "title",
-      "Seller details are locked. Click the edit seller button to modify."
+      "Seller details are locked. Click the Edit Seller button (Pencil icon) to modify."
     );
 
     // Seller Name
@@ -189,6 +211,21 @@ test.describe("Seller management", () => {
     await expect(swiftBicSwitch).not.toBeChecked();
     await expect(swiftBicSwitch).toBeDisabled();
 
+    // Seller Notes
+    await expect(
+      sellerForm.getByRole("textbox", { name: "Notes" })
+    ).toHaveAttribute("aria-readonly", "true");
+    await expect(
+      sellerForm.getByRole("textbox", { name: "Notes" })
+    ).toHaveValue(testData.notes);
+
+    const notesSwitch = sellerForm.getByTestId(
+      `sellerNotesInvoiceFormFieldVisibilitySwitch`
+    );
+    // Verify Notes switch is visible
+    await expect(notesSwitch).toBeChecked();
+    await expect(notesSwitch).toBeDisabled();
+
     // Verify the seller appears in the dropdown
     await expect(
       sellerForm.getByRole("combobox", { name: "Select Seller" })
@@ -197,6 +234,7 @@ test.describe("Seller management", () => {
     // Test edit functionality
     await sellerForm.getByRole("button", { name: "Edit seller" }).click();
 
+    // ------- TEST EDIT FUNCTIONALITY IN SELLER MANAGEMENT DIALOG -------
     // Verify all fields are populated in edit dialog
     await expect(
       manageSellerDialog.getByRole("textbox", { name: "Name" })
@@ -227,6 +265,19 @@ test.describe("Seller management", () => {
     await expect(
       manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(2)
     ).not.toBeChecked();
+
+    // Verify notes text
+    await expect(
+      manageSellerDialog.getByRole("textbox", { name: "Notes" })
+    ).toHaveValue(testData.notes);
+
+    // Verify notes visibility switch is checked
+    const notesManageSellerDialogFormSwitch = manageSellerDialog.getByTestId(
+      `sellerNotesDialogFieldVisibilitySwitch`
+    );
+
+    await expect(notesManageSellerDialogFormSwitch).toBeChecked();
+    await expect(notesManageSellerDialogFormSwitch).toBeEnabled();
   });
 
   test("delete seller", async ({ page }) => {
@@ -246,6 +297,9 @@ test.describe("Seller management", () => {
 
       swiftBicFieldIsVisible: true,
       swiftBic: "123456789",
+
+      notesFieldIsVisible: true,
+      notes: "This is a test note",
     } as const satisfies SellerData;
 
     const manageSellerDialog = page.getByTestId(`manage-seller-dialog`);

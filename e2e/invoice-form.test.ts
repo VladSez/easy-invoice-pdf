@@ -2,6 +2,7 @@ import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   CURRENCY_SYMBOLS,
   LANGUAGE_TO_LABEL,
+  PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_CURRENCIES,
   SUPPORTED_DATE_FORMATS,
   SUPPORTED_LANGUAGES,
@@ -18,6 +19,9 @@ test.describe("Invoice Generator Page", () => {
   });
 
   test("displays correct buttons and links in header", async ({ page }) => {
+    // Check URL is correct
+    await expect(page).toHaveURL("/en/app");
+
     // Check title and branding
     await expect(page).toHaveTitle(
       "Invoice PDF Generator with Live Preview | No Sign-Up"
@@ -287,9 +291,13 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       buyerSection.getByRole("textbox", { name: "VAT Number" })
     ).toHaveValue(INITIAL_INVOICE_DATA.buyer.vatNo);
-    await expect(
-      buyerSection.getByRole("switch", { name: /Show in PDF/i })
-    ).toBeChecked();
+
+    const buyerVatNoFieldIsVisibleSwitch = buyerSection.getByTestId(
+      `buyerVatNoFieldIsVisible`
+    );
+
+    await expect(buyerVatNoFieldIsVisibleSwitch).toHaveRole("switch");
+    await expect(buyerVatNoFieldIsVisibleSwitch).toBeChecked();
 
     // Email field
     await expect(
@@ -582,7 +590,9 @@ test.describe("Invoice Generator Page", () => {
 
     await invoiceNumberValueField.fill("TEST/2024");
 
-    await page
+    const finalSection = page.getByTestId(`final-section`);
+
+    await finalSection
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Test note");
 
@@ -591,9 +601,10 @@ test.describe("Invoice Generator Page", () => {
     await page.waitForTimeout(500);
 
     // Verify data is actually saved in localStorage
-    const storedData = (await page.evaluate(() => {
-      return localStorage.getItem("EASY_INVOICE_PDF_DATA");
-    })) as string;
+    const storedData = (await page.evaluate((key) => {
+      return localStorage.getItem(key);
+    }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
+
     expect(storedData).toBeTruthy();
 
     const parsedData = JSON.parse(storedData) as InvoiceData;
@@ -622,7 +633,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(invoiceNumberValueField2).toHaveValue("TEST/2024");
 
     await expect(
-      page.getByRole("textbox", { name: "Notes", exact: true })
+      finalSection.getByRole("textbox", { name: "Notes", exact: true })
     ).toHaveValue("Test note");
   });
 
@@ -1039,7 +1050,9 @@ test.describe("Invoice Generator Page", () => {
 
     await invoiceNumberValueField.fill("SHARE-TEST-001");
 
-    await page
+    const finalSection = page.getByTestId(`final-section`);
+
+    await finalSection
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Test note for sharing");
 
@@ -1094,8 +1107,10 @@ test.describe("Invoice Generator Page", () => {
       invoiceNumberFieldset.getByRole("textbox", { name: "Value" })
     ).toHaveValue("SHARE-TEST-001");
 
+    const newPageFinalSection = newPage.getByTestId(`final-section`);
+
     await expect(
-      newPage.getByRole("textbox", { name: "Notes", exact: true })
+      newPageFinalSection.getByRole("textbox", { name: "Notes", exact: true })
     ).toHaveValue("Test note for sharing");
 
     // Verify seller information
@@ -1128,5 +1143,37 @@ test.describe("Invoice Generator Page", () => {
 
     // Close the new page
     await newPage.close();
+  });
+
+  test("shows notification when invoice link is broken", async ({ page }) => {
+    // Navigate to page with invalid data parameter
+    await page.goto("/en/app?data=invalid-data-string");
+
+    // Verify error toast appears
+    await expect(
+      page.getByText("The shared invoice URL appears to be incorrect")
+    ).toBeVisible();
+
+    // Verify error description is shown
+    await expect(
+      page.getByText(
+        "Please verify that you have copied the complete invoice URL. The link may be truncated or corrupted."
+      )
+    ).toBeVisible();
+
+    // Verify clear URL button is present
+    await expect(page.getByRole("button", { name: "Clear URL" })).toBeVisible();
+
+    // Click clear URL button
+    await page.getByRole("button", { name: "Clear URL" }).click();
+
+    // Verify toast is dismissed
+    await expect(
+      page.getByText("The shared invoice URL appears to be incorrect")
+    ).toBeHidden();
+
+    // Verify URL is cleared
+    expect(page.url()).toContain("/en/app");
+    expect(page.url()).not.toContain("?data=");
   });
 });

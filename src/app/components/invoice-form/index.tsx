@@ -5,6 +5,7 @@ import {
   accordionSchema,
   invoiceItemSchema,
   invoiceSchema,
+  PDF_DATA_LOCAL_STORAGE_KEY,
   type AccordionState,
   type InvoiceData,
   type InvoiceItemData,
@@ -42,7 +43,6 @@ import { GeneralInformation } from "./sections/general-information";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
 
-export const PDF_DATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_DATA";
 export const LOADING_BUTTON_TIMEOUT = 400;
 export const LOADING_BUTTON_TEXT = "Generating Document...";
 const DEBOUNCE_TIMEOUT = 500;
