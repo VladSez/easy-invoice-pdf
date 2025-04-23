@@ -45,11 +45,17 @@ jobs:
 
       - name: 🎭 Run Playwright tests
         id: playwright
+        env:
+          BASE_URL: ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}
+          SENTRY_ENABLED: false # we don't want to send errors to Sentry in the e2e tests
+          NEXT_PUBLIC_SENTRY_ENABLED: false # we don't want to send errors to Sentry in the e2e tests
+          NEXT_PUBLIC_CI: true
+          continue-on-error: true
         # calculate duration of the job and runs playwright test
         run: |
           start_time=$(date +%s)
 
-          pnpm exec playwright test
+          NEXT_PUBLIC_CI=true pnpm exec playwright test
 
           end_time=$(date +%s)
           duration=$((end_time - start_time))
@@ -57,11 +63,6 @@ jobs:
           seconds=$((duration % 60))
 
           echo "duration_formatted=${minutes}m ${seconds}s" >> "$GITHUB_OUTPUT"
-        env:
-          BASE_URL: ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}
-          SENTRY_ENABLED: false # we don't want to send errors to Sentry in the e2e tests
-          NEXT_PUBLIC_SENTRY_ENABLED: false # we don't want to send errors to Sentry in the e2e tests
-          continue-on-error: true
 
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 #4.6.1
         name: 🎲 Upload Playwright report

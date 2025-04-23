@@ -3,17 +3,18 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
-import { APP_URL, isProduction } from "@/config";
+import { APP_URL } from "@/config";
 
-const isSentryEnabled =
-  process.env.NEXT_PUBLIC_SENTRY_ENABLED === "true" && isProduction;
+const isCI = process.env.CI === "true";
+
+const isSentryEnabled = process.env.SENTRY_ENABLED === "true" && !isCI;
 
 console.log("server config", {
   isSentryEnabled,
-  isProduction,
   APP_URL,
   NEXT_PUBLIC_SENTRY_ENABLED: process.env.NEXT_PUBLIC_SENTRY_ENABLED,
   SENTRY_ENABLED: process.env.SENTRY_ENABLED,
+  isCI,
 });
 
 if (isSentryEnabled) {
