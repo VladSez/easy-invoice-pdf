@@ -13,6 +13,14 @@ import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
 
+console.log("e2e test env variables", {
+  NEXT_PUBLIC_CI: process.env.NEXT_PUBLIC_CI,
+  CI: process.env.CI,
+  SENTRY_ENABLED: process.env.SENTRY_ENABLED,
+  NEXT_PUBLIC_SENTRY_ENABLED: process.env.NEXT_PUBLIC_SENTRY_ENABLED,
+  BASE_URL: process.env.BASE_URL,
+});
+
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
