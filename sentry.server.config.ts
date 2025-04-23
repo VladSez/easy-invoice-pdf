@@ -4,9 +4,17 @@
 
 import * as Sentry from "@sentry/nextjs";
 
+const isVercelProd = process.env.VERCEL_ENV === "production";
+
+console.log("server config", {
+  isVercelProd,
+  env: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  vercelEnv: process.env.VERCEL_ENV,
+});
+
 Sentry.init({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  enabled: process.env.NODE_ENV === "production",
+  dsn: isVercelProd ? process.env.NEXT_PUBLIC_SENTRY_DSN : "",
+  enabled: isVercelProd,
 
   // Adjust sampling in production for better performance/cost balance
   tracesSampleRate: 0.15, // Sample 15% of transactions
