@@ -60,6 +60,21 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         permissions: ["clipboard-read", "clipboard-write"],
+        // Set localStorage to disable umami analytics
+        storageState: {
+          cookies: [],
+          origins: [
+            {
+              origin: BASE_URL,
+              localStorage: [
+                {
+                  name: "umami.disabled",
+                  value: "1",
+                },
+              ],
+            },
+          ],
+        },
       },
     },
     // {
@@ -73,6 +88,21 @@ export default defineConfig({
       use: {
         ...devices["Pixel 5"],
         permissions: ["clipboard-read", "clipboard-write"],
+        // Set localStorage to disable umami analytics
+        storageState: {
+          cookies: [],
+          origins: [
+            {
+              origin: BASE_URL,
+              localStorage: [
+                {
+                  name: "umami.disabled",
+                  value: "1",
+                },
+              ],
+            },
+          ],
+        },
       },
     },
     {
@@ -80,6 +110,21 @@ export default defineConfig({
       use: {
         ...devices["iPhone 12"],
         // on iOS we don't need to grant clipboard permissions
+        // Set localStorage to disable umami analytics
+        storageState: {
+          cookies: [],
+          origins: [
+            {
+              origin: BASE_URL,
+              localStorage: [
+                {
+                  name: "umami.disabled",
+                  value: "1",
+                },
+              ],
+            },
+          ],
+        },
       },
     },
 
