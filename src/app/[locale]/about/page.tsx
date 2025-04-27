@@ -14,57 +14,88 @@ import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import {
   CalculatorIcon,
+  CheckCircle,
   Download,
   FileText,
   GlobeIcon,
   Share2,
+  ArrowRight,
 } from "lucide-react";
 import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
+import { type Graph } from "schema-dts";
 import { LanguageSwitcher } from "./components/language-switcher";
-import { type FAQPage, type WithContext } from "schema-dts";
 
-// FAQ JSON-LD schema
-const faqJsonLd: WithContext<FAQPage> = {
+const JSON_LD: Graph = {
   "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
+  "@graph": [
     {
-      "@type": "Question",
-      name: "Is Invoice PDF Generator really free?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes, Invoice PDF Generator is completely free to use with no usage limits. There are no hidden fees, subscriptions, or paywalls.",
+      "@type": "WebPage",
+      "@id": "https://easyinvoicepdf.com/en/about",
+      url: "https://easyinvoicepdf.com/en/about",
+      name: "About | Free Invoice Generator – Live Preview, No Sign-Up",
+      description:
+        "EasyInvoicePDF is a free, open-source tool to create professional invoices with real-time PDF preview, no sign-up required.",
+      mainEntity: {
+        "@id": "https://easyinvoicepdf.com/en/about",
       },
     },
     {
-      "@type": "Question",
-      name: "Do I need to create an account?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "No, you don't need to create an account or sign up to use Invoice PDF Generator. You can start creating invoices right away.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Is my data secure?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes. Your data never leaves your browser - we don't store any of your invoice information on our servers. The application runs entirely in your web browser.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Can I customize the invoice templates?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes, you can customize various aspects of your invoice including company details, items, tax rates, and more with our user-friendly interface.",
-      },
+      "@type": "FAQPage",
+      "@id": "https://easyinvoicepdf.com/en/about#faq",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "What is EasyInvoicePDF?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "EasyInvoicePDF is a free, open-source tool that helps you create professional invoices instantly. It features a live preview, customizable templates, and supports multiple languages and currencies.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Is it really free?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Yes, EasyInvoicePDF is completely free to use. The entire project is open-source and available on GitHub.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Do I need to create an account?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "No, you don't need to create an account or sign up. You can start creating invoices immediately without any registration process.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Can I customize the invoice template?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Yes, you can customize various aspects of your invoice including company details, currency, and language. More customization options are being added regularly.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Is my data secure?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Your privacy is important to us. All invoice data is processed entirely in your browser - we don't store any of your information on our servers. You can even use the tool offline once loaded.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Can I share invoices with others?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Yes, you can generate shareable links for your invoices that others can view and download. These links are secure and only accessible to people you share them with.",
+          },
+        },
+      ],
     },
   ],
 };
-
-// ... rest of the file unchanged
 
 export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const { locale } = params;
@@ -78,7 +109,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
         id="json-ld"
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(faqJsonLd),
+          __html: JSON.stringify(JSON_LD),
         }}
       />
       <div className="flex min-h-screen flex-col bg-slate-50">
@@ -112,7 +143,7 @@ function Header({ locale }: { locale: Locale }) {
                 locale={locale}
                 buttonText={t("switchLanguage")}
               />
-              <GoToAppButton className="" />
+              <BlackGoToAppButton />
             </div>
           </div>
         </div>
@@ -127,42 +158,75 @@ function HeroSection() {
   return (
     <section
       id="hero"
-      className="flex w-full items-center justify-center bg-white py-12 md:py-24 lg:py-32 lg:pb-44"
+      className="relative flex w-full items-center justify-center overflow-hidden bg-gradient-to-b from-white to-slate-50 py-10 md:py-16 lg:py-24"
     >
-      <div className="container px-4 md:px-6">
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="flex flex-col justify-center space-y-4">
-            <div className="space-y-2">
-              <h1 className="text-balance pb-3 text-3xl font-bold tracking-tighter text-slate-900 sm:text-[54px]/[1]">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-indigo-50/50 blur-3xl" />
+        <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-emerald-50/40 blur-3xl" />
+      </div>
+
+      <div className="container relative z-10 px-4 md:px-6">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+          <div className="flex flex-col justify-center space-y-5 md:space-y-6">
+            <div className="space-y-3 md:space-y-4">
+              <h1 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl md:text-5xl lg:text-6xl">
                 {t("hero.title")}
               </h1>
-              <p className="max-w-[450px] text-balance text-slate-600 md:text-lg">
+
+              <p className="text-balance text-base text-slate-600 sm:text-lg md:max-w-[500px] md:text-xl">
                 {t("hero.description")}
               </p>
             </div>
-            <div className="flex flex-col gap-2 md:flex-row">
-              <GoToAppButton />
-              <Button _size="lg" _variant="outline" className="px-8" asChild>
+
+            <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <BlackGoToAppButton className="px-10 py-6 text-lg" />
+
+              <Button
+                _size="lg"
+                _variant="outline"
+                className="group relative overflow-hidden border-slate-200 px-10 py-6 text-lg shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md"
+                asChild
+              >
                 <Link
                   href="https://github.com/VladSez/easy-invoice-pdf"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <GithubIcon className="mr-2 h-5 w-5" />
+                  <GithubIcon className="mr-2 h-6 w-6 transition-transform group-hover:scale-110" />
                   {t("buttons.viewOnGithub")}
                 </Link>
               </Button>
             </div>
-            <p className="text-sm font-bold text-slate-500">
-              {t("hero.noSignup")}
-            </p>
+            <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 md:mx-0">
+              <CheckCircle className="h-4 w-4" />
+              <span>{t("hero.noSignup")}</span>
+            </div>
           </div>
 
-          <Video
-            src="https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-demo.mp4"
-            fallbackImg="https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-hero.webp"
-            testId="hero-about-page-video"
-          />
+          <div className="relative mx-auto w-full max-w-[600px] lg:mx-0">
+            {/* Mac OS Frame around the video */}
+            <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
+              {/* Browser chrome bar */}
+              <div className="h-8 w-full rounded-t-xl bg-slate-100 px-4 md:h-12 md:rounded-t-2xl">
+                <div className="flex h-full items-center">
+                  <div className="flex space-x-2">
+                    <div className="h-2.5 w-2.5 rounded-full bg-red-400 md:h-3 md:w-3"></div>
+                    <div className="h-2.5 w-2.5 rounded-full bg-amber-400 md:h-3 md:w-3"></div>
+                    <div className="h-2.5 w-2.5 rounded-full bg-green-400 md:h-3 md:w-3"></div>
+                  </div>
+                </div>
+              </div>
+              {/* Video container */}
+              <div className="w-full">
+                <Video
+                  src="https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-demo.mp4"
+                  fallbackImg="https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-hero.webp"
+                  testId="hero-about-page-video"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -580,11 +644,29 @@ function GoToAppButton({ className }: { className?: string }) {
   return (
     <Button
       _size="lg"
-      className={cn("bg-slate-950 px-8 hover:bg-slate-950/85", className)}
+      _variant="outline"
+      className={cn(
+        "group relative overflow-hidden border-slate-200 px-8 shadow-sm transition-all duration-300 hover:border-slate-200/80 hover:shadow-lg",
+        className
+      )}
       asChild
     >
-      <Link href="/app">{t("buttons.goToApp")}</Link>
+      <Link href="/app">
+        <ArrowRight className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
+        {t("buttons.goToApp")}
+      </Link>
     </Button>
+  );
+}
+
+function BlackGoToAppButton({ className }: { className?: string }) {
+  return (
+    <GoToAppButton
+      className={cn(
+        "relative overflow-hidden bg-zinc-900 text-white transition-all duration-300 hover:scale-[1.02] hover:bg-zinc-800 hover:text-white active:scale-[0.98]",
+        className
+      )}
+    />
   );
 }
 

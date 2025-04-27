@@ -46,6 +46,7 @@ export const metadata: Metadata = {
 const JSONLD: WithContext<WebSite> = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  url: "https://easyinvoicepdf.com/en/app",
   name: "EasyInvoicePDF.com",
   description: "Invoice Generator with Live Preview | No Sign-Up",
   keywords: [
@@ -56,21 +57,25 @@ const JSONLD: WithContext<WebSite> = {
     "invoice generator app",
     "free invoice generator",
   ],
-  url: APP_URL,
   image: "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png",
   mainEntityOfPage: {
-    "@type": "WebPage",
-    "@id": `${APP_URL}/en/app`,
+    "@type": "SoftwareApplication",
+    "@id": `https://easyinvoicepdf.com/en/app`,
+    featureList: [
+      "Live preview invoice generation",
+      "Instant PDF download",
+      "Support for multiple languages and currencies",
+      "European VAT support",
+      "Secure shareable invoice links",
+      "Offline support",
+    ],
+    operatingSystem: "All",
+    applicationCategory: "BusinessApplication",
   },
   author: {
     "@type": "Person",
     name: "Uladzislau Sazonau",
-    url: "https://vladsazon.com/",
-  },
-  publisher: {
-    "@type": "Person",
-    name: "Uladzislau Sazonau",
-    url: "https://vladsazon.com/",
+    url: "https://vladsazon.com",
   },
 };
 
