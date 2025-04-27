@@ -283,9 +283,6 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
         // Copy to clipboard
         await navigator.clipboard.writeText(newFullUrl);
 
-        // const newFullUrl = `${window.location.origin}/?data=${compressed}`;
-        // await navigator.clipboard.writeText(newFullUrl);
-
         toast.success("Invoice link copied to clipboard!", {
           description:
             "Share this link to let others view and edit this invoice",
