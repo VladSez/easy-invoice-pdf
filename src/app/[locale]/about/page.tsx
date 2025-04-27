@@ -651,7 +651,11 @@ function GoToAppButton({ className }: { className?: string }) {
       )}
       asChild
     >
-      <Link href="/app">
+      {/**
+       * scroll={false} is used to disable the default behavior of the link because it doesn't work for some reason
+       * the page is already scrolled to the top on mount at /en/app
+       */}
+      <Link href="/app" scroll={false}>
         <ArrowRight className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
         {t("buttons.goToApp")}
       </Link>

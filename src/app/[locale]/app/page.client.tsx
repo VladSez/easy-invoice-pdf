@@ -107,6 +107,11 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
     null
   );
 
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   // Initialize data from URL or localStorage on mount
   useEffect(() => {
     const compressedInvoiceDataInUrl = searchParams.get("data");
