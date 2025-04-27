@@ -12,7 +12,7 @@ export default function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === "/") {
     console.log("___Redirecting from root to /en/app___");
     return NextResponse.redirect(new URL("/en/app", request.url), {
-      status: 301, // Permanent redirect
+      status: 308, // Permanent redirect that preserves the request method
     });
   }
 
