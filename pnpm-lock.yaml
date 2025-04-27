@@ -203,6 +203,9 @@ importers:
       react-email:
         specifier: 4.0.4
         version: 4.0.4(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.51.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      schema-dts:
+        specifier: 1.1.5
+        version: 1.1.5
       tailwindcss:
         specifier: 3.4.14
         version: 3.4.14
@@ -7707,6 +7710,12 @@ packages:
         integrity: sha512-pFwF6H1XrSdYYNLfOcGlM28/j8CGLu8IvdrxqhjWULe2bPcKiKW4CV+OWqR/9fT52mywx65l7ysNkjLKBda7eA==,
       }
 
+  schema-dts@1.1.5:
+    resolution:
+      {
+        integrity: sha512-RJr9EaCmsLzBX2NDiO5Z3ux2BVosNZN5jo0gWgsyKvxKIUL5R3swNvoorulAeL9kLB0iTSX7V6aokhla2m7xbg==,
+      }
+
   schema-utils@4.3.0:
     resolution:
       {
@@ -14125,6 +14134,8 @@ snapshots:
       loose-envify: 1.4.0
 
   scheduler@0.25.0-rc-603e6108-20241029: {}
+
+  schema-dts@1.1.5: {}
 
   schema-utils@4.3.0:
     dependencies:

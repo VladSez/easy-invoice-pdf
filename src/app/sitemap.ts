@@ -6,13 +6,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date().toISOString().split("T")[0];
 
   const sitemapEntries: MetadataRoute.Sitemap = [
-    // Root URL (will be redirected to /en/app)
-    {
-      url: APP_URL,
-      lastModified,
-      changeFrequency: "daily",
-      priority: 1,
-    },
     // Main app page (non-shared version)
     {
       url: `${APP_URL}/en/app`,

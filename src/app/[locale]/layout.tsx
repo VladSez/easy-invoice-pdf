@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import { hasLocale, type Locale } from "next-intl";
 import { notFound } from "next/navigation";
 import { Toaster } from "sonner";
+import { type WebSite, type WithContext } from "schema-dts";
 
 import { APP_URL } from "@/config";
 
@@ -18,27 +19,58 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
-  title: "Invoice PDF Generator with Live Preview | No Sign-Up",
+  title: "Invoice Generator with Live Preview | No Sign-Up",
   description:
-    "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
+    "Create and download professional invoices instantly with real-time preview. Free and open-source. No signup required.",
   keywords:
     "invoice generator, pdf invoice, invoice maker, invoice template, online invoice, billing software, open-source, free invoice generator",
   authors: [{ name: "Uladzislau Sazonau" }],
   creator: "Uladzislau Sazonau",
   publisher: "Uladzislau Sazonau",
   openGraph: {
-    title: "Invoice PDF Generator with Live Preview | No Sign-Up",
+    title: "Invoice Generator with Live Preview | No Sign-Up",
     description:
-      "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
+      "Create and download professional invoices instantly with real-time preview. Free and open-source. No signup required.",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Invoice PDF Generator with Live Preview | No Sign-Up",
+    title: "Invoice Generator with Live Preview | No Sign-Up",
     description:
-      "Create and download professional PDF invoices instantly with real-time preview. Free and open-source. No signup required.",
+      "Create and download professional invoices instantly with real-time preview. Free and open-source. No signup required.",
     creator: "@vlad_sazon",
+  },
+};
+
+const JSONLD: WithContext<WebSite> = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "EasyInvoicePDF.com",
+  description: "Invoice Generator with Live Preview | No Sign-Up",
+  keywords: [
+    "invoice",
+    "invoice generator",
+    "invoice generating",
+    "invoice app",
+    "invoice generator app",
+    "free invoice generator",
+  ],
+  url: APP_URL,
+  image: "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png",
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": `${APP_URL}/en/app`,
+  },
+  author: {
+    "@type": "Person",
+    name: "Uladzislau Sazonau",
+    url: "https://vladsazon.com/",
+  },
+  publisher: {
+    "@type": "Person",
+    name: "Uladzislau Sazonau",
+    url: "https://vladsazon.com/",
   },
 };
 
@@ -92,6 +124,11 @@ export default async function RootLayout({
           />
         </>
       )}
+      <script
+        id="json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSONLD) }}
+      />
     </>
   );
 }

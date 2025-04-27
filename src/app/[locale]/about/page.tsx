@@ -22,6 +22,49 @@ import {
 import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { LanguageSwitcher } from "./components/language-switcher";
+import { type FAQPage, type WithContext } from "schema-dts";
+
+// FAQ JSON-LD schema
+const faqJsonLd: WithContext<FAQPage> = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Is Invoice PDF Generator really free?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes, Invoice PDF Generator is completely free to use with no usage limits. There are no hidden fees, subscriptions, or paywalls.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Do I need to create an account?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "No, you don't need to create an account or sign up to use Invoice PDF Generator. You can start creating invoices right away.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is my data secure?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. Your data never leaves your browser - we don't store any of your invoice information on our servers. The application runs entirely in your web browser.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Can I customize the invoice templates?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes, you can customize various aspects of your invoice including company details, items, tax rates, and more with our user-friendly interface.",
+      },
+    },
+  ],
+};
+
+// ... rest of the file unchanged
 
 export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const { locale } = params;
@@ -31,6 +74,13 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
 
   return (
     <TooltipProvider>
+      <script
+        id="json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd),
+        }}
+      />
       <div className="flex min-h-screen flex-col bg-slate-50">
         <Header locale={locale} />
         <main>
