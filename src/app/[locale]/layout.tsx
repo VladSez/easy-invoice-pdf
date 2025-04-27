@@ -61,8 +61,12 @@ const JSONLD: WithContext<WebSite> = {
   mainEntityOfPage: {
     "@type": "SoftwareApplication",
     "@id": `https://easyinvoicepdf.com/en/app`,
+    name: "EasyInvoicePDF.com",
+    description: "Invoice Generator with Live Preview | No Sign-Up",
     featureList: [
       "Live preview invoice generation",
+      "No sign-up required",
+      "Customizable templates",
       "Instant PDF download",
       "Support for multiple languages and currencies",
       "European VAT support",
