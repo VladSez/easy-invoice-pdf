@@ -14,7 +14,6 @@ import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import {
   CalculatorIcon,
-  CheckCircle,
   Download,
   FileText,
   GlobeIcon,
@@ -199,7 +198,9 @@ function HeroSection() {
               </Button>
             </div>
             <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 md:mx-0">
-              <CheckCircle className="h-4 w-4" />
+              <span className="" role="img" aria-label="checkmark">
+                ✅
+              </span>
               <span>{t("hero.noSignup")}</span>
             </div>
           </div>
@@ -208,12 +209,12 @@ function HeroSection() {
             {/* Mac OS Frame around the video */}
             <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
               {/* Browser chrome bar */}
-              <div className="h-8 w-full rounded-t-xl bg-slate-100 px-4 md:h-12 md:rounded-t-2xl">
+              <div className="h-8 w-full rounded-t-xl bg-gradient-to-b from-[#F3F3F3] to-[#E9E9E9] px-4 shadow-sm md:h-12 md:rounded-t-2xl">
                 <div className="flex h-full items-center">
                   <div className="flex space-x-2">
-                    <div className="h-2.5 w-2.5 rounded-full bg-red-400 md:h-3 md:w-3"></div>
-                    <div className="h-2.5 w-2.5 rounded-full bg-amber-400 md:h-3 md:w-3"></div>
-                    <div className="h-2.5 w-2.5 rounded-full bg-green-400 md:h-3 md:w-3"></div>
+                    <div className="h-2.5 w-2.5 rounded-full bg-[#FF5F57] md:h-3 md:w-3"></div>
+                    <div className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E] md:h-3 md:w-3"></div>
+                    <div className="h-2.5 w-2.5 rounded-full bg-[#28C840] md:h-3 md:w-3"></div>
                   </div>
                 </div>
               </div>
