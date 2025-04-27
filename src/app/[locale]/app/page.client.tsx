@@ -1,32 +1,19 @@
 "use client";
 
+import { InvoiceClientPage } from "@/app/components";
+import { InvoicePDFDownloadLink } from "@/app/components/invoice-pdf-download-link";
+import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import {
   invoiceSchema,
   PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_LANGUAGES,
   type InvoiceData,
 } from "@/app/schema";
-import { Button } from "@/components/ui/button";
-import { CustomTooltip, TooltipProvider } from "@/components/ui/tooltip";
-import { isLocalStorageAvailable } from "@/lib/check-local-storage";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import * as Sentry from "@sentry/nextjs";
-import {
-  compressToEncodedURIComponent,
-  decompressFromEncodedURIComponent,
-} from "lz-string";
-// eslint-disable-next-line no-restricted-imports
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { InvoicePDFDownloadLink } from "@/app/components/invoice-pdf-download-link";
-import { INITIAL_INVOICE_DATA } from "@/app/constants";
-import { useDeviceContext } from "@/contexts/device-context";
-import { Link } from "@/i18n/navigation";
-import { ProjectLogo } from "@/components/etc/project-logo";
+import { TRANSLATIONS } from "@/app/schema/translations";
 import { GithubIcon } from "@/components/etc/github-logo";
-import type { Locale } from "next-intl";
+import { ProjectLogo } from "@/components/etc/project-logo";
 import { SubscribeInput } from "@/components/subscribe-input";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -34,9 +21,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { CustomTooltip, TooltipProvider } from "@/components/ui/tooltip";
+import { useDeviceContext } from "@/contexts/device-context";
+import { Link, useRouter } from "@/i18n/navigation";
+import { isLocalStorageAvailable } from "@/lib/check-local-storage";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import * as Sentry from "@sentry/nextjs";
+import {
+  compressToEncodedURIComponent,
+  decompressFromEncodedURIComponent,
+} from "lz-string";
+import type { Locale } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { z } from "zod";
-import { TRANSLATIONS } from "@/app/schema/translations";
-import { InvoiceClientPage } from "@/app/components";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 /**
@@ -107,6 +106,11 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
   const [invoiceDataState, setInvoiceDataState] = useState<InvoiceData | null>(
     null
   );
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   // Initialize data from URL or localStorage on mount
   useEffect(() => {
@@ -220,7 +224,7 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
               );
 
               // Clean URL if data differs
-              router.replace("/");
+              router.replace("/app");
             }
           } catch (error) {
             console.error("Failed to compare with URL data:", error);
@@ -236,7 +240,7 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
                     _variant="outline"
                     _size="sm"
                     onClick={() => {
-                      router.replace("/");
+                      router.replace("/app");
                       toast.dismiss();
                     }}
                   >
@@ -271,10 +275,12 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
         const stringified = JSON.stringify(newInvoiceDataValidated);
         const compressed = compressToEncodedURIComponent(stringified);
 
-        // Use push instead of replace to maintain history
-        router.push(`/?data=${compressed}`);
+        router.push(`/app?data=${compressed}`);
 
-        const newFullUrl = `${window.location.origin}/?data=${compressed}`;
+        // Construct full URL with locale and compressed data
+        const newFullUrl = `${window.location.origin}/${locale}/app?data=${compressed}`;
+
+        // Copy to clipboard
         await navigator.clipboard.writeText(newFullUrl);
 
         toast.success("Invoice link copied to clipboard!", {

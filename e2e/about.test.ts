@@ -26,7 +26,7 @@ test.describe("About page", () => {
 
     await expect(
       heroSection.getByText(
-        "EasyInvoicePDF is a free, open-source tool that lets you create, customize, and download professional PDF invoices with real-time preview."
+        "EasyInvoicePDF is a free, open-source tool that lets you create, customize, and download professional invoices with real-time preview."
       )
     ).toBeVisible();
 

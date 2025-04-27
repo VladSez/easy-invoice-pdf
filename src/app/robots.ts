@@ -8,14 +8,14 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: [
-          // Allow root
-          "/",
           // Allow about pages in all languages
           ...SUPPORTED_LANGUAGES.map((locale) => `/${locale}/about`),
           // Allow main app page (/en/app) for now
           "/en/app",
         ],
         disallow: [
+          // Disallow root as it redirects to /en/app
+          "/",
           // Disallow shared invoice URLs, like /en/app?data=*
           "/*app?data=*",
           "/*app?*data=*",

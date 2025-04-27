@@ -1,9 +1,24 @@
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default createMiddleware({
-  ...routing,
-});
+// Create the middleware handler
+const intlMiddleware = createMiddleware(routing);
+
+// Custom middleware handler that adds the redirect logic
+export default function middleware(request: NextRequest) {
+  // Redirect from root to /en/app
+  if (request.nextUrl.pathname === "/") {
+    console.log("___Redirecting from root to /en/app___");
+    return NextResponse.redirect(new URL("/en/app", request.url), {
+      status: 308, // Permanent redirect that preserves the request method
+    });
+  }
+
+  // For all other routes, use the intl middleware
+  return intlMiddleware(request);
+}
 
 export const config = {
   // Match all pathnames except for
@@ -11,6 +26,7 @@ export const config = {
   // - … the ones containing a dot (e.g. `favicon.ico`)
   matcher: [
     "/((?!api|trpc|_next|_vercel|.*\\..*).*)",
-    // Also match the specific about page path to include locale
+    // Include the root path explicitly for the redirect
+    "/",
   ],
 };
