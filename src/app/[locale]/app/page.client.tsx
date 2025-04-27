@@ -22,7 +22,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CustomTooltip, TooltipProvider } from "@/components/ui/tooltip";
-import { APP_URL } from "@/config";
 import { useDeviceContext } from "@/contexts/device-context";
 import { Link, useRouter } from "@/i18n/navigation";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
@@ -274,7 +273,7 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
         router.push(`/app?data=${compressed}`);
 
         // Construct full URL with locale and compressed data
-        const newFullUrl = `${APP_URL}/${locale}/app?data=${compressed}`;
+        const newFullUrl = `${window.location.origin}/${locale}/app?data=${compressed}`;
 
         // Copy to clipboard
         await navigator.clipboard.writeText(newFullUrl);
