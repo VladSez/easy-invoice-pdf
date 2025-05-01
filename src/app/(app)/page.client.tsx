@@ -23,7 +23,9 @@ import {
 } from "@/components/ui/dialog";
 import { CustomTooltip, TooltipProvider } from "@/components/ui/tooltip";
 import { useDeviceContext } from "@/contexts/device-context";
-import { Link, useRouter } from "@/i18n/navigation";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
@@ -31,7 +33,6 @@ import {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,
 } from "lz-string";
-import type { Locale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -94,9 +95,7 @@ function handleInvoiceNumberBreakingChange(json: unknown) {
   return json;
 }
 
-export function AppPageClient({ params }: { params: { locale: Locale } }) {
-  const { locale } = params;
-
+export function AppPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -107,10 +106,10 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
     null
   );
 
-  // Scroll to top on mount
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  // // Scroll to top on mount
+  // useEffect(() => {
+  //   window.scrollTo({ top: 0, behavior: "smooth" });
+  // }, []);
 
   // Initialize data from URL or localStorage on mount
   useEffect(() => {
@@ -224,7 +223,7 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
               );
 
               // Clean URL if data differs
-              router.replace("/app");
+              router.replace("/");
             }
           } catch (error) {
             console.error("Failed to compare with URL data:", error);
@@ -240,7 +239,7 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
                     _variant="outline"
                     _size="sm"
                     onClick={() => {
-                      router.replace("/app");
+                      router.replace("/");
                       toast.dismiss();
                     }}
                   >
@@ -273,12 +272,12 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
       try {
         const newInvoiceDataValidated = invoiceSchema.parse(invoiceDataState);
         const stringified = JSON.stringify(newInvoiceDataValidated);
-        const compressed = compressToEncodedURIComponent(stringified);
+        const compressedData = compressToEncodedURIComponent(stringified);
 
-        router.push(`/app?data=${compressed}`);
+        router.push(`/?data=${compressedData}`);
 
         // Construct full URL with locale and compressed data
-        const newFullUrl = `${window.location.origin}/${locale}/app?data=${compressed}`;
+        const newFullUrl = `${window.location.origin}/?data=${compressedData}`;
 
         // Copy to clipboard
         await navigator.clipboard.writeText(newFullUrl);
@@ -389,7 +388,7 @@ export function AppPageClient({ params }: { params: { locale: Locale } }) {
           </div>
         </div>
       </div>
-      <Footer locale={locale} />
+      <Footer />
     </TooltipProvider>
   );
 }
@@ -460,7 +459,7 @@ function ProjectInfo() {
   );
 }
 
-function Footer({ locale }: { locale: Locale }) {
+function Footer() {
   return (
     <footer className="w-full border-t border-slate-200 bg-white py-12 md:py-16">
       <div className="container mx-auto px-4 md:px-6">
@@ -529,8 +528,7 @@ function Footer({ locale }: { locale: Locale }) {
               <ul className="space-y-2">
                 <li>
                   <Link
-                    href="/about"
-                    locale={locale}
+                    href="/en/about"
                     className="text-sm text-slate-500 hover:text-slate-900"
                   >
                     About
@@ -575,7 +573,6 @@ function Footer({ locale }: { locale: Locale }) {
               error: "Failed to subscribe. Please try again.",
               emailLanguageInfo: "All emails will be sent in English",
             }}
-            locale={locale}
           />
         </div>
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">

@@ -1,5 +1,3 @@
-import type { Locale } from "next-intl";
-
 import type { Metadata } from "next";
 import { AppPageClient } from "./page.client";
 
@@ -11,7 +9,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const hasShareableData = Boolean(searchParams?.data);
 
-  // we want to index this page if there is no shareable data
+  // we want to index this page ONLY if there is no shareable data in the URL
   return {
     robots: hasShareableData
       ? {
@@ -32,11 +30,11 @@ export async function generateMetadata({
         },
     alternates: {
       // preferred version of the page
-      canonical: `/en/app`,
+      canonical: `/`,
     },
   };
 }
 
-export default function AppPage({ params }: { params: { locale: Locale } }) {
-  return <AppPageClient params={params} />;
+export default function AppPage() {
+  return <AppPageClient />;
 }

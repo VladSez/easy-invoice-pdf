@@ -139,6 +139,15 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: "/:locale/app", // Redirect all /:locale/app requests to the root, because we changed the structure of the app
+        destination: "/",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withSentryConfig(withNextIntl(nextConfig), {

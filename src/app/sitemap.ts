@@ -8,9 +8,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const sitemapEntries: MetadataRoute.Sitemap = [
     // Main app page (non-shared version)
     {
-      url: `${APP_URL}/en/app`,
+      url: `${APP_URL}/`,
       lastModified,
-      changeFrequency: "daily",
+      changeFrequency: "weekly",
       priority: 1,
     },
 
