@@ -727,7 +727,9 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     const pdfData = await pdf(dataBuffer);
 
     // Verify PDF content
-    expect(pdfData.text).toContain("Fatura TEST PORTUGUESE N°: 1/04-2025");
+    expect(pdfData.text).toContain(
+      `Fatura TEST PORTUGUESE N°: 1/${CURRENT_MONTH_AND_YEAR}`
+    );
     expect(pdfData.text).toContain("Data de emissão");
   });
 });
