@@ -6,11 +6,6 @@
       "keywords": "ferramenta de invoice, gerador de invoices gratuito, invoices PDF, criador de invoices, software de faturamento"
     }
   },
-  "NotFound": {
-    "error": "404",
-    "message": "Esta página não pôde ser encontrada.",
-    "returnHome": "Voltar à página inicial"
-  },
   "About": {
     "tagline": "Gerador de faturas PDF com pré-visualização em tempo real",
     "hero": {
@@ -81,14 +76,6 @@
       "error": "Falha na inscrição. Por favor, tente novamente.",
       "emailLanguageInfo": "Todos os emails serão enviados em inglês"
     }
-  },
-  "Error": {
-    "title": "Algo deu errado",
-    "description": "Por favor, tente atualizar a página ou reportar o erro",
-    "bugReport": "aqui",
-    "tryAgain": "Tentar novamente",
-    "goBack": "Voltar",
-    "toastMessage": "Algo deu errado! Por favor, tente atualizar a página ou reportar o erro."
   },
   "FAQ": {
     "title": "Perguntas Frequentes",

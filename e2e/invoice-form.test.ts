@@ -18,6 +18,11 @@ test.describe("Invoice Generator Page", () => {
     await page.goto("/");
   });
 
+  test("should redirect from /:locale/app to /", async ({ page }) => {
+    await page.goto("/en/app");
+    await expect(page).toHaveURL("/");
+  });
+
   test("displays correct buttons and links in header", async ({ page }) => {
     // Check URL is correct
     await expect(page).toHaveURL("/");

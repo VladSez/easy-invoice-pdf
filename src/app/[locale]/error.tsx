@@ -1,6 +1,5 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
 import { Button } from "@/components/ui/button";
@@ -15,16 +14,17 @@ type Props = {
 };
 
 export default function Error({ error, reset }: Props) {
-  const t = useTranslations("Error");
-
   useEffect(() => {
     Sentry.captureException(error);
 
-    toast.error(t("toastMessage"), {
-      closeButton: true,
-      richColors: true,
-    });
-  }, [error, t]);
+    toast.error(
+      "Something went wrong! Please try to refresh the page or fill a bug report.",
+      {
+        closeButton: true,
+        richColors: true,
+      }
+    );
+  }, [error]);
 
   return (
     <div className="flex h-dvh flex-col items-center justify-center gap-4">

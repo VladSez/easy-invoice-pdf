@@ -6,19 +6,6 @@
       "keywords": "narzędzie do faktur, darmowy generator faktur, faktury PDF, kreator faktur, oprogramowanie do fakturowania"
     }
   },
-  "NotFound": {
-    "error": "404",
-    "message": "Nie można znaleźć tej strony.",
-    "returnHome": "Wróć do strony głównej"
-  },
-  "Error": {
-    "title": "Coś poszło nie tak",
-    "description": "Spróbuj odświeżyć stronę lub zgłoś błąd",
-    "bugReport": "tutaj",
-    "tryAgain": "Spróbuj ponownie",
-    "goBack": "Wróć",
-    "toastMessage": "Coś poszło nie tak! Spróbuj odświeżyć stronę lub zgłoś błąd."
-  },
   "About": {
     "tagline": "Generator faktur PDF z podglądem na żywo",
     "hero": {

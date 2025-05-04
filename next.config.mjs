@@ -40,7 +40,7 @@ async function validatei18n() {
   // Import the messages schema using jiti
   // @ts-ignore
   const { messagesSchema } = await loadTsFileViaJiti.import(
-    "./src/app/schema/i18n-messages.ts"
+    "./src/app/schema/i18n-schema.ts"
   );
 
   // Validate messages

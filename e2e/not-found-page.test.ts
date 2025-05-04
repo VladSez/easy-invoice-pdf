@@ -6,6 +6,9 @@ test.describe("Not Found page", () => {
   }) => {
     await page.goto("/non-existent-page");
 
+    // Verify URL is correct
+    await expect(page).toHaveURL("/non-existent-page");
+
     // Verify error message is displayed
     await expect(page.getByText("404")).toBeVisible();
     await expect(
@@ -24,6 +27,9 @@ test.describe("Not Found page", () => {
     page,
   }) => {
     await page.goto("/es/non-existent-page");
+
+    // Verify URL is correct
+    await expect(page).toHaveURL("/es/non-existent-page");
 
     // Verify error message is displayed in English (default locale)
     await expect(page.getByText("404")).toBeVisible();

@@ -70,19 +70,6 @@
       "emailLanguageInfo": "Alle e-mails worden in het Engels verzonden"
     }
   },
-  "NotFound": {
-    "error": "404",
-    "message": "Deze pagina kon niet worden gevonden.",
-    "returnHome": "Terug naar homepage"
-  },
-  "Error": {
-    "title": "Er is iets misgegaan",
-    "description": "Probeer de pagina te vernieuwen of meld een bug",
-    "bugReport": "hier",
-    "tryAgain": "Opnieuw proberen",
-    "goBack": "Ga terug",
-    "toastMessage": "Er is iets misgegaan! Probeer de pagina te vernieuwen of meld een bug."
-  },
   "Metadata": {
     "about": {
       "title": "Over | Gratis Factuur Generator – Live Voorbeeld, Geen Registratie",

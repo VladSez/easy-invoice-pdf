@@ -12,25 +12,6 @@ const metadataSchema = z
   })
   .strict();
 
-const notFoundSchema = z
-  .object({
-    error: z.string(),
-    message: z.string(),
-    returnHome: z.string(),
-  })
-  .strict();
-
-const errorSchema = z
-  .object({
-    title: z.string(),
-    description: z.string(),
-    bugReport: z.string(),
-    tryAgain: z.string(),
-    goBack: z.string(),
-    toastMessage: z.string(),
-  })
-  .strict();
-
 const aboutFeaturesItemSchema = z
   .object({
     title: z.string(),
@@ -151,8 +132,6 @@ const faqSchema = z
 export const messagesSchema = z
   .object({
     About: aboutSchema,
-    NotFound: notFoundSchema,
-    Error: errorSchema,
     Metadata: metadataSchema,
     FAQ: faqSchema,
   })
