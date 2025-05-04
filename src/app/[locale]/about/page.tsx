@@ -173,7 +173,7 @@ function HeroSection() {
                 {t("hero.title")}
               </h1>
 
-              <p className="text-pretty text-base text-slate-600 sm:text-lg md:max-w-[500px] md:text-xl">
+              <p className="text-balance text-base text-slate-600 sm:text-lg md:max-w-[500px] md:text-xl">
                 {t("hero.description")}
               </p>
             </div>
