@@ -8,7 +8,6 @@ import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import type { Locale } from "next-intl";
 
 function SubmitButton({
   translations,
@@ -44,7 +43,6 @@ function SubmitButton({
 
 export function SubscribeInput({
   translations,
-  locale,
 }: {
   translations: {
     title: string;
@@ -55,7 +53,6 @@ export function SubscribeInput({
     error: string;
     emailLanguageInfo: string;
   };
-  locale: Locale;
 }) {
   const [isSubmitted, setSubmitted] = useState(false);
 
@@ -79,7 +76,7 @@ export function SubscribeInput({
           <form
             data-testid="subscribe-form"
             action={async (formData) => {
-              const result = await subscribeAction(formData, locale);
+              const result = await subscribeAction(formData);
 
               if (result.error) {
                 toast.error(result.error);

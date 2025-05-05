@@ -1,8 +1,7 @@
 import { verifySubscriptionToken } from "@/utils/subscription-token";
 import { resend } from "@/lib/resend";
-// eslint-disable-next-line no-restricted-imports
 import { redirect } from "next/navigation";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { headers } from "next/headers";
 
 export const metadata = {
@@ -72,9 +71,9 @@ export default async function ConfirmSubscriptionPage({
           improvements.
         </Text>
         <Text>
-          Ready to create your first invoice?{" "}
+          <b>Ready to create your first invoice?</b>{" "}
           <Link
-            href="/app"
+            href="/"
             className="inline-flex items-center font-medium text-emerald-600 underline underline-offset-4 transition-opacity hover:opacity-80"
           >
             Go to the app

@@ -16,11 +16,10 @@ import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
 import * as Sentry from "@sentry/nextjs";
 
-// Move static content outside component to prevent recreation
 const DONATION_TOAST_CONFIG = {
-  title: "Consider Supporting Us!",
+  title: "❤️ Enjoying EasyInvoicePDF? Help Keep It Free!",
   description:
-    "If you find this tool helpful, please consider making a small donation to support our work.",
+    "This tool is free and ad-free thanks to user support. If it’s helped you, consider a small donation to keep it running and growing. Every bit counts—thank you!",
   duration: Infinity,
   closeButton: true,
 } as const;

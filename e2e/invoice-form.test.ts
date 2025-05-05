@@ -18,9 +18,14 @@ test.describe("Invoice Generator Page", () => {
     await page.goto("/");
   });
 
+  test("should redirect from /:locale/app to /", async ({ page }) => {
+    await page.goto("/en/app");
+    await expect(page).toHaveURL("/");
+  });
+
   test("displays correct buttons and links in header", async ({ page }) => {
     // Check URL is correct
-    await expect(page).toHaveURL("/en/app");
+    await expect(page).toHaveURL("/");
 
     // Check title and branding
     await expect(page).toHaveTitle(
@@ -82,7 +87,7 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(video).toHaveAttribute(
       "src",
-      "https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-demo.mp4"
+      "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-demo.mp4"
     );
     await expect(video).toHaveAttribute("autoplay", "");
     await expect(video).toHaveAttribute("controls", "");
@@ -1147,7 +1152,7 @@ test.describe("Invoice Generator Page", () => {
 
   test("shows notification when invoice link is broken", async ({ page }) => {
     // Navigate to page with invalid data parameter
-    await page.goto("/en/app?data=invalid-data-string");
+    await page.goto("/?data=invalid-data-string");
 
     // Verify error toast appears
     await expect(
@@ -1173,7 +1178,7 @@ test.describe("Invoice Generator Page", () => {
     ).toBeHidden();
 
     // Verify URL is cleared
-    expect(page.url()).toContain("/en/app");
+    expect(page.url()).toContain("/");
     expect(page.url()).not.toContain("?data=");
   });
 });

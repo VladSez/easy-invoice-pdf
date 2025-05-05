@@ -1,32 +1,17 @@
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Create the middleware handler
 const intlMiddleware = createMiddleware(routing);
 
-// Custom middleware handler that adds the redirect logic
 export default function middleware(request: NextRequest) {
-  // Redirect from root to /en/app
-  if (request.nextUrl.pathname === "/") {
-    console.log("___Redirecting from root to /en/app___");
-    return NextResponse.redirect(new URL("/en/app", request.url), {
-      status: 308, // Permanent redirect that preserves the request method
-    });
-  }
-
-  // For all other routes, use the intl middleware
   return intlMiddleware(request);
 }
 
+// ___IMPORTANT__: we restrict the middleware to only the /about page for i18n
+// because the /about page is the only page that has i18n
+// if you want to add i18n to other pages, you need to add them to the matcher
 export const config = {
-  // Match all pathnames except for
-  // - … if they start with `/api`, `/trpc`, `/_next` or `/_vercel`
-  // - … the ones containing a dot (e.g. `favicon.ico`)
-  matcher: [
-    "/((?!api|trpc|_next|_vercel|.*\\..*).*)",
-    // Include the root path explicitly for the redirect
-    "/",
-  ],
+  // Match only "/:locale/about" paths for i18n (en/about, pl/about, de/about, etc.)
+  matcher: ["/:locale/about"],
 };

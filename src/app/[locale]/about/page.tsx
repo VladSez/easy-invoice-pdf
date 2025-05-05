@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/disclosure";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Video } from "@/components/video";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
   CalculatorIcon,
@@ -117,10 +117,10 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
           <HeroSection />
           <FeaturesSection />
           <FaqSection />
-          <SubscribeSection locale={locale} />
+          <SubscribeSection />
           <CtaSection />
         </main>
-        <Footer locale={locale} />
+        <Footer />
       </div>
     </TooltipProvider>
   );
@@ -221,8 +221,8 @@ function HeroSection() {
               {/* Video container */}
               <div className="w-full">
                 <Video
-                  src="https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-demo.mp4"
-                  fallbackImg="https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-hero.webp"
+                  src="https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-demo.mp4"
+                  fallbackImg="https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-video-placeholder.webp?v=1"
                   testId="hero-about-page-video"
                 />
               </div>
@@ -389,7 +389,7 @@ function FaqSection() {
   );
 }
 
-function SubscribeSection({ locale }: { locale: Locale }) {
+function SubscribeSection() {
   const tNewsletter = useTranslations("About.newsletter");
 
   const newsletterTitle = tNewsletter("title");
@@ -426,7 +426,6 @@ function SubscribeSection({ locale }: { locale: Locale }) {
                 error: newsletterErrorMessage,
                 emailLanguageInfo: newsletterEmailLanguageInfo,
               }}
-              locale={locale}
             />
           </div>
         </div>
@@ -479,7 +478,7 @@ function CtaSection() {
   );
 }
 
-function Footer({ locale }: { locale: Locale }) {
+function Footer() {
   const t = useTranslations("About");
   const tFaq = useTranslations("FAQ");
   const tNewsletter = useTranslations("About.newsletter");
@@ -553,7 +552,7 @@ function Footer({ locale }: { locale: Locale }) {
               <ul className="space-y-2" data-testid="about-page-footer-links">
                 <li>
                   <Link
-                    href="/app"
+                    href="/"
                     className="text-sm text-slate-500 hover:text-slate-900"
                   >
                     {t("buttons.app")}
@@ -613,7 +612,6 @@ function Footer({ locale }: { locale: Locale }) {
               error: newsletterErrorMessage,
               emailLanguageInfo: newsletterEmailLanguageInfo,
             }}
-            locale={locale}
           />
         </div>
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
@@ -656,7 +654,7 @@ function GoToAppButton({ className }: { className?: string }) {
        * scroll={false} is used to disable the default behavior of the link because it doesn't work for some reason
        * the page is already scrolled to the top on mount at /en/app
        */}
-      <Link href="/app" scroll={false}>
+      <Link href="/" scroll={false}>
         <ArrowRight className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
         {t("buttons.goToApp")}
       </Link>

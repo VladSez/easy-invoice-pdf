@@ -1,0 +1,17 @@
+# EasyInvoicePDF
+
+[EasyInvoicePDF](https://easyinvoicepdf.com) is a free and open-source invoice generator that runs entirely in your browser. It offers live previews, shareable links, instant PDF downloads, and supports multiple languages and currencies, including European VAT calculations. Built with React, TypeScript, Next.js, and TailwindCSS, it ensures privacy and security by processing data client-side.
+
+## Features
+
+- **Live Previews**: Real-time updates as you make changes.
+- **Shareable Links**: Easily share invoices with clients.
+- **Instant PDF Downloads**: Download invoices with one click.
+- **Multi-language and Currency Support**: Create invoices in English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, Dutch and other languages, with support for all major currencies.
+- **European VAT Calculations**: Automatic VAT rate calculations.
+
+## Main Pages
+
+- [Home](https://easyinvoicepdf.com)
+- [Features](https://easyinvoicepdf.com/en/about)
+- [FAQ](https://easyinvoicepdf.com/en/about#faq)

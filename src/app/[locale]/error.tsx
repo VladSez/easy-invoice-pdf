@@ -1,12 +1,11 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
 import { Button } from "@/components/ui/button";
 import { ErrorMessage } from "@/components/etc/error-message";
 import { toast } from "sonner";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 
 type Props = {
   error: Error;
@@ -14,35 +13,39 @@ type Props = {
 };
 
 export default function Error({ error, reset }: Props) {
-  const t = useTranslations("Error");
-
   useEffect(() => {
     Sentry.captureException(error);
 
-    toast.error(t("toastMessage"), {
-      closeButton: true,
-      richColors: true,
-    });
-  }, [error, t]);
+    toast.error(
+      "Something went wrong! Please try to refresh the page or fill a bug report.",
+      {
+        closeButton: true,
+        richColors: true,
+      }
+    );
+  }, [error]);
 
   return (
     <div className="flex h-dvh flex-col items-center justify-center gap-4">
       <div className="flex flex-col items-center justify-center gap-4">
         <ErrorMessage>
-          {t("title")}. {t("description")}{" "}
+          Something went wrong. Please try to refresh the page or fill a bug
+          report{" "}
           <a
             href="https://pdfinvoicegenerator.userjot.com/board/bugs"
             className="underline"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            {t("bugReport")}
+            here
           </a>
         </ErrorMessage>
       </div>
       <Button onClick={reset} _variant="outline">
-        {t("tryAgain")}
+        Try again
       </Button>
       <Button asChild>
-        <Link href="/app">{t("goBack")}</Link>
+        <Link href="/">Return to homepage</Link>
       </Button>
     </div>
   );

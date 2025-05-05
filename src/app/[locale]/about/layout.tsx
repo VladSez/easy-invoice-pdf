@@ -41,12 +41,28 @@ export async function generateMetadata({
         description: messages.Metadata.about.description,
         locale: params.locale,
         type: "website",
+        images: [
+          {
+            url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-opengraph-image.png",
+            width: 1200,
+            height: 630,
+            alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
+          },
+        ],
       },
       twitter: {
         card: "summary_large_image",
         title: messages.Metadata.about.title,
         description: messages.Metadata.about.description,
         creator: "@vlad_sazon",
+        images: [
+          {
+            url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-opengraph-image.png",
+            width: 1200,
+            height: 630,
+            alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
+          },
+        ],
       },
       robots: {
         index: true,
@@ -85,6 +101,5 @@ export default async function AboutLocaleLayout({
   // Enables static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
   setRequestLocale(locale);
 
-  // return children;
   return children;
 }

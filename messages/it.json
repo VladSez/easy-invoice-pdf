@@ -70,19 +70,6 @@
       "emailLanguageInfo": "Tutte le email saranno inviate in inglese"
     }
   },
-  "NotFound": {
-    "error": "404",
-    "message": "Questa pagina non è stata trovata.",
-    "returnHome": "Torna alla homepage"
-  },
-  "Error": {
-    "title": "Qualcosa è andato storto",
-    "description": "Per favore prova ad aggiornare la pagina o segnala un bug",
-    "bugReport": "qui",
-    "tryAgain": "Riprova",
-    "goBack": "Torna indietro",
-    "toastMessage": "Qualcosa è andato storto! Per favore prova ad aggiornare la pagina o segnala un bug."
-  },
   "Metadata": {
     "about": {
       "title": "Chi Siamo | Generatore di Fatture Gratuito – Anteprima in Tempo Reale, Nessuna Registrazione",

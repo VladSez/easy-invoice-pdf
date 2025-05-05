@@ -6,13 +6,10 @@ import { generateSubscriptionToken } from "@/utils/subscription-token";
 import { checkRateLimit, ipLimiter, emailLimiter } from "@/lib/rate-limit";
 import { headers } from "next/headers";
 import ConfirmSubscriptionEmail from "@/emails/confirm-subscription";
-import type { Locale } from "next-intl";
-import { SUPPORTED_LANGUAGES } from "@/app/schema";
 
 const subscribeSchema = z
   .object({
     email: z.string().email("Please enter a valid email address"),
-    locale: z.enum(SUPPORTED_LANGUAGES).default("en"),
   })
   .strict();
 
@@ -20,14 +17,17 @@ if (!process.env.RESEND_AUDIENCE_ID) {
   throw new Error("RESEND_AUDIENCE_ID is not set");
 }
 
-const CONFIRMATION_URL = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+const CONFIRMATION_URL =
+  process.env.VERCEL_ENV === "production"
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_ENV === "preview"
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000";
 
-export async function subscribeAction(formData: FormData, locale: Locale) {
+export async function subscribeAction(formData: FormData) {
   try {
     const email = formData.get("email");
-    const validatedFields = subscribeSchema.parse({ email, locale });
+    const validatedFields = subscribeSchema.parse({ email });
 
     // Get IP address for rate limiting
     const forwardedFor = headers().get("x-forwarded-for");
@@ -64,7 +64,7 @@ export async function subscribeAction(formData: FormData, locale: Locale) {
 
     // Generate confirmation token
     const token = await generateSubscriptionToken(validatedFields.email);
-    const confirmationUrl = `${CONFIRMATION_URL}/${validatedFields.locale}/confirm-subscription?token=${token}`;
+    const confirmationUrl = `${CONFIRMATION_URL}/confirm-subscription?token=${token}`;
 
     // Send confirmation email
     const { error: emailError } = await resend.emails.send({

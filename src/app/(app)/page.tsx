@@ -1,5 +1,3 @@
-import type { Locale } from "next-intl";
-
 import type { Metadata } from "next";
 import { AppPageClient } from "./page.client";
 
@@ -10,33 +8,37 @@ export async function generateMetadata({
   searchParams: { [key: string]: string | string[] | undefined };
 }): Promise<Metadata> {
   const hasShareableData = Boolean(searchParams?.data);
+  const isProd = process.env.VERCEL_ENV === "production";
 
-  // we want to index this page if there is no shareable data
+  const defaultRobotsConfig = {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  };
+
+  // Only allow indexing on production and when there's no shareable data
+  const shouldIndex = isProd && !hasShareableData;
+
   return {
-    robots: hasShareableData
+    robots: shouldIndex
       ? {
-          index: false,
-          follow: false,
-          googleBot: {
-            index: false,
-            follow: false,
-          },
-        }
-      : {
           index: true,
           follow: true,
           googleBot: {
             index: true,
             follow: true,
           },
-        },
+        }
+      : defaultRobotsConfig,
     alternates: {
-      // preferred version of the page
-      canonical: `/en/app`,
+      canonical: "/",
     },
   };
 }
 
-export default function AppPage({ params }: { params: { locale: Locale } }) {
-  return <AppPageClient params={params} />;
+export default function AppPage() {
+  return <AppPageClient />;
 }

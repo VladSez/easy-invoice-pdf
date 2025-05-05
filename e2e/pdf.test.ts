@@ -542,10 +542,12 @@ Reste à payer: 184.50 GBP
 Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
 
     // Verify toast appears after download
-    await expect(page.getByText("Consider Supporting Us!")).toBeVisible();
+    await expect(
+      page.getByText("❤️ Enjoying EasyInvoicePDF? Help Keep It Free!")
+    ).toBeVisible();
     await expect(
       page.getByText(
-        "If you find this tool helpful, please consider making a small donation to support our work."
+        "This tool is free and ad-free thanks to user support. If it’s helped you, consider a small donation to keep it running and growing. Every bit counts—thank you!"
       )
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Donate" })).toBeVisible();
@@ -727,7 +729,9 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     const pdfData = await pdf(dataBuffer);
 
     // Verify PDF content
-    expect(pdfData.text).toContain("Fatura TEST PORTUGUESE N°: 1/04-2025");
+    expect(pdfData.text).toContain(
+      `Fatura TEST PORTUGUESE N°: 1/${CURRENT_MONTH_AND_YEAR}`
+    );
     expect(pdfData.text).toContain("Data de emissão");
   });
 });

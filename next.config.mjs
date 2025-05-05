@@ -40,7 +40,7 @@ async function validatei18n() {
   // Import the messages schema using jiti
   // @ts-ignore
   const { messagesSchema } = await loadTsFileViaJiti.import(
-    "./src/app/schema/i18n-messages.ts"
+    "./src/app/schema/i18n-schema.ts"
   );
 
   // Validate messages
@@ -136,6 +136,15 @@ const nextConfig = {
         // proxy umami analytics https://umami.is/docs/guides/running-on-vercel
         source: "/stats/:match*",
         destination: "https://cloud.umami.is/:match*",
+      },
+    ];
+  },
+  async redirects() {
+    return [
+      {
+        source: "/:locale/app", // Redirect all /:locale/app requests to the root, because we changed the structure of the app
+        destination: "/",
+        permanent: true,
       },
     ];
   },

@@ -70,19 +70,6 @@
       "emailLanguageInfo": "Tous les emails seront envoyés en anglais"
     }
   },
-  "NotFound": {
-    "error": "404",
-    "message": "Cette page est introuvable.",
-    "returnHome": "Retour à l'accueil"
-  },
-  "Error": {
-    "title": "Une erreur s'est produite",
-    "description": "Veuillez essayer de rafraîchir la page ou signaler un bug",
-    "bugReport": "ici",
-    "tryAgain": "Réessayer",
-    "goBack": "Retour",
-    "toastMessage": "Une erreur s'est produite ! Veuillez essayer de rafraîchir la page ou signaler un bug."
-  },
   "Metadata": {
     "about": {
       "title": "À propos | Générateur de Factures Gratuit – Aperçu en Direct, Sans Inscription",

@@ -39,7 +39,7 @@ test.describe("About page", () => {
     await expect(video).toBeVisible();
     await expect(video).toHaveAttribute(
       "poster",
-      "https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-hero.webp"
+      "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-video-placeholder.webp?v=1"
     );
     await expect(video).toHaveAttribute("muted");
     await expect(video).toHaveAttribute("loop");
@@ -50,7 +50,7 @@ test.describe("About page", () => {
     const videoSource = video.locator("source");
     await expect(videoSource).toHaveAttribute(
       "src",
-      "https://ik.imagekit.io/fl2lbswwo/easy-invoice/easy-invoice-demo.mp4#t=0.001"
+      "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-demo.mp4#t=0.001"
     );
     await expect(videoSource).toHaveAttribute("type", "video/mp4");
 
@@ -184,7 +184,7 @@ test.describe("About page", () => {
     const appLink = footerLinks.getByRole("link", { name: "App" });
 
     await expect(appLink).toBeVisible();
-    await expect(appLink).toHaveAttribute("href", "/en/app");
+    await expect(appLink).toHaveAttribute("href", "/");
     await expect(appLink).not.toHaveAttribute("target", "_blank");
 
     const featuresLink = footerLinks.getByRole("link", {
@@ -325,7 +325,7 @@ test.describe("About page", () => {
     const appLink = footerLinks.getByRole("link", { name: "App" });
 
     await expect(appLink).toBeVisible();
-    await expect(appLink).toHaveAttribute("href", "/fr/app");
+    await expect(appLink).toHaveAttribute("href", "/");
     await expect(appLink).not.toHaveAttribute("target", "_blank");
 
     const featuresLink = footerLinks.getByRole("link", {
@@ -442,6 +442,6 @@ test.describe("About page", () => {
     const headerGoToAppButton = header.getByRole("link", { name: "Go to app" });
 
     await headerGoToAppButton.click();
-    await expect(page).toHaveURL("/en/app");
+    await expect(page).toHaveURL("/");
   });
 });
