@@ -8,29 +8,33 @@ export async function generateMetadata({
   searchParams: { [key: string]: string | string[] | undefined };
 }): Promise<Metadata> {
   const hasShareableData = Boolean(searchParams?.data);
+  const isProd = process.env.VERCEL_ENV === "production";
 
-  // we want to index this page ONLY if there is no shareable data in the URL
+  const defaultRobotsConfig = {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  };
+
+  // Only allow indexing on production and when there's no shareable data
+  const shouldIndex = isProd && !hasShareableData;
+
   return {
-    robots: hasShareableData
+    robots: shouldIndex
       ? {
-          index: false,
-          follow: false,
-          googleBot: {
-            index: false,
-            follow: false,
-          },
-        }
-      : {
           index: true,
           follow: true,
           googleBot: {
             index: true,
             follow: true,
           },
-        },
+        }
+      : defaultRobotsConfig,
     alternates: {
-      // preferred version of the page
-      canonical: `/`,
+      canonical: "/",
     },
   };
 }

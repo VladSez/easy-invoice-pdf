@@ -1,8 +1,6 @@
 import { verifySubscriptionToken } from "@/utils/subscription-token";
 import { resend } from "@/lib/resend";
-// eslint-disable-next-line no-restricted-imports
 import { redirect } from "next/navigation";
-// import { Link } from "@/i18n/navigation";
 import Link from "next/link";
 import { headers } from "next/headers";
 
