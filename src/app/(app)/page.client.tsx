@@ -106,10 +106,10 @@ export function AppPageClient() {
     null
   );
 
-  // // Scroll to top on mount
-  // useEffect(() => {
-  //   window.scrollTo({ top: 0, behavior: "smooth" });
-  // }, []);
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   // Initialize data from URL or localStorage on mount
   useEffect(() => {
