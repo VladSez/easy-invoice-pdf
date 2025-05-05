@@ -40,7 +40,7 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     await expect(
-      header.getByText("Invoice PDF generator with live preview")
+      header.getByText("Free Invoice Generator with Real-Time PDF Preview")
     ).toBeVisible();
 
     // Check main action buttons

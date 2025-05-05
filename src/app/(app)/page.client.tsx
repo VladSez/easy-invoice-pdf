@@ -323,7 +323,7 @@ export function AppPageClient() {
                   </p>
                 </div>
                 <p className="relative bottom-1.5 left-[49px] text-[12px] text-slate-700">
-                  Invoice PDF generator with live preview
+                  Free Invoice Generator with Real-Time PDF Preview
                 </p>
               </div>
               <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
