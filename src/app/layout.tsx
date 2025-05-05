@@ -30,6 +30,23 @@ export const metadata: Metadata = {
   authors: [{ name: "Uladzislau Sazonau" }],
   creator: "Uladzislau Sazonau",
   publisher: "Uladzislau Sazonau",
+  icons: {
+    icon: [
+      { url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/favicon.ico" },
+      {
+        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/icon.png",
+        type: "image/png",
+        sizes: "96x96",
+      },
+    ],
+    apple: [
+      {
+        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/apple-icon.png",
+        type: "image/png",
+        sizes: "180x180",
+      },
+    ],
+  },
   openGraph: {
     title: "Invoice Generator with Live Preview | No Sign-Up",
     description:
