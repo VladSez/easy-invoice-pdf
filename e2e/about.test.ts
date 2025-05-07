@@ -39,7 +39,7 @@ test.describe("About page", () => {
     await expect(video).toBeVisible();
     await expect(video).toHaveAttribute(
       "poster",
-      "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-video-placeholder.webp?v=1"
+      "https://ik.imagekit.io/fl2lbswwo/easy-invoice-video-placeholder.webp"
     );
     await expect(video).toHaveAttribute("muted");
     await expect(video).toHaveAttribute("loop");

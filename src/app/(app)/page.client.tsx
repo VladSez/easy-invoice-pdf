@@ -37,6 +37,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { VIDEO_DEMO_URL } from "@/config";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 /**
@@ -444,7 +445,7 @@ function ProjectInfo() {
           </DialogHeader>
           <div className="aspect-video w-full overflow-hidden">
             <video
-              src="https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-demo.mp4"
+              src={VIDEO_DEMO_URL}
               muted
               controls
               autoPlay

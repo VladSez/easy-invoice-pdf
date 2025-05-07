@@ -32,16 +32,18 @@ export const metadata: Metadata = {
   publisher: "Uladzislau Sazonau",
   icons: {
     icon: [
-      { url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/favicon.ico" },
       {
-        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/icon.png",
+        url: "https://ik.imagekit.io/fl2lbswwo/favicon.ico",
+      },
+      {
+        url: "https://ik.imagekit.io/fl2lbswwo/icon.png",
         type: "image/png",
         sizes: "96x96",
       },
     ],
     apple: [
       {
-        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/apple-icon.png",
+        url: "https://ik.imagekit.io/fl2lbswwo/apple-icon.png",
         type: "image/png",
         sizes: "180x180",
       },
@@ -55,7 +57,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-opengraph-image.png",
+        url: "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png",
         width: 1200,
         height: 630,
         alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
@@ -70,7 +72,7 @@ export const metadata: Metadata = {
     creator: "@vlad_sazon",
     images: [
       {
-        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-opengraph-image.png",
+        url: "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png",
         width: 1200,
         height: 630,
         alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
