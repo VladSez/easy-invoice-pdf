@@ -33,17 +33,17 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "https://ik.imagekit.io/fl2lbswwo/favicon.ico",
+        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/favicon.ico",
       },
       {
-        url: "https://ik.imagekit.io/fl2lbswwo/icon.png",
+        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/icon.png",
         type: "image/png",
         sizes: "96x96",
       },
     ],
     apple: [
       {
-        url: "https://ik.imagekit.io/fl2lbswwo/apple-icon.png",
+        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/apple-icon.png",
         type: "image/png",
         sizes: "180x180",
       },
@@ -95,7 +95,8 @@ const JSONLD: WithContext<WebSite> = {
     "invoice generator app",
     "free invoice generator",
   ],
-  image: "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png",
+  image:
+    "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-opengraph-image.png?v=1",
   mainEntityOfPage: {
     "@type": "SoftwareApplication",
     "@id": `https://easyinvoicepdf.com/`,
