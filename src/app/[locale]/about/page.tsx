@@ -24,6 +24,7 @@ import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { type Graph } from "schema-dts";
 import { LanguageSwitcher } from "./components/language-switcher";
+import { VIDEO_DEMO_URL } from "@/config";
 
 const JSON_LD: Graph = {
   "@context": "https://schema.org",
@@ -221,7 +222,7 @@ function HeroSection() {
               {/* Video container */}
               <div className="w-full">
                 <Video
-                  src="https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-demo.mp4"
+                  src={VIDEO_DEMO_URL}
                   fallbackImg="https://ik.imagekit.io/fl2lbswwo/easy-invoice-video-placeholder.webp"
                   testId="hero-about-page-video"
                 />
