@@ -12,6 +12,7 @@ import {
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
+import { VIDEO_DEMO_URL } from "@/config";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -85,10 +86,7 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(video).toBeVisible();
 
-    await expect(video).toHaveAttribute(
-      "src",
-      "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-demo.mp4"
-    );
+    await expect(video).toHaveAttribute("src", VIDEO_DEMO_URL);
     await expect(video).toHaveAttribute("autoplay", "");
     await expect(video).toHaveAttribute("controls", "");
     await expect(video).toHaveAttribute("playsInline", "");

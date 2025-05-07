@@ -1,3 +1,4 @@
+import { VIDEO_DEMO_URL } from "@/config";
 import { test, expect } from "@playwright/test";
 
 test.describe("About page", () => {
@@ -39,7 +40,7 @@ test.describe("About page", () => {
     await expect(video).toBeVisible();
     await expect(video).toHaveAttribute(
       "poster",
-      "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-video-placeholder.webp"
+      "https://ik.imagekit.io/fl2lbswwo/easy-invoice-video-placeholder.webp"
     );
     await expect(video).toHaveAttribute("muted");
     await expect(video).toHaveAttribute("loop");
@@ -50,7 +51,7 @@ test.describe("About page", () => {
     const videoSource = video.locator("source");
     await expect(videoSource).toHaveAttribute(
       "src",
-      "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-demo.mp4#t=0.001"
+      `${VIDEO_DEMO_URL}#t=0.001`
     );
     await expect(videoSource).toHaveAttribute("type", "video/mp4");
 

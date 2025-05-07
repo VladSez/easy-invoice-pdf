@@ -43,9 +43,10 @@ export async function generateMetadata({
         type: "website",
         images: [
           {
-            url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-opengraph-image.png?v=1",
+            url: "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png?updatedAt=1745697738714",
             width: 1200,
             height: 630,
+            type: "image/png",
             alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
           },
         ],
@@ -57,9 +58,10 @@ export async function generateMetadata({
         creator: "@vlad_sazon",
         images: [
           {
-            url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-opengraph-image.png?v=1",
+            url: "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png?updatedAt=1745697738714",
             width: 1200,
             height: 630,
+            type: "image/png",
             alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
           },
         ],

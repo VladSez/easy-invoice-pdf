@@ -33,17 +33,17 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/favicon.ico",
+        url: "https://ik.imagekit.io/fl2lbswwo/favicon.ico?updatedAt=1746617951837",
       },
       {
-        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/icon.png",
+        url: "https://ik.imagekit.io/fl2lbswwo/icon.png?updatedAt=1746617951770",
         type: "image/png",
         sizes: "96x96",
       },
     ],
     apple: [
       {
-        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/apple-icon.png",
+        url: "https://ik.imagekit.io/fl2lbswwo/apple-icon.png?updatedAt=1746617951784",
         type: "image/png",
         sizes: "180x180",
       },
@@ -57,7 +57,8 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-opengraph-image.png?v=1",
+        url: "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png?updatedAt=1745697738714",
+        type: "image/png",
         width: 1200,
         height: 630,
         alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
@@ -72,7 +73,8 @@ export const metadata: Metadata = {
     creator: "@vlad_sazon",
     images: [
       {
-        url: "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-opengraph-image.png?v=1",
+        url: "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png?updatedAt=1745697738714",
+        type: "image/png",
         width: 1200,
         height: 630,
         alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
@@ -96,7 +98,7 @@ const JSONLD: WithContext<WebSite> = {
     "free invoice generator",
   ],
   image:
-    "https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-opengraph-image.png?v=1",
+    "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png?updatedAt=1745697738714",
   mainEntityOfPage: {
     "@type": "SoftwareApplication",
     "@id": `https://easyinvoicepdf.com/`,
