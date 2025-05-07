@@ -222,7 +222,7 @@ function HeroSection() {
               <div className="w-full">
                 <Video
                   src="https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-demo.mp4"
-                  fallbackImg="https://easy-invoice-pdf-assets.1xeq.workers.dev/easy-invoice-video-placeholder.webp?v=1"
+                  fallbackImg="https://ik.imagekit.io/fl2lbswwo/easy-invoice-video-placeholder.webp"
                   testId="hero-about-page-video"
                 />
               </div>
