@@ -9,7 +9,7 @@ import Script from "next/script";
 import { type WebSite, type WithContext } from "schema-dts";
 import { Toaster } from "sonner";
 
-import { APP_URL } from "@/config";
+import { APP_URL, STATIC_ASSETS_URL } from "@/config";
 
 import "./globals.css";
 
@@ -33,17 +33,17 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "https://ik.imagekit.io/fl2lbswwo/favicon.ico?updatedAt=1746617951837",
+        url: `${STATIC_ASSETS_URL}/favicon.ico`,
       },
       {
-        url: "https://ik.imagekit.io/fl2lbswwo/icon.png?updatedAt=1746617951770",
+        url: `${STATIC_ASSETS_URL}/icon.png`,
         type: "image/png",
         sizes: "96x96",
       },
     ],
     apple: [
       {
-        url: "https://ik.imagekit.io/fl2lbswwo/apple-icon.png?updatedAt=1746617951784",
+        url: `${STATIC_ASSETS_URL}/apple-icon.png`,
         type: "image/png",
         sizes: "180x180",
       },

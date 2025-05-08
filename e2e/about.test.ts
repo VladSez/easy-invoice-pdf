@@ -1,4 +1,4 @@
-import { VIDEO_DEMO_URL } from "@/config";
+import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
 import { test, expect } from "@playwright/test";
 
 test.describe("About page", () => {
@@ -40,7 +40,7 @@ test.describe("About page", () => {
     await expect(video).toBeVisible();
     await expect(video).toHaveAttribute(
       "poster",
-      "https://ik.imagekit.io/fl2lbswwo/easy-invoice-video-placeholder.webp"
+      `${STATIC_ASSETS_URL}/easy-invoice-video-placeholder.webp`
     );
     await expect(video).toHaveAttribute("muted");
     await expect(video).toHaveAttribute("loop");
