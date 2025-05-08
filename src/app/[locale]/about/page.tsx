@@ -24,7 +24,7 @@ import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { type Graph } from "schema-dts";
 import { LanguageSwitcher } from "./components/language-switcher";
-import { VIDEO_DEMO_URL } from "@/config";
+import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
 
 const JSON_LD: Graph = {
   "@context": "https://schema.org",
@@ -223,7 +223,7 @@ function HeroSection() {
               <div className="w-full">
                 <Video
                   src={VIDEO_DEMO_URL}
-                  fallbackImg="https://ik.imagekit.io/fl2lbswwo/easy-invoice-video-placeholder.webp"
+                  fallbackImg={`${STATIC_ASSETS_URL}/easy-invoice-video-placeholder.webp`}
                   testId="hero-about-page-video"
                 />
               </div>
