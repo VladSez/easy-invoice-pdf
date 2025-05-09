@@ -8,7 +8,7 @@ export default function AboutLoading() {
         <div className="flex items-center justify-center">
           <div className="container h-auto px-3 py-2 sm:h-16 sm:py-0">
             <div className="flex h-full flex-row flex-wrap items-center justify-between gap-2">
-              <div className="w-[50%]">
+              <div className="w-[53%]">
                 <div className="flex items-center gap-1 sm:gap-2">
                   <ProjectLogo className="h-7 w-7 flex-shrink-0 sm:h-8 sm:w-8" />
                   <div className="flex flex-col">
