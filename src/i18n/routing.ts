@@ -15,6 +15,9 @@ export const routing = defineRouting({
   // For the about page, we'll use locale prefixes (handled by pathnames in routing)
   localePrefix: "always",
 
+  localeDetection: false,
+  alternateLinks: false,
+
   // Define pathnames for our routes
   // pathnames: {
   //   // "/app": {
