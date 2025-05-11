@@ -132,6 +132,7 @@ export function InvoicePDFDownloadLink({
 
   return (
     <a
+      translate="no"
       href={url || "#"}
       download={filename}
       onClick={handleClick}
