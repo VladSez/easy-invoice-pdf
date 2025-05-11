@@ -30,7 +30,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Check title and branding
     await expect(page).toHaveTitle(
-      "Invoice Generator with Live Preview | No Sign-Up"
+      "EasyInvoicePDF.com | Free Invoice Generator with Live Preview"
     );
 
     const header = page.getByTestId("header");

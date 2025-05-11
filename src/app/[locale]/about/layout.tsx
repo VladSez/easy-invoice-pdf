@@ -40,15 +40,18 @@ export async function generateMetadata({
       openGraph: {
         title: `${messages.Metadata.about.title} | EasyInvoicePDF.com`,
         description: messages.Metadata.about.description,
+        siteName:
+          "EasyInvoicePDF.com | Free Invoice Generator with Live Preview",
         locale: params.locale,
         type: "website",
+        url: "https://easyinvoicepdf.com",
         images: [
           {
             url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=5`,
             width: 1200,
             height: 630,
             type: "image/png",
-            alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
+            alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
           },
         ],
       },
@@ -63,7 +66,7 @@ export async function generateMetadata({
             width: 1200,
             height: 630,
             type: "image/png",
-            alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
+            alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
           },
         ],
       },
