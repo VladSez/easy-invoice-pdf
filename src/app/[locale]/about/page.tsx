@@ -27,6 +27,7 @@ import { LanguageSwitcher } from "./components/language-switcher";
 import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
 import { routing } from "@/i18n/routing";
 
+// statically generate the pages for all locales
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
