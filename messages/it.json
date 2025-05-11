@@ -72,9 +72,10 @@
   },
   "Metadata": {
     "about": {
-      "title": "Chi Siamo | Generatore di Fatture Gratuito – Anteprima in Tempo Reale, Nessuna Registrazione | EasyInvoicePDF.com",
-      "description": "Crea e scarica fatture professionali istantaneamente con EasyInvoicePDF.com. Gratuito e open-source con anteprima in tempo reale. Nessuna registrazione richiesta.",
-      "keywords": "strumento per fatture, generatore di fatture gratuito, fatture PDF, creatore di fatture, software di fatturazione"
+      "title": "Chi Siamo | Generatore di Fatture Gratuito – Anteprima in Tempo Reale, Nessuna Registrazione",
+      "description": "Crea e scarica fatture professionali istantaneamente con EasyInvoicePDF.com. Gratuito e open-source. Nessuna registrazione richiesta.",
+      "keywords": "strumento per fatture, generatore di fatture gratuito, fatture PDF, creatore di fatture, software di fatturazione",
+      "siteName": "EasyInvoicePDF.com | Generatore di Fatture Gratuito con Anteprima in Tempo Reale"
     }
   },
   "FAQ": {

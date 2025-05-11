@@ -40,8 +40,7 @@ export async function generateMetadata({
       openGraph: {
         title: `${messages.Metadata.about.title}`,
         description: messages.Metadata.about.description,
-        siteName:
-          "EasyInvoicePDF.com | Free Invoice Generator with Live Preview",
+        siteName: messages.Metadata.about.siteName,
         locale: params.locale,
         type: "website",
         url: "https://easyinvoicepdf.com",
