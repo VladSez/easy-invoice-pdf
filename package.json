@@ -71,23 +71,23 @@
     "tailwindcss-animate": "1.0.7",
     "ua-parser-js": "2.0.3",
     "use-debounce": "10.0.4",
-    "zod": "3.24.2"
+    "zod": "3.24.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.1",
     "@next/eslint-plugin-next": "15.2.3",
-    "@playwright/test": "1.51.1",
+    "@playwright/test": "1.52.0",
     "@types/file-saver": "2.0.7",
     "@types/node": "22.8.1",
-    "@types/pdf-parse": "1.1.4",
+    "@types/pdf-parse": "1.1.5",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "autoprefixer": "10.4.21",
-    "eslint": "9.23.0",
+    "eslint": "9.26.0",
     "eslint-config-next": "15.2.3",
     "eslint-plugin-playwright": "2.2.0",
     "husky": "9.1.7",
-    "knip": "5.46.0",
+    "knip": "5.55.1",
     "lint-staged": "15.5.0",
     "postcss": "^8",
     "prettier": "3.5.3",
@@ -95,7 +95,7 @@
     "react-email": "4.0.4",
     "schema-dts": "1.1.5",
     "tailwindcss": "3.4.14",
-    "typescript": "5.8.2",
-    "typescript-eslint": "8.28.0"
+    "typescript": "5.8.3",
+    "typescript-eslint": "8.32.0"
   }
 }
