@@ -23,6 +23,7 @@ const SelectNative = React.forwardRef<HTMLSelectElement, SelectPropsNative>(
             className
           )}
           ref={ref}
+          translate="no"
           {...props}
         >
           {children}

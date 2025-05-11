@@ -18,6 +18,7 @@ import { InvoiceVATSummaryTable } from "./invoice-vat-summary-table";
 import { InvoicePaymentTotals } from "./invoice-payment-totals";
 import { memo, useMemo } from "react";
 import { TRANSLATIONS } from "@/app/schema/translations";
+import { STATIC_ASSETS_URL } from "@/config";
 
 const PROD_WEBSITE_URL = "https://dub.sh/easy-invoice";
 
@@ -29,10 +30,10 @@ Font.register({
   family: fontFamily,
   fonts: [
     {
-      src: "/fonts/open-sans-regular.ttf",
+      src: `${STATIC_ASSETS_URL}/open-sans-regular.ttf`,
     },
     {
-      src: "/fonts/open-sans-700.ttf",
+      src: `${STATIC_ASSETS_URL}/open-sans-700.ttf`,
       fontWeight: 700,
     },
   ],

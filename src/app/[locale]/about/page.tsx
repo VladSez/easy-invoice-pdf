@@ -25,77 +25,12 @@ import { setRequestLocale } from "next-intl/server";
 import { type Graph } from "schema-dts";
 import { LanguageSwitcher } from "./components/language-switcher";
 import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
+import { routing } from "@/i18n/routing";
 
-const JSON_LD: Graph = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebPage",
-      "@id": "https://easyinvoicepdf.com/en/about",
-      url: "https://easyinvoicepdf.com/en/about",
-      name: "About | Free Invoice Generator – Live Preview, No Sign-Up",
-      description:
-        "EasyInvoicePDF is a free, open-source tool to create professional invoices with real-time PDF preview, no sign-up required.",
-      mainEntity: {
-        "@id": "https://easyinvoicepdf.com/en/about",
-      },
-    },
-    {
-      "@type": "FAQPage",
-      "@id": "https://easyinvoicepdf.com/en/about#faq",
-      mainEntity: [
-        {
-          "@type": "Question",
-          name: "What is EasyInvoicePDF?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "EasyInvoicePDF is a free, open-source tool that helps you create professional invoices instantly. It features a live preview, customizable templates, and supports multiple languages and currencies.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Is it really free?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Yes, EasyInvoicePDF is completely free to use. The entire project is open-source and available on GitHub.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Do I need to create an account?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "No, you don't need to create an account or sign up. You can start creating invoices immediately without any registration process.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Can I customize the invoice template?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Yes, you can customize various aspects of your invoice including company details, currency, and language. More customization options are being added regularly.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Is my data secure?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Your privacy is important to us. All invoice data is processed entirely in your browser - we don't store any of your information on our servers. You can even use the tool offline once loaded.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Can I share invoices with others?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Yes, you can generate shareable links for your invoices that others can view and download. These links are secure and only accessible to people you share them with.",
-          },
-        },
-      ],
-    },
-  ],
-};
+// statically generate the pages for all locales
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
 
 export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const { locale } = params;
@@ -699,3 +634,74 @@ function Logo() {
     </div>
   );
 }
+
+const JSON_LD: Graph = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://easyinvoicepdf.com/en/about",
+      url: "https://easyinvoicepdf.com/en/about",
+      name: "About | Free Invoice Generator – Live Preview, No Sign-Up",
+      description:
+        "EasyInvoicePDF is a free, open-source tool to create professional invoices with real-time PDF preview, no sign-up required.",
+      mainEntity: {
+        "@id": "https://easyinvoicepdf.com/en/about",
+      },
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://easyinvoicepdf.com/en/about#faq",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "What is EasyInvoicePDF?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "EasyInvoicePDF is a free, open-source tool that helps you create professional invoices instantly. It features a live preview, customizable templates, and supports multiple languages and currencies.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Is it really free?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Yes, EasyInvoicePDF is completely free to use. The entire project is open-source and available on GitHub.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Do I need to create an account?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "No, you don't need to create an account or sign up. You can start creating invoices immediately without any registration process.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Can I customize the invoice template?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Yes, you can customize various aspects of your invoice including company details, currency, and language. More customization options are being added regularly.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Is my data secure?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Your privacy is important to us. All invoice data is processed entirely in your browser - we don't store any of your information on our servers. You can even use the tool offline once loaded.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Can I share invoices with others?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Yes, you can generate shareable links for your invoices that others can view and download. These links are secure and only accessible to people you share them with.",
+          },
+        },
+      ],
+    },
+  ],
+};
