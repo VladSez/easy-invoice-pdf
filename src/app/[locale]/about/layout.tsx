@@ -19,7 +19,7 @@ export async function generateMetadata({
     ).then((module: { default: typeof EnMessages }) => module.default);
 
     return {
-      title: messages.Metadata.about.title,
+      title: `${messages.Metadata.about.title} | EasyInvoicePDF.com`,
       description: messages.Metadata.about.description,
       keywords: messages.Metadata.about.keywords,
       alternates: {
@@ -38,7 +38,7 @@ export async function generateMetadata({
         } satisfies Record<Locale, string>,
       },
       openGraph: {
-        title: messages.Metadata.about.title,
+        title: `${messages.Metadata.about.title} | EasyInvoicePDF.com`,
         description: messages.Metadata.about.description,
         locale: params.locale,
         type: "website",
@@ -54,7 +54,7 @@ export async function generateMetadata({
       },
       twitter: {
         card: "summary_large_image",
-        title: messages.Metadata.about.title,
+        title: `${messages.Metadata.about.title} | EasyInvoicePDF.com`,
         description: messages.Metadata.about.description,
         creator: "@vlad_sazon",
         images: [

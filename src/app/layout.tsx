@@ -22,7 +22,10 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
-  title: "Invoice Generator with Live Preview | No Sign-Up",
+  title: {
+    default: "EasyInvoicePDF.com | Free Invoice Generator with Live Preview",
+    template: "%s | EasyInvoicePDF.com",
+  },
   description:
     "Create and download professional invoices instantly with real-time preview. Free and open-source. No signup required.",
   keywords:
@@ -50,7 +53,7 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "Invoice Generator with Live Preview | No Sign-Up",
+    title: "EasyInvoicePDF.com | Free Invoice Generator with Live Preview",
     description:
       "Create and download professional invoices instantly with real-time preview. Free and open-source. No signup required.",
     locale: "en_US",
@@ -67,7 +70,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Invoice Generator with Live Preview | No Sign-Up",
+    title: "EasyInvoicePDF.com | Free Invoice Generator with Live Preview",
     description:
       "Create and download professional invoices instantly with real-time preview. Free and open-source. No signup required.",
     creator: "@vlad_sazon",
