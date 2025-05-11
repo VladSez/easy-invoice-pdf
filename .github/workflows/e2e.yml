@@ -89,5 +89,7 @@ jobs:
             Playwright Browser Binaries Installation Time: ${{ steps.playwright-install.outputs.duration_formatted }}
             ${{ steps.playwright.outcome == 'success' && format('Playwright Tests Duration: {0}', steps.playwright.outputs.duration_formatted) }}
 
-            For more details, please check the GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            For more details, please check:
+            - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            ${{ github.event.deployment.ref && format('- Pull Request: {0}/{1}/pull/{2}', github.server_url, github.repository, github.event.deployment.ref) }}
           attachments: playwright-output/report/index.html
