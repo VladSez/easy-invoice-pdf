@@ -91,5 +91,5 @@ jobs:
 
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            ${{ github.event.deployment.ref && format('- Pull Request: {0}/{1}/pull/{2}', github.server_url, github.repository, github.event.deployment.ref) }}
+            - Pull Request: ${{ github.event.pull_request.html_url || 'Unknown' }}
           attachments: playwright-output/report/index.html
