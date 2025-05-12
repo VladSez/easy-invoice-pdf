@@ -4,6 +4,7 @@ import { routing } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import type EnMessages from "../../../../messages/en.json";
+import { STATIC_ASSETS_URL } from "@/config";
 
 // Add metadata to make sure search engines can index the page
 export async function generateMetadata({
@@ -39,15 +40,17 @@ export async function generateMetadata({
       openGraph: {
         title: messages.Metadata.about.title,
         description: messages.Metadata.about.description,
+        siteName: messages.Metadata.about.siteName,
         locale: params.locale,
         type: "website",
+        url: "https://easyinvoicepdf.com",
         images: [
           {
-            url: "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png?updatedAt=1745697738714",
+            url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=5`,
             width: 1200,
             height: 630,
             type: "image/png",
-            alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
+            alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
           },
         ],
       },
@@ -58,11 +61,11 @@ export async function generateMetadata({
         creator: "@vlad_sazon",
         images: [
           {
-            url: "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png?updatedAt=1745697738714",
+            url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=5`,
             width: 1200,
             height: 630,
             type: "image/png",
-            alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
+            alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
           },
         ],
       },

@@ -22,9 +22,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
-  title: "Invoice Generator with Live Preview | No Sign-Up",
+  title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
   description:
-    "Create and download professional invoices instantly with real-time preview. Free and open-source. No signup required.",
+    "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
   keywords:
     "invoice generator, pdf invoice, invoice maker, invoice template, online invoice, billing software, open-source, free invoice generator",
   authors: [{ name: "Uladzislau Sazonau" }],
@@ -50,34 +50,36 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "Invoice Generator with Live Preview | No Sign-Up",
+    title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
     description:
-      "Create and download professional invoices instantly with real-time preview. Free and open-source. No signup required.",
+      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
+    siteName: "EasyInvoicePDF.com | Free Invoice Generator",
     locale: "en_US",
     type: "website",
+    url: "https://easyinvoicepdf.com",
     images: [
       {
-        url: "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png?updatedAt=1745697738714",
+        url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=5`,
         type: "image/png",
         width: 1200,
         height: 630,
-        alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
+        alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Invoice Generator with Live Preview | No Sign-Up",
+    title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
     description:
-      "Create and download professional invoices instantly with real-time preview. Free and open-source. No signup required.",
+      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
     creator: "@vlad_sazon",
     images: [
       {
-        url: "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png?updatedAt=1745697738714",
+        url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=5`,
         type: "image/png",
         width: 1200,
         height: 630,
-        alt: "Free Invoice Generator - A web application offering live preview, open source functionality, and no sign up required",
+        alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
       },
     ],
   },
@@ -87,8 +89,9 @@ const JSONLD: WithContext<WebSite> = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   url: "https://easyinvoicepdf.com/",
-  name: "EasyInvoicePDF.com",
-  description: "Invoice Generator with Live Preview | No Sign-Up",
+  name: "EasyInvoicePDF.com | Free Invoice Generator – Live Preview, No Sign-Up",
+  description:
+    "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
   keywords: [
     "invoice",
     "invoice generator",
@@ -97,16 +100,17 @@ const JSONLD: WithContext<WebSite> = {
     "invoice generator app",
     "free invoice generator",
   ],
-  image:
-    "https://ik.imagekit.io/fl2lbswwo/opengraph-image.png?updatedAt=1745697738714",
+  image: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=5`,
   mainEntityOfPage: {
     "@type": "SoftwareApplication",
     "@id": `https://easyinvoicepdf.com/`,
-    name: "EasyInvoicePDF.com",
-    description: "Invoice Generator with Live Preview | No Sign-Up",
+    name: "EasyInvoicePDF.com | Free Invoice Generator – Live Preview, No Sign-Up",
+    description:
+      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
     featureList: [
       "Live preview invoice generation",
       "No sign-up required",
+      "Free and open-source",
       "Customizable templates",
       "Instant PDF download",
       "Support for multiple languages and currencies",

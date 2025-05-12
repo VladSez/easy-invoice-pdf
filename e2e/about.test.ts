@@ -8,6 +8,10 @@ test.describe("About page", () => {
     // Verify the page is loaded
     await expect(page).toHaveURL("/en/about");
 
+    await expect(page).toHaveTitle(
+      "About | Free Invoice Generator – Live Preview, No Sign-Up"
+    );
+
     const header = page.getByRole("banner");
     // Check header elements
     await expect(header.getByText("EasyInvoicePDF.com")).toBeVisible();

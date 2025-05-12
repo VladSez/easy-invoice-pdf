@@ -7,6 +7,7 @@ const metadataSchema = z
         title: z.string(),
         description: z.string(),
         keywords: z.string(),
+        siteName: z.string(),
       })
       .strict(),
   })
