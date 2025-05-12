@@ -139,6 +139,20 @@ function HeroSection() {
               </span>
               <span>{t("hero.noSignup")}</span>
             </div>
+            <div className="mx-auto sm:mx-0">
+              <a
+                href="https://startupfa.me/s/easyinvoicepdf?utm_source=easyinvoicepdf.com"
+                target="_blank"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://startupfa.me/badges/featured-badge-small.webp"
+                  alt="Featured on Startup Fame"
+                  width="224"
+                  height="36"
+                />
+              </a>
+            </div>
           </div>
 
           <div className="relative mx-auto w-full max-w-[600px] lg:mx-0">
