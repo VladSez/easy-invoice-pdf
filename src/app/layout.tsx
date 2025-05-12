@@ -89,9 +89,9 @@ const JSONLD: WithContext<WebSite> = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   url: "https://easyinvoicepdf.com/",
-  name: "EasyInvoicePDF.com",
+  name: "EasyInvoicePDF.com | Free Invoice Generator – Live Preview, No Sign-Up",
   description:
-    "EasyInvoicePDF.com - Free Invoice Generator with Live Preview. No signup required.",
+    "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
   keywords: [
     "invoice",
     "invoice generator",
@@ -104,12 +104,13 @@ const JSONLD: WithContext<WebSite> = {
   mainEntityOfPage: {
     "@type": "SoftwareApplication",
     "@id": `https://easyinvoicepdf.com/`,
-    name: "EasyInvoicePDF.com",
+    name: "EasyInvoicePDF.com | Free Invoice Generator – Live Preview, No Sign-Up",
     description:
-      "EasyInvoicePDF.com - Free Invoice Generator with Live Preview. No signup required.",
+      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
     featureList: [
       "Live preview invoice generation",
       "No sign-up required",
+      "Free and open-source",
       "Customizable templates",
       "Instant PDF download",
       "Support for multiple languages and currencies",
