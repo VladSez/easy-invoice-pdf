@@ -70,7 +70,7 @@ function Header({ locale }: { locale: Locale }) {
       <div className="flex items-center justify-center">
         <div className="container h-auto px-3 py-2 sm:h-16 sm:py-0">
           <div className="flex h-full flex-row flex-wrap items-center justify-between gap-2">
-            <div className="w-[53%]">
+            <div className="w-[53%] sm:w-auto">
               <Logo />
             </div>
             <div className="flex items-center sm:mt-0 sm:gap-2">
@@ -133,7 +133,7 @@ function HeroSection() {
                 </Link>
               </Button>
             </div>
-            <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 md:mx-0">
+            <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0">
               <span className="" role="img" aria-label="checkmark">
                 ✅
               </span>
