@@ -22,12 +22,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
-  title: {
-    default: "EasyInvoicePDF.com | Free Invoice Generator with Live Preview",
-    template: "%s | EasyInvoicePDF.com",
-  },
+  title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
   description:
-    "Create and download professional invoices instantly with EasyInvoicePDF.com. Free, open-source and with real-time preview. No signup required.",
+    "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
   keywords:
     "invoice generator, pdf invoice, invoice maker, invoice template, online invoice, billing software, open-source, free invoice generator",
   authors: [{ name: "Uladzislau Sazonau" }],
@@ -55,7 +52,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
     description:
-      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free, open-source and with real-time preview. No signup required.",
+      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
     siteName: "EasyInvoicePDF.com | Free Invoice Generator",
     locale: "en_US",
     type: "website",
@@ -74,7 +71,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
     description:
-      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free, open-source and with real-time preview. No signup required.",
+      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
     creator: "@vlad_sazon",
     images: [
       {
