@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
 import * as Sentry from "@sentry/nextjs";
+import dayjs from "dayjs";
 
 const DONATION_TOAST_CONFIG = {
   title: "❤️ Enjoying EasyInvoicePDF? Help Keep It Free!",
@@ -57,10 +58,15 @@ export function InvoicePDFDownloadLink({
   const filename = useMemo(() => {
     const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
 
-    const name = `invoice-${invoiceData.language}-${invoiceNumberValue}.pdf`;
+    // Replace all slashes with dashes (e.g. 01/2025 -> 01-2025)
+    const formattedInvoiceNumber = invoiceNumberValue
+      ? invoiceNumberValue?.replace(/\//g, "-")
+      : dayjs().format("MM-YYYY"); // Fallback to current month and year if no invoice number
+
+    const name = `invoice-${invoiceData?.language?.toUpperCase()}-${formattedInvoiceNumber}.pdf`;
 
     return name;
-  }, [invoiceData.language, invoiceData.invoiceNumberObject]);
+  }, [invoiceData?.language, invoiceData?.invoiceNumberObject]);
 
   const PdfDocument = useMemo(
     () => <InvoicePdfTemplate invoiceData={invoiceData} />,

@@ -93,7 +93,7 @@ export const INITIAL_INVOICE_DATA = {
       nameFieldIsVisible: true,
 
       typeOfGTU: "",
-      typeOfGTUFieldIsVisible: false,
+      typeOfGTUFieldIsVisible: false, // we hide this field by default because it's not always needed
 
       amount: 1,
       amountFieldIsVisible: true,

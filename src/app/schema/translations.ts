@@ -272,7 +272,7 @@ export const TRANSLATIONS = {
     invoiceItemsTable: {
       no: "N°",
       nameOfGoodsService: "Descripción del producto/servicio",
-      typeOfGTU: "Tipo GTU",
+      typeOfGTU: "Tipo\n GTU",
       amount: "Cantidad",
       unit: "Unidad",
       netPrice: "Precio neto",
@@ -323,7 +323,7 @@ export const TRANSLATIONS = {
     invoiceItemsTable: {
       no: "N°",
       nameOfGoodsService: "Descrição do produto/serviço",
-      typeOfGTU: "Tipo GTU",
+      typeOfGTU: "Tipo\n GTU",
       amount: "Quantidade",
       unit: "Unidade",
       netPrice: "Preço\n líquido",
@@ -374,7 +374,7 @@ export const TRANSLATIONS = {
     invoiceItemsTable: {
       no: "№",
       nameOfGoodsService: "Наименование товара/услуги",
-      typeOfGTU: "Тип GTU",
+      typeOfGTU: "Тип\n GTU",
       amount: "Количество",
       unit: "Ед.\n изм.",
       netPrice: "Цена без НДС",
@@ -425,7 +425,7 @@ export const TRANSLATIONS = {
     invoiceItemsTable: {
       no: "№",
       nameOfGoodsService: "Найменування товару/послуги",
-      typeOfGTU: "Тип GTU",
+      typeOfGTU: "Тип\n GTU",
       amount: "Кількість",
       unit: "Од.\n вим.",
       netPrice: "Ціна без ПДВ",
@@ -476,7 +476,7 @@ export const TRANSLATIONS = {
     invoiceItemsTable: {
       no: "N°",
       nameOfGoodsService: "Désignation du produit/service",
-      typeOfGTU: "Type GTU",
+      typeOfGTU: "Type\n GTU",
       amount: "Quantité",
       unit: "Unité",
       netPrice: "Prix HT",
@@ -527,7 +527,7 @@ export const TRANSLATIONS = {
     invoiceItemsTable: {
       no: "N°",
       nameOfGoodsService: "Descrizione del prodotto/servizio",
-      typeOfGTU: "Tipo GTU",
+      typeOfGTU: "Tipo\n GTU",
       amount: "Quantità",
       unit: "Unità",
       netPrice: "Prezzo netto",
