@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "Free Invoice Generator with Live Preview | No Sign-Up",
+    title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
     description:
       "Create and download professional invoices instantly with EasyInvoicePDF.com. Free, open-source and with real-time preview. No signup required.",
     siteName: "EasyInvoicePDF.com | Free Invoice Generator",
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free Invoice Generator with Live Preview | No Sign-Up",
+    title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
     description:
       "Create and download professional invoices instantly with EasyInvoicePDF.com. Free, open-source and with real-time preview. No signup required.",
     creator: "@vlad_sazon",
