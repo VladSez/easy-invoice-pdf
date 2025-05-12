@@ -559,6 +559,21 @@ function Footer() {
             </div>
           </div>
         </div>
+        {/* Badge for featured on Startup Fame */}
+        <div className="my-5">
+          <a
+            href="https://startupfa.me/s/easyinvoicepdf?utm_source=easyinvoicepdf.com"
+            target="_blank"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://startupfa.me/badges/featured-badge-small.webp"
+              alt="Featured on Startup Fame"
+              width="224"
+              height="36"
+            />
+          </a>
+        </div>
         <div className="my-5 max-w-lg space-y-2">
           <p className="text-sm font-medium text-slate-900">
             Subscribe to our newsletter

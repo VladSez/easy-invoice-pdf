@@ -139,6 +139,7 @@ function HeroSection() {
               </span>
               <span>{t("hero.noSignup")}</span>
             </div>
+            {/* Badge for featured on Startup Fame */}
             <div className="mx-auto sm:mx-0">
               <a
                 href="https://startupfa.me/s/easyinvoicepdf?utm_source=easyinvoicepdf.com"
