@@ -1,14 +1,20 @@
-import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
-import { styles } from ".";
+import {
+  Text,
+  View,
+  type Styles,
+} from "@react-pdf/renderer/lib/react-pdf.browser";
+// import { styles } from ".";
 import type { InvoiceData } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";
 
 export function InvoiceItemsTable({
   invoiceData,
   formattedInvoiceTotal,
+  styles,
 }: {
   invoiceData: InvoiceData;
   formattedInvoiceTotal: string;
+  styles: Styles;
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];

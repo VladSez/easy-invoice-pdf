@@ -9,14 +9,16 @@ import {
 import { TRANSLATIONS } from "../schema/translations";
 import dayjs from "dayjs";
 
-const today = dayjs().format("YYYY-MM-DD");
-const lastDayOfMonth = dayjs().endOf("month").format("YYYY-MM-DD");
-const invoiceCurrentMonthAndYear = dayjs().format("MM-YYYY");
-const paymentDue = dayjs(today).add(14, "days").format("YYYY-MM-DD");
+export const TODAY = dayjs().format("YYYY-MM-DD");
+export const LAST_DAY_OF_MONTH = dayjs().endOf("month").format("YYYY-MM-DD");
+export const PAYMENT_DUE = dayjs(TODAY).add(14, "days").format("YYYY-MM-DD");
+const INVOICE_CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
 
 const EUR = SUPPORTED_CURRENCIES[0];
 const EN = SUPPORTED_LANGUAGES[0];
 const DEFAULT_DATE_FORMAT = SUPPORTED_DATE_FORMATS[0];
+
+export const INVOICE_DEFAULT_NUMBER_VALUE = `1/${INVOICE_CURRENT_MONTH_AND_YEAR}`;
 
 /**
  * Default seller data
@@ -72,11 +74,11 @@ export const INITIAL_INVOICE_DATA = {
   currency: EUR,
   invoiceNumberObject: {
     label: `${TRANSLATIONS[EN].invoiceNumber}:`,
-    value: `1/${invoiceCurrentMonthAndYear}`,
+    value: INVOICE_DEFAULT_NUMBER_VALUE,
   },
 
-  dateOfIssue: today,
-  dateOfService: lastDayOfMonth,
+  dateOfIssue: TODAY,
+  dateOfService: LAST_DAY_OF_MONTH,
   dateFormat: DEFAULT_DATE_FORMAT,
 
   invoiceType: "Reverse Charge",
@@ -120,7 +122,7 @@ export const INITIAL_INVOICE_DATA = {
   total: 0,
   paymentMethod: "wire transfer",
 
-  paymentDue: paymentDue,
+  paymentDue: PAYMENT_DUE,
 
   notes: "Reverse charge",
   notesFieldIsVisible: true,

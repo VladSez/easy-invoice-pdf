@@ -68,7 +68,7 @@ export async function subscribeAction(formData: FormData) {
 
     // Send confirmation email
     const { error: emailError } = await resend.emails.send({
-      from: "Vlad from EasyInvoicePDF <vlad@updates.easyinvoicepdf.com>",
+      from: "Vlad from EasyInvoicePDF.com <vlad@updates.easyinvoicepdf.com>",
       to: validatedFields.email,
       subject: "Confirm your subscription to EasyInvoicePDF newsletter",
       react: ConfirmSubscriptionEmail({ confirmationUrl }),

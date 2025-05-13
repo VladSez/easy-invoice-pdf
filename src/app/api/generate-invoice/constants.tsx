@@ -1,6 +1,19 @@
-"use client";
-
-import { type InvoiceData } from "@/app/schema";
+import { InvoiceHeader } from "@/app/components/invoice-pdf-template/invoice-header";
+import { InvoiceItemsTable } from "@/app/components/invoice-pdf-template/invoice-items-table";
+import { InvoicePaymentInfo } from "@/app/components/invoice-pdf-template/invoice-payment-info";
+import { InvoicePaymentTotals } from "@/app/components/invoice-pdf-template/invoice-payment-totals";
+import { InvoiceSellerBuyerInfo } from "@/app/components/invoice-pdf-template/invoice-seller-buyer-info";
+import { InvoiceVATSummaryTable } from "@/app/components/invoice-pdf-template/invoice-vat-summary-table";
+import {
+  INVOICE_DEFAULT_NUMBER_VALUE,
+  LAST_DAY_OF_MONTH,
+  PAYMENT_DUE,
+  TODAY,
+} from "@/app/constants";
+import type { InvoiceData, SupportedLanguages } from "@/app/schema";
+import { TRANSLATIONS } from "@/app/schema/translations";
+import { STATIC_ASSETS_URL } from "@/config";
+// eslint-disable-next-line no-restricted-imports
 import {
   Document,
   Font,
@@ -9,23 +22,14 @@ import {
   StyleSheet,
   Text,
   View,
-} from "@react-pdf/renderer/lib/react-pdf.browser";
-import { InvoiceHeader } from "./invoice-header";
-import { InvoiceSellerBuyerInfo } from "./invoice-seller-buyer-info";
-import { InvoiceItemsTable } from "./invoice-items-table";
-import { InvoicePaymentInfo } from "./invoice-payment-info";
-import { InvoiceVATSummaryTable } from "./invoice-vat-summary-table";
-import { InvoicePaymentTotals } from "./invoice-payment-totals";
-import { TRANSLATIONS } from "@/app/schema/translations";
-import { STATIC_ASSETS_URL } from "@/config";
-import { memo } from "react";
-
-const PROD_WEBSITE_URL = "https://dub.sh/easy-invoice";
+} from "@react-pdf/renderer";
 
 // Open sans seems to be working fine with EN and PL
 const fontFamily = "Open Sans";
 const fontFamilyBold = "Open Sans";
 
+// we need to duplicate font registration from invoice-pdf-template.tsx for some reason
+// otherwise fonts are not applied
 Font.register({
   family: fontFamily,
   fonts: [
@@ -39,7 +43,8 @@ Font.register({
   ],
 });
 
-// Styles for the PDF
+// we need to duplicate styles from invoice-pdf-template.tsx for some reason
+// otherwise styles are not applied
 const styles = StyleSheet.create({
   wFull: {
     width: "100%",
@@ -179,21 +184,18 @@ const styles = StyleSheet.create({
   },
 } as const);
 
-// Memoize the PDF Document component
-export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
+/**
+ * This component is used to render the invoice PDF template on the backend
+ *
+ * It is used to generate the PDF file for the invoice and is duplicated from the frontend component, due to some issues.
+ */
+export const InvoicePdfTemplateToRenderOnBackend = ({
   invoiceData,
 }: {
   invoiceData: InvoiceData;
-}) {
+}) => {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
-
-  const invoiceNumberLabel = invoiceData?.invoiceNumberObject?.label;
-
-  const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
-
-  const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`;
-  const invoiceDocTitle = `${invoiceNumber} | Created with https://easyinvoicepdf.com`;
 
   const formattedInvoiceTotal = invoiceData?.total
     .toLocaleString("en-US", {
@@ -202,11 +204,18 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
     })
     .replaceAll(",", " ");
 
+  const vatTableSummaryIsVisible = invoiceData.vatTableSummaryIsVisible;
+
   const signatureSectionIsVisible =
     invoiceData.personAuthorizedToReceiveFieldIsVisible ||
     invoiceData.personAuthorizedToIssueFieldIsVisible;
 
-  const vatTableSummaryIsVisible = invoiceData.vatTableSummaryIsVisible;
+  const invoiceNumberLabel = invoiceData?.invoiceNumberObject?.label;
+
+  const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
+
+  const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`;
+  const invoiceDocTitle = `${invoiceNumber} | Created with https://easyinvoicepdf.com`;
 
   return (
     <Document title={invoiceDocTitle}>
@@ -218,7 +227,6 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
           formattedInvoiceTotal={formattedInvoiceTotal}
           styles={styles}
         />
-
         <View
           style={{
             display: "flex",
@@ -240,7 +248,6 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
             </View>
           )}
         </View>
-
         <View style={{ marginTop: vatTableSummaryIsVisible ? 0 : 15 }}>
           <InvoicePaymentTotals
             invoiceData={invoiceData}
@@ -284,7 +291,7 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
             {t.createdWith}{" "}
             <Link
               style={[styles.fontSize9, { color: "blue" }]}
-              src={PROD_WEBSITE_URL}
+              src={"https://easyinvoicepdf.com"}
             >
               https://easyinvoicepdf.com
             </Link>
@@ -300,4 +307,101 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
       </Page>
     </Document>
   );
-});
+};
+
+const translateInvoiceNumberLabel = ({
+  language,
+}: {
+  language: SupportedLanguages;
+}) => {
+  const invoiceNumberLabel = `${TRANSLATIONS[language].invoiceNumber}:`;
+
+  return invoiceNumberLabel;
+};
+
+const INVOICE_NET_PRICE = Number(process.env.INVOICE_NET_PRICE) || 0;
+
+export const ENGLISH_INVOICE_REAL_DATA = {
+  language: "en",
+  dateFormat: "YYYY-MM-DD",
+  currency: "EUR",
+
+  invoiceNumberObject: {
+    label: "Invoice No. of:",
+    value: INVOICE_DEFAULT_NUMBER_VALUE,
+  },
+
+  dateOfIssue: TODAY,
+  dateOfService: LAST_DAY_OF_MONTH,
+  paymentDue: PAYMENT_DUE,
+
+  invoiceType: "Reverse Charge",
+  invoiceTypeFieldIsVisible: true,
+  seller: {
+    name: process.env.SELLER_NAME!,
+    address: process.env.SELLER_ADDRESS!,
+
+    vatNo: process.env.SELLER_VAT_NO!,
+    vatNoFieldIsVisible: true,
+
+    email: process.env.SELLER_EMAIL!,
+    accountNumber: process.env.SELLER_ACCOUNT_NUMBER!,
+    accountNumberFieldIsVisible: true,
+
+    swiftBic: process.env.SELLER_SWIFT_BIC!,
+    swiftBicFieldIsVisible: true,
+
+    notesFieldIsVisible: true,
+  },
+  buyer: {
+    name: process.env.BUYER_NAME!,
+    address: process.env.BUYER_ADDRESS!,
+
+    vatNo: process.env.BUYER_VAT_NO!,
+    vatNoFieldIsVisible: true,
+
+    email: process.env.BUYER_EMAIL!,
+    notesFieldIsVisible: true,
+  },
+  items: [
+    {
+      invoiceItemNumberIsVisible: true,
+      name: "Software Development",
+      nameFieldIsVisible: true,
+      typeOfGTU: "",
+      typeOfGTUFieldIsVisible: false,
+      amount: 1,
+      amountFieldIsVisible: true,
+      unit: "service",
+      unitFieldIsVisible: true,
+      netPrice: INVOICE_NET_PRICE,
+      netPriceFieldIsVisible: true,
+      vat: "NP",
+      vatFieldIsVisible: true,
+      netAmount: INVOICE_NET_PRICE,
+      netAmountFieldIsVisible: true,
+      vatAmount: 0,
+      vatAmountFieldIsVisible: true,
+      preTaxAmount: INVOICE_NET_PRICE,
+      preTaxAmountFieldIsVisible: true,
+    },
+  ],
+  total: INVOICE_NET_PRICE,
+  vatTableSummaryIsVisible: true,
+  paymentMethod: "wire transfer",
+  paymentMethodFieldIsVisible: true,
+
+  notes: "Reverse charge",
+  notesFieldIsVisible: true,
+  personAuthorizedToReceiveFieldIsVisible: true,
+  personAuthorizedToIssueFieldIsVisible: true,
+} as const satisfies InvoiceData;
+
+export const POLISH_INVOICE_REAL_DATA = {
+  ...ENGLISH_INVOICE_REAL_DATA,
+  language: "pl",
+  invoiceNumberObject: {
+    label: translateInvoiceNumberLabel({ language: "pl" }),
+    value: INVOICE_DEFAULT_NUMBER_VALUE,
+  },
+} as const satisfies InvoiceData;
