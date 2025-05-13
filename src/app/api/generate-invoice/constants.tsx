@@ -248,13 +248,13 @@ export const InvoicePdfTemplateToRenderOnBackend = ({
             </View>
           )}
         </View>
-        <div style={{ marginTop: vatTableSummaryIsVisible ? 0 : 15 }}>
+        <View style={{ marginTop: vatTableSummaryIsVisible ? 0 : 15 }}>
           <InvoicePaymentTotals
             invoiceData={invoiceData}
             formattedInvoiceTotal={formattedInvoiceTotal}
             styles={styles}
           />
-        </div>
+        </View>
 
         {/* Signature section */}
         {signatureSectionIsVisible && (
@@ -319,6 +319,8 @@ const translateInvoiceNumberLabel = ({
   return invoiceNumberLabel;
 };
 
+const INVOICE_NET_PRICE = Number(process.env.INVOICE_NET_PRICE) || 0;
+
 export const ENGLISH_INVOICE_REAL_DATA = {
   language: "en",
   dateFormat: "YYYY-MM-DD",
@@ -372,19 +374,19 @@ export const ENGLISH_INVOICE_REAL_DATA = {
       amountFieldIsVisible: true,
       unit: "service",
       unitFieldIsVisible: true,
-      netPrice: Number(process.env.INVOICE_NET_PRICE),
+      netPrice: INVOICE_NET_PRICE,
       netPriceFieldIsVisible: true,
       vat: "NP",
       vatFieldIsVisible: true,
-      netAmount: Number(process.env.INVOICE_NET_PRICE),
+      netAmount: INVOICE_NET_PRICE,
       netAmountFieldIsVisible: true,
       vatAmount: 0,
       vatAmountFieldIsVisible: true,
-      preTaxAmount: Number(process.env.INVOICE_NET_PRICE),
+      preTaxAmount: INVOICE_NET_PRICE,
       preTaxAmountFieldIsVisible: true,
     },
   ],
-  total: Number(process.env.INVOICE_NET_PRICE),
+  total: INVOICE_NET_PRICE,
   vatTableSummaryIsVisible: true,
   paymentMethod: "wire transfer",
   paymentMethodFieldIsVisible: true,

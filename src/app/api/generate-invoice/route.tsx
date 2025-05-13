@@ -37,8 +37,14 @@ export async function GET(req: NextRequest) {
     );
 
     const GENERATED_INVOICES = await Promise.allSettled([
-      { language: "en", promise: GENERATED_ENGLISH_INVOICE_PDF_DOCUMENT },
-      { language: "pl", promise: GENERATED_POLISH_INVOICE_PDF_DOCUMENT },
+      GENERATED_ENGLISH_INVOICE_PDF_DOCUMENT.then((buf) => ({
+        language: "en",
+        document: buf,
+      })),
+      GENERATED_POLISH_INVOICE_PDF_DOCUMENT.then((buf) => ({
+        language: "pl",
+        document: buf,
+      })),
     ]);
 
     const fulfilledInvoices = [];
@@ -47,7 +53,7 @@ export async function GET(req: NextRequest) {
       if (invoice.status === "fulfilled") {
         fulfilledInvoices.push({
           language: invoice.value.language,
-          document: await invoice.value.promise,
+          document: invoice.value.document,
         });
       } else if (invoice.status === "rejected") {
         console.error(

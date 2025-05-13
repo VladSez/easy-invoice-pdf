@@ -241,13 +241,13 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
           )}
         </View>
 
-        <div style={{ marginTop: vatTableSummaryIsVisible ? 0 : 15 }}>
+        <View style={{ marginTop: vatTableSummaryIsVisible ? 0 : 15 }}>
           <InvoicePaymentTotals
             invoiceData={invoiceData}
             formattedInvoiceTotal={formattedInvoiceTotal}
             styles={styles}
           />
-        </div>
+        </View>
 
         {/* Signature section */}
         {signatureSectionIsVisible && (
