@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
     const emailResponse = await resend.emails.send({
       from: "Vlad from EasyInvoicePDF.com <vlad@updates.easyinvoicepdf.com>",
       to: "vladsazon27@gmail.com",
-      subject: `📄 Invoice for ${dayjs().format("MMMM, YYYY")}`,
+      subject: `📝 Invoice for ${dayjs().format("MMMM, YYYY")}`,
       text: `Hello,\n\nPlease find your invoices in the attachments. Please check them carefully and let me know if any adjustments are needed.\n\nDate: ${dayjs().format("MMMM D, YYYY")}\n\nBest regards,\nEasyInvoicePDF.com`,
       attachments: ATTACHMENTS,
     });
