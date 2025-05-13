@@ -28,24 +28,44 @@ export async function GET(req: NextRequest) {
       <InvoicePdfTemplateToRenderOnBackend
         invoiceData={ENGLISH_INVOICE_REAL_DATA}
       />
-    );
+    ).catch((err) => {
+      console.error(
+        "\n\n_________________________Error during `renderToBuffer` for English invoice:",
+        err
+      );
+
+      throw err;
+    });
 
     const GENERATED_POLISH_INVOICE_PDF_DOCUMENT = renderToBuffer(
       <InvoicePdfTemplateToRenderOnBackend
         invoiceData={POLISH_INVOICE_REAL_DATA}
       />
-    );
+    ).catch((err) => {
+      console.error(
+        "\n\n_________________________Error during `renderToBuffer` for Polish invoice:",
+        err
+      );
 
-    const GENERATED_INVOICES = await Promise.allSettled([
-      GENERATED_ENGLISH_INVOICE_PDF_DOCUMENT.then((buf) => ({
-        language: "en",
-        document: buf,
-      })),
-      GENERATED_POLISH_INVOICE_PDF_DOCUMENT.then((buf) => ({
-        language: "pl",
-        document: buf,
-      })),
-    ]);
+      throw err;
+    });
+
+    const GENERATED_INVOICES =
+      (await Promise.allSettled([
+        GENERATED_ENGLISH_INVOICE_PDF_DOCUMENT.then((buf) => ({
+          language: "en",
+          document: buf,
+        })),
+        GENERATED_POLISH_INVOICE_PDF_DOCUMENT.then((buf) => ({
+          language: "pl",
+          document: buf,
+        })),
+      ]).catch((err) => {
+        console.error(
+          "\n\n_________________________Error during `Promise.allSettled`:",
+          err
+        );
+      })) || [];
 
     const fulfilledInvoices = [];
 
@@ -57,7 +77,7 @@ export async function GET(req: NextRequest) {
         });
       } else if (invoice.status === "rejected") {
         console.error(
-          "Error in generate-invoice route:",
+          "\n\n_________________________Error in generate-invoice route:",
           invoice?.reason || "Unknown error"
         );
       }
@@ -77,6 +97,13 @@ export async function GET(req: NextRequest) {
         contentType: "application/pdf",
       } satisfies Attachment;
     });
+
+    if (!ATTACHMENTS.length) {
+      return NextResponse.json(
+        { error: "No attachments found" },
+        { status: 400 }
+      );
+    }
 
     // Send email with PDF attachment
     const emailResponse = await resend.emails.send({
