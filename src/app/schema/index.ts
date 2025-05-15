@@ -20,6 +20,7 @@ export const SUPPORTED_CURRENCIES = [
   "CNY", // Chinese Yuan (RMB)
   "SGD", // Singapore Dollar
 ] as const;
+
 export type SupportedCurrencies = (typeof SUPPORTED_CURRENCIES)[number];
 
 export const CURRENCY_SYMBOLS = {
@@ -42,8 +43,33 @@ export const CURRENCY_SYMBOLS = {
   CNY: "¥", // Chinese Yuan (RMB)
   SGD: "S$", // Singapore Dollar
 } as const satisfies Record<SupportedCurrencies, string>;
+
 export type CurrencySymbols =
   (typeof CURRENCY_SYMBOLS)[keyof typeof CURRENCY_SYMBOLS];
+
+export const CURRENCY_TO_LABEL = {
+  EUR: "Euro",
+  USD: "United States Dollar",
+  CAD: "Canadian Dollar",
+  AUD: "Australian Dollar",
+  GBP: "British Pound Sterling",
+  PLN: "Polish Złoty",
+  RUB: "Russian Ruble",
+  UAH: "Ukrainian Hryvnia",
+  BYN: "Belarusian Ruble",
+  BRL: "Brazilian Real",
+  MXN: "Mexican Peso",
+  ARS: "Argentine Peso",
+  INR: "Indian Rupee",
+  CHF: "Swiss Franc",
+  HKD: "Hong Kong Dollar",
+  TWD: "New Taiwan Dollar",
+  CNY: "Chinese Yuan Renminbi",
+  SGD: "Singapore Dollar",
+} as const satisfies Record<SupportedCurrencies, string>;
+
+export type CurrencyLabels =
+  (typeof CURRENCY_TO_LABEL)[keyof typeof CURRENCY_TO_LABEL];
 
 export const SUPPORTED_LANGUAGES = [
   "en",
