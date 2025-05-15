@@ -1,4 +1,5 @@
 import { resend } from "@/lib/resend";
+import { sendTelegramMessage } from "@/lib/telegram";
 // eslint-disable-next-line no-restricted-imports
 import { renderToBuffer } from "@react-pdf/renderer";
 import dayjs from "dayjs";
@@ -10,6 +11,8 @@ import {
   POLISH_INVOICE_REAL_DATA,
 } from "./constants";
 import { INVOICE_DEFAULT_NUMBER_VALUE } from "@/app/constants";
+import { invoiceSchema } from "@/app/schema";
+import { compressToEncodedURIComponent } from "lz-string";
 
 if (!process.env.AUTH_TOKEN) {
   throw new Error("AUTH_TOKEN is not set");
@@ -105,12 +108,27 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    const newInvoiceDataValidated = invoiceSchema.parse(
+      ENGLISH_INVOICE_REAL_DATA
+    );
+    const stringified = JSON.stringify(newInvoiceDataValidated);
+    const compressedData = compressToEncodedURIComponent(stringified);
+
+    const invoiceUrl = `https://easyinvoicepdf.com/?data=${compressedData}`;
+
+    const monthAndYear = dayjs().format("MMMM, YYYY");
+
     // Send email with PDF attachment
     const emailResponse = await resend.emails.send({
       from: "Vlad from EasyInvoicePDF.com <vlad@updates.easyinvoicepdf.com>",
       to: "vladsazon27@gmail.com",
-      subject: `📝 Invoice for ${dayjs().format("MMMM, YYYY")}`,
-      text: `Hello,\n\nPlease find your invoices in the attachments. Please check them carefully and let me know if any adjustments are needed.\n\nDate: ${dayjs().format("MMMM D, YYYY")}\n\nBest regards,\nEasyInvoicePDF.com`,
+      subject: `📝 Invoices for ${monthAndYear}`,
+      html: `<p>Hello,</p>
+    <p>The generated invoices are included in the attachments. Please check them carefully.</p>
+    <p>Date: <b>${dayjs().format("MMMM D, YYYY")}</b></p>
+    <p><a href="${invoiceUrl}">View invoice online</a></p>
+    <p>Have a nice day!</p>
+    <p>Best regards,<br/>EasyInvoicePDF.com</p>`,
       attachments: ATTACHMENTS,
     });
 
@@ -118,8 +136,17 @@ export async function GET(req: NextRequest) {
       throw new Error(`Failed to send email: ${emailResponse.error.message}`);
     }
 
+    // Send Telegram notification with PDFs
+    await sendTelegramMessage({
+      message: `📝 <b>Invoices for ${monthAndYear}</b>\n\nThe generated invoices are included in the attachments. Please check them carefully.\n\nDate: <b>${dayjs().format("MMMM D, YYYY")}</b>\n<a href="${invoiceUrl}">View invoice online</a>\n\nHave a nice day!\n\nBest regards,\nEasyInvoicePDF.com`,
+      files: ATTACHMENTS.map((attachment) => ({
+        filename: attachment.filename,
+        buffer: Buffer.from(attachment.content),
+      })),
+    });
+
     return NextResponse.json(
-      { message: "Email sent successfully", id: emailResponse.data?.id },
+      { message: "Invoice sent successfully" },
       { status: 200 }
     );
   } catch (error) {
