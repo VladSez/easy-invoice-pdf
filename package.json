@@ -52,6 +52,7 @@
     "dayjs": "1.11.13",
     "eslint-plugin-react-hooks": "5.2.0",
     "file-saver": "2.0.5",
+    "googleapis": "148.0.0",
     "jiti": "2.4.2",
     "jszip": "3.10.1",
     "lucide-react": "0.477.0",
