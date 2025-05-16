@@ -21,16 +21,21 @@ import {
   POLISH_INVOICE_REAL_DATA,
 } from "./constants";
 
-if (!process.env.AUTH_TOKEN) {
-  throw new Error("AUTH_TOKEN is not set");
-}
+import { z } from "zod";
+
+const envSchema = z.object({
+  AUTH_TOKEN: z.string().min(1),
+  GOOGLE_DRIVE_PARENT_FOLDER_ID: z.string().min(1),
+});
 
 export async function GET(req: NextRequest) {
   try {
-    // Check if the request is authorized
-    const AUTH_TOKEN = process.env.AUTH_TOKEN;
+    const env = envSchema.parse({
+      AUTH_TOKEN: process.env.AUTH_TOKEN,
+      GOOGLE_DRIVE_PARENT_FOLDER_ID: process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID,
+    });
 
-    if (req.headers.get("Authorization") !== `Bearer ${AUTH_TOKEN}`) {
+    if (req.headers.get("Authorization") !== `Bearer ${env.AUTH_TOKEN}`) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -136,7 +141,7 @@ export async function GET(req: NextRequest) {
     // Create the month folder (this will automatically create/find the year folder)
     const result = await createOrFindInvoiceFolder({
       googleDrive,
-      parentFolderId: process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID!,
+      parentFolderId: env.GOOGLE_DRIVE_PARENT_FOLDER_ID,
       month: currentMonth,
       year: currentYear,
     });
