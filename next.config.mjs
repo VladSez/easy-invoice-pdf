@@ -10,8 +10,12 @@ import fs from "node:fs";
 
 const loadTsFileViaJiti = createJiti(fileURLToPath(import.meta.url));
 
-// Validate translations object against schema, that is used to translate pdf fields
-async function validateTranslations() {
+// Import ENV file here to validate during build. Using jiti@^1 we can import .ts files :)
+loadTsFileViaJiti("./src/env");
+
+// Validate all i18n files, that are used to translate the /about page
+async function validatei18nAndTranslationFiles() {
+  // Validate our custom translations object against schema, that is used to translate pdf fields
   try {
     // Import the translations schema using jiti
     // @ts-ignore
@@ -20,6 +24,7 @@ async function validateTranslations() {
     );
 
     const result = translationsSchema.safeParse(TRANSLATIONS);
+
     if (!result.success) {
       console.error("❌ Invalid translations:", result.error.message);
       process.exit(1);
@@ -28,14 +33,8 @@ async function validateTranslations() {
     console.error("❌ Error validating translations:", error);
     process.exit(1);
   }
-}
 
-// Validate all i18n files, that are used to translate the /about page
-async function validatei18n() {
   const messagesDir = path.join(process.cwd(), "messages");
-
-  // Validate translations first
-  await validateTranslations();
 
   // Import the messages schema using jiti
   // @ts-ignore
@@ -103,7 +102,7 @@ async function validatei18n() {
 }
 
 // Since the function is now async, we need to handle it properly
-validatei18n().catch((error) => {
+validatei18nAndTranslationFiles().catch((error) => {
   console.error("❌ Fatal error during validation:", error);
   process.exit(1);
 });

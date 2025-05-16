@@ -1,11 +1,7 @@
 import { google } from "googleapis";
 import { z } from "zod";
 import { Readable } from "node:stream";
-
-const googleDriveConfigSchema = z.object({
-  clientEmail: z.string().email(),
-  privateKey: z.string().min(1),
-});
+import { env } from "@/env";
 
 interface GoogleDriveFile {
   id: string;
@@ -39,15 +35,12 @@ export async function initializeGoogleDrive() {
     return cachedDrive;
   }
 
-  const config = googleDriveConfigSchema.parse({
-    clientEmail: process.env.GOOGLE_DRIVE_CLIENT_EMAIL,
-    privateKey: process.env.GOOGLE_DRIVE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-  });
+  const googlePrivateKey = env.GOOGLE_DRIVE_PRIVATE_KEY.replace(/\\n/g, "\n");
 
   const auth = new google.auth.GoogleAuth({
     credentials: {
-      client_email: config.clientEmail,
-      private_key: config.privateKey,
+      client_email: env.GOOGLE_DRIVE_CLIENT_EMAIL,
+      private_key: googlePrivateKey,
     },
     scopes: ["https://www.googleapis.com/auth/drive"],
   });

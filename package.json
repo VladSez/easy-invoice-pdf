@@ -42,6 +42,7 @@
     "@react-email/tailwind": "1.0.4",
     "@react-pdf/renderer": "4.3.0",
     "@sentry/nextjs": "9.3.0",
+    "@t3-oss/env-nextjs": "0.13.4",
     "@types/ua-parser-js": "0.7.39",
     "@upstash/ratelimit": "2.0.5",
     "@upstash/redis": "1.34.6",

@@ -21,22 +21,10 @@ import {
   POLISH_INVOICE_REAL_DATA,
 } from "./constants";
 
-import { z } from "zod";
-
-const envSchema = z.object({
-  AUTH_TOKEN: z.string().min(1),
-  GOOGLE_DRIVE_PARENT_FOLDER_ID: z.string().min(1),
-  INVOICE_EMAIL_RECIPIENT: z.string().email(),
-});
+import { env } from "@/env";
 
 export async function GET(req: NextRequest) {
   try {
-    const env = envSchema.parse({
-      AUTH_TOKEN: process.env.AUTH_TOKEN,
-      GOOGLE_DRIVE_PARENT_FOLDER_ID: process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID,
-      INVOICE_EMAIL_RECIPIENT: process.env.INVOICE_EMAIL_RECIPIENT,
-    });
-
     if (req.headers.get("Authorization") !== `Bearer ${env.AUTH_TOKEN}`) {
       return new NextResponse("Unauthorized", { status: 401 });
     }

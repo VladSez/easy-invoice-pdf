@@ -1,9 +1,4 @@
-import { z } from "zod";
-
-const telegramConfigSchema = z.object({
-  botToken: z.string().min(1),
-  chatId: z.string().min(1),
-});
+import { env } from "@/env";
 
 interface SendMessageOptions {
   message: string;
@@ -17,22 +12,17 @@ export async function sendTelegramMessage({
   message,
   files,
 }: SendMessageOptions) {
-  const config = telegramConfigSchema.parse({
-    botToken: process.env.TELEGRAM_BOT_TOKEN,
-    chatId: process.env.TELEGRAM_CHAT_ID,
-  });
-
   try {
     // Send text message
     const textResponse = await fetch(
-      `https://api.telegram.org/bot${config.botToken}/sendMessage`,
+      `https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          chat_id: config.chatId,
+          chat_id: env.TELEGRAM_CHAT_ID,
           text: message,
           parse_mode: "Markdown",
         }),
@@ -49,11 +39,11 @@ export async function sendTelegramMessage({
     if (files?.length) {
       for (const file of files) {
         const formData = new FormData();
-        formData.append("chat_id", config.chatId);
+        formData.append("chat_id", env.TELEGRAM_CHAT_ID);
         formData.append("document", new Blob([file.buffer]), file.filename);
 
         const fileResponse = await fetch(
-          `https://api.telegram.org/bot${config.botToken}/sendDocument`,
+          `https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendDocument`,
           {
             method: "POST",
             body: formData,
