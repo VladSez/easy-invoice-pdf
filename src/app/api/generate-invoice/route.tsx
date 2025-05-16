@@ -19,9 +19,11 @@ import {
   ENGLISH_INVOICE_REAL_DATA,
   InvoicePdfTemplateToRenderOnBackend,
   POLISH_INVOICE_REAL_DATA,
-} from "./constants";
+} from "./render-pdf-on-server";
 
 import { env } from "@/env";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
