@@ -16,26 +16,29 @@ interface GoogleDriveFile {
 
 interface Success {
   status: "success";
-  targetFolder: GoogleDriveFile;
-  invoiceToUploadFolderPath: string;
+  folderToUploadInvoices: GoogleDriveFile;
+  googleDriveFolderPath: string;
 }
 
-interface Error {
-  status: "error";
-  notification: string;
-}
-
-type CreateOrFindInvoiceFolderResult = Success | Error;
+type CreateOrFindInvoiceFolderResult = Success;
 
 const FolderInputSchema = z.object({
   parentFolderId: z.string().min(1),
-  month: z.string().regex(/^\d{2}$/, "Month must be in MM format"),
+  month: z
+    .string()
+    .regex(/^(0[1-9]|1[0-2])$/, "Month must be between 01 and 12 (MM format)"),
   year: z.string().regex(/^\d{4}$/, "Year must be in YYYY format"),
 });
 
 type FolderInput = z.infer<typeof FolderInputSchema>;
 
+let cachedDrive: ReturnType<typeof google.drive> | undefined;
+
 export async function initializeGoogleDrive() {
+  if (cachedDrive) {
+    return cachedDrive;
+  }
+
   const config = googleDriveConfigSchema.parse({
     clientEmail: process.env.GOOGLE_DRIVE_CLIENT_EMAIL,
     privateKey: process.env.GOOGLE_DRIVE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
@@ -49,7 +52,9 @@ export async function initializeGoogleDrive() {
     scopes: ["https://www.googleapis.com/auth/drive"],
   });
 
-  return google.drive({ version: "v3", auth });
+  cachedDrive = google.drive({ version: "v3", auth });
+
+  return cachedDrive;
 }
 
 async function createFolder(
@@ -75,13 +80,12 @@ async function createFolder(
   return response.data as GoogleDriveFile;
 }
 
-function bufferToStream(buffer: Buffer): Readable {
-  const stream = new Readable();
-  stream.push(buffer);
-  stream.push(null);
-
-  return stream;
-}
+/**
+ * Converts a Buffer to a Readable stream for efficient streaming to Google Drive API
+ * @param {Buffer} buffer - The input buffer containing file data
+ * @returns {Readable} A readable stream created from the buffer using Node's Readable.from()
+ */
+const bufferToStream = (buffer: Buffer): Readable => Readable.from(buffer);
 
 export async function uploadFile({
   googleDrive,
@@ -164,20 +168,26 @@ export async function createOrFindInvoiceFolder({
     spaces: "drive",
   });
 
-  // if the month folder already exists, return early with notification
-  if (monthFolderResponse.data.files?.length) {
-    return {
-      status: "error",
-      notification: `Folder for ${monthFolderName} already exists`,
-    };
-  }
+  let monthFolder: GoogleDriveFile;
 
-  // if the month folder does not exist (new month), create it
-  const monthFolder = await createFolder(
-    googleDrive,
-    monthFolderName,
-    yearFolder.id
-  );
+  if (monthFolderResponse.data.files?.length) {
+    // if the month folder already exists, use it
+    monthFolder = monthFolderResponse.data.files[0] as GoogleDriveFile;
+
+    console.log(
+      "\n\n________month folder already exists, using it: ",
+      monthFolder,
+      { monthFolderName, yearFolderName },
+      "\n\n"
+    );
+  } else {
+    // if the month folder does not exist (new month), create it
+    monthFolder = await createFolder(
+      googleDrive,
+      monthFolderName,
+      yearFolder.id
+    );
+  }
 
   // Finally, try to find or create the invoices folder
   const invoicesFolderQuery =
@@ -189,27 +199,32 @@ export async function createOrFindInvoiceFolder({
     spaces: "drive",
   });
 
-  let targetFolder: GoogleDriveFile;
+  let folderToUploadInvoices: GoogleDriveFile;
 
   if (invoicesFolderResponse.data.files?.length) {
     // if the invoices folder already exists, use it
-    targetFolder = invoicesFolderResponse.data.files[0] as GoogleDriveFile;
+    folderToUploadInvoices = invoicesFolderResponse.data
+      .files[0] as GoogleDriveFile;
   } else {
     // if the invoices folder does not exist, create it
-    targetFolder = await createFolder(googleDrive, "invoices", monthFolder.id);
+    folderToUploadInvoices = await createFolder(
+      googleDrive,
+      "invoices",
+      monthFolder.id
+    );
   }
 
-  const invoiceToUploadFolderPath = `/${yearFolder.name}/${monthFolder.name}/${targetFolder.name}`;
+  const googleDriveFolderPath = `/${yearFolder.name}/${monthFolder.name}/${folderToUploadInvoices.name}`;
 
   console.log(
-    "\n\n________invoice to upload folder path: ",
-    invoiceToUploadFolderPath,
+    "\n\n________invoice to upload Google Drive folder path: ",
+    googleDriveFolderPath,
     "\n\n"
   );
 
   return {
     status: "success",
-    targetFolder,
-    invoiceToUploadFolderPath,
+    folderToUploadInvoices,
+    googleDriveFolderPath,
   };
 }

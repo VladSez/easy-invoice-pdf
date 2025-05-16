@@ -141,13 +141,7 @@ export async function GET(req: NextRequest) {
       year: currentYear,
     });
 
-    // If the folder already exists, return an error
-    if (result.status === "error") {
-      return NextResponse.json({ error: result.notification }, { status: 400 });
-    }
-
-    const { targetFolder: folderToUploadInvoices, invoiceToUploadFolderPath } =
-      result;
+    const { folderToUploadInvoices, googleDriveFolderPath } = result;
 
     // Upload each invoice to Google Drive
     const uploadPromises = ATTACHMENTS.map((attachment) =>
@@ -202,7 +196,7 @@ export async function GET(req: NextRequest) {
     <br/>
     <br/>
 
-    Google Drive folder path: <b>${invoiceToUploadFolderPath}</b>
+    Google Drive folder path: <b>${googleDriveFolderPath}</b>
     <br/>
     <br/>
     
@@ -227,7 +221,7 @@ The generated invoices are included in the attachments. Please check them carefu
 [View invoice online](${invoiceUrl})
 [View in Google Drive](${folderToUploadInvoices.webViewLink})
 
-Google Drive folder path: *${invoiceToUploadFolderPath}*
+Google Drive folder path: *${googleDriveFolderPath}*
 
 Have a nice day!
 
