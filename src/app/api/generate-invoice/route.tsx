@@ -26,6 +26,7 @@ import { z } from "zod";
 const envSchema = z.object({
   AUTH_TOKEN: z.string().min(1),
   GOOGLE_DRIVE_PARENT_FOLDER_ID: z.string().min(1),
+  INVOICE_EMAIL_RECIPIENT: z.string().email(),
 });
 
 export async function GET(req: NextRequest) {
@@ -33,6 +34,7 @@ export async function GET(req: NextRequest) {
     const env = envSchema.parse({
       AUTH_TOKEN: process.env.AUTH_TOKEN,
       GOOGLE_DRIVE_PARENT_FOLDER_ID: process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID,
+      INVOICE_EMAIL_RECIPIENT: process.env.INVOICE_EMAIL_RECIPIENT,
     });
 
     if (req.headers.get("Authorization") !== `Bearer ${env.AUTH_TOKEN}`) {
@@ -184,7 +186,7 @@ export async function GET(req: NextRequest) {
     // Send email with PDF attachment
     const emailResponse = await resend.emails.send({
       from: "Vlad from EasyInvoicePDF.com <vlad@updates.easyinvoicepdf.com>",
-      to: "vladsazon27@gmail.com",
+      to: env.INVOICE_EMAIL_RECIPIENT,
       subject: `📝 Invoices for ${monthAndYear}`,
       html: `<p>Hello,</p>
     <span>Invoice No. of: <b>${invoiceNumberValue}</b><br/>
