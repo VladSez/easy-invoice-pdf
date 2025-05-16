@@ -3,8 +3,6 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    SENTRY_ENABLED: z.string().min(1),
-
     AUTH_TOKEN: z.string().min(1),
 
     RESEND_API_KEY: z.string().min(1),
@@ -36,13 +34,10 @@ export const env = createEnv({
     GOOGLE_DRIVE_PRIVATE_KEY: z.string().min(1),
   },
   client: {
-    NEXT_PUBLIC_SENTRY_ENABLED: z.string().min(1),
     NEXT_PUBLIC_SENTRY_DSN: z.string().min(1),
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
   runtimeEnv: {
-    SENTRY_ENABLED: process.env.SENTRY_ENABLED,
-    NEXT_PUBLIC_SENTRY_ENABLED: process.env.NEXT_PUBLIC_SENTRY_ENABLED,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
     AUTH_TOKEN: process.env.AUTH_TOKEN,
