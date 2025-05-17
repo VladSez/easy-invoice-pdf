@@ -50,6 +50,14 @@ export default tseslint.config(
               message:
                 "Please use @react-pdf/renderer/lib/react-pdf.browser instead. Check https://github.com/diegomura/react-pdf/issues/2890#issuecomment-2443831013 for more details.",
             },
+            {
+              name: "node:process",
+              message: "Please use @/env.ts instead.",
+            },
+            {
+              name: "process",
+              message: "Please use @/env.ts instead.",
+            },
           ],
         },
       ],

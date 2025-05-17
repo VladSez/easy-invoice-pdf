@@ -6,16 +6,13 @@ import { generateSubscriptionToken } from "@/utils/subscription-token";
 import { checkRateLimit, ipLimiter, emailLimiter } from "@/lib/rate-limit";
 import { headers } from "next/headers";
 import ConfirmSubscriptionEmail from "@/emails/confirm-subscription";
+import { env } from "@/env";
 
 const subscribeSchema = z
   .object({
     email: z.string().email("Please enter a valid email address"),
   })
   .strict();
-
-if (!process.env.RESEND_AUDIENCE_ID) {
-  throw new Error("RESEND_AUDIENCE_ID is not set");
-}
 
 const CONFIRMATION_URL =
   process.env.VERCEL_ENV === "production"
@@ -50,7 +47,7 @@ export async function subscribeAction(formData: FormData) {
 
     // Check if email already exists
     const { data: existingContacts } = await resend.contacts.list({
-      audienceId: process.env.RESEND_AUDIENCE_ID as string,
+      audienceId: env.RESEND_AUDIENCE_ID,
     });
 
     if (

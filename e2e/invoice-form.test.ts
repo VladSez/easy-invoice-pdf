@@ -1,6 +1,7 @@
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   CURRENCY_SYMBOLS,
+  CURRENCY_TO_LABEL,
   LANGUAGE_TO_LABEL,
   PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_CURRENCIES,
@@ -165,7 +166,10 @@ test.describe("Invoice Generator Page", () => {
     // Verify all supported currencies are available as options with correct labels
     for (const currency of SUPPORTED_CURRENCIES) {
       const currencySymbol = CURRENCY_SYMBOLS[currency];
-      const expectedLabel = `${currency} ${currencySymbol}`.trim();
+      const currencyFullName = CURRENCY_TO_LABEL[currency];
+
+      const expectedLabel =
+        `${currency} ${currencySymbol} ${currencyFullName}`.trim();
 
       await expect(
         currencySelect.locator(`option[value="${currency}"]`)

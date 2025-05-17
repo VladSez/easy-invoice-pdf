@@ -7,6 +7,7 @@ import {
 } from "react-hook-form";
 import {
   CURRENCY_SYMBOLS,
+  CURRENCY_TO_LABEL,
   LANGUAGE_TO_LABEL,
   type InvoiceData,
 } from "@/app/schema";
@@ -156,13 +157,15 @@ export const GeneralInformation = memo(function GeneralInformation({
                 {SUPPORTED_CURRENCIES.map((currency) => {
                   const currencySymbol = CURRENCY_SYMBOLS[currency] || null;
 
+                  const currencyFullName = CURRENCY_TO_LABEL[currency] || null;
+
                   return (
                     <option
                       key={currency}
                       value={currency}
                       defaultValue={SUPPORTED_CURRENCIES[0]}
                     >
-                      {currency} {currencySymbol}
+                      {currency} {currencySymbol} {currencyFullName}
                     </option>
                   );
                 })}

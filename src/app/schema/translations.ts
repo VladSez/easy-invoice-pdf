@@ -86,11 +86,18 @@ export const translationSchema = z
   })
   .strict();
 
-// Schema for all translations
-export const translationsSchema = z.record(
-  z.enum(SUPPORTED_LANGUAGES),
-  translationSchema
+// Create a map of language to schema
+// {
+//   en: translationSchema,
+//   pl: translationSchema,
+//   de: translationSchema,
+//   ...etc
+// }
+const languageToSchemaMap = Object.fromEntries(
+  SUPPORTED_LANGUAGES.map((lang) => [lang, translationSchema])
 );
+// Schema for all translations
+export const translationsSchema = z.object(languageToSchemaMap);
 
 // Type for a single language translation
 export type TranslationSchema = z.infer<typeof translationSchema>;

@@ -1,26 +1,33 @@
+import { INVOICE_DEFAULT_NUMBER_VALUE } from "@/app/constants";
+import { invoiceSchema } from "@/app/schema";
+import {
+  createOrFindInvoiceFolder,
+  initializeGoogleDrive,
+  uploadFile,
+} from "@/lib/google-drive";
 import { resend } from "@/lib/resend";
+import { sendTelegramMessage } from "@/lib/telegram";
+
 // eslint-disable-next-line no-restricted-imports
 import { renderToBuffer } from "@react-pdf/renderer";
 import dayjs from "dayjs";
-import { type NextRequest, NextResponse } from "next/server";
+import { compressToEncodedURIComponent } from "lz-string";
+import { NextResponse, type NextRequest } from "next/server";
 import type { Attachment } from "resend";
+
 import {
   ENGLISH_INVOICE_REAL_DATA,
   InvoicePdfTemplateToRenderOnBackend,
   POLISH_INVOICE_REAL_DATA,
-} from "./constants";
-import { INVOICE_DEFAULT_NUMBER_VALUE } from "@/app/constants";
+} from "./render-pdf-on-server";
 
-if (!process.env.AUTH_TOKEN) {
-  throw new Error("AUTH_TOKEN is not set");
-}
+import { env } from "@/env";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    // Check if the request is authorized
-    const AUTH_TOKEN = process.env.AUTH_TOKEN;
-
-    if (req.headers.get("Authorization") !== `Bearer ${AUTH_TOKEN}`) {
+    if (req.headers.get("Authorization") !== `Bearer ${env.AUTH_TOKEN}`) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -105,12 +112,93 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    const newInvoiceDataValidated = invoiceSchema.parse(
+      ENGLISH_INVOICE_REAL_DATA
+    );
+    const stringified = JSON.stringify(newInvoiceDataValidated);
+    const compressedData = compressToEncodedURIComponent(stringified);
+
+    const invoiceUrl = `https://easyinvoicepdf.com/?data=${compressedData}`;
+
+    const monthAndYear = dayjs().format("MMMM, YYYY");
+
+    // *___________UPLOAD INVOICES TO GOOGLE DRIVE___________*
+
+    // Initialize Google Drive
+    const googleDrive = await initializeGoogleDrive();
+
+    const currentMonth = dayjs().format("MM");
+    const currentYear = dayjs().format("YYYY");
+
+    // Create the month folder (this will automatically create/find the year folder)
+    const result = await createOrFindInvoiceFolder({
+      googleDrive,
+      parentFolderId: env.GOOGLE_DRIVE_PARENT_FOLDER_ID,
+      month: currentMonth,
+      year: currentYear,
+    });
+
+    const { folderToUploadInvoices, googleDriveFolderPath } = result;
+
+    // Upload each invoice to Google Drive
+    const uploadPromises = ATTACHMENTS.map((attachment) =>
+      uploadFile({
+        googleDrive,
+        fileName: attachment.filename,
+        fileContent: Buffer.from(attachment.content),
+        folderId: folderToUploadInvoices.id,
+      })
+    );
+
+    const uploadResults = await Promise.allSettled(uploadPromises);
+    const failedUploads = uploadResults.filter(
+      (result): result is PromiseRejectedResult => result.status === "rejected"
+    );
+
+    if (failedUploads.length > 0) {
+      console.error(
+        "Some files failed to upload to Google Drive:",
+        failedUploads
+      );
+
+      return NextResponse.json(
+        { error: "Failed to upload invoices to Google Drive" },
+        { status: 500 }
+      );
+    }
+
+    // we only need the value of the invoice number e.g. 1/05.2025
+    const invoiceNumberValue =
+      ENGLISH_INVOICE_REAL_DATA?.invoiceNumberObject?.value;
+
+    // *___________SEND NOTIFICATIONS___________*
+
     // Send email with PDF attachment
     const emailResponse = await resend.emails.send({
       from: "Vlad from EasyInvoicePDF.com <vlad@updates.easyinvoicepdf.com>",
-      to: "vladsazon27@gmail.com",
-      subject: `📝 Invoice for ${dayjs().format("MMMM, YYYY")}`,
-      text: `Hello,\n\nPlease find your invoices in the attachments. Please check them carefully and let me know if any adjustments are needed.\n\nDate: ${dayjs().format("MMMM D, YYYY")}\n\nBest regards,\nEasyInvoicePDF.com`,
+      to: env.INVOICE_EMAIL_RECIPIENT,
+      subject: `📝 Invoices for ${monthAndYear}`,
+      html: `<p>Hello,</p>
+    <span>Invoice No. of: <b>${invoiceNumberValue}</b><br/>
+    Date: <b>${dayjs().format("MMMM D, YYYY")}</b>
+    <br/>
+    <br/>
+
+    The generated invoices are included in the attachments. Please check them carefully.
+    <br/>
+    <br/>
+
+    <a href="${invoiceUrl}">View invoice online</a><br/>
+    <a href="${folderToUploadInvoices.webViewLink}">View in Google Drive</a>
+    <br/>
+    <br/>
+
+    Google Drive folder path: <b>${googleDriveFolderPath}</b>
+    <br/>
+    <br/>
+    
+    Have a nice day!<br/><br/>
+    Best regards,<br/>EasyInvoicePDF.com</span>`,
       attachments: ATTACHMENTS,
     });
 
@@ -118,8 +206,32 @@ export async function GET(req: NextRequest) {
       throw new Error(`Failed to send email: ${emailResponse.error.message}`);
     }
 
+    // Send Telegram notification with PDFs
+    await sendTelegramMessage({
+      message: `📝 *Invoices for ${monthAndYear}*
+
+Invoice No. of: *${invoiceNumberValue}*
+Date: *${dayjs().format("MMMM D, YYYY")}*
+
+The generated invoices are included in the attachments. Please check them carefully.
+
+[View invoice online](${invoiceUrl})
+[View in Google Drive](${folderToUploadInvoices.webViewLink})
+
+Google Drive folder path: *${googleDriveFolderPath}*
+
+Have a nice day!
+
+Best regards,
+EasyInvoicePDF.com`,
+      files: ATTACHMENTS.map((attachment) => ({
+        filename: attachment.filename,
+        buffer: Buffer.from(attachment.content),
+      })),
+    });
+
     return NextResponse.json(
-      { message: "Email sent successfully", id: emailResponse.data?.id },
+      { message: "Invoice sent successfully" },
       { status: 200 }
     );
   } catch (error) {

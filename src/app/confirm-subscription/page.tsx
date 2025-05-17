@@ -3,6 +3,7 @@ import { resend } from "@/lib/resend";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { headers } from "next/headers";
+import { env } from "@/env";
 
 export const metadata = {
   robots: {
@@ -53,7 +54,7 @@ export default async function ConfirmSubscriptionPage({
     // Add contact to Resend audience
     const { error } = await resend.contacts.create({
       email,
-      audienceId: process.env.RESEND_AUDIENCE_ID as string,
+      audienceId: env.RESEND_AUDIENCE_ID,
     });
 
     if (error) {

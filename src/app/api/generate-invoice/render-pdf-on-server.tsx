@@ -13,6 +13,7 @@ import {
 import type { InvoiceData, SupportedLanguages } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";
 import { STATIC_ASSETS_URL } from "@/config";
+import { env } from "@/env";
 // eslint-disable-next-line no-restricted-imports
 import {
   Document,
@@ -319,7 +320,7 @@ const translateInvoiceNumberLabel = ({
   return invoiceNumberLabel;
 };
 
-const INVOICE_NET_PRICE = Number(process.env.INVOICE_NET_PRICE) || 0;
+const INVOICE_NET_PRICE = Number(env.INVOICE_NET_PRICE) || 0;
 
 export const ENGLISH_INVOICE_REAL_DATA = {
   language: "en",
@@ -338,29 +339,29 @@ export const ENGLISH_INVOICE_REAL_DATA = {
   invoiceType: "Reverse Charge",
   invoiceTypeFieldIsVisible: true,
   seller: {
-    name: process.env.SELLER_NAME!,
-    address: process.env.SELLER_ADDRESS!,
+    name: env.SELLER_NAME,
+    address: env.SELLER_ADDRESS,
 
-    vatNo: process.env.SELLER_VAT_NO!,
+    vatNo: env.SELLER_VAT_NO,
     vatNoFieldIsVisible: true,
 
-    email: process.env.SELLER_EMAIL!,
-    accountNumber: process.env.SELLER_ACCOUNT_NUMBER!,
+    email: env.SELLER_EMAIL,
+    accountNumber: env.SELLER_ACCOUNT_NUMBER,
     accountNumberFieldIsVisible: true,
 
-    swiftBic: process.env.SELLER_SWIFT_BIC!,
+    swiftBic: env.SELLER_SWIFT_BIC,
     swiftBicFieldIsVisible: true,
 
     notesFieldIsVisible: true,
   },
   buyer: {
-    name: process.env.BUYER_NAME!,
-    address: process.env.BUYER_ADDRESS!,
+    name: env.BUYER_NAME,
+    address: env.BUYER_ADDRESS,
 
-    vatNo: process.env.BUYER_VAT_NO!,
+    vatNo: env.BUYER_VAT_NO,
     vatNoFieldIsVisible: true,
 
-    email: process.env.BUYER_EMAIL!,
+    email: env.BUYER_EMAIL,
     notesFieldIsVisible: true,
   },
   items: [
