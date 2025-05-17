@@ -198,7 +198,7 @@ export async function GET(req: NextRequest) {
     <br/>
     <br/>
 
-    Don't forget to <a href="${emailLink}"><b>send email to company</b></a>
+    <b>Don't forget to</b> <a href="${emailLink}"><b>send email to company</b></a>
     <br/>
     <br/>
 
