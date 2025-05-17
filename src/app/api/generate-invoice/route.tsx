@@ -25,6 +25,9 @@ import { env } from "@/env";
 
 export const dynamic = "force-dynamic";
 
+// serverless function can run for max 30 seconds
+export const maxDuration = 30; // Set to 30 seconds
+
 export async function GET(req: NextRequest) {
   try {
     if (req.headers.get("Authorization") !== `Bearer ${env.AUTH_TOKEN}`) {
@@ -167,6 +170,8 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    const emailLink = `https://outlook.office.com/mail/deeplink/compose?to=${env.INVOICE_EMAIL_COMPANY_TO}&subject=Invoice%20for%20${monthAndYear}&body=Hello%2C%0A%0AInvoice%20for%20${monthAndYear}%20in%20attachments%0A%0AHave%20a%20nice%20day`;
+
     // we only need the value of the invoice number e.g. 1/05.2025
     const invoiceNumberValue =
       ENGLISH_INVOICE_REAL_DATA?.invoiceNumberObject?.value;
@@ -189,14 +194,14 @@ export async function GET(req: NextRequest) {
     <br/>
 
     <a href="${invoiceUrl}">View invoice online</a><br/>
-    <a href="${folderToUploadInvoices.webViewLink}">View in Google Drive</a>
+    <a href="${folderToUploadInvoices.webViewLink}">View in Google Drive</a> path: <b>${googleDriveFolderPath}</b>
     <br/>
     <br/>
 
-    Google Drive folder path: <b>${googleDriveFolderPath}</b>
+    Don't forget to <a href="${emailLink}"><b>send email to company</b></a>
     <br/>
     <br/>
-    
+
     Have a nice day!<br/><br/>
     Best regards,<br/>EasyInvoicePDF.com</span>`,
       attachments: ATTACHMENTS,
@@ -216,9 +221,9 @@ Date: *${dayjs().format("MMMM D, YYYY")}*
 The generated invoices are included in the attachments. Please check them carefully.
 
 [View invoice online](${invoiceUrl})
-[View in Google Drive](${folderToUploadInvoices.webViewLink})
+[View in Google Drive](${folderToUploadInvoices.webViewLink}) path: *${googleDriveFolderPath}*
 
-Google Drive folder path: *${googleDriveFolderPath}*
+*Don't forget to* [send email to company](${emailLink})
 
 Have a nice day!
 

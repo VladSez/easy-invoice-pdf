@@ -28,6 +28,7 @@ export const env = createEnv({
 
     INVOICE_NET_PRICE: z.string().min(1),
     INVOICE_EMAIL_RECIPIENT: z.string().email(),
+    INVOICE_EMAIL_COMPANY_TO: z.string().email(),
 
     GOOGLE_DRIVE_PARENT_FOLDER_ID: z.string().min(1),
     GOOGLE_DRIVE_CLIENT_EMAIL: z.string().email(),
@@ -65,6 +66,7 @@ export const env = createEnv({
 
     INVOICE_NET_PRICE: process.env.INVOICE_NET_PRICE,
     INVOICE_EMAIL_RECIPIENT: process.env.INVOICE_EMAIL_RECIPIENT,
+    INVOICE_EMAIL_COMPANY_TO: process.env.INVOICE_EMAIL_COMPANY_TO,
 
     GOOGLE_DRIVE_PARENT_FOLDER_ID: process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID,
     GOOGLE_DRIVE_CLIENT_EMAIL: process.env.GOOGLE_DRIVE_CLIENT_EMAIL,
