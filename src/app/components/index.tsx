@@ -8,6 +8,7 @@ import type { InvoiceData } from "../schema";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { usePDF } from "@react-pdf/renderer/lib/react-pdf.browser";
+import { useEffect } from "react";
 
 // const InvoicePDFViewer = dynamic(
 //   () => import("./invoice-pdf-viewer").then((mod) => mod.InvoicePDFViewer),
@@ -26,9 +27,12 @@ import { usePDF } from "@react-pdf/renderer/lib/react-pdf.browser";
 // );
 
 const PdfViewer = ({ invoiceData }: { invoiceData: InvoiceData }) => {
-  const [instance] = usePDF({
-    document: <InvoicePdfTemplate invoiceData={invoiceData} />,
-  });
+  const [instance, updateInstance] = usePDF();
+
+  // Handle PDF updates
+  useEffect(() => {
+    updateInstance(<InvoicePdfTemplate invoiceData={invoiceData} />);
+  }, [invoiceData, updateInstance]);
 
   if (instance?.loading) {
     return (
