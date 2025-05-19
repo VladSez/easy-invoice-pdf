@@ -1,62 +1,105 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileTextIcon, PencilIcon } from "lucide-react";
-// import dynamic from "next/dynamic";
+import dynamic from "next/dynamic";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 import type { InvoiceData } from "../schema";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { usePDF } from "@react-pdf/renderer/lib/react-pdf.browser";
+import {
+  BlobProvider,
+  Document,
+  Page,
+  usePDF,
+} from "@react-pdf/renderer/lib/react-pdf.browser";
 import { useEffect } from "react";
 
-// const InvoicePDFViewer = dynamic(
-//   () => import("./invoice-pdf-viewer").then((mod) => mod.InvoicePDFViewer),
+const InvoicePDFViewer = dynamic(
+  () => import("./invoice-pdf-viewer").then((mod) => mod.InvoicePDFViewer),
 
-//   {
-//     ssr: false,
-//     loading: () => (
-//       <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-//         <div className="text-center">
-//           <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-//           <p className="text-gray-600">Loading PDF viewer...</p>
-//         </div>
-//       </div>
-//     ),
-//   }
-// );
-
-const PdfViewer = ({ invoiceData }: { invoiceData: InvoiceData }) => {
-  const [instance, updateInstance] = usePDF();
-
-  // Handle PDF updates
-  useEffect(() => {
-    updateInstance(<InvoicePdfTemplate invoiceData={invoiceData} />);
-  }, [invoiceData, updateInstance]);
-
-  if (instance?.loading) {
-    return (
+  {
+    ssr: false,
+    loading: () => (
       <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
         <div className="text-center">
           <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
           <p className="text-gray-600">Loading PDF viewer...</p>
         </div>
       </div>
-    );
+    ),
   }
+);
 
-  if (instance?.url) {
+const PdfViewer = ({
+  invoiceData,
+  isMobile,
+}: {
+  invoiceData: InvoiceData;
+  isMobile: boolean;
+}) => {
+  // const [instance, updateInstance] = usePDF();
+
+  // // Handle PDF updates
+  // useEffect(() => {
+  //   updateInstance(<InvoicePdfTemplate invoiceData={invoiceData} />);
+  // }, [invoiceData, updateInstance]);
+
+  if (isMobile) {
     return (
-      <iframe
-        src={instance.url}
-        width="100%"
-        height="100%"
-        title="Invoice PDF"
-      />
+      <BlobProvider document={<InvoicePdfTemplate invoiceData={invoiceData} />}>
+        {({ url, loading }) => {
+          return loading ? (
+            <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+              <div className="text-center">
+                <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+                <p className="text-gray-600">Loading PDF viewer...</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <object
+                data={url ?? ""}
+                type="application/pdf"
+                width="100%"
+                height="100%"
+              />
+            </>
+          );
+        }}
+      </BlobProvider>
     );
   }
 
-  return <div>Unable to generate PDF</div>;
+  // if (instance?.loading) {
+  //   return (
+  //     <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+  //       <div className="text-center">
+  //         <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+  //         <p className="text-gray-600">Loading PDF viewer...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
+  // if (instance?.url) {
+  //   return (
+  //     <iframe
+  //       src={instance.url}
+  //       width="100%"
+  //       height="100%"
+  //       title="Invoice PDF"
+  //     />
+  //   );
+  // }
+
+  // return <div>Unable to generate PDF</div>;
+
+  return (
+    <InvoicePDFViewer>
+      <InvoicePdfTemplate invoiceData={invoiceData} />
+    </InvoicePDFViewer>
+  );
 };
 
 const TABS_VALUES = ["invoice-form", "invoice-preview"] as const;
@@ -107,7 +150,7 @@ export function InvoiceClientPage({
                 {/* <InvoicePDFViewer>
                   <InvoicePdfTemplate invoiceData={invoiceDataState} />
                 </InvoicePDFViewer> */}
-                <PdfViewer invoiceData={invoiceDataState} />
+                <PdfViewer invoiceData={invoiceDataState} isMobile={isMobile} />
               </div>
             </TabsContent>
           </Tabs>
@@ -142,7 +185,7 @@ export function InvoiceClientPage({
             {/* <InvoicePDFViewer>
               <InvoicePdfTemplate invoiceData={invoiceDataState} />
             </InvoicePDFViewer> */}
-            <PdfViewer invoiceData={invoiceDataState} />
+            <PdfViewer invoiceData={invoiceDataState} isMobile={isMobile} />
           </div>
         </>
       )}
