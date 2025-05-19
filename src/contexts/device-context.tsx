@@ -5,12 +5,14 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 interface DeviceContextType {
   isDesktop: boolean;
+  isAndroid: boolean;
 }
 
 const DeviceContext = createContext<DeviceContextType | null>(null);
 
 export function useDeviceContext() {
   const context = useContext(DeviceContext);
+
   if (!context) {
     throw new Error("useDeviceContext must be used within a DeviceProvider");
   }
@@ -20,6 +22,7 @@ export function useDeviceContext() {
 export function DeviceContextProvider({
   children,
   isDesktop,
+  isAndroid,
 }: DeviceContextType & { children: React.ReactNode }) {
   const [isDesktopClient, setIsDesktopClient] = useState(isDesktop);
 
@@ -37,7 +40,7 @@ export function DeviceContextProvider({
   }, [isMediaQueryDesktop]);
 
   return (
-    <DeviceContext.Provider value={{ isDesktop: isDesktopClient }}>
+    <DeviceContext.Provider value={{ isDesktop: isDesktopClient, isAndroid }}>
       {children}
     </DeviceContext.Provider>
   );

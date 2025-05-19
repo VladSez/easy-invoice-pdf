@@ -31,8 +31,11 @@ export const checkDeviceUserAgent = async () => {
   // Detect mobile phones
   const isMobile = device.type === "mobile";
 
+  // Detect Android specifically
+  const isAndroid = os.name === "Android";
+
   // Desktop is when it's neither tablet nor mobile
   const isDesktop = !isTablet && !isMobile;
 
-  return { isDesktop };
+  return { isDesktop, isAndroid };
 };
