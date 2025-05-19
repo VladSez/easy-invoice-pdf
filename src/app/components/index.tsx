@@ -1,19 +1,13 @@
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CustomTooltip } from "@/components/ui/tooltip";
+import { BlobProvider } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
+import type { InvoiceData } from "../schema";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
-import type { InvoiceData } from "../schema";
-import { CustomTooltip } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
-import {
-  BlobProvider,
-  Document,
-  Page,
-  usePDF,
-} from "@react-pdf/renderer/lib/react-pdf.browser";
-import { useEffect } from "react";
 
 const InvoicePDFViewer = dynamic(
   () => import("./invoice-pdf-viewer").then((mod) => mod.InvoicePDFViewer),
@@ -38,63 +32,62 @@ const PdfViewer = ({
   invoiceData: InvoiceData;
   isMobile: boolean;
 }) => {
-  // const [instance, updateInstance] = usePDF();
-
-  // // Handle PDF updates
-  // useEffect(() => {
-  //   updateInstance(<InvoicePdfTemplate invoiceData={invoiceData} />);
-  // }, [invoiceData, updateInstance]);
-
+  // On mobile, we use the BlobProvider to generate a PDF preview
+  // This is because the PDF viewer is not supported on Android Chrome devices
+  // https://github.com/diegomura/react-pdf/issues/714
   if (isMobile) {
     return (
       <BlobProvider document={<InvoicePdfTemplate invoiceData={invoiceData} />}>
-        {({ url, loading }) => {
-          return loading ? (
-            <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-              <div className="text-center">
-                <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-                <p className="text-gray-600">Loading PDF viewer...</p>
+        {({ url, loading, error }) => {
+          if (error) {
+            return (
+              <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+                <div className="text-center">
+                  <p className="text-red-600">Error generating PDF preview</p>
+                  <p className="mt-2 text-sm text-gray-600">
+                    {error?.message ??
+                      "Something went wrong. Please try again or contact support."}
+                  </p>
+                </div>
               </div>
-            </div>
-          ) : (
-            <>
-              <object
-                data={url ?? ""}
-                type="application/pdf"
-                width="100%"
-                height="100%"
-              />
-            </>
+            );
+          }
+
+          if (loading) {
+            return (
+              <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+                <div className="text-center">
+                  <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+                  <p className="text-gray-600">Loading PDF viewer...</p>
+                </div>
+              </div>
+            );
+          }
+
+          if (!url) {
+            return (
+              <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+                <div className="text-center">
+                  <p className="text-red-600">Unable to generate PDF preview</p>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <object
+              data={url}
+              type="application/pdf"
+              width="100%"
+              height="100%"
+            />
           );
         }}
       </BlobProvider>
     );
   }
 
-  // if (instance?.loading) {
-  //   return (
-  //     <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-  //       <div className="text-center">
-  //         <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-  //         <p className="text-gray-600">Loading PDF viewer...</p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  // if (instance?.url) {
-  //   return (
-  //     <iframe
-  //       src={instance.url}
-  //       width="100%"
-  //       height="100%"
-  //       title="Invoice PDF"
-  //     />
-  //   );
-  // }
-
-  // return <div>Unable to generate PDF</div>;
-
+  // Desktop version
   return (
     <InvoicePDFViewer>
       <InvoicePdfTemplate invoiceData={invoiceData} />
@@ -147,9 +140,6 @@ export function InvoiceClientPage({
             </TabsContent>
             <TabsContent value={TAB_INVOICE_PREVIEW} className="mt-1">
               <div className="h-[480px] w-full">
-                {/* <InvoicePDFViewer>
-                  <InvoicePdfTemplate invoiceData={invoiceDataState} />
-                </InvoicePDFViewer> */}
                 <PdfViewer invoiceData={invoiceDataState} isMobile={isMobile} />
               </div>
             </TabsContent>
@@ -182,9 +172,6 @@ export function InvoiceClientPage({
             </div>
           </div>
           <div className="col-span-8 h-[620px] w-full max-w-full 2xl:h-[700px]">
-            {/* <InvoicePDFViewer>
-              <InvoicePdfTemplate invoiceData={invoiceDataState} />
-            </InvoicePDFViewer> */}
             <PdfViewer invoiceData={invoiceDataState} isMobile={isMobile} />
           </div>
         </>
