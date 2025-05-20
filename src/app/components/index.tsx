@@ -9,8 +9,17 @@ import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 import { useDeviceContext } from "@/contexts/device-context";
 
-const PDFViewerLoading = () => (
+const DesktopPDFViewerModuleLoading = () => (
   <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+    <div className="text-center">
+      <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      <p className="text-gray-600">Loading PDF viewer...</p>
+    </div>
+  </div>
+);
+
+const AndroidPDFViewerModuleLoading = () => (
+  <div className="flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200">
     <div className="text-center">
       <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
       <p className="text-gray-600">Loading PDF viewer...</p>
@@ -23,7 +32,7 @@ const InvoicePDFViewer = dynamic(
 
   {
     ssr: false,
-    loading: () => <PDFViewerLoading />,
+    loading: () => <DesktopPDFViewerModuleLoading />,
   }
 );
 
@@ -31,108 +40,19 @@ const AndroidPDFViewer = dynamic(
   () => import("./android-pdf-viewer").then((mod) => mod.AndroidPdfViewer),
   {
     ssr: false,
-    loading: () => <PDFViewerLoading />,
+    loading: () => <AndroidPDFViewerModuleLoading />,
   }
 );
 
 const PdfViewer = ({ invoiceData }: { invoiceData: InvoiceData }) => {
   const { isAndroid } = useDeviceContext();
-  // const parentRef = useRef<HTMLDivElement>(null);
 
-  // On mobile, we use the BlobProvider to generate a PDF preview
-  // This is because the PDF viewer is not supported on Android Chrome devices
+  // we only show the Android PDF viewer on Android devices due to the limitations of the PDF viewer
   // https://github.com/diegomura/react-pdf/issues/714
-  // if (isMobile) {
-  //   return (
-  //     // <div ref={parentRef}>
-  //     <BlobProvider document={<InvoicePdfTemplate invoiceData={invoiceData} />}>
-  //       {({ url, loading, error }) => {
-  //         // if (error) {
-  //         //   return (
-  //         //     <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-  //         //       <div className="text-center">
-  //         //         <p className="text-red-600">Error generating PDF preview</p>
-  //         //         <p className="mt-2 text-sm text-gray-600">
-  //         //           {error?.message ??
-  //         //             "Something went wrong. Please try again or contact support."}
-  //         //         </p>
-  //         //       </div>
-  //         //     </div>
-  //         //   );
-  //         // }
-
-  //         if (loading) {
-  //           return (
-  //             <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-  //               <div className="text-center">
-  //                 <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-  //                 <p className="text-gray-600">Loading PDF viewer...</p>
-  //               </div>
-  //             </div>
-  //           );
-  //         }
-
-  //         // if (!url) {
-  //         //   return (
-  //         //     <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-  //         //       <div className="text-center">
-  //         //         <p className="text-red-600">Unable to generate PDF preview</p>
-  //         //       </div>
-  //         //     </div>
-  //         //   );
-  //         // }
-
-  //         return (
-  //           <Document
-  //             file={url}
-  //             options={{}}
-  //             className="h-[400px] w-[700px] overflow-auto"
-  //             loading={
-  //               <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-  //                 <div className="text-center">
-  //                   <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-  //                   <p className="text-gray-600">Loading PDF viewer...</p>
-  //                 </div>
-  //               </div>
-  //             }
-  //           >
-  //             <Page
-  //               pageNumber={1}
-  //               error={"Something went wrong"}
-  //               loading={
-  //                 <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-  //                   <div className="text-center">
-  //                     <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-  //                     <p className="text-gray-600">Loading PDF viewer...</p>
-  //                   </div>
-  //                 </div>
-  //               }
-  //               // scale={0.9}
-  //               height={400}
-  //               width={700}
-  //               // scale={1}
-  //               // width={parentRef.current?.clientWidth}
-  //               // height={400}
-  //             />
-  //           </Document>
-  //         );
-  //         // return (
-  //         //   <object
-  //         //     data={url}
-  //         //     type="application/pdf"
-  //         //     width="100%"
-  //         //     height="100%"
-  //         //   />
-  //         // );
-  //       }}
-  //     </BlobProvider>
-  //     // </div>
-  //   );
-  // }
-
   if (isAndroid) {
     return <AndroidPDFViewer invoiceData={invoiceData} />;
   }
+
   // Desktop version
   return (
     <InvoicePDFViewer>
@@ -193,7 +113,7 @@ export function InvoiceClientPage({
               </div>
             </TabsContent>
           </Tabs>
-          <div className="sticky bottom-0 mt-2 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
+          <div className="sticky bottom-0 z-50 mt-2 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
             <CustomTooltip
               trigger={
                 <Button
