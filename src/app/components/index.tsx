@@ -1,28 +1,65 @@
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CustomTooltip } from "@/components/ui/tooltip";
 import { FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
+import type { InvoiceData } from "../schema";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
-import type { InvoiceData } from "../schema";
-import { CustomTooltip } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
+import { useDeviceContext } from "@/contexts/device-context";
+
+const DesktopPDFViewerModuleLoading = () => (
+  <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+    <div className="text-center">
+      <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      <p className="text-gray-600">Loading PDF viewer...</p>
+    </div>
+  </div>
+);
+
+const AndroidPDFViewerModuleLoading = () => (
+  <div className="flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200">
+    <div className="text-center">
+      <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      <p className="text-gray-600">Loading PDF viewer...</p>
+    </div>
+  </div>
+);
 
 const InvoicePDFViewer = dynamic(
   () => import("./invoice-pdf-viewer").then((mod) => mod.InvoicePDFViewer),
 
   {
     ssr: false,
-    loading: () => (
-      <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-          <p className="text-gray-600">Loading PDF viewer...</p>
-        </div>
-      </div>
-    ),
+    loading: () => <DesktopPDFViewerModuleLoading />,
   }
 );
+
+const AndroidPDFViewer = dynamic(
+  () => import("./android-pdf-viewer").then((mod) => mod.AndroidPdfViewer),
+  {
+    ssr: false,
+    loading: () => <AndroidPDFViewerModuleLoading />,
+  }
+);
+
+const PdfViewer = ({ invoiceData }: { invoiceData: InvoiceData }) => {
+  const { isAndroid } = useDeviceContext();
+
+  // we only show the Android PDF viewer on Android devices due to the limitations of the PDF viewer
+  // https://github.com/diegomura/react-pdf/issues/714
+  if (isAndroid) {
+    return <AndroidPDFViewer invoiceData={invoiceData} />;
+  }
+
+  // Desktop version
+  return (
+    <InvoicePDFViewer>
+      <InvoicePdfTemplate invoiceData={invoiceData} />
+    </InvoicePDFViewer>
+  );
+};
 
 const TABS_VALUES = ["invoice-form", "invoice-preview"] as const;
 
@@ -68,14 +105,12 @@ export function InvoiceClientPage({
               </div>
             </TabsContent>
             <TabsContent value={TAB_INVOICE_PREVIEW} className="mt-1">
-              <div className="h-[480px] w-full">
-                <InvoicePDFViewer>
-                  <InvoicePdfTemplate invoiceData={invoiceDataState} />
-                </InvoicePDFViewer>
+              <div className="flex h-[480px] w-full items-center justify-center">
+                <PdfViewer invoiceData={invoiceDataState} />
               </div>
             </TabsContent>
           </Tabs>
-          <div className="sticky bottom-0 mt-2 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
+          <div className="sticky bottom-0 z-50 mt-2 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
             <CustomTooltip
               trigger={
                 <Button
@@ -103,9 +138,7 @@ export function InvoiceClientPage({
             </div>
           </div>
           <div className="col-span-8 h-[620px] w-full max-w-full 2xl:h-[700px]">
-            <InvoicePDFViewer>
-              <InvoicePdfTemplate invoiceData={invoiceDataState} />
-            </InvoicePDFViewer>
+            <PdfViewer invoiceData={invoiceDataState} />
           </div>
         </>
       )}

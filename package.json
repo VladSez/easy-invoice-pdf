@@ -67,6 +67,7 @@
     "react-dom": "18.3.1",
     "react-hook-form": "7.53.1",
     "react-intersection-observer": "9.16.0",
+    "react-pdf": "9.2.1",
     "resend": "4.2.0",
     "sonner": "1.7.4",
     "tailwind-merge": "2.6.0",

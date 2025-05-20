@@ -133,12 +133,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { isDesktop: isDesktopServer } = await checkDeviceUserAgent();
+  const { isDesktop: isDesktopServer, isAndroid } =
+    await checkDeviceUserAgent();
 
   return (
     <html lang="en">
       <body>
-        <DeviceContextProvider isDesktop={isDesktopServer}>
+        <DeviceContextProvider
+          isDesktop={isDesktopServer}
+          isAndroid={isAndroid}
+        >
           <NextIntlClientProvider>
             {/* React-scan is a tool for detecting and fixing issues with React
             components https://github.com/aidenybai/react-scan#readme Uncomment
