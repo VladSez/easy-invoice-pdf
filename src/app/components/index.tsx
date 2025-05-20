@@ -77,13 +77,10 @@ export function InvoiceClientPage({
   handleShareInvoice: () => void;
   isMobile: boolean;
 }) {
-  const { isAndroid } = useDeviceContext();
-
   return (
     <>
       {isMobile ? (
         <div>
-          {JSON.stringify({ isAndroid })}
           <Tabs defaultValue={TAB_INVOICE_FORM} className="w-full">
             <TabsList className="w-full">
               <TabsTrigger value={TAB_INVOICE_FORM} className="flex-1">
