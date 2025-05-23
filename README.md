@@ -4,7 +4,7 @@
 
 If you found this project helpful, you can support my work here: [Buy Me a Coffee](https://buymeacoffee.com/vladsazon). Every contribution is greatly appreciated!
 
-![easy-invoice-demo-gif](https://github.com/user-attachments/assets/04d0a471-4932-4217-a2e3-b6619db57389)
+![easy-invoice-hero](https://github.com/user-attachments/assets/ad4baaae-4bf2-44a2-9bd6-389b7fe3f748)
 
 ## Features
 
