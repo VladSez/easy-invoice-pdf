@@ -1,6 +1,7 @@
 import { DeviceContextProvider } from "@/contexts/device-context";
 import { checkDeviceUserAgent } from "@/lib/check-device.server";
 import { NextIntlClientProvider } from "next-intl";
+import { DevToolbar } from "@/components/dev/stagewise-toolbar";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
@@ -12,6 +13,7 @@ import { Toaster } from "sonner";
 import { APP_URL, STATIC_ASSETS_URL } from "@/config";
 
 import "./globals.css";
+import { ReactScan } from "@/components/dev/react-scan";
 
 export const viewport: Viewport = {
   initialScale: 1, // Sets the default zoom level to 1 (100%)
@@ -138,6 +140,8 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      {/* Performance monitoring */}
+      <ReactScan />
       <body>
         <DeviceContextProvider
           isDesktop={isDesktopServer}
@@ -157,6 +161,9 @@ export default async function RootLayout({
             )} */}
 
             {children}
+
+            {/* Stagewise toolbar for development */}
+            <DevToolbar />
 
             {/* https://sonner.emilkowal.ski/ */}
             <Toaster visibleToasts={1} richColors closeButton />

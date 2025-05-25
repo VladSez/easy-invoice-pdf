@@ -2,7 +2,7 @@
 
 [EasyInvoicePDF](https://easyinvoicepdf.com) – Free & Open-Source Invoice Generator | Live Preview, No Sign-Up, Runs in Your Browser.
 
-If you found this project helpful, you can support my work here: [Buy Me a Coffee](https://buymeacoffee.com/vladsazon). Every contribution is greatly appreciated!
+❤️ Love EasyInvoicePDF? Help keep it free and open-source! [Buy me a coffee](https://buymeacoffee.com/vladsazon) to support new features, better templates, and continued maintenance. Even a small contribution makes a big difference. Thank you for being part of this journey! ✨
 
 ![easy-invoice-hero](https://github.com/user-attachments/assets/ad4baaae-4bf2-44a2-9bd6-389b7fe3f748)
 
@@ -15,11 +15,13 @@ If you found this project helpful, you can support my work here: [Buy Me a Coffe
 - **Multiple Languages & Currencies**: Create invoices in multiple languages with support for all major currencies and automatic formatting.
 - **European VAT Support**: Automatically calculate European VAT rates and totals for your invoices.
 
-## Demo
+## Demo Video 🎥
+
+Watch a quick demo of EasyInvoicePDF in action to see how easy it is to create professional invoices in seconds. The video demonstrates key features like live preview, instant PDF download, and customization options.
 
 https://github.com/user-attachments/assets/9e3194e0-3072-4c95-ae99-e66db1301dc6
 
-## Technologies we use
+## Tech Stack
 
 - [React](https://react.dev/)
 - [TypeScript](https://www.typescriptlang.org/)
@@ -29,7 +31,7 @@ https://github.com/user-attachments/assets/9e3194e0-3072-4c95-ae99-e66db1301dc6
 - [Origin UI](https://originui.com/)
 - [@react-pdf/renderer](https://github.com/diegomura/react-pdf)
 
-## other tools we use
+## Other Tools & Services
 
 - Generate beautiful OG images: https://og.new
 - Analytics: https://umami.is/

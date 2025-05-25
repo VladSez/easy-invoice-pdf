@@ -170,7 +170,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const emailLink = `https://outlook.office.com/mail/deeplink/compose?to=${env.INVOICE_EMAIL_COMPANY_TO}&subject=Invoice%20for%20${monthAndYear}&body=Hello%2C%0A%0AInvoice%20for%20${monthAndYear}%20in%20attachments%0A%0AHave%20a%20nice%20day`;
+    const companyEmailLink = `https://outlook.office.com/mail/deeplink/compose?to=${env.INVOICE_EMAIL_COMPANY_TO}&subject=Invoice%20for%20${monthAndYear}&body=Hello%2C%0A%0AInvoice%20for%20${monthAndYear}%20in%20attachments%0A%0AHave%20a%20nice%20day`;
 
     // we only need the value of the invoice number e.g. 1/05.2025
     const invoiceNumberValue =
@@ -178,12 +178,38 @@ export async function GET(req: NextRequest) {
 
     // *___________SEND NOTIFICATIONS___________*
 
-    // Send email with PDF attachment
-    const emailResponse = await resend.emails.send({
-      from: "Vlad from EasyInvoicePDF.com <vlad@updates.easyinvoicepdf.com>",
-      to: env.INVOICE_EMAIL_RECIPIENT,
-      subject: `📝 Invoices for ${monthAndYear}`,
-      html: `<p>Hello,</p>
+    // Send notifications in parallel
+    const notificationResults = await Promise.allSettled([
+      // Send Telegram notification with PDFs
+      sendTelegramMessage({
+        message: `📝 *Invoices for ${monthAndYear}*
+
+Invoice No. of: *${invoiceNumberValue}*
+Date: *${dayjs().format("MMMM D, YYYY")}*
+
+The generated invoices are included in the attachments. Please check them carefully.
+
+[View invoice online](${invoiceUrl})
+[View in Google Drive](${folderToUploadInvoices.webViewLink}) path: *${googleDriveFolderPath}*
+
+*Don't forget to* [send email to company](${companyEmailLink})
+
+Have a nice day!
+
+Best regards,
+EasyInvoicePDF.com`,
+        files: ATTACHMENTS.map((attachment) => ({
+          filename: attachment.filename,
+          buffer: Buffer.from(attachment.content),
+        })),
+      }),
+
+      // Send email with PDF attachment
+      resend.emails.send({
+        from: "Vlad from EasyInvoicePDF.com <vlad@updates.easyinvoicepdf.com>",
+        to: env.INVOICE_EMAIL_RECIPIENT,
+        subject: `📝 Invoices for ${monthAndYear}`,
+        html: `<p>Hello,</p>
     <span>Invoice No. of: <b>${invoiceNumberValue}</b><br/>
     Date: <b>${dayjs().format("MMMM D, YYYY")}</b>
     <br/>
@@ -198,42 +224,25 @@ export async function GET(req: NextRequest) {
     <br/>
     <br/>
 
-    <b>Don't forget to</b> <a href="${emailLink}"><b>send email to company</b></a>
+    <b>Don't forget to</b> <a href="${companyEmailLink}"><b>send email to company</b></a>
     <br/>
     <br/>
 
     Have a nice day!<br/><br/>
     Best regards,<br/>EasyInvoicePDF.com</span>`,
-      attachments: ATTACHMENTS,
-    });
+        attachments: ATTACHMENTS,
+      }),
+    ]);
 
-    if (emailResponse.error) {
-      throw new Error(`Failed to send email: ${emailResponse.error.message}`);
+    const failedNotifications = notificationResults.filter(
+      (result): result is PromiseRejectedResult => result.status === "rejected"
+    );
+
+    if (failedNotifications.length > 0) {
+      console.error("Some notifications failed to send:", failedNotifications);
+
+      throw new Error("Failed to send some notifications");
     }
-
-    // Send Telegram notification with PDFs
-    await sendTelegramMessage({
-      message: `📝 *Invoices for ${monthAndYear}*
-
-Invoice No. of: *${invoiceNumberValue}*
-Date: *${dayjs().format("MMMM D, YYYY")}*
-
-The generated invoices are included in the attachments. Please check them carefully.
-
-[View invoice online](${invoiceUrl})
-[View in Google Drive](${folderToUploadInvoices.webViewLink}) path: *${googleDriveFolderPath}*
-
-*Don't forget to* [send email to company](${emailLink})
-
-Have a nice day!
-
-Best regards,
-EasyInvoicePDF.com`,
-      files: ATTACHMENTS.map((attachment) => ({
-        filename: attachment.filename,
-        buffer: Buffer.from(attachment.content),
-      })),
-    });
 
     return NextResponse.json(
       { message: "Invoice sent successfully" },

@@ -17,7 +17,7 @@ const config: KnipConfig = {
   ],
   ignore: [
     "lint-staged.config.js",
-    "src/app/components/invoice-pdf-download-multiple-languages.tsx",
+    "src/app/**/invoice-pdf-download-multiple-languages.tsx",
     "src/components/ui/**/*.tsx",
     "global.ts",
     "i18n-messages/**/*",
