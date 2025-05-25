@@ -14,6 +14,8 @@ const config: KnipConfig = {
     "eslint-config-next",
     "@ianvs/prettier-plugin-sort-imports",
     "react-email",
+    "react-scan",
+    "@stagewise/toolbar-next",
   ],
   ignore: [
     "lint-staged.config.js",
@@ -23,6 +25,7 @@ const config: KnipConfig = {
     "i18n-messages/**/*",
     "src/i18n/**/*",
     "src/app/schema/**/*",
+    "src/**/dev/**/*",
   ],
   includeEntryExports: true,
   // ignore tags
