@@ -140,8 +140,8 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      {/* Performance monitoring */}
-      <ReactScan />
+      {/* Performance monitoring only in development */}
+      {process.env.NODE_ENV !== "development" ? null : <ReactScan />}
       <body>
         <DeviceContextProvider
           isDesktop={isDesktopServer}
