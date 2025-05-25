@@ -1,6 +1,6 @@
 import { BlobProvider } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { Document, Page, pdfjs } from "react-pdf";
-import type { InvoiceData } from "../schema";
+import type { InvoiceData } from "@/app/schema";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
@@ -9,6 +9,11 @@ import "react-pdf/dist/esm/Page/TextLayer.css";
 // https://github.com/wojtekmaj/react-pdf/issues/1822#issuecomment-2233334169
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
+/**
+ * Android PDF viewer.
+ * We only show the Android PDF viewer on Android devices due to the limitations of the PDF viewer
+ * https://github.com/diegomura/react-pdf/issues/714
+ */
 export const AndroidPdfViewer = ({
   invoiceData,
 }: {

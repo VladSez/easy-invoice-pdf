@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
-import type { InvoiceData } from "../schema";
+import type { InvoiceData } from "@/app/schema";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";

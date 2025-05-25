@@ -1,9 +1,9 @@
-import { InvoiceHeader } from "@/app/components/invoice-pdf-template/invoice-header";
-import { InvoiceItemsTable } from "@/app/components/invoice-pdf-template/invoice-items-table";
-import { InvoicePaymentInfo } from "@/app/components/invoice-pdf-template/invoice-payment-info";
-import { InvoicePaymentTotals } from "@/app/components/invoice-pdf-template/invoice-payment-totals";
-import { InvoiceSellerBuyerInfo } from "@/app/components/invoice-pdf-template/invoice-seller-buyer-info";
-import { InvoiceVATSummaryTable } from "@/app/components/invoice-pdf-template/invoice-vat-summary-table";
+import { InvoiceHeader } from "@/app/(app)/components/invoice-pdf-template/invoice-header";
+import { InvoiceItemsTable } from "@/app/(app)/components/invoice-pdf-template/invoice-items-table";
+import { InvoicePaymentInfo } from "@/app/(app)/components/invoice-pdf-template/invoice-payment-info";
+import { InvoicePaymentTotals } from "@/app/(app)/components/invoice-pdf-template/invoice-payment-totals";
+import { InvoiceSellerBuyerInfo } from "@/app/(app)/components/invoice-pdf-template/invoice-seller-buyer-info";
+import { InvoiceVATSummaryTable } from "@/app/(app)/components/invoice-pdf-template/invoice-vat-summary-table";
 import {
   INVOICE_DEFAULT_NUMBER_VALUE,
   LAST_DAY_OF_MONTH,
