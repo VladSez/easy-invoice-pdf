@@ -1,7 +1,5 @@
 "use client";
 
-import { InvoiceClientPage } from "@/app/components";
-import { InvoicePDFDownloadLink } from "@/app/components/invoice-pdf-download-link";
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import {
   invoiceSchema,
@@ -38,6 +36,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { VIDEO_DEMO_URL } from "@/config";
+import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
+import { InvoiceClientPage } from "./components";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 /**
@@ -436,7 +436,7 @@ function ProjectInfo() {
 
       <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
         <DialogContent className="max-h-[calc(100vh-2rem)] gap-0 overflow-hidden p-0 sm:max-w-[800px]">
-          <DialogHeader className="p-6 pb-3">
+          <DialogHeader className="p-6 pb-4">
             <DialogTitle>How EasyInvoicePDF Works</DialogTitle>
             <DialogDescription>
               Watch this quick demo to learn how to create and customize your

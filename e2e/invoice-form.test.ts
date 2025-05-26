@@ -83,7 +83,10 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     // Check that video is displayed in dialog
-    const video = page.getByTestId("how-it-works-video");
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+
+    const video = dialog.getByTestId("how-it-works-video");
 
     await expect(video).toBeVisible();
 
@@ -92,12 +95,11 @@ test.describe("Invoice Generator Page", () => {
     await expect(video).toHaveAttribute("controls", "");
     await expect(video).toHaveAttribute("playsInline", "");
 
-    await expect(page.getByRole("button", { name: "Close" })).toBeVisible();
-
-    await page.getByRole("button", { name: "Close" }).click();
+    await dialog.getByRole("button", { name: "Close" }).click();
+    await expect(dialog).toBeHidden();
 
     await expect(
-      page.getByRole("heading", { name: "How EasyInvoicePDF Works" })
+      dialog.getByRole("heading", { name: "How EasyInvoicePDF Works" })
     ).toBeHidden();
 
     await expect(

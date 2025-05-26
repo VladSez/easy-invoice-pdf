@@ -10,7 +10,7 @@ import {
   SUPPORTED_LANGUAGES,
   type InvoiceData,
   type SupportedLanguages,
-} from "../schema";
+} from "@/app/schema";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 
 import { MultiSelect } from "@/components/ui/multi-select";

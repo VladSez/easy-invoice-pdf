@@ -54,7 +54,7 @@ jobs:
         run: |
           start_time=$(date +%s)
 
-          pnpm exec playwright test
+          pnpm exec playwright test --reporter=list
 
           end_time=$(date +%s)
           duration=$((end_time - start_time))
