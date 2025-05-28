@@ -53,7 +53,7 @@ const PdfViewer = ({ invoiceData }: { invoiceData: InvoiceData }) => {
     return <AndroidPDFViewer invoiceData={invoiceData} />;
   }
 
-  // Desktop version
+  // Normal version
   return (
     <InvoicePDFViewer>
       <InvoicePdfTemplate invoiceData={invoiceData} />
