@@ -167,6 +167,7 @@ export async function createOrFindInvoiceFolder({
     // if the month folder already exists, use it
     monthFolder = monthFolderResponse.data.files[0] as GoogleDriveFile;
 
+    // eslint-disable-next-line no-console
     console.log(
       "\n\n________month folder already exists, using it: ",
       monthFolder,
@@ -209,6 +210,7 @@ export async function createOrFindInvoiceFolder({
 
   const googleDriveFolderPath = `/${yearFolder.name}/${monthFolder.name}/${folderToUploadInvoices.name}`;
 
+  // eslint-disable-next-line no-console
   console.log(
     "\n\n________invoice to upload Google Drive folder path: ",
     googleDriveFolderPath,

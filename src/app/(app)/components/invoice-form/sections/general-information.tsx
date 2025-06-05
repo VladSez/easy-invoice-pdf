@@ -9,6 +9,8 @@ import {
   CURRENCY_SYMBOLS,
   CURRENCY_TO_LABEL,
   LANGUAGE_TO_LABEL,
+  SUPPORTED_TEMPLATES,
+  TEMPLATE_TO_LABEL,
   type InvoiceData,
 } from "@/app/schema";
 import {
@@ -27,7 +29,7 @@ import { CustomTooltip } from "@/components/ui/tooltip";
 import { TRANSLATIONS } from "@/app/schema/translations";
 import dayjs from "dayjs";
 import { AlertTriangle } from "lucide-react";
-import { memo } from "react";
+import { memo, useEffect } from "react";
 
 const AlertIcon = () => {
   return <AlertTriangle className="mr-1 inline-block h-3 w-3 text-amber-500" />;
@@ -64,6 +66,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
   const dateOfService = useWatch({ control, name: "dateOfService" });
   const language = useWatch({ control, name: "language" });
+  const template = useWatch({ control, name: "template" });
 
   const t = TRANSLATIONS[language];
   const defaultInvoiceNumber = `${t.invoiceNumber}:`;
@@ -86,8 +89,46 @@ export const GeneralInformation = memo(function GeneralInformation({
   const isInvoiceNumberInCurrentMonth =
     extractInvoiceMonthAndYear === CURRENT_MONTH_AND_YEAR;
 
+  // Clear Stripe Pay Online URL when template is not Stripe and there is an error for better user experience
+  useEffect(() => {
+    if (template !== "stripe" && errors.stripePayOnlineUrl) {
+      setValue("stripePayOnlineUrl", "");
+    }
+  }, [template, setValue, errors.stripePayOnlineUrl]);
+
   return (
     <div className="space-y-4">
+      {/* Invoice Template Selection */}
+      <div>
+        <Label htmlFor={`template`} className="mb-1">
+          Invoice Template
+        </Label>
+        <Controller
+          name="template"
+          control={control}
+          render={({ field }) => (
+            <SelectNative {...field} id={`template`} className="block">
+              {SUPPORTED_TEMPLATES.map((template) => {
+                const templateLabel = TEMPLATE_TO_LABEL[template];
+
+                return (
+                  <option key={template} value={template}>
+                    {templateLabel}
+                  </option>
+                );
+              })}
+            </SelectNative>
+          )}
+        />
+        {errors.template ? (
+          <ErrorMessage>{errors.template.message}</ErrorMessage>
+        ) : (
+          <InputHelperMessage>
+            Select the design template for your invoice
+          </InputHelperMessage>
+        )}
+      </div>
+
       {/* Language PDF Select */}
       <div>
         <Label htmlFor={`language`} className="mb-1">
@@ -215,6 +256,36 @@ export const GeneralInformation = memo(function GeneralInformation({
           </InputHelperMessage>
         )}
       </div>
+
+      {/* Pay Online URL - Only for Stripe template */}
+      {template === "stripe" && (
+        <div className="duration-300 animate-in fade-in slide-in-from-bottom-2">
+          <Label htmlFor={`stripePayOnlineUrl`} className="">
+            Stripe Payment Link URL
+          </Label>
+
+          <Controller
+            name="stripePayOnlineUrl"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                id={`stripePayOnlineUrl`}
+                type="url"
+                className="mt-1"
+              />
+            )}
+          />
+          {errors.stripePayOnlineUrl ? (
+            <ErrorMessage>{errors.stripePayOnlineUrl.message}</ErrorMessage>
+          ) : (
+            <InputHelperMessage>
+              Enter your Stripe payment URL. This adds a &quot;Pay Online&quot;
+              button to the PDF invoice for secure Stripe payments.
+            </InputHelperMessage>
+          )}
+        </div>
+      )}
 
       {/* Invoice Number */}
       <div>

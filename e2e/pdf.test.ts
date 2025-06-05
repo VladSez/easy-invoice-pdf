@@ -542,15 +542,13 @@ Reste à payer: 184.50 GBP
 Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
 
     // Verify toast appears after download
+    await expect(page.getByTestId("download-pdf-toast")).toBeVisible();
+
     await expect(
-      page.getByText("❤️ Enjoying EasyInvoicePDF? Help Keep It Free!")
+      page.getByRole("link", { name: "Star on GitHub" })
     ).toBeVisible();
-    await expect(
-      page.getByText(
-        "This tool is free and ad-free thanks to user support. If it’s helped you, consider a small donation to keep it running and growing. Every bit counts—thank you!"
-      )
-    ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Donate" })).toBeVisible();
+
+    await expect(page.getByRole("link", { name: "Donate $5" })).toBeVisible();
 
     // Switch back to form tab
     await page.getByRole("tab", { name: "Edit Invoice" }).click();

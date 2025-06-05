@@ -4,6 +4,7 @@ import { BlobProvider } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { Document, Page, pdfjs } from "react-pdf";
 import type { InvoiceData } from "@/app/schema";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
+import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
 import { toast } from "sonner";
 import * as Sentry from "@sentry/nextjs";
 import { useMemo } from "react";
@@ -24,7 +25,13 @@ export const AndroidPdfViewer = ({
   invoiceData: InvoiceData;
 }) => {
   const memoizedInvoicePdfTemplate = useMemo(() => {
-    return <InvoicePdfTemplate invoiceData={invoiceData} />;
+    switch (invoiceData.template) {
+      case "stripe":
+        return <StripeInvoicePdfTemplate invoiceData={invoiceData} />;
+      case "default":
+      default:
+        return <InvoicePdfTemplate invoiceData={invoiceData} />;
+    }
   }, [invoiceData]);
 
   // On mobile, we need to use the BlobProvider to generate a PDF preview

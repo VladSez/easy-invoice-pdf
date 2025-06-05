@@ -92,6 +92,7 @@
     "eslint": "9.26.0",
     "eslint-config-next": "15.2.3",
     "eslint-plugin-playwright": "2.2.0",
+    "eslint-plugin-react-you-might-not-need-an-effect": "0.0.39",
     "husky": "9.1.7",
     "knip": "5.55.1",
     "lint-staged": "15.5.0",

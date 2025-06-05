@@ -7,6 +7,7 @@ import type { InvoiceData } from "@/app/schema";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
+import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
 import { useDeviceContext } from "@/contexts/device-context";
 
 const DesktopPDFViewerModuleLoading = () => (
@@ -44,8 +45,25 @@ const AndroidPDFViewer = dynamic(
   }
 );
 
-const PdfViewer = ({ invoiceData }: { invoiceData: InvoiceData }) => {
+const PdfViewer = ({
+  invoiceData,
+  errorWhileGeneratingPdfIsShown,
+}: {
+  invoiceData: InvoiceData;
+  errorWhileGeneratingPdfIsShown: boolean;
+}) => {
   const { isAndroid } = useDeviceContext();
+
+  // Render the appropriate template based on the selected template
+  const renderTemplate = () => {
+    switch (invoiceData.template) {
+      case "stripe":
+        return <StripeInvoicePdfTemplate invoiceData={invoiceData} />;
+      case "default":
+      default:
+        return <InvoicePdfTemplate invoiceData={invoiceData} />;
+    }
+  };
 
   // we only show the Android PDF viewer on Android devices due to the limitations of the PDF viewer
   // https://github.com/diegomura/react-pdf/issues/714
@@ -53,10 +71,14 @@ const PdfViewer = ({ invoiceData }: { invoiceData: InvoiceData }) => {
     return <AndroidPDFViewer invoiceData={invoiceData} />;
   }
 
+  const template = renderTemplate();
+
   // Normal version
   return (
-    <InvoicePDFViewer>
-      <InvoicePdfTemplate invoiceData={invoiceData} />
+    <InvoicePDFViewer
+      errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
+    >
+      {template}
     </InvoicePDFViewer>
   );
 };
@@ -71,11 +93,15 @@ export function InvoiceClientPage({
   handleInvoiceDataChange,
   handleShareInvoice,
   isMobile,
+  errorWhileGeneratingPdfIsShown,
+  setErrorWhileGeneratingPdfIsShown,
 }: {
   invoiceDataState: InvoiceData;
   handleInvoiceDataChange: (invoiceData: InvoiceData) => void;
   handleShareInvoice: () => void;
   isMobile: boolean;
+  errorWhileGeneratingPdfIsShown: boolean;
+  setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
 }) {
   return (
     <>
@@ -106,7 +132,12 @@ export function InvoiceClientPage({
             </TabsContent>
             <TabsContent value={TAB_INVOICE_PREVIEW} className="mt-1">
               <div className="flex h-[480px] w-full items-center justify-center">
-                <PdfViewer invoiceData={invoiceDataState} />
+                <PdfViewer
+                  invoiceData={invoiceDataState}
+                  errorWhileGeneratingPdfIsShown={
+                    errorWhileGeneratingPdfIsShown
+                  }
+                />
               </div>
             </TabsContent>
           </Tabs>
@@ -123,7 +154,13 @@ export function InvoiceClientPage({
               }
               content="Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
             />
-            <InvoicePDFDownloadLink invoiceData={invoiceDataState} />
+            <InvoicePDFDownloadLink
+              invoiceData={invoiceDataState}
+              errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
+              setErrorWhileGeneratingPdfIsShown={
+                setErrorWhileGeneratingPdfIsShown
+              }
+            />
           </div>
         </div>
       ) : (
@@ -138,7 +175,10 @@ export function InvoiceClientPage({
             </div>
           </div>
           <div className="col-span-8 h-[620px] w-full max-w-full 2xl:h-[700px]">
-            <PdfViewer invoiceData={invoiceDataState} />
+            <PdfViewer
+              invoiceData={invoiceDataState}
+              errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
+            />
           </div>
         </>
       )}

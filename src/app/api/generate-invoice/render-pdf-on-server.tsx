@@ -396,6 +396,8 @@ export const ENGLISH_INVOICE_REAL_DATA = {
   notesFieldIsVisible: true,
   personAuthorizedToReceiveFieldIsVisible: true,
   personAuthorizedToIssueFieldIsVisible: true,
+
+  template: "default",
 } as const satisfies InvoiceData;
 
 export const POLISH_INVOICE_REAL_DATA = {

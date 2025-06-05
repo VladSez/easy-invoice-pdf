@@ -38,6 +38,8 @@ import { z } from "zod";
 import { VIDEO_DEMO_URL } from "@/config";
 import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
 import { InvoiceClientPage } from "./components";
+import { customDefaultToast } from "./components/cta-toasts";
+import { customPremiumToast } from "./components/cta-toasts";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 /**
@@ -106,6 +108,9 @@ export function AppPageClient() {
   const [invoiceDataState, setInvoiceDataState] = useState<InvoiceData | null>(
     null
   );
+
+  const [errorWhileGeneratingPdfIsShown, setErrorWhileGeneratingPdfIsShown] =
+    useState(false);
 
   // Scroll to top on mount
   useEffect(() => {
@@ -264,6 +269,38 @@ export function AppPageClient() {
     }
   }, [invoiceDataState, router, searchParams]);
 
+  // Show CTA toast every minute
+  useEffect(() => {
+    // only show on production
+    if (process.env.NODE_ENV !== "production") {
+      return;
+    }
+
+    const showCTAToast = () => {
+      // Randomly show either default or premium donation toast
+      if (Math.random() <= 0.5) {
+        customPremiumToast({
+          title: "Support Our Work",
+          description:
+            "Your contribution helps us maintain and improve this project for everyone! 🚀",
+        });
+      } else {
+        customDefaultToast({
+          title: "Love this project?",
+          description:
+            "Help us keep building amazing tools! Your support means the world to us. ✨",
+        });
+      }
+    };
+
+    // Show cta toast after 1 minute
+    const initialTimer = setTimeout(showCTAToast, 60_000);
+
+    return () => {
+      clearTimeout(initialTimer);
+    };
+  }, []);
+
   const handleInvoiceDataChange = (updatedData: InvoiceData) => {
     setInvoiceDataState(updatedData);
   };
@@ -363,7 +400,15 @@ export function AppPageClient() {
                       }
                       content="Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
                     />
-                    <InvoicePDFDownloadLink invoiceData={invoiceDataState} />
+                    <InvoicePDFDownloadLink
+                      invoiceData={invoiceDataState}
+                      errorWhileGeneratingPdfIsShown={
+                        errorWhileGeneratingPdfIsShown
+                      }
+                      setErrorWhileGeneratingPdfIsShown={
+                        setErrorWhileGeneratingPdfIsShown
+                      }
+                    />
                   </>
                 ) : null}
 
@@ -385,6 +430,10 @@ export function AppPageClient() {
               handleInvoiceDataChange={handleInvoiceDataChange}
               handleShareInvoice={handleShareInvoice}
               isMobile={isMobile}
+              errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
+              setErrorWhileGeneratingPdfIsShown={
+                setErrorWhileGeneratingPdfIsShown
+              }
             />
           </div>
         </div>
@@ -478,9 +527,9 @@ function Footer() {
                 </a>
               </p>
             </div>
-            <p className="text-sm text-slate-500">
-              A free, open-source tool for creating professional PDF invoices
-              with real-time preview.
+            <p className="text-sm text-slate-700">
+              A free, open-source tool for creating professional invoices with
+              real-time preview.
             </p>
             <div className="flex gap-4">
               <Link

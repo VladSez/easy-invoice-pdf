@@ -139,21 +139,6 @@ function HeroSection() {
               </span>
               <span>{t("hero.noSignup")}</span>
             </div>
-            {/* Badge for featured on Startup Fame */}
-            <div className="mx-auto sm:mx-0">
-              <a
-                href="https://startupfa.me/s/easyinvoicepdf?utm_source=easyinvoicepdf.com"
-                target="_blank"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="https://startupfa.me/badges/featured-badge-small.webp"
-                  alt="Featured on Startup Fame"
-                  width="224"
-                  height="36"
-                />
-              </a>
-            </div>
           </div>
 
           <div className="relative mx-auto w-full max-w-[600px] lg:mx-0">
@@ -405,10 +390,10 @@ function CtaSection() {
           </div>
           <div className="flex w-full flex-col items-center justify-center gap-6">
             <div className="flex w-full flex-col justify-center gap-2 md:flex-row">
-              <GoToAppButton className="border-slate-600 bg-white text-slate-950 hover:bg-white/90" />
+              <GoToAppButton className="border-slate-600 bg-white px-10 py-6 text-lg text-slate-950 hover:bg-white/90" />
               <Button
                 _size="lg"
-                className="bg-slate-700 px-8 text-white hover:bg-slate-700/90"
+                className="group border border-slate-700 bg-slate-700 px-10 py-6 text-lg text-white transition-all duration-300 hover:bg-slate-600/80"
                 asChild
               >
                 <Link
@@ -416,8 +401,8 @@ function CtaSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <GithubIcon className="mr-2 h-5 w-5 fill-white" />
-                  {t("buttons.viewOnGithub")}
+                  <GithubIcon className="mr-2 h-6 w-6 transition-transform duration-300 group-hover:scale-110 group-hover:fill-slate-100" />
+                  {t("buttons.starOnGithub")}
                 </Link>
               </Button>
             </div>
@@ -444,13 +429,24 @@ function Footer() {
   return (
     <footer
       id="footer"
-      className="flex w-full items-center justify-center border-t border-slate-200 bg-white py-12 md:py-16 lg:py-20"
+      className="w-full border-t border-slate-200 bg-white py-12 md:py-16"
     >
-      <div className="container px-4 md:px-6">
+      <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col gap-10 md:flex-row">
           <div className="space-y-4 md:w-1/3">
-            <Logo />
-            <p className="text-sm text-slate-500">{t("footer.description")}</p>
+            <div className="flex items-center">
+              <ProjectLogo className="h-8 w-8" />
+              <p className="text-balance text-center text-xl font-bold text-slate-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
+                <a
+                  href="https://easyinvoicepdf.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  EasyInvoicePDF.com
+                </a>
+              </p>
+            </div>
+            <p className="text-sm text-slate-700">{t("footer.description")}</p>
             <div
               className="flex gap-4"
               data-testid="about-page-footer-social-links"
@@ -549,6 +545,23 @@ function Footer() {
             </div>
           </div>
         </div>
+
+        {/* Badge for featured on Startup Fame */}
+        <div className="my-5 md:mt-0">
+          <a
+            href="https://startupfa.me/s/easyinvoicepdf?utm_source=easyinvoicepdf.com"
+            target="_blank"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://startupfa.me/badges/featured-badge-small.webp"
+              alt="Featured on Startup Fame"
+              width="224"
+              height="36"
+            />
+          </a>
+        </div>
+
         <div className="my-5 max-w-lg space-y-2">
           <p className="text-sm font-medium text-slate-900">
             {tNewsletter("title")}

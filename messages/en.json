@@ -56,6 +56,7 @@
     "buttons": {
       "goToApp": "Go to app",
       "viewOnGithub": "View on GitHub",
+      "starOnGithub": "Star on GitHub",
       "switchLanguage": "Switch language",
       "shareFeedback": "Share feedback",
       "app": "App"
