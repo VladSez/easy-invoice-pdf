@@ -20,12 +20,16 @@ export async function sendTelegramMessage({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
         },
         body: JSON.stringify({
           chat_id: env.TELEGRAM_CHAT_ID,
           text: message,
           parse_mode: "Markdown",
         }),
+        cache: "no-store",
       }
     );
 
@@ -46,7 +50,13 @@ export async function sendTelegramMessage({
           `https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendDocument`,
           {
             method: "POST",
+            headers: {
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
+              Expires: "0",
+            },
             body: formData,
+            cache: "no-store",
           }
         );
 

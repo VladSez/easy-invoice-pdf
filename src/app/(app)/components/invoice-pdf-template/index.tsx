@@ -1,27 +1,24 @@
 "use client";
 
-import { CURRENCY_SYMBOLS, type InvoiceData } from "@/app/schema";
+import { type InvoiceData } from "@/app/schema";
+import { TRANSLATIONS } from "@/app/schema/translations";
+import { STATIC_ASSETS_URL } from "@/config";
 import {
   Document,
   Font,
-  Link,
   Page,
   StyleSheet,
   Text,
   View,
 } from "@react-pdf/renderer/lib/react-pdf.browser";
+import { memo } from "react";
+import { InvoiceFooter } from "./invoice-footer";
 import { InvoiceHeader } from "./invoice-header";
-import { InvoiceSellerBuyerInfo } from "./invoice-seller-buyer-info";
 import { InvoiceItemsTable } from "./invoice-items-table";
 import { InvoicePaymentInfo } from "./invoice-payment-info";
-import { InvoiceVATSummaryTable } from "./invoice-vat-summary-table";
 import { InvoicePaymentTotals } from "./invoice-payment-totals";
-import { TRANSLATIONS } from "@/app/schema/translations";
-import { STATIC_ASSETS_URL } from "@/config";
-import { memo } from "react";
-import dayjs from "dayjs";
-
-export const PROD_WEBSITE_URL = "https://dub.sh/easy-invoice";
+import { InvoiceSellerBuyerInfo } from "./invoice-seller-buyer-info";
+import { InvoiceVATSummaryTable } from "./invoice-vat-summary-table";
 
 // Open sans seems to be working fine with EN and PL
 const fontFamily = "Open Sans";
@@ -217,12 +214,6 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
 
   const vatTableSummaryIsVisible = invoiceData.vatTableSummaryIsVisible;
 
-  const currencySymbol = CURRENCY_SYMBOLS[invoiceData.currency];
-
-  const dateOfService = dayjs(invoiceData.dateOfService).format(
-    invoiceData.dateFormat
-  );
-
   return (
     <Document title={invoiceDocTitle}>
       <Page size="A4" style={styles.page}>
@@ -294,35 +285,11 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
         )}
 
         {/* Footer  */}
-        <View style={styles.footer} fixed>
-          <View style={styles.spaceBetween}>
-            <View style={[styles.row, { gap: 3 }]}>
-              <Text style={[styles.fontSize8]}>{invoiceNumberValue}</Text>
-              <Text style={[styles.fontSize8]}>·</Text>
-              <Text style={[styles.fontSize8]}>
-                {currencySymbol}
-                {formattedInvoiceTotal} {invoiceData.currency} {t.stripe.due}{" "}
-                {dateOfService}
-              </Text>
-              <Text style={[styles.fontSize8]}>·</Text>
-              <Text style={[styles.fontSize8]}>
-                {t.createdWith}{" "}
-                <Link
-                  style={[styles.fontSize8, { color: "blue" }]}
-                  src={PROD_WEBSITE_URL}
-                >
-                  https://easyinvoicepdf.com
-                </Link>
-              </Text>
-            </View>
-            <Text
-              style={[styles.fontSize8]}
-              render={({ pageNumber, totalPages }) =>
-                `${t.stripe.page} ${pageNumber} ${t.stripe.of} ${totalPages}`
-              }
-            />
-          </View>
-        </View>
+        <InvoiceFooter
+          invoiceData={invoiceData}
+          styles={styles}
+          formattedInvoiceTotal={formattedInvoiceTotal}
+        />
       </Page>
     </Document>
   );

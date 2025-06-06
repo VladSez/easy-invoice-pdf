@@ -1,3 +1,4 @@
+import { InvoiceFooter } from "@/app/(app)/components/invoice-pdf-template/invoice-footer";
 import { InvoiceHeader } from "@/app/(app)/components/invoice-pdf-template/invoice-header";
 import { InvoiceItemsTable } from "@/app/(app)/components/invoice-pdf-template/invoice-items-table";
 import { InvoicePaymentInfo } from "@/app/(app)/components/invoice-pdf-template/invoice-payment-info";
@@ -10,7 +11,7 @@ import {
   PAYMENT_DUE,
   TODAY,
 } from "@/app/constants";
-import type { InvoiceData, SupportedLanguages } from "@/app/schema";
+import { type InvoiceData, type SupportedLanguages } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";
 import { STATIC_ASSETS_URL } from "@/config";
 import { env } from "@/env";
@@ -18,7 +19,6 @@ import { env } from "@/env";
 import {
   Document,
   Font,
-  Link,
   Page,
   StyleSheet,
   Text,
@@ -46,7 +46,7 @@ Font.register({
 
 // we need to duplicate styles from invoice-pdf-template.tsx for some reason
 // otherwise styles are not applied
-const styles = StyleSheet.create({
+const SERVER_RENDERED_PDF_STYLES = StyleSheet.create({
   wFull: {
     width: "100%",
   },
@@ -169,8 +169,6 @@ const styles = StyleSheet.create({
     bottom: 30,
     left: 30,
     right: 30,
-    flexDirection: "row",
-    justifyContent: "space-between",
     borderTop: "1px solid #000",
     paddingTop: 5,
   },
@@ -181,6 +179,16 @@ const styles = StyleSheet.create({
   center: {
     display: "flex",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  spaceBetween: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
   },
 } as const);
@@ -220,13 +228,19 @@ export const InvoicePdfTemplateToRenderOnBackend = ({
 
   return (
     <Document title={invoiceDocTitle}>
-      <Page size="A4" style={styles.page}>
-        <InvoiceHeader invoiceData={invoiceData} styles={styles} />
-        <InvoiceSellerBuyerInfo invoiceData={invoiceData} styles={styles} />
+      <Page size="A4" style={SERVER_RENDERED_PDF_STYLES.page}>
+        <InvoiceHeader
+          invoiceData={invoiceData}
+          styles={SERVER_RENDERED_PDF_STYLES}
+        />
+        <InvoiceSellerBuyerInfo
+          invoiceData={invoiceData}
+          styles={SERVER_RENDERED_PDF_STYLES}
+        />
         <InvoiceItemsTable
           invoiceData={invoiceData}
           formattedInvoiceTotal={formattedInvoiceTotal}
-          styles={styles}
+          styles={SERVER_RENDERED_PDF_STYLES}
         />
         <View
           style={{
@@ -236,7 +250,10 @@ export const InvoicePdfTemplateToRenderOnBackend = ({
           }}
         >
           <View style={{ width: "50%" }}>
-            <InvoicePaymentInfo invoiceData={invoiceData} styles={styles} />
+            <InvoicePaymentInfo
+              invoiceData={invoiceData}
+              styles={SERVER_RENDERED_PDF_STYLES}
+            />
           </View>
 
           {vatTableSummaryIsVisible && (
@@ -244,7 +261,7 @@ export const InvoicePdfTemplateToRenderOnBackend = ({
               <InvoiceVATSummaryTable
                 invoiceData={invoiceData}
                 formattedInvoiceTotal={formattedInvoiceTotal}
-                styles={styles}
+                styles={SERVER_RENDERED_PDF_STYLES}
               />
             </View>
           )}
@@ -253,25 +270,25 @@ export const InvoicePdfTemplateToRenderOnBackend = ({
           <InvoicePaymentTotals
             invoiceData={invoiceData}
             formattedInvoiceTotal={formattedInvoiceTotal}
-            styles={styles}
+            styles={SERVER_RENDERED_PDF_STYLES}
           />
         </View>
 
         {/* Signature section */}
         {signatureSectionIsVisible && (
-          <View style={styles.signatureSection}>
+          <View style={SERVER_RENDERED_PDF_STYLES.signatureSection}>
             {invoiceData.personAuthorizedToReceiveFieldIsVisible && (
-              <View style={styles.signatureColumn}>
-                <View style={styles.signatureLine} />
-                <Text style={styles.signatureText}>
+              <View style={SERVER_RENDERED_PDF_STYLES.signatureColumn}>
+                <View style={SERVER_RENDERED_PDF_STYLES.signatureLine} />
+                <Text style={SERVER_RENDERED_PDF_STYLES.signatureText}>
                   {t.personAuthorizedToReceive}
                 </Text>
               </View>
             )}
             {invoiceData.personAuthorizedToIssueFieldIsVisible && (
-              <View style={styles.signatureColumn}>
-                <View style={styles.signatureLine} />
-                <Text style={styles.signatureText}>
+              <View style={SERVER_RENDERED_PDF_STYLES.signatureColumn}>
+                <View style={SERVER_RENDERED_PDF_STYLES.signatureLine} />
+                <Text style={SERVER_RENDERED_PDF_STYLES.signatureText}>
                   {t.personAuthorizedToIssue}
                 </Text>
               </View>
@@ -282,29 +299,18 @@ export const InvoicePdfTemplateToRenderOnBackend = ({
         {/* Notes */}
         {invoiceData.notesFieldIsVisible && (
           <View style={{ marginTop: 10 }}>
-            <Text style={styles.fontSize8}>{invoiceData?.notes}</Text>
+            <Text style={SERVER_RENDERED_PDF_STYLES.fontSize8}>
+              {invoiceData?.notes}
+            </Text>
           </View>
         )}
 
         {/* Footer  */}
-        <View style={styles.footer}>
-          <Text style={[styles.fontSize9]}>
-            {t.createdWith}{" "}
-            <Link
-              style={[styles.fontSize9, { color: "blue" }]}
-              src={"https://easyinvoicepdf.com"}
-            >
-              https://easyinvoicepdf.com
-            </Link>
-          </Text>
-          {/* Page number */}
-          <Text
-            style={styles.footerText}
-            render={({ pageNumber, totalPages }) =>
-              `${pageNumber}/${totalPages}`
-            }
-          />
-        </View>
+        <InvoiceFooter
+          invoiceData={invoiceData}
+          styles={SERVER_RENDERED_PDF_STYLES}
+          formattedInvoiceTotal={formattedInvoiceTotal}
+        />
       </Page>
     </Document>
   );
