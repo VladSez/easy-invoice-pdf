@@ -462,10 +462,19 @@ test.describe("Invoice Generator Page", () => {
     await itemNameInput.fill("TEST INVOICE ITEM");
     await expect(itemNameInput).toHaveValue("TEST INVOICE ITEM");
 
+    // Set up dialog handler before triggering the action
+    page.on("dialog", async (dialog) => {
+      expect(dialog.message()).toBe(
+        "Are you sure you want to delete invoice item #2?"
+      );
+      await dialog.accept();
+    });
+
     // Remove the added item
     await invoiceItemsSection
       .getByRole("button", { name: "Delete Invoice Item 2" })
       .click();
+
     await expect(
       invoiceItemsSection.getByText("Item 2", { exact: true })
     ).toBeHidden();

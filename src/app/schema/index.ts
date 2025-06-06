@@ -71,6 +71,18 @@ export const CURRENCY_TO_LABEL = {
 export type CurrencyLabels =
   (typeof CURRENCY_TO_LABEL)[keyof typeof CURRENCY_TO_LABEL];
 
+export const SUPPORTED_TEMPLATES = ["default", "stripe"] as const;
+
+export type SupportedTemplates = (typeof SUPPORTED_TEMPLATES)[number];
+
+export const TEMPLATE_TO_LABEL = {
+  default: "Default Template",
+  stripe: "Stripe Template",
+} as const satisfies Record<SupportedTemplates, string>;
+
+export type TemplateLabels =
+  (typeof TEMPLATE_TO_LABEL)[keyof typeof TEMPLATE_TO_LABEL];
+
 export const SUPPORTED_LANGUAGES = [
   "en",
   "pl",
@@ -294,7 +306,42 @@ export const invoiceSchema = z.object({
   language: z.enum(SUPPORTED_LANGUAGES).default("en"),
   dateFormat: z.enum(SUPPORTED_DATE_FORMATS).default("YYYY-MM-DD"),
   currency: z.enum(SUPPORTED_CURRENCIES).default("EUR"),
+  template: z.enum(SUPPORTED_TEMPLATES).default("default"),
 
+  /**
+   * Logo field for Stripe template
+   *
+   * Stores base64 image data
+   *
+   * Max 3MB limit enforced on the client side during upload
+   */
+  logo: z
+    .string()
+    .trim()
+    .default("")
+    .refine((val) => {
+      if (!val) return true; // Allow empty string
+      // Check if it's a valid base64 data URL
+      const base64Pattern = /^data:image\/(jpeg|jpg|png|webp);base64,/;
+      return base64Pattern.test(val);
+    }, "Logo must be a valid image (JPEG, PNG or WebP) in base64 format")
+    .optional()
+    .describe(
+      "Stripe template specific field. Logo must be a valid image (JPEG, PNG or WebP) in base64 format"
+    ),
+
+  /**
+   * Invoice number object
+   *
+   * Contains label and value for invoice number
+   *
+   * {
+   *   label: "Invoice Number",
+   *   value: "1234",
+   * }
+   *
+   * Optional field
+   */
   invoiceNumberObject: z
     .object({
       label: z
@@ -335,6 +382,34 @@ export const invoiceSchema = z.object({
   paymentMethodFieldIsVisible: z.boolean().default(true),
 
   paymentDue: z.string().min(1, "Payment due is required").trim(),
+
+  /**
+   * Pay Online URL field for Stripe template only
+   *
+   * URL field for Stripe payment link that:
+   * - Accepts empty string or valid URL
+   * - Trims whitespace
+   * - Optional field
+   * - Validates URL format if non-empty value provided
+   */
+  stripePayOnlineUrl: z
+    .string()
+    .trim() // Remove whitespace
+    .transform((val) => val) // Pass through value
+    .pipe(
+      z.union([
+        z.literal(""), // Allow empty string
+        z
+          .string()
+          .url("Please enter a valid URL or leave empty")
+          .refine(
+            (url) => url.startsWith("https://"),
+            "URL must start with https://"
+          ), // Validate HTTPS URL format
+      ])
+    )
+    .optional()
+    .describe("Stripe template specific field. URL field for payment link"),
 
   notes: z
     .string()

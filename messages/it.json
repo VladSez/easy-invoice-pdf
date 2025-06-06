@@ -55,7 +55,8 @@
     },
     "buttons": {
       "goToApp": "Vai all'app",
-      "viewOnGithub": "Vedi su GitHub",
+      "viewOnGithub": "Visualizza su GitHub",
+      "starOnGithub": "Metti una stella su GitHub",
       "switchLanguage": "Cambia lingua",
       "shareFeedback": "Condividi feedback",
       "app": "App"

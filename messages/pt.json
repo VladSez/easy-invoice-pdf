@@ -62,11 +62,12 @@
       "createdBy": "Criado por"
     },
     "buttons": {
-      "goToApp": "Ir para o aplicativo",
+      "goToApp": "Ir para o app",
       "viewOnGithub": "Ver no GitHub",
+      "starOnGithub": "Dar estrela no GitHub",
       "switchLanguage": "Mudar idioma",
       "shareFeedback": "Compartilhar feedback",
-      "app": "Aplicativo"
+      "app": "App"
     },
     "newsletter": {
       "title": "Inscreva-se em nossa newsletter",

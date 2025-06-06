@@ -62,10 +62,11 @@
       "createdBy": "Erstellt von"
     },
     "buttons": {
-      "goToApp": "Zur App",
+      "goToApp": "Zur App gehen",
       "viewOnGithub": "Auf GitHub ansehen",
-      "switchLanguage": "Sprache ändern",
-      "shareFeedback": "Feedback geben",
+      "starOnGithub": "Auf GitHub bewerten",
+      "switchLanguage": "Sprache wechseln",
+      "shareFeedback": "Feedback teilen",
       "app": "App"
     },
     "newsletter": {

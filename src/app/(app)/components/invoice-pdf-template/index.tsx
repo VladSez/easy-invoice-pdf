@@ -1,26 +1,24 @@
 "use client";
 
 import { type InvoiceData } from "@/app/schema";
+import { TRANSLATIONS } from "@/app/schema/translations";
+import { STATIC_ASSETS_URL } from "@/config";
 import {
   Document,
   Font,
-  Link,
   Page,
   StyleSheet,
   Text,
   View,
 } from "@react-pdf/renderer/lib/react-pdf.browser";
+import { memo } from "react";
+import { InvoiceFooter } from "./invoice-footer";
 import { InvoiceHeader } from "./invoice-header";
-import { InvoiceSellerBuyerInfo } from "./invoice-seller-buyer-info";
 import { InvoiceItemsTable } from "./invoice-items-table";
 import { InvoicePaymentInfo } from "./invoice-payment-info";
-import { InvoiceVATSummaryTable } from "./invoice-vat-summary-table";
 import { InvoicePaymentTotals } from "./invoice-payment-totals";
-import { TRANSLATIONS } from "@/app/schema/translations";
-import { STATIC_ASSETS_URL } from "@/config";
-import { memo } from "react";
-
-const PROD_WEBSITE_URL = "https://dub.sh/easy-invoice";
+import { InvoiceSellerBuyerInfo } from "./invoice-seller-buyer-info";
+import { InvoiceVATSummaryTable } from "./invoice-vat-summary-table";
 
 // Open sans seems to be working fine with EN and PL
 const fontFamily = "Open Sans";
@@ -163,8 +161,6 @@ const styles = StyleSheet.create({
     bottom: 30,
     left: 30,
     right: 30,
-    flexDirection: "row",
-    justifyContent: "space-between",
     borderTop: "1px solid #000",
     paddingTop: 5,
   },
@@ -175,6 +171,16 @@ const styles = StyleSheet.create({
   center: {
     display: "flex",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  spaceBetween: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
   },
 } as const);
@@ -279,24 +285,11 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
         )}
 
         {/* Footer  */}
-        <View style={styles.footer}>
-          <Text style={[styles.fontSize9]}>
-            {t.createdWith}{" "}
-            <Link
-              style={[styles.fontSize9, { color: "blue" }]}
-              src={PROD_WEBSITE_URL}
-            >
-              https://easyinvoicepdf.com
-            </Link>
-          </Text>
-          {/* Page number */}
-          <Text
-            style={styles.footerText}
-            render={({ pageNumber, totalPages }) =>
-              `${pageNumber}/${totalPages}`
-            }
-          />
-        </View>
+        <InvoiceFooter
+          invoiceData={invoiceData}
+          styles={styles}
+          formattedInvoiceTotal={formattedInvoiceTotal}
+        />
       </Page>
     </Document>
   );

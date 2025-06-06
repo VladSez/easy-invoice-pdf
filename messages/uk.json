@@ -64,6 +64,7 @@
     "buttons": {
       "goToApp": "Перейти до додатку",
       "viewOnGithub": "Переглянути на GitHub",
+      "starOnGithub": "Поставити зірку на GitHub",
       "switchLanguage": "Змінити мову",
       "shareFeedback": "Поділитися відгуком",
       "app": "Додаток"

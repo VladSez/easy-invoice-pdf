@@ -56,8 +56,9 @@
     "buttons": {
       "goToApp": "Ga naar app",
       "viewOnGithub": "Bekijk op GitHub",
-      "switchLanguage": "Taal wijzigen",
-      "shareFeedback": "Deel feedback",
+      "starOnGithub": "Ster geven op GitHub",
+      "switchLanguage": "Verander taal",
+      "shareFeedback": "Feedback delen",
       "app": "App"
     },
     "newsletter": {

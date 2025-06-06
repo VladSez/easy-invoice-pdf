@@ -64,6 +64,7 @@
     "buttons": {
       "goToApp": "Перейти в приложение",
       "viewOnGithub": "Посмотреть на GitHub",
+      "starOnGithub": "Поставить звезду на GitHub",
       "switchLanguage": "Изменить язык",
       "shareFeedback": "Поделиться отзывом",
       "app": "Приложение"
