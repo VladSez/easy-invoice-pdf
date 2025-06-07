@@ -1,8 +1,4 @@
-import {
-  Text,
-  View,
-  type Styles,
-} from "@react-pdf/renderer/lib/react-pdf.browser";
+import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { type InvoiceData } from "@/app/schema";
 import { CURRENCY_SYMBOLS } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";

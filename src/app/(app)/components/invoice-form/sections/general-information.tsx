@@ -28,8 +28,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { TRANSLATIONS } from "@/app/schema/translations";
 import dayjs from "dayjs";
-import { AlertTriangle } from "lucide-react";
-import { memo, useEffect } from "react";
+import { AlertTriangle, Upload, X } from "lucide-react";
+import { memo, useCallback, useEffect, useRef } from "react";
+import { toast } from "sonner";
 
 const AlertIcon = () => {
   return <AlertTriangle className="mr-1 inline-block h-3 w-3 text-amber-500" />;
@@ -40,6 +41,24 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
 };
 
 const CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
+
+// Logo helper functions
+const validateImageSize = (file: File): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const maxSize = 3 * 1024 * 1024; // 3MB in bytes
+
+    resolve(file.size <= maxSize);
+  });
+};
+
+const convertFileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
 
 interface GeneralInformationProps {
   control: Control<InvoiceData>;
@@ -54,6 +73,8 @@ export const GeneralInformation = memo(function GeneralInformation({
   setValue,
   dateOfIssue,
 }: GeneralInformationProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const invoiceNumberLabel = useWatch({
     control,
     name: "invoiceNumberObject.label",
@@ -67,6 +88,7 @@ export const GeneralInformation = memo(function GeneralInformation({
   const dateOfService = useWatch({ control, name: "dateOfService" });
   const language = useWatch({ control, name: "language" });
   const template = useWatch({ control, name: "template" });
+  const logo = useWatch({ control, name: "logo" });
 
   const t = TRANSLATIONS[language];
   const defaultInvoiceNumber = `${t.invoiceNumber}:`;
@@ -89,12 +111,59 @@ export const GeneralInformation = memo(function GeneralInformation({
   const isInvoiceNumberInCurrentMonth =
     extractInvoiceMonthAndYear === CURRENT_MONTH_AND_YEAR;
 
+  // Logo upload handlers
+  const handleLogoUpload = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      // Validate file type
+      const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+      if (!validTypes.includes(file.type)) {
+        toast.error("Please select a valid image file (JPEG, PNG or WebP)");
+        return;
+      }
+
+      // Validate file size (3MB max)
+      const isValidSize = await validateImageSize(file);
+      if (!isValidSize) {
+        toast.error("Image size must be less than 3MB");
+        return;
+      }
+
+      try {
+        const base64 = await convertFileToBase64(file);
+        setValue("logo", base64);
+        toast.success("Logo uploaded successfully!");
+      } catch (error) {
+        console.error("Error converting file to base64:", error);
+        toast.error("Error uploading image. Please try again.");
+      }
+    },
+    [setValue]
+  );
+
+  const handleLogoRemove = useCallback(() => {
+    setValue("logo", "");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    toast.success("Logo removed successfully!");
+  }, [setValue]);
+
   // Clear Stripe Pay Online URL when template is not Stripe and there is an error for better user experience
   useEffect(() => {
     if (template !== "stripe" && errors.stripePayOnlineUrl) {
       setValue("stripePayOnlineUrl", "");
     }
   }, [template, setValue, errors.stripePayOnlineUrl]);
+
+  // Clear logo when template is not Stripe
+  useEffect(() => {
+    if (template !== "stripe" && logo) {
+      setValue("logo", "");
+    }
+  }, [template, setValue, logo]);
 
   return (
     <div className="space-y-4">
@@ -128,6 +197,97 @@ export const GeneralInformation = memo(function GeneralInformation({
           </InputHelperMessage>
         )}
       </div>
+
+      {/* Logo Upload - Only for Stripe template */}
+      {template === "stripe" && (
+        <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
+          <Label htmlFor="logoUpload" className="mb-2">
+            Company Logo (Optional)
+          </Label>
+
+          {logo ? (
+            <div className="space-y-2">
+              {/* Logo preview */}
+              <div className="relative inline-block">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={logo}
+                  alt="Company logo preview"
+                  className="h-28 max-w-40 rounded-lg border-2 border-gray-200 object-contain p-2 shadow-sm"
+                />
+                <button
+                  type="button"
+                  onClick={handleLogoRemove}
+                  className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-colors hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  aria-label="Remove logo"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <InputHelperMessage>
+                Logo uploaded successfully. Click the X to remove it.
+              </InputHelperMessage>
+            </div>
+          ) : (
+            <div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                id="logoUpload"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                onChange={handleLogoUpload}
+                className="hidden"
+              />
+              <label
+                htmlFor="logoUpload"
+                className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-8 transition-colors hover:border-gray-400 hover:bg-gray-50"
+              >
+                <div className="text-center">
+                  <Upload className="mx-auto h-4 w-4 text-gray-400" />
+                  <p className="mt-3 text-sm font-medium text-gray-600">
+                    Click to upload your company logo
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    JPEG, PNG or WebP (max 3MB)
+                  </p>
+                </div>
+              </label>
+            </div>
+          )}
+
+          {errors.logo && <ErrorMessage>{errors.logo.message}</ErrorMessage>}
+        </div>
+      )}
+
+      {/* Pay Online URL - Only for Stripe template */}
+      {template === "stripe" && (
+        <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
+          <Label htmlFor={`stripePayOnlineUrl`} className="">
+            Payment Link URL (Optional)
+          </Label>
+
+          <Controller
+            name="stripePayOnlineUrl"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                id={`stripePayOnlineUrl`}
+                type="url"
+                className="mt-1"
+              />
+            )}
+          />
+          {errors.stripePayOnlineUrl ? (
+            <ErrorMessage>{errors.stripePayOnlineUrl.message}</ErrorMessage>
+          ) : (
+            <InputHelperMessage>
+              Enter your payment URL. This adds a &quot;Pay Online&quot; button
+              to the PDF invoice.
+            </InputHelperMessage>
+          )}
+        </div>
+      )}
 
       {/* Language PDF Select */}
       <div>
@@ -256,36 +416,6 @@ export const GeneralInformation = memo(function GeneralInformation({
           </InputHelperMessage>
         )}
       </div>
-
-      {/* Pay Online URL - Only for Stripe template */}
-      {template === "stripe" && (
-        <div className="duration-300 animate-in fade-in slide-in-from-bottom-2">
-          <Label htmlFor={`stripePayOnlineUrl`} className="">
-            Stripe Payment Link URL
-          </Label>
-
-          <Controller
-            name="stripePayOnlineUrl"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                id={`stripePayOnlineUrl`}
-                type="url"
-                className="mt-1"
-              />
-            )}
-          />
-          {errors.stripePayOnlineUrl ? (
-            <ErrorMessage>{errors.stripePayOnlineUrl.message}</ErrorMessage>
-          ) : (
-            <InputHelperMessage>
-              Enter your Stripe payment URL. This adds a &quot;Pay Online&quot;
-              button to the PDF invoice for secure Stripe payments.
-            </InputHelperMessage>
-          )}
-        </div>
-      )}
 
       {/* Invoice Number */}
       <div>

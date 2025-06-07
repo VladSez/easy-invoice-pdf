@@ -64,11 +64,13 @@ type AccordionKeys = Array<(typeof DEFAULT_ACCORDION_VALUES)[number]>;
 interface InvoiceFormProps {
   invoiceData: InvoiceData;
   onInvoiceDataChange: (updatedData: InvoiceData) => void;
+  setCanShareInvoice: (canShareInvoice: boolean) => void;
 }
 
 export const InvoiceForm = memo(function InvoiceForm({
   invoiceData,
   onInvoiceDataChange,
+  setCanShareInvoice,
 }: InvoiceFormProps) {
   const form = useForm<InvoiceData>({
     resolver: zodResolver(invoiceSchema),
@@ -184,6 +186,19 @@ export const InvoiceForm = memo(function InvoiceForm({
 
     return () => subscription.unsubscribe();
   }, [debouncedRegeneratePdfOnFormChange, watch]);
+
+  // Check if template is stripe and logo exists to disable sharing due to technical limitations (we can't put the logo base64 string in the URL due to browser URL length limits)
+  useEffect(() => {
+    const currentFormData = watch();
+    const isStripeTemplate = currentFormData.template === "stripe";
+    const hasLogo = Boolean(currentFormData.logo);
+
+    if (isStripeTemplate && hasLogo) {
+      setCanShareInvoice(false);
+    } else {
+      setCanShareInvoice(true);
+    }
+  }, [watch, setCanShareInvoice]);
 
   // Add a wrapper function for remove item that triggers the form update
   const handleRemoveItem = useCallback(

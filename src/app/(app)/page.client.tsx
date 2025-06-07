@@ -112,6 +112,8 @@ export function AppPageClient() {
   const [errorWhileGeneratingPdfIsShown, setErrorWhileGeneratingPdfIsShown] =
     useState(false);
 
+  const [canShareInvoice, setCanShareInvoice] = useState(true);
+
   // Scroll to top on mount
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -293,8 +295,8 @@ export function AppPageClient() {
       }
     };
 
-    // Show cta toast after 1 minute
-    const initialTimer = setTimeout(showCTAToast, 60_000);
+    // Show cta toast after 30 seconds on the page
+    const initialTimer = setTimeout(showCTAToast, 30_000);
 
     return () => {
       clearTimeout(initialTimer);
@@ -306,11 +308,35 @@ export function AppPageClient() {
   };
 
   const handleShareInvoice = async () => {
+    if (!canShareInvoice) {
+      toast.error(
+        "Invoices with logos cannot be shared. Please remove the logo to generate a shareable link. You can still download the invoice as PDF and share it.",
+        {
+          duration: 5000,
+        }
+      );
+
+      return;
+    }
+
     if (invoiceDataState) {
       try {
         const newInvoiceDataValidated = invoiceSchema.parse(invoiceDataState);
         const stringified = JSON.stringify(newInvoiceDataValidated);
         const compressedData = compressToEncodedURIComponent(stringified);
+
+        // Check if the compressed data length exceeds browser URL limits
+        // Most browsers have a limit around 2000 characters for URLs
+        const URL_LENGTH_LIMIT = 2000;
+        const estimatedUrlLength =
+          window.location.origin.length + 7 + compressedData.length; // 7 for "/?data="
+
+        if (estimatedUrlLength > URL_LENGTH_LIMIT) {
+          toast.error("Invoice data is too large to share via URL", {
+            description: "Try removing some items or simplifying the invoice",
+          });
+          return;
+        }
 
         router.push(`/?data=${compressedData}`);
 
@@ -391,6 +417,7 @@ export function AppPageClient() {
                     <CustomTooltip
                       trigger={
                         <Button
+                          disabled={!canShareInvoice}
                           onClick={handleShareInvoice}
                           _variant="outline"
                           className="mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
@@ -398,7 +425,11 @@ export function AppPageClient() {
                           Generate a link to invoice
                         </Button>
                       }
-                      content="Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
+                      content={
+                        canShareInvoice
+                          ? "Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
+                          : "Invoices with logos cannot be shared. Please remove the logo to generate a shareable link."
+                      }
                     />
                     <InvoicePDFDownloadLink
                       invoiceData={invoiceDataState}
@@ -434,6 +465,8 @@ export function AppPageClient() {
               setErrorWhileGeneratingPdfIsShown={
                 setErrorWhileGeneratingPdfIsShown
               }
+              canShareInvoice={canShareInvoice}
+              setCanShareInvoice={setCanShareInvoice}
             />
           </div>
         </div>

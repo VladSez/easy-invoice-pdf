@@ -9,6 +9,7 @@ import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
 import { useDeviceContext } from "@/contexts/device-context";
+import { cn } from "@/lib/utils";
 
 const DesktopPDFViewerModuleLoading = () => (
   <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
@@ -95,6 +96,8 @@ export function InvoiceClientPage({
   isMobile,
   errorWhileGeneratingPdfIsShown,
   setErrorWhileGeneratingPdfIsShown,
+  setCanShareInvoice,
+  canShareInvoice,
 }: {
   invoiceDataState: InvoiceData;
   handleInvoiceDataChange: (invoiceData: InvoiceData) => void;
@@ -102,6 +105,8 @@ export function InvoiceClientPage({
   isMobile: boolean;
   errorWhileGeneratingPdfIsShown: boolean;
   setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
+  setCanShareInvoice: (canShareInvoice: boolean) => void;
+  canShareInvoice: boolean;
 }) {
   return (
     <>
@@ -127,6 +132,7 @@ export function InvoiceClientPage({
                 <InvoiceForm
                   invoiceData={invoiceDataState}
                   onInvoiceDataChange={handleInvoiceDataChange}
+                  setCanShareInvoice={setCanShareInvoice}
                 />
               </div>
             </TabsContent>
@@ -147,12 +153,15 @@ export function InvoiceClientPage({
                 <Button
                   onClick={handleShareInvoice}
                   _variant="outline"
-                  className="mx-2 w-full"
+                  className={cn(
+                    "mx-2 w-full",
+                    !canShareInvoice && "opacity-50" // 'disabled' styles
+                  )}
                 >
                   Generate a link to invoice
                 </Button>
               }
-              content="Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
+              content={null}
             />
             <InvoicePDFDownloadLink
               invoiceData={invoiceDataState}
@@ -171,6 +180,7 @@ export function InvoiceClientPage({
               <InvoiceForm
                 invoiceData={invoiceDataState}
                 onInvoiceDataChange={handleInvoiceDataChange}
+                setCanShareInvoice={setCanShareInvoice}
               />
             </div>
           </div>

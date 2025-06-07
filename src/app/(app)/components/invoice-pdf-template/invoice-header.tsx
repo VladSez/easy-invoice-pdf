@@ -3,9 +3,9 @@ import {
   View,
   type Styles,
 } from "@react-pdf/renderer/lib/react-pdf.browser";
-// import { styles } from ".";
 import { type InvoiceData } from "@/app/schema";
 import dayjs from "dayjs";
+
 import { TRANSLATIONS } from "@/app/schema/translations";
 
 export function InvoiceHeader({

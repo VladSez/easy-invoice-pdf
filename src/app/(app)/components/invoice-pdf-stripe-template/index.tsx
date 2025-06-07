@@ -21,7 +21,17 @@ import { StripeSellerBuyerInfo } from "./stripe-seller-buyer-info";
 import { StripeTotals } from "./stripe-totals";
 import { STATIC_ASSETS_URL } from "@/config";
 
-// const PROD_WEBSITE_URL = "https://dub.sh/easy-invoice";
+import "dayjs/locale/en";
+import "dayjs/locale/pl";
+import "dayjs/locale/de";
+import "dayjs/locale/es";
+import "dayjs/locale/pt";
+import "dayjs/locale/ru";
+import "dayjs/locale/uk";
+import "dayjs/locale/fr";
+import "dayjs/locale/it";
+import "dayjs/locale/nl";
+import dayjs from "dayjs";
 
 const fontFamily = "Inter";
 
@@ -182,8 +192,10 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
 }: {
   invoiceData: InvoiceData;
 }) {
-  // const language = invoiceData.language;
-  // const t = TRANSLATIONS[language];
+  const language = invoiceData.language;
+
+  // Set dayjs locale based on invoice language
+  dayjs.locale(language);
 
   const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
   const invoiceNumber = `${invoiceNumberValue}`;
