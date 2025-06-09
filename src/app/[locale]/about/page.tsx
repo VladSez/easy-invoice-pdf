@@ -26,6 +26,7 @@ import { type Graph } from "schema-dts";
 import { LanguageSwitcher } from "./components/language-switcher";
 import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
 import { routing } from "@/i18n/routing";
+import { LandingCtaToast } from "./components/landing-cta-toast";
 
 // statically generate the pages for all locales
 export function generateStaticParams() {
@@ -47,6 +48,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
           __html: JSON.stringify(JSON_LD),
         }}
       />
+      <LandingCtaToast />
       <div className="flex min-h-screen flex-col bg-slate-50">
         <Header locale={locale} />
         <main>
@@ -133,7 +135,7 @@ function HeroSection() {
                 </Link>
               </Button>
             </div>
-            <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0">
+            <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0">
               <span className="" role="img" aria-label="checkmark">
                 ✅
               </span>

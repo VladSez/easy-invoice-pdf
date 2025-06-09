@@ -18,6 +18,7 @@ interface ToastProps {
   id: string | number;
   title: string;
   description: string;
+  showDonationButton?: boolean;
 }
 
 /**
@@ -30,6 +31,7 @@ export function customPremiumToast(toast: Omit<ToastProps, "id">) {
         id={id}
         title={toast.title}
         description={toast.description}
+        showDonationButton={toast.showDonationButton}
       />
     ),
     {
@@ -48,6 +50,7 @@ export function customDefaultToast(toast: Omit<ToastProps, "id">) {
         id={id}
         title={toast.title}
         description={toast.description}
+        showDonationButton={toast.showDonationButton}
       />
     ),
     {
@@ -57,7 +60,7 @@ export function customDefaultToast(toast: Omit<ToastProps, "id">) {
 }
 
 function PremiumDonationToast(props: ToastProps) {
-  const { title, description, id } = props;
+  const { title, description, id, showDonationButton = true } = props;
 
   return (
     <div
@@ -109,25 +112,29 @@ function PremiumDonationToast(props: ToastProps) {
               Star on GitHub
             </a>
           </Button>
-          <Button
-            _size="sm"
-            className="h-8 flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-xs text-white transition-all duration-200 hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg"
-            asChild
-          >
-            <a
-              href={DONATION_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                umamiTrackEvent("donate_btn_click_download_pdf_toast_premium");
-
-                sonnerToast.dismiss(id);
-              }}
+          {showDonationButton && (
+            <Button
+              _size="sm"
+              className="h-8 flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-xs text-white transition-all duration-200 hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg"
+              asChild
             >
-              <HeartIcon className="mr-1 h-3 w-3 fill-current" />
-              Donate $5
-            </a>
-          </Button>
+              <a
+                href={DONATION_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  umamiTrackEvent(
+                    "donate_btn_click_download_pdf_toast_premium"
+                  );
+
+                  sonnerToast.dismiss(id);
+                }}
+              >
+                <HeartIcon className="mr-1 h-3 w-3 fill-current" />
+                Donate $5
+              </a>
+            </Button>
+          )}
         </div>
       </div>
     </div>
@@ -135,7 +142,7 @@ function PremiumDonationToast(props: ToastProps) {
 }
 
 function DefaultDonationToast(props: ToastProps) {
-  const { title, description, id } = props;
+  const { title, description, id, showDonationButton = true } = props;
 
   return (
     <div
@@ -184,25 +191,29 @@ function DefaultDonationToast(props: ToastProps) {
               Star on GitHub
             </a>
           </Button>
-          <Button
-            _size="sm"
-            className="h-7 bg-gradient-to-r from-pink-500 to-purple-600 px-3 text-xs font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-pink-600 hover:to-purple-700"
-            asChild
-          >
-            <a
-              href={DONATION_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                umamiTrackEvent("donate_btn_click_download_pdf_toast_default");
-
-                sonnerToast.dismiss(id);
-              }}
+          {showDonationButton && (
+            <Button
+              _size="sm"
+              className="h-7 bg-gradient-to-r from-pink-500 to-purple-600 px-3 text-xs font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-pink-600 hover:to-purple-700"
+              asChild
             >
-              <Coffee className="mr-1 h-3 w-3" />
-              Donate $5
-            </a>
-          </Button>
+              <a
+                href={DONATION_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  umamiTrackEvent(
+                    "donate_btn_click_download_pdf_toast_default"
+                  );
+
+                  sonnerToast.dismiss(id);
+                }}
+              >
+                <Coffee className="mr-1 h-3 w-3" />
+                Donate $5
+              </a>
+            </Button>
+          )}
         </div>
       </div>
     </div>

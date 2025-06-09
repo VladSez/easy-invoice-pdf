@@ -3,6 +3,17 @@ import type { InvoiceData } from "@/app/schema";
 import { CURRENCY_SYMBOLS } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";
 import type { STRIPE_TEMPLATE_STYLES } from ".";
+import dayjs from "dayjs";
+import "dayjs/locale/en";
+import "dayjs/locale/pl";
+import "dayjs/locale/de";
+import "dayjs/locale/es";
+import "dayjs/locale/pt";
+import "dayjs/locale/ru";
+import "dayjs/locale/uk";
+import "dayjs/locale/fr";
+import "dayjs/locale/it";
+import "dayjs/locale/nl";
 
 export function StripeItemsTable({
   invoiceData,
@@ -14,6 +25,18 @@ export function StripeItemsTable({
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
   const currencySymbol = CURRENCY_SYMBOLS[invoiceData.currency];
+
+  // Set dayjs locale based on invoice language
+  dayjs.locale(language);
+
+  // Calculate service period (example: Jan 01 2025 - Jan 31 2025)
+  const servicePeriodStart = dayjs(invoiceData.dateOfService)
+    .startOf("month")
+    .format(invoiceData.dateFormat);
+
+  const servicePeriodEnd = dayjs(invoiceData.dateOfService).format(
+    invoiceData.dateFormat
+  );
 
   return (
     <View style={[styles.table, styles.mt24]}>
@@ -59,7 +82,7 @@ export function StripeItemsTable({
               <Text style={[styles.fontSize11]}>{item.name}</Text>
               {/* Add service period if available */}
               <Text style={[styles.fontSize10, styles.mt4]}>
-                Jan 1 – Jan 31, 2025
+                {servicePeriodStart} – {servicePeriodEnd}
               </Text>
             </View>
             <View style={styles.colQty}>

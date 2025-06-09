@@ -3,7 +3,7 @@
     "tagline": "PDF-factuur generator met live preview",
     "hero": {
       "title": "Maak professionele facturen in seconden",
-      "description": "EasyInvoicePDF is een gratis, open-source tool waarmee je professionele PDF-facturen kunt maken, aanpassen en downloaden met realtime voorbeeld.",
+      "description": "EasyInvoicePDF is een gratis, open-source tool waarmee je professionele facturen kunt maken, aanpassen en downloaden met realtime voorbeeld. Draait volledig in je browser.",
       "noSignup": "Geen registratie vereist. 100% gratis en open-source."
     },
     "features": {

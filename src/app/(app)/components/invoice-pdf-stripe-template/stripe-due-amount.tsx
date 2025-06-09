@@ -3,6 +3,16 @@ import { type InvoiceData } from "@/app/schema";
 import { CURRENCY_SYMBOLS } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";
 import dayjs from "dayjs";
+import "dayjs/locale/en";
+import "dayjs/locale/pl";
+import "dayjs/locale/de";
+import "dayjs/locale/es";
+import "dayjs/locale/pt";
+import "dayjs/locale/ru";
+import "dayjs/locale/uk";
+import "dayjs/locale/fr";
+import "dayjs/locale/it";
+import "dayjs/locale/nl";
 import type { STRIPE_TEMPLATE_STYLES } from ".";
 
 export function StripeDueAmount({
@@ -16,7 +26,13 @@ export function StripeDueAmount({
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
-  const dateOfService = dayjs(invoiceData.dateOfService).format("MMMM D, YYYY");
+
+  // Set dayjs locale based on invoice language
+  dayjs.locale(language);
+
+  const paymentDueDate = dayjs(invoiceData.paymentDue).format(
+    invoiceData.dateFormat
+  );
   const currencySymbol = CURRENCY_SYMBOLS[invoiceData.currency];
 
   // Check if payOnlineUrl is provided and valid
@@ -27,7 +43,7 @@ export function StripeDueAmount({
       <Text style={[styles.fontSize14, styles.fontBold, styles.mb8]}>
         {currencySymbol}
         {formattedInvoiceTotal} {invoiceData.currency} {t.stripe.due}{" "}
-        {dateOfService}
+        {paymentDueDate}
       </Text>
       {hasPayOnlineUrl ? (
         <Link

@@ -1,6 +1,7 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { type InvoiceData } from "@/app/schema";
 import dayjs from "dayjs";
+
 import { TRANSLATIONS } from "@/app/schema/translations";
 import type { STRIPE_TEMPLATE_STYLES } from ".";
 
@@ -17,19 +18,21 @@ export function StripeInvoiceInfo({
   const dateOfIssue = dayjs(invoiceData.dateOfIssue).format(
     invoiceData.dateFormat
   );
-  const dateOfService = dayjs(invoiceData.dateOfService).format(
-    invoiceData.dateFormat
-  );
 
   const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
 
   // Calculate service period (example: Jan 01 2025 - Jan 31 2025)
-  const servicePeriodStart = dayjs(invoiceData.dateOfService).format(
-    "MMM DD YYYY"
+  const servicePeriodStart = dayjs(invoiceData.dateOfService)
+    .startOf("month")
+    .format(invoiceData.dateFormat);
+
+  const servicePeriodEnd = dayjs(invoiceData.dateOfService).format(
+    invoiceData.dateFormat
   );
-  const servicePeriodEnd = dayjs(invoiceData.dateOfService)
-    .endOf("month")
-    .format("MMM DD YYYY");
+
+  const paymentDueDate = dayjs(invoiceData.paymentDue).format(
+    invoiceData.dateFormat
+  );
 
   return (
     <View style={[styles.mb24]}>
@@ -54,7 +57,7 @@ export function StripeInvoiceInfo({
           {t.stripe.dateDue}
         </Text>
         <Text style={[styles.fontSize9, styles.fontMedium]}>
-          {dateOfService}
+          {paymentDueDate}
         </Text>
       </View>
 

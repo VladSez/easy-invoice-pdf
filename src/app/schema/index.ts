@@ -3,29 +3,42 @@ import { z } from "zod";
 export const SUPPORTED_CURRENCIES = [
   "EUR", // Euro
   "USD", // US Dollar
+  "PLN", // Polish Złoty
+  "GBP", // British Pound
+
+  "JPY", // Japanese Yen
+  "CNY", // Chinese Yuan (RMB)
+  "CHF", // Swiss Franc
   "CAD", // Canadian Dollar
   "AUD", // Australian Dollar
-  "GBP", // British Pound
-  "PLN", // Polish Złoty
+  "HKD", // Hong Kong Dollar
+  "SGD", // Singapore Dollar
+  "INR", // Indian Rupee
+  "KRW", // South Korean Won
+  "BRL", // Brazilian Real
   "RUB", // Russian Ruble
+  "TWD", // Taiwan Dollar
+  "SEK", // Swedish Krona
+  "MXN", // Mexican Peso
+  "NZD", // New Zealand Dollar
+  "TRY", // Turkish Lira
+  "ZAR", // South African Rand
+  "NOK", // Norwegian Krone
+  "DKK", // Danish Krone
+  "ILS", // Israeli New Shekel
+  "CZK", // Czech Koruna
+  "HUF", // Hungarian Forint
   "UAH", // Ukrainian Hryvnia
   "BYN", // Belarusian Ruble
-  "BRL", // Brazilian Real
-  "MXN", // Mexican Peso
   "ARS", // Argentine Peso
-  "INR", // Indian Rupee
-  "CHF", // Swiss Franc
-  "HKD", // Hong Kong Dollar
-  "TWD", // Taiwan Dollar
-  "CNY", // Chinese Yuan (RMB)
-  "SGD", // Singapore Dollar
-] as const;
+] as const satisfies string[];
 
 export type SupportedCurrencies = (typeof SUPPORTED_CURRENCIES)[number];
 
 export const CURRENCY_SYMBOLS = {
   EUR: "€", // Euro
   USD: "$", // US Dollar
+
   CAD: "$", // Canadian Dollar
   AUD: "$", // Australian Dollar
   GBP: "£", // British Pound
@@ -42,6 +55,17 @@ export const CURRENCY_SYMBOLS = {
   TWD: "NT$", // Taiwan Dollar
   CNY: "¥", // Chinese Yuan (RMB)
   SGD: "S$", // Singapore Dollar
+  JPY: "¥", // Japanese Yen
+  SEK: "kr", // Swedish Krona
+  NOK: "kr", // Norwegian Krone
+  DKK: "kr", // Danish Krone
+  CZK: "Kč", // Czech Koruna
+  HUF: "Ft", // Hungarian Forint
+  ILS: "₪", // Israeli New Shekel
+  ZAR: "R", // South African Rand
+  TRY: "₺", // Turkish Lira
+  KRW: "₩", // South Korean Won
+  NZD: "NZ$", // New Zealand Dollar
 } as const satisfies Record<SupportedCurrencies, string>;
 
 export type CurrencySymbols =
@@ -66,6 +90,17 @@ export const CURRENCY_TO_LABEL = {
   TWD: "New Taiwan Dollar",
   CNY: "Chinese Yuan Renminbi",
   SGD: "Singapore Dollar",
+  JPY: "Japanese Yen",
+  SEK: "Swedish Krona",
+  NOK: "Norwegian Krone",
+  DKK: "Danish Krone",
+  CZK: "Czech Koruna",
+  HUF: "Hungarian Forint",
+  ILS: "Israeli New Shekel",
+  ZAR: "South African Rand",
+  TRY: "Turkish Lira",
+  KRW: "South Korean Won",
+  NZD: "New Zealand Dollar",
 } as const satisfies Record<SupportedCurrencies, string>;
 
 export type CurrencyLabels =
@@ -447,3 +482,26 @@ export const accordionSchema = z
 export type AccordionState = z.infer<typeof accordionSchema>;
 
 export const ACCORDION_STATE_LOCAL_STORAGE_KEY = "EASY_INVOICE_ACCORDION_STATE";
+
+// __________________________________________________________
+// Validate that currencies are unique
+// __________________________________________________________
+const uniqueCurrencies = new Set(SUPPORTED_CURRENCIES);
+
+if (uniqueCurrencies.size !== SUPPORTED_CURRENCIES.length) {
+  const duplicates = SUPPORTED_CURRENCIES.filter(
+    (currency, index) => SUPPORTED_CURRENCIES.indexOf(currency) !== index
+  );
+
+  const currencyFullNames = duplicates.map((currency) => {
+    const currencyFullName = CURRENCY_TO_LABEL[currency];
+
+    return `${currency} - ${currencyFullName}`;
+  });
+
+  throw new Error(
+    `SUPPORTED_CURRENCIES contains duplicate entries: ${currencyFullNames.join(
+      ", "
+    )}`
+  );
+}

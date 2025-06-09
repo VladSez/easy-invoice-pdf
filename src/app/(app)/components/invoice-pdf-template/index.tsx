@@ -1,24 +1,13 @@
-"use client";
-
 import { type InvoiceData } from "@/app/schema";
-import { TRANSLATIONS } from "@/app/schema/translations";
 import { STATIC_ASSETS_URL } from "@/config";
 import {
   Document,
   Font,
   Page,
   StyleSheet,
-  Text,
-  View,
 } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { memo } from "react";
-import { InvoiceFooter } from "./invoice-footer";
-import { InvoiceHeader } from "./invoice-header";
-import { InvoiceItemsTable } from "./invoice-items-table";
-import { InvoicePaymentInfo } from "./invoice-payment-info";
-import { InvoicePaymentTotals } from "./invoice-payment-totals";
-import { InvoiceSellerBuyerInfo } from "./invoice-seller-buyer-info";
-import { InvoiceVATSummaryTable } from "./invoice-vat-summary-table";
+import { InvoiceBody } from "./invoice-body";
 
 // Open sans seems to be working fine with EN and PL
 const fontFamily = "Open Sans";
@@ -38,7 +27,7 @@ Font.register({
 });
 
 // Styles for the PDF
-const styles = StyleSheet.create({
+export const PDF_DEFAULT_TEMPLATE_STYLES = StyleSheet.create({
   wFull: {
     width: "100%",
   },
@@ -191,9 +180,6 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
 }: {
   invoiceData: InvoiceData;
 }) {
-  const language = invoiceData.language;
-  const t = TRANSLATIONS[language];
-
   const invoiceNumberLabel = invoiceData?.invoiceNumberObject?.label;
 
   const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
@@ -201,94 +187,12 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
   const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`;
   const invoiceDocTitle = `${invoiceNumber} | Created with https://easyinvoicepdf.com`;
 
-  const formattedInvoiceTotal = invoiceData?.total
-    .toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-    .replaceAll(",", " ");
-
-  const signatureSectionIsVisible =
-    invoiceData.personAuthorizedToReceiveFieldIsVisible ||
-    invoiceData.personAuthorizedToIssueFieldIsVisible;
-
-  const vatTableSummaryIsVisible = invoiceData.vatTableSummaryIsVisible;
-
   return (
     <Document title={invoiceDocTitle}>
-      <Page size="A4" style={styles.page}>
-        <InvoiceHeader invoiceData={invoiceData} styles={styles} />
-        <InvoiceSellerBuyerInfo invoiceData={invoiceData} styles={styles} />
-        <InvoiceItemsTable
+      <Page size="A4" style={PDF_DEFAULT_TEMPLATE_STYLES.page}>
+        <InvoiceBody
           invoiceData={invoiceData}
-          formattedInvoiceTotal={formattedInvoiceTotal}
-          styles={styles}
-        />
-
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <View style={{ width: "50%" }}>
-            <InvoicePaymentInfo invoiceData={invoiceData} styles={styles} />
-          </View>
-
-          {vatTableSummaryIsVisible && (
-            <View style={{ width: "50%" }}>
-              <InvoiceVATSummaryTable
-                invoiceData={invoiceData}
-                formattedInvoiceTotal={formattedInvoiceTotal}
-                styles={styles}
-              />
-            </View>
-          )}
-        </View>
-
-        <View style={{ marginTop: vatTableSummaryIsVisible ? 0 : 15 }}>
-          <InvoicePaymentTotals
-            invoiceData={invoiceData}
-            formattedInvoiceTotal={formattedInvoiceTotal}
-            styles={styles}
-          />
-        </View>
-
-        {/* Signature section */}
-        {signatureSectionIsVisible && (
-          <View style={styles.signatureSection}>
-            {invoiceData.personAuthorizedToReceiveFieldIsVisible && (
-              <View style={styles.signatureColumn}>
-                <View style={styles.signatureLine} />
-                <Text style={styles.signatureText}>
-                  {t.personAuthorizedToReceive}
-                </Text>
-              </View>
-            )}
-            {invoiceData.personAuthorizedToIssueFieldIsVisible && (
-              <View style={styles.signatureColumn}>
-                <View style={styles.signatureLine} />
-                <Text style={styles.signatureText}>
-                  {t.personAuthorizedToIssue}
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
-
-        {/* Notes */}
-        {invoiceData.notesFieldIsVisible && (
-          <View style={{ marginTop: 10 }}>
-            <Text style={styles.fontSize8}>{invoiceData?.notes}</Text>
-          </View>
-        )}
-
-        {/* Footer  */}
-        <InvoiceFooter
-          invoiceData={invoiceData}
-          styles={styles}
-          formattedInvoiceTotal={formattedInvoiceTotal}
+          styles={PDF_DEFAULT_TEMPLATE_STYLES}
         />
       </Page>
     </Document>

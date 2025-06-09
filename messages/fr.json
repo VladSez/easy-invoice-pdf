@@ -3,7 +3,7 @@
     "tagline": "Générateur de factures PDF avec aperçu en direct",
     "hero": {
       "title": "Créez des factures professionnelles en quelques secondes",
-      "description": "EasyInvoicePDF est un outil gratuit et open-source qui vous permet de créer, personnaliser et télécharger des factures professionelles avec aperçu en temps réel.",
+      "description": "EasyInvoicePDF est un outil gratuit et open-source qui vous permet de créer, personnaliser et télécharger des factures professionnelles avec aperçu en temps réel. Fonctionne entièrement dans votre navigateur.",
       "noSignup": "Aucune inscription requise. 100% gratuit et open-source."
     },
     "features": {
