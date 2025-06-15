@@ -227,7 +227,7 @@ export const TRANSLATIONS = {
       vat: "VAT",
       netAmount: "Kwota\n netto",
       vatAmount: "Kwota VAT",
-      preTaxAmount: "Kwota brutto",
+      preTaxAmount: "Kwota\n brutto",
       sum: "SUMA",
     },
     paymentInfo: {

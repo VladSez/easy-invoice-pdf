@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { FileTextIcon, PencilIcon } from "lucide-react";
+import { AlertCircleIcon, FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import type { InvoiceData } from "@/app/schema";
 import { InvoiceForm } from "./invoice-form";
@@ -149,8 +149,10 @@ export function InvoiceClientPage({
           </Tabs>
           <div className="sticky bottom-0 z-50 mt-2 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
             <CustomTooltip
+              className={cn(!canShareInvoice && "bg-red-50")}
               trigger={
                 <Button
+                  aria-disabled={!canShareInvoice} // for better UX
                   onClick={handleShareInvoice}
                   _variant="outline"
                   className={cn(
@@ -161,7 +163,39 @@ export function InvoiceClientPage({
                   Generate a link to invoice
                 </Button>
               }
-              content={null}
+              content={
+                canShareInvoice ? (
+                  <div className="flex items-center gap-3 p-2">
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-slate-900">
+                        Share Invoice Online
+                      </p>
+                      <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                        Generate a secure link to share this invoice with your
+                        clients. They can view and download it directly from
+                        their browser.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    data-testid="share-invoice-tooltip-content"
+                    className="flex items-center gap-3 bg-red-50 p-3"
+                  >
+                    <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-red-800">
+                        Unable to Share Invoice
+                      </p>
+                      <p className="text-pretty text-xs leading-relaxed text-red-700">
+                        Invoices with logos cannot be shared. Please remove the
+                        logo to generate a shareable link. You can still
+                        download the invoice as PDF and share it.
+                      </p>
+                    </div>
+                  </div>
+                )
+              }
             />
             <InvoicePDFDownloadLink
               invoiceData={invoiceDataState}

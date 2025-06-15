@@ -1,4 +1,5 @@
 import { z } from "zod";
+import dayjs from "dayjs";
 
 export const SUPPORTED_CURRENCIES = [
   "EUR", // Euro
@@ -31,6 +32,16 @@ export const SUPPORTED_CURRENCIES = [
   "UAH", // Ukrainian Hryvnia
   "BYN", // Belarusian Ruble
   "ARS", // Argentine Peso
+  "PKR", // Pakistani Rupee
+  "SAR", // Saudi Riyal
+  "AED", // UAE Dirham
+  "QAR", // Qatari Riyal
+  "KWD", // Kuwaiti Dinar
+  "BHD", // Bahraini Dinar
+  "OMR", // Omani Rial
+  "JOD", // Jordanian Dinar
+  "EGP", // Egyptian Pound
+  "LBP", // Lebanese Pound
 ] as const satisfies string[];
 
 export type SupportedCurrencies = (typeof SUPPORTED_CURRENCIES)[number];
@@ -66,6 +77,16 @@ export const CURRENCY_SYMBOLS = {
   TRY: "₺", // Turkish Lira
   KRW: "₩", // South Korean Won
   NZD: "NZ$", // New Zealand Dollar
+  PKR: "₨", // Pakistani Rupee
+  SAR: "SAR", // Saudi Riyal
+  AED: "AED", // UAE Dirham
+  QAR: "QR", // Qatari Riyal
+  KWD: "KWD", // Kuwaiti Dinar
+  BHD: "BHD", // Bahraini Dinar
+  OMR: "OMR", // Omani Rial
+  JOD: "JOD", // Jordanian Dinar
+  EGP: "EGP", // Egyptian Pound
+  LBP: "LBP", // Lebanese Pound
 } as const satisfies Record<SupportedCurrencies, string>;
 
 export type CurrencySymbols =
@@ -101,6 +122,16 @@ export const CURRENCY_TO_LABEL = {
   TRY: "Turkish Lira",
   KRW: "South Korean Won",
   NZD: "New Zealand Dollar",
+  PKR: "Pakistani Rupee",
+  SAR: "Saudi Riyal",
+  AED: "UAE Dirham",
+  QAR: "Qatari Riyal",
+  KWD: "Kuwaiti Dinar",
+  BHD: "Bahraini Dinar",
+  OMR: "Omani Rial",
+  JOD: "Jordanian Dinar",
+  EGP: "Egyptian Pound",
+  LBP: "Lebanese Pound",
 } as const satisfies Record<SupportedCurrencies, string>;
 
 export type CurrencyLabels =
@@ -390,8 +421,32 @@ export const invoiceSchema = z.object({
     })
     .optional(),
 
-  dateOfIssue: z.string().min(1, "Date of issue is required").trim(),
-  dateOfService: z.string().min(1, "Date of service is required").trim(),
+  dateOfIssue: z
+    .string()
+    .trim()
+    .transform((val) => {
+      if (!val) {
+        // If no value is provided, set the date of issue to today's date
+        return dayjs().format("YYYY-MM-DD");
+      }
+
+      return val;
+    })
+    .describe("Invoice date of issue. Default is today's date"),
+
+  dateOfService: z
+    .string()
+    .trim()
+    .transform((val) => {
+      if (!val) {
+        // If no value is provided, set the date of service to the last day of the current month
+        return dayjs().endOf("month").format("YYYY-MM-DD");
+      }
+      return val;
+    })
+    .describe(
+      "Invoice date of service. Default is the last day of the current month"
+    ),
 
   invoiceType: z
     .string()
@@ -416,7 +471,17 @@ export const invoiceSchema = z.object({
     .optional(),
   paymentMethodFieldIsVisible: z.boolean().default(true),
 
-  paymentDue: z.string().min(1, "Payment due is required").trim(),
+  paymentDue: z
+    .string()
+    .trim()
+    .transform((val) => {
+      if (!val) {
+        // If no value is provided, set the payment due date to 14 days from the date of issue
+        return dayjs().add(14, "days").format("YYYY-MM-DD");
+      }
+      return val;
+    })
+    .describe("Payment due date. Default is 14 days from the date of issue"),
 
   /**
    * Pay Online URL field for Stripe template only

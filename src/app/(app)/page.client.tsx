@@ -40,6 +40,8 @@ import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
 import { InvoiceClientPage } from "./components";
 import { customDefaultToast } from "./components/cta-toasts";
 import { customPremiumToast } from "./components/cta-toasts";
+import { cn } from "@/lib/utils";
+import { AlertCircleIcon } from "lucide-react";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 /**
@@ -282,20 +284,20 @@ export function AppPageClient() {
       // Randomly show either default or premium donation toast
       if (Math.random() <= 0.5) {
         customPremiumToast({
-          title: "Support Our Work",
+          title: "Support My Work",
           description:
-            "Your contribution helps us maintain and improve this project for everyone! 🚀",
+            "Your contribution helps me maintain and improve this project for everyone! 🚀",
         });
       } else {
         customDefaultToast({
           title: "Love this project?",
           description:
-            "Help us keep building amazing tools! Your support means the world to us. ✨",
+            "Help me keep building amazing tools! Your support means the world to me. ✨",
         });
       }
     };
 
-    // Show cta toast after 30 seconds on the page
+    // Show cta toast after 30 seconds on the app page
     const initialTimer = setTimeout(showCTAToast, 30_000);
 
     return () => {
@@ -309,12 +311,18 @@ export function AppPageClient() {
 
   const handleShareInvoice = async () => {
     if (!canShareInvoice) {
-      toast.error(
-        "Invoices with logos cannot be shared. Please remove the logo to generate a shareable link. You can still download the invoice as PDF and share it.",
-        {
-          duration: 5000,
-        }
-      );
+      toast.error("Unable to Share Invoice", {
+        duration: 5000,
+        description: (
+          <>
+            <p className="text-pretty text-xs leading-relaxed text-red-700">
+              Invoices with logos cannot be shared. Please remove the logo to
+              generate a shareable link. You can still download the invoice as
+              PDF and share it.
+            </p>
+          </>
+        ),
+      });
 
       return;
     }
@@ -415,20 +423,53 @@ export function AppPageClient() {
                 {isDesktop ? (
                   <>
                     <CustomTooltip
+                      className={cn(!canShareInvoice && "bg-red-50")}
                       trigger={
                         <Button
-                          disabled={!canShareInvoice}
+                          aria-disabled={!canShareInvoice} // better UX
                           onClick={handleShareInvoice}
                           _variant="outline"
-                          className="mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
+                          className={cn(
+                            "mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto",
+                            !canShareInvoice && "opacity-50" // 'disabled' styles
+                          )}
                         >
                           Generate a link to invoice
                         </Button>
                       }
                       content={
-                        canShareInvoice
-                          ? "Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
-                          : "Invoices with logos cannot be shared. Please remove the logo to generate a shareable link."
+                        canShareInvoice ? (
+                          <div className="flex items-center gap-3 p-2">
+                            <div className="space-y-1">
+                              <p className="text-sm font-semibold text-slate-900">
+                                Share Invoice Online
+                              </p>
+                              <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                                Generate a secure link to share this invoice
+                                with your clients. They can view and download it
+                                directly from their browser.
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            data-testid="share-invoice-tooltip-content"
+                            className="flex items-center gap-3 bg-red-50 p-3"
+                          >
+                            <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
+                            <div className="space-y-1">
+                              <p className="text-sm font-semibold text-red-800">
+                                Unable to Share Invoice
+                              </p>
+                              <p className="text-pretty text-xs leading-relaxed text-red-700">
+                                Invoices with logos cannot be shared. Please
+                                remove the logo to generate a shareable link.
+                                You can still download the invoice as PDF and
+                                share it.
+                              </p>
+                            </div>
+                          </div>
+                        )
                       }
                     />
                     <InvoicePDFDownloadLink

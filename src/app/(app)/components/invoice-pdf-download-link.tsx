@@ -94,15 +94,15 @@ export function InvoicePDFDownloadLink({
       setTimeout(() => {
         if (Math.random() <= 0.5) {
           customPremiumToast({
-            title: "Support Our Work",
+            title: "Support My Work",
             description:
-              "Your contribution helps us maintain and improve this project for everyone! 🚀",
+              "Your contribution helps me maintain and improve this project for everyone! 🚀",
           });
         } else {
           customDefaultToast({
             title: "Love this project?",
             description:
-              "Help us keep building amazing tools! Your support means the world to us. ✨",
+              "Help me keep building amazing tools! Your support means the world to me. ✨",
           });
         }
       }, 2000);

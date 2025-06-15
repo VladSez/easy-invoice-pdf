@@ -35,36 +35,58 @@ export function StripeInvoiceInfo({
   );
 
   return (
-    <View style={[styles.mb24]}>
-      <View style={[styles.mb1, styles.row]}>
-        <Text style={[styles.fontSize9, styles.fontBold, { width: 120 }]}>
-          {t.stripe.invoiceNumber}
-        </Text>
+    <View style={[styles.mb24, { gap: 2 }]}>
+      <View style={[styles.mb1, styles.row, { alignItems: "baseline" }]}>
+        {/* Invoice number text column */}
+        <View style={{ width: 90 }}>
+          <Text style={[styles.fontSize9, styles.fontBold, { maxWidth: 80 }]}>
+            {t.stripe.invoiceNumber}
+          </Text>
+        </View>
+        {/* Invoice number value column */}
         <Text style={[styles.fontSize9, styles.fontBold]}>
           {invoiceNumberValue}
         </Text>
       </View>
 
-      <View style={[styles.mb1, styles.row]}>
-        <Text style={[styles.fontSize9, styles.fontMedium, { width: 120 }]}>
-          {t.stripe.dateOfIssue}
-        </Text>
+      <View style={[styles.mb1, styles.row, { alignItems: "baseline" }]}>
+        {/* Date of issue text column */}
+        <View style={{ width: 90 }}>
+          <Text
+            style={[styles.fontSize9, styles.fontMedium, { maxWidth: 120 }]}
+          >
+            {t.stripe.dateOfIssue}
+          </Text>
+        </View>
+        {/* Date of issue value column */}
         <Text style={[styles.fontSize9, styles.fontMedium]}>{dateOfIssue}</Text>
       </View>
 
-      <View style={[styles.mb1, styles.row]}>
-        <Text style={[styles.fontSize9, styles.fontMedium, { width: 120 }]}>
-          {t.stripe.dateDue}
-        </Text>
+      <View style={[styles.mb1, styles.row, { alignItems: "baseline" }]}>
+        {/* Date due text column */}
+        <View style={{ width: 90 }}>
+          <Text
+            style={[styles.fontSize9, styles.fontMedium, { maxWidth: 120 }]}
+          >
+            {t.stripe.dateDue}
+          </Text>
+        </View>
+        {/* Date due value column */}
         <Text style={[styles.fontSize9, styles.fontMedium]}>
           {paymentDueDate}
         </Text>
       </View>
 
-      <View style={[styles.mb1, styles.row]}>
-        <Text style={[styles.fontSize9, styles.fontMedium, { width: 120 }]}>
-          {t.stripe.servicePeriod}
-        </Text>
+      <View style={[styles.mb1, styles.row, { alignItems: "baseline" }]}>
+        {/* Service period text column */}
+        <View style={{ width: 90 }}>
+          <Text
+            style={[styles.fontSize9, styles.fontMedium, { maxWidth: 120 }]}
+          >
+            {t.stripe.servicePeriod}
+          </Text>
+        </View>
+        {/* Service period value column */}
         <Text style={[styles.fontSize9, styles.fontMedium]}>
           {servicePeriodStart} - {servicePeriodEnd}
         </Text>

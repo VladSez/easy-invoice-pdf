@@ -104,7 +104,8 @@ function HeroSection() {
       </div>
 
       <div className="container relative z-10 px-4 md:px-6">
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-0">
+          {/* Left column (text) */}
           <div className="flex flex-col justify-center space-y-5 md:space-y-6">
             <div className="space-y-3 md:space-y-4">
               <h1 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl md:text-5xl lg:text-6xl">
@@ -143,7 +144,8 @@ function HeroSection() {
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[600px] lg:mx-0">
+          {/* Right column (video) */}
+          <div className="relative mx-auto w-full max-w-[650px] lg:mx-0">
             {/* Mac OS Frame around the video */}
             <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
               {/* Browser chrome bar */}
@@ -208,7 +210,7 @@ function FeaturesSection() {
   return (
     <section
       id="features"
-      className="flex w-full items-center justify-center bg-slate-50 py-12 md:py-20"
+      className="flex w-full items-center justify-center bg-slate-50 py-12 lg:py-20"
     >
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -403,13 +405,15 @@ function CtaSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <GithubIcon className="mr-2 h-6 w-6 transition-transform duration-300 group-hover:scale-110 group-hover:fill-slate-100" />
+                  <GithubIcon className="mr-2 h-6 w-6 fill-slate-100 transition-transform duration-300 group-hover:scale-110 group-hover:fill-slate-950" />
                   {t("buttons.starOnGithub")}
                 </Link>
               </Button>
             </div>
           </div>
-          <p className="text-sm text-slate-400">{t("cta.noSignup")}</p>
+          <p className="animate-pulse text-sm text-slate-400">
+            {t("cta.noSignup")}
+          </p>
         </div>
       </div>
     </section>

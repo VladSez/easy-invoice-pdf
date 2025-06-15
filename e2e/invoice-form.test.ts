@@ -536,10 +536,6 @@ test.describe("Invoice Generator Page", () => {
     await invoiceItemsSection.getByRole("textbox", { name: "Name" }).clear();
 
     await expect(
-      page.getByText("Date of issue is required", { exact: true })
-    ).toBeVisible();
-
-    await expect(
       page.getByText("Seller name is required", { exact: true })
     ).toBeVisible();
 
@@ -583,9 +579,6 @@ test.describe("Invoice Generator Page", () => {
       .fill("Test Buyer");
 
     // Check for error messages to be hidden
-    await expect(
-      page.getByText("Date of issue is required", { exact: true })
-    ).toBeHidden();
 
     await expect(
       page.getByText("Seller name is required", { exact: true })

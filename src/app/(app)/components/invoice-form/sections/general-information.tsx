@@ -33,7 +33,9 @@ import { memo, useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 const AlertIcon = () => {
-  return <AlertTriangle className="mr-1 inline-block h-3 w-3 text-amber-500" />;
+  return (
+    <AlertTriangle className="mr-1 inline-block h-3.5 w-3.5 text-amber-500" />
+  );
 };
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
@@ -89,6 +91,7 @@ export const GeneralInformation = memo(function GeneralInformation({
   const language = useWatch({ control, name: "language" });
   const template = useWatch({ control, name: "template" });
   const logo = useWatch({ control, name: "logo" });
+  const selectedDateFormat = useWatch({ control, name: "dateFormat" });
 
   const t = TRANSLATIONS[language];
   const defaultInvoiceNumber = `${t.invoiceNumber}:`;
@@ -229,7 +232,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               </InputHelperMessage>
             </div>
           ) : (
-            <div>
+            <div data-testid="stripe-logo-upload-input">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -484,7 +487,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               {!isInvoiceNumberInCurrentMonth &&
                 !errors.invoiceNumberObject?.value && (
                   <div className="mt-1 flex flex-col items-start text-balance text-xs text-zinc-700/90">
-                    <span className="mb-2 flex items-center md:mb-0 lg:mb-2">
+                    <span className="mb-2 flex items-center text-amber-800 md:mb-0 lg:mb-2">
                       <AlertIcon />
                       Invoice number does not match current month
                     </span>
@@ -524,19 +527,22 @@ export const GeneralInformation = memo(function GeneralInformation({
         )}
         {isDateOfIssueNotToday && !errors.dateOfIssue ? (
           <InputHelperMessage>
-            <span className="flex items-center">
+            <span className="flex items-center text-amber-800">
               <AlertIcon />
               Date of issue is not today
             </span>
 
             <ButtonHelper
               onClick={() => {
-                const currentMonth = dayjs().format("YYYY-MM-DD");
+                const currentMonth = dayjs().format("YYYY-MM-DD"); // default browser date input format is YYYY-MM-DD
 
                 setValue("dateOfIssue", currentMonth);
               }}
             >
-              Click to set the date to today ({dayjs().format("DD/MM/YYYY")})
+              <span className="text-balance">
+                Set date of issue to {dayjs().format(selectedDateFormat)}{" "}
+                (today)
+              </span>
             </ButtonHelper>
           </InputHelperMessage>
         ) : null}
@@ -560,7 +566,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
         {!isDateOfServiceEqualsEndOfCurrentMonth && !errors.dateOfService ? (
           <InputHelperMessage>
-            <span className="flex items-center">
+            <span className="flex items-center text-amber-800">
               <AlertIcon />
               Date of service is not the last day of the current month
             </span>
@@ -569,13 +575,14 @@ export const GeneralInformation = memo(function GeneralInformation({
               onClick={() => {
                 const lastDayOfCurrentMonth = dayjs()
                   .endOf("month")
-                  .format("YYYY-MM-DD");
+                  .format("YYYY-MM-DD"); // default browser date input format is YYYY-MM-DD
 
                 setValue("dateOfService", lastDayOfCurrentMonth);
               }}
             >
-              Click to set the date to the last day of the current month (
-              {dayjs().endOf("month").format("DD/MM/YYYY")})
+              Set date of service to{" "}
+              {dayjs().endOf("month").format(selectedDateFormat)} (end of
+              current month)
             </ButtonHelper>
           </InputHelperMessage>
         ) : null}

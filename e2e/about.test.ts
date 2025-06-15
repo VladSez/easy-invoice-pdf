@@ -258,7 +258,7 @@ test.describe("About page", () => {
 
     await expect(
       heroSection.getByText(
-        "EasyInvoicePDF est un outil gratuit et open-source qui vous permet de créer, personnaliser et télécharger des factures professionelles avec aperçu en temps réel."
+        "EasyInvoicePDF est un outil gratuit et open-source qui vous permet de créer, personnaliser et télécharger des factures professionnelles avec aperçu en temps réel. Fonctionne entièrement dans votre navigateur."
       )
     ).toBeVisible();
 

@@ -28,17 +28,17 @@ export const LandingCtaToast = () => {
       // Randomly show either default or premium donation toast
       if (Math.random() <= 0.5) {
         customPremiumToast({
-          title: "Support Our Work",
+          title: "Support My Work",
           description:
-            "Your contribution helps us maintain and improve this project for everyone! 🚀",
-          showDonationButton: false,
+            "Your contribution helps me maintain and improve this project for everyone! 🚀",
+          showDonationButton: false, // we only want to show the donation button on the app page
         });
       } else {
         customDefaultToast({
           title: "Love this project?",
           description:
-            "Help us keep building amazing tools! Your support means the world to us. ✨",
-          showDonationButton: false,
+            "Help me keep building amazing tools! Your support means the world to me. ✨",
+          showDonationButton: false, // we only want to show the donation button on the app page
         });
       }
     };

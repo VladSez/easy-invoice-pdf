@@ -93,6 +93,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   const paymentDue = useWatch({ control, name: "paymentDue" });
   const language = useWatch({ control, name: "language" });
+  const selectedDateFormat = useWatch({ control, name: "dateFormat" });
 
   const isPaymentDueBeforeDateOfIssue = dayjs(paymentDue).isBefore(
     dayjs(dateOfIssue)
@@ -534,31 +535,39 @@ export const InvoiceForm = memo(function InvoiceForm({
             {errors.paymentDue && (
               <ErrorMessage>{errors.paymentDue.message}</ErrorMessage>
             )}
-            {!errors.paymentDue && isPaymentDueBeforeDateOfIssue ? (
+            {!errors.paymentDue &&
+            isPaymentDueBeforeDateOfIssue &&
+            dateOfIssue ? (
               <InputHelperMessage>
-                <span className="flex items-center text-balance">
+                <span className="flex items-center text-balance text-amber-800">
                   <AlertIcon />
                   Payment due date is before date of issue (
-                  {dayjs(dateOfIssue).format("DD.MM.YYYY")})
+                  {dayjs(dateOfIssue).format(selectedDateFormat)})
                 </span>
                 <ButtonHelper
                   onClick={() => {
                     const newPaymentDue = dayjs(dateOfIssue)
                       .add(14, "days")
-                      .format("YYYY-MM-DD");
+                      .format("YYYY-MM-DD"); // default browser date input format is YYYY-MM-DD
 
                     setValue("paymentDue", newPaymentDue);
                   }}
                 >
-                  Click to set payment due date 14 days after the date of issue
-                  ({dayjs(dateOfIssue).add(14, "days").format("DD/MM/YYYY")})
+                  <span className="text-balance">
+                    Set payment due date to{" "}
+                    {dayjs(dateOfIssue)
+                      .add(14, "days")
+                      .format(selectedDateFormat)}{" "}
+                    (14 days from issue date)
+                  </span>
                 </ButtonHelper>
               </InputHelperMessage>
             ) : null}
             {/* If there are no errors and the payment due date is not before the date of issue and the payment due date is not 14 days after the date of issue, show the button to set the payment due date to 14 days after the date of issue (probably a bit better UX) */}
             {!errors.paymentDue &&
             !isPaymentDueBeforeDateOfIssue &&
-            !isPaymentDue14DaysFromDateOfIssue ? (
+            !isPaymentDue14DaysFromDateOfIssue &&
+            dateOfIssue ? (
               <ButtonHelper
                 className="whitespace-normal"
                 onClick={() => {
@@ -569,8 +578,13 @@ export const InvoiceForm = memo(function InvoiceForm({
                   setValue("paymentDue", newPaymentDue);
                 }}
               >
-                Click to set payment due date 14 days after the date of issue (
-                {dayjs(dateOfIssue).add(14, "days").format("DD/MM/YYYY")})
+                <span className="text-balance">
+                  Set payment due date to{" "}
+                  {dayjs(dateOfIssue)
+                    .add(14, "days")
+                    .format(selectedDateFormat)}{" "}
+                  (14 days from issue date)
+                </span>
               </ButtonHelper>
             ) : null}
           </div>

@@ -194,6 +194,10 @@ test.describe("PDF Preview", () => {
     const dataBuffer = await fs.promises.readFile(tmpPath);
     const pdfData = await pdf(dataBuffer);
 
+    expect((pdfData.info as { Title: string }).Title).toContain(
+      `Faktura nr: 1/${CURRENT_MONTH_AND_YEAR} | Created with https://easyinvoicepdf.com`
+    );
+
     // Verify PDF content
     expect(pdfData.text).toContain("Faktura nr");
     expect(pdfData.text).toContain("Data wystawienia");

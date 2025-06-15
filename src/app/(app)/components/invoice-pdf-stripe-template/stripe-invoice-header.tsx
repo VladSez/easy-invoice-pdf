@@ -15,7 +15,7 @@ export function StripeInvoiceHeader({
   const hasLogo = invoiceData.logo && invoiceData.logo.length > 0;
 
   return (
-    <View style={[styles.mb20]}>
+    <View style={[hasLogo ? {} : styles.mb20]}>
       {hasLogo ? (
         // Header with logo and title side by side
         <View
@@ -37,8 +37,8 @@ export function StripeInvoiceHeader({
             <Image
               src={invoiceData.logo}
               style={{
-                maxWidth: 120,
-                maxHeight: 50,
+                maxWidth: 110,
+                maxHeight: 40,
                 objectFit: "contain",
               }}
             />
