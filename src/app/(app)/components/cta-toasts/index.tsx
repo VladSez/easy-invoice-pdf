@@ -75,6 +75,23 @@ export function customDefaultToast(toast: Omit<ToastProps, "id">) {
   );
 }
 
+const SonnerCloseButton = (
+  props: React.ButtonHTMLAttributes<HTMLButtonElement>
+) => {
+  return (
+    <button
+      className="absolute flex h-5 w-5 border border-gray-300 bg-white"
+      aria-label="Close toast"
+      type="button"
+      data-disabled="false"
+      data-close-button="true"
+      {...props}
+    >
+      <XIcon className="h-3.5 w-3.5" />
+    </button>
+  );
+};
+
 function PremiumDonationToast(props: ToastProps) {
   const { title, description, id, showDonationButton = true } = props;
   const showDonationRandomly = shouldShowDonationButton();
@@ -85,16 +102,7 @@ function PremiumDonationToast(props: ToastProps) {
       data-testid="download-pdf-toast"
     >
       {/* Close button - styled like default Sonner toast */}
-      <button
-        onClick={() => sonnerToast.dismiss(id)}
-        className="absolute flex h-5 w-5 border border-gray-300 bg-white"
-        aria-label="Close toast"
-        type="button"
-        data-disabled="false"
-        data-close-button="true"
-      >
-        <XIcon className="h-3.5 w-3.5" />
-      </button>
+      <SonnerCloseButton onClick={() => sonnerToast.dismiss(id)} />
 
       <div className="relative">
         <div className="mb-2 flex items-center gap-2">
@@ -191,16 +199,8 @@ function DefaultDonationToast(props: ToastProps) {
       data-testid="download-pdf-toast"
     >
       {/* Close button - styled like default Sonner toast */}
-      <button
-        onClick={() => sonnerToast.dismiss(id)}
-        className="absolute flex h-5 w-5 border border-gray-300 bg-white"
-        aria-label="Close toast"
-        type="button"
-        data-disabled="false"
-        data-close-button="true"
-      >
-        <XIcon className="h-3.5 w-3.5" />
-      </button>
+      <SonnerCloseButton onClick={() => sonnerToast.dismiss(id)} />
+
       <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-600">
         <Heart className="h-5 w-5 fill-current text-white" />
       </div>

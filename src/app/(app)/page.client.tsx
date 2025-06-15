@@ -426,12 +426,11 @@ export function AppPageClient() {
                       className={cn(!canShareInvoice && "bg-red-50")}
                       trigger={
                         <Button
-                          aria-disabled={!canShareInvoice} // better UX
+                          aria-disabled={!canShareInvoice} // better UX than 'disabled'
                           onClick={handleShareInvoice}
                           _variant="outline"
                           className={cn(
-                            "mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto",
-                            !canShareInvoice && "opacity-50" // 'disabled' styles
+                            "mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
                           )}
                         >
                           Generate a link to invoice

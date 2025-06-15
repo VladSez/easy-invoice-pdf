@@ -1183,8 +1183,8 @@ test.describe("Invoice Generator Page", () => {
       page.getByText("The shared invoice URL appears to be incorrect")
     ).toBeHidden();
 
-    // Verify URL is cleared
-    expect(page.url()).toContain("/");
-    expect(page.url()).not.toContain("?data=");
+    // Wait for URL to be cleared and verify
+    await expect(page).toHaveURL("/");
+    await expect(page).not.toHaveURL(/\?data=/);
   });
 });

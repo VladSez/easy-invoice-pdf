@@ -188,18 +188,15 @@ export const InvoiceForm = memo(function InvoiceForm({
     return () => subscription.unsubscribe();
   }, [debouncedRegeneratePdfOnFormChange, watch]);
 
-  // Check if template is stripe and logo exists to disable sharing due to technical limitations (we can't put the logo base64 string in the URL due to browser URL length limits)
-  useEffect(() => {
-    const currentFormData = watch();
-    const isStripeTemplate = currentFormData.template === "stripe";
-    const hasLogo = Boolean(currentFormData.logo);
+  const template = useWatch({ control, name: "template" });
+  const logo = useWatch({ control, name: "logo" });
 
-    if (isStripeTemplate && hasLogo) {
-      setCanShareInvoice(false);
-    } else {
-      setCanShareInvoice(true);
-    }
-  }, [watch, setCanShareInvoice]);
+  // Disable sharing when Stripe template contains a logo (we can't put the logo base64 string in the URL due to browser URL length limits)
+  useEffect(() => {
+    const canShareInvoice = !(template === "stripe" && Boolean(logo));
+
+    setCanShareInvoice(canShareInvoice);
+  }, [template, logo, setCanShareInvoice]);
 
   // Add a wrapper function for remove item that triggers the form update
   const handleRemoveItem = useCallback(
