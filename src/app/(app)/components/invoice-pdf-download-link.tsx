@@ -80,8 +80,12 @@ export function InvoicePDFDownloadLink({
 
   // Memoize tracking functions
   const trackDownload = useCallback(() => {
-    umamiTrackEvent("download_invoice");
-  }, []);
+    umamiTrackEvent("download_invoice", {
+      data: {
+        invoice_template: invoiceData.template,
+      },
+    });
+  }, [invoiceData.template]);
 
   const handleClick = useCallback(() => {
     if (!isLoading && url) {
