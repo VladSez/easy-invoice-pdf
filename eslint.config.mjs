@@ -2,6 +2,7 @@
 import { FlatCompat } from "@eslint/eslintrc";
 import tseslint from "typescript-eslint";
 import playwright from "eslint-plugin-playwright";
+import youMightNotNeedAnEffect from "eslint-plugin-react-you-might-not-need-an-effect";
 
 const compat = new FlatCompat({
   baseDirectory: import.meta.dirname,
@@ -66,6 +67,15 @@ export default tseslint.config(
   {
     rules: {
       "no-console": ["warn", { allow: ["error"] }],
+    },
+  },
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    plugins: {
+      "react-you-might-not-need-an-effect": youMightNotNeedAnEffect,
+    },
+    rules: {
+      "react-you-might-not-need-an-effect/you-might-not-need-an-effect": "warn",
     },
   },
   // Playwright config for e2e tests only

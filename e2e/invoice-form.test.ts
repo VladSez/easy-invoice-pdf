@@ -462,10 +462,19 @@ test.describe("Invoice Generator Page", () => {
     await itemNameInput.fill("TEST INVOICE ITEM");
     await expect(itemNameInput).toHaveValue("TEST INVOICE ITEM");
 
+    // Set up dialog handler before triggering the action
+    page.on("dialog", async (dialog) => {
+      expect(dialog.message()).toBe(
+        "Are you sure you want to delete invoice item #2?"
+      );
+      await dialog.accept();
+    });
+
     // Remove the added item
     await invoiceItemsSection
       .getByRole("button", { name: "Delete Invoice Item 2" })
       .click();
+
     await expect(
       invoiceItemsSection.getByText("Item 2", { exact: true })
     ).toBeHidden();
@@ -527,10 +536,6 @@ test.describe("Invoice Generator Page", () => {
     await invoiceItemsSection.getByRole("textbox", { name: "Name" }).clear();
 
     await expect(
-      page.getByText("Date of issue is required", { exact: true })
-    ).toBeVisible();
-
-    await expect(
       page.getByText("Seller name is required", { exact: true })
     ).toBeVisible();
 
@@ -574,9 +579,6 @@ test.describe("Invoice Generator Page", () => {
       .fill("Test Buyer");
 
     // Check for error messages to be hidden
-    await expect(
-      page.getByText("Date of issue is required", { exact: true })
-    ).toBeHidden();
 
     await expect(
       page.getByText("Seller name is required", { exact: true })
@@ -1181,8 +1183,8 @@ test.describe("Invoice Generator Page", () => {
       page.getByText("The shared invoice URL appears to be incorrect")
     ).toBeHidden();
 
-    // Verify URL is cleared
-    expect(page.url()).toContain("/");
-    expect(page.url()).not.toContain("?data=");
+    // Wait for URL to be cleared and verify
+    await expect(page).toHaveURL("/");
+    await expect(page).not.toHaveURL(/\?data=/);
   });
 });

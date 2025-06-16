@@ -1,4 +1,4 @@
-import { Plus, Trash2, Pencil } from "lucide-react";
+import { Plus, Trash2, Pencil, AlertCircleIcon } from "lucide-react";
 import { useId, useState, useEffect } from "react";
 import { CustomTooltip } from "./ui/tooltip";
 import { SelectNative } from "./ui/select-native";
@@ -304,6 +304,7 @@ export function BuyerManagement({
         ) : null}
 
         <CustomTooltip
+          className={cn(!isLocalStorageAvailable && "bg-red-50")}
           trigger={
             <Button
               _variant="outline"
@@ -315,21 +316,52 @@ export function BuyerManagement({
 
                   // open buyer dialog
                   setIsBuyerDialogOpen(true);
+                } else {
+                  toast.error("Unable to add buyer", {
+                    description: (
+                      <>
+                        <p className="text-pretty text-xs leading-relaxed text-red-700">
+                          Local storage is not available in your browser. Please
+                          enable it or try another browser.
+                        </p>
+                      </>
+                    ),
+                  });
                 }
               }}
-              aria-disabled={!isLocalStorageAvailable}
-              className={cn(
-                !isLocalStorageAvailable && "cursor-not-allowed opacity-40"
-              )}
+              aria-disabled={!isLocalStorageAvailable} // better UX than 'disabled'
             >
               New Buyer
               <Plus className="ml-1 h-3 w-3" />
             </Button>
           }
           content={
-            isLocalStorageAvailable
-              ? "You can save multiple buyers to use them later"
-              : "Local storage is not available in your browser. Please enable it or try another browser"
+            isLocalStorageAvailable ? (
+              <div className="flex items-center gap-3 p-2">
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-slate-900">
+                    Save Buyers for Quick Access
+                  </p>
+                  <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                    Store multiple buyers to easily reuse their information in
+                    future invoices. All data is saved locally in your browser.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 bg-red-50 p-3">
+                <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-red-800">
+                    Storage Not Available
+                  </p>
+                  <p className="text-pretty text-xs leading-relaxed text-red-700">
+                    Local storage is not available in your browser. Please
+                    enable it or try another browser to save buyer information.
+                  </p>
+                </div>
+              </div>
+            )
           }
         />
       </div>
