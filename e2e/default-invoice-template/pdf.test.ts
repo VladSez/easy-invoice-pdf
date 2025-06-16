@@ -558,7 +558,7 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
       page.getByRole("link", { name: "Star on GitHub" })
     ).toBeVisible();
 
-    await expect(page.getByRole("link", { name: "Donate $5" })).toBeVisible();
+    await expect(page.getByTestId("toast-cta-btn")).toBeVisible();
 
     // Switch back to form tab
     await page.getByRole("tab", { name: "Edit Invoice" }).click();
