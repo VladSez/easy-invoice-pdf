@@ -27,7 +27,7 @@ interface ToastProps {
 /**
  * Randomly determines whether to show donation or feedback button
  */
-function shouldShowDonationButton(): boolean {
+function randomlyShowDonationButton() {
   return Math.random() < 0.5;
 }
 
@@ -94,7 +94,7 @@ const SonnerCloseButton = (
 
 function PremiumDonationToast(props: ToastProps) {
   const { title, description, id, showDonationButton = true } = props;
-  const showDonationRandomly = shouldShowDonationButton();
+  const showDonationBtnRandomly = randomlyShowDonationButton();
 
   return (
     <div
@@ -137,61 +137,94 @@ function PremiumDonationToast(props: ToastProps) {
               Star on GitHub
             </a>
           </Button>
-          {showDonationButton &&
-            (showDonationRandomly ? (
-              <Button
-                _size="sm"
-                className="h-8 flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-xs text-white transition-all duration-200 hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg"
-                asChild
-              >
-                <a
-                  href={DONATION_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => {
-                    umamiTrackEvent(
-                      "donate_btn_click_download_pdf_toast_premium"
-                    );
+          {showDonationButton ? (
+            showDonationBtnRandomly ? (
+              <PremiumToastDonationButton
+                onClick={() => {
+                  umamiTrackEvent(
+                    "donate_btn_click_download_pdf_toast_premium"
+                  );
 
-                    sonnerToast.dismiss(id);
-                  }}
-                >
-                  <HeartIcon className="mr-1 h-3 w-3 fill-current" />
-                  Donate $5
-                </a>
-              </Button>
+                  sonnerToast.dismiss(id);
+                }}
+              />
             ) : (
-              <Button
-                _size="sm"
-                className="h-8 flex-1 bg-gradient-to-r from-green-500 to-blue-600 text-xs text-white transition-all duration-200 hover:from-green-600 hover:to-blue-700 hover:shadow-lg"
-                asChild
-              >
-                <a
-                  href={FEEDBACK_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => {
-                    umamiTrackEvent(
-                      "feedback_btn_click_download_pdf_toast_premium"
-                    );
+              <PremiumToastFeedbackButton
+                onClick={() => {
+                  umamiTrackEvent(
+                    "feedback_btn_click_download_pdf_toast_premium"
+                  );
 
-                    sonnerToast.dismiss(id);
-                  }}
-                >
-                  <MessageSquare className="mr-1 h-3 w-3" />
-                  Share Feedback
-                </a>
-              </Button>
-            ))}
+                  sonnerToast.dismiss(id);
+                }}
+              />
+            )
+          ) : (
+            <PremiumToastFeedbackButton
+              onClick={() => {
+                umamiTrackEvent(
+                  "feedback_btn_click_download_pdf_toast_premium"
+                );
+
+                sonnerToast.dismiss(id);
+              }}
+            />
+          )}
         </div>
       </div>
     </div>
   );
 }
 
+function PremiumToastFeedbackButton(
+  props: React.AnchorHTMLAttributes<HTMLAnchorElement>
+) {
+  return (
+    <Button
+      _size="sm"
+      className="h-8 flex-1 bg-gradient-to-r from-green-500 to-blue-600 text-xs text-white transition-all duration-200 hover:from-green-600 hover:to-blue-700 hover:shadow-lg"
+      asChild
+    >
+      <a
+        href={FEEDBACK_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        {...props}
+      >
+        <MessageSquare className="mr-1 h-3 w-3" />
+        Share Feedback
+      </a>
+    </Button>
+  );
+}
+
+function PremiumToastDonationButton(
+  props: React.AnchorHTMLAttributes<HTMLAnchorElement>
+) {
+  return (
+    <Button
+      _size="sm"
+      className="h-8 flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-xs text-white transition-all duration-200 hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg"
+      asChild
+    >
+      <a
+        href={DONATION_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        {...props}
+      >
+        <HeartIcon className="mr-1 h-3 w-3 fill-current" />
+        Donate $5
+      </a>
+    </Button>
+  );
+}
+
 function DefaultDonationToast(props: ToastProps) {
   const { title, description, id, showDonationButton = true } = props;
-  const showDonationRandomly = shouldShowDonationButton();
+
+  // Randomly determine whether to show donation or feedback button
+  const showDonationBtnRandomly = randomlyShowDonationButton();
 
   return (
     <div
@@ -232,54 +265,85 @@ function DefaultDonationToast(props: ToastProps) {
               Star on GitHub
             </a>
           </Button>
-          {showDonationButton &&
-            (showDonationRandomly ? (
-              <Button
-                _size="sm"
-                className="h-7 bg-gradient-to-r from-pink-500 to-purple-600 px-3 text-xs font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-pink-600 hover:to-purple-700"
-                asChild
-              >
-                <a
-                  href={DONATION_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => {
-                    umamiTrackEvent(
-                      "donate_btn_click_download_pdf_toast_default"
-                    );
+          {showDonationButton ? (
+            showDonationBtnRandomly ? (
+              <DefaultToastDonationButton
+                onClick={() => {
+                  umamiTrackEvent(
+                    "donate_btn_click_download_pdf_toast_default"
+                  );
 
-                    sonnerToast.dismiss(id);
-                  }}
-                >
-                  <Coffee className="mr-1 h-3 w-3" />
-                  Donate $5
-                </a>
-              </Button>
+                  sonnerToast.dismiss(id);
+                }}
+              />
             ) : (
-              <Button
-                _size="sm"
-                className="h-7 bg-gradient-to-r from-green-500 to-blue-600 px-3 text-xs font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-green-600 hover:to-blue-700"
-                asChild
-              >
-                <a
-                  href={FEEDBACK_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => {
-                    umamiTrackEvent(
-                      "feedback_btn_click_download_pdf_toast_default"
-                    );
+              <DefaultToastFeedbackButton
+                onClick={() => {
+                  umamiTrackEvent(
+                    "feedback_btn_click_download_pdf_toast_default"
+                  );
 
-                    sonnerToast.dismiss(id);
-                  }}
-                >
-                  <MessageSquare className="mr-1 h-3 w-3" />
-                  Share Feedback
-                </a>
-              </Button>
-            ))}
+                  sonnerToast.dismiss(id);
+                }}
+              />
+            )
+          ) : (
+            <DefaultToastFeedbackButton
+              onClick={() => {
+                umamiTrackEvent(
+                  "feedback_btn_click_download_pdf_toast_default"
+                );
+
+                sonnerToast.dismiss(id);
+              }}
+            />
+          )}
         </div>
       </div>
     </div>
+  );
+}
+
+function DefaultToastDonationButton(
+  props: React.AnchorHTMLAttributes<HTMLAnchorElement>
+) {
+  return (
+    <Button
+      _size="sm"
+      className="h-7 bg-gradient-to-r from-pink-500 to-purple-600 px-3 text-xs font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-pink-600 hover:to-purple-700"
+      asChild
+    >
+      <a
+        href={DONATION_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        {...props}
+      >
+        <Coffee className="mr-1 h-3 w-3" />
+        Donate $5
+      </a>
+    </Button>
+  );
+}
+
+function DefaultToastFeedbackButton(
+  props: React.AnchorHTMLAttributes<HTMLAnchorElement>
+) {
+  return (
+    <Button
+      _size="sm"
+      className="h-7 bg-gradient-to-r from-green-500 to-blue-600 px-3 text-xs font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-green-600 hover:to-blue-700"
+      asChild
+    >
+      <a
+        href={FEEDBACK_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        {...props}
+      >
+        <MessageSquare className="mr-1 h-3 w-3" />
+        Share Feedback
+      </a>
+    </Button>
   );
 }
