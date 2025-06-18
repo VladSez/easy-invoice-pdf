@@ -398,7 +398,7 @@ export const GeneralInformation = memo(function GeneralInformation({
           render={({ field }) => (
             <SelectNative {...field} id={`dateFormat`} className="block">
               {SUPPORTED_DATE_FORMATS.map((format) => {
-                const preview = dayjs().format(format);
+                const preview = dayjs().locale(language).format(format);
                 const isDefault = format === SUPPORTED_DATE_FORMATS[0];
 
                 return (
