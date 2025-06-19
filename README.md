@@ -37,3 +37,8 @@ https://github.com/user-attachments/assets/9e3194e0-3072-4c95-ae99-e66db1301dc6
 - Analytics: https://umami.is/
 
 <!-- GitAds-Verify: JHXPD28PWARXHPOAHBA7ZTVRIFBKGZPE -->
+
+## GitAds Sponsored
+Ads help support this project 🙏
+[![Sponsored by GitAds](https://gitads.dev/v1/ad-serve?source=vladsez/easy-invoice-pdf@github)](https://gitads.dev/v1/ad-track?source=vladsez/easy-invoice-pdf@github)
+
