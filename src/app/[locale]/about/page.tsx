@@ -26,6 +26,7 @@ import { type Graph } from "schema-dts";
 import { LanguageSwitcher } from "./components/language-switcher";
 import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
 import { routing } from "@/i18n/routing";
+import { LandingCtaToast } from "./components/landing-cta-toast";
 
 // statically generate the pages for all locales
 export function generateStaticParams() {
@@ -47,6 +48,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
           __html: JSON.stringify(JSON_LD),
         }}
       />
+      <LandingCtaToast />
       <div className="flex min-h-screen flex-col bg-slate-50">
         <Header locale={locale} />
         <main>
@@ -102,7 +104,8 @@ function HeroSection() {
       </div>
 
       <div className="container relative z-10 px-4 md:px-6">
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-0">
+          {/* Left column (text) */}
           <div className="flex flex-col justify-center space-y-5 md:space-y-6">
             <div className="space-y-3 md:space-y-4">
               <h1 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl md:text-5xl lg:text-6xl">
@@ -133,30 +136,16 @@ function HeroSection() {
                 </Link>
               </Button>
             </div>
-            <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0">
+            <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0">
               <span className="" role="img" aria-label="checkmark">
                 ✅
               </span>
               <span>{t("hero.noSignup")}</span>
             </div>
-            {/* Badge for featured on Startup Fame */}
-            <div className="mx-auto sm:mx-0">
-              <a
-                href="https://startupfa.me/s/easyinvoicepdf?utm_source=easyinvoicepdf.com"
-                target="_blank"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="https://startupfa.me/badges/featured-badge-small.webp"
-                  alt="Featured on Startup Fame"
-                  width="224"
-                  height="36"
-                />
-              </a>
-            </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[600px] lg:mx-0">
+          {/* Right column (video) */}
+          <div className="relative mx-auto w-full max-w-[650px] lg:mx-0">
             {/* Mac OS Frame around the video */}
             <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
               {/* Browser chrome bar */}
@@ -221,7 +210,7 @@ function FeaturesSection() {
   return (
     <section
       id="features"
-      className="flex w-full items-center justify-center bg-slate-50 py-12 md:py-20"
+      className="flex w-full items-center justify-center bg-slate-50 py-12 lg:py-20"
     >
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -405,10 +394,10 @@ function CtaSection() {
           </div>
           <div className="flex w-full flex-col items-center justify-center gap-6">
             <div className="flex w-full flex-col justify-center gap-2 md:flex-row">
-              <GoToAppButton className="border-slate-600 bg-white text-slate-950 hover:bg-white/90" />
+              <GoToAppButton className="border-slate-600 bg-white px-10 py-6 text-lg text-slate-950 hover:bg-white/90" />
               <Button
                 _size="lg"
-                className="bg-slate-700 px-8 text-white hover:bg-slate-700/90"
+                className="group border border-slate-700 bg-slate-700 px-10 py-6 text-lg text-white transition-all duration-300 hover:bg-slate-600/80"
                 asChild
               >
                 <Link
@@ -416,13 +405,15 @@ function CtaSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <GithubIcon className="mr-2 h-5 w-5 fill-white" />
-                  {t("buttons.viewOnGithub")}
+                  <GithubIcon className="mr-2 h-6 w-6 fill-slate-100 transition-transform duration-300 group-hover:scale-110 group-hover:fill-slate-950" />
+                  {t("buttons.starOnGithub")}
                 </Link>
               </Button>
             </div>
           </div>
-          <p className="text-sm text-slate-400">{t("cta.noSignup")}</p>
+          <p className="animate-pulse text-sm text-slate-400">
+            {t("cta.noSignup")}
+          </p>
         </div>
       </div>
     </section>
@@ -444,13 +435,24 @@ function Footer() {
   return (
     <footer
       id="footer"
-      className="flex w-full items-center justify-center border-t border-slate-200 bg-white py-12 md:py-16 lg:py-20"
+      className="w-full border-t border-slate-200 bg-white py-12 md:py-16"
     >
-      <div className="container px-4 md:px-6">
+      <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col gap-10 md:flex-row">
           <div className="space-y-4 md:w-1/3">
-            <Logo />
-            <p className="text-sm text-slate-500">{t("footer.description")}</p>
+            <div className="flex items-center">
+              <ProjectLogo className="h-8 w-8" />
+              <p className="text-balance text-center text-xl font-bold text-slate-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
+                <a
+                  href="https://easyinvoicepdf.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  EasyInvoicePDF.com
+                </a>
+              </p>
+            </div>
+            <p className="text-sm text-slate-700">{t("footer.description")}</p>
             <div
               className="flex gap-4"
               data-testid="about-page-footer-social-links"
@@ -549,6 +551,23 @@ function Footer() {
             </div>
           </div>
         </div>
+
+        {/* Badge for featured on Startup Fame */}
+        <div className="my-5 md:mt-0">
+          <a
+            href="https://startupfa.me/s/easyinvoicepdf?utm_source=easyinvoicepdf.com"
+            target="_blank"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://startupfa.me/badges/featured-badge-small.webp"
+              alt="Featured on Startup Fame"
+              width="224"
+              height="36"
+            />
+          </a>
+        </div>
+
         <div className="my-5 max-w-lg space-y-2">
           <p className="text-sm font-medium text-slate-900">
             {tNewsletter("title")}

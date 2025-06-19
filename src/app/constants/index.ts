@@ -2,6 +2,7 @@ import {
   SUPPORTED_CURRENCIES,
   SUPPORTED_LANGUAGES,
   SUPPORTED_DATE_FORMATS,
+  SUPPORTED_TEMPLATES,
   type InvoiceData,
   type SellerData,
   type BuyerData,
@@ -17,6 +18,7 @@ const INVOICE_CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
 const EUR = SUPPORTED_CURRENCIES[0];
 const EN = SUPPORTED_LANGUAGES[0];
 const DEFAULT_DATE_FORMAT = SUPPORTED_DATE_FORMATS[0];
+const DEFAULT_TEMPLATE = SUPPORTED_TEMPLATES[0];
 
 export const INVOICE_DEFAULT_NUMBER_VALUE = `1/${INVOICE_CURRENT_MONTH_AND_YEAR}`;
 
@@ -72,6 +74,11 @@ export const DEFAULT_BUYER_DATA = {
 export const INITIAL_INVOICE_DATA = {
   language: EN,
   currency: EUR,
+  template: DEFAULT_TEMPLATE,
+
+  logo: "",
+  stripePayOnlineUrl: "",
+
   invoiceNumberObject: {
     label: `${TRANSLATIONS[EN].invoiceNumber}:`,
     value: INVOICE_DEFAULT_NUMBER_VALUE,

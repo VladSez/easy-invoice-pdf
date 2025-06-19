@@ -38,6 +38,10 @@ import { z } from "zod";
 import { VIDEO_DEMO_URL } from "@/config";
 import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
 import { InvoiceClientPage } from "./components";
+import { customDefaultToast } from "./components/cta-toasts";
+import { customPremiumToast } from "./components/cta-toasts";
+import { cn } from "@/lib/utils";
+import { AlertCircleIcon } from "lucide-react";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 /**
@@ -106,6 +110,11 @@ export function AppPageClient() {
   const [invoiceDataState, setInvoiceDataState] = useState<InvoiceData | null>(
     null
   );
+
+  const [errorWhileGeneratingPdfIsShown, setErrorWhileGeneratingPdfIsShown] =
+    useState(false);
+
+  const [canShareInvoice, setCanShareInvoice] = useState(true);
 
   // Scroll to top on mount
   useEffect(() => {
@@ -264,16 +273,80 @@ export function AppPageClient() {
     }
   }, [invoiceDataState, router, searchParams]);
 
+  // Show CTA toast every minute
+  useEffect(() => {
+    // only show on production
+    if (process.env.NODE_ENV !== "production") {
+      return;
+    }
+
+    const showCTAToast = () => {
+      // Randomly show either default or premium donation toast
+      if (Math.random() <= 0.5) {
+        customPremiumToast({
+          title: "Support My Work",
+          description:
+            "Your contribution helps me maintain and improve this project for everyone! 🚀",
+          showDonationButton: false,
+        });
+      } else {
+        customDefaultToast({
+          title: "Love this project?",
+          description:
+            "Help me keep building amazing tools! Your support means the world to me. ✨",
+          showDonationButton: false,
+        });
+      }
+    };
+
+    // Show cta toast after 40 seconds on the app page
+    const initialTimer = setTimeout(showCTAToast, 40_000);
+
+    return () => {
+      clearTimeout(initialTimer);
+    };
+  }, []);
+
   const handleInvoiceDataChange = (updatedData: InvoiceData) => {
     setInvoiceDataState(updatedData);
   };
 
   const handleShareInvoice = async () => {
+    if (!canShareInvoice) {
+      toast.error("Unable to Share Invoice", {
+        duration: 5000,
+        description: (
+          <>
+            <p className="text-pretty text-xs leading-relaxed text-red-700">
+              Invoices with logos cannot be shared. Please remove the logo to
+              generate a shareable link. You can still download the invoice as
+              PDF and share it.
+            </p>
+          </>
+        ),
+      });
+
+      return;
+    }
+
     if (invoiceDataState) {
       try {
         const newInvoiceDataValidated = invoiceSchema.parse(invoiceDataState);
         const stringified = JSON.stringify(newInvoiceDataValidated);
         const compressedData = compressToEncodedURIComponent(stringified);
+
+        // Check if the compressed data length exceeds browser URL limits
+        // Most browsers have a limit around 2000 characters for URLs
+        const URL_LENGTH_LIMIT = 2000;
+        const estimatedUrlLength =
+          window.location.origin.length + 7 + compressedData.length; // 7 for "/?data="
+
+        if (estimatedUrlLength > URL_LENGTH_LIMIT) {
+          toast.error("Invoice data is too large to share via URL", {
+            description: "Try removing some items or simplifying the invoice",
+          });
+          return;
+        }
 
         router.push(`/?data=${compressedData}`);
 
@@ -352,18 +425,63 @@ export function AppPageClient() {
                 {isDesktop ? (
                   <>
                     <CustomTooltip
+                      className={cn(!canShareInvoice && "bg-red-50")}
                       trigger={
                         <Button
+                          aria-disabled={!canShareInvoice} // better UX than 'disabled'
                           onClick={handleShareInvoice}
                           _variant="outline"
-                          className="mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
+                          className={cn(
+                            "mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
+                          )}
                         >
                           Generate a link to invoice
                         </Button>
                       }
-                      content="Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
+                      content={
+                        canShareInvoice ? (
+                          <div className="flex items-center gap-3 p-2">
+                            <div className="space-y-1">
+                              <p className="text-sm font-semibold text-slate-900">
+                                Share Invoice Online
+                              </p>
+                              <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                                Generate a secure link to share this invoice
+                                with your clients. They can view and download it
+                                directly from their browser.
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            data-testid="share-invoice-tooltip-content"
+                            className="flex items-center gap-3 bg-red-50 p-3"
+                          >
+                            <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
+                            <div className="space-y-1">
+                              <p className="text-sm font-semibold text-red-800">
+                                Unable to Share Invoice
+                              </p>
+                              <p className="text-pretty text-xs leading-relaxed text-red-700">
+                                Invoices with logos cannot be shared. Please
+                                remove the logo to generate a shareable link.
+                                You can still download the invoice as PDF and
+                                share it.
+                              </p>
+                            </div>
+                          </div>
+                        )
+                      }
                     />
-                    <InvoicePDFDownloadLink invoiceData={invoiceDataState} />
+                    <InvoicePDFDownloadLink
+                      invoiceData={invoiceDataState}
+                      errorWhileGeneratingPdfIsShown={
+                        errorWhileGeneratingPdfIsShown
+                      }
+                      setErrorWhileGeneratingPdfIsShown={
+                        setErrorWhileGeneratingPdfIsShown
+                      }
+                    />
                   </>
                 ) : null}
 
@@ -385,6 +503,12 @@ export function AppPageClient() {
               handleInvoiceDataChange={handleInvoiceDataChange}
               handleShareInvoice={handleShareInvoice}
               isMobile={isMobile}
+              errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
+              setErrorWhileGeneratingPdfIsShown={
+                setErrorWhileGeneratingPdfIsShown
+              }
+              canShareInvoice={canShareInvoice}
+              setCanShareInvoice={setCanShareInvoice}
             />
           </div>
         </div>
@@ -478,9 +602,9 @@ function Footer() {
                 </a>
               </p>
             </div>
-            <p className="text-sm text-slate-500">
-              A free, open-source tool for creating professional PDF invoices
-              with real-time preview.
+            <p className="text-sm text-slate-700">
+              A free, open-source tool for creating professional invoices with
+              real-time preview.
             </p>
             <div className="flex gap-4">
               <Link

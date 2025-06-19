@@ -75,6 +75,7 @@ const aboutSchema = z
       .object({
         goToApp: z.string(),
         viewOnGithub: z.string(),
+        starOnGithub: z.string(),
         switchLanguage: z.string(),
         shareFeedback: z.string(),
         app: z.string(),

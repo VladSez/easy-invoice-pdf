@@ -151,7 +151,11 @@ test.describe("PDF Preview", () => {
     expect(pdfData.text).toContain("Person authorized to issue");
     expect(pdfData.text).toContain("Reverse charge");
     expect(pdfData.text).toContain("Created with https://easyinvoicepdf.com");
-    expect(pdfData.text).toContain("1/1");
+
+    // Check page footer and metadata
+    expect(pdfData.text).toContain(
+      `1/${CURRENT_MONTH_AND_YEAR}·€0.00 EUR due ${PAYMENT_DATE}·Created with https://easyinvoicepdf.comPage 1 of 1`
+    );
   });
 
   test("downloads PDF in Polish and verifies translated content", async ({
@@ -190,6 +194,10 @@ test.describe("PDF Preview", () => {
     const dataBuffer = await fs.promises.readFile(tmpPath);
     const pdfData = await pdf(dataBuffer);
 
+    expect((pdfData.info as { Title: string }).Title).toContain(
+      `Faktura nr: 1/${CURRENT_MONTH_AND_YEAR} | Created with https://easyinvoicepdf.com`
+    );
+
     // Verify PDF content
     expect(pdfData.text).toContain("Faktura nr");
     expect(pdfData.text).toContain("Data wystawienia");
@@ -210,7 +218,7 @@ Pozostało do zapłaty: 0.00 EUR
 Kwota słownie: zero EUR 00/100`);
 
     expect(pdfData.text).toContain(
-      "Utworzono za pomocą https://easyinvoicepdf.com"
+      `1/${CURRENT_MONTH_AND_YEAR}·€0.00 EUR termin ${PAYMENT_DATE}·Utworzono za pomocą https://easyinvoicepdf.comStrona 1 z 1`
     );
   });
 
@@ -404,8 +412,10 @@ Kwota słownie: zero EUR 00/100`);
     expect(pdfData.text).toContain("Person authorized to receive");
     expect(pdfData.text).toContain("Person authorized to issue");
     expect(pdfData.text).toContain("Reverse charge");
-    expect(pdfData.text).toContain("Created with https://easyinvoicepdf.com");
-    expect(pdfData.text).toContain("1/1");
+
+    expect(pdfData.text).toContain(
+      `1/${CURRENT_MONTH_AND_YEAR}·£3 000.00 GBP due ${paymentDate}·Created with https://easyinvoicepdf.comPage 1 of 1`
+    );
   });
 
   test("completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French", async ({
@@ -542,15 +552,13 @@ Reste à payer: 184.50 GBP
 Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
 
     // Verify toast appears after download
+    await expect(page.getByTestId("download-pdf-toast")).toBeVisible();
+
     await expect(
-      page.getByText("❤️ Enjoying EasyInvoicePDF? Help Keep It Free!")
+      page.getByRole("link", { name: "Star on GitHub" })
     ).toBeVisible();
-    await expect(
-      page.getByText(
-        "This tool is free and ad-free thanks to user support. If it’s helped you, consider a small donation to keep it running and growing. Every bit counts—thank you!"
-      )
-    ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Donate" })).toBeVisible();
+
+    await expect(page.getByTestId("toast-cta-btn")).toBeVisible();
 
     // Switch back to form tab
     await page.getByRole("tab", { name: "Edit Invoice" }).click();
