@@ -109,7 +109,7 @@ export function InvoicePDFDownloadLink({
               "Help me keep building amazing tools! Your support means the world to me. ✨",
           });
         }
-      }, 2000);
+      }, 2500);
     }
   }, [isLoading, url, trackDownload]);
 
