@@ -1,10 +1,13 @@
+"use client";
+
 import { BlobProvider } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { Document, Page, pdfjs } from "react-pdf";
 import type { InvoiceData } from "@/app/schema";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
-
-import "react-pdf/dist/esm/Page/AnnotationLayer.css";
-import "react-pdf/dist/esm/Page/TextLayer.css";
+import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
+import { toast } from "sonner";
+import * as Sentry from "@sentry/nextjs";
+import { useMemo } from "react";
 
 // https://github.com/wojtekmaj/react-pdf/issues/1822#issuecomment-2233334169
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -13,17 +16,29 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
  * Android PDF viewer.
  * We only show the Android PDF viewer on Android devices due to the limitations of the PDF viewer
  * https://github.com/diegomura/react-pdf/issues/714
+ *
+ * https://github.com/wojtekmaj/react-pdf
  */
 export const AndroidPdfViewer = ({
   invoiceData,
 }: {
   invoiceData: InvoiceData;
 }) => {
+  const memoizedInvoicePdfTemplate = useMemo(() => {
+    switch (invoiceData.template) {
+      case "stripe":
+        return <StripeInvoicePdfTemplate invoiceData={invoiceData} />;
+      case "default":
+      default:
+        return <InvoicePdfTemplate invoiceData={invoiceData} />;
+    }
+  }, [invoiceData]);
+
   // On mobile, we need to use the BlobProvider to generate a PDF preview
   // This is because the PDF viewer is not supported on Android Chrome devices
   // https://github.com/diegomura/react-pdf/issues/714
   return (
-    <BlobProvider document={<InvoicePdfTemplate invoiceData={invoiceData} />}>
+    <BlobProvider document={memoizedInvoicePdfTemplate}>
       {({ url, loading, error }) => {
         if (error) {
           return (
@@ -49,6 +64,15 @@ export const AndroidPdfViewer = ({
           );
         }
 
+        if (!url) {
+          return (
+            <div className="flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200">
+              <p className="text-gray-600">No PDF URL</p>
+            </div>
+          );
+        }
+
+        // https://github.com/wojtekmaj/react-pdf
         return (
           <Document
             file={url}
@@ -61,6 +85,11 @@ export const AndroidPdfViewer = ({
                 </div>
               </div>
             }
+            onLoadError={(error) => {
+              Sentry.captureException(error);
+
+              toast.error("Error loading PDF");
+            }}
           >
             <Page
               pageNumber={1}
@@ -73,6 +102,9 @@ export const AndroidPdfViewer = ({
                   </div>
                 </div>
               }
+              onLoadError={(error) => {
+                Sentry.captureException(error);
+              }}
               height={450}
               width={650}
             />

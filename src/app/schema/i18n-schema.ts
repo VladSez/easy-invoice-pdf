@@ -65,9 +65,9 @@ const aboutSchema = z
           .object({
             features: z.string(),
             github: z.string(),
+            changelog: z.string(),
           })
           .strict(),
-        copyright: z.string(),
         createdBy: z.string(),
       })
       .strict(),
@@ -75,6 +75,7 @@ const aboutSchema = z
       .object({
         goToApp: z.string(),
         viewOnGithub: z.string(),
+        starOnGithub: z.string(),
         switchLanguage: z.string(),
         shareFeedback: z.string(),
         app: z.string(),
@@ -98,7 +99,6 @@ const faqSchema = z
   .object({
     title: z.string(),
     description: z.string(),
-    badge: z.string(),
     items: z
       .object({
         whatIs: z.object({

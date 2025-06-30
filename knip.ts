@@ -26,6 +26,7 @@ const config: KnipConfig = {
     "src/i18n/**/*",
     "src/app/schema/**/*",
     "src/**/dev/**/*",
+    "src/app/changelog/content/**/*",
   ],
   includeEntryExports: true,
   // ignore tags

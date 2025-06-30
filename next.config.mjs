@@ -2,7 +2,9 @@
 
 import { withSentryConfig } from "@sentry/nextjs";
 import createNextIntlPlugin from "next-intl/plugin";
+import createMDX from "@next/mdx";
 import { createJiti } from "jiti";
+import remarkGfm from "remark-gfm";
 
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -113,8 +115,19 @@ const withNextIntl = createNextIntlPlugin({
   },
 });
 
+const withMDX = createMDX({
+  // Add markdown plugins here, as desired
+  extension: /\.mdx?$/,
+  options: {
+    remarkPlugins: [remarkGfm],
+    rehypePlugins: [],
+  },
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Configure the file extensions that Next.js should handle
+  pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -153,7 +166,7 @@ const nextConfig = {
   },
 };
 
-export default withSentryConfig(withNextIntl(nextConfig), {
+export default withSentryConfig(withNextIntl(withMDX(nextConfig)), {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
