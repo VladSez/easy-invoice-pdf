@@ -35,3 +35,16 @@ https://github.com/user-attachments/assets/9e3194e0-3072-4c95-ae99-e66db1301dc6
 
 - Generate beautiful OG images: https://og.new
 - Analytics: https://umami.is/
+
+## Quick Start
+
+- Run `pnpm i`
+- Copy `.env.local.sample to .env.local`
+- Run `pnpm run dev`
+
+For the full app experience, you’ll need to obtain and set values from the following services:
+
+- [Resend](https://resend.com/)
+- [Upstash](https://upstash.com/)
+- [Google Drive API](https://developers.google.com/workspace/drive/api/quickstart/js)
+- [Telegram Bot API](https://core.telegram.org/bots)
