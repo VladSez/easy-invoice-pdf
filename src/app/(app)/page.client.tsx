@@ -25,7 +25,7 @@ import { useRouter } from "next/navigation";
 
 import { Footer } from "@/components/footer";
 import { ProjectLogoDescription } from "@/components/project-logo-description";
-import { VIDEO_DEMO_URL } from "@/config";
+import { GITHUB_URL, VIDEO_DEMO_URL } from "@/config";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
@@ -513,6 +513,7 @@ export function AppPageClient() {
           footerDescription:
             "A free, open-source tool for creating professional invoices with real-time preview.",
           footerCreatedBy: "Created by",
+          product: "Product",
 
           newsletterTitle: "Subscribe to our newsletter",
           newsletterDescription:
@@ -530,7 +531,7 @@ export function AppPageClient() {
                 href="/en/about"
                 className="text-sm text-slate-500 hover:text-slate-900"
               >
-                About product
+                About
               </Link>
             </li>
             <li>
@@ -543,7 +544,7 @@ export function AppPageClient() {
             </li>
             <li>
               <Link
-                href="https://github.com/VladSez/easy-invoice-pdf"
+                href={GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-slate-500 hover:text-slate-900"
@@ -580,7 +581,7 @@ function ProjectInfo() {
     <>
       <span className="relative bottom-0 text-center text-sm text-gray-900 lg:bottom-3">
         <a
-          href="https://github.com/VladSez/pdf-invoice-generator"
+          href={GITHUB_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="group inline-flex items-center gap-1"

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { GithubIcon } from "@/components/etc/github-logo";
-import { DONATION_URL } from "@/config";
+import { DONATION_URL, GITHUB_URL } from "@/config";
 import { toast as sonnerToast } from "sonner";
 
 const FEEDBACK_URL = "https://pdfinvoicegenerator.userjot.com/";
@@ -124,7 +124,7 @@ function PremiumDonationToast(props: ToastProps) {
             className="h-8 flex-1 border-gray-300 text-xs transition-all duration-200 hover:bg-gray-50"
           >
             <a
-              href="https://github.com/VladSez/easy-invoice-pdf"
+              href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
@@ -254,7 +254,7 @@ function DefaultDonationToast(props: ToastProps) {
             asChild
           >
             <a
-              href="https://github.com/VladSez/easy-invoice-pdf"
+              href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {

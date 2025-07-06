@@ -1,4 +1,9 @@
-import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
+import {
+  GITHUB_URL,
+  STATIC_ASSETS_URL,
+  TWITTER_URL,
+  VIDEO_DEMO_URL,
+} from "@/config";
 import { test, expect } from "@playwright/test";
 
 test.describe("About page", () => {
@@ -148,9 +153,8 @@ test.describe("About page", () => {
     const footer = page.getByRole("contentinfo");
     await expect(footer).toBeVisible();
 
-    const footerSocialLinks = footer.getByTestId(
-      "about-page-footer-social-links"
-    );
+    // check footer social logos first
+    const footerSocialLinks = footer.getByTestId("footer-logos-social-links");
 
     const githubSocialLink = footerSocialLinks.getByRole("link", {
       name: "GitHub",
@@ -158,10 +162,7 @@ test.describe("About page", () => {
     });
 
     await expect(githubSocialLink).toBeVisible();
-    await expect(githubSocialLink).toHaveAttribute(
-      "href",
-      "https://github.com/VladSez/easy-invoice-pdf"
-    );
+    await expect(githubSocialLink).toHaveAttribute("href", GITHUB_URL);
     await expect(githubSocialLink).toHaveAttribute("target", "_blank");
 
     const twitterSocialLink = footerSocialLinks.getByRole("link", {
@@ -170,10 +171,7 @@ test.describe("About page", () => {
     });
 
     await expect(twitterSocialLink).toBeVisible();
-    await expect(twitterSocialLink).toHaveAttribute(
-      "href",
-      "https://x.com/vlad_sazon"
-    );
+    await expect(twitterSocialLink).toHaveAttribute("href", TWITTER_URL);
     await expect(twitterSocialLink).toHaveAttribute("target", "_blank");
 
     // Check newsletter subscription form
@@ -194,7 +192,8 @@ test.describe("About page", () => {
       newsletterForm.getByRole("button", { name: "Subscribe" })
     ).toBeVisible();
 
-    const footerLinks = footer.getByTestId("about-page-footer-links");
+    // now check all the rest of the footer links
+    const footerLinks = footer.getByTestId("footer-social-links");
 
     const appLink = footerLinks.getByRole("link", { name: "App" });
 
@@ -247,10 +246,7 @@ test.describe("About page", () => {
     });
 
     await expect(githubLink).toBeVisible();
-    await expect(githubLink).toHaveAttribute(
-      "href",
-      "https://github.com/VladSez/easy-invoice-pdf"
-    );
+    await expect(githubLink).toHaveAttribute("href", GITHUB_URL);
     await expect(githubLink).toHaveAttribute("target", "_blank");
   });
 
@@ -352,9 +348,12 @@ test.describe("About page", () => {
       newsletterForm.getByRole("button", { name: "S'abonner", exact: true })
     ).toBeVisible();
 
-    const footerLinks = footer.getByTestId("about-page-footer-links");
+    const footerLinks = footer.getByTestId("footer-social-links");
 
-    const appLink = footerLinks.getByRole("link", { name: "App", exact: true });
+    const appLink = footerLinks.getByRole("link", {
+      name: "Application",
+      exact: true,
+    });
 
     await expect(appLink).toBeVisible();
     await expect(appLink).toHaveAttribute("href", "/");
@@ -448,7 +447,7 @@ test.describe("About page", () => {
       newsletterForm.getByRole("button", { name: "Abonnieren", exact: true })
     ).toBeVisible();
 
-    const footerLinks = footer.getByTestId("about-page-footer-links");
+    const footerLinks = footer.getByTestId("footer-social-links");
     await expect(
       footerLinks.getByRole("link", { name: "Funktionen", exact: true })
     ).toBeVisible();

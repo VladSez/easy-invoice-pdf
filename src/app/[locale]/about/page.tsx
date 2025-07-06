@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/disclosure";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Video } from "@/components/video";
-import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
+import { GITHUB_URL, STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
 import { routing } from "@/i18n/routing";
 import {
   CalculatorIcon,
@@ -75,7 +75,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
         </main>
         <Footer
           links={
-            <ul className="space-y-2" data-testid="about-page-footer-links">
+            <ul className="space-y-2">
               <li>
                 <Link
                   href="/"
@@ -120,7 +120,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
               </li>
               <li>
                 <Link
-                  href="https://github.com/VladSez/easy-invoice-pdf"
+                  href={GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-slate-500 hover:text-slate-900"
@@ -133,6 +133,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
           translations={{
             footerDescription: t("footer.description"),
             footerCreatedBy: t("footer.createdBy"),
+            product: t("footer.product"),
 
             newsletterTitle: newsletterTitle,
             newsletterDescription: newsletterDescription,
@@ -163,7 +164,7 @@ function Header({ locale }: { locale: Locale }) {
             <div className="flex items-center sm:mt-0 sm:gap-2">
               <Button
                 _variant="ghost"
-                className="hidden md:inline-flex"
+                className="hidden lg:inline-flex"
                 asChild
               >
                 <Link href="/changelog">{tFooter("changelog")}</Link>
@@ -224,7 +225,7 @@ function HeroSection() {
                 asChild
               >
                 <Link
-                  href="https://github.com/VladSez/easy-invoice-pdf"
+                  href={GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -500,7 +501,7 @@ function CtaSection() {
                 asChild
               >
                 <Link
-                  href="https://github.com/VladSez/easy-invoice-pdf"
+                  href={GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

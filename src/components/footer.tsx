@@ -1,5 +1,6 @@
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { SubscribeInput } from "@/components/subscribe-input";
+import { GITHUB_URL, TWITTER_URL } from "@/config";
 import Link from "next/link";
 
 export function Footer({
@@ -10,6 +11,8 @@ export function Footer({
   translations: {
     footerDescription: string;
     footerCreatedBy: string;
+
+    product: string;
 
     newsletterTitle: string;
     newsletterDescription: string;
@@ -38,12 +41,11 @@ export function Footer({
               </p>
             </div>
             <p className="text-sm text-slate-700">
-              A free, open-source tool for creating professional invoices with
-              real-time preview.
+              {translations.footerDescription}
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-4" data-testid="footer-logos-social-links">
               <Link
-                href="https://github.com/VladSez/pdf-invoice-generator"
+                href={GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-slate-400 hover:text-slate-800"
@@ -63,7 +65,7 @@ export function Footer({
                 </svg>
               </Link>
               <Link
-                href="https://x.com/vlad_sazon"
+                href={TWITTER_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-slate-400 hover:text-slate-800"
@@ -77,54 +79,16 @@ export function Footer({
                 >
                   <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
                 </svg>
-                <span className="sr-only">Twitter</span>
               </Link>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:gap-10 md:flex-1 md:grid-cols-2">
             <div className="space-y-3"></div>
-            <div className="space-y-3">
-              {/* <h3 className="text-sm font-medium text-slate-900">Product</h3> */}
+            <div className="space-y-3" data-testid="footer-social-links">
+              <h3 className="text-sm font-medium text-slate-900">
+                {translations.product}
+              </h3>
               {links}
-              {/* <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="/"
-                    className="text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    App
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/en/about"
-                    className="text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    About
-                  </Link>
-                </li>
-
-                <li>
-                  <Link
-                    href="https://github.com/VladSez/easy-invoice-pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    GitHub
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    Share feedback
-                  </Link>
-                </li>
-              </ul> */}
             </div>
           </div>
         </div>
@@ -145,7 +109,7 @@ export function Footer({
         </div>
         <div className="my-5 max-w-lg space-y-2">
           <p className="text-sm font-medium text-slate-900">
-            Subscribe to our newsletter
+            {translations.newsletterTitle}
           </p>
           <SubscribeInput
             translations={{

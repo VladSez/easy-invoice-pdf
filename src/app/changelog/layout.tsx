@@ -3,7 +3,7 @@ import { Footer } from "@/components/footer";
 import { BlackGoToAppButton } from "@/components/go-to-app-button-cta";
 import { ProjectLogoDescription } from "@/components/project-logo-description";
 import { Button } from "@/components/ui/button";
-import { STATIC_ASSETS_URL } from "@/config";
+import { GITHUB_URL, STATIC_ASSETS_URL } from "@/config";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -75,6 +75,7 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
           footerDescription:
             "A free, open-source tool for creating professional invoices with real-time preview.",
           footerCreatedBy: "Created by",
+          product: "Product",
 
           newsletterTitle: "Subscribe to our newsletter",
           newsletterDescription:
@@ -100,13 +101,13 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
                 href="/en/about"
                 className="text-sm text-slate-500 hover:text-slate-900"
               >
-                About product
+                About
               </Link>
             </li>
 
             <li>
               <Link
-                href="https://github.com/VladSez/easy-invoice-pdf"
+                href={GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-slate-500 hover:text-slate-900"

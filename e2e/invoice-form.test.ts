@@ -13,7 +13,7 @@ import {
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
-import { VIDEO_DEMO_URL } from "@/config";
+import { GITHUB_URL, VIDEO_DEMO_URL } from "@/config";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -38,7 +38,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(header).toBeVisible();
 
     await expect(
-      header.getByRole("link", { name: "EasyInvoicePDF.com" })
+      header.getByRole("link", { name: "EasyInvoicePDF" })
     ).toBeVisible();
 
     await expect(
@@ -104,10 +104,7 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(
       header.getByRole("link", { name: "Open Source" })
-    ).toHaveAttribute(
-      "href",
-      "https://github.com/VladSez/pdf-invoice-generator"
-    );
+    ).toHaveAttribute("href", GITHUB_URL);
 
     // Verify buttons are enabled
     await expect(
