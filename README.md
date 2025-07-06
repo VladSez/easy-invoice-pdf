@@ -39,7 +39,7 @@ https://github.com/user-attachments/assets/9e3194e0-3072-4c95-ae99-e66db1301dc6
 ## Quick Start
 
 - Run `pnpm i`
-- Copy `.env.local.sample to .env.local`
+- Copy `.env.example to .env.local` (`cp .env.example .env.local`)
 - Run `pnpm run dev`
 
 For the full app experience, you’ll need to obtain and set values from the following services:
@@ -48,3 +48,10 @@ For the full app experience, you’ll need to obtain and set values from the fol
 - [Upstash](https://upstash.com/)
 - [Google Drive API](https://developers.google.com/workspace/drive/api/quickstart/js)
 - [Telegram Bot API](https://core.telegram.org/bots)
+
+## GitAds Sponsored
+
+<!-- GitAds-Verify: JHXPD28PWARXHPOAHBA7ZTVRIFBKGZPE -->
+
+Ads help support this project 🙏
+[![Sponsored by GitAds](https://gitads.dev/v1/ad-serve?source=vladsez/easy-invoice-pdf@github)](https://gitads.dev/v1/ad-track?source=vladsez/easy-invoice-pdf@github)
