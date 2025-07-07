@@ -391,7 +391,7 @@ export function AppPageClient() {
                   <ProjectLogo className="h-8 w-8" />
 
                   <ProjectLogoDescription>
-                    Free Invoice Generator with Real-Time PDF Preview
+                    Free Invoice Generator with Live PDF Preview
                   </ProjectLogoDescription>
                 </div>
               </div>

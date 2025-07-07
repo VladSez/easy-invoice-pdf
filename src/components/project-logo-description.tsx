@@ -15,7 +15,7 @@ export function ProjectLogoDescription({
         </a>
       </span>
       <span className="text-balance text-[12px] text-slate-700 sm:text-[13px]">
-        {children || "Free Invoice Generator with Real-Time PDF Preview"}
+        {children || "Free Invoice Generator with Live PDF Preview"}
       </span>
     </div>
   );

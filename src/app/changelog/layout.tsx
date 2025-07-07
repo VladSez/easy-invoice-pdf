@@ -179,7 +179,7 @@ function Logo() {
       <div className="flex items-center gap-1 sm:gap-2">
         <ProjectLogo className="h-7 w-7 flex-shrink-0 sm:h-8 sm:w-8" />
         <ProjectLogoDescription>
-          Free Invoice Generator with Real-Time PDF Preview
+          Free Invoice Generator with Live PDF Preview
         </ProjectLogoDescription>
       </div>
     </div>
