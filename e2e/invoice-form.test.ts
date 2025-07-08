@@ -13,7 +13,7 @@ import {
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
-import { VIDEO_DEMO_URL } from "@/config";
+import { GITHUB_URL, VIDEO_DEMO_URL } from "@/config";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -38,11 +38,11 @@ test.describe("Invoice Generator Page", () => {
     await expect(header).toBeVisible();
 
     await expect(
-      header.getByRole("link", { name: "EasyInvoicePDF.com" })
+      header.getByRole("link", { name: "EasyInvoicePDF" })
     ).toBeVisible();
 
     await expect(
-      header.getByText("Free Invoice Generator with Real-Time PDF Preview")
+      header.getByText("Free Invoice Generator with Live PDF Preview")
     ).toBeVisible();
 
     // Check main action buttons
@@ -104,10 +104,7 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(
       header.getByRole("link", { name: "Open Source" })
-    ).toHaveAttribute(
-      "href",
-      "https://github.com/VladSez/pdf-invoice-generator"
-    );
+    ).toHaveAttribute("href", GITHUB_URL);
 
     // Verify buttons are enabled
     await expect(
@@ -462,10 +459,19 @@ test.describe("Invoice Generator Page", () => {
     await itemNameInput.fill("TEST INVOICE ITEM");
     await expect(itemNameInput).toHaveValue("TEST INVOICE ITEM");
 
+    // Set up dialog handler before triggering the action
+    page.on("dialog", async (dialog) => {
+      expect(dialog.message()).toBe(
+        "Are you sure you want to delete invoice item #2?"
+      );
+      await dialog.accept();
+    });
+
     // Remove the added item
     await invoiceItemsSection
       .getByRole("button", { name: "Delete Invoice Item 2" })
       .click();
+
     await expect(
       invoiceItemsSection.getByText("Item 2", { exact: true })
     ).toBeHidden();
@@ -527,10 +533,6 @@ test.describe("Invoice Generator Page", () => {
     await invoiceItemsSection.getByRole("textbox", { name: "Name" }).clear();
 
     await expect(
-      page.getByText("Date of issue is required", { exact: true })
-    ).toBeVisible();
-
-    await expect(
       page.getByText("Seller name is required", { exact: true })
     ).toBeVisible();
 
@@ -574,9 +576,6 @@ test.describe("Invoice Generator Page", () => {
       .fill("Test Buyer");
 
     // Check for error messages to be hidden
-    await expect(
-      page.getByText("Date of issue is required", { exact: true })
-    ).toBeHidden();
 
     await expect(
       page.getByText("Seller name is required", { exact: true })
@@ -1181,8 +1180,8 @@ test.describe("Invoice Generator Page", () => {
       page.getByText("The shared invoice URL appears to be incorrect")
     ).toBeHidden();
 
-    // Verify URL is cleared
-    expect(page.url()).toContain("/");
-    expect(page.url()).not.toContain("?data=");
+    // Wait for URL to be cleared and verify
+    await expect(page).toHaveURL("/");
+    await expect(page).not.toHaveURL(/\?data=/);
   });
 });

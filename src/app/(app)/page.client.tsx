@@ -10,7 +10,6 @@ import {
 import { TRANSLATIONS } from "@/app/schema/translations";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { ProjectLogo } from "@/components/etc/project-logo";
-import { SubscribeInput } from "@/components/subscribe-input";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,9 +23,14 @@ import { useDeviceContext } from "@/contexts/device-context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { Footer } from "@/components/footer";
+import { ProjectLogoDescription } from "@/components/project-logo-description";
+import { GITHUB_URL, VIDEO_DEMO_URL } from "@/config";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { cn } from "@/lib/utils";
 import * as Sentry from "@sentry/nextjs";
+import { AlertCircleIcon } from "lucide-react";
 import {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,
@@ -35,9 +39,12 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { VIDEO_DEMO_URL } from "@/config";
-import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
 import { InvoiceClientPage } from "./components";
+import {
+  customDefaultToast,
+  customPremiumToast,
+} from "./components/cta-toasts";
+import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 /**
@@ -106,6 +113,11 @@ export function AppPageClient() {
   const [invoiceDataState, setInvoiceDataState] = useState<InvoiceData | null>(
     null
   );
+
+  const [errorWhileGeneratingPdfIsShown, setErrorWhileGeneratingPdfIsShown] =
+    useState(false);
+
+  const [canShareInvoice, setCanShareInvoice] = useState(true);
 
   // Scroll to top on mount
   useEffect(() => {
@@ -264,16 +276,80 @@ export function AppPageClient() {
     }
   }, [invoiceDataState, router, searchParams]);
 
+  // Show CTA toast every minute
+  useEffect(() => {
+    // only show on production
+    if (process.env.NODE_ENV !== "production") {
+      return;
+    }
+
+    const showCTAToast = () => {
+      // Randomly show either default or premium donation toast
+      if (Math.random() <= 0.5) {
+        customPremiumToast({
+          title: "Support My Work",
+          description:
+            "Your contribution helps me maintain and improve this project for everyone! 🚀",
+          showDonationButton: false,
+        });
+      } else {
+        customDefaultToast({
+          title: "Love this project?",
+          description:
+            "Help me keep building amazing tools! Your support means the world to me. ✨",
+          showDonationButton: false,
+        });
+      }
+    };
+
+    // Show cta toast after 40 seconds on the app page
+    const initialTimer = setTimeout(showCTAToast, 40_000);
+
+    return () => {
+      clearTimeout(initialTimer);
+    };
+  }, []);
+
   const handleInvoiceDataChange = (updatedData: InvoiceData) => {
     setInvoiceDataState(updatedData);
   };
 
   const handleShareInvoice = async () => {
+    if (!canShareInvoice) {
+      toast.error("Unable to Share Invoice", {
+        duration: 5000,
+        description: (
+          <>
+            <p className="text-pretty text-xs leading-relaxed text-red-700">
+              Invoices with logos cannot be shared. Please remove the logo to
+              generate a shareable link. You can still download the invoice as
+              PDF and share it.
+            </p>
+          </>
+        ),
+      });
+
+      return;
+    }
+
     if (invoiceDataState) {
       try {
         const newInvoiceDataValidated = invoiceSchema.parse(invoiceDataState);
         const stringified = JSON.stringify(newInvoiceDataValidated);
         const compressedData = compressToEncodedURIComponent(stringified);
+
+        // Check if the compressed data length exceeds browser URL limits
+        // Most browsers have a limit around 2000 characters for URLs
+        const URL_LENGTH_LIMIT = 2000;
+        const estimatedUrlLength =
+          window.location.origin.length + 7 + compressedData.length; // 7 for "/?data="
+
+        if (estimatedUrlLength > URL_LENGTH_LIMIT) {
+          toast.error("Invoice data is too large to share via URL", {
+            description: "Try removing some items or simplifying the invoice",
+          });
+          return;
+        }
 
         router.push(`/?data=${compressedData}`);
 
@@ -310,22 +386,14 @@ export function AppPageClient() {
         <div className="w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 2xl:max-w-[1680px]">
           <div data-testid="header">
             <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
-              <div className="relative bottom-3 mt-3 flex flex-col items-center justify-center sm:mt-0">
+              <div className="relative bottom-2 mt-2 flex w-full flex-col justify-center sm:bottom-4 sm:mt-0">
                 <div className="flex items-center">
                   <ProjectLogo className="h-8 w-8" />
-                  <p className="text-balance text-center text-xl font-bold text-slate-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
-                    <a
-                      href="https://easyinvoicepdf.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      EasyInvoicePDF.com
-                    </a>
-                  </p>
+
+                  <ProjectLogoDescription>
+                    Free Invoice Generator with Live PDF Preview
+                  </ProjectLogoDescription>
                 </div>
-                <p className="relative bottom-1.5 left-[49px] text-[12px] text-slate-700">
-                  Free Invoice Generator with Real-Time PDF Preview
-                </p>
               </div>
               <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
                 <Button
@@ -352,18 +420,63 @@ export function AppPageClient() {
                 {isDesktop ? (
                   <>
                     <CustomTooltip
+                      className={cn(!canShareInvoice && "bg-red-50")}
                       trigger={
                         <Button
+                          aria-disabled={!canShareInvoice} // better UX than 'disabled'
                           onClick={handleShareInvoice}
                           _variant="outline"
-                          className="mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
+                          className={cn(
+                            "mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
+                          )}
                         >
                           Generate a link to invoice
                         </Button>
                       }
-                      content="Generate a shareable link to this invoice. Share it with your clients to allow them to view the invoice online."
+                      content={
+                        canShareInvoice ? (
+                          <div className="flex items-center gap-3 p-2">
+                            <div className="space-y-1">
+                              <p className="text-sm font-semibold text-slate-900">
+                                Share Invoice Online
+                              </p>
+                              <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                                Generate a secure link to share this invoice
+                                with your clients. They can view and download it
+                                directly from their browser.
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            data-testid="share-invoice-tooltip-content"
+                            className="flex items-center gap-3 bg-red-50 p-3"
+                          >
+                            <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
+                            <div className="space-y-1">
+                              <p className="text-sm font-semibold text-red-800">
+                                Unable to Share Invoice
+                              </p>
+                              <p className="text-pretty text-xs leading-relaxed text-red-700">
+                                Invoices with logos cannot be shared. Please
+                                remove the logo to generate a shareable link.
+                                You can still download the invoice as PDF and
+                                share it.
+                              </p>
+                            </div>
+                          </div>
+                        )
+                      }
                     />
-                    <InvoicePDFDownloadLink invoiceData={invoiceDataState} />
+                    <InvoicePDFDownloadLink
+                      invoiceData={invoiceDataState}
+                      errorWhileGeneratingPdfIsShown={
+                        errorWhileGeneratingPdfIsShown
+                      }
+                      setErrorWhileGeneratingPdfIsShown={
+                        setErrorWhileGeneratingPdfIsShown
+                      }
+                    />
                   </>
                 ) : null}
 
@@ -375,7 +488,7 @@ export function AppPageClient() {
               ) : null} */}
               </div>
             </div>
-            <div className="mb-3 mt-2 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-0">
+            <div className="mb-3 mt-2 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-1">
               <ProjectInfo />
             </div>
           </div>
@@ -385,11 +498,73 @@ export function AppPageClient() {
               handleInvoiceDataChange={handleInvoiceDataChange}
               handleShareInvoice={handleShareInvoice}
               isMobile={isMobile}
+              errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
+              setErrorWhileGeneratingPdfIsShown={
+                setErrorWhileGeneratingPdfIsShown
+              }
+              canShareInvoice={canShareInvoice}
+              setCanShareInvoice={setCanShareInvoice}
             />
           </div>
         </div>
       </div>
-      <Footer />
+      <Footer
+        translations={{
+          footerDescription:
+            "A free, open-source tool for creating professional invoices with real-time preview.",
+          footerCreatedBy: "Created by",
+          product: "Product",
+
+          newsletterTitle: "Subscribe to our newsletter",
+          newsletterDescription:
+            "Get the latest updates and news from EasyInvoicePDF.com",
+          newsletterSubscribe: "Subscribe",
+          newsletterPlaceholder: "Enter your email",
+          newsletterSuccessMessage: "Thank you for subscribing!",
+          newsletterErrorMessage: "Failed to subscribe. Please try again.",
+          newsletterEmailLanguageInfo: "All emails will be sent in English",
+        }}
+        links={
+          <ul className="space-y-2">
+            <li>
+              <Link
+                href="/en/about"
+                className="text-sm text-slate-500 hover:text-slate-900"
+              >
+                About
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/changelog"
+                className="text-sm text-slate-500 hover:text-slate-900"
+              >
+                Changelog
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-slate-500 hover:text-slate-900"
+              >
+                GitHub
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-slate-500 hover:text-slate-900"
+              >
+                Share feedback
+              </Link>
+            </li>
+          </ul>
+        }
+      />
     </TooltipProvider>
   );
 }
@@ -406,7 +581,7 @@ function ProjectInfo() {
     <>
       <span className="relative bottom-0 text-center text-sm text-gray-900 lg:bottom-3">
         <a
-          href="https://github.com/VladSez/pdf-invoice-generator"
+          href={GITHUB_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="group inline-flex items-center gap-1"
@@ -457,157 +632,5 @@ function ProjectInfo() {
         </DialogContent>
       </Dialog>
     </>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="w-full border-t border-slate-200 bg-white py-12 md:py-16">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="flex flex-col gap-10 md:flex-row">
-          <div className="space-y-4 md:w-1/3">
-            <div className="flex items-center">
-              <ProjectLogo className="h-8 w-8" />
-              <p className="text-balance text-center text-xl font-bold text-slate-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
-                <a
-                  href="https://easyinvoicepdf.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  EasyInvoicePDF.com
-                </a>
-              </p>
-            </div>
-            <p className="text-sm text-slate-500">
-              A free, open-source tool for creating professional PDF invoices
-              with real-time preview.
-            </p>
-            <div className="flex gap-4">
-              <Link
-                href="https://github.com/VladSez/pdf-invoice-generator"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-slate-400 hover:text-slate-800"
-              >
-                <span className="sr-only">GitHub</span>
-                <svg
-                  className="h-5 w-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </Link>
-              <Link
-                href="https://x.com/vlad_sazon"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-slate-400 hover:text-slate-800"
-              >
-                <span className="sr-only">Twitter</span>
-                <svg
-                  className="h-5 w-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                </svg>
-                <span className="sr-only">Twitter</span>
-              </Link>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:gap-10 md:flex-1 md:grid-cols-2">
-            <div className="space-y-3"></div>
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium text-slate-900">Product</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="/en/about"
-                    className="text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="https://github.com/VladSez/easy-invoice-pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    GitHub
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    Share feedback
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        {/* Badge for featured on Startup Fame */}
-        <div className="my-5">
-          <a
-            href="https://startupfa.me/s/easyinvoicepdf?utm_source=easyinvoicepdf.com"
-            target="_blank"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://startupfa.me/badges/featured-badge-small.webp"
-              alt="Featured on Startup Fame"
-              width="224"
-              height="36"
-            />
-          </a>
-        </div>
-        <div className="my-5 max-w-lg space-y-2">
-          <p className="text-sm font-medium text-slate-900">
-            Subscribe to our newsletter
-          </p>
-          <SubscribeInput
-            translations={{
-              title: "Subscribe to our newsletter",
-              description:
-                "Get the latest updates and news from EasyInvoicePDF.com",
-              subscribe: "Subscribe",
-              placeholder: "Enter your email",
-              success: "Thank you for subscribing!",
-              error: "Failed to subscribe. Please try again.",
-              emailLanguageInfo: "All emails will be sent in English",
-            }}
-          />
-        </div>
-        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
-          <p className="text-xs text-slate-500">
-            © {new Date().getFullYear()} EasyInvoicePDF.com
-          </p>
-          <p className="text-xs text-slate-500">
-            Created by{" "}
-            <Link
-              href="https://github.com/VladSez"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-slate-900"
-            >
-              Vlad Sazonau
-            </Link>
-          </p>
-        </div>
-      </div>
-    </footer>
   );
 }

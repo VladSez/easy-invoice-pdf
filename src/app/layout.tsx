@@ -15,6 +15,9 @@ import { APP_URL, STATIC_ASSETS_URL } from "@/config";
 
 import "./globals.css";
 
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import "react-pdf/dist/esm/Page/TextLayer.css";
+
 export const viewport: Viewport = {
   initialScale: 1, // Sets the default zoom level to 1 (100%)
   width: "device-width", // Ensures the viewport width matches the device's screen width

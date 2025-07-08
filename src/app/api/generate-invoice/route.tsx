@@ -22,6 +22,7 @@ import {
 } from "./render-pdf-on-server";
 
 import { env } from "@/env";
+import { ipLimiter } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -30,8 +31,30 @@ export const maxDuration = 30; // Set to 30 seconds
 
 export async function GET(req: NextRequest) {
   try {
+    // Check if the request is authorized
     if (req.headers.get("Authorization") !== `Bearer ${env.AUTH_TOKEN}`) {
       return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // Rate limiting
+    const ip = req.headers.get("x-forwarded-for") || "127.0.0.1";
+
+    const rateLimitResult = await ipLimiter.limit(ip);
+
+    if (!rateLimitResult.success) {
+      console.log(`Rate limit exceeded for IP: ${ip}`);
+
+      return new NextResponse(
+        JSON.stringify({
+          error: "Too many requests.",
+        }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
     }
 
     const GENERATED_ENGLISH_INVOICE_PDF_DOCUMENT = renderToBuffer(

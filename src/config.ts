@@ -7,3 +7,11 @@ export const APP_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
 export const STATIC_ASSETS_URL = "https://static.easyinvoicepdf.com";
 
 export const VIDEO_DEMO_URL = `${STATIC_ASSETS_URL}/easy-invoice-demo.mp4`;
+
+export const DONATION_URL = "https://dub.sh/easyinvoice-donate";
+
+export const PROD_WEBSITE_URL = "https://dub.sh/easy-invoice";
+
+export const GITHUB_URL = "https://github.com/VladSez/easy-invoice-pdf";
+
+export const TWITTER_URL = "https://x.com/vlad_sazon";

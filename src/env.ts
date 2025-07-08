@@ -3,39 +3,39 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    AUTH_TOKEN: z.string().min(1),
+    AUTH_TOKEN: z.string(),
 
-    RESEND_API_KEY: z.string().min(1),
-    RESEND_AUDIENCE_ID: z.string().min(1),
+    RESEND_API_KEY: z.string(),
+    RESEND_AUDIENCE_ID: z.string(),
 
-    UPSTASH_REDIS_REST_URL: z.string().min(1),
-    UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
+    UPSTASH_REDIS_REST_URL: z.string(),
+    UPSTASH_REDIS_REST_TOKEN: z.string(),
 
-    TELEGRAM_BOT_TOKEN: z.string().min(1),
-    TELEGRAM_CHAT_ID: z.string().min(1),
+    TELEGRAM_BOT_TOKEN: z.string(),
+    TELEGRAM_CHAT_ID: z.string(),
 
-    SELLER_NAME: z.string().min(1),
-    SELLER_ADDRESS: z.string().min(1),
-    SELLER_VAT_NO: z.string().min(1),
+    SELLER_NAME: z.string(),
+    SELLER_ADDRESS: z.string(),
+    SELLER_VAT_NO: z.string(),
     SELLER_EMAIL: z.string().email(),
-    SELLER_ACCOUNT_NUMBER: z.string().min(1),
-    SELLER_SWIFT_BIC: z.string().min(1),
+    SELLER_ACCOUNT_NUMBER: z.string(),
+    SELLER_SWIFT_BIC: z.string(),
 
-    BUYER_NAME: z.string().min(1),
-    BUYER_ADDRESS: z.string().min(1),
-    BUYER_VAT_NO: z.string().min(1),
+    BUYER_NAME: z.string(),
+    BUYER_ADDRESS: z.string(),
+    BUYER_VAT_NO: z.string(),
     BUYER_EMAIL: z.string().email(),
 
-    INVOICE_NET_PRICE: z.string().min(1),
+    INVOICE_NET_PRICE: z.string(),
     INVOICE_EMAIL_RECIPIENT: z.string().email(),
     INVOICE_EMAIL_COMPANY_TO: z.string().email(),
 
-    GOOGLE_DRIVE_PARENT_FOLDER_ID: z.string().min(1),
+    GOOGLE_DRIVE_PARENT_FOLDER_ID: z.string(),
     GOOGLE_DRIVE_CLIENT_EMAIL: z.string().email(),
-    GOOGLE_DRIVE_PRIVATE_KEY: z.string().min(1),
+    GOOGLE_DRIVE_PRIVATE_KEY: z.string(),
   },
   client: {
-    NEXT_PUBLIC_SENTRY_DSN: z.string().min(1),
+    NEXT_PUBLIC_SENTRY_DSN: z.string(),
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
   runtimeEnv: {
@@ -72,4 +72,5 @@ export const env = createEnv({
     GOOGLE_DRIVE_CLIENT_EMAIL: process.env.GOOGLE_DRIVE_CLIENT_EMAIL,
     GOOGLE_DRIVE_PRIVATE_KEY: process.env.GOOGLE_DRIVE_PRIVATE_KEY,
   },
+  // emptyStringAsUndefined: true,
 });

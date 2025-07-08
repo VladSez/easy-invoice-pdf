@@ -1,5 +1,10 @@
 import { GithubIcon } from "@/components/etc/github-logo";
 import { ProjectLogo } from "@/components/etc/project-logo";
+import { Footer } from "@/components/footer";
+import {
+  BlackGoToAppButton,
+  GoToAppButton,
+} from "@/components/go-to-app-button-cta";
 import { SubscribeInput } from "@/components/subscribe-input";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,22 +15,22 @@ import {
 } from "@/components/ui/disclosure";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Video } from "@/components/video";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { GITHUB_URL, STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
+import { routing } from "@/i18n/routing";
 import {
   CalculatorIcon,
   Download,
   FileText,
   GlobeIcon,
   Share2,
-  ArrowRight,
 } from "lucide-react";
 import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
+import Link from "next/link";
 import { type Graph } from "schema-dts";
+import { LandingCtaToast } from "./components/landing-cta-toast";
 import { LanguageSwitcher } from "./components/language-switcher";
-import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
-import { routing } from "@/i18n/routing";
+import { ProjectLogoDescription } from "@/components/project-logo-description";
 
 // statically generate the pages for all locales
 export function generateStaticParams() {
@@ -38,6 +43,17 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
   // Enables static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
   setRequestLocale(locale);
 
+  const t = useTranslations("About");
+  const tNewsletter = useTranslations("About.newsletter");
+
+  const newsletterTitle = tNewsletter("title");
+  const newsletterDescription = tNewsletter("description");
+  const newsletterSubscribe = tNewsletter("subscribe");
+  const newsletterPlaceholder = tNewsletter("placeholder");
+  const newsletterSuccessMessage = tNewsletter("success");
+  const newsletterErrorMessage = tNewsletter("error");
+  const newsletterEmailLanguageInfo = tNewsletter("emailLanguageInfo");
+
   return (
     <TooltipProvider>
       <script
@@ -47,6 +63,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
           __html: JSON.stringify(JSON_LD),
         }}
       />
+      <LandingCtaToast />
       <div className="flex min-h-screen flex-col bg-slate-50">
         <Header locale={locale} />
         <main>
@@ -56,7 +73,77 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
           <SubscribeSection />
           <CtaSection />
         </main>
-        <Footer />
+        <Footer
+          links={
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  href="/"
+                  className="text-sm text-slate-500 hover:text-slate-900"
+                >
+                  {t("buttons.app")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="#features"
+                  className="text-sm text-slate-500 hover:text-slate-900"
+                >
+                  {t("footer.links.features")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="#faq"
+                  className="text-sm text-slate-500 hover:text-slate-900"
+                >
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/changelog"
+                  className="text-sm text-slate-500 hover:text-slate-900"
+                >
+                  {t("footer.links.changelog")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-slate-500 hover:text-slate-900"
+                >
+                  {t("buttons.shareFeedback")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={GITHUB_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-slate-500 hover:text-slate-900"
+                >
+                  {t("footer.links.github")}
+                </Link>
+              </li>
+            </ul>
+          }
+          translations={{
+            footerDescription: t("footer.description"),
+            footerCreatedBy: t("footer.createdBy"),
+            product: t("footer.product"),
+
+            newsletterTitle: newsletterTitle,
+            newsletterDescription: newsletterDescription,
+            newsletterSubscribe: newsletterSubscribe,
+            newsletterPlaceholder: newsletterPlaceholder,
+            newsletterSuccessMessage: newsletterSuccessMessage,
+            newsletterErrorMessage: newsletterErrorMessage,
+            newsletterEmailLanguageInfo: newsletterEmailLanguageInfo,
+          }}
+        />
       </div>
     </TooltipProvider>
   );
@@ -64,6 +151,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
 
 function Header({ locale }: { locale: Locale }) {
   const t = useTranslations("About.buttons");
+  const tFooter = useTranslations("About.footer.links");
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
@@ -74,11 +162,21 @@ function Header({ locale }: { locale: Locale }) {
               <Logo />
             </div>
             <div className="flex items-center sm:mt-0 sm:gap-2">
+              <Button
+                _variant="ghost"
+                className="hidden lg:inline-flex"
+                asChild
+              >
+                <Link href="/changelog">{tFooter("changelog")}</Link>
+              </Button>
               <LanguageSwitcher
                 locale={locale}
                 buttonText={t("switchLanguage")}
               />
-              <BlackGoToAppButton className="px-3 sm:px-8" />
+              {/* <BlackGoToAppButton className="px-3 sm:px-8" /> */}
+              <BlackGoToAppButton className="px-3 sm:px-8">
+                {t("goToApp")}
+              </BlackGoToAppButton>
             </div>
           </div>
         </div>
@@ -102,7 +200,8 @@ function HeroSection() {
       </div>
 
       <div className="container relative z-10 px-4 md:px-6">
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-6">
+          {/* Left column (text) */}
           <div className="flex flex-col justify-center space-y-5 md:space-y-6">
             <div className="space-y-3 md:space-y-4">
               <h1 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl md:text-5xl lg:text-6xl">
@@ -115,7 +214,9 @@ function HeroSection() {
             </div>
 
             <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <BlackGoToAppButton className="px-10 py-6 text-lg" />
+              <BlackGoToAppButton className="px-10 py-6 text-lg">
+                {t("buttons.goToApp")}
+              </BlackGoToAppButton>
 
               <Button
                 _size="lg"
@@ -124,7 +225,7 @@ function HeroSection() {
                 asChild
               >
                 <Link
-                  href="https://github.com/VladSez/easy-invoice-pdf"
+                  href={GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -133,30 +234,16 @@ function HeroSection() {
                 </Link>
               </Button>
             </div>
-            <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0">
+            <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0">
               <span className="" role="img" aria-label="checkmark">
                 ✅
               </span>
               <span>{t("hero.noSignup")}</span>
             </div>
-            {/* Badge for featured on Startup Fame */}
-            <div className="mx-auto sm:mx-0">
-              <a
-                href="https://startupfa.me/s/easyinvoicepdf?utm_source=easyinvoicepdf.com"
-                target="_blank"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="https://startupfa.me/badges/featured-badge-small.webp"
-                  alt="Featured on Startup Fame"
-                  width="224"
-                  height="36"
-                />
-              </a>
-            </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[600px] lg:mx-0">
+          {/* Right column (video) */}
+          <div className="relative mx-auto w-full max-w-[650px] lg:mx-0">
             {/* Mac OS Frame around the video */}
             <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
               {/* Browser chrome bar */}
@@ -221,7 +308,7 @@ function FeaturesSection() {
   return (
     <section
       id="features"
-      className="flex w-full items-center justify-center bg-slate-50 py-12 md:py-20"
+      className="flex w-full items-center justify-center bg-slate-50 py-12 lg:py-20"
     >
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -310,7 +397,7 @@ function FaqSection() {
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <div className="mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-sm transition-colors">
-              {t("badge")}
+              FAQ
             </div>
             <h2 className="text-3xl font-bold tracking-tighter text-slate-900 md:text-4xl/tight">
               {t("title")}
@@ -405,222 +492,31 @@ function CtaSection() {
           </div>
           <div className="flex w-full flex-col items-center justify-center gap-6">
             <div className="flex w-full flex-col justify-center gap-2 md:flex-row">
-              <GoToAppButton className="border-slate-600 bg-white text-slate-950 hover:bg-white/90" />
+              <GoToAppButton className="border-slate-600 bg-white px-10 py-6 text-lg text-slate-950 hover:bg-white/90">
+                {t("buttons.goToApp")}
+              </GoToAppButton>
               <Button
                 _size="lg"
-                className="bg-slate-700 px-8 text-white hover:bg-slate-700/90"
+                className="group border border-slate-700 bg-slate-700 px-10 py-6 text-lg text-white transition-all duration-300 hover:bg-slate-600/80"
                 asChild
               >
                 <Link
-                  href="https://github.com/VladSez/easy-invoice-pdf"
+                  href={GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <GithubIcon className="mr-2 h-5 w-5 fill-white" />
-                  {t("buttons.viewOnGithub")}
+                  <GithubIcon className="mr-2 h-6 w-6 fill-slate-100 transition-transform duration-300 group-hover:scale-110 group-hover:fill-slate-950" />
+                  {t("buttons.starOnGithub")}
                 </Link>
               </Button>
             </div>
           </div>
-          <p className="text-sm text-slate-400">{t("cta.noSignup")}</p>
+          <p className="animate-pulse text-sm text-slate-400">
+            {t("cta.noSignup")}
+          </p>
         </div>
       </div>
     </section>
-  );
-}
-
-function Footer() {
-  const t = useTranslations("About");
-  const tFaq = useTranslations("FAQ");
-  const tNewsletter = useTranslations("About.newsletter");
-
-  const newsletterTitle = tNewsletter("title");
-  const newsletterDescription = tNewsletter("description");
-  const newsletterSubscribe = tNewsletter("subscribe");
-  const newsletterPlaceholder = tNewsletter("placeholder");
-  const newsletterSuccessMessage = tNewsletter("success");
-  const newsletterErrorMessage = tNewsletter("error");
-  const newsletterEmailLanguageInfo = tNewsletter("emailLanguageInfo");
-  return (
-    <footer
-      id="footer"
-      className="flex w-full items-center justify-center border-t border-slate-200 bg-white py-12 md:py-16 lg:py-20"
-    >
-      <div className="container px-4 md:px-6">
-        <div className="flex flex-col gap-10 md:flex-row">
-          <div className="space-y-4 md:w-1/3">
-            <Logo />
-            <p className="text-sm text-slate-500">{t("footer.description")}</p>
-            <div
-              className="flex gap-4"
-              data-testid="about-page-footer-social-links"
-            >
-              <Link
-                href="https://github.com/VladSez/easy-invoice-pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-slate-400 hover:text-slate-800"
-              >
-                <span className="sr-only">GitHub</span>
-                <svg
-                  className="h-5 w-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </Link>
-              <Link
-                href="https://x.com/vlad_sazon"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-slate-400 hover:text-slate-800"
-              >
-                <span className="sr-only">Twitter</span>
-                <svg
-                  className="h-5 w-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                </svg>
-                <span className="sr-only">Twitter</span>
-              </Link>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:gap-10 md:flex-1 md:grid-cols-2">
-            <div className="space-y-3"></div>
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium text-slate-900">
-                {t("footer.product")}
-              </h3>
-              <ul className="space-y-2" data-testid="about-page-footer-links">
-                <li>
-                  <Link
-                    href="/"
-                    className="text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    {t("buttons.app")}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#features"
-                    className="text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    {t("footer.links.features")}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#faq"
-                    className="text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    {tFaq("badge")}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    {t("buttons.shareFeedback")}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="https://github.com/VladSez/easy-invoice-pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    {t("footer.links.github")}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div className="my-5 max-w-lg space-y-2">
-          <p className="text-sm font-medium text-slate-900">
-            {tNewsletter("title")}
-          </p>
-          <SubscribeInput
-            translations={{
-              title: newsletterTitle,
-              description: newsletterDescription,
-              subscribe: newsletterSubscribe,
-              placeholder: newsletterPlaceholder,
-              success: newsletterSuccessMessage,
-              error: newsletterErrorMessage,
-              emailLanguageInfo: newsletterEmailLanguageInfo,
-            }}
-          />
-        </div>
-        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
-          <p className="text-xs text-slate-500">
-            {t("footer.copyright", {
-              year: String(new Date().getFullYear()),
-            })}
-          </p>
-          <p className="text-xs text-slate-500">
-            {t("footer.createdBy")}{" "}
-            <Link
-              href="https://github.com/VladSez"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-slate-900"
-            >
-              Vlad Sazonau
-            </Link>
-          </p>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-function GoToAppButton({ className }: { className?: string }) {
-  const t = useTranslations("About");
-
-  return (
-    <Button
-      _size="lg"
-      _variant="outline"
-      className={cn(
-        "group relative overflow-hidden border-slate-200 px-8 shadow-sm transition-all duration-300 hover:border-slate-200/80 hover:shadow-lg",
-        className
-      )}
-      asChild
-    >
-      {/**
-       * scroll={false} is used to disable the default behavior of the link because it doesn't work for some reason
-       * the page is already scrolled to the top on mount at /en/app
-       */}
-      <Link href="/" scroll={false}>
-        <ArrowRight className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
-        {t("buttons.goToApp")}
-      </Link>
-    </Button>
-  );
-}
-
-function BlackGoToAppButton({ className }: { className?: string }) {
-  return (
-    <GoToAppButton
-      className={cn(
-        "relative overflow-hidden bg-zinc-900 text-white transition-all duration-300 hover:scale-[1.02] hover:bg-zinc-800 hover:text-white active:scale-[0.98]",
-        className
-      )}
-    />
   );
 }
 
@@ -631,20 +527,7 @@ function Logo() {
     <div>
       <div className="flex items-center gap-1 sm:gap-2">
         <ProjectLogo className="h-7 w-7 flex-shrink-0 sm:h-8 sm:w-8" />
-        <div className="flex flex-col">
-          <p className="text-balance text-base font-bold text-slate-800 sm:text-xl lg:text-2xl">
-            <a
-              href="https://easyinvoicepdf.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              EasyInvoicePDF.com
-            </a>
-          </p>
-          <p className="text-balance text-[11px] text-slate-700 sm:text-[12px]">
-            {t("tagline")}
-          </p>
-        </div>
+        <ProjectLogoDescription>{t("tagline")}</ProjectLogoDescription>
       </div>
     </div>
   );

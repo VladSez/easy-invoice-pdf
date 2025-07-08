@@ -111,7 +111,15 @@ export const InvoiceItems = memo(function InvoiceItems({
                   trigger={
                     <button
                       type="button"
-                      onClick={() => handleRemoveItem(index)}
+                      onClick={() => {
+                        const canDelete = window.confirm(
+                          `Are you sure you want to delete invoice item #${index + 1}?`
+                        );
+
+                        if (canDelete) {
+                          handleRemoveItem(index);
+                        }
+                      }}
                       className="flex items-center justify-center rounded-full bg-red-600 p-2 transition-colors hover:bg-red-700"
                     >
                       <span className="sr-only">

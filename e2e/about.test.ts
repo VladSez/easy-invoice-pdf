@@ -1,4 +1,9 @@
-import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
+import {
+  GITHUB_URL,
+  STATIC_ASSETS_URL,
+  TWITTER_URL,
+  VIDEO_DEMO_URL,
+} from "@/config";
 import { test, expect } from "@playwright/test";
 
 test.describe("About page", () => {
@@ -14,8 +19,11 @@ test.describe("About page", () => {
 
     const header = page.getByRole("banner");
     // Check header elements
-    await expect(header.getByText("EasyInvoicePDF.com")).toBeVisible();
-    const goToAppButton = header.getByRole("link", { name: "Go to app" });
+    await expect(header.getByText("EasyInvoicePDF")).toBeVisible();
+    const goToAppButton = header.getByRole("link", {
+      name: "Go to app",
+      exact: true,
+    });
     await expect(goToAppButton).toBeVisible();
 
     // Check Hero section
@@ -26,6 +34,7 @@ test.describe("About page", () => {
       heroSection.getByRole("heading", {
         level: 1,
         name: "Create professional invoices in seconds",
+        exact: true,
       })
     ).toBeVisible();
 
@@ -71,6 +80,7 @@ test.describe("About page", () => {
       featuresSection.getByRole("heading", {
         level: 2,
         name: "Everything you need for professional invoicing",
+        exact: true,
       })
     ).toBeVisible();
 
@@ -92,6 +102,7 @@ test.describe("About page", () => {
       faqSection.getByRole("heading", {
         level: 2,
         name: "Frequently Asked Questions",
+        exact: true,
       })
     ).toBeVisible();
 
@@ -106,6 +117,7 @@ test.describe("About page", () => {
       subscribeFormSection.getByRole("heading", {
         level: 2,
         name: "Subscribe to our newsletter",
+        exact: true,
       })
     ).toBeVisible();
 
@@ -131,6 +143,7 @@ test.describe("About page", () => {
 
     const subscribeFormButton = subscribeForm.getByRole("button", {
       name: "Subscribe",
+      exact: true,
     });
 
     await expect(subscribeFormButton).toBeVisible();
@@ -140,30 +153,25 @@ test.describe("About page", () => {
     const footer = page.getByRole("contentinfo");
     await expect(footer).toBeVisible();
 
-    const footerSocialLinks = footer.getByTestId(
-      "about-page-footer-social-links"
-    );
+    // check footer social logos first
+    const footerSocialLinks = footer.getByTestId("footer-logos-social-links");
 
     const githubSocialLink = footerSocialLinks.getByRole("link", {
       name: "GitHub",
+      exact: true,
     });
 
     await expect(githubSocialLink).toBeVisible();
-    await expect(githubSocialLink).toHaveAttribute(
-      "href",
-      "https://github.com/VladSez/easy-invoice-pdf"
-    );
+    await expect(githubSocialLink).toHaveAttribute("href", GITHUB_URL);
     await expect(githubSocialLink).toHaveAttribute("target", "_blank");
 
     const twitterSocialLink = footerSocialLinks.getByRole("link", {
       name: "Twitter",
+      exact: true,
     });
 
     await expect(twitterSocialLink).toBeVisible();
-    await expect(twitterSocialLink).toHaveAttribute(
-      "href",
-      "https://x.com/vlad_sazon"
-    );
+    await expect(twitterSocialLink).toHaveAttribute("href", TWITTER_URL);
     await expect(twitterSocialLink).toHaveAttribute("target", "_blank");
 
     // Check newsletter subscription form
@@ -184,7 +192,8 @@ test.describe("About page", () => {
       newsletterForm.getByRole("button", { name: "Subscribe" })
     ).toBeVisible();
 
-    const footerLinks = footer.getByTestId("about-page-footer-links");
+    // now check all the rest of the footer links
+    const footerLinks = footer.getByTestId("footer-social-links");
 
     const appLink = footerLinks.getByRole("link", { name: "App" });
 
@@ -194,6 +203,7 @@ test.describe("About page", () => {
 
     const featuresLink = footerLinks.getByRole("link", {
       name: "Features",
+      exact: true,
     });
 
     await expect(featuresLink).toBeVisible();
@@ -202,14 +212,25 @@ test.describe("About page", () => {
 
     const faqLink = footerLinks.getByRole("link", {
       name: "FAQ",
+      exact: true,
     });
 
     await expect(faqLink).toBeVisible();
     await expect(faqLink).toHaveAttribute("href", "#faq");
     await expect(faqLink).not.toHaveAttribute("target", "_blank");
 
+    const changelogLink = footerLinks.getByRole("link", {
+      name: "Changelog",
+      exact: true,
+    });
+
+    await expect(changelogLink).toBeVisible();
+    await expect(changelogLink).toHaveAttribute("href", "/changelog");
+    await expect(changelogLink).not.toHaveAttribute("target", "_blank");
+
     const shareFeedbackLink = footerLinks.getByRole("link", {
       name: "Share feedback",
+      exact: true,
     });
 
     await expect(shareFeedbackLink).toBeVisible();
@@ -221,13 +242,11 @@ test.describe("About page", () => {
 
     const githubLink = footerLinks.getByRole("link", {
       name: "GitHub",
+      exact: true,
     });
 
     await expect(githubLink).toBeVisible();
-    await expect(githubLink).toHaveAttribute(
-      "href",
-      "https://github.com/VladSez/easy-invoice-pdf"
-    );
+    await expect(githubLink).toHaveAttribute("href", GITHUB_URL);
     await expect(githubLink).toHaveAttribute("target", "_blank");
   });
 
@@ -239,9 +258,10 @@ test.describe("About page", () => {
 
     const header = page.getByRole("banner");
     // Check header elements in French
-    await expect(header.getByText("EasyInvoicePDF.com")).toBeVisible();
+    await expect(header.getByText("EasyInvoicePDF")).toBeVisible();
     const goToAppButton = header.getByRole("link", {
       name: "Aller à l'application",
+      exact: true,
     });
     await expect(goToAppButton).toBeVisible();
 
@@ -253,12 +273,13 @@ test.describe("About page", () => {
       heroSection.getByRole("heading", {
         level: 1,
         name: "Créez des factures professionnelles en quelques secondes",
+        exact: true,
       })
     ).toBeVisible();
 
     await expect(
       heroSection.getByText(
-        "EasyInvoicePDF est un outil gratuit et open-source qui vous permet de créer, personnaliser et télécharger des factures professionelles avec aperçu en temps réel."
+        "EasyInvoicePDF est un outil gratuit et open-source qui vous permet de créer, personnaliser et télécharger des factures professionnelles avec aperçu en temps réel. Fonctionne entièrement dans votre navigateur."
       )
     ).toBeVisible();
 
@@ -284,6 +305,7 @@ test.describe("About page", () => {
       featuresSection.getByRole("heading", {
         level: 2,
         name: "Tout ce dont vous avez besoin pour une facturation professionnelle",
+        exact: true,
       })
     ).toBeVisible();
 
@@ -295,6 +317,7 @@ test.describe("About page", () => {
       subscribeFormSection.getByRole("heading", {
         level: 2,
         name: "Abonnez-vous à notre newsletter",
+        exact: true,
       })
     ).toBeVisible();
 
@@ -322,12 +345,15 @@ test.describe("About page", () => {
       newsletterForm.getByPlaceholder("Entrez votre email")
     ).toBeVisible();
     await expect(
-      newsletterForm.getByRole("button", { name: "S'abonner" })
+      newsletterForm.getByRole("button", { name: "S'abonner", exact: true })
     ).toBeVisible();
 
-    const footerLinks = footer.getByTestId("about-page-footer-links");
+    const footerLinks = footer.getByTestId("footer-social-links");
 
-    const appLink = footerLinks.getByRole("link", { name: "App" });
+    const appLink = footerLinks.getByRole("link", {
+      name: "Application",
+      exact: true,
+    });
 
     await expect(appLink).toBeVisible();
     await expect(appLink).toHaveAttribute("href", "/");
@@ -335,10 +361,12 @@ test.describe("About page", () => {
 
     const featuresLink = footerLinks.getByRole("link", {
       name: "Fonctionnalités",
+      exact: true,
     });
 
     await expect(featuresLink).toBeVisible();
     await expect(featuresLink).toHaveAttribute("href", "#features");
+    await expect(featuresLink).not.toHaveAttribute("target", "_blank");
   });
 
   test("should display about page content in German", async ({ page }) => {
@@ -349,8 +377,11 @@ test.describe("About page", () => {
 
     const header = page.getByRole("banner");
     // Check header elements in German
-    await expect(header.getByText("EasyInvoicePDF.com")).toBeVisible();
-    const goToAppButton = header.getByRole("link", { name: "Zur App" });
+    await expect(header.getByText("EasyInvoicePDF")).toBeVisible();
+    const goToAppButton = header.getByRole("link", {
+      name: "Zur App gehen",
+      exact: true,
+    });
     await expect(goToAppButton).toBeVisible();
 
     // Check Hero section in German
@@ -361,6 +392,7 @@ test.describe("About page", () => {
       heroSection.getByRole("heading", {
         level: 1,
         name: "Erstellen Sie professionelle Rechnungen in Sekunden",
+        exact: true,
       })
     ).toBeVisible();
 
@@ -392,6 +424,7 @@ test.describe("About page", () => {
       featuresSection.getByRole("heading", {
         level: 2,
         name: "Alles, was Sie für professionelle Rechnungsstellung brauchen",
+        exact: true,
       })
     ).toBeVisible();
 
@@ -411,12 +444,12 @@ test.describe("About page", () => {
       newsletterForm.getByPlaceholder("E-Mail eingeben")
     ).toBeVisible();
     await expect(
-      newsletterForm.getByRole("button", { name: "Abonnieren" })
+      newsletterForm.getByRole("button", { name: "Abonnieren", exact: true })
     ).toBeVisible();
 
-    const footerLinks = footer.getByTestId("about-page-footer-links");
+    const footerLinks = footer.getByTestId("footer-social-links");
     await expect(
-      footerLinks.getByRole("link", { name: "Funktionen" })
+      footerLinks.getByRole("link", { name: "Funktionen", exact: true })
     ).toBeVisible();
   });
 
@@ -426,12 +459,17 @@ test.describe("About page", () => {
     await expect(page).toHaveURL("/en/about");
 
     // Switch to French
-    await page.getByRole("button", { name: "Switch language" }).click();
+    await page
+      .getByRole("button", { name: "Switch language", exact: true })
+      .click();
     await page.getByText("Français").click();
 
     const header = page.getByRole("banner");
     await expect(
-      header.getByRole("link", { name: "Aller à l'application" })
+      header.getByRole("link", {
+        name: "Aller à l'application",
+        exact: true,
+      })
     ).toBeVisible();
     await expect(page).toHaveURL("/fr/about");
   });
@@ -444,7 +482,10 @@ test.describe("About page", () => {
     // Click the Go to App button in header
     const header = page.getByRole("banner");
 
-    const headerGoToAppButton = header.getByRole("link", { name: "Go to app" });
+    const headerGoToAppButton = header.getByRole("link", {
+      name: "Go to app",
+      exact: true,
+    });
 
     await headerGoToAppButton.click();
     await expect(page).toHaveURL("/");

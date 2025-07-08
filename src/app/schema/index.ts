@@ -1,31 +1,55 @@
 import { z } from "zod";
+import dayjs from "dayjs";
 
 export const SUPPORTED_CURRENCIES = [
   "EUR", // Euro
   "USD", // US Dollar
+  "PLN", // Polish Złoty
+  "GBP", // British Pound
+
+  "JPY", // Japanese Yen
+  "CNY", // Chinese Yuan (RMB)
+  "CHF", // Swiss Franc
   "CAD", // Canadian Dollar
   "AUD", // Australian Dollar
-  "GBP", // British Pound
-  "PLN", // Polish Złoty
+  "HKD", // Hong Kong Dollar
+  "SGD", // Singapore Dollar
+  "INR", // Indian Rupee
+  "KRW", // South Korean Won
+  "BRL", // Brazilian Real
   "RUB", // Russian Ruble
+  "TWD", // Taiwan Dollar
+  "SEK", // Swedish Krona
+  "MXN", // Mexican Peso
+  "NZD", // New Zealand Dollar
+  "TRY", // Turkish Lira
+  "ZAR", // South African Rand
+  "NOK", // Norwegian Krone
+  "DKK", // Danish Krone
+  "ILS", // Israeli New Shekel
+  "CZK", // Czech Koruna
+  "HUF", // Hungarian Forint
   "UAH", // Ukrainian Hryvnia
   "BYN", // Belarusian Ruble
-  "BRL", // Brazilian Real
-  "MXN", // Mexican Peso
   "ARS", // Argentine Peso
-  "INR", // Indian Rupee
-  "CHF", // Swiss Franc
-  "HKD", // Hong Kong Dollar
-  "TWD", // Taiwan Dollar
-  "CNY", // Chinese Yuan (RMB)
-  "SGD", // Singapore Dollar
-] as const;
+  "PKR", // Pakistani Rupee
+  "SAR", // Saudi Riyal
+  "AED", // UAE Dirham
+  "QAR", // Qatari Riyal
+  "KWD", // Kuwaiti Dinar
+  "BHD", // Bahraini Dinar
+  "OMR", // Omani Rial
+  "JOD", // Jordanian Dinar
+  "EGP", // Egyptian Pound
+  "LBP", // Lebanese Pound
+] as const satisfies string[];
 
 export type SupportedCurrencies = (typeof SUPPORTED_CURRENCIES)[number];
 
 export const CURRENCY_SYMBOLS = {
   EUR: "€", // Euro
   USD: "$", // US Dollar
+
   CAD: "$", // Canadian Dollar
   AUD: "$", // Australian Dollar
   GBP: "£", // British Pound
@@ -42,6 +66,27 @@ export const CURRENCY_SYMBOLS = {
   TWD: "NT$", // Taiwan Dollar
   CNY: "¥", // Chinese Yuan (RMB)
   SGD: "S$", // Singapore Dollar
+  JPY: "¥", // Japanese Yen
+  SEK: "kr", // Swedish Krona
+  NOK: "kr", // Norwegian Krone
+  DKK: "kr", // Danish Krone
+  CZK: "Kč", // Czech Koruna
+  HUF: "Ft", // Hungarian Forint
+  ILS: "₪", // Israeli New Shekel
+  ZAR: "R", // South African Rand
+  TRY: "₺", // Turkish Lira
+  KRW: "₩", // South Korean Won
+  NZD: "NZ$", // New Zealand Dollar
+  PKR: "₨", // Pakistani Rupee
+  SAR: "SAR", // Saudi Riyal
+  AED: "AED", // UAE Dirham
+  QAR: "QR", // Qatari Riyal
+  KWD: "KWD", // Kuwaiti Dinar
+  BHD: "BHD", // Bahraini Dinar
+  OMR: "OMR", // Omani Rial
+  JOD: "JOD", // Jordanian Dinar
+  EGP: "EGP", // Egyptian Pound
+  LBP: "LBP", // Lebanese Pound
 } as const satisfies Record<SupportedCurrencies, string>;
 
 export type CurrencySymbols =
@@ -66,10 +111,43 @@ export const CURRENCY_TO_LABEL = {
   TWD: "New Taiwan Dollar",
   CNY: "Chinese Yuan Renminbi",
   SGD: "Singapore Dollar",
+  JPY: "Japanese Yen",
+  SEK: "Swedish Krona",
+  NOK: "Norwegian Krone",
+  DKK: "Danish Krone",
+  CZK: "Czech Koruna",
+  HUF: "Hungarian Forint",
+  ILS: "Israeli New Shekel",
+  ZAR: "South African Rand",
+  TRY: "Turkish Lira",
+  KRW: "South Korean Won",
+  NZD: "New Zealand Dollar",
+  PKR: "Pakistani Rupee",
+  SAR: "Saudi Riyal",
+  AED: "UAE Dirham",
+  QAR: "Qatari Riyal",
+  KWD: "Kuwaiti Dinar",
+  BHD: "Bahraini Dinar",
+  OMR: "Omani Rial",
+  JOD: "Jordanian Dinar",
+  EGP: "Egyptian Pound",
+  LBP: "Lebanese Pound",
 } as const satisfies Record<SupportedCurrencies, string>;
 
 export type CurrencyLabels =
   (typeof CURRENCY_TO_LABEL)[keyof typeof CURRENCY_TO_LABEL];
+
+export const SUPPORTED_TEMPLATES = ["default", "stripe"] as const;
+
+export type SupportedTemplates = (typeof SUPPORTED_TEMPLATES)[number];
+
+export const TEMPLATE_TO_LABEL = {
+  default: "Default Template",
+  stripe: "Stripe Template",
+} as const satisfies Record<SupportedTemplates, string>;
+
+export type TemplateLabels =
+  (typeof TEMPLATE_TO_LABEL)[keyof typeof TEMPLATE_TO_LABEL];
 
 export const SUPPORTED_LANGUAGES = [
   "en",
@@ -108,6 +186,8 @@ export const SUPPORTED_DATE_FORMATS = [
   "DD-MM-YYYY", // 20-03-2024
   "YYYY.MM.DD", // 2024.03.20
 ] as const;
+
+export const STRIPE_DEFAULT_DATE_FORMAT = "MMMM D, YYYY";
 
 /**
  * Supported date formats
@@ -294,7 +374,42 @@ export const invoiceSchema = z.object({
   language: z.enum(SUPPORTED_LANGUAGES).default("en"),
   dateFormat: z.enum(SUPPORTED_DATE_FORMATS).default("YYYY-MM-DD"),
   currency: z.enum(SUPPORTED_CURRENCIES).default("EUR"),
+  template: z.enum(SUPPORTED_TEMPLATES).default("default"),
 
+  /**
+   * Logo field for Stripe template
+   *
+   * Stores base64 image data
+   *
+   * Max 3MB limit enforced on the client side during upload
+   */
+  logo: z
+    .string()
+    .trim()
+    .default("")
+    .refine((val) => {
+      if (!val) return true; // Allow empty string
+      // Check if it's a valid base64 data URL
+      const base64Pattern = /^data:image\/(jpeg|jpg|png|webp);base64,/;
+      return base64Pattern.test(val);
+    }, "Logo must be a valid image (JPEG, PNG or WebP) in base64 format")
+    .optional()
+    .describe(
+      "Stripe template specific field. Logo must be a valid image (JPEG, PNG or WebP) in base64 format"
+    ),
+
+  /**
+   * Invoice number object
+   *
+   * Contains label and value for invoice number
+   *
+   * {
+   *   label: "Invoice Number",
+   *   value: "1234",
+   * }
+   *
+   * Optional field
+   */
   invoiceNumberObject: z
     .object({
       label: z
@@ -308,8 +423,32 @@ export const invoiceSchema = z.object({
     })
     .optional(),
 
-  dateOfIssue: z.string().min(1, "Date of issue is required").trim(),
-  dateOfService: z.string().min(1, "Date of service is required").trim(),
+  dateOfIssue: z
+    .string()
+    .trim()
+    .transform((val) => {
+      if (!val) {
+        // If no value is provided, set the date of issue to today's date
+        return dayjs().format("YYYY-MM-DD");
+      }
+
+      return val;
+    })
+    .describe("Invoice date of issue. Default is today's date"),
+
+  dateOfService: z
+    .string()
+    .trim()
+    .transform((val) => {
+      if (!val) {
+        // If no value is provided, set the date of service to the last day of the current month
+        return dayjs().endOf("month").format("YYYY-MM-DD");
+      }
+      return val;
+    })
+    .describe(
+      "Invoice date of service. Default is the last day of the current month"
+    ),
 
   invoiceType: z
     .string()
@@ -334,7 +473,45 @@ export const invoiceSchema = z.object({
     .optional(),
   paymentMethodFieldIsVisible: z.boolean().default(true),
 
-  paymentDue: z.string().min(1, "Payment due is required").trim(),
+  paymentDue: z
+    .string()
+    .trim()
+    .transform((val) => {
+      if (!val) {
+        // If no value is provided, set the payment due date to 14 days from the date of issue
+        return dayjs().add(14, "days").format("YYYY-MM-DD");
+      }
+      return val;
+    })
+    .describe("Payment due date. Default is 14 days from the date of issue"),
+
+  /**
+   * Pay Online URL field for Stripe template only
+   *
+   * URL field for Stripe payment link that:
+   * - Accepts empty string or valid URL
+   * - Trims whitespace
+   * - Optional field
+   * - Validates URL format if non-empty value provided
+   */
+  stripePayOnlineUrl: z
+    .string()
+    .trim() // Remove whitespace
+    .transform((val) => val) // Pass through value
+    .pipe(
+      z.union([
+        z.literal(""), // Allow empty string
+        z
+          .string()
+          .url("Please enter a valid URL or leave empty")
+          .refine(
+            (url) => url.startsWith("https://"),
+            "URL must start with https://"
+          ), // Validate HTTPS URL format
+      ])
+    )
+    .optional()
+    .describe("Stripe template specific field. URL field for payment link"),
 
   notes: z
     .string()
@@ -372,3 +549,26 @@ export const accordionSchema = z
 export type AccordionState = z.infer<typeof accordionSchema>;
 
 export const ACCORDION_STATE_LOCAL_STORAGE_KEY = "EASY_INVOICE_ACCORDION_STATE";
+
+// __________________________________________________________
+// Validate that currencies are unique
+// __________________________________________________________
+const uniqueCurrencies = new Set(SUPPORTED_CURRENCIES);
+
+if (uniqueCurrencies.size !== SUPPORTED_CURRENCIES.length) {
+  const duplicates = SUPPORTED_CURRENCIES.filter(
+    (currency, index) => SUPPORTED_CURRENCIES.indexOf(currency) !== index
+  );
+
+  const currencyFullNames = duplicates.map((currency) => {
+    const currencyFullName = CURRENCY_TO_LABEL[currency];
+
+    return `${currency} - ${currencyFullName}`;
+  });
+
+  throw new Error(
+    `SUPPORTED_CURRENCIES contains duplicate entries: ${currencyFullNames.join(
+      ", "
+    )}`
+  );
+}

@@ -11,7 +11,7 @@
     "tagline": "Generator faktur PDF z podglądem na żywo",
     "hero": {
       "title": "Twórz profesjonalne faktury w kilka sekund",
-      "description": "EasyInvoicePDF to darmowe narzędzie open-source, które pozwala tworzyć, dostosowywać i pobierać profesjonalne faktury z podglądem w czasie rzeczywistym.",
+      "description": "EasyInvoicePDF to darmowe narzędzie open-source, które pozwala tworzyć, dostosowywać i pobierać profesjonalne faktury z podglądem w czasie rzeczywistym. Działa całkowicie w Twojej przeglądarce.",
       "noSignup": "Bez rejestracji. W 100% darmowe i open-source."
     },
     "features": {
@@ -56,14 +56,15 @@
       "product": "Produkt",
       "links": {
         "features": "Funkcje",
-        "github": "GitHub"
+        "github": "GitHub",
+        "changelog": "Dziennik zmian"
       },
-      "copyright": "© {year} EasyInvoicePDF.com",
       "createdBy": "Stworzone przez"
     },
     "buttons": {
       "goToApp": "Przejdź do aplikacji",
       "viewOnGithub": "Zobacz na GitHub",
+      "starOnGithub": "Oznacz gwiazdką na GitHub",
       "switchLanguage": "Zmień język",
       "shareFeedback": "Podziel się opinią",
       "app": "Aplikacja"
@@ -81,7 +82,6 @@
   "FAQ": {
     "title": "Często Zadawane Pytania",
     "description": "Znajdź odpowiedzi na często zadawane pytania o EasyInvoicePDF",
-    "badge": "FAQ",
     "items": {
       "whatIs": {
         "question": "Czym jest EasyInvoicePDF?",

@@ -64,11 +64,13 @@ type AccordionKeys = Array<(typeof DEFAULT_ACCORDION_VALUES)[number]>;
 interface InvoiceFormProps {
   invoiceData: InvoiceData;
   onInvoiceDataChange: (updatedData: InvoiceData) => void;
+  setCanShareInvoice: (canShareInvoice: boolean) => void;
 }
 
 export const InvoiceForm = memo(function InvoiceForm({
   invoiceData,
   onInvoiceDataChange,
+  setCanShareInvoice,
 }: InvoiceFormProps) {
   const form = useForm<InvoiceData>({
     resolver: zodResolver(invoiceSchema),
@@ -91,6 +93,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   const paymentDue = useWatch({ control, name: "paymentDue" });
   const language = useWatch({ control, name: "language" });
+  const selectedDateFormat = useWatch({ control, name: "dateFormat" });
 
   const isPaymentDueBeforeDateOfIssue = dayjs(paymentDue).isBefore(
     dayjs(dateOfIssue)
@@ -161,10 +164,11 @@ export const InvoiceForm = memo(function InvoiceForm({
       // submit form e.g. regenerates pdf and run form validations
       void handleSubmit(onSubmit)(data as unknown as React.BaseSyntheticEvent);
 
-      // data should be already validated
-      const stringifiedData = JSON.stringify(data);
-
       try {
+        const validatedData = invoiceSchema.parse(data);
+
+        const stringifiedData = JSON.stringify(validatedData);
+
         localStorage.setItem(PDF_DATA_LOCAL_STORAGE_KEY, stringifiedData);
       } catch (error) {
         console.error("Error saving to local storage:", error);
@@ -184,6 +188,16 @@ export const InvoiceForm = memo(function InvoiceForm({
 
     return () => subscription.unsubscribe();
   }, [debouncedRegeneratePdfOnFormChange, watch]);
+
+  const template = useWatch({ control, name: "template" });
+  const logo = useWatch({ control, name: "logo" });
+
+  // Disable sharing when Stripe template contains a logo (we can't put the logo base64 string in the URL due to browser URL length limits)
+  useEffect(() => {
+    const canShareInvoice = !(template === "stripe" && Boolean(logo));
+
+    setCanShareInvoice(canShareInvoice);
+  }, [template, logo, setCanShareInvoice]);
 
   // Add a wrapper function for remove item that triggers the form update
   const handleRemoveItem = useCallback(
@@ -519,31 +533,39 @@ export const InvoiceForm = memo(function InvoiceForm({
             {errors.paymentDue && (
               <ErrorMessage>{errors.paymentDue.message}</ErrorMessage>
             )}
-            {!errors.paymentDue && isPaymentDueBeforeDateOfIssue ? (
+            {!errors.paymentDue &&
+            isPaymentDueBeforeDateOfIssue &&
+            dateOfIssue ? (
               <InputHelperMessage>
-                <span className="flex items-center text-balance">
+                <span className="flex items-center text-balance text-amber-800">
                   <AlertIcon />
                   Payment due date is before date of issue (
-                  {dayjs(dateOfIssue).format("DD.MM.YYYY")})
+                  {dayjs(dateOfIssue).format(selectedDateFormat)})
                 </span>
                 <ButtonHelper
                   onClick={() => {
                     const newPaymentDue = dayjs(dateOfIssue)
                       .add(14, "days")
-                      .format("YYYY-MM-DD");
+                      .format("YYYY-MM-DD"); // default browser date input format is YYYY-MM-DD
 
                     setValue("paymentDue", newPaymentDue);
                   }}
                 >
-                  Click to set payment due date 14 days after the date of issue
-                  ({dayjs(dateOfIssue).add(14, "days").format("DD/MM/YYYY")})
+                  <span className="text-balance">
+                    Set payment due date to{" "}
+                    {dayjs(dateOfIssue)
+                      .add(14, "days")
+                      .format(selectedDateFormat)}{" "}
+                    (14 days from issue date)
+                  </span>
                 </ButtonHelper>
               </InputHelperMessage>
             ) : null}
             {/* If there are no errors and the payment due date is not before the date of issue and the payment due date is not 14 days after the date of issue, show the button to set the payment due date to 14 days after the date of issue (probably a bit better UX) */}
             {!errors.paymentDue &&
             !isPaymentDueBeforeDateOfIssue &&
-            !isPaymentDue14DaysFromDateOfIssue ? (
+            !isPaymentDue14DaysFromDateOfIssue &&
+            dateOfIssue ? (
               <ButtonHelper
                 className="whitespace-normal"
                 onClick={() => {
@@ -554,8 +576,13 @@ export const InvoiceForm = memo(function InvoiceForm({
                   setValue("paymentDue", newPaymentDue);
                 }}
               >
-                Click to set payment due date 14 days after the date of issue (
-                {dayjs(dateOfIssue).add(14, "days").format("DD/MM/YYYY")})
+                <span className="text-balance">
+                  Set payment due date to{" "}
+                  {dayjs(dateOfIssue)
+                    .add(14, "days")
+                    .format(selectedDateFormat)}{" "}
+                  (14 days from issue date)
+                </span>
               </ButtonHelper>
             ) : null}
           </div>

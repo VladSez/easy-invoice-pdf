@@ -1,6 +1,7 @@
 "use client";
 
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 interface UmamiEventData {
   [key: string]: string | number | boolean | undefined;
@@ -36,6 +37,8 @@ export const umamiTrackEvent = (
   try {
     eventNameSchema.parse(eventName);
   } catch (error) {
+    Sentry.captureException(error);
+
     if (error instanceof z.ZodError) {
       console.error("Invalid event name:", error.errors[0].message);
       return;
@@ -46,6 +49,7 @@ export const umamiTrackEvent = (
     window.umami?.track(eventName, options);
   } catch (error) {
     console.error("Failed to track event:", error);
+    Sentry.captureException(error);
 
     if (error instanceof Error) {
       umamiTrackEvent("error_tracking_umami_event", {

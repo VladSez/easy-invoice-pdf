@@ -1,9 +1,10 @@
 {
   "About": {
-    "tagline": "Free Invoice Generator with Real-Time PDF Preview",
+    "tagline": "Free Invoice Generator with Live PDF Preview",
     "hero": {
       "title": "Create professional invoices in seconds",
-      "description": "EasyInvoicePDF is a free, open-source tool that lets you create, customize, and download professional invoices with real-time preview.",
+      "description": "EasyInvoicePDF is a free, open-source tool that lets you create, customize, and download professional invoices with real-time preview. Runs entirely in your browser.",
+
       "noSignup": "No sign-up required. 100% free and open-source."
     },
     "features": {
@@ -48,14 +49,15 @@
       "product": "Product",
       "links": {
         "features": "Features",
-        "github": "GitHub"
+        "github": "GitHub",
+        "changelog": "Changelog"
       },
-      "copyright": "© {year} EasyInvoicePDF.com",
       "createdBy": "Created by"
     },
     "buttons": {
       "goToApp": "Go to app",
       "viewOnGithub": "View on GitHub",
+      "starOnGithub": "Star on GitHub",
       "switchLanguage": "Switch language",
       "shareFeedback": "Share feedback",
       "app": "App"
@@ -81,7 +83,6 @@
   "FAQ": {
     "title": "Frequently Asked Questions",
     "description": "Find answers to common questions about EasyInvoicePDF",
-    "badge": "FAQ",
     "items": {
       "whatIs": {
         "question": "What is EasyInvoicePDF?",
