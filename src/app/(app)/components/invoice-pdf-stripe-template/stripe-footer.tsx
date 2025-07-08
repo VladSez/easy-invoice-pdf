@@ -30,8 +30,12 @@ export function StripeFooter({
     <View style={styles.footer} fixed>
       <View style={styles.spaceBetween}>
         <View style={[styles.row, { gap: 3 }]}>
-          <Text style={[styles.fontSize8]}>{invoiceNumber}</Text>
-          <Text style={[styles.fontSize8]}>·</Text>
+          {invoiceNumber && (
+            <>
+              <Text style={[styles.fontSize8]}>{invoiceNumber}</Text>
+              <Text style={[styles.fontSize8]}>·</Text>
+            </>
+          )}
           <Text style={[styles.fontSize8]}>
             {currencySymbol}
             {formattedInvoiceTotal} {invoiceData.currency} {t.stripe.due}{" "}
