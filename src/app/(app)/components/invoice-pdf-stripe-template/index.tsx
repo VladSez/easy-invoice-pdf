@@ -112,6 +112,7 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
   // Spacing
   mb1: { marginBottom: 1 },
   mb2: { marginBottom: 2 },
+  mb3: { marginBottom: 3 },
   mb4: { marginBottom: 4 },
   mb8: { marginBottom: 8 },
   mb12: { marginBottom: 12 },

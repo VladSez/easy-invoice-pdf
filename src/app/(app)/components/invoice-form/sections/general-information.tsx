@@ -154,19 +154,26 @@ export const GeneralInformation = memo(function GeneralInformation({
     toast.success("Logo removed successfully!");
   }, [setValue]);
 
-  // Clear Stripe Pay Online URL when template is not Stripe and there is an error for better user experience
+  // Handle template-specific form updates
   useEffect(() => {
-    if (template !== "stripe" && errors.stripePayOnlineUrl) {
-      setValue("stripePayOnlineUrl", "");
-    }
-  }, [template, setValue, errors.stripePayOnlineUrl]);
+    if (template === "stripe") {
+      // Set date format to "MMMM D, YYYY" when template is Stripe
+      setValue("dateFormat", "MMMM D, YYYY");
+    } else {
+      // Clear Stripe-specific fields when not using Stripe template
+      if (errors.stripePayOnlineUrl) {
+        setValue("stripePayOnlineUrl", "");
+      }
 
-  // Clear logo when template is not Stripe
-  useEffect(() => {
-    if (template !== "stripe" && logo) {
-      setValue("logo", "");
+      // Clear logo when template is not stripe
+      if (logo) {
+        setValue("logo", "");
+      }
+
+      // Set date format to "YYYY-MM-DD" when template is not stripe
+      setValue("dateFormat", SUPPORTED_DATE_FORMATS[0]);
     }
-  }, [template, setValue, logo]);
+  }, [template, setValue, errors.stripePayOnlineUrl, logo]);
 
   return (
     <div className="space-y-4">

@@ -41,12 +41,17 @@ export const InvoiceBody = ({
     dayjs.locale(language);
   }
 
-  const formattedInvoiceTotal = invoiceData?.total
-    .toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-    .replaceAll(",", " ");
+  const invoiceTotal = invoiceData?.total;
+
+  const formattedInvoiceTotal =
+    typeof invoiceTotal === "number"
+      ? invoiceTotal
+          .toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+          .replaceAll(",", " ")
+      : "0.00";
 
   const signatureSectionIsVisible =
     invoiceData.personAuthorizedToReceiveFieldIsVisible ||

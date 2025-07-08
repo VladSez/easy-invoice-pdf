@@ -164,10 +164,11 @@ export const InvoiceForm = memo(function InvoiceForm({
       // submit form e.g. regenerates pdf and run form validations
       void handleSubmit(onSubmit)(data as unknown as React.BaseSyntheticEvent);
 
-      // data should be already validated
-      const stringifiedData = JSON.stringify(data);
-
       try {
+        const validatedData = invoiceSchema.parse(data);
+
+        const stringifiedData = JSON.stringify(validatedData);
+
         localStorage.setItem(PDF_DATA_LOCAL_STORAGE_KEY, stringifiedData);
       } catch (error) {
         console.error("Error saving to local storage:", error);
