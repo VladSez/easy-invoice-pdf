@@ -187,6 +187,8 @@ export const SUPPORTED_DATE_FORMATS = [
   "YYYY.MM.DD", // 2024.03.20
 ] as const;
 
+export const STRIPE_DEFAULT_DATE_FORMAT = "MMMM D, YYYY";
+
 /**
  * Supported date formats
  *

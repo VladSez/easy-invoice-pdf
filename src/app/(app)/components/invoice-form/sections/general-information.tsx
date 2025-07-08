@@ -9,6 +9,7 @@ import {
   CURRENCY_SYMBOLS,
   CURRENCY_TO_LABEL,
   LANGUAGE_TO_LABEL,
+  STRIPE_DEFAULT_DATE_FORMAT,
   SUPPORTED_TEMPLATES,
   TEMPLATE_TO_LABEL,
   type InvoiceData,
@@ -158,7 +159,7 @@ export const GeneralInformation = memo(function GeneralInformation({
   useEffect(() => {
     if (template === "stripe") {
       // Set date format to "MMMM D, YYYY" when template is Stripe
-      setValue("dateFormat", "MMMM D, YYYY");
+      setValue("dateFormat", STRIPE_DEFAULT_DATE_FORMAT);
     } else {
       // Clear Stripe-specific fields when not using Stripe template
       if (errors.stripePayOnlineUrl) {

@@ -1,4 +1,8 @@
-import { PDF_DATA_LOCAL_STORAGE_KEY, type InvoiceData } from "@/app/schema";
+import {
+  PDF_DATA_LOCAL_STORAGE_KEY,
+  STRIPE_DEFAULT_DATE_FORMAT,
+  type InvoiceData,
+} from "@/app/schema";
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import fs from "fs";
@@ -14,12 +18,16 @@ const getDownloadDir = ({ browserName }: { browserName: string }) => {
 };
 
 const CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
-const TODAY = dayjs().format("YYYY-MM-DD");
-const START_OF_CURRENT_MONTH = dayjs().startOf("month").format("YYYY-MM-DD");
-const LAST_DAY_OF_CURRENT_MONTH = dayjs().endOf("month").format("YYYY-MM-DD");
+const TODAY = dayjs().format(STRIPE_DEFAULT_DATE_FORMAT);
+const START_OF_CURRENT_MONTH = dayjs()
+  .startOf("month")
+  .format(STRIPE_DEFAULT_DATE_FORMAT);
+const LAST_DAY_OF_CURRENT_MONTH = dayjs()
+  .endOf("month")
+  .format(STRIPE_DEFAULT_DATE_FORMAT);
 
 // Payment date is 14 days from today (by default)
-const PAYMENT_DATE = dayjs().add(14, "day").format("YYYY-MM-DD");
+const PAYMENT_DATE = dayjs().add(14, "day").format(STRIPE_DEFAULT_DATE_FORMAT);
 
 test.describe("Stripe InvoiceTemplate", () => {
   let downloadDir: string;
