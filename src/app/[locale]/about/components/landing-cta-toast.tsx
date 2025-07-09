@@ -43,8 +43,8 @@ export const LandingCtaToast = () => {
       }
     };
 
-    // Show cta toast after 7 seconds on the page
-    const initialTimer = setTimeout(showCTAToast, 7_000);
+    // Show cta toast after 15 seconds on the page
+    const initialTimer = setTimeout(showCTAToast, 15_000);
 
     return () => {
       clearTimeout(initialTimer);
