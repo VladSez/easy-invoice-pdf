@@ -146,7 +146,7 @@ export async function GET(req: NextRequest) {
 
     const invoiceUrl = `https://easyinvoicepdf.com/?data=${compressedData}`;
 
-    const monthAndYear = dayjs().format("MMMM, YYYY");
+    const monthAndYear = dayjs().format("MMMM YYYY");
 
     // *___________UPLOAD INVOICES TO GOOGLE DRIVE___________*
 
@@ -247,7 +247,7 @@ EasyInvoicePDF.com`,
     <br/>
     <br/>
 
-    <b>Don't forget to</b> <a href="${companyEmailLink}"><b>send email to company</b></a>
+    <b>Important:</b> <a href="${companyEmailLink}"><b>Send these invoices via email to the company</b></a> for processing and payment
     <br/>
     <br/>
 

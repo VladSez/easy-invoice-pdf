@@ -1,5 +1,5 @@
 import { Link, Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
-import { type InvoiceData, CURRENCY_SYMBOLS } from "@/app/schema";
+import { type InvoiceData } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";
 import { PROD_WEBSITE_URL } from "@/config";
 import dayjs from "dayjs";
@@ -18,7 +18,6 @@ export function StripeFooter({
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
 
-  const currencySymbol = CURRENCY_SYMBOLS[invoiceData.currency];
   const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
   const invoiceNumber = `${invoiceNumberValue}`;
 
@@ -37,9 +36,7 @@ export function StripeFooter({
             </>
           )}
           <Text style={[styles.fontSize8]}>
-            {currencySymbol}
-            {formattedInvoiceTotal} {invoiceData.currency} {t.stripe.due}{" "}
-            {paymentDueDate}
+            {formattedInvoiceTotal} {t.stripe.due} {paymentDueDate}
           </Text>
           <Text style={[styles.fontSize8]}>·</Text>
           <Text style={[styles.fontSize8]}>

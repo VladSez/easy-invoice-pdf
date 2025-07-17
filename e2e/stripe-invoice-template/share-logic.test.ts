@@ -7,6 +7,11 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await page.goto("/");
   });
 
+  test.afterEach(async ({ page }) => {
+    // Clear localStorage after each test
+    await page.evaluate(() => localStorage.clear());
+  });
+
   test("can share invoice with Stripe template and *WITHOUT* logo", async ({
     page,
   }) => {
@@ -58,7 +63,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // eslint-disable-next-line playwright/no-force-option
     await shareButton.click({ force: true });
 
-    await expect(page.getByText("Unable to Share Invoice")).toBeVisible();
+    await expect(page.getByText("Unable to Share Invoice")).toBeVisible({
+      timeout: 700,
+    });
 
     await expect(
       page.getByText(
@@ -262,7 +269,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // eslint-disable-next-line playwright/no-force-option
     await shareButton.click({ force: true });
 
-    await expect(page.getByText("Unable to Share Invoice")).toBeVisible();
+    await expect(page.getByText("Unable to Share Invoice")).toBeVisible({
+      timeout: 700,
+    });
 
     await expect(
       page.getByText(

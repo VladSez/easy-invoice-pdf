@@ -1,6 +1,5 @@
 import { Text, View, Link } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { type InvoiceData } from "@/app/schema";
-import { CURRENCY_SYMBOLS } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";
 import dayjs from "dayjs";
 import "dayjs/locale/en";
@@ -33,7 +32,6 @@ export function StripeDueAmount({
   const paymentDueDate = dayjs(invoiceData.paymentDue).format(
     invoiceData.dateFormat
   );
-  const currencySymbol = CURRENCY_SYMBOLS[invoiceData.currency];
 
   // Check if payOnlineUrl is provided and valid
   const hasPayOnlineUrl = invoiceData.stripePayOnlineUrl;
@@ -41,9 +39,7 @@ export function StripeDueAmount({
   return (
     <View>
       <Text style={[styles.fontSize14, styles.fontBold, styles.mb8]}>
-        {currencySymbol}
-        {formattedInvoiceTotal} {invoiceData.currency} {t.stripe.due}{" "}
-        {paymentDueDate}
+        {formattedInvoiceTotal} {t.stripe.due} {paymentDueDate}
       </Text>
       {hasPayOnlineUrl ? (
         <Link
