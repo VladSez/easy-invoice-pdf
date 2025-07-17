@@ -29,7 +29,7 @@ export function StripeTotals({
 
   return (
     <View style={{ alignItems: "flex-end", marginTop: 24 }}>
-      <View style={{ width: "40%" }}>
+      <View style={{ width: "50%" }}>
         {/* Subtotal */}
         <View
           style={[styles.totalRow, styles.borderTop, { paddingVertical: 1.5 }]}

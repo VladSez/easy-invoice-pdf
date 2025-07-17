@@ -383,7 +383,7 @@ test.describe("Stripe Invoice Template", () => {
     expect(pdfData.text).toContain("Amount Due€0.00");
     expect(pdfData.text).toContain("Reverse charge");
     expect(pdfData.text).toContain(
-      `1/${CURRENT_MONTH_AND_YEAR}·€0.00 — due ${PAYMENT_DATE}·Created with https://easyinvoicepdf.comPage 1 of 1`
+      `1/${CURRENT_MONTH_AND_YEAR}·€0.00 due ${PAYMENT_DATE}·Created with https://easyinvoicepdf.comPage 1 of 1`
     );
   });
 

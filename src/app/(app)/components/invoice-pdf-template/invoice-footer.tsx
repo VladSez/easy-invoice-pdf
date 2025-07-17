@@ -45,7 +45,7 @@ export function InvoiceFooter({
             </>
           )}
           <Text style={[styles.fontSize8]}>
-            {formattedInvoiceTotal} — {t.stripe.due} {paymentDueDate}
+            {formattedInvoiceTotal} {t.stripe.due} {paymentDueDate}
           </Text>
           <Text style={[styles.fontSize8]}>·</Text>
           <Text style={[styles.fontSize8]}>
