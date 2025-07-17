@@ -1,9 +1,10 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import type { InvoiceData } from "@/app/schema";
-import { CURRENCY_SYMBOLS } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";
 import type { STRIPE_TEMPLATE_STYLES } from ".";
 import dayjs from "dayjs";
+import { formatCurrency } from "../../utils/format-currency";
+
 import "dayjs/locale/en";
 import "dayjs/locale/pl";
 import "dayjs/locale/de";
@@ -24,7 +25,6 @@ export function StripeItemsTable({
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
-  const currencySymbol = CURRENCY_SYMBOLS[invoiceData.currency];
 
   // Set dayjs locale based on invoice language
   dayjs.locale(language);
@@ -58,18 +58,17 @@ export function StripeItemsTable({
 
       {/* Table rows */}
       {invoiceData.items.map((item, index) => {
-        const formattedNetPrice = item.netPrice.toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 5,
+        const formattedNetPrice = formatCurrency({
+          amount: item.netPrice,
+          currency: invoiceData.currency,
+          language,
         });
 
-        const formattedPreTaxAmount = item.preTaxAmount.toLocaleString(
-          "en-US",
-          {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }
-        );
+        const formattedPreTaxAmount = formatCurrency({
+          amount: item.preTaxAmount,
+          currency: invoiceData.currency,
+          language,
+        });
 
         const formattedAmount = item.amount.toLocaleString("en-US", {
           style: "decimal",
@@ -92,13 +91,11 @@ export function StripeItemsTable({
             </View>
             <View style={styles.colUnitPrice}>
               <Text style={[styles.fontSize11, styles.textDark]}>
-                {currencySymbol}
                 {formattedNetPrice}
               </Text>
             </View>
             <View style={styles.colAmount}>
               <Text style={[styles.fontSize11, styles.textDark]}>
-                {currencySymbol}
                 {formattedPreTaxAmount}
               </Text>
             </View>

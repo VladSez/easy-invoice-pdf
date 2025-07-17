@@ -20,6 +20,7 @@ import { StripeItemsTable } from "./stripe-items-table";
 import { StripeSellerBuyerInfo } from "./stripe-seller-buyer-info";
 import { StripeTotals } from "./stripe-totals";
 import { STATIC_ASSETS_URL } from "@/config";
+import { formatCurrency } from "@/app/(app)/utils/format-currency";
 
 import "dayjs/locale/en";
 import "dayjs/locale/pl";
@@ -46,10 +47,12 @@ Font.register({
     {
       src: `${STATIC_ASSETS_URL}/Inter-Medium.ttf`,
       fontWeight: 500,
+      fontStyle: "normal",
     },
     {
       src: `${STATIC_ASSETS_URL}/Inter-SemiBold.ttf`,
       fontWeight: 600,
+      fontStyle: "normal",
     },
   ],
 });
@@ -202,9 +205,10 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
   const invoiceNumber = `${invoiceNumberValue}`;
   const invoiceDocTitle = `Invoice ${invoiceNumber} | Created with https://easyinvoicepdf.com`;
 
-  const formattedInvoiceTotal = invoiceData?.total.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+  const formattedInvoiceTotal = formatCurrency({
+    amount: invoiceData?.total,
+    currency: invoiceData.currency,
+    language,
   });
 
   return (

@@ -129,11 +129,7 @@ export const InvoiceBody = ({
       )}
 
       {/* Footer  */}
-      <InvoiceFooter
-        invoiceData={invoiceData}
-        styles={styles}
-        formattedInvoiceTotal={formattedInvoiceTotal}
-      />
+      <InvoiceFooter invoiceData={invoiceData} styles={styles} />
     </>
   );
 };
