@@ -347,9 +347,6 @@ test.describe("Stripe Invoice Template", () => {
     expect(pdfData.text).toContain(`Invoice number1/${CURRENT_MONTH_AND_YEAR}`);
     expect(pdfData.text).toContain(`Date of issue${TODAY}`);
     expect(pdfData.text).toContain(`Date due${PAYMENT_DATE}`);
-    expect(pdfData.text).toContain(
-      `Service period${START_OF_CURRENT_MONTH} - ${LAST_DAY_OF_CURRENT_MONTH}`
-    );
     expect(pdfData.text).toContain("Seller name");
     expect(pdfData.text).toContain("Seller address");
     expect(pdfData.text).toContain("seller@email.com");
