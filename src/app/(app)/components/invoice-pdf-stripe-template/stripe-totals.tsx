@@ -27,6 +27,12 @@ export function StripeTotals({
     language,
   });
 
+  const invoiceTotal = formatCurrency({
+    amount: invoiceData?.total,
+    currency: invoiceData.currency,
+    language,
+  });
+
   return (
     <View style={{ alignItems: "flex-end", marginTop: 24 }}>
       <View style={{ width: "50%" }}>
@@ -46,7 +52,8 @@ export function StripeTotals({
         >
           <Text style={[styles.fontSize9]}>{t.stripe.total}</Text>
           <Text style={[styles.fontSize9, styles.textDark]}>
-            {formattedInvoiceTotal}
+            {/* USD is not needed for the total */}
+            {invoiceTotal}
           </Text>
         </View>
 

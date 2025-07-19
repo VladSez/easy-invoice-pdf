@@ -21,7 +21,7 @@ export function StripeSellerBuyerInfo({
       }}
     >
       {/* Seller info */}
-      <View style={{ marginRight: 80, width: "150px" }}>
+      <View style={{ marginRight: 70, width: "160px" }}>
         <Text style={[styles.fontSize10, styles.fontBold, styles.mb3]}>
           {invoiceData.seller.name}
         </Text>
@@ -55,7 +55,7 @@ export function StripeSellerBuyerInfo({
       </View>
 
       {/* Buyer info */}
-      <View style={{ width: "150px" }}>
+      <View style={{ width: "160px" }}>
         <Text style={[styles.fontSize10, styles.fontBold, styles.mb3]}>
           {t.stripe.billTo}
         </Text>

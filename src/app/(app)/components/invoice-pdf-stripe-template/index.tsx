@@ -74,7 +74,10 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
   },
   // Main content container
   content: {
-    padding: 30,
+    paddingLeft: 30,
+    paddingRight: 30,
+    paddingTop: 27,
+    paddingBottom: 27,
   },
   // Typography
   fontSize8: { fontSize: 8 },
@@ -211,6 +214,12 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
     language,
   });
 
+  // we want to mimic the Stripe invoice format, so we need to add the currency code only for USD in English
+  const currencyCode =
+    invoiceData.currency === "USD" && language === "en" ? "USD" : "";
+
+  const formattedInvoiceTotalWithCurrency = `${formattedInvoiceTotal} ${currencyCode}`;
+
   return (
     <Document title={invoiceDocTitle}>
       <Page size={"LETTER"} style={STRIPE_TEMPLATE_STYLES.page}>
@@ -240,7 +249,7 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
           {/* Due amount highlight */}
           <StripeDueAmount
             invoiceData={invoiceData}
-            formattedInvoiceTotal={formattedInvoiceTotal}
+            formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
             styles={STRIPE_TEMPLATE_STYLES}
           />
 
@@ -253,7 +262,7 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
           {/* Totals */}
           <StripeTotals
             invoiceData={invoiceData}
-            formattedInvoiceTotal={formattedInvoiceTotal}
+            formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
             styles={STRIPE_TEMPLATE_STYLES}
           />
 
@@ -270,7 +279,7 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
         {/* Footer */}
         <StripeFooter
           invoiceData={invoiceData}
-          formattedInvoiceTotal={formattedInvoiceTotal}
+          formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
           styles={STRIPE_TEMPLATE_STYLES}
         />
       </Page>
