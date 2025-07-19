@@ -216,9 +216,9 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
 
   // we want to mimic the Stripe invoice format, so we need to add the currency code only for USD in English
   const currencyCode =
-    invoiceData.currency === "USD" && language === "en" ? "USD" : "";
+    invoiceData.currency === "USD" && language === "en" ? " USD" : "";
 
-  const formattedInvoiceTotalWithCurrency = `${formattedInvoiceTotal} ${currencyCode}`;
+  const formattedInvoiceTotalWithCurrency = `${formattedInvoiceTotal}${currencyCode}`;
 
   return (
     <Document title={invoiceDocTitle}>

@@ -353,8 +353,7 @@ test.describe("Stripe Invoice Template", () => {
     expect(pdfData.text).toContain("VAT no: Seller vat number");
 
     expect(pdfData.text).toContain(
-      "Account Number: Seller account \n" +
-        "number\n" +
+      "Account Number: Seller account num-\nber\n" +
         "SWIFT/BIC number: Seller swift bic\n" +
         "Bill to\n"
     );
