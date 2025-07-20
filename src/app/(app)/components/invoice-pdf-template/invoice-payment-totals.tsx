@@ -1,8 +1,4 @@
-import {
-  View,
-  Text,
-  type Styles,
-} from "@react-pdf/renderer/lib/react-pdf.browser";
+import { View, Text } from "@react-pdf/renderer/lib/react-pdf.browser";
 import type { InvoiceData } from "@/app/schema";
 
 import { TRANSLATIONS } from "@/app/schema/translations";
@@ -10,6 +6,7 @@ import {
   getAmountInWords,
   getNumberFractionalPart,
 } from "@/utils/invoice.utils";
+import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
 export function InvoicePaymentTotals({
   invoiceData,
@@ -18,7 +15,7 @@ export function InvoicePaymentTotals({
 }: {
   invoiceData: InvoiceData;
   formattedInvoiceTotal: string;
-  styles: Styles;
+  styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];

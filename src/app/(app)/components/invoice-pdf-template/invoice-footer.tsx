@@ -1,21 +1,17 @@
 import { type InvoiceData } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";
 import { PROD_WEBSITE_URL } from "@/config";
-import {
-  Link,
-  Text,
-  View,
-  type Styles,
-} from "@react-pdf/renderer/lib/react-pdf.browser";
+import { Link, Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import dayjs from "dayjs";
 import { formatCurrency } from "../../utils/format-currency";
+import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
 export function InvoiceFooter({
   invoiceData,
   styles,
 }: {
   invoiceData: InvoiceData;
-  styles: Styles;
+  styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
