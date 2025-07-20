@@ -21,7 +21,7 @@ export default function robots(): MetadataRoute.Robots {
           "/confirm-subscription?*",
           // Disallow favicon and other icon files from being indexed
           "/favicon.ico",
-          "*.ico",
+          "/*.ico$",
         ],
       },
     ],
