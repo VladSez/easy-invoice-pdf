@@ -19,6 +19,9 @@ export default function robots(): MetadataRoute.Robots {
           // Disallow subscription confirmation pages with and without tokens
           "/confirm-subscription",
           "/confirm-subscription?*",
+          // Disallow favicon and other icon files from being indexed
+          "/favicon.ico",
+          "*.ico",
         ],
       },
     ],
