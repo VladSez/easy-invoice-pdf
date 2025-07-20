@@ -26,6 +26,7 @@ import {
   getAmountInWords,
   getNumberFractionalPart,
 } from "@/utils/invoice.utils";
+import { Button } from "@/components/ui/button";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
@@ -724,8 +725,7 @@ export const InvoiceItems = memo(function InvoiceItems({
           </fieldset>
         );
       })}
-      <button
-        type="button"
+      <Button
         onClick={() => {
           append({
             invoiceItemNumberIsVisible: true,
@@ -752,11 +752,11 @@ export const InvoiceItems = memo(function InvoiceItems({
           // analytics track event
           umamiTrackEvent("add_invoice_item");
         }}
-        className="mb-1 flex items-center text-sm font-medium text-gray-700 hover:text-black"
+        _variant="outline"
       >
         <Plus className="mr-2 h-4 w-4" />
         Add invoice item
-      </button>
+      </Button>
     </>
   );
 });

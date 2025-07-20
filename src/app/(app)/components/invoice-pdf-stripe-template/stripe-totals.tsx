@@ -18,7 +18,7 @@ export function StripeTotals({
 
   // Calculate subtotal (sum of all items)
   const subtotal = invoiceData.items.reduce(
-    (sum, item) => sum + item.preTaxAmount,
+    (sum, item) => sum + item.netAmount,
     0
   );
   const formattedSubtotal = formatCurrency({
@@ -33,6 +33,11 @@ export function StripeTotals({
     language,
   });
 
+  // Check if any items have numeric VAT values (not "NP" or "OO")
+  const hasNumericVat = invoiceData.items.some(
+    (item) => typeof item.vat === "number"
+  );
+
   return (
     <View style={{ alignItems: "flex-end", marginTop: 24 }}>
       <View style={{ width: "50%" }}>
@@ -45,6 +50,60 @@ export function StripeTotals({
             {formattedSubtotal}
           </Text>
         </View>
+
+        {hasNumericVat && (
+          <>
+            <View
+              style={[
+                styles.totalRow,
+                styles.borderTop,
+                { paddingVertical: 1.5 },
+              ]}
+            >
+              <Text style={[styles.fontSize9]}>Total excluding tax</Text>
+              <Text style={[styles.fontSize9, styles.textDark]}>
+                {formattedSubtotal}
+              </Text>
+            </View>
+
+            {/* VAT, we use .reverse() to mimic stripe behavior */}
+            {[...(invoiceData?.items ?? [])].reverse().map((item, index) => {
+              if (typeof item.vat !== "number") {
+                return null;
+              }
+
+              const formattedVatAmount = formatCurrency({
+                amount: item.vatAmount,
+                currency: invoiceData.currency,
+                language,
+              });
+
+              const formattedNetAmount = formatCurrency({
+                amount: item.netAmount,
+                currency: invoiceData.currency,
+                language,
+              });
+
+              return (
+                <View
+                  key={index}
+                  style={[
+                    styles.totalRow,
+                    styles.borderTop,
+                    { paddingVertical: 1.5 },
+                  ]}
+                >
+                  <Text style={[styles.fontSize9]}>
+                    VAT ({item.vat}% on {formattedNetAmount})
+                  </Text>
+                  <Text style={[styles.fontSize9, styles.textDark]}>
+                    {formattedVatAmount}
+                  </Text>
+                </View>
+              );
+            })}
+          </>
+        )}
 
         {/* Total */}
         <View

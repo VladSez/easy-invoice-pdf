@@ -218,7 +218,7 @@ Pozostało do zapłaty: 0.00 EUR
 Kwota słownie: zero EUR 00/100`);
 
     expect(pdfData.text).toContain(
-      `1/${CURRENT_MONTH_AND_YEAR}·0,00 € termin ${PAYMENT_DATE}·Utworzono za pomocą https://easyinvoicepdf.comStrona 1 z 1`
+      `1/${CURRENT_MONTH_AND_YEAR}·0,00 € do zapłaty do ${PAYMENT_DATE}·Utworzono za pomocą https://easyinvoicepdf.comStrona 1 z 1`
     );
   });
 

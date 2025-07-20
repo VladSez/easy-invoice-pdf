@@ -150,6 +150,7 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
   colDescription: { flex: 3 },
   colQty: { flex: 0.8, textAlign: "center" },
   colUnitPrice: { flex: 1.2, textAlign: "right" },
+  colTax: { flex: 0.8, textAlign: "right" },
   colAmount: { flex: 1.2, textAlign: "right" },
   // Due amount highlight
   dueAmountBox: {

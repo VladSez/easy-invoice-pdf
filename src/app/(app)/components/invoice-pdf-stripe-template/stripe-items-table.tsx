@@ -29,6 +29,11 @@ export function StripeItemsTable({
   // Set dayjs locale based on invoice language
   dayjs.locale(language);
 
+  // Check if any items have numeric VAT values (not "NP" or "OO")
+  const hasNumericVat = invoiceData.items.some(
+    (item) => typeof item.vat === "number"
+  );
+
   // Calculate service period (example: Jan 01 2025 - Jan 31 2025)
   const servicePeriodStart = dayjs(invoiceData.dateOfService)
     .startOf("month")
@@ -37,6 +42,10 @@ export function StripeItemsTable({
   const servicePeriodEnd = dayjs(invoiceData.dateOfService).format(
     invoiceData.dateFormat
   );
+
+  const vatAmountFieldIsVisible = invoiceData.items[0].vatFieldIsVisible;
+
+  const canShowVat = vatAmountFieldIsVisible && hasNumericVat;
 
   return (
     <View style={[styles.table, styles.mt24]}>
@@ -51,6 +60,11 @@ export function StripeItemsTable({
         <View style={styles.colUnitPrice}>
           <Text style={[styles.fontSize8]}>{t.stripe.unitPrice}</Text>
         </View>
+        {canShowVat ? (
+          <View style={styles.colTax}>
+            <Text style={[styles.fontSize8]}>{t.stripe.tax}</Text>
+          </View>
+        ) : null}
         <View style={styles.colAmount}>
           <Text style={[styles.fontSize8]}>{t.stripe.amount}</Text>
         </View>
@@ -65,7 +79,7 @@ export function StripeItemsTable({
         });
 
         const formattedPreTaxAmount = formatCurrency({
-          amount: item.preTaxAmount,
+          amount: item.netAmount,
           currency: invoiceData.currency,
           language,
         });
@@ -75,12 +89,16 @@ export function StripeItemsTable({
           maximumFractionDigits: 0,
         });
 
+        // Format VAT value
+        const formattedVat =
+          typeof item.vat === "number" ? `${item.vat}%` : item.vat;
+
         return (
           <View style={styles.tableRow} key={index}>
             <View style={styles.colDescription}>
-              <Text style={[styles.fontSize11]}>{item.name}</Text>
+              <Text style={[styles.fontSize10]}>{item.name}</Text>
               {/* Add service period if available */}
-              <Text style={[styles.fontSize10, styles.mt4]}>
+              <Text style={[styles.fontSize9, styles.mt4]}>
                 {servicePeriodStart} – {servicePeriodEnd}
               </Text>
             </View>
@@ -94,6 +112,13 @@ export function StripeItemsTable({
                 {formattedNetPrice}
               </Text>
             </View>
+            {canShowVat ? (
+              <View style={styles.colTax}>
+                <Text style={[styles.fontSize11, styles.textDark]}>
+                  {typeof item.vat === "number" ? formattedVat : ""}
+                </Text>
+              </View>
+            ) : null}
             <View style={styles.colAmount}>
               <Text style={[styles.fontSize11, styles.textDark]}>
                 {formattedPreTaxAmount}
