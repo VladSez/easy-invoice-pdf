@@ -20,6 +20,7 @@ import { StripeItemsTable } from "./stripe-items-table";
 import { StripeSellerBuyerInfo } from "./stripe-seller-buyer-info";
 import { StripeTotals } from "./stripe-totals";
 import { STATIC_ASSETS_URL } from "@/config";
+import { formatCurrency } from "@/app/(app)/utils/format-currency";
 
 import "dayjs/locale/en";
 import "dayjs/locale/pl";
@@ -46,10 +47,12 @@ Font.register({
     {
       src: `${STATIC_ASSETS_URL}/Inter-Medium.ttf`,
       fontWeight: 500,
+      fontStyle: "normal",
     },
     {
       src: `${STATIC_ASSETS_URL}/Inter-SemiBold.ttf`,
       fontWeight: 600,
+      fontStyle: "normal",
     },
   ],
 });
@@ -71,7 +74,10 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
   },
   // Main content container
   content: {
-    padding: 30,
+    paddingLeft: 30,
+    paddingRight: 30,
+    paddingTop: 27,
+    paddingBottom: 27,
   },
   // Typography
   fontSize8: { fontSize: 8 },
@@ -144,6 +150,7 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
   colDescription: { flex: 3 },
   colQty: { flex: 0.8, textAlign: "center" },
   colUnitPrice: { flex: 1.2, textAlign: "right" },
+  colTax: { flex: 0.8, textAlign: "right" },
   colAmount: { flex: 1.2, textAlign: "right" },
   // Due amount highlight
   dueAmountBox: {
@@ -202,10 +209,17 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
   const invoiceNumber = `${invoiceNumberValue}`;
   const invoiceDocTitle = `Invoice ${invoiceNumber} | Created with https://easyinvoicepdf.com`;
 
-  const formattedInvoiceTotal = invoiceData?.total.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+  const formattedInvoiceTotal = formatCurrency({
+    amount: invoiceData?.total,
+    currency: invoiceData.currency,
+    language,
   });
+
+  // we want to mimic the Stripe invoice format, so we need to add the currency code only for USD in English
+  const currencyCode =
+    invoiceData.currency === "USD" && language === "en" ? " USD" : "";
+
+  const formattedInvoiceTotalWithCurrency = `${formattedInvoiceTotal}${currencyCode}`;
 
   return (
     <Document title={invoiceDocTitle}>
@@ -236,7 +250,7 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
           {/* Due amount highlight */}
           <StripeDueAmount
             invoiceData={invoiceData}
-            formattedInvoiceTotal={formattedInvoiceTotal}
+            formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
             styles={STRIPE_TEMPLATE_STYLES}
           />
 
@@ -249,7 +263,7 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
           {/* Totals */}
           <StripeTotals
             invoiceData={invoiceData}
-            formattedInvoiceTotal={formattedInvoiceTotal}
+            formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
             styles={STRIPE_TEMPLATE_STYLES}
           />
 
@@ -266,7 +280,7 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
         {/* Footer */}
         <StripeFooter
           invoiceData={invoiceData}
-          formattedInvoiceTotal={formattedInvoiceTotal}
+          formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
           styles={STRIPE_TEMPLATE_STYLES}
         />
       </Page>

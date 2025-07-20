@@ -1,10 +1,6 @@
 import { type InvoiceData } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";
-import {
-  Text,
-  View,
-  type Styles,
-} from "@react-pdf/renderer/lib/react-pdf.browser";
+import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { InvoiceFooter } from "./invoice-footer";
 import { InvoiceHeader } from "./invoice-header";
 import { InvoiceItemsTable } from "./invoice-items-table";
@@ -12,6 +8,7 @@ import { InvoicePaymentInfo } from "./invoice-payment-info";
 import { InvoicePaymentTotals } from "./invoice-payment-totals";
 import { InvoiceSellerBuyerInfo } from "./invoice-seller-buyer-info";
 import { InvoiceVATSummaryTable } from "./invoice-vat-summary-table";
+import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
 import "dayjs/locale/en";
 import "dayjs/locale/pl";
@@ -31,7 +28,7 @@ export const InvoiceBody = ({
   shouldLocaliseDates = true,
 }: {
   invoiceData: InvoiceData;
-  styles: Styles;
+  styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
   shouldLocaliseDates?: boolean;
 }) => {
   const language = invoiceData.language;
@@ -129,11 +126,7 @@ export const InvoiceBody = ({
       )}
 
       {/* Footer  */}
-      <InvoiceFooter
-        invoiceData={invoiceData}
-        styles={styles}
-        formattedInvoiceTotal={formattedInvoiceTotal}
-      />
+      <InvoiceFooter invoiceData={invoiceData} styles={styles} />
     </>
   );
 };

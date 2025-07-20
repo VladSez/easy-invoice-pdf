@@ -49,6 +49,16 @@ For the full app experience, you’ll need to obtain and set values from the fol
 - [Google Drive API](https://developers.google.com/workspace/drive/api/quickstart/js)
 - [Telegram Bot API](https://core.telegram.org/bots)
 
+## License
+
+This project is dual-licensed under the AGPL-3.0 and a commercial license.
+
+### Commercial Use
+
+For commercial licensing, contact vlad@mail.easyinvoicepdf.com
+
+By using this software, you agree to the terms of the license.
+
 ## GitAds Sponsored
 
 <!-- GitAds-Verify: JHXPD28PWARXHPOAHBA7ZTVRIFBKGZPE -->

@@ -29,7 +29,7 @@ const LAST_DAY_OF_CURRENT_MONTH = dayjs()
 // Payment date is 14 days from today (by default)
 const PAYMENT_DATE = dayjs().add(14, "day").format(STRIPE_DEFAULT_DATE_FORMAT);
 
-test.describe("Stripe InvoiceTemplate", () => {
+test.describe("Stripe Invoice Template", () => {
   let downloadDir: string;
 
   test.beforeAll(async ({ browserName }) => {
@@ -61,6 +61,11 @@ test.describe("Stripe InvoiceTemplate", () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
+  });
+
+  test.afterEach(async ({ page }) => {
+    // Clear localStorage after each test
+    await page.evaluate(() => localStorage.clear());
   });
 
   test("logo upload section and payment link URL section only appear for Stripe template", async ({
@@ -342,17 +347,13 @@ test.describe("Stripe InvoiceTemplate", () => {
     expect(pdfData.text).toContain(`Invoice number1/${CURRENT_MONTH_AND_YEAR}`);
     expect(pdfData.text).toContain(`Date of issue${TODAY}`);
     expect(pdfData.text).toContain(`Date due${PAYMENT_DATE}`);
-    expect(pdfData.text).toContain(
-      `Service period${START_OF_CURRENT_MONTH} - ${LAST_DAY_OF_CURRENT_MONTH}`
-    );
     expect(pdfData.text).toContain("Seller name");
     expect(pdfData.text).toContain("Seller address");
     expect(pdfData.text).toContain("seller@email.com");
     expect(pdfData.text).toContain("VAT no: Seller vat number");
 
     expect(pdfData.text).toContain(
-      "Account Number: Seller account \n" +
-        "number\n" +
+      "Account Number: Seller account num-\nber\n" +
         "SWIFT/BIC number: Seller swift bic\n" +
         "Bill to\n"
     );
@@ -362,7 +363,7 @@ test.describe("Stripe InvoiceTemplate", () => {
     expect(pdfData.text).toContain("Buyer address");
     expect(pdfData.text).toContain("buyer@email.com");
     expect(pdfData.text).toContain("VAT no: Buyer vat number");
-    expect(pdfData.text).toContain(`€0.00 EUR due ${PAYMENT_DATE}`);
+    expect(pdfData.text).toContain(`€0.00 due ${PAYMENT_DATE}`);
 
     // Payment URL should be visible
     expect(pdfData.text).toContain("Pay Online");
@@ -375,10 +376,10 @@ test.describe("Stripe InvoiceTemplate", () => {
     expect(pdfData.text).toContain("1€0.00€0.00");
     expect(pdfData.text).toContain("Subtotal€0.00");
     expect(pdfData.text).toContain("Total€0.00");
-    expect(pdfData.text).toContain("Amount Due€0.00 EUR");
+    expect(pdfData.text).toContain("Amount Due€0.00");
     expect(pdfData.text).toContain("Reverse charge");
     expect(pdfData.text).toContain(
-      `1/${CURRENT_MONTH_AND_YEAR}·€0.00 EUR due ${PAYMENT_DATE}·Created with https://easyinvoicepdf.comPage 1 of 1`
+      `1/${CURRENT_MONTH_AND_YEAR}·€0.00 due ${PAYMENT_DATE}·Created with https://easyinvoicepdf.comPage 1 of 1`
     );
   });
 

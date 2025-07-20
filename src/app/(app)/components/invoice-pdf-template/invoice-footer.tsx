@@ -1,32 +1,34 @@
-import { CURRENCY_SYMBOLS, type InvoiceData } from "@/app/schema";
+import { type InvoiceData } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";
 import { PROD_WEBSITE_URL } from "@/config";
-import {
-  Link,
-  Text,
-  View,
-  type Styles,
-} from "@react-pdf/renderer/lib/react-pdf.browser";
+import { Link, Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import dayjs from "dayjs";
+import { formatCurrency } from "../../utils/format-currency";
+import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
 export function InvoiceFooter({
   invoiceData,
   styles,
-  formattedInvoiceTotal,
 }: {
   invoiceData: InvoiceData;
-  styles: Styles;
-  formattedInvoiceTotal: string;
+  styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
 
-  const currencySymbol = CURRENCY_SYMBOLS[invoiceData.currency];
   const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
 
   const paymentDueDate = dayjs(invoiceData.paymentDue).format(
     invoiceData.dateFormat
   );
+
+  const invoiceTotal = invoiceData?.total;
+
+  const formattedInvoiceTotal = formatCurrency({
+    amount: invoiceTotal,
+    currency: invoiceData.currency,
+    language,
+  });
 
   return (
     <View style={styles.footer} fixed>
@@ -39,9 +41,7 @@ export function InvoiceFooter({
             </>
           )}
           <Text style={[styles.fontSize8]}>
-            {currencySymbol}
-            {formattedInvoiceTotal} {invoiceData.currency} {t.stripe.due}{" "}
-            {paymentDueDate}
+            {formattedInvoiceTotal} {t.stripe.due} {paymentDueDate}
           </Text>
           <Text style={[styles.fontSize8]}>·</Text>
           <Text style={[styles.fontSize8]}>

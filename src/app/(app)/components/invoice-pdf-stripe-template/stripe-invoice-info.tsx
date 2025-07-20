@@ -21,25 +21,26 @@ export function StripeInvoiceInfo({
 
   const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
 
-  // Calculate service period (example: Jan 01 2025 - Jan 31 2025)
-  const servicePeriodStart = dayjs(invoiceData.dateOfService)
-    .startOf("month")
-    .format(invoiceData.dateFormat);
-
-  const servicePeriodEnd = dayjs(invoiceData.dateOfService).format(
-    invoiceData.dateFormat
-  );
-
   const paymentDueDate = dayjs(invoiceData.paymentDue).format(
     invoiceData.dateFormat
   );
+
+  // for better readability, we need to adjust the column width based on the language
+  const INVOICE_NUMBER_MAX_WIDTH = invoiceData.language === "de" ? 100 : 80;
+  const COLUMN_WIDTH = invoiceData.language === "en" ? 90 : 105;
 
   return (
     <View style={[styles.mb24, { gap: 2 }]}>
       <View style={[styles.mb1, styles.row, { alignItems: "baseline" }]}>
         {/* Invoice number text column */}
-        <View style={{ width: 90 }}>
-          <Text style={[styles.fontSize9, styles.fontBold, { maxWidth: 80 }]}>
+        <View style={{ width: COLUMN_WIDTH }}>
+          <Text
+            style={[
+              styles.fontSize9,
+              styles.fontBold,
+              { maxWidth: INVOICE_NUMBER_MAX_WIDTH },
+            ]}
+          >
             {t.stripe.invoiceNumber}
           </Text>
         </View>
@@ -51,7 +52,7 @@ export function StripeInvoiceInfo({
 
       <View style={[styles.mb1, styles.row, { alignItems: "baseline" }]}>
         {/* Date of issue text column */}
-        <View style={{ width: 90 }}>
+        <View style={{ width: COLUMN_WIDTH }}>
           <Text
             style={[styles.fontSize9, styles.fontMedium, { maxWidth: 120 }]}
           >
@@ -64,7 +65,7 @@ export function StripeInvoiceInfo({
 
       <View style={[styles.mb1, styles.row, { alignItems: "baseline" }]}>
         {/* Date due text column */}
-        <View style={{ width: 90 }}>
+        <View style={{ width: COLUMN_WIDTH }}>
           <Text
             style={[styles.fontSize9, styles.fontMedium, { maxWidth: 120 }]}
           >
@@ -74,21 +75,6 @@ export function StripeInvoiceInfo({
         {/* Date due value column */}
         <Text style={[styles.fontSize9, styles.fontMedium]}>
           {paymentDueDate}
-        </Text>
-      </View>
-
-      <View style={[styles.mb1, styles.row, { alignItems: "baseline" }]}>
-        {/* Service period text column */}
-        <View style={{ width: 90 }}>
-          <Text
-            style={[styles.fontSize9, styles.fontMedium, { maxWidth: 120 }]}
-          >
-            {t.stripe.servicePeriod}
-          </Text>
-        </View>
-        {/* Service period value column */}
-        <Text style={[styles.fontSize9, styles.fontMedium]}>
-          {servicePeriodStart} - {servicePeriodEnd}
         </Text>
       </View>
     </View>

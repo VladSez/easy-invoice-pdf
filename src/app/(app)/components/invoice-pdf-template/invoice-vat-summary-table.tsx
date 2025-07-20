@@ -1,10 +1,7 @@
-import {
-  Text,
-  View,
-  type Styles,
-} from "@react-pdf/renderer/lib/react-pdf.browser";
+import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import type { InvoiceData } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";
+import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
 export function InvoiceVATSummaryTable({
   invoiceData,
@@ -13,12 +10,12 @@ export function InvoiceVATSummaryTable({
 }: {
   invoiceData: InvoiceData;
   formattedInvoiceTotal: string;
-  styles: Styles;
+  styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
 
-  const sortedItems = [...invoiceData?.items].sort((a, b) => {
+  const sortedItems = [...(invoiceData?.items ?? [])].sort((a, b) => {
     // Handle cases where either value is a string (NP or OO)
     const isAString = isNaN(Number(a.vat));
     const isBString = isNaN(Number(b.vat));
@@ -76,20 +73,37 @@ export function InvoiceVATSummaryTable({
         </View>
       </View>
 
+      {/* Table body rows*/}
       {sortedItems?.map((item, index) => {
-        const formattedNetAmount = item.netAmount
-          .toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })
-          .replaceAll(",", " ");
+        const formattedNetAmount =
+          typeof item.netAmount === "number"
+            ? item.netAmount
+                .toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+                .replaceAll(",", " ")
+            : "0.00";
 
-        const formattedPreTaxAmount = item.preTaxAmount
-          .toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })
-          .replaceAll(",", " ");
+        const formattedPreTaxAmount =
+          typeof item.preTaxAmount === "number"
+            ? item.preTaxAmount
+                .toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+                .replaceAll(",", " ")
+            : "0.00";
+
+        const formattedVatAmount =
+          typeof item.vatAmount === "number"
+            ? item.vatAmount
+                .toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+                .replaceAll(",", " ")
+            : "0.00";
 
         return (
           <View style={styles.tableRow} key={index}>
@@ -123,9 +137,7 @@ export function InvoiceVATSummaryTable({
                   { textAlign: "right", marginRight: 2 },
                 ]}
               >
-                {typeof item.vatAmount === "number"
-                  ? item.vatAmount.toFixed(2)
-                  : "0.00"}
+                {formattedVatAmount}
               </Text>
             </View>
             {/* Pre-tax */}

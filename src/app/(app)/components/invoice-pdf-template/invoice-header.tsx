@@ -1,19 +1,16 @@
-import {
-  Text,
-  View,
-  type Styles,
-} from "@react-pdf/renderer/lib/react-pdf.browser";
+import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { type InvoiceData } from "@/app/schema";
 import dayjs from "dayjs";
 
 import { TRANSLATIONS } from "@/app/schema/translations";
+import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
 export function InvoiceHeader({
   invoiceData,
   styles,
 }: {
   invoiceData: InvoiceData;
-  styles: Styles;
+  styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
