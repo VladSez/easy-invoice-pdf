@@ -51,13 +51,12 @@ For the full app experience, you’ll need to obtain and set values from the fol
 
 ## License
 
-This project is dual-licensed under the AGPL-3.0 and a commercial license.
+This project is dual-licensed:
 
-### Commercial Use
+- **AGPL-3.0** (for open-source or compliant use): [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.html)
+- **Commercial license** (for proprietary use): contact [vlad@mail.easyinvoicepdf.com](mailto:vlad@mail.easyinvoicepdf.com)
 
-For commercial licensing, contact vlad@mail.easyinvoicepdf.com
-
-By using this software, you agree to the terms of the license.
+By using this software, you agree to the terms of the applicable license.
 
 ## GitAds Sponsored
 
