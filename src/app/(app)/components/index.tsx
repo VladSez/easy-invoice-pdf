@@ -128,7 +128,7 @@ export function InvoiceClientPage({
               </TabsTrigger>
             </TabsList>
             <TabsContent value={TAB_INVOICE_FORM} className="mt-1">
-              <div className="h-[480px] overflow-auto rounded-lg border-b px-3 shadow-sm">
+              <div className="h-[480px] overflow-auto rounded-lg border-b px-3 shadow-xs">
                 <InvoiceForm
                   invoiceData={invoiceDataState}
                   onInvoiceDataChange={handleInvoiceDataChange}
@@ -179,7 +179,7 @@ export function InvoiceClientPage({
                     data-testid="share-invoice-tooltip-content"
                     className="flex items-center gap-3 bg-red-50 p-3"
                   >
-                    <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
+                    <AlertCircleIcon className="h-5 w-5 shrink-0 fill-red-600 text-white" />
                     <div className="space-y-1">
                       <p className="text-sm font-semibold text-red-800">
                         Unable to Share Invoice

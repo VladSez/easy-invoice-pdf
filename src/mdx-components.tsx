@@ -66,7 +66,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         alt={alt}
         height={450}
         width={840}
-        className="aspect-auto rounded-lg border border-gray-200 bg-slate-300 shadow-sm dark:border-gray-700"
+        className="aspect-auto rounded-lg border border-gray-200 bg-slate-300 shadow-xs dark:border-gray-700"
         style={{ maxWidth: "100%", height: "auto" }}
       />
     ),

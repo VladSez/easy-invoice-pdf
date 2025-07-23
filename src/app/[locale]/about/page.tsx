@@ -154,7 +154,7 @@ function Header({ locale }: { locale: Locale }) {
   const tFooter = useTranslations("About.footer.links");
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-xs">
       <div className="flex items-center justify-center">
         <div className="container h-auto px-3 py-2 sm:h-16 sm:py-0">
           <div className="flex h-full flex-row flex-wrap items-center justify-between gap-2">
@@ -191,7 +191,7 @@ function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative flex w-full items-center justify-center overflow-hidden bg-gradient-to-b from-white to-slate-50 py-10 md:py-16 lg:py-24"
+      className="relative flex w-full items-center justify-center overflow-hidden bg-linear-to-b from-white to-slate-50 py-10 md:py-16 lg:py-24"
     >
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -221,7 +221,7 @@ function HeroSection() {
               <Button
                 _size="lg"
                 _variant="outline"
-                className="group relative overflow-hidden border-slate-200 px-10 py-6 text-lg shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md"
+                className="group relative overflow-hidden border-slate-200 px-10 py-6 text-lg shadow-xs transition-all duration-300 hover:border-slate-300 hover:shadow-md"
                 asChild
               >
                 <Link
@@ -234,7 +234,7 @@ function HeroSection() {
                 </Link>
               </Button>
             </div>
-            <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0">
+            <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-xs transition-all hover:scale-105 sm:mx-0">
               <span className="" role="img" aria-label="checkmark">
                 ✅
               </span>
@@ -247,7 +247,7 @@ function HeroSection() {
             {/* Mac OS Frame around the video */}
             <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
               {/* Browser chrome bar */}
-              <div className="h-8 w-full rounded-t-xl bg-gradient-to-b from-[#F3F3F3] to-[#E9E9E9] px-4 shadow-sm md:h-12 md:rounded-t-2xl">
+              <div className="h-8 w-full rounded-t-xl bg-linear-to-b from-[#F3F3F3] to-[#E9E9E9] px-4 shadow-xs md:h-12 md:rounded-t-2xl">
                 <div className="flex h-full items-center">
                   <div className="flex space-x-2">
                     <div className="h-2.5 w-2.5 rounded-full bg-[#FF5F57] md:h-3 md:w-3"></div>
@@ -314,7 +314,7 @@ function FeaturesSection() {
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <div
-              className="mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-sm transition-colors"
+              className="mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-xs transition-colors"
               data-testid="features-badge"
             >
               {t("features.badge")}
@@ -328,7 +328,7 @@ function FeaturesSection() {
             </p>
           </div>
           <div
-            className="inline-flex items-center rounded-md border border-amber-200 bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-900 shadow-sm transition-colors"
+            className="inline-flex items-center rounded-md border border-amber-200 bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-900 shadow-xs transition-colors"
             data-testid="features-coming-soon"
           >
             {t("features.comingSoon")}
@@ -344,7 +344,7 @@ function FeaturesSection() {
             return (
               <div
                 key={feature.translationKey}
-                className="flex h-full flex-col items-start gap-4 rounded-lg border border-slate-100 bg-white p-6 shadow-sm"
+                className="flex h-full flex-col items-start gap-4 rounded-lg border border-slate-100 bg-white p-6 shadow-xs"
               >
                 {feature.icon}
                 <div>
@@ -396,7 +396,7 @@ function FaqSection() {
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <div className="mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-sm transition-colors">
+            <div className="mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-xs transition-colors">
               FAQ
             </div>
             <h2 className="text-3xl font-bold tracking-tighter text-slate-900 md:text-4xl/tight">
@@ -526,7 +526,7 @@ function Logo() {
   return (
     <div>
       <div className="flex items-center gap-1 sm:gap-2">
-        <ProjectLogo className="h-7 w-7 flex-shrink-0 sm:h-8 sm:w-8" />
+        <ProjectLogo className="h-7 w-7 shrink-0 sm:h-8 sm:w-8" />
         <ProjectLogoDescription>{t("tagline")}</ProjectLogoDescription>
       </div>
     </div>

@@ -238,7 +238,7 @@ export function SellerDialog({
                   </Label>
                 }
                 content="Use the seller details already entered in the invoice form to pre-fill this dialog"
-                className="z-[1000]"
+                className="z-1000"
               />
             </div>
           )}
@@ -320,7 +320,7 @@ export function SellerDialog({
                               </Label>
                             }
                             content='Show/Hide the "VAT Number" field in the PDF'
-                            className="z-[1000]"
+                            className="z-1000"
                           />
                         </div>
                       </FormItem>
@@ -387,7 +387,7 @@ export function SellerDialog({
                                 </Label>
                               }
                               content='Show/Hide the "Account Number" field in the PDF'
-                              className="z-[1000]"
+                              className="z-1000"
                             />
                           </div>
                         </FormItem>
@@ -436,7 +436,7 @@ export function SellerDialog({
                                 </Label>
                               }
                               content='Show/Hide the "SWIFT/BIC" field in the PDF'
-                              className="z-[1000]"
+                              className="z-1000"
                             />
                           </div>
                         </FormItem>
@@ -491,7 +491,7 @@ export function SellerDialog({
                                 </Label>
                               }
                               content="Show/Hide the notes field in the PDF"
-                              className="z-[1000]"
+                              className="z-1000"
                             />
                           </div>
                         </FormItem>
@@ -521,7 +521,7 @@ export function SellerDialog({
                   </Label>
                 }
                 content="When enabled, the newly created seller will be automatically applied to your current invoice form"
-                className="z-[1000]"
+                className="z-1000"
               />
             </div>
           )}

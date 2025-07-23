@@ -40,7 +40,7 @@ const MoneyInput = React.memo(
     return (
       <div>
         <div
-          className="relative flex rounded-lg shadow-sm shadow-black/5"
+          className="relative flex rounded-lg shadow-xs shadow-black/5"
           data-testid={dataTestId}
         >
           {currencySymbol ? (
@@ -58,7 +58,7 @@ const MoneyInput = React.memo(
             )}
             placeholder="0.00"
           />
-          <span className="inline-flex items-center rounded-e-lg border border-gray-300 bg-background px-3 text-sm text-slate-950 shadow-sm shadow-black/5 transition-shadow">
+          <span className="inline-flex items-center rounded-e-lg border border-gray-300 bg-background px-3 text-sm text-slate-950 shadow-xs shadow-black/5 transition-shadow">
             {shownCurrencyText}
           </span>
         </div>
@@ -82,7 +82,7 @@ const ReadOnlyMoneyInput = React.memo(
     return (
       <div>
         <div
-          className="relative flex rounded-lg shadow-sm shadow-black/5"
+          className="relative flex rounded-lg shadow-xs shadow-black/5"
           data-testid={dataTestId}
         >
           {currencySymbol ? (
@@ -96,7 +96,7 @@ const ReadOnlyMoneyInput = React.memo(
             className={cn(
               "-me-px block w-full cursor-not-allowed rounded-md rounded-e-none border border-gray-300 bg-gray-100 px-3 py-2 ps-6",
               getCurrencyPadding(currencySymbol),
-              "focus-visible:border-indigo-500 focus-visible:ring focus-visible:ring-indigo-200 focus-visible:ring-opacity-50",
+              "focus-visible:border-indigo-500 focus-visible:ring-3 focus-visible:ring-indigo-200 focus-visible:ring-opacity-50",
               props.className
             )}
             placeholder="0.00"
@@ -104,7 +104,7 @@ const ReadOnlyMoneyInput = React.memo(
             readOnly
             title="This field is read-only"
           />
-          <span className="inline-flex cursor-default items-center rounded-e-lg border border-gray-300 bg-gray-100 px-3 text-sm text-slate-950 shadow-sm shadow-black/5 transition-shadow">
+          <span className="inline-flex cursor-default items-center rounded-e-lg border border-gray-300 bg-gray-100 px-3 text-sm text-slate-950 shadow-xs shadow-black/5 transition-shadow">
             {shownCurrencyText}
           </span>
         </div>

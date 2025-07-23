@@ -23,7 +23,7 @@ export default async function ChangelogPage() {
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <div className="relative z-0">
         <div className="relative mb-8 pt-16 text-center sm:mb-16">
-          <div className="absolute bottom-0 h-full w-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] sm:bottom-auto"></div>
+          <div className="absolute bottom-0 h-full w-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[16px_16px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] sm:bottom-auto"></div>
           <h1 className="relative z-10 text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-5xl">
             Changelog
           </h1>

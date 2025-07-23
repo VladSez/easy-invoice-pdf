@@ -155,9 +155,9 @@ export function InvoicePDFDownloadLink({
         onClick={handleClick}
         className={cn(
           "h-[36px] w-full rounded-lg bg-slate-900 px-4 py-2 text-center text-sm font-medium text-slate-50",
-          "shadow-sm shadow-black/5 outline-offset-2 hover:bg-slate-900/90",
-          "focus-visible:border-indigo-500 focus-visible:ring focus-visible:ring-indigo-200 focus-visible:ring-opacity-50",
-          "dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 lg:mb-0 lg:w-[210px]",
+          "shadow-xs shadow-black/5 outline-offset-2 hover:bg-slate-900/90",
+          "focus-visible:ring-opacity-50 focus-visible:border-indigo-500 focus-visible:ring-3 focus-visible:ring-indigo-200",
+          "lg:mb-0 lg:w-[210px] dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90",
           {
             "pointer-events-none opacity-70": isLoading,
             "lg:w-[240px]": invoiceData.language === "pt",

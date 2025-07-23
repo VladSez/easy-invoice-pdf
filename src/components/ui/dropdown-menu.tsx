@@ -123,7 +123,7 @@ function DropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "data-[variant=destructive]:*:[svg]:!text-destructive-foreground outline-hidden relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-slate-100 hover:text-slate-900 data-[disabled]:pointer-events-none data-[highlighted]:bg-slate-100 data-[variant=destructive]:data-[highlighted]:bg-red-500/10 data-[inset]:pl-8 data-[highlighted]:text-slate-900 data-[variant=destructive]:data-[highlighted]:text-slate-50 data-[variant=destructive]:text-slate-50 data-[disabled]:opacity-50 data-[highlighted]:outline-none data-[variant=destructive]:hover:bg-red-500/10 data-[variant=destructive]:hover:text-slate-50 dark:hover:bg-slate-800 dark:hover:text-slate-50 dark:data-[highlighted]:bg-slate-800 dark:data-[variant=destructive]:data-[highlighted]:bg-red-900/10 dark:data-[highlighted]:text-slate-50 dark:data-[variant=destructive]:data-[highlighted]:text-slate-50 dark:data-[variant=destructive]:text-slate-50 dark:data-[variant=destructive]:hover:bg-red-900/10 dark:data-[variant=destructive]:hover:text-slate-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        "data-[variant=destructive]:*:[svg]:!text-destructive-foreground outline-hidden relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-slate-100 hover:text-slate-900 data-disabled:pointer-events-none data-highlighted:bg-slate-100 data-[variant=destructive]:data-highlighted:bg-red-500/10 data-inset:pl-8 data-highlighted:text-slate-900 data-[variant=destructive]:data-highlighted:text-slate-50 data-[variant=destructive]:text-slate-50 data-disabled:opacity-50 data-highlighted:outline-hidden data-[variant=destructive]:hover:bg-red-500/10 data-[variant=destructive]:hover:text-slate-50 dark:hover:bg-slate-800 dark:hover:text-slate-50 dark:data-highlighted:bg-slate-800 dark:data-[variant=destructive]:data-highlighted:bg-red-900/10 dark:data-highlighted:text-slate-50 dark:data-[variant=destructive]:data-highlighted:text-slate-50 dark:data-[variant=destructive]:text-slate-50 dark:data-[variant=destructive]:hover:bg-red-900/10 dark:data-[variant=destructive]:hover:text-slate-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className
       )}
       {...props}
@@ -141,7 +141,7 @@ function DropdownMenuCheckboxItem({
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
       className={cn(
-        "outline-hidden relative flex cursor-default select-none items-center gap-2 rounded-sm py-1.5 pl-8 pr-2 text-sm focus:bg-slate-100 focus:text-slate-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:focus:bg-slate-800 dark:focus:text-slate-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        "outline-hidden relative flex cursor-default select-none items-center gap-2 rounded-sm py-1.5 pl-8 pr-2 text-sm focus:bg-slate-100 focus:text-slate-900 data-disabled:pointer-events-none data-disabled:opacity-50 dark:focus:bg-slate-800 dark:focus:text-slate-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className
       )}
       checked={checked}
@@ -177,7 +177,7 @@ function DropdownMenuRadioItem({
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
       className={cn(
-        "outline-hidden relative flex cursor-default select-none items-center gap-2 rounded-sm py-1.5 pl-8 pr-2 text-sm focus:bg-slate-100 focus:text-slate-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:focus:bg-slate-800 dark:focus:text-slate-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        "outline-hidden relative flex cursor-default select-none items-center gap-2 rounded-sm py-1.5 pl-8 pr-2 text-sm focus:bg-slate-100 focus:text-slate-900 data-disabled:pointer-events-none data-disabled:opacity-50 dark:focus:bg-slate-800 dark:focus:text-slate-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className
       )}
       {...props}
@@ -204,7 +204,7 @@ function DropdownMenuLabel({
       data-slot="dropdown-menu-label"
       data-inset={inset}
       className={cn(
-        "px-2 py-1.5 text-xs font-medium text-slate-500 data-[inset]:pl-8 dark:text-slate-400",
+        "px-2 py-1.5 text-xs font-medium text-slate-500 data-inset:pl-8 dark:text-slate-400",
         className
       )}
       {...props}
@@ -263,7 +263,7 @@ function DropdownMenuSubTrigger({
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
       className={cn(
-        "outline-hidden flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm focus:bg-slate-100 focus:text-slate-900 data-[state=open]:bg-slate-100 data-[inset]:pl-8 data-[state=open]:text-slate-900 dark:focus:bg-slate-800 dark:focus:text-slate-50 dark:data-[state=open]:bg-slate-800 dark:data-[state=open]:text-slate-50",
+        "outline-hidden flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm focus:bg-slate-100 focus:text-slate-900 data-[state=open]:bg-slate-100 data-inset:pl-8 data-[state=open]:text-slate-900 dark:focus:bg-slate-800 dark:focus:text-slate-50 dark:data-[state=open]:bg-slate-800 dark:data-[state=open]:text-slate-50",
         className
       )}
       {...props}

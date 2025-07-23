@@ -355,7 +355,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         {/* General Information */}
         <AccordionItem
           value={ACCORDION_GENERAL}
-          className="rounded-lg border shadow"
+          className="rounded-lg border shadow-sm"
           data-testid={`general-information-section`}
         >
           <AccordionTrigger className="px-4 py-3">
@@ -374,7 +374,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         {/* Seller Information */}
         <AccordionItem
           value={ACCORDION_SELLER}
-          className="rounded-lg border shadow"
+          className="rounded-lg border shadow-sm"
           data-testid={`seller-information-section`}
         >
           <AccordionTrigger className="px-4 py-3">
@@ -393,7 +393,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         {/* Buyer Information */}
         <AccordionItem
           value={ACCORDION_BUYER}
-          className="rounded-lg border shadow"
+          className="rounded-lg border shadow-sm"
           data-testid={`buyer-information-section`}
         >
           <AccordionTrigger className="px-4 py-3">
@@ -412,7 +412,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         {/* Invoice Items */}
         <AccordionItem
           value={ACCORDION_ITEMS}
-          className="rounded-lg border shadow"
+          className="rounded-lg border shadow-sm"
           data-testid={`invoice-items-section`}
         >
           <AccordionTrigger className="px-4 py-3">
@@ -440,7 +440,7 @@ export const InvoiceForm = memo(function InvoiceForm({
           <Label htmlFor={`total`} className="mb-1">
             Total
           </Label>
-          <div className="relative mt-1 rounded-md shadow-sm">
+          <div className="relative mt-1 rounded-md shadow-xs">
             <Controller
               name="total"
               control={control}
@@ -485,7 +485,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                     id={`paymentMethodFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                   />
                 )}
               />
@@ -606,7 +606,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                     id={`notesFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                   />
                 )}
               />
@@ -654,7 +654,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                     id={`personAuthorizedToReceiveFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                   />
                 )}
               />
@@ -676,7 +676,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                     id={`personAuthorizedToIssueFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                   />
                 )}
               />

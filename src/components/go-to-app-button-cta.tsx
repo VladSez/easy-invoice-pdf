@@ -15,7 +15,7 @@ export function GoToAppButton({
       _size="lg"
       _variant="outline"
       className={cn(
-        "group relative overflow-hidden border-slate-200 px-8 shadow-sm transition-all duration-300 hover:border-slate-200/80 hover:shadow-lg",
+        "group relative overflow-hidden border-slate-200 px-8 shadow-xs transition-all duration-300 hover:border-slate-200/80 hover:shadow-lg",
         className
       )}
       asChild

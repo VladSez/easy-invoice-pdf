@@ -452,7 +452,7 @@ export function AppPageClient() {
                             data-testid="share-invoice-tooltip-content"
                             className="flex items-center gap-3 bg-red-50 p-3"
                           >
-                            <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
+                            <AlertCircleIcon className="h-5 w-5 shrink-0 fill-red-600 text-white" />
                             <div className="space-y-1">
                               <p className="text-sm font-semibold text-red-800">
                                 Unable to Share Invoice

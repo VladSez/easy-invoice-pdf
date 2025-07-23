@@ -163,7 +163,7 @@ export const SellerInformation = memo(function SellerInformation({
                     id={`sellerVatNoFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                     disabled={isSellerSelected}
                     data-testid={`sellerVatNoFieldIsVisible`}
                   />
@@ -266,7 +266,7 @@ export const SellerInformation = memo(function SellerInformation({
                     id={`sellerAccountNumberFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                     disabled={isSellerSelected}
                     data-testid={`sellerAccountNumberFieldIsVisible`}
                   />
@@ -338,7 +338,7 @@ export const SellerInformation = memo(function SellerInformation({
                     id={`sellerSwiftBicFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                     disabled={isSellerSelected}
                     data-testid={`sellerSwiftBicFieldIsVisible`}
                   />
@@ -411,7 +411,7 @@ export const SellerInformation = memo(function SellerInformation({
                     id={`sellerNotesFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                     disabled={isSellerSelected}
                     data-testid={`sellerNotesInvoiceFormFieldVisibilitySwitch`}
                   />

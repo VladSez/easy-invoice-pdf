@@ -224,7 +224,7 @@ export function BuyerDialog({
                   </Label>
                 }
                 content="Pre-fill with values from the current invoice form"
-                className="z-[1000]"
+                className="z-1000"
               />
             </div>
           )}
@@ -308,7 +308,7 @@ export function BuyerDialog({
                                 </Label>
                               }
                               content='Show/Hide the "VAT Number" field in the PDF'
-                              className="z-[1000]"
+                              className="z-1000"
                             />
                           </div>
                         </FormItem>
@@ -381,7 +381,7 @@ export function BuyerDialog({
                                 </Label>
                               }
                               content="Show/Hide the notes field in the PDF"
-                              className="z-[1000]"
+                              className="z-1000"
                             />
                           </div>
                         </FormItem>
@@ -411,7 +411,7 @@ export function BuyerDialog({
                   </Label>
                 }
                 content="When enabled, the newly created buyer will be automatically applied to your current invoice form"
-                className="z-[1000]"
+                className="z-1000"
               />
             </div>
           )}

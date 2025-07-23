@@ -134,7 +134,7 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
 
 function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-xs">
       <div className="flex items-center justify-center">
         <div className="container h-auto px-3 py-2 sm:h-16 sm:py-0">
           <div className="flex h-full flex-row flex-wrap items-center justify-between gap-2">
@@ -177,7 +177,7 @@ function Logo() {
   return (
     <div>
       <div className="flex items-center gap-1 sm:gap-2">
-        <ProjectLogo className="h-7 w-7 flex-shrink-0 sm:h-8 sm:w-8" />
+        <ProjectLogo className="h-7 w-7 shrink-0 sm:h-8 sm:w-8" />
         <ProjectLogoDescription>
           Free Invoice Generator with Live PDF Preview
         </ProjectLogoDescription>

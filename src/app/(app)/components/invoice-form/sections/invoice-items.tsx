@@ -69,7 +69,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                 id={`itemInvoiceItemNumberIsVisible0`}
                 checked={value}
                 onCheckedChange={onChange}
-                className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
               />
             )}
           />
@@ -90,7 +90,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                 id={`vatTableSummaryIsVisible`}
                 checked={value}
                 onCheckedChange={onChange}
-                className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
               />
             )}
           />
@@ -103,7 +103,7 @@ export const InvoiceItems = memo(function InvoiceItems({
         return (
           <fieldset
             key={field.id}
-            className="relative mb-4 rounded-lg border p-4 shadow"
+            className="relative mb-4 rounded-lg border p-4 shadow-sm"
           >
             {/* Delete invoice item button */}
             {isNotFirstItem ? (
@@ -154,7 +154,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             id={`itemNameFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                           />
                         )}
                       />
@@ -209,7 +209,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             id={`itemTypeOfGTUFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                           />
                         )}
                       />
@@ -266,7 +266,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             id={`itemAmountFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                           />
                         )}
                       />
@@ -339,7 +339,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             id={`itemUnitFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                           />
                         )}
                       />
@@ -389,7 +389,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             id={`itemNetPriceFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                           />
                         )}
                       />
@@ -480,7 +480,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             id={`itemVatFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                           />
                         )}
                       />
@@ -538,7 +538,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             id={`itemNetAmountFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                           />
                         )}
                       />
@@ -606,7 +606,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             id={`itemVatAmountFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                           />
                         )}
                       />
@@ -674,7 +674,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             id={`itemPreTaxAmountFieldIsVisible${index}`}
                             checked={value}
                             onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
                           />
                         )}
                       />
