@@ -152,7 +152,7 @@ export function InvoiceClientPage({
               className={cn(!canShareInvoice && "bg-red-50")}
               trigger={
                 <Button
-                  aria-disabled={!canShareInvoice} // for better UX than 'disabled'
+                  data-disabled={!canShareInvoice} // for better UX than 'disabled'
                   onClick={handleShareInvoice}
                   _variant="outline"
                   className={cn("mx-2 w-full")}

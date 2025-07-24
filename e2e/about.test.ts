@@ -45,7 +45,9 @@ test.describe("About page", () => {
     ).toBeVisible();
 
     await expect(
-      heroSection.getByText("No sign-up required. 100% free and open-source.")
+      heroSection
+        .getByText("No sign-up required. 100% free and open-source.")
+        .filter({ visible: true })
     ).toBeVisible();
 
     const video = heroSection.getByTestId("hero-about-page-video");
@@ -284,9 +286,9 @@ test.describe("About page", () => {
     ).toBeVisible();
 
     await expect(
-      heroSection.getByText(
-        "Aucune inscription requise. 100% gratuit et open-source."
-      )
+      heroSection
+        .getByText("Aucune inscription requise. 100% gratuit et open-source.")
+        .filter({ visible: true })
     ).toBeVisible();
 
     // Check Features section in French
@@ -403,9 +405,11 @@ test.describe("About page", () => {
     ).toBeVisible();
 
     await expect(
-      heroSection.getByText(
-        "Keine Anmeldung erforderlich. 100% kostenlos und Open-Source."
-      )
+      heroSection
+        .getByText(
+          "Keine Anmeldung erforderlich. 100% kostenlos und Open-Source."
+        )
+        .filter({ visible: true })
     ).toBeVisible();
 
     // Check Features section in German
