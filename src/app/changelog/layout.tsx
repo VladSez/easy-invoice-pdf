@@ -91,7 +91,10 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
             <li>
               <Link
                 href="/"
-                className="text-sm text-slate-500 hover:text-slate-900"
+                className={`
+                  text-sm text-slate-500
+                  hover:text-slate-900
+                `}
               >
                 App
               </Link>
@@ -99,7 +102,10 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
             <li>
               <Link
                 href="/en/about"
-                className="text-sm text-slate-500 hover:text-slate-900"
+                className={`
+                  text-sm text-slate-500
+                  hover:text-slate-900
+                `}
               >
                 About
               </Link>
@@ -110,7 +116,10 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
                 href={GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-slate-500 hover:text-slate-900"
+                className={`
+                  text-sm text-slate-500
+                  hover:text-slate-900
+                `}
               >
                 GitHub
               </Link>
@@ -120,7 +129,10 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
                 href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-slate-500 hover:text-slate-900"
+                className={`
+                  text-sm text-slate-500
+                  hover:text-slate-900
+                `}
               >
                 Share feedback
               </Link>
@@ -136,22 +148,37 @@ function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-xs">
       <div className="flex items-center justify-center">
-        <div className="container h-auto px-3 py-2 sm:h-16 sm:py-0">
+        <div className={`
+          container h-auto px-3 py-2
+          sm:h-16 sm:py-0
+        `}>
           <div className="flex h-full flex-row flex-wrap items-center justify-between gap-2">
-            <div className="w-[53%] sm:w-auto">
+            <div className={`
+              w-[53%]
+              sm:w-auto
+            `}>
               <Logo />
             </div>
-            <div className="flex items-center sm:mt-0 sm:gap-2">
+            <div className={`
+              flex items-center
+              sm:mt-0 sm:gap-2
+            `}>
               <Button
                 _variant="ghost"
-                className="hidden lg:inline-flex"
+                className={`
+                  hidden
+                  lg:inline-flex
+                `}
                 asChild
               >
                 <Link href="/en/about">About product</Link>
               </Button>
               <Button
                 _variant="ghost"
-                className="hidden lg:inline-flex"
+                className={`
+                  hidden
+                  lg:inline-flex
+                `}
                 asChild
               >
                 <Link
@@ -162,7 +189,10 @@ function Header() {
                   Share feedback
                 </Link>
               </Button>
-              <BlackGoToAppButton className="px-3 sm:px-8">
+              <BlackGoToAppButton className={`
+                px-3
+                sm:px-8
+              `}>
                 Go to App
               </BlackGoToAppButton>
             </div>
@@ -176,8 +206,14 @@ function Header() {
 function Logo() {
   return (
     <div>
-      <div className="flex items-center gap-1 sm:gap-2">
-        <ProjectLogo className="h-7 w-7 shrink-0 sm:h-8 sm:w-8" />
+      <div className={`
+        flex items-center gap-1
+        sm:gap-2
+      `}>
+        <ProjectLogo className={`
+          h-7 w-7 shrink-0
+          sm:h-8 sm:w-8
+        `} />
         <ProjectLogoDescription>
           Free Invoice Generator with Live PDF Preview
         </ProjectLogoDescription>

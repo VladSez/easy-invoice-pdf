@@ -158,7 +158,12 @@ export const BuyerInformation = memo(function BuyerInformation({
                     id={`buyerVatNoFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
+                    className={`
+                      h-5 w-8
+                      [&_span]:size-4
+                      data-[state=checked]:[&_span]:translate-x-3
+                      data-[state=checked]:[&_span]:rtl:-translate-x-3
+                    `}
                     disabled={isBuyerSelected}
                     data-testid={`buyerVatNoFieldIsVisible`}
                   />
@@ -261,7 +266,12 @@ export const BuyerInformation = memo(function BuyerInformation({
                     id={`buyerNotesFieldIsVisible`}
                     checked={value}
                     onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
+                    className={`
+                      h-5 w-8
+                      [&_span]:size-4
+                      data-[state=checked]:[&_span]:translate-x-3
+                      data-[state=checked]:[&_span]:rtl:-translate-x-3
+                    `}
                     disabled={isBuyerSelected}
                     data-testid={`buyerNotesInvoiceFormFieldVisibilitySwitch`}
                   />

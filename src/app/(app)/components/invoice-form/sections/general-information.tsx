@@ -211,7 +211,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
       {/* Logo Upload - Only for Stripe template */}
       {template === "stripe" && (
-        <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
+        <div className="animate-in duration-500 fade-in slide-in-from-bottom-2">
           <Label htmlFor="logoUpload" className="mb-2">
             Company Logo (Optional)
           </Label>
@@ -224,12 +224,19 @@ export const GeneralInformation = memo(function GeneralInformation({
                 <img
                   src={logo}
                   alt="Company logo preview"
-                  className="h-28 max-w-40 rounded-lg border-2 border-gray-200 object-contain p-2 shadow-xs"
+                  className={`
+                    h-28 max-w-40 rounded-lg border-2 border-gray-200 object-contain p-2 shadow-xs
+                  `}
                 />
                 <button
                   type="button"
                   onClick={handleLogoRemove}
-                  className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-colors hover:bg-red-600 focus:outline-hidden focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  className={`
+                    absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full
+                    bg-red-500 text-white shadow-md transition-colors
+                    hover:bg-red-600
+                    focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-hidden
+                  `}
                   aria-label="Remove logo"
                 >
                   <X className="h-4 w-4" />
@@ -251,7 +258,11 @@ export const GeneralInformation = memo(function GeneralInformation({
               />
               <label
                 htmlFor="logoUpload"
-                className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-8 transition-colors hover:border-gray-400 hover:bg-gray-50"
+                className={`
+                  flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed
+                  border-gray-300 p-8 transition-colors
+                  hover:border-gray-400 hover:bg-gray-50
+                `}
               >
                 <div className="text-center">
                   <Upload className="mx-auto h-4 w-4 text-gray-400" />
@@ -272,7 +283,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
       {/* Pay Online URL - Only for Stripe template */}
       {template === "stripe" && (
-        <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
+        <div className="animate-in duration-500 fade-in slide-in-from-bottom-2">
           <Label htmlFor={`stripePayOnlineUrl`} className="">
             Payment Link URL (Optional)
           </Label>
@@ -494,8 +505,18 @@ export const GeneralInformation = memo(function GeneralInformation({
 
               {!isInvoiceNumberInCurrentMonth &&
                 !errors.invoiceNumberObject?.value && (
-                  <div className="mt-1 flex flex-col items-start text-balance text-xs text-zinc-700/90">
-                    <span className="mb-2 flex items-center text-amber-800 md:mb-0 lg:mb-2">
+                  <div
+                    className={`
+                      mt-1 flex flex-col items-start text-xs text-balance text-zinc-700/90
+                    `}
+                  >
+                    <span
+                      className={`
+                        mb-2 flex items-center text-amber-800
+                        md:mb-0
+                        lg:mb-2
+                      `}
+                    >
                       <AlertIcon />
                       Invoice number does not match current month
                     </span>
@@ -614,7 +635,12 @@ export const GeneralInformation = memo(function GeneralInformation({
                   id={`invoiceTypeFieldIsVisible`}
                   checked={value}
                   onCheckedChange={onChange}
-                  className="h-5 w-8 [&_span]:size-4 data-[state=checked]:[&_span]:translate-x-3 data-[state=checked]:[&_span]:rtl:-translate-x-3"
+                  className={`
+                    h-5 w-8
+                    [&_span]:size-4
+                    data-[state=checked]:[&_span]:translate-x-3
+                    data-[state=checked]:[&_span]:rtl:-translate-x-3
+                  `}
                 />
               )}
             />

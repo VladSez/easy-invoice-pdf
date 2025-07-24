@@ -29,7 +29,10 @@ const AccordionTrigger = React.forwardRef<
     <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        "flex flex-1 items-center justify-between py-4 font-medium transition-all [&[data-state=open]>svg]:rotate-180",
+        `
+          flex flex-1 items-center justify-between py-4 font-medium transition-all
+          [&[data-state=open]>svg]:rotate-180
+        `,
         className
       )}
       {...props}
@@ -37,7 +40,10 @@ const AccordionTrigger = React.forwardRef<
       {children}
       <CustomTooltip
         trigger={
-          <ChevronDown className="h-6 w-6 shrink-0 rounded-full p-1 transition-all duration-200 hover:bg-gray-200" />
+          <ChevronDown className={`
+            h-6 w-6 shrink-0 rounded-full p-1 transition-all duration-200
+            hover:bg-gray-200
+          `} />
         }
         content="Expand/Collapse Section"
       />
@@ -52,10 +58,14 @@ const AccordionContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <AccordionPrimitive.Content
     ref={ref}
-    className="overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+    className={`
+      overflow-hidden text-sm transition-all
+      data-[state=closed]:animate-accordion-up
+      data-[state=open]:animate-accordion-down
+    `}
     {...props}
   >
-    <div className={cn("pb-4 pt-0", className)}>{children}</div>
+    <div className={cn("pt-0 pb-4", className)}>{children}</div>
   </AccordionPrimitive.Content>
 ));
 

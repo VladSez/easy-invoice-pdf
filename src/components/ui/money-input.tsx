@@ -44,7 +44,12 @@ const MoneyInput = React.memo(
           data-testid={dataTestId}
         >
           {currencySymbol ? (
-            <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-sm">
+            <span
+              className={`
+                pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3
+                text-sm
+              `}
+            >
               {currencySymbol}
             </span>
           ) : null}
@@ -58,7 +63,12 @@ const MoneyInput = React.memo(
             )}
             placeholder="0.00"
           />
-          <span className="inline-flex items-center rounded-e-lg border border-gray-300 bg-background px-3 text-sm text-slate-950 shadow-xs shadow-black/5 transition-shadow">
+          <span
+            className={`
+              inline-flex items-center rounded-e-lg border border-gray-300 bg-background px-3
+              text-sm text-slate-950 shadow-xs shadow-black/5 transition-shadow
+            `}
+          >
             {shownCurrencyText}
           </span>
         </div>
@@ -86,7 +96,12 @@ const ReadOnlyMoneyInput = React.memo(
           data-testid={dataTestId}
         >
           {currencySymbol ? (
-            <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-sm">
+            <span
+              className={`
+                pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3
+                text-sm
+              `}
+            >
               {currencySymbol}
             </span>
           ) : null}
@@ -94,9 +109,15 @@ const ReadOnlyMoneyInput = React.memo(
             {...props}
             ref={ref}
             className={cn(
-              "-me-px block w-full cursor-not-allowed rounded-md rounded-e-none border border-gray-300 bg-gray-100 px-3 py-2 ps-6",
+              `
+                -me-px block w-full cursor-not-allowed rounded-md rounded-e-none border
+                border-gray-300 bg-gray-100 px-3 py-2 ps-6
+              `,
               getCurrencyPadding(currencySymbol),
-              "focus-visible:border-indigo-500 focus-visible:ring-3 focus-visible:ring-indigo-200 focus-visible:ring-opacity-50",
+              `
+                focus-visible:border-indigo-500 focus-visible:ring-3
+                focus-visible:ring-indigo-200/50
+              `,
               props.className
             )}
             placeholder="0.00"
@@ -104,7 +125,12 @@ const ReadOnlyMoneyInput = React.memo(
             readOnly
             title="This field is read-only"
           />
-          <span className="inline-flex cursor-default items-center rounded-e-lg border border-gray-300 bg-gray-100 px-3 text-sm text-slate-950 shadow-xs shadow-black/5 transition-shadow">
+          <span
+            className={`
+              inline-flex cursor-default items-center rounded-e-lg border border-gray-300
+              bg-gray-100 px-3 text-sm text-slate-950 shadow-xs shadow-black/5 transition-shadow
+            `}
+          >
             {shownCurrencyText}
           </span>
         </div>

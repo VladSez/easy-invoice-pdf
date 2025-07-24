@@ -42,6 +42,7 @@ export async function GET(req: NextRequest) {
     const rateLimitResult = await ipLimiter.limit(ip);
 
     if (!rateLimitResult.success) {
+      // eslint-disable-next-line no-console
       console.log(`Rate limit exceeded for IP: ${ip}`);
 
       return new NextResponse(

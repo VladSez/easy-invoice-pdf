@@ -28,14 +28,26 @@ const TooltipContent = React.memo(
         ref={ref}
         sideOffset={sideOffset}
         className={cn(
-          "relative z-50 max-w-[280px] rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-950 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50",
+          `
+            relative z-50 max-w-[280px] animate-in rounded-lg border border-slate-200 bg-white px-3
+            py-1.5 text-sm text-slate-950 fade-in-0 zoom-in-95
+            data-[side=bottom]:slide-in-from-top-2
+            data-[side=left]:slide-in-from-right-2
+            data-[side=right]:slide-in-from-left-2
+            data-[side=top]:slide-in-from-bottom-2
+            data-[state=closed]:animate-out data-[state=closed]:fade-out-0
+            data-[state=closed]:zoom-out-95
+            dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50
+          `,
           className
         )}
         {...props}
       >
         {props.children}
         {showArrow && (
-          <TooltipPrimitive.Arrow className="my-px border-slate-200 fill-white drop-shadow-[0_1px_0_hsl(var(--border))]" />
+          <TooltipPrimitive.Arrow
+            className={`my-px border-slate-200 fill-white drop-shadow-[0_1px_0_hsl(var(--border))]`}
+          />
         )}
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>

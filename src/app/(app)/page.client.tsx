@@ -217,7 +217,7 @@ export function AppPageClient() {
               JSON.stringify(newInvoiceDataValidated)
             ) {
               toast.info(
-                <p className="text-pretty text-sm leading-relaxed">
+                <p className="text-sm leading-relaxed text-pretty">
                   <span className="font-semibold text-blue-600">
                     Invoice Updated:
                   </span>{" "}
@@ -320,7 +320,7 @@ export function AppPageClient() {
         duration: 5000,
         description: (
           <>
-            <p className="text-pretty text-xs leading-relaxed text-red-700">
+            <p className="text-xs leading-relaxed text-pretty text-red-700">
               Invoices with logos cannot be shared. Please remove the logo to
               generate a shareable link. You can still download the invoice as
               PDF and share it.
@@ -382,11 +382,34 @@ export function AppPageClient() {
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
-        <div className="w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 2xl:max-w-[1680px]">
+      <div
+        className={`
+          flex flex-col items-center justify-start bg-gray-100 pb-4
+          sm:p-4
+          md:justify-center
+          lg:min-h-screen
+        `}
+      >
+        <div
+          className={`
+            w-full max-w-7xl bg-white p-3 shadow-lg
+            sm:mb-0 sm:rounded-lg sm:p-6
+            2xl:max-w-[1680px]
+          `}
+        >
           <div data-testid="header">
-            <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
-              <div className="relative bottom-2 mt-2 flex w-full flex-col justify-center sm:bottom-4 sm:mt-0">
+            <div
+              className={`
+                flex w-full flex-row flex-wrap items-center justify-between
+                lg:flex-nowrap
+              `}
+            >
+              <div
+                className={`
+                  relative bottom-2 mt-2 flex w-full flex-col justify-center
+                  sm:bottom-4 sm:mt-0
+                `}
+              >
                 <div className="flex items-center">
                   <ProjectLogo className="h-8 w-8" />
 
@@ -395,10 +418,19 @@ export function AppPageClient() {
                   </ProjectLogoDescription>
                 </div>
               </div>
-              <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
+              <div
+                className={`
+                  mb-1 flex w-full flex-wrap justify-center gap-3
+                  lg:flex-nowrap lg:justify-end
+                `}
+              >
                 <Button
                   asChild
-                  className="mx-2 w-full bg-blue-500 text-white transition-all hover:scale-105 hover:bg-blue-600 hover:no-underline lg:mx-0 lg:w-auto"
+                  className={`
+                    mx-2 w-full bg-blue-500 text-white transition-all
+                    hover:scale-105 hover:bg-blue-600 hover:no-underline
+                    lg:mx-0 lg:w-auto
+                  `}
                   _variant="link"
                   onClick={() => {
                     // analytics track event
@@ -427,7 +459,10 @@ export function AppPageClient() {
                           onClick={handleShareInvoice}
                           _variant="outline"
                           className={cn(
-                            "mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
+                            `
+                              mx-2 mb-2 w-full
+                              lg:mx-0 lg:mb-0 lg:w-auto
+                            `
                           )}
                         >
                           Generate a link to invoice
@@ -440,7 +475,7 @@ export function AppPageClient() {
                               <p className="text-sm font-semibold text-slate-900">
                                 Share Invoice Online
                               </p>
-                              <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                              <p className="text-xs leading-relaxed text-pretty text-slate-700">
                                 Generate a secure link to share this invoice
                                 with your clients. They can view and download it
                                 directly from their browser.
@@ -457,7 +492,7 @@ export function AppPageClient() {
                               <p className="text-sm font-semibold text-red-800">
                                 Unable to Share Invoice
                               </p>
-                              <p className="text-pretty text-xs leading-relaxed text-red-700">
+                              <p className="text-xs leading-relaxed text-pretty text-red-700">
                                 Invoices with logos cannot be shared. Please
                                 remove the logo to generate a shareable link.
                                 You can still download the invoice as PDF and
@@ -488,11 +523,22 @@ export function AppPageClient() {
               ) : null} */}
               </div>
             </div>
-            <div className="mb-3 mt-2 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-1">
+            <div
+              className={`
+                mt-2 mb-3 flex flex-row items-center justify-center
+                lg:mt-4 lg:mb-0 lg:justify-start
+                xl:mt-1
+              `}
+            >
               <ProjectInfo />
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+          <div
+            className={`
+              grid grid-cols-1 gap-4
+              lg:grid-cols-12
+            `}
+          >
             <InvoiceClientPage
               invoiceDataState={invoiceDataState}
               handleInvoiceDataChange={handleInvoiceDataChange}
@@ -529,7 +575,10 @@ export function AppPageClient() {
             <li>
               <Link
                 href="/en/about"
-                className="text-sm text-slate-500 hover:text-slate-900"
+                className={`
+                  text-sm text-slate-500
+                  hover:text-slate-900
+                `}
               >
                 About
               </Link>
@@ -537,7 +586,10 @@ export function AppPageClient() {
             <li>
               <Link
                 href="/changelog"
-                className="text-sm text-slate-500 hover:text-slate-900"
+                className={`
+                  text-sm text-slate-500
+                  hover:text-slate-900
+                `}
               >
                 Changelog
               </Link>
@@ -547,7 +599,10 @@ export function AppPageClient() {
                 href={GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-slate-500 hover:text-slate-900"
+                className={`
+                  text-sm text-slate-500
+                  hover:text-slate-900
+                `}
               >
                 GitHub
               </Link>
@@ -557,7 +612,10 @@ export function AppPageClient() {
                 href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-slate-500 hover:text-slate-900"
+                className={`
+                  text-sm text-slate-500
+                  hover:text-slate-900
+                `}
               >
                 Share feedback
               </Link>
@@ -579,7 +637,12 @@ function ProjectInfo() {
 
   return (
     <>
-      <span className="relative bottom-0 text-center text-sm text-gray-900 lg:bottom-3">
+      <span
+        className={`
+          relative bottom-0 text-center text-sm text-gray-900
+          lg:bottom-3
+        `}
+      >
         <a
           href={GITHUB_URL}
           target="_blank"
@@ -587,7 +650,12 @@ function ProjectInfo() {
           className="group inline-flex items-center gap-1"
           title="View on GitHub"
         >
-          <span className="transition-all group-hover:text-blue-600 group-hover:underline">
+          <span
+            className={`
+              transition-all
+              group-hover:text-blue-600 group-hover:underline
+            `}
+          >
             Open Source
           </span>
           <GithubIcon />
@@ -595,7 +663,10 @@ function ProjectInfo() {
         {" | "}
         <a
           href="https://dub.sh/easy-invoice-pdf-feedback"
-          className="transition-colors hover:text-blue-600 hover:underline"
+          className={`
+            transition-colors
+            hover:text-blue-600 hover:underline
+          `}
           target="_blank"
         >
           Share your feedback
@@ -603,14 +674,22 @@ function ProjectInfo() {
         {" | "}
         <button
           onClick={handleWatchDemoClick}
-          className="inline-flex items-center gap-1.5 transition-colors hover:text-blue-600 hover:underline"
+          className={`
+            inline-flex items-center gap-1.5 transition-colors
+            hover:text-blue-600 hover:underline
+          `}
         >
           <span>How it works</span>
         </button>
       </span>
 
       <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
-        <DialogContent className="max-h-[calc(100vh-2rem)] gap-0 overflow-hidden p-0 sm:max-w-[800px]">
+        <DialogContent
+          className={`
+            max-h-[calc(100vh-2rem)] gap-0 overflow-hidden p-0
+            sm:max-w-[800px]
+          `}
+        >
           <DialogHeader className="p-6 pb-4">
             <DialogTitle>How EasyInvoicePDF Works</DialogTitle>
             <DialogDescription>

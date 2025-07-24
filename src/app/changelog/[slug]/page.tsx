@@ -95,28 +95,68 @@ export default async function ChangelogEntryPage({
   ]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
+    <div
+      className={`
+        min-h-screen bg-white
+        dark:bg-gray-900
+      `}
+    >
+      <div
+        className={`
+          mx-auto max-w-4xl px-4 py-16
+          sm:px-6
+          lg:px-8
+        `}
+      >
         {/* Back to changelog link */}
         <div className="mb-8">
           <Link
             href="/changelog"
-            className="group inline-flex items-center text-start text-base font-medium text-slate-700 dark:text-gray-400"
+            className={`
+              group inline-flex items-center text-start text-base font-medium text-slate-700
+              dark:text-gray-400
+            `}
           >
-            <ArrowLeftIcon className="inline-block size-4 transition-transform group-hover:-translate-x-0.5" />
+            <ArrowLeftIcon
+              className={`
+                inline-block size-4 transition-transform
+                group-hover:-translate-x-0.5
+              `}
+            />
             <span className="ml-1">Back to All Posts</span>
           </Link>
         </div>
 
         {/* Entry header */}
-        <article className="prose prose-gray max-w-none dark:prose-invert">
-          <header className="not-prose mb-4 sm:mb-8">
+        <article
+          className={`
+            prose max-w-none prose-gray
+            dark:prose-invert
+          `}
+        >
+          <header
+            className={`
+              mb-4
+              sm:mb-8
+            `}
+          >
             <div className="mb-4 flex items-center gap-3">
-              <h1 className="text-pretty text-3xl font-bold text-gray-900 dark:text-gray-100 sm:text-4xl">
+              <h1
+                className={`
+                  text-3xl font-bold text-pretty text-gray-900
+                  sm:text-4xl
+                  dark:text-gray-100
+                `}
+              >
                 {entry.metadata.title || `Update ${formattedDate}`}
               </h1>
             </div>
-            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+            <div
+              className={`
+                flex items-center gap-4 text-sm text-gray-600
+                dark:text-gray-400
+              `}
+            >
               <DateTime dateTime={entry.metadata.date}>
                 {formattedDate}
               </DateTime>
@@ -124,7 +164,12 @@ export default async function ChangelogEntryPage({
           </header>
 
           {/* Author and social sharing */}
-          <div className="my-4 flex flex-col justify-between sm:my-8 sm:flex-row sm:items-center">
+          <div
+            className={`
+              my-4 flex flex-col justify-between
+              sm:my-8 sm:flex-row sm:items-center
+            `}
+          >
             <div className="flex items-center gap-x-8">
               <div
                 className="flex items-center space-x-3"
@@ -143,21 +188,38 @@ export default async function ChangelogEntryPage({
                     width="36"
                     height="36"
                     decoding="async"
-                    className="rounded-full blur-0 transition-all group-hover:brightness-95"
+                    className={`
+                      rounded-full transition-all
+                      group-hover:brightness-95
+                    `}
                     src={
                       "https://pbs.twimg.com/profile_images/1927695477971030016/Dwloje_P_400x400.jpg"
                     }
                   />
                 </Link>
                 <div className="flex flex-col" data-testid="author-info-text">
-                  <span className="text-sm font-medium text-neutral-800 dark:text-neutral-300">
+                  <span
+                    className={`
+                      text-sm font-medium text-neutral-800
+                      dark:text-neutral-300
+                    `}
+                  >
                     Vlad Sazonau
                   </span>
-                  <span className="text-sm text-slate-500 dark:text-neutral-400">
+                  <span
+                    className={`
+                      text-sm text-slate-500
+                      dark:text-neutral-400
+                    `}
+                  >
                     Founder,{" "}
                     <Link
                       href="/"
-                      className="text-slate-500 no-underline hover:underline hover:underline-offset-2 dark:text-neutral-400"
+                      className={`
+                        text-slate-500 no-underline
+                        hover:underline hover:underline-offset-2
+                        dark:text-neutral-400
+                      `}
                     >
                       {" "}
                       EasyInvoicePDF
@@ -171,7 +233,10 @@ export default async function ChangelogEntryPage({
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                className="transition-all hover:scale-110"
+                className={`
+                  transition-all
+                  hover:scale-110
+                `}
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
                   `EasyInvoicePDF: ${entry.metadata.title || `Update ${formattedDate}`}`
                 )}&url=${encodeURIComponent(`${APP_URL}/changelog/${slug}`)}`}
@@ -182,7 +247,10 @@ export default async function ChangelogEntryPage({
                   viewBox="0 0 300 300"
                   version="1.1"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="size-5 p-px text-black dark:text-white"
+                  className={`
+                    size-5 p-px text-black
+                    dark:text-white
+                  `}
                 >
                   <path
                     stroke="currentColor"
@@ -194,7 +262,10 @@ export default async function ChangelogEntryPage({
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                className="transition-all hover:scale-110"
+                className={`
+                  transition-all
+                  hover:scale-110
+                `}
                 href={`http://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
                   `${APP_URL}/changelog/${slug}`
                 )}&title=${encodeURIComponent(
@@ -206,7 +277,10 @@ export default async function ChangelogEntryPage({
                   width="24"
                   height="24"
                   viewBox="0 0 24 24"
-                  className="size-6 text-[#0077b5] dark:text-[#0077b5]"
+                  className={`
+                    size-6 text-[#0077b5]
+                    dark:text-[#0077b5]
+                  `}
                 >
                   <path
                     fill="currentColor"
@@ -218,7 +292,10 @@ export default async function ChangelogEntryPage({
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                className="transition-all hover:scale-110"
+                className={`
+                  transition-all
+                  hover:scale-110
+                `}
                 href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
                   `${APP_URL}/changelog/${slug}`
                 )}&title=${encodeURIComponent(
@@ -230,7 +307,10 @@ export default async function ChangelogEntryPage({
                   width="1365.12"
                   height="1365.12"
                   viewBox="0 0 14222 14222"
-                  className="size-6 text-[#1877f2] dark:text-[#1877f2]"
+                  className={`
+                    size-6 text-[#1877f2]
+                    dark:text-[#1877f2]
+                  `}
                 >
                   <circle cx="7111" cy="7112" r="7111" fill="currentColor" />
                   <path
@@ -243,7 +323,10 @@ export default async function ChangelogEntryPage({
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                className="transition-all hover:scale-110"
+                className={`
+                  transition-all
+                  hover:scale-110
+                `}
                 href={`https://news.ycombinator.com/submitlink?u=${encodeURIComponent(
                   `${APP_URL}/changelog/${slug}`
                 )}&t=${encodeURIComponent(`EasyInvoicePDF: ${entry.metadata.title || `Update ${formattedDate}`}`)}`}
@@ -253,7 +336,10 @@ export default async function ChangelogEntryPage({
                   width="24"
                   height="24"
                   viewBox="0 0 24 24"
-                  className="size-6 text-[#ff6600] dark:text-[#ff6600]"
+                  className={`
+                    size-6 text-[#ff6600]
+                    dark:text-[#ff6600]
+                  `}
                 >
                   <path
                     fill="currentColor"
@@ -265,10 +351,38 @@ export default async function ChangelogEntryPage({
           </div>
 
           {/* Entry content */}
-          <div className="prose-headings:mt-8 prose-headings:font-semibold prose-headings:text-black prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg prose-h5:text-base prose-h6:text-sm prose-p:text-gray-600 prose-blockquote:border-l-blue-500 prose-strong:text-gray-900 prose-code:rounded prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-pre:bg-gray-100 prose-li:text-gray-600 prose-img:rounded-lg prose-img:shadow-lg dark:prose-headings:text-white dark:prose-p:text-gray-300 dark:prose-strong:text-gray-100 dark:prose-code:bg-gray-800 dark:prose-pre:bg-gray-800 dark:prose-li:text-gray-300">
+          <div
+            className={`
+              prose-headings:mt-8 prose-headings:font-semibold prose-headings:text-black
+              dark:prose-headings:text-white
+              prose-h1:text-3xl
+              prose-h2:text-2xl
+              prose-h3:text-xl
+              prose-h4:text-lg
+              prose-h5:text-base
+              prose-h6:text-sm
+              prose-p:text-gray-600
+              dark:prose-p:text-gray-300
+              prose-blockquote:border-l-blue-500
+              prose-strong:text-gray-900
+              dark:prose-strong:text-gray-100
+              prose-code:rounded prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1
+              dark:prose-code:bg-gray-800
+              prose-pre:bg-gray-100
+              dark:prose-pre:bg-gray-800
+              prose-li:text-gray-600
+              dark:prose-li:text-gray-300
+              prose-img:rounded-lg prose-img:shadow-lg
+            `}
+          >
             <Suspense
               fallback={
-                <div className="h-64 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+                <div
+                  className={`
+                    h-64 animate-pulse rounded bg-gray-200
+                    dark:bg-gray-700
+                  `}
+                ></div>
               }
             >
               <entry.Component />
@@ -288,19 +402,50 @@ export default async function ChangelogEntryPage({
 
         {/* Previous and Next post navigation */}
         {(previousEntry || nextEntry) && (
-          <div className="mt-16 border-t border-gray-200 pt-8 dark:border-gray-700">
-            <div className="flex flex-row gap-8 sm:justify-between">
+          <div
+            className={`
+              mt-16 border-t border-gray-200 pt-8
+              dark:border-gray-700
+            `}
+          >
+            <div
+              className={`
+                flex flex-row gap-8
+                sm:justify-between
+              `}
+            >
               {/* Previous post link */}
               {previousEntry ? (
                 <Link
                   href={`/changelog/${previousEntry.slug}`}
-                  className="group ml-2 flex-1 text-left sm:ml-10"
+                  className={`
+                    group ml-2 flex-1 text-left
+                    sm:ml-10
+                  `}
                 >
-                  <p className="flex items-center justify-end gap-1 text-sm font-medium text-slate-500 dark:text-gray-400 sm:text-base">
-                    <ArrowLeftIcon className="inline-block size-4 transition-transform group-hover:-translate-x-0.5" />
+                  <p
+                    className={`
+                      flex items-center justify-end gap-1 text-sm font-medium text-slate-500
+                      sm:text-base
+                      dark:text-gray-400
+                    `}
+                  >
+                    <ArrowLeftIcon
+                      className={`
+                        inline-block size-4 transition-transform
+                        group-hover:-translate-x-0.5
+                      `}
+                    />
                     Previous
                   </p>
-                  <h3 className="mt-1 text-pretty text-end text-sm font-semibold text-gray-900 group-hover:underline dark:text-gray-100 sm:text-base">
+                  <h3
+                    className={`
+                      mt-1 text-end text-sm font-semibold text-pretty text-gray-900
+                      group-hover:underline
+                      sm:text-base
+                      dark:text-gray-100
+                    `}
+                  >
                     {previousEntry.metadata.title ||
                       `Update ${formatChangelogDate(previousEntry.metadata.date)}`}
                   </h3>
@@ -310,19 +455,45 @@ export default async function ChangelogEntryPage({
               )}
 
               {/* Center divider */}
-              <div className="block w-px self-stretch bg-gray-200 dark:bg-gray-700" />
+              <div
+                className={`
+                  block w-px self-stretch bg-gray-200
+                  dark:bg-gray-700
+                `}
+              />
 
               {/* Next post link */}
               {nextEntry ? (
                 <Link
                   href={`/changelog/${nextEntry.slug}`}
-                  className="group mr-2 flex-1 text-right sm:mr-10"
+                  className={`
+                    group mr-2 flex-1 text-right
+                    sm:mr-10
+                  `}
                 >
-                  <p className="flex items-center justify-start gap-1 text-sm font-medium text-slate-500 dark:text-gray-400 sm:text-base">
+                  <p
+                    className={`
+                      flex items-center justify-start gap-1 text-sm font-medium text-slate-500
+                      sm:text-base
+                      dark:text-gray-400
+                    `}
+                  >
                     Next
-                    <ArrowRightIcon className="inline-block size-4 transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRightIcon
+                      className={`
+                        inline-block size-4 transition-transform
+                        group-hover:translate-x-0.5
+                      `}
+                    />
                   </p>
-                  <h3 className="mt-1 text-pretty text-start text-sm font-semibold text-gray-900 group-hover:underline dark:text-gray-100 sm:text-base">
+                  <h3
+                    className={`
+                      mt-1 text-start text-sm font-semibold text-pretty text-gray-900
+                      group-hover:underline
+                      sm:text-base
+                      dark:text-gray-100
+                    `}
+                  >
                     {nextEntry.metadata.title ||
                       `Update ${formatChangelogDate(nextEntry.metadata.date)}`}
                   </h3>

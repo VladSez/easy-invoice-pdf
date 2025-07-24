@@ -75,7 +75,11 @@ export default async function ConfirmSubscriptionPage({
           <b>Ready to create your first invoice?</b>{" "}
           <Link
             href="/"
-            className="inline-flex items-center font-medium text-emerald-600 underline underline-offset-4 transition-opacity hover:opacity-80"
+            className={`
+              inline-flex items-center font-medium text-emerald-600 underline underline-offset-4
+              transition-opacity
+              hover:opacity-80
+            `}
           >
             Go to the app
           </Link>{" "}
@@ -101,7 +105,7 @@ export default async function ConfirmSubscriptionPage({
 
 function Text({ children }: { children: React.ReactNode }) {
   return (
-    <p className="max-w-lg text-balance text-base leading-relaxed text-slate-600">
+    <p className="max-w-lg text-base leading-relaxed text-balance text-slate-600">
       {children}
     </p>
   );
@@ -117,7 +121,11 @@ function CustomEmailLink({
   return (
     <Link
       href={href}
-      className="inline-flex items-center font-medium text-emerald-600 underline underline-offset-4 transition-opacity hover:opacity-80"
+      className={`
+        inline-flex items-center font-medium text-emerald-600 underline underline-offset-4
+        transition-opacity
+        hover:opacity-80
+      `}
     >
       {children}
     </Link>

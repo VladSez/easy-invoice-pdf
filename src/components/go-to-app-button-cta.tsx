@@ -15,13 +15,19 @@ export function GoToAppButton({
       _size="lg"
       _variant="outline"
       className={cn(
-        "group relative overflow-hidden border-slate-200 px-8 shadow-xs transition-all duration-300 hover:border-slate-200/80 hover:shadow-lg",
+        `
+          group relative overflow-hidden border-slate-200 px-8 shadow-xs transition-all duration-300
+          hover:border-slate-200/80 hover:shadow-lg
+        `,
         className
       )}
       asChild
     >
       <Link href="/" scroll={false}>
-        <ArrowRight className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
+        <ArrowRight className={`
+          mr-2 h-5 w-5 transition-transform
+          group-hover:scale-110
+        `} />
         {children}
       </Link>
     </Button>
@@ -38,7 +44,11 @@ export function BlackGoToAppButton({
   return (
     <GoToAppButton
       className={cn(
-        "relative overflow-hidden bg-zinc-900 text-white transition-all duration-300 hover:scale-[1.02] hover:bg-zinc-800 hover:text-white active:scale-[0.98]",
+        `
+          relative overflow-hidden bg-zinc-900 text-white transition-all duration-300
+          hover:scale-[1.02] hover:bg-zinc-800 hover:text-white
+          active:scale-[0.98]
+        `,
         className
       )}
     >

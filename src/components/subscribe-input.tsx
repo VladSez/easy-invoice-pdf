@@ -24,8 +24,11 @@ function SubmitButton({
       _variant="default"
       _size="default"
       className={cn(
-        "absolute right-2 top-1.5 transition-all duration-200",
-        "hover:opacity-90 active:scale-95",
+        "absolute top-1.5 right-2 transition-all duration-200",
+        `
+          hover:opacity-90
+          active:scale-95
+        `,
         pending && "cursor-not-allowed opacity-80"
       )}
       disabled={pending}
@@ -64,7 +67,7 @@ export function SubscribeInput({
             className={cn(
               "flex h-12 items-center justify-between",
               "rounded-lg border bg-emerald-50 px-4 py-2",
-              "duration-300 animate-in fade-in-0 slide-in-from-top-1"
+              "animate-in duration-300 fade-in-0 slide-in-from-top-1"
             )}
           >
             <p className="flex items-center gap-2 text-emerald-700">
@@ -99,7 +102,9 @@ export function SubscribeInput({
             className="relative"
           >
             <div className="relative">
-              <Mail className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+              <Mail className={`
+                absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground
+              `} />
               <Input
                 type="email"
                 name="email"
@@ -107,10 +112,10 @@ export function SubscribeInput({
                 placeholder={translations.placeholder}
                 aria-label={translations.placeholder}
                 className={cn(
-                  "h-12 pl-10 pr-32",
+                  "h-12 pr-32 pl-10",
                   "placeholder:text-muted-foreground/60",
                   "transition-all duration-200",
-                  "focus:ring-primary/20 focus:ring-2 focus:ring-offset-0",
+                  "focus:ring-2 focus:ring-primary/20 focus:ring-offset-0",
                   "hover:border-primary/50"
                 )}
                 required

@@ -13,7 +13,7 @@ import { Toaster } from "sonner";
 
 import { APP_URL, STATIC_ASSETS_URL } from "@/config";
 
-import "./globals.css";
+import "../globals.css";
 
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
@@ -145,7 +145,7 @@ export default async function RootLayout({
     <html lang="en">
       {/* Performance monitoring only in development */}
       {/* {process.env.NODE_ENV !== "development" ? null : <ReactScan />} */}
-      <body>
+      <body className="bg-white antialiased">
         <DeviceContextProvider
           isDesktop={isDesktopServer}
           isAndroid={isAndroid}

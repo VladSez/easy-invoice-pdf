@@ -20,7 +20,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             target: "_blank",
             rel: "noopener noreferrer",
           })}
-          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
+          className={`
+            text-blue-600
+            hover:text-blue-800
+            dark:text-blue-400 dark:hover:text-blue-200
+          `}
         >
           {children}
         </a>
@@ -31,7 +35,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     pre: ({ children, ...props }) => (
       <pre
         {...props}
-        className="overflow-x-auto rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm dark:border-gray-700 dark:bg-gray-800"
+        className={`
+          overflow-x-auto rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm
+          dark:border-gray-700 dark:bg-gray-800
+        `}
       >
         {children}
       </pre>
@@ -41,7 +48,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     code: ({ children, ...props }) => (
       <code
         {...props}
-        className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-sm text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+        className={`
+          rounded bg-gray-100 px-1.5 py-0.5 font-mono text-sm text-gray-800
+          dark:bg-gray-800 dark:text-gray-200
+        `}
       >
         {children}
       </code>
@@ -51,7 +61,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     blockquote: ({ children, ...props }) => (
       <blockquote
         {...props}
-        className="border-l-4 border-blue-500 bg-blue-50 py-2 pl-6 italic dark:bg-blue-950/20"
+        className={`
+          border-l-4 border-blue-500 bg-blue-50 py-2 pl-6 italic
+          dark:bg-blue-950/20
+        `}
       >
         {children}
       </blockquote>
@@ -66,7 +79,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         alt={alt}
         height={450}
         width={840}
-        className="aspect-auto rounded-lg border border-gray-200 bg-slate-300 shadow-xs dark:border-gray-700"
+        className={`
+          aspect-auto rounded-lg border border-gray-200 bg-slate-300 shadow-xs
+          dark:border-gray-700
+        `}
         style={{ maxWidth: "100%", height: "auto" }}
       />
     ),

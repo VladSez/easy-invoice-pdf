@@ -12,9 +12,15 @@ import { useDeviceContext } from "@/contexts/device-context";
 import { cn } from "@/lib/utils";
 
 const DesktopPDFViewerModuleLoading = () => (
-  <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+  <div className={`
+    flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200
+    lg:h-[620px]
+    2xl:h-[700px]
+  `}>
     <div className="text-center">
-      <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      <div className={`
+        mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent
+      `} />
       <p className="text-gray-600">Loading PDF viewer...</p>
     </div>
   </div>
@@ -23,7 +29,9 @@ const DesktopPDFViewerModuleLoading = () => (
 const AndroidPDFViewerModuleLoading = () => (
   <div className="flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200">
     <div className="text-center">
-      <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      <div className={`
+        mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent
+      `} />
       <p className="text-gray-600">Loading PDF viewer...</p>
     </div>
   </div>
@@ -147,7 +155,11 @@ export function InvoiceClientPage({
               </div>
             </TabsContent>
           </Tabs>
-          <div className="sticky bottom-0 z-50 mt-2 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
+          <div className={`
+            sticky bottom-0 z-50 mt-2 flex flex-col items-center justify-center gap-3 rounded-lg
+            border border-t border-gray-200 bg-white px-3 py-3
+            shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]
+          `}>
             <CustomTooltip
               className={cn(!canShareInvoice && "bg-red-50")}
               trigger={
@@ -167,7 +179,7 @@ export function InvoiceClientPage({
                       <p className="text-sm font-semibold text-slate-900">
                         Share Invoice Online
                       </p>
-                      <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                      <p className="text-xs leading-relaxed text-pretty text-slate-700">
                         Generate a secure link to share this invoice with your
                         clients. They can view and download it directly from
                         their browser.
@@ -184,7 +196,7 @@ export function InvoiceClientPage({
                       <p className="text-sm font-semibold text-red-800">
                         Unable to Share Invoice
                       </p>
-                      <p className="text-pretty text-xs leading-relaxed text-red-700">
+                      <p className="text-xs leading-relaxed text-pretty text-red-700">
                         Invoices with logos cannot be shared. Please remove the
                         logo to generate a shareable link. You can still
                         download the invoice as PDF and share it.
@@ -207,7 +219,10 @@ export function InvoiceClientPage({
         // Desktop View
         <>
           <div className="col-span-4">
-            <div className="h-[620px] overflow-auto border-b px-3 pl-0 2xl:h-[700px]">
+            <div className={`
+              h-[620px] overflow-auto border-b px-3 pl-0
+              2xl:h-[700px]
+            `}>
               <InvoiceForm
                 invoiceData={invoiceDataState}
                 onInvoiceDataChange={handleInvoiceDataChange}
@@ -215,7 +230,10 @@ export function InvoiceClientPage({
               />
             </div>
           </div>
-          <div className="col-span-8 h-[620px] w-full max-w-full 2xl:h-[700px]">
+          <div className={`
+            col-span-8 h-[620px] w-full max-w-full
+            2xl:h-[700px]
+          `}>
             <PdfViewer
               invoiceData={invoiceDataState}
               errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}

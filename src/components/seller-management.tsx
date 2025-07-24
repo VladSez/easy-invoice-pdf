@@ -256,7 +256,7 @@ export function SellerManagement({
                 id={sellerSelectId}
                 className={cn(
                   "block h-8 max-w-[200px] text-[12px]",
-                  !selectedSellerId && "italic text-gray-700"
+                  !selectedSellerId && "text-gray-700 italic"
                 )}
                 onChange={handleSellerChange}
                 value={selectedSellerId}
@@ -336,7 +336,7 @@ export function SellerManagement({
                   toast.error("Unable to add seller", {
                     description: (
                       <>
-                        <p className="text-pretty text-xs leading-relaxed text-red-700">
+                        <p className="text-xs leading-relaxed text-pretty text-red-700">
                           Local storage is not available in your browser. Please
                           enable it or try another browser.
                         </p>
@@ -358,7 +358,7 @@ export function SellerManagement({
                   <p className="text-sm font-semibold text-slate-900">
                     Save Sellers for Quick Access
                   </p>
-                  <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                  <p className="text-xs leading-relaxed text-pretty text-slate-700">
                     Store multiple sellers to easily reuse their information in
                     future invoices. All data is saved locally in your browser.
                   </p>
@@ -371,7 +371,7 @@ export function SellerManagement({
                   <p className="text-sm font-semibold text-red-800">
                     Storage Not Available
                   </p>
-                  <p className="text-pretty text-xs leading-relaxed text-red-700">
+                  <p className="text-xs leading-relaxed text-pretty text-red-700">
                     Local storage is not available in your browser. Please
                     enable it or try another browser to save seller information.
                   </p>
@@ -417,7 +417,10 @@ export function SellerManagement({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteSeller}
-              className="bg-red-500 text-red-50 hover:bg-red-500/90"
+              className={`
+                bg-red-500 text-red-50
+                hover:bg-red-500/90
+              `}
             >
               Delete
             </AlertDialogAction>

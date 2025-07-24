@@ -31,17 +31,25 @@ import { CustomTooltip } from "./tooltip";
  * Uses class-variance-authority (cva) to define different styles based on "variant" prop.
  */
 const multiSelectVariants = cva(
-  "m-1 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300",
+  `
+    m-1 transition delay-150 duration-300 ease-in-out
+    hover:-translate-y-1 hover:scale-110
+  `,
   {
     variants: {
       variant: {
-        default:
-          "border-foreground/10 text-foreground bg-card hover:bg-card/80",
-        secondary:
-          "border-foreground/10 bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        inverted: "inverted",
+        default: `
+          border-foreground/10 bg-card text-foreground
+          hover:bg-card/80
+        `,
+        secondary: `
+          border-foreground/10 bg-secondary text-secondary-foreground
+          hover:bg-secondary/80
+        `,
+        destructive: `
+          border-transparent bg-destructive text-destructive-foreground
+          hover:bg-destructive/80
+        `,
       },
     },
     defaultVariants: {
@@ -217,7 +225,16 @@ export const MultiSelect = React.forwardRef<
                     }
                   }}
                   className={cn(
-                    "min-h- mb-4 h-auto rounded-l-lg rounded-r-none border-r-0 bg-slate-900 px-4 py-2 text-center text-sm font-medium text-slate-50 shadow-xs shadow-black/5 outline-offset-2 hover:bg-slate-900/90 focus-visible:border-indigo-500 focus-visible:ring-3 focus-visible:ring-indigo-200 focus-visible:ring-opacity-50 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 lg:mb-0",
+                    `
+                      mb-4 h-auto rounded-l-lg rounded-r-none border-r-0 bg-slate-900 px-4 py-2
+                      text-center text-sm font-medium text-slate-50 shadow-xs shadow-black/5
+                      outline-offset-2
+                      hover:bg-slate-900/90
+                      focus-visible:border-indigo-500 focus-visible:ring-3
+                      focus-visible:ring-indigo-200/50
+                      lg:mb-0
+                      dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90
+                    `,
                     selectedLanguages.length === 0 && "lg:w-[120px]",
                     selectedLanguages.length === 1 && "lg:w-[200px]",
                     selectedLanguages.length === 2 && "lg:w-[240px]",
@@ -248,7 +265,10 @@ export const MultiSelect = React.forwardRef<
                       {selectedLanguages.length > maxCount && (
                         <Badge
                           className={cn(
-                            "border-foreground/1 bg-transparent text-foreground hover:bg-transparent",
+                            `
+                              border-foreground/1 bg-transparent text-foreground
+                              hover:bg-transparent
+                            `,
                             multiSelectVariants({ variant })
                           )}
                         >
@@ -276,10 +296,19 @@ export const MultiSelect = React.forwardRef<
                 <Button
                   onClick={handleTogglePopover}
                   className={cn(
-                    "mb-4 h-auto rounded-l-none rounded-r-lg border-l-0 bg-slate-900 px-2 py-2 text-center text-sm font-medium text-slate-50 shadow-xs shadow-black/5 outline-offset-2 hover:bg-slate-900/90 focus-visible:border-indigo-500 focus-visible:ring-3 focus-visible:ring-indigo-200 focus-visible:ring-opacity-50 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 lg:mb-0"
+                    `
+                      mb-4 h-auto rounded-l-none rounded-r-lg border-l-0 bg-slate-900 px-2 py-2
+                      text-center text-sm font-medium text-slate-50 shadow-xs shadow-black/5
+                      outline-offset-2
+                      hover:bg-slate-900/90
+                      focus-visible:border-indigo-500 focus-visible:ring-3
+                      focus-visible:ring-indigo-200/50
+                      lg:mb-0
+                      dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90
+                    `
                   )}
                 >
-                  <ChevronDown className="text-muted-foreground h-4 w-4" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </Button>
               }
             ></CustomTooltip>
@@ -312,10 +341,16 @@ export const MultiSelect = React.forwardRef<
                     >
                       <div
                         className={cn(
-                          "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-gray-500",
+                          `
+                            mr-2 flex h-4 w-4 items-center justify-center rounded-sm border
+                            border-gray-500
+                          `,
                           isSelected
                             ? "bg-gray-50 text-gray-900"
-                            : "opacity-50 [&_svg]:invisible"
+                            : `
+                              opacity-50
+                              [&_svg]:invisible
+                            `
                         )}
                       >
                         <CheckIcon className="h-4 w-4" />
@@ -348,7 +383,11 @@ export const MultiSelect = React.forwardRef<
                           setIsPopoverOpen(false);
                           if (handleDownload) await handleDownload();
                         }}
-                        className="max-w-full flex-1 cursor-pointer justify-center bg-slate-900 text-slate-50 data-[selected='true']:bg-slate-900/90 data-[selected='true']:text-white dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90"
+                        className={`
+                          max-w-full flex-1 cursor-pointer justify-center bg-slate-900 text-slate-50
+                          data-[selected='true']:bg-slate-900/90 data-[selected='true']:text-white
+                          dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90
+                        `}
                       >
                         Download
                       </CommandItem>

@@ -13,7 +13,7 @@ export const ButtonHelper = ({
       _variant="link"
       _size="sm"
       className={cn(
-        "h-5 max-w-full whitespace-normal text-pretty p-0 text-left underline",
+        "h-5 max-w-full p-0 text-left text-pretty whitespace-normal underline",
         className
       )}
       {...props}

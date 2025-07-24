@@ -3,7 +3,7 @@
 
 const config = {
   trailingComma: "es5",
-  plugins: [require.resolve("prettier-plugin-tailwindcss")],
+  // plugins: [require.resolve("prettier-plugin-tailwindcss")],
 };
 
 module.exports = config;

@@ -24,13 +24,29 @@ export function Footer({
   };
 }) {
   return (
-    <footer className="w-full border-t border-slate-200 bg-white py-12 md:py-16">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="flex flex-col gap-10 md:flex-row">
-          <div className="space-y-4 md:w-1/3">
+    <footer className={`
+      w-full border-t border-slate-200 bg-white py-12
+      md:py-16
+    `}>
+      <div className={`
+        container mx-auto px-4
+        md:px-6
+      `}>
+        <div className={`
+          flex flex-col gap-10
+          md:flex-row
+        `}>
+          <div className={`
+            space-y-4
+            md:w-1/3
+          `}>
             <div className="flex items-center">
               <ProjectLogo className="h-8 w-8" />
-              <p className="text-balance text-center text-xl font-bold text-slate-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
+              <p className={`
+                text-center text-xl font-bold text-balance text-slate-800
+                sm:mt-0 sm:text-2xl
+                lg:mr-5 lg:text-left
+              `}>
                 <a
                   href="https://easyinvoicepdf.com"
                   target="_blank"
@@ -48,7 +64,10 @@ export function Footer({
                 href={GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate-400 hover:text-slate-800"
+                className={`
+                  text-slate-400
+                  hover:text-slate-800
+                `}
               >
                 <span className="sr-only">GitHub</span>
                 <svg
@@ -68,7 +87,10 @@ export function Footer({
                 href={TWITTER_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate-400 hover:text-slate-800"
+                className={`
+                  text-slate-400
+                  hover:text-slate-800
+                `}
               >
                 <span className="sr-only">Twitter</span>
                 <svg
@@ -82,7 +104,11 @@ export function Footer({
               </Link>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:gap-10 md:flex-1 md:grid-cols-2">
+          <div className={`
+            grid grid-cols-1
+            sm:gap-10
+            md:flex-1 md:grid-cols-2
+          `}>
             <div className="space-y-3"></div>
             <div className="space-y-3" data-testid="footer-social-links">
               <h3 className="text-sm font-medium text-slate-900">
@@ -123,7 +149,10 @@ export function Footer({
             }}
           />
         </div>
-        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
+        <div className={`
+          mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8
+          md:flex-row
+        `}>
           <p className="text-xs text-slate-500">
             © {new Date().getFullYear()} EasyInvoicePDF.com
           </p>
@@ -133,7 +162,10 @@ export function Footer({
               href="https://github.com/VladSez"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline hover:text-slate-900"
+              className={`
+                underline
+                hover:text-slate-900
+              `}
             >
               Vlad Sazonau
             </Link>

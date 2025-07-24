@@ -191,10 +191,17 @@ export function BuyerDialog({
       }}
     >
       <DialogContent
-        className="flex flex-col gap-0 overflow-y-visible p-0 sm:max-w-lg [&>button:last-child]:top-3.5"
+        className={`
+          flex flex-col gap-0 overflow-y-visible p-0
+          sm:max-w-lg
+          [&>button:last-child]:top-3.5
+        `}
         data-testid={`manage-buyer-dialog`}
       >
-        <DialogHeader className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
+        <DialogHeader className={`
+          border-b border-slate-200 px-6 py-4
+          dark:border-slate-800
+        `}>
           <DialogTitle className="text-base">
             {isEditMode ? "Edit Buyer" : "Add New Buyer"}
           </DialogTitle>
@@ -416,7 +423,7 @@ export function BuyerDialog({
             </div>
           )}
         </div>
-        <DialogFooter className="border-border border-t px-6 py-4">
+        <DialogFooter className="border-t border-border px-6 py-4">
           <DialogClose asChild>
             <Button type="button" _variant="outline">
               Cancel
