@@ -7,7 +7,10 @@ export function GithubIcon({ className }: { className?: string }) {
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
       className={cn(
-        "h-5 w-5 transition-all group-hover:fill-blue-600",
+        `
+          h-5 w-5 transition-all
+          group-hover:fill-blue-600
+        `,
         className
       )}
     >

@@ -191,10 +191,17 @@ export function BuyerDialog({
       }}
     >
       <DialogContent
-        className="flex flex-col gap-0 overflow-y-visible p-0 sm:max-w-lg [&>button:last-child]:top-3.5"
+        className={`
+          flex flex-col gap-0 overflow-y-visible p-0
+          sm:max-w-lg
+          [&>button:last-child]:top-3.5
+        `}
         data-testid={`manage-buyer-dialog`}
       >
-        <DialogHeader className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
+        <DialogHeader className={`
+          border-b border-slate-200 px-6 py-4
+          dark:border-slate-800
+        `}>
           <DialogTitle className="text-base">
             {isEditMode ? "Edit Buyer" : "Add New Buyer"}
           </DialogTitle>
@@ -224,7 +231,7 @@ export function BuyerDialog({
                   </Label>
                 }
                 content="Pre-fill with values from the current invoice form"
-                className="z-[1000]"
+                className="z-1000"
               />
             </div>
           )}
@@ -308,7 +315,7 @@ export function BuyerDialog({
                                 </Label>
                               }
                               content='Show/Hide the "VAT Number" field in the PDF'
-                              className="z-[1000]"
+                              className="z-1000"
                             />
                           </div>
                         </FormItem>
@@ -381,7 +388,7 @@ export function BuyerDialog({
                                 </Label>
                               }
                               content="Show/Hide the notes field in the PDF"
-                              className="z-[1000]"
+                              className="z-1000"
                             />
                           </div>
                         </FormItem>
@@ -411,12 +418,12 @@ export function BuyerDialog({
                   </Label>
                 }
                 content="When enabled, the newly created buyer will be automatically applied to your current invoice form"
-                className="z-[1000]"
+                className="z-1000"
               />
             </div>
           )}
         </div>
-        <DialogFooter className="border-border border-t px-6 py-4">
+        <DialogFooter className="border-t border-border px-6 py-4">
           <DialogClose asChild>
             <Button type="button" _variant="outline">
               Cancel

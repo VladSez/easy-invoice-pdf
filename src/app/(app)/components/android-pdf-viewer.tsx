@@ -42,7 +42,11 @@ export const AndroidPdfViewer = ({
       {({ url, loading, error }) => {
         if (error) {
           return (
-            <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+            <div className={`
+              flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200
+              lg:h-[620px]
+              2xl:h-[700px]
+            `}>
               <div className="text-center">
                 <p className="text-red-600">Error generating PDF preview</p>
                 <p className="mt-2 text-sm text-gray-600">
@@ -55,9 +59,14 @@ export const AndroidPdfViewer = ({
 
         if (loading) {
           return (
-            <div className="flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200">
+            <div className={`
+              flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200
+            `}>
               <div className="text-center">
-                <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+                <div className={`
+                  mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500
+                  border-t-transparent
+                `} />
                 <p className="text-gray-600">Loading PDF viewer...</p>
               </div>
             </div>
@@ -66,7 +75,9 @@ export const AndroidPdfViewer = ({
 
         if (!url) {
           return (
-            <div className="flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200">
+            <div className={`
+              flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200
+            `}>
               <p className="text-gray-600">No PDF URL</p>
             </div>
           );
@@ -78,9 +89,16 @@ export const AndroidPdfViewer = ({
             file={url}
             className="h-[480px] w-[650px] overflow-auto"
             loading={
-              <div className="flex h-[480px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+              <div className={`
+                flex h-[480px] w-full items-center justify-center border border-gray-200 bg-gray-200
+                lg:h-[620px]
+                2xl:h-[700px]
+              `}>
                 <div className="text-center">
-                  <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+                  <div className={`
+                    mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500
+                    border-t-transparent
+                  `} />
                   <p className="text-gray-600">Loading PDF viewer...</p>
                 </div>
               </div>
@@ -95,9 +113,17 @@ export const AndroidPdfViewer = ({
               pageNumber={1}
               error={"Something went wrong"}
               loading={
-                <div className="flex h-[480px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+                <div className={`
+                  flex h-[480px] w-full items-center justify-center border border-gray-200
+                  bg-gray-200
+                  lg:h-[620px]
+                  2xl:h-[700px]
+                `}>
                   <div className="text-center">
-                    <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+                    <div className={`
+                      mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500
+                      border-t-transparent
+                    `} />
                     <p className="text-gray-600">Loading PDF viewer...</p>
                   </div>
                 </div>

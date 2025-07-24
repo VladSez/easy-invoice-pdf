@@ -79,7 +79,10 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
               <li>
                 <Link
                   href="/"
-                  className="text-sm text-slate-500 hover:text-slate-900"
+                  className={`
+                    text-sm text-slate-500
+                    hover:text-slate-900
+                  `}
                 >
                   {t("buttons.app")}
                 </Link>
@@ -87,7 +90,10 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
               <li>
                 <Link
                   href="#features"
-                  className="text-sm text-slate-500 hover:text-slate-900"
+                  className={`
+                    text-sm text-slate-500
+                    hover:text-slate-900
+                  `}
                 >
                   {t("footer.links.features")}
                 </Link>
@@ -95,7 +101,10 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
               <li>
                 <Link
                   href="#faq"
-                  className="text-sm text-slate-500 hover:text-slate-900"
+                  className={`
+                    text-sm text-slate-500
+                    hover:text-slate-900
+                  `}
                 >
                   FAQ
                 </Link>
@@ -103,7 +112,10 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
               <li>
                 <Link
                   href="/changelog"
-                  className="text-sm text-slate-500 hover:text-slate-900"
+                  className={`
+                    text-sm text-slate-500
+                    hover:text-slate-900
+                  `}
                 >
                   {t("footer.links.changelog")}
                 </Link>
@@ -113,7 +125,10 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
                   href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-slate-500 hover:text-slate-900"
+                  className={`
+                    text-sm text-slate-500
+                    hover:text-slate-900
+                  `}
                 >
                   {t("buttons.shareFeedback")}
                 </Link>
@@ -123,7 +138,10 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
                   href={GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-slate-500 hover:text-slate-900"
+                  className={`
+                    text-sm text-slate-500
+                    hover:text-slate-900
+                  `}
                 >
                   {t("footer.links.github")}
                 </Link>
@@ -154,17 +172,29 @@ function Header({ locale }: { locale: Locale }) {
   const tFooter = useTranslations("About.footer.links");
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-xs">
       <div className="flex items-center justify-center">
-        <div className="container h-auto px-3 py-2 sm:h-16 sm:py-0">
+        <div className={`
+          container h-auto px-3 py-2
+          sm:h-16 sm:py-0
+        `}>
           <div className="flex h-full flex-row flex-wrap items-center justify-between gap-2">
-            <div className="w-[53%] sm:w-auto">
+            <div className={`
+              w-[53%]
+              sm:w-auto
+            `}>
               <Logo />
             </div>
-            <div className="flex items-center sm:mt-0 sm:gap-2">
+            <div className={`
+              flex items-center
+              sm:mt-0 sm:gap-2
+            `}>
               <Button
                 _variant="ghost"
-                className="hidden lg:inline-flex"
+                className={`
+                  hidden
+                  lg:inline-flex
+                `}
                 asChild
               >
                 <Link href="/changelog">{tFooter("changelog")}</Link>
@@ -174,7 +204,10 @@ function Header({ locale }: { locale: Locale }) {
                 buttonText={t("switchLanguage")}
               />
               {/* <BlackGoToAppButton className="px-3 sm:px-8" /> */}
-              <BlackGoToAppButton className="px-3 sm:px-8">
+              <BlackGoToAppButton className={`
+                px-3
+                sm:px-8
+              `}>
                 {t("goToApp")}
               </BlackGoToAppButton>
             </div>
@@ -191,29 +224,59 @@ function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative flex w-full items-center justify-center overflow-hidden bg-gradient-to-b from-white to-slate-50 py-10 md:py-16 lg:py-24"
+      className={`
+        relative flex w-full items-center justify-center overflow-hidden bg-linear-to-b from-white
+        to-slate-50 py-10
+        md:py-16
+        lg:py-24
+      `}
     >
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-indigo-50/50 blur-3xl" />
+        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-indigo-50/50 blur-3xl" />
         <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-emerald-50/40 blur-3xl" />
       </div>
 
-      <div className="container relative z-10 px-4 md:px-6">
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-6">
+      <div className={`
+        relative z-10 container px-4
+        md:px-6
+      `}>
+        <div className={`
+          grid gap-8
+          lg:grid-cols-2 lg:gap-12
+          xl:gap-6
+        `}>
           {/* Left column (text) */}
-          <div className="flex flex-col justify-center space-y-5 md:space-y-6">
-            <div className="space-y-3 md:space-y-4">
-              <h1 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl md:text-5xl lg:text-6xl">
+          <div className={`
+            flex flex-col justify-center space-y-5
+            md:space-y-6
+          `}>
+            <div className={`
+              space-y-3
+              md:space-y-4
+            `}>
+              <h1 className={`
+                text-3xl font-bold tracking-tight text-balance text-slate-900
+                sm:text-4xl
+                md:text-5xl
+                lg:text-6xl
+              `}>
                 {t("hero.title")}
               </h1>
 
-              <p className="text-balance text-base text-slate-600 sm:text-lg md:max-w-[500px] md:text-xl">
+              <p className={`
+                text-base text-balance text-slate-600
+                sm:text-lg
+                md:max-w-[500px] md:text-xl
+              `}>
                 {t("hero.description")}
               </p>
             </div>
 
-            <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className={`
+              flex w-full flex-col gap-3
+              sm:flex-row sm:flex-wrap
+            `}>
               <BlackGoToAppButton className="px-10 py-6 text-lg">
                 {t("buttons.goToApp")}
               </BlackGoToAppButton>
@@ -221,7 +284,11 @@ function HeroSection() {
               <Button
                 _size="lg"
                 _variant="outline"
-                className="group relative overflow-hidden border-slate-200 px-10 py-6 text-lg shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md"
+                className={`
+                  group relative overflow-hidden border-slate-200 px-10 py-6 text-lg shadow-xs
+                  transition-all duration-300
+                  hover:border-slate-300 hover:shadow-md
+                `}
                 asChild
               >
                 <Link
@@ -229,12 +296,21 @@ function HeroSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <GithubIcon className="mr-2 h-6 w-6 transition-transform group-hover:scale-110" />
+                  <GithubIcon className={`
+                    mr-2 h-6 w-6 transition-transform
+                    group-hover:scale-110
+                  `} />
                   {t("buttons.viewOnGithub")}
                 </Link>
               </Button>
             </div>
-            <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0">
+            <div className={`
+              mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 rounded-full
+              border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-pretty
+              text-amber-800 shadow-xs transition-all
+              hover:scale-105
+              sm:mx-0
+            `}>
               <span className="" role="img" aria-label="checkmark">
                 ✅
               </span>
@@ -243,16 +319,34 @@ function HeroSection() {
           </div>
 
           {/* Right column (video) */}
-          <div className="relative mx-auto w-full max-w-[650px] lg:mx-0">
+          <div className={`
+            relative mx-auto w-full max-w-[650px]
+            lg:mx-0
+          `}>
             {/* Mac OS Frame around the video */}
-            <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
+            <div className={`
+              relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg
+              md:rounded-2xl md:shadow-xl
+            `}>
               {/* Browser chrome bar */}
-              <div className="h-8 w-full rounded-t-xl bg-gradient-to-b from-[#F3F3F3] to-[#E9E9E9] px-4 shadow-sm md:h-12 md:rounded-t-2xl">
+              <div className={`
+                h-8 w-full rounded-t-xl bg-linear-to-b from-[#F3F3F3] to-[#E9E9E9] px-4 shadow-xs
+                md:h-12 md:rounded-t-2xl
+              `}>
                 <div className="flex h-full items-center">
                   <div className="flex space-x-2">
-                    <div className="h-2.5 w-2.5 rounded-full bg-[#FF5F57] md:h-3 md:w-3"></div>
-                    <div className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E] md:h-3 md:w-3"></div>
-                    <div className="h-2.5 w-2.5 rounded-full bg-[#28C840] md:h-3 md:w-3"></div>
+                    <div className={`
+                      h-2.5 w-2.5 rounded-full bg-[#FF5F57]
+                      md:h-3 md:w-3
+                    `}></div>
+                    <div className={`
+                      h-2.5 w-2.5 rounded-full bg-[#FEBC2E]
+                      md:h-3 md:w-3
+                    `}></div>
+                    <div className={`
+                      h-2.5 w-2.5 rounded-full bg-[#28C840]
+                      md:h-3 md:w-3
+                    `}></div>
                   </div>
                 </div>
               </div>
@@ -308,33 +402,57 @@ function FeaturesSection() {
   return (
     <section
       id="features"
-      className="flex w-full items-center justify-center bg-slate-50 py-12 lg:py-20"
+      className={`
+        flex w-full items-center justify-center bg-slate-50 py-12
+        lg:py-20
+      `}
     >
-      <div className="container px-4 md:px-6">
+      <div className={`
+        container px-4
+        md:px-6
+      `}>
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <div
-              className="mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-sm transition-colors"
+              className={`
+                mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100
+                px-3 py-1 text-sm font-semibold text-indigo-900 shadow-xs transition-colors
+              `}
               data-testid="features-badge"
             >
               {t("features.badge")}
             </div>
 
-            <h2 className="text-3xl font-bold tracking-tighter text-slate-900 md:text-4xl/tight">
+            <h2 className={`
+              text-3xl font-bold tracking-tighter text-slate-900
+              md:text-4xl/tight
+            `}>
               {t("features.title")}
             </h2>
-            <p className="max-w-[900px] text-slate-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+            <p className={`
+              max-w-[900px] text-slate-600
+              md:text-xl/relaxed
+              lg:text-base/relaxed
+              xl:text-xl/relaxed
+            `}>
               {t("features.description")}
             </p>
           </div>
           <div
-            className="inline-flex items-center rounded-md border border-amber-200 bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-900 shadow-sm transition-colors"
+            className={`
+              inline-flex items-center rounded-md border border-amber-200 bg-amber-100 px-3 py-1
+              text-sm font-semibold text-amber-900 shadow-xs transition-colors
+            `}
             data-testid="features-coming-soon"
           >
             {t("features.comingSoon")}
           </div>
         </div>
-        <div className="mx-auto grid max-w-5xl items-center gap-6 pt-10 md:grid-cols-2 md:gap-10 lg:grid-cols-3">
+        <div className={`
+          mx-auto grid max-w-5xl items-center gap-6 pt-10
+          md:grid-cols-2 md:gap-10
+          lg:grid-cols-3
+        `}>
           {FEATURES_CARDS.map((feature) => {
             const title = t(`features.items.${feature.translationKey}.title`);
             const description = t(
@@ -344,11 +462,14 @@ function FeaturesSection() {
             return (
               <div
                 key={feature.translationKey}
-                className="flex h-full flex-col items-start gap-4 rounded-lg border border-slate-100 bg-white p-6 shadow-sm"
+                className={`
+                  flex h-full flex-col items-start gap-4 rounded-lg border border-slate-100 bg-white
+                  p-6 shadow-xs
+                `}
               >
                 {feature.icon}
                 <div>
-                  <h3 className="text-balance pb-2 text-xl font-bold text-slate-900">
+                  <h3 className="pb-2 text-xl font-bold text-balance text-slate-900">
                     {title}
                   </h3>
                   <p className="text-balance text-slate-600">{description}</p>
@@ -391,18 +512,35 @@ function FaqSection() {
   return (
     <section
       id="faq"
-      className="flex w-full items-center justify-center bg-white py-12 md:py-20"
+      className={`
+        flex w-full items-center justify-center bg-white py-12
+        md:py-20
+      `}
     >
-      <div className="container px-4 md:px-6">
+      <div className={`
+        container px-4
+        md:px-6
+      `}>
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <div className="mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-sm transition-colors">
+            <div className={`
+              mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3
+              py-1 text-sm font-semibold text-indigo-900 shadow-xs transition-colors
+            `}>
               FAQ
             </div>
-            <h2 className="text-3xl font-bold tracking-tighter text-slate-900 md:text-4xl/tight">
+            <h2 className={`
+              text-3xl font-bold tracking-tighter text-slate-900
+              md:text-4xl/tight
+            `}>
               {t("title")}
             </h2>
-            <p className="max-w-[900px] text-slate-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+            <p className={`
+              max-w-[900px] text-slate-600
+              md:text-xl/relaxed
+              lg:text-base/relaxed
+              xl:text-xl/relaxed
+            `}>
               {t("description")}
             </p>
           </div>
@@ -441,15 +579,28 @@ function SubscribeSection() {
   return (
     <section
       id="newsletter"
-      className="flex w-full items-center justify-center bg-white py-12 md:py-24"
+      className={`
+        flex w-full items-center justify-center bg-white py-12
+        md:py-24
+      `}
     >
-      <div className="container px-4 md:px-6">
+      <div className={`
+        container px-4
+        md:px-6
+      `}>
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tighter text-slate-900 md:text-4xl/tight">
+            <h2 className={`
+              text-3xl font-bold tracking-tighter text-slate-900
+              md:text-4xl/tight
+            `}>
               {tNewsletter("title")}
             </h2>
-            <p className="max-w-[600px] text-slate-600 lg:text-base/relaxed xl:text-xl/relaxed">
+            <p className={`
+              max-w-[600px] text-slate-600
+              lg:text-base/relaxed
+              xl:text-xl/relaxed
+            `}>
               {tNewsletter("description")}
             </p>
           </div>
@@ -478,26 +629,51 @@ function CtaSection() {
   return (
     <section
       id="cta"
-      className="flex w-full items-center justify-center bg-slate-900 py-12 md:py-24 lg:py-32"
+      className={`
+        flex w-full items-center justify-center bg-slate-900 py-12
+        md:py-24
+        lg:py-32
+      `}
     >
-      <div className="container px-4 md:px-6">
+      <div className={`
+        container px-4
+        md:px-6
+      `}>
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tighter text-white md:text-4xl/tight">
+            <h2 className={`
+              text-3xl font-bold tracking-tighter text-white
+              md:text-4xl/tight
+            `}>
               {t("cta.title")}
             </h2>
-            <p className="max-w-[600px] text-slate-300 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+            <p className={`
+              max-w-[600px] text-slate-300
+              md:text-xl/relaxed
+              lg:text-base/relaxed
+              xl:text-xl/relaxed
+            `}>
               {t("cta.description")}
             </p>
           </div>
           <div className="flex w-full flex-col items-center justify-center gap-6">
-            <div className="flex w-full flex-col justify-center gap-2 md:flex-row">
-              <GoToAppButton className="border-slate-600 bg-white px-10 py-6 text-lg text-slate-950 hover:bg-white/90">
+            <div className={`
+              flex w-full flex-col justify-center gap-2
+              md:flex-row
+            `}>
+              <GoToAppButton className={`
+                border-slate-600 bg-white px-10 py-6 text-lg text-slate-950
+                hover:bg-white/90
+              `}>
                 {t("buttons.goToApp")}
               </GoToAppButton>
               <Button
                 _size="lg"
-                className="group border border-slate-700 bg-slate-700 px-10 py-6 text-lg text-white transition-all duration-300 hover:bg-slate-600/80"
+                className={`
+                  group border border-slate-700 bg-slate-700 px-10 py-6 text-lg text-white
+                  transition-all duration-300
+                  hover:bg-slate-600/80
+                `}
                 asChild
               >
                 <Link
@@ -505,7 +681,10 @@ function CtaSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <GithubIcon className="mr-2 h-6 w-6 fill-slate-100 transition-transform duration-300 group-hover:scale-110 group-hover:fill-slate-950" />
+                  <GithubIcon className={`
+                    mr-2 h-6 w-6 fill-slate-100 transition-transform duration-300
+                    group-hover:scale-110 group-hover:fill-slate-950
+                  `} />
                   {t("buttons.starOnGithub")}
                 </Link>
               </Button>
@@ -525,8 +704,14 @@ function Logo() {
 
   return (
     <div>
-      <div className="flex items-center gap-1 sm:gap-2">
-        <ProjectLogo className="h-7 w-7 flex-shrink-0 sm:h-8 sm:w-8" />
+      <div className={`
+        flex items-center gap-1
+        sm:gap-2
+      `}>
+        <ProjectLogo className={`
+          h-7 w-7 shrink-0
+          sm:h-8 sm:w-8
+        `} />
         <ProjectLogoDescription>{t("tagline")}</ProjectLogoDescription>
       </div>
     </div>

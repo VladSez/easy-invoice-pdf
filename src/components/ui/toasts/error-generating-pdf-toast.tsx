@@ -14,7 +14,10 @@ export function ErrorGeneratingPdfToast() {
       3. Contact support at{" "}
       <a
         href="mailto:vladsazon27@gmail.com"
-        className="underline hover:text-blue-600"
+        className={`
+          underline
+          hover:text-blue-600
+        `}
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -23,7 +26,10 @@ export function ErrorGeneratingPdfToast() {
       or{" "}
       <a
         href="https://pdfinvoicegenerator.userjot.com/board/bugs"
-        className="underline hover:text-blue-600"
+        className={`
+          underline
+          hover:text-blue-600
+        `}
         target="_blank"
         rel="noopener noreferrer"
       >

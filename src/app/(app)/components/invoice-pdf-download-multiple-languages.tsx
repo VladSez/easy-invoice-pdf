@@ -111,7 +111,7 @@ export function InvoicePDFDownloadMultipleLanguages({
         selectedLanguages={selectedLanguages}
         setSelectedLanguages={setSelectedLanguages}
         placeholder="Download PDF"
-        variant="inverted"
+        // variant="inverted"
         maxCount={3}
         handleDownload={() =>
           generateAndZipPDFs(selectedLanguages.map((lang) => lang))

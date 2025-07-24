@@ -10,6 +10,7 @@ import { type InvoiceData, type SupportedLanguages } from "@/app/schema";
 import { TRANSLATIONS } from "@/app/schema/translations";
 import { STATIC_ASSETS_URL } from "@/config";
 import { env } from "@/env";
+
 // eslint-disable-next-line no-restricted-imports
 import { Document, Font, Page } from "@react-pdf/renderer";
 

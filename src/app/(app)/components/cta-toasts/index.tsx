@@ -98,7 +98,10 @@ function PremiumDonationToast(props: ToastProps) {
 
   return (
     <div
-      className="relative max-w-sm rounded-lg border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4 shadow-xl"
+      className={`
+        relative max-w-sm rounded-lg border border-indigo-200 bg-linear-to-br from-indigo-50
+        via-white to-purple-50 p-4 shadow-xl
+      `}
       data-testid="download-pdf-toast"
     >
       {/* Close button - styled like default Sonner toast */}
@@ -106,7 +109,10 @@ function PremiumDonationToast(props: ToastProps) {
 
       <div className="relative">
         <div className="mb-2 flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600">
+          <div className={`
+            flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500
+            to-purple-600
+          `}>
             <GiftIcon className="h-4 w-4 text-white" />
           </div>
           <div>
@@ -121,7 +127,10 @@ function PremiumDonationToast(props: ToastProps) {
             _size="sm"
             _variant="outline"
             asChild
-            className="h-8 flex-1 border-gray-300 text-xs transition-all duration-200 hover:bg-gray-50"
+            className={`
+              h-8 flex-1 border-gray-300 text-xs transition-all duration-200
+              hover:bg-gray-50
+            `}
           >
             <a
               href={GITHUB_URL}
@@ -182,7 +191,11 @@ function PremiumToastFeedbackButton(
   return (
     <Button
       _size="sm"
-      className="h-8 flex-1 bg-gradient-to-r from-green-500 to-blue-600 text-xs text-white transition-all duration-200 hover:from-green-600 hover:to-blue-700 hover:shadow-lg"
+      className={`
+        h-8 flex-1 bg-linear-to-r from-green-500 to-blue-600 text-xs text-white transition-all
+        duration-200
+        hover:from-green-600 hover:to-blue-700 hover:shadow-lg
+      `}
       asChild
       data-testid="toast-cta-btn"
     >
@@ -205,7 +218,11 @@ function PremiumToastDonationButton(
   return (
     <Button
       _size="sm"
-      className="h-8 flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-xs text-white transition-all duration-200 hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg"
+      className={`
+        h-8 flex-1 bg-linear-to-r from-indigo-500 to-purple-600 text-xs text-white transition-all
+        duration-200
+        hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg
+      `}
       asChild
       data-testid="toast-cta-btn"
     >
@@ -230,13 +247,19 @@ function DefaultDonationToast(props: ToastProps) {
 
   return (
     <div
-      className="flex max-w-md items-start gap-3 rounded-lg border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4 shadow-xl"
+      className={`
+        flex max-w-md items-start gap-3 rounded-lg border border-indigo-200 bg-linear-to-br
+        from-indigo-50 via-white to-purple-50 p-4 shadow-xl
+      `}
       data-testid="download-pdf-toast"
     >
       {/* Close button - styled like default Sonner toast */}
       <SonnerCloseButton onClick={() => sonnerToast.dismiss(id)} />
 
-      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-600">
+      <div className={`
+        flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br
+        from-pink-500 to-purple-600
+      `}>
         <Heart className="h-5 w-5 fill-current text-white" />
       </div>
       <div className="min-w-0 flex-1">
@@ -250,7 +273,10 @@ function DefaultDonationToast(props: ToastProps) {
         <div className="flex gap-2">
           <Button
             _size="sm"
-            className="h-7 bg-gray-900 px-3 text-xs font-medium text-white transition-all duration-200 hover:scale-105 hover:bg-gray-800"
+            className={`
+              h-7 bg-gray-900 px-3 text-xs font-medium text-white transition-all duration-200
+              hover:scale-105 hover:bg-gray-800
+            `}
             asChild
           >
             <a
@@ -312,7 +338,11 @@ function DefaultToastDonationButton(
   return (
     <Button
       _size="sm"
-      className="h-7 bg-gradient-to-r from-pink-500 to-purple-600 px-3 text-xs font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-pink-600 hover:to-purple-700"
+      className={`
+        h-7 bg-linear-to-r from-pink-500 to-purple-600 px-3 text-xs font-medium text-white shadow-lg
+        transition-all duration-200
+        hover:scale-105 hover:from-pink-600 hover:to-purple-700
+      `}
       asChild
       data-testid="toast-cta-btn"
     >
@@ -335,7 +365,11 @@ function DefaultToastFeedbackButton(
   return (
     <Button
       _size="sm"
-      className="h-7 bg-gradient-to-r from-green-500 to-blue-600 px-3 text-xs font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-green-600 hover:to-blue-700"
+      className={`
+        h-7 bg-linear-to-r from-green-500 to-blue-600 px-3 text-xs font-medium text-white shadow-lg
+        transition-all duration-200
+        hover:scale-105 hover:from-green-600 hover:to-blue-700
+      `}
       asChild
       data-testid="toast-cta-btn"
     >

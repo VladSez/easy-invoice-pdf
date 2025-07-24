@@ -94,7 +94,10 @@ const DisclosureTrigger = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 trigger={
                   <ChevronDown
                     data-slot="disclosure-chevron"
-                    className="ml-auto size-6 shrink-0 rounded-full p-1 transition-all duration-200 hover:bg-gray-200"
+                    className={`
+                      ml-auto size-6 shrink-0 rounded-full p-1 transition-all duration-200
+                      hover:bg-gray-200
+                    `}
                   />
                 }
                 content="Expand/Collapse Section"
@@ -127,7 +130,10 @@ const DisclosurePanel = React.forwardRef<
     >
       <div
         data-slot="disclosure-panel-content"
-        className="pb-4 pl-0 pr-4 pt-2 [&:has([data-slot=disclosure-group])_&]:px-11"
+        className={`
+          pt-2 pr-4 pb-4 pl-0
+          [&:has([data-slot=disclosure-group])_&]:px-11
+        `}
       >
         {children}
       </div>

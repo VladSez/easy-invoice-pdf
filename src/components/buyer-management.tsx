@@ -240,7 +240,7 @@ export function BuyerManagement({
                 id={buyerSelectId}
                 className={cn(
                   "block h-8 max-w-[200px] text-[12px]",
-                  !selectedBuyerId && "italic text-gray-700"
+                  !selectedBuyerId && "text-gray-700 italic"
                 )}
                 onChange={handleBuyerChange}
                 value={selectedBuyerId}
@@ -320,7 +320,7 @@ export function BuyerManagement({
                   toast.error("Unable to add buyer", {
                     description: (
                       <>
-                        <p className="text-pretty text-xs leading-relaxed text-red-700">
+                        <p className="text-xs leading-relaxed text-pretty text-red-700">
                           Local storage is not available in your browser. Please
                           enable it or try another browser.
                         </p>
@@ -342,7 +342,7 @@ export function BuyerManagement({
                   <p className="text-sm font-semibold text-slate-900">
                     Save Buyers for Quick Access
                   </p>
-                  <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                  <p className="text-xs leading-relaxed text-pretty text-slate-700">
                     Store multiple buyers to easily reuse their information in
                     future invoices. All data is saved locally in your browser.
                   </p>
@@ -350,12 +350,12 @@ export function BuyerManagement({
               </div>
             ) : (
               <div className="flex items-center gap-3 bg-red-50 p-3">
-                <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
+                <AlertCircleIcon className="h-5 w-5 shrink-0 fill-red-600 text-white" />
                 <div className="space-y-1">
                   <p className="text-sm font-semibold text-red-800">
                     Storage Not Available
                   </p>
-                  <p className="text-pretty text-xs leading-relaxed text-red-700">
+                  <p className="text-xs leading-relaxed text-pretty text-red-700">
                     Local storage is not available in your browser. Please
                     enable it or try another browser to save buyer information.
                   </p>
@@ -399,7 +399,10 @@ export function BuyerManagement({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteBuyer}
-              className="bg-red-500 text-red-50 hover:bg-red-500/90"
+              className={`
+                bg-red-500 text-red-50
+                hover:bg-red-500/90
+              `}
             >
               Delete
             </AlertDialogAction>

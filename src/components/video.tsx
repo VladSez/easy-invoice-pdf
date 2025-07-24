@@ -80,7 +80,7 @@ export const Video = ({ src, fallbackImg, testId = "" }: VideoProps) => {
         className=""
       />
       <video
-        className="absolute left-0 top-0 h-full w-full cursor-pointer"
+        className="absolute top-0 left-0 h-full w-full cursor-pointer"
         autoPlay
         muted
         loop
