@@ -200,7 +200,7 @@ function HeroSection() {
       </div>
 
       <div className="container relative z-10 px-4 md:px-6">
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-6">
+        <div className="grid gap-6 md:gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-6">
           {/* Left column (text) */}
           <div className="flex flex-col justify-center space-y-5 md:space-y-6">
             <div className="space-y-3 md:space-y-4">
@@ -234,12 +234,7 @@ function HeroSection() {
                 </Link>
               </Button>
             </div>
-            <div className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0">
-              <span className="" role="img" aria-label="checkmark">
-                ✅
-              </span>
-              <span>{t("hero.noSignup")}</span>
-            </div>
+            <CtaTextDesktop text={t("hero.noSignup")} />
           </div>
 
           {/* Right column (video) */}
@@ -266,9 +261,49 @@ function HeroSection() {
               </div>
             </div>
           </div>
+
+          <CtaTextMobile text={t("hero.noSignup")} />
         </div>
       </div>
     </section>
+  );
+}
+
+// should be hidden on desktop
+function CtaTextMobile({
+  text = "No sign-up required. 100% free and open-source.",
+}: {
+  text: string;
+}) {
+  return (
+    <div
+      className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 lg:hidden"
+      data-testid="cta-text-mobile"
+    >
+      <span className="" role="img" aria-label="checkmark">
+        ✅
+      </span>
+      <span>{text}</span>
+    </div>
+  );
+}
+
+// should be hidden on mobile
+function CtaTextDesktop({
+  text = "No sign-up required. 100% free and open-source.",
+}: {
+  text: string;
+}) {
+  return (
+    <div
+      className="mx-auto hidden max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0 lg:flex"
+      data-testid="cta-text-desktop"
+    >
+      <span className="" role="img" aria-label="checkmark">
+        ✅
+      </span>
+      <span>{text}</span>
+    </div>
   );
 }
 
@@ -308,7 +343,7 @@ function FeaturesSection() {
   return (
     <section
       id="features"
-      className="flex w-full items-center justify-center bg-slate-50 py-12 lg:py-20"
+      className="flex w-full items-center justify-center bg-slate-50 py-4 lg:py-8 xl:py-16"
     >
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
