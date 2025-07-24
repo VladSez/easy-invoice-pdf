@@ -56,7 +56,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     const shareButton = page.getByRole("button", {
       name: "Generate a link to invoice",
     });
-    await expect(shareButton).toHaveAttribute("aria-disabled", "true");
+    await expect(shareButton).toHaveAttribute("data-disabled", "true");
 
     // click over share button to verify tooltip
     // on mobile, we need to click the button to show the toast because it's better UX for user (you can't hover on mobile)
@@ -114,7 +114,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     const shareButton = page.getByRole("button", {
       name: "Generate a link to invoice",
     });
-    await expect(shareButton).toHaveAttribute("aria-disabled", "true");
+    await expect(shareButton).toHaveAttribute("data-disabled", "true");
 
     // Remove the logo
     await generalInfoSection
@@ -127,7 +127,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     ).toBeHidden();
 
     // Verify share button is enabled again
-    await expect(shareButton).toHaveAttribute("aria-disabled", "false");
+    await expect(shareButton).toHaveAttribute("data-disabled", "false");
     await expect(shareButton).toBeEnabled();
 
     // Test that sharing works
@@ -176,7 +176,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     }, SMALL_TEST_IMAGE_BASE64);
 
     // Verify share button becomes disabled
-    await expect(shareButton).toHaveAttribute("aria-disabled", "true");
+    await expect(shareButton).toHaveAttribute("data-disabled", "true");
 
     // Switch back to default template
     await page
@@ -184,7 +184,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .selectOption("default");
 
     // Verify share button is enabled again (logo is cleared when switching away from Stripe)
-    await expect(shareButton).toHaveAttribute("aria-disabled", "false");
+    await expect(shareButton).toHaveAttribute("data-disabled", "false");
     await expect(shareButton).toBeEnabled();
   });
 
@@ -207,7 +207,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     });
 
     // Verify share button is disabled
-    await expect(shareButton).toHaveAttribute("aria-disabled", "true");
+    await expect(shareButton).toHaveAttribute("data-disabled", "true");
 
     // Wait a moment for any debounced localStorage updates
     // eslint-disable-next-line playwright/no-wait-for-timeout
@@ -238,7 +238,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     ).toBeVisible();
 
     // Verify share button is still disabled
-    await expect(shareButton).toHaveAttribute("aria-disabled", "true");
+    await expect(shareButton).toHaveAttribute("data-disabled", "true");
   });
 
   test("sharing functionality works correctly in mobile view (mobile UI is a bit different)", async ({
@@ -263,7 +263,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
 
     // Verify share button is disabled in mobile view too
-    await expect(shareButton).toHaveAttribute("aria-disabled", "true");
+    await expect(shareButton).toHaveAttribute("data-disabled", "true");
 
     // Click share button to verify toast is shown
     // eslint-disable-next-line playwright/no-force-option
@@ -285,7 +285,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .getByRole("button", { name: "Remove logo" })
       .click();
 
-    await expect(shareButton).toHaveAttribute("aria-disabled", "false");
+    await expect(shareButton).toHaveAttribute("data-disabled", "false");
     await expect(shareButton).toBeEnabled();
   });
 });

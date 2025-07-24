@@ -423,7 +423,7 @@ export function AppPageClient() {
                       className={cn(!canShareInvoice && "bg-red-50")}
                       trigger={
                         <Button
-                          aria-disabled={!canShareInvoice} // better UX than 'disabled'
+                          data-disabled={!canShareInvoice} // better UX than 'disabled'
                           onClick={handleShareInvoice}
                           _variant="outline"
                           className={cn(
