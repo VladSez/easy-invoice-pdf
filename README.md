@@ -4,8 +4,7 @@
 
 ❤️ Love EasyInvoicePDF? Help keep it free and open-source! [Buy me a coffee](https://buymeacoffee.com/vladsazon) to support new features, better templates, and continued maintenance. Even a small contribution makes a big difference. Thank you for being part of this journey! ✨
 
-<img width="1429" height="769" alt="default-tmpl" src="https://github.com/user-attachments/assets/e9a10eed-d8ae-46c9-8674-29988629e618" />
-
+![easy-invoice-hero](https://github.com/user-attachments/assets/e9a10eed-d8ae-46c9-8674-29988629e618)
 
 ## Features
 
