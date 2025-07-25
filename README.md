@@ -4,7 +4,7 @@
 
 ❤️ Love EasyInvoicePDF? Help keep it free and open-source! [Buy me a coffee](https://buymeacoffee.com/vladsazon) to support new features, better templates, and continued maintenance. Even a small contribution makes a big difference. Thank you for being part of this journey! ✨
 
-![easy-invoice-hero](https://github.com/user-attachments/assets/ad4baaae-4bf2-44a2-9bd6-389b7fe3f748)
+![easy-invoice-hero](.github/screenshots/default-template.png)
 
 ## Features
 
@@ -20,6 +20,17 @@
 Watch a quick demo of EasyInvoicePDF in action to see how easy it is to create professional invoices in seconds. The video demonstrates key features like live preview, instant PDF download, and customization options.
 
 https://github.com/user-attachments/assets/9e3194e0-3072-4c95-ae99-e66db1301dc6
+
+## Screenshots
+
+<details open>
+
+<summary>View Screenshots</summary>
+	<img src=".github/screenshots/default-template.png"/>
+	<img src=".github/screenshots/stripe-template.png"/>
+	<img src=".github/screenshots/default-invoice.png"/>
+	<img src=".github/screenshots/stripe-invoice.png"/>
+</details>
 
 ## Tech Stack
 
