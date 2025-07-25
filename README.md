@@ -4,7 +4,8 @@
 
 ❤️ Love EasyInvoicePDF? Help keep it free and open-source! [Buy me a coffee](https://buymeacoffee.com/vladsazon) to support new features, better templates, and continued maintenance. Even a small contribution makes a big difference. Thank you for being part of this journey! ✨
 
-<img src=".github/screenshots/default-template.png" height="800" width="1200" alt="EasyInvoicePDF Default Template Screenshot" />
+<img width="1429" height="769" alt="default-tmpl" src="https://github.com/user-attachments/assets/e9a10eed-d8ae-46c9-8674-29988629e618" />
+
 
 ## Features
 
@@ -26,10 +27,11 @@ https://github.com/user-attachments/assets/9e3194e0-3072-4c95-ae99-e66db1301dc6
 <details open>
 
 <summary>View Screenshots</summary>
-	<img src=".github/screenshots/default-template.png" width="1200" height="800"/>
-	<img src=".github/screenshots/stripe-template.png" width="1200" height="800"/>
-	<img src=".github/screenshots/default-invoice.png" width="1200" height="800"/>
-	<img src=".github/screenshots/stripe-invoice.png" width="1200" height="800"/>
+<img width="1429" height="769" alt="default-tmpl" src="https://github.com/user-attachments/assets/31c32ddd-4060-4eb7-9cd1-5f8540aea163" />
+<img width="1425" height="771" alt="stripe-template" src="https://github.com/user-attachments/assets/7a8702b2-4e35-4f98-a2f3-41dbfe9398df" />
+<img width="1440" height="769" alt="Screenshot 2025-07-25 at 18 50 54" src="https://github.com/user-attachments/assets/ce43f7c0-950f-413c-bcc5-6332525307e2" />
+<img width="1440" height="769" alt="Screenshot 2025-07-25 at 18 50 36" src="https://github.com/user-attachments/assets/57bf5dc6-8757-482a-b91e-2965b5fd4daa" />
+
 </details>
 
 ## Tech Stack
