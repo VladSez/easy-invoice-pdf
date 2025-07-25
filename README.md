@@ -4,11 +4,8 @@
 
 ❤️ Love EasyInvoicePDF? Help keep it free and open-source! [Buy me a coffee](https://buymeacoffee.com/vladsazon) to support new features, better templates, and continued maintenance. Even a small contribution makes a big difference. Thank you for being part of this journey! ✨
 
-<details open>
-<summary>Screenshots</summary>
 <img width="1440" height="769" alt="default template" src=".github/screenshots/default.png" />
 <img width="1440" height="769" alt="stripe template" src=".github/screenshots/stripe.png" />
-</details>
 
 ## Features
 
