@@ -1,6 +1,6 @@
 # [EasyInvoicePDF](https://easyinvoicepdf.com)
 
-[EasyInvoicePDF](https://easyinvoicepdf.com) – Free & Open-Source Invoice Generator | Live Preview, No Sign-Up, Runs in Your Browser.
+[EasyInvoicePDF](https://easyinvoicepdf.com) – Free & Open-Source Invoice Generator | Live Preview, No Sign-Up, Runs in Your Browser. Features multiple templates including a modern Stripe-style design.
 
 ❤️ Love EasyInvoicePDF? Help keep it free and open-source! [Buy me a coffee](https://buymeacoffee.com/vladsazon) to support new features, better templates, and continued maintenance. Even a small contribution makes a big difference. Thank you for being part of this journey! ✨
 
@@ -10,7 +10,7 @@
 
 #### Stripe Invoice Template
 
-<img width="1440" height="769" alt="stripe template" src=".github/screenshots/stripe.png" />
+<img width="1440" height="769" alt="stripe template" src=".github/screenshots/stripe-tmp.png" />
 
 ## Features
 
@@ -20,6 +20,7 @@
 - **Browser Only**: Runs entirely in your browser—no server-side processing or data storage. Your data stays private and secure.
 - **Multiple Languages & Currencies**: Create invoices in multiple languages with support for all major currencies and automatic formatting.
 - **European VAT Support**: Automatically calculate European VAT rates and totals for your invoices.
+- **Multiple Templates**: Choose from different invoice templates including a professional Stripe-style template for modern businesses.
 
 ## Demo Video 🎥
 

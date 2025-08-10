@@ -121,7 +121,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                           handleRemoveItem(index);
                         }
                       }}
-                      className="flex items-center justify-center rounded-full bg-red-600 p-2 transition-colors hover:bg-red-700"
+                      className="flex items-center justify-center rounded-full bg-red-600 p-2 transition-colors hover:bg-red-700 active:scale-[98%] active:transition-transform"
                     >
                       <span className="sr-only">
                         Delete Invoice Item {index + 1}

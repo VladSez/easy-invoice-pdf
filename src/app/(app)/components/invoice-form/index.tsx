@@ -63,13 +63,13 @@ type AccordionKeys = Array<(typeof DEFAULT_ACCORDION_VALUES)[number]>;
 
 interface InvoiceFormProps {
   invoiceData: InvoiceData;
-  onInvoiceDataChange: (updatedData: InvoiceData) => void;
+  handleInvoiceDataChange: (updatedData: InvoiceData) => void;
   setCanShareInvoice: (canShareInvoice: boolean) => void;
 }
 
 export const InvoiceForm = memo(function InvoiceForm({
   invoiceData,
-  onInvoiceDataChange,
+  handleInvoiceDataChange,
   setCanShareInvoice,
 }: InvoiceFormProps) {
   const form = useForm<InvoiceData>({
@@ -216,7 +216,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   // TODO: refactor this and debouncedRegeneratePdfOnFormChange(), so data is saved to local storage, basically copy everything from debouncedRegeneratePdfOnFormChange() and use this onSubmit function in two places
   const onSubmit = (data: InvoiceData) => {
-    onInvoiceDataChange(data);
+    handleInvoiceDataChange(data);
   };
 
   /**
@@ -636,53 +636,58 @@ export const InvoiceForm = memo(function InvoiceForm({
           )}
         </div>
 
-        <div>
-          <div className="relative mt-5 space-y-4">
-            {/* Show/hide Person Authorized to Receive field in PDF switch */}
-            <div className="flex items-center justify-between">
-              <Label htmlFor={`personAuthorizedToReceiveFieldIsVisible`}>
-                Show &quot;Person Authorized to Receive&quot; Signature Field in
-                the PDF
-              </Label>
+        {/*
+            Stripe template doesn't have these fields
+        */}
+        {invoiceData.template === "default" && (
+          <div>
+            <div className="relative mt-5 space-y-4">
+              {/* Show/hide Person Authorized to Receive field in PDF switch */}
+              <div className="flex items-center justify-between">
+                <Label htmlFor={`personAuthorizedToReceiveFieldIsVisible`}>
+                  Show &quot;Person Authorized to Receive&quot; Signature Field
+                  in the PDF
+                </Label>
 
-              <Controller
-                name={`personAuthorizedToReceiveFieldIsVisible`}
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`personAuthorizedToReceiveFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                  />
-                )}
-              />
-            </div>
+                <Controller
+                  name={`personAuthorizedToReceiveFieldIsVisible`}
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Switch
+                      {...field}
+                      id={`personAuthorizedToReceiveFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    />
+                  )}
+                />
+              </div>
 
-            {/* Show/hide Person Authorized to Issue field in PDF switch */}
-            <div className="flex items-center justify-between">
-              <Label htmlFor={`personAuthorizedToIssueFieldIsVisible`}>
-                Show &quot;Person Authorized to Issue&quot; Signature Field in
-                the PDF
-              </Label>
+              {/* Show/hide Person Authorized to Issue field in PDF switch */}
+              <div className="flex items-center justify-between">
+                <Label htmlFor={`personAuthorizedToIssueFieldIsVisible`}>
+                  Show &quot;Person Authorized to Issue&quot; Signature Field in
+                  the PDF
+                </Label>
 
-              <Controller
-                name={`personAuthorizedToIssueFieldIsVisible`}
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`personAuthorizedToIssueFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                  />
-                )}
-              />
+                <Controller
+                  name={`personAuthorizedToIssueFieldIsVisible`}
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Switch
+                      {...field}
+                      id={`personAuthorizedToIssueFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    />
+                  )}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </form>
   );

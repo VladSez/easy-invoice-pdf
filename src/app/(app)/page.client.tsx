@@ -4,10 +4,9 @@ import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import {
   invoiceSchema,
   PDF_DATA_LOCAL_STORAGE_KEY,
-  SUPPORTED_LANGUAGES,
+  SUPPORTED_TEMPLATES,
   type InvoiceData,
 } from "@/app/schema";
-import { TRANSLATIONS } from "@/app/schema/translations";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { Button } from "@/components/ui/button";
@@ -35,8 +34,9 @@ import {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,
 } from "lz-string";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { InvoiceClientPage } from "./components";
@@ -45,67 +45,29 @@ import {
   customPremiumToast,
 } from "./components/cta-toasts";
 import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
+import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
+// import { DevLocalStorageView } from "./components/dev/dev-local-storage-view";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
-/**
- * This function handles the breaking change of the invoice number field.
- * It removes the old "invoiceNumber" field and adds the new "invoiceNumberObject" field with label and value.
- * @param json - The JSON object to handle the breaking change.
- * @returns The updated JSON object.
- */
-function handleInvoiceNumberBreakingChange(json: unknown) {
-  // check if the invoice number is in the json
-  if (
-    typeof json === "object" &&
-    json !== null &&
-    "invoiceNumber" in json &&
-    typeof json.invoiceNumber === "string" &&
-    "language" in json
-  ) {
-    umamiTrackEvent("breaking_change_detected");
-
-    let lang: keyof typeof TRANSLATIONS;
-
-    const invoiceLanguage = z
-      .enum(SUPPORTED_LANGUAGES)
-      .safeParse(json.language);
-
-    if (!invoiceLanguage.success) {
-      console.error("Invalid invoice language:", invoiceLanguage.error);
-
-      // fallback to default language
-      lang = SUPPORTED_LANGUAGES[0];
-    } else {
-      lang = invoiceLanguage.data;
-    }
-
-    const invoiceNumberLabel = TRANSLATIONS[lang].invoiceNumber;
-
-    // Create new object without invoiceNumber and with invoiceNumberObject
-    const newJson = {
-      ...json,
-      // assign invoiceNumber to invoiceNumberObject.value
-      invoiceNumberObject: {
-        label: `${invoiceNumberLabel}:`,
-        value: json.invoiceNumber,
-      },
-    };
-
-    // remove deprecated invoiceNumber from json
-    delete (newJson as Record<string, unknown>).invoiceNumber;
-
-    // update json
-    json = newJson;
-
-    return json;
-  }
-
-  return json;
-}
+const DevLocalStorageView = dynamic(
+  () =>
+    import("./components/dev/dev-local-storage-view").then(
+      (mod) => mod.DevLocalStorageView
+    ),
+  { ssr: false }
+);
 
 export function AppPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const urlTemplateSearchParam = searchParams.get("template");
+
+  // Validate template parameter with zod
+  const templateValidation = z
+    .enum(SUPPORTED_TEMPLATES)
+    .default("default")
+    .safeParse(urlTemplateSearchParam);
 
   const { isDesktop } = useDeviceContext();
   const isMobile = !isDesktop;
@@ -119,46 +81,11 @@ export function AppPageClient() {
 
   const [canShareInvoice, setCanShareInvoice] = useState(true);
 
-  // Scroll to top on mount
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
-
-  // Initialize data from URL or localStorage on mount
-  useEffect(() => {
-    const compressedInvoiceDataInUrl = searchParams.get("data");
-
-    // first try to load from url
-    if (compressedInvoiceDataInUrl) {
-      try {
-        const decompressed = decompressFromEncodedURIComponent(
-          compressedInvoiceDataInUrl
-        );
-        const parsedJSON: unknown = JSON.parse(decompressed);
-
-        // this should happen before parsing the data with zod
-        const updatedJson = handleInvoiceNumberBreakingChange(parsedJSON);
-
-        const validated = invoiceSchema.parse(updatedJson);
-
-        setInvoiceDataState(validated);
-      } catch (error) {
-        // fallback to local storage
-        console.error("Failed to parse URL data:", error);
-        loadFromLocalStorage();
-
-        Sentry.captureException(error);
-      }
-    } else {
-      // if no data in url, load from local storage
-      loadFromLocalStorage();
-    }
-  }, [searchParams]);
-
   // Helper function to load from localStorage
-  const loadFromLocalStorage = () => {
+  const loadFromLocalStorage = useCallback(() => {
     try {
       const savedData = localStorage.getItem(PDF_DATA_LOCAL_STORAGE_KEY);
+
       if (savedData) {
         const json: unknown = JSON.parse(savedData);
 
@@ -167,10 +94,23 @@ export function AppPageClient() {
 
         const parsedData = invoiceSchema.parse(updatedJson);
 
+        // if template is in url, use it
+        if (templateValidation.success) {
+          parsedData.template = templateValidation.data;
+        }
+
         setInvoiceDataState(parsedData);
       } else {
-        // if no data in local storage, set initial data
-        setInvoiceDataState(INITIAL_INVOICE_DATA);
+        if (templateValidation.success) {
+          // if no data in local storage and template is in url, set initial data with template from url
+          setInvoiceDataState({
+            ...INITIAL_INVOICE_DATA,
+            template: templateValidation.data,
+          });
+        } else {
+          // if no data in local storage, set initial data
+          setInvoiceDataState(INITIAL_INVOICE_DATA);
+        }
       }
     } catch (error) {
       console.error("Failed to load saved invoice data:", error);
@@ -188,7 +128,54 @@ export function AppPageClient() {
 
       Sentry.captureException(error);
     }
-  };
+  }, [templateValidation.data, templateValidation.success]);
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  // Initialize data from URL or localStorage on mount
+  useEffect(() => {
+    const compressedInvoiceDataInUrl = searchParams.get("data");
+    const urlTemplateSearchParam = searchParams.get("template");
+
+    // Validate template parameter with zod
+    const templateValidation = z
+      .enum(SUPPORTED_TEMPLATES)
+      .default("default")
+      .safeParse(urlTemplateSearchParam);
+
+    // first try to load from url
+    if (compressedInvoiceDataInUrl) {
+      try {
+        const decompressed = decompressFromEncodedURIComponent(
+          compressedInvoiceDataInUrl
+        );
+        const parsedJSON: unknown = JSON.parse(decompressed);
+
+        // this should happen before parsing the data with zod
+        const updatedJson = handleInvoiceNumberBreakingChange(parsedJSON);
+
+        const validated = invoiceSchema.parse(updatedJson);
+
+        if (templateValidation.success) {
+          validated.template = templateValidation.data;
+        }
+
+        setInvoiceDataState(validated);
+      } catch (error) {
+        // fallback to local storage
+        console.error("Failed to parse URL data:", error);
+        loadFromLocalStorage();
+
+        Sentry.captureException(error);
+      }
+    } else {
+      // if no data in url, load from local storage
+      loadFromLocalStorage();
+    }
+  }, [loadFromLocalStorage, searchParams]);
 
   // Save to localStorage whenever data changes on form update
   useEffect(() => {
@@ -201,6 +188,12 @@ export function AppPageClient() {
           PDF_DATA_LOCAL_STORAGE_KEY,
           JSON.stringify(newInvoiceDataValidated)
         );
+
+        // Update template in search params if it exists
+
+        const newSearchParams = new URLSearchParams(searchParams);
+        newSearchParams.set("template", newInvoiceDataValidated.template);
+        router.replace(`/?${newSearchParams.toString()}`);
 
         // Check if URL has data and current data is different
         const urlData = searchParams.get("data");
@@ -302,8 +295,8 @@ export function AppPageClient() {
       }
     };
 
-    // Show cta toast after 40 seconds on the app page
-    const initialTimer = setTimeout(showCTAToast, 40_000);
+    // Show cta toast after 50 seconds on the app page
+    const initialTimer = setTimeout(showCTAToast, 50_000);
 
     return () => {
       clearTimeout(initialTimer);
@@ -351,13 +344,18 @@ export function AppPageClient() {
           return;
         }
 
-        router.push(`/?data=${compressedData}`);
+        router.push(
+          `/?template=${newInvoiceDataValidated.template}&data=${compressedData}`
+        );
 
         // Construct full URL with locale and compressed data
-        const newFullUrl = `${window.location.origin}/?data=${compressedData}`;
+        const newFullUrl = `${window.location.origin}/?template=${newInvoiceDataValidated.template}&data=${compressedData}`;
 
         // Copy to clipboard
         await navigator.clipboard.writeText(newFullUrl);
+
+        // Dismiss any existing toast before showing new one
+        toast.dismiss();
 
         toast.success("Invoice link copied to clipboard!", {
           description:
@@ -382,6 +380,10 @@ export function AppPageClient() {
 
   return (
     <TooltipProvider delayDuration={0}>
+      {process.env.NEXT_PUBLIC_DEBUG_LOCAL_STORAGE_UI === "true" && (
+        <DevLocalStorageView />
+      )}
+
       <div className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
         <div className="w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 2xl:max-w-[1680px]">
           <div data-testid="header">
@@ -398,7 +400,7 @@ export function AppPageClient() {
               <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
                 <Button
                   asChild
-                  className="mx-2 w-full bg-blue-500 text-white transition-all hover:scale-105 hover:bg-blue-600 hover:no-underline lg:mx-0 lg:w-auto"
+                  className="mx-2 w-full bg-blue-500 text-white transition-all hover:no-underline hover:opacity-90 lg:mx-0 lg:w-auto"
                   _variant="link"
                   onClick={() => {
                     // analytics track event

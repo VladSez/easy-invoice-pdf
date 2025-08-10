@@ -131,7 +131,7 @@ export function InvoiceClientPage({
               <div className="h-[480px] overflow-auto rounded-lg border-b px-3 shadow-sm">
                 <InvoiceForm
                   invoiceData={invoiceDataState}
-                  onInvoiceDataChange={handleInvoiceDataChange}
+                  handleInvoiceDataChange={handleInvoiceDataChange}
                   setCanShareInvoice={setCanShareInvoice}
                 />
               </div>
@@ -210,7 +210,7 @@ export function InvoiceClientPage({
             <div className="h-[620px] overflow-auto border-b px-3 pl-0 2xl:h-[700px]">
               <InvoiceForm
                 invoiceData={invoiceDataState}
-                onInvoiceDataChange={handleInvoiceDataChange}
+                handleInvoiceDataChange={handleInvoiceDataChange}
                 setCanShareInvoice={setCanShareInvoice}
               />
             </div>
