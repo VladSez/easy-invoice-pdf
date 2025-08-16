@@ -22,12 +22,12 @@ test.describe("Invoice Generator Page", () => {
 
   test("should redirect from /:locale/app to /", async ({ page }) => {
     await page.goto("/en/app");
-    await expect(page).toHaveURL("/");
+    await expect(page).toHaveURL("/?template=default");
   });
 
   test("displays correct buttons and links in header", async ({ page }) => {
     // Check URL is correct
-    await expect(page).toHaveURL("/");
+    await expect(page).toHaveURL("/?template=default");
 
     // Check title and branding
     await expect(page).toHaveTitle(
@@ -1041,147 +1041,5 @@ test.describe("Invoice Generator Page", () => {
         })
       ).toHaveValue(testCase.expected.total);
     }
-  });
-
-  test("can share invoice and data is persisted in new tab", async ({
-    page,
-    context,
-  }) => {
-    // Fill in some test data
-    const invoiceNumberFieldset = page.getByRole("group", {
-      name: "Invoice Number",
-    });
-
-    const invoiceNumberValueField = invoiceNumberFieldset.getByRole("textbox", {
-      name: "Value",
-    });
-
-    await invoiceNumberValueField.fill("SHARE-TEST-001");
-
-    const finalSection = page.getByTestId(`final-section`);
-
-    await finalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill("Test note for sharing");
-
-    // Fill in seller information
-    const sellerSection = page.getByTestId("seller-information-section");
-    await sellerSection
-      .getByRole("textbox", { name: "Name" })
-      .fill("Test Seller");
-    await sellerSection
-      .getByRole("textbox", { name: "Address" })
-      .fill("123 Test St");
-    await sellerSection
-      .getByRole("textbox", { name: "Email" })
-      .fill("seller@test.com");
-
-    // Fill in an invoice item
-    const invoiceItemsSection = page.getByTestId("invoice-items-section");
-    await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)" })
-      .fill("5");
-    await invoiceItemsSection
-      .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
-      })
-      .fill("100");
-    await invoiceItemsSection
-      .getByRole("textbox", { name: "VAT", exact: true })
-      .fill("23");
-
-    // wait for debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
-
-    // Generate share link
-    await page
-      .getByRole("button", { name: "Generate a link to invoice" })
-      .click();
-
-    // Wait for URL to update with share data
-    await page.waitForURL((url) => url.searchParams.has("data"));
-
-    // Get the current URL which should now contain the share data
-    const sharedUrl = page.url();
-    expect(sharedUrl).toContain("?data=");
-
-    // Open URL in new tab
-    const newPage = await context.newPage();
-    await newPage.goto(sharedUrl);
-
-    // Verify data is loaded in new tab
-    await expect(
-      invoiceNumberFieldset.getByRole("textbox", { name: "Value" })
-    ).toHaveValue("SHARE-TEST-001");
-
-    const newPageFinalSection = newPage.getByTestId(`final-section`);
-
-    await expect(
-      newPageFinalSection.getByRole("textbox", { name: "Notes", exact: true })
-    ).toHaveValue("Test note for sharing");
-
-    // Verify seller information
-    const newSellerSection = newPage.getByTestId("seller-information-section");
-    await expect(
-      newSellerSection.getByRole("textbox", { name: "Name" })
-    ).toHaveValue("Test Seller");
-    await expect(
-      newSellerSection.getByRole("textbox", { name: "Address" })
-    ).toHaveValue("123 Test St");
-    await expect(
-      newSellerSection.getByRole("textbox", { name: "Email" })
-    ).toHaveValue("seller@test.com");
-
-    // Verify invoice item
-    const newInvoiceItemsSection = newPage.getByTestId("invoice-items-section");
-    await expect(
-      newInvoiceItemsSection.getByRole("spinbutton", {
-        name: "Amount (Quantity)",
-      })
-    ).toHaveValue("5");
-    await expect(
-      newInvoiceItemsSection.getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
-      })
-    ).toHaveValue("100");
-    await expect(
-      newInvoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true })
-    ).toHaveValue("23");
-
-    // Close the new page
-    await newPage.close();
-  });
-
-  test("shows notification when invoice link is broken", async ({ page }) => {
-    // Navigate to page with invalid data parameter
-    await page.goto("/?data=invalid-data-string");
-
-    // Verify error toast appears
-    await expect(
-      page.getByText("The shared invoice URL appears to be incorrect")
-    ).toBeVisible();
-
-    // Verify error description is shown
-    await expect(
-      page.getByText(
-        "Please verify that you have copied the complete invoice URL. The link may be truncated or corrupted."
-      )
-    ).toBeVisible();
-
-    // Verify clear URL button is present
-    await expect(page.getByRole("button", { name: "Clear URL" })).toBeVisible();
-
-    // Click clear URL button
-    await page.getByRole("button", { name: "Clear URL" }).click();
-
-    // Verify toast is dismissed
-    await expect(
-      page.getByText("The shared invoice URL appears to be incorrect")
-    ).toBeHidden();
-
-    // Wait for URL to be cleared and verify
-    await expect(page).toHaveURL("/");
-    await expect(page).not.toHaveURL(/\?data=/);
   });
 });

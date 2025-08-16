@@ -3,11 +3,17 @@ import { TRANSLATIONS } from "@/app/schema/translations";
 
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { z } from "zod";
+
 /**
  * This function handles the breaking change of the invoice number field.
  * It removes the old "invoiceNumber" field and adds the new "invoiceNumberObject" field with label and value.
- * @param json - The JSON object to handle the breaking change.
- * @returns The updated JSON object.
+ *
+ * @example
+ * ```typescript
+ * const json = { invoiceNumber: "123", language: "en" };
+ * const updatedJson = handleInvoiceNumberBreakingChange(json);
+ * // Returns: { invoiceNumberObject: { label: "Invoice Number:", value: "123" }
+ * ```
  */
 export function handleInvoiceNumberBreakingChange(json: unknown) {
   // check if the invoice number is in the json

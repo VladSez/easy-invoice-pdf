@@ -23,6 +23,7 @@ import {
 
 import { env } from "@/env";
 import { ipLimiter } from "@/lib/rate-limit";
+import { compressInvoiceData } from "@/utils/url-compression";
 
 export const dynamic = "force-dynamic";
 
@@ -141,8 +142,12 @@ export async function GET(req: NextRequest) {
     const newInvoiceDataValidated = invoiceSchema.parse(
       ENGLISH_INVOICE_REAL_DATA
     );
-    const stringified = JSON.stringify(newInvoiceDataValidated);
-    const compressedData = compressToEncodedURIComponent(stringified);
+
+    // Compress JSON keys before stringifying to reduce URL size
+    const compressedKeys = compressInvoiceData(newInvoiceDataValidated);
+    const compressedJson = JSON.stringify(compressedKeys);
+
+    const compressedData = compressToEncodedURIComponent(compressedJson);
 
     const invoiceUrl = `https://easyinvoicepdf.com/?data=${compressedData}`;
 
@@ -193,7 +198,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const companyEmailLink = `https://outlook.office.com/mail/deeplink/compose?to=${env.INVOICE_EMAIL_COMPANY_TO}&subject=Invoice%20for%20${monthAndYear}&body=Hello%2C%0A%0AInvoice%20for%20${monthAndYear}%20in%20attachments%0A%0AHave%20a%20nice%20day`;
+    const companyEmailLink = `https://outlook.office.com/mail/deeplink/compose?to=${env.INVOICE_EMAIL_COMPANY_TO}&subject=Invoice%20for%20${monthAndYear}&body=Hello%2C%0AThe%20invoice%20for%20${monthAndYear}%20is%20in%20the%20attachment.%0A%0AHave%20a%20nice%20day.`;
 
     // we only need the value of the invoice number e.g. 1/05.2025
     const invoiceNumberValue =

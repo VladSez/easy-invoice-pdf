@@ -34,6 +34,10 @@ import {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,
 } from "lz-string";
+import {
+  compressInvoiceData,
+  decompressInvoiceData,
+} from "@/utils/url-compression";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -152,10 +156,16 @@ export function AppPageClient() {
         const decompressed = decompressFromEncodedURIComponent(
           compressedInvoiceDataInUrl
         );
+
         const parsedJSON: unknown = JSON.parse(decompressed);
 
+        // Restore original keys from compressed format, we store keys in compressed format to reduce URL size i.e. {name: "John Doe"} -> {n: "John Doe"}
+        const decompressedKeys = decompressInvoiceData(
+          parsedJSON as Record<string, unknown>
+        );
+
         // this should happen before parsing the data with zod
-        const updatedJson = handleInvoiceNumberBreakingChange(parsedJSON);
+        const updatedJson = handleInvoiceNumberBreakingChange(decompressedKeys);
 
         const validated = invoiceSchema.parse(updatedJson);
 
@@ -195,15 +205,21 @@ export function AppPageClient() {
         newSearchParams.set("template", newInvoiceDataValidated.template);
         router.replace(`/?${newSearchParams.toString()}`);
 
-        // Check if URL has data and current data is different
+        // Check if URL has data i.e. if user has shared invoice link
         const urlData = searchParams.get("data");
 
         if (urlData) {
           try {
             const decompressed = decompressFromEncodedURIComponent(urlData);
+
             const urlParsed: unknown = JSON.parse(decompressed);
 
-            const urlValidated = invoiceSchema.parse(urlParsed);
+            // Restore original keys from compressed format
+            const decompressedKeys = decompressInvoiceData(
+              urlParsed as Record<string, unknown>
+            );
+
+            const urlValidated = invoiceSchema.parse(decompressedKeys);
 
             if (
               JSON.stringify(urlValidated) !==
@@ -234,7 +250,9 @@ export function AppPageClient() {
           } catch (error) {
             console.error("Failed to compare with URL data:", error);
 
+            // TODO: move to 'Initialize data from URL or localStorage on mount' useEffect?
             toast.error("The shared invoice URL appears to be incorrect", {
+              id: "invalid-invoice-url-error-toast", // prevent duplicate toasts
               description: (
                 <div className="flex flex-col gap-2">
                   <p className="">
@@ -245,7 +263,7 @@ export function AppPageClient() {
                     _variant="outline"
                     _size="sm"
                     onClick={() => {
-                      router.replace("/");
+                      router.replace("/?template=default");
                       toast.dismiss();
                     }}
                   >
@@ -328,11 +346,16 @@ export function AppPageClient() {
     if (invoiceDataState) {
       try {
         const newInvoiceDataValidated = invoiceSchema.parse(invoiceDataState);
-        const stringified = JSON.stringify(newInvoiceDataValidated);
-        const compressedData = compressToEncodedURIComponent(stringified);
+
+        // Compress JSON keys before stringifying to reduce URL size
+        const compressedKeys = compressInvoiceData(newInvoiceDataValidated);
+        const compressedJson = JSON.stringify(compressedKeys);
+
+        const compressedData = compressToEncodedURIComponent(compressedJson);
 
         // Check if the compressed data length exceeds browser URL limits
         // Most browsers have a limit around 2000 characters for URLs
+        // With key compression, we can fit much larger invoices within this limit
         const URL_LENGTH_LIMIT = 2000;
         const estimatedUrlLength =
           window.location.origin.length + 7 + compressedData.length; // 7 for "/?data="

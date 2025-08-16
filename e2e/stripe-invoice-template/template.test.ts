@@ -71,6 +71,9 @@ test.describe("Stripe Invoice Template", () => {
   test("logo upload section and payment link URL section only appear for Stripe template", async ({
     page,
   }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/?template=default");
+
     const generalInfoSection = page.getByTestId("general-information-section");
 
     // Initially default template - logo section should not be visible
@@ -92,6 +95,11 @@ test.describe("Stripe Invoice Template", () => {
     await page
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
+
+    // Wait for URL to be updated
+    await page.waitForURL("/?template=stripe");
+
+    await expect(page).toHaveURL("/?template=stripe");
 
     // Logo section should now be visible
     await expect(

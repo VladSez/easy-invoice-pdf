@@ -15,10 +15,18 @@ test.describe("Stripe Invoice Sharing Logic", () => {
   test("can share invoice with Stripe template and *WITHOUT* logo", async ({
     page,
   }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/?template=default");
+
     // Switch to Stripe template
     await page
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
+
+    // Wait for URL to be updated
+    await page.waitForURL("/?template=stripe");
+
+    await expect(page).toHaveURL("/?template=stripe");
 
     // Verify share button is still enabled (no logo uploaded)
     const shareButton = page.getByRole("button", {
@@ -33,7 +41,65 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Verify URL contains shared data
     await page.waitForURL((url) => url.searchParams.has("data"));
-    expect(page.url()).toContain("?data=");
+    const url = page.url();
+    expect(url).toContain(`?template=stripe&data=`);
+
+    // Verify data parameter is not empty
+    const urlObj = new URL(url);
+    const dataParam = urlObj.searchParams.get("data");
+    expect(dataParam).toBeTruthy();
+    expect(dataParam).not.toBe("");
+
+    // ------------------------------------------------------------
+    // Open URL in new tab
+    // ------------------------------------------------------------
+    const context = page.context();
+    const newPage = await context.newPage();
+    await newPage.goto(url);
+
+    const newUrl = newPage.url();
+    expect(newUrl).toContain(`?template=stripe&data=`);
+
+    // Verify data parameter is not empty
+    const newUrlObj = new URL(newUrl);
+    const newDataParam = newUrlObj.searchParams.get("data");
+    expect(newDataParam).toBeTruthy();
+    expect(newDataParam).not.toBe("");
+
+    // Verify stripe template UI elements are visible
+    const newPageGeneralInfoSection = newPage.getByTestId(
+      "general-information-section"
+    );
+
+    // Verify logo upload section is visible (but empty since no logo was shared)
+    await expect(
+      newPageGeneralInfoSection.getByText("Company Logo (Optional)")
+    ).toBeVisible();
+
+    // Verify payment URL section is visible
+    await expect(
+      newPageGeneralInfoSection.getByRole("textbox", {
+        name: "Payment Link URL (Optional)",
+      })
+    ).toBeVisible();
+
+    const finalSection = page.getByTestId(`final-section`);
+
+    // Verify that signature fields are hidden (there are only for default template)
+    await expect(
+      finalSection.getByRole("switch", {
+        name: 'Show "Person Authorized to Receive" Signature Field in the PDF',
+      })
+    ).toBeHidden();
+
+    await expect(
+      finalSection.getByRole("switch", {
+        name: 'Show "Person Authorized to Issue" Signature Field in the PDF',
+      })
+    ).toBeHidden();
+
+    // Close the new page
+    await newPage.close();
   });
 
   test("cannot share invoice with Stripe template and *WITH* logo", async ({
@@ -133,7 +199,14 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // Test that sharing works
     await shareButton.click();
     await page.waitForURL((url) => url.searchParams.has("data"));
-    expect(page.url()).toContain("?data=");
+    const url = page.url();
+    expect(url).toContain(`?template=stripe&data=`);
+
+    // Verify data parameter is not empty
+    const urlObj = new URL(url);
+    const dataParam = urlObj.searchParams.get("data");
+    expect(dataParam).toBeTruthy();
+    expect(dataParam).not.toBe("");
 
     await expect(
       page.getByText("Invoice link copied to clipboard!")
