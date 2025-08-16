@@ -126,11 +126,10 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // click over share button to verify tooltip
     // on mobile, we need to click the button to show the toast because it's better UX for user (you can't hover on mobile)
-    // eslint-disable-next-line playwright/no-force-option
-    await shareButton.click({ force: true });
+    await shareButton.click();
 
     await expect(page.getByText("Unable to Share Invoice")).toBeVisible({
-      timeout: 700,
+      timeout: 2000,
     });
 
     await expect(
@@ -171,6 +170,10 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       }
     }, SMALL_TEST_IMAGE_BASE64);
 
+    // Wait for logo to be uploaded
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
+
     const generalInfoSection = page.getByTestId("general-information-section");
     await expect(
       generalInfoSection.getByAltText("Company logo preview")
@@ -199,6 +202,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // Test that sharing works
     await shareButton.click();
     await page.waitForURL((url) => url.searchParams.has("data"));
+
     const url = page.url();
     expect(url).toContain(`?template=stripe&data=`);
 

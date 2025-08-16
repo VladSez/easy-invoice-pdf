@@ -437,7 +437,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Wait a moment for any debounced localStorage updates
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(600);
 
     // Verify data is actually saved in localStorage
     const storedData = (await page.evaluate((key) => {
