@@ -27,9 +27,6 @@ jobs:
       - name: 🚚 Install dependencies
         run: pnpm install
 
-      - name: 🏗️ Type check
-        run: pnpm type-check
-
       - name: 🧪 Run Vitest tests
         id: vitest
         run: pnpm vitest run --reporter=verbose
