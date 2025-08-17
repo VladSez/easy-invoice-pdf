@@ -72,9 +72,14 @@ test.describe("Generate Invoice Link", () => {
     const newPage = await context.newPage();
     await newPage.goto(sharedUrl);
 
+    // Get elements from the new page context
+    const newInvoiceNumberFieldset = newPage.getByRole("group", {
+      name: "Invoice Number",
+    });
+
     // Verify data is loaded in new tab
     await expect(
-      invoiceNumberFieldset.getByRole("textbox", { name: "Value" })
+      newInvoiceNumberFieldset.getByRole("textbox", { name: "Value" })
     ).toHaveValue("SHARE-TEST-001");
 
     const newPageFinalSection = newPage.getByTestId(`final-section`);

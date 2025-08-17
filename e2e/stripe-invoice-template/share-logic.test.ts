@@ -83,7 +83,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       })
     ).toBeVisible();
 
-    const finalSection = page.getByTestId(`final-section`);
+    const finalSection = newPage.getByTestId(`final-section`);
 
     // Verify that signature fields are hidden (there are only for default template)
     await expect(
@@ -271,6 +271,8 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
+    await page.waitForURL("/?template=stripe");
+
     await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
 
     // Wait for upload and verify share button is disabled
@@ -305,6 +307,8 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Reload the page
     await page.reload();
+
+    await page.waitForURL("/?template=stripe");
 
     // Verify state persists after reload
     await expect(

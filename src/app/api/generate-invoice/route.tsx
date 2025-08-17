@@ -198,7 +198,11 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const companyEmailLink = `https://outlook.office.com/mail/deeplink/compose?to=${env.INVOICE_EMAIL_COMPANY_TO}&subject=Invoice%20for%20${monthAndYear}&body=Hello%2C%0AThe%20invoice%20for%20${monthAndYear}%20is%20in%20the%20attachment.%0A%0AHave%20a%20nice%20day.`;
+    const companyEmailLink =
+      `https://outlook.office.com/mail/deeplink/compose` +
+      `?to=${encodeURIComponent(env.INVOICE_EMAIL_COMPANY_TO)}` +
+      `&subject=${encodeURIComponent(`Invoice for ${monthAndYear}`)}` +
+      `&body=${encodeURIComponent(`Hello,\nThe invoice for ${monthAndYear} is in the attachment.\n\nHave a nice day.`)}`;
 
     // we only need the value of the invoice number e.g. 1/05.2025
     const invoiceNumberValue =

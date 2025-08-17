@@ -17,7 +17,9 @@ export default function robots(): MetadataRoute.Robots {
         ],
         disallow: [
           // Disallow shared invoice URLs, like /?data=*
-          "/?data=*",
+          "/?*data=*",
+          "/?template=*&data=*",
+          "/?data=*&template=*",
           // Disallow subscription confirmation pages with and without tokens
           "/confirm-subscription",
           "/confirm-subscription?*",
