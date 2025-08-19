@@ -436,12 +436,6 @@ packages:
         integrity: sha512-XsLw1dEOpkSX/WucdqUhPWP7hDxSvZiY+fsUC14h+FtQ2Ifni4znbBt8punRX+Uj2JG/uDb8nEHVKvrVlvdZ5Q==,
       }
 
-  "@emnapi/runtime@1.3.1":
-    resolution:
-      {
-        integrity: sha512-kEBmG8KyqtxJZv+ygbEim+KCGtIq1fC22Ms3S4ziXmYKm8uyoLX0MHONVKwp+9opg390VaKRNt4a7A9NwmpNhw==,
-      }
-
   "@emnapi/runtime@1.4.5":
     resolution:
       {
@@ -1068,24 +1062,10 @@ packages:
         integrity: sha512-OuLGC46TjB5BbN1dH8JULVVZY4WTdkF7tV9Ys6wLL1rubZnCMstOhNHueU5bLCrnRuDhKPDM4g6sw4Bel5Gzqg==,
       }
 
-  "@jridgewell/gen-mapping@0.3.8":
-    resolution:
-      {
-        integrity: sha512-imAbBGkb+ebQyxKgzv5Hu2nmROxoDOXHh80evxdoXNOrvAnVx7zimzc1Oo5h9RlfV4vPXaE2iM5pOFbvOCClWA==,
-      }
-    engines: { node: ">=6.0.0" }
-
   "@jridgewell/resolve-uri@3.1.2":
     resolution:
       {
         integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==,
-      }
-    engines: { node: ">=6.0.0" }
-
-  "@jridgewell/set-array@1.2.1":
-    resolution:
-      {
-        integrity: sha512-R8gLRTZeyp03ymzP/6Lil/28tGeGEzhx1q2k703KGWRAI1VdvPIXdG70VJc2pAMw3NA6JKL5hhFu1sJX0Mnn/A==,
       }
     engines: { node: ">=6.0.0" }
 
@@ -1095,22 +1075,10 @@ packages:
         integrity: sha512-0pPkgz9dY+bijgistcTTJ5mR+ocqRXLuhXHYdzoMmmoJ2C9S46RCm2GMUbatPEUK9Yjy26IrAy8D/M00lLkv+Q==,
       }
 
-  "@jridgewell/sourcemap-codec@1.5.0":
-    resolution:
-      {
-        integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==,
-      }
-
   "@jridgewell/sourcemap-codec@1.5.4":
     resolution:
       {
         integrity: sha512-VT2+G1VQs/9oz078bLrYbecdZKs912zQlkelYpuf+SXF+QvZDYJlbx/LSx+meSAwdDFnF8FVXW92AVjjkVmgFw==,
-      }
-
-  "@jridgewell/trace-mapping@0.3.25":
-    resolution:
-      {
-        integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==,
       }
 
   "@jridgewell/trace-mapping@0.3.29":
@@ -4051,6 +4019,7 @@ packages:
       {
         integrity: sha512-6/Z03eLmDz8AyMYIMvX/nnEBIK/gajtLi21aIho3u0qP+RM/7tDbphN9e4ssKOKj46MEPp/C8LkSR4ISOSbMQQ==,
       }
+    deprecated: "This package is deprecated and has been replaced by the stagewise CLI. Get started with the CLI here: https://stagewise.io/docs"
     peerDependencies:
       "@types/react": ">=18.0.0"
       next: ">=14.0.0"
@@ -5280,14 +5249,6 @@ packages:
         integrity: sha512-Z942RysHXmJrhqk88FmKBVq/v5tqmSkDz7p54G/MGyjMnCFFnC79XWNbg+Vta8W6Wb2qtSZTSxIGkJrRpCFEiA==,
       }
 
-  browserslist@4.24.4:
-    resolution:
-      {
-        integrity: sha512-KDi1Ny1gSePi1vm0q4oxSF8b4DR44GF4BbmS2YdhPLOEqd8pDviZOGH/GsmRwoWJ2+5Lr085X7naowMwKHDG1A==,
-      }
-    engines: { node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7 }
-    hasBin: true
-
   browserslist@4.25.2:
     resolution:
       {
@@ -5378,12 +5339,6 @@ packages:
         integrity: sha512-QOSvevhslijgYwRx6Rv7zKdMF8lbRmx+uQGx2+vDc+KI/eBnsy9kit5aj23AgGu3pa4t9AgwbnXWqS+iOY+2aA==,
       }
     engines: { node: ">= 6" }
-
-  caniuse-lite@1.0.30001707:
-    resolution:
-      {
-        integrity: sha512-3qtRjw/HQSMlDWf+X79N206fepf4SOOU6SQLMaq/0KkZLmSjPxAkBOQQ+FxbHKfHmYLZFfdWsO3KA90ceHPSnw==,
-      }
 
   caniuse-lite@1.0.30001733:
     resolution:
@@ -5831,18 +5786,6 @@ packages:
       supports-color:
         optional: true
 
-  debug@4.4.0:
-    resolution:
-      {
-        integrity: sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==,
-      }
-    engines: { node: ">=6.0" }
-    peerDependencies:
-      supports-color: "*"
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
-
   debug@4.4.1:
     resolution:
       {
@@ -6047,12 +5990,6 @@ packages:
     resolution:
       {
         integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==,
-      }
-
-  electron-to-chromium@1.5.109:
-    resolution:
-      {
-        integrity: sha512-AidaH9JETVRr9DIPGfp1kAarm/W6hRJTPuCnkF+2MqhF4KaAgRIcBc8nvjk+YMXZhwfISof/7WG29eS4iGxQLQ==,
       }
 
   electron-to-chromium@1.5.199:
@@ -6388,13 +6325,6 @@ packages:
         integrity: sha512-wpc+LXeiyiisxPlEkUzU6svyS1frIO3Mgxj1fdy7Pm8Ygzguax2N3Fa/D/ag1WqbOprdI+uY6wMUl8/a2G+iag==,
       }
     engines: { node: ^12.22.0 || ^14.17.0 || >=16.0.0 }
-
-  eslint-visitor-keys@4.2.0:
-    resolution:
-      {
-        integrity: sha512-UyLnSehNt62FFhSwjZlHmeokpRK59rcz29j+F1/aDgbkbRTk7wIc9XzdoasMUbRNKDM0qQt/+BJ4BrpFeABemw==,
-      }
-    engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
 
   eslint-visitor-keys@4.2.1:
     resolution:
@@ -6873,12 +6803,6 @@ packages:
         integrity: sha512-w9UMqWwJxHNOvoNzSJ2oPF5wvYcvP7jUvYzhp67yEhTi17ZDBBC1z9pTdGuzjD+EFIqLSYRweZjqfiPzQ06Ebg==,
       }
     engines: { node: ">= 0.4" }
-
-  get-tsconfig@4.10.0:
-    resolution:
-      {
-        integrity: sha512-kGzZ3LWWQcGIAmg6iWvXn0ei6WDtV26wzHRMwDSzmAbcXrTEXxHy6IehI6/4eT6VRKyMP1eF1VqwrVUmE/LR7A==,
-      }
 
   get-tsconfig@4.10.1:
     resolution:
@@ -8972,13 +8896,6 @@ packages:
       }
     engines: { node: ">=8.6" }
 
-  picomatch@4.0.2:
-    resolution:
-      {
-        integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==,
-      }
-    engines: { node: ">=12" }
-
   picomatch@4.0.3:
     resolution:
       {
@@ -9888,14 +9805,6 @@ packages:
       }
     hasBin: true
 
-  semver@7.7.1:
-    resolution:
-      {
-        integrity: sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==,
-      }
-    engines: { node: ">=10" }
-    hasBin: true
-
   semver@7.7.2:
     resolution:
       {
@@ -10138,6 +10047,7 @@ packages:
         integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==,
       }
     engines: { node: ">= 8" }
+    deprecated: The work that was done in this beta branch won't be included in future versions
 
   space-separated-tokens@2.0.2:
     resolution:
@@ -10542,13 +10452,6 @@ packages:
       {
         integrity: sha512-KQQR9yN7R5+OSwaK0XQoj22pwHoTlgYqmUscPYoknOoWCWfj/5/ABTMRi69FrKU5ffPVh5QcFikpWJI/P1ocHA==,
       }
-
-  tinyglobby@0.2.13:
-    resolution:
-      {
-        integrity: sha512-mEwzpUgrLySlveBwEVDMKk5B57bhLPYovRfPAXD5gA/98Opn0rCDj3GtLwFvCvH5RK9uPCExUROW5NjDwvqkxw==,
-      }
-    engines: { node: ">=12.0.0" }
 
   tinyglobby@0.2.14:
     resolution:
@@ -11147,13 +11050,6 @@ packages:
         integrity: sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==,
       }
 
-  webpack-sources@3.2.3:
-    resolution:
-      {
-        integrity: sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==,
-      }
-    engines: { node: ">=10.13.0" }
-
   webpack-sources@3.3.3:
     resolution:
       {
@@ -11380,8 +11276,8 @@ snapshots:
 
   "@ampproject/remapping@2.3.0":
     dependencies:
-      "@jridgewell/gen-mapping": 0.3.8
-      "@jridgewell/trace-mapping": 0.3.25
+      "@jridgewell/gen-mapping": 0.3.12
+      "@jridgewell/trace-mapping": 0.3.29
 
   "@ark/schema@0.46.0":
     dependencies:
@@ -11410,7 +11306,7 @@ snapshots:
       "@babel/traverse": 7.26.9
       "@babel/types": 7.26.9
       convert-source-map: 2.0.0
-      debug: 4.4.0
+      debug: 4.4.1
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -11421,15 +11317,15 @@ snapshots:
     dependencies:
       "@babel/parser": 7.26.9
       "@babel/types": 7.26.9
-      "@jridgewell/gen-mapping": 0.3.8
-      "@jridgewell/trace-mapping": 0.3.25
+      "@jridgewell/gen-mapping": 0.3.12
+      "@jridgewell/trace-mapping": 0.3.29
       jsesc: 3.1.0
 
   "@babel/helper-compilation-targets@7.26.5":
     dependencies:
       "@babel/compat-data": 7.26.8
       "@babel/helper-validator-option": 7.25.9
-      browserslist: 4.24.4
+      browserslist: 4.25.2
       lru-cache: 5.1.1
       semver: 6.3.1
 
@@ -11485,7 +11381,7 @@ snapshots:
       "@babel/parser": 7.26.9
       "@babel/template": 7.26.9
       "@babel/types": 7.26.9
-      debug: 4.4.0
+      debug: 4.4.1
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -11497,7 +11393,7 @@ snapshots:
       "@babel/parser": 7.26.9
       "@babel/template": 7.26.9
       "@babel/types": 7.26.9
-      debug: 4.4.0
+      debug: 4.4.1
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -11521,11 +11417,6 @@ snapshots:
   "@emnapi/core@1.4.5":
     dependencies:
       "@emnapi/wasi-threads": 1.0.4
-      tslib: 2.8.1
-    optional: true
-
-  "@emnapi/runtime@1.3.1":
-    dependencies:
       tslib: 2.8.1
     optional: true
 
@@ -11624,7 +11515,7 @@ snapshots:
   "@eslint/config-array@0.20.0":
     dependencies:
       "@eslint/object-schema": 2.1.6
-      debug: 4.4.0
+      debug: 4.4.1
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -11638,7 +11529,7 @@ snapshots:
   "@eslint/eslintrc@3.3.1":
     dependencies:
       ajv: 6.12.6
-      debug: 4.4.0
+      debug: 4.4.1
       espree: 10.3.0
       globals: 14.0.0
       ignore: 5.3.2
@@ -11806,7 +11697,7 @@ snapshots:
 
   "@img/sharp-wasm32@0.33.5":
     dependencies:
-      "@emnapi/runtime": 1.3.1
+      "@emnapi/runtime": 1.4.5
     optional: true
 
   "@img/sharp-win32-ia32@0.33.5":
@@ -11846,29 +11737,14 @@ snapshots:
       "@jridgewell/sourcemap-codec": 1.5.4
       "@jridgewell/trace-mapping": 0.3.29
 
-  "@jridgewell/gen-mapping@0.3.8":
-    dependencies:
-      "@jridgewell/set-array": 1.2.1
-      "@jridgewell/sourcemap-codec": 1.5.0
-      "@jridgewell/trace-mapping": 0.3.25
-
   "@jridgewell/resolve-uri@3.1.2": {}
-
-  "@jridgewell/set-array@1.2.1": {}
 
   "@jridgewell/source-map@0.3.10":
     dependencies:
       "@jridgewell/gen-mapping": 0.3.12
       "@jridgewell/trace-mapping": 0.3.29
 
-  "@jridgewell/sourcemap-codec@1.5.0": {}
-
   "@jridgewell/sourcemap-codec@1.5.4": {}
-
-  "@jridgewell/trace-mapping@0.3.25":
-    dependencies:
-      "@jridgewell/resolve-uri": 3.1.2
-      "@jridgewell/sourcemap-codec": 1.5.0
 
   "@jridgewell/trace-mapping@0.3.29":
     dependencies:
@@ -11887,7 +11763,7 @@ snapshots:
 
   "@mdx-js/mdx@3.1.0(acorn@8.14.1)":
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       "@types/estree-jsx": 1.0.5
       "@types/hast": 3.0.4
       "@types/mdx": 2.0.13
@@ -12130,7 +12006,7 @@ snapshots:
       "@opentelemetry/instrumentation": 0.57.2(@opentelemetry/api@1.9.0)
       "@opentelemetry/semantic-conventions": 1.28.0
       forwarded-parse: 2.1.2
-      semver: 7.7.1
+      semver: 7.7.2
     transitivePeerDependencies:
       - supports-color
 
@@ -12255,7 +12131,7 @@ snapshots:
       "@types/shimmer": 1.2.0
       import-in-the-middle: 1.13.1
       require-in-the-middle: 7.5.2
-      semver: 7.7.1
+      semver: 7.7.2
       shimmer: 1.2.1
     transitivePeerDependencies:
       - supports-color
@@ -14141,18 +14017,18 @@ snapshots:
       "@rollup/pluginutils": 5.1.4(rollup@3.29.5)
       commondir: 1.0.1
       estree-walker: 2.0.2
-      fdir: 6.4.4(picomatch@4.0.2)
+      fdir: 6.4.4(picomatch@4.0.3)
       is-reference: 1.2.1
       magic-string: 0.30.17
-      picomatch: 4.0.2
+      picomatch: 4.0.3
     optionalDependencies:
       rollup: 3.29.5
 
   "@rollup/pluginutils@5.1.4(rollup@3.29.5)":
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       estree-walker: 2.0.2
-      picomatch: 4.0.2
+      picomatch: 4.0.3
     optionalDependencies:
       rollup: 3.29.5
 
@@ -14567,7 +14443,7 @@ snapshots:
 
   "@types/estree-jsx@1.0.5":
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
 
   "@types/estree@1.0.7": {}
 
@@ -15000,7 +14876,7 @@ snapshots:
 
   agent-base@6.0.2:
     dependencies:
-      debug: 4.4.0
+      debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
 
@@ -15144,8 +15020,8 @@ snapshots:
 
   autoprefixer@10.4.21(postcss@8.5.3):
     dependencies:
-      browserslist: 4.24.4
-      caniuse-lite: 1.0.30001707
+      browserslist: 4.25.2
+      caniuse-lite: 1.0.30001733
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.1.1
@@ -15197,7 +15073,7 @@ snapshots:
     dependencies:
       bytes: 3.1.2
       content-type: 1.0.5
-      debug: 4.4.0
+      debug: 4.4.1
       http-errors: 2.0.0
       iconv-lite: 0.6.3
       on-finished: 2.4.1
@@ -15227,13 +15103,6 @@ snapshots:
   browserify-zlib@0.2.0:
     dependencies:
       pako: 1.0.11
-
-  browserslist@4.24.4:
-    dependencies:
-      caniuse-lite: 1.0.30001707
-      electron-to-chromium: 1.5.109
-      node-releases: 2.0.19
-      update-browserslist-db: 1.1.3(browserslist@4.24.4)
 
   browserslist@4.25.2:
     dependencies:
@@ -15284,8 +15153,6 @@ snapshots:
   callsites@3.1.0: {}
 
   camelcase-css@2.0.1: {}
-
-  caniuse-lite@1.0.30001707: {}
 
   caniuse-lite@1.0.30001733: {}
 
@@ -15508,10 +15375,6 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
-  debug@4.4.0:
-    dependencies:
-      ms: 2.1.3
-
   debug@4.4.1:
     dependencies:
       ms: 2.1.3
@@ -15612,8 +15475,6 @@ snapshots:
       safe-buffer: 5.2.1
 
   ee-first@1.1.1: {}
-
-  electron-to-chromium@1.5.109: {}
 
   electron-to-chromium@1.5.199: {}
 
@@ -15967,8 +15828,6 @@ snapshots:
 
   eslint-visitor-keys@3.4.3: {}
 
-  eslint-visitor-keys@4.2.0: {}
-
   eslint-visitor-keys@4.2.1: {}
 
   eslint@9.26.0(jiti@2.4.2):
@@ -15985,15 +15844,15 @@ snapshots:
       "@humanwhocodes/module-importer": 1.0.1
       "@humanwhocodes/retry": 0.4.3
       "@modelcontextprotocol/sdk": 1.11.1
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       "@types/json-schema": 7.0.15
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
-      debug: 4.4.0
+      debug: 4.4.1
       escape-string-regexp: 4.0.0
       eslint-scope: 8.3.0
-      eslint-visitor-keys: 4.2.0
+      eslint-visitor-keys: 4.2.1
       espree: 10.3.0
       esquery: 1.6.0
       esutils: 2.0.3
@@ -16019,7 +15878,7 @@ snapshots:
     dependencies:
       acorn: 8.14.1
       acorn-jsx: 5.3.2(acorn@8.14.1)
-      eslint-visitor-keys: 4.2.0
+      eslint-visitor-keys: 4.2.1
 
   esquery@1.6.0:
     dependencies:
@@ -16035,7 +15894,7 @@ snapshots:
 
   estree-util-attach-comments@3.0.0:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
 
   estree-util-build-jsx@3.0.1:
     dependencies:
@@ -16048,7 +15907,7 @@ snapshots:
 
   estree-util-scope@1.0.0:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       devlop: 1.1.0
 
   estree-util-to-js@2.0.0:
@@ -16066,7 +15925,7 @@ snapshots:
 
   estree-walker@3.0.3:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
 
   esutils@2.0.3: {}
 
@@ -16111,7 +15970,7 @@ snapshots:
       content-type: 1.0.5
       cookie: 0.7.2
       cookie-signature: 1.2.2
-      debug: 4.4.0
+      debug: 4.4.1
       encodeurl: 2.0.0
       escape-html: 1.0.3
       etag: 1.8.1
@@ -16171,10 +16030,6 @@ snapshots:
     dependencies:
       walk-up-path: 4.0.0
 
-  fdir@6.4.4(picomatch@4.0.2):
-    optionalDependencies:
-      picomatch: 4.0.2
-
   fdir@6.4.4(picomatch@4.0.3):
     optionalDependencies:
       picomatch: 4.0.3
@@ -16191,7 +16046,7 @@ snapshots:
 
   finalhandler@2.1.0:
     dependencies:
-      debug: 4.4.0
+      debug: 4.4.1
       encodeurl: 2.0.0
       escape-html: 1.0.3
       on-finished: 2.4.1
@@ -16334,10 +16189,6 @@ snapshots:
       es-errors: 1.3.0
       get-intrinsic: 1.3.0
 
-  get-tsconfig@4.10.0:
-    dependencies:
-      resolve-pkg-maps: 1.0.0
-
   get-tsconfig@4.10.1:
     dependencies:
       resolve-pkg-maps: 1.0.0
@@ -16464,7 +16315,7 @@ snapshots:
 
   hast-util-to-estree@3.1.3:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       "@types/estree-jsx": 1.0.5
       "@types/hast": 3.0.4
       comma-separated-tokens: 2.0.3
@@ -16485,7 +16336,7 @@ snapshots:
 
   hast-util-to-jsx-runtime@2.3.6:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       "@types/hast": 3.0.4
       "@types/unist": 3.0.3
       comma-separated-tokens: 2.0.3
@@ -16543,14 +16394,14 @@ snapshots:
   https-proxy-agent@5.0.1:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.4.0
+      debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
 
   https-proxy-agent@7.0.6:
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0
+      debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
 
@@ -16713,7 +16564,7 @@ snapshots:
 
   is-reference@1.2.1:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
 
   is-regex@1.2.1:
     dependencies:
@@ -16924,7 +16775,7 @@ snapshots:
     dependencies:
       chalk: 5.4.1
       commander: 13.1.0
-      debug: 4.4.0
+      debug: 4.4.1
       execa: 8.0.1
       lilconfig: 3.1.3
       listr2: 8.2.5
@@ -17001,11 +16852,11 @@ snapshots:
 
   magic-string@0.30.17:
     dependencies:
-      "@jridgewell/sourcemap-codec": 1.5.0
+      "@jridgewell/sourcemap-codec": 1.5.4
 
   magic-string@0.30.8:
     dependencies:
-      "@jridgewell/sourcemap-codec": 1.5.0
+      "@jridgewell/sourcemap-codec": 1.5.4
 
   make-cancellable-promise@1.3.2: {}
 
@@ -17280,7 +17131,7 @@ snapshots:
 
   micromark-extension-mdx-expression@3.0.1:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       devlop: 1.1.0
       micromark-factory-mdx-expression: 2.0.3
       micromark-factory-space: 2.0.1
@@ -17291,7 +17142,7 @@ snapshots:
 
   micromark-extension-mdx-jsx@3.0.2:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       devlop: 1.1.0
       estree-util-is-identifier-name: 3.0.0
       micromark-factory-mdx-expression: 2.0.3
@@ -17308,7 +17159,7 @@ snapshots:
 
   micromark-extension-mdxjs-esm@3.0.0:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       devlop: 1.1.0
       micromark-core-commonmark: 2.0.3
       micromark-util-character: 2.1.1
@@ -17344,7 +17195,7 @@ snapshots:
 
   micromark-factory-mdx-expression@2.0.3:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       devlop: 1.1.0
       micromark-factory-space: 2.0.1
       micromark-util-character: 2.1.1
@@ -17408,7 +17259,7 @@ snapshots:
 
   micromark-util-events-to-acorn@2.0.3:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       "@types/unist": 3.0.3
       devlop: 1.1.0
       estree-util-visit: 2.0.0
@@ -17446,7 +17297,7 @@ snapshots:
   micromark@4.0.2:
     dependencies:
       "@types/debug": 4.1.12
-      debug: 4.4.0
+      debug: 4.4.1
       decode-named-character-reference: 1.2.0
       devlop: 1.1.0
       micromark-core-commonmark: 2.0.3
@@ -17563,7 +17414,7 @@ snapshots:
       "@next/env": 14.2.15
       "@swc/helpers": 0.5.5
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001707
+      caniuse-lite: 1.0.30001733
       graceful-fs: 4.2.11
       postcss: 8.4.31
       react: 18.3.1
@@ -17591,7 +17442,7 @@ snapshots:
       "@swc/counter": 0.1.3
       "@swc/helpers": 0.5.15
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001707
+      caniuse-lite: 1.0.30001733
       postcss: 8.4.31
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -17614,7 +17465,7 @@ snapshots:
 
   node-abi@3.75.0:
     dependencies:
-      semver: 7.7.1
+      semver: 7.7.2
     optional: true
 
   node-addon-api@7.1.1:
@@ -17819,8 +17670,6 @@ snapshots:
   picocolors@1.1.1: {}
 
   picomatch@2.3.1: {}
-
-  picomatch@4.0.2: {}
 
   picomatch@4.0.3: {}
 
@@ -18303,7 +18152,7 @@ snapshots:
 
   recma-build-jsx@1.0.0:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       estree-util-build-jsx: 3.0.1
       vfile: 6.0.3
 
@@ -18319,14 +18168,14 @@ snapshots:
 
   recma-parse@1.0.0:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       esast-util-from-js: 2.0.1
       unified: 11.0.5
       vfile: 6.0.3
 
   recma-stringify@1.0.0:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       estree-util-to-js: 2.0.0
       unified: 11.0.5
       vfile: 6.0.3
@@ -18355,7 +18204,7 @@ snapshots:
 
   rehype-recma@1.0.0:
     dependencies:
-      "@types/estree": 1.0.7
+      "@types/estree": 1.0.8
       "@types/hast": 3.0.4
       hast-util-to-estree: 3.1.3
     transitivePeerDependencies:
@@ -18408,7 +18257,7 @@ snapshots:
 
   require-in-the-middle@7.5.2:
     dependencies:
-      debug: 4.4.0
+      debug: 4.4.1
       module-details-from-path: 1.0.3
       resolve: 1.22.10
     transitivePeerDependencies:
@@ -18493,7 +18342,7 @@ snapshots:
 
   router@2.2.0:
     dependencies:
-      debug: 4.4.0
+      debug: 4.4.1
       depd: 2.0.0
       is-promise: 4.0.0
       parseurl: 1.3.3
@@ -18551,13 +18400,11 @@ snapshots:
 
   semver@6.3.1: {}
 
-  semver@7.7.1: {}
-
   semver@7.7.2: {}
 
   send@1.2.0:
     dependencies:
-      debug: 4.4.0
+      debug: 4.4.1
       encodeurl: 2.0.0
       escape-html: 1.0.3
       etag: 1.8.1
@@ -18614,7 +18461,7 @@ snapshots:
     dependencies:
       color: 4.2.3
       detect-libc: 2.0.3
-      semver: 7.7.1
+      semver: 7.7.2
     optionalDependencies:
       "@img/sharp-darwin-arm64": 0.33.5
       "@img/sharp-darwin-x64": 0.33.5
@@ -18908,7 +18755,7 @@ snapshots:
 
   sucrase@3.35.0:
     dependencies:
-      "@jridgewell/gen-mapping": 0.3.8
+      "@jridgewell/gen-mapping": 0.3.12
       commander: 4.1.1
       glob: 10.4.5
       lines-and-columns: 1.2.4
@@ -19024,15 +18871,10 @@ snapshots:
 
   tinyexec@0.3.2: {}
 
-  tinyglobby@0.2.13:
+  tinyglobby@0.2.14:
     dependencies:
       fdir: 6.4.4(picomatch@4.0.3)
       picomatch: 4.0.3
-
-  tinyglobby@0.2.14:
-    dependencies:
-      fdir: 6.4.4(picomatch@4.0.2)
-      picomatch: 4.0.2
 
   tinypool@1.1.1: {}
 
@@ -19079,7 +18921,7 @@ snapshots:
       cac: 6.7.14
       chokidar: 4.0.3
       consola: 3.4.2
-      debug: 4.4.0
+      debug: 4.4.1
       esbuild: 0.25.0
       fix-dts-default-cjs-exports: 1.0.1
       joycon: 3.1.1
@@ -19090,7 +18932,7 @@ snapshots:
       source-map: 0.8.0-beta.0
       sucrase: 3.35.0
       tinyexec: 0.3.2
-      tinyglobby: 0.2.13
+      tinyglobby: 0.2.14
       tree-kill: 1.2.2
     optionalDependencies:
       postcss: 8.5.3
@@ -19104,7 +18946,7 @@ snapshots:
   tsx@4.19.4:
     dependencies:
       esbuild: 0.25.0
-      get-tsconfig: 4.10.0
+      get-tsconfig: 4.10.1
     optionalDependencies:
       fsevents: 2.3.3
 
@@ -19249,7 +19091,7 @@ snapshots:
     dependencies:
       acorn: 8.14.1
       chokidar: 3.6.0
-      webpack-sources: 3.2.3
+      webpack-sources: 3.3.3
       webpack-virtual-modules: 0.5.0
 
   unplugin@2.1.0:
@@ -19281,12 +19123,6 @@ snapshots:
       "@unrs/resolver-binding-win32-arm64-msvc": 1.11.1
       "@unrs/resolver-binding-win32-ia32-msvc": 1.11.1
       "@unrs/resolver-binding-win32-x64-msvc": 1.11.1
-
-  update-browserslist-db@1.1.3(browserslist@4.24.4):
-    dependencies:
-      browserslist: 4.24.4
-      escalade: 3.2.0
-      picocolors: 1.1.1
 
   update-browserslist-db@1.1.3(browserslist@4.25.2):
     dependencies:
@@ -19399,8 +19235,8 @@ snapshots:
   vite@6.3.5(@types/node@22.8.1)(jiti@2.4.2)(terser@5.43.1)(tsx@4.19.4)(yaml@2.7.0):
     dependencies:
       esbuild: 0.25.0
-      fdir: 6.4.4(picomatch@4.0.2)
-      picomatch: 4.0.2
+      fdir: 6.4.4(picomatch@4.0.3)
+      picomatch: 4.0.3
       postcss: 8.5.3
       rollup: 4.41.0
       tinyglobby: 0.2.14
@@ -19427,7 +19263,7 @@ snapshots:
       expect-type: 1.2.2
       magic-string: 0.30.17
       pathe: 2.0.3
-      picomatch: 4.0.2
+      picomatch: 4.0.3
       std-env: 3.9.0
       tinybench: 2.9.0
       tinyexec: 0.3.2
@@ -19472,8 +19308,6 @@ snapshots:
   webidl-conversions@3.0.1: {}
 
   webidl-conversions@4.0.2: {}
-
-  webpack-sources@3.2.3: {}
 
   webpack-sources@3.3.3: {}
 
