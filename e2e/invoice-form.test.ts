@@ -13,7 +13,7 @@ import {
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
-import { GITHUB_URL, VIDEO_DEMO_URL } from "@/config";
+import { VIDEO_DEMO_URL } from "@/config";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -57,9 +57,6 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     await expect(
-      header.getByRole("link", { name: "Open Source" })
-    ).toBeVisible();
-    await expect(
       header.getByRole("link", { name: "Share your feedback" })
     ).toBeVisible();
 
@@ -102,9 +99,8 @@ test.describe("Invoice Generator Page", () => {
       dialog.getByRole("heading", { name: "How EasyInvoicePDF Works" })
     ).toBeHidden();
 
-    await expect(
-      header.getByRole("link", { name: "Open Source" })
-    ).toHaveAttribute("href", GITHUB_URL);
+    // Verify GitHub Star CTA button is visible
+    await expect(page.getByTestId("github-star-cta-button")).toBeVisible();
 
     // Verify buttons are enabled
     await expect(

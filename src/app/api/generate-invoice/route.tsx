@@ -149,7 +149,7 @@ export async function GET(req: NextRequest) {
 
     const compressedData = compressToEncodedURIComponent(compressedJson);
 
-    const invoiceUrl = `https://easyinvoicepdf.com/?data=${compressedData}`;
+    const invoiceUrl = `https://easyinvoicepdf.com/?template=${newInvoiceDataValidated.template}&data=${compressedData}`;
 
     const monthAndYear = dayjs().format("MMMM YYYY");
 

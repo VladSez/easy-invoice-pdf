@@ -7,7 +7,6 @@ import {
   SUPPORTED_TEMPLATES,
   type InvoiceData,
 } from "@/app/schema";
-import { GithubIcon } from "@/components/etc/github-logo";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +22,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { Footer } from "@/components/footer";
+import { GitHubStarCTA } from "@/components/github-star-cta";
 import { ProjectLogoDescription } from "@/components/project-logo-description";
 import { GITHUB_URL, VIDEO_DEMO_URL } from "@/config";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
@@ -590,6 +590,7 @@ export function AppPageClient() {
           </ul>
         }
       />
+      <GitHubStarCTA />
     </TooltipProvider>
   );
 }
@@ -605,18 +606,12 @@ function ProjectInfo() {
   return (
     <>
       <span className="relative bottom-0 text-center text-sm text-gray-900 lg:bottom-3">
-        <a
-          href={GITHUB_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group inline-flex items-center gap-1"
-          title="View on GitHub"
+        <button
+          onClick={handleWatchDemoClick}
+          className="inline-flex items-center gap-1.5 transition-colors hover:text-blue-600 hover:underline"
         >
-          <span className="transition-all group-hover:text-blue-600 group-hover:underline">
-            Open Source
-          </span>
-          <GithubIcon />
-        </a>
+          <span>How it works</span>
+        </button>
         {" | "}
         <a
           href="https://dub.sh/easy-invoice-pdf-feedback"
@@ -625,13 +620,6 @@ function ProjectInfo() {
         >
           Share your feedback
         </a>
-        {" | "}
-        <button
-          onClick={handleWatchDemoClick}
-          className="inline-flex items-center gap-1.5 transition-colors hover:text-blue-600 hover:underline"
-        >
-          <span>How it works</span>
-        </button>
       </span>
 
       <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
