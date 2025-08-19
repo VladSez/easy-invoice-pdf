@@ -96,9 +96,9 @@
     "@types/pdf-parse": "1.1.5",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
-    "@typescript/native-preview": "7.0.0-dev.20250810.1",
+    "@typescript/native-preview": "7.0.0-dev.20250819.1",
     "autoprefixer": "10.4.21",
-    "eslint": "9.26.0",
+    "eslint": "9.33.0",
     "eslint-config-next": "15.2.3",
     "eslint-plugin-playwright": "2.2.0",
     "eslint-plugin-react-you-might-not-need-an-effect": "0.0.39",
@@ -113,7 +113,7 @@
     "schema-dts": "1.1.5",
     "tailwindcss": "3.4.14",
     "typescript": "5.9.2",
-    "typescript-eslint": "8.39.0",
+    "typescript-eslint": "8.40.0",
     "vitest": "3.2.4"
   }
 }

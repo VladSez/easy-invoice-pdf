@@ -25,6 +25,54 @@ test.describe("Invoice Generator Page", () => {
     await expect(page).toHaveURL("/?template=default");
   });
 
+  test("displays correct OG meta tags for default template", async ({
+    page,
+  }) => {
+    // Navigate to default template
+    await page.goto("/?template=default");
+
+    await expect(page).toHaveURL("/?template=default");
+
+    const templateCombobox = page.getByRole("combobox", {
+      name: "Invoice Template",
+    });
+    await expect(templateCombobox).toHaveValue("default");
+
+    // Check that OG image changed to Stripe template
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+      "content",
+      "https://static.easyinvoicepdf.com/easy-invoice-opengraph-image.png?v=5",
+    );
+
+    // Check other meta tags for Stripe template
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+      "content",
+      "App | Free Invoice Generator – Live Preview, No Sign-Up",
+    );
+    await expect(
+      page.locator('meta[property="og:description"]'),
+    ).toHaveAttribute(
+      "content",
+      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
+    );
+    await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
+      "content",
+      "EasyInvoicePDF.com | Free Invoice Generator",
+    );
+
+    // Verify OG image dimensions
+    await expect(
+      page.locator('meta[property="og:image:width"]'),
+    ).toHaveAttribute("content", "1200");
+    await expect(
+      page.locator('meta[property="og:image:height"]'),
+    ).toHaveAttribute("content", "630");
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+      "content",
+      "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
+    );
+  });
+
   test("displays correct buttons and links in header", async ({ page }) => {
     // Check URL is correct
     await expect(page).toHaveURL("/?template=default");
