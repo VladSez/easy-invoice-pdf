@@ -21,7 +21,9 @@
 
 #### Stripe Invoice Template
 
-<img width="1440" height="769" alt="stripe template" src=".github/screenshots/stripe-tmp.png" />
+<img width="1440" height="769" alt="stripe template" src=".github/screenshots/stripe.png" />
+
+<img width="1440" height="769" alt="stripe template with logo" src=".github/screenshots/stripe-with-logo.png" />
 
 ## Demo Video 🎥
 
