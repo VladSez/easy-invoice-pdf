@@ -22,7 +22,7 @@ export function StripeFooter({
   const invoiceNumber = `${invoiceNumberValue}`;
 
   const paymentDueDate = dayjs(invoiceData.paymentDue).format(
-    invoiceData.dateFormat
+    invoiceData.dateFormat,
   );
 
   return (

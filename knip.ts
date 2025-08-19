@@ -15,7 +15,6 @@ const config: KnipConfig = {
     "@ianvs/prettier-plugin-sort-imports",
     "react-email",
     "react-scan",
-    "@stagewise/toolbar-next",
   ],
   ignore: [
     "lint-staged.config.js",

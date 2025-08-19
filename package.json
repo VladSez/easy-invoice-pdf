@@ -2,7 +2,7 @@
   "name": "pdf-invoice-generator",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.9.0",
+  "packageManager": "pnpm@10.14.0",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -17,7 +17,8 @@
     "prettify": "prettier --write --cache '**/*.{ts?(x),json,js,mjs,yml,yaml,md}'",
     "knip": "knip",
     "update-deps": "pnpm upgrade --interactive --latest",
-    "test": "pnpm exec playwright test --reporter=list",
+    "vitest": "vitest --reporter=verbose",
+    "vitest:ui": "vitest --ui",
     "e2e": "pnpm exec playwright test --reporter=list",
     "e2e:ui": "pnpm exec playwright test --ui",
     "dedupe": "pnpm dedupe",
@@ -31,6 +32,7 @@
     "@hookform/resolvers": "3.9.0",
     "@mdx-js/loader": "3.1.0",
     "@mdx-js/react": "3.1.0",
+    "@microlink/react-json-view": "1.27.0",
     "@next/mdx": "15.3.3",
     "@radix-ui/react-accordion": "1.2.3",
     "@radix-ui/react-alert-dialog": "1.1.6",
@@ -88,15 +90,14 @@
     "@eslint/eslintrc": "3.3.1",
     "@next/eslint-plugin-next": "15.2.3",
     "@playwright/test": "1.52.0",
-    "@stagewise/toolbar-next": "0.1.2",
     "@types/file-saver": "2.0.7",
     "@types/node": "22.8.1",
     "@types/pdf-parse": "1.1.5",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
-    "@typescript/native-preview": "7.0.0-dev.20250525.1",
+    "@typescript/native-preview": "7.0.0-dev.20250819.1",
     "autoprefixer": "10.4.21",
-    "eslint": "9.26.0",
+    "eslint": "9.33.0",
     "eslint-config-next": "15.2.3",
     "eslint-plugin-playwright": "2.2.0",
     "eslint-plugin-react-you-might-not-need-an-effect": "0.0.39",
@@ -110,7 +111,8 @@
     "react-scan": "0.3.4",
     "schema-dts": "1.1.5",
     "tailwindcss": "3.4.14",
-    "typescript": "5.8.3",
-    "typescript-eslint": "8.32.0"
+    "typescript": "5.9.2",
+    "typescript-eslint": "8.40.0",
+    "vitest": "3.2.4"
   }
 }

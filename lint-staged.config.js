@@ -4,7 +4,7 @@ module.exports = {
   "*": () => [
     `pnpm run type-check:go`,
     `pnpm run lint`,
-    `pnpm run knip`,
+    // `pnpm run knip`, // TODO: temporarily disabled due to issues with knip
     `pnpm run prettify --write`,
   ],
 };

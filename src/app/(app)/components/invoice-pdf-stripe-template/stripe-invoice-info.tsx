@@ -16,13 +16,13 @@ export function StripeInvoiceInfo({
   const t = TRANSLATIONS[language];
 
   const dateOfIssue = dayjs(invoiceData.dateOfIssue).format(
-    invoiceData.dateFormat
+    invoiceData.dateFormat,
   );
 
   const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
 
   const paymentDueDate = dayjs(invoiceData.paymentDue).format(
-    invoiceData.dateFormat
+    invoiceData.dateFormat,
   );
 
   // for better readability, we need to adjust the column width based on the language

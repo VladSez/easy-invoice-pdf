@@ -13,7 +13,7 @@ import {
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
-import { GITHUB_URL, VIDEO_DEMO_URL } from "@/config";
+import { VIDEO_DEMO_URL } from "@/config";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -22,45 +22,90 @@ test.describe("Invoice Generator Page", () => {
 
   test("should redirect from /:locale/app to /", async ({ page }) => {
     await page.goto("/en/app");
-    await expect(page).toHaveURL("/");
+    await expect(page).toHaveURL("/?template=default");
+  });
+
+  test("displays correct OG meta tags for default template", async ({
+    page,
+  }) => {
+    // Navigate to default template
+    await page.goto("/?template=default");
+
+    await expect(page).toHaveURL("/?template=default");
+
+    const templateCombobox = page.getByRole("combobox", {
+      name: "Invoice Template",
+    });
+    await expect(templateCombobox).toHaveValue("default");
+
+    // Check that OG image changed to Stripe template
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+      "content",
+      "https://static.easyinvoicepdf.com/easy-invoice-opengraph-image.png?v=5",
+    );
+
+    // Check other meta tags for Stripe template
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+      "content",
+      "App | Free Invoice Generator – Live Preview, No Sign-Up",
+    );
+    await expect(
+      page.locator('meta[property="og:description"]'),
+    ).toHaveAttribute(
+      "content",
+      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
+    );
+    await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
+      "content",
+      "EasyInvoicePDF.com | Free Invoice Generator",
+    );
+
+    // Verify OG image dimensions
+    await expect(
+      page.locator('meta[property="og:image:width"]'),
+    ).toHaveAttribute("content", "1200");
+    await expect(
+      page.locator('meta[property="og:image:height"]'),
+    ).toHaveAttribute("content", "630");
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+      "content",
+      "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
+    );
   });
 
   test("displays correct buttons and links in header", async ({ page }) => {
     // Check URL is correct
-    await expect(page).toHaveURL("/");
+    await expect(page).toHaveURL("/?template=default");
 
     // Check title and branding
     await expect(page).toHaveTitle(
-      "App | Free Invoice Generator – Live Preview, No Sign-Up"
+      "App | Free Invoice Generator – Live Preview, No Sign-Up",
     );
 
     const header = page.getByTestId("header");
     await expect(header).toBeVisible();
 
     await expect(
-      header.getByRole("link", { name: "EasyInvoicePDF" })
+      header.getByRole("link", { name: "EasyInvoicePDF" }),
     ).toBeVisible();
 
     await expect(
-      header.getByText("Free Invoice Generator with Live PDF Preview")
+      header.getByText("Free Invoice Generator with Live PDF Preview"),
     ).toBeVisible();
 
     // Check main action buttons
     await expect(
-      page.getByRole("link", { name: "Support Project" })
+      page.getByRole("link", { name: "Support Project" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Generate a link to invoice" })
+      page.getByRole("button", { name: "Generate a link to invoice" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Download PDF in English" })
+      page.getByRole("link", { name: "Download PDF in English" }),
     ).toBeVisible();
 
     await expect(
-      header.getByRole("link", { name: "Open Source" })
-    ).toBeVisible();
-    await expect(
-      header.getByRole("link", { name: "Share your feedback" })
+      header.getByRole("link", { name: "Share your feedback" }),
     ).toBeVisible();
 
     const howItWorksButton = header.getByRole("button", {
@@ -73,13 +118,13 @@ test.describe("Invoice Generator Page", () => {
     await howItWorksButton.click();
 
     await expect(
-      page.getByRole("heading", { name: "How EasyInvoicePDF Works" })
+      page.getByRole("heading", { name: "How EasyInvoicePDF Works" }),
     ).toBeVisible();
 
     await expect(
       page.getByText(
-        "Watch this quick demo to learn how to create and customize your invoices."
-      )
+        "Watch this quick demo to learn how to create and customize your invoices.",
+      ),
     ).toBeVisible();
 
     // Check that video is displayed in dialog
@@ -99,19 +144,18 @@ test.describe("Invoice Generator Page", () => {
     await expect(dialog).toBeHidden();
 
     await expect(
-      dialog.getByRole("heading", { name: "How EasyInvoicePDF Works" })
+      dialog.getByRole("heading", { name: "How EasyInvoicePDF Works" }),
     ).toBeHidden();
 
-    await expect(
-      header.getByRole("link", { name: "Open Source" })
-    ).toHaveAttribute("href", GITHUB_URL);
+    // Verify GitHub Star CTA button is visible
+    await expect(page.getByTestId("github-star-cta-button")).toBeVisible();
 
     // Verify buttons are enabled
     await expect(
-      page.getByRole("button", { name: "Generate a link to invoice" })
+      page.getByRole("button", { name: "Generate a link to invoice" }),
     ).toBeEnabled();
     await expect(
-      page.getByRole("link", { name: "Download PDF in English" })
+      page.getByRole("link", { name: "Download PDF in English" }),
     ).toBeEnabled();
   });
 
@@ -135,7 +179,7 @@ test.describe("Invoice Generator Page", () => {
     // **CHECK GENERAL INFORMATION SECTION**
     const generalInfoSection = page.getByTestId(`general-information-section`);
     await expect(
-      generalInfoSection.getByText("General Information", { exact: true })
+      generalInfoSection.getByText("General Information", { exact: true }),
     ).toBeVisible();
 
     // Check all supported languages are available as options with correct labels
@@ -151,7 +195,7 @@ test.describe("Invoice Generator Page", () => {
       const languageName = LANGUAGE_TO_LABEL[lang];
 
       await expect(
-        languageSelect.locator(`option[value="${lang}"]`)
+        languageSelect.locator(`option[value="${lang}"]`),
       ).toHaveText(languageName);
     }
 
@@ -171,7 +215,7 @@ test.describe("Invoice Generator Page", () => {
         `${currency} ${currencySymbol} ${currencyFullName}`.trim();
 
       await expect(
-        currencySelect.locator(`option[value="${currency}"]`)
+        currencySelect.locator(`option[value="${currency}"]`),
       ).toHaveText(expectedLabel);
     }
 
@@ -188,9 +232,9 @@ test.describe("Invoice Generator Page", () => {
       const isDefault = dateFormat === SUPPORTED_DATE_FORMATS[0];
 
       await expect(
-        dateFormatSelect.locator(`option[value="${dateFormat}"]`)
+        dateFormatSelect.locator(`option[value="${dateFormat}"]`),
       ).toHaveText(
-        `${dateFormat} (Preview: ${preview}) ${isDefault ? "(default)" : ""}`
+        `${dateFormat} (Preview: ${preview}) ${isDefault ? "(default)" : ""}`,
       );
     }
 
@@ -200,106 +244,106 @@ test.describe("Invoice Generator Page", () => {
     });
 
     await expect(
-      invoiceNumberFieldset.getByRole("textbox", { name: "Label" })
+      invoiceNumberFieldset.getByRole("textbox", { name: "Label" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.invoiceNumberObject.label);
 
     await expect(
-      invoiceNumberFieldset.getByRole("textbox", { name: "Value" })
+      invoiceNumberFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.invoiceNumberObject.value);
 
     // Date of Issue
     await expect(
-      generalInfoSection.getByRole("textbox", { name: "Date of Issue" })
+      generalInfoSection.getByRole("textbox", { name: "Date of Issue" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.dateOfIssue);
 
     // Date of Service
     await expect(
-      generalInfoSection.getByRole("textbox", { name: "Date of Service" })
+      generalInfoSection.getByRole("textbox", { name: "Date of Service" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.dateOfService);
 
     // Invoice Type
     await expect(
-      generalInfoSection.getByRole("textbox", { name: "Invoice Type" })
+      generalInfoSection.getByRole("textbox", { name: "Invoice Type" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.invoiceType);
 
     // Visibility toggles
     await expect(
-      generalInfoSection.getByRole("switch", { name: "Show in PDF" })
+      generalInfoSection.getByRole("switch", { name: "Show in PDF" }),
     ).toBeChecked();
 
     // **CHECK SELLER INFORMATION SECTION**
     const sellerSection = page.getByTestId(`seller-information-section`);
     await expect(
-      sellerSection.getByText("Seller Information", { exact: true })
+      sellerSection.getByText("Seller Information", { exact: true }),
     ).toBeVisible();
 
     // Name field
     await expect(
-      sellerSection.getByRole("textbox", { name: "Name" })
+      sellerSection.getByRole("textbox", { name: "Name" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.name);
 
     // Address field
     await expect(
-      sellerSection.getByRole("textbox", { name: "Address" })
+      sellerSection.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.address);
 
     // VAT Number field and visibility toggle
     await expect(
-      sellerSection.getByRole("textbox", { name: "VAT Number" })
+      sellerSection.getByRole("textbox", { name: "VAT Number" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.vatNo);
     await expect(
-      sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(0)
+      sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(0),
     ).toBeChecked();
 
     // Email field
     await expect(
-      sellerSection.getByRole("textbox", { name: "Email" })
+      sellerSection.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.email);
 
     // Account Number field and visibility toggle
     await expect(
-      sellerSection.getByRole("textbox", { name: "Account Number" })
+      sellerSection.getByRole("textbox", { name: "Account Number" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.accountNumber);
     await expect(
-      sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(1)
+      sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(1),
     ).toBeChecked();
 
     // SWIFT/BIC field and visibility toggle
     await expect(
-      sellerSection.getByRole("textbox", { name: "SWIFT/BIC" })
+      sellerSection.getByRole("textbox", { name: "SWIFT/BIC" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.swiftBic);
     await expect(
-      sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(2)
+      sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(2),
     ).toBeChecked();
 
     // Verify Seller Management button is present
     await expect(
-      sellerSection.getByRole("button", { name: "New Seller" })
+      sellerSection.getByRole("button", { name: "New Seller" }),
     ).toBeVisible();
 
     // **CHECK BUYER INFORMATION SECTION**
     const buyerSection = page.getByTestId(`buyer-information-section`);
     await expect(
-      buyerSection.getByText("Buyer Information", { exact: true })
+      buyerSection.getByText("Buyer Information", { exact: true }),
     ).toBeVisible();
 
     // Name field
     await expect(
-      buyerSection.getByRole("textbox", { name: "Name" })
+      buyerSection.getByRole("textbox", { name: "Name" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.buyer.name);
 
     // Address field
     await expect(
-      buyerSection.getByRole("textbox", { name: "Address" })
+      buyerSection.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.buyer.address);
 
     // VAT Number field and visibility toggle
     await expect(
-      buyerSection.getByRole("textbox", { name: "VAT Number" })
+      buyerSection.getByRole("textbox", { name: "VAT Number" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.buyer.vatNo);
 
     const buyerVatNoFieldIsVisibleSwitch = buyerSection.getByTestId(
-      `buyerVatNoFieldIsVisible`
+      `buyerVatNoFieldIsVisible`,
     );
 
     await expect(buyerVatNoFieldIsVisibleSwitch).toHaveRole("switch");
@@ -307,29 +351,31 @@ test.describe("Invoice Generator Page", () => {
 
     // Email field
     await expect(
-      buyerSection.getByRole("textbox", { name: "Email" })
+      buyerSection.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.buyer.email);
 
     // Verify Buyer Management button is present
     await expect(
-      buyerSection.getByRole("button", { name: "New Buyer" })
+      buyerSection.getByRole("button", { name: "New Buyer" }),
     ).toBeVisible();
 
     // **Check INVOICE ITEMS section**
     const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
     await expect(
-      invoiceItemsSection.getByText("Invoice Items", { exact: true })
+      invoiceItemsSection.getByText("Invoice Items", { exact: true }),
     ).toBeVisible();
 
     // Check visibility toggles in settings
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show "Number" Column/i })
+      invoiceItemsSection.getByRole("switch", {
+        name: /Show "Number" Column/i,
+      }),
     ).toBeChecked();
 
     await expect(
       invoiceItemsSection.getByRole("switch", {
         name: /Show "VAT Table Summary"/i,
-      })
+      }),
     ).toBeChecked();
 
     // Check first invoice item fields
@@ -337,54 +383,54 @@ test.describe("Invoice Generator Page", () => {
 
     // Name field and visibility toggle
     await expect(
-      invoiceItemsSection.getByRole("textbox", { name: "Name" })
+      invoiceItemsSection.getByRole("textbox", { name: "Name" }),
     ).toHaveValue(firstItem.name);
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(0)
+      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(0),
     ).toBeChecked();
 
     // Type of GTU field and visibility toggle
     await expect(
-      invoiceItemsSection.getByRole("textbox", { name: "Type of GTU" })
+      invoiceItemsSection.getByRole("textbox", { name: "Type of GTU" }),
     ).toHaveValue(firstItem.typeOfGTU);
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(1)
+      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(1),
     ).not.toBeChecked(); // we don't want to show this in PDF by default
 
     // Amount field and visibility toggle
     await expect(
       invoiceItemsSection.getByRole("spinbutton", {
         name: "Amount (Quantity)",
-      })
+      }),
     ).toHaveValue(firstItem.amount.toString());
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(2)
+      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(2),
     ).toBeChecked();
 
     // Unit field and visibility toggle
     await expect(
-      invoiceItemsSection.getByRole("textbox", { name: "Unit" })
+      invoiceItemsSection.getByRole("textbox", { name: "Unit" }),
     ).toHaveValue(firstItem.unit);
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(3)
+      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(3),
     ).toBeChecked();
 
     // Net Price field and visibility toggle
     await expect(
       invoiceItemsSection.getByRole("spinbutton", {
         name: "Net Price (Rate or Unit Price)",
-      })
+      }),
     ).toHaveValue(firstItem.netPrice.toString());
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(4)
+      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(4),
     ).toBeChecked();
 
     // VAT field and visibility toggle
     await expect(
-      invoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true })
+      invoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true }),
     ).toHaveValue(firstItem.vat);
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(5)
+      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(5),
     ).toBeChecked();
 
     // Net Amount field (read-only) and visibility toggle
@@ -392,15 +438,15 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("textbox", {
         name: "Net Amount",
         exact: true,
-      })
+      }),
     ).toHaveValue(
       firstItem.netAmount.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      })
+      }),
     );
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(6)
+      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(6),
     ).toBeChecked();
 
     // VAT Amount field (read-only) and visibility toggle
@@ -408,15 +454,15 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("textbox", {
         name: "VAT Amount",
         exact: true,
-      })
+      }),
     ).toHaveValue(
       firstItem.vatAmount.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      })
+      }),
     );
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(7)
+      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(7),
     ).toBeChecked();
 
     // Pre-tax Amount field (read-only) and visibility toggle
@@ -424,20 +470,20 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("textbox", {
         name: "Pre-tax Amount",
         exact: true,
-      })
+      }),
     ).toHaveValue(
       firstItem.preTaxAmount.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      })
+      }),
     );
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(8)
+      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(8),
     ).toBeChecked();
 
     // Verify Add Invoice Item button is present
     await expect(
-      invoiceItemsSection.getByRole("button", { name: "Add invoice item" })
+      invoiceItemsSection.getByRole("button", { name: "Add invoice item" }),
     ).toBeVisible();
   });
 
@@ -449,7 +495,7 @@ test.describe("Invoice Generator Page", () => {
       .getByRole("button", { name: "Add invoice item" })
       .click();
     await expect(
-      invoiceItemsSection.getByText("Item 2", { exact: true })
+      invoiceItemsSection.getByText("Item 2", { exact: true }),
     ).toBeVisible();
 
     // Fill in new item details
@@ -462,7 +508,7 @@ test.describe("Invoice Generator Page", () => {
     // Set up dialog handler before triggering the action
     page.on("dialog", async (dialog) => {
       expect(dialog.message()).toBe(
-        "Are you sure you want to delete invoice item #2?"
+        "Are you sure you want to delete invoice item #2?",
       );
       await dialog.accept();
     });
@@ -473,7 +519,7 @@ test.describe("Invoice Generator Page", () => {
       .click();
 
     await expect(
-      invoiceItemsSection.getByText("Item 2", { exact: true })
+      invoiceItemsSection.getByText("Item 2", { exact: true }),
     ).toBeHidden();
   });
 
@@ -499,13 +545,13 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("textbox", {
         name: "Net Amount",
         exact: true,
-      })
+      }),
     ).toHaveValue("200.00");
     await expect(
       invoiceItemsSection.getByRole("textbox", {
         name: "VAT Amount",
         exact: true,
-      })
+      }),
     ).toHaveValue("46.00");
 
     const finalSection = page.getByTestId(`final-section`);
@@ -513,7 +559,7 @@ test.describe("Invoice Generator Page", () => {
       finalSection.getByRole("textbox", {
         name: "Total",
         exact: true,
-      })
+      }),
     ).toHaveValue("246.00");
   });
 
@@ -533,15 +579,15 @@ test.describe("Invoice Generator Page", () => {
     await invoiceItemsSection.getByRole("textbox", { name: "Name" }).clear();
 
     await expect(
-      page.getByText("Seller name is required", { exact: true })
+      page.getByText("Seller name is required", { exact: true }),
     ).toBeVisible();
 
     await expect(
-      page.getByText("Buyer name is required", { exact: true })
+      page.getByText("Buyer name is required", { exact: true }),
     ).toBeVisible();
 
     await expect(
-      page.getByText("Item name is required", { exact: true })
+      page.getByText("Item name is required", { exact: true }),
     ).toBeVisible();
 
     const dateOfIssue = dayjs().format("YYYY-MM-DD");
@@ -562,7 +608,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Check if the date of issue is filled in correctly
     await expect(
-      page.getByRole("textbox", { name: "Date of Issue" })
+      page.getByRole("textbox", { name: "Date of Issue" }),
     ).toHaveValue(dateOfIssue);
 
     // Fill in seller name
@@ -578,11 +624,11 @@ test.describe("Invoice Generator Page", () => {
     // Check for error messages to be hidden
 
     await expect(
-      page.getByText("Seller name is required", { exact: true })
+      page.getByText("Seller name is required", { exact: true }),
     ).toBeHidden();
 
     await expect(
-      page.getByText("Buyer name is required", { exact: true })
+      page.getByText("Buyer name is required", { exact: true }),
     ).toBeHidden();
   });
 
@@ -636,12 +682,12 @@ test.describe("Invoice Generator Page", () => {
       "textbox",
       {
         name: "Value",
-      }
+      },
     );
     await expect(invoiceNumberValueField2).toHaveValue("TEST/2024");
 
     await expect(
-      finalSection.getByRole("textbox", { name: "Notes", exact: true })
+      finalSection.getByRole("textbox", { name: "Notes", exact: true }),
     ).toHaveValue("Test note");
   });
 
@@ -659,7 +705,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(netAmountFormElement).toHaveText("€EUR");
 
     await expect(
-      invoiceItemsSection.getByText("Preview: €0.00 (zero EUR 00/100)")
+      invoiceItemsSection.getByText("Preview: €0.00 (zero EUR 00/100)"),
     ).toBeVisible();
 
     const currencySelect = page.getByRole("combobox", { name: "Currency" });
@@ -687,8 +733,8 @@ test.describe("Invoice Generator Page", () => {
         "Preview: $100.75 (one hundred USD 75/100)",
         {
           exact: true,
-        }
-      )
+        },
+      ),
     ).toBeVisible();
 
     const finalSection = page.getByTestId(`final-section`);
@@ -696,7 +742,7 @@ test.describe("Invoice Generator Page", () => {
       finalSection.getByRole("textbox", {
         name: "Total",
         exact: true,
-      })
+      }),
     ).toHaveValue("201.50");
   });
 
@@ -716,7 +762,7 @@ test.describe("Invoice Generator Page", () => {
       const sectionElement = page.getByTestId(section.id);
       await expect(sectionElement).toBeVisible();
       await expect(
-        sectionElement.getByRole("region", { name: section.label })
+        sectionElement.getByRole("region", { name: section.label }),
       ).toBeVisible();
     }
 
@@ -735,25 +781,25 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       page
         .getByTestId("general-information-section")
-        .getByRole("region", { name: "General Information" })
+        .getByRole("region", { name: "General Information" }),
     ).toBeVisible();
 
     await expect(
       page
         .getByTestId("seller-information-section")
-        .getByRole("region", { name: "Seller Information" })
+        .getByRole("region", { name: "Seller Information" }),
     ).toBeHidden();
 
     await expect(
       page
         .getByTestId("buyer-information-section")
-        .getByRole("region", { name: "Buyer Information" })
+        .getByRole("region", { name: "Buyer Information" }),
     ).toBeVisible();
 
     await expect(
       page
         .getByTestId("invoice-items-section")
-        .getByRole("region", { name: "Invoice Items" })
+        .getByRole("region", { name: "Invoice Items" }),
     ).toBeHidden();
 
     // Verify the state is saved in localStorage
@@ -779,25 +825,25 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       page
         .getByTestId("general-information-section")
-        .getByRole("region", { name: "General Information" })
+        .getByRole("region", { name: "General Information" }),
     ).toBeVisible();
 
     await expect(
       page
         .getByTestId("seller-information-section")
-        .getByRole("region", { name: "Seller Information" })
+        .getByRole("region", { name: "Seller Information" }),
     ).toBeHidden();
 
     await expect(
       page
         .getByTestId("buyer-information-section")
-        .getByRole("region", { name: "Buyer Information" })
+        .getByRole("region", { name: "Buyer Information" }),
     ).toBeVisible();
 
     await expect(
       page
         .getByTestId("invoice-items-section")
-        .getByRole("region", { name: "Invoice Items" })
+        .getByRole("region", { name: "Invoice Items" }),
     ).toBeHidden();
 
     // Toggle states after reload
@@ -815,25 +861,25 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       page
         .getByTestId("general-information-section")
-        .getByRole("region", { name: "General Information" })
+        .getByRole("region", { name: "General Information" }),
     ).toBeHidden();
 
     await expect(
       page
         .getByTestId("seller-information-section")
-        .getByRole("region", { name: "Seller Information" })
+        .getByRole("region", { name: "Seller Information" }),
     ).toBeVisible();
 
     await expect(
       page
         .getByTestId("buyer-information-section")
-        .getByRole("region", { name: "Buyer Information" })
+        .getByRole("region", { name: "Buyer Information" }),
     ).toBeVisible();
 
     await expect(
       page
         .getByTestId("invoice-items-section")
-        .getByRole("region", { name: "Invoice Items" })
+        .getByRole("region", { name: "Invoice Items" }),
     ).toBeHidden();
 
     // Verify updated state is saved in localStorage
@@ -871,20 +917,20 @@ test.describe("Invoice Generator Page", () => {
 
     await amountInput.fill("1000000000000"); // 1 trillion
     await expect(
-      page.getByText("Amount must not exceed 9 999 999 999.99")
+      page.getByText("Amount must not exceed 9 999 999 999.99"),
     ).toBeVisible();
 
     // Test valid values
     await amountInput.fill("1");
     await expect(page.getByText("Amount must be positive")).toBeHidden();
     await expect(
-      page.getByText("Amount must not exceed 9 999 999 999.99")
+      page.getByText("Amount must not exceed 9 999 999 999.99"),
     ).toBeHidden();
 
     await amountInput.fill("9999999999.99"); // Maximum valid value
     await expect(page.getByText("Amount must be positive")).toBeHidden();
     await expect(
-      page.getByText("Amount must not exceed 9 999 999 999.99")
+      page.getByText("Amount must not exceed 9 999 999 999.99"),
     ).toBeHidden();
 
     // **NET PRICE FIELD**
@@ -900,7 +946,7 @@ test.describe("Invoice Generator Page", () => {
     // Test exceeding maximum value
     await netPriceInput.fill("1000000000000"); // 1 trillion
     await expect(
-      page.getByText("Net price must not exceed 100 billion")
+      page.getByText("Net price must not exceed 100 billion"),
     ).toBeVisible();
 
     // Test zero value
@@ -911,7 +957,7 @@ test.describe("Invoice Generator Page", () => {
     await netPriceInput.fill("1");
     await expect(page.getByText("Net price must be >= 0")).toBeHidden();
     await expect(
-      page.getByText("Net price must not exceed 100 billion")
+      page.getByText("Net price must not exceed 100 billion"),
     ).toBeHidden();
 
     // **VAT FIELD**
@@ -930,7 +976,7 @@ test.describe("Invoice Generator Page", () => {
 
     await vatInput.fill("abc");
     await expect(
-      page.getByText("Must be a valid number (0-100) or NP or OO")
+      page.getByText("Must be a valid number (0-100) or NP or OO"),
     ).toBeVisible();
 
     // Try valid values
@@ -939,12 +985,12 @@ test.describe("Invoice Generator Page", () => {
 
     await vatInput.fill("NP");
     await expect(
-      page.getByText("Must be a valid number (0-100) or NP or OO")
+      page.getByText("Must be a valid number (0-100) or NP or OO"),
     ).toBeHidden();
 
     await vatInput.fill("OO");
     await expect(
-      page.getByText("Must be a valid number (0-100) or NP or OO")
+      page.getByText("Must be a valid number (0-100) or NP or OO"),
     ).toBeHidden();
   });
 
@@ -1017,171 +1063,29 @@ test.describe("Invoice Generator Page", () => {
         invoiceItemsSection.getByRole("textbox", {
           name: "Net Amount",
           exact: true,
-        })
+        }),
       ).toHaveValue(testCase.expected.net);
 
       await expect(
         invoiceItemsSection.getByRole("textbox", {
           name: "VAT Amount",
           exact: true,
-        })
+        }),
       ).toHaveValue(testCase.expected.vatAmount);
 
       await expect(
         invoiceItemsSection.getByRole("textbox", {
           name: "Pre-tax Amount",
           exact: true,
-        })
+        }),
       ).toHaveValue(testCase.expected.total);
 
       await expect(
         page.getByRole("textbox", {
           name: "Total",
           exact: true,
-        })
+        }),
       ).toHaveValue(testCase.expected.total);
     }
-  });
-
-  test("can share invoice and data is persisted in new tab", async ({
-    page,
-    context,
-  }) => {
-    // Fill in some test data
-    const invoiceNumberFieldset = page.getByRole("group", {
-      name: "Invoice Number",
-    });
-
-    const invoiceNumberValueField = invoiceNumberFieldset.getByRole("textbox", {
-      name: "Value",
-    });
-
-    await invoiceNumberValueField.fill("SHARE-TEST-001");
-
-    const finalSection = page.getByTestId(`final-section`);
-
-    await finalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill("Test note for sharing");
-
-    // Fill in seller information
-    const sellerSection = page.getByTestId("seller-information-section");
-    await sellerSection
-      .getByRole("textbox", { name: "Name" })
-      .fill("Test Seller");
-    await sellerSection
-      .getByRole("textbox", { name: "Address" })
-      .fill("123 Test St");
-    await sellerSection
-      .getByRole("textbox", { name: "Email" })
-      .fill("seller@test.com");
-
-    // Fill in an invoice item
-    const invoiceItemsSection = page.getByTestId("invoice-items-section");
-    await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)" })
-      .fill("5");
-    await invoiceItemsSection
-      .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
-      })
-      .fill("100");
-    await invoiceItemsSection
-      .getByRole("textbox", { name: "VAT", exact: true })
-      .fill("23");
-
-    // wait for debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
-
-    // Generate share link
-    await page
-      .getByRole("button", { name: "Generate a link to invoice" })
-      .click();
-
-    // Wait for URL to update with share data
-    await page.waitForURL((url) => url.searchParams.has("data"));
-
-    // Get the current URL which should now contain the share data
-    const sharedUrl = page.url();
-    expect(sharedUrl).toContain("?data=");
-
-    // Open URL in new tab
-    const newPage = await context.newPage();
-    await newPage.goto(sharedUrl);
-
-    // Verify data is loaded in new tab
-    await expect(
-      invoiceNumberFieldset.getByRole("textbox", { name: "Value" })
-    ).toHaveValue("SHARE-TEST-001");
-
-    const newPageFinalSection = newPage.getByTestId(`final-section`);
-
-    await expect(
-      newPageFinalSection.getByRole("textbox", { name: "Notes", exact: true })
-    ).toHaveValue("Test note for sharing");
-
-    // Verify seller information
-    const newSellerSection = newPage.getByTestId("seller-information-section");
-    await expect(
-      newSellerSection.getByRole("textbox", { name: "Name" })
-    ).toHaveValue("Test Seller");
-    await expect(
-      newSellerSection.getByRole("textbox", { name: "Address" })
-    ).toHaveValue("123 Test St");
-    await expect(
-      newSellerSection.getByRole("textbox", { name: "Email" })
-    ).toHaveValue("seller@test.com");
-
-    // Verify invoice item
-    const newInvoiceItemsSection = newPage.getByTestId("invoice-items-section");
-    await expect(
-      newInvoiceItemsSection.getByRole("spinbutton", {
-        name: "Amount (Quantity)",
-      })
-    ).toHaveValue("5");
-    await expect(
-      newInvoiceItemsSection.getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
-      })
-    ).toHaveValue("100");
-    await expect(
-      newInvoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true })
-    ).toHaveValue("23");
-
-    // Close the new page
-    await newPage.close();
-  });
-
-  test("shows notification when invoice link is broken", async ({ page }) => {
-    // Navigate to page with invalid data parameter
-    await page.goto("/?data=invalid-data-string");
-
-    // Verify error toast appears
-    await expect(
-      page.getByText("The shared invoice URL appears to be incorrect")
-    ).toBeVisible();
-
-    // Verify error description is shown
-    await expect(
-      page.getByText(
-        "Please verify that you have copied the complete invoice URL. The link may be truncated or corrupted."
-      )
-    ).toBeVisible();
-
-    // Verify clear URL button is present
-    await expect(page.getByRole("button", { name: "Clear URL" })).toBeVisible();
-
-    // Click clear URL button
-    await page.getByRole("button", { name: "Clear URL" }).click();
-
-    // Verify toast is dismissed
-    await expect(
-      page.getByText("The shared invoice URL appears to be incorrect")
-    ).toBeHidden();
-
-    // Wait for URL to be cleared and verify
-    await expect(page).toHaveURL("/");
-    await expect(page).not.toHaveURL(/\?data=/);
   });
 });

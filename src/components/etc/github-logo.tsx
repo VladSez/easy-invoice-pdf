@@ -8,7 +8,7 @@ export function GithubIcon({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       className={cn(
         "h-5 w-5 transition-all group-hover:fill-blue-600",
-        className
+        className,
       )}
     >
       <title>View on GitHub</title>

@@ -12,10 +12,14 @@ export default function robots(): MetadataRoute.Robots {
           "/",
           // Allow about pages in all languages
           ...SUPPORTED_LANGUAGES.map((locale) => `/${locale}/about`),
+          // Allow template parameter URLs
+          "/?template=*",
         ],
         disallow: [
           // Disallow shared invoice URLs, like /?data=*
-          "/?data=*",
+          "/?*data=*",
+          "/?template=*&data=*",
+          "/?data=*&template=*",
           // Disallow subscription confirmation pages with and without tokens
           "/confirm-subscription",
           "/confirm-subscription?*",

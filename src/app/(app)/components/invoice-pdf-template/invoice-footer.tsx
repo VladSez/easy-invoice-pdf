@@ -19,7 +19,7 @@ export function InvoiceFooter({
   const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
 
   const paymentDueDate = dayjs(invoiceData.paymentDue).format(
-    invoiceData.dateFormat
+    invoiceData.dateFormat,
   );
 
   const invoiceTotal = invoiceData?.total;

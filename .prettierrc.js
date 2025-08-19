@@ -2,7 +2,15 @@
 /** @typedef  {import("@ianvs/prettier-plugin-sort-imports").PluginConfig} SortImportsConfig*/
 
 const config = {
-  trailingComma: "es5",
+  trailingComma: "all",
+  singleQuote: false,
+  semi: true,
+  arrowParens: "always",
+  bracketSpacing: true,
+  endOfLine: "lf",
+  printWidth: 80,
+  tabWidth: 2,
+  useTabs: false,
   plugins: [require.resolve("prettier-plugin-tailwindcss")],
 };
 

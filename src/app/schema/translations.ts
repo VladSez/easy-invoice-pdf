@@ -119,7 +119,7 @@ export const translationSchema = z
 //   ...etc
 // }
 const languageToSchemaMap = Object.fromEntries(
-  SUPPORTED_LANGUAGES.map((lang) => [lang, translationSchema])
+  SUPPORTED_LANGUAGES.map((lang) => [lang, translationSchema]),
 );
 // Schema for all translations
 export const translationsSchema = z.object(languageToSchemaMap);

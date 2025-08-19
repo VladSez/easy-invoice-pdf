@@ -16,7 +16,7 @@ export function InvoicePaymentInfo({
   const t = TRANSLATIONS[language];
 
   const paymentDate = dayjs(invoiceData.paymentDue).format(
-    invoiceData.dateFormat
+    invoiceData.dateFormat,
   );
 
   const paymentMethodIsVisible = invoiceData.paymentMethodFieldIsVisible;

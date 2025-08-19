@@ -25,7 +25,7 @@ interface RateLimitResult {
 
 export async function checkRateLimit(
   identifier: string,
-  limiter: Ratelimit
+  limiter: Ratelimit,
 ): Promise<RateLimitResult> {
   try {
     const result = await limiter.limit(identifier);

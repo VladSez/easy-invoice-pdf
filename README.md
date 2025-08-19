@@ -1,8 +1,19 @@
-# [EasyInvoicePDF](https://easyinvoicepdf.com)
+# 🧾 [EasyInvoicePDF](https://easyinvoicepdf.com)
 
-[EasyInvoicePDF](https://easyinvoicepdf.com) – Free & Open-Source Invoice Generator | Live Preview, No Sign-Up, Runs in Your Browser.
+> Free & Open-Source Invoice Generator. Create professional invoices instantly in your browser with live preview, multiple templates, and no sign-up required. **[Try it now → easyinvoicepdf.com](https://easyinvoicepdf.com)**
 
-❤️ Love EasyInvoicePDF? Help keep it free and open-source! [Buy me a coffee](https://buymeacoffee.com/vladsazon) to support new features, better templates, and continued maintenance. Even a small contribution makes a big difference. Thank you for being part of this journey! ✨
+## Features
+
+- ⚡ **Live Preview**: See changes in real-time as you type
+- 🔗 **Shareable Links**: Send invoices directly to clients without attachments
+- ⭐ **No Sign-Up Required**: Start creating invoices immediately without any registration
+- 📱 **Browser Only**: No server uploads, your data stays private
+- 🌍 **Multi-Language**: Support for 10+ languages and all major currencies
+- 🧮 **European VAT**: Automatic VAT calculation and formatting
+- 🎨 **Multiple Templates**: Including modern **Stripe-style design**
+- 📄 **Instant PDF**: One-click download ready for printing or sending
+
+**❤️ Support the project**: [Buy me a coffee](https://buymeacoffee.com/vladsazon) to help keep EasyInvoicePDF free and open-source!
 
 #### Default Invoice Template
 
@@ -10,16 +21,7 @@
 
 #### Stripe Invoice Template
 
-<img width="1440" height="769" alt="stripe template" src=".github/screenshots/stripe.png" />
-
-## Features
-
-- **Live Preview**: See your invoice update in real-time as you make changes, ensuring it looks exactly how you want.
-- **Shareable Links**: Generate links to share your invoices directly with clients without sending attachments.
-- **Instant Download**: Download your invoice as a PDF file with one click, ready to be sent or printed.
-- **Browser Only**: Runs entirely in your browser—no server-side processing or data storage. Your data stays private and secure.
-- **Multiple Languages & Currencies**: Create invoices in multiple languages with support for all major currencies and automatic formatting.
-- **European VAT Support**: Automatically calculate European VAT rates and totals for your invoices.
+<img width="1440" height="769" alt="stripe template" src=".github/screenshots/stripe-tmp.png" />
 
 ## Demo Video 🎥
 

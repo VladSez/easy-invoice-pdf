@@ -35,7 +35,7 @@ export function InvoiceVATSummaryTable({
 
   const totalNetAmount = sortedItems.reduce(
     (acc, item) => acc + item.netAmount,
-    0
+    0,
   );
   const formattedTotalNetAmount = totalNetAmount
     .toLocaleString("en-US", {
@@ -46,7 +46,7 @@ export function InvoiceVATSummaryTable({
 
   const totalVATAmount = sortedItems.reduce(
     (acc, item) => acc + item.vatAmount,
-    0
+    0,
   );
   const formattedTotalVATAmount = totalVATAmount
     .toLocaleString("en-US", {

@@ -46,7 +46,7 @@ export function InvoicePDFDownloadMultipleLanguages({
   }, [language]);
 
   const generateAndZipPDFs = async (
-    selectedLanguages: SupportedLanguages[]
+    selectedLanguages: SupportedLanguages[],
   ) => {
     try {
       // Generate PDF documents for each selected language
@@ -83,7 +83,7 @@ export function InvoicePDFDownloadMultipleLanguages({
       selectedLanguages.forEach((lang, index) => {
         zip.file(
           `invoice-${lang}-${invoiceNumberFormatted}.pdf`,
-          pdfBlobs[index]
+          pdfBlobs[index],
         );
       });
 

@@ -13,7 +13,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       : routing.defaultLocale;
 
     const messages = await import(`../../messages/${locale}.json`).then(
-      (module: { default: typeof EnMessages }) => module.default
+      (module: { default: typeof EnMessages }) => module.default,
     );
 
     return {

@@ -31,7 +31,7 @@ export function StripeItemsTable({
 
   // Check if any items have numeric VAT values (not "NP" or "OO")
   const hasNumericVat = invoiceData.items.some(
-    (item) => typeof item.vat === "number"
+    (item) => typeof item.vat === "number",
   );
 
   // Calculate service period (example: Jan 01 2025 - Jan 31 2025)
@@ -40,7 +40,7 @@ export function StripeItemsTable({
     .format(invoiceData.dateFormat);
 
   const servicePeriodEnd = dayjs(invoiceData.dateOfService).format(
-    invoiceData.dateFormat
+    invoiceData.dateFormat,
   );
 
   const vatAmountFieldIsVisible = invoiceData.items[0].vatFieldIsVisible;

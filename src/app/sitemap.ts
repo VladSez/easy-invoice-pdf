@@ -6,7 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
 
   const languages = Object.fromEntries(
-    SUPPORTED_LANGUAGES.map((lang) => [lang, `${APP_URL}/${lang}/about`])
+    SUPPORTED_LANGUAGES.map((lang) => [lang, `${APP_URL}/${lang}/about`]),
   );
 
   const sitemapEntries: MetadataRoute.Sitemap = [

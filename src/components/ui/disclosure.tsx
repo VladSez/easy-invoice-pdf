@@ -35,7 +35,7 @@ const DisclosureGroup = React.forwardRef<HTMLDivElement, DisclosureGroupProps>(
         {...props}
         className={composeTailwindRenderProps(
           className,
-          "peer cursor-pointer disabled:cursor-not-allowed disabled:opacity-75"
+          "peer cursor-pointer disabled:cursor-not-allowed disabled:opacity-75",
         )}
       >
         {(values) => (
@@ -45,7 +45,7 @@ const DisclosureGroup = React.forwardRef<HTMLDivElement, DisclosureGroupProps>(
         )}
       </Accordion>
     );
-  }
+  },
 );
 DisclosureGroup.displayName = "DisclosureGroup";
 
@@ -61,13 +61,13 @@ const Disclosure = React.forwardRef<HTMLDivElement, CollapsibleProps>(
         {...props}
         className={composeTailwindRenderProps(
           className,
-          "w-full min-w-60 border-b disabled:opacity-60"
+          "w-full min-w-60 border-b disabled:opacity-60",
         )}
       >
         {children}
       </Collapsible>
     );
-  }
+  },
 );
 Disclosure.displayName = "Disclosure";
 
@@ -83,7 +83,7 @@ const DisclosureTrigger = React.forwardRef<HTMLButtonElement, ButtonProps>(
           slot="trigger"
           className={composeTailwindRenderProps(
             className,
-            "flex w-full items-center justify-between gap-x-2 py-3 text-left text-base font-medium disabled:cursor-default disabled:opacity-50 forced-colors:disabled:text-[GrayText] [&[aria-expanded=true]_[data-slot=disclosure-chevron]]:rotate-180"
+            "flex w-full items-center justify-between gap-x-2 py-3 text-left text-base font-medium disabled:cursor-default disabled:opacity-50 forced-colors:disabled:text-[GrayText] [&[aria-expanded=true]_[data-slot=disclosure-chevron]]:rotate-180",
           )}
           {...props}
         >
@@ -104,7 +104,7 @@ const DisclosureTrigger = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </Button>
       </Heading>
     );
-  }
+  },
 );
 DisclosureTrigger.displayName = "DisclosureTrigger";
 
@@ -121,7 +121,7 @@ const DisclosurePanel = React.forwardRef<
       data-slot="disclosure-panel"
       className={composeTailwindRenderProps(
         className,
-        "cursor-text overflow-hidden text-sm text-slate-600 transition-all duration-200 ease-in-out"
+        "cursor-text overflow-hidden text-sm text-slate-600 transition-all duration-200 ease-in-out",
       )}
       {...props}
     >
@@ -138,10 +138,10 @@ DisclosurePanel.displayName = "DisclosurePanel";
 
 function composeTailwindRenderProps<T>(
   className: string | ((v: T) => string) | undefined,
-  tailwind: string
+  tailwind: string,
 ): string | ((v: T) => string) {
   return composeRenderProps(className, (className) =>
-    twMerge(tailwind, className)
+    twMerge(tailwind, className),
   );
 }
 

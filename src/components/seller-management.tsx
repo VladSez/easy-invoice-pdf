@@ -82,7 +82,7 @@ export function SellerManagement({
       const selectedSeller = validationResult.data.find(
         (seller: SellerData) => {
           return seller?.id === invoiceData?.seller?.id;
-        }
+        },
       );
 
       setSellersSelectOptions(validationResult.data);
@@ -99,7 +99,7 @@ export function SellerManagement({
     newSeller: SellerData,
     {
       shouldApplyNewSellerToInvoice,
-    }: { shouldApplyNewSellerToInvoice: boolean }
+    }: { shouldApplyNewSellerToInvoice: boolean },
   ) => {
     try {
       const newSellerWithId = {
@@ -113,7 +113,7 @@ export function SellerManagement({
       // Save to localStorage
       localStorage.setItem(
         SELLERS_LOCAL_STORAGE_KEY,
-        JSON.stringify(newSellers)
+        JSON.stringify(newSellers),
       );
 
       // Update the sellers state
@@ -146,12 +146,12 @@ export function SellerManagement({
   const handleSellerEdit = (editedSeller: SellerData) => {
     try {
       const updatedSellers = sellersSelectOptions.map((seller) =>
-        seller.id === editedSeller.id ? editedSeller : seller
+        seller.id === editedSeller.id ? editedSeller : seller,
       );
 
       localStorage.setItem(
         SELLERS_LOCAL_STORAGE_KEY,
-        JSON.stringify(updatedSellers)
+        JSON.stringify(updatedSellers),
       );
 
       setSellersSelectOptions(updatedSellers);
@@ -183,7 +183,7 @@ export function SellerManagement({
     if (id) {
       setSelectedSellerId(id);
       const selectedSeller = sellersSelectOptions.find(
-        (seller) => seller.id === id
+        (seller) => seller.id === id,
       );
 
       if (selectedSeller) {
@@ -203,12 +203,12 @@ export function SellerManagement({
     try {
       setSellersSelectOptions((prevSellers) => {
         const updatedSellers = prevSellers.filter(
-          (seller) => seller.id !== selectedSellerId
+          (seller) => seller.id !== selectedSellerId,
         );
 
         localStorage.setItem(
           SELLERS_LOCAL_STORAGE_KEY,
-          JSON.stringify(updatedSellers)
+          JSON.stringify(updatedSellers),
         );
         return updatedSellers;
       });
@@ -238,7 +238,7 @@ export function SellerManagement({
   };
 
   const activeSeller = sellersSelectOptions.find(
-    (seller) => seller.id === selectedSellerId
+    (seller) => seller.id === selectedSellerId,
   );
 
   return (
@@ -256,7 +256,7 @@ export function SellerManagement({
                 id={sellerSelectId}
                 className={cn(
                   "block h-8 max-w-[200px] text-[12px]",
-                  !selectedSellerId && "italic text-gray-700"
+                  !selectedSellerId && "italic text-gray-700",
                 )}
                 onChange={handleSellerChange}
                 value={selectedSellerId}

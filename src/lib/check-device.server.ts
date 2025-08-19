@@ -10,7 +10,7 @@ import { UAParser } from "ua-parser-js";
 export const checkDeviceUserAgent = async () => {
   if (typeof process === "undefined") {
     throw new Error(
-      "[Server method] you are importing a server-only module outside of server"
+      "[Server method] you are importing a server-only module outside of server",
     );
   }
 

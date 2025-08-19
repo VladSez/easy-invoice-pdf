@@ -373,7 +373,7 @@ function FeaturesSection() {
           {FEATURES_CARDS.map((feature) => {
             const title = t(`features.items.${feature.translationKey}.title`);
             const description = t(
-              `features.items.${feature.translationKey}.description`
+              `features.items.${feature.translationKey}.description`,
             );
 
             return (

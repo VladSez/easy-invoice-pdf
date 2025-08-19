@@ -28,7 +28,7 @@ declare global {
  */
 export const umamiTrackEvent = (
   eventName: string,
-  options?: UmamiTrackOptions
+  options?: UmamiTrackOptions,
 ) => {
   if (typeof window === "undefined") return;
 

@@ -49,7 +49,7 @@ export function customPremiumToast(toast: Omit<ToastProps, "id">) {
     ),
     {
       duration: Infinity,
-    }
+    },
   );
 }
 
@@ -71,12 +71,12 @@ export function customDefaultToast(toast: Omit<ToastProps, "id">) {
     ),
     {
       duration: Infinity,
-    }
+    },
   );
 }
 
 const SonnerCloseButton = (
-  props: React.ButtonHTMLAttributes<HTMLButtonElement>
+  props: React.ButtonHTMLAttributes<HTMLButtonElement>,
 ) => {
   return (
     <button
@@ -142,7 +142,7 @@ function PremiumDonationToast(props: ToastProps) {
               <PremiumToastDonationButton
                 onClick={() => {
                   umamiTrackEvent(
-                    "donate_btn_click_download_pdf_toast_premium"
+                    "donate_btn_click_download_pdf_toast_premium",
                   );
 
                   sonnerToast.dismiss(id);
@@ -152,7 +152,7 @@ function PremiumDonationToast(props: ToastProps) {
               <PremiumToastFeedbackButton
                 onClick={() => {
                   umamiTrackEvent(
-                    "feedback_btn_click_download_pdf_toast_premium"
+                    "feedback_btn_click_download_pdf_toast_premium",
                   );
 
                   sonnerToast.dismiss(id);
@@ -163,7 +163,7 @@ function PremiumDonationToast(props: ToastProps) {
             <PremiumToastFeedbackButton
               onClick={() => {
                 umamiTrackEvent(
-                  "feedback_btn_click_download_pdf_toast_premium"
+                  "feedback_btn_click_download_pdf_toast_premium",
                 );
 
                 sonnerToast.dismiss(id);
@@ -177,7 +177,7 @@ function PremiumDonationToast(props: ToastProps) {
 }
 
 function PremiumToastFeedbackButton(
-  props: React.AnchorHTMLAttributes<HTMLAnchorElement>
+  props: React.AnchorHTMLAttributes<HTMLAnchorElement>,
 ) {
   return (
     <Button
@@ -200,7 +200,7 @@ function PremiumToastFeedbackButton(
 }
 
 function PremiumToastDonationButton(
-  props: React.AnchorHTMLAttributes<HTMLAnchorElement>
+  props: React.AnchorHTMLAttributes<HTMLAnchorElement>,
 ) {
   return (
     <Button
@@ -272,7 +272,7 @@ function DefaultDonationToast(props: ToastProps) {
               <DefaultToastDonationButton
                 onClick={() => {
                   umamiTrackEvent(
-                    "donate_btn_click_download_pdf_toast_default"
+                    "donate_btn_click_download_pdf_toast_default",
                   );
 
                   sonnerToast.dismiss(id);
@@ -282,7 +282,7 @@ function DefaultDonationToast(props: ToastProps) {
               <DefaultToastFeedbackButton
                 onClick={() => {
                   umamiTrackEvent(
-                    "feedback_btn_click_download_pdf_toast_default"
+                    "feedback_btn_click_download_pdf_toast_default",
                   );
 
                   sonnerToast.dismiss(id);
@@ -293,7 +293,7 @@ function DefaultDonationToast(props: ToastProps) {
             <DefaultToastFeedbackButton
               onClick={() => {
                 umamiTrackEvent(
-                  "feedback_btn_click_download_pdf_toast_default"
+                  "feedback_btn_click_download_pdf_toast_default",
                 );
 
                 sonnerToast.dismiss(id);
@@ -307,7 +307,7 @@ function DefaultDonationToast(props: ToastProps) {
 }
 
 function DefaultToastDonationButton(
-  props: React.AnchorHTMLAttributes<HTMLAnchorElement>
+  props: React.AnchorHTMLAttributes<HTMLAnchorElement>,
 ) {
   return (
     <Button
@@ -330,7 +330,7 @@ function DefaultToastDonationButton(
 }
 
 function DefaultToastFeedbackButton(
-  props: React.AnchorHTMLAttributes<HTMLAnchorElement>
+  props: React.AnchorHTMLAttributes<HTMLAnchorElement>,
 ) {
   return (
     <Button

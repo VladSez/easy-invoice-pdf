@@ -114,14 +114,14 @@ export const InvoiceItems = memo(function InvoiceItems({
                       type="button"
                       onClick={() => {
                         const canDelete = window.confirm(
-                          `Are you sure you want to delete invoice item #${index + 1}?`
+                          `Are you sure you want to delete invoice item #${index + 1}?`,
                         );
 
                         if (canDelete) {
                           handleRemoveItem(index);
                         }
                       }}
-                      className="flex items-center justify-center rounded-full bg-red-600 p-2 transition-colors hover:bg-red-700"
+                      className="flex items-center justify-center rounded-full bg-red-600 p-2 transition-colors hover:bg-red-700 active:scale-[98%] active:transition-transform"
                     >
                       <span className="sr-only">
                         Delete Invoice Item {index + 1}

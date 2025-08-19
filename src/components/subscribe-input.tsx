@@ -26,7 +26,7 @@ function SubmitButton({
       className={cn(
         "absolute right-2 top-1.5 transition-all duration-200",
         "hover:opacity-90 active:scale-95",
-        pending && "cursor-not-allowed opacity-80"
+        pending && "cursor-not-allowed opacity-80",
       )}
       disabled={pending}
     >
@@ -64,7 +64,7 @@ export function SubscribeInput({
             className={cn(
               "flex h-12 items-center justify-between",
               "rounded-lg border bg-emerald-50 px-4 py-2",
-              "duration-300 animate-in fade-in-0 slide-in-from-top-1"
+              "duration-300 animate-in fade-in-0 slide-in-from-top-1",
             )}
           >
             <p className="flex items-center gap-2 text-emerald-700">
@@ -111,7 +111,7 @@ export function SubscribeInput({
                   "placeholder:text-muted-foreground/60",
                   "transition-all duration-200",
                   "focus:ring-primary/20 focus:ring-2 focus:ring-offset-0",
-                  "hover:border-primary/50"
+                  "hover:border-primary/50",
                 )}
                 required
               />

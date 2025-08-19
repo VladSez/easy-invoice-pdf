@@ -63,13 +63,13 @@ type AccordionKeys = Array<(typeof DEFAULT_ACCORDION_VALUES)[number]>;
 
 interface InvoiceFormProps {
   invoiceData: InvoiceData;
-  onInvoiceDataChange: (updatedData: InvoiceData) => void;
+  handleInvoiceDataChange: (updatedData: InvoiceData) => void;
   setCanShareInvoice: (canShareInvoice: boolean) => void;
 }
 
 export const InvoiceForm = memo(function InvoiceForm({
   invoiceData,
-  onInvoiceDataChange,
+  handleInvoiceDataChange,
   setCanShareInvoice,
 }: InvoiceFormProps) {
   const form = useForm<InvoiceData>({
@@ -96,7 +96,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   const selectedDateFormat = useWatch({ control, name: "dateFormat" });
 
   const isPaymentDueBeforeDateOfIssue = dayjs(paymentDue).isBefore(
-    dayjs(dateOfIssue)
+    dayjs(dateOfIssue),
   );
 
   // payment due date is 14 days after the date of issue or the same day
@@ -124,7 +124,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       ? Number(
           invoiceItems
             .reduce((sum, item) => sum + (item?.preTaxAmount || 0), 0)
-            .toFixed(2)
+            .toFixed(2),
         )
       : 0;
 
@@ -177,7 +177,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       }
     },
     // debounce delay in ms
-    DEBOUNCE_TIMEOUT
+    DEBOUNCE_TIMEOUT,
   );
 
   // subscribe to form changes to regenerate pdf on every input change
@@ -211,12 +211,12 @@ export const InvoiceForm = memo(function InvoiceForm({
       const currentFormData = watch();
       debouncedRegeneratePdfOnFormChange(currentFormData);
     },
-    [remove, watch, debouncedRegeneratePdfOnFormChange]
+    [remove, watch, debouncedRegeneratePdfOnFormChange],
   );
 
   // TODO: refactor this and debouncedRegeneratePdfOnFormChange(), so data is saved to local storage, basically copy everything from debouncedRegeneratePdfOnFormChange() and use this onSubmit function in two places
   const onSubmit = (data: InvoiceData) => {
-    onInvoiceDataChange(data);
+    handleInvoiceDataChange(data);
   };
 
   /**
@@ -230,7 +230,7 @@ export const InvoiceForm = memo(function InvoiceForm({
     // Try to load from localStorage
     try {
       const savedState = localStorage.getItem(
-        ACCORDION_STATE_LOCAL_STORAGE_KEY
+        ACCORDION_STATE_LOCAL_STORAGE_KEY,
       );
 
       if (savedState) {
@@ -273,7 +273,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
       localStorage.setItem(
         ACCORDION_STATE_LOCAL_STORAGE_KEY,
-        JSON.stringify(stateToSave)
+        JSON.stringify(stateToSave),
       );
     } catch (error) {
       console.error("Error saving accordion state:", error);
@@ -310,7 +310,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                   if (Array.isArray(error)) {
                     return error.map((item, index) =>
                       Object.entries(
-                        item as { [key: string]: { message?: string } }
+                        item as { [key: string]: { message?: string } },
                       ).map(([fieldName, fieldError]) => (
                         <li
                           key={`${key}.${index}.${fieldName}`}
@@ -318,14 +318,14 @@ export const InvoiceForm = memo(function InvoiceForm({
                         >
                           {fieldError?.message || "Unknown error"}
                         </li>
-                      ))
+                      )),
                     );
                   }
 
                   // Handle nested object errors
                   if (error && typeof error === "object") {
                     return Object.entries(
-                      error as { [key: string]: { message?: string } }
+                      error as { [key: string]: { message?: string } },
                     ).map(([nestedKey, nestedError]) => {
                       return (
                         <li key={`${key}.${nestedKey}`} className="text-sm">
@@ -342,7 +342,7 @@ export const InvoiceForm = memo(function InvoiceForm({
           </div>,
           {
             closeButton: true,
-          }
+          },
         );
       })}
     >
@@ -636,53 +636,58 @@ export const InvoiceForm = memo(function InvoiceForm({
           )}
         </div>
 
-        <div>
-          <div className="relative mt-5 space-y-4">
-            {/* Show/hide Person Authorized to Receive field in PDF switch */}
-            <div className="flex items-center justify-between">
-              <Label htmlFor={`personAuthorizedToReceiveFieldIsVisible`}>
-                Show &quot;Person Authorized to Receive&quot; Signature Field in
-                the PDF
-              </Label>
+        {/*
+            Stripe template doesn't have these fields
+        */}
+        {invoiceData.template === "default" && (
+          <div>
+            <div className="relative mt-5 space-y-4">
+              {/* Show/hide Person Authorized to Receive field in PDF switch */}
+              <div className="flex items-center justify-between">
+                <Label htmlFor={`personAuthorizedToReceiveFieldIsVisible`}>
+                  Show &quot;Person Authorized to Receive&quot; Signature Field
+                  in the PDF
+                </Label>
 
-              <Controller
-                name={`personAuthorizedToReceiveFieldIsVisible`}
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`personAuthorizedToReceiveFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                  />
-                )}
-              />
-            </div>
+                <Controller
+                  name={`personAuthorizedToReceiveFieldIsVisible`}
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Switch
+                      {...field}
+                      id={`personAuthorizedToReceiveFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    />
+                  )}
+                />
+              </div>
 
-            {/* Show/hide Person Authorized to Issue field in PDF switch */}
-            <div className="flex items-center justify-between">
-              <Label htmlFor={`personAuthorizedToIssueFieldIsVisible`}>
-                Show &quot;Person Authorized to Issue&quot; Signature Field in
-                the PDF
-              </Label>
+              {/* Show/hide Person Authorized to Issue field in PDF switch */}
+              <div className="flex items-center justify-between">
+                <Label htmlFor={`personAuthorizedToIssueFieldIsVisible`}>
+                  Show &quot;Person Authorized to Issue&quot; Signature Field in
+                  the PDF
+                </Label>
 
-              <Controller
-                name={`personAuthorizedToIssueFieldIsVisible`}
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`personAuthorizedToIssueFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                  />
-                )}
-              />
+                <Controller
+                  name={`personAuthorizedToIssueFieldIsVisible`}
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Switch
+                      {...field}
+                      id={`personAuthorizedToIssueFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    />
+                  )}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </form>
   );
@@ -703,7 +708,7 @@ const calculateItemTotals = (item: InvoiceItemData | null) => {
 
   const formattedVatAmount = Number(vatAmount.toFixed(2));
   const formattedPreTaxAmount = Number(
-    (formattedNetAmount + formattedVatAmount).toFixed(2)
+    (formattedNetAmount + formattedVatAmount).toFixed(2),
   );
 
   return {

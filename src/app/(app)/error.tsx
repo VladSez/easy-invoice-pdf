@@ -24,7 +24,7 @@ export default function Error({
       {
         closeButton: true,
         richColors: true,
-      }
+      },
     );
   }, [error]);
 
@@ -60,7 +60,7 @@ export default function Error({
               // Clear the invoice data and start from scratch
               localStorage.setItem(
                 PDF_DATA_LOCAL_STORAGE_KEY,
-                JSON.stringify(INITIAL_INVOICE_DATA)
+                JSON.stringify(INITIAL_INVOICE_DATA),
               );
 
               // Attempt to recover by trying to re-render the segment

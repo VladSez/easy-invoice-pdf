@@ -32,6 +32,6 @@ export function ErrorGeneratingPdfToast() {
     </span>,
     {
       duration: Infinity,
-    }
+    },
   );
 }

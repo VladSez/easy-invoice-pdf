@@ -30,12 +30,12 @@ export async function sendTelegramMessage({
           parse_mode: "Markdown",
         }),
         cache: "no-store",
-      }
+      },
     );
 
     if (!textResponse.ok) {
       throw new Error(
-        `Failed to send Telegram message: ${textResponse.statusText}`
+        `Failed to send Telegram message: ${textResponse.statusText}`,
       );
     }
 
@@ -57,12 +57,12 @@ export async function sendTelegramMessage({
             },
             body: formData,
             cache: "no-store",
-          }
+          },
         );
 
         if (!fileResponse.ok) {
           throw new Error(
-            `Failed to send file ${file.filename}: ${fileResponse.statusText}`
+            `Failed to send file ${file.filename}: ${fileResponse.statusText}`,
           );
         }
       }

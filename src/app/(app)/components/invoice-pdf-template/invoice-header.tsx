@@ -16,10 +16,10 @@ export function InvoiceHeader({
   const t = TRANSLATIONS[language];
 
   const dateOfIssue = dayjs(invoiceData.dateOfIssue).format(
-    invoiceData.dateFormat
+    invoiceData.dateFormat,
   );
   const dateOfService = dayjs(invoiceData.dateOfService).format(
-    invoiceData.dateFormat
+    invoiceData.dateFormat,
   );
 
   const invoiceNumberLabel = invoiceData?.invoiceNumberObject?.label;

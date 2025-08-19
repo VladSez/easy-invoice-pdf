@@ -23,6 +23,7 @@ import {
 
 import { env } from "@/env";
 import { ipLimiter } from "@/lib/rate-limit";
+import { compressInvoiceData } from "@/utils/url-compression";
 
 export const dynamic = "force-dynamic";
 
@@ -53,18 +54,18 @@ export async function GET(req: NextRequest) {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
     }
 
     const GENERATED_ENGLISH_INVOICE_PDF_DOCUMENT = renderToBuffer(
       <InvoicePdfTemplateToRenderOnBackend
         invoiceData={ENGLISH_INVOICE_REAL_DATA}
-      />
+      />,
     ).catch((err) => {
       console.error(
         "\n\n_________________________Error during `renderToBuffer` for English invoice:",
-        err
+        err,
       );
 
       throw err;
@@ -73,11 +74,11 @@ export async function GET(req: NextRequest) {
     const GENERATED_POLISH_INVOICE_PDF_DOCUMENT = renderToBuffer(
       <InvoicePdfTemplateToRenderOnBackend
         invoiceData={POLISH_INVOICE_REAL_DATA}
-      />
+      />,
     ).catch((err) => {
       console.error(
         "\n\n_________________________Error during `renderToBuffer` for Polish invoice:",
-        err
+        err,
       );
 
       throw err;
@@ -96,7 +97,7 @@ export async function GET(req: NextRequest) {
       ]).catch((err) => {
         console.error(
           "\n\n_________________________Error during `Promise.allSettled`:",
-          err
+          err,
         );
       })) || [];
 
@@ -111,7 +112,7 @@ export async function GET(req: NextRequest) {
       } else if (invoice.status === "rejected") {
         console.error(
           "\n\n_________________________Error in generate-invoice route:",
-          invoice?.reason || "Unknown error"
+          invoice?.reason || "Unknown error",
         );
       }
     }
@@ -134,17 +135,21 @@ export async function GET(req: NextRequest) {
     if (!ATTACHMENTS.length) {
       return NextResponse.json(
         { error: "No attachments found" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const newInvoiceDataValidated = invoiceSchema.parse(
-      ENGLISH_INVOICE_REAL_DATA
+      ENGLISH_INVOICE_REAL_DATA,
     );
-    const stringified = JSON.stringify(newInvoiceDataValidated);
-    const compressedData = compressToEncodedURIComponent(stringified);
 
-    const invoiceUrl = `https://easyinvoicepdf.com/?data=${compressedData}`;
+    // Compress JSON keys before stringifying to reduce URL size
+    const compressedKeys = compressInvoiceData(newInvoiceDataValidated);
+    const compressedJson = JSON.stringify(compressedKeys);
+
+    const compressedData = compressToEncodedURIComponent(compressedJson);
+
+    const invoiceUrl = `https://easyinvoicepdf.com/?template=${newInvoiceDataValidated.template}&data=${compressedData}`;
 
     const monthAndYear = dayjs().format("MMMM YYYY");
 
@@ -173,27 +178,31 @@ export async function GET(req: NextRequest) {
         fileName: attachment.filename,
         fileContent: Buffer.from(attachment.content),
         folderId: folderToUploadInvoices.id,
-      })
+      }),
     );
 
     const uploadResults = await Promise.allSettled(uploadPromises);
     const failedUploads = uploadResults.filter(
-      (result): result is PromiseRejectedResult => result.status === "rejected"
+      (result): result is PromiseRejectedResult => result.status === "rejected",
     );
 
     if (failedUploads.length > 0) {
       console.error(
         "Some files failed to upload to Google Drive:",
-        failedUploads
+        failedUploads,
       );
 
       return NextResponse.json(
         { error: "Failed to upload invoices to Google Drive" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
-    const companyEmailLink = `https://outlook.office.com/mail/deeplink/compose?to=${env.INVOICE_EMAIL_COMPANY_TO}&subject=Invoice%20for%20${monthAndYear}&body=Hello%2C%0A%0AInvoice%20for%20${monthAndYear}%20in%20attachments%0A%0AHave%20a%20nice%20day`;
+    const companyEmailLink =
+      `https://outlook.office.com/mail/deeplink/compose` +
+      `?to=${encodeURIComponent(env.INVOICE_EMAIL_COMPANY_TO)}` +
+      `&subject=${encodeURIComponent(`Invoice for ${monthAndYear}`)}` +
+      `&body=${encodeURIComponent(`Hello,\nThe invoice for ${monthAndYear} is in the attachment.\n\nHave a nice day.`)}`;
 
     // we only need the value of the invoice number e.g. 1/05.2025
     const invoiceNumberValue =
@@ -258,7 +267,7 @@ EasyInvoicePDF.com`,
     ]);
 
     const failedNotifications = notificationResults.filter(
-      (result): result is PromiseRejectedResult => result.status === "rejected"
+      (result): result is PromiseRejectedResult => result.status === "rejected",
     );
 
     if (failedNotifications.length > 0) {
@@ -269,14 +278,14 @@ EasyInvoicePDF.com`,
 
     return NextResponse.json(
       { message: "Invoice sent successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error in generate-invoice route:", error);
 
     return NextResponse.json(
       { error: "Failed to generate and send invoice" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

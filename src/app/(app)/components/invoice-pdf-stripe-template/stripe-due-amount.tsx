@@ -30,7 +30,7 @@ export function StripeDueAmount({
   dayjs.locale(language);
 
   const paymentDueDate = dayjs(invoiceData.paymentDue).format(
-    invoiceData.dateFormat
+    invoiceData.dateFormat,
   );
 
   // Check if payOnlineUrl is provided and valid

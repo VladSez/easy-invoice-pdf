@@ -39,7 +39,7 @@ export async function subscribeAction(formData: FormData) {
     // Check email rate limit
     const emailLimit = await checkRateLimit(
       validatedFields.email.toLowerCase(),
-      emailLimiter
+      emailLimiter,
     );
     if (!emailLimit.success) {
       return { error: emailLimit.error };
@@ -53,7 +53,7 @@ export async function subscribeAction(formData: FormData) {
     if (
       existingContacts?.data?.some(
         (contact) =>
-          contact.email.toLowerCase() === validatedFields.email.toLowerCase()
+          contact.email.toLowerCase() === validatedFields.email.toLowerCase(),
       )
     ) {
       return { error: "This email is already subscribed." };
