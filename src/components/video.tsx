@@ -35,7 +35,7 @@ export const Video = ({ src, fallbackImg, testId = "" }: VideoProps) => {
         });
       }
     },
-    [inViewRef]
+    [inViewRef],
   );
 
   useEffect(() => {

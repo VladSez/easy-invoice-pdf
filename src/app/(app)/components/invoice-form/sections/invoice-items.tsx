@@ -114,7 +114,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                       type="button"
                       onClick={() => {
                         const canDelete = window.confirm(
-                          `Are you sure you want to delete invoice item #${index + 1}?`
+                          `Are you sure you want to delete invoice item #${index + 1}?`,
                         );
 
                         if (canDelete) {

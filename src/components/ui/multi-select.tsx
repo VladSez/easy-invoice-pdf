@@ -47,7 +47,7 @@ const multiSelectVariants = cva(
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 );
 
 /**
@@ -153,12 +153,12 @@ export const MultiSelect = React.forwardRef<
       handleDownload,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
 
     const handleInputKeyDown = (
-      event: React.KeyboardEvent<HTMLInputElement>
+      event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
       if (event.key === "Enter") {
         setIsPopoverOpen(true);
@@ -222,7 +222,7 @@ export const MultiSelect = React.forwardRef<
                     selectedLanguages.length === 1 && "lg:w-[200px]",
                     selectedLanguages.length === 2 && "lg:w-[240px]",
                     selectedLanguages.length >= 3 && "lg:w-[280px]",
-                    className
+                    className,
                   )}
                 >
                   <div className="flex w-full items-center">
@@ -249,7 +249,7 @@ export const MultiSelect = React.forwardRef<
                         <Badge
                           className={cn(
                             "border-foreground/1 bg-transparent text-foreground hover:bg-transparent",
-                            multiSelectVariants({ variant })
+                            multiSelectVariants({ variant }),
                           )}
                         >
                           {`+ ${selectedLanguages.length - maxCount} more`}
@@ -276,7 +276,7 @@ export const MultiSelect = React.forwardRef<
                 <Button
                   onClick={handleTogglePopover}
                   className={cn(
-                    "mb-4 h-auto rounded-l-none rounded-r-lg border-l-0 bg-slate-900 px-2 py-2 text-center text-sm font-medium text-slate-50 shadow-sm shadow-black/5 outline-offset-2 hover:bg-slate-900/90 focus-visible:border-indigo-500 focus-visible:ring focus-visible:ring-indigo-200 focus-visible:ring-opacity-50 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 lg:mb-0"
+                    "mb-4 h-auto rounded-l-none rounded-r-lg border-l-0 bg-slate-900 px-2 py-2 text-center text-sm font-medium text-slate-50 shadow-sm shadow-black/5 outline-offset-2 hover:bg-slate-900/90 focus-visible:border-indigo-500 focus-visible:ring focus-visible:ring-indigo-200 focus-visible:ring-opacity-50 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 lg:mb-0",
                   )}
                 >
                   <ChevronDown className="text-muted-foreground h-4 w-4" />
@@ -300,7 +300,7 @@ export const MultiSelect = React.forwardRef<
               <CommandGroup>
                 {options.map((option) => {
                   const isSelected = selectedLanguages.includes(
-                    option.value as SupportedLanguages
+                    option.value as SupportedLanguages,
                   );
                   return (
                     <CommandItem
@@ -315,7 +315,7 @@ export const MultiSelect = React.forwardRef<
                           "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-gray-500",
                           isSelected
                             ? "bg-gray-50 text-gray-900"
-                            : "opacity-50 [&_svg]:invisible"
+                            : "opacity-50 [&_svg]:invisible",
                         )}
                       >
                         <CheckIcon className="h-4 w-4" />
@@ -369,7 +369,7 @@ export const MultiSelect = React.forwardRef<
         </PopoverContent>
       </Popover>
     );
-  }
+  },
 );
 
 MultiSelect.displayName = "MultiSelect";

@@ -26,7 +26,7 @@ async function getChangelogFiles(): Promise<string[]> {
       "src",
       "app",
       "changelog",
-      "content"
+      "content",
     );
     const files = await readdir(changelogDir);
     return files.filter((file) => file.endsWith(".mdx"));
@@ -69,7 +69,7 @@ async function importChangelogFile(filename: string) {
       if (error instanceof z.ZodError) {
         console.error(
           `Invalid metadata in changelog file ${filename}:`,
-          error.errors
+          error.errors,
         );
         return null;
       }
@@ -119,7 +119,7 @@ export async function getChangelogEntries(): Promise<ChangelogEntry[]> {
   // Sort by date (newest first)
   return entries.sort(
     (a, b) =>
-      new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime()
+      new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime(),
   );
 }
 
@@ -127,7 +127,7 @@ export async function getChangelogEntries(): Promise<ChangelogEntry[]> {
  * Gets a specific changelog entry by slug
  */
 export async function getChangelogEntry(
-  slug: string
+  slug: string,
 ): Promise<ChangelogEntry | null> {
   const files = await getChangelogFiles();
   const filename = files.find((file) => filenameToSlug(file) === slug);
@@ -172,11 +172,11 @@ export function formatChangelogDate(date: string): string {
  * Gets the next changelog entry after the current one (based on date order)
  */
 export async function getNextChangelogEntry(
-  currentSlug: string
+  currentSlug: string,
 ): Promise<ChangelogEntry | null> {
   const allEntries = await getChangelogEntries();
   const currentIndex = allEntries.findIndex(
-    (entry) => entry.slug === currentSlug
+    (entry) => entry.slug === currentSlug,
   );
 
   // If current entry is not found or is the first one (newest), return null
@@ -192,11 +192,11 @@ export async function getNextChangelogEntry(
  * Gets the previous changelog entry before the current one (based on date order)
  */
 export async function getPreviousChangelogEntry(
-  currentSlug: string
+  currentSlug: string,
 ): Promise<ChangelogEntry | null> {
   const allEntries = await getChangelogEntries();
   const currentIndex = allEntries.findIndex(
-    (entry) => entry.slug === currentSlug
+    (entry) => entry.slug === currentSlug,
   );
 
   // If current entry is not found or is the last one (oldest), return null

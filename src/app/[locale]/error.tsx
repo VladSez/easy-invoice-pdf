@@ -21,7 +21,7 @@ export default function Error({ error, reset }: Props) {
       {
         closeButton: true,
         richColors: true,
-      }
+      },
     );
   }, [error]);
 

@@ -35,7 +35,7 @@ const InvoicePDFViewer = dynamic(
   {
     ssr: false,
     loading: () => <DesktopPDFViewerModuleLoading />,
-  }
+  },
 );
 
 const AndroidPDFViewer = dynamic(
@@ -43,7 +43,7 @@ const AndroidPDFViewer = dynamic(
   {
     ssr: false,
     loading: () => <AndroidPDFViewerModuleLoading />,
-  }
+  },
 );
 
 const PdfViewer = ({

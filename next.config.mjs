@@ -22,7 +22,7 @@ async function validatei18nAndTranslationFiles() {
     // Import the translations schema using jiti
     // @ts-ignore
     const { translationsSchema, TRANSLATIONS } = await loadTsFileViaJiti.import(
-      "./src/app/schema/translations.ts"
+      "./src/app/schema/translations.ts",
     );
 
     const result = translationsSchema.safeParse(TRANSLATIONS);
@@ -41,7 +41,7 @@ async function validatei18nAndTranslationFiles() {
   // Import the messages schema using jiti
   // @ts-ignore
   const { messagesSchema } = await loadTsFileViaJiti.import(
-    "./src/app/schema/i18n-schema.ts"
+    "./src/app/schema/i18n-schema.ts",
   );
 
   // Validate messages
@@ -52,7 +52,7 @@ async function validatei18nAndTranslationFiles() {
   const validationPromises = is18nJSONMessageFiles.map(async (file) => {
     try {
       const messages = JSON.parse(
-        await fs.promises.readFile(path.join(messagesDir, file), "utf8")
+        await fs.promises.readFile(path.join(messagesDir, file), "utf8"),
       );
 
       const result = messagesSchema.safeParse(messages);
@@ -83,7 +83,7 @@ async function validatei18nAndTranslationFiles() {
   const hasErrors = results.some(
     (result) =>
       result.status === "rejected" ||
-      (result.status === "fulfilled" && !result.value.success)
+      (result.status === "fulfilled" && !result.value.success),
   );
 
   if (hasErrors) {
@@ -93,7 +93,7 @@ async function validatei18nAndTranslationFiles() {
       } else if (!result.value.success) {
         console.error(
           `❌ Invalid i18n messages in ${result.value.file}:`,
-          result.value.error
+          result.value.error,
         );
       }
     });

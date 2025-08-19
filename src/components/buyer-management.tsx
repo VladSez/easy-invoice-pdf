@@ -46,7 +46,7 @@ export function BuyerManagement({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const [buyersSelectOptions, setBuyersSelectOptions] = useState<BuyerData[]>(
-    []
+    [],
   );
   // const [selectedBuyerId, setSelectedBuyerId] = useState("");
   const [editingBuyer, setEditingBuyer] = useState<BuyerData | null>(null);
@@ -86,7 +86,7 @@ export function BuyerManagement({
   // Update buyers when a new one is added
   const handleBuyerAdd = (
     newBuyer: BuyerData,
-    { shouldApplyNewBuyerToInvoice }: { shouldApplyNewBuyerToInvoice: boolean }
+    { shouldApplyNewBuyerToInvoice }: { shouldApplyNewBuyerToInvoice: boolean },
   ) => {
     try {
       const newBuyerWithId = {
@@ -130,12 +130,12 @@ export function BuyerManagement({
   const handleBuyerEdit = (editedBuyer: BuyerData) => {
     try {
       const updatedBuyers = buyersSelectOptions.map((buyer) =>
-        buyer.id === editedBuyer.id ? editedBuyer : buyer
+        buyer.id === editedBuyer.id ? editedBuyer : buyer,
       );
 
       localStorage.setItem(
         BUYERS_LOCAL_STORAGE_KEY,
-        JSON.stringify(updatedBuyers)
+        JSON.stringify(updatedBuyers),
       );
 
       setBuyersSelectOptions(updatedBuyers);
@@ -167,7 +167,7 @@ export function BuyerManagement({
     if (id) {
       setSelectedBuyerId(id);
       const selectedBuyer = buyersSelectOptions.find(
-        (buyer) => buyer.id === id
+        (buyer) => buyer.id === id,
       );
 
       if (selectedBuyer) {
@@ -187,12 +187,12 @@ export function BuyerManagement({
     try {
       setBuyersSelectOptions((prevBuyers) => {
         const updatedBuyers = prevBuyers.filter(
-          (buyer) => buyer.id !== selectedBuyerId
+          (buyer) => buyer.id !== selectedBuyerId,
         );
 
         localStorage.setItem(
           BUYERS_LOCAL_STORAGE_KEY,
-          JSON.stringify(updatedBuyers)
+          JSON.stringify(updatedBuyers),
         );
         return updatedBuyers;
       });
@@ -222,7 +222,7 @@ export function BuyerManagement({
   };
 
   const activeBuyer = buyersSelectOptions.find(
-    (buyer) => buyer.id === selectedBuyerId
+    (buyer) => buyer.id === selectedBuyerId,
   );
 
   return (
@@ -240,7 +240,7 @@ export function BuyerManagement({
                 id={buyerSelectId}
                 className={cn(
                   "block h-8 max-w-[200px] text-[12px]",
-                  !selectedBuyerId && "italic text-gray-700"
+                  !selectedBuyerId && "italic text-gray-700",
                 )}
                 onChange={handleBuyerChange}
                 value={selectedBuyerId}

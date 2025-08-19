@@ -395,7 +395,7 @@ export const invoiceSchema = z.object({
     }, "Logo must be a valid image (JPEG, PNG or WebP) in base64 format")
     .optional()
     .describe(
-      "Stripe template specific field. Logo must be a valid image (JPEG, PNG or WebP) in base64 format"
+      "Stripe template specific field. Logo must be a valid image (JPEG, PNG or WebP) in base64 format",
     ),
 
   /**
@@ -447,7 +447,7 @@ export const invoiceSchema = z.object({
       return val;
     })
     .describe(
-      "Invoice date of service. Default is the last day of the current month"
+      "Invoice date of service. Default is the last day of the current month",
     ),
 
   invoiceType: z
@@ -506,9 +506,9 @@ export const invoiceSchema = z.object({
           .url("Please enter a valid URL or leave empty")
           .refine(
             (url) => url.startsWith("https://"),
-            "URL must start with https://"
+            "URL must start with https://",
           ), // Validate HTTPS URL format
-      ])
+      ]),
     )
     .optional()
     .describe("Stripe template specific field. URL field for payment link"),
@@ -557,7 +557,7 @@ const uniqueCurrencies = new Set(SUPPORTED_CURRENCIES);
 
 if (uniqueCurrencies.size !== SUPPORTED_CURRENCIES.length) {
   const duplicates = SUPPORTED_CURRENCIES.filter(
-    (currency, index) => SUPPORTED_CURRENCIES.indexOf(currency) !== index
+    (currency, index) => SUPPORTED_CURRENCIES.indexOf(currency) !== index,
   );
 
   const currencyFullNames = duplicates.map((currency) => {
@@ -567,8 +567,6 @@ if (uniqueCurrencies.size !== SUPPORTED_CURRENCIES.length) {
   });
 
   throw new Error(
-    `SUPPORTED_CURRENCIES contains duplicate entries: ${currencyFullNames.join(
-      ", "
-    )}`
+    `SUPPORTED_CURRENCIES contains duplicate entries: ${currencyFullNames.join(", ")}`,
   );
 }

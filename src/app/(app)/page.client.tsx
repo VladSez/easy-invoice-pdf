@@ -56,9 +56,9 @@ import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaki
 const DevLocalStorageView = dynamic(
   () =>
     import("./components/dev/dev-local-storage-view").then(
-      (mod) => mod.DevLocalStorageView
+      (mod) => mod.DevLocalStorageView,
     ),
-  { ssr: false }
+  { ssr: false },
 );
 
 export function AppPageClient() {
@@ -77,7 +77,7 @@ export function AppPageClient() {
   const isMobile = !isDesktop;
 
   const [invoiceDataState, setInvoiceDataState] = useState<InvoiceData | null>(
-    null
+    null,
   );
 
   const [errorWhileGeneratingPdfIsShown, setErrorWhileGeneratingPdfIsShown] =
@@ -127,7 +127,7 @@ export function AppPageClient() {
           duration: 20000,
           closeButton: true,
           richColors: true,
-        }
+        },
       );
 
       Sentry.captureException(error);
@@ -154,14 +154,14 @@ export function AppPageClient() {
     if (compressedInvoiceDataInUrl) {
       try {
         const decompressed = decompressFromEncodedURIComponent(
-          compressedInvoiceDataInUrl
+          compressedInvoiceDataInUrl,
         );
 
         const parsedJSON: unknown = JSON.parse(decompressed);
 
         // Restore original keys from compressed format, we store keys in compressed format to reduce URL size i.e. {name: "John Doe"} -> {n: "John Doe"}
         const decompressedKeys = decompressInvoiceData(
-          parsedJSON as Record<string, unknown>
+          parsedJSON as Record<string, unknown>,
         );
 
         // this should happen before parsing the data with zod
@@ -196,7 +196,7 @@ export function AppPageClient() {
 
         localStorage.setItem(
           PDF_DATA_LOCAL_STORAGE_KEY,
-          JSON.stringify(newInvoiceDataValidated)
+          JSON.stringify(newInvoiceDataValidated),
         );
 
         // Update template in search params if it exists
@@ -216,7 +216,7 @@ export function AppPageClient() {
 
             // Restore original keys from compressed format
             const decompressedKeys = decompressInvoiceData(
-              urlParsed as Record<string, unknown>
+              urlParsed as Record<string, unknown>,
             );
 
             const urlValidated = invoiceSchema.parse(decompressedKeys);
@@ -241,7 +241,7 @@ export function AppPageClient() {
                   duration: 10000,
                   closeButton: true,
                   richColors: true,
-                }
+                },
               );
 
               // Clean URL if data differs
@@ -368,7 +368,7 @@ export function AppPageClient() {
         }
 
         router.push(
-          `/?template=${newInvoiceDataValidated.template}&data=${compressedData}`
+          `/?template=${newInvoiceDataValidated.template}&data=${compressedData}`,
         );
 
         // Construct full URL with locale and compressed data
@@ -452,7 +452,7 @@ export function AppPageClient() {
                           onClick={handleShareInvoice}
                           _variant="outline"
                           className={cn(
-                            "mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
+                            "mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto",
                           )}
                         >
                           Generate a link to invoice

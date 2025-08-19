@@ -68,19 +68,19 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Verify stripe template UI elements are visible
     const newPageGeneralInfoSection = newPage.getByTestId(
-      "general-information-section"
+      "general-information-section",
     );
 
     // Verify logo upload section is visible (but empty since no logo was shared)
     await expect(
-      newPageGeneralInfoSection.getByText("Company Logo (Optional)")
+      newPageGeneralInfoSection.getByText("Company Logo (Optional)"),
     ).toBeVisible();
 
     // Verify payment URL section is visible
     await expect(
       newPageGeneralInfoSection.getByRole("textbox", {
         name: "Payment Link URL (Optional)",
-      })
+      }),
     ).toBeVisible();
 
     const finalSection = newPage.getByTestId(`final-section`);
@@ -89,13 +89,13 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await expect(
       finalSection.getByRole("switch", {
         name: 'Show "Person Authorized to Receive" Signature Field in the PDF',
-      })
+      }),
     ).toBeHidden();
 
     await expect(
       finalSection.getByRole("switch", {
         name: 'Show "Person Authorized to Issue" Signature Field in the PDF',
-      })
+      }),
     ).toBeHidden();
 
     // Close the new page
@@ -115,7 +115,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // Wait for logo to be uploaded
     const generalInfoSection = page.getByTestId("general-information-section");
     await expect(
-      generalInfoSection.getByAltText("Company logo preview")
+      generalInfoSection.getByAltText("Company logo preview"),
     ).toBeVisible();
 
     // Verify share button is disabled
@@ -134,8 +134,8 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     await expect(
       page.getByText(
-        "Invoices with logos cannot be shared. Please remove the logo to generate a shareable link. You can still download the invoice as PDF and share it."
-      )
+        "Invoices with logos cannot be shared. Please remove the logo to generate a shareable link. You can still download the invoice as PDF and share it.",
+      ),
     ).toBeVisible();
   });
 
@@ -151,7 +151,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     await page.evaluate((base64Data) => {
       const fileInput = document.querySelector(
-        "#logoUpload"
+        "#logoUpload",
       ) as HTMLInputElement;
 
       if (fileInput) {
@@ -176,7 +176,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     const generalInfoSection = page.getByTestId("general-information-section");
     await expect(
-      generalInfoSection.getByAltText("Company logo preview")
+      generalInfoSection.getByAltText("Company logo preview"),
     ).toBeVisible();
 
     // Verify share button is disabled
@@ -192,7 +192,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Wait for logo to be removed
     await expect(
-      generalInfoSection.getByAltText("Company logo preview")
+      generalInfoSection.getByAltText("Company logo preview"),
     ).toBeHidden();
 
     // Verify share button is enabled again
@@ -213,7 +213,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     expect(dataParam).not.toBe("");
 
     await expect(
-      page.getByText("Invoice link copied to clipboard!")
+      page.getByText("Invoice link copied to clipboard!"),
     ).toBeVisible();
   });
 
@@ -234,7 +234,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // Upload a logo
     await page.evaluate((base64Data) => {
       const fileInput = document.querySelector(
-        "#logoUpload"
+        "#logoUpload",
       ) as HTMLInputElement;
       if (fileInput) {
         const byteString = atob(base64Data.split(",")[1]);
@@ -278,7 +278,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // Wait for upload and verify share button is disabled
     const generalInfoSection = page.getByTestId("general-information-section");
     await expect(
-      generalInfoSection.getByAltText("Company logo preview")
+      generalInfoSection.getByAltText("Company logo preview"),
     ).toBeVisible();
 
     const shareButton = page.getByRole("button", {
@@ -312,10 +312,10 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Verify state persists after reload
     await expect(
-      page.getByRole("combobox", { name: "Invoice Template" })
+      page.getByRole("combobox", { name: "Invoice Template" }),
     ).toHaveValue("stripe");
     await expect(
-      generalInfoSection.getByAltText("Company logo preview")
+      generalInfoSection.getByAltText("Company logo preview"),
     ).toBeVisible();
 
     // Verify share button is still disabled
@@ -356,8 +356,8 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     await expect(
       page.getByText(
-        "Invoices with logos cannot be shared. Please remove the logo to generate a shareable link. You can still download the invoice as PDF and share it."
-      )
+        "Invoices with logos cannot be shared. Please remove the logo to generate a shareable link. You can still download the invoice as PDF and share it.",
+      ),
     ).toBeVisible();
 
     // Remove logo and verify sharing works again

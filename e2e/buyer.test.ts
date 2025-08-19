@@ -44,7 +44,7 @@ test.describe("Buyer management", () => {
 
     // Verify VAT visibility switch is checked by default
     await expect(
-      manageBuyerDialog.getByRole("switch", { name: "Show in PDF" }).nth(0)
+      manageBuyerDialog.getByRole("switch", { name: "Show in PDF" }).nth(0),
     ).toBeChecked();
 
     // Toggle VAT visibility switch
@@ -59,7 +59,7 @@ test.describe("Buyer management", () => {
       .fill(testData.notes);
 
     const notesSwitch = manageBuyerDialog.getByTestId(
-      `buyerNotesDialogFieldVisibilitySwitch`
+      `buyerNotesDialogFieldVisibilitySwitch`,
     );
 
     await expect(notesSwitch).toHaveRole("switch");
@@ -71,12 +71,12 @@ test.describe("Buyer management", () => {
     await expect(
       manageBuyerDialog.getByRole("switch", {
         name: "Apply to Current Invoice",
-      })
+      }),
     ).toBeChecked();
 
     // Cancel button is shown
     await expect(
-      manageBuyerDialog.getByRole("button", { name: "Cancel" })
+      manageBuyerDialog.getByRole("button", { name: "Cancel" }),
     ).toBeVisible();
 
     // Save buyer
@@ -84,7 +84,7 @@ test.describe("Buyer management", () => {
 
     // Verify success toast message is visible
     await expect(
-      page.getByText("Buyer added successfully", { exact: true })
+      page.getByText("Buyer added successfully", { exact: true }),
     ).toBeVisible();
 
     // Verify buyer data is actually saved in localStorage
@@ -123,13 +123,13 @@ test.describe("Buyer management", () => {
     if (desktopTooltipExists) {
       // Get desktop tooltip icons and hover over the first one because we use tooltip
       const desktopTooltips = buyerForm.getByTestId(
-        "form-section-tooltip-info-icon-desktop"
+        "form-section-tooltip-info-icon-desktop",
       );
       await desktopTooltips.first().hover();
     } else {
       // Get mobile tooltip icons and click the first one because we use popover
       const mobileTooltips = buyerForm.getByTestId(
-        "form-section-tooltip-info-icon-mobile"
+        "form-section-tooltip-info-icon-mobile",
       );
       await mobileTooltips.first().click();
     }
@@ -138,7 +138,7 @@ test.describe("Buyer management", () => {
     const nameInput = buyerForm.getByRole("textbox", { name: "Name" });
     await expect(nameInput).toHaveAttribute(
       "title",
-      "Buyer details are locked. Click the Edit Buyer button (Pencil icon) to modify."
+      "Buyer details are locked. Click the Edit Buyer button (Pencil icon) to modify.",
     );
 
     // Buyer Name
@@ -147,18 +147,18 @@ test.describe("Buyer management", () => {
 
     // Buyer Address
     await expect(
-      buyerForm.getByRole("textbox", { name: "Address" })
+      buyerForm.getByRole("textbox", { name: "Address" }),
     ).toHaveAttribute("aria-readonly", "true");
     await expect(
-      buyerForm.getByRole("textbox", { name: "Address" })
+      buyerForm.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(testData.address);
 
     // Buyer VAT Number
     await expect(
-      buyerForm.getByRole("textbox", { name: "VAT Number" })
+      buyerForm.getByRole("textbox", { name: "VAT Number" }),
     ).toHaveAttribute("aria-readonly", "true");
     await expect(
-      buyerForm.getByRole("textbox", { name: "VAT Number" })
+      buyerForm.getByRole("textbox", { name: "VAT Number" }),
     ).toHaveValue(testData.vatNo);
 
     const vatNumberSwitch = buyerForm.getByTestId(`buyerVatNoFieldIsVisible`);
@@ -168,30 +168,30 @@ test.describe("Buyer management", () => {
 
     // Buyer Email
     await expect(
-      buyerForm.getByRole("textbox", { name: "Email" })
+      buyerForm.getByRole("textbox", { name: "Email" }),
     ).toHaveAttribute("aria-readonly", "true");
     await expect(buyerForm.getByRole("textbox", { name: "Email" })).toHaveValue(
-      testData.email
+      testData.email,
     );
 
     // Buyer Notes
     await expect(
-      buyerForm.getByRole("textbox", { name: "Notes" })
+      buyerForm.getByRole("textbox", { name: "Notes" }),
     ).toHaveAttribute("aria-readonly", "true");
 
     await expect(buyerForm.getByRole("textbox", { name: "Notes" })).toHaveValue(
-      testData.notes
+      testData.notes,
     );
 
     const notesInvoiceFormSwitch = buyerForm.getByTestId(
-      `buyerNotesInvoiceFormFieldVisibilitySwitch`
+      `buyerNotesInvoiceFormFieldVisibilitySwitch`,
     );
     await expect(notesInvoiceFormSwitch).toBeChecked();
     await expect(notesInvoiceFormSwitch).toBeDisabled();
 
     // Verify the buyer appears in the dropdown
     await expect(
-      buyerForm.getByRole("combobox", { name: "Select Buyer" })
+      buyerForm.getByRole("combobox", { name: "Select Buyer" }),
     ).toContainText(testData.name);
 
     // ------- TEST EDIT FUNCTIONALITY -------
@@ -199,31 +199,31 @@ test.describe("Buyer management", () => {
 
     // Verify all fields are populated in edit dialog
     await expect(
-      manageBuyerDialog.getByRole("textbox", { name: "Name" })
+      manageBuyerDialog.getByRole("textbox", { name: "Name" }),
     ).toHaveValue(testData.name);
     await expect(
-      manageBuyerDialog.getByRole("textbox", { name: "Address" })
+      manageBuyerDialog.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(testData.address);
     await expect(
-      manageBuyerDialog.getByRole("textbox", { name: "VAT Number" })
+      manageBuyerDialog.getByRole("textbox", { name: "VAT Number" }),
     ).toHaveValue(testData.vatNo);
     await expect(
-      manageBuyerDialog.getByRole("textbox", { name: "Email" })
+      manageBuyerDialog.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(testData.email);
 
     // Verify visibility switch state persisted in edit dialog
     await expect(
-      manageBuyerDialog.getByRole("switch", { name: "Show in PDF" }).nth(0)
+      manageBuyerDialog.getByRole("switch", { name: "Show in PDF" }).nth(0),
     ).not.toBeChecked();
 
     // Verify notes text
     await expect(
-      manageBuyerDialog.getByRole("textbox", { name: "Notes" })
+      manageBuyerDialog.getByRole("textbox", { name: "Notes" }),
     ).toHaveValue(testData.notes);
 
     // Verify notes visibility switch is checked
     const notesDialogFormSwitch = manageBuyerDialog.getByTestId(
-      `buyerNotesDialogFieldVisibilitySwitch`
+      `buyerNotesDialogFieldVisibilitySwitch`,
     );
 
     await expect(notesDialogFormSwitch).toHaveRole("switch");
@@ -252,18 +252,18 @@ test.describe("Buyer management", () => {
 
     // Verify success toast for update
     await expect(
-      page.getByText("Buyer updated successfully", { exact: true })
+      page.getByText("Buyer updated successfully", { exact: true }),
     ).toBeVisible();
 
     // ------- TEST UPDATED INFORMATION IN INVOICE FORM -------
     // Verify updated information is displayed
     await expect(buyerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
-      updatedName
+      updatedName,
     );
 
     // Verify VAT visibility is now enabled
     await expect(
-      buyerForm.getByTestId(`buyerVatNoFieldIsVisible`)
+      buyerForm.getByTestId(`buyerVatNoFieldIsVisible`),
     ).toBeChecked();
 
     // Verify notes visibility switch is unchecked
@@ -305,7 +305,7 @@ test.describe("Buyer management", () => {
     // Verify buyer was added
     const buyerForm = page.getByTestId(`buyer-information-section`);
     await expect(
-      buyerForm.getByRole("combobox", { name: "Select Buyer" })
+      buyerForm.getByRole("combobox", { name: "Select Buyer" }),
     ).toContainText(testData.name);
 
     // Click delete button
@@ -315,8 +315,8 @@ test.describe("Buyer management", () => {
     await expect(page.getByRole("alertdialog")).toBeVisible();
     await expect(
       page.getByText(
-        `Are you sure you want to delete "${testData.name}" buyer?`
-      )
+        `Are you sure you want to delete "${testData.name}" buyer?`,
+      ),
     ).toBeVisible();
 
     // Cancel button is shown
@@ -335,8 +335,8 @@ test.describe("Buyer management", () => {
     await expect(page.getByRole("alertdialog")).toBeVisible();
     await expect(
       page.getByText(
-        `Are you sure you want to delete "${testData.name}" buyer?`
-      )
+        `Are you sure you want to delete "${testData.name}" buyer?`,
+      ),
     ).toBeVisible();
 
     // Confirm deletion
@@ -344,30 +344,30 @@ test.describe("Buyer management", () => {
 
     // Verify success message
     await expect(
-      page.getByText("Buyer deleted successfully", { exact: true })
+      page.getByText("Buyer deleted successfully", { exact: true }),
     ).toBeVisible();
 
     // Verify buyer is removed from dropdown
     // because we have only one buyer, dropdown will be completely hidden
     await expect(
-      buyerForm.getByRole("combobox", { name: "Select Buyer" })
+      buyerForm.getByRole("combobox", { name: "Select Buyer" }),
     ).toBeHidden();
 
     // Verify form is reset to default values
     await expect(buyerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
-      DEFAULT_BUYER_DATA.name
+      DEFAULT_BUYER_DATA.name,
     );
 
     await expect(
-      buyerForm.getByRole("textbox", { name: "Address" })
+      buyerForm.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(DEFAULT_BUYER_DATA.address);
 
     await expect(buyerForm.getByRole("textbox", { name: "Email" })).toHaveValue(
-      DEFAULT_BUYER_DATA.email
+      DEFAULT_BUYER_DATA.email,
     );
 
     await expect(
-      buyerForm.getByRole("textbox", { name: "VAT Number" })
+      buyerForm.getByRole("textbox", { name: "VAT Number" }),
     ).toHaveValue(DEFAULT_BUYER_DATA.vatNo);
   });
 });

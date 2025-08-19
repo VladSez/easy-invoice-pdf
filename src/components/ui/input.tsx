@@ -15,14 +15,14 @@ const Input = React.memo(
               "[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none",
             type === "file" &&
               "p-0 pr-3 italic text-slate-500/70 file:me-3 file:h-full file:border-0 file:border-r file:border-solid file:border-slate-200 file:bg-transparent file:px-3 file:text-sm file:font-medium file:not-italic file:text-slate-950 dark:text-slate-400/70 dark:file:border-slate-800 dark:file:text-slate-50",
-            className
+            className,
           )}
           ref={ref}
           {...props}
         />
       );
-    }
-  )
+    },
+  ),
 );
 Input.displayName = "Input";
 

@@ -39,7 +39,7 @@ interface SellerDialogProps {
     seller: SellerData,
     {
       shouldApplyNewSellerToInvoice,
-    }: { shouldApplyNewSellerToInvoice: boolean }
+    }: { shouldApplyNewSellerToInvoice: boolean },
   ) => void;
   handleSellerEdit?: (seller: SellerData) => void;
   initialData: SellerData | null;
@@ -108,7 +108,7 @@ export function SellerDialog({
           swiftBicFieldIsVisible: true,
           notes: "",
           notesFieldIsVisible: true,
-        }
+        },
       );
     }
   }, [shouldApplyFormValues, formValues, initialData, isEditMode, form]);
@@ -129,7 +129,7 @@ export function SellerDialog({
       if (!existingSellersValidationResult.success) {
         console.error(
           "Invalid existing sellers data:",
-          existingSellersValidationResult.error
+          existingSellersValidationResult.error,
         );
 
         // Show error toast
@@ -149,7 +149,7 @@ export function SellerDialog({
       // Validate seller data against existing sellers
       const isDuplicateName = existingSellersValidationResult.data.some(
         (seller: SellerData) =>
-          seller.name === formValues.name && seller.id !== formValues.id
+          seller.name === formValues.name && seller.id !== formValues.id,
       );
 
       if (isDuplicateName) {

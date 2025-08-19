@@ -13,14 +13,14 @@ test.describe("Changelog page", () => {
         level: 1,
         name: "Changelog",
         exact: true,
-      })
+      }),
     ).toBeVisible();
 
     // Check subtitle
     await expect(
       page.getByText(
-        "All the latest updates, improvements, and fixes to EasyInvoicePDF"
-      )
+        "All the latest updates, improvements, and fixes to EasyInvoicePDF",
+      ),
     ).toBeVisible();
 
     // Check that changelog entries are present
@@ -49,7 +49,7 @@ test.describe("Changelog page", () => {
 
     // Check that we're on an individual entry page by looking for "Back to All Posts" link
     await expect(
-      page.getByRole("link", { name: "Back to All Posts" })
+      page.getByRole("link", { name: "Back to All Posts" }),
     ).toBeVisible();
   });
 
@@ -84,24 +84,24 @@ test.describe("Changelog page", () => {
 
     // Check author information
     await expect(page.getByTestId("author-info-text")).toHaveText(
-      "Vlad SazonauFounder,  EasyInvoicePDF"
+      "Vlad SazonauFounder,  EasyInvoicePDF",
     );
     await expect(page.getByTestId("author-info-img")).toBeVisible();
 
     // Check social sharing buttons are present
     const twitterShareLink = page.locator(
-      'a[href*="twitter.com/intent/tweet"]'
+      'a[href*="twitter.com/intent/tweet"]',
     );
     await expect(twitterShareLink).toBeVisible();
 
     const linkedinShareLink = page.locator(
-      'a[href*="linkedin.com/shareArticle"]'
+      'a[href*="linkedin.com/shareArticle"]',
     );
     await expect(linkedinShareLink).toBeVisible();
 
     // Check "Go to App" CTA button
     const goToAppButtonContainer = page.getByTestId(
-      "go-to-app-button-container"
+      "go-to-app-button-container",
     );
 
     const goToAppButton = goToAppButtonContainer.getByRole("link");
@@ -133,7 +133,7 @@ test.describe("Changelog page", () => {
     // Verify we're back on the main changelog page
     await expect(page).toHaveURL("/changelog");
     await expect(
-      page.getByRole("heading", { level: 1, name: "Changelog" })
+      page.getByRole("heading", { level: 1, name: "Changelog" }),
     ).toBeVisible();
   });
 
@@ -151,7 +151,7 @@ test.describe("Changelog page", () => {
 
     // Verify the page loads correctly
     await expect(
-      page.getByRole("link", { name: "Back to All Posts" })
+      page.getByRole("link", { name: "Back to All Posts" }),
     ).toBeVisible();
 
     // Verify we can still navigate back

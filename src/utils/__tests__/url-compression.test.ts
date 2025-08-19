@@ -38,7 +38,7 @@ describe("URL Compression Utilities", () => {
       expect(result).toHaveProperty("r", "2024-01-29"); // paymentDue
       expect(result).toHaveProperty(
         "s",
-        "https://checkout.stripe.com/pay/cs_123"
+        "https://checkout.stripe.com/pay/cs_123",
       ); // stripePayOnlineUrl
       expect(result).toHaveProperty("t", "Thank you for your business"); // notes
       expect(result).toHaveProperty("u", true); // notesFieldIsVisible
@@ -214,17 +214,17 @@ describe("URL Compression Utilities", () => {
       expect(result).toHaveProperty("paymentDue", "2024-01-29");
       expect(result).toHaveProperty(
         "stripePayOnlineUrl",
-        "https://checkout.stripe.com/pay/cs_123"
+        "https://checkout.stripe.com/pay/cs_123",
       );
       expect(result).toHaveProperty("notes", "Thank you for your business");
       expect(result).toHaveProperty("notesFieldIsVisible", true);
       expect(result).toHaveProperty(
         "personAuthorizedToReceiveFieldIsVisible",
-        true
+        true,
       );
       expect(result).toHaveProperty(
         "personAuthorizedToIssueFieldIsVisible",
-        true
+        true,
       );
     });
 
@@ -396,7 +396,7 @@ describe("URL Compression Utilities", () => {
       };
 
       const compressedData = compressInvoiceData(
-        dataWithNulls as unknown as InvoiceData
+        dataWithNulls as unknown as InvoiceData,
       );
       const decompressedData = decompressInvoiceData(compressedData);
 
@@ -414,7 +414,7 @@ describe("URL Compression Utilities", () => {
       };
 
       const compressedData = compressInvoiceData(
-        dataWithUndefined as unknown as InvoiceData
+        dataWithUndefined as unknown as InvoiceData,
       );
       const decompressedData = decompressInvoiceData(compressedData);
 
@@ -462,7 +462,7 @@ describe("URL Compression Utilities", () => {
       };
 
       const compressedData = compressInvoiceData(
-        complexData as unknown as InvoiceData
+        complexData as unknown as InvoiceData,
       );
       const decompressedData = decompressInvoiceData(compressedData);
 
@@ -471,22 +471,22 @@ describe("URL Compression Utilities", () => {
 
     it("should handle primitive values as root", () => {
       const compressedString = compressInvoiceData(
-        "test string" as unknown as InvoiceData
+        "test string" as unknown as InvoiceData,
       );
       expect(compressedString).toBe("test string");
 
       const compressedNumber = compressInvoiceData(
-        123 as unknown as InvoiceData
+        123 as unknown as InvoiceData,
       );
       expect(compressedNumber).toBe(123);
 
       const compressedBoolean = compressInvoiceData(
-        true as unknown as InvoiceData
+        true as unknown as InvoiceData,
       );
       expect(compressedBoolean).toBe(true);
 
       const compressedNull = compressInvoiceData(
-        null as unknown as InvoiceData
+        null as unknown as InvoiceData,
       );
       expect(compressedNull).toBe(null);
     });
@@ -498,27 +498,27 @@ describe("URL Compression Utilities", () => {
       // Check that numbers remain numbers
       expect(typeof decompressedData.total).toBe("number");
       expect(
-        typeof (decompressedData.items as InvoiceItemData[])[0].amount
+        typeof (decompressedData.items as InvoiceItemData[])[0].amount,
       ).toBe("number");
       expect(
-        typeof (decompressedData.items as InvoiceItemData[])[0].netPrice
+        typeof (decompressedData.items as InvoiceItemData[])[0].netPrice,
       ).toBe("number");
       expect(typeof (decompressedData.items as InvoiceItemData[])[0].vat).toBe(
-        "number"
+        "number",
       );
 
       // Check that booleans remain booleans
       expect(typeof decompressedData.vatTableSummaryIsVisible).toBe("boolean");
       expect(
         typeof (decompressedData.items as InvoiceItemData[])[0]
-          .nameFieldIsVisible
+          .nameFieldIsVisible,
       ).toBe("boolean");
 
       // Check that strings remain strings
       expect(typeof decompressedData.language).toBe("string");
       expect(typeof decompressedData.currency).toBe("string");
       expect(typeof (decompressedData.seller as SellerData).name).toBe(
-        "string"
+        "string",
       );
     });
 
@@ -528,19 +528,19 @@ describe("URL Compression Utilities", () => {
         // We'll do this by creating a comprehensive mock object and checking each key exists in INVOICE_KEY_COMPRESSION_MAP
 
         const invoiceRootKeys = Object.keys(
-          invoiceSchema.shape
+          invoiceSchema.shape,
         ) as (keyof typeof invoiceSchema.shape)[];
 
         const sellerKeys = Object.keys(
-          sellerSchema.shape
+          sellerSchema.shape,
         ) as (keyof typeof sellerSchema.shape)[];
 
         const buyerKeys = Object.keys(
-          buyerSchema.shape
+          buyerSchema.shape,
         ) as (keyof typeof buyerSchema.shape)[];
 
         const invoiceItemKeys = Object.keys(
-          invoiceItemSchema.shape
+          invoiceItemSchema.shape,
         ) as (keyof typeof invoiceItemSchema.shape)[];
 
         // Combine all keys
@@ -565,7 +565,7 @@ describe("URL Compression Utilities", () => {
         if (missingKeys.length > 0) {
           console.log(
             "Missing keys in INVOICE_KEY_COMPRESSION_MAP:",
-            missingKeys
+            missingKeys,
           );
         }
       });
@@ -578,7 +578,7 @@ describe("URL Compression Utilities", () => {
 
         if (compressedValues.length !== uniqueValues.length) {
           const duplicates = compressedValues.filter(
-            (value, index) => compressedValues.indexOf(value) !== index
+            (value, index) => compressedValues.indexOf(value) !== index,
           );
           console.log("Duplicate compressed values:", duplicates);
         }
@@ -588,7 +588,7 @@ describe("URL Compression Utilities", () => {
         // Extract all keys recursively from the mock data
         function getAllKeys(
           obj: unknown,
-          keySet = new Set<string>()
+          keySet = new Set<string>(),
         ): Set<string> {
           if (obj === null || typeof obj !== "object") {
             return keySet;
@@ -621,7 +621,7 @@ describe("URL Compression Utilities", () => {
         if (missingKeys.length > 0) {
           console.log(
             "Keys in MOCK_INVOICE_DATA missing from INVOICE_KEY_COMPRESSION_MAP:",
-            missingKeys
+            missingKeys,
           );
         }
       });

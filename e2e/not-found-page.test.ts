@@ -12,7 +12,7 @@ test.describe("Not Found page", () => {
     // Verify error message is displayed
     await expect(page.getByText("404")).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "This page could not be found." })
+      page.getByRole("heading", { name: "This page could not be found." }),
     ).toBeVisible();
 
     // Check return home link
@@ -34,7 +34,7 @@ test.describe("Not Found page", () => {
     // Verify error message is displayed in English (default locale)
     await expect(page.getByText("404")).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "This page could not be found." })
+      page.getByRole("heading", { name: "This page could not be found." }),
     ).toBeVisible();
 
     // Check return home link

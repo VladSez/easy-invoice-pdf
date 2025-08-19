@@ -93,7 +93,7 @@ export function DevLocalStorageView() {
       window.removeEventListener("storage", handleStorageChange);
       window.removeEventListener(
         "local-storage-change",
-        handleCustomStorageChange
+        handleCustomStorageChange,
       );
     };
   }, [updateLocalStorageReactState]);

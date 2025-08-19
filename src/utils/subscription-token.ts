@@ -19,7 +19,7 @@ const tokenVerificationLimiter = new Ratelimit({
  * @returns The generated token
  */
 export async function generateSubscriptionToken(
-  email: string
+  email: string,
 ): Promise<string> {
   // Generate a random token
   const token = randomBytes(32).toString("hex");
@@ -40,7 +40,7 @@ export async function generateSubscriptionToken(
  */
 export async function verifySubscriptionToken(
   token: string,
-  ip: string
+  ip: string,
 ): Promise<{
   email: string;
   isValid: boolean;

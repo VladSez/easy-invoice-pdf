@@ -19,7 +19,7 @@ export function StripeTotals({
   // Calculate subtotal (sum of all items)
   const subtotal = invoiceData.items.reduce(
     (sum, item) => sum + item.netAmount,
-    0
+    0,
   );
   const formattedSubtotal = formatCurrency({
     amount: subtotal,
@@ -35,7 +35,7 @@ export function StripeTotals({
 
   // Check if any items have numeric VAT values (not "NP" or "OO")
   const hasNumericVat = invoiceData.items.some(
-    (item) => typeof item.vat === "number"
+    (item) => typeof item.vat === "number",
   );
 
   return (

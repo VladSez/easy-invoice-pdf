@@ -10,7 +10,7 @@ export const SMALL_TEST_IMAGE_BASE64 =
 export const uploadBase64LogoAsFile = (base64Data: string) => {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
   const fileInput = document.querySelector(
-    "#logoUpload"
+    "#logoUpload",
   ) as HTMLInputElement | null;
 
   if (!fileInput) {

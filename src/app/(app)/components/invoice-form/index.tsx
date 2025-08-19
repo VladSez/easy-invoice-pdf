@@ -96,7 +96,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   const selectedDateFormat = useWatch({ control, name: "dateFormat" });
 
   const isPaymentDueBeforeDateOfIssue = dayjs(paymentDue).isBefore(
-    dayjs(dateOfIssue)
+    dayjs(dateOfIssue),
   );
 
   // payment due date is 14 days after the date of issue or the same day
@@ -124,7 +124,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       ? Number(
           invoiceItems
             .reduce((sum, item) => sum + (item?.preTaxAmount || 0), 0)
-            .toFixed(2)
+            .toFixed(2),
         )
       : 0;
 
@@ -177,7 +177,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       }
     },
     // debounce delay in ms
-    DEBOUNCE_TIMEOUT
+    DEBOUNCE_TIMEOUT,
   );
 
   // subscribe to form changes to regenerate pdf on every input change
@@ -211,7 +211,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       const currentFormData = watch();
       debouncedRegeneratePdfOnFormChange(currentFormData);
     },
-    [remove, watch, debouncedRegeneratePdfOnFormChange]
+    [remove, watch, debouncedRegeneratePdfOnFormChange],
   );
 
   // TODO: refactor this and debouncedRegeneratePdfOnFormChange(), so data is saved to local storage, basically copy everything from debouncedRegeneratePdfOnFormChange() and use this onSubmit function in two places
@@ -230,7 +230,7 @@ export const InvoiceForm = memo(function InvoiceForm({
     // Try to load from localStorage
     try {
       const savedState = localStorage.getItem(
-        ACCORDION_STATE_LOCAL_STORAGE_KEY
+        ACCORDION_STATE_LOCAL_STORAGE_KEY,
       );
 
       if (savedState) {
@@ -273,7 +273,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
       localStorage.setItem(
         ACCORDION_STATE_LOCAL_STORAGE_KEY,
-        JSON.stringify(stateToSave)
+        JSON.stringify(stateToSave),
       );
     } catch (error) {
       console.error("Error saving accordion state:", error);
@@ -310,7 +310,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                   if (Array.isArray(error)) {
                     return error.map((item, index) =>
                       Object.entries(
-                        item as { [key: string]: { message?: string } }
+                        item as { [key: string]: { message?: string } },
                       ).map(([fieldName, fieldError]) => (
                         <li
                           key={`${key}.${index}.${fieldName}`}
@@ -318,14 +318,14 @@ export const InvoiceForm = memo(function InvoiceForm({
                         >
                           {fieldError?.message || "Unknown error"}
                         </li>
-                      ))
+                      )),
                     );
                   }
 
                   // Handle nested object errors
                   if (error && typeof error === "object") {
                     return Object.entries(
-                      error as { [key: string]: { message?: string } }
+                      error as { [key: string]: { message?: string } },
                     ).map(([nestedKey, nestedError]) => {
                       return (
                         <li key={`${key}.${nestedKey}`} className="text-sm">
@@ -342,7 +342,7 @@ export const InvoiceForm = memo(function InvoiceForm({
           </div>,
           {
             closeButton: true,
-          }
+          },
         );
       })}
     >
@@ -708,7 +708,7 @@ const calculateItemTotals = (item: InvoiceItemData | null) => {
 
   const formattedVatAmount = Number(vatAmount.toFixed(2));
   const formattedPreTaxAmount = Number(
-    (formattedNetAmount + formattedVatAmount).toFixed(2)
+    (formattedNetAmount + formattedVatAmount).toFixed(2),
   );
 
   return {

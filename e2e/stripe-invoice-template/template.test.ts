@@ -78,17 +78,17 @@ test.describe("Stripe Invoice Template", () => {
 
     // Initially default template - logo section should not be visible
     await expect(
-      generalInfoSection.getByText("Company Logo (Optional)")
+      generalInfoSection.getByText("Company Logo (Optional)"),
     ).toBeHidden();
     await expect(
-      generalInfoSection.getByTestId("stripe-logo-upload-input")
+      generalInfoSection.getByTestId("stripe-logo-upload-input"),
     ).toBeHidden();
 
     // Payment URL section should not be visible
     await expect(
       generalInfoSection.getByRole("textbox", {
         name: "Payment Link URL (Optional)",
-      })
+      }),
     ).toBeHidden();
 
     // Switch to Stripe template
@@ -103,24 +103,24 @@ test.describe("Stripe Invoice Template", () => {
 
     // Logo section should now be visible
     await expect(
-      generalInfoSection.getByTestId("stripe-logo-upload-input")
+      generalInfoSection.getByTestId("stripe-logo-upload-input"),
     ).toBeVisible();
 
     await expect(
-      generalInfoSection.getByText("Company Logo (Optional)")
+      generalInfoSection.getByText("Company Logo (Optional)"),
     ).toBeVisible();
     await expect(
-      generalInfoSection.getByText("Click to upload your company logo")
+      generalInfoSection.getByText("Click to upload your company logo"),
     ).toBeVisible();
     await expect(
-      generalInfoSection.getByText("JPEG, PNG or WebP (max 3MB)")
+      generalInfoSection.getByText("JPEG, PNG or WebP (max 3MB)"),
     ).toBeVisible();
 
     // Payment URL section should now be visible
     await expect(
       generalInfoSection.getByRole("textbox", {
         name: "Payment Link URL (Optional)",
-      })
+      }),
     ).toBeVisible();
 
     // Switch back to default template
@@ -130,18 +130,18 @@ test.describe("Stripe Invoice Template", () => {
 
     // Logo section should be hidden again
     await expect(
-      generalInfoSection.getByText("Company Logo (Optional)")
+      generalInfoSection.getByText("Company Logo (Optional)"),
     ).toBeHidden();
 
     await expect(
-      generalInfoSection.getByTestId("stripe-logo-upload-input")
+      generalInfoSection.getByTestId("stripe-logo-upload-input"),
     ).toBeHidden();
 
     // Payment URL section should be hidden again
     await expect(
       generalInfoSection.getByRole("textbox", {
         name: "Payment Link URL (Optional)",
-      })
+      }),
     ).toBeHidden();
   });
 
@@ -156,7 +156,7 @@ test.describe("Stripe Invoice Template", () => {
     // Create a mock file input event with invalid file type
     await page.evaluate(() => {
       const fileInput = document.querySelector(
-        "#logoUpload"
+        "#logoUpload",
       ) as HTMLInputElement;
       if (fileInput) {
         // Create a mock file with invalid type
@@ -172,7 +172,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Should show error toast
     await expect(
-      page.getByText("Please select a valid image file (JPEG, PNG or WebP)")
+      page.getByText("Please select a valid image file (JPEG, PNG or WebP)"),
     ).toBeVisible();
   });
 
@@ -187,7 +187,7 @@ test.describe("Stripe Invoice Template", () => {
     // Create a mock file input event with large file
     await page.evaluate(() => {
       const fileInput = document.querySelector(
-        "#logoUpload"
+        "#logoUpload",
       ) as HTMLInputElement;
       if (fileInput) {
         // Create a mock file that's too large (4MB)
@@ -206,7 +206,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Should show error toast
     await expect(
-      page.getByText("Image size must be less than 3MB")
+      page.getByText("Image size must be less than 3MB"),
     ).toBeVisible();
   });
 
@@ -228,22 +228,22 @@ test.describe("Stripe Invoice Template", () => {
 
     // Should show logo preview
     await expect(
-      generalInfoSection.getByAltText("Company logo preview")
+      generalInfoSection.getByAltText("Company logo preview"),
     ).toBeVisible();
     await expect(
       generalInfoSection.getByText(
-        "Logo uploaded successfully. Click the X to remove it."
-      )
+        "Logo uploaded successfully. Click the X to remove it.",
+      ),
     ).toBeVisible();
 
     // Should show remove button
     await expect(
-      generalInfoSection.getByRole("button", { name: "Remove logo" })
+      generalInfoSection.getByRole("button", { name: "Remove logo" }),
     ).toBeVisible();
 
     // Upload area should be hidden
     await expect(
-      generalInfoSection.getByText("Click to upload your company logo")
+      generalInfoSection.getByText("Click to upload your company logo"),
     ).toBeHidden();
   });
 
@@ -260,7 +260,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Wait for logo to be uploaded
     await expect(
-      generalInfoSection.getByAltText("Company logo preview")
+      generalInfoSection.getByAltText("Company logo preview"),
     ).toBeVisible();
 
     // Click remove button
@@ -273,12 +273,12 @@ test.describe("Stripe Invoice Template", () => {
 
     // Logo preview should be hidden
     await expect(
-      generalInfoSection.getByAltText("Company logo preview")
+      generalInfoSection.getByAltText("Company logo preview"),
     ).toBeHidden();
 
     // Upload area should be visible again
     await expect(
-      generalInfoSection.getByText("Click to upload your company logo")
+      generalInfoSection.getByText("Click to upload your company logo"),
     ).toBeVisible();
   });
 
@@ -348,7 +348,7 @@ test.describe("Stripe Invoice Template", () => {
     const pdfData = await pdf(dataBuffer);
 
     expect((pdfData.info as { Title: string }).Title).toContain(
-      `Invoice 1/${CURRENT_MONTH_AND_YEAR} | Created with https://easyinvoicepdf.com`
+      `Invoice 1/${CURRENT_MONTH_AND_YEAR} | Created with https://easyinvoicepdf.com`,
     );
 
     expect(pdfData.text).toContain("Invoice");
@@ -363,7 +363,7 @@ test.describe("Stripe Invoice Template", () => {
     expect(pdfData.text).toContain(
       "Account Number: Seller account num-\nber\n" +
         "SWIFT/BIC number: Seller swift bic\n" +
-        "Bill to\n"
+        "Bill to\n",
     );
 
     expect(pdfData.text).toContain("Bill to");
@@ -379,7 +379,7 @@ test.describe("Stripe Invoice Template", () => {
     expect(pdfData.text).toContain("DescriptionQtyUnit PriceAmount");
     expect(pdfData.text).toContain("Item name");
     expect(pdfData.text).toContain(
-      `${START_OF_CURRENT_MONTH} – ${LAST_DAY_OF_CURRENT_MONTH}`
+      `${START_OF_CURRENT_MONTH} – ${LAST_DAY_OF_CURRENT_MONTH}`,
     );
     expect(pdfData.text).toContain("1€0.00€0.00");
     expect(pdfData.text).toContain("Subtotal€0.00");
@@ -387,7 +387,7 @@ test.describe("Stripe Invoice Template", () => {
     expect(pdfData.text).toContain("Amount Due€0.00");
     expect(pdfData.text).toContain("Reverse charge");
     expect(pdfData.text).toContain(
-      `1/${CURRENT_MONTH_AND_YEAR}·€0.00 due ${PAYMENT_DATE}·Created with https://easyinvoicepdf.comPage 1 of 1`
+      `1/${CURRENT_MONTH_AND_YEAR}·€0.00 due ${PAYMENT_DATE}·Created with https://easyinvoicepdf.comPage 1 of 1`,
     );
   });
 
@@ -415,7 +415,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Should not show error for valid URL
     await expect(paymentUrlInput).toHaveValue(
-      "https://buy.stripe.com/test_payment_link"
+      "https://buy.stripe.com/test_payment_link",
     );
   });
 
@@ -457,19 +457,19 @@ test.describe("Stripe Invoice Template", () => {
 
     // Verify template is still Stripe
     await expect(
-      page.getByRole("combobox", { name: "Invoice Template" })
+      page.getByRole("combobox", { name: "Invoice Template" }),
     ).toHaveValue("stripe");
 
     // Verify payment URL persists
     await expect(
       generalInfoSection.getByRole("textbox", {
         name: "Payment Link URL (Optional)",
-      })
+      }),
     ).toHaveValue("https://buy.stripe.com/test_payment_link");
 
     // Verify logo persists
     await expect(
-      generalInfoSection.getByAltText("Company logo preview")
+      generalInfoSection.getByAltText("Company logo preview"),
     ).toBeVisible();
   });
 });

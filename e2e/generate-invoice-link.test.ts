@@ -79,25 +79,25 @@ test.describe("Generate Invoice Link", () => {
 
     // Verify data is loaded in new tab
     await expect(
-      newInvoiceNumberFieldset.getByRole("textbox", { name: "Value" })
+      newInvoiceNumberFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue("SHARE-TEST-001");
 
     const newPageFinalSection = newPage.getByTestId(`final-section`);
 
     await expect(
-      newPageFinalSection.getByRole("textbox", { name: "Notes", exact: true })
+      newPageFinalSection.getByRole("textbox", { name: "Notes", exact: true }),
     ).toHaveValue("Test note for sharing");
 
     // Verify seller information
     const newSellerSection = newPage.getByTestId("seller-information-section");
     await expect(
-      newSellerSection.getByRole("textbox", { name: "Name" })
+      newSellerSection.getByRole("textbox", { name: "Name" }),
     ).toHaveValue("Test Seller");
     await expect(
-      newSellerSection.getByRole("textbox", { name: "Address" })
+      newSellerSection.getByRole("textbox", { name: "Address" }),
     ).toHaveValue("123 Test St");
     await expect(
-      newSellerSection.getByRole("textbox", { name: "Email" })
+      newSellerSection.getByRole("textbox", { name: "Email" }),
     ).toHaveValue("seller@test.com");
 
     // Verify invoice item
@@ -105,15 +105,15 @@ test.describe("Generate Invoice Link", () => {
     await expect(
       newInvoiceItemsSection.getByRole("spinbutton", {
         name: "Amount (Quantity)",
-      })
+      }),
     ).toHaveValue("5");
     await expect(
       newInvoiceItemsSection.getByRole("spinbutton", {
         name: "Net Price (Rate or Unit Price)",
-      })
+      }),
     ).toHaveValue("100");
     await expect(
-      newInvoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true })
+      newInvoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true }),
     ).toHaveValue("23");
 
     // Close the new page
@@ -126,14 +126,14 @@ test.describe("Generate Invoice Link", () => {
 
     // Verify error toast appears
     await expect(
-      page.getByText("The shared invoice URL appears to be incorrect")
+      page.getByText("The shared invoice URL appears to be incorrect"),
     ).toBeVisible();
 
     // Verify error description is shown
     await expect(
       page.getByText(
-        "Please verify that you have copied the complete invoice URL. The link may be truncated or corrupted."
-      )
+        "Please verify that you have copied the complete invoice URL. The link may be truncated or corrupted.",
+      ),
     ).toBeVisible();
 
     const clearUrlButton = page.getByRole("button", {
@@ -147,13 +147,13 @@ test.describe("Generate Invoice Link", () => {
 
     // Verify toast is dismissed
     await expect(
-      page.getByText("The shared invoice URL appears to be incorrect")
+      page.getByText("The shared invoice URL appears to be incorrect"),
     ).toBeHidden();
 
     await expect(
       page.getByText(
-        "Please verify that you have copied the complete invoice URL. The link may be truncated or corrupted."
-      )
+        "Please verify that you have copied the complete invoice URL. The link may be truncated or corrupted.",
+      ),
     ).toBeHidden();
 
     // Wait for URL to be cleared and verify
@@ -173,7 +173,7 @@ test.describe("Generate Invoice Link", () => {
 
     // Verify the page loads without error
     await expect(page).toHaveURL(
-      `/?data=${oldUncompressedUrl}&template=stripe`
+      `/?data=${oldUncompressedUrl}&template=stripe`,
     );
 
     const oldUrl = page.url();
@@ -183,12 +183,12 @@ test.describe("Generate Invoice Link", () => {
     await expect(
       generalInfoSection.getByRole("combobox", {
         name: "Invoice PDF Language",
-      })
+      }),
     ).toHaveValue("pl");
 
     // Verify the Stripe template is selected
     await expect(
-      page.getByRole("combobox", { name: "Invoice Template" })
+      page.getByRole("combobox", { name: "Invoice Template" }),
     ).toHaveValue("stripe");
 
     // Invoice Number
@@ -197,11 +197,11 @@ test.describe("Generate Invoice Link", () => {
     });
 
     await expect(
-      invoiceNumberFieldset.getByRole("textbox", { name: "Label" })
+      invoiceNumberFieldset.getByRole("textbox", { name: "Label" }),
     ).toHaveValue("Faktura nr:");
 
     await expect(
-      invoiceNumberFieldset.getByRole("textbox", { name: "Value" })
+      invoiceNumberFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue("1/08-2025");
 
     // Verify seller information is loaded
@@ -238,18 +238,18 @@ test.describe("Generate Invoice Link", () => {
     const newUrl = page.url();
 
     const newGeneralInfoSection = page.getByTestId(
-      "general-information-section"
+      "general-information-section",
     );
 
     await expect(
       newGeneralInfoSection.getByRole("combobox", {
         name: "Invoice PDF Language",
-      })
+      }),
     ).toHaveValue("pl");
 
     // Verify the Stripe template is selected
     await expect(
-      page.getByRole("combobox", { name: "Invoice Template" })
+      page.getByRole("combobox", { name: "Invoice Template" }),
     ).toHaveValue("stripe");
 
     // Invoice Number
@@ -258,11 +258,11 @@ test.describe("Generate Invoice Link", () => {
     });
 
     await expect(
-      newInvoiceNumberFieldset.getByRole("textbox", { name: "Label" })
+      newInvoiceNumberFieldset.getByRole("textbox", { name: "Label" }),
     ).toHaveValue("Faktura nr:");
 
     await expect(
-      newInvoiceNumberFieldset.getByRole("textbox", { name: "Value" })
+      newInvoiceNumberFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue("1/08-2025");
 
     // Verify seller information is loaded

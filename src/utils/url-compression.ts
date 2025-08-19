@@ -108,7 +108,7 @@ const REVERSE_KEY_MAP = Object.fromEntries(
   Object.entries(INVOICE_KEY_COMPRESSION_MAP).map(([key, value]) => [
     value,
     key,
-  ])
+  ]),
 ) as Record<string, keyof typeof INVOICE_KEY_COMPRESSION_MAP>;
 
 /**
@@ -122,7 +122,7 @@ const REVERSE_KEY_MAP = Object.fromEntries(
  * ```
  */
 function remapKeys<T>(
-  obj: T
+  obj: T,
 ): T extends Record<string, unknown>
   ? Record<string, unknown>
   : T extends unknown[]
@@ -172,7 +172,7 @@ function remapKeys<T>(
  * ```
  */
 function restoreKeys<T>(
-  obj: T
+  obj: T,
 ): T extends Record<string, unknown>
   ? Record<string, unknown>
   : T extends unknown[]

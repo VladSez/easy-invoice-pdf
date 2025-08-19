@@ -101,7 +101,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
   const isDateOfServiceEqualsEndOfCurrentMonth = dayjs(dateOfService).isSame(
     dayjs().endOf("month"),
-    "day"
+    "day",
   );
 
   const isDefaultInvoiceNumberLabel =
@@ -109,7 +109,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
   // extract the month and year from the invoice number (i.e. 1/04-2025 -> 04-2025)
   const extractInvoiceMonthAndYear = /(\d{2}-\d{4})/.exec(
-    invoiceNumberValue ?? ""
+    invoiceNumberValue ?? "",
   )?.[1];
 
   const isInvoiceNumberInCurrentMonth =
@@ -144,7 +144,7 @@ export const GeneralInformation = memo(function GeneralInformation({
         toast.error("Error uploading image. Please try again.");
       }
     },
-    [setValue]
+    [setValue],
   );
 
   const handleLogoRemove = useCallback(() => {
@@ -325,7 +325,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                 // we need to keep the invoice number suffix (e.g. 1/MM-YYYY) for better user experience, when switching language
                 setValue(
                   "invoiceNumberObject.label",
-                  `${newInvoiceNumberLabel}:`
+                  `${newInvoiceNumberLabel}:`,
                 );
                 setValue("invoiceNumberObject.value", invoiceNumberValue);
               }}
@@ -460,7 +460,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                       onClick={() => {
                         setValue(
                           "invoiceNumberObject.label",
-                          defaultInvoiceNumber
+                          defaultInvoiceNumber,
                         );
                       }}
                     >
@@ -504,7 +504,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                       onClick={() => {
                         setValue(
                           "invoiceNumberObject.value",
-                          `1/${CURRENT_MONTH_AND_YEAR}`
+                          `1/${CURRENT_MONTH_AND_YEAR}`,
                         );
                       }}
                     >

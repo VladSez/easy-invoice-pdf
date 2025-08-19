@@ -20,7 +20,7 @@ export function GitHubStarCTA() {
         _size="sm"
         className={cn(
           "group border-slate-200 bg-white shadow-sm transition-all duration-300 hover:scale-105 hover:border-slate-300 hover:shadow-md",
-          "text-slate-900 hover:text-slate-900"
+          "text-slate-900 hover:text-slate-900",
         )}
         onClick={handleStarClick}
         data-testid="github-star-cta-button"

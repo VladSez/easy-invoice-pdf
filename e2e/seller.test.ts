@@ -55,13 +55,13 @@ test.describe("Seller management", () => {
 
     // Verify all switches are checked by default
     await expect(
-      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(0)
+      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(0),
     ).toBeChecked();
     await expect(
-      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(1)
+      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(1),
     ).toBeChecked();
     await expect(
-      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(2)
+      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(2),
     ).toBeChecked();
 
     // Toggle some visibility switches
@@ -80,7 +80,7 @@ test.describe("Seller management", () => {
       .fill(testData.notes);
 
     const notesSellerSwitch = manageSellerDialog.getByTestId(
-      `sellerNotesDialogFieldVisibilitySwitch`
+      `sellerNotesDialogFieldVisibilitySwitch`,
     );
 
     await expect(notesSellerSwitch).toHaveRole("switch");
@@ -92,12 +92,12 @@ test.describe("Seller management", () => {
     await expect(
       manageSellerDialog.getByRole("switch", {
         name: "Apply to Current Invoice",
-      })
+      }),
     ).toBeChecked();
 
     // Cancel button is shown
     await expect(
-      manageSellerDialog.getByRole("button", { name: "Cancel" })
+      manageSellerDialog.getByRole("button", { name: "Cancel" }),
     ).toBeVisible();
 
     // Save seller
@@ -134,7 +134,7 @@ test.describe("Seller management", () => {
 
     // Verify success toast message is visible
     await expect(
-      page.getByText("Seller added successfully", { exact: true })
+      page.getByText("Seller added successfully", { exact: true }),
     ).toBeVisible();
 
     // ------- TEST SAVED DETAILS IN INVOICE FORM -------
@@ -145,7 +145,7 @@ test.describe("Seller management", () => {
     const nameInput = sellerForm.getByRole("textbox", { name: "Name" });
     await expect(nameInput).toHaveAttribute(
       "title",
-      "Seller details are locked. Click the Edit Seller button (Pencil icon) to modify."
+      "Seller details are locked. Click the Edit Seller button (Pencil icon) to modify.",
     );
 
     // Seller Name
@@ -154,18 +154,18 @@ test.describe("Seller management", () => {
 
     // Seller Address
     await expect(
-      sellerForm.getByRole("textbox", { name: "Address" })
+      sellerForm.getByRole("textbox", { name: "Address" }),
     ).toHaveAttribute("aria-readonly", "true");
     await expect(
-      sellerForm.getByRole("textbox", { name: "Address" })
+      sellerForm.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(testData.address);
 
     // Seller VAT Number
     await expect(
-      sellerForm.getByRole("textbox", { name: "VAT Number" })
+      sellerForm.getByRole("textbox", { name: "VAT Number" }),
     ).toHaveAttribute("aria-readonly", "true");
     await expect(
-      sellerForm.getByRole("textbox", { name: "VAT Number" })
+      sellerForm.getByRole("textbox", { name: "VAT Number" }),
     ).toHaveValue(testData.vatNo);
 
     const vatNumberSwitch = sellerForm.getByTestId(`sellerVatNoFieldIsVisible`);
@@ -175,22 +175,22 @@ test.describe("Seller management", () => {
 
     // Seller Email
     await expect(
-      sellerForm.getByRole("textbox", { name: "Email" })
+      sellerForm.getByRole("textbox", { name: "Email" }),
     ).toHaveAttribute("aria-readonly", "true");
     await expect(
-      sellerForm.getByRole("textbox", { name: "Email" })
+      sellerForm.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(testData.email);
 
     // Seller Account Number
     await expect(
-      sellerForm.getByRole("textbox", { name: "Account Number" })
+      sellerForm.getByRole("textbox", { name: "Account Number" }),
     ).toHaveAttribute("aria-readonly", "true");
     await expect(
-      sellerForm.getByRole("textbox", { name: "Account Number" })
+      sellerForm.getByRole("textbox", { name: "Account Number" }),
     ).toHaveValue(testData.accountNumber);
 
     const accountNumberSwitch = sellerForm.getByTestId(
-      `sellerAccountNumberFieldIsVisible`
+      `sellerAccountNumberFieldIsVisible`,
     );
     // Verify Account Number switch is visible
     await expect(accountNumberSwitch).not.toBeChecked();
@@ -198,14 +198,14 @@ test.describe("Seller management", () => {
 
     // Seller SWIFT/BIC
     await expect(
-      sellerForm.getByRole("textbox", { name: "SWIFT/BIC" })
+      sellerForm.getByRole("textbox", { name: "SWIFT/BIC" }),
     ).toHaveAttribute("aria-readonly", "true");
     await expect(
-      sellerForm.getByRole("textbox", { name: "SWIFT/BIC" })
+      sellerForm.getByRole("textbox", { name: "SWIFT/BIC" }),
     ).toHaveValue(testData.swiftBic);
 
     const swiftBicSwitch = sellerForm.getByTestId(
-      `sellerSwiftBicFieldIsVisible`
+      `sellerSwiftBicFieldIsVisible`,
     );
     // Verify SWIFT/BIC switch is visible
     await expect(swiftBicSwitch).not.toBeChecked();
@@ -213,14 +213,14 @@ test.describe("Seller management", () => {
 
     // Seller Notes
     await expect(
-      sellerForm.getByRole("textbox", { name: "Notes" })
+      sellerForm.getByRole("textbox", { name: "Notes" }),
     ).toHaveAttribute("aria-readonly", "true");
     await expect(
-      sellerForm.getByRole("textbox", { name: "Notes" })
+      sellerForm.getByRole("textbox", { name: "Notes" }),
     ).toHaveValue(testData.notes);
 
     const notesSwitch = sellerForm.getByTestId(
-      `sellerNotesInvoiceFormFieldVisibilitySwitch`
+      `sellerNotesInvoiceFormFieldVisibilitySwitch`,
     );
     // Verify Notes switch is visible
     await expect(notesSwitch).toBeChecked();
@@ -228,7 +228,7 @@ test.describe("Seller management", () => {
 
     // Verify the seller appears in the dropdown
     await expect(
-      sellerForm.getByRole("combobox", { name: "Select Seller" })
+      sellerForm.getByRole("combobox", { name: "Select Seller" }),
     ).toContainText(testData.name);
 
     // Test edit functionality
@@ -237,43 +237,43 @@ test.describe("Seller management", () => {
     // ------- TEST EDIT FUNCTIONALITY IN SELLER MANAGEMENT DIALOG -------
     // Verify all fields are populated in edit dialog
     await expect(
-      manageSellerDialog.getByRole("textbox", { name: "Name" })
+      manageSellerDialog.getByRole("textbox", { name: "Name" }),
     ).toHaveValue(testData.name);
     await expect(
-      manageSellerDialog.getByRole("textbox", { name: "Address" })
+      manageSellerDialog.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(testData.address);
     await expect(
-      manageSellerDialog.getByRole("textbox", { name: "VAT Number" })
+      manageSellerDialog.getByRole("textbox", { name: "VAT Number" }),
     ).toHaveValue(testData.vatNo);
     await expect(
-      manageSellerDialog.getByRole("textbox", { name: "Email" })
+      manageSellerDialog.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(testData.email);
     await expect(
-      manageSellerDialog.getByRole("textbox", { name: "Account Number" })
+      manageSellerDialog.getByRole("textbox", { name: "Account Number" }),
     ).toHaveValue(testData.accountNumber);
     await expect(
-      manageSellerDialog.getByRole("textbox", { name: "SWIFT/BIC" })
+      manageSellerDialog.getByRole("textbox", { name: "SWIFT/BIC" }),
     ).toHaveValue(testData.swiftBic);
 
     // Verify visibility switches state persisted in edit dialog
     await expect(
-      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(0)
+      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(0),
     ).toBeChecked();
     await expect(
-      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(1)
+      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(1),
     ).not.toBeChecked();
     await expect(
-      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(2)
+      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(2),
     ).not.toBeChecked();
 
     // Verify notes text
     await expect(
-      manageSellerDialog.getByRole("textbox", { name: "Notes" })
+      manageSellerDialog.getByRole("textbox", { name: "Notes" }),
     ).toHaveValue(testData.notes);
 
     // Verify notes visibility switch is checked
     const notesManageSellerDialogFormSwitch = manageSellerDialog.getByTestId(
-      `sellerNotesDialogFieldVisibilitySwitch`
+      `sellerNotesDialogFieldVisibilitySwitch`,
     );
 
     await expect(notesManageSellerDialogFormSwitch).toBeChecked();
@@ -323,7 +323,7 @@ test.describe("Seller management", () => {
     // Verify seller was added
     const sellerForm = page.getByTestId(`seller-information-section`);
     await expect(
-      sellerForm.getByRole("combobox", { name: "Select Seller" })
+      sellerForm.getByRole("combobox", { name: "Select Seller" }),
     ).toContainText(testData.name);
 
     // Click delete button
@@ -349,8 +349,8 @@ test.describe("Seller management", () => {
 
     await expect(
       page.getByText(
-        `Are you sure you want to delete "${testData.name}" seller?`
-      )
+        `Are you sure you want to delete "${testData.name}" seller?`,
+      ),
     ).toBeVisible();
 
     // Confirm deletion
@@ -358,33 +358,33 @@ test.describe("Seller management", () => {
 
     // Verify success message
     await expect(
-      page.getByText("Seller deleted successfully", { exact: true })
+      page.getByText("Seller deleted successfully", { exact: true }),
     ).toBeVisible();
 
     // Verify seller is removed from dropdown
     // because we have only one seller, dropdown will be completely hidden
     await expect(
-      sellerForm.getByRole("combobox", { name: "Select Seller" })
+      sellerForm.getByRole("combobox", { name: "Select Seller" }),
     ).toBeHidden();
 
     // Verify form is reset to default values
     await expect(sellerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
-      DEFAULT_SELLER_DATA.name
+      DEFAULT_SELLER_DATA.name,
     );
     await expect(
-      sellerForm.getByRole("textbox", { name: "Address" })
+      sellerForm.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(DEFAULT_SELLER_DATA.address);
     await expect(
-      sellerForm.getByRole("textbox", { name: "Email" })
+      sellerForm.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(DEFAULT_SELLER_DATA.email);
     await expect(
-      sellerForm.getByRole("textbox", { name: "VAT Number" })
+      sellerForm.getByRole("textbox", { name: "VAT Number" }),
     ).toHaveValue(DEFAULT_SELLER_DATA.vatNo);
     await expect(
-      sellerForm.getByRole("textbox", { name: "Account Number" })
+      sellerForm.getByRole("textbox", { name: "Account Number" }),
     ).toHaveValue(DEFAULT_SELLER_DATA.accountNumber);
     await expect(
-      sellerForm.getByRole("textbox", { name: "SWIFT/BIC" })
+      sellerForm.getByRole("textbox", { name: "SWIFT/BIC" }),
     ).toHaveValue(DEFAULT_SELLER_DATA.swiftBic);
   });
 });

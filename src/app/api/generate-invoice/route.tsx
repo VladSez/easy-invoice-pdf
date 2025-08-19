@@ -54,18 +54,18 @@ export async function GET(req: NextRequest) {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
     }
 
     const GENERATED_ENGLISH_INVOICE_PDF_DOCUMENT = renderToBuffer(
       <InvoicePdfTemplateToRenderOnBackend
         invoiceData={ENGLISH_INVOICE_REAL_DATA}
-      />
+      />,
     ).catch((err) => {
       console.error(
         "\n\n_________________________Error during `renderToBuffer` for English invoice:",
-        err
+        err,
       );
 
       throw err;
@@ -74,11 +74,11 @@ export async function GET(req: NextRequest) {
     const GENERATED_POLISH_INVOICE_PDF_DOCUMENT = renderToBuffer(
       <InvoicePdfTemplateToRenderOnBackend
         invoiceData={POLISH_INVOICE_REAL_DATA}
-      />
+      />,
     ).catch((err) => {
       console.error(
         "\n\n_________________________Error during `renderToBuffer` for Polish invoice:",
-        err
+        err,
       );
 
       throw err;
@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
       ]).catch((err) => {
         console.error(
           "\n\n_________________________Error during `Promise.allSettled`:",
-          err
+          err,
         );
       })) || [];
 
@@ -112,7 +112,7 @@ export async function GET(req: NextRequest) {
       } else if (invoice.status === "rejected") {
         console.error(
           "\n\n_________________________Error in generate-invoice route:",
-          invoice?.reason || "Unknown error"
+          invoice?.reason || "Unknown error",
         );
       }
     }
@@ -135,12 +135,12 @@ export async function GET(req: NextRequest) {
     if (!ATTACHMENTS.length) {
       return NextResponse.json(
         { error: "No attachments found" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const newInvoiceDataValidated = invoiceSchema.parse(
-      ENGLISH_INVOICE_REAL_DATA
+      ENGLISH_INVOICE_REAL_DATA,
     );
 
     // Compress JSON keys before stringifying to reduce URL size
@@ -178,23 +178,23 @@ export async function GET(req: NextRequest) {
         fileName: attachment.filename,
         fileContent: Buffer.from(attachment.content),
         folderId: folderToUploadInvoices.id,
-      })
+      }),
     );
 
     const uploadResults = await Promise.allSettled(uploadPromises);
     const failedUploads = uploadResults.filter(
-      (result): result is PromiseRejectedResult => result.status === "rejected"
+      (result): result is PromiseRejectedResult => result.status === "rejected",
     );
 
     if (failedUploads.length > 0) {
       console.error(
         "Some files failed to upload to Google Drive:",
-        failedUploads
+        failedUploads,
       );
 
       return NextResponse.json(
         { error: "Failed to upload invoices to Google Drive" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -267,7 +267,7 @@ EasyInvoicePDF.com`,
     ]);
 
     const failedNotifications = notificationResults.filter(
-      (result): result is PromiseRejectedResult => result.status === "rejected"
+      (result): result is PromiseRejectedResult => result.status === "rejected",
     );
 
     if (failedNotifications.length > 0) {
@@ -278,14 +278,14 @@ EasyInvoicePDF.com`,
 
     return NextResponse.json(
       { message: "Invoice sent successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error in generate-invoice route:", error);
 
     return NextResponse.json(
       { error: "Failed to generate and send invoice" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

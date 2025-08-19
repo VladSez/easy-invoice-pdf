@@ -14,7 +14,7 @@ test.describe("About page", () => {
     await expect(page).toHaveURL("/en/about");
 
     await expect(page).toHaveTitle(
-      "About | Free Invoice Generator – Live Preview, No Sign-Up"
+      "About | Free Invoice Generator – Live Preview, No Sign-Up",
     );
 
     const header = page.getByRole("banner");
@@ -35,19 +35,19 @@ test.describe("About page", () => {
         level: 1,
         name: "Create professional invoices in seconds",
         exact: true,
-      })
+      }),
     ).toBeVisible();
 
     await expect(
       heroSection.getByText(
-        "EasyInvoicePDF is a free, open-source tool that lets you create, customize, and download professional invoices with real-time preview."
-      )
+        "EasyInvoicePDF is a free, open-source tool that lets you create, customize, and download professional invoices with real-time preview.",
+      ),
     ).toBeVisible();
 
     await expect(
       heroSection
         .getByText("No sign-up required. 100% free and open-source.")
-        .filter({ visible: true })
+        .filter({ visible: true }),
     ).toBeVisible();
 
     const video = heroSection.getByTestId("hero-about-page-video");
@@ -55,7 +55,7 @@ test.describe("About page", () => {
     await expect(video).toBeVisible();
     await expect(video).toHaveAttribute(
       "poster",
-      `${STATIC_ASSETS_URL}/easy-invoice-video-placeholder.webp`
+      `${STATIC_ASSETS_URL}/easy-invoice-video-placeholder.webp`,
     );
     await expect(video).toHaveAttribute("muted");
     await expect(video).toHaveAttribute("loop");
@@ -66,7 +66,7 @@ test.describe("About page", () => {
     const videoSource = video.locator("source");
     await expect(videoSource).toHaveAttribute(
       "src",
-      `${VIDEO_DEMO_URL}#t=0.001`
+      `${VIDEO_DEMO_URL}#t=0.001`,
     );
     await expect(videoSource).toHaveAttribute("type", "video/mp4");
 
@@ -75,7 +75,7 @@ test.describe("About page", () => {
     await expect(featuresSection).toBeVisible();
 
     await expect(
-      featuresSection.getByTestId("features-coming-soon")
+      featuresSection.getByTestId("features-coming-soon"),
     ).toHaveText("E-invoices support coming soon");
 
     await expect(
@@ -83,17 +83,17 @@ test.describe("About page", () => {
         level: 2,
         name: "Everything you need for professional invoicing",
         exact: true,
-      })
+      }),
     ).toBeVisible();
 
     await expect(
       featuresSection.getByText(
-        "Our simple yet powerful invoice generator includes all the features you need to create professional invoices quickly."
-      )
+        "Our simple yet powerful invoice generator includes all the features you need to create professional invoices quickly.",
+      ),
     ).toBeVisible();
 
     await expect(
-      featuresSection.getByText("E-invoices support coming soon")
+      featuresSection.getByText("E-invoices support coming soon"),
     ).toBeVisible();
 
     // check FAQ section
@@ -105,7 +105,7 @@ test.describe("About page", () => {
         level: 2,
         name: "Frequently Asked Questions",
         exact: true,
-      })
+      }),
     ).toBeVisible();
 
     await expect(faqSection.getByText("What is EasyInvoicePDF?")).toBeVisible();
@@ -120,13 +120,13 @@ test.describe("About page", () => {
         level: 2,
         name: "Subscribe to our newsletter",
         exact: true,
-      })
+      }),
     ).toBeVisible();
 
     await expect(
       subscribeFormSection.getByText(
-        "Get updates on new features and improvements from EasyInvoicePDF.com"
-      )
+        "Get updates on new features and improvements from EasyInvoicePDF.com",
+      ),
     ).toBeVisible();
 
     const subscribeForm = subscribeFormSection.getByTestId("subscribe-form");
@@ -140,7 +140,7 @@ test.describe("About page", () => {
     await expect(subscribeFormEmailInput).toHaveAttribute("required");
     await expect(subscribeFormEmailInput).toHaveAttribute(
       "autocomplete",
-      "email"
+      "email",
     );
 
     const subscribeFormButton = subscribeForm.getByRole("button", {
@@ -180,18 +180,18 @@ test.describe("About page", () => {
     await expect(footer.getByText("Subscribe to our newsletter")).toBeVisible();
 
     await expect(
-      footer.getByText("All emails will be sent in English")
+      footer.getByText("All emails will be sent in English"),
     ).toBeVisible();
 
     const newsletterForm = footer.getByTestId("subscribe-form");
     await expect(newsletterForm).toBeVisible();
 
     await expect(
-      newsletterForm.getByPlaceholder("Enter your email")
+      newsletterForm.getByPlaceholder("Enter your email"),
     ).toBeVisible();
 
     await expect(
-      newsletterForm.getByRole("button", { name: "Subscribe" })
+      newsletterForm.getByRole("button", { name: "Subscribe" }),
     ).toBeVisible();
 
     // now check all the rest of the footer links
@@ -238,7 +238,7 @@ test.describe("About page", () => {
     await expect(shareFeedbackLink).toBeVisible();
     await expect(shareFeedbackLink).toHaveAttribute(
       "href",
-      "https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
+      "https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10",
     );
     await expect(shareFeedbackLink).toHaveAttribute("target", "_blank");
 
@@ -276,19 +276,19 @@ test.describe("About page", () => {
         level: 1,
         name: "Créez des factures professionnelles en quelques secondes",
         exact: true,
-      })
+      }),
     ).toBeVisible();
 
     await expect(
       heroSection.getByText(
-        "EasyInvoicePDF est un outil gratuit et open-source qui vous permet de créer, personnaliser et télécharger des factures professionnelles avec aperçu en temps réel. Fonctionne entièrement dans votre navigateur."
-      )
+        "EasyInvoicePDF est un outil gratuit et open-source qui vous permet de créer, personnaliser et télécharger des factures professionnelles avec aperçu en temps réel. Fonctionne entièrement dans votre navigateur.",
+      ),
     ).toBeVisible();
 
     await expect(
       heroSection
         .getByText("Aucune inscription requise. 100% gratuit et open-source.")
-        .filter({ visible: true })
+        .filter({ visible: true }),
     ).toBeVisible();
 
     // Check Features section in French
@@ -296,11 +296,11 @@ test.describe("About page", () => {
     await expect(featuresSection).toBeVisible();
 
     await expect(featuresSection.getByTestId("features-badge")).toHaveText(
-      "Fonctionnalités"
+      "Fonctionnalités",
     );
 
     await expect(
-      featuresSection.getByTestId("features-coming-soon")
+      featuresSection.getByTestId("features-coming-soon"),
     ).toHaveText("Version Pro et API bientôt disponibles");
 
     await expect(
@@ -308,7 +308,7 @@ test.describe("About page", () => {
         level: 2,
         name: "Tout ce dont vous avez besoin pour une facturation professionnelle",
         exact: true,
-      })
+      }),
     ).toBeVisible();
 
     // check subscribe form section in French
@@ -320,13 +320,13 @@ test.describe("About page", () => {
         level: 2,
         name: "Abonnez-vous à notre newsletter",
         exact: true,
-      })
+      }),
     ).toBeVisible();
 
     await expect(
       subscribeFormSection.getByText(
-        "Recevez des mises à jour sur les nouvelles fonctionnalités et améliorations de EasyInvoicePDF.com"
-      )
+        "Recevez des mises à jour sur les nouvelles fonctionnalités et améliorations de EasyInvoicePDF.com",
+      ),
     ).toBeVisible();
 
     // Check footer in French
@@ -335,19 +335,19 @@ test.describe("About page", () => {
 
     // Check newsletter subscription form in French
     await expect(
-      footer.getByText("Abonnez-vous à notre newsletter")
+      footer.getByText("Abonnez-vous à notre newsletter"),
     ).toBeVisible();
     await expect(
-      footer.getByText("Tous les emails seront envoyés en anglais")
+      footer.getByText("Tous les emails seront envoyés en anglais"),
     ).toBeVisible();
 
     const newsletterForm = footer.getByTestId("subscribe-form");
     await expect(newsletterForm).toBeVisible();
     await expect(
-      newsletterForm.getByPlaceholder("Entrez votre email")
+      newsletterForm.getByPlaceholder("Entrez votre email"),
     ).toBeVisible();
     await expect(
-      newsletterForm.getByRole("button", { name: "S'abonner", exact: true })
+      newsletterForm.getByRole("button", { name: "S'abonner", exact: true }),
     ).toBeVisible();
 
     const footerLinks = footer.getByTestId("footer-social-links");
@@ -395,21 +395,21 @@ test.describe("About page", () => {
         level: 1,
         name: "Erstellen Sie professionelle Rechnungen in Sekunden",
         exact: true,
-      })
+      }),
     ).toBeVisible();
 
     await expect(
       heroSection.getByText(
-        "EasyInvoicePDF ist ein kostenloses Open-Source-Tool, mit dem Sie professionelle Rechnungen mit Echtzeit-Vorschau erstellen, anpassen und herunterladen können."
-      )
+        "EasyInvoicePDF ist ein kostenloses Open-Source-Tool, mit dem Sie professionelle Rechnungen mit Echtzeit-Vorschau erstellen, anpassen und herunterladen können.",
+      ),
     ).toBeVisible();
 
     await expect(
       heroSection
         .getByText(
-          "Keine Anmeldung erforderlich. 100% kostenlos und Open-Source."
+          "Keine Anmeldung erforderlich. 100% kostenlos und Open-Source.",
         )
-        .filter({ visible: true })
+        .filter({ visible: true }),
     ).toBeVisible();
 
     // Check Features section in German
@@ -417,11 +417,11 @@ test.describe("About page", () => {
     await expect(featuresSection).toBeVisible();
 
     await expect(featuresSection.getByTestId("features-badge")).toHaveText(
-      "Funktionen"
+      "Funktionen",
     );
 
     await expect(
-      featuresSection.getByTestId("features-coming-soon")
+      featuresSection.getByTestId("features-coming-soon"),
     ).toHaveText("Pro-Version und API in Kürze verfügbar");
 
     await expect(
@@ -429,7 +429,7 @@ test.describe("About page", () => {
         level: 2,
         name: "Alles, was Sie für professionelle Rechnungsstellung brauchen",
         exact: true,
-      })
+      }),
     ).toBeVisible();
 
     // Check footer in German
@@ -439,21 +439,21 @@ test.describe("About page", () => {
     // Check newsletter subscription form in German
     await expect(footer.getByText("Newsletter abonnieren")).toBeVisible();
     await expect(
-      footer.getByText("Alle E-Mails werden in englischer Sprache versendet")
+      footer.getByText("Alle E-Mails werden in englischer Sprache versendet"),
     ).toBeVisible();
 
     const newsletterForm = footer.getByTestId("subscribe-form");
     await expect(newsletterForm).toBeVisible();
     await expect(
-      newsletterForm.getByPlaceholder("E-Mail eingeben")
+      newsletterForm.getByPlaceholder("E-Mail eingeben"),
     ).toBeVisible();
     await expect(
-      newsletterForm.getByRole("button", { name: "Abonnieren", exact: true })
+      newsletterForm.getByRole("button", { name: "Abonnieren", exact: true }),
     ).toBeVisible();
 
     const footerLinks = footer.getByTestId("footer-social-links");
     await expect(
-      footerLinks.getByRole("link", { name: "Funktionen", exact: true })
+      footerLinks.getByRole("link", { name: "Funktionen", exact: true }),
     ).toBeVisible();
   });
 
@@ -473,7 +473,7 @@ test.describe("About page", () => {
       header.getByRole("link", {
         name: "Aller à l'application",
         exact: true,
-      })
+      }),
     ).toBeVisible();
     await expect(page).toHaveURL("/fr/about");
   });

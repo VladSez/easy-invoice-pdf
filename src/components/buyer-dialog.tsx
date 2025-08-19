@@ -37,7 +37,7 @@ interface BuyerDialogProps {
   onClose: React.Dispatch<React.SetStateAction<boolean>>;
   handleBuyerAdd?: (
     buyer: BuyerData,
-    { shouldApplyNewBuyerToInvoice }: { shouldApplyNewBuyerToInvoice: boolean }
+    { shouldApplyNewBuyerToInvoice }: { shouldApplyNewBuyerToInvoice: boolean },
   ) => void;
   handleBuyerEdit?: (buyer: BuyerData) => void;
   initialData: BuyerData | null;
@@ -96,7 +96,7 @@ export function BuyerDialog({
           vatNoFieldIsVisible: true,
           notes: "",
           notesFieldIsVisible: true,
-        }
+        },
       );
     }
   }, [shouldApplyFormValues, formValues, initialData, isEditMode, form]);
@@ -117,7 +117,7 @@ export function BuyerDialog({
       if (!existingBuyersValidationResult.success) {
         console.error(
           "Invalid existing buyers data:",
-          existingBuyersValidationResult.error
+          existingBuyersValidationResult.error,
         );
 
         // Show error toast
@@ -135,7 +135,7 @@ export function BuyerDialog({
       // Validate buyer data against existing buyers
       const isDuplicateName = existingBuyersValidationResult.data.some(
         (buyer: BuyerData) =>
-          buyer.name === formValues.name && buyer.id !== formValues.id
+          buyer.name === formValues.name && buyer.id !== formValues.id,
       );
 
       if (isDuplicateName) {

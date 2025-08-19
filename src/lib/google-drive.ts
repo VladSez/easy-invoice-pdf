@@ -53,7 +53,7 @@ export async function initializeGoogleDrive() {
 async function createFolder(
   drive: ReturnType<typeof google.drive>,
   folderName: string,
-  parentFolderId?: string
+  parentFolderId?: string,
 ): Promise<GoogleDriveFile> {
   const fileMetadata = {
     name: folderName,
@@ -145,7 +145,7 @@ export async function createOrFindInvoiceFolder({
     yearFolder = await createFolder(
       googleDrive,
       yearFolderName,
-      validatedInput.parentFolderId
+      validatedInput.parentFolderId,
     );
   }
 
@@ -172,14 +172,14 @@ export async function createOrFindInvoiceFolder({
       "\n\n________month folder already exists, using it: ",
       monthFolder,
       { monthFolderName, yearFolderName },
-      "\n\n"
+      "\n\n",
     );
   } else {
     // if the month folder does not exist (new month), create it
     monthFolder = await createFolder(
       googleDrive,
       monthFolderName,
-      yearFolder.id
+      yearFolder.id,
     );
   }
 
@@ -204,7 +204,7 @@ export async function createOrFindInvoiceFolder({
     folderToUploadInvoices = await createFolder(
       googleDrive,
       "invoices",
-      monthFolder.id
+      monthFolder.id,
     );
   }
 
@@ -214,7 +214,7 @@ export async function createOrFindInvoiceFolder({
   console.log(
     "\n\n________invoice to upload Google Drive folder path: ",
     googleDriveFolderPath,
-    "\n\n"
+    "\n\n",
   );
 
   return {

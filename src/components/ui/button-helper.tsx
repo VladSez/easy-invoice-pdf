@@ -14,7 +14,7 @@ export const ButtonHelper = ({
       _size="sm"
       className={cn(
         "h-5 max-w-full whitespace-normal text-pretty p-0 text-left underline",
-        className
+        className,
       )}
       {...props}
     >

@@ -91,7 +91,7 @@ test.describe("PDF Preview", () => {
     // Save the file to a browser-specific temporary location
     const tmpPath = path.join(
       getDownloadDir({ browserName }),
-      suggestedFilename
+      suggestedFilename,
     );
     await download.saveAs(tmpPath);
 
@@ -108,12 +108,12 @@ test.describe("PDF Preview", () => {
 
     // Check invoice header details
     expect(pdfData.text).toContain(
-      `Invoice No. of: 1/${CURRENT_MONTH_AND_YEAR}`
+      `Invoice No. of: 1/${CURRENT_MONTH_AND_YEAR}`,
     );
     expect(pdfData.text).toContain("Reverse Charge");
     expect(pdfData.text).toContain(`Date of issue: ${TODAY}`);
     expect(pdfData.text).toContain(
-      `Date of sales/of executing the service: ${LAST_DAY_OF_CURRENT_MONTH}`
+      `Date of sales/of executing the service: ${LAST_DAY_OF_CURRENT_MONTH}`,
     );
 
     // Check seller details
@@ -154,7 +154,7 @@ test.describe("PDF Preview", () => {
 
     // Check page footer and metadata
     expect(pdfData.text).toContain(
-      `1/${CURRENT_MONTH_AND_YEAR}·€0.00 due ${PAYMENT_DATE}·Created with https://easyinvoicepdf.comPage 1 of 1`
+      `1/${CURRENT_MONTH_AND_YEAR}·€0.00 due ${PAYMENT_DATE}·Created with https://easyinvoicepdf.comPage 1 of 1`,
     );
   });
 
@@ -195,7 +195,7 @@ test.describe("PDF Preview", () => {
     const pdfData = await pdf(dataBuffer);
 
     expect((pdfData.info as { Title: string }).Title).toContain(
-      `Faktura nr: 1/${CURRENT_MONTH_AND_YEAR} | Created with https://easyinvoicepdf.com`
+      `Faktura nr: 1/${CURRENT_MONTH_AND_YEAR} | Created with https://easyinvoicepdf.com`,
     );
 
     // Verify PDF content
@@ -209,7 +209,7 @@ test.describe("PDF Preview", () => {
 
     const lastDayOfCurrentMonth = dayjs().endOf("month").format("YYYY-MM-DD");
     expect(pdfData.text).toContain(
-      `Data sprzedaży / wykonania usługi: ${lastDayOfCurrentMonth}`
+      `Data sprzedaży / wykonania usługi: ${lastDayOfCurrentMonth}`,
     );
 
     expect(pdfData.text).toContain(`Razem do zapłaty: 0.00 EUR
@@ -218,7 +218,7 @@ Pozostało do zapłaty: 0.00 EUR
 Kwota słownie: zero EUR 00/100`);
 
     expect(pdfData.text).toContain(
-      `1/${CURRENT_MONTH_AND_YEAR}·0,00 € do zapłaty do ${PAYMENT_DATE}·Utworzono za pomocą https://easyinvoicepdf.comStrona 1 z 1`
+      `1/${CURRENT_MONTH_AND_YEAR}·0,00 € do zapłaty do ${PAYMENT_DATE}·Utworzono za pomocą https://easyinvoicepdf.comStrona 1 z 1`,
     );
   });
 
@@ -272,7 +272,7 @@ Kwota słownie: zero EUR 00/100`);
 
     // Toggle notes visibility on
     const sellerNotesSwitch = sellerSection.getByTestId(
-      `sellerNotesInvoiceFormFieldVisibilitySwitch`
+      `sellerNotesInvoiceFormFieldVisibilitySwitch`,
     );
 
     await expect(sellerNotesSwitch).toHaveRole("switch");
@@ -302,7 +302,7 @@ Kwota słownie: zero EUR 00/100`);
 
     // Toggle notes visibility on
     const buyerNotesSwitch = buyerSection.getByTestId(
-      `buyerNotesInvoiceFormFieldVisibilitySwitch`
+      `buyerNotesInvoiceFormFieldVisibilitySwitch`,
     );
 
     await expect(buyerNotesSwitch).toHaveRole("switch");
@@ -353,7 +353,7 @@ Kwota słownie: zero EUR 00/100`);
     // Save the file to a browser-specific temporary location
     const tmpPath = path.join(
       getDownloadDir({ browserName }),
-      suggestedFilename
+      suggestedFilename,
     );
     await download.saveAs(tmpPath);
 
@@ -368,12 +368,12 @@ Kwota słownie: zero EUR 00/100`);
     // Verify PDF content
     // Check invoice header details
     expect(pdfData.text).toContain(
-      `Invoice No. of: 1/${CURRENT_MONTH_AND_YEAR}`
+      `Invoice No. of: 1/${CURRENT_MONTH_AND_YEAR}`,
     );
     expect(pdfData.text).toContain("HELLO FROM PLAYWRIGHT TEST!");
     expect(pdfData.text).toContain(`Date of issue: ${today}`);
     expect(pdfData.text).toContain(
-      `Date of sales/of executing the service: ${lastDayOfCurrentMonth}`
+      `Date of sales/of executing the service: ${lastDayOfCurrentMonth}`,
     );
 
     // Check seller details
@@ -405,7 +405,7 @@ Kwota słownie: zero EUR 00/100`);
     expect(pdfData.text).toContain("Paid: 0.00 GBP");
     expect(pdfData.text).toContain("Left to pay: 3 000.00 GBP");
     expect(pdfData.text).toContain(
-      "Amount in words: three thousand GBP 00/100"
+      "Amount in words: three thousand GBP 00/100",
     );
 
     // Check footer
@@ -414,7 +414,7 @@ Kwota słownie: zero EUR 00/100`);
     expect(pdfData.text).toContain("Reverse charge");
 
     expect(pdfData.text).toContain(
-      `1/${CURRENT_MONTH_AND_YEAR}·£3,000.00 due ${paymentDate}·Created with https://easyinvoicepdf.comPage 1 of 1`
+      `1/${CURRENT_MONTH_AND_YEAR}·£3,000.00 due ${paymentDate}·Created with https://easyinvoicepdf.comPage 1 of 1`,
     );
   });
 
@@ -502,10 +502,10 @@ Kwota słownie: zero EUR 00/100`);
 
     // Verify preview tab is selected
     await expect(
-      page.getByRole("tabpanel", { name: "Preview PDF" })
+      page.getByRole("tabpanel", { name: "Preview PDF" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("tabpanel", { name: "Edit Invoice" })
+      page.getByRole("tabpanel", { name: "Edit Invoice" }),
     ).toBeHidden();
 
     // Set up download handler
@@ -523,7 +523,7 @@ Kwota słownie: zero EUR 00/100`);
     // Save the file to a browser-specific temporary location
     const tmpPath = path.join(
       getDownloadDir({ browserName }),
-      suggestedFilename
+      suggestedFilename,
     );
     await download.saveAs(tmpPath);
 
@@ -542,7 +542,7 @@ Kwota słownie: zero EUR 00/100`);
 
     const lastDayOfCurrentMonth = dayjs().endOf("month").format("YYYY-MM-DD");
     expect(pdfData.text).toContain(
-      `Date de vente/prestation de service: ${lastDayOfCurrentMonth}`
+      `Date de vente/prestation de service: ${lastDayOfCurrentMonth}`,
     );
 
     // Verify calculations in Polish
@@ -555,7 +555,7 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     await expect(page.getByTestId("download-pdf-toast")).toBeVisible();
 
     await expect(
-      page.getByRole("link", { name: "Star on GitHub" })
+      page.getByRole("link", { name: "Star on GitHub" }),
     ).toBeVisible();
 
     await expect(page.getByTestId("toast-cta-btn")).toBeVisible();
@@ -565,10 +565,10 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
 
     // Verify form tab is selected and data persists
     await expect(
-      page.getByRole("tabpanel", { name: "Edit Invoice" })
+      page.getByRole("tabpanel", { name: "Edit Invoice" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("tabpanel", { name: "Preview PDF" })
+      page.getByRole("tabpanel", { name: "Preview PDF" }),
     ).toBeHidden();
 
     // Verify form data persists
@@ -576,30 +576,30 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     await expect(invoiceNumberValueInput).toHaveValue("2/05-2024");
 
     await expect(
-      finalSection.getByRole("textbox", { name: "Notes", exact: true })
+      finalSection.getByRole("textbox", { name: "Notes", exact: true }),
     ).toHaveValue("Mobile test note");
 
     // Verify seller information persists
     await expect(
-      sellerSection.getByRole("textbox", { name: "Name" })
+      sellerSection.getByRole("textbox", { name: "Name" }),
     ).toHaveValue("Mobile Test Seller");
     await expect(
-      sellerSection.getByRole("textbox", { name: "Address" })
+      sellerSection.getByRole("textbox", { name: "Address" }),
     ).toHaveValue("456 Mobile St");
 
     // Verify invoice item persists
     await expect(
       invoiceItemsSection.getByRole("spinbutton", {
         name: "Amount (Quantity)",
-      })
+      }),
     ).toHaveValue("3");
     await expect(
       invoiceItemsSection.getByRole("spinbutton", {
         name: "Net Price (Rate or Unit Price)",
-      })
+      }),
     ).toHaveValue("50");
     await expect(
-      invoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true })
+      invoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true }),
     ).toHaveValue("23");
 
     // Verify calculations are correct
@@ -607,19 +607,19 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
       invoiceItemsSection.getByRole("textbox", {
         name: "Net Amount",
         exact: true,
-      })
+      }),
     ).toHaveValue("150.00");
     await expect(
       invoiceItemsSection.getByRole("textbox", {
         name: "VAT Amount",
         exact: true,
-      })
+      }),
     ).toHaveValue("34.50");
     await expect(
       invoiceItemsSection.getByRole("textbox", {
         name: "Pre-tax Amount",
         exact: true,
-      })
+      }),
     ).toHaveValue("184.50");
   });
 
@@ -641,11 +641,11 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     });
 
     await expect(invoiceNumberLabelInput).toHaveValue(
-      INITIAL_INVOICE_DATA.invoiceNumberObject.label
+      INITIAL_INVOICE_DATA.invoiceNumberObject.label,
     );
 
     await expect(invoiceNumberValueInput).toHaveValue(
-      INITIAL_INVOICE_DATA.invoiceNumberObject.value
+      INITIAL_INVOICE_DATA.invoiceNumberObject.value,
     );
 
     const languageSelect = page.getByRole("combobox", {
@@ -655,11 +655,11 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     await languageSelect.selectOption("pl");
 
     await expect(invoiceNumberLabelInput).toHaveValue(
-      `${TRANSLATIONS.pl.invoiceNumber}:`
+      `${TRANSLATIONS.pl.invoiceNumber}:`,
     );
 
     await expect(invoiceNumberValueInput).toHaveValue(
-      `1/${CURRENT_MONTH_AND_YEAR}`
+      `1/${CURRENT_MONTH_AND_YEAR}`,
     );
 
     // I can fill in a new invoice number
@@ -697,7 +697,7 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     await languageSelect.selectOption("pt");
 
     await expect(invoiceNumberLabelInput).toHaveValue(
-      `${TRANSLATIONS.pt.invoiceNumber}:`
+      `${TRANSLATIONS.pt.invoiceNumber}:`,
     );
 
     await invoiceNumberLabelInput.fill("Fatura TEST PORTUGUESE N°:");
@@ -705,7 +705,7 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     await expect(
       page.getByRole("button", {
         name: `Switch to default label ("Fatura N°:")`,
-      })
+      }),
     ).toBeVisible();
 
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
@@ -738,7 +738,7 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
 
     // Verify PDF content
     expect(pdfData.text).toContain(
-      `Fatura TEST PORTUGUESE N°: 1/${CURRENT_MONTH_AND_YEAR}`
+      `Fatura TEST PORTUGUESE N°: 1/${CURRENT_MONTH_AND_YEAR}`,
     );
     expect(pdfData.text).toContain("Data de emissão");
   });

@@ -173,7 +173,7 @@ export default async function ChangelogEntryPage({
                 rel="noopener noreferrer"
                 className="transition-all hover:scale-110"
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                  `EasyInvoicePDF: ${entry.metadata.title || `Update ${formattedDate}`}`
+                  `EasyInvoicePDF: ${entry.metadata.title || `Update ${formattedDate}`}`,
                 )}&url=${encodeURIComponent(`${APP_URL}/changelog/${slug}`)}`}
               >
                 <svg
@@ -196,10 +196,8 @@ export default async function ChangelogEntryPage({
                 rel="noopener noreferrer"
                 className="transition-all hover:scale-110"
                 href={`http://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
-                  `${APP_URL}/changelog/${slug}`
-                )}&title=${encodeURIComponent(
-                  `EasyInvoicePDF: ${entry.metadata.title || `Update ${formattedDate}`}`
-                )}`}
+                  `${APP_URL}/changelog/${slug}`,
+                )}&title=${encodeURIComponent(`EasyInvoicePDF: ${entry.metadata.title || `Update ${formattedDate}`}`)}`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -220,10 +218,8 @@ export default async function ChangelogEntryPage({
                 rel="noopener noreferrer"
                 className="transition-all hover:scale-110"
                 href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                  `${APP_URL}/changelog/${slug}`
-                )}&title=${encodeURIComponent(
-                  `EasyInvoicePDF: ${entry.metadata.title || `Update ${formattedDate}`}`
-                )}`}
+                  `${APP_URL}/changelog/${slug}`,
+                )}&title=${encodeURIComponent(`EasyInvoicePDF: ${entry.metadata.title || `Update ${formattedDate}`}`)}`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -245,7 +241,7 @@ export default async function ChangelogEntryPage({
                 rel="noopener noreferrer"
                 className="transition-all hover:scale-110"
                 href={`https://news.ycombinator.com/submitlink?u=${encodeURIComponent(
-                  `${APP_URL}/changelog/${slug}`
+                  `${APP_URL}/changelog/${slug}`,
                 )}&t=${encodeURIComponent(`EasyInvoicePDF: ${entry.metadata.title || `Update ${formattedDate}`}`)}`}
               >
                 <svg

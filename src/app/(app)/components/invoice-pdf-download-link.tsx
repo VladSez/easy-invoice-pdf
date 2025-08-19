@@ -123,7 +123,7 @@ export function InvoicePDFDownloadLink({
     if (!pdfLoading) {
       const timer = setTimeout(
         () => setIsLoading(false),
-        LOADING_BUTTON_TIMEOUT
+        LOADING_BUTTON_TIMEOUT,
       );
       return () => clearTimeout(timer);
     }
@@ -161,7 +161,7 @@ export function InvoicePDFDownloadLink({
           {
             "pointer-events-none opacity-70": isLoading,
             "lg:w-[240px]": invoiceData.language === "pt",
-          }
+          },
         )}
       >
         <ButtonContent isLoading={isLoading} language={invoiceData.language} />

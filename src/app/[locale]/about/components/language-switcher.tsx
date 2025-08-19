@@ -85,7 +85,7 @@ export function LanguageSwitcher({
                 startTransition(() => {
                   const pathnameWithoutLocale = pathname.replace(
                     `/${locale}`,
-                    ""
+                    "",
                   );
 
                   router.push(pathnameWithoutLocale || "/", {

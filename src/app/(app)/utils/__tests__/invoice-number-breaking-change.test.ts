@@ -133,7 +133,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
       // Should log error for invalid language
       expect(consoleSpy).toHaveBeenCalledWith(
         "Invalid invoice language:",
-        expect.any(Object)
+        expect.any(Object),
       );
 
       // Should still track the breaking change event
@@ -249,7 +249,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
       expect(handleInvoiceNumberBreakingChange(stringInput)).toBe(stringInput);
       expect(handleInvoiceNumberBreakingChange(numberInput)).toBe(numberInput);
       expect(handleInvoiceNumberBreakingChange(booleanInput)).toBe(
-        booleanInput
+        booleanInput,
       );
 
       expect(umamiTrackEvent).not.toHaveBeenCalled();
@@ -320,7 +320,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
       const result = handleInvoiceNumberBreakingChange(input);
 
       expect((result as InvoiceData).invoiceNumberObject?.value).toBe(
-        "INV/2024\\001-#@!"
+        "INV/2024\\001-#@!",
       );
     });
 
@@ -334,7 +334,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
       const result = handleInvoiceNumberBreakingChange(input);
 
       expect((result as InvoiceData).invoiceNumberObject?.value).toBe(
-        longInvoiceNumber
+        longInvoiceNumber,
       );
     });
   });

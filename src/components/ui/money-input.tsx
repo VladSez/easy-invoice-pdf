@@ -54,7 +54,7 @@ const MoneyInput = React.memo(
             className={cn(
               "-me-px rounded-e-none ps-6 shadow-none",
               getCurrencyPadding(currencySymbol),
-              props.className
+              props.className,
             )}
             placeholder="0.00"
           />
@@ -64,7 +64,7 @@ const MoneyInput = React.memo(
         </div>
       </div>
     );
-  })
+  }),
 );
 MoneyInput.displayName = "MoneyInput";
 
@@ -97,7 +97,7 @@ const ReadOnlyMoneyInput = React.memo(
               "-me-px block w-full cursor-not-allowed rounded-md rounded-e-none border border-gray-300 bg-gray-100 px-3 py-2 ps-6",
               getCurrencyPadding(currencySymbol),
               "focus-visible:border-indigo-500 focus-visible:ring focus-visible:ring-indigo-200 focus-visible:ring-opacity-50",
-              props.className
+              props.className,
             )}
             placeholder="0.00"
             type="text"
@@ -110,7 +110,7 @@ const ReadOnlyMoneyInput = React.memo(
         </div>
       </div>
     );
-  })
+  }),
 );
 ReadOnlyMoneyInput.displayName = "ReadOnlyMoneyInput";
 
