@@ -2,7 +2,6 @@ import { DeviceContextProvider } from "@/contexts/device-context";
 import { checkDeviceUserAgent } from "@/lib/check-device.server";
 import { NextIntlClientProvider } from "next-intl";
 // import { ReactScan } from "@/components/dev/react-scan";
-// import { DevToolbar } from "@/components/dev/stagewise-toolbar";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
@@ -152,9 +151,6 @@ export default async function RootLayout({
         >
           <NextIntlClientProvider>
             {children}
-
-            {/* Stagewise toolbar for development */}
-            {/* <DevToolbar /> */}
 
             {/* https://sonner.emilkowal.ski/ */}
             <Toaster visibleToasts={1} richColors closeButton />
