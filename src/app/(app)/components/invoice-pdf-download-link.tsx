@@ -148,10 +148,10 @@ export function InvoicePDFDownloadLink({
     <>
       <a
         translate="no"
-        href={url || "#"}
-        download={url ? filename : undefined}
+        href={url && filename ? url : "#"}
+        download={url && filename ? filename : undefined}
         onClick={
-          url
+          url && filename
             ? handleDownloadPDFClick
             : (e) => {
                 // prevent default to avoid the link being opened
