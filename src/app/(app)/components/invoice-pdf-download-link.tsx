@@ -153,7 +153,11 @@ export function InvoicePDFDownloadLink({
         onClick={
           url
             ? handleDownloadPDFClick
-            : () => toast.error("Please try again in different browser")
+            : (e) => {
+                // prevent default to avoid the link being opened
+                e.preventDefault();
+                toast.error("Please try again in different browser");
+              }
         }
         className={cn(
           "h-[36px] w-full rounded-lg bg-slate-900 px-4 py-2 text-center text-sm font-medium text-slate-50",

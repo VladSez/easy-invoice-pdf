@@ -485,7 +485,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Wait a moment for any debounced localStorage updates
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(700);
 
     // Verify data is actually saved in localStorage
     const storedData = (await page.evaluate((key) => {
@@ -502,6 +502,8 @@ test.describe("Stripe Invoice Template", () => {
 
     // Reload page
     await page.reload();
+
+    await expect(page).toHaveURL("/?template=stripe");
 
     // Verify template is still Stripe
     await expect(
