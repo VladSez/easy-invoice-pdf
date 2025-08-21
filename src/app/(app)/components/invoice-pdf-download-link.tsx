@@ -76,7 +76,6 @@ export function InvoicePDFDownloadLink({
   // Combine loading states
   const [{ loading: pdfLoading, url, error }, updatePdfInstance] = usePDF();
   const [isLoading, setIsLoading] = useState(false);
-  // const [errorShown, setErrorShown] = useState(false);
 
   // Memoize tracking functions
   const trackDownload = useCallback(() => {
@@ -88,7 +87,7 @@ export function InvoicePDFDownloadLink({
   }, [invoiceData.template]);
 
   const handleDownloadPDFClick = useCallback(() => {
-    if (!isLoading && url) {
+    if (!isLoading && url && filename && !error) {
       trackDownload();
 
       // close all other toasts (if any)
@@ -111,7 +110,7 @@ export function InvoicePDFDownloadLink({
         }
       }, 3000);
     }
-  }, [isLoading, url, trackDownload]);
+  }, [isLoading, url, trackDownload, filename, error]);
 
   // Handle PDF updates
   useEffect(() => {
@@ -134,7 +133,6 @@ export function InvoicePDFDownloadLink({
   useEffect(() => {
     if (error && !errorWhileGeneratingPdfIsShown) {
       ErrorGeneratingPdfToast();
-      // setErrorShown(true);
       setErrorWhileGeneratingPdfIsShown(true);
 
       umamiTrackEvent("error_generating_document_link", { data: { error } });
@@ -151,8 +149,12 @@ export function InvoicePDFDownloadLink({
       <a
         translate="no"
         href={url || "#"}
-        download={filename}
-        onClick={handleDownloadPDFClick}
+        download={url ? filename : undefined}
+        onClick={
+          url
+            ? handleDownloadPDFClick
+            : () => toast.error("Please try again in different browser")
+        }
         className={cn(
           "h-[36px] w-full rounded-lg bg-slate-900 px-4 py-2 text-center text-sm font-medium text-slate-50",
           "shadow-sm shadow-black/5 outline-offset-2 hover:bg-slate-900/90 active:scale-[98%] active:transition-transform",
