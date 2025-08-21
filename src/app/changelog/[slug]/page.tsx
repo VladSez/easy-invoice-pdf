@@ -53,7 +53,7 @@ export async function generateMetadata({
       siteName: `https://easyinvoicepdf.com/changelog/${slug}`,
       images: [
         {
-          url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=5`,
+          url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
           type: "image/png",
           width: 1200,
           height: 630,
@@ -67,7 +67,7 @@ export async function generateMetadata({
       description: `Changelog entry from ${formattedDate}`,
       images: [
         {
-          url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=5`,
+          url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
           type: "image/png",
           width: 1200,
           height: 630,

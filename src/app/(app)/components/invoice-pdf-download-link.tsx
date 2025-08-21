@@ -87,7 +87,7 @@ export function InvoicePDFDownloadLink({
     });
   }, [invoiceData.template]);
 
-  const handleClick = useCallback(() => {
+  const handleDownloadPDFClick = useCallback(() => {
     if (!isLoading && url) {
       trackDownload();
 
@@ -109,7 +109,7 @@ export function InvoicePDFDownloadLink({
               "Help me keep building amazing tools! Your support means the world to me. ✨",
           });
         }
-      }, 2500);
+      }, 3000);
     }
   }, [isLoading, url, trackDownload]);
 
@@ -152,7 +152,7 @@ export function InvoicePDFDownloadLink({
         translate="no"
         href={url || "#"}
         download={filename}
-        onClick={handleClick}
+        onClick={handleDownloadPDFClick}
         className={cn(
           "h-[36px] w-full rounded-lg bg-slate-900 px-4 py-2 text-center text-sm font-medium text-slate-50",
           "shadow-sm shadow-black/5 outline-offset-2 hover:bg-slate-900/90 active:scale-[98%] active:transition-transform",

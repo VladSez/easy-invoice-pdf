@@ -46,7 +46,7 @@ export async function generateMetadata({
         url: "https://easyinvoicepdf.com",
         images: [
           {
-            url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=5`,
+            url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
             width: 1200,
             height: 630,
             type: "image/png",
@@ -61,7 +61,7 @@ export async function generateMetadata({
         creator: "@vlad_sazon",
         images: [
           {
-            url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=5`,
+            url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
             width: 1200,
             height: 630,
             type: "image/png",

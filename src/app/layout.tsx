@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     url: "https://easyinvoicepdf.com",
     images: [
       {
-        url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=5`,
+        url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
         type: "image/png",
         width: 1200,
         height: 630,
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
     creator: "@vlad_sazon",
     images: [
       {
-        url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=5`,
+        url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
         type: "image/png",
         width: 1200,
         height: 630,
@@ -104,7 +104,7 @@ const JSONLD: WithContext<WebSite> = {
     "invoice generator app",
     "free invoice generator",
   ],
-  image: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=5`,
+  image: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
   mainEntityOfPage: {
     "@type": "SoftwareApplication",
     "@id": `https://easyinvoicepdf.com/`,

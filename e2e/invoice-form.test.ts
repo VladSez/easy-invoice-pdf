@@ -41,7 +41,7 @@ test.describe("Invoice Generator Page", () => {
     // Check that OG image changed to Stripe template
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
       "content",
-      "https://static.easyinvoicepdf.com/easy-invoice-opengraph-image.png?v=5",
+      "https://static.easyinvoicepdf.com/easy-invoice-opengraph-image.png?v=1755773879597",
     );
 
     // Check other meta tags for Stripe template

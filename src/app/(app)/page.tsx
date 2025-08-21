@@ -50,7 +50,7 @@ export async function generateMetadata({
         siteName: "EasyInvoicePDF.com | Free Invoice Generator",
         images: [
           {
-            url: `${STATIC_ASSETS_URL}/stripe-og.png`,
+            url: `${STATIC_ASSETS_URL}/stripe-og.png?v=1755773921680`,
             width: 1200,
             height: 630,
             alt: "Stripe Invoice Template",
