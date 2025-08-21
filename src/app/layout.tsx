@@ -103,8 +103,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { isDesktop: isDesktopServer, isAndroid } =
-    await checkDeviceUserAgent();
+  const {
+    isDesktop: isDesktopServer,
+    isAndroid,
+    isWebView,
+  } = await checkDeviceUserAgent();
 
   return (
     <html lang="en">
@@ -114,6 +117,7 @@ export default async function RootLayout({
         <DeviceContextProvider
           isDesktop={isDesktopServer}
           isAndroid={isAndroid}
+          isWebView={isWebView}
         >
           <NextIntlClientProvider>
             {children}

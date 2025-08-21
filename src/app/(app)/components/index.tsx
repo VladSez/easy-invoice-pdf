@@ -53,7 +53,7 @@ const PdfViewer = ({
   invoiceData: InvoiceData;
   errorWhileGeneratingPdfIsShown: boolean;
 }) => {
-  const { isAndroid } = useDeviceContext();
+  const { isAndroid, isWebView } = useDeviceContext();
 
   // Render the appropriate template based on the selected template
   const renderTemplate = () => {
@@ -66,15 +66,18 @@ const PdfViewer = ({
     }
   };
 
-  // we only show the Android PDF viewer on Android devices due to the limitations of the PDF viewer
+  // Use Android PDF viewer for:
+  // 1. Android devices (original logic)
+  // 2. Any in-app browser/WebView environment (new logic for platforms like X.com, LinkedIn, etc.)
+  // This is due to limitations of the standard PDF viewer in these environments
   // https://github.com/diegomura/react-pdf/issues/714
-  if (isAndroid) {
+  if (isAndroid || isWebView) {
     return <AndroidPDFViewer invoiceData={invoiceData} />;
   }
 
   const template = renderTemplate();
 
-  // Normal version
+  // Normal version for standard desktop browsers
   return (
     <InvoicePDFViewer
       errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}

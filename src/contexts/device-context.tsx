@@ -6,6 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 interface DeviceContextType {
   isDesktop: boolean;
   isAndroid: boolean;
+  isWebView: boolean;
 }
 
 const DeviceContext = createContext<DeviceContextType | null>(null);
@@ -23,6 +24,7 @@ export function DeviceContextProvider({
   children,
   isDesktop,
   isAndroid,
+  isWebView,
 }: DeviceContextType & { children: React.ReactNode }) {
   const [isDesktopClient, setIsDesktopClient] = useState(isDesktop);
 
@@ -40,7 +42,9 @@ export function DeviceContextProvider({
   }, [isMediaQueryDesktop]);
 
   return (
-    <DeviceContext.Provider value={{ isDesktop: isDesktopClient, isAndroid }}>
+    <DeviceContext.Provider
+      value={{ isDesktop: isDesktopClient, isAndroid, isWebView }}
+    >
       {children}
     </DeviceContext.Provider>
   );
