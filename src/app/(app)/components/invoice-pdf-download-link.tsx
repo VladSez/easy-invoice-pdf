@@ -86,31 +86,41 @@ export function InvoicePDFDownloadLink({
     });
   }, [invoiceData.template]);
 
-  const handleDownloadPDFClick = useCallback(() => {
-    if (!isLoading && url && filename && !error) {
-      trackDownload();
+  const handleDownloadPDFClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (!url || !filename) {
+        e.preventDefault();
 
-      // close all other toasts (if any)
-      toast.dismiss();
+        toast.error("Please try again in different browser");
+        return;
+      }
 
-      // Randomly show either default or premium donation toast after 3 seconds
-      setTimeout(() => {
-        if (Math.random() <= 0.5) {
-          customPremiumToast({
-            title: "Support My Work",
-            description:
-              "Your contribution helps me maintain and improve this project for everyone! 🚀",
-          });
-        } else {
-          customDefaultToast({
-            title: "Love this project?",
-            description:
-              "Help me keep building amazing tools! Your support means the world to me. ✨",
-          });
-        }
-      }, 3000);
-    }
-  }, [isLoading, url, trackDownload, filename, error]);
+      if (!isLoading && !error) {
+        trackDownload();
+
+        // close all other toasts (if any)
+        toast.dismiss();
+
+        // Randomly show either default or premium donation toast after 3 seconds
+        setTimeout(() => {
+          if (Math.random() <= 0.5) {
+            customPremiumToast({
+              title: "Support My Work",
+              description:
+                "Your contribution helps me maintain and improve this project for everyone! 🚀",
+            });
+          } else {
+            customDefaultToast({
+              title: "Love this project?",
+              description:
+                "Help me keep building amazing tools! Your support means the world to me. ✨",
+            });
+          }
+        }, 3000);
+      }
+    },
+    [isLoading, url, trackDownload, filename, error],
+  );
 
   // Handle PDF updates
   useEffect(() => {
@@ -148,17 +158,9 @@ export function InvoicePDFDownloadLink({
     <>
       <a
         translate="no"
-        href={url && filename ? url : "#"}
-        download={url && filename ? filename : undefined}
-        onClick={
-          url && filename
-            ? handleDownloadPDFClick
-            : (e) => {
-                // prevent default to avoid the link being opened
-                e.preventDefault();
-                toast.error("Please try again in different browser");
-              }
-        }
+        href={url || "#"}
+        download={url ? filename : undefined}
+        onClick={handleDownloadPDFClick}
         className={cn(
           "h-[36px] w-full rounded-lg bg-slate-900 px-4 py-2 text-center text-sm font-medium text-slate-50",
           "shadow-sm shadow-black/5 outline-offset-2 hover:bg-slate-900/90 active:scale-[98%] active:transition-transform",
