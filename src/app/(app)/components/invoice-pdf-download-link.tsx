@@ -17,6 +17,7 @@ import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 
 import { customDefaultToast, customPremiumToast } from "./cta-toasts";
+import { useDeviceContext } from "@/contexts/device-context";
 
 // Separate button states into a memoized component
 const ButtonContent = ({
@@ -49,6 +50,8 @@ export function InvoicePDFDownloadLink({
   errorWhileGeneratingPdfIsShown: boolean;
   setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
 }) {
+  const { isWebView } = useDeviceContext();
+
   // Memoize static values
   const filename = useMemo(() => {
     const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
@@ -88,7 +91,7 @@ export function InvoicePDFDownloadLink({
 
   const handleDownloadPDFClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
-      if (!url || !filename) {
+      if (!url || !filename || isWebView) {
         e.preventDefault();
 
         toast.error("Please try again in different browser");
