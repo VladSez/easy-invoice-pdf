@@ -43,7 +43,7 @@ export async function generateMetadata({
         siteName: messages.Metadata.about.siteName,
         locale: params.locale,
         type: "website",
-        url: "https://easyinvoicepdf.com/en/about",
+        url: `${APP_URL}/${params.locale}/about`,
         images: [
           {
             url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
