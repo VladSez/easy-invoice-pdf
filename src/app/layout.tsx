@@ -10,7 +10,7 @@ import Script from "next/script";
 import { type WebSite, type WithContext } from "schema-dts";
 import { Toaster } from "sonner";
 
-import { APP_URL, STATIC_ASSETS_URL } from "@/config";
+import { STATIC_ASSETS_URL } from "@/config";
 
 import "./globals.css";
 
@@ -25,7 +25,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(APP_URL),
+  // metadataBase: new URL(APP_URL),
   title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
   description:
     "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
@@ -50,40 +50,6 @@ export const metadata: Metadata = {
         url: `${STATIC_ASSETS_URL}/apple-icon.png`,
         type: "image/png",
         sizes: "180x180",
-      },
-    ],
-  },
-  openGraph: {
-    title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
-    description:
-      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
-    siteName: "EasyInvoicePDF.com | Free Invoice Generator",
-    locale: "en_US",
-    type: "website",
-    url: "https://easyinvoicepdf.com",
-    images: [
-      {
-        url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
-        type: "image/png",
-        width: 1200,
-        height: 630,
-        alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
-    description:
-      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
-    creator: "@vlad_sazon",
-    images: [
-      {
-        url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
-        type: "image/png",
-        width: 1200,
-        height: 630,
-        alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
       },
     ],
   },

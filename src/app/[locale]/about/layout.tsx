@@ -4,7 +4,7 @@ import { routing } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import type EnMessages from "../../../../messages/en.json";
-import { STATIC_ASSETS_URL } from "@/config";
+import { APP_URL, STATIC_ASSETS_URL } from "@/config";
 
 // Add metadata to make sure search engines can index the page
 export async function generateMetadata({
@@ -23,18 +23,18 @@ export async function generateMetadata({
       description: messages.Metadata.about.description,
       keywords: messages.Metadata.about.keywords,
       alternates: {
-        canonical: `/${params.locale}/about`,
+        canonical: `${APP_URL}/${params.locale}/about`,
         languages: {
-          en: `/en/about`,
-          pl: `/pl/about`,
-          de: `/de/about`,
-          es: `/es/about`,
-          pt: `/pt/about`,
-          ru: `/ru/about`,
-          uk: `/uk/about`,
-          fr: `/fr/about`,
-          it: `/it/about`,
-          nl: `/nl/about`,
+          en: `${APP_URL}/en/about`,
+          pl: `${APP_URL}/pl/about`,
+          de: `${APP_URL}/de/about`,
+          es: `${APP_URL}/es/about`,
+          pt: `${APP_URL}/pt/about`,
+          ru: `${APP_URL}/ru/about`,
+          uk: `${APP_URL}/uk/about`,
+          fr: `${APP_URL}/fr/about`,
+          it: `${APP_URL}/it/about`,
+          nl: `${APP_URL}/nl/about`,
         } satisfies Record<Locale, string>,
       },
       openGraph: {
@@ -43,7 +43,7 @@ export async function generateMetadata({
         siteName: messages.Metadata.about.siteName,
         locale: params.locale,
         type: "website",
-        url: "https://easyinvoicepdf.com",
+        url: `${APP_URL}/${params.locale}/about`,
         images: [
           {
             url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
