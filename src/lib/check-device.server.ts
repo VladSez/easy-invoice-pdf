@@ -1,125 +1,143 @@
 "use server";
 
-import type { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
-import { headers } from "next/headers";
+import { headers, type headers as Headers } from "next/headers";
 import { UAParser } from "ua-parser-js";
 
+export interface InAppInfo {
+  isInApp: boolean;
+  name: string | null;
+}
+
 /**
- * Check if the user agent represents an in-app browser (WebView)
- * Comprehensive detection for major social media, messaging, and other apps
+ * Simplified in-app browser detection with detailed app identification
  */
-const isInAppBrowser = (ua: string, headers: ReadonlyHeaders) => {
-  // Strong signals via UA patterns
-  const inAppPatterns = [
-    // Android WebView markers
-    /wv\)/i, // Android WebView marker
+function detectInAppBrowser(ua: string, headers: Headers): InAppInfo {
+  const s = ua.toLowerCase();
 
-    // Facebook family
-    /FBAN/i, // Facebook for Android
-    /FBAV/i, // Facebook App
-    /FB_IAB/i, // Facebook In-App Browser
-    /MessengerForiOS/i, // Messenger for iOS
-    /FBAN\/Messenger/i, // Messenger
+  // Helper functions
+  function has(token: string): boolean {
+    return s.includes(token);
+  }
 
-    // Social Media Apps
-    /Instagram/i, // Instagram app
-    /Twitter/i, // Twitter app (covers TwitterAndroid, TwitteriPhone)
-    /X-Client/i, // X (formerly Twitter) client
-    /TikTok/i, // TikTok app
-    /Snapchat/i, // Snapchat app
-    /Pinterest/i, // Pinterest app
-    /Reddit/i, // Reddit app
-    /LinkedInApp/i, // LinkedIn mobile app
-    /Discord/i, // Discord app
+  function ios(): boolean {
+    return /iphone|ipad|ipod/.test(s);
+  }
 
-    // Messaging Apps
-    /WhatsApp/i, // WhatsApp app
-    /MicroMessenger/i, // WeChat
-    /Line\//i, // Line app
-    /Telegram/i, // Telegram (includes TelegramBot)
-    /TelegramBot/i, // Telegram Bot
-
-    // Regional/Other Apps
-    /QQ\//i, // QQ Browser
-    /SamsungBrowser/i, // Samsung Internet
-    /UCBrowser/i, // UC Browser
-    /MiuiBrowser/i, // Xiaomi MIUI Browser
-    /YaBrowser/i, // Yandex Browser
-    /OPiOS/i, // Opera iOS
-    /CriOS/i, // Chrome iOS (can act as in-app browser)
-    /FxiOS/i, // Firefox iOS
-    /EdgiOS/i, // Edge iOS
-
-    // News/Content Apps
-    /Flipboard/i, // Flipboard app
-    /SmartNews/i, // SmartNews app
-    /NewsBreak/i, // NewsBreak app
-
-    // Shopping/Business Apps
-    /AliApp/i, // Alibaba app
-    /MicroMessenger/i, // WeChat (duplicate for emphasis)
-    /DingTalk/i, // DingTalk app
-
-    // Dating Apps
-    /Tinder/i, // Tinder app
-    /Bumble/i, // Bumble app
-
-    // Video/Streaming Apps
-    /YouTube/i, // YouTube app
-    /Netflix/i, // Netflix app
-    /Spotify/i, // Spotify app
-
-    // Email Apps
-    /GSA/i, // Google Search App
-    /Gmail/i, // Gmail app
-    /Outlook/i, // Outlook app
-  ];
-
-  // Android WebView specific check: Version/4.0 without separate Chrome version
-  const isAndroidWebView =
-    ua.includes("Version/4.0") && !ua.includes("Chrome/");
-
-  // iOS WebView specific check: common patterns
-  const isIOSWebView =
-    ua.includes("Mobile/") &&
-    !ua.includes("Safari/") &&
-    (ua.includes("iPhone") || ua.includes("iPad"));
-
-  // Check for app-specific headers (X-Requested-With header indicates WebView)
+  // Check for app-specific headers first (most reliable)
   const xRequestedWith = headers.get("x-requested-with") || "";
-  const appPackagePatterns = [
-    "com.instagram.android", // Instagram Android
-    "com.facebook.katana", // Facebook Android
-    "com.facebook.orca", // Messenger Android
-    "com.twitter.android", // Twitter Android
-    "com.zhiliaoapp.musically", // TikTok Android
-    "com.snapchat.android", // Snapchat Android
-    "com.pinterest", // Pinterest Android
-    "com.reddit.frontpage", // Reddit Android
-    "com.linkedin.android", // LinkedIn Android
-    "com.discord", // Discord Android
-    "com.whatsapp", // WhatsApp Android
-    "com.tencent.mm", // WeChat Android
-    "jp.naver.line.android", // Line Android
-    "org.telegram.messenger", // Telegram Android
-    "com.alibaba.android.rimet", // DingTalk Android
-    "com.ss.android.ugc.trill", // TikTok (alternative package)
-    "com.google.android.gm", // Gmail Android
-    "com.microsoft.office.outlook", // Outlook Android
-    "com.google.android.googlequicksearchbox", // Google Search App
+  const headerDetectors = [
+    {
+      name: "Instagram",
+      test: () => xRequestedWith.includes("com.instagram.android"),
+    },
+    {
+      name: "Facebook",
+      test: () => xRequestedWith.includes("com.facebook.katana"),
+    },
+    {
+      name: "Facebook Messenger",
+      test: () => xRequestedWith.includes("com.facebook.orca"),
+    },
+    {
+      name: "Twitter/X",
+      test: () => xRequestedWith.includes("com.twitter.android"),
+    },
+    {
+      name: "TikTok",
+      test: () =>
+        xRequestedWith.includes("com.zhiliaoapp.musically") ||
+        xRequestedWith.includes("com.ss.android.ugc.trill"),
+    },
+    { name: "WhatsApp", test: () => xRequestedWith.includes("com.whatsapp") },
+    { name: "WeChat", test: () => xRequestedWith.includes("com.tencent.mm") },
+    {
+      name: "LINE",
+      test: () => xRequestedWith.includes("jp.naver.line.android"),
+    },
+    {
+      name: "Telegram",
+      test: () => xRequestedWith.includes("org.telegram.messenger"),
+    },
+    {
+      name: "Gmail",
+      test: () => xRequestedWith.includes("com.google.android.gm"),
+    },
+    {
+      name: "Google App",
+      test: () =>
+        xRequestedWith.includes("com.google.android.googlequicksearchbox"),
+    },
   ];
 
-  const isAppWebView = appPackagePatterns.some((pattern) =>
-    xRequestedWith.includes(pattern),
-  );
+  // Check headers first (most reliable)
+  for (const detector of headerDetectors) {
+    try {
+      if (detector.test()) return { isInApp: true, name: detector.name };
+    } catch {
+      // ignore failing tests
+    }
+  }
 
-  return (
-    inAppPatterns.some((pattern) => pattern.test(ua)) ||
-    isAndroidWebView ||
-    isIOSWebView ||
-    isAppWebView
-  );
-};
+  // User agent detectors (fallback)
+  const uaDetectors = [
+    {
+      name: "Facebook",
+      test: () => has("fbav") || has("fban") || has("fb_iab"),
+    },
+    { name: "Instagram", test: () => has("instagram") },
+    {
+      name: "Facebook Messenger",
+      test: () => has("messenger") && (has("fb") || has("fban")),
+    },
+    { name: "WhatsApp", test: () => has("whatsapp") },
+    { name: "Telegram", test: () => has("telegram") || has("tgwebview") },
+    { name: "Twitter/X", test: () => has("twitter") || has("x-client") },
+    { name: "LinkedIn", test: () => has("linkedinapp") },
+    { name: "Pinterest", test: () => has("pinterest") },
+    { name: "Reddit", test: () => has("reddit") },
+    { name: "Snapchat", test: () => has("snapchat") },
+    { name: "TikTok", test: () => has("tiktok") || has("com.zhiliaoapp") },
+    { name: "WeChat", test: () => has("micromessenger") },
+    { name: "LINE", test: () => has("line/") },
+    { name: "QQ", test: () => has("qq/") },
+    { name: "Gmail", test: () => has("gmail") },
+    { name: "Google App", test: () => has("gsa/") || has("googleapp") },
+    { name: "Discord", test: () => has("discord") },
+    { name: "YouTube", test: () => has("youtube") },
+    { name: "Android WebView", test: () => has("wv") && has("android") },
+    {
+      name: "Chrome Custom Tab",
+      test: () => has("chrome") && has("customtabs"),
+    },
+    {
+      name: "iOS WebView",
+      test: () =>
+        ios() &&
+        has("applewebkit") &&
+        !has("safari") &&
+        !has("crios") &&
+        !has("fxios") &&
+        !has("edgios"),
+    },
+    {
+      name: "Generic WebView",
+      test: () =>
+        (has("android") && has("webview")) ||
+        (has("mobile safari") && !has("safari")),
+    },
+  ];
+
+  // Test user agent patterns
+  for (const detector of uaDetectors) {
+    try {
+      if (detector.test()) return { isInApp: true, name: detector.name };
+    } catch {
+      // ignore failing tests
+    }
+  }
+
+  return { isInApp: false, name: null };
+}
 
 /**
  * Check the device type based on the user agent
@@ -153,11 +171,18 @@ export const checkDeviceUserAgent = async () => {
   // Detect Android specifically
   const isAndroid = os.name === "Android";
 
-  // Detect in-app browsers/WebViews (pass headers for additional detection)
-  const isWebView = isInAppBrowser(ua || "", headersList);
+  // Detect in-app browsers/WebViews with detailed app identification
+  const inAppInfo = detectInAppBrowser(ua || "", headersList);
+  const isWebView = inAppInfo.isInApp;
 
   // Desktop is when it's neither tablet nor mobile
   const isDesktop = !isTablet && !isMobile;
 
-  return { isDesktop, isAndroid, isWebView };
+  return {
+    isDesktop,
+    isAndroid,
+    isWebView,
+    isMobile,
+    inAppInfo, // Include detailed in-app browser information
+  };
 };

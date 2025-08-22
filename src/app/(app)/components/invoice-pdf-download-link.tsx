@@ -50,7 +50,7 @@ export function InvoicePDFDownloadLink({
   errorWhileGeneratingPdfIsShown: boolean;
   setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
 }) {
-  const { isWebView } = useDeviceContext();
+  const { inAppInfo } = useDeviceContext();
 
   // Memoize static values
   const filename = useMemo(() => {
@@ -91,11 +91,22 @@ export function InvoicePDFDownloadLink({
 
   const handleDownloadPDFClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
-      if (!url || !filename || isWebView) {
+      if (!url) {
         e.preventDefault();
 
-        toast.error("Please try again in different browser");
+        toast.error(
+          "File not available. Please try again in different browser.",
+        );
         return;
+      }
+
+      if (inAppInfo.isInApp) {
+        e.preventDefault();
+
+        toast(
+          `Downloads are blocked inside ${inAppInfo?.name ?? "this app"}. Open in your browser to save.`,
+          { icon: "📱" },
+        );
       }
 
       if (!isLoading && !error) {

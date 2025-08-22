@@ -1,12 +1,15 @@
 "use client";
 
 import { useIsDesktop } from "@/hooks/use-media-query";
+import type { InAppInfo } from "@/lib/check-device.server";
 import { createContext, useContext, useEffect, useState } from "react";
 
 interface DeviceContextType {
   isDesktop: boolean;
   isAndroid: boolean;
   isWebView: boolean;
+  isMobile: boolean;
+  inAppInfo: InAppInfo;
 }
 
 const DeviceContext = createContext<DeviceContextType | null>(null);
@@ -25,6 +28,8 @@ export function DeviceContextProvider({
   isDesktop,
   isAndroid,
   isWebView,
+  isMobile,
+  inAppInfo,
 }: DeviceContextType & { children: React.ReactNode }) {
   const [isDesktopClient, setIsDesktopClient] = useState(isDesktop);
 
@@ -43,7 +48,13 @@ export function DeviceContextProvider({
 
   return (
     <DeviceContext.Provider
-      value={{ isDesktop: isDesktopClient, isAndroid, isWebView }}
+      value={{
+        isDesktop: isDesktopClient,
+        isAndroid,
+        isWebView,
+        isMobile,
+        inAppInfo,
+      }}
     >
       {children}
     </DeviceContext.Provider>

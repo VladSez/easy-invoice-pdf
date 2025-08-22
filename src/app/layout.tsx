@@ -107,6 +107,8 @@ export default async function RootLayout({
     isDesktop: isDesktopServer,
     isAndroid,
     isWebView,
+    isMobile,
+    inAppInfo,
   } = await checkDeviceUserAgent();
 
   return (
@@ -118,6 +120,8 @@ export default async function RootLayout({
           isDesktop={isDesktopServer}
           isAndroid={isAndroid}
           isWebView={isWebView}
+          isMobile={isMobile}
+          inAppInfo={inAppInfo}
         >
           <NextIntlClientProvider>
             {children}
