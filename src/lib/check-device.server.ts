@@ -56,7 +56,14 @@ function detectInAppBrowser(ua: string, headers: Headers): InAppInfo {
     },
     {
       name: "Telegram",
-      test: () => xRequestedWith.includes("org.telegram.messenger"),
+      test: () =>
+        xRequestedWith.includes("org.telegram.messenger") ||
+        xRequestedWith.includes("org.telegram.plus") ||
+        xRequestedWith.includes("org.telegram.btelegram") ||
+        xRequestedWith.includes("org.thunderdog.challegram") ||
+        xRequestedWith.includes("nekox.messenger") ||
+        xRequestedWith.includes("org.telegram.mdgram") ||
+        xRequestedWith.includes("it.owlgram.android"),
     },
     {
       name: "Gmail",
@@ -90,7 +97,23 @@ function detectInAppBrowser(ua: string, headers: Headers): InAppInfo {
       test: () => has("messenger") && (has("fb") || has("fban")),
     },
     { name: "WhatsApp", test: () => has("whatsapp") },
-    { name: "Telegram", test: () => has("telegram") || has("tgwebview") },
+    {
+      name: "Telegram",
+      test: () =>
+        has("telegram") ||
+        has("tgwebview") ||
+        has("telegrambot-like") ||
+        has("tgbot") ||
+        has("telegram-") ||
+        // Bot user agents
+        has("telegrambot") ||
+        // Version-specific patterns
+        has("telegram/") ||
+        // iOS specific patterns
+        (ios() && (has("telegram") || has("tg/"))) ||
+        // Android specific patterns
+        (has("android") && has("tg")),
+    },
     { name: "Twitter/X", test: () => has("twitter") || has("x-client") },
     { name: "LinkedIn", test: () => has("linkedinapp") },
     { name: "Pinterest", test: () => has("pinterest") },
