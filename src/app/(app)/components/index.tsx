@@ -48,6 +48,16 @@ const AndroidPDFViewer = dynamic(
   },
 );
 
+const isTelegramInAppBrowser = () => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const userAgent = navigator?.userAgent;
+
+  return /Telegram/i.test(userAgent || "");
+};
+
 const PdfViewer = ({
   invoiceData,
   errorWhileGeneratingPdfIsShown,
@@ -57,13 +67,22 @@ const PdfViewer = ({
   errorWhileGeneratingPdfIsShown: boolean;
   isMobile: boolean;
 }) => {
-  const { userAgent } = useDeviceContext();
+  const { userAgent, xRequestedWith } = useDeviceContext();
 
   useEffect(() => {
-    toast.info(userAgent, {
-      duration: Infinity,
-    });
-  }, [userAgent]);
+    toast.info(
+      <p>
+        {JSON.stringify({
+          userAgent,
+          xRequestedWith,
+          isTelegramInAppBrowser: isTelegramInAppBrowser(),
+        })}
+      </p>,
+      {
+        duration: Infinity,
+      },
+    );
+  }, [xRequestedWith, userAgent]);
 
   // Render the appropriate template based on the selected template
   const renderTemplate = () => {
@@ -81,7 +100,7 @@ const PdfViewer = ({
   // 2. Any in-app browser/WebView environment (new logic for platforms like X.com, LinkedIn, etc.)
   // This is due to limitations of the standard PDF viewer in these environments
   // https://github.com/diegomura/react-pdf/issues/714
-  if (isMobile) {
+  if (isMobile || isTelegramInAppBrowser()) {
     return <AndroidPDFViewer invoiceData={invoiceData} />;
   }
 

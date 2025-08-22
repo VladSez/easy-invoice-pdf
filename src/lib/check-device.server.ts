@@ -1,6 +1,6 @@
 "use server";
 
-import { headers, type headers as Headers } from "next/headers";
+import { headers } from "next/headers";
 import { UAParser } from "ua-parser-js";
 
 export interface InAppInfo {
@@ -8,10 +8,12 @@ export interface InAppInfo {
   name: string | null;
 }
 
+type HeadersList = ReturnType<typeof headers>;
+
 /**
  * Simplified in-app browser detection with detailed app identification
  */
-function detectInAppBrowser(ua: string, headers: Headers): InAppInfo {
+function detectInAppBrowser(ua: string, headers: HeadersList): InAppInfo {
   const s = ua.toLowerCase();
 
   // Helper functions
@@ -174,8 +176,7 @@ export const checkDeviceUserAgent = async () => {
   }
 
   const headersList = headers();
-  const { get } = headersList;
-  const ua = get("user-agent");
+  const ua = headersList.get("user-agent");
 
   const parser = new UAParser(ua || "");
 
@@ -201,8 +202,11 @@ export const checkDeviceUserAgent = async () => {
   // Desktop is when it's neither tablet nor mobile
   const isDesktop = !isTablet && !isMobile;
 
+  const xRequestedWith = headersList.get("x-requested-with");
+
   return {
     userAgent: ua || "",
+    xRequestedWith,
     isDesktop,
     isAndroid,
     isWebView,

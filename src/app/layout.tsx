@@ -110,6 +110,7 @@ export default async function RootLayout({
     isWebView,
     isMobile,
     inAppInfo,
+    xRequestedWith,
   } = await checkDeviceUserAgent();
 
   return (
@@ -124,6 +125,7 @@ export default async function RootLayout({
           isMobile={isMobile}
           inAppInfo={inAppInfo}
           userAgent={userAgent}
+          xRequestedWith={xRequestedWith}
         >
           <NextIntlClientProvider>
             {children}
