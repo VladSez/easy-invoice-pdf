@@ -197,19 +197,14 @@ export const checkDeviceUserAgent = async () => {
 
   // Detect in-app browsers/WebViews with detailed app identification
   const inAppInfo = detectInAppBrowser(ua || "", headersList);
-  const isWebView = inAppInfo.isInApp;
 
   // Desktop is when it's neither tablet nor mobile
   const isDesktop = !isTablet && !isMobile;
 
-  const xRequestedWith = headersList.get("x-requested-with");
-
   return {
     userAgent: ua || "",
-    xRequestedWith,
     isDesktop,
     isAndroid,
-    isWebView,
     isMobile,
     inAppInfo, // Include detailed in-app browser information
   };

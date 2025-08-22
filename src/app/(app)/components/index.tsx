@@ -48,15 +48,26 @@ const AndroidPDFViewer = dynamic(
   },
 );
 
-const isTelegramInAppBrowser = () => {
+function isTelegramInAppBrowser() {
   if (typeof window === "undefined") {
     return false;
   }
 
-  const userAgent = navigator?.userAgent;
+  // Android
+  if ("TelegramWebview" in window) {
+    return true;
+  }
 
-  return /Telegram/i.test(userAgent || "");
-};
+  // iOS
+  if (
+    "TelegramWebviewProxy" in window &&
+    "TelegramWebviewProxyProto" in window
+  ) {
+    return true;
+  }
+
+  return false;
+}
 
 const PdfViewer = ({
   invoiceData,
@@ -67,14 +78,13 @@ const PdfViewer = ({
   errorWhileGeneratingPdfIsShown: boolean;
   isMobile: boolean;
 }) => {
-  const { userAgent, xRequestedWith } = useDeviceContext();
+  const { userAgent } = useDeviceContext();
 
   useEffect(() => {
     toast.info(
       <p>
         {JSON.stringify({
           userAgent,
-          xRequestedWith,
           isTelegramInAppBrowser: isTelegramInAppBrowser(),
         })}
       </p>,
@@ -82,7 +92,7 @@ const PdfViewer = ({
         duration: Infinity,
       },
     );
-  }, [xRequestedWith, userAgent]);
+  }, [userAgent]);
 
   // Render the appropriate template based on the selected template
   const renderTemplate = () => {
