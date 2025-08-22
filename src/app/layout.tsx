@@ -104,7 +104,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const {
-    userAgent,
     isDesktop: isDesktopServer,
     isAndroid,
     isMobile,
@@ -121,7 +120,6 @@ export default async function RootLayout({
           isAndroid={isAndroid}
           isMobile={isMobile}
           inAppInfo={inAppInfo}
-          userAgent={userAgent}
         >
           <NextIntlClientProvider>
             {children}

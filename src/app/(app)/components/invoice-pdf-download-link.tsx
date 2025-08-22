@@ -18,6 +18,7 @@ import { InvoicePdfTemplate } from "./invoice-pdf-template";
 
 import { customDefaultToast, customPremiumToast } from "./cta-toasts";
 import { useDeviceContext } from "@/contexts/device-context";
+import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
 
 // Separate button states into a memoized component
 const ButtonContent = ({
@@ -107,6 +108,18 @@ export function InvoicePDFDownloadLink({
           `Downloads are blocked inside ${inAppInfo?.name ?? "this app"}. Open in your browser to save.`,
           { icon: "📱" },
         );
+
+        return;
+      }
+
+      if (isTelegramInAppBrowser()) {
+        e.preventDefault();
+        toast(
+          `Downloads are blocked inside Telegram. Open in your browser to save.`,
+          { icon: "📱" },
+        );
+
+        return;
       }
 
       if (!isLoading && !error) {
@@ -133,7 +146,7 @@ export function InvoicePDFDownloadLink({
         }, 3000);
       }
     },
-    [isLoading, url, trackDownload, filename, error],
+    [url, inAppInfo.isInApp, inAppInfo?.name, isLoading, error, trackDownload],
   );
 
   // Handle PDF updates

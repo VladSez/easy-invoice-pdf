@@ -9,9 +9,6 @@ import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
 import { cn } from "@/lib/utils";
-import { useDeviceContext } from "@/contexts/device-context";
-import { useEffect } from "react";
-import { toast } from "sonner";
 
 const DesktopPDFViewerModuleLoading = () => (
   <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
@@ -48,27 +45,6 @@ const AndroidPDFViewer = dynamic(
   },
 );
 
-function isTelegramInAppBrowser() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  // Android
-  if ("TelegramWebview" in window) {
-    return true;
-  }
-
-  // iOS
-  if (
-    "TelegramWebviewProxy" in window &&
-    "TelegramWebviewProxyProto" in window
-  ) {
-    return true;
-  }
-
-  return false;
-}
-
 const PdfViewer = ({
   invoiceData,
   errorWhileGeneratingPdfIsShown,
@@ -78,22 +54,6 @@ const PdfViewer = ({
   errorWhileGeneratingPdfIsShown: boolean;
   isMobile: boolean;
 }) => {
-  const { userAgent } = useDeviceContext();
-
-  useEffect(() => {
-    toast.info(
-      <p>
-        {JSON.stringify({
-          userAgent,
-          isTelegramInAppBrowser: isTelegramInAppBrowser(),
-        })}
-      </p>,
-      {
-        duration: Infinity,
-      },
-    );
-  }, [userAgent]);
-
   // Render the appropriate template based on the selected template
   const renderTemplate = () => {
     switch (invoiceData.template) {
@@ -110,7 +70,7 @@ const PdfViewer = ({
   // 2. Any in-app browser/WebView environment (new logic for platforms like X.com, LinkedIn, etc.)
   // This is due to limitations of the standard PDF viewer in these environments
   // https://github.com/diegomura/react-pdf/issues/714
-  if (isMobile || isTelegramInAppBrowser()) {
+  if (isMobile) {
     return <AndroidPDFViewer invoiceData={invoiceData} />;
   }
 

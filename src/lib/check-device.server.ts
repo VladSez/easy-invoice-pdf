@@ -202,7 +202,6 @@ export const checkDeviceUserAgent = async () => {
   const isDesktop = !isTablet && !isMobile;
 
   return {
-    userAgent: ua || "",
     isDesktop,
     isAndroid,
     isMobile,
