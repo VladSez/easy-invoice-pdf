@@ -8,7 +8,6 @@ import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
-import { useDeviceContext } from "@/contexts/device-context";
 import { cn } from "@/lib/utils";
 
 const DesktopPDFViewerModuleLoading = () => (
@@ -49,12 +48,12 @@ const AndroidPDFViewer = dynamic(
 const PdfViewer = ({
   invoiceData,
   errorWhileGeneratingPdfIsShown,
+  isMobile,
 }: {
   invoiceData: InvoiceData;
   errorWhileGeneratingPdfIsShown: boolean;
+  isMobile: boolean;
 }) => {
-  const { isAndroid, inAppInfo } = useDeviceContext();
-
   // Render the appropriate template based on the selected template
   const renderTemplate = () => {
     switch (invoiceData.template) {
@@ -71,8 +70,7 @@ const PdfViewer = ({
   // 2. Any in-app browser/WebView environment (new logic for platforms like X.com, LinkedIn, etc.)
   // This is due to limitations of the standard PDF viewer in these environments
   // https://github.com/diegomura/react-pdf/issues/714
-  // TODO: we can simplify this logic to just if(isMobile){}
-  if (isAndroid || inAppInfo?.isInApp) {
+  if (isMobile) {
     return <AndroidPDFViewer invoiceData={invoiceData} />;
   }
 
@@ -147,6 +145,7 @@ export function InvoiceClientPage({
                   errorWhileGeneratingPdfIsShown={
                     errorWhileGeneratingPdfIsShown
                   }
+                  isMobile={isMobile}
                 />
               </div>
             </TabsContent>
@@ -223,6 +222,7 @@ export function InvoiceClientPage({
             <PdfViewer
               invoiceData={invoiceDataState}
               errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
+              isMobile={false}
             />
           </div>
         </>
