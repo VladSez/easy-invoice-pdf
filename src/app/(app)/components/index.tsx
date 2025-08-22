@@ -9,6 +9,9 @@ import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
 import { cn } from "@/lib/utils";
+import { useDeviceContext } from "@/contexts/device-context";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 const DesktopPDFViewerModuleLoading = () => (
   <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
@@ -54,6 +57,14 @@ const PdfViewer = ({
   errorWhileGeneratingPdfIsShown: boolean;
   isMobile: boolean;
 }) => {
+  const { userAgent } = useDeviceContext();
+
+  useEffect(() => {
+    toast.info(userAgent, {
+      duration: Infinity,
+    });
+  }, [userAgent]);
+
   // Render the appropriate template based on the selected template
   const renderTemplate = () => {
     switch (invoiceData.template) {

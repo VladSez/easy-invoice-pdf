@@ -10,6 +10,7 @@ interface DeviceContextType {
   isWebView: boolean;
   isMobile: boolean;
   inAppInfo: InAppInfo;
+  userAgent: string;
 }
 
 const DeviceContext = createContext<DeviceContextType | null>(null);
@@ -30,6 +31,7 @@ export function DeviceContextProvider({
   isWebView,
   isMobile,
   inAppInfo,
+  userAgent,
 }: DeviceContextType & { children: React.ReactNode }) {
   const [isDesktopClient, setIsDesktopClient] = useState(isDesktop);
 
@@ -54,6 +56,7 @@ export function DeviceContextProvider({
         isWebView,
         isMobile,
         inAppInfo,
+        userAgent,
       }}
     >
       {children}
