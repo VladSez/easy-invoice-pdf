@@ -1,11 +1,10 @@
 "use client";
 
-import { BlobProvider } from "@react-pdf/renderer/lib/react-pdf.browser";
+import { PDFDownloadLink } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { Document, Page, pdfjs } from "react-pdf";
 import type { InvoiceData } from "@/app/schema";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
-import { toast } from "sonner";
 import * as Sentry from "@sentry/nextjs";
 import { useMemo } from "react";
 
@@ -34,11 +33,14 @@ export const AndroidPdfViewer = ({
     }
   }, [invoiceData]);
 
-  // On mobile, we need to use the BlobProvider to generate a PDF preview
+  // On mobile, we need to use the 'react-pdf' (https://github.com/wojtekmaj/react-pdf) to generate a PDF preview
   // This is because the PDF viewer is not supported on Android Chrome devices
   // https://github.com/diegomura/react-pdf/issues/714
   return (
-    <BlobProvider document={memoizedInvoicePdfTemplate}>
+    <PDFDownloadLink
+      document={memoizedInvoicePdfTemplate}
+      className="flex h-[480px] w-[650px] items-center justify-center overflow-auto"
+    >
       {({ url, loading, error }) => {
         if (error) {
           return (
@@ -87,8 +89,6 @@ export const AndroidPdfViewer = ({
             }
             onLoadError={(error) => {
               Sentry.captureException(error);
-
-              toast.error("Error loading PDF");
             }}
           >
             <Page
@@ -111,6 +111,6 @@ export const AndroidPdfViewer = ({
           </Document>
         );
       }}
-    </BlobProvider>
+    </PDFDownloadLink>
   );
 };

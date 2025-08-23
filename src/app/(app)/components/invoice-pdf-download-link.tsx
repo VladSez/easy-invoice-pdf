@@ -77,11 +77,9 @@ export function InvoicePDFDownloadLink({
     }
   }, [invoiceData]);
 
-  // Combine loading states
   const [{ loading: pdfLoading, url, error }, updatePdfInstance] = usePDF();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Memoize tracking functions
   const trackDownload = useCallback(() => {
     umamiTrackEvent("download_invoice", {
       data: {
