@@ -53,32 +53,10 @@ export function InvoicePDFDownloadLink({
 }) {
   const { inAppInfo } = useDeviceContext();
 
-  // Memoize static values
-  const filename = useMemo(() => {
-    const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
-
-    // Replace all slashes with dashes (e.g. 01/2025 -> 01-2025)
-    const formattedInvoiceNumber = invoiceNumberValue
-      ? invoiceNumberValue?.replace(/\//g, "-")
-      : dayjs().format("MM-YYYY"); // Fallback to current month and year if no invoice number
-
-    const name = `invoice-${invoiceData?.language?.toUpperCase()}-${formattedInvoiceNumber}.pdf`;
-
-    return name;
-  }, [invoiceData?.language, invoiceData?.invoiceNumberObject]);
-
-  const PdfDocument = useMemo(() => {
-    switch (invoiceData.template) {
-      case "stripe":
-        return <StripeInvoicePdfTemplate invoiceData={invoiceData} />;
-      case "default":
-      default:
-        return <InvoicePdfTemplate invoiceData={invoiceData} />;
-    }
-  }, [invoiceData]);
-
   const [{ loading: pdfLoading, url, error }, updatePdfInstance] = usePDF();
   const [isLoading, setIsLoading] = useState(false);
+
+  const [inAppBrowserToastShown, setInAppBrowserToastShown] = useState(false);
 
   const trackDownload = useCallback(() => {
     umamiTrackEvent("download_invoice", {
@@ -147,6 +125,30 @@ export function InvoicePDFDownloadLink({
     [url, inAppInfo.isInApp, inAppInfo?.name, isLoading, error, trackDownload],
   );
 
+  // Memoize static values
+  const filename = useMemo(() => {
+    const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
+
+    // Replace all slashes with dashes (e.g. 01/2025 -> 01-2025)
+    const formattedInvoiceNumber = invoiceNumberValue
+      ? invoiceNumberValue?.replace(/\//g, "-")
+      : dayjs().format("MM-YYYY"); // Fallback to current month and year if no invoice number
+
+    const name = `invoice-${invoiceData?.language?.toUpperCase()}-${formattedInvoiceNumber}.pdf`;
+
+    return name;
+  }, [invoiceData?.language, invoiceData?.invoiceNumberObject]);
+
+  const PdfDocument = useMemo(() => {
+    switch (invoiceData.template) {
+      case "stripe":
+        return <StripeInvoicePdfTemplate invoiceData={invoiceData} />;
+      case "default":
+      default:
+        return <InvoicePdfTemplate invoiceData={invoiceData} />;
+    }
+  }, [invoiceData]);
+
   // Handle PDF updates
   useEffect(() => {
     updatePdfInstance(PdfDocument);
@@ -178,6 +180,20 @@ export function InvoicePDFDownloadLink({
     errorWhileGeneratingPdfIsShown,
     setErrorWhileGeneratingPdfIsShown,
   ]);
+
+  // Show a toast if the user is in an in-app browser
+  useEffect(() => {
+    if (inAppInfo?.isInApp && !inAppBrowserToastShown) {
+      toast.info(
+        "🌐 Seems like you're using an in-app browser. For the best experience, please open this page in your default browser.",
+        {
+          id: "in-app-browser-toast", // To prevent duplicate toasts
+          duration: 8000,
+        },
+      );
+      setInAppBrowserToastShown(true);
+    }
+  }, [inAppInfo?.isInApp, inAppBrowserToastShown]);
 
   return (
     <>
