@@ -198,8 +198,12 @@ export function InvoicePDFDownloadLink({
       !inAppBrowserToastShown
     ) {
       toast.info("In-App Browser Detected", {
-        description:
-          "For the best experience, please open this page in your default browser 🌐",
+        description: (
+          <p>
+            For the best experience, please open this page in your{" "}
+            <span className="underline">default browser.</span>
+          </p>
+        ),
         id: "in-app-browser-toast", // To prevent duplicate toasts
         duration: 8000,
         icon: "⚠️",
