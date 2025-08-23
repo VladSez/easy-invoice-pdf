@@ -96,7 +96,14 @@ function detectInAppBrowser(ua: string, headers: HeadersList): InAppInfo {
     { name: "Instagram", test: () => has("instagram") },
     {
       name: "Facebook Messenger",
-      test: () => has("messenger") && (has("fb") || has("fban")),
+      test: () =>
+        // iOS Messenger: [FBAN/MessengerForiOS;
+        has("fban/messengerforio") ||
+        has("messengerforio") ||
+        // Android Messenger: [FB_IAB/MESSENGER;
+        has("fb_iab/messenger") ||
+        // Fallback patterns
+        (has("messenger") && (has("fban") || has("fb_iab"))),
     },
     { name: "WhatsApp", test: () => has("whatsapp") },
     {
