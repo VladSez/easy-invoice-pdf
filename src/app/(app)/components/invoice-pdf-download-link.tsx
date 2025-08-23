@@ -58,6 +58,8 @@ export function InvoicePDFDownloadLink({
 
   const [inAppBrowserToastShown, setInAppBrowserToastShown] = useState(false);
 
+  const isTelegramPreviewBrowser = isTelegramInAppBrowser();
+
   const trackDownload = useCallback(() => {
     umamiTrackEvent("download_invoice", {
       data: {
@@ -88,7 +90,7 @@ export function InvoicePDFDownloadLink({
         return;
       }
 
-      if (isTelegramInAppBrowser()) {
+      if (isTelegramPreviewBrowser) {
         e.preventDefault();
         toast(
           `Downloads are blocked inside Telegram. Open in your browser to save.`,
@@ -122,7 +124,15 @@ export function InvoicePDFDownloadLink({
         }, 3000);
       }
     },
-    [url, inAppInfo.isInApp, inAppInfo?.name, isLoading, error, trackDownload],
+    [
+      url,
+      inAppInfo.isInApp,
+      inAppInfo?.name,
+      isLoading,
+      error,
+      trackDownload,
+      isTelegramPreviewBrowser,
+    ],
   );
 
   // Memoize static values
@@ -183,17 +193,20 @@ export function InvoicePDFDownloadLink({
 
   // Show a toast if the user is in an in-app browser
   useEffect(() => {
-    if (inAppInfo?.isInApp && !inAppBrowserToastShown) {
-      toast.info(
-        "🌐 Seems like you're using an in-app browser. For the best experience, please open this page in your default browser.",
-        {
-          id: "in-app-browser-toast", // To prevent duplicate toasts
-          duration: 8000,
-        },
-      );
+    if (
+      (inAppInfo?.isInApp || isTelegramPreviewBrowser) &&
+      !inAppBrowserToastShown
+    ) {
+      toast.info("In-App Browser Detected", {
+        description:
+          "For the best experience, please open this page in your default browser 🌐",
+        id: "in-app-browser-toast", // To prevent duplicate toasts
+        duration: 8000,
+        icon: "⚠️",
+      });
       setInAppBrowserToastShown(true);
     }
-  }, [inAppInfo?.isInApp, inAppBrowserToastShown]);
+  }, [inAppInfo?.isInApp, inAppBrowserToastShown, isTelegramPreviewBrowser]);
 
   return (
     <>
