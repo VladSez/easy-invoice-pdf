@@ -1,6 +1,6 @@
 "use client";
 
-import { PDFDownloadLink } from "@react-pdf/renderer/lib/react-pdf.browser";
+import { BlobProvider } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { Document, Page, pdfjs } from "react-pdf";
 import type { InvoiceData } from "@/app/schema";
 import { InvoicePdfTemplate } from "../invoice-pdf-template";
@@ -37,14 +37,11 @@ export const MobileInvoicePDFViewer = ({
   // This is because the PDF viewer is not supported on Android Chrome devices
   // https://github.com/diegomura/react-pdf/issues/714
   return (
-    <PDFDownloadLink
-      document={memoizedInvoicePdfTemplate}
-      className="flex h-[480px] w-[650px] items-center justify-center overflow-auto"
-    >
+    <BlobProvider document={memoizedInvoicePdfTemplate}>
       {({ url, loading, error }) => {
         if (error) {
           return (
-            <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+            <div className="flex h-[480px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
               <div className="text-center">
                 <p className="text-red-600">Error generating PDF preview</p>
                 <p className="mt-2 text-sm text-gray-600">
@@ -57,7 +54,7 @@ export const MobileInvoicePDFViewer = ({
 
         if (loading || !url) {
           return (
-            <div className="flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200">
+            <div className="flex h-[480px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
               <div className="text-center">
                 <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
                 <p className="text-gray-600">Loading PDF viewer...</p>
@@ -70,7 +67,7 @@ export const MobileInvoicePDFViewer = ({
         return (
           <Document
             file={url}
-            className="h-[480px] w-[650px] overflow-auto"
+            className="h-[480px] w-[650px] overflow-auto lg:h-[620px] 2xl:h-[700px]"
             loading={
               <div className="flex h-[480px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
                 <div className="text-center">
@@ -103,6 +100,6 @@ export const MobileInvoicePDFViewer = ({
           </Document>
         );
       }}
-    </PDFDownloadLink>
+    </BlobProvider>
   );
 };

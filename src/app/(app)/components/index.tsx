@@ -20,7 +20,7 @@ const DesktopPDFViewerModuleLoading = () => (
 );
 
 const MobileInvoicePDFViewerModuleLoading = () => (
-  <div className="flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200">
+  <div className="flex h-[480px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
     <div className="text-center">
       <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
       <p className="text-gray-600">Loading PDF viewer...</p>
