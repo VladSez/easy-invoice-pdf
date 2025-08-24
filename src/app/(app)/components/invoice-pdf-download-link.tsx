@@ -202,7 +202,7 @@ export function InvoicePDFDownloadLink({
       toast.info("In-App Browser Detected", {
         description: (
           <p>
-            For the best experience, please open this page in your{" "}
+            For the best experience, please open this page in{" "}
             <span className="underline">Safari or Chrome browser.</span>
           </p>
         ),
