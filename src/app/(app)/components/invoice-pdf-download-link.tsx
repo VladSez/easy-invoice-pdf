@@ -79,7 +79,7 @@ export function InvoicePDFDownloadLink({
         return;
       }
 
-      if (inAppInfo.isInApp) {
+      if (inAppInfo?.isInApp) {
         e.preventDefault();
 
         toast(
@@ -128,7 +128,7 @@ export function InvoicePDFDownloadLink({
     },
     [
       url,
-      inAppInfo.isInApp,
+      inAppInfo?.isInApp,
       inAppInfo?.name,
       isLoading,
       error,

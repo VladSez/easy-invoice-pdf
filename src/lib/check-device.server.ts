@@ -76,6 +76,19 @@ function detectInAppBrowser(ua: string, headers: HeadersList) {
       test: () =>
         xRequestedWith.includes("com.google.android.googlequicksearchbox"),
     },
+    {
+      name: "Chrome Custom Tab",
+      test: () =>
+        xRequestedWith.includes("com.android.chrome") ||
+        xRequestedWith.includes("com.chrome.beta") ||
+        xRequestedWith.includes("com.chrome.canary") ||
+        xRequestedWith.includes("com.chrome.dev") ||
+        xRequestedWith.includes("org.chromium.chrome"),
+    },
+    {
+      name: "LinkedIn",
+      test: () => xRequestedWith.includes("com.linkedin.android"),
+    },
   ];
 
   // Check headers first (most reliable)
@@ -137,10 +150,6 @@ function detectInAppBrowser(ua: string, headers: HeadersList) {
     { name: "Discord", test: () => has("discord") },
     { name: "YouTube", test: () => has("youtube") },
     { name: "Android WebView", test: () => has("wv") && has("android") },
-    {
-      name: "Chrome Custom Tab",
-      test: () => has("chrome") && has("customtabs"),
-    },
     {
       name: "iOS WebView",
       test: () =>
