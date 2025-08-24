@@ -13,7 +13,7 @@ type HeadersList = ReturnType<typeof headers>;
 /**
  * Simplified in-app browser detection with detailed app identification
  */
-function detectInAppBrowser(ua: string, headers: HeadersList): InAppInfo {
+function detectInAppBrowser(ua: string, headers: HeadersList) {
   const s = ua.toLowerCase();
 
   // Helper functions

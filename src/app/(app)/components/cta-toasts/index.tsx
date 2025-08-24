@@ -34,7 +34,7 @@ function randomlyShowDonationButton() {
 /**
  * Renders a premium donation toast
  */
-export function customPremiumToast(toast: Omit<ToastProps, "id">) {
+export function customPremiumToast(toast: ToastProps) {
   // dismiss any existing toasts
   sonnerToast.dismiss();
 
@@ -56,7 +56,7 @@ export function customPremiumToast(toast: Omit<ToastProps, "id">) {
 /**
  * Renders a default donation toast
  */
-export function customDefaultToast(toast: Omit<ToastProps, "id">) {
+export function customDefaultToast(toast: ToastProps) {
   // dismiss any existing toasts
   sonnerToast.dismiss();
 
