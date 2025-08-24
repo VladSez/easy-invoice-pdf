@@ -3,8 +3,8 @@
 import { PDFDownloadLink } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { Document, Page, pdfjs } from "react-pdf";
 import type { InvoiceData } from "@/app/schema";
-import { InvoicePdfTemplate } from "./invoice-pdf-template";
-import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
+import { InvoicePdfTemplate } from "../invoice-pdf-template";
+import { StripeInvoicePdfTemplate } from "../invoice-pdf-stripe-template";
 import * as Sentry from "@sentry/nextjs";
 import { useMemo } from "react";
 
@@ -18,7 +18,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
  *
  * https://github.com/wojtekmaj/react-pdf
  */
-export const AndroidPdfViewer = ({
+export const MobileInvoicePDFViewer = ({
   invoiceData,
 }: {
   invoiceData: InvoiceData;
@@ -55,21 +55,13 @@ export const AndroidPdfViewer = ({
           );
         }
 
-        if (loading) {
+        if (loading || !url) {
           return (
             <div className="flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200">
               <div className="text-center">
                 <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
                 <p className="text-gray-600">Loading PDF viewer...</p>
               </div>
-            </div>
-          );
-        }
-
-        if (!url) {
-          return (
-            <div className="flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200">
-              <p className="text-gray-600">No PDF URL</p>
             </div>
           );
         }

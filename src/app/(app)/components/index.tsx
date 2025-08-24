@@ -19,7 +19,7 @@ const DesktopPDFViewerModuleLoading = () => (
   </div>
 );
 
-const AndroidPDFViewerModuleLoading = () => (
+const MobileInvoicePDFViewerModuleLoading = () => (
   <div className="flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200">
     <div className="text-center">
       <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
@@ -28,8 +28,11 @@ const AndroidPDFViewerModuleLoading = () => (
   </div>
 );
 
-const InvoicePDFViewer = dynamic(
-  () => import("./invoice-pdf-viewer").then((mod) => mod.InvoicePDFViewer),
+const DesktopInvoicePDFViewer = dynamic(
+  () =>
+    import("./invoice-pdf-preview/desktop-pdf-viewer").then(
+      (mod) => mod.DesktopInvoicePDFViewer,
+    ),
 
   {
     ssr: false,
@@ -37,11 +40,14 @@ const InvoicePDFViewer = dynamic(
   },
 );
 
-const AndroidPDFViewer = dynamic(
-  () => import("./android-pdf-viewer").then((mod) => mod.AndroidPdfViewer),
+const MobileInvoicePDFViewer = dynamic(
+  () =>
+    import("./invoice-pdf-preview/mobile-pdf-viewer").then(
+      (mod) => mod.MobileInvoicePDFViewer,
+    ),
   {
     ssr: false,
-    loading: () => <AndroidPDFViewerModuleLoading />,
+    loading: () => <MobileInvoicePDFViewerModuleLoading />,
   },
 );
 
@@ -65,24 +71,24 @@ const PdfViewer = ({
     }
   };
 
-  // Use Android PDF viewer for:
-  // 1. Android devices (original logic)
+  // Use Mobile PDF viewer for:
+  // 1. Mobile devices
   // 2. Any in-app browser/WebView environment (new logic for platforms like X.com, LinkedIn, etc.)
   // This is due to limitations of the standard PDF viewer in these environments
   // https://github.com/diegomura/react-pdf/issues/714
   if (isMobile) {
-    return <AndroidPDFViewer invoiceData={invoiceData} />;
+    return <MobileInvoicePDFViewer invoiceData={invoiceData} />;
   }
 
   const template = renderTemplate();
 
   // Normal version for standard desktop browsers
   return (
-    <InvoicePDFViewer
+    <DesktopInvoicePDFViewer
       errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
     >
       {template}
-    </InvoicePDFViewer>
+    </DesktopInvoicePDFViewer>
   );
 };
 
