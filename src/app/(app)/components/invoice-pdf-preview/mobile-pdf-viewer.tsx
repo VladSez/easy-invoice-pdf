@@ -82,7 +82,6 @@ export const MobileInvoicePDFViewer = ({
             }
             onLoadError={(error) => {
               console.error(error);
-              Sentry.captureException(error);
 
               // Force a re-render of the PDF viewer to try to recover from error
               setKey((prev) => prev + 1);
