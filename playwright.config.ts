@@ -33,7 +33,7 @@ export default defineConfig({
   workers: process.env.CI ? 2 : undefined,
   /* timeout for expect assertions */
   expect: {
-    timeout: 40_000,
+    timeout: 35_000,
   },
 
   // /* timeout for test execution */

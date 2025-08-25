@@ -17,6 +17,8 @@ import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 
 import { customDefaultToast, customPremiumToast } from "./cta-toasts";
+import { useDeviceContext } from "@/contexts/device-context";
+import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
 
 // Separate button states into a memoized component
 const ButtonContent = ({
@@ -49,6 +51,92 @@ export function InvoicePDFDownloadLink({
   errorWhileGeneratingPdfIsShown: boolean;
   setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
 }) {
+  const { inAppInfo } = useDeviceContext();
+
+  const [{ loading: pdfLoading, url, error }, updatePdfInstance] = usePDF();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [inAppBrowserToastShown, setInAppBrowserToastShown] = useState(false);
+
+  const isTelegramPreviewBrowser = isTelegramInAppBrowser();
+
+  const trackDownload = useCallback(() => {
+    umamiTrackEvent("download_invoice", {
+      data: {
+        invoice_template: invoiceData.template,
+      },
+    });
+  }, [invoiceData.template]);
+
+  const handleDownloadPDFClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (!url) {
+        e.preventDefault();
+
+        toast.error(
+          "File not available. Please try again in different browser.",
+        );
+        return;
+      }
+
+      if (inAppInfo?.isInApp) {
+        e.preventDefault();
+
+        toast(
+          `Downloads are blocked inside ${inAppInfo?.name ?? "this app"}. Open in your browser to save.`,
+          { icon: "📱" },
+        );
+
+        return;
+      }
+
+      if (isTelegramPreviewBrowser) {
+        e.preventDefault();
+        toast(
+          `Downloads are blocked inside Telegram. Open in your browser to save.`,
+          { icon: "📱" },
+        );
+
+        return;
+      }
+
+      if (!isLoading && !error) {
+        trackDownload();
+
+        // close all other toasts (if any)
+        toast.dismiss();
+
+        // Randomly show either default or premium donation toast after 3 seconds
+        setTimeout(() => {
+          if (Math.random() <= 0.5) {
+            customPremiumToast({
+              id: "premium-donation-toast",
+              title: "Support My Work",
+              description:
+                "Your contribution helps me maintain and improve this project for everyone! 🚀",
+            });
+          } else {
+            customDefaultToast({
+              id: "default-donation-toast",
+              title: "Love this project?",
+              description:
+                "Help me keep building amazing tools! Your support means the world to me. ✨",
+            });
+          }
+        }, 3000);
+      }
+    },
+    [
+      url,
+      inAppInfo?.isInApp,
+      inAppInfo?.name,
+      isLoading,
+      error,
+      trackDownload,
+      isTelegramPreviewBrowser,
+    ],
+  );
+
   // Memoize static values
   const filename = useMemo(() => {
     const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
@@ -73,46 +161,6 @@ export function InvoicePDFDownloadLink({
     }
   }, [invoiceData]);
 
-  // Combine loading states
-  const [{ loading: pdfLoading, url, error }, updatePdfInstance] = usePDF();
-  const [isLoading, setIsLoading] = useState(false);
-  // const [errorShown, setErrorShown] = useState(false);
-
-  // Memoize tracking functions
-  const trackDownload = useCallback(() => {
-    umamiTrackEvent("download_invoice", {
-      data: {
-        invoice_template: invoiceData.template,
-      },
-    });
-  }, [invoiceData.template]);
-
-  const handleDownloadPDFClick = useCallback(() => {
-    if (!isLoading && url) {
-      trackDownload();
-
-      // close all other toasts (if any)
-      toast.dismiss();
-
-      // Randomly show either default or premium donation toast after 3 seconds
-      setTimeout(() => {
-        if (Math.random() <= 0.5) {
-          customPremiumToast({
-            title: "Support My Work",
-            description:
-              "Your contribution helps me maintain and improve this project for everyone! 🚀",
-          });
-        } else {
-          customDefaultToast({
-            title: "Love this project?",
-            description:
-              "Help me keep building amazing tools! Your support means the world to me. ✨",
-          });
-        }
-      }, 3000);
-    }
-  }, [isLoading, url, trackDownload]);
-
   // Handle PDF updates
   useEffect(() => {
     updatePdfInstance(PdfDocument);
@@ -134,7 +182,6 @@ export function InvoicePDFDownloadLink({
   useEffect(() => {
     if (error && !errorWhileGeneratingPdfIsShown) {
       ErrorGeneratingPdfToast();
-      // setErrorShown(true);
       setErrorWhileGeneratingPdfIsShown(true);
 
       umamiTrackEvent("error_generating_document_link", { data: { error } });
@@ -146,12 +193,33 @@ export function InvoicePDFDownloadLink({
     setErrorWhileGeneratingPdfIsShown,
   ]);
 
+  // Show a toast if the user is in an in-app browser
+  useEffect(() => {
+    if (
+      (inAppInfo?.isInApp || isTelegramPreviewBrowser) &&
+      !inAppBrowserToastShown
+    ) {
+      toast.info("In-App Browser Detected", {
+        description: (
+          <p>
+            For the best experience, please open this page in{" "}
+            <span className="underline">Safari or Chrome browser.</span>
+          </p>
+        ),
+        id: "in-app-browser-toast", // To prevent duplicate toasts
+        duration: 8000,
+        icon: "⚠️",
+      });
+      setInAppBrowserToastShown(true);
+    }
+  }, [inAppInfo?.isInApp, inAppBrowserToastShown, isTelegramPreviewBrowser]);
+
   return (
     <>
       <a
         translate="no"
         href={url || "#"}
-        download={filename}
+        download={url ? filename : undefined}
         onClick={handleDownloadPDFClick}
         className={cn(
           "h-[36px] w-full rounded-lg bg-slate-900 px-4 py-2 text-center text-sm font-medium text-slate-50",

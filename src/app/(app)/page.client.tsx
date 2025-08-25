@@ -298,6 +298,7 @@ export function AppPageClient() {
       // Randomly show either default or premium donation toast
       if (Math.random() <= 0.5) {
         customPremiumToast({
+          id: "premium-donation-toast-client-page",
           title: "Support My Work",
           description:
             "Your contribution helps me maintain and improve this project for everyone! 🚀",
@@ -305,6 +306,7 @@ export function AppPageClient() {
         });
       } else {
         customDefaultToast({
+          id: "default-donation-toast-client-page",
           title: "Love this project?",
           description:
             "Help me keep building amazing tools! Your support means the world to me. ✨",

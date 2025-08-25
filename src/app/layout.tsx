@@ -14,8 +14,8 @@ import { STATIC_ASSETS_URL } from "@/config";
 
 import "./globals.css";
 
-import "react-pdf/dist/esm/Page/AnnotationLayer.css";
-import "react-pdf/dist/esm/Page/TextLayer.css";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
 
 export const viewport: Viewport = {
   initialScale: 1, // Sets the default zoom level to 1 (100%)
@@ -103,8 +103,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { isDesktop: isDesktopServer, isAndroid } =
-    await checkDeviceUserAgent();
+  const {
+    isDesktop: isDesktopServer,
+    isAndroid,
+    isMobile,
+    inAppInfo,
+  } = await checkDeviceUserAgent();
 
   return (
     <html lang="en">
@@ -114,6 +118,8 @@ export default async function RootLayout({
         <DeviceContextProvider
           isDesktop={isDesktopServer}
           isAndroid={isAndroid}
+          isMobile={isMobile}
+          inAppInfo={inAppInfo}
         >
           <NextIntlClientProvider>
             {children}

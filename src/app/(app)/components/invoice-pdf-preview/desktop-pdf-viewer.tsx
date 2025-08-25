@@ -2,7 +2,7 @@
 
 import { PDFViewer } from "@react-pdf/renderer/lib/react-pdf.browser";
 
-export function InvoicePDFViewer({
+export function DesktopInvoicePDFViewer({
   children,
   errorWhileGeneratingPdfIsShown,
 }: {

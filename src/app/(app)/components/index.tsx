@@ -8,7 +8,6 @@ import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
-import { useDeviceContext } from "@/contexts/device-context";
 import { cn } from "@/lib/utils";
 
 const DesktopPDFViewerModuleLoading = () => (
@@ -20,8 +19,8 @@ const DesktopPDFViewerModuleLoading = () => (
   </div>
 );
 
-const AndroidPDFViewerModuleLoading = () => (
-  <div className="flex h-full w-full items-center justify-center border border-gray-200 bg-gray-200">
+const MobileInvoicePDFViewerModuleLoading = () => (
+  <div className="flex h-[480px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
     <div className="text-center">
       <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
       <p className="text-gray-600">Loading PDF viewer...</p>
@@ -29,8 +28,11 @@ const AndroidPDFViewerModuleLoading = () => (
   </div>
 );
 
-const InvoicePDFViewer = dynamic(
-  () => import("./invoice-pdf-viewer").then((mod) => mod.InvoicePDFViewer),
+const DesktopInvoicePDFViewer = dynamic(
+  () =>
+    import("./invoice-pdf-preview/desktop-pdf-viewer").then(
+      (mod) => mod.DesktopInvoicePDFViewer,
+    ),
 
   {
     ssr: false,
@@ -38,23 +40,26 @@ const InvoicePDFViewer = dynamic(
   },
 );
 
-const AndroidPDFViewer = dynamic(
-  () => import("./android-pdf-viewer").then((mod) => mod.AndroidPdfViewer),
+const MobileInvoicePDFViewer = dynamic(
+  () =>
+    import("./invoice-pdf-preview/mobile-pdf-viewer").then(
+      (mod) => mod.MobileInvoicePDFViewer,
+    ),
   {
     ssr: false,
-    loading: () => <AndroidPDFViewerModuleLoading />,
+    loading: () => <MobileInvoicePDFViewerModuleLoading />,
   },
 );
 
 const PdfViewer = ({
   invoiceData,
   errorWhileGeneratingPdfIsShown,
+  isMobile,
 }: {
   invoiceData: InvoiceData;
   errorWhileGeneratingPdfIsShown: boolean;
+  isMobile: boolean;
 }) => {
-  const { isAndroid } = useDeviceContext();
-
   // Render the appropriate template based on the selected template
   const renderTemplate = () => {
     switch (invoiceData.template) {
@@ -66,21 +71,24 @@ const PdfViewer = ({
     }
   };
 
-  // we only show the Android PDF viewer on Android devices due to the limitations of the PDF viewer
+  // Use Mobile PDF viewer for:
+  // 1. Mobile devices
+  // 2. Any in-app browser/WebView environment (new logic for platforms like X.com, LinkedIn, etc.)
+  // This is due to limitations of the standard PDF viewer in these environments
   // https://github.com/diegomura/react-pdf/issues/714
-  if (isAndroid) {
-    return <AndroidPDFViewer invoiceData={invoiceData} />;
+  if (isMobile) {
+    return <MobileInvoicePDFViewer invoiceData={invoiceData} />;
   }
 
   const template = renderTemplate();
 
-  // Normal version
+  // Normal version for standard desktop browsers
   return (
-    <InvoicePDFViewer
+    <DesktopInvoicePDFViewer
       errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
     >
       {template}
-    </InvoicePDFViewer>
+    </DesktopInvoicePDFViewer>
   );
 };
 
@@ -143,6 +151,7 @@ export function InvoiceClientPage({
                   errorWhileGeneratingPdfIsShown={
                     errorWhileGeneratingPdfIsShown
                   }
+                  isMobile={isMobile}
                 />
               </div>
             </TabsContent>
@@ -219,6 +228,7 @@ export function InvoiceClientPage({
             <PdfViewer
               invoiceData={invoiceDataState}
               errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
+              isMobile={false}
             />
           </div>
         </>
