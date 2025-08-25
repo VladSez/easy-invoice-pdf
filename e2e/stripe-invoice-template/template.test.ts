@@ -340,6 +340,9 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
+    // Wait for URL to be updated
+    await expect(page).toHaveURL("/?template=stripe");
+
     // Upload a valid logo
     await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
 
@@ -353,7 +356,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Wait a moment for any debounced localStorage updates
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(600);
 
     // Verify data is actually saved in localStorage
     const storedData = (await page.evaluate((key) => {
@@ -472,6 +475,9 @@ test.describe("Stripe Invoice Template", () => {
     await page
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
+
+    // Wait for URL to be updated
+    await expect(page).toHaveURL("/?template=stripe");
 
     const generalInfoSection = page.getByTestId("general-information-section");
 
