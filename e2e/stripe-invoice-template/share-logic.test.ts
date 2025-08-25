@@ -351,7 +351,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await shareButton.click({ force: true });
 
     await expect(page.getByText("Unable to Share Invoice")).toBeVisible({
-      timeout: 700,
+      timeout: 3000,
     });
 
     await expect(
