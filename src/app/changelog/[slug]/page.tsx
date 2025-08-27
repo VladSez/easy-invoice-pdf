@@ -34,9 +34,7 @@ export async function generateMetadata({
   const entry = await getChangelogEntry(slug);
 
   if (!entry) {
-    return {
-      title: "Changelog Entry Not Found",
-    };
+    throw new Error(`Changelog entry not found for slug: ${slug}`);
   }
 
   const formattedDate = formatChangelogDate(entry.metadata.date);
