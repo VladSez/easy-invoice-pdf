@@ -34,23 +34,24 @@ export async function generateMetadata({
   const entry = await getChangelogEntry(slug);
 
   if (!entry) {
-    return {
-      title: "Changelog Entry Not Found",
-    };
+    throw new Error(`Changelog entry not found for slug: ${slug}`);
   }
 
   const formattedDate = formatChangelogDate(entry.metadata.date);
 
   return {
-    title: `${entry.metadata.title || `Update ${formattedDate}`} | Changelog`,
-    description: `Changelog entry from ${formattedDate}`,
+    title: `${entry.metadata.title || `Update ${formattedDate}`}`,
+    description: entry.metadata.description,
     authors: [{ name: "Vlad Sazonau", url: "https://x.com/vlad_sazon" }],
+    alternates: {
+      canonical: `https://easyinvoicepdf.com/changelog/${slug}`,
+    },
     openGraph: {
-      title: `${entry.metadata.title || `Update ${formattedDate}`} | Changelog`,
-      description: `Changelog entry from ${formattedDate}`,
+      title: `${entry.metadata.title || `Update ${formattedDate}`}`,
+      description: entry.metadata.description,
       type: "article",
       publishedTime: entry.metadata.date,
-      siteName: `https://easyinvoicepdf.com/changelog/${slug}`,
+      siteName: "EasyInvoicePDF.com",
       images: [
         {
           url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
@@ -64,7 +65,7 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: `${entry.metadata.title || `Update ${formattedDate}`} | Changelog`,
-      description: `Changelog entry from ${formattedDate}`,
+      description: entry.metadata.description,
       images: [
         {
           url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,

@@ -3,7 +3,8 @@ import { join } from "path";
 import { z } from "zod";
 
 interface ChangelogMetadata {
-  title?: string;
+  title: string;
+  description: string;
   date: string;
   version?: string;
   type?: "major" | "minor" | "patch";
@@ -15,6 +16,15 @@ export interface ChangelogEntry {
   metadata: ChangelogMetadata;
   Component: React.ComponentType;
 }
+
+// Validate metadata with Zod schema
+export const changelogEntryMetadataSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  date: z.string().date(),
+  version: z.string().optional(),
+  type: z.enum(["major", "minor", "patch"]).optional(),
+});
 
 /**
  * Gets all MDX files from the content/changelog directory
@@ -54,17 +64,9 @@ async function importChangelogFile(filename: string) {
       default: React.ComponentType;
     };
 
-    // Validate metadata with Zod schema
-    const metadataSchema = z.object({
-      title: z.string().optional(),
-      date: z.string().date(),
-      version: z.string().optional(),
-      type: z.enum(["major", "minor", "patch"]).optional(),
-    });
-
     // Validate metadata and throw error if invalid
     try {
-      metadataSchema.parse(dynamicModule.metadata);
+      changelogEntryMetadataSchema.parse(dynamicModule.metadata);
     } catch (error) {
       if (error instanceof z.ZodError) {
         console.error(
@@ -98,7 +100,12 @@ export async function getChangelogEntries(): Promise<ChangelogEntry[]> {
 
   for (const filename of files) {
     const imported = await importChangelogFile(filename);
-    if (!imported) continue;
+
+    if (!imported) {
+      throw new Error(
+        `\n\n __________ ERROR: Failed to import changelog file ${filename} __________\n\n`,
+      );
+    }
 
     const { slug, module } = imported;
     const { metadata, default: Component } = module as {

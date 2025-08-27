@@ -14,6 +14,9 @@ export default function robots(): MetadataRoute.Robots {
           ...SUPPORTED_LANGUAGES.map((locale) => `/${locale}/about`),
           // Allow template parameter URLs
           "/?template=*",
+          // Allow changelog pages
+          "/changelog",
+          "/changelog/*",
         ],
         disallow: [
           // Disallow shared invoice URLs, like /?data=*

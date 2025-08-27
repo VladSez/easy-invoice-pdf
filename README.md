@@ -12,6 +12,7 @@
 - 🧮 **European VAT**: Automatic VAT calculation and formatting
 - 🎨 **Multiple Templates**: Including modern **Stripe-style design**
 - 📄 **Instant PDF**: One-click download ready for printing or sending
+- 📱 **Mobile-Friendly**: Fully responsive design works perfectly on all devices
 
 **❤️ Support the project**: [Buy me a coffee](https://buymeacoffee.com/vladsazon) to help keep EasyInvoicePDF free and open-source!
 
@@ -22,6 +23,8 @@
 #### Stripe Invoice Template
 
 <img width="1440" height="769" alt="stripe template" src=".github/screenshots/stripe.png" />
+
+#### Stripe Invoice Template with Logo
 
 <img width="1440" height="769" alt="stripe template with logo" src=".github/screenshots/stripe-with-logo.png" />
 
