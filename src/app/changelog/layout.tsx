@@ -11,7 +11,7 @@ import Link from "next/link";
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
-  title: "Changelog  | Free Invoice Generator – Live Preview, No Sign-Up",
+  title: "Changelog  | EasyInvoicePDF - Free & Open-Source Invoice Generator",
   description:
     "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
   keywords: [
@@ -21,12 +21,28 @@ export const metadata: Metadata = {
     "features",
     "bug fixes",
     "pdf invoice generator",
+    "easyinvoicepdf",
+    "easy invoice pdf changelog",
   ],
   authors: [{ name: "Uladzislau Sazonau" }],
   creator: "Uladzislau Sazonau",
   publisher: "Uladzislau Sazonau",
+  alternates: {
+    canonical: "https://easyinvoicepdf.com/changelog",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
-    title: "Changelog | Free Invoice Generator – Live Preview, No Sign-Up",
+    title: "Changelog | EasyInvoicePDF - Free & Open-Source Invoice Generator",
     description:
       "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
     siteName: "EasyInvoicePDF.com | Free Invoice Generator",

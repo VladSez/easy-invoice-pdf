@@ -3,7 +3,8 @@ import { join } from "path";
 import { z } from "zod";
 
 interface ChangelogMetadata {
-  title?: string;
+  title: string;
+  description: string;
   date: string;
   version?: string;
   type?: "major" | "minor" | "patch";
@@ -56,7 +57,8 @@ async function importChangelogFile(filename: string) {
 
     // Validate metadata with Zod schema
     const metadataSchema = z.object({
-      title: z.string().optional(),
+      title: z.string().min(1, "Title is required"),
+      description: z.string().min(1, "Description is required"),
       date: z.string().date(),
       version: z.string().optional(),
       type: z.enum(["major", "minor", "patch"]).optional(),
