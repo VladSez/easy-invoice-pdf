@@ -596,54 +596,58 @@ export const GeneralInformation = memo(function GeneralInformation({
         ) : null}
       </div>
 
-      {/* Invoice Type */}
-      <div>
-        <div className="relative mb-2 flex items-center justify-between">
-          <Label htmlFor={`invoiceType`} className="">
-            Invoice Type
-          </Label>
+      {/* Invoice Type - We don't show this field for Stripe template */}
+      {template !== "stripe" && (
+        <div>
+          <div className="relative mb-2 flex items-center justify-between">
+            <Label htmlFor={`invoiceType`} className="">
+              Invoice Type
+            </Label>
 
-          {/* Show/hide Invoice Type field in PDF switch */}
-          <div className="inline-flex items-center gap-2">
-            <Controller
-              name={`invoiceTypeFieldIsVisible`}
-              control={control}
-              render={({ field: { value, onChange, ...field } }) => (
-                <Switch
-                  {...field}
-                  id={`invoiceTypeFieldIsVisible`}
-                  checked={value}
-                  onCheckedChange={onChange}
-                  className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                />
-              )}
-            />
-            <CustomTooltip
-              trigger={
-                <Label htmlFor={`invoiceTypeFieldIsVisible`}>Show in PDF</Label>
-              }
-              content='Show/Hide the "Invoice Type" Field in the PDF'
-            />
+            {/* Show/hide Invoice Type field in PDF switch */}
+            <div className="inline-flex items-center gap-2">
+              <Controller
+                name={`invoiceTypeFieldIsVisible`}
+                control={control}
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Switch
+                    {...field}
+                    id={`invoiceTypeFieldIsVisible`}
+                    checked={value}
+                    onCheckedChange={onChange}
+                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                  />
+                )}
+              />
+              <CustomTooltip
+                trigger={
+                  <Label htmlFor={`invoiceTypeFieldIsVisible`}>
+                    Show in PDF
+                  </Label>
+                }
+                content='Show/Hide the "Invoice Type" Field in the PDF'
+              />
+            </div>
           </div>
-        </div>
 
-        <Controller
-          name="invoiceType"
-          control={control}
-          render={({ field }) => (
-            <Textarea
-              {...field}
-              id={`invoiceType`}
-              rows={2}
-              className=""
-              placeholder="Enter invoice type"
-            />
+          <Controller
+            name="invoiceType"
+            control={control}
+            render={({ field }) => (
+              <Textarea
+                {...field}
+                id={`invoiceType`}
+                rows={2}
+                className=""
+                placeholder="Enter invoice type"
+              />
+            )}
+          />
+          {errors.invoiceType && (
+            <ErrorMessage>{errors.invoiceType.message}</ErrorMessage>
           )}
-        />
-        {errors.invoiceType && (
-          <ErrorMessage>{errors.invoiceType.message}</ErrorMessage>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 });
