@@ -161,7 +161,7 @@ export const GeneralInformation = memo(function GeneralInformation({
       // Set date format to "MMMM D, YYYY" when template is Stripe
       setValue("dateFormat", STRIPE_DEFAULT_DATE_FORMAT);
 
-      // Always enable VAT field visibility for Stripe template
+      // Always enable VAT field visibility for Stripe template (because we don't show Switches for items in Stripe template and we want to make sure the Tax column is visible in the PDF)
       setValue("items.0.vatFieldIsVisible", true);
     } else {
       // Clear Stripe-specific fields when not using Stripe template
