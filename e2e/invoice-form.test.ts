@@ -433,6 +433,15 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(5),
     ).toBeChecked();
 
+    // Verify VAT helper text is displayed
+    await expect(
+      invoiceItemsSection
+        .getByTestId(`itemVat0`)
+        .getByText(
+          'Enter "NP" (not applicable), "OO" (out of scope), or a percentage value (0-100)',
+        ),
+    ).toBeVisible();
+
     // Net Amount field (read-only) and visibility toggle
     await expect(
       invoiceItemsSection.getByRole("textbox", {

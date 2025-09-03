@@ -1,6 +1,7 @@
 import {
   PDF_DATA_LOCAL_STORAGE_KEY,
   STRIPE_DEFAULT_DATE_FORMAT,
+  SUPPORTED_DATE_FORMATS,
   type InvoiceData,
 } from "@/app/schema";
 import { expect, test } from "@playwright/test";
@@ -191,213 +192,6 @@ test.describe("Stripe Invoice Template", () => {
         name: "Payment Link URL (Optional)",
       }),
     ).toBeHidden();
-  });
-
-  test("Invoice Type field and signature fields only appear for default template", async ({
-    page,
-  }) => {
-    // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
-
-    const generalInfoSection = page.getByTestId("general-information-section");
-    const finalSection = page.getByTestId("final-section");
-
-    // Initially default template - Invoice Type field should be visible
-    await expect(
-      generalInfoSection.getByRole("textbox", { name: "Invoice Type" }),
-    ).toBeVisible();
-
-    // Invoice Type visibility switch should be visible
-    await expect(
-      generalInfoSection.getByRole("switch", { name: "Show in PDF" }),
-    ).toBeVisible();
-
-    // Signature fields should be visible for default template
-    await expect(
-      finalSection.getByRole("switch", {
-        name: 'Show "Person Authorized to Receive" Signature Field in the PDF',
-      }),
-    ).toBeVisible();
-
-    await expect(
-      finalSection.getByRole("switch", {
-        name: 'Show "Person Authorized to Issue" Signature Field in the PDF',
-      }),
-    ).toBeVisible();
-
-    // Switch to Stripe template
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
-
-    // Wait for URL to be updated
-    await page.waitForURL("/?template=stripe");
-
-    await expect(page).toHaveURL("/?template=stripe");
-
-    // Invoice Type field should now be hidden
-    await expect(
-      generalInfoSection.getByRole("textbox", { name: "Invoice Type" }),
-    ).toBeHidden();
-
-    // Signature fields should be hidden for Stripe template
-    await expect(
-      finalSection.getByRole("switch", {
-        name: 'Show "Person Authorized to Receive" Signature Field in the PDF',
-      }),
-    ).toBeHidden();
-
-    await expect(
-      finalSection.getByRole("switch", {
-        name: 'Show "Person Authorized to Issue" Signature Field in the PDF',
-      }),
-    ).toBeHidden();
-
-    // Switch back to default template
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("default");
-
-    // Invoice Type field should be visible again
-    await expect(
-      generalInfoSection.getByRole("textbox", { name: "Invoice Type" }),
-    ).toBeVisible();
-
-    // Invoice Type visibility switch should be visible again
-    await expect(
-      generalInfoSection.getByRole("switch", { name: "Show in PDF" }),
-    ).toBeVisible();
-
-    // Signature fields should be visible again for default template
-    await expect(
-      finalSection.getByRole("switch", {
-        name: 'Show "Person Authorized to Receive" Signature Field in the PDF',
-      }),
-    ).toBeVisible();
-
-    await expect(
-      finalSection.getByRole("switch", {
-        name: 'Show "Person Authorized to Issue" Signature Field in the PDF',
-      }),
-    ).toBeVisible();
-  });
-
-  test("signature field switches work correctly in default template", async ({
-    page,
-  }) => {
-    // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
-
-    const finalSection = page.getByTestId("final-section");
-
-    // Get the signature field switches
-    const personAuthorizedToReceiveSwitch = finalSection.getByRole("switch", {
-      name: 'Show "Person Authorized to Receive" Signature Field in the PDF',
-    });
-
-    const personAuthorizedToIssueSwitch = finalSection.getByRole("switch", {
-      name: 'Show "Person Authorized to Issue" Signature Field in the PDF',
-    });
-
-    // Verify both switches are visible and enabled
-    await expect(personAuthorizedToReceiveSwitch).toBeVisible();
-    await expect(personAuthorizedToReceiveSwitch).toBeEnabled();
-    await expect(personAuthorizedToIssueSwitch).toBeVisible();
-    await expect(personAuthorizedToIssueSwitch).toBeEnabled();
-
-    // Verify initial state (should be checked by default based on initial data)
-    await expect(personAuthorizedToReceiveSwitch).toBeChecked();
-    await expect(personAuthorizedToIssueSwitch).toBeChecked();
-
-    // Toggle the switches
-    await personAuthorizedToReceiveSwitch.click();
-    await personAuthorizedToIssueSwitch.click();
-
-    // Verify switches are now unchecked
-    await expect(personAuthorizedToReceiveSwitch).not.toBeChecked();
-    await expect(personAuthorizedToIssueSwitch).not.toBeChecked();
-
-    // Toggle them back
-    await personAuthorizedToReceiveSwitch.click();
-    await personAuthorizedToIssueSwitch.click();
-
-    // Verify switches are checked again
-    await expect(personAuthorizedToReceiveSwitch).toBeChecked();
-    await expect(personAuthorizedToIssueSwitch).toBeChecked();
-
-    // Switch to Stripe template to verify switches become hidden
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
-
-    await page.waitForURL("/?template=stripe");
-
-    // Verify switches are now hidden
-    await expect(personAuthorizedToReceiveSwitch).toBeHidden();
-    await expect(personAuthorizedToIssueSwitch).toBeHidden();
-  });
-
-  test("Invoice Type field works correctly in default template", async ({
-    page,
-  }) => {
-    // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
-
-    const generalInfoSection = page.getByTestId("general-information-section");
-
-    // Get the Invoice Type field and its visibility switch
-    const invoiceTypeField = generalInfoSection.getByRole("textbox", {
-      name: "Invoice Type",
-    });
-    const invoiceTypeVisibilitySwitch = generalInfoSection.getByRole("switch", {
-      name: "Show in PDF",
-    });
-
-    // Verify field and switch are visible and enabled
-    await expect(invoiceTypeField).toBeVisible();
-    await expect(invoiceTypeField).toBeEnabled();
-    await expect(invoiceTypeVisibilitySwitch).toBeVisible();
-    await expect(invoiceTypeVisibilitySwitch).toBeEnabled();
-
-    // Verify initial state (should be checked by default)
-    await expect(invoiceTypeVisibilitySwitch).toBeChecked();
-
-    // Test filling in the Invoice Type field
-    await invoiceTypeField.fill("Test Invoice Type");
-    await expect(invoiceTypeField).toHaveValue("Test Invoice Type");
-
-    // Test toggling the visibility switch
-    await invoiceTypeVisibilitySwitch.click();
-    await expect(invoiceTypeVisibilitySwitch).not.toBeChecked();
-
-    // Toggle it back
-    await invoiceTypeVisibilitySwitch.click();
-    await expect(invoiceTypeVisibilitySwitch).toBeChecked();
-
-    // Clear the field and verify it's empty
-    await invoiceTypeField.clear();
-    await expect(invoiceTypeField).toHaveValue("");
-
-    // Switch to Stripe template to verify field becomes hidden
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
-
-    await page.waitForURL("/?template=stripe");
-
-    // Verify Invoice Type field is now hidden
-    await expect(invoiceTypeField).toBeHidden();
-
-    // Switch back to default template
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("default");
-
-    // Verify field is visible again and data persists
-    await expect(invoiceTypeField).toBeVisible();
-    await expect(invoiceTypeField).toHaveValue(""); // Should be empty as we cleared it
-    await expect(invoiceTypeVisibilitySwitch).toBeVisible();
-    await expect(invoiceTypeVisibilitySwitch).toBeChecked(); // Should maintain its state
   });
 
   test("validates file types and shows error for invalid files", async ({
@@ -734,5 +528,454 @@ test.describe("Stripe Invoice Template", () => {
     await expect(
       generalInfoSection.getByAltText("Company logo preview"),
     ).toBeVisible();
+  });
+
+  test("Signature fields only appears for default template", async ({
+    page,
+  }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/?template=default");
+
+    const finalSection = page.getByTestId("final-section");
+
+    // Get the signature field switches
+    const personAuthorizedToReceiveSwitch = finalSection.getByRole("switch", {
+      name: 'Show "Person Authorized to Receive" Signature Field in the PDF',
+    });
+
+    const personAuthorizedToIssueSwitch = finalSection.getByRole("switch", {
+      name: 'Show "Person Authorized to Issue" Signature Field in the PDF',
+    });
+
+    // Verify both switches are visible and enabled
+    await expect(personAuthorizedToReceiveSwitch).toBeVisible();
+    await expect(personAuthorizedToReceiveSwitch).toBeEnabled();
+    await expect(personAuthorizedToIssueSwitch).toBeVisible();
+    await expect(personAuthorizedToIssueSwitch).toBeEnabled();
+
+    // Verify initial state (should be checked by default based on initial data)
+    await expect(personAuthorizedToReceiveSwitch).toBeChecked();
+    await expect(personAuthorizedToIssueSwitch).toBeChecked();
+
+    // Toggle the switches
+    await personAuthorizedToReceiveSwitch.click();
+    await personAuthorizedToIssueSwitch.click();
+
+    // Verify switches are now unchecked
+    await expect(personAuthorizedToReceiveSwitch).not.toBeChecked();
+    await expect(personAuthorizedToIssueSwitch).not.toBeChecked();
+
+    // Toggle them back
+    await personAuthorizedToReceiveSwitch.click();
+    await personAuthorizedToIssueSwitch.click();
+
+    // Verify switches are checked again
+    await expect(personAuthorizedToReceiveSwitch).toBeChecked();
+    await expect(personAuthorizedToIssueSwitch).toBeChecked();
+
+    // Switch to Stripe template to verify switches become hidden
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+
+    // Verify switches are now hidden
+    await expect(personAuthorizedToReceiveSwitch).toBeHidden();
+    await expect(personAuthorizedToIssueSwitch).toBeHidden();
+  });
+
+  test("Invoice Type field only appears for default template", async ({
+    page,
+  }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/?template=default");
+
+    const generalInfoSection = page.getByTestId("general-information-section");
+
+    // Get the Invoice Type field and its visibility switch
+    const invoiceTypeField = generalInfoSection.getByRole("textbox", {
+      name: "Invoice Type",
+    });
+    const invoiceTypeVisibilitySwitch = generalInfoSection.getByRole("switch", {
+      name: "Show in PDF",
+    });
+
+    // Verify field and switch are visible and enabled
+    await expect(invoiceTypeField).toBeVisible();
+    await expect(invoiceTypeField).toBeEnabled();
+    await expect(invoiceTypeVisibilitySwitch).toBeVisible();
+    await expect(invoiceTypeVisibilitySwitch).toBeEnabled();
+
+    // Verify initial state (should be checked by default)
+    await expect(invoiceTypeVisibilitySwitch).toBeChecked();
+
+    // Test filling in the Invoice Type field
+    await invoiceTypeField.fill("Test Invoice Type");
+    await expect(invoiceTypeField).toHaveValue("Test Invoice Type");
+
+    // Test toggling the visibility switch
+    await invoiceTypeVisibilitySwitch.click();
+    await expect(invoiceTypeVisibilitySwitch).not.toBeChecked();
+
+    // Toggle it back
+    await invoiceTypeVisibilitySwitch.click();
+    await expect(invoiceTypeVisibilitySwitch).toBeChecked();
+
+    // Clear the field and verify it's empty
+    await invoiceTypeField.clear();
+    await expect(invoiceTypeField).toHaveValue("");
+
+    // Switch to Stripe template to verify field becomes hidden
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+
+    // Verify Invoice Type field is now hidden
+    await expect(invoiceTypeField).toBeHidden();
+
+    // Switch back to default template
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("default");
+
+    // Verify field is visible again and data persists
+    await expect(invoiceTypeField).toBeVisible();
+    await expect(invoiceTypeField).toHaveValue(""); // Should be empty as we cleared it
+    await expect(invoiceTypeVisibilitySwitch).toBeVisible();
+    await expect(invoiceTypeVisibilitySwitch).toBeChecked(); // Should maintain its state
+  });
+
+  test("Invoice items fields and switches only appear for default template", async ({
+    page,
+  }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/?template=default");
+
+    const invoiceItemsSection = page.getByTestId("invoice-items-section");
+
+    // =============== GLOBAL SWITCHES TESTING ===============
+
+    // 1. Show Number Column switch
+    const showNumberColumnSwitch = invoiceItemsSection.getByRole("switch", {
+      name: 'Show "Number" Column in the Invoice Items Table',
+    });
+
+    await expect(showNumberColumnSwitch).toBeVisible();
+    await expect(showNumberColumnSwitch).toBeEnabled();
+    await expect(showNumberColumnSwitch).toBeChecked(); // Should be checked by default
+
+    // 2. Show VAT Table Summary switch
+    const showVatTableSummarySwitch = invoiceItemsSection.getByRole("switch", {
+      name: 'Show "VAT Table Summary" in the PDF',
+    });
+
+    await expect(showVatTableSummarySwitch).toBeVisible();
+    await expect(showVatTableSummarySwitch).toBeEnabled();
+    await expect(showVatTableSummarySwitch).toBeChecked(); // Should be checked by default
+
+    // =============== ITEM FIELD SWITCHES TESTING ===============
+
+    // Get all "Show in PDF" switches for individual fields (these are the ones that only show for first item)
+    const nameFieldSwitch = invoiceItemsSection
+      .getByRole("switch", { name: /Show in PDF/i })
+      .nth(0);
+    const typeOfGTUFieldSwitch = invoiceItemsSection
+      .getByRole("switch", { name: /Show in PDF/i })
+      .nth(1);
+    const amountFieldSwitch = invoiceItemsSection
+      .getByRole("switch", { name: /Show in PDF/i })
+      .nth(2);
+    const unitFieldSwitch = invoiceItemsSection
+      .getByRole("switch", { name: /Show in PDF/i })
+      .nth(3);
+    const netPriceFieldSwitch = invoiceItemsSection
+      .getByRole("switch", { name: /Show in PDF/i })
+      .nth(4);
+    const vatFieldSwitch = invoiceItemsSection
+      .getByRole("switch", { name: /Show in PDF/i })
+      .nth(5);
+    const netAmountFieldSwitch = invoiceItemsSection
+      .getByRole("switch", { name: /Show in PDF/i })
+      .nth(6);
+    const vatAmountFieldSwitch = invoiceItemsSection
+      .getByRole("switch", { name: /Show in PDF/i })
+      .nth(7);
+    const preTaxAmountFieldSwitch = invoiceItemsSection
+      .getByRole("switch", { name: /Show in PDF/i })
+      .nth(8);
+
+    // Verify all field switches are visible and enabled
+    const fieldSwitches = [
+      nameFieldSwitch,
+      typeOfGTUFieldSwitch,
+      amountFieldSwitch,
+      unitFieldSwitch,
+      netPriceFieldSwitch,
+      vatFieldSwitch,
+      netAmountFieldSwitch,
+      vatAmountFieldSwitch,
+      preTaxAmountFieldSwitch,
+    ] as const;
+
+    for (const switchElement of fieldSwitches) {
+      await expect(switchElement).toBeVisible();
+      await expect(switchElement).toBeEnabled();
+    }
+
+    // Check initial states (some switches should be checked by default, some not)
+    await expect(nameFieldSwitch).toBeChecked();
+    await expect(typeOfGTUFieldSwitch).not.toBeChecked(); // Type of GTU is not shown by default
+    await expect(amountFieldSwitch).toBeChecked();
+    await expect(unitFieldSwitch).toBeChecked();
+    await expect(netPriceFieldSwitch).toBeChecked();
+    await expect(vatFieldSwitch).toBeChecked();
+    await expect(netAmountFieldSwitch).toBeChecked();
+    await expect(vatAmountFieldSwitch).toBeChecked();
+    await expect(preTaxAmountFieldSwitch).toBeChecked();
+
+    // =============== TYPE OF GTU FIELD TESTING ===============
+
+    // Type of GTU field should be visible
+    const typeOfGTUField = invoiceItemsSection.getByRole("textbox", {
+      name: "Type of GTU",
+    });
+    await expect(typeOfGTUField).toBeVisible();
+
+    // =============== TOGGLE TESTING ===============
+
+    // Test toggling the global switches
+    await showNumberColumnSwitch.click();
+    await expect(showNumberColumnSwitch).not.toBeChecked();
+    await showNumberColumnSwitch.click();
+    await expect(showNumberColumnSwitch).toBeChecked();
+
+    await showVatTableSummarySwitch.click();
+    await expect(showVatTableSummarySwitch).not.toBeChecked();
+    await showVatTableSummarySwitch.click();
+    await expect(showVatTableSummarySwitch).toBeChecked();
+
+    // Test toggling some field switches
+    await typeOfGTUFieldSwitch.click();
+    await expect(typeOfGTUFieldSwitch).toBeChecked();
+    await typeOfGTUFieldSwitch.click();
+    await expect(typeOfGTUFieldSwitch).not.toBeChecked();
+
+    await nameFieldSwitch.click();
+    await expect(nameFieldSwitch).not.toBeChecked();
+    await nameFieldSwitch.click();
+    await expect(nameFieldSwitch).toBeChecked();
+
+    // =============== STRIPE TEMPLATE TESTING ===============
+
+    // Switch to Stripe template
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    // Wait for URL to be updated
+    await page.waitForURL("/?template=stripe");
+
+    // All switches and Type of GTU field should now be hidden
+    await expect(showNumberColumnSwitch).toBeHidden();
+    await expect(showVatTableSummarySwitch).toBeHidden();
+    await expect(typeOfGTUField).toBeHidden();
+
+    for (const switchElement of fieldSwitches) {
+      await expect(switchElement).toBeHidden();
+    }
+
+    // =============== BACK TO DEFAULT TEMPLATE TESTING ===============
+
+    // Switch back to default template
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("default");
+
+    // All switches and Type of GTU field should be visible again
+    await expect(showNumberColumnSwitch).toBeVisible();
+    await expect(showVatTableSummarySwitch).toBeVisible();
+    await expect(typeOfGTUField).toBeVisible();
+
+    for (const switchElement of fieldSwitches) {
+      await expect(switchElement).toBeVisible();
+    }
+
+    // Verify states are maintained after switching back
+    await expect(showNumberColumnSwitch).toBeChecked();
+    await expect(showVatTableSummarySwitch).toBeChecked();
+    await expect(nameFieldSwitch).toBeChecked();
+    await expect(typeOfGTUFieldSwitch).not.toBeChecked();
+  });
+
+  test("Payment Method field only appears for default template", async ({
+    page,
+  }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/?template=default");
+
+    const finalSection = page.getByTestId("final-section");
+
+    // Get the Payment Method field and its visibility switch
+    const paymentMethodField = finalSection.getByRole("textbox", {
+      name: "Payment Method",
+    });
+    const paymentMethodVisibilitySwitch = finalSection.getByTestId(
+      "paymentMethodFieldIsVisible",
+    );
+
+    // Verify field and switch are visible and enabled for default template
+    await expect(paymentMethodField).toBeVisible();
+    await expect(paymentMethodField).toBeEnabled();
+    await expect(paymentMethodVisibilitySwitch).toBeVisible();
+    await expect(paymentMethodVisibilitySwitch).toBeEnabled();
+
+    // Verify initial state (should be checked by default)
+    await expect(paymentMethodVisibilitySwitch).toBeChecked();
+
+    // Test filling in the Payment Method field
+    await paymentMethodField.fill("Bank Transfer");
+    await expect(paymentMethodField).toHaveValue("Bank Transfer");
+
+    // Test toggling the visibility switch
+    await paymentMethodVisibilitySwitch.click();
+    await expect(paymentMethodVisibilitySwitch).not.toBeChecked();
+
+    // Toggle it back
+    await paymentMethodVisibilitySwitch.click();
+    await expect(paymentMethodVisibilitySwitch).toBeChecked();
+
+    // Switch to Stripe template to verify field becomes hidden
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+
+    // Verify Payment Method field is now hidden
+    await expect(paymentMethodField).toBeHidden();
+    await expect(paymentMethodVisibilitySwitch).toBeHidden();
+
+    // Switch back to default template
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("default");
+
+    // Verify field is visible again and data persists
+    await expect(paymentMethodField).toBeVisible();
+    await expect(paymentMethodField).toHaveValue("Bank Transfer");
+    await expect(paymentMethodVisibilitySwitch).toBeVisible();
+    await expect(paymentMethodVisibilitySwitch).toBeChecked(); // Should maintain its state
+  });
+
+  test("automatically enables VAT field visibility and sets date format when switching to Stripe template", async ({
+    page,
+  }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/?template=default");
+
+    const invoiceItemsSection = page.getByTestId("invoice-items-section");
+
+    // Get the VAT field switch (5th "Show in PDF" switch)
+    const vatFieldSwitch = invoiceItemsSection
+      .getByRole("switch", { name: /Show in PDF/i })
+      .nth(5);
+
+    // Verify VAT switch is visible and checked by default
+    await expect(vatFieldSwitch).toBeVisible();
+    await expect(vatFieldSwitch).toBeEnabled();
+    await expect(vatFieldSwitch).toBeChecked();
+
+    // SCENARIO: User disables VAT field visibility in default template
+    await vatFieldSwitch.click();
+    await expect(vatFieldSwitch).not.toBeChecked();
+
+    // Set VAT to a numeric value to make Tax column potentially visible in Stripe
+    const vatInput = invoiceItemsSection.getByRole("textbox", {
+      name: "VAT",
+      exact: true,
+    });
+    await vatInput.clear();
+    await vatInput.fill("20");
+
+    // Wait a moment for form state to update
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
+
+    // Switch to Stripe template
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    // Wait for URL to be updated
+    await page.waitForURL("/?template=stripe");
+
+    // VAT field switch should now be hidden (since most switches are hidden in Stripe)
+    await expect(vatFieldSwitch).toBeHidden();
+
+    // BUT the VAT field visibility should be automatically enabled
+    // Let's verify this by checking the localStorage data
+    const storedData = (await page.evaluate((key) => {
+      return localStorage.getItem(key);
+    }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
+
+    expect(storedData).toBeTruthy();
+    const parsedData = JSON.parse(storedData) as InvoiceData;
+
+    // The VAT field should be automatically enabled for Stripe template
+    expect(parsedData.items[0].vatFieldIsVisible).toBe(true);
+
+    // The date format should be automatically set to Stripe default format
+    expect(parsedData.dateFormat).toBe(STRIPE_DEFAULT_DATE_FORMAT);
+
+    // Generate PDF to verify Tax column is visible
+    const downloadPromise = page.waitForEvent("download");
+    const downloadButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadButton).toBeVisible();
+    await downloadButton.click();
+
+    const download = await downloadPromise;
+    const suggestedFilename = download.suggestedFilename();
+    const tmpPath = path.join(downloadDir, suggestedFilename);
+    await download.saveAs(tmpPath);
+
+    // Read and verify PDF content
+    const dataBuffer = await fs.promises.readFile(tmpPath);
+    const pdfData = await pdf(dataBuffer);
+
+    // Verify that Tax column is visible in the Stripe template PDF
+    expect(pdfData.text).toContain("DescriptionQtyUnit PriceTaxAmount");
+    expect(pdfData.text).toContain("20%"); // The VAT percentage should be visible
+
+    // Switch back to default template
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("default");
+
+    // Wait for URL to be updated
+    await page.waitForURL("/?template=default");
+
+    // VAT switch should be visible again and should maintain the enabled state
+    await expect(vatFieldSwitch).toBeVisible();
+    await expect(vatFieldSwitch).toBeChecked(); // Should be re-enabled due to Stripe template logic
+
+    // Verify VAT input still has the numeric value
+    await expect(vatInput).toHaveValue("20");
+
+    // Verify that date format is restored to default template format
+    const finalStoredData = (await page.evaluate((key) => {
+      return localStorage.getItem(key);
+    }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
+
+    expect(finalStoredData).toBeTruthy();
+    const finalParsedData = JSON.parse(finalStoredData) as InvoiceData;
+
+    // The date format should be restored to default format
+    expect(finalParsedData.dateFormat).toBe(SUPPORTED_DATE_FORMATS[0]);
   });
 });

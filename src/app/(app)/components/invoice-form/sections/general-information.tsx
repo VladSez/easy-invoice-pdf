@@ -160,6 +160,9 @@ export const GeneralInformation = memo(function GeneralInformation({
     if (template === "stripe") {
       // Set date format to "MMMM D, YYYY" when template is Stripe
       setValue("dateFormat", STRIPE_DEFAULT_DATE_FORMAT);
+
+      // Always enable VAT field visibility for Stripe template
+      setValue("items.0.vatFieldIsVisible", true);
     } else {
       // Clear Stripe-specific fields when not using Stripe template
       if (errors.stripePayOnlineUrl) {

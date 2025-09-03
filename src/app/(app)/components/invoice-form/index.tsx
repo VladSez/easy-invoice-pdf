@@ -427,6 +427,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               currency={currency}
               language={language}
               append={append}
+              template={template}
             />
           </AccordionContent>
         </AccordionItem>
@@ -467,55 +468,58 @@ export const InvoiceForm = memo(function InvoiceForm({
           )}
         </div>
 
-        {/* Payment Method */}
-        <div>
-          <div className="relative mb-2 mt-6 flex items-center justify-between">
-            <Label htmlFor={`paymentMethod`} className="">
-              Payment Method
-            </Label>
+        {/* Payment Method (Only show for default template) */}
+        {template === "default" && (
+          <div>
+            <div className="relative mb-2 mt-6 flex items-center justify-between">
+              <Label htmlFor={`paymentMethod`} className="">
+                Payment Method
+              </Label>
 
-            {/* Show/hide Payment Method field in PDF switch */}
-            <div className="inline-flex items-center gap-2">
-              <Controller
-                name={`paymentMethodFieldIsVisible`}
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`paymentMethodFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                  />
-                )}
-              />
-              <CustomTooltip
-                trigger={
-                  <Label htmlFor={`paymentMethodFieldIsVisible`}>
-                    Show in PDF
-                  </Label>
-                }
-                content='Show/Hide the "Payment Method" Field in the PDF'
-              />
+              {/* Show/hide Payment Method field in PDF switch */}
+              <div className="inline-flex items-center gap-2">
+                <Controller
+                  name={`paymentMethodFieldIsVisible`}
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Switch
+                      {...field}
+                      id={`paymentMethodFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      data-testid="paymentMethodFieldIsVisible"
+                    />
+                  )}
+                />
+                <CustomTooltip
+                  trigger={
+                    <Label htmlFor={`paymentMethodFieldIsVisible`}>
+                      Show in PDF
+                    </Label>
+                  }
+                  content='Show/Hide the "Payment Method" Field in the PDF'
+                />
+              </div>
             </div>
-          </div>
 
-          <Controller
-            name="paymentMethod"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                id={`paymentMethod`}
-                type="text"
-                className="mt-1"
-              />
+            <Controller
+              name="paymentMethod"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  id={`paymentMethod`}
+                  type="text"
+                  className="mt-1"
+                />
+              )}
+            />
+            {errors.paymentMethod && (
+              <ErrorMessage>{errors.paymentMethod.message}</ErrorMessage>
             )}
-          />
-          {errors.paymentMethod && (
-            <ErrorMessage>{errors.paymentMethod.message}</ErrorMessage>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Payment Due */}
         <div>

@@ -40,6 +40,7 @@ interface InvoiceItemsSettingsProps {
   errors: FieldErrors<InvoiceData>;
   currency: SupportedCurrencies;
   language: SupportedLanguages;
+  template: InvoiceData["template"];
 }
 
 export const InvoiceItems = memo(function InvoiceItems({
@@ -50,52 +51,56 @@ export const InvoiceItems = memo(function InvoiceItems({
   currency,
   language,
   append,
+  template,
 }: InvoiceItemsSettingsProps) {
   return (
     <>
-      <div className="mb-3 space-y-4">
-        {/* Show Number column on PDF switch */}
-        <div className="relative flex items-center justify-between">
-          <Label htmlFor={`itemInvoiceItemNumberIsVisible0`}>
-            Show &quot;Number&quot; Column in the Invoice Items Table
-          </Label>
+      {/** we only want to show these settings for default template */}
+      {template === "default" && (
+        <div className="mb-3 space-y-4">
+          {/* Show Number column on PDF switch */}
+          <div className="relative flex items-center justify-between">
+            <Label htmlFor={`itemInvoiceItemNumberIsVisible0`}>
+              Show &quot;Number&quot; Column in the Invoice Items Table
+            </Label>
 
-          <Controller
-            name={`items.0.invoiceItemNumberIsVisible`}
-            control={control}
-            render={({ field: { value, onChange, ...field } }) => (
-              <Switch
-                {...field}
-                id={`itemInvoiceItemNumberIsVisible0`}
-                checked={value}
-                onCheckedChange={onChange}
-                className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-              />
-            )}
-          />
+            <Controller
+              name={`items.0.invoiceItemNumberIsVisible`}
+              control={control}
+              render={({ field: { value, onChange, ...field } }) => (
+                <Switch
+                  {...field}
+                  id={`itemInvoiceItemNumberIsVisible0`}
+                  checked={value}
+                  onCheckedChange={onChange}
+                  className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                />
+              )}
+            />
+          </div>
+
+          {/* Show VAT Table Summary in PDF switch */}
+          <div className="relative flex items-center justify-between">
+            <Label htmlFor={`vatTableSummaryIsVisible`}>
+              Show &quot;VAT Table Summary&quot; in the PDF
+            </Label>
+
+            <Controller
+              name={`vatTableSummaryIsVisible`}
+              control={control}
+              render={({ field: { value, onChange, ...field } }) => (
+                <Switch
+                  {...field}
+                  id={`vatTableSummaryIsVisible`}
+                  checked={value}
+                  onCheckedChange={onChange}
+                  className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                />
+              )}
+            />
+          </div>
         </div>
-
-        {/* Show VAT Table Summary in PDF switch */}
-        <div className="relative flex items-center justify-between">
-          <Label htmlFor={`vatTableSummaryIsVisible`}>
-            Show &quot;VAT Table Summary&quot; in the PDF
-          </Label>
-
-          <Controller
-            name={`vatTableSummaryIsVisible`}
-            control={control}
-            render={({ field: { value, onChange, ...field } }) => (
-              <Switch
-                {...field}
-                id={`vatTableSummaryIsVisible`}
-                checked={value}
-                onCheckedChange={onChange}
-                className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-              />
-            )}
-          />
-        </div>
-      </div>
+      )}
       {fields.map((field, index) => {
         const isNotFirstItem = index > 0;
         const isFirstItem = index === 0;
@@ -142,8 +147,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                     Name
                   </Label>
 
-                  {/* Show/hide Name field in PDF switch */}
-                  {isFirstItem ? (
+                  {/* Show/hide Name field in PDF switch (Only show for default template) */}
+                  {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
                         name={`items.${index}.nameFieldIsVisible`}
@@ -190,62 +195,66 @@ export const InvoiceItems = memo(function InvoiceItems({
                 )}
               </div>
 
-              {/* Invoice Item Type of GTU */}
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <Label htmlFor={`itemTypeOfGTU${index}`} className="">
-                    Type of GTU
-                  </Label>
+              {/* Invoice Item Type of GTU - Only show for default template */}
+              {template === "default" && (
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <Label htmlFor={`itemTypeOfGTU${index}`} className="">
+                      Type of GTU
+                    </Label>
 
-                  {/* Show/hide Type of GTU field in PDF switch */}
-                  {isFirstItem ? (
-                    <div className="inline-flex items-center gap-2">
-                      <Controller
-                        name={`items.${index}.typeOfGTUFieldIsVisible`}
-                        control={control}
-                        render={({ field: { value, onChange, ...field } }) => (
-                          <Switch
-                            {...field}
-                            id={`itemTypeOfGTUFieldIsVisible${index}`}
-                            checked={value}
-                            onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                          />
-                        )}
-                      />
-                      <CustomTooltip
-                        trigger={
-                          <Label
-                            htmlFor={`itemTypeOfGTUFieldIsVisible${index}`}
-                          >
-                            Show in PDF
-                          </Label>
-                        }
-                        content='Show/hide the "Type of GTU" Column in the PDF'
-                      />
-                    </div>
-                  ) : null}
-                </div>
+                    {/* Show/hide Type of GTU field in PDF switch */}
+                    {isFirstItem ? (
+                      <div className="inline-flex items-center gap-2">
+                        <Controller
+                          name={`items.${index}.typeOfGTUFieldIsVisible`}
+                          control={control}
+                          render={({
+                            field: { value, onChange, ...field },
+                          }) => (
+                            <Switch
+                              {...field}
+                              id={`itemTypeOfGTUFieldIsVisible${index}`}
+                              checked={value}
+                              onCheckedChange={onChange}
+                              className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            />
+                          )}
+                        />
+                        <CustomTooltip
+                          trigger={
+                            <Label
+                              htmlFor={`itemTypeOfGTUFieldIsVisible${index}`}
+                            >
+                              Show in PDF
+                            </Label>
+                          }
+                          content='Show/hide the "Type of GTU" Column in the PDF'
+                        />
+                      </div>
+                    ) : null}
+                  </div>
 
-                {/* Type of GTU input */}
-                <Controller
-                  name={`items.${index}.typeOfGTU`}
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id={`itemTypeOfGTU${index}`}
-                      className=""
-                      type="text"
-                    />
+                  {/* Type of GTU input */}
+                  <Controller
+                    name={`items.${index}.typeOfGTU`}
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        id={`itemTypeOfGTU${index}`}
+                        className=""
+                        type="text"
+                      />
+                    )}
+                  />
+                  {errors.items?.[index]?.typeOfGTU && (
+                    <ErrorMessage>
+                      {errors.items[index]?.typeOfGTU?.message}
+                    </ErrorMessage>
                   )}
-                />
-                {errors.items?.[index]?.typeOfGTU && (
-                  <ErrorMessage>
-                    {errors.items[index]?.typeOfGTU?.message}
-                  </ErrorMessage>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Invoice Item Amount */}
               <div>
@@ -254,8 +263,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                     Amount (Quantity)
                   </Label>
 
-                  {/* Show/hide Amount field in PDF switch */}
-                  {isFirstItem ? (
+                  {/* Show/hide Amount field in PDF switch (Only show for default template) */}
+                  {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
                         name={`items.${index}.amountFieldIsVisible`}
@@ -327,8 +336,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                     Unit
                   </Label>
 
-                  {/* Show/hide Unit field in PDF switch */}
-                  {isFirstItem ? (
+                  {/* Show/hide Unit field in PDF switch (Only show for default template) */}
+                  {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
                         name={`items.${index}.unitFieldIsVisible`}
@@ -377,8 +386,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                     Net Price (Rate or Unit Price)
                   </Label>
 
-                  {/* Show/hide Net Price field in PDF switch */}
-                  {isFirstItem ? (
+                  {/* Show/hide Net Price field in PDF switch (Only show for default template) */}
+                  {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
                         name={`items.${index}.netPriceFieldIsVisible`}
@@ -462,14 +471,14 @@ export const InvoiceItems = memo(function InvoiceItems({
               </div>
 
               {/* Invoice Item VAT */}
-              <div>
+              <div data-testid={`itemVat${index}`}>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemVat${index}`} className="">
                     VAT
                   </Label>
 
-                  {/* Show/hide VAT field in PDF switch */}
-                  {isFirstItem ? (
+                  {/* Show/hide VAT field in PDF switch (Only show for default template) */}
+                  {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
                         name={`items.${index}.vatFieldIsVisible`}
@@ -514,7 +523,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                   <ErrorMessage>{errors.items[index].vat.message}</ErrorMessage>
                 ) : (
                   <InputHelperMessage>
-                    Enter NP, OO or percentage value (0-100)
+                    Enter &quot;NP&quot; (not applicable), &quot;OO&quot; (out
+                    of scope), or a percentage value (0-100)
                   </InputHelperMessage>
                 )}
               </div>
@@ -526,8 +536,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                     Net Amount
                   </Label>
 
-                  {/* Show/hide Net Amount field in PDF switch */}
-                  {isFirstItem ? (
+                  {/* Show/hide Net Amount field in PDF switch (Only show for default template) */}
+                  {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
                         name={`items.${index}.netAmountFieldIsVisible`}
@@ -594,8 +604,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                     VAT Amount
                   </Label>
 
-                  {/* Show/hide VAT Amount field in PDF switch */}
-                  {isFirstItem ? (
+                  {/* Show/hide VAT Amount field in PDF switch (Only show for default template) */}
+                  {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
                         name={`items.${index}.vatAmountFieldIsVisible`}
@@ -662,8 +672,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                     Pre-tax Amount
                   </Label>
 
-                  {/* Show/hide Pre-tax Amount field in PDF switch */}
-                  {isFirstItem ? (
+                  {/* Show/hide Pre-tax Amount field in PDF switch (Only show for default template) */}
+                  {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
                         name={`items.${index}.preTaxAmountFieldIsVisible`}
