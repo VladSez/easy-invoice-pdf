@@ -985,7 +985,9 @@ test.describe("Invoice Generator Page", () => {
 
     await vatInput.fill("abc");
     await expect(
-      page.getByText("Must be a valid number (0-100) or NP or OO"),
+      page.getByText(
+        `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
+      ),
     ).toBeVisible();
 
     // Try valid values
@@ -994,12 +996,16 @@ test.describe("Invoice Generator Page", () => {
 
     await vatInput.fill("NP");
     await expect(
-      page.getByText("Must be a valid number (0-100) or NP or OO"),
+      page.getByText(
+        `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
+      ),
     ).toBeHidden();
 
     await vatInput.fill("OO");
     await expect(
-      page.getByText("Must be a valid number (0-100) or NP or OO"),
+      page.getByText(
+        `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
+      ),
     ).toBeHidden();
   });
 
