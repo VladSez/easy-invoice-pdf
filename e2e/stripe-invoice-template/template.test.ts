@@ -559,18 +559,16 @@ test.describe("Stripe Invoice Template", () => {
 
     // Toggle the switches
     await personAuthorizedToReceiveSwitch.click();
-    await personAuthorizedToIssueSwitch.click();
-
-    // Verify switches are now unchecked
     await expect(personAuthorizedToReceiveSwitch).not.toBeChecked();
+
+    await personAuthorizedToIssueSwitch.click();
     await expect(personAuthorizedToIssueSwitch).not.toBeChecked();
 
     // Toggle them back
     await personAuthorizedToReceiveSwitch.click();
-    await personAuthorizedToIssueSwitch.click();
-
-    // Verify switches are checked again
     await expect(personAuthorizedToReceiveSwitch).toBeChecked();
+
+    await personAuthorizedToIssueSwitch.click();
     await expect(personAuthorizedToIssueSwitch).toBeChecked();
 
     // Switch to Stripe template to verify switches become hidden
