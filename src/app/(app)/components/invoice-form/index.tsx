@@ -663,7 +663,6 @@ export const InvoiceForm = memo(function InvoiceForm({
                       checked={value}
                       onCheckedChange={onChange}
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                      data-testid="personAuthorizedToReceiveFieldIsVisible"
                     />
                   )}
                 />
@@ -686,7 +685,6 @@ export const InvoiceForm = memo(function InvoiceForm({
                       checked={value}
                       onCheckedChange={onChange}
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                      data-testid="personAuthorizedToIssueFieldIsVisible"
                     />
                   )}
                 />
