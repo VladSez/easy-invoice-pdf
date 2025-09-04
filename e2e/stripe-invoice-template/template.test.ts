@@ -559,6 +559,10 @@ test.describe("Stripe Invoice Template", () => {
 
     // Toggle the switches
     await personAuthorizedToReceiveSwitch.click();
+
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
+
     await personAuthorizedToIssueSwitch.click();
 
     // Verify switches are now unchecked
@@ -567,6 +571,9 @@ test.describe("Stripe Invoice Template", () => {
 
     // Toggle them back
     await personAuthorizedToReceiveSwitch.click();
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
+
     await personAuthorizedToIssueSwitch.click();
 
     // Verify switches are checked again
