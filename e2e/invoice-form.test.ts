@@ -433,6 +433,15 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(5),
     ).toBeChecked();
 
+    // Verify VAT helper text is displayed
+    await expect(
+      invoiceItemsSection
+        .getByTestId(`itemVat0`)
+        .getByText(
+          'Enter "NP" (not applicable), "OO" (out of scope), or a percentage value (0-100)',
+        ),
+    ).toBeVisible();
+
     // Net Amount field (read-only) and visibility toggle
     await expect(
       invoiceItemsSection.getByRole("textbox", {
@@ -976,7 +985,9 @@ test.describe("Invoice Generator Page", () => {
 
     await vatInput.fill("abc");
     await expect(
-      page.getByText("Must be a valid number (0-100) or NP or OO"),
+      page.getByText(
+        `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
+      ),
     ).toBeVisible();
 
     // Try valid values
@@ -985,12 +996,16 @@ test.describe("Invoice Generator Page", () => {
 
     await vatInput.fill("NP");
     await expect(
-      page.getByText("Must be a valid number (0-100) or NP or OO"),
+      page.getByText(
+        `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
+      ),
     ).toBeHidden();
 
     await vatInput.fill("OO");
     await expect(
-      page.getByText("Must be a valid number (0-100) or NP or OO"),
+      page.getByText(
+        `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
+      ),
     ).toBeHidden();
   });
 

@@ -255,10 +255,10 @@ export const invoiceItemSchema = z
       z
         .any()
         .refine((val) => val !== "", {
-          message: "VAT is required (0-100 or NP or OO)",
+          message: `VAT is required. Enter a percentage (0-100), "NP" (not applicable), or "OO" (out of scope)`,
         })
         .refine((val) => !isNaN(Number(val)), {
-          message: "Must be a valid number (0-100) or NP or OO",
+          message: `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
         })
         .transform(Number)
         .refine((val) => val >= 0 && val <= 100, {
