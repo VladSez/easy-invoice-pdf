@@ -7,10 +7,14 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 
-import { type WebSite, type WithContext } from "schema-dts";
 import { Toaster } from "sonner";
 
 import { STATIC_ASSETS_URL } from "@/config";
+import {
+  BREADCRUMB_JSONLD,
+  SITE_NAVIGATION_JSONLD,
+  WEBSITE_JSONLD,
+} from "./constants/seo";
 
 import "./globals.css";
 
@@ -52,49 +56,6 @@ export const metadata: Metadata = {
         sizes: "180x180",
       },
     ],
-  },
-};
-
-const JSONLD: WithContext<WebSite> = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  url: "https://easyinvoicepdf.com/",
-  name: "EasyInvoicePDF.com | Free Invoice Generator – Live Preview, No Sign-Up",
-  description:
-    "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
-  keywords: [
-    "invoice",
-    "invoice generator",
-    "invoice generating",
-    "invoice app",
-    "invoice generator app",
-    "free invoice generator",
-  ],
-  image: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
-  mainEntityOfPage: {
-    "@type": "SoftwareApplication",
-    "@id": `https://easyinvoicepdf.com/`,
-    name: "EasyInvoicePDF.com | Free Invoice Generator – Live Preview, No Sign-Up",
-    description:
-      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
-    featureList: [
-      "Live preview invoice generation",
-      "No sign-up required",
-      "Free and open-source",
-      "Customizable templates",
-      "Instant PDF download",
-      "Support for multiple languages and currencies",
-      "European VAT support",
-      "Secure shareable invoice links",
-      "Offline support",
-    ],
-    operatingSystem: "All",
-    applicationCategory: "BusinessApplication",
-  },
-  author: {
-    "@type": "Person",
-    name: "Uladzislau Sazonau",
-    url: "https://vladsazon.com",
   },
 };
 
@@ -141,9 +102,25 @@ export default async function RootLayout({
               </>
             )}
             <script
-              id="json-ld"
+              id="website-json-ld"
               type="application/ld+json"
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(JSONLD) }}
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(WEBSITE_JSONLD),
+              }}
+            />
+            <script
+              id="breadcrumb-json-ld"
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(BREADCRUMB_JSONLD),
+              }}
+            />
+            <script
+              id="site-navigation-json-ld"
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(SITE_NAVIGATION_JSONLD),
+              }}
             />
           </NextIntlClientProvider>
         </DeviceContextProvider>
