@@ -2,6 +2,8 @@
 
 > Free & Open-Source Invoice Generator. Create professional invoices instantly in your browser with **live preview**, **multiple templates**, and **no sign-up required**. **[Try it now → easyinvoicepdf.com](https://easyinvoicepdf.com)**
 
+**🌐 [Discover more features and use cases → easyinvoicepdf.com/en/about](https://easyinvoicepdf.com/en/about)**
+
 ## Features
 
 - ⚡ **Live Preview**: See changes in real-time as you type
