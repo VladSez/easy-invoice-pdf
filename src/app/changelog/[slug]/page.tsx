@@ -132,7 +132,7 @@ export default async function ChangelogEntryPage({
                 data-testid="author-info-img"
               >
                 <Link
-                  href="https://x.com/vlad_sazon"
+                  href="https://dub.sh/vldszn-x.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group"
@@ -146,14 +146,19 @@ export default async function ChangelogEntryPage({
                     decoding="async"
                     className="rounded-full blur-0 transition-all group-hover:brightness-95"
                     src={
-                      "https://pbs.twimg.com/profile_images/1927695477971030016/Dwloje_P_400x400.jpg"
+                      "https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459"
                     }
                   />
                 </Link>
                 <div className="flex flex-col" data-testid="author-info-text">
-                  <span className="text-sm font-medium text-neutral-800 dark:text-neutral-300">
+                  <Link
+                    href="https://dub.sh/vldszn-x.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-neutral-800 no-underline hover:underline hover:underline-offset-2 dark:text-neutral-300"
+                  >
                     Vlad Sazonau
-                  </span>
+                  </Link>
                   <span className="text-sm text-slate-500 dark:text-neutral-400">
                     Founder,{" "}
                     <Link
