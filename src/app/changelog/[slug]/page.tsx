@@ -13,6 +13,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { DateTime } from "../components/date-time";
 import { BlackGoToAppButton } from "@/components/go-to-app-button-cta";
+import * as Sentry from "@sentry/nextjs";
 
 interface ChangelogPageProps {
   params: Promise<{ slug: string }>;
@@ -34,7 +35,36 @@ export async function generateMetadata({
   const entry = await getChangelogEntry(slug);
 
   if (!entry) {
-    throw new Error(`Changelog entry not found for slug: ${slug}`);
+    Sentry.captureEvent({
+      message: `Changelog entry not found for slug: ${slug}`,
+      level: "error",
+    });
+
+    return {
+      title:
+        "Changelog | EasyInvoicePDF - Free & Open-Source Invoice Generator",
+      description:
+        "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
+      authors: [{ name: "Vlad Sazonau", url: "https://x.com/vlad_sazon" }],
+      alternates: {
+        canonical: `https://easyinvoicepdf.com/changelog/${slug}`,
+      },
+      openGraph: {
+        title:
+          "Changelog | EasyInvoicePDF - Free & Open-Source Invoice Generator",
+        description:
+          "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
+        type: "website",
+        locale: "en_US",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Changelog | Free Invoice Generator – Live Preview, No Sign-Up",
+        description:
+          "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
+        creator: "@vlad_sazon",
+      },
+    };
   }
 
   const formattedDate = formatChangelogDate(entry.metadata.date);
@@ -86,6 +116,11 @@ export default async function ChangelogEntryPage({
   const entry = await getChangelogEntry(slug);
 
   if (!entry) {
+    Sentry.captureEvent({
+      message: `Changelog entry not found for slug: ${slug}`,
+      level: "error",
+    });
+
     notFound();
   }
 
