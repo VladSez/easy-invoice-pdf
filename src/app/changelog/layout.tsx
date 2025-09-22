@@ -13,7 +13,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = {
   title: "Changelog  | EasyInvoicePDF - Free & Open-Source Invoice Generator",
   description:
-    "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
+    "Explore the latest updates, new features, and improvements to EasyInvoicePDF.com - the free, open-source invoice generator. Track our development progress and upcoming features.",
   keywords: [
     "changelog",
     "updates",
@@ -30,6 +30,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://easyinvoicepdf.com/changelog",
   },
+
   robots: {
     index: true,
     follow: true,
@@ -62,7 +63,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Changelog | Free Invoice Generator – Live Preview, No Sign-Up",
     description:
-      "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
+      "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.com",
     creator: "@vlad_sazon",
     images: [
       {
@@ -89,7 +90,7 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
       <Footer
         translations={{
           footerDescription:
-            "A free, open-source tool for creating professional invoices with real-time preview.",
+            "Create professional invoices in seconds with our free & open-source invoice maker. 100% in-browser, no sign-up required. Includes live PDF preview and a Stripe-style template - perfect for freelancers, startups, and small businesses.",
           footerCreatedBy: "Created by",
           product: "Product",
 
@@ -106,7 +107,7 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
           <ul className="space-y-2">
             <li>
               <Link
-                href="/"
+                href="/?template=default"
                 className="text-sm text-slate-500 hover:text-slate-900"
               >
                 App

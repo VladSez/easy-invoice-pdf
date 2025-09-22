@@ -78,7 +78,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/"
+                  href="/?template=default"
                   className="text-sm text-slate-500 hover:text-slate-900"
                 >
                   {t("buttons.app")}

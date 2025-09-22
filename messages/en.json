@@ -45,7 +45,7 @@
       "noSignup": "No sign-up required. 100% free and open-source."
     },
     "footer": {
-      "description": "A free, open-source tool for creating professional invoices with real-time preview.",
+      "description": "Create professional invoices in seconds with our free & open-source invoice maker. 100% in-browser, no sign-up required. Includes live PDF preview and a Stripe-style template - perfect for freelancers, startups, and small businesses.",
       "product": "Product",
       "links": {
         "features": "Features",
@@ -74,7 +74,7 @@
   },
   "Metadata": {
     "about": {
-      "title": "About | Free Invoice Generator – Live Preview, No Sign-Up",
+      "title": "Free Invoice Generator - No Sign-Up | EasyInvoicePDF.com",
       "description": "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
       "keywords": "invoice tool, free invoice generator, PDF invoices, invoice creator, billing software",
       "siteName": "EasyInvoicePDF.com | Free Invoice Generator"

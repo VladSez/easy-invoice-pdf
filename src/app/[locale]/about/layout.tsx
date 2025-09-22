@@ -25,6 +25,8 @@ export async function generateMetadata({
       alternates: {
         canonical: `${APP_URL}/${params.locale}/about`,
         languages: {
+          // @ts-expect-error - x-default is not a valid locale
+          "x-default": `${APP_URL}/en/about`,
           en: `${APP_URL}/en/about`,
           pl: `${APP_URL}/pl/about`,
           de: `${APP_URL}/de/about`,

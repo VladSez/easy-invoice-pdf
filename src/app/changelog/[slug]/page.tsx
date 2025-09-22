@@ -76,12 +76,23 @@ export async function generateMetadata({
     alternates: {
       canonical: `https://easyinvoicepdf.com/changelog/${slug}`,
     },
+    keywords: [
+      "changelog",
+      "updates",
+      "releases",
+      "features",
+      "bug fixes",
+      "pdf invoice generator",
+      "easyinvoicepdf",
+      "easy invoice pdf changelog",
+    ],
     openGraph: {
       title: `${entry.metadata.title || `Update ${formattedDate}`}`,
       description: entry.metadata.description,
       type: "article",
       publishedTime: entry.metadata.date,
       siteName: "EasyInvoicePDF.com",
+      locale: "en_US",
       images: [
         {
           url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
@@ -197,7 +208,7 @@ export default async function ChangelogEntryPage({
                   <span className="text-sm text-slate-500 dark:text-neutral-400">
                     Founder,{" "}
                     <Link
-                      href="/"
+                      href="/?template=default"
                       className="text-slate-500 no-underline hover:underline hover:underline-offset-2 dark:text-neutral-400"
                     >
                       {" "}
