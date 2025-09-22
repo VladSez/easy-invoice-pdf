@@ -14,7 +14,7 @@ test.describe("About page", () => {
     await expect(page).toHaveURL("/en/about");
 
     await expect(page).toHaveTitle(
-      "About | Free Invoice Generator – Live Preview, No Sign-Up",
+      "Free Invoice Generator - No Sign-Up | EasyInvoicePDF.com",
     );
 
     const header = page.getByRole("banner");
@@ -25,6 +25,7 @@ test.describe("About page", () => {
       exact: true,
     });
     await expect(goToAppButton).toBeVisible();
+    await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
 
     // Check Hero section
     const heroSection = page.locator("#hero");
@@ -200,7 +201,7 @@ test.describe("About page", () => {
     const appLink = footerLinks.getByRole("link", { name: "App" });
 
     await expect(appLink).toBeVisible();
-    await expect(appLink).toHaveAttribute("href", "/");
+    await expect(appLink).toHaveAttribute("href", "/?template=default");
     await expect(appLink).not.toHaveAttribute("target", "_blank");
 
     const featuresLink = footerLinks.getByRole("link", {
@@ -358,7 +359,7 @@ test.describe("About page", () => {
     });
 
     await expect(appLink).toBeVisible();
-    await expect(appLink).toHaveAttribute("href", "/");
+    await expect(appLink).toHaveAttribute("href", "/?template=default");
     await expect(appLink).not.toHaveAttribute("target", "_blank");
 
     const featuresLink = footerLinks.getByRole("link", {
@@ -492,6 +493,6 @@ test.describe("About page", () => {
     });
 
     await headerGoToAppButton.click();
-    await expect(page).toHaveURL("/");
+    await expect(page).toHaveURL("/?template=default");
   });
 });

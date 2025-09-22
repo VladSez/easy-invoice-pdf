@@ -74,7 +74,7 @@ export default async function ConfirmSubscriptionPage({
         <Text>
           <b>Ready to create your first invoice?</b>{" "}
           <Link
-            href="/"
+            href="/?template=default"
             className="inline-flex items-center font-medium text-emerald-600 underline underline-offset-4 transition-opacity hover:opacity-80"
           >
             Go to the app

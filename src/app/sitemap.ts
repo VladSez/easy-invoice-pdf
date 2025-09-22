@@ -11,7 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const sitemapEntries: MetadataRoute.Sitemap = [
     // Main app page (non-shared version)
     {
-      url: `${APP_URL}`,
+      url: `${APP_URL}?template=default`,
       lastModified,
       changeFrequency: "daily",
       priority: 0.7,

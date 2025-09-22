@@ -538,7 +538,7 @@ export function AppPageClient() {
       <Footer
         translations={{
           footerDescription:
-            "A free, open-source tool for creating professional invoices with real-time preview.",
+            "Create professional invoices in seconds with our free & open-source invoice maker. 100% in-browser, no sign-up required. Includes live PDF preview and a Stripe-style template - perfect for freelancers, startups, and small businesses.",
           footerCreatedBy: "Created by",
           product: "Product",
 
