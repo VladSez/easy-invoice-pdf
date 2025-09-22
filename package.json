@@ -2,7 +2,7 @@
   "name": "pdf-invoice-generator",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.14.0",
+  "packageManager": "pnpm@10.17.0+sha512.fce8a3dd29a4ed2ec566fb53efbb04d8c44a0f05bc6f24a73046910fb9c3ce7afa35a0980500668fa3573345bd644644fa98338fa168235c80f4aa17aa17fbef",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -16,7 +16,7 @@
     "lint:fix": "pnpm eslint . --fix",
     "prettify": "prettier --write --cache '**/*.{ts?(x),json,js,mjs,yml,yaml,md}'",
     "knip": "knip",
-    "update-deps": "pnpm upgrade --interactive --latest",
+    "update-deps": "pnpm upgrade --interactive --latest -rLi --config.minimum-release-age=4320",
     "vitest": "vitest --reporter=verbose",
     "vitest:ui": "vitest --ui",
     "e2e": "pnpm exec playwright test --reporter=list",
@@ -26,7 +26,9 @@
     "check-meta": "pnpx check-site-meta",
     "dev:email": "email dev --dir src/emails",
     "prepare": "husky",
-    "expose-to-internet": "pnpm dlx localtunnel --port 3000"
+    "expose-to-internet": "pnpm dlx localtunnel --port 3000",
+    "corepack:enable": "corepack enable",
+    "corepack:prepare": "corepack prepare pnpm@latest"
   },
   "dependencies": {
     "@hookform/resolvers": "3.9.0",

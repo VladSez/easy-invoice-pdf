@@ -47,7 +47,7 @@ const config: Config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        heartbeat: "heartbeat 3s ease-in-out infinite 25s", // 3s = duration of animation, infinite = repeat forever, 25s = delay before starting animation
+        heartbeat: "heartbeat 3s ease-in-out infinite 5s", // 3s = duration of animation, infinite = repeat forever, 25s = delay before starting animation
       },
     },
   },
