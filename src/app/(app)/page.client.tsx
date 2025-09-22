@@ -425,7 +425,7 @@ export function AppPageClient() {
               <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
                 <Button
                   asChild
-                  className="mx-2 w-full bg-blue-500 text-white transition-all hover:no-underline hover:opacity-90 lg:mx-0 lg:w-auto"
+                  className="mx-2 w-full bg-blue-600 text-white transition-all hover:bg-blue-700 hover:no-underline lg:mx-0 lg:w-auto"
                   _variant="link"
                   onClick={() => {
                     // analytics track event

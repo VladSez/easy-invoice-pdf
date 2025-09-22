@@ -150,6 +150,7 @@ export function DevLocalStorageView() {
             _variant="outline"
             className="fixed bottom-2 left-2 isolate z-[50] border border-gray-300 bg-gray-100 shadow-sm backdrop-blur-sm transition-all duration-200 animate-in fade-in slide-in-from-bottom-2 hover:border-gray-400 hover:bg-gray-200 hover:shadow-md"
           >
+            <span className="sr-only">View localStorage data</span>
             <Database className="h-4 w-4 text-gray-600" />
           </Button>
         }

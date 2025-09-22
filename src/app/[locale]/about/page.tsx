@@ -200,20 +200,22 @@ function HeroSection() {
       </div>
 
       <div className="container relative z-10 px-4 md:px-6">
-        <div className="grid gap-6 md:gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-6">
+        <div className="grid gap-6 md:gap-8 lg:gap-12 xl:grid-cols-2 xl:gap-6">
           {/* Left column (text) */}
           <div className="flex flex-col justify-center space-y-5 md:space-y-6">
             <div className="space-y-3 md:space-y-4">
-              <h1 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl md:text-5xl lg:text-6xl">
+              <h1 className="text-balance text-center text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl md:text-6xl xl:text-left">
                 {t("hero.title")}
               </h1>
 
-              <p className="text-balance text-base text-slate-600 sm:text-lg md:max-w-[500px] md:text-xl">
-                {t("hero.description")}
-              </p>
+              <div className="flex justify-center xl:justify-start">
+                <p className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
+                  {t("hero.description")}
+                </p>
+              </div>
             </div>
 
-            <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="flex w-full flex-col justify-center gap-3 sm:flex-row sm:flex-wrap xl:justify-start">
               <BlackGoToAppButton className="px-10 py-6 text-lg">
                 {t("buttons.goToApp")}
               </BlackGoToAppButton>
@@ -238,7 +240,7 @@ function HeroSection() {
           </div>
 
           {/* Right column (video) */}
-          <div className="relative mx-auto w-full max-w-[650px] lg:mx-0">
+          <div className="relative mx-auto w-full max-w-[950px] xl:mx-0">
             {/* Mac OS Frame around the video */}
             <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
               {/* Browser chrome bar */}
@@ -277,7 +279,7 @@ function CtaTextMobile({
 }) {
   return (
     <div
-      className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 lg:hidden"
+      className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 xl:hidden"
       data-testid="cta-text-mobile"
     >
       <span className="" role="img" aria-label="checkmark">
@@ -296,7 +298,7 @@ function CtaTextDesktop({
 }) {
   return (
     <div
-      className="mx-auto hidden max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0 lg:flex"
+      className="mx-auto hidden max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0 xl:flex"
       data-testid="cta-text-desktop"
     >
       <span className="" role="img" aria-label="checkmark">
