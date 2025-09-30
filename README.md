@@ -72,10 +72,3 @@ This project is dual-licensed:
 - **Commercial license** (for proprietary use): contact [vlad@mail.easyinvoicepdf.com](mailto:vlad@mail.easyinvoicepdf.com)
 
 By using this software, you agree to the terms of the applicable license.
-
-## GitAds Sponsored
-
-<!-- GitAds-Verify: JHXPD28PWARXHPOAHBA7ZTVRIFBKGZPE -->
-
-Ads help support this project 🙏
-[![Sponsored by GitAds](https://gitads.dev/v1/ad-serve?source=vladsez/easy-invoice-pdf@github)](https://gitads.dev/v1/ad-track?source=vladsez/easy-invoice-pdf@github)

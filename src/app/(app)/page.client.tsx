@@ -309,14 +309,14 @@ export function AppPageClient() {
           id: "default-donation-toast-client-page",
           title: "Love this project?",
           description:
-            "Help me keep building amazing tools! Your support means the world to me. ✨",
+            "Help me keep this free tool running! Your support enables me to add new features and maintain the service. 🙏",
           showDonationButton: false,
         });
       }
     };
 
-    // Show cta toast after 50 seconds on the app page
-    const initialTimer = setTimeout(showCTAToast, 50_000);
+    // Show cta toast after 25 seconds on the app page
+    const initialTimer = setTimeout(showCTAToast, 25_000);
 
     return () => {
       clearTimeout(initialTimer);
