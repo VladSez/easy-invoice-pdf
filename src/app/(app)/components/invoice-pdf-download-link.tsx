@@ -106,7 +106,7 @@ export function InvoicePDFDownloadLink({
         // close all other toasts (if any)
         toast.dismiss();
 
-        // Randomly show either default or premium donation toast after 3 seconds
+        // Randomly show either default or premium donation toast after 2.5 seconds
         setTimeout(() => {
           if (Math.random() <= 0.5) {
             customPremiumToast({
@@ -123,7 +123,7 @@ export function InvoicePDFDownloadLink({
                 "Help me keep building amazing tools! Your support means the world to me. ✨",
             });
           }
-        }, 3000);
+        }, 2500);
       }
     },
     [

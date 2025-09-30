@@ -29,7 +29,7 @@ import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
 import * as Sentry from "@sentry/nextjs";
-import { AlertCircleIcon } from "lucide-react";
+import { AlertCircleIcon, HeartIcon } from "lucide-react";
 import {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,
@@ -294,27 +294,6 @@ export function AppPageClient() {
       return;
     }
 
-    const showCTAToast = () => {
-      // Randomly show either default or premium donation toast
-      if (Math.random() <= 0.5) {
-        customPremiumToast({
-          id: "premium-donation-toast-client-page",
-          title: "Support My Work",
-          description:
-            "Your contribution helps me maintain and improve this project for everyone! 🚀",
-          showDonationButton: false,
-        });
-      } else {
-        customDefaultToast({
-          id: "default-donation-toast-client-page",
-          title: "Love this project?",
-          description:
-            "Help me keep this free tool running! Your support enables me to add new features and maintain the service. 🙏",
-          showDonationButton: false,
-        });
-      }
-    };
-
     // Show cta toast after 25 seconds on the app page
     const initialTimer = setTimeout(showCTAToast, 25_000);
 
@@ -387,6 +366,11 @@ export function AppPageClient() {
             "Share this link to let others view and edit this invoice",
         });
 
+        // Show CTA toast after 5 seconds
+        setTimeout(() => {
+          showCTAToast();
+        }, 5000);
+
         // analytics track event
         umamiTrackEvent("share_invoice_link");
       } catch (error) {
@@ -425,8 +409,8 @@ export function AppPageClient() {
               <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
                 <Button
                   asChild
-                  className="mx-2 w-full bg-blue-600 text-white transition-all hover:bg-blue-700 hover:no-underline lg:mx-0 lg:w-auto"
-                  _variant="link"
+                  _variant="outline"
+                  className="group mx-2 w-full border-pink-200 bg-pink-50 shadow-md transition-all duration-200 hover:border-pink-300 hover:bg-pink-100 hover:no-underline hover:shadow-lg focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 lg:mx-0 lg:w-auto"
                   onClick={() => {
                     // analytics track event
                     umamiTrackEvent("donate_to_project_button_clicked_header");
@@ -436,11 +420,18 @@ export function AppPageClient() {
                     href="https://dub.sh/easyinvoice-donate"
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-pink-700 hover:text-pink-800"
                   >
-                    <span className="flex items-center space-x-1.5">
-                      <span className="animate-heartbeat">❤️</span>
-                      <span>Support Project</span>
-                    </span>
+                    Support Project
+                    <div className="relative select-none">
+                      <HeartIcon className="size-3 scale-110 fill-pink-500 text-pink-500 transition-all duration-200 group-hover:fill-pink-600 group-hover:text-pink-600" />
+                      <HeartIcon
+                        className={cn(
+                          "size-3 animate-ping fill-pink-500 text-pink-500 duration-1000 group-hover:fill-pink-600",
+                          "absolute inset-0 flex",
+                        )}
+                      />
+                    </div>
                   </Link>
                 </Button>
 
@@ -649,3 +640,24 @@ function ProjectInfo() {
     </>
   );
 }
+
+const showCTAToast = () => {
+  // Randomly show either default or premium donation toast
+  if (Math.random() <= 0.5) {
+    customPremiumToast({
+      id: "premium-donation-toast-client-page",
+      title: "Support My Work",
+      description:
+        "Your contribution helps me maintain and improve this project for everyone! 🚀",
+      showDonationButton: false,
+    });
+  } else {
+    customDefaultToast({
+      id: "default-donation-toast-client-page",
+      title: "Love this project?",
+      description:
+        "Help me keep this free tool running! Your support enables me to add new features and maintain the service. 🙏",
+      showDonationButton: false,
+    });
+  }
+};
