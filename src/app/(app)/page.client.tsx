@@ -294,8 +294,8 @@ export function AppPageClient() {
       return;
     }
 
-    // Show cta toast after 25 seconds on the app page
-    const initialTimer = setTimeout(showCTAToast, 25_000);
+    // Show cta toast after 15 seconds on the app page
+    const initialTimer = setTimeout(showCTAToast, 15_000);
 
     return () => {
       clearTimeout(initialTimer);

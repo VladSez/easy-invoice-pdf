@@ -120,7 +120,7 @@ export function InvoicePDFDownloadLink({
               id: "default-donation-toast",
               title: "Love this project?",
               description:
-                "Help me keep building amazing tools! Your support means the world to me. ✨",
+                "Your support helps me keep this free tool running and build even better features! 🙏",
             });
           }
         }, 2500);
