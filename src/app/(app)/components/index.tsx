@@ -163,7 +163,7 @@ export function InvoiceClientPage({
                 <Button
                   data-disabled={!canShareInvoice} // for better UX than 'disabled'
                   onClick={handleShareInvoice}
-                  _variant="outline"
+                  variant="outline"
                   className={cn("mx-2 w-full")}
                 >
                   Generate a link to invoice

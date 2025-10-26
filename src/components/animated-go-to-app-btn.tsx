@@ -11,8 +11,8 @@ export function BlackAnimatedGoToAppBtn({
 }) {
   return (
     <Button
-      _size="lg"
-      _variant="outline"
+      size="lg"
+      variant="outline"
       className={
         "group relative overflow-hidden bg-zinc-900 px-3 text-white transition-all duration-300 hover:scale-[1.02] hover:bg-zinc-800 hover:text-white active:scale-[0.98] sm:px-8"
       }

@@ -50,7 +50,7 @@ export default function Error({
               umamiTrackEvent("error_button_try_again_clicked");
             }
           }
-          _variant="outline"
+          variant="outline"
         >
           Try again
         </Button>

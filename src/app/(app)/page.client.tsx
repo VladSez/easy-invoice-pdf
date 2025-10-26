@@ -277,8 +277,8 @@ export function AppPageClient({
                     The link may be truncated or corrupted.
                   </p>
                   <Button
-                    _variant="outline"
-                    _size="sm"
+                    variant="outline"
+                    size="sm"
                     onClick={() => {
                       router.replace("/?template=default");
                       toast.dismiss();
@@ -426,7 +426,7 @@ export function AppPageClient({
               <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
                 <Button
                   asChild
-                  _variant="outline"
+                  variant="outline"
                   className="group mx-2 w-full border-pink-200 bg-pink-50 text-pink-700 shadow-md transition-all duration-200 hover:border-pink-300 hover:bg-pink-100 hover:text-pink-800 hover:no-underline hover:shadow-lg focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 lg:mx-0 lg:w-auto"
                   onClick={() => {
                     // analytics track event
@@ -460,7 +460,7 @@ export function AppPageClient({
                         <Button
                           data-disabled={!canShareInvoice} // better UX than 'disabled'
                           onClick={handleShareInvoice}
-                          _variant="outline"
+                          variant="outline"
                           className={cn(
                             "mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto",
                           )}

@@ -25,8 +25,8 @@ export function GitHubStarCTA({
         <TooltipTrigger asChild>
           <Button
             asChild
-            _variant="outline"
-            _size="sm"
+            variant="outline"
+            size="sm"
             className={cn(
               "group border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-slate-300",
               "min-w-[80px] text-slate-900 will-change-transform hover:text-slate-900",

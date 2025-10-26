@@ -21,8 +21,8 @@ function SubmitButton({
   return (
     <Button
       type="submit"
-      _variant="default"
-      _size="default"
+      variant="default"
+      size="default"
       className={cn(
         "absolute right-2 top-1.5 transition-all duration-200",
         "hover:opacity-90 active:scale-95",

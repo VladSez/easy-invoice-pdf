@@ -418,7 +418,7 @@ export function BuyerDialog({
         </div>
         <DialogFooter className="border-border border-t px-6 py-4">
           <DialogClose asChild>
-            <Button type="button" _variant="outline">
+            <Button type="button" variant="outline">
               Cancel
             </Button>
           </DialogClose>

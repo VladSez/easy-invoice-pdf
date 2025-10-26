@@ -159,11 +159,7 @@ function Header({ locale }: { locale: Locale }) {
               <Logo />
             </div>
             <div className="flex items-center sm:mt-0 sm:gap-2">
-              <Button
-                _variant="ghost"
-                className="hidden lg:inline-flex"
-                asChild
-              >
+              <Button variant="ghost" className="hidden lg:inline-flex" asChild>
                 <Link href="/changelog">{tFooter("changelog")}</Link>
               </Button>
               <LanguageSwitcher
@@ -216,8 +212,8 @@ function HeroSection() {
               </BlackGoToAppButton>
 
               <Button
-                _size="lg"
-                _variant="outline"
+                size="lg"
+                variant="outline"
                 className="group relative overflow-hidden border-slate-200 px-10 py-6 text-lg shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md"
                 asChild
               >
@@ -545,7 +541,7 @@ function CtaSection() {
                 {t("buttons.goToApp")}
               </GoToAppButton>
               <Button
-                _size="lg"
+                size="lg"
                 className="group border border-slate-700 bg-slate-700 px-10 py-6 text-lg text-white transition-all duration-300 hover:bg-slate-600/80"
                 asChild
               >
@@ -637,7 +633,7 @@ const JSON_LD: Graph = {
           name: "Is my data secure?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Your privacy is important to us. All invoice data is processed entirely in your browser - we don't store any of your information on our servers. You can even use the tool offline once loaded.",
+            text: "Your privacy is important to us. All invoice data is processed entirely in your browser - we don't store any of your information on our servers.",
           },
         },
         {
