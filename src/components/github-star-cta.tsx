@@ -8,6 +8,7 @@ import { Star } from "lucide-react";
 import Link from "next/link";
 import { CountUpNumber } from "./ui/count-up-number";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { GithubIcon } from "./etc/github-logo";
 
 export function GitHubStarCTA({
   githubStarsCount,
@@ -32,6 +33,7 @@ export function GitHubStarCTA({
             )}
             onClick={handleStarClick}
             data-testid="github-star-cta-button"
+            aria-label="Star project on GitHub"
           >
             <Link
               href={GITHUB_URL}
@@ -48,7 +50,7 @@ export function GitHubStarCTA({
                   <CountUpNumber number={githubStarsCount} />
                 </div>
               ) : (
-                "check repo"
+                <GithubIcon className="size-4 transition-all duration-300 ease-in-out" />
               )}
               <style jsx>{`
                 @keyframes pulse-scale {
