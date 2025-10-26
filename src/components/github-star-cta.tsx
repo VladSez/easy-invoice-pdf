@@ -29,7 +29,7 @@ export function GitHubStarCTA({
             size="sm"
             className={cn(
               "group border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-slate-300",
-              "min-w-[80px] text-slate-900 will-change-transform hover:text-slate-900",
+              "min-w-[80px] text-slate-900 will-change-transform hover:bg-slate-50 hover:text-black",
             )}
             onClick={handleStarClick}
             data-testid="github-star-cta-button"
@@ -39,14 +39,14 @@ export function GitHubStarCTA({
               href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="animate-pulse-scale flex items-center gap-1.5 px-3 py-2"
+              className="flex items-center gap-1.5 px-3 py-2"
               style={{
                 animation: "pulse-scale 8s infinite",
               }}
             >
               {githubStarsCount > 0 ? (
                 <div className="flex items-center gap-1">
-                  <Star className="size-4 fill-yellow-400 text-yellow-500 transition-all duration-300 ease-in-out" />
+                  <Star className="size-4 fill-yellow-400 text-yellow-500 transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:fill-yellow-300 group-hover:text-yellow-600 group-hover:drop-shadow-sm" />
                   <CountUpNumber number={githubStarsCount} />
                 </div>
               ) : (
