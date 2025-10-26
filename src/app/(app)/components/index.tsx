@@ -177,9 +177,9 @@ export function InvoiceClientPage({
                         Share Invoice Online
                       </p>
                       <p className="text-pretty text-xs leading-relaxed text-slate-700">
-                        Generate a secure link to share this invoice with your
-                        clients. They can view and download it directly from
-                        their browser.
+                        Generate a link to share this invoice with your clients.
+                        They can view and download it directly from their
+                        browser.
                       </p>
                     </div>
                   </div>
