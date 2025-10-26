@@ -8,7 +8,7 @@ import {
 import { SubscribeInput } from "@/components/subscribe-input";
 import { Button } from "@/components/ui/button";
 
-import { CustomTooltip, TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Video } from "@/components/video";
 import { GITHUB_URL, STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
 import { routing } from "@/i18n/routing";
@@ -454,11 +454,9 @@ function FaqSection() {
                     <span className="text-base font-medium text-slate-900">
                       {question}
                     </span>
-                    <CustomTooltip
-                      trigger={
-                        <ChevronDown className="ml-auto size-6 shrink-0 rounded-full p-1 text-slate-600 transition-all duration-200 hover:bg-gray-200 hover:text-slate-900 group-open:rotate-180" />
-                      }
-                      content="Expand/Collapse Section"
+                    <ChevronDown
+                      className="ml-auto size-6 shrink-0 rounded-full p-1 text-slate-600 transition-all duration-200 hover:bg-gray-200 hover:text-slate-900 group-open:rotate-180"
+                      aria-hidden="true"
                     />
                   </summary>
                   <div className="overflow-hidden">

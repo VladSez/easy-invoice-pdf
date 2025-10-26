@@ -29,7 +29,7 @@ export function BlackAnimatedGoToAppBtn({
             animation: "pulse-arrow 5s infinite",
           }}
         />
-        <style jsx global>{`
+        <style jsx>{`
           @keyframes pulse-arrow {
             0%,
             70%,
