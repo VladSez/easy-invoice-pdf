@@ -27,6 +27,7 @@ import { type Graph } from "schema-dts";
 import { LandingCtaToast } from "./components/landing-cta-toast";
 import { LanguageSwitcher } from "./components/language-switcher";
 import { ProjectLogoDescription } from "@/components/project-logo-description";
+import { BlackAnimatedGoToAppBtn } from "@/components/animated-go-to-app-btn";
 
 // statically generate the pages for all locales
 export function generateStaticParams() {
@@ -169,10 +170,8 @@ function Header({ locale }: { locale: Locale }) {
                 locale={locale}
                 buttonText={t("switchLanguage")}
               />
-              {/* <BlackGoToAppButton className="px-3 sm:px-8" /> */}
-              <BlackGoToAppButton className="px-3 sm:px-8">
-                {t("goToApp")}
-              </BlackGoToAppButton>
+
+              <BlackAnimatedGoToAppBtn>{t("goToApp")}</BlackAnimatedGoToAppBtn>
             </div>
           </div>
         </div>

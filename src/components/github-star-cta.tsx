@@ -41,7 +41,7 @@ export function GitHubStarCTA({
               rel="noopener noreferrer"
               className="animate-pulse-scale flex items-center gap-1.5 px-3 py-2"
               style={{
-                animation: "pulse-scale 6s infinite",
+                animation: "pulse-scale 8s infinite",
               }}
             >
               {githubStarsCount > 0 ? (
