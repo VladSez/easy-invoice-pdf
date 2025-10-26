@@ -101,7 +101,7 @@
       },
       "dataSecurity": {
         "question": "Sind meine Daten sicher?",
-        "answer": "Ihre Privatsphäre ist uns wichtig. Alle Rechnungsdaten werden vollständig in Ihrem Browser verarbeitet - wir speichern keine Ihrer Informationen auf unseren Servern. Sie können das Tool nach dem Laden sogar offline nutzen."
+        "answer": "Ihre Privatsphäre ist uns wichtig. Alle Rechnungsdaten werden vollständig in Ihrem Browser verarbeitet - wir speichern keine Ihrer Informationen auf unseren Servern."
       },
       "sharing": {
         "question": "Kann ich Rechnungen mit anderen teilen?",

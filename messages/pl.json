@@ -101,7 +101,7 @@
       },
       "dataSecurity": {
         "question": "Czy moje dane są bezpieczne?",
-        "answer": "Twoja prywatność jest dla nas ważna. Wszystkie dane faktur są przetwarzane wyłącznie w Twojej przeglądarce - nie przechowujemy żadnych informacji na naszych serwerach. Możesz nawet korzystać z narzędzia offline po załadowaniu."
+        "answer": "Twoja prywatność jest dla nas ważna. Wszystkie dane faktur są przetwarzane wyłącznie w Twojej przeglądarce - nie przechowujemy żadnych informacji na naszych serwerach."
       },
       "sharing": {
         "question": "Czy mogę udostępniać faktury innym?",
