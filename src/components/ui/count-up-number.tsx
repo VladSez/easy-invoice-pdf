@@ -17,7 +17,7 @@ export function CountUpNumber({ number }: Props) {
   }, [count, number]);
 
   return (
-    <motion.span className="text-sm font-medium tabular-nums text-slate-950">
+    <motion.span className="min-w-[25px] text-center text-sm font-medium tabular-nums text-slate-950">
       {rounded}
     </motion.span>
   );
