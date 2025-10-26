@@ -2,7 +2,7 @@
   "name": "pdf-invoice-generator",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.17.0+sha512.fce8a3dd29a4ed2ec566fb53efbb04d8c44a0f05bc6f24a73046910fb9c3ce7afa35a0980500668fa3573345bd644644fa98338fa168235c80f4aa17aa17fbef",
+  "packageManager": "pnpm@10.19.0+sha512.c9fc7236e92adf5c8af42fd5bf1612df99c2ceb62f27047032f4720b33f8eacdde311865e91c411f2774f618d82f320808ecb51718bfa82c060c4ba7c76a32b8",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -69,12 +69,12 @@
     "jszip": "3.10.1",
     "lucide-react": "0.477.0",
     "lz-string": "1.5.0",
+    "motion": "12.23.24",
     "n2words": "1.21.0",
     "next": "14.2.15",
     "next-intl": "4.0.2",
     "pdf-parse": "1.1.1",
     "react": "18.3.1",
-    "react-aria-components": "1.8.0",
     "react-dom": "18.3.1",
     "react-hook-form": "7.53.1",
     "react-intersection-observer": "9.16.0",
@@ -114,7 +114,7 @@
     "schema-dts": "1.1.5",
     "shadcn": "3.2.1",
     "tailwindcss": "3.4.14",
-    "typescript": "5.9.2",
+    "typescript": "5.9.3",
     "typescript-eslint": "8.40.0",
     "vitest": "3.2.4"
   }

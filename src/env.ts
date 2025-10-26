@@ -33,6 +33,8 @@ export const env = createEnv({
     GOOGLE_DRIVE_PARENT_FOLDER_ID: z.string(),
     GOOGLE_DRIVE_CLIENT_EMAIL: z.string().email(),
     GOOGLE_DRIVE_PRIVATE_KEY: z.string(),
+
+    GITHUB_TOKEN: z.string(),
   },
   client: {
     NEXT_PUBLIC_SENTRY_DSN: z.string(),
@@ -71,6 +73,8 @@ export const env = createEnv({
     GOOGLE_DRIVE_PARENT_FOLDER_ID: process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID,
     GOOGLE_DRIVE_CLIENT_EMAIL: process.env.GOOGLE_DRIVE_CLIENT_EMAIL,
     GOOGLE_DRIVE_PRIVATE_KEY: process.env.GOOGLE_DRIVE_PRIVATE_KEY,
+
+    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
   },
   // emptyStringAsUndefined: true,
 });
