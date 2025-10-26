@@ -23,36 +23,8 @@ export function BlackAnimatedGoToAppBtn({
         scroll={false}
         className="flex items-center"
       >
-        <ArrowRightIcon
-          className="mr-2 size-5 transition-transform group-hover:scale-110"
-          style={{
-            animation: "pulse-arrow 5s infinite",
-          }}
-        />
-        <style jsx>{`
-          @keyframes pulse-arrow {
-            0%,
-            70%,
-            100% {
-              transform: translateX(0);
-            }
-            75% {
-              transform: translateX(4px);
-            }
-            80% {
-              transform: translateX(0);
-            }
-            85% {
-              transform: translateX(4px);
-            }
-            90% {
-              transform: translateX(0);
-            }
-            95% {
-              transform: translateX(4px);
-            }
-          }
-        `}</style>
+        <ArrowRightIcon className="mr-2 size-5 animate-pulse-arrow transition-transform group-hover:scale-110" />
+
         {children}
       </Link>
     </Button>

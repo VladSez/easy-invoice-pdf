@@ -43,11 +43,32 @@ const config: Config = {
           "75%": { transform: "scale(1.4)" },
           "100%": { transform: "scale(1)" },
         },
+        "pulse-arrow": {
+          "0%, 70%, 100%": {
+            transform: "translateX(0)",
+          },
+          "75%": {
+            transform: "translateX(4px)",
+          },
+          "80%": {
+            transform: "translateX(0)",
+          },
+          "85%": {
+            transform: "translateX(4px)",
+          },
+          "90%": {
+            transform: "translateX(0)",
+          },
+          "95%": {
+            transform: "translateX(4px)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        heartbeat: "heartbeat 3s ease-in-out infinite 5s", // 3s = duration of animation, infinite = repeat forever, 25s = delay before starting animation
+        heartbeat: "heartbeat 3s ease-in-out infinite 5s", // 3s = duration of animation, infinite = repeat forever, 25s = delay before starting animation,
+        "pulse-arrow": "pulse-arrow 5s infinite",
       },
     },
   },
