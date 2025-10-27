@@ -259,8 +259,8 @@ export function BuyerManagement({
                   <CustomTooltip
                     trigger={
                       <Button
-                        _variant="outline"
-                        _size="sm"
+                        variant="outline"
+                        size="sm"
                         onClick={() => {
                           if (activeBuyer) {
                             // dismiss any existing toast for better UX
@@ -281,8 +281,8 @@ export function BuyerManagement({
                   <CustomTooltip
                     trigger={
                       <Button
-                        _variant="destructive"
-                        _size="sm"
+                        variant="destructive"
+                        size="sm"
                         onClick={() => {
                           // dismiss any existing toast for better UX
                           toast.dismiss();
@@ -307,8 +307,8 @@ export function BuyerManagement({
           className={cn(!isLocalStorageAvailable && "bg-red-50")}
           trigger={
             <Button
-              _variant="outline"
-              _size="sm"
+              variant="outline"
+              size="sm"
               onClick={() => {
                 if (isLocalStorageAvailable) {
                   // dismiss any existing toast for better UX

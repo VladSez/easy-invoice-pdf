@@ -101,7 +101,7 @@
       },
       "dataSecurity": {
         "question": "Zijn mijn gegevens veilig?",
-        "answer": "Je privacy is belangrijk voor ons. Alle factuurgegevens worden volledig in je browser verwerkt - we slaan geen informatie op onze servers op. Je kunt de tool zelfs offline gebruiken zodra deze is geladen."
+        "answer": "Je privacy is belangrijk voor ons. Alle factuurgegevens worden volledig in je browser verwerkt - we slaan geen informatie op onze servers op."
       },
       "sharing": {
         "question": "Kan ik facturen delen met anderen?",

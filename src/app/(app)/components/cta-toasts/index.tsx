@@ -118,8 +118,8 @@ function PremiumDonationToast(props: ToastProps) {
         </p>
         <div className="flex gap-2">
           <Button
-            _size="sm"
-            _variant="outline"
+            size="sm"
+            variant="outline"
             asChild
             className="h-8 flex-1 border-gray-300 text-xs transition-all duration-200 hover:bg-gray-50"
           >
@@ -181,7 +181,7 @@ function PremiumToastFeedbackButton(
 ) {
   return (
     <Button
-      _size="sm"
+      size="sm"
       className="h-8 flex-1 bg-gradient-to-r from-green-500 to-blue-600 text-xs text-white transition-all duration-200 hover:from-green-600 hover:to-blue-700 hover:shadow-lg"
       asChild
       data-testid="toast-cta-btn"
@@ -204,7 +204,7 @@ function PremiumToastDonationButton(
 ) {
   return (
     <Button
-      _size="sm"
+      size="sm"
       className="h-8 flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-xs text-white transition-all duration-200 hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg"
       asChild
       data-testid="toast-cta-btn"
@@ -249,7 +249,7 @@ function DefaultDonationToast(props: ToastProps) {
         </p>
         <div className="flex gap-2">
           <Button
-            _size="sm"
+            size="sm"
             className="h-7 bg-gray-900 px-3 text-xs font-medium text-white transition-all duration-200 hover:scale-105 hover:bg-gray-800"
             asChild
           >
@@ -311,7 +311,7 @@ function DefaultToastDonationButton(
 ) {
   return (
     <Button
-      _size="sm"
+      size="sm"
       className="h-7 bg-gradient-to-r from-pink-500 to-purple-600 px-3 text-xs font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-pink-600 hover:to-purple-700"
       asChild
       data-testid="toast-cta-btn"
@@ -334,7 +334,7 @@ function DefaultToastFeedbackButton(
 ) {
   return (
     <Button
-      _size="sm"
+      size="sm"
       className="h-7 bg-gradient-to-r from-green-500 to-blue-600 px-3 text-xs font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-green-600 hover:to-blue-700"
       asChild
       data-testid="toast-cta-btn"

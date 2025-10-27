@@ -101,7 +101,7 @@
       },
       "dataSecurity": {
         "question": "I miei dati sono sicuri?",
-        "answer": "La tua privacy è importante per noi. Tutti i dati delle fatture vengono elaborati interamente nel tuo browser - non memorizziamo alcuna informazione sui nostri server. Puoi persino utilizzare lo strumento offline una volta caricato."
+        "answer": "La tua privacy è importante per noi. Tutti i dati delle fatture vengono elaborati interamente nel tuo browser - non memorizziamo alcuna informazione sui nostri server."
       },
       "sharing": {
         "question": "Posso condividere le fatture con altri?",

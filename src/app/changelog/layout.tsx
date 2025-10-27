@@ -159,18 +159,10 @@ function Header() {
               <Logo />
             </div>
             <div className="flex items-center sm:mt-0 sm:gap-2">
-              <Button
-                _variant="ghost"
-                className="hidden lg:inline-flex"
-                asChild
-              >
+              <Button variant="ghost" className="hidden lg:inline-flex" asChild>
                 <Link href="/en/about">About product</Link>
               </Button>
-              <Button
-                _variant="ghost"
-                className="hidden lg:inline-flex"
-                asChild
-              >
+              <Button variant="ghost" className="hidden lg:inline-flex" asChild>
                 <Link
                   href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
                   target="_blank"

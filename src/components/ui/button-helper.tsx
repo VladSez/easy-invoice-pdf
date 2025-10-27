@@ -10,8 +10,8 @@ export const ButtonHelper = ({
 >) => {
   return (
     <Button
-      _variant="link"
-      _size="sm"
+      variant="link"
+      size="sm"
       className={cn(
         "h-5 max-w-full whitespace-normal text-pretty p-0 text-left underline",
         className,

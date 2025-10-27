@@ -762,7 +762,7 @@ export const InvoiceItems = memo(function InvoiceItems({
           // analytics track event
           umamiTrackEvent("add_invoice_item");
         }}
-        _variant="outline"
+        variant="outline"
       >
         <Plus className="mr-2 h-4 w-4" />
         Add invoice item

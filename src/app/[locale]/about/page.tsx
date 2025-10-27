@@ -7,18 +7,14 @@ import {
 } from "@/components/go-to-app-button-cta";
 import { SubscribeInput } from "@/components/subscribe-input";
 import { Button } from "@/components/ui/button";
-import {
-  Disclosure,
-  DisclosureGroup,
-  DisclosurePanel,
-  DisclosureTrigger,
-} from "@/components/ui/disclosure";
+
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Video } from "@/components/video";
 import { GITHUB_URL, STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
 import { routing } from "@/i18n/routing";
 import {
   CalculatorIcon,
+  ChevronDown,
   Download,
   FileText,
   GlobeIcon,
@@ -31,6 +27,7 @@ import { type Graph } from "schema-dts";
 import { LandingCtaToast } from "./components/landing-cta-toast";
 import { LanguageSwitcher } from "./components/language-switcher";
 import { ProjectLogoDescription } from "@/components/project-logo-description";
+import { BlackAnimatedGoToAppBtn } from "@/components/animated-go-to-app-btn";
 
 // statically generate the pages for all locales
 export function generateStaticParams() {
@@ -162,21 +159,15 @@ function Header({ locale }: { locale: Locale }) {
               <Logo />
             </div>
             <div className="flex items-center sm:mt-0 sm:gap-2">
-              <Button
-                _variant="ghost"
-                className="hidden lg:inline-flex"
-                asChild
-              >
+              <Button variant="ghost" className="hidden lg:inline-flex" asChild>
                 <Link href="/changelog">{tFooter("changelog")}</Link>
               </Button>
               <LanguageSwitcher
                 locale={locale}
                 buttonText={t("switchLanguage")}
               />
-              {/* <BlackGoToAppButton className="px-3 sm:px-8" /> */}
-              <BlackGoToAppButton className="px-3 sm:px-8">
-                {t("goToApp")}
-              </BlackGoToAppButton>
+
+              <BlackAnimatedGoToAppBtn>{t("goToApp")}</BlackAnimatedGoToAppBtn>
             </div>
           </div>
         </div>
@@ -221,8 +212,8 @@ function HeroSection() {
               </BlackGoToAppButton>
 
               <Button
-                _size="lg"
-                _variant="outline"
+                size="lg"
+                variant="outline"
                 className="group relative overflow-hidden border-slate-200 px-10 py-6 text-lg shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md"
                 asChild
               >
@@ -445,19 +436,36 @@ function FaqSection() {
           </div>
         </div>
         <div className="mx-auto mt-8 max-w-3xl">
-          <DisclosureGroup allowsMultipleExpanded>
+          <div className="space-y-2">
             {FAQ_ITEMS.map((item) => {
               const question = t(`items.${item.translationKey}.question`);
               const answer = t(`items.${item.translationKey}.answer`);
 
               return (
-                <Disclosure key={item.translationKey} id={item.translationKey}>
-                  <DisclosureTrigger>{question}</DisclosureTrigger>
-                  <DisclosurePanel>{answer}</DisclosurePanel>
-                </Disclosure>
+                <details
+                  key={item.translationKey}
+                  className="group cursor-pointer border-b border-slate-200 bg-white transition-all duration-200 hover:border-slate-200"
+                >
+                  <summary className="flex select-none items-center justify-between gap-2 py-3 text-left">
+                    <span className="text-base font-medium text-slate-900">
+                      {question}
+                    </span>
+                    <ChevronDown
+                      className="ml-auto size-6 shrink-0 rounded-full p-1 text-slate-600 transition-all duration-200 hover:bg-gray-200 hover:text-slate-900 group-open:rotate-180"
+                      aria-hidden="true"
+                    />
+                  </summary>
+                  <div className="overflow-hidden">
+                    <div className="pb-4 pr-4">
+                      <p className="cursor-default text-pretty text-sm leading-relaxed text-slate-600">
+                        {answer}
+                      </p>
+                    </div>
+                  </div>
+                </details>
               );
             })}
-          </DisclosureGroup>
+          </div>
         </div>
       </div>
     </section>
@@ -533,7 +541,7 @@ function CtaSection() {
                 {t("buttons.goToApp")}
               </GoToAppButton>
               <Button
-                _size="lg"
+                size="lg"
                 className="group border border-slate-700 bg-slate-700 px-10 py-6 text-lg text-white transition-all duration-300 hover:bg-slate-600/80"
                 asChild
               >
@@ -625,7 +633,7 @@ const JSON_LD: Graph = {
           name: "Is my data secure?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Your privacy is important to us. All invoice data is processed entirely in your browser - we don't store any of your information on our servers. You can even use the tool offline once loaded.",
+            text: "Your privacy is important to us. All invoice data is processed entirely in your browser - we don't store any of your information on our servers.",
           },
         },
         {

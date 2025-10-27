@@ -102,7 +102,7 @@
       },
       "dataSecurity": {
         "question": "Is my data secure?",
-        "answer": "Your privacy is important to us. All invoice data is processed entirely in your browser - we don't store any of your information on our servers. You can even use the tool offline once loaded."
+        "answer": "Your privacy is important to us. All invoice data is processed entirely in your browser - we don't store any of your information on our servers."
       },
       "sharing": {
         "question": "Can I share invoices with others?",

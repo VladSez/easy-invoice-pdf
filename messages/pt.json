@@ -101,7 +101,7 @@
       },
       "dataSecurity": {
         "question": "Meus dados estão seguros?",
-        "answer": "Sua privacidade é importante para nós. Todos os dados das faturas são processados inteiramente no seu navegador - não armazenamos nenhuma informação em nossos servidores. Você pode até usar a ferramenta offline depois de carregada."
+        "answer": "Sua privacidade é importante para nós. Todos os dados das faturas são processados inteiramente no seu navegador - não armazenamos nenhuma informação em nossos servidores."
       },
       "sharing": {
         "question": "Posso compartilhar faturas com outros?",

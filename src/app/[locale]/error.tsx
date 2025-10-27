@@ -41,7 +41,7 @@ export default function Error({ error, reset }: Props) {
           </a>
         </ErrorMessage>
       </div>
-      <Button onClick={reset} _variant="outline">
+      <Button onClick={reset} variant="outline">
         Try again
       </Button>
       <Button asChild>

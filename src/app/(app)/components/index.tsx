@@ -163,7 +163,7 @@ export function InvoiceClientPage({
                 <Button
                   data-disabled={!canShareInvoice} // for better UX than 'disabled'
                   onClick={handleShareInvoice}
-                  _variant="outline"
+                  variant="outline"
                   className={cn("mx-2 w-full")}
                 >
                   Generate a link to invoice
@@ -177,9 +177,9 @@ export function InvoiceClientPage({
                         Share Invoice Online
                       </p>
                       <p className="text-pretty text-xs leading-relaxed text-slate-700">
-                        Generate a secure link to share this invoice with your
-                        clients. They can view and download it directly from
-                        their browser.
+                        Generate a link to share this invoice with your clients.
+                        They can view and download it directly from their
+                        browser.
                       </p>
                     </div>
                   </div>

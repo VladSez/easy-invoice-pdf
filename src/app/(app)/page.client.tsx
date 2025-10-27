@@ -61,7 +61,11 @@ const DevLocalStorageView = dynamic(
   { ssr: false },
 );
 
-export function AppPageClient() {
+export function AppPageClient({
+  githubStarsCount,
+}: {
+  githubStarsCount: number;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -134,8 +138,21 @@ export function AppPageClient() {
     }
   }, [templateValidation.data, templateValidation.success]);
 
-  // Scroll to top on mount
   useEffect(() => {
+    // CTA text in the console =)
+    // eslint-disable-next-line no-console
+    console.log(
+      "%c🚀 EasyInvoicePDF — Free & Open-Source Invoice Generator%c\n⭐ Star this project on GitHub: https://github.com/VladSez/easy-invoice-pdf",
+      "font-size:24px; font-weight:900; color: white;" +
+        "background: linear-gradient(90deg, #12E19A, #04C9B8, #1FD6FF, #ff5f6d, #ffc371);" +
+        "padding:12px 16px; border-radius:10px; text-shadow:2px 2px 6px rgba(0,0,0,0.5);" +
+        "font-family: 'American Typewriter', monospace; letter-spacing:1px;",
+      "font-size:16px; font-weight:700; color: #333;" +
+        "padding:8px 12px; border-radius:6px;" +
+        "font-family: 'Monaco', monospace;",
+    );
+
+    // Scroll to top on mount
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
@@ -260,8 +277,8 @@ export function AppPageClient() {
                     The link may be truncated or corrupted.
                   </p>
                   <Button
-                    _variant="outline"
-                    _size="sm"
+                    variant="outline"
+                    size="sm"
                     onClick={() => {
                       router.replace("/?template=default");
                       toast.dismiss();
@@ -409,8 +426,8 @@ export function AppPageClient() {
               <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
                 <Button
                   asChild
-                  _variant="outline"
-                  className="group mx-2 w-full border-pink-200 bg-pink-50 shadow-md transition-all duration-200 hover:border-pink-300 hover:bg-pink-100 hover:no-underline hover:shadow-lg focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 lg:mx-0 lg:w-auto"
+                  variant="outline"
+                  className="group mx-2 w-full border-pink-200 bg-pink-50 text-pink-700 shadow-md transition-all duration-200 hover:border-pink-300 hover:bg-pink-100 hover:text-pink-800 hover:no-underline hover:shadow-lg focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 lg:mx-0 lg:w-auto"
                   onClick={() => {
                     // analytics track event
                     umamiTrackEvent("donate_to_project_button_clicked_header");
@@ -420,7 +437,7 @@ export function AppPageClient() {
                     href="https://dub.sh/easyinvoice-donate"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-pink-700 hover:text-pink-800"
+                    className="flex items-center gap-2"
                   >
                     Support Project
                     <div className="relative select-none">
@@ -443,7 +460,7 @@ export function AppPageClient() {
                         <Button
                           data-disabled={!canShareInvoice} // better UX than 'disabled'
                           onClick={handleShareInvoice}
-                          _variant="outline"
+                          variant="outline"
                           className={cn(
                             "mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto",
                           )}
@@ -459,9 +476,9 @@ export function AppPageClient() {
                                 Share Invoice Online
                               </p>
                               <p className="text-pretty text-xs leading-relaxed text-slate-700">
-                                Generate a secure link to share this invoice
-                                with your clients. They can view and download it
-                                directly from their browser.
+                                Generate a link to share this invoice with your
+                                clients. They can view and download it directly
+                                from their browser.
                               </p>
                             </div>
                           </div>
@@ -583,7 +600,7 @@ export function AppPageClient() {
           </ul>
         }
       />
-      <GitHubStarCTA />
+      <GitHubStarCTA githubStarsCount={githubStarsCount} />
     </TooltipProvider>
   );
 }

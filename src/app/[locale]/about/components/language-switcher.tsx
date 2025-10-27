@@ -55,8 +55,8 @@ export function LanguageSwitcher({
           <DropdownMenuTrigger asChild>
             <TooltipTrigger asChild>
               <Button
-                _size="icon"
-                _variant="ghost"
+                size="icon"
+                variant="ghost"
                 className="rounded-full shadow-none"
                 aria-label={buttonText}
                 disabled={isPending}
