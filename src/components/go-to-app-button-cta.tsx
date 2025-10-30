@@ -21,7 +21,7 @@ export function GoToAppButton({
       asChild
     >
       <Link href="/?template=default" scroll={false}>
-        <ArrowRight className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
+        <ArrowRight className="mr-2 size-6 transition-transform group-hover:scale-110" />
         {children}
       </Link>
     </Button>
