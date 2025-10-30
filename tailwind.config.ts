@@ -63,12 +63,28 @@ const config: Config = {
             transform: "translateX(4px)",
           },
         },
+        "star-hover": {
+          "0%, 100%": {
+            transform: "scale(1)",
+            fill: "rgb(250 204 21)", // fill-yellow-400
+            color: "rgb(234 179 8)", // text-yellow-500
+            filter: "none",
+          },
+          "50%": {
+            transform: "scale(1.1)",
+            fill: "rgb(255 215 0)", // gold
+            color: "rgb(255 165 0)", // orange-gold
+            filter:
+              "drop-shadow(0 2px 4px rgb(255 215 0 / 0.3)) drop-shadow(0 1px 2px rgb(255 165 0 / 0.2)) brightness(1.1)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         heartbeat: "heartbeat 3s ease-in-out infinite 5s", // 3s = duration of animation, infinite = repeat forever, 25s = delay before starting animation,
         "pulse-arrow": "pulse-arrow 5s infinite",
+        "star-hover": "star-hover 2s ease-in-out infinite 3s",
       },
     },
   },

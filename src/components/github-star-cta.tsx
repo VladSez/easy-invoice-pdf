@@ -40,36 +40,15 @@ export function GitHubStarCTA({
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3 py-2"
-              style={{
-                animation: "pulse-scale 8s infinite",
-              }}
             >
               {githubStarsCount > 0 ? (
                 <div className="flex items-center gap-1">
-                  <Star className="size-4 fill-yellow-400 text-yellow-500 transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:fill-yellow-300 group-hover:text-yellow-600 group-hover:drop-shadow-sm" />
+                  <Star className="size-4 animate-star-hover fill-yellow-400 text-yellow-500" />
                   <CountUpNumber number={githubStarsCount} />
                 </div>
               ) : (
                 <GithubIcon className="size-4 transition-all duration-300 ease-in-out" />
               )}
-              <style jsx>{`
-                @keyframes pulse-scale {
-                  0%,
-                  80%,
-                  100% {
-                    transform: scale(1);
-                  }
-                  85% {
-                    transform: scale(1.05);
-                  }
-                  90% {
-                    transform: scale(1);
-                  }
-                  95% {
-                    transform: scale(1.05);
-                  }
-                }
-              `}</style>
             </Link>
           </Button>
         </TooltipTrigger>
