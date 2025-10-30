@@ -84,7 +84,7 @@ const config: Config = {
         "accordion-up": "accordion-up 0.2s ease-out",
         heartbeat: "heartbeat 3s ease-in-out infinite 5s", // 3s = duration of animation, infinite = repeat forever, 25s = delay before starting animation,
         "pulse-arrow": "pulse-arrow 5s infinite",
-        "star-hover": "star-hover 2s ease-in-out infinite 3s",
+        "star-hover": "star-hover 2s ease-in-out infinite 6s",
       },
     },
   },
