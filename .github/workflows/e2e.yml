@@ -49,12 +49,12 @@ jobs:
           BASE_URL: ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}
           SENTRY_ENABLED: false
           NEXT_PUBLIC_SENTRY_ENABLED: false
-          continue-on-error: true
+        continue-on-error: true
         # calculate duration of the job and runs playwright test
         run: |
           start_time=$(date +%s)
 
-          pnpm exec playwright test --reporter=list
+          pnpm exec playwright test --reporter=html,list
 
           end_time=$(date +%s)
           duration=$((end_time - start_time))
