@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AppPageClient } from "./page.client";
 import { APP_URL, STATIC_ASSETS_URL } from "@/config";
-import { fetchGithubStars } from "@/actions/fetch-github-starts";
+import { fetchGithubStars } from "@/actions/fetch-github-stars";
 
 // we generate metadata here, because we need access to searchParams (in layout we don't have it)
 export async function generateMetadata({

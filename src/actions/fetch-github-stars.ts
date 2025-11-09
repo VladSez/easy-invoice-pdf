@@ -1,3 +1,5 @@
+"use server";
+
 import { env } from "@/env";
 
 export async function fetchGithubStars(): Promise<number> {
@@ -8,6 +10,7 @@ export async function fetchGithubStars(): Promise<number> {
         headers: {
           Authorization: `Bearer ${env.GITHUB_TOKEN}`,
         },
+        next: { revalidate: 1800 }, // 30 minutes in seconds
       },
     );
 
