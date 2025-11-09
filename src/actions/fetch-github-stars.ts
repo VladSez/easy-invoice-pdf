@@ -10,7 +10,7 @@ export async function fetchGithubStars(): Promise<number> {
         headers: {
           Authorization: `Bearer ${env.GITHUB_TOKEN}`,
         },
-        next: { revalidate: 1800 }, // 30 minutes in seconds
+        next: { revalidate: 300 }, // 5 minutes in seconds
       },
     );
 
