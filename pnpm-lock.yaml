@@ -257,6 +257,9 @@ importers:
       typescript-eslint:
         specifier: 8.40.0
         version: 8.40.0(eslint@9.33.0(jiti@2.4.2))(typescript@5.9.3)
+      typescript-plugin-directives:
+        specifier: 0.0.3
+        version: 0.0.3(typescript@5.9.3)
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.8.1)(jiti@2.4.2)(msw@2.11.1(@types/node@22.8.1)(typescript@5.9.3))(terser@5.43.1)(tsx@4.19.4)(yaml@2.7.0)
@@ -10375,6 +10378,15 @@ packages:
       eslint: ^8.57.0 || ^9.0.0
       typescript: ">=4.8.4 <6.0.0"
 
+  typescript-plugin-directives@0.0.3:
+    resolution:
+      {
+        integrity: sha512-QJyv9LqwoEGCHtpHe9keA5J731cMbwL3g0I3qsRzhnYlfrk3sMDwu7R8YkAOSdXtZ8V53zgp7OzX/RfbV0JURg==,
+      }
+    engines: { node: ">=24" }
+    peerDependencies:
+      typescript: ">=5.0.0"
+
   typescript@5.9.3:
     resolution:
       {
@@ -17912,6 +17924,10 @@ snapshots:
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
+
+  typescript-plugin-directives@0.0.3(typescript@5.9.3):
+    dependencies:
+      typescript: 5.9.3
 
   typescript@5.9.3: {}
 

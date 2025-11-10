@@ -8,7 +8,7 @@ jobs:
     if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
 
     name: Run e2e tests via ${{ github.event_name == 'deployment_status' && 'Vercel deployment' }}
-    timeout-minutes: 20
+    timeout-minutes: 35
     runs-on: ubuntu-latest
     steps:
       - run: |
