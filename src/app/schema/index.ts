@@ -2,39 +2,45 @@ import { z } from "zod";
 import dayjs from "dayjs";
 
 export const SUPPORTED_CURRENCIES = [
+  // Top currencies (pinned)
   "EUR", // Euro
   "USD", // US Dollar
   "PLN", // Polish Złoty
   "GBP", // British Pound
 
+  // Major global currencies
   "JPY", // Japanese Yen
-  "CNY", // Chinese Yuan (RMB)
-  "CHF", // Swiss Franc
-  "CAD", // Canadian Dollar
   "AUD", // Australian Dollar
+  "CAD", // Canadian Dollar
+  "CHF", // Swiss Franc
+  "CNY", // Chinese Yuan (RMB)
   "HKD", // Hong Kong Dollar
   "SGD", // Singapore Dollar
-  "INR", // Indian Rupee
-  "KRW", // South Korean Won
-  "BRL", // Brazilian Real
-  "RUB", // Russian Ruble
-  "TWD", // Taiwan Dollar
   "SEK", // Swedish Krona
-  "MXN", // Mexican Peso
-  "NZD", // New Zealand Dollar
-  "TRY", // Turkish Lira
-  "ZAR", // South African Rand
   "NOK", // Norwegian Krone
   "DKK", // Danish Krone
-  "ILS", // Israeli New Shekel
-  "CZK", // Czech Koruna
-  "HUF", // Hungarian Forint
-  "UAH", // Ukrainian Hryvnia
-  "BYN", // Belarusian Ruble
-  "ARS", // Argentine Peso
-  "PKR", // Pakistani Rupee
-  "SAR", // Saudi Riyal
+  "NZD", // New Zealand Dollar
+
+  // Large emerging markets
+  "INR", // Indian Rupee
+  "KRW", // South Korean Won
+  "MXN", // Mexican Peso
+  "BRL", // Brazilian Real
+  "ZAR", // South African Rand
+  "TRY", // Turkish Lira
+  "RUB", // Russian Ruble
+
+  // Southeast Asia
+  "THB", // Thai Baht
+  "MYR", // Malaysian Ringgit
+  "IDR", // Indonesian Rupiah
+  "PHP", // Philippine Peso
+  "VND", // Vietnamese Dong
+
+  // Middle East & Gulf
   "AED", // UAE Dirham
+  "SAR", // Saudi Riyal
+  "ILS", // Israeli New Shekel
   "QAR", // Qatari Riyal
   "KWD", // Kuwaiti Dinar
   "BHD", // Bahraini Dinar
@@ -42,44 +48,90 @@ export const SUPPORTED_CURRENCIES = [
   "JOD", // Jordanian Dinar
   "EGP", // Egyptian Pound
   "LBP", // Lebanese Pound
+  "IQD", // Iraqi Dinar
+
+  // Eastern Europe
+  "CZK", // Czech Koruna
+  "HUF", // Hungarian Forint
+  "RON", // Romanian Leu
+  "BGN", // Bulgarian Lev
+  "HRK", // Croatian Kuna
+  "RSD", // Serbian Dinar
+  "UAH", // Ukrainian Hryvnia
+  "BYN", // Belarusian Ruble
+  "MDL", // Moldovan Leu
+  "GEL", // Georgian Lari
+  "KZT", // Kazakhstani Tenge
+
+  // Latin America
+  "ARS", // Argentine Peso
+  "CLP", // Chilean Peso
+  "COP", // Colombian Peso
+  "PEN", // Peruvian Sol
+  "UYU", // Uruguayan Peso
+  "BOB", // Bolivian Boliviano
+
+  // South Asia
+  "PKR", // Pakistani Rupee
+  "BDT", // Bangladeshi Taka
+  "LKR", // Sri Lankan Rupee
+  "NPR", // Nepalese Rupee
+
+  // Africa
+  "NGN", // Nigerian Naira
+  "KES", // Kenyan Shilling
+  "GHS", // Ghanaian Cedi
+  "ETB", // Ethiopian Birr
+  "MAD", // Moroccan Dirham
+  "TND", // Tunisian Dinar
+
+  // Other
+  "ISK", // Icelandic Króna
+  "TWD", // Taiwan Dollar
 ] as const satisfies string[];
 
 export type SupportedCurrencies = (typeof SUPPORTED_CURRENCIES)[number];
 
 export const CURRENCY_SYMBOLS = {
+  // Top currencies (pinned)
   EUR: "€", // Euro
   USD: "$", // US Dollar
-
-  CAD: "$", // Canadian Dollar
-  AUD: "$", // Australian Dollar
   GBP: "£", // British Pound
   PLN: "zł", // Polish Złoty
-  RUB: "₽", // Russian Ruble
-  UAH: "₴", // Ukrainian Hryvnia
-  BYN: "Br", // Belarusian Ruble
-  BRL: "R$", // Brazilian Real
-  MXN: "$", // Mexican Peso
-  ARS: "$", // Argentine Peso
-  INR: "₹", // Indian Rupee
-  CHF: "Fr", // Swiss Franc
-  HKD: "HK$", // Hong Kong Dollar
-  TWD: "NT$", // Taiwan Dollar
-  CNY: "¥", // Chinese Yuan (RMB)
-  SGD: "S$", // Singapore Dollar
+
+  // Major global currencies
   JPY: "¥", // Japanese Yen
+  AUD: "$", // Australian Dollar
+  CAD: "$", // Canadian Dollar
+  CHF: "Fr", // Swiss Franc
+  CNY: "¥", // Chinese Yuan (RMB)
+  HKD: "HK$", // Hong Kong Dollar
+  SGD: "S$", // Singapore Dollar
   SEK: "kr", // Swedish Krona
   NOK: "kr", // Norwegian Krone
   DKK: "kr", // Danish Krone
-  CZK: "Kč", // Czech Koruna
-  HUF: "Ft", // Hungarian Forint
-  ILS: "₪", // Israeli New Shekel
+  NZD: "NZ$", // New Zealand Dollar
+
+  // Large emerging markets
+  INR: "₹", // Indian Rupee
+  KRW: "₩", // South Korean Won
+  MXN: "$", // Mexican Peso
+  BRL: "R$", // Brazilian Real
   ZAR: "R", // South African Rand
   TRY: "₺", // Turkish Lira
-  KRW: "₩", // South Korean Won
-  NZD: "NZ$", // New Zealand Dollar
-  PKR: "₨", // Pakistani Rupee
-  SAR: "SAR", // Saudi Riyal
+  RUB: "₽", // Russian Ruble
+
+  // Southeast Asia
+  THB: "฿", // Thai Baht
+  MYR: "RM", // Malaysian Ringgit
+  IDR: "Rp", // Indonesian Rupiah
+  PHP: "₱", // Philippine Peso
+  VND: "₫", // Vietnamese Dong
+
+  // Middle East & Gulf
   AED: "AED", // UAE Dirham
+  SAR: "SAR", // Saudi Riyal
+  ILS: "₪", // Israeli New Shekel
   QAR: "QR", // Qatari Riyal
   KWD: "KWD", // Kuwaiti Dinar
   BHD: "BHD", // Bahraini Dinar
@@ -87,44 +139,91 @@ export const CURRENCY_SYMBOLS = {
   JOD: "JOD", // Jordanian Dinar
   EGP: "EGP", // Egyptian Pound
   LBP: "LBP", // Lebanese Pound
+  IQD: "IQD", // Iraqi Dinar
+
+  // Eastern Europe
+  CZK: "Kč", // Czech Koruna
+  HUF: "Ft", // Hungarian Forint
+  RON: "lei", // Romanian Leu
+  BGN: "лв", // Bulgarian Lev
+  HRK: "kn", // Croatian Kuna
+  RSD: "дин", // Serbian Dinar
+  UAH: "₴", // Ukrainian Hryvnia
+  BYN: "Br", // Belarusian Ruble
+  MDL: "L", // Moldovan Leu
+  GEL: "₾", // Georgian Lari
+  KZT: "₸", // Kazakhstani Tenge
+
+  // Latin America
+  ARS: "$", // Argentine Peso
+  CLP: "$", // Chilean Peso
+  COP: "$", // Colombian Peso
+  PEN: "S/", // Peruvian Sol
+  UYU: "$", // Uruguayan Peso
+  BOB: "Bs", // Bolivian Boliviano
+
+  // South Asia
+  PKR: "₨", // Pakistani Rupee
+  BDT: "৳", // Bangladeshi Taka
+  LKR: "Rs", // Sri Lankan Rupee
+  NPR: "Rs", // Nepalese Rupee
+
+  // Africa
+  NGN: "₦", // Nigerian Naira
+  KES: "KSh", // Kenyan Shilling
+  GHS: "₵", // Ghanaian Cedi
+  ETB: "Br", // Ethiopian Birr
+  MAD: "MAD", // Moroccan Dirham
+  TND: "TND", // Tunisian Dinar
+
+  // Other
+  ISK: "kr", // Icelandic Króna
+  TWD: "NT$", // Taiwan Dollar
 } as const satisfies Record<SupportedCurrencies, string>;
 
 export type CurrencySymbols =
   (typeof CURRENCY_SYMBOLS)[keyof typeof CURRENCY_SYMBOLS];
 
 export const CURRENCY_TO_LABEL = {
+  // Top currencies (pinned)
   EUR: "Euro",
   USD: "United States Dollar",
-  CAD: "Canadian Dollar",
-  AUD: "Australian Dollar",
   GBP: "British Pound Sterling",
   PLN: "Polish Złoty",
-  RUB: "Russian Ruble",
-  UAH: "Ukrainian Hryvnia",
-  BYN: "Belarusian Ruble",
-  BRL: "Brazilian Real",
-  MXN: "Mexican Peso",
-  ARS: "Argentine Peso",
-  INR: "Indian Rupee",
-  CHF: "Swiss Franc",
-  HKD: "Hong Kong Dollar",
-  TWD: "New Taiwan Dollar",
-  CNY: "Chinese Yuan Renminbi",
-  SGD: "Singapore Dollar",
+
+  // Major global currencies
   JPY: "Japanese Yen",
+  AUD: "Australian Dollar",
+  CAD: "Canadian Dollar",
+  CHF: "Swiss Franc",
+  CNY: "Chinese Yuan Renminbi",
+  HKD: "Hong Kong Dollar",
+  SGD: "Singapore Dollar",
   SEK: "Swedish Krona",
   NOK: "Norwegian Krone",
   DKK: "Danish Krone",
-  CZK: "Czech Koruna",
-  HUF: "Hungarian Forint",
-  ILS: "Israeli New Shekel",
+  NZD: "New Zealand Dollar",
+
+  // Large emerging markets
+  INR: "Indian Rupee",
+  KRW: "South Korean Won",
+  MXN: "Mexican Peso",
+  BRL: "Brazilian Real",
   ZAR: "South African Rand",
   TRY: "Turkish Lira",
-  KRW: "South Korean Won",
-  NZD: "New Zealand Dollar",
-  PKR: "Pakistani Rupee",
-  SAR: "Saudi Riyal",
+  RUB: "Russian Ruble",
+
+  // Southeast Asia
+  THB: "Thai Baht",
+  MYR: "Malaysian Ringgit",
+  IDR: "Indonesian Rupiah",
+  PHP: "Philippine Peso",
+  VND: "Vietnamese Dong",
+
+  // Middle East & Gulf
   AED: "UAE Dirham",
+  SAR: "Saudi Riyal",
+  ILS: "Israeli New Shekel",
   QAR: "Qatari Riyal",
   KWD: "Kuwaiti Dinar",
   BHD: "Bahraini Dinar",
@@ -132,6 +231,46 @@ export const CURRENCY_TO_LABEL = {
   JOD: "Jordanian Dinar",
   EGP: "Egyptian Pound",
   LBP: "Lebanese Pound",
+  IQD: "Iraqi Dinar",
+
+  // Eastern Europe
+  CZK: "Czech Koruna",
+  HUF: "Hungarian Forint",
+  RON: "Romanian Leu",
+  BGN: "Bulgarian Lev",
+  HRK: "Croatian Kuna",
+  RSD: "Serbian Dinar",
+  UAH: "Ukrainian Hryvnia",
+  BYN: "Belarusian Ruble",
+  MDL: "Moldovan Leu",
+  GEL: "Georgian Lari",
+  KZT: "Kazakhstani Tenge",
+
+  // Latin America
+  ARS: "Argentine Peso",
+  CLP: "Chilean Peso",
+  COP: "Colombian Peso",
+  PEN: "Peruvian Sol",
+  UYU: "Uruguayan Peso",
+  BOB: "Bolivian Boliviano",
+
+  // South Asia
+  PKR: "Pakistani Rupee",
+  BDT: "Bangladeshi Taka",
+  LKR: "Sri Lankan Rupee",
+  NPR: "Nepalese Rupee",
+
+  // Africa
+  NGN: "Nigerian Naira",
+  KES: "Kenyan Shilling",
+  GHS: "Ghanaian Cedi",
+  ETB: "Ethiopian Birr",
+  MAD: "Moroccan Dirham",
+  TND: "Tunisian Dinar",
+
+  // Other
+  ISK: "Icelandic Króna",
+  TWD: "New Taiwan Dollar",
 } as const satisfies Record<SupportedCurrencies, string>;
 
 export type CurrencyLabels =
