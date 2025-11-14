@@ -55,7 +55,7 @@ export const SUPPORTED_CURRENCIES = [
   "HUF", // Hungarian Forint
   "RON", // Romanian Leu
   "BGN", // Bulgarian Lev
-  "HRK", // Croatian Kuna
+  "HRK", // Croatian Kuna (obsolete since 2023 - retained for historical invoices)
   "RSD", // Serbian Dinar
   "UAH", // Ukrainian Hryvnia
   "BYN", // Belarusian Ruble
