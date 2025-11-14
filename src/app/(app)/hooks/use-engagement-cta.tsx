@@ -15,24 +15,32 @@ export function useShowRandomCTAToastOnEngagement() {
     if (process.env.NODE_ENV !== "production") return;
 
     const hasShown = localStorage.getItem(CTA_TOAST_SHOWN_LOCAL_STORAGE_KEY);
+
     if (hasShown) return;
 
     let interactionCount = 0;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
     const handleInteraction = () => {
       interactionCount++;
 
       if (interactionCount === INTERACTION_COUNT_THRESHOLD) {
-        const timer = setTimeout(() => {
+        timer = setTimeout(() => {
           showRandomCTAToast();
           localStorage.setItem(CTA_TOAST_SHOWN_LOCAL_STORAGE_KEY, "true");
         }, DELAY_BEFORE_SHOWING_CTA_TOAST);
 
         window.removeEventListener("click", handleInteraction);
-        return () => clearTimeout(timer);
       }
     };
 
     window.addEventListener("click", handleInteraction);
-    return () => window.removeEventListener("click", handleInteraction);
+
+    return () => {
+      window.removeEventListener("click", handleInteraction);
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
   }, []);
 }

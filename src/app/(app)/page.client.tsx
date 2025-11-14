@@ -44,7 +44,6 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { InvoiceClientPage } from "./components";
-import { showRandomCTAToast } from "./components/cta-toasts";
 import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
 import { useShowRandomCTAToastOnEngagement } from "./hooks/use-engagement-cta";
@@ -367,11 +366,6 @@ export function AppPageClient({
           description:
             "Share this link to let others view and edit this invoice",
         });
-
-        // Show CTA toast after 5 seconds
-        setTimeout(() => {
-          showRandomCTAToast();
-        }, 5000);
 
         // analytics track event
         umamiTrackEvent("share_invoice_link");
