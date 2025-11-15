@@ -10,26 +10,34 @@ dayjs.extend(duration);
 
 const STORAGE_KEY = "EASY_INVOICE_CTA_LAST_SHOWN_AT";
 const COOLDOWN_DAYS = 7;
-const MIN_TIME_ON_PAGE = 10_000; // in milliseconds
-const IDLE_TIME = 3_000; // in milliseconds
+const MIN_TIME_ON_PAGE = 15_000; // in milliseconds
+const IDLE_TIME = 5_000; // in milliseconds
 
 /**
  * This hook is used to show a CTA toast after a certain number of interactions with the page.
  *
- * - User stays on page 10s → we consider them “present”.
- * - Any real interaction (scroll, type, click) → we mark them engaged.
- * - Once they stop interacting for 3s → toast appears.
+ * - User stays on page 10s (MIN_TIME_ON_PAGE) → we consider them “present”.
+ * - Any real interaction (type, click) → we mark them engaged.
+ * - Once they stop interacting for X seconds (IDLE_TIME) → toast appears.
  */
 export function useShowRandomCTAToast() {
   useEffect(() => {
-    if (process.env.NODE_ENV !== "production") return;
-
     const last = localStorage.getItem(STORAGE_KEY);
 
     // Check if the last time the CTA toast was shown was less than 7 days ago
+    // Parse and validate the stored timestamp
+    const parsedLast = last ? Number(last) : NaN;
+    const isValidTimestamp = Number.isFinite(parsedLast);
+
+    // If invalid timestamp, clear it from storage and treat as not in cooldown
+    if (last && !isValidTimestamp) {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
     const isWithinCooldownPeriod =
-      dayjs().diff(dayjs(Number(last))) <
-      dayjs.duration(COOLDOWN_DAYS, "day").asMilliseconds();
+      isValidTimestamp &&
+      dayjs().diff(dayjs(parsedLast)) <
+        dayjs.duration(COOLDOWN_DAYS, "day").asMilliseconds();
 
     // If the last time the CTA toast was shown was less than 7 days ago, skip showing the toast
     if (last && isWithinCooldownPeriod) {
@@ -40,11 +48,13 @@ export function useShowRandomCTAToast() {
     let timeOnPageTimer: ReturnType<typeof setTimeout> | null = null;
     let idleTimer: ReturnType<typeof setTimeout> | null = null;
     let hasMeaningfulInteraction = false;
+    let hasMinTimeElapsed = false;
     let triggered = false;
 
     function tryTrigger() {
       if (triggered) return;
       if (!hasMeaningfulInteraction) return;
+      if (!hasMinTimeElapsed) return;
 
       triggered = true;
       showRandomCTAToast();
@@ -74,13 +84,17 @@ export function useShowRandomCTAToast() {
     // start tracking
     timeOnPageTimer = setTimeout(() => {
       // user has been here long enough, now wait for idle
+      hasMinTimeElapsed = true;
       handleIdle();
     }, MIN_TIME_ON_PAGE);
 
     // interaction types
     window.addEventListener("pointerdown", handleMeaningfulInteraction);
     window.addEventListener("keydown", handleMeaningfulInteraction);
-    window.addEventListener("scroll", resetIdle, { passive: true });
+    // window.addEventListener("scroll", resetIdle, {
+    //   passive: true,
+    //   capture: true,
+    // });
     window.addEventListener("pointerdown", resetIdle);
     window.addEventListener("keydown", resetIdle);
 
@@ -90,7 +104,7 @@ export function useShowRandomCTAToast() {
 
       window.removeEventListener("pointerdown", handleMeaningfulInteraction);
       window.removeEventListener("keydown", handleMeaningfulInteraction);
-      window.removeEventListener("scroll", resetIdle);
+      // window.removeEventListener("scroll", resetIdle);
       window.removeEventListener("pointerdown", resetIdle);
       window.removeEventListener("keydown", resetIdle);
     };
