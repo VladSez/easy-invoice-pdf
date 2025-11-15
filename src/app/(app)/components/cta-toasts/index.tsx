@@ -1,10 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import {
-  Coffee,
   GiftIcon,
   Heart,
-  HeartIcon,
   MessageSquare,
   Sparkles,
   Star,
@@ -12,7 +10,7 @@ import {
 } from "lucide-react";
 
 import { GithubIcon } from "@/components/etc/github-logo";
-import { DONATION_URL, GITHUB_URL } from "@/config";
+import { GITHUB_URL } from "@/config";
 import { toast as sonnerToast } from "sonner";
 
 const FEEDBACK_URL = "https://pdfinvoicegenerator.userjot.com/";
@@ -21,14 +19,6 @@ interface ToastProps {
   id: string | number;
   title: string;
   description: string;
-  showDonationButton?: boolean;
-}
-
-/**
- * Randomly determines whether to show donation or feedback button
- */
-function randomlyShowDonationButton() {
-  return Math.random() < 0.5;
 }
 
 /**
@@ -44,7 +34,6 @@ export function customPremiumToast(toast: ToastProps) {
         id={id}
         title={toast.title}
         description={toast.description}
-        showDonationButton={toast.showDonationButton}
       />
     ),
     {
@@ -66,7 +55,6 @@ export function customDefaultToast(toast: ToastProps) {
         id={id}
         title={toast.title}
         description={toast.description}
-        showDonationButton={toast.showDonationButton}
       />
     ),
     {
@@ -93,8 +81,7 @@ const SonnerCloseButton = (
 };
 
 function PremiumDonationToast(props: ToastProps) {
-  const { title, description, id, showDonationButton = true } = props;
-  const showDonationBtnRandomly = randomlyShowDonationButton();
+  const { title, description, id } = props;
 
   return (
     <div
@@ -119,9 +106,9 @@ function PremiumDonationToast(props: ToastProps) {
         <div className="flex gap-2">
           <Button
             size="sm"
-            variant="outline"
+            variant="default"
             asChild
-            className="h-8 flex-1 border-gray-300 text-xs transition-all duration-200 hover:bg-gray-50"
+            className="h-8 flex-1 border-gray-300 text-xs transition-all duration-200 hover:scale-105"
           >
             <a
               href={GITHUB_URL}
@@ -133,43 +120,17 @@ function PremiumDonationToast(props: ToastProps) {
                 sonnerToast.dismiss(id);
               }}
             >
-              <GithubIcon className="mr-1 h-3 w-3" />
+              <GithubIcon className="mr-1.5 size-3.5 fill-white" />
               Star on GitHub
             </a>
           </Button>
-          {showDonationButton ? (
-            showDonationBtnRandomly ? (
-              <PremiumToastDonationButton
-                onClick={() => {
-                  umamiTrackEvent(
-                    "donate_btn_click_download_pdf_toast_premium",
-                  );
+          <PremiumToastFeedbackButton
+            onClick={() => {
+              umamiTrackEvent("feedback_btn_click_download_pdf_toast_premium");
 
-                  sonnerToast.dismiss(id);
-                }}
-              />
-            ) : (
-              <PremiumToastFeedbackButton
-                onClick={() => {
-                  umamiTrackEvent(
-                    "feedback_btn_click_download_pdf_toast_premium",
-                  );
-
-                  sonnerToast.dismiss(id);
-                }}
-              />
-            )
-          ) : (
-            <PremiumToastFeedbackButton
-              onClick={() => {
-                umamiTrackEvent(
-                  "feedback_btn_click_download_pdf_toast_premium",
-                );
-
-                sonnerToast.dismiss(id);
-              }}
-            />
-          )}
+              sonnerToast.dismiss(id);
+            }}
+          />
         </div>
       </div>
     </div>
@@ -182,7 +143,8 @@ function PremiumToastFeedbackButton(
   return (
     <Button
       size="sm"
-      className="h-8 flex-1 bg-gradient-to-r from-green-500 to-blue-600 text-xs text-white transition-all duration-200 hover:from-green-600 hover:to-blue-700 hover:shadow-lg"
+      className="h-8 flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
+      variant="secondary"
       asChild
       data-testid="toast-cta-btn"
     >
@@ -199,34 +161,8 @@ function PremiumToastFeedbackButton(
   );
 }
 
-function PremiumToastDonationButton(
-  props: React.AnchorHTMLAttributes<HTMLAnchorElement>,
-) {
-  return (
-    <Button
-      size="sm"
-      className="h-8 flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-xs text-white transition-all duration-200 hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg"
-      asChild
-      data-testid="toast-cta-btn"
-    >
-      <a
-        href={DONATION_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        {...props}
-      >
-        <HeartIcon className="mr-1 h-3 w-3 fill-current" />
-        Donate $5
-      </a>
-    </Button>
-  );
-}
-
 function DefaultDonationToast(props: ToastProps) {
-  const { title, description, id, showDonationButton = true } = props;
-
-  // Randomly determine whether to show donation or feedback button
-  const showDonationBtnRandomly = randomlyShowDonationButton();
+  const { title, description, id } = props;
 
   return (
     <div
@@ -250,7 +186,7 @@ function DefaultDonationToast(props: ToastProps) {
         <div className="flex gap-2">
           <Button
             size="sm"
-            className="h-7 bg-gray-900 px-3 text-xs font-medium text-white transition-all duration-200 hover:scale-105 hover:bg-gray-800"
+            className="group h-8 bg-gray-900 px-3 text-xs font-medium text-white transition-all duration-200 hover:scale-105 hover:bg-gray-800"
             asChild
           >
             <a
@@ -263,69 +199,20 @@ function DefaultDonationToast(props: ToastProps) {
                 sonnerToast.dismiss(id);
               }}
             >
-              <Star className="mr-1 h-3 w-3" />
+              <Star className="mr-1 size-3.5 fill-yellow-300 text-yellow-300" />
               Star on GitHub
             </a>
           </Button>
-          {showDonationButton ? (
-            showDonationBtnRandomly ? (
-              <DefaultToastDonationButton
-                onClick={() => {
-                  umamiTrackEvent(
-                    "donate_btn_click_download_pdf_toast_default",
-                  );
+          <DefaultToastFeedbackButton
+            onClick={() => {
+              umamiTrackEvent("feedback_btn_click_download_pdf_toast_default");
 
-                  sonnerToast.dismiss(id);
-                }}
-              />
-            ) : (
-              <DefaultToastFeedbackButton
-                onClick={() => {
-                  umamiTrackEvent(
-                    "feedback_btn_click_download_pdf_toast_default",
-                  );
-
-                  sonnerToast.dismiss(id);
-                }}
-              />
-            )
-          ) : (
-            <DefaultToastFeedbackButton
-              onClick={() => {
-                umamiTrackEvent(
-                  "feedback_btn_click_download_pdf_toast_default",
-                );
-
-                sonnerToast.dismiss(id);
-              }}
-            />
-          )}
+              sonnerToast.dismiss(id);
+            }}
+          />
         </div>
       </div>
     </div>
-  );
-}
-
-function DefaultToastDonationButton(
-  props: React.AnchorHTMLAttributes<HTMLAnchorElement>,
-) {
-  return (
-    <Button
-      size="sm"
-      className="h-7 bg-gradient-to-r from-pink-500 to-purple-600 px-3 text-xs font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-pink-600 hover:to-purple-700"
-      asChild
-      data-testid="toast-cta-btn"
-    >
-      <a
-        href={DONATION_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        {...props}
-      >
-        <Coffee className="mr-1 h-3 w-3" />
-        Donate $5
-      </a>
-    </Button>
   );
 }
 
@@ -335,7 +222,8 @@ function DefaultToastFeedbackButton(
   return (
     <Button
       size="sm"
-      className="h-7 bg-gradient-to-r from-green-500 to-blue-600 px-3 text-xs font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-green-600 hover:to-blue-700"
+      className="h-8 flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
+      variant="secondary"
       asChild
       data-testid="toast-cta-btn"
     >
@@ -351,3 +239,22 @@ function DefaultToastFeedbackButton(
     </Button>
   );
 }
+
+export const showRandomCTAToast = () => {
+  // Randomly show either default or premium donation toast
+  if (Math.random() <= 0.5) {
+    customPremiumToast({
+      id: "premium-donation-toast-client-page",
+      title: "Support My Work",
+      description:
+        "Your contribution helps me maintain and improve this project for everyone! 🚀",
+    });
+  } else {
+    customDefaultToast({
+      id: "default-donation-toast-client-page",
+      title: "Love this project?",
+      description:
+        "Help me keep this free tool running! Your support enables me to add new features and maintain the service. 🙏",
+    });
+  }
+};

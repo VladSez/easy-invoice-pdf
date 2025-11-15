@@ -32,7 +32,6 @@ export const LandingCtaToast = () => {
           title: "Support My Work",
           description:
             "Your contribution helps me maintain and improve this project for everyone! 🚀",
-          showDonationButton: false, // we only want to show the donation button on the app page
         });
       } else {
         customDefaultToast({
@@ -40,7 +39,6 @@ export const LandingCtaToast = () => {
           title: "Love this project?",
           description:
             "Help me keep building amazing tools! Your support means the world to me. ✨",
-          showDonationButton: false, // we only want to show the donation button on the app page
         });
       }
     };

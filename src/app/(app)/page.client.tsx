@@ -44,12 +44,9 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { InvoiceClientPage } from "./components";
-import {
-  customDefaultToast,
-  customPremiumToast,
-} from "./components/cta-toasts";
 import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
+import { useShowRandomCTAToastOnEngagement } from "./hooks/use-engagement-cta";
 // import { DevLocalStorageView } from "./components/dev/dev-local-storage-view";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
@@ -88,6 +85,8 @@ export function AppPageClient({
     useState(false);
 
   const [canShareInvoice, setCanShareInvoice] = useState(true);
+
+  useShowRandomCTAToastOnEngagement();
 
   // Helper function to load from localStorage
   const loadFromLocalStorage = useCallback(() => {
@@ -304,21 +303,6 @@ export function AppPageClient({
     }
   }, [invoiceDataState, router, searchParams]);
 
-  // Show CTA toast
-  useEffect(() => {
-    // only show on production
-    if (process.env.NODE_ENV !== "production") {
-      return;
-    }
-
-    // Show cta toast after x seconds on the app page
-    const initialTimer = setTimeout(showCTAToast, 25_000);
-
-    return () => {
-      clearTimeout(initialTimer);
-    };
-  }, []);
-
   const handleInvoiceDataChange = (updatedData: InvoiceData) => {
     setInvoiceDataState(updatedData);
   };
@@ -382,11 +366,6 @@ export function AppPageClient({
           description:
             "Share this link to let others view and edit this invoice",
         });
-
-        // Show CTA toast after 5 seconds
-        setTimeout(() => {
-          showCTAToast();
-        }, 5000);
 
         // analytics track event
         umamiTrackEvent("share_invoice_link");
@@ -657,24 +636,3 @@ function ProjectInfo() {
     </>
   );
 }
-
-const showCTAToast = () => {
-  // Randomly show either default or premium donation toast
-  if (Math.random() <= 0.5) {
-    customPremiumToast({
-      id: "premium-donation-toast-client-page",
-      title: "Support My Work",
-      description:
-        "Your contribution helps me maintain and improve this project for everyone! 🚀",
-      showDonationButton: false,
-    });
-  } else {
-    customDefaultToast({
-      id: "default-donation-toast-client-page",
-      title: "Love this project?",
-      description:
-        "Help me keep this free tool running! Your support enables me to add new features and maintain the service. 🙏",
-      showDonationButton: false,
-    });
-  }
-};
