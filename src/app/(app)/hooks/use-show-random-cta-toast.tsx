@@ -29,7 +29,7 @@ export function useShowRandomCTAToast() {
     // Check if the last time the CTA toast was shown was less than 7 days ago
     const isWithinCooldownPeriod =
       dayjs().diff(dayjs(Number(last))) <
-      dayjs.duration(COOLDOWN_DAYS, "minute").asMilliseconds();
+      dayjs.duration(COOLDOWN_DAYS, "day").asMilliseconds();
 
     // If the last time the CTA toast was shown was less than 7 days ago, skip showing the toast
     if (last && isWithinCooldownPeriod) {
