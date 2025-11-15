@@ -46,7 +46,7 @@ import { z } from "zod";
 import { InvoiceClientPage } from "./components";
 import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
-import { useShowRandomCTAToastOnEngagement } from "./hooks/use-engagement-cta";
+import { useShowRandomCTAToast } from "./hooks/use-show-random-cta-toast";
 // import { DevLocalStorageView } from "./components/dev/dev-local-storage-view";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
@@ -86,7 +86,7 @@ export function AppPageClient({
 
   const [canShareInvoice, setCanShareInvoice] = useState(true);
 
-  useShowRandomCTAToastOnEngagement();
+  useShowRandomCTAToast();
 
   // Helper function to load from localStorage
   const loadFromLocalStorage = useCallback(() => {

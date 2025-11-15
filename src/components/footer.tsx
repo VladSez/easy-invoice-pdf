@@ -130,7 +130,7 @@ export function Footer({
           <p className="text-xs text-slate-500">
             {translations.footerCreatedBy}{" "}
             <Link
-              href="https://github.com/VladSez"
+              href="https://dub.sh/vladsazon.com"
               target="_blank"
               rel="noopener noreferrer"
               className="underline hover:text-slate-900"

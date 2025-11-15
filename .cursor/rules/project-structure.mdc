@@ -1,11 +1,13 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
+
 Project Structure and Architecture Guidelines
 
 Directory Structure:
+
 ```
 ├── app/                    # Next.js App Router directory
 │   ├── (auth)/            # Auth-related routes (grouped)
@@ -23,18 +25,21 @@ Directory Structure:
 ```
 
 Component Organization:
+
 - Group related components in feature directories
 - Keep components small and focused
 - Extract reusable logic into custom hooks
 - Place shared types in dedicated files
 
 File Naming:
+
 - Use kebab-case for directories and files
 - Components: PascalCase.tsx
 - Utilities: camelCase.ts
 - Types: PascalCase.types.ts
 
 Component Structure:
+
 ```typescript
 // types.ts
 interface Props {
@@ -47,8 +52,8 @@ function helperFunction() {
 }
 
 // Component.tsx
-import { type Props } from './types';
-import { helperFunction } from './helpers';
+import { type Props } from "./types";
+import { helperFunction } from "./helpers";
 
 export function Component({ prop1, prop2 }: Props) {
   // ... component logic
@@ -56,24 +61,57 @@ export function Component({ prop1, prop2 }: Props) {
 ```
 
 Data Fetching:
+
 - Use Server Components for data fetching
 - Implement proper caching strategies
 - Handle loading and error states
 - Use React Suspense boundaries
 
 Route Organization:
+
 - Group related routes in directories
 - Use route groups (parentheses) for organization
 - Keep page components lean
 - Extract business logic to separate files
 
 State Management:
+
 - Use Server Components when possible
 - Keep client state minimal
 - Use React Context sparingly
 
 API Structure:
+
 - Organize by feature/resource
 - Use consistent error handling
 - Implement proper validation
 - Follow RESTful conventions
+
+Red flags in a React codebase
+
+🚩 functions like <button onClick={handleClick}
+
+- handleClick doesn't explain what it does
+- you lose colocation
+- need new names for each callback
+
+Inline callbacks can call multiple functions with good names
+
+onClick={() => {
+analytics.event('this-button')
+openModal()
+
+🚩 useMemo
+
+React devs are terrified of renders and often overuseMemo
+
+- memoize things that you pass as props to components that may have expensive children
+- it's ok for leaf components to over-render
+
+useMemo does not fix bugs, it just makes them happen less often
+
+🚩 <div onClick
+
+divs are not interactive elements and adding onClick requires implementing keyboard control, screen reader announcement, etc
+
+This is almost never the right move, and anyone capable of doing it right (the new tweet button) isn't going to be swayed by this tweet

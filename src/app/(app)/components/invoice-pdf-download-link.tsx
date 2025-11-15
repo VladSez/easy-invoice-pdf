@@ -123,7 +123,7 @@ export function InvoicePDFDownloadLink({
                 "Your support helps me keep this free tool running and build even better features! 🙏",
             });
           }
-        }, 4000);
+        }, 3000);
       }
     },
     [
