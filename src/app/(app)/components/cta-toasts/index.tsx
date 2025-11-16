@@ -240,21 +240,40 @@ function DefaultToastFeedbackButton(
   );
 }
 
+export const CTA_TOASTS = [
+  {
+    id: "premium-donation-toast-client-page",
+    title: "Support My Work",
+    description:
+      "Your contribution helps me maintain and improve this project for everyone! 🚀",
+    show: customPremiumToast,
+  },
+  {
+    id: "default-donation-toast-client-page",
+    title: "Love this project?",
+    description:
+      "Help me keep this free tool running! Your support enables me to add new features and maintain the service. 🙏",
+    show: customDefaultToast,
+  },
+] as const satisfies {
+  id: string;
+  title: string;
+  description: string;
+  show: (toast: ToastProps) => void;
+}[];
+
 export const showRandomCTAToast = () => {
-  // Randomly show either default or premium donation toast
-  if (Math.random() <= 0.5) {
-    customPremiumToast({
-      id: "premium-donation-toast-client-page",
-      title: "Support My Work",
-      description:
-        "Your contribution helps me maintain and improve this project for everyone! 🚀",
-    });
-  } else {
-    customDefaultToast({
-      id: "default-donation-toast-client-page",
-      title: "Love this project?",
-      description:
-        "Help me keep this free tool running! Your support enables me to add new features and maintain the service. 🙏",
-    });
-  }
+  // Randomly show a CTA toast
+  const variant = CTA_TOASTS[Math.floor(Math.random() * CTA_TOASTS.length)];
+
+  variant.show({
+    id: variant.id,
+    title: variant.title,
+    description: variant.description,
+  });
 };
+
+/**
+ * Slight delay to prevent the toast from appearing too quickly
+ */
+export const CTA_TOAST_TIMEOUT = 3_000; // in ms
