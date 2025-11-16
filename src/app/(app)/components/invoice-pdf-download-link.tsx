@@ -16,9 +16,12 @@ import { LOADING_BUTTON_TEXT, LOADING_BUTTON_TIMEOUT } from "./invoice-form";
 import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
 import { InvoicePdfTemplate } from "./invoice-pdf-template";
 
-import { customDefaultToast, customPremiumToast } from "./cta-toasts";
+import { showRandomCTAToast } from "./cta-toasts";
 import { useDeviceContext } from "@/contexts/device-context";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
+import { CTA_TOAST_LAST_SHOWN_STORAGE_KEY } from "../hooks/use-show-random-cta-toast";
+import { useCTAToast } from "../contexts/cta-toast-context";
+import { CTA_TOAST_TIMEOUT } from "./cta-toasts";
 
 // Separate button states into a memoized component
 const ButtonContent = ({
@@ -52,6 +55,7 @@ export function InvoicePDFDownloadLink({
   setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
 }) {
   const { inAppInfo } = useDeviceContext();
+  const { markToastAsShown } = useCTAToast();
 
   const [{ loading: pdfLoading, url, error }, updatePdfInstance] = usePDF();
   const [isLoading, setIsLoading] = useState(false);
@@ -106,24 +110,19 @@ export function InvoicePDFDownloadLink({
         // close all other toasts (if any)
         toast.dismiss();
 
-        // Randomly show either default or premium donation toast after 2.5 seconds
+        // Show a CTA toast
         setTimeout(() => {
-          if (Math.random() <= 0.5) {
-            customPremiumToast({
-              id: "premium-donation-toast",
-              title: "Support My Work",
-              description:
-                "Your contribution helps me maintain and improve this project for everyone! 🚀",
-            });
-          } else {
-            customDefaultToast({
-              id: "default-donation-toast",
-              title: "Love this project?",
-              description:
-                "Your support helps me keep this free tool running and build even better features! 🙏",
-            });
-          }
-        }, 3000);
+          showRandomCTAToast();
+
+          // Mark toast as shown in session to prevent duplicate toasts
+          markToastAsShown();
+
+          // Update timestamp to prevent other CTA toasts from showing for 7 days
+          localStorage.setItem(
+            CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
+            String(Date.now()),
+          );
+        }, CTA_TOAST_TIMEOUT);
       }
     },
     [
@@ -134,6 +133,7 @@ export function InvoicePDFDownloadLink({
       error,
       trackDownload,
       isTelegramPreviewBrowser,
+      markToastAsShown,
     ],
   );
 

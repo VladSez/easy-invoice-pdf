@@ -46,7 +46,13 @@ import { z } from "zod";
 import { InvoiceClientPage } from "./components";
 import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
-import { useShowRandomCTAToast } from "./hooks/use-show-random-cta-toast";
+import {
+  CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
+  useShowRandomCTAToast,
+} from "./hooks/use-show-random-cta-toast";
+import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./components/cta-toasts";
+import { useCTAToast } from "./contexts/cta-toast-context";
+
 // import { DevLocalStorageView } from "./components/dev/dev-local-storage-view";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
@@ -65,6 +71,8 @@ export function AppPageClient({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const { markToastAsShown } = useCTAToast();
 
   const urlTemplateSearchParam = searchParams.get("template");
 
@@ -369,6 +377,20 @@ export function AppPageClient({
 
         // analytics track event
         umamiTrackEvent("share_invoice_link");
+
+        // Show a CTA toast
+        setTimeout(() => {
+          showRandomCTAToast();
+
+          // Mark toast as shown in session to prevent duplicate toasts
+          markToastAsShown();
+
+          // Update timestamp to prevent other CTA toasts from showing
+          localStorage.setItem(
+            CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
+            String(Date.now()),
+          );
+        }, CTA_TOAST_TIMEOUT);
       } catch (error) {
         console.error("Failed to share invoice:", error);
         toast.error("Failed to generate shareable link");
