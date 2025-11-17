@@ -41,6 +41,7 @@ interface InvoiceItemsSettingsProps {
   currency: SupportedCurrencies;
   language: SupportedLanguages;
   template: InvoiceData["template"];
+  vatLabelText: string;
 }
 
 export const InvoiceItems = memo(function InvoiceItems({
@@ -52,12 +53,45 @@ export const InvoiceItems = memo(function InvoiceItems({
   language,
   append,
   template,
+  vatLabelText,
 }: InvoiceItemsSettingsProps) {
   return (
     <>
       {/** we only want to show these settings for default template */}
       {template === "default" && (
         <div className="mb-3 space-y-4">
+          {/* VAT Label Customization */}
+          <div>
+            <fieldset className="rounded-md border p-4">
+              <legend className="px-2 text-sm">Tax Label Customization</legend>
+              <div>
+                <Label htmlFor="vatLabelText">Tax Label</Label>
+                <Controller
+                  name="vatLabelText"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="text"
+                      id="vatLabelText"
+                      placeholder="Enter tax label (e.g., VAT, Tax, GST, Sales Tax)"
+                      className="mt-1 block w-full"
+                    />
+                  )}
+                />
+                {errors.vatLabelText && (
+                  <ErrorMessage>{errors.vatLabelText.message}</ErrorMessage>
+                )}
+                {!errors.vatLabelText && (
+                  <InputHelperMessage>
+                    Set a custom tax label (e.g. &quot;VAT&quot;, &quot;Sales
+                    Tax&quot;, &quot;GST&quot;, &quot;IVA&quot;, etc.)
+                  </InputHelperMessage>
+                )}
+              </div>
+            </fieldset>
+          </div>
+
           {/* Show Number column on PDF switch */}
           <div className="relative flex items-center justify-between">
             <Label htmlFor={`itemInvoiceItemNumberIsVisible0`}>
@@ -82,7 +116,7 @@ export const InvoiceItems = memo(function InvoiceItems({
           {/* Show VAT Table Summary in PDF switch */}
           <div className="relative flex items-center justify-between">
             <Label htmlFor={`vatTableSummaryIsVisible`}>
-              Show &quot;VAT Table Summary&quot; in the PDF
+              Show &quot;{vatLabelText} Table Summary&quot; in the PDF
             </Label>
 
             <Controller
@@ -474,7 +508,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               <div data-testid={`itemVat${index}`}>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemVat${index}`} className="">
-                    VAT
+                    {vatLabelText}
                   </Label>
 
                   {/* Show/hide VAT field in PDF switch (Only show for default template) */}
@@ -499,7 +533,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             Show in PDF
                           </Label>
                         }
-                        content='Show/hide the "VAT" Column in the PDF'
+                        content={`Show/hide the "${vatLabelText}" Column in the PDF`}
                       />
                     </div>
                   ) : null}
@@ -523,8 +557,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                   <ErrorMessage>{errors.items[index].vat.message}</ErrorMessage>
                 ) : (
                   <InputHelperMessage>
-                    Enter &quot;NP&quot; (not applicable), &quot;OO&quot; (out
-                    of scope), or a percentage value (0-100)
+                    Enter a number (0-100), or any string (i.e. &quot;NP&quot;,
+                    &quot;OO&quot;, etc).
                   </InputHelperMessage>
                 )}
               </div>
@@ -601,7 +635,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               <div>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemVatAmount${index}`} className="">
-                    VAT Amount
+                    {vatLabelText} Amount
                   </Label>
 
                   {/* Show/hide VAT Amount field in PDF switch (Only show for default template) */}
@@ -628,7 +662,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             Show in PDF
                           </Label>
                         }
-                        content='Show/hide the "VAT Amount" Column in the PDF'
+                        content={`Show/hide the "${vatLabelText} Amount" Column in the PDF`}
                       />
                     </div>
                   ) : null}
@@ -660,7 +694,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                   </ErrorMessage>
                 ) : (
                   <InputHelperMessage>
-                    Calculated automatically based on Net Amount and VAT
+                    Calculated automatically based on Net Amount and{" "}
+                    {vatLabelText}
                   </InputHelperMessage>
                 )}
               </div>
@@ -727,7 +762,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                   </ErrorMessage>
                 ) : (
                   <InputHelperMessage>
-                    Calculated automatically based on Net Amount and VAT
+                    Calculated automatically based on Net Amount and{" "}
+                    {vatLabelText}
                   </InputHelperMessage>
                 )}
               </div>

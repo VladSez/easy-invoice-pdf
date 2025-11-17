@@ -438,7 +438,7 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection
         .getByTestId(`itemVat0`)
         .getByText(
-          'Enter "NP" (not applicable), "OO" (out of scope), or a percentage value (0-100)',
+          'Enter a number (0-100), or any string (i.e. "NP", "OO", etc).',
         ),
     ).toBeVisible();
 

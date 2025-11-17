@@ -191,6 +191,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   const template = useWatch({ control, name: "template" });
   const logo = useWatch({ control, name: "logo" });
+  const vatLabelText = useWatch({ control, name: "vatLabelText" }) || "VAT";
 
   // Disable sharing when Stripe template contains a logo (we can't put the logo base64 string in the URL due to browser URL length limits)
   useEffect(() => {
@@ -428,6 +429,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               language={language}
               append={append}
               template={template}
+              vatLabelText={vatLabelText}
             />
           </AccordionContent>
         </AccordionItem>

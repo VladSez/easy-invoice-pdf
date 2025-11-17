@@ -25,6 +25,7 @@ export function StripeItemsTable({
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
+  const vatLabelText = invoiceData.vatLabelText || "VAT";
 
   // Set dayjs locale based on invoice language
   dayjs.locale(language);
@@ -62,7 +63,7 @@ export function StripeItemsTable({
         </View>
         {canShowVat ? (
           <View style={styles.colTax}>
-            <Text style={[styles.fontSize8]}>{t.stripe.tax}</Text>
+            <Text style={[styles.fontSize8]}>{vatLabelText}</Text>
           </View>
         ) : null}
         <View style={styles.colAmount}>

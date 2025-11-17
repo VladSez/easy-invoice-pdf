@@ -15,6 +15,7 @@ export function StripeTotals({
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
+  const vatLabelText = invoiceData.vatLabelText || "VAT";
 
   // Calculate subtotal (sum of all items)
   const subtotal = invoiceData.items.reduce(
@@ -94,7 +95,7 @@ export function StripeTotals({
                   ]}
                 >
                   <Text style={[styles.fontSize9]}>
-                    VAT ({item.vat}% on {formattedNetAmount})
+                    {vatLabelText} ({item.vat}% on {formattedNetAmount})
                   </Text>
                   <Text style={[styles.fontSize9, styles.textDark]}>
                     {formattedVatAmount}

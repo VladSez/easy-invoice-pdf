@@ -394,14 +394,14 @@ export const invoiceItemSchema = z
       z
         .any()
         .refine((val) => val !== "", {
-          message: `VAT is required. Enter a percentage (0-100), "NP" (not applicable), or "OO" (out of scope)`,
+          message: `Field is required. Enter a percentage (0-100), "NP" (not applicable), or "OO" (out of scope)`,
         })
         .refine((val) => !isNaN(Number(val)), {
           message: `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
         })
         .transform(Number)
         .refine((val) => val >= 0 && val <= 100, {
-          message: "VAT must be between 0 and 100",
+          message: "Must be between 0 and 100",
         }),
     ]),
     vatFieldIsVisible: z.boolean().default(true),
@@ -561,6 +561,22 @@ export const invoiceSchema = z.object({
         .trim(),
     })
     .optional(),
+
+  /**
+   * VAT label customization
+   *
+   * Allows users to customize the tax label text
+   * Default is "VAT" but can be changed to "Tax", "GST", "Sales Tax", etc.
+   */
+  vatLabelText: z
+    .string()
+    .min(1, "VAT label is required")
+    .max(50, "VAT label must not exceed 50 characters")
+    .trim()
+    .default("VAT")
+    .describe(
+      "Customizable tax label text. Default is 'VAT'. Can be changed to 'Tax', 'GST', 'Sales Tax', etc.",
+    ),
 
   dateOfIssue: z
     .string()

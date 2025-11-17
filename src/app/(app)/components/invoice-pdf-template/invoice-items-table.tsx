@@ -14,6 +14,7 @@ export function InvoiceItemsTable({
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
+  const vatLabelText = invoiceData.vatLabelText || "VAT";
 
   // we need to check only the first row, because all next rows are the same
   const isInvoiceItemNumberVisible =
@@ -91,7 +92,7 @@ export function InvoiceItemsTable({
           {isVATFieldVisible ? (
             <View style={[styles.tableCol, styles.colVAT, styles.center]}>
               <Text style={styles.tableCellBold}>
-                {t.invoiceItemsTable.vat}
+                {vatLabelText}
               </Text>
             </View>
           ) : null}
@@ -109,7 +110,7 @@ export function InvoiceItemsTable({
           {isVATAmountFieldVisible ? (
             <View style={[styles.tableCol, styles.colVATAmount, styles.center]}>
               <Text style={styles.tableCellBold}>
-                {t.invoiceItemsTable.vatAmount}
+                {vatLabelText} Amount
               </Text>
             </View>
           ) : null}

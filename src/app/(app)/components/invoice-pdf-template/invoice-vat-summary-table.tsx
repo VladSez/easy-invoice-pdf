@@ -14,6 +14,7 @@ export function InvoiceVATSummaryTable({
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
+  const vatLabelText = invoiceData.vatLabelText || "VAT";
 
   const sortedItems = [...(invoiceData?.items ?? [])].sort((a, b) => {
     // Handle cases where either value is a string (NP or OO)
@@ -60,13 +61,13 @@ export function InvoiceVATSummaryTable({
       {/* Header row */}
       <View style={styles.tableRow}>
         <View style={[styles.tableCol, { width: "25%" }]}>
-          <Text style={styles.tableCellBold}>{t.vatSummaryTable.vatRate}</Text>
+          <Text style={styles.tableCellBold}>{vatLabelText} Rate</Text>
         </View>
         <View style={[styles.tableCol, { width: "25%" }]}>
           <Text style={styles.tableCellBold}>{t.vatSummaryTable.net}</Text>
         </View>
         <View style={[styles.tableCol, { width: "25%" }]}>
-          <Text style={styles.tableCellBold}>{t.vatSummaryTable.vat}</Text>
+          <Text style={styles.tableCellBold}>{vatLabelText}</Text>
         </View>
         <View style={[styles.tableCol, { width: "25%" }]}>
           <Text style={styles.tableCellBold}>{t.vatSummaryTable.preTax}</Text>
