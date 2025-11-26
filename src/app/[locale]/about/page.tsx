@@ -201,7 +201,22 @@ function HeroSection() {
 
               <div className="flex justify-center xl:justify-start">
                 <p className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
-                  {t("hero.description")}
+                  {t.rich("hero.description", {
+                    span: (chunks) => (
+                      <span className="relative inline-block px-0.5 font-bold text-slate-900">
+                        <span
+                          className="absolute inset-0 -rotate-1 scale-105 transform bg-yellow-300 dark:bg-yellow-600"
+                          style={{
+                            clipPath:
+                              "polygon(1% 12%, 98% 8%, 98% 88%, 2% 92%)",
+                            zIndex: -1,
+                            opacity: 0.8,
+                          }}
+                        ></span>
+                        {chunks}
+                      </span>
+                    ),
+                  })}
                 </p>
               </div>
             </div>
@@ -550,7 +565,7 @@ function CtaSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <GithubIcon className="mr-2 h-6 w-6 fill-slate-100 transition-transform duration-300 group-hover:scale-110 group-hover:fill-slate-950" />
+                  <GithubIcon className="mr-2 size-6 fill-slate-100 transition-transform duration-300 group-hover:scale-110 group-hover:fill-slate-200" />
                   {t("buttons.starOnGithub")}
                 </Link>
               </Button>

@@ -1,38 +1,50 @@
-# 🧾 [EasyInvoicePDF](https://easyinvoicepdf.com)
+<div align="center">
+  <a href="https://git.new/easy-invoice">
+    <img src=".github/screenshots/easy-invoice-logo.svg" alt="Logo" width="80" height="80">
+  </a>
 
-> Free & Open-Source Invoice Generator. Create professional invoices instantly in your browser with **live preview**, **multiple templates**, and **no sign-up required**. **[Try it now → easyinvoicepdf.com](https://easyinvoicepdf.com)**
+  <h3 align="center">EasyInvoicePDF</h3>
 
-**🌐 [Discover more features and use cases → easyinvoicepdf.com/en/about](https://easyinvoicepdf.com/en/about)**
+  <p align="center">
+       Free & Open-Source Invoice Generator
+    <br />
+    <br />
+    <a href="https://dub.sh/invoice-stripe">App</a>
+    ·
+    <a href="https://dub.sh/easy-pdf-about">Landing Page</a>
+    ·
+    <a href="https://github.com/VladSez/easy-invoice-pdf/releases">Releases</a>
 
-## Features
+  </p>
+</div>
+
+## Introduction
+
+**EasyInvoicePDF** is a Free & Open-Source Invoice Generator. Create professional invoices instantly in your browser with **Live Preview**, **Multiple Templates** (including a Stripe-style design). **No Sign-Up Required**.
+
+Visit the app website at [EasyInvoicePDF.com](https://dub.sh/invoice-stripe)
+
+<img width="1440" height="769" alt="stripe template" src=".github/screenshots/stripe-template.png" />
+
+<img width="1440" height="769" alt="stripe template" src=".github/screenshots/default-template.png" />
+
+## ✨ Key Features
 
 - ⚡ **Live Preview**: See changes in real-time as you type
 - 🔗 **Shareable Links**: Send invoices directly to clients without attachments
 - ⭐ **No Sign-Up Required**: Start creating invoices immediately without any registration
 - 📱 **Browser Only**: No server uploads, your data stays private
 - 🌍 **Multi-Language**: Support for 10+ languages and all major currencies
-- 🧮 **European VAT**: Automatic VAT calculation and formatting
+- 💰 **Flexible Tax Support**: VAT, GST, Sales Tax, and custom tax formats with automatic calculations
 - 🎨 **Multiple Templates**: Including modern **Stripe-style design**
 - 📄 **Instant PDF**: One-click download ready for printing or sending
 - 📱 **Mobile-Friendly**: Fully responsive design works perfectly on all devices
 
-**❤️ Support the project**: [Buy me a coffee](https://buymeacoffee.com/vladsazon) to help keep EasyInvoicePDF free and open-source!
-
-#### Default Invoice Template
-
-<img width="1440" height="769" alt="default template" src=".github/screenshots/default.png" />
-
-#### Stripe Invoice Template
-
-<img width="1440" height="769" alt="stripe template" src=".github/screenshots/stripe.png" />
-
-#### Stripe Invoice Template with Logo
-
-<img width="1440" height="769" alt="stripe template with logo" src=".github/screenshots/stripe-with-logo.png" />
+**❤️ Support the project**: [Buy me a coffee](https://buymeacoffee.com/vladsazon) to help keep EasyInvoicePDF free and open-source 🚀
 
 ## Demo Video 🎥
 
-Watch a quick demo of EasyInvoicePDF in action to see how easy it is to create professional invoices in seconds. The video demonstrates key features like live preview, instant PDF download, and customization options.
+Watch a quick demo of EasyInvoicePDF in action to see how easy it is to create professional invoices in seconds. The video demonstrates key features like **Live Preview**, **Instant PDF Download**, and **Customization Options**.
 
 https://github.com/user-attachments/assets/9e3194e0-3072-4c95-ae99-e66db1301dc6
 

@@ -52,6 +52,7 @@ import {
 } from "./hooks/use-show-random-cta-toast";
 import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./components/cta-toasts";
 import { useCTAToast } from "./contexts/cta-toast-context";
+import { GithubIcon } from "@/components/etc/github-logo";
 
 // import { DevLocalStorageView } from "./components/dev/dev-local-storage-view";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
@@ -616,7 +617,7 @@ function ProjectInfo() {
 
   return (
     <>
-      <span className="relative bottom-0 text-center text-sm text-gray-900 lg:bottom-3">
+      <div className="relative bottom-0 flex flex-wrap items-center justify-center gap-1 text-center text-sm text-gray-900 lg:bottom-3">
         <button
           onClick={handleWatchDemoClick}
           className="inline-flex items-center gap-1.5 transition-colors hover:text-blue-600 hover:underline"
@@ -631,7 +632,18 @@ function ProjectInfo() {
         >
           Share your feedback
         </a>
-      </span>
+        {" | "}
+
+        <a
+          href={GITHUB_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex items-center gap-1 transition-colors hover:text-blue-600 hover:underline"
+        >
+          <GithubIcon className="size-4 transition-transform group-hover:fill-blue-600" />
+          <span className="group-hover:text-blue-600">View on GitHub</span>
+        </a>
+      </div>
 
       <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
         <DialogContent className="max-h-[calc(100vh-2rem)] gap-0 overflow-hidden p-0 sm:max-w-[800px]">
