@@ -389,21 +389,62 @@ export const invoiceItemSchema = z
       }),
     netPriceFieldIsVisible: z.boolean().default(true),
 
-    vat: z.union([
-      z.enum(["NP", "OO"]),
-      z
-        .any()
-        .refine((val) => val !== "", {
-          message: `Field is required. Enter a percentage (0-100), "NP" (not applicable), or "OO" (out of scope)`,
-        })
-        .refine((val) => !isNaN(Number(val)), {
-          message: `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
-        })
-        .transform(Number)
-        .refine((val) => val >= 0 && val <= 100, {
-          message: "Must be between 0 and 100",
-        }),
-    ]),
+    // Tax rate. Accepts numbers 0-100 or any text string (i.e. NP, OO, etc)
+    // Valid inputs and their outputs:
+    // - "23" -> 23 (number)
+    // - "100" -> 100 (number)
+    // - "NP" -> "NP" (string)
+    vat: z
+      .preprocess(
+        // z.preprocess runs before Zod does any validation, parsing, or type checking on the schema it wraps.
+        (raw) => {
+          // Handle null/undefined by returning empty string for validation
+          if (raw == null) return "";
+
+          // Trim whitespace from string inputs, pass through other types as-is
+          const val = typeof raw === "string" ? raw.trim() : raw;
+
+          // Empty strings should fail the required validation
+          if (val === "") return "";
+
+          // Attempt to convert to number
+          const num = Number(val);
+
+          // If conversion succeeds, return as number (for 0-100 validation)
+          // Otherwise, return as string (for text values like "NP", "OO", etc)
+          return Number.isNaN(num) ? val : num;
+        },
+        z.union(
+          [
+            z
+              .number()
+              .min(
+                0,
+                `Must be a number between 0-100 or any text string (i.e. NP, OO, etc).`,
+              )
+              .max(
+                100,
+                `Must be a number between 0-100 or any text string (i.e. NP, OO, etc).`,
+              ),
+            z
+              .string()
+              .min(
+                1,
+                `Field is required. Enter a number (0-100) or any text string (i.e. NP, OO, etc).`,
+              ),
+          ],
+          {
+            errorMap: () => ({
+              message:
+                "Field is required. Must be a number between 0-100 or any text string (i.e. NP, OO, etc).",
+            }),
+          },
+        ),
+      )
+      .describe(
+        "Tax rate. Accepts numbers 0-100 or any text string (i.e. NP, OO, etc).",
+      ),
+
     vatFieldIsVisible: z.boolean().default(true),
 
     netAmount: z.coerce.number().nonnegative("Net amount must be non-negative"),
@@ -566,16 +607,16 @@ export const invoiceSchema = z.object({
    * VAT label customization
    *
    * Allows users to customize the tax label text
-   * Default is "VAT" but can be changed to "Tax", "GST", "Sales Tax", etc.
+   * Default is "VAT" but can be changed to any string value i.e. "Sales Tax", "GST", "IVA", etc.
    */
-  vatLabelText: z
+  taxLabelText: z
     .string()
-    .min(1, "VAT label is required")
-    .max(50, "VAT label must not exceed 50 characters")
+    .min(1, "Tax label is required i.e. 'VAT', 'GST', 'Sales Tax', etc.")
+    .max(50, "Tax label must not exceed 50 characters")
     .trim()
     .default("VAT")
     .describe(
-      "Customizable tax label text. Default is 'VAT'. Can be changed to 'Tax', 'GST', 'Sales Tax', etc.",
+      "Customizable tax label text. Default is 'VAT'. Can be changed to any string value i.e. 'Sales Tax', 'GST', 'IVA', etc.",
     ),
 
   dateOfIssue: z

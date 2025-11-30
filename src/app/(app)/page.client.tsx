@@ -38,7 +38,6 @@ import {
   compressInvoiceData,
   decompressInvoiceData,
 } from "@/utils/url-compression";
-import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -54,16 +53,7 @@ import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./components/cta-toasts";
 import { useCTAToast } from "./contexts/cta-toast-context";
 import { GithubIcon } from "@/components/etc/github-logo";
 
-// import { DevLocalStorageView } from "./components/dev/dev-local-storage-view";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
-
-const DevLocalStorageView = dynamic(
-  () =>
-    import("./components/dev/dev-local-storage-view").then(
-      (mod) => mod.DevLocalStorageView,
-    ),
-  { ssr: false },
-);
 
 export function AppPageClient({
   githubStarsCount,
@@ -408,10 +398,6 @@ export function AppPageClient({
 
   return (
     <TooltipProvider delayDuration={0}>
-      {process.env.NEXT_PUBLIC_DEBUG_LOCAL_STORAGE_UI === "true" && (
-        <DevLocalStorageView />
-      )}
-
       <div className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
         <div className="w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 2xl:max-w-[1680px]">
           <div data-testid="header">

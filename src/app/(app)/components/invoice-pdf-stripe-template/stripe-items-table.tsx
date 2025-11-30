@@ -25,15 +25,10 @@ export function StripeItemsTable({
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
-  const vatLabelText = invoiceData.vatLabelText || "VAT";
+  const taxLabelText = invoiceData.taxLabelText || "VAT";
 
   // Set dayjs locale based on invoice language
   dayjs.locale(language);
-
-  // Check if any items have numeric VAT values (not "NP" or "OO")
-  const hasNumericVat = invoiceData.items.some(
-    (item) => typeof item.vat === "number",
-  );
 
   // Calculate service period (example: Jan 01 2025 - Jan 31 2025)
   const servicePeriodStart = dayjs(invoiceData.dateOfService)
@@ -45,8 +40,6 @@ export function StripeItemsTable({
   );
 
   const vatAmountFieldIsVisible = invoiceData.items[0].vatFieldIsVisible;
-
-  const canShowVat = vatAmountFieldIsVisible && hasNumericVat;
 
   return (
     <View style={[styles.table, styles.mt24]}>
@@ -61,9 +54,9 @@ export function StripeItemsTable({
         <View style={styles.colUnitPrice}>
           <Text style={[styles.fontSize8]}>{t.stripe.unitPrice}</Text>
         </View>
-        {canShowVat ? (
+        {vatAmountFieldIsVisible ? (
           <View style={styles.colTax}>
-            <Text style={[styles.fontSize8]}>{vatLabelText}</Text>
+            <Text style={[styles.fontSize8]}>{taxLabelText}</Text>
           </View>
         ) : null}
         <View style={styles.colAmount}>
@@ -91,8 +84,9 @@ export function StripeItemsTable({
         });
 
         // Format VAT value
-        const formattedVat =
-          typeof item.vat === "number" ? `${item.vat}%` : item.vat;
+        const formattedVat = Number.isNaN(Number(item.vat))
+          ? item.vat
+          : `${Number(item.vat)}%`;
 
         return (
           <View style={styles.tableRow} key={index}>
@@ -113,10 +107,10 @@ export function StripeItemsTable({
                 {formattedNetPrice}
               </Text>
             </View>
-            {canShowVat ? (
+            {vatAmountFieldIsVisible ? (
               <View style={styles.colTax}>
                 <Text style={[styles.fontSize11, styles.textDark]}>
-                  {typeof item.vat === "number" ? formattedVat : ""}
+                  {formattedVat}
                 </Text>
               </View>
             ) : null}

@@ -138,4 +138,6 @@ export const INITIAL_INVOICE_DATA = {
   paymentMethodFieldIsVisible: true,
   personAuthorizedToReceiveFieldIsVisible: true,
   personAuthorizedToIssueFieldIsVisible: true,
+
+  taxLabelText: "VAT",
 } as const satisfies InvoiceData;

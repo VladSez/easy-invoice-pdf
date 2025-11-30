@@ -14,7 +14,7 @@ export function InvoiceItemsTable({
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
-  const vatLabelText = invoiceData.vatLabelText || "VAT";
+  const taxLabelText = invoiceData.taxLabelText || "VAT";
 
   // we need to check only the first row, because all next rows are the same
   const isInvoiceItemNumberVisible =
@@ -29,6 +29,8 @@ export function InvoiceItemsTable({
   const isVATAmountFieldVisible = invoiceData.items[0].vatAmountFieldIsVisible;
   const isPreTaxAmountFieldVisible =
     invoiceData.items[0].preTaxAmountFieldIsVisible;
+
+  console.log({ invoiceData });
 
   return (
     <View style={{ marginBottom: 5, marginTop: 14 }}>
@@ -91,9 +93,7 @@ export function InvoiceItemsTable({
           {/* VAT column */}
           {isVATFieldVisible ? (
             <View style={[styles.tableCol, styles.colVAT, styles.center]}>
-              <Text style={styles.tableCellBold}>
-                {vatLabelText}
-              </Text>
+              <Text style={styles.tableCellBold}>{taxLabelText}</Text>
             </View>
           ) : null}
 
@@ -109,9 +109,7 @@ export function InvoiceItemsTable({
           {/* VAT amount column */}
           {isVATAmountFieldVisible ? (
             <View style={[styles.tableCol, styles.colVATAmount, styles.center]}>
-              <Text style={styles.tableCellBold}>
-                {vatLabelText} Amount
-              </Text>
+              <Text style={styles.tableCellBold}>{taxLabelText} Amount</Text>
             </View>
           ) : null}
 
@@ -163,6 +161,10 @@ export function InvoiceItemsTable({
               maximumFractionDigits: 2,
             })
             .replaceAll(",", " ");
+
+          const formattedVat = Number.isNaN(Number(item.vat))
+            ? item.vat
+            : `${Number(item.vat)}%`;
 
           // Table row
           return (
@@ -245,9 +247,7 @@ export function InvoiceItemsTable({
                     { textAlign: "center" },
                   ]}
                 >
-                  <Text style={styles.tableCell}>
-                    {isNaN(Number(item.vat)) ? item.vat : `${item.vat}%`}
-                  </Text>
+                  <Text style={styles.tableCell}>{formattedVat}</Text>
                 </View>
               ) : null}
 

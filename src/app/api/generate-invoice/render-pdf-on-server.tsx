@@ -148,6 +148,7 @@ export const ENGLISH_INVOICE_REAL_DATA = {
   personAuthorizedToIssueFieldIsVisible: true,
 
   template: "default",
+  taxLabelText: "VAT",
 } as const satisfies InvoiceData;
 
 export const POLISH_INVOICE_REAL_DATA = {

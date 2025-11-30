@@ -29,7 +29,7 @@ export function Footer({
         <div className="flex flex-col gap-10 md:flex-row">
           <div className="space-y-4 md:w-1/3">
             <div className="flex items-center">
-              <ProjectLogo className="h-8 w-8" />
+              <ProjectLogo className="size-8" />
               <p className="text-balance text-center text-xl font-bold text-slate-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
                 <a
                   href="https://easyinvoicepdf.com"

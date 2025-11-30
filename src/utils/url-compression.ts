@@ -99,6 +99,7 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   vatAmountFieldIsVisible: "Y",
   preTaxAmount: "Z",
   preTaxAmountFieldIsVisible: "0",
+  taxLabelText: "1",
 } as const satisfies Record<AllInvoiceKeys, string>;
 
 /**

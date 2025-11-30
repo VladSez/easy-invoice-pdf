@@ -191,7 +191,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   const template = useWatch({ control, name: "template" });
   const logo = useWatch({ control, name: "logo" });
-  const vatLabelText = useWatch({ control, name: "vatLabelText" }) || "VAT";
+  const taxLabelText = useWatch({ control, name: "taxLabelText" }) || "VAT";
 
   // Disable sharing when Stripe template contains a logo (we can't put the logo base64 string in the URL due to browser URL length limits)
   useEffect(() => {
@@ -429,7 +429,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               language={language}
               append={append}
               template={template}
-              vatLabelText={vatLabelText}
+              taxLabelText={taxLabelText}
             />
           </AccordionContent>
         </AccordionItem>
@@ -708,8 +708,16 @@ const calculateItemTotals = (item: InvoiceItemData | null) => {
   const formattedNetAmount = Number(calculatedNetAmount.toFixed(2));
 
   let vatAmount = 0;
-  if (item.vat && item.vat !== "NP" && item.vat !== "OO") {
-    vatAmount = (formattedNetAmount * Number(item.vat)) / 100;
+
+  // item.vat always come as a string, so we need to convert it to a number ("23" -> 23) to calculate the VAT amount
+  // it also can be not a number (e.g. "NP", "OO", etc), in this case we don't calculate the VAT amount and set it to 0
+  if (item?.vat) {
+    const vatValue = Number(item.vat);
+    const isVatValueANumber = !Number.isNaN(vatValue);
+
+    if (isVatValueANumber) {
+      vatAmount = (formattedNetAmount * vatValue) / 100;
+    }
   }
 
   const formattedVatAmount = Number(vatAmount.toFixed(2));
