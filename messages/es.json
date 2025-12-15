@@ -36,9 +36,9 @@
           "title": "Múltiples Idiomas y Monedas",
           "description": "Cree facturas en diez idiomas (inglés, polaco, alemán, español, portugués, ruso, ucraniano, francés, italiano, holandés) con soporte para todas las principales monedas y formato automático."
         },
-        "vatSupport": {
-          "title": "Soporte de VAT Europeo",
-          "description": "Calcula automáticamente las tasas y totales del VAT europeo para tus facturas."
+        "taxSupport": {
+          "title": "Sistema Fiscal Flexible",
+          "description": "Compatible con cualquier sistema fiscal incluyendo IVA, Sales Tax, GST y más. Completamente personalizable según tus requisitos locales."
         },
         "openSource": {
           "title": "Código Abierto",
@@ -67,7 +67,8 @@
       "starOnGithub": "Dar estrella en GitHub",
       "switchLanguage": "Cambiar idioma",
       "shareFeedback": "Compartir comentarios",
-      "app": "Aplicación"
+      "app": "Aplicación",
+      "startInvoicing": "Comenzar a facturar"
     },
     "newsletter": {
       "title": "Suscríbete a nuestro boletín",

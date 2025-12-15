@@ -1,12 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
 
+import dotenv from "dotenv";
+import path from "path";
+dotenv.config({ path: path.resolve(__dirname, ".env.local") });
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 // process.env.NODE_ENV = "test";
 
@@ -16,7 +17,10 @@ const PORT = process.env.PORT ?? 3000;
 // Set webServer.url and use.baseURL with the location of the WebServer respecting the correct set port
 const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
 
-const TIMEOUT = 120 * 1000;
+// @ts-expect-error - NODE_ENV is not defined in the environment variables
+const isLocal = process.env.NODE_ENV === "local";
+
+const TIMEOUT = isLocal ? 40_000 : 80_000; // 80 seconds
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -33,7 +37,7 @@ export default defineConfig({
   workers: process.env.CI ? 2 : undefined,
   /* timeout for expect assertions */
   expect: {
-    timeout: 60_000,
+    timeout: isLocal ? 30_000 : 60_000,
   },
 
   // /* timeout for test execution */

@@ -100,6 +100,9 @@ importers:
       dayjs:
         specifier: 1.11.13
         version: 1.11.13
+      dotenv:
+        specifier: 17.2.3
+        version: 17.2.3
       eslint-plugin-react-hooks:
         specifier: 5.2.0
         version: 5.2.0(eslint@9.33.0(jiti@2.4.2))
@@ -5493,10 +5496,10 @@ packages:
       }
     engines: { node: ">=12" }
 
-  dotenv@17.2.2:
+  dotenv@17.2.3:
     resolution:
       {
-        integrity: sha512-Sf2LSQP+bOlhKWWyhFsn0UsfdK/kCWRv1iuA2gXAwt3dyNabr6QSj00I2V10pidqz69soatm9ZwZvpQMTIOd5Q==,
+        integrity: sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w==,
       }
     engines: { node: ">=12" }
 
@@ -11358,7 +11361,7 @@ snapshots:
   "@dotenvx/dotenvx@1.49.0":
     dependencies:
       commander: 11.1.0
-      dotenv: 17.2.2
+      dotenv: 17.2.3
       eciesjs: 0.4.15
       execa: 5.1.1
       fdir: 6.4.4(picomatch@4.0.3)
@@ -14380,7 +14383,7 @@ snapshots:
 
   dotenv@16.4.7: {}
 
-  dotenv@17.2.2: {}
+  dotenv@17.2.3: {}
 
   dunder-proto@1.0.1:
     dependencies:

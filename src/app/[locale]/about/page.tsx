@@ -8,26 +8,23 @@ import {
 import { SubscribeInput } from "@/components/subscribe-input";
 import { Button } from "@/components/ui/button";
 
+import { BlackAnimatedGoToAppBtn } from "@/components/animated-go-to-app-btn";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Video } from "@/components/video";
-import { GITHUB_URL, STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
-import { routing } from "@/i18n/routing";
 import {
-  CalculatorIcon,
-  ChevronDown,
-  Download,
-  FileText,
-  GlobeIcon,
-  Share2,
-} from "lucide-react";
+  GITHUB_URL,
+  IMAGEKIT_CDN_URL,
+  STATIC_ASSETS_URL,
+  VIDEO_DEMO_URL,
+} from "@/config";
+import { routing } from "@/i18n/routing";
+import { cn } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
 import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { type Graph } from "schema-dts";
-import { LandingCtaToast } from "./components/landing-cta-toast";
 import { LanguageSwitcher } from "./components/language-switcher";
-import { ProjectLogoDescription } from "@/components/project-logo-description";
-import { BlackAnimatedGoToAppBtn } from "@/components/animated-go-to-app-btn";
 
 // statically generate the pages for all locales
 export function generateStaticParams() {
@@ -60,7 +57,6 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
           __html: JSON.stringify(JSON_LD),
         }}
       />
-      <LandingCtaToast />
       <div className="flex min-h-screen flex-col bg-slate-50">
         <Header locale={locale} />
         <main>
@@ -222,14 +218,14 @@ function HeroSection() {
             </div>
 
             <div className="flex w-full flex-col justify-center gap-3 sm:flex-row sm:flex-wrap xl:justify-start">
-              <BlackGoToAppButton className="px-10 py-6 text-lg">
-                {t("buttons.goToApp")}
+              <BlackGoToAppButton className="w-full px-10 py-6 text-lg lg:w-[270px] lg:max-w-[270px]">
+                <span className="text-clip">{t("buttons.startInvoicing")}</span>
               </BlackGoToAppButton>
 
               <Button
                 size="lg"
                 variant="outline"
-                className="group relative overflow-hidden border-slate-200 px-10 py-6 text-lg shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md"
+                className="group relative w-full overflow-hidden border-slate-200 px-10 py-6 text-lg shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md lg:w-[270px] lg:max-w-[270px]"
                 asChild
               >
                 <Link
@@ -238,7 +234,7 @@ function HeroSection() {
                   rel="noopener noreferrer"
                 >
                   <GithubIcon className="mr-2 h-6 w-6 transition-transform group-hover:scale-110" />
-                  {t("buttons.viewOnGithub")}
+                  <span className="text-clip">{t("buttons.viewOnGithub")}</span>
                 </Link>
               </Button>
             </div>
@@ -285,13 +281,12 @@ function CtaTextMobile({
 }) {
   return (
     <div
-      className="mx-auto flex max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 xl:hidden"
+      className="mx-auto mt-6 flex max-w-fit items-center justify-center gap-x-2 rounded-full border border-amber-300 bg-gradient-to-br from-amber-50 to-amber-100/80 px-5 py-2 text-center text-sm font-medium text-amber-900 shadow-md transition-all xl:hidden"
       data-testid="cta-text-mobile"
+      role="status"
+      aria-live="polite"
     >
-      <span className="" role="img" aria-label="checkmark">
-        ✅
-      </span>
-      <span>{text}</span>
+      <span className="leading-relaxed">{text}</span>
     </div>
   );
 }
@@ -304,7 +299,7 @@ function CtaTextDesktop({
 }) {
   return (
     <div
-      className="mx-auto hidden max-w-fit cursor-pointer items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0 xl:flex"
+      className="mx-auto hidden max-w-fit items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0 xl:flex"
       data-testid="cta-text-desktop"
     >
       <span className="" role="img" aria-label="checkmark">
@@ -321,52 +316,52 @@ function FeaturesSection() {
   const FEATURES_CARDS = [
     {
       translationKey: "livePreview",
-      icon: <FileText className="h-10 w-10 text-slate-700" />,
+      videoSrc: `${IMAGEKIT_CDN_URL}/live-preview.mp4?updatedAt=1764511439140`,
+      videoFallbackImg: `${IMAGEKIT_CDN_URL}/live-preview-fallback.png?updatedAt=1764511421437`,
     },
     {
       translationKey: "shareableLinks",
-      icon: <Share2 className="h-10 w-10 text-slate-700" />,
+      videoSrc: `${IMAGEKIT_CDN_URL}/share-invoice.mp4`,
+      videoFallbackImg: `${IMAGEKIT_CDN_URL}/share-invoice-fallback.png`,
     },
     {
       translationKey: "instantDownload",
-      icon: <Download className="h-10 w-10 text-slate-700" />,
+      videoSrc: `${IMAGEKIT_CDN_URL}/instand-download.mp4`,
+      videoFallbackImg: `${IMAGEKIT_CDN_URL}/instant-download-fallback.png`,
     },
     {
       translationKey: "multiLanguage",
-      icon: <GlobeIcon className="h-10 w-10 text-slate-700" />,
+      videoSrc: `${IMAGEKIT_CDN_URL}/multi-lang.mp4?updatedAt=1764535032761`,
+      videoFallbackImg: `${IMAGEKIT_CDN_URL}/multi-lang-fallback.png?updatedAt=1764535032761`,
     },
     {
-      translationKey: "vatSupport",
-      icon: <CalculatorIcon className="h-10 w-10 text-slate-700" />,
+      translationKey: "taxSupport",
+      videoSrc: `${IMAGEKIT_CDN_URL}/tax-custom.mp4`,
+      videoFallbackImg: `${IMAGEKIT_CDN_URL}/tax-custom-fallback.png`,
     },
     {
       translationKey: "openSource",
-      icon: <GithubIcon className="h-10 w-10 text-slate-700" />,
+      videoSrc: `${IMAGEKIT_CDN_URL}/open-source.mp4`,
+      videoFallbackImg: `${IMAGEKIT_CDN_URL}/open-source-fallback.png`,
     },
   ] as const satisfies {
     translationKey: string;
-    icon: React.ReactNode;
+    videoSrc: string;
+    videoFallbackImg: string;
   }[];
 
   return (
     <section
       id="features"
-      className="flex w-full items-center justify-center bg-slate-50 py-4 lg:py-8 xl:py-16"
+      className="mt-8 flex w-full items-center justify-center bg-slate-50 py-4 lg:py-8 xl:mt-16 xl:py-16"
     >
       <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center">
-          <div className="space-y-2">
-            <div
-              className="mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-sm transition-colors"
-              data-testid="features-badge"
-            >
-              {t("features.badge")}
-            </div>
-
-            <h2 className="text-3xl font-bold tracking-tighter text-slate-900 md:text-4xl/tight">
+        <div className="flex flex-col items-center justify-center space-y-8 text-center">
+          <div className="space-y-5">
+            <h2 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
               {t("features.title")}
             </h2>
-            <p className="max-w-[900px] text-slate-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+            <p className="mx-auto mt-4 max-w-[700px] text-pretty text-base text-slate-600 sm:text-lg md:text-xl">
               {t("features.description")}
             </p>
           </div>
@@ -377,24 +372,39 @@ function FeaturesSection() {
             {t("features.comingSoon")}
           </div>
         </div>
-        <div className="mx-auto grid max-w-5xl items-center gap-6 pt-10 md:grid-cols-2 md:gap-10 lg:grid-cols-3">
-          {FEATURES_CARDS.map((feature) => {
+
+        <div className="flex flex-row flex-wrap items-center justify-center gap-6 pt-10 md:gap-10">
+          {FEATURES_CARDS.map((feature, index) => {
             const title = t(`features.items.${feature.translationKey}.title`);
             const description = t(
               `features.items.${feature.translationKey}.description`,
             );
+            const isEven = index % 2 === 0;
 
             return (
               <div
                 key={feature.translationKey}
-                className="flex h-full flex-col items-start gap-4 rounded-lg border border-slate-100 bg-white p-6 shadow-sm"
+                className={cn(
+                  `flex h-full w-full flex-col items-start gap-6 rounded-lg border border-slate-200 bg-white shadow-sm md:items-center`,
+                  isEven ? "lg:flex-row" : "lg:flex-row-reverse", // swap the video and text content for even index
+                )}
               >
-                {feature.icon}
-                <div>
-                  <h3 className="text-balance pb-2 text-xl font-bold text-slate-900">
+                <div className="flex-1 px-6 pb-2 pt-6 xl:px-8 xl:py-4">
+                  <h3 className="text-balance pb-4 text-xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-2xl">
                     {title}
                   </h3>
-                  <p className="text-balance text-slate-600">{description}</p>
+                  <p className="text-pretty text-base leading-relaxed text-slate-600 sm:text-lg sm:leading-7">
+                    {description}
+                  </p>
+                </div>
+                <div className="w-full max-w-[800px]">
+                  {feature?.videoSrc && feature?.videoFallbackImg && (
+                    <Video
+                      src={feature.videoSrc}
+                      fallbackImg={feature.videoFallbackImg}
+                      testId={`${feature.translationKey}-demo-video`}
+                    />
+                  )}
                 </div>
               </div>
             );
@@ -438,19 +448,16 @@ function FaqSection() {
     >
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
-          <div className="space-y-2">
-            <div className="mb-10 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-900 shadow-sm transition-colors">
-              FAQ
-            </div>
-            <h2 className="text-3xl font-bold tracking-tighter text-slate-900 md:text-4xl/tight">
+          <div className="space-y-5">
+            <h2 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
               {t("title")}
             </h2>
-            <p className="max-w-[900px] text-slate-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+            <p className="mx-auto mt-4 max-w-[700px] text-pretty text-base text-slate-600 sm:text-lg md:text-xl">
               {t("description")}
             </p>
           </div>
         </div>
-        <div className="mx-auto mt-8 max-w-3xl">
+        <div className="mx-auto mt-14 max-w-3xl">
           <div className="space-y-2">
             {FAQ_ITEMS.map((item) => {
               const question = t(`items.${item.translationKey}.question`);
@@ -541,9 +548,9 @@ function CtaSection() {
       className="flex w-full items-center justify-center bg-slate-900 py-12 md:py-24 lg:py-32"
     >
       <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tighter text-white md:text-4xl/tight">
+        <div className="flex flex-col items-center justify-center space-y-7 text-center">
+          <div className="flex flex-col items-center justify-center space-y-2">
+            <h2 className="text-3xl font-bold tracking-tighter text-white md:text-5xl/tight">
               {t("cta.title")}
             </h2>
             <p className="max-w-[600px] text-slate-300 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -552,12 +559,12 @@ function CtaSection() {
           </div>
           <div className="flex w-full flex-col items-center justify-center gap-6">
             <div className="flex w-full flex-col justify-center gap-2 md:flex-row">
-              <GoToAppButton className="border-slate-600 bg-white px-10 py-6 text-lg text-slate-950 hover:bg-white/90">
-                {t("buttons.goToApp")}
+              <GoToAppButton className="w-full border-slate-600 bg-white px-10 py-6 text-lg text-slate-950 hover:bg-white/90 lg:w-[300px] lg:max-w-[300px]">
+                <span className="text-clip">{t("buttons.goToApp")}</span>
               </GoToAppButton>
               <Button
                 size="lg"
-                className="group border border-slate-700 bg-slate-700 px-10 py-6 text-lg text-white transition-all duration-300 hover:bg-slate-600/80"
+                className="group w-full border border-slate-700 bg-slate-700 px-10 py-6 text-lg text-white transition-all duration-300 hover:bg-slate-600/80 lg:w-[300px] lg:max-w-[300px]"
                 asChild
               >
                 <Link
@@ -566,14 +573,14 @@ function CtaSection() {
                   rel="noopener noreferrer"
                 >
                   <GithubIcon className="mr-2 size-6 fill-slate-100 transition-transform duration-300 group-hover:scale-110 group-hover:fill-slate-200" />
-                  {t("buttons.starOnGithub")}
+                  <span className="text-clip">{t("buttons.starOnGithub")}</span>
                 </Link>
               </Button>
             </div>
+            <p className="animate-pulse text-sm text-slate-400">
+              {t("cta.noSignup")}
+            </p>
           </div>
-          <p className="animate-pulse text-sm text-slate-400">
-            {t("cta.noSignup")}
-          </p>
         </div>
       </div>
     </section>
@@ -581,13 +588,36 @@ function CtaSection() {
 }
 
 function Logo() {
-  const t = useTranslations("About");
+  // const t = useTranslations("About");
 
   return (
     <div>
-      <div className="flex items-center gap-1 sm:gap-2">
-        <ProjectLogo className="h-7 w-7 flex-shrink-0 sm:h-8 sm:w-8" />
-        <ProjectLogoDescription>{t("tagline")}</ProjectLogoDescription>
+      {/* <div className="flex items-center gap-1">
+        <ProjectLogo className="size-7 flex-shrink-0 sm:size-8" />
+        <div className="flex flex-col">
+          <h1 className="text-balance text-xl font-bold text-slate-800 lg:text-2xl">
+            <a
+              href="https://dub.sh/easy-invoice?ref=about-page"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              EasyInvoicePDF
+            </a>
+          </h1>
+        </div> */}
+      {/* <ProjectLogoDescription>{t("tagline")}</ProjectLogoDescription> */}
+      {/* </div> */}
+      <div className="flex items-center">
+        <ProjectLogo className="size-7 flex-shrink-0 sm:size-8" />
+        <p className="text-balance text-center text-xl font-bold text-slate-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
+          <a
+            href="https://easyinvoicepdf.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            EasyInvoicePDF
+          </a>
+        </p>
       </div>
     </div>
   );

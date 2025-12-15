@@ -296,10 +296,6 @@ test.describe("About page", () => {
     const featuresSection = page.locator("#features");
     await expect(featuresSection).toBeVisible();
 
-    await expect(featuresSection.getByTestId("features-badge")).toHaveText(
-      "Fonctionnalités",
-    );
-
     await expect(
       featuresSection.getByTestId("features-coming-soon"),
     ).toHaveText("Version Pro et API bientôt disponibles");
@@ -416,10 +412,6 @@ test.describe("About page", () => {
     // Check Features section in German
     const featuresSection = page.locator("#features");
     await expect(featuresSection).toBeVisible();
-
-    await expect(featuresSection.getByTestId("features-badge")).toHaveText(
-      "Funktionen",
-    );
 
     await expect(
       featuresSection.getByTestId("features-coming-soon"),

@@ -71,14 +71,15 @@ export const Video = ({ src, fallbackImg, testId = "" }: VideoProps) => {
   }, [inView]);
 
   return (
-    <div className="relative">
-      <div
-        style={{
-          // paddingBottom: (2 / 2.67) * 100 + "%", // keeps aspect ratio
-          paddingBottom: "56.3%", // keeps aspect ratio for 16:9
-        }}
-        className=""
-      />
+    // <div className="relative">
+    //   <div
+    //     style={{
+    //       // paddingBottom: (2 / 2.67) * 100 + "%", // keeps aspect ratio
+    //       paddingBottom: "56.3%", // keeps aspect ratio for 16:9
+    //     }}
+    //     className=""
+    //   />
+    <div className="relative aspect-video w-full">
       <video
         className="absolute left-0 top-0 h-full w-full cursor-pointer"
         autoPlay

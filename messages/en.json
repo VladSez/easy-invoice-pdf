@@ -29,9 +29,9 @@
           "title": "Multiple Languages & Currencies",
           "description": "Create invoices in ten languages (English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, Dutch) with support for all major currencies and automatic formatting."
         },
-        "vatSupport": {
-          "title": "European VAT Support",
-          "description": "Automatically calculate European VAT rates and totals for your invoices."
+        "taxSupport": {
+          "title": "Flexible Tax System Support",
+          "description": "Support for any tax system including VAT, Sales Tax, GST, and more. Fully customizable to match your local requirements."
         },
         "openSource": {
           "title": "Open Source",
@@ -60,7 +60,8 @@
       "starOnGithub": "Star on GitHub",
       "switchLanguage": "Switch language",
       "shareFeedback": "Share feedback",
-      "app": "App"
+      "app": "App",
+      "startInvoicing": "Start Invoicing"
     },
     "newsletter": {
       "title": "Subscribe to our newsletter",

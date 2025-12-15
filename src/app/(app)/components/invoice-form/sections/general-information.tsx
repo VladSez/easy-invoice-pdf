@@ -28,8 +28,9 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { TRANSLATIONS } from "@/app/schema/translations";
+import { Button } from "@/components/ui/button";
 import dayjs from "dayjs";
-import { AlertTriangle, Upload, X } from "lucide-react";
+import { AlertTriangle, Upload, X, InfoIcon } from "lucide-react";
 import { memo, useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
@@ -434,7 +435,9 @@ export const GeneralInformation = memo(function GeneralInformation({
       {/* Invoice Number */}
       <div>
         <fieldset className="rounded-md border p-4">
-          <legend className="px-2 text-sm">Invoice Number</legend>
+          <legend className="px-1 text-lg font-semibold text-gray-900">
+            Invoice Number
+          </legend>
           <div className="space-y-4">
             <div>
               <Label htmlFor="invoiceNumberLabel">Label</Label>
@@ -598,6 +601,56 @@ export const GeneralInformation = memo(function GeneralInformation({
           </InputHelperMessage>
         ) : null}
       </div>
+
+      {!isDateOfServiceEqualsEndOfCurrentMonth ||
+      !isInvoiceNumberInCurrentMonth ||
+      isDateOfIssueNotToday ? (
+        <InputHelperMessage>
+          <span className="flex items-start gap-1.5 text-pretty text-blue-800">
+            <InfoIcon className="mt-0.5 inline-block size-3.5 shrink-0 text-blue-800" />
+            <span>
+              Update date of service to end of month, date of issue to today,
+              invoice number to current month, and payment due date to 14 days
+              from today
+            </span>
+          </span>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="default"
+            className="mt-2 text-slate-950 hover:bg-slate-50 hover:text-slate-900"
+            onClick={() => {
+              const today = dayjs().format("YYYY-MM-DD");
+
+              const lastDayOfCurrentMonth = dayjs()
+                .endOf("month")
+                .format("YYYY-MM-DD");
+
+              // Update date of service to end of current month
+              setValue("dateOfService", lastDayOfCurrentMonth);
+
+              // Update date of issue to today
+              setValue("dateOfIssue", today);
+
+              // Update invoice number to current month/year
+              setValue(
+                "invoiceNumberObject.value",
+                `1/${CURRENT_MONTH_AND_YEAR}`,
+              );
+
+              // Update payment due date to 14 days from today
+              const newPaymentDue = dayjs(today)
+                .add(14, "days")
+                .format("YYYY-MM-DD");
+
+              setValue("paymentDue", newPaymentDue);
+            }}
+          >
+            Update all dates
+          </Button>
+        </InputHelperMessage>
+      ) : null}
 
       {/* Invoice Type - We don't show this field for Stripe template */}
       {template !== "stripe" && (

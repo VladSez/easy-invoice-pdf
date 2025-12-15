@@ -36,9 +36,9 @@
           "title": "Mehrere Sprachen & Währungen",
           "description": "Erstellen Sie Rechnungen in zehn Sprachen (Englisch, Polnisch, Deutsch, Spanisch, Portugiesisch, Russisch, Ukrainisch, Französisch, Italienisch, Niederländisch) mit Unterstützung für alle wichtigen Währungen und automatischer Formatierung."
         },
-        "vatSupport": {
-          "title": "Europäische VAT-Unterstützung",
-          "description": "Automatische Berechnung europäischer VAT-Sätze und Gesamtbeträge für Ihre Rechnungen."
+        "taxSupport": {
+          "title": "Flexibles Steuersystem",
+          "description": "Unterstützung für jedes Steuersystem einschließlich MwSt., Sales Tax, GST und mehr. Vollständig anpassbar an Ihre lokalen Anforderungen."
         },
         "openSource": {
           "title": "Open Source",
@@ -67,7 +67,8 @@
       "starOnGithub": "Auf GitHub bewerten",
       "switchLanguage": "Sprache wechseln",
       "shareFeedback": "Feedback teilen",
-      "app": "App"
+      "app": "App",
+      "startInvoicing": "Zur App gehen"
     },
     "newsletter": {
       "title": "Newsletter abonnieren",

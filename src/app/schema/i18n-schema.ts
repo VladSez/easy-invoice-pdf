@@ -32,7 +32,7 @@ const aboutFeaturesSchema = z
         shareableLinks: aboutFeaturesItemSchema,
         instantDownload: aboutFeaturesItemSchema,
         multiLanguage: aboutFeaturesItemSchema,
-        vatSupport: aboutFeaturesItemSchema,
+        taxSupport: aboutFeaturesItemSchema,
         openSource: aboutFeaturesItemSchema,
       })
       .strict(),
@@ -79,6 +79,7 @@ const aboutSchema = z
         switchLanguage: z.string(),
         shareFeedback: z.string(),
         app: z.string(),
+        startInvoicing: z.string(),
       })
       .strict(),
     newsletter: z
