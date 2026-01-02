@@ -30,8 +30,6 @@ export function InvoiceItemsTable({
   const isPreTaxAmountFieldVisible =
     invoiceData.items[0].preTaxAmountFieldIsVisible;
 
-  console.log({ invoiceData });
-
   return (
     <View style={{ marginBottom: 5, marginTop: 14 }}>
       <View style={styles.table}>

@@ -46,7 +46,6 @@ const aboutSchema = z
       .object({
         title: z.string(),
         description: z.string(),
-        noSignup: z.string(),
       })
       .strict(),
     features: aboutFeaturesSchema,

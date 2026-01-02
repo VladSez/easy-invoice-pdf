@@ -320,7 +320,9 @@ export const GeneralInformation = memo(function GeneralInformation({
               onChange={(e) => {
                 field.onChange(e);
 
-                // Update invoice number when language changes
+                // for BETTER USER EXPERIENCE, when switching language, we update the invoice number and labels to the new language
+
+                // Update INVOICE NUMBER and LABELS when language changes
                 const newLanguage = e.target.value as keyof typeof TRANSLATIONS;
 
                 const newInvoiceNumberLabel =
@@ -332,6 +334,18 @@ export const GeneralInformation = memo(function GeneralInformation({
                   `${newInvoiceNumberLabel}:`,
                 );
                 setValue("invoiceNumberObject.value", invoiceNumberValue);
+
+                // Update SELLER VAT NO (Account Number) LABEL TEXT when language changes
+                setValue(
+                  "seller.vatNoLabelText",
+                  TRANSLATIONS[newLanguage].seller.vatNo,
+                );
+
+                // Update BUYER VAT NO (Account Number) LABEL TEXT when language changes
+                setValue(
+                  "buyer.vatNoLabelText",
+                  TRANSLATIONS[newLanguage].buyer.vatNo,
+                );
               }}
             >
               {SUPPORTED_LANGUAGES.map((lang) => {
@@ -609,9 +623,15 @@ export const GeneralInformation = memo(function GeneralInformation({
           <span className="flex items-start gap-1.5 text-pretty text-blue-800">
             <InfoIcon className="mt-0.5 inline-block size-3.5 shrink-0 text-blue-800" />
             <span>
-              Update date of service to end of month, date of issue to today,
-              invoice number to current month, and payment due date to 14 days
-              from today
+              Some dates are out of date. Click the button to set the service
+              date to the end of the month (
+              {dayjs().locale("en").endOf("month").format(selectedDateFormat)}),
+              the issue date to today (
+              {dayjs().locale("en").format(selectedDateFormat)}), the invoice
+              number to the current month ({`1/${CURRENT_MONTH_AND_YEAR}`}), and
+              the payment due date to 14 days from today (
+              {dayjs().locale("en").add(14, "days").format(selectedDateFormat)}
+              ).
             </span>
           </span>
 

@@ -285,7 +285,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   return (
     <form
-      className="mb-4 space-y-3.5"
+      className="relative mb-4 space-y-3.5"
       onSubmit={handleSubmit(onSubmit, (errors) => {
         console.error("Form validation errors:", errors);
         toast.error(
@@ -649,7 +649,7 @@ export const InvoiceForm = memo(function InvoiceForm({
           <div>
             <div className="relative mt-5 space-y-4">
               {/* Show/hide Person Authorized to Receive field in PDF switch */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <Label htmlFor={`personAuthorizedToReceiveFieldIsVisible`}>
                   Show &quot;Person Authorized to Receive&quot; Signature Field
                   in the PDF
@@ -671,7 +671,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               </div>
 
               {/* Show/hide Person Authorized to Issue field in PDF switch */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <Label htmlFor={`personAuthorizedToIssueFieldIsVisible`}>
                   Show &quot;Person Authorized to Issue&quot; Signature Field in
                   the PDF

@@ -19,6 +19,7 @@ export const MOCK_SELLER_DATA = {
   swiftBicFieldIsVisible: true,
   notes: "Seller notes",
   notesFieldIsVisible: true,
+  vatNoLabelText: "VAT no",
 } as const satisfies SellerData;
 
 export const MOCK_BUYER_DATA = {
@@ -30,6 +31,7 @@ export const MOCK_BUYER_DATA = {
   email: "buyer@xyz.com",
   notes: "Buyer notes",
   notesFieldIsVisible: true,
+  vatNoLabelText: "VAT no",
 } as const satisfies BuyerData;
 
 export const MOCK_INVOICE_ITEM_DATA = {

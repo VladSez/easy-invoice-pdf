@@ -162,6 +162,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            // aria-label={`Show/hide the 'Name of Goods/Service' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -220,6 +221,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                               checked={value}
                               onCheckedChange={onChange}
                               className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                              // aria-label={`Show/hide the 'Type of GTU' Column in the PDF for item ${index + 1}`}
                             />
                           )}
                         />
@@ -278,6 +280,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            // aria-label={`Show/hide the 'Amount' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -473,8 +476,38 @@ export const InvoiceItems = memo(function InvoiceItems({
               </div>
 
               {/* Invoice Item Tax Settings */}
-              <fieldset className="mb-4 rounded-md border p-4">
-                <Legend>Tax Settings</Legend>
+              <fieldset className="rounded-md border px-4 pb-4">
+                <legend className="text-base font-semibold lg:text-lg">
+                  Tax Settings
+                </legend>
+                <div className="mb-2 flex items-center justify-end">
+                  {isFirstItem ? (
+                    <div className="inline-flex items-center gap-2">
+                      <Controller
+                        name={`items.${index}.vatFieldIsVisible`}
+                        control={control}
+                        render={({ field: { value, onChange, ...field } }) => (
+                          <Switch
+                            {...field}
+                            id={`itemVatFieldIsVisible${index}`}
+                            checked={value}
+                            onCheckedChange={onChange}
+                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                          />
+                        )}
+                      />
+                      <CustomTooltip
+                        trigger={
+                          <Label htmlFor={`itemVatFieldIsVisible${index}`}>
+                            Show in PDF
+                          </Label>
+                        }
+                        content={`Show/hide the "${taxLabelText}" Column in the PDF`}
+                      />
+                    </div>
+                  ) : null}
+                </div>
+
                 <div>
                   <Label htmlFor="taxLabelText">Tax Label</Label>
                   <Controller
@@ -507,7 +540,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     </Label>
 
                     {/* Show/hide Tax field in PDF switch (Show for both default and custom templates) */}
-                    {isFirstItem ? (
+                    {/* {isFirstItem ? (
                       <div className="inline-flex items-center gap-2">
                         <Controller
                           name={`items.${index}.vatFieldIsVisible`}
@@ -533,7 +566,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                           content={`Show/hide the "${taxLabelText}" Column in the PDF`}
                         />
                       </div>
-                    ) : null}
+                    ) : null} */}
                   </div>
 
                   {/* Tax input */}
@@ -556,7 +589,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     </ErrorMessage>
                   ) : (
                     <InputHelperMessage>
-                      Enter a number (0-100), or any string (i.e. NP, OO, etc).
+                      Enter a number (0-100), or any text (i.e. NP, OO, etc).
                     </InputHelperMessage>
                   )}
                 </div>

@@ -33,7 +33,7 @@ export function StripeSellerBuyerInfo({
         </Text>
         {invoiceData.seller.vatNoFieldIsVisible && (
           <Text style={[styles.fontSize9, styles.mb3]}>
-            {t.seller.vatNo}: {invoiceData.seller.vatNo}
+            {invoiceData.seller.vatNoLabelText}: {invoiceData.seller.vatNo}
           </Text>
         )}
         {invoiceData.seller.accountNumberFieldIsVisible && (
@@ -71,7 +71,7 @@ export function StripeSellerBuyerInfo({
 
         {invoiceData.buyer.vatNoFieldIsVisible && (
           <Text style={[styles.fontSize9, styles.mb3]}>
-            {t.buyer.vatNo}: {invoiceData.buyer.vatNo}
+            {invoiceData.buyer.vatNoLabelText}: {invoiceData.buyer.vatNo}
           </Text>
         )}
 

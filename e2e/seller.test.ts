@@ -1,3 +1,4 @@
+import { SELLER_TOOLTIP_CONTENT } from "@/app/(app)/components/invoice-form/sections/seller-information";
 import { DEFAULT_SELLER_DATA } from "@/app/constants";
 import { type SellerData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
@@ -18,6 +19,8 @@ test.describe("Seller management", () => {
 
       vatNoFieldIsVisible: true,
       vatNo: "123456789",
+      vatNoLabelText: "Tax Number",
+
       email: "test@company.com",
 
       accountNumberFieldIsVisible: true,
@@ -37,12 +40,24 @@ test.describe("Seller management", () => {
     await manageSellerDialog
       .getByRole("textbox", { name: "Name" })
       .fill(testData.name);
+
     await manageSellerDialog
       .getByRole("textbox", { name: "Address" })
       .fill(testData.address);
-    await manageSellerDialog
-      .getByRole("textbox", { name: "VAT Number" })
+
+    // Fill Tax Number fieldset (Label and Value)
+    const vatNumberFieldset = manageSellerDialog.getByRole("group", {
+      name: "Seller Tax Number",
+    });
+
+    await vatNumberFieldset
+      .getByRole("textbox", { name: "Label" })
+      .fill(testData.vatNoLabelText);
+
+    await vatNumberFieldset
+      .getByRole("textbox", { name: "Value" })
       .fill(testData.vatNo);
+
     await manageSellerDialog
       .getByRole("textbox", { name: "Email" })
       .fill(testData.email);
@@ -53,26 +68,32 @@ test.describe("Seller management", () => {
       .getByRole("textbox", { name: "SWIFT/BIC" })
       .fill(testData.swiftBic);
 
+    const taxNumberSwitchInDialogForm = manageSellerDialog.getByRole("switch", {
+      name: `Show/hide the 'Tax Number' field in the PDF`,
+    });
+
+    const accountNumberSwitchInDialogForm = manageSellerDialog.getByRole(
+      "switch",
+      {
+        name: `Show/hide the 'Account Number' field in the PDF`,
+      },
+    );
+    const swiftBicSwitchInDialogForm = manageSellerDialog.getByRole("switch", {
+      name: `Show/hide the 'SWIFT/BIC' field in the PDF`,
+    });
+
     // Verify all switches are checked by default
-    await expect(
-      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(0),
-    ).toBeChecked();
-    await expect(
-      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(1),
-    ).toBeChecked();
-    await expect(
-      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(2),
-    ).toBeChecked();
+    await expect(taxNumberSwitchInDialogForm).toBeChecked();
+    await expect(accountNumberSwitchInDialogForm).toBeChecked();
+    await expect(swiftBicSwitchInDialogForm).toBeChecked();
 
     // Toggle some visibility switches
-    await manageSellerDialog
-      .getByRole("switch", { name: "Show in PDF" })
-      .nth(1)
-      .click(); // Toggle Account Number visibility
-    await manageSellerDialog
-      .getByRole("switch", { name: "Show in PDF" })
-      .nth(2)
-      .click(); // Toggle SWIFT/BIC visibility
+    await accountNumberSwitchInDialogForm.click(); // Toggle Account Number visibility
+
+    await expect(accountNumberSwitchInDialogForm).not.toBeChecked();
+    await swiftBicSwitchInDialogForm.click(); // Toggle SWIFT/BIC visibility
+
+    await expect(swiftBicSwitchInDialogForm).not.toBeChecked();
 
     // Fill in notes field
     await manageSellerDialog
@@ -119,6 +140,7 @@ test.describe("Seller management", () => {
 
       vatNo: testData.vatNo,
       vatNoFieldIsVisible: testData.vatNoFieldIsVisible,
+      vatNoLabelText: testData.vatNoLabelText,
 
       email: testData.email,
 
@@ -143,10 +165,7 @@ test.describe("Seller management", () => {
 
     // Check that HTML title attributes contain the tooltip message on input fields
     const nameInput = sellerForm.getByRole("textbox", { name: "Name" });
-    await expect(nameInput).toHaveAttribute(
-      "title",
-      "Seller details are locked. Click the Edit Seller button (Pencil icon) to modify.",
-    );
+    await expect(nameInput).toHaveAttribute("title", SELLER_TOOLTIP_CONTENT);
 
     // Seller Name
     await expect(nameInput).toHaveAttribute("aria-readonly", "true");
@@ -160,12 +179,24 @@ test.describe("Seller management", () => {
       sellerForm.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(testData.address);
 
-    // Seller VAT Number
+    // Seller Tax Number
+    const sellerVatFieldset = sellerForm.getByRole("group", {
+      name: "Seller Tax Number",
+    });
+
     await expect(
-      sellerForm.getByRole("textbox", { name: "VAT Number" }),
+      sellerVatFieldset.getByRole("textbox", { name: "Label" }),
     ).toHaveAttribute("aria-readonly", "true");
     await expect(
-      sellerForm.getByRole("textbox", { name: "VAT Number" }),
+      sellerVatFieldset.getByRole("textbox", { name: "Label" }),
+    ).toHaveValue(testData.vatNoLabelText);
+
+    await expect(
+      sellerVatFieldset.getByRole("textbox", { name: "Value" }),
+    ).toHaveAttribute("aria-readonly", "true");
+
+    await expect(
+      sellerVatFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue(testData.vatNo);
 
     const vatNumberSwitch = sellerForm.getByTestId(`sellerVatNoFieldIsVisible`);
@@ -189,12 +220,12 @@ test.describe("Seller management", () => {
       sellerForm.getByRole("textbox", { name: "Account Number" }),
     ).toHaveValue(testData.accountNumber);
 
-    const accountNumberSwitch = sellerForm.getByTestId(
+    const accountNumberSwitchNotInDialog = sellerForm.getByTestId(
       `sellerAccountNumberFieldIsVisible`,
     );
     // Verify Account Number switch is visible
-    await expect(accountNumberSwitch).not.toBeChecked();
-    await expect(accountNumberSwitch).toBeDisabled();
+    await expect(accountNumberSwitchNotInDialog).not.toBeChecked();
+    await expect(accountNumberSwitchNotInDialog).toBeDisabled();
 
     // Seller SWIFT/BIC
     await expect(
@@ -204,12 +235,12 @@ test.describe("Seller management", () => {
       sellerForm.getByRole("textbox", { name: "SWIFT/BIC" }),
     ).toHaveValue(testData.swiftBic);
 
-    const swiftBicSwitch = sellerForm.getByTestId(
+    const swiftBicSwitchNotInDialog = sellerForm.getByTestId(
       `sellerSwiftBicFieldIsVisible`,
     );
     // Verify SWIFT/BIC switch is visible
-    await expect(swiftBicSwitch).not.toBeChecked();
-    await expect(swiftBicSwitch).toBeDisabled();
+    await expect(swiftBicSwitchNotInDialog).not.toBeChecked();
+    await expect(swiftBicSwitchNotInDialog).toBeDisabled();
 
     // Seller Notes
     await expect(
@@ -242,9 +273,19 @@ test.describe("Seller management", () => {
     await expect(
       manageSellerDialog.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(testData.address);
+
     await expect(
-      manageSellerDialog.getByRole("textbox", { name: "VAT Number" }),
+      manageSellerDialog
+        .getByRole("group", { name: "Seller Tax Number" })
+        .getByRole("textbox", { name: "Label" }),
+    ).toHaveValue(testData.vatNoLabelText);
+
+    await expect(
+      manageSellerDialog
+        .getByRole("group", { name: "Seller Tax Number" })
+        .getByRole("textbox", { name: "Value" }),
     ).toHaveValue(testData.vatNo);
+
     await expect(
       manageSellerDialog.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(testData.email);
@@ -256,15 +297,9 @@ test.describe("Seller management", () => {
     ).toHaveValue(testData.swiftBic);
 
     // Verify visibility switches state persisted in edit dialog
-    await expect(
-      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(0),
-    ).toBeChecked();
-    await expect(
-      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(1),
-    ).not.toBeChecked();
-    await expect(
-      manageSellerDialog.getByRole("switch", { name: "Show in PDF" }).nth(2),
-    ).not.toBeChecked();
+    await expect(taxNumberSwitchInDialogForm).toBeChecked();
+    await expect(accountNumberSwitchInDialogForm).not.toBeChecked();
+    await expect(swiftBicSwitchInDialogForm).not.toBeChecked();
 
     // Verify notes text
     await expect(
@@ -291,6 +326,7 @@ test.describe("Seller management", () => {
 
       vatNoFieldIsVisible: true,
       vatNo: "123456789",
+      vatNoLabelText: "Tax Number",
 
       accountNumberFieldIsVisible: true,
       accountNumber: "123456789",
@@ -374,15 +410,27 @@ test.describe("Seller management", () => {
     await expect(
       sellerForm.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(DEFAULT_SELLER_DATA.address);
+
     await expect(
       sellerForm.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(DEFAULT_SELLER_DATA.email);
+
     await expect(
-      sellerForm.getByRole("textbox", { name: "VAT Number" }),
+      sellerForm
+        .getByRole("group", { name: "Seller Tax Number" })
+        .getByRole("textbox", { name: "Label" }),
+    ).toHaveValue(DEFAULT_SELLER_DATA.vatNoLabelText);
+
+    await expect(
+      sellerForm
+        .getByRole("group", { name: "Seller Tax Number" })
+        .getByRole("textbox", { name: "Value" }),
     ).toHaveValue(DEFAULT_SELLER_DATA.vatNo);
+
     await expect(
       sellerForm.getByRole("textbox", { name: "Account Number" }),
     ).toHaveValue(DEFAULT_SELLER_DATA.accountNumber);
+
     await expect(
       sellerForm.getByRole("textbox", { name: "SWIFT/BIC" }),
     ).toHaveValue(DEFAULT_SELLER_DATA.swiftBic);

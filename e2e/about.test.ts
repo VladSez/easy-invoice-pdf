@@ -41,14 +41,8 @@ test.describe("About page", () => {
 
     await expect(
       heroSection.getByText(
-        "EasyInvoicePDF is a free, open-source tool that lets you create, customize, and download professional invoices with real-time preview.",
+        "EasyInvoicePDF is a free, open-source invoice generator with real-time preview. Create, customize, and download professional invoices. No sign-up required.",
       ),
-    ).toBeVisible();
-
-    await expect(
-      heroSection
-        .getByText("No sign-up required. 100% free and open-source.")
-        .filter({ visible: true }),
     ).toBeVisible();
 
     const video = heroSection.getByTestId("hero-about-page-video");
@@ -112,46 +106,6 @@ test.describe("About page", () => {
     await expect(faqSection.getByText("What is EasyInvoicePDF?")).toBeVisible();
     await expect(faqSection.getByText("Is it really free?")).toBeVisible();
 
-    // check subscribe form section
-    const subscribeFormSection = page.locator("#newsletter");
-    await expect(subscribeFormSection).toBeVisible();
-
-    await expect(
-      subscribeFormSection.getByRole("heading", {
-        level: 2,
-        name: "Subscribe to our newsletter",
-        exact: true,
-      }),
-    ).toBeVisible();
-
-    await expect(
-      subscribeFormSection.getByText(
-        "Get updates on new features and improvements from EasyInvoicePDF.com",
-      ),
-    ).toBeVisible();
-
-    const subscribeForm = subscribeFormSection.getByTestId("subscribe-form");
-    await expect(subscribeForm).toBeVisible();
-
-    const subscribeFormEmailInput =
-      subscribeForm.getByPlaceholder("Enter your email");
-
-    await expect(subscribeFormEmailInput).toBeVisible();
-    await expect(subscribeFormEmailInput).toHaveAttribute("type", "email");
-    await expect(subscribeFormEmailInput).toHaveAttribute("required");
-    await expect(subscribeFormEmailInput).toHaveAttribute(
-      "autocomplete",
-      "email",
-    );
-
-    const subscribeFormButton = subscribeForm.getByRole("button", {
-      name: "Subscribe",
-      exact: true,
-    });
-
-    await expect(subscribeFormButton).toBeVisible();
-    await expect(subscribeFormButton).toHaveAttribute("type", "submit");
-
     // Check footer
     const footer = page.getByRole("contentinfo");
     await expect(footer).toBeVisible();
@@ -176,24 +130,6 @@ test.describe("About page", () => {
     await expect(twitterSocialLink).toBeVisible();
     await expect(twitterSocialLink).toHaveAttribute("href", TWITTER_URL);
     await expect(twitterSocialLink).toHaveAttribute("target", "_blank");
-
-    // Check newsletter subscription form
-    await expect(footer.getByText("Subscribe to our newsletter")).toBeVisible();
-
-    await expect(
-      footer.getByText("All emails will be sent in English"),
-    ).toBeVisible();
-
-    const newsletterForm = footer.getByTestId("subscribe-form");
-    await expect(newsletterForm).toBeVisible();
-
-    await expect(
-      newsletterForm.getByPlaceholder("Enter your email"),
-    ).toBeVisible();
-
-    await expect(
-      newsletterForm.getByRole("button", { name: "Subscribe" }),
-    ).toBeVisible();
 
     // now check all the rest of the footer links
     const footerLinks = footer.getByTestId("footer-social-links");
@@ -251,6 +187,8 @@ test.describe("About page", () => {
     await expect(githubLink).toBeVisible();
     await expect(githubLink).toHaveAttribute("href", GITHUB_URL);
     await expect(githubLink).toHaveAttribute("target", "_blank");
+
+    await expect(footer.getByText("Made by Vlad Sazonau")).toBeVisible();
   });
 
   test("should display about page content in French", async ({ page }) => {
@@ -286,12 +224,6 @@ test.describe("About page", () => {
       ),
     ).toBeVisible();
 
-    await expect(
-      heroSection
-        .getByText("Aucune inscription requise. 100% gratuit et open-source.")
-        .filter({ visible: true }),
-    ).toBeVisible();
-
     // Check Features section in French
     const featuresSection = page.locator("#features");
     await expect(featuresSection).toBeVisible();
@@ -308,44 +240,9 @@ test.describe("About page", () => {
       }),
     ).toBeVisible();
 
-    // check subscribe form section in French
-    const subscribeFormSection = page.locator("#newsletter");
-    await expect(subscribeFormSection).toBeVisible();
-
-    await expect(
-      subscribeFormSection.getByRole("heading", {
-        level: 2,
-        name: "Abonnez-vous à notre newsletter",
-        exact: true,
-      }),
-    ).toBeVisible();
-
-    await expect(
-      subscribeFormSection.getByText(
-        "Recevez des mises à jour sur les nouvelles fonctionnalités et améliorations de EasyInvoicePDF.com",
-      ),
-    ).toBeVisible();
-
     // Check footer in French
     const footer = page.getByRole("contentinfo");
     await expect(footer).toBeVisible();
-
-    // Check newsletter subscription form in French
-    await expect(
-      footer.getByText("Abonnez-vous à notre newsletter"),
-    ).toBeVisible();
-    await expect(
-      footer.getByText("Tous les emails seront envoyés en anglais"),
-    ).toBeVisible();
-
-    const newsletterForm = footer.getByTestId("subscribe-form");
-    await expect(newsletterForm).toBeVisible();
-    await expect(
-      newsletterForm.getByPlaceholder("Entrez votre email"),
-    ).toBeVisible();
-    await expect(
-      newsletterForm.getByRole("button", { name: "S'abonner", exact: true }),
-    ).toBeVisible();
 
     const footerLinks = footer.getByTestId("footer-social-links");
 
@@ -401,14 +298,6 @@ test.describe("About page", () => {
       ),
     ).toBeVisible();
 
-    await expect(
-      heroSection
-        .getByText(
-          "Keine Anmeldung erforderlich. 100% kostenlos und Open-Source.",
-        )
-        .filter({ visible: true }),
-    ).toBeVisible();
-
     // Check Features section in German
     const featuresSection = page.locator("#features");
     await expect(featuresSection).toBeVisible();
@@ -428,21 +317,6 @@ test.describe("About page", () => {
     // Check footer in German
     const footer = page.getByRole("contentinfo");
     await expect(footer).toBeVisible();
-
-    // Check newsletter subscription form in German
-    await expect(footer.getByText("Newsletter abonnieren")).toBeVisible();
-    await expect(
-      footer.getByText("Alle E-Mails werden in englischer Sprache versendet"),
-    ).toBeVisible();
-
-    const newsletterForm = footer.getByTestId("subscribe-form");
-    await expect(newsletterForm).toBeVisible();
-    await expect(
-      newsletterForm.getByPlaceholder("E-Mail eingeben"),
-    ).toBeVisible();
-    await expect(
-      newsletterForm.getByRole("button", { name: "Abonnieren", exact: true }),
-    ).toBeVisible();
 
     const footerLinks = footer.getByTestId("footer-social-links");
     await expect(

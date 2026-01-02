@@ -43,7 +43,7 @@ export function StripeFooter({
             {t.createdWith}{" "}
             <Link
               style={[styles.fontSize8, { color: "blue" }]}
-              src={PROD_WEBSITE_URL}
+              src={`${PROD_WEBSITE_URL}?ref=pdf`}
             >
               https://easyinvoicepdf.com
             </Link>

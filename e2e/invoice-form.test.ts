@@ -95,9 +95,6 @@ test.describe("Invoice Generator Page", () => {
 
     // Check main action buttons
     await expect(
-      page.getByRole("link", { name: "Support Project" }),
-    ).toBeVisible();
-    await expect(
       page.getByRole("button", { name: "Generate a link to invoice" }),
     ).toBeVisible();
     await expect(
@@ -234,7 +231,7 @@ test.describe("Invoice Generator Page", () => {
       await expect(
         dateFormatSelect.locator(`option[value="${dateFormat}"]`),
       ).toHaveText(
-        `${dateFormat} (Preview: ${preview}) ${isDefault ? "(default)" : ""}`,
+        `${dateFormat} (${preview}) ${isDefault ? "(default)" : ""}`,
       );
     }
 
@@ -287,9 +284,12 @@ test.describe("Invoice Generator Page", () => {
       sellerSection.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.address);
 
-    // VAT Number field and visibility toggle
+    // Tax Number field and visibility toggle
+    const sellerVatFieldset = sellerSection.getByRole("group", {
+      name: "Tax Number",
+    });
     await expect(
-      sellerSection.getByRole("textbox", { name: "VAT Number" }),
+      sellerVatFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.vatNo);
     await expect(
       sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(0),
@@ -337,9 +337,12 @@ test.describe("Invoice Generator Page", () => {
       buyerSection.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.buyer.address);
 
-    // VAT Number field and visibility toggle
+    // Tax Number field and visibility toggle
+    const buyerVatFieldset = buyerSection.getByRole("group", {
+      name: "Tax Number",
+    });
     await expect(
-      buyerSection.getByRole("textbox", { name: "VAT Number" }),
+      buyerVatFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.buyer.vatNo);
 
     const buyerVatNoFieldIsVisibleSwitch = buyerSection.getByTestId(
@@ -437,9 +440,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       invoiceItemsSection
         .getByTestId(`itemVat0`)
-        .getByText(
-          'Enter a number (0-100), or any string (i.e. "NP", "OO", etc).',
-        ),
+        .getByText("Enter a number (0-100), or any text (i.e. NP, OO, etc)."),
     ).toBeVisible();
 
     // Net Amount field (read-only) and visibility toggle
@@ -658,6 +659,11 @@ test.describe("Invoice Generator Page", () => {
     await finalSection
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Test note");
+
+    // Check that "Invoice last updated:" text is displayed after filling in the data
+    await expect(
+      page.getByText("Invoice last updated:", { exact: false }),
+    ).toBeVisible();
 
     // Wait a moment for any debounced localStorage updates
     // eslint-disable-next-line playwright/no-wait-for-timeout
@@ -976,37 +982,27 @@ test.describe("Invoice Generator Page", () => {
       exact: true,
     });
 
+    const helperText = `Must be a number between 0-100 or any text (i.e. NP, OO, etc).`;
+
     // Try invalid values
     await vatInput.fill("101");
-    await expect(page.getByText("VAT must be between 0 and 100")).toBeVisible();
+    await expect(page.getByText(helperText)).toBeVisible();
 
     await vatInput.fill("-1");
-    await expect(page.getByText("VAT must be between 0 and 100")).toBeVisible();
-
-    await vatInput.fill("abc");
-    await expect(
-      page.getByText(
-        `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
-      ),
-    ).toBeVisible();
+    await expect(page.getByText(helperText)).toBeVisible();
 
     // Try valid values
     await vatInput.fill("23");
-    await expect(page.getByText("VAT must be between 0 and 100")).toBeHidden();
+    await expect(page.getByText(helperText)).toBeHidden();
 
     await vatInput.fill("NP");
-    await expect(
-      page.getByText(
-        `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
-      ),
-    ).toBeHidden();
+    await expect(page.getByText(helperText)).toBeHidden();
 
     await vatInput.fill("OO");
-    await expect(
-      page.getByText(
-        `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
-      ),
-    ).toBeHidden();
+    await expect(page.getByText(helperText)).toBeHidden();
+
+    await vatInput.fill("CUSTOM");
+    await expect(page.getByText(helperText)).toBeHidden();
   });
 
   test("handles VAT calculations for different rates", async ({ page }) => {

@@ -42,6 +42,26 @@ interface SellerManagementProps {
   formValues?: Partial<SellerData>;
 }
 
+/**
+ * SellerManagement Component
+ *
+ * Manages seller data for invoices including:
+ * - Loading and displaying saved sellers from localStorage
+ * - Creating new sellers via a dialog form
+ * - Editing existing seller details
+ * - Deleting sellers with confirmation
+ * - Auto-populating invoice form fields when a seller is selected
+ *
+ * When a seller is selected from the dropdown, their details are populated into the
+ * invoice form and the form fields become read-only. Users must use the Edit Seller
+ * button to modify saved seller information.
+ *
+ * @param setValue - React Hook Form setter to update invoice form values
+ * @param invoiceData - Current invoice data including seller information
+ * @param selectedSellerId - ID of the currently selected seller
+ * @param setSelectedSellerId - Callback to update the selected seller ID
+ * @param formValues - Current seller form values (optional)
+ */
 export function SellerManagement({
   setValue,
   invoiceData,

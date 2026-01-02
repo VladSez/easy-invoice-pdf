@@ -47,7 +47,7 @@ import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
 import {
   CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
-  useShowRandomCTAToast,
+  useShowRandomCTAToastOnIdle,
 } from "./hooks/use-show-random-cta-toast";
 import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./components/cta-toasts";
 import { useCTAToast } from "./contexts/cta-toast-context";
@@ -85,7 +85,7 @@ export function AppPageClient({
 
   const [canShareInvoice, setCanShareInvoice] = useState(true);
 
-  useShowRandomCTAToast();
+  useShowRandomCTAToastOnIdle();
 
   // Helper function to load from localStorage
   const loadFromLocalStorage = useCallback(() => {
@@ -368,6 +368,11 @@ export function AppPageClient({
 
         // analytics track event
         umamiTrackEvent("share_invoice_link");
+
+        // if (isToastShownInSession) {
+        //   umamiTrackEvent("cta_toast_skipped_shared_invoice_link");
+        //   return;
+        // }
 
         // Show a CTA toast
         setTimeout(() => {

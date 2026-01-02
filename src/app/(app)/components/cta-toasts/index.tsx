@@ -263,7 +263,6 @@ export const CTA_TOASTS = [
 }[];
 
 export const showRandomCTAToast = () => {
-  // Randomly show a CTA toast
   const variant = CTA_TOASTS[Math.floor(Math.random() * CTA_TOASTS.length)];
 
   variant.show({
@@ -276,4 +275,4 @@ export const showRandomCTAToast = () => {
 /**
  * Slight delay to prevent the toast from appearing too quickly
  */
-export const CTA_TOAST_TIMEOUT = 3_000; // in ms
+export const CTA_TOAST_TIMEOUT = 2_000; // in ms

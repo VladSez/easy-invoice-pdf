@@ -1,5 +1,4 @@
 import { ProjectLogo } from "@/components/etc/project-logo";
-import { SubscribeInput } from "@/components/subscribe-input";
 import { GITHUB_URL, TWITTER_URL } from "@/config";
 import Link from "next/link";
 
@@ -107,33 +106,18 @@ export function Footer({
             />
           </a>
         </div>
-        <div className="my-5 max-w-lg space-y-2">
-          <p className="text-sm font-medium text-slate-900">
-            {translations.newsletterTitle}
-          </p>
-          <SubscribeInput
-            translations={{
-              title: translations.newsletterTitle,
-              description: translations.newsletterDescription,
-              subscribe: translations.newsletterSubscribe,
-              placeholder: translations.newsletterPlaceholder,
-              success: translations.newsletterSuccessMessage,
-              error: translations.newsletterErrorMessage,
-              emailLanguageInfo: translations.newsletterEmailLanguageInfo,
-            }}
-          />
-        </div>
+
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
-          <p className="text-xs text-slate-500">
+          <p className="text-sm text-slate-700">
             © {new Date().getFullYear()} EasyInvoicePDF.com
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-sm text-slate-700">
             {translations.footerCreatedBy}{" "}
             <Link
-              href="https://dub.sh/vladsazon.com"
+              href="https://vladsazon.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline hover:text-slate-900"
+              className="underline hover:text-black"
             >
               Vlad Sazonau
             </Link>

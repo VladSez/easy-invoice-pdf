@@ -64,14 +64,6 @@ export function InvoicePDFDownloadLink({
 
   const isTelegramPreviewBrowser = isTelegramInAppBrowser();
 
-  const trackDownload = useCallback(() => {
-    umamiTrackEvent("download_invoice", {
-      data: {
-        invoice_template: invoiceData.template,
-      },
-    });
-  }, [invoiceData.template]);
-
   const handleDownloadPDFClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (!url) {
@@ -105,10 +97,20 @@ export function InvoicePDFDownloadLink({
       }
 
       if (!isLoading && !error) {
-        trackDownload();
+        // track download event
+        umamiTrackEvent("download_invoice", {
+          data: {
+            invoice_template: invoiceData.template,
+          },
+        });
 
         // close all other toasts (if any)
         toast.dismiss();
+
+        // if (isToastShownInSession) {
+        //   umamiTrackEvent("cta_toast_skipped_downloaded_invoice");
+        //   return;
+        // }
 
         // Show a CTA toast
         setTimeout(() => {
@@ -129,10 +131,10 @@ export function InvoicePDFDownloadLink({
       url,
       inAppInfo?.isInApp,
       inAppInfo?.name,
+      isTelegramPreviewBrowser,
       isLoading,
       error,
-      trackDownload,
-      isTelegramPreviewBrowser,
+      invoiceData.template,
       markToastAsShown,
     ],
   );
@@ -203,11 +205,11 @@ export function InvoicePDFDownloadLink({
         description: (
           <p>
             For the best experience, please open this page in{" "}
-            <span className="underline">Safari or Chrome browser.</span>
+            <span className="font-bold">Safari or Chrome browser.</span>
           </p>
         ),
         id: "in-app-browser-toast", // To prevent duplicate toasts
-        duration: 8000,
+        duration: Infinity,
         icon: "⚠️",
       });
       setInAppBrowserToastShown(true);

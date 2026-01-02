@@ -93,6 +93,7 @@ export const ENGLISH_INVOICE_REAL_DATA = {
     address: env.SELLER_ADDRESS,
 
     vatNo: env.SELLER_VAT_NO,
+    vatNoLabelText: "VAT no",
     vatNoFieldIsVisible: true,
 
     email: env.SELLER_EMAIL,
@@ -109,6 +110,7 @@ export const ENGLISH_INVOICE_REAL_DATA = {
     address: env.BUYER_ADDRESS,
 
     vatNo: env.BUYER_VAT_NO,
+    vatNoLabelText: "VAT no",
     vatNoFieldIsVisible: true,
 
     email: env.BUYER_EMAIL,

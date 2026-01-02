@@ -1,24 +1,25 @@
+import { type InvoiceData, type SellerData } from "@/app/schema";
+import { LabelWithEditIcon } from "@/components/label-with-edit-icon";
+import { SellerManagement } from "@/components/seller-management";
+import { Input } from "@/components/ui/input";
+import { InputHelperMessage } from "@/components/ui/input-helper-message";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { CustomTooltip } from "@/components/ui/tooltip";
+import { memo, useState } from "react";
 import {
   type Control,
   Controller,
   type FieldErrors,
   type UseFormSetValue,
 } from "react-hook-form";
-import { type InvoiceData, type SellerData } from "@/app/schema";
-import { SellerManagement } from "@/components/seller-management";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { CustomTooltip } from "@/components/ui/tooltip";
-import { memo, useState } from "react";
-import { LabelWithEditIcon } from "@/components/label-with-edit-icon";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
 };
 
-const SELLER_TOOLTIP_CONTENT =
+export const SELLER_TOOLTIP_CONTENT =
   "Seller details are locked. Click the Edit Seller button (Pencil icon) next to the 'Select Seller' dropdown to modify seller details.";
 
 interface SellerInformationProps {
@@ -37,15 +38,14 @@ export const SellerInformation = memo(function SellerInformation({
   const [selectedSellerId, setSelectedSellerId] = useState("");
   const isSellerSelected = !!selectedSellerId;
 
-  const HTML_TITLE_CONTENT = isSellerSelected
-    ? "Seller details are locked. Click the Edit Seller button (Pencil icon) to modify."
-    : "";
+  const HTML_TITLE_CONTENT = isSellerSelected ? SELLER_TOOLTIP_CONTENT : "";
 
   // Get current form values to pass to SellerManagement
   const currentFormValues = {
     name: invoiceData.seller.name,
     address: invoiceData.seller.address,
     vatNo: invoiceData.seller.vatNo,
+    vatNoLabelText: invoiceData.seller.vatNoLabelText,
     email: invoiceData.seller.email,
     accountNumber: invoiceData.seller.accountNumber,
     swiftBic: invoiceData.seller.swiftBic,
@@ -135,72 +135,120 @@ export const SellerInformation = memo(function SellerInformation({
         </div>
 
         <div>
-          <div className="relative mb-2 flex items-center justify-between">
-            {isSellerSelected ? (
-              <LabelWithEditIcon
-                htmlFor={`sellerVatNo`}
-                content={SELLER_TOOLTIP_CONTENT}
-              >
-                VAT Number
-              </LabelWithEditIcon>
-            ) : (
-              <Label htmlFor={`sellerVatNo`} className="">
-                VAT Number
-              </Label>
-            )}
+          <fieldset className="rounded-md border px-4 pb-4">
+            <legend className="text-base font-semibold lg:text-lg">
+              Seller Tax Number
+            </legend>
 
-            {/* Show/hide Seller VAT Number field in PDF switch */}
-            <div
-              className="inline-flex items-center gap-2"
-              title={HTML_TITLE_CONTENT}
-            >
-              <Controller
-                name={`seller.vatNoFieldIsVisible`}
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`sellerVatNoFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    disabled={isSellerSelected}
-                    data-testid={`sellerVatNoFieldIsVisible`}
-                  />
-                )}
-              />
-              <CustomTooltip
-                trigger={
-                  <Label htmlFor={`sellerVatNoFieldIsVisible`}>
-                    Show in PDF
-                  </Label>
-                }
-                content={
-                  isSellerSelected
-                    ? null
-                    : "Show/Hide the 'Seller VAT Number' Field in the PDF"
-                }
-              />
-            </div>
-          </div>
-          <Controller
-            name="seller.vatNo"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                id={`sellerVatNo`}
-                type="text"
-                className=""
-                readOnly={isSellerSelected}
-                aria-readonly={isSellerSelected}
+            <div className="mb-2 flex items-center justify-end">
+              {/* Show/hide Seller Tax Number field in PDF switch */}
+              <div
+                className="inline-flex items-center gap-2"
                 title={HTML_TITLE_CONTENT}
-              />
-            )}
-          />
-          {errors.seller?.vatNo && (
-            <ErrorMessage>{errors.seller.vatNo.message}</ErrorMessage>
-          )}
+              >
+                <Controller
+                  name={`seller.vatNoFieldIsVisible`}
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Switch
+                      {...field}
+                      id={`sellerVatNoFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      disabled={isSellerSelected}
+                      data-testid={`sellerVatNoFieldIsVisible`}
+                    />
+                  )}
+                />
+                <CustomTooltip
+                  trigger={
+                    <Label htmlFor={`sellerVatNoFieldIsVisible`}>
+                      Show in PDF
+                    </Label>
+                  }
+                  content={
+                    isSellerSelected
+                      ? null
+                      : "Show/Hide the 'Seller Tax Number' Field in the PDF"
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                {isSellerSelected ? (
+                  <LabelWithEditIcon
+                    htmlFor="sellerVatNoLabel"
+                    content={SELLER_TOOLTIP_CONTENT}
+                  >
+                    Label
+                  </LabelWithEditIcon>
+                ) : (
+                  <Label htmlFor="sellerVatNoLabel">Label</Label>
+                )}
+                <Controller
+                  name="seller.vatNoLabelText"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="text"
+                      id="sellerVatNoLabel"
+                      placeholder="Enter Tax number label"
+                      className="mt-1 block w-full"
+                      readOnly={isSellerSelected}
+                      aria-readonly={isSellerSelected}
+                      title={HTML_TITLE_CONTENT}
+                    />
+                  )}
+                />
+                {errors.seller?.vatNoLabelText && (
+                  <ErrorMessage>
+                    {errors.seller.vatNoLabelText.message}
+                  </ErrorMessage>
+                )}
+                {!errors.seller?.vatNoLabelText && (
+                  <InputHelperMessage>
+                    Set a custom label (e.g. VAT no, Tax no, etc.)
+                  </InputHelperMessage>
+                )}
+              </div>
+
+              <div>
+                {isSellerSelected ? (
+                  <LabelWithEditIcon
+                    htmlFor={`sellerVatNo`}
+                    content={SELLER_TOOLTIP_CONTENT}
+                  >
+                    Value
+                  </LabelWithEditIcon>
+                ) : (
+                  <Label htmlFor={`sellerVatNo`}>Value</Label>
+                )}
+                <Controller
+                  name="seller.vatNo"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id={`sellerVatNo`}
+                      type="text"
+                      placeholder="Enter Tax number value"
+                      className="mt-1 block w-full"
+                      readOnly={isSellerSelected}
+                      aria-readonly={isSellerSelected}
+                      title={HTML_TITLE_CONTENT}
+                    />
+                  )}
+                />
+                {errors.seller?.vatNo && (
+                  <ErrorMessage>{errors.seller.vatNo.message}</ErrorMessage>
+                )}
+              </div>
+            </div>
+          </fieldset>
         </div>
 
         <div>

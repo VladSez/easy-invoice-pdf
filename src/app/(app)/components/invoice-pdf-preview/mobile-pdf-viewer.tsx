@@ -7,6 +7,7 @@ import { InvoicePdfTemplate } from "../invoice-pdf-template";
 import { StripeInvoicePdfTemplate } from "../invoice-pdf-stripe-template";
 import * as Sentry from "@sentry/nextjs";
 import { useMemo, useState } from "react";
+import { BUG_REPORT_URL } from "@/config";
 
 // https://github.com/wojtekmaj/react-pdf/issues/1822#issuecomment-2233334169
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -47,7 +48,17 @@ export const MobileInvoicePDFViewer = ({
               <div className="text-center">
                 <p className="text-red-600">Error generating PDF preview</p>
                 <p className="mt-2 text-sm text-gray-600">
-                  Something went wrong. Please try again or contact support.
+                  Something went wrong. Please try refreshing the page or using{" "}
+                  <span className="font-bold">Chrome</span> browser. If the
+                  issue persists, please fill a bug report{" "}
+                  <a
+                    href={BUG_REPORT_URL}
+                    className="underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    here.
+                  </a>
                 </p>
               </div>
             </div>
