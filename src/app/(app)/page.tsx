@@ -48,7 +48,7 @@ export async function generateMetadata({
             canonical: `${APP_URL}/?template=stripe`,
           },
           openGraph: {
-            title: "Stripe Invoice Template | Free Invoice Generator",
+            title: "Stripe Template — Create Invoice | EasyInvoicePDF",
             description:
               "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
             siteName: "EasyInvoicePDF.com | Free Invoice Generator",
@@ -66,7 +66,7 @@ export async function generateMetadata({
           },
           twitter: {
             card: "summary_large_image",
-            title: "Stripe Invoice Template | Free Invoice Generator",
+            title: "Stripe Template — Create Invoice | EasyInvoicePDF",
             description:
               "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
             creator: "@vlad_sazon",
@@ -86,7 +86,7 @@ export async function generateMetadata({
             canonical: `${APP_URL}/?template=default`,
           },
           openGraph: {
-            title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
+            title: "Create Invoice — EasyInvoicePDF",
             description:
               "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
             siteName: "EasyInvoicePDF.com | Free Invoice Generator",
@@ -105,7 +105,7 @@ export async function generateMetadata({
           },
           twitter: {
             card: "summary_large_image",
-            title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
+            title: "Create Invoice — EasyInvoicePDF",
             description:
               "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
             creator: "@vlad_sazon",

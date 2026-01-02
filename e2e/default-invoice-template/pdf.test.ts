@@ -1,13 +1,10 @@
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import { TRANSLATIONS } from "@/app/schema/translations";
-import dayjs from "dayjs";
 import fs from "node:fs";
 import path from "node:path";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { test, expect } from "../utils/extended-playwright-test";
-
-const CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
 
 test.describe("Default Invoice Template", () => {
   test.beforeEach(async ({ page }) => {
@@ -88,6 +85,53 @@ test.describe("Default Invoice Template", () => {
     await expect(downloadPdfPolishButton).toBeVisible();
     await expect(downloadPdfPolishButton).toBeEnabled();
 
+    const invoiceItemsSection = page.getByTestId("invoice-items-section");
+
+    // update name for the first invoice item
+    await invoiceItemsSection
+      .getByRole("textbox", { name: "Name" })
+      .fill("Invoice Item 1 TEST");
+
+    // update price and quantity for the first invoice item
+    await invoiceItemsSection
+      .getByRole("spinbutton", { name: "Amount (Quantity)" })
+      .fill("3");
+
+    await invoiceItemsSection
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
+      .fill("1000");
+
+    // update VAT for the first invoice item
+    const taxSettingsFieldset = invoiceItemsSection.getByRole("group", {
+      name: "Tax Settings",
+    });
+    await taxSettingsFieldset.getByRole("textbox", { name: "VAT" }).fill("10");
+
+    // add new invoice item
+
+    await invoiceItemsSection
+      .getByRole("button", { name: "Add invoice item" })
+      .click();
+
+    const invoiceItem2Fieldset = invoiceItemsSection.getByRole("group", {
+      name: "Item 2",
+    });
+
+    // update name for the second invoice item
+    await invoiceItem2Fieldset
+      .getByRole("textbox", { name: "Name" })
+      .fill("Invoice Item 2 TEST");
+
+    // wait, because we update pdf on debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
+
+    // Check that the total is correct (should be 3,300.00)
+    const totalTextbox = page.getByRole("textbox", { name: "Total" });
+    await expect(totalTextbox).toHaveValue("3,300.00");
+
     // Click the download button and wait for download
     const [download] = await Promise.all([
       page.waitForEvent("download"),
@@ -125,6 +169,71 @@ test.describe("Default Invoice Template", () => {
       path.join(
         "downloads-PDF-in-Polish",
         `pdf-playwright-screenshot-${suggestedFilename}.png`,
+      ),
+    );
+
+    // navigate back to the previous page
+    await page.goto("/");
+
+    /**
+     * Switch to Stripe template and download PDF in Polish with Stripe template
+     */
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+    // Verify that the Stripe template is selected
+    const templateSelect = page.getByRole("combobox", {
+      name: "Invoice Template",
+    });
+    await expect(templateSelect).toHaveValue("stripe");
+
+    // Wait for the download button to be visible and enabled for Stripe template
+    const downloadPdfStripeButton = page.getByRole("link", {
+      name: "Download PDF in Polish",
+    });
+
+    await expect(downloadPdfStripeButton).toBeVisible();
+    await expect(downloadPdfStripeButton).toBeEnabled();
+
+    // Click the download button and wait for download
+    const [stripeDownload] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfStripeButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+
+    // save the file to temporary directory
+    const stripePdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-stripe-${stripeSuggestedFilename}`,
+    );
+
+    await stripeDownload.saveAs(stripePdfFilePath);
+
+    // Convert to absolute path and use proper file URL format
+    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+
+    // Set viewport size to match the PDF Viewer UI
+    await page.setViewportSize({
+      width: 1100,
+      height: 1185,
+    });
+
+    await page.goto(`file://${stripeAbsolutePath}`);
+
+    // sometimes there's a blank screen without this
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
+
+    await expect(page).toHaveScreenshot(
+      path.join(
+        "downloads-PDF-in-Polish-stripe-template",
+        `pdf-playwright-screenshot-stripe-${stripeSuggestedFilename}.png`,
       ),
     );
   });
@@ -283,6 +392,69 @@ test.describe("Default Invoice Template", () => {
       path.join(
         "update-pdf-when-invoice-data-changes",
         `pdf-playwright-screenshot-${suggestedFilename}.png`,
+      ),
+    );
+
+    // navigate back to the previous page
+    await page.goto("/");
+
+    /**
+     * Switch to Stripe template and download PDF in English with Stripe template
+     */
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+    // Verify that the Stripe template is selected
+    const templateSelect = page.getByRole("combobox", {
+      name: "Invoice Template",
+    });
+    await expect(templateSelect).toHaveValue("stripe");
+
+    const downloadPdfStripeButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadPdfStripeButton).toBeVisible();
+
+    // Click the download button and wait for download
+    const [stripeDownload] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfStripeButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+
+    // save the file to temporary directory
+    const stripePdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-stripe-${stripeSuggestedFilename}`,
+    );
+
+    await stripeDownload.saveAs(stripePdfFilePath);
+
+    // Convert to absolute path and use proper file URL format
+    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+
+    // Set viewport size to match the PDF Viewer UI
+    await page.setViewportSize({
+      width: 1100,
+      height: 1185,
+    });
+
+    await page.goto(`file://${stripeAbsolutePath}`);
+
+    // sometimes there's a blank screen without this
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
+
+    await expect(page).toHaveScreenshot(
+      path.join(
+        "update-pdf-when-invoice-data-changes-stripe-template",
+        `pdf-playwright-screenshot-stripe-${stripeSuggestedFilename}.png`,
       ),
     );
   });
@@ -495,6 +667,66 @@ test.describe("Default Invoice Template", () => {
         exact: true,
       }),
     ).toHaveValue("184.50");
+
+    /**
+     * Switch to Stripe template and download PDF in English with Stripe template
+     */
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+    // Verify that the Stripe template is selected
+    const templateSelect = page.getByRole("combobox", {
+      name: "Invoice Template",
+    });
+    await expect(templateSelect).toHaveValue("stripe");
+
+    const downloadPdfStripeButton = page.getByRole("link", {
+      name: "Download PDF in French",
+    });
+
+    await expect(downloadPdfStripeButton).toBeVisible();
+
+    // Click the download button and wait for download
+    const [stripeDownload] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfStripeButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+
+    // save the file to temporary directory
+    const stripePdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-stripe-${stripeSuggestedFilename}`,
+    );
+
+    await stripeDownload.saveAs(stripePdfFilePath);
+
+    // Convert to absolute path and use proper file URL format
+    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+
+    // Set viewport size to match the PDF Viewer UI
+    await page.setViewportSize({
+      width: 1100,
+      height: 1185,
+    });
+
+    await page.goto(`file://${stripeAbsolutePath}`);
+
+    // sometimes there's a blank screen without this
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
+
+    await expect(page).toHaveScreenshot(
+      path.join(
+        "completes-full-invoice-flow-on-mobile-stripe-template",
+        `pdf-playwright-screenshot-stripe-${stripeSuggestedFilename}.png`,
+      ),
+    );
   });
 
   test("should display and persist invoice number in different languages", async ({
@@ -520,9 +752,8 @@ test.describe("Default Invoice Template", () => {
       INITIAL_INVOICE_DATA.invoiceNumberObject.label,
     );
 
-    await expect(invoiceNumberValueInput).toHaveValue(
-      INITIAL_INVOICE_DATA.invoiceNumberObject.value,
-    );
+    // we mock the system time to a fixed date, so that the invoice number is consistent across tests
+    await expect(invoiceNumberValueInput).toHaveValue("1/12-2025");
 
     const languageSelect = page.getByRole("combobox", {
       name: "Invoice PDF Language",
@@ -534,9 +765,8 @@ test.describe("Default Invoice Template", () => {
       `${TRANSLATIONS.pl.invoiceNumber}:`,
     );
 
-    await expect(invoiceNumberValueInput).toHaveValue(
-      `1/${CURRENT_MONTH_AND_YEAR}`,
-    );
+    // we mock the system time to a fixed date, so that the invoice number is consistent across tests
+    await expect(invoiceNumberValueInput).toHaveValue("1/12-2025");
 
     // I can fill in a new invoice number
     await invoiceNumberLabelInput.fill("Faktura TEST:");
@@ -560,6 +790,11 @@ test.describe("Default Invoice Template", () => {
     // fill once again the invoice number
     await invoiceNumberLabelInput.fill("Faktura TEST:");
 
+    // Switch currency to CHF
+    const currencySelect = page.getByRole("combobox", { name: "Currency" });
+    await currencySelect.selectOption("CHF");
+    await expect(currencySelect).toHaveValue("CHF");
+
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
     // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(600);
@@ -570,6 +805,7 @@ test.describe("Default Invoice Template", () => {
     // Verify that the invoice number is persisted after page reload
     await expect(invoiceNumberLabelInput).toHaveValue("Faktura TEST:");
 
+    // switch to Portuguese
     await languageSelect.selectOption("pt");
 
     await expect(invoiceNumberLabelInput).toHaveValue(
@@ -583,6 +819,9 @@ test.describe("Default Invoice Template", () => {
         name: `Switch to default label ("Fatura N°:")`,
       }),
     ).toBeVisible();
+
+    // Verify CHF currency is selected
+    await expect(currencySelect).toHaveValue("CHF");
 
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
     const downloadPdfPtButton = page.getByRole("link", {
@@ -629,6 +868,73 @@ test.describe("Default Invoice Template", () => {
       path.join(
         "should-display-and-persist-invoice-number-in-different-languages",
         `pdf-playwright-screenshot-${suggestedFilename}.png`,
+      ),
+    );
+
+    // navigate back to the previous page
+    await page.goto("/");
+
+    /**
+     * Switch to Stripe template and download PDF in English with Stripe template
+     */
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+    // Verify that the Stripe template is selected
+    const templateSelect = page.getByRole("combobox", {
+      name: "Invoice Template",
+    });
+    await expect(templateSelect).toHaveValue("stripe");
+
+    // Currency should be CHF after navigating back to the previous page
+    const currencySelect2 = page.getByRole("combobox", { name: "Currency" });
+    await expect(currencySelect2).toHaveValue("CHF");
+
+    const downloadPdfStripeButton = page.getByRole("link", {
+      name: "Download PDF in Portuguese",
+    });
+
+    await expect(downloadPdfStripeButton).toBeVisible();
+
+    // Click the download button and wait for download
+    const [stripeDownload] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfStripeButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+
+    // save the file to temporary directory
+    const stripePdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-stripe-${stripeSuggestedFilename}`,
+    );
+
+    await stripeDownload.saveAs(stripePdfFilePath);
+
+    // Convert to absolute path and use proper file URL format
+    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+
+    // Set viewport size to match the PDF Viewer UI
+    await page.setViewportSize({
+      width: 1100,
+      height: 1185,
+    });
+
+    await page.goto(`file://${stripeAbsolutePath}`);
+
+    // sometimes there's a blank screen without this
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
+
+    await expect(page).toHaveScreenshot(
+      path.join(
+        "should-display-and-persist-invoice-number-in-different-languages-stripe-template",
+        `pdf-playwright-screenshot-stripe-${stripeSuggestedFilename}.png`,
       ),
     );
   });

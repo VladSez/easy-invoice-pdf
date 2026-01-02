@@ -5,7 +5,6 @@ import {
   BlackGoToAppButton,
   GoToAppButton,
 } from "@/components/go-to-app-button-cta";
-import { SubscribeInput } from "@/components/subscribe-input";
 import { Button } from "@/components/ui/button";
 
 import { BlackAnimatedGoToAppBtn } from "@/components/animated-go-to-app-btn";
@@ -63,7 +62,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
           <HeroSection />
           <FeaturesSection />
           <FaqSection />
-          <SubscribeSection />
+          {/* <SubscribeSection /> */}
           <CtaSection />
         </main>
         <Footer
@@ -188,7 +187,7 @@ function HeroSection() {
 
       <div className="container relative z-10 px-4 md:px-6">
         <div className="grid gap-6 md:gap-8 lg:gap-12 xl:grid-cols-2 xl:gap-6">
-          {/* Left column (text) */}
+          {/* Left column start (text and CTA buttons) */}
           <div className="flex flex-col justify-center space-y-5 md:space-y-6">
             <div className="space-y-3 md:space-y-4">
               <h1 className="text-balance text-center text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl md:text-6xl xl:text-left">
@@ -199,16 +198,7 @@ function HeroSection() {
                 <p className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
                   {t.rich("hero.description", {
                     span: (chunks) => (
-                      <span className="relative inline-block px-0.5 font-bold text-slate-900">
-                        <span
-                          className="absolute inset-0 -rotate-1 scale-105 transform bg-yellow-300 dark:bg-yellow-600"
-                          style={{
-                            clipPath:
-                              "polygon(1% 12%, 98% 8%, 98% 88%, 2% 92%)",
-                            zIndex: -1,
-                            opacity: 0.8,
-                          }}
-                        ></span>
+                      <span className="bg-yellow-300 px-0.5 font-bold text-slate-900 dark:bg-yellow-600">
                         {chunks}
                       </span>
                     ),
@@ -217,6 +207,7 @@ function HeroSection() {
               </div>
             </div>
 
+            {/* CTA Buttons (Go to app and View on GitHub) */}
             <div className="flex w-full flex-col justify-center gap-3 sm:flex-row sm:flex-wrap xl:justify-start">
               <BlackGoToAppButton className="w-full px-10 py-6 text-lg lg:w-[270px] lg:max-w-[270px]">
                 <span className="text-clip">{t("buttons.startInvoicing")}</span>
@@ -238,10 +229,10 @@ function HeroSection() {
                 </Link>
               </Button>
             </div>
-            <CtaTextDesktop text={t("hero.noSignup")} />
           </div>
+          {/* Left column end */}
 
-          {/* Right column (video) */}
+          {/* Right column start (video) */}
           <div className="relative mx-auto w-full max-w-[950px] xl:mx-0">
             {/* Mac OS Frame around the video */}
             <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
@@ -256,7 +247,7 @@ function HeroSection() {
                 </div>
               </div>
               {/* Video container */}
-              <div className="w-full">
+              <div className="relative aspect-video w-full">
                 <Video
                   src={VIDEO_DEMO_URL}
                   fallbackImg={`${STATIC_ASSETS_URL}/easy-invoice-video-placeholder.webp`}
@@ -265,48 +256,10 @@ function HeroSection() {
               </div>
             </div>
           </div>
-
-          <CtaTextMobile text={t("hero.noSignup")} />
+          {/* Right column end */}
         </div>
       </div>
     </section>
-  );
-}
-
-// should be hidden on desktop
-function CtaTextMobile({
-  text = "No sign-up required. 100% free and open-source.",
-}: {
-  text: string;
-}) {
-  return (
-    <div
-      className="mx-auto mt-6 flex max-w-fit items-center justify-center gap-x-2 rounded-full border border-amber-300 bg-gradient-to-br from-amber-50 to-amber-100/80 px-5 py-2 text-center text-sm font-medium text-amber-900 shadow-md transition-all xl:hidden"
-      data-testid="cta-text-mobile"
-      role="status"
-      aria-live="polite"
-    >
-      <span className="leading-relaxed">{text}</span>
-    </div>
-  );
-}
-
-// should be hidden on mobile
-function CtaTextDesktop({
-  text = "No sign-up required. 100% free and open-source.",
-}: {
-  text: string;
-}) {
-  return (
-    <div
-      className="mx-auto hidden max-w-fit items-center justify-center gap-x-2 text-pretty rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800 shadow-sm transition-all hover:scale-105 sm:mx-0 xl:flex"
-      data-testid="cta-text-desktop"
-    >
-      <span className="" role="img" aria-label="checkmark">
-        ✅
-      </span>
-      <span>{text}</span>
-    </div>
   );
 }
 
@@ -320,24 +273,24 @@ function FeaturesSection() {
       videoFallbackImg: `${IMAGEKIT_CDN_URL}/live-preview-fallback.png?updatedAt=1764511421437`,
     },
     {
-      translationKey: "shareableLinks",
-      videoSrc: `${IMAGEKIT_CDN_URL}/share-invoice.mp4`,
-      videoFallbackImg: `${IMAGEKIT_CDN_URL}/share-invoice-fallback.png`,
-    },
-    {
       translationKey: "instantDownload",
       videoSrc: `${IMAGEKIT_CDN_URL}/instand-download.mp4`,
       videoFallbackImg: `${IMAGEKIT_CDN_URL}/instant-download-fallback.png`,
     },
     {
-      translationKey: "multiLanguage",
-      videoSrc: `${IMAGEKIT_CDN_URL}/multi-lang.mp4?updatedAt=1764535032761`,
-      videoFallbackImg: `${IMAGEKIT_CDN_URL}/multi-lang-fallback.png?updatedAt=1764535032761`,
+      translationKey: "shareableLinks",
+      videoSrc: `${IMAGEKIT_CDN_URL}/share-invoice.mp4`,
+      videoFallbackImg: `${IMAGEKIT_CDN_URL}/share-invoice-fallback.png`,
     },
     {
       translationKey: "taxSupport",
       videoSrc: `${IMAGEKIT_CDN_URL}/tax-custom.mp4`,
       videoFallbackImg: `${IMAGEKIT_CDN_URL}/tax-custom-fallback.png`,
+    },
+    {
+      translationKey: "multiLanguage",
+      videoSrc: `${IMAGEKIT_CDN_URL}/multi-lang.mp4?updatedAt=1764535032761`,
+      videoFallbackImg: `${IMAGEKIT_CDN_URL}/multi-lang-fallback.png?updatedAt=1764535032761`,
     },
     {
       translationKey: "openSource",
@@ -353,10 +306,11 @@ function FeaturesSection() {
   return (
     <section
       id="features"
-      className="mt-8 flex w-full items-center justify-center bg-slate-50 py-4 lg:py-8 xl:mt-16 xl:py-16"
+      className="mt-6 flex w-full items-center justify-center bg-slate-50 py-4 lg:py-8 xl:mt-16 xl:py-16"
     >
-      <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-8 text-center">
+      <div className="container">
+        {/* Features section title and description */}
+        <div className="flex flex-col items-center justify-center space-y-8 px-4 text-center md:px-6">
           <div className="space-y-5">
             <h2 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
               {t("features.title")}
@@ -373,6 +327,7 @@ function FeaturesSection() {
           </div>
         </div>
 
+        {/* Features cards */}
         <div className="flex flex-row flex-wrap items-center justify-center gap-6 pt-10 md:gap-10">
           {FEATURES_CARDS.map((feature, index) => {
             const title = t(`features.items.${feature.translationKey}.title`);
@@ -385,11 +340,11 @@ function FeaturesSection() {
               <div
                 key={feature.translationKey}
                 className={cn(
-                  `flex h-full w-full flex-col items-start gap-6 rounded-lg border border-slate-200 bg-white shadow-sm md:items-center`,
+                  `flex h-full w-full flex-col items-start gap-6 rounded-xl bg-white md:items-center md:rounded-2xl`,
                   isEven ? "lg:flex-row" : "lg:flex-row-reverse", // swap the video and text content for even index
                 )}
               >
-                <div className="flex-1 px-6 pb-2 pt-6 xl:px-8 xl:py-4">
+                <div className="flex-1 px-8 pb-2 pt-6 xl:py-4">
                   <h3 className="text-balance pb-4 text-xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-2xl">
                     {title}
                   </h3>
@@ -397,14 +352,29 @@ function FeaturesSection() {
                     {description}
                   </p>
                 </div>
-                <div className="w-full max-w-[800px]">
-                  {feature?.videoSrc && feature?.videoFallbackImg && (
-                    <Video
-                      src={feature.videoSrc}
-                      fallbackImg={feature.videoFallbackImg}
-                      testId={`${feature.translationKey}-demo-video`}
-                    />
-                  )}
+
+                <div className="relative w-full max-w-[800px] px-2 pb-3 lg:p-0 xl:mx-0">
+                  {/* Mac OS Frame around the video */}
+                  <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
+                    {/* Browser chrome bar */}
+                    <div className="h-8 w-full rounded-t-xl bg-gradient-to-b from-[#F3F3F3] to-[#E9E9E9] px-4 shadow-sm md:h-12 md:rounded-t-2xl">
+                      <div className="flex h-full items-center">
+                        <div className="flex space-x-2">
+                          <div className="h-2.5 w-2.5 rounded-full bg-[#FF5F57] md:h-3 md:w-3"></div>
+                          <div className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E] md:h-3 md:w-3"></div>
+                          <div className="h-2.5 w-2.5 rounded-full bg-[#28C840] md:h-3 md:w-3"></div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Video container */}
+                    <div className="relative aspect-[16.6/8.9] h-full w-full lg:aspect-[16.99/9.1]">
+                      <Video
+                        src={feature.videoSrc}
+                        fallbackImg={feature.videoFallbackImg}
+                        testId={`${feature.translationKey}-demo-video`}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             );
@@ -487,51 +457,6 @@ function FaqSection() {
                 </details>
               );
             })}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SubscribeSection() {
-  const tNewsletter = useTranslations("About.newsletter");
-
-  const newsletterTitle = tNewsletter("title");
-  const newsletterDescription = tNewsletter("description");
-  const newsletterSubscribe = tNewsletter("subscribe");
-  const newsletterPlaceholder = tNewsletter("placeholder");
-  const newsletterSuccessMessage = tNewsletter("success");
-  const newsletterErrorMessage = tNewsletter("error");
-  const newsletterEmailLanguageInfo = tNewsletter("emailLanguageInfo");
-
-  return (
-    <section
-      id="newsletter"
-      className="flex w-full items-center justify-center bg-white py-12 md:py-24"
-    >
-      <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tighter text-slate-900 md:text-4xl/tight">
-              {tNewsletter("title")}
-            </h2>
-            <p className="max-w-[600px] text-slate-600 lg:text-base/relaxed xl:text-xl/relaxed">
-              {tNewsletter("description")}
-            </p>
-          </div>
-          <div className="w-full max-w-md">
-            <SubscribeInput
-              translations={{
-                title: newsletterTitle,
-                description: newsletterDescription,
-                subscribe: newsletterSubscribe,
-                placeholder: newsletterPlaceholder,
-                success: newsletterSuccessMessage,
-                error: newsletterErrorMessage,
-                emailLanguageInfo: newsletterEmailLanguageInfo,
-              }}
-            />
           </div>
         </div>
       </div>

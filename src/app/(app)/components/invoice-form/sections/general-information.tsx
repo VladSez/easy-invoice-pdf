@@ -31,12 +31,12 @@ import { TRANSLATIONS } from "@/app/schema/translations";
 import { Button } from "@/components/ui/button";
 import dayjs from "dayjs";
 import { AlertTriangle, Upload, X, InfoIcon } from "lucide-react";
-import { memo, useCallback, useEffect, useRef } from "react";
+import { memo, useCallback, useRef } from "react";
 import { toast } from "sonner";
 
 const AlertIcon = () => {
   return (
-    <AlertTriangle className="mr-1 inline-block h-3.5 w-3.5 text-amber-500" />
+    <AlertTriangle className="mr-1 inline-block size-3.5 shrink-0 text-amber-500" />
   );
 };
 
@@ -156,298 +156,308 @@ export const GeneralInformation = memo(function GeneralInformation({
     toast.success("Logo removed successfully!");
   }, [setValue]);
 
-  // Handle template-specific form updates
-  useEffect(() => {
-    if (template === "stripe") {
-      // Set date format to "MMMM D, YYYY" when template is Stripe
-      setValue("dateFormat", STRIPE_DEFAULT_DATE_FORMAT);
-
-      // Always enable VAT field visibility for Stripe template (because we don't show Switches for items in Stripe template and we want to make sure the Tax column is visible in the PDF)
-      setValue("items.0.vatFieldIsVisible", true);
-    } else {
-      // Clear Stripe-specific fields when not using Stripe template
-      if (errors.stripePayOnlineUrl) {
-        setValue("stripePayOnlineUrl", "");
-      }
-
-      // Clear logo when template is not stripe
-      if (logo) {
-        setValue("logo", "");
-      }
-
-      // Set date format to "YYYY-MM-DD" when template is not stripe
-      setValue("dateFormat", SUPPORTED_DATE_FORMATS[0]);
-    }
-  }, [template, setValue, errors.stripePayOnlineUrl, logo]);
-
   return (
-    <div className="space-y-4">
-      {/* Invoice Template Selection */}
-      <div>
-        <Label htmlFor={`template`} className="mb-1">
-          Invoice Template
-        </Label>
-        <Controller
-          name="template"
-          control={control}
-          render={({ field }) => (
-            <SelectNative {...field} id={`template`} className="block">
-              {SUPPORTED_TEMPLATES.map((template) => {
-                const templateLabel = TEMPLATE_TO_LABEL[template];
-
-                return (
-                  <option key={template} value={template}>
-                    {templateLabel}
-                  </option>
-                );
-              })}
-            </SelectNative>
-          )}
-        />
-        {errors.template ? (
-          <ErrorMessage>{errors.template.message}</ErrorMessage>
-        ) : (
-          <InputHelperMessage>
-            Select the design template for your invoice
-          </InputHelperMessage>
-        )}
-      </div>
-
-      {/* Logo Upload - Only for Stripe template */}
-      {template === "stripe" && (
-        <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
-          <Label htmlFor="logoUpload" className="mb-2">
-            Company Logo (Optional)
+    <div>
+      <div className="space-y-4">
+        {/* Invoice Template Selection */}
+        <div>
+          <Label htmlFor={`template`} className="mb-1">
+            Invoice Template
           </Label>
-
-          {logo ? (
-            <div className="space-y-2">
-              {/* Logo preview */}
-              <div className="relative inline-block">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={logo}
-                  alt="Company logo preview"
-                  className="h-28 max-w-40 rounded-lg border-2 border-gray-200 object-contain p-2 shadow-sm"
-                />
-                <button
-                  type="button"
-                  onClick={handleLogoRemove}
-                  className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-colors hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                  aria-label="Remove logo"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <InputHelperMessage>
-                Logo uploaded successfully. Click the X to remove it.
-              </InputHelperMessage>
-            </div>
-          ) : (
-            <div data-testid="stripe-logo-upload-input">
-              <input
-                ref={fileInputRef}
-                type="file"
-                id="logoUpload"
-                accept="image/jpeg,image/jpg,image/png,image/webp"
-                onChange={handleLogoUpload}
-                className="hidden"
-              />
-              <label
-                htmlFor="logoUpload"
-                className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-8 transition-colors hover:border-gray-400 hover:bg-gray-50"
-              >
-                <div className="text-center">
-                  <Upload className="mx-auto h-4 w-4 text-gray-400" />
-                  <p className="mt-3 text-sm font-medium text-gray-600">
-                    Click to upload your company logo
-                  </p>
-                  <p className="mt-1 text-xs text-gray-500">
-                    JPEG, PNG or WebP (max 3MB)
-                  </p>
-                </div>
-              </label>
-            </div>
-          )}
-
-          {errors.logo && <ErrorMessage>{errors.logo.message}</ErrorMessage>}
-        </div>
-      )}
-
-      {/* Pay Online URL - Only for Stripe template */}
-      {template === "stripe" && (
-        <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
-          <Label htmlFor={`stripePayOnlineUrl`} className="">
-            Payment Link URL (Optional)
-          </Label>
-
           <Controller
-            name="stripePayOnlineUrl"
+            name="template"
             control={control}
             render={({ field }) => (
-              <Input
+              <SelectNative
                 {...field}
-                id={`stripePayOnlineUrl`}
-                type="url"
-                className="mt-1"
-              />
-            )}
-          />
-          {errors.stripePayOnlineUrl ? (
-            <ErrorMessage>{errors.stripePayOnlineUrl.message}</ErrorMessage>
-          ) : (
-            <InputHelperMessage>
-              Enter your payment URL. This adds a &quot;Pay Online&quot; button
-              to the PDF invoice.
-            </InputHelperMessage>
-          )}
-        </div>
-      )}
+                id={`template`}
+                className="block"
+                onChange={(e) => {
+                  field.onChange(e);
 
-      {/* Language PDF Select */}
-      <div>
-        <Label htmlFor={`language`} className="mb-1">
-          Invoice PDF Language
-        </Label>
-        <Controller
-          name="language"
-          control={control}
-          render={({ field }) => (
-            <SelectNative
-              {...field}
-              id={`language`}
-              className="block"
-              onChange={(e) => {
-                field.onChange(e);
+                  const newTemplate = e.target.value;
 
-                // for BETTER USER EXPERIENCE, when switching language, we update the invoice number and labels to the new language
+                  // Handles template-specific form updates for better UX
 
-                // Update INVOICE NUMBER and LABELS when language changes
-                const newLanguage = e.target.value as keyof typeof TRANSLATIONS;
+                  if (newTemplate === "stripe") {
+                    // Set date format to "MMMM D, YYYY" when template is Stripe
+                    setValue("dateFormat", STRIPE_DEFAULT_DATE_FORMAT);
 
-                const newInvoiceNumberLabel =
-                  TRANSLATIONS[newLanguage].invoiceNumber;
+                    // Always enable VAT field visibility for Stripe template (because we don't show Switches for items in Stripe template and we want to make sure the Tax column is visible in the PDF)
+                    setValue("items.0.vatFieldIsVisible", true);
+                  } else {
+                    // Clear Stripe-specific fields when not using Stripe template
+                    if (errors.stripePayOnlineUrl) {
+                      setValue("stripePayOnlineUrl", "");
+                    }
 
-                // we need to keep the invoice number suffix (e.g. 1/MM-YYYY) for better user experience, when switching language
-                setValue(
-                  "invoiceNumberObject.label",
-                  `${newInvoiceNumberLabel}:`,
-                );
-                setValue("invoiceNumberObject.value", invoiceNumberValue);
+                    // Clear logo when template is default
+                    if (logo) {
+                      setValue("logo", "");
+                    }
 
-                // Update SELLER VAT NO (Account Number) LABEL TEXT when language changes
-                setValue(
-                  "seller.vatNoLabelText",
-                  TRANSLATIONS[newLanguage].seller.vatNo,
-                );
-
-                // Update BUYER VAT NO (Account Number) LABEL TEXT when language changes
-                setValue(
-                  "buyer.vatNoLabelText",
-                  TRANSLATIONS[newLanguage].buyer.vatNo,
-                );
-              }}
-            >
-              {SUPPORTED_LANGUAGES.map((lang) => {
-                const languageName = LANGUAGE_TO_LABEL[lang];
-
-                if (!languageName) {
-                  return null;
-                }
-
-                return (
-                  <option key={lang} value={lang}>
-                    {languageName}
-                  </option>
-                );
-              })}
-            </SelectNative>
-          )}
-        />
-        {errors.language ? (
-          <ErrorMessage>{errors.language.message}</ErrorMessage>
-        ) : (
-          <InputHelperMessage>
-            Select the language of the invoice
-          </InputHelperMessage>
-        )}
-      </div>
-
-      {/* Currency Select */}
-      <div>
-        <Label htmlFor={`currency`} className="mb-1">
-          Currency
-        </Label>
-        <Controller
-          name="currency"
-          control={control}
-          render={({ field }) => {
-            return (
-              <SelectNative {...field} id={`currency`} className="block">
-                {SUPPORTED_CURRENCIES.map((currency) => {
-                  const currencySymbol = CURRENCY_SYMBOLS[currency] || null;
-
-                  const currencyFullName = CURRENCY_TO_LABEL[currency] || null;
+                    // Set date format to "YYYY-MM-DD" when template is default
+                    setValue("dateFormat", SUPPORTED_DATE_FORMATS[0]);
+                  }
+                }}
+              >
+                {SUPPORTED_TEMPLATES.map((template) => {
+                  const templateLabel = TEMPLATE_TO_LABEL[template];
 
                   return (
-                    <option
-                      key={currency}
-                      value={currency}
-                      defaultValue={SUPPORTED_CURRENCIES[0]}
-                    >
-                      {currency} {currencySymbol} {currencyFullName}
+                    <option key={template} value={template}>
+                      {templateLabel}
                     </option>
                   );
                 })}
               </SelectNative>
-            );
-          }}
-        />
-
-        {errors.currency ? (
-          <ErrorMessage>{errors.currency.message}</ErrorMessage>
-        ) : (
-          <InputHelperMessage>
-            Select the currency of the invoice
-          </InputHelperMessage>
-        )}
-      </div>
-
-      {/* Date Format */}
-      <div>
-        <Label htmlFor={`dateFormat`} className="mb-1">
-          Date Format
-        </Label>
-        <Controller
-          name="dateFormat"
-          control={control}
-          render={({ field }) => (
-            <SelectNative {...field} id={`dateFormat`} className="block">
-              {SUPPORTED_DATE_FORMATS.map((format) => {
-                const preview = dayjs().locale(language).format(format);
-                const isDefault = format === SUPPORTED_DATE_FORMATS[0];
-
-                return (
-                  <option key={format} value={format}>
-                    {format} (Preview: {preview}) {isDefault ? "(default)" : ""}
-                  </option>
-                );
-              })}
-            </SelectNative>
+            )}
+          />
+          {errors.template ? (
+            <ErrorMessage>{errors.template.message}</ErrorMessage>
+          ) : (
+            <InputHelperMessage>
+              Select the design template for your invoice
+            </InputHelperMessage>
           )}
-        />
+        </div>
 
-        {errors.dateFormat ? (
-          <ErrorMessage>{errors.dateFormat.message}</ErrorMessage>
-        ) : (
-          <InputHelperMessage>
-            Select the date format of the invoice
-          </InputHelperMessage>
+        {/* Logo Upload - Only for Stripe template */}
+        {template === "stripe" && (
+          <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
+            <Label htmlFor="logoUpload" className="mb-2">
+              Company Logo (Optional)
+            </Label>
+
+            {logo ? (
+              <div className="space-y-2">
+                {/* Logo preview */}
+                <div className="relative inline-block">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={logo}
+                    alt="Company logo preview"
+                    className="h-28 max-w-40 rounded-lg border-2 border-gray-200 object-contain p-2 shadow-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleLogoRemove}
+                    className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-colors hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                    aria-label="Remove logo"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <InputHelperMessage>
+                  Logo uploaded successfully. Click the X to remove it.
+                </InputHelperMessage>
+              </div>
+            ) : (
+              <div data-testid="stripe-logo-upload-input">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  id="logoUpload"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="logoUpload"
+                  className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-8 transition-colors hover:border-gray-400 hover:bg-gray-50"
+                >
+                  <div className="text-center">
+                    <Upload className="mx-auto h-4 w-4 text-gray-400" />
+                    <p className="mt-3 text-sm font-medium text-gray-600">
+                      Click to upload your company logo
+                    </p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      JPEG, PNG or WebP (max 3MB)
+                    </p>
+                  </div>
+                </label>
+              </div>
+            )}
+
+            {errors.logo && <ErrorMessage>{errors.logo.message}</ErrorMessage>}
+          </div>
         )}
-      </div>
 
-      {/* Invoice Number */}
-      <div>
+        {/* Pay Online URL - Only for Stripe template */}
+        {template === "stripe" && (
+          <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
+            <Label htmlFor={`stripePayOnlineUrl`} className="">
+              Payment Link URL (Optional)
+            </Label>
+
+            <Controller
+              name="stripePayOnlineUrl"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  id={`stripePayOnlineUrl`}
+                  type="url"
+                  className="mt-1"
+                />
+              )}
+            />
+            {errors.stripePayOnlineUrl ? (
+              <ErrorMessage>{errors.stripePayOnlineUrl.message}</ErrorMessage>
+            ) : (
+              <InputHelperMessage>
+                Enter your payment URL. This adds a &quot;Pay Online&quot;
+                button to the PDF invoice.
+              </InputHelperMessage>
+            )}
+          </div>
+        )}
+
+        {/* Language PDF Select */}
+        <div>
+          <Label htmlFor={`language`} className="mb-1">
+            Invoice PDF Language
+          </Label>
+          <Controller
+            name="language"
+            control={control}
+            render={({ field }) => (
+              <SelectNative
+                {...field}
+                id={`language`}
+                className="block"
+                onChange={(e) => {
+                  field.onChange(e);
+
+                  // IMPORTANT: for BETTER USER EXPERIENCE, when switching language, we update the invoice number and labels to the new language
+
+                  // Update INVOICE NUMBER and LABELS when language changes
+                  const newLanguage = e.target
+                    .value as keyof typeof TRANSLATIONS;
+
+                  const newInvoiceNumberLabel =
+                    TRANSLATIONS[newLanguage].invoiceNumber;
+
+                  // we need to keep the invoice number suffix (e.g. 1/MM-YYYY) for better user experience, when switching language
+                  setValue(
+                    "invoiceNumberObject.label",
+                    `${newInvoiceNumberLabel}:`,
+                  );
+                  setValue("invoiceNumberObject.value", invoiceNumberValue);
+
+                  // Update SELLER VAT NO (Account Number) LABEL TEXT when language changes
+                  setValue(
+                    "seller.vatNoLabelText",
+                    TRANSLATIONS[newLanguage].seller.vatNo,
+                  );
+
+                  // Update BUYER VAT NO (Account Number) LABEL TEXT when language changes
+                  setValue(
+                    "buyer.vatNoLabelText",
+                    TRANSLATIONS[newLanguage].buyer.vatNo,
+                  );
+                }}
+              >
+                {SUPPORTED_LANGUAGES.map((lang) => {
+                  const languageName = LANGUAGE_TO_LABEL[lang];
+
+                  if (!languageName) {
+                    return null;
+                  }
+
+                  return (
+                    <option key={lang} value={lang}>
+                      {languageName}
+                    </option>
+                  );
+                })}
+              </SelectNative>
+            )}
+          />
+          {errors.language ? (
+            <ErrorMessage>{errors.language.message}</ErrorMessage>
+          ) : (
+            <InputHelperMessage>
+              Select the language of the invoice
+            </InputHelperMessage>
+          )}
+        </div>
+
+        {/* Currency Select */}
+        <div>
+          <Label htmlFor={`currency`} className="mb-1">
+            Currency
+          </Label>
+          <Controller
+            name="currency"
+            control={control}
+            render={({ field }) => {
+              return (
+                <SelectNative {...field} id={`currency`} className="block">
+                  {SUPPORTED_CURRENCIES.map((currency) => {
+                    const currencySymbol = CURRENCY_SYMBOLS[currency] || null;
+
+                    const currencyFullName =
+                      CURRENCY_TO_LABEL[currency] || null;
+
+                    return (
+                      <option
+                        key={currency}
+                        value={currency}
+                        defaultValue={SUPPORTED_CURRENCIES[0]}
+                      >
+                        {currency} {currencySymbol} {currencyFullName}
+                      </option>
+                    );
+                  })}
+                </SelectNative>
+              );
+            }}
+          />
+
+          {errors.currency ? (
+            <ErrorMessage>{errors.currency.message}</ErrorMessage>
+          ) : (
+            <InputHelperMessage>
+              Select the currency of the invoice
+            </InputHelperMessage>
+          )}
+        </div>
+
+        {/* Date Format */}
+        <div>
+          <Label htmlFor={`dateFormat`} className="mb-1">
+            Date Format
+          </Label>
+          <Controller
+            name="dateFormat"
+            control={control}
+            render={({ field }) => (
+              <SelectNative {...field} id={`dateFormat`} className="block">
+                {SUPPORTED_DATE_FORMATS.map((format) => {
+                  const preview = dayjs().locale(language).format(format);
+                  const isDefault = format === SUPPORTED_DATE_FORMATS[0];
+
+                  return (
+                    <option key={format} value={format}>
+                      {format} ({preview}) {isDefault ? "(default)" : ""}
+                    </option>
+                  );
+                })}
+              </SelectNative>
+            )}
+          />
+
+          {errors.dateFormat ? (
+            <ErrorMessage>{errors.dateFormat.message}</ErrorMessage>
+          ) : (
+            <InputHelperMessage>
+              Select the date format of the invoice
+            </InputHelperMessage>
+          )}
+        </div>
+
+        {/* Invoice Number */}
         <fieldset className="rounded-md border p-4">
           <legend className="px-1 text-lg font-semibold text-gray-900">
             Invoice Number
@@ -515,7 +525,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               {!isInvoiceNumberInCurrentMonth &&
                 !errors.invoiceNumberObject?.value && (
                   <div className="mt-1 flex flex-col items-start text-balance text-xs text-zinc-700/90">
-                    <span className="mb-2 flex items-center text-amber-800 md:mb-0 lg:mb-2">
+                    <span className="flex items-center text-amber-800">
                       <AlertIcon />
                       Invoice number does not match current month
                     </span>
@@ -528,202 +538,247 @@ export const GeneralInformation = memo(function GeneralInformation({
                         );
                       }}
                     >
-                      Click to set the invoice number to the current month (
-                      {`1/${CURRENT_MONTH_AND_YEAR}`})
+                      <span className="text-pretty">
+                        Set Invoice No. as{" "}
+                        <span className="font-bold">
+                          current month ({`1/${CURRENT_MONTH_AND_YEAR}`})
+                        </span>
+                      </span>
                     </ButtonHelper>
                   </div>
                 )}
             </div>
           </div>
         </fieldset>
-      </div>
 
-      {/* Date of Issue */}
-      <div>
-        <Label htmlFor={`dateOfIssue`} className="mb-1">
-          Date of Issue
-        </Label>
-        <Controller
-          name="dateOfIssue"
-          control={control}
-          render={({ field }) => (
-            <Input {...field} type="date" id={`dateOfIssue`} className="" />
-          )}
-        />
-        {errors.dateOfIssue && (
-          <ErrorMessage>{errors.dateOfIssue.message}</ErrorMessage>
-        )}
-        {isDateOfIssueNotToday && !errors.dateOfIssue ? (
-          <InputHelperMessage>
-            <span className="flex items-center text-amber-800">
-              <AlertIcon />
-              Date of issue is not today
-            </span>
-
-            <ButtonHelper
-              onClick={() => {
-                const currentMonth = dayjs().format("YYYY-MM-DD"); // default browser date input format is YYYY-MM-DD
-
-                setValue("dateOfIssue", currentMonth);
-              }}
-            >
-              <span className="text-balance">
-                Set date of issue to {dayjs().format(selectedDateFormat)}{" "}
-                (today)
-              </span>
-            </ButtonHelper>
-          </InputHelperMessage>
-        ) : null}
-      </div>
-
-      {/* Date of Service */}
-      <div>
-        <Label htmlFor={`dateOfService`} className="mb-1">
-          Date of Service
-        </Label>
-        <Controller
-          name="dateOfService"
-          control={control}
-          render={({ field }) => (
-            <Input {...field} type="date" id={`dateOfService`} className="" />
-          )}
-        />
-        {errors.dateOfService && (
-          <ErrorMessage>{errors.dateOfService.message}</ErrorMessage>
-        )}
-
-        {!isDateOfServiceEqualsEndOfCurrentMonth && !errors.dateOfService ? (
-          <InputHelperMessage>
-            <span className="flex items-center text-amber-800">
-              <AlertIcon />
-              Date of service is not the last day of the current month
-            </span>
-
-            <ButtonHelper
-              onClick={() => {
-                const lastDayOfCurrentMonth = dayjs()
-                  .endOf("month")
-                  .format("YYYY-MM-DD"); // default browser date input format is YYYY-MM-DD
-
-                setValue("dateOfService", lastDayOfCurrentMonth);
-              }}
-            >
-              Set date of service to{" "}
-              {dayjs().endOf("month").format(selectedDateFormat)} (end of
-              current month)
-            </ButtonHelper>
-          </InputHelperMessage>
-        ) : null}
-      </div>
-
-      {!isDateOfServiceEqualsEndOfCurrentMonth ||
-      !isInvoiceNumberInCurrentMonth ||
-      isDateOfIssueNotToday ? (
-        <InputHelperMessage>
-          <span className="flex items-start gap-1.5 text-pretty text-blue-800">
-            <InfoIcon className="mt-0.5 inline-block size-3.5 shrink-0 text-blue-800" />
-            <span>
-              Some dates are out of date. Click the button to set the service
-              date to the end of the month (
-              {dayjs().locale("en").endOf("month").format(selectedDateFormat)}),
-              the issue date to today (
-              {dayjs().locale("en").format(selectedDateFormat)}), the invoice
-              number to the current month ({`1/${CURRENT_MONTH_AND_YEAR}`}), and
-              the payment due date to 14 days from today (
-              {dayjs().locale("en").add(14, "days").format(selectedDateFormat)}
-              ).
-            </span>
-          </span>
-
-          <Button
-            type="button"
-            variant="outline"
-            size="default"
-            className="mt-2 text-slate-950 hover:bg-slate-50 hover:text-slate-900"
-            onClick={() => {
-              const today = dayjs().format("YYYY-MM-DD");
-
-              const lastDayOfCurrentMonth = dayjs()
-                .endOf("month")
-                .format("YYYY-MM-DD");
-
-              // Update date of service to end of current month
-              setValue("dateOfService", lastDayOfCurrentMonth);
-
-              // Update date of issue to today
-              setValue("dateOfIssue", today);
-
-              // Update invoice number to current month/year
-              setValue(
-                "invoiceNumberObject.value",
-                `1/${CURRENT_MONTH_AND_YEAR}`,
-              );
-
-              // Update payment due date to 14 days from today
-              const newPaymentDue = dayjs(today)
-                .add(14, "days")
-                .format("YYYY-MM-DD");
-
-              setValue("paymentDue", newPaymentDue);
-            }}
-          >
-            Update all dates
-          </Button>
-        </InputHelperMessage>
-      ) : null}
-
-      {/* Invoice Type - We don't show this field for Stripe template */}
-      {template !== "stripe" && (
+        {/* Date of Issue */}
         <div>
-          <div className="relative mb-2 flex items-center justify-between">
-            <Label htmlFor={`invoiceType`} className="">
-              Invoice Type
-            </Label>
-
-            {/* Show/hide Invoice Type field in PDF switch */}
-            <div className="inline-flex items-center gap-2">
-              <Controller
-                name={`invoiceTypeFieldIsVisible`}
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`invoiceTypeFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                  />
-                )}
-              />
-              <CustomTooltip
-                trigger={
-                  <Label htmlFor={`invoiceTypeFieldIsVisible`}>
-                    Show in PDF
-                  </Label>
-                }
-                content='Show/Hide the "Invoice Type" Field in the PDF'
-              />
-            </div>
-          </div>
-
+          <Label htmlFor={`dateOfIssue`} className="mb-1">
+            Date of Issue
+          </Label>
           <Controller
-            name="invoiceType"
+            name="dateOfIssue"
             control={control}
             render={({ field }) => (
-              <Textarea
-                {...field}
-                id={`invoiceType`}
-                rows={2}
-                className=""
-                placeholder="Enter invoice type"
-              />
+              <Input {...field} type="date" id={`dateOfIssue`} className="" />
             )}
           />
-          {errors.invoiceType && (
-            <ErrorMessage>{errors.invoiceType.message}</ErrorMessage>
+          {errors.dateOfIssue && (
+            <ErrorMessage>{errors.dateOfIssue.message}</ErrorMessage>
           )}
+          {isDateOfIssueNotToday && !errors.dateOfIssue ? (
+            <InputHelperMessage>
+              <span className="flex items-center text-amber-800">
+                <AlertIcon />
+                Date of issue is not today
+              </span>
+
+              <ButtonHelper
+                onClick={() => {
+                  const currentMonth = dayjs().format("YYYY-MM-DD"); // default browser date input format is YYYY-MM-DD
+
+                  setValue("dateOfIssue", currentMonth);
+                }}
+              >
+                <span className="text-pretty">
+                  Set date of issue to{" "}
+                  <span className="font-bold">
+                    today ({dayjs().format(selectedDateFormat)})
+                  </span>
+                </span>
+              </ButtonHelper>
+            </InputHelperMessage>
+          ) : null}
         </div>
-      )}
+
+        {/* Date of Service */}
+        <div>
+          <Label htmlFor={`dateOfService`} className="mb-1">
+            Date of Service
+          </Label>
+          <Controller
+            name="dateOfService"
+            control={control}
+            render={({ field }) => (
+              <Input {...field} type="date" id={`dateOfService`} className="" />
+            )}
+          />
+          {errors.dateOfService && (
+            <ErrorMessage>{errors.dateOfService.message}</ErrorMessage>
+          )}
+
+          {!isDateOfServiceEqualsEndOfCurrentMonth && !errors.dateOfService ? (
+            <InputHelperMessage>
+              <span className="flex items-center text-amber-800">
+                <AlertIcon />
+                Date of service is not the last day of the current month
+              </span>
+
+              <ButtonHelper
+                onClick={() => {
+                  const lastDayOfCurrentMonth = dayjs()
+                    .endOf("month")
+                    .format("YYYY-MM-DD"); // default browser date input format is YYYY-MM-DD
+
+                  setValue("dateOfService", lastDayOfCurrentMonth);
+                }}
+              >
+                <span className="text-pretty">
+                  Set date of service to{" "}
+                  <span className="font-bold">
+                    month end (
+                    {dayjs().endOf("month").format(selectedDateFormat)})
+                  </span>
+                </span>
+              </ButtonHelper>
+            </InputHelperMessage>
+          ) : null}
+        </div>
+
+        {!isDateOfServiceEqualsEndOfCurrentMonth ||
+        !isInvoiceNumberInCurrentMonth ||
+        isDateOfIssueNotToday ? (
+          <div className="max-w-[400px] rounded-md border border-blue-200 bg-blue-50 p-4 shadow-sm shadow-blue-200/50 duration-500 animate-in fade-in slide-in-from-bottom-2">
+            <InputHelperMessage>
+              <span className="flex items-start gap-1.5 text-pretty text-blue-800">
+                <InfoIcon className="mt-0.5 inline-block size-3.5 shrink-0 text-blue-800" />
+                <div>
+                  <span className="mb-2 inline-block">
+                    Some dates are out of date. Click the button to update all
+                    at once:
+                  </span>
+                  <ul className="list-disc space-y-1 text-balance pl-5">
+                    <li>
+                      Date of issue to{" "}
+                      <span className="font-bold">
+                        today ({dayjs().locale("en").format(selectedDateFormat)}
+                        )
+                      </span>
+                    </li>
+                    <li>
+                      Date of service to{" "}
+                      <span className="font-bold">
+                        end of current month (
+                        {dayjs()
+                          .locale("en")
+                          .endOf("month")
+                          .format(selectedDateFormat)}
+                        )
+                      </span>
+                    </li>
+                    <li>
+                      Invoice number to{" "}
+                      <span className="font-bold">
+                        current month ({`1/${CURRENT_MONTH_AND_YEAR}`})
+                      </span>
+                    </li>
+                    <li>
+                      Payment due date to{" "}
+                      <span className="font-bold">
+                        14 days from today (
+                        {dayjs()
+                          .locale("en")
+                          .add(14, "days")
+                          .format(selectedDateFormat)}
+                        )
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </span>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-3 text-slate-950 hover:bg-slate-50 hover:text-slate-900"
+                onClick={() => {
+                  const today = dayjs().format("YYYY-MM-DD");
+
+                  const lastDayOfCurrentMonth = dayjs()
+                    .endOf("month")
+                    .format("YYYY-MM-DD");
+
+                  // Update date of service to end of current month
+                  setValue("dateOfService", lastDayOfCurrentMonth);
+
+                  // Update date of issue to today
+                  setValue("dateOfIssue", today);
+
+                  // Update invoice number to current month/year
+                  setValue(
+                    "invoiceNumberObject.value",
+                    `1/${CURRENT_MONTH_AND_YEAR}`,
+                  );
+
+                  // Update payment due date to 14 days from today
+                  const newPaymentDue = dayjs(today)
+                    .add(14, "days")
+                    .format("YYYY-MM-DD");
+
+                  setValue("paymentDue", newPaymentDue);
+                }}
+              >
+                Update all dates
+              </Button>
+            </InputHelperMessage>
+          </div>
+        ) : null}
+
+        {/* Invoice Type - We don't show this field for Stripe template */}
+        {/* TODO: rename to "Invoice Notes", probably "Invoice Type" is not the best name for this field ?*/}
+        {template !== "stripe" && (
+          <div>
+            <div className="relative mb-2 flex items-center justify-between">
+              <Label htmlFor={`invoiceType`} className="">
+                Invoice Type
+              </Label>
+
+              {/* Show/hide Invoice Type field in PDF switch */}
+              <div className="inline-flex items-center gap-2">
+                <Controller
+                  name={`invoiceTypeFieldIsVisible`}
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Switch
+                      {...field}
+                      id={`invoiceTypeFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    />
+                  )}
+                />
+                <CustomTooltip
+                  trigger={
+                    <Label htmlFor={`invoiceTypeFieldIsVisible`}>
+                      Show in PDF
+                    </Label>
+                  }
+                  content='Show/Hide the "Invoice Type" Field in the PDF'
+                />
+              </div>
+            </div>
+
+            <Controller
+              name="invoiceType"
+              control={control}
+              render={({ field }) => (
+                <Textarea
+                  {...field}
+                  id={`invoiceType`}
+                  rows={2}
+                  className=""
+                  placeholder="Enter invoice type"
+                />
+              )}
+            />
+            {errors.invoiceType && (
+              <ErrorMessage>{errors.invoiceType.message}</ErrorMessage>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 });

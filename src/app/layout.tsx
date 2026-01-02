@@ -31,7 +31,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   // metadataBase: new URL(APP_URL),
-  title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
+  title: "Create Invoice — EasyInvoicePDF",
   description:
     "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
   keywords: [

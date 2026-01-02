@@ -63,6 +63,7 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   notesFieldIsVisible: "u",
   personAuthorizedToReceiveFieldIsVisible: "v",
   personAuthorizedToIssueFieldIsVisible: "w",
+  taxLabelText: "1",
 
   // Invoice number object properties
   label: "x",
@@ -79,6 +80,7 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   accountNumberFieldIsVisible: "G",
   swiftBic: "H",
   swiftBicFieldIsVisible: "I",
+  vatNoLabelText: "2",
 
   // Invoice item properties
   invoiceItemNumberIsVisible: "J",
@@ -99,8 +101,6 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   vatAmountFieldIsVisible: "Y",
   preTaxAmount: "Z",
   preTaxAmountFieldIsVisible: "0",
-  taxLabelText: "1",
-  vatNoLabelText: "2",
 } as const satisfies Record<AllInvoiceKeys, string>;
 
 /**

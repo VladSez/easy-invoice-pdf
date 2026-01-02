@@ -30,15 +30,15 @@ Visit the app website at [EasyInvoicePDF.com](https://easyinvoicepdf.com/?templa
 
 ## ✨ Key Features
 
+- ⭐ **No Sign-Up Required**: Start creating invoices immediately without any registration
+- 📄 **Instant PDF**: One-click download ready for printing or sending
 - ⚡ **Live Preview**: See changes in real-time as you type
 - 🔗 **Shareable Links**: Send invoices directly to clients without attachments
-- ⭐ **No Sign-Up Required**: Start creating invoices immediately without any registration
-- 📱 **Browser Only**: No server uploads, your data stays private
-- 🌍 **Multi-Language**: Support for 10+ languages and all major currencies
-- 💰 **Flexible Tax Support**: VAT, GST, Sales Tax, and custom tax formats with automatic calculations
 - 🎨 **Multiple Templates**: Including modern **Stripe-style design**
-- 📄 **Instant PDF**: One-click download ready for printing or sending
-- 📱 **Mobile-Friendly**: Fully responsive design works perfectly on all devices
+- 📱 **Browser Only**: No server uploads, your data stays private
+- 💰 **Flexible Tax Support**: VAT, GST, Sales Tax, and custom tax formats with automatic calculations
+- 🌍 **Multi-Language**: Support for 10+ languages and all major currencies
+- 📱 **Mobile-Friendly**: Create invoices on the go from any device
 
 ## 🎥 Demo Video
 
@@ -65,6 +65,7 @@ If you find EasyInvoicePDF useful, consider supporting the creator and project b
 - Generate beautiful OG images: https://og.new
 - Analytics: https://umami.is/
 - [typescript-plugin-directives](https://www.npmjs.com/package/typescript-plugin-directives)
+- [Create Mockups with shots.so](https://shots.so/)
 
 ## Quick Start
 

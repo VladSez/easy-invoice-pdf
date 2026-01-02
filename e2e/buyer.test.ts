@@ -13,7 +13,7 @@ test.describe("Buyer management", () => {
     await page.getByRole("button", { name: "New Buyer" }).click();
 
     // Fill in all buyer details
-    const testData = {
+    const TEST_BUYER_DATA = {
       name: "New Test Client",
       address: "456 Client Avenue\nClient City, 54321\nClient Country",
 
@@ -33,10 +33,10 @@ test.describe("Buyer management", () => {
     // Fill in form fields
     await manageBuyerDialog
       .getByRole("textbox", { name: "Name" })
-      .fill(testData.name);
+      .fill(TEST_BUYER_DATA.name);
     await manageBuyerDialog
       .getByRole("textbox", { name: "Address" })
-      .fill(testData.address);
+      .fill(TEST_BUYER_DATA.address);
 
     // Fill TAX Number fieldset (Label and Value)
     const vatNumberFieldset = manageBuyerDialog.getByRole("group", {
@@ -45,15 +45,15 @@ test.describe("Buyer management", () => {
 
     await vatNumberFieldset
       .getByRole("textbox", { name: "Label" })
-      .fill(testData.vatNoLabelText);
+      .fill(TEST_BUYER_DATA.vatNoLabelText);
 
     await vatNumberFieldset
       .getByRole("textbox", { name: "Value" })
-      .fill(testData.vatNo);
+      .fill(TEST_BUYER_DATA.vatNo);
 
     await manageBuyerDialog
       .getByRole("textbox", { name: "Email" })
-      .fill(testData.email);
+      .fill(TEST_BUYER_DATA.email);
 
     const taxNumberSwitchInDialogForm = manageBuyerDialog.getByRole("switch", {
       name: `Show/hide the 'Tax Number' field in the PDF`,
@@ -70,7 +70,7 @@ test.describe("Buyer management", () => {
     // Fill in notes field
     await manageBuyerDialog
       .getByRole("textbox", { name: "Notes" })
-      .fill(testData.notes);
+      .fill(TEST_BUYER_DATA.notes);
 
     const notesSwitchInDialogForm = manageBuyerDialog.getByRole("switch", {
       name: `Show/hide the 'Notes' field in the PDF`,
@@ -108,16 +108,16 @@ test.describe("Buyer management", () => {
     const parsedData = JSON.parse(storedData) as BuyerData[];
 
     expect(parsedData[0]).toMatchObject({
-      name: testData.name,
-      address: testData.address,
+      name: TEST_BUYER_DATA.name,
+      address: TEST_BUYER_DATA.address,
 
-      vatNo: testData.vatNo,
-      vatNoLabelText: testData.vatNoLabelText,
+      vatNo: TEST_BUYER_DATA.vatNo,
+      vatNoLabelText: TEST_BUYER_DATA.vatNoLabelText,
       vatNoFieldIsVisible: false,
 
-      email: testData.email,
+      email: TEST_BUYER_DATA.email,
 
-      notes: testData.notes,
+      notes: TEST_BUYER_DATA.notes,
       notesFieldIsVisible: true,
     } satisfies BuyerData);
 
@@ -153,7 +153,7 @@ test.describe("Buyer management", () => {
 
     // Buyer Name
     await expect(nameInput).toHaveAttribute("aria-readonly", "true");
-    await expect(nameInput).toHaveValue(testData.name);
+    await expect(nameInput).toHaveValue(TEST_BUYER_DATA.name);
 
     // Buyer Address
     await expect(
@@ -161,7 +161,7 @@ test.describe("Buyer management", () => {
     ).toHaveAttribute("aria-readonly", "true");
     await expect(
       buyerForm.getByRole("textbox", { name: "Address" }),
-    ).toHaveValue(testData.address);
+    ).toHaveValue(TEST_BUYER_DATA.address);
 
     // Buyer VAT Number
     const buyerVatFieldset = buyerForm.getByRole("group", {
@@ -174,14 +174,14 @@ test.describe("Buyer management", () => {
 
     await expect(
       buyerVatFieldset.getByRole("textbox", { name: "Label" }),
-    ).toHaveValue(testData.vatNoLabelText);
+    ).toHaveValue(TEST_BUYER_DATA.vatNoLabelText);
 
     await expect(
       buyerVatFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveAttribute("aria-readonly", "true");
     await expect(
       buyerVatFieldset.getByRole("textbox", { name: "Value" }),
-    ).toHaveValue(testData.vatNo);
+    ).toHaveValue(TEST_BUYER_DATA.vatNo);
 
     const vatNumberSwitchNotInDialog = buyerForm.getByTestId(
       `buyerVatNoFieldIsVisible`,
@@ -195,7 +195,7 @@ test.describe("Buyer management", () => {
       buyerForm.getByRole("textbox", { name: "Email" }),
     ).toHaveAttribute("aria-readonly", "true");
     await expect(buyerForm.getByRole("textbox", { name: "Email" })).toHaveValue(
-      testData.email,
+      TEST_BUYER_DATA.email,
     );
 
     // Buyer Notes
@@ -204,7 +204,7 @@ test.describe("Buyer management", () => {
     ).toHaveAttribute("aria-readonly", "true");
 
     await expect(buyerForm.getByRole("textbox", { name: "Notes" })).toHaveValue(
-      testData.notes,
+      TEST_BUYER_DATA.notes,
     );
 
     const notesSwitchNotInDialog = buyerForm.getByTestId(
@@ -216,7 +216,7 @@ test.describe("Buyer management", () => {
     // Verify the buyer appears in the dropdown
     await expect(
       buyerForm.getByRole("combobox", { name: "Select Buyer" }),
-    ).toContainText(testData.name);
+    ).toContainText(TEST_BUYER_DATA.name);
 
     // ------- TEST EDIT FUNCTIONALITY -------
     await buyerForm.getByRole("button", { name: "Edit buyer" }).click();
@@ -224,26 +224,26 @@ test.describe("Buyer management", () => {
     // Verify all fields are populated in edit dialog
     await expect(
       manageBuyerDialog.getByRole("textbox", { name: "Name" }),
-    ).toHaveValue(testData.name);
+    ).toHaveValue(TEST_BUYER_DATA.name);
     await expect(
       manageBuyerDialog.getByRole("textbox", { name: "Address" }),
-    ).toHaveValue(testData.address);
+    ).toHaveValue(TEST_BUYER_DATA.address);
 
     await expect(
       manageBuyerDialog
         .getByRole("group", { name: "Buyer Tax Number" })
         .getByRole("textbox", { name: "Label" }),
-    ).toHaveValue(testData.vatNoLabelText);
+    ).toHaveValue(TEST_BUYER_DATA.vatNoLabelText);
 
     await expect(
       manageBuyerDialog
         .getByRole("group", { name: "Buyer Tax Number" })
         .getByRole("textbox", { name: "Value" }),
-    ).toHaveValue(testData.vatNo);
+    ).toHaveValue(TEST_BUYER_DATA.vatNo);
 
     await expect(
       manageBuyerDialog.getByRole("textbox", { name: "Email" }),
-    ).toHaveValue(testData.email);
+    ).toHaveValue(TEST_BUYER_DATA.email);
 
     // Verify visibility switch state persisted in edit dialog
     await expect(taxNumberSwitchInDialogForm).not.toBeChecked();
@@ -251,7 +251,7 @@ test.describe("Buyer management", () => {
     // Verify notes text
     await expect(
       manageBuyerDialog.getByRole("textbox", { name: "Notes" }),
-    ).toHaveValue(testData.notes);
+    ).toHaveValue(TEST_BUYER_DATA.notes);
 
     // Verify notes visibility switch is checked
 

@@ -13,11 +13,13 @@ import { BUG_REPORT_URL } from "@/config";
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 /**
- * Android PDF viewer.
- * We only show the Android PDF viewer on Android devices due to the limitations of the PDF viewer
- * https://github.com/diegomura/react-pdf/issues/714
+ * Mobile PDF viewer.
  *
- * https://github.com/wojtekmaj/react-pdf
+ * We show the different (enhanced) PDF viewer on all mobile devices due to the limitations of the `@react-pdf/renderer` default built-in PDF viewer
+ *
+ * Issue with the default PDF viewer: https://github.com/diegomura/react-pdf/issues/714
+ *
+ * **PDF viewer we use on mobile devices:** https://github.com/wojtekmaj/react-pdf
  */
 export const MobileInvoicePDFViewer = ({
   invoiceData,
@@ -44,7 +46,7 @@ export const MobileInvoicePDFViewer = ({
       {({ url, loading, error }) => {
         if (error) {
           return (
-            <div className="flex h-[480px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+            <div className="flex h-[520px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
               <div className="text-center">
                 <p className="text-red-600">Error generating PDF preview</p>
                 <p className="mt-2 text-sm text-gray-600">
@@ -67,7 +69,7 @@ export const MobileInvoicePDFViewer = ({
 
         if (loading || !url) {
           return (
-            <div className="flex h-[480px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+            <div className="flex h-[520px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
               <div className="text-center">
                 <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
                 <p className="text-gray-600">Loading PDF viewer...</p>
@@ -82,9 +84,9 @@ export const MobileInvoicePDFViewer = ({
             // we use a key to force a re-render of the PDF viewer in case of error
             key={key}
             file={url || ""}
-            className="h-[480px] w-[650px] overflow-auto lg:h-[620px] 2xl:h-[700px]"
+            className="h-[520px] w-[650px] overflow-auto border border-slate-100 lg:h-[620px] 2xl:h-[700px]"
             loading={
-              <div className="flex h-[480px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+              <div className="flex h-[520px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
                 <div className="text-center">
                   <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
                   <p className="text-gray-600">Loading PDF viewer...</p>
@@ -98,7 +100,7 @@ export const MobileInvoicePDFViewer = ({
               setKey((prev) => prev + 1);
             }}
             error={
-              <div className="flex h-[480px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+              <div className="flex h-[520px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
                 <div className="text-center">
                   <p className="text-balance text-red-600">
                     Error generating PDF preview. Please refresh the page or use
@@ -121,7 +123,7 @@ export const MobileInvoicePDFViewer = ({
               pageNumber={1}
               error={"Something went wrong"}
               loading={
-                <div className="flex h-[480px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+                <div className="flex h-[520px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
                   <div className="text-center">
                     <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
                     <p className="text-gray-600">Loading PDF viewer...</p>

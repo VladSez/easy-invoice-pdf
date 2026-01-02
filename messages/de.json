@@ -11,8 +11,7 @@
     "tagline": "Rechnungs-PDF-Generator mit Live-Vorschau",
     "hero": {
       "title": "Erstellen Sie professionelle Rechnungen in Sekunden",
-      "description": "EasyInvoicePDF ist ein <span>kostenloses</span> Open-Source-Tool, mit dem Sie professionelle Rechnungen mit <span>Echtzeit-Vorschau</span> erstellen, anpassen und herunterladen können. Läuft vollständig in Ihrem Browser.",
-      "noSignup": "Keine Anmeldung erforderlich. 100% kostenlos und Open-Source."
+      "description": "EasyInvoicePDF ist ein <span>kostenloses</span> Open-Source-Tool, mit dem Sie professionelle Rechnungen mit <span>Echtzeit-Vorschau</span> erstellen, anpassen und herunterladen können. Läuft vollständig in Ihrem Browser."
     },
     "features": {
       "badge": "Funktionen",

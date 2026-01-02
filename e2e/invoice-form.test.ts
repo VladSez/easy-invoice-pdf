@@ -47,7 +47,7 @@ test.describe("Invoice Generator Page", () => {
     // Check other meta tags for Stripe template
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
       "content",
-      "App | Free Invoice Generator – Live Preview, No Sign-Up",
+      "Create Invoice — EasyInvoicePDF",
     );
     await expect(
       page.locator('meta[property="og:description"]'),
@@ -78,9 +78,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(page).toHaveURL("/?template=default");
 
     // Check title and branding
-    await expect(page).toHaveTitle(
-      "App | Free Invoice Generator – Live Preview, No Sign-Up",
-    );
+    await expect(page).toHaveTitle("Create Invoice — EasyInvoicePDF");
 
     const header = page.getByTestId("header");
     await expect(header).toBeVisible();
@@ -1098,5 +1096,92 @@ test.describe("Invoice Generator Page", () => {
         }),
       ).toHaveValue(testCase.expected.total);
     }
+  });
+
+  test("displays helper messages when dates are out of date and allows updating all dates", async ({
+    page,
+  }) => {
+    // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
+    await page.clock.setSystemTime(new Date("2025-12-01T00:00:00Z"));
+
+    // Navigate to the page
+    await page.goto("/?template=default");
+
+    // Get the general information section
+    const generalInfoSection = page.getByRole("region", {
+      name: "General Information",
+    });
+
+    // Set date of issue to a past date (not today)
+    const dateOfIssueInput = generalInfoSection.getByLabel("Date of Issue");
+    await dateOfIssueInput.fill("2024-01-15");
+
+    // Verify "Date of issue is not today" message appears
+    await expect(
+      generalInfoSection.getByText("Date of issue is not today"),
+    ).toBeVisible();
+
+    const dateOfIssueBtn = generalInfoSection.getByRole("button", {
+      name: "Set date of issue to today (2025-12-01)",
+    });
+
+    // Verify the helper button to set date to today is visible
+    await expect(dateOfIssueBtn).toBeVisible();
+    await expect(dateOfIssueBtn).toBeEnabled();
+
+    // Set date of service to a date that's not the last day of current month
+    const dateOfServiceInput = generalInfoSection.getByLabel("Date of Service");
+    await dateOfServiceInput.fill("2024-01-15");
+
+    // Verify "Date of service is not the last day of the current month" message appears
+    await expect(
+      generalInfoSection.getByText(
+        "Date of service is not the last day of the current month",
+      ),
+    ).toBeVisible();
+
+    const dateOfServiceBtn = generalInfoSection.getByRole("button", {
+      name: "Set date of service to month end (2025-12-31)",
+    });
+
+    // Verify the helper button to set date to month end is visible
+    await expect(dateOfServiceBtn).toBeVisible();
+    await expect(dateOfServiceBtn).toBeEnabled();
+
+    // Verify the "Update all dates" section appears
+    await expect(
+      generalInfoSection.getByText(
+        "Some dates are out of date. Click the button to update all at once:",
+      ),
+    ).toBeVisible();
+
+    // Verify the "Update all dates" button is visible
+    const updateAllDatesButton = generalInfoSection.getByRole("button", {
+      name: "Update all dates",
+    });
+    await expect(updateAllDatesButton).toBeVisible();
+
+    // Click the "Update all dates" button
+    await updateAllDatesButton.click();
+
+    // Verify that the helper messages are no longer visible after update
+
+    await expect(
+      generalInfoSection.getByText("Date of issue is not today"),
+    ).toBeHidden();
+    await expect(dateOfIssueInput).toHaveValue("2025-12-01");
+
+    await expect(
+      generalInfoSection.getByText(
+        "Date of service is not the last day of the current month",
+      ),
+    ).toBeHidden();
+    await expect(dateOfServiceInput).toHaveValue("2025-12-31");
+
+    await expect(
+      generalInfoSection.getByText(
+        "Some dates are out of date. Click the button to update all at once:",
+      ),
+    ).toBeHidden();
   });
 });

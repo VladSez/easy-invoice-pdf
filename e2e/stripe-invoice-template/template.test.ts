@@ -46,7 +46,7 @@ test.describe("Stripe Invoice Template", () => {
     // Check other meta tags for Stripe template
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
       "content",
-      "Stripe Invoice Template | Free Invoice Generator",
+      "Stripe Template — Create Invoice | EasyInvoicePDF",
     );
     await expect(
       page.locator('meta[property="og:description"]'),
@@ -945,6 +945,4 @@ test.describe("Stripe Invoice Template", () => {
       ),
     );
   });
-
-  // TODO: add more tests for Stripe template pdf generation (multiple invoice items, different languages and currencies, different date formats, etc)
 });

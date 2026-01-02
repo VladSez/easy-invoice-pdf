@@ -14,7 +14,7 @@ test.describe("About page", () => {
     await expect(page).toHaveURL("/en/about");
 
     await expect(page).toHaveTitle(
-      "Free Invoice Generator - No Sign-Up | EasyInvoicePDF.com",
+      "About EasyInvoicePDF — Free Invoice Generator",
     );
 
     const header = page.getByRole("banner");
@@ -71,7 +71,7 @@ test.describe("About page", () => {
 
     await expect(
       featuresSection.getByTestId("features-coming-soon"),
-    ).toHaveText("E-invoices support coming soon");
+    ).toHaveText("E-invoicing and API support - coming soon");
 
     await expect(
       featuresSection.getByRole("heading", {
@@ -83,12 +83,8 @@ test.describe("About page", () => {
 
     await expect(
       featuresSection.getByText(
-        "Our simple yet powerful invoice generator includes all the features you need to create professional invoices quickly.",
+        "Create professional invoices in minutes with a simple, powerful tool.",
       ),
-    ).toBeVisible();
-
-    await expect(
-      featuresSection.getByText("E-invoices support coming soon"),
     ).toBeVisible();
 
     // check FAQ section

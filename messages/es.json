@@ -11,8 +11,7 @@
     "tagline": "Generador de facturas PDF con vista previa en vivo",
     "hero": {
       "title": "Cree facturas profesionales en segundos",
-      "description": "EasyInvoicePDF es una <span>herramienta gratuita</span> de código abierto que le permite crear, personalizar y descargar facturas profesionales con <span>vista previa en tiempo real</span>. Funciona completamente en su navegador.",
-      "noSignup": "No requiere registro. 100% gratuito y de código abierto."
+      "description": "EasyInvoicePDF es una <span>herramienta gratuita</span> de código abierto que le permite crear, personalizar y descargar facturas profesionales con <span>vista previa en tiempo real</span>. Funciona completamente en su navegador."
     },
     "features": {
       "badge": "Características",

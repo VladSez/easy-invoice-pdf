@@ -17,7 +17,7 @@ export const PROD_WEBSITE_URL = "https://easyinvoicepdf.com";
 
 export const GITHUB_URL = "https://github.com/VladSez/easy-invoice-pdf";
 
-export const TWITTER_URL = "https://x.com/vlad_sazon";
+export const TWITTER_URL = "https://x.com/vladsazonau";
 
 export const BUG_REPORT_URL =
   "https://pdfinvoicegenerator.userjot.com/board/bugs";

@@ -2,14 +2,12 @@ import { defineConfig, devices } from "@playwright/test";
 
 import dotenv from "dotenv";
 import path from "path";
-dotenv.config({ path: path.resolve(__dirname, ".env.local") });
-
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
 
-// process.env.NODE_ENV = "test";
+dotenv.config({ path: path.resolve(__dirname, ".env.local") });
 
 // Use process.env.PORT by default and fallback to port 3000
 const PORT = process.env.PORT ?? 3000;
@@ -20,7 +18,7 @@ const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
 // @ts-expect-error - NODE_ENV is not defined in the environment variables
 const isLocal = process.env.NODE_ENV === "local";
 
-const TIMEOUT = isLocal ? 40_000 : 80_000; // 80 seconds
+const TIMEOUT = isLocal ? 35_000 : 80_000; // 80 seconds
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -34,7 +32,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 2 : undefined,
+  workers: process.env.CI ? 2 : undefined, // IMPORTANT: if tests are flaky locally, make workers > 1
   /* timeout for expect assertions */
   expect: {
     timeout: isLocal ? 30_000 : 60_000,
@@ -65,6 +63,7 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
+        channel: "chromium",
         permissions: ["clipboard-read", "clipboard-write"],
         // Set localStorage to disable umami analytics
         storageState: {
@@ -93,6 +92,7 @@ export default defineConfig({
       name: "Mobile Chrome",
       use: {
         ...devices["Pixel 5"],
+        channel: "chromium",
         permissions: ["clipboard-read", "clipboard-write"],
         // Set localStorage to disable umami analytics
         storageState: {

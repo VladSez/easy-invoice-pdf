@@ -42,6 +42,7 @@ import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
+import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 
 export const LOADING_BUTTON_TIMEOUT = 400;
 export const LOADING_BUTTON_TEXT = "Generating Document...";
@@ -161,9 +162,10 @@ export const InvoiceForm = memo(function InvoiceForm({
   // regenerate pdf on every input change with debounce
   const debouncedRegeneratePdfOnFormChange = useDebouncedCallback(
     (data: InvoiceData) => {
-      // submit form e.g. regenerates pdf and run form validations
+      // Submit form to regenerate PDF and run form validations
       void handleSubmit(onSubmit)(data as unknown as React.BaseSyntheticEvent);
 
+      // TODO: double check if we need this code, because we already save to local storage in the page.client.tsx (parent component) (line: 267) useEffect "Save to localStorage whenever data changes on form update"
       try {
         const validatedData = invoiceSchema.parse(data);
 
@@ -180,6 +182,8 @@ export const InvoiceForm = memo(function InvoiceForm({
     DEBOUNCE_TIMEOUT,
   );
 
+  // IMPORTANT
+  // TODO: rewrite to subscribe()? https://react-hook-form.com/docs/useform/subscribe
   // subscribe to form changes to regenerate pdf on every input change
   useEffect(() => {
     const subscription = watch((value) => {
@@ -215,9 +219,18 @@ export const InvoiceForm = memo(function InvoiceForm({
     [remove, watch, debouncedRegeneratePdfOnFormChange],
   );
 
-  // TODO: refactor this and debouncedRegeneratePdfOnFormChange(), so data is saved to local storage, basically copy everything from debouncedRegeneratePdfOnFormChange() and use this onSubmit function in two places
   const onSubmit = (data: InvoiceData) => {
+    // pass the updated data to the parent component
     handleInvoiceDataChange(data);
+
+    // update the `invoiceLastUpdatedAt` timestamp when the form is submitted (i.e. invoice is regenerated)
+    // this is used to display the last updated at timestamp in the invoice preview
+    updateAppMetadata((current) => {
+      return {
+        ...current,
+        invoiceLastUpdatedAt: dayjs().toISOString(),
+      };
+    });
   };
 
   /**
@@ -557,7 +570,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                     setValue("paymentDue", newPaymentDue);
                   }}
                 >
-                  <span className="text-balance">
+                  <span className="text-pretty">
                     Set payment due date to{" "}
                     {dayjs(dateOfIssue)
                       .add(14, "days")
@@ -572,24 +585,26 @@ export const InvoiceForm = memo(function InvoiceForm({
             !isPaymentDueBeforeDateOfIssue &&
             !isPaymentDue14DaysFromDateOfIssue &&
             dateOfIssue ? (
-              <ButtonHelper
-                className="whitespace-normal"
-                onClick={() => {
-                  const newPaymentDue = dayjs(dateOfIssue)
-                    .add(14, "days")
-                    .format("YYYY-MM-DD");
+              <InputHelperMessage>
+                <ButtonHelper
+                  className="whitespace-normal"
+                  onClick={() => {
+                    const newPaymentDue = dayjs(dateOfIssue)
+                      .add(14, "days")
+                      .format("YYYY-MM-DD");
 
-                  setValue("paymentDue", newPaymentDue);
-                }}
-              >
-                <span className="text-balance">
-                  Set payment due date to{" "}
-                  {dayjs(dateOfIssue)
-                    .add(14, "days")
-                    .format(selectedDateFormat)}{" "}
-                  (14 days from issue date)
-                </span>
-              </ButtonHelper>
+                    setValue("paymentDue", newPaymentDue);
+                  }}
+                >
+                  <span className="text-pretty">
+                    Set payment due date to{" "}
+                    {dayjs(dateOfIssue)
+                      .add(14, "days")
+                      .format(selectedDateFormat)}{" "}
+                    (14 days from issue date)
+                  </span>
+                </ButtonHelper>
+              </InputHelperMessage>
             ) : null}
           </div>
         </div>
