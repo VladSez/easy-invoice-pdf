@@ -1,4 +1,4 @@
-import type { InvoiceData } from "@/app/schema";
+import type { InvoiceData, MobileTabsValues } from "@/app/schema";
 import { DEFAULT_MOBILE_TAB, MOBILE_TABS_VALUES } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -136,11 +136,13 @@ export function InvoiceClientPage({
             defaultValue={defaultMobileTab}
             className="w-full"
             onValueChange={(value) => {
+              const newValue = value as MobileTabsValues;
+
               // update the last visited mobile tab in the app metadata
               updateAppMetadata((current) => {
                 return {
                   ...current,
-                  lastVisitedMobileTab: value as typeof DEFAULT_MOBILE_TAB,
+                  lastVisitedMobileTab: newValue,
                 };
               });
             }}

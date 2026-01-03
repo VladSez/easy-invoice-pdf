@@ -59,12 +59,7 @@ test.describe("Default Invoice Template", () => {
     // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(1000);
 
-    await expect(page).toHaveScreenshot(
-      path.join(
-        "downloads-PDF-in-English",
-        `pdf-playwright-screenshot-${suggestedFilename}.png`,
-      ),
-    );
+    await expect(page).toHaveScreenshot(`downloads-PDF-in-English.png`);
   });
 
   test("downloads PDF in Polish and verifies translated content", async ({
@@ -165,12 +160,7 @@ test.describe("Default Invoice Template", () => {
     // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(1000);
 
-    await expect(page).toHaveScreenshot(
-      path.join(
-        "downloads-PDF-in-Polish",
-        `pdf-playwright-screenshot-${suggestedFilename}.png`,
-      ),
-    );
+    await expect(page).toHaveScreenshot(`downloads-PDF-in-Polish.png`);
 
     // navigate back to the previous page
     await page.goto("/");
@@ -231,10 +221,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(1000);
 
     await expect(page).toHaveScreenshot(
-      path.join(
-        "downloads-PDF-in-Polish-stripe-template",
-        `pdf-playwright-screenshot-stripe-${stripeSuggestedFilename}.png`,
-      ),
+      `downloads-PDF-in-Polish-stripe-template.png`,
     );
   });
 
@@ -389,10 +376,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(1000);
 
     await expect(page).toHaveScreenshot(
-      path.join(
-        "update-pdf-when-invoice-data-changes",
-        `pdf-playwright-screenshot-${suggestedFilename}.png`,
-      ),
+      `update-pdf-when-invoice-data-changes.png`,
     );
 
     // navigate back to the previous page
@@ -452,10 +436,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(1000);
 
     await expect(page).toHaveScreenshot(
-      path.join(
-        "update-pdf-when-invoice-data-changes-stripe-template",
-        `pdf-playwright-screenshot-stripe-${stripeSuggestedFilename}.png`,
-      ),
+      `update-pdf-when-invoice-data-changes-stripe-template.png`,
     );
   });
 
@@ -594,10 +575,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(1000);
 
     await expect(page).toHaveScreenshot(
-      path.join(
-        "completes-full-invoice-flow-on-mobile",
-        `pdf-playwright-screenshot-${suggestedFilename}.png`,
-      ),
+      `completes-full-invoice-flow-on-mobile.png`,
     );
 
     // Navigate back to the previous page
@@ -722,10 +700,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(1000);
 
     await expect(page).toHaveScreenshot(
-      path.join(
-        "completes-full-invoice-flow-on-mobile-stripe-template",
-        `pdf-playwright-screenshot-stripe-${stripeSuggestedFilename}.png`,
-      ),
+      `completes-full-invoice-flow-on-mobile-stripe-template.png`,
     );
   });
 
@@ -865,10 +840,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(1000);
 
     await expect(page).toHaveScreenshot(
-      path.join(
-        "should-display-and-persist-invoice-number-in-different-languages",
-        `pdf-playwright-screenshot-${suggestedFilename}.png`,
-      ),
+      `should-display-and-persist-invoice-number-in-different-languages.png`,
     );
 
     // navigate back to the previous page
@@ -932,10 +904,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(1000);
 
     await expect(page).toHaveScreenshot(
-      path.join(
-        "should-display-and-persist-invoice-number-in-different-languages-stripe-template",
-        `pdf-playwright-screenshot-stripe-${stripeSuggestedFilename}.png`,
-      ),
+      `should-display-and-persist-invoice-number-in-different-languages-stripe-template.png`,
     );
   });
 });

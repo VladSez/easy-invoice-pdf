@@ -775,6 +775,8 @@ export const ACCORDION_STATE_LOCAL_STORAGE_KEY = "EASY_INVOICE_ACCORDION_STATE";
 export const MOBILE_TABS_VALUES = ["invoice-form", "invoice-preview"] as const;
 export const DEFAULT_MOBILE_TAB = MOBILE_TABS_VALUES[0];
 
+export type MobileTabsValues = (typeof MOBILE_TABS_VALUES)[number];
+
 /**
  * Metadata schema
  *

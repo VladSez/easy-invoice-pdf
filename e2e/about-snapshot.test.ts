@@ -1,5 +1,3 @@
-import path from "node:path";
-
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { expect, test } from "./utils/extended-playwright-test";
 
@@ -22,11 +20,6 @@ test.describe("About page (Snapshot Test)", () => {
       });
     });
 
-    await expect(page).toHaveScreenshot(
-      path.join(
-        "about-page-english-screenshot",
-        `about-page-english-screenshot.png`,
-      ),
-    );
+    await expect(page).toHaveScreenshot("about-page-english.png");
   });
 });

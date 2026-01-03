@@ -538,35 +538,6 @@ export const InvoiceItems = memo(function InvoiceItems({
                     <Label htmlFor={`itemVat${index}`} className="">
                       {taxLabelText}
                     </Label>
-
-                    {/* Show/hide Tax field in PDF switch (Show for both default and custom templates) */}
-                    {/* {isFirstItem ? (
-                      <div className="inline-flex items-center gap-2">
-                        <Controller
-                          name={`items.${index}.vatFieldIsVisible`}
-                          control={control}
-                          render={({
-                            field: { value, onChange, ...field },
-                          }) => (
-                            <Switch
-                              {...field}
-                              id={`itemVatFieldIsVisible${index}`}
-                              checked={value}
-                              onCheckedChange={onChange}
-                              className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                            />
-                          )}
-                        />
-                        <CustomTooltip
-                          trigger={
-                            <Label htmlFor={`itemVatFieldIsVisible${index}`}>
-                              Show in PDF
-                            </Label>
-                          }
-                          content={`Show/hide the "${taxLabelText}" Column in the PDF`}
-                        />
-                      </div>
-                    ) : null} */}
                   </div>
 
                   {/* Tax input */}

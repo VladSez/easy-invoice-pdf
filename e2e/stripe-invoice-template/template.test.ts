@@ -810,10 +810,7 @@ test.describe("Stripe Invoice Template", () => {
     await page.waitForTimeout(1000);
 
     await expect(page).toHaveScreenshot(
-      path.join(
-        "automatically-enables-VAT-field-visibility-and-sets-date-format-when-switching-to-Stripe-template",
-        `pdf-playwright-screenshot-${suggestedFilename}.png`,
-      ),
+      `automatically-enables-VAT-field-visibility-and-sets-date-format-when-switching-to-Stripe-template.png`,
     );
 
     // navigate back to the previous page
@@ -939,10 +936,7 @@ test.describe("Stripe Invoice Template", () => {
     await page.waitForTimeout(1000);
 
     await expect(page).toHaveScreenshot(
-      path.join(
-        "pdf-with-logo-and-payment-url-when-using-stripe-template",
-        `pdf-playwright-screenshot-${suggestedFilename}.png`,
-      ),
+      `pdf-with-logo-and-payment-url-when-using-stripe-template.png`,
     );
   });
 });
