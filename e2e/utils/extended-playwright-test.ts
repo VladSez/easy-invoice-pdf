@@ -17,7 +17,7 @@ import { test as base } from "@playwright/test";
 export const test = base.extend<{
   downloadDir: string;
 }>({
-  downloadDir: async (_, use) => {
+  downloadDir: async ({}, use) => {
     const downloadDir = fs.mkdtempSync(
       path.join(os.tmpdir(), "playwright-pdf-download-"),
     );
