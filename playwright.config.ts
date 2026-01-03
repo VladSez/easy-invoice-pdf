@@ -2,12 +2,12 @@ import { defineConfig, devices } from "@playwright/test";
 
 import dotenv from "dotenv";
 import path from "node:path";
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-
-dotenv.config({ path: path.resolve(__dirname, ".env.local") });
+dotenv.config({ path: path.resolve(__dirname, ".env.local"), quiet: true });
 
 // Use process.env.PORT by default and fallback to port 3000
 const PORT = process.env.PORT ?? 3000;
