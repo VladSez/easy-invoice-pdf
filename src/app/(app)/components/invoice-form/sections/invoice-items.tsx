@@ -41,6 +41,7 @@ interface InvoiceItemsSettingsProps {
   currency: SupportedCurrencies;
   language: SupportedLanguages;
   template: InvoiceData["template"];
+  taxLabelText: string;
 }
 
 export const InvoiceItems = memo(function InvoiceItems({
@@ -52,6 +53,7 @@ export const InvoiceItems = memo(function InvoiceItems({
   language,
   append,
   template,
+  taxLabelText,
 }: InvoiceItemsSettingsProps) {
   return (
     <>
@@ -79,10 +81,10 @@ export const InvoiceItems = memo(function InvoiceItems({
             />
           </div>
 
-          {/* Show VAT Table Summary in PDF switch */}
+          {/* Show Tax Table Summary in PDF switch */}
           <div className="relative flex items-center justify-between">
             <Label htmlFor={`vatTableSummaryIsVisible`}>
-              Show &quot;VAT Table Summary&quot; in the PDF
+              Show &quot;{taxLabelText} Table Summary&quot; in the PDF
             </Label>
 
             <Controller
@@ -160,6 +162,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            // aria-label={`Show/hide the 'Name of Goods/Service' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -218,6 +221,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                               checked={value}
                               onCheckedChange={onChange}
                               className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                              // aria-label={`Show/hide the 'Type of GTU' Column in the PDF for item ${index + 1}`}
                             />
                           )}
                         />
@@ -276,6 +280,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            // aria-label={`Show/hide the 'Amount' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -470,15 +475,13 @@ export const InvoiceItems = memo(function InvoiceItems({
                 )}
               </div>
 
-              {/* Invoice Item VAT */}
-              <div data-testid={`itemVat${index}`}>
-                <div className="mb-2 flex items-center justify-between">
-                  <Label htmlFor={`itemVat${index}`} className="">
-                    VAT
-                  </Label>
-
-                  {/* Show/hide VAT field in PDF switch (Only show for default template) */}
-                  {isFirstItem && template === "default" ? (
+              {/* Invoice Item Tax Settings */}
+              <fieldset className="rounded-md border px-4 pb-4">
+                <legend className="text-base font-semibold lg:text-lg">
+                  Tax Settings
+                </legend>
+                <div className="mb-2 flex items-center justify-end">
+                  {isFirstItem ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
                         name={`items.${index}.vatFieldIsVisible`}
@@ -499,35 +502,69 @@ export const InvoiceItems = memo(function InvoiceItems({
                             Show in PDF
                           </Label>
                         }
-                        content='Show/hide the "VAT" Column in the PDF'
+                        content={`Show/hide the "${taxLabelText}" Column in the PDF`}
                       />
                     </div>
                   ) : null}
                 </div>
 
-                {/* VAT input */}
-                <Controller
-                  name={`items.${index}.vat`}
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id={`itemVat${index}`}
-                      type="text"
-                      className=""
-                    />
+                <div>
+                  <Label htmlFor="taxLabelText">Tax Label</Label>
+                  <Controller
+                    name="taxLabelText"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        type="text"
+                        id="taxLabelText"
+                        placeholder="Enter tax label (e.g., VAT, Tax, GST, Sales Tax)"
+                        className="mt-1 block w-full"
+                      />
+                    )}
+                  />
+                  {errors.taxLabelText && (
+                    <ErrorMessage>{errors.taxLabelText.message}</ErrorMessage>
                   )}
-                />
+                  {!errors.taxLabelText && (
+                    <InputHelperMessage>
+                      Set a custom tax label (e.g. VAT, Sales Tax, GST, IVA,
+                      etc.)
+                    </InputHelperMessage>
+                  )}
+                </div>
+                <div data-testid={`itemVat${index}`} className="mt-4">
+                  <div className="mb-2 flex items-center justify-between">
+                    <Label htmlFor={`itemVat${index}`} className="">
+                      {taxLabelText}
+                    </Label>
+                  </div>
 
-                {errors.items?.[index]?.vat ? (
-                  <ErrorMessage>{errors.items[index].vat.message}</ErrorMessage>
-                ) : (
-                  <InputHelperMessage>
-                    Enter &quot;NP&quot; (not applicable), &quot;OO&quot; (out
-                    of scope), or a percentage value (0-100)
-                  </InputHelperMessage>
-                )}
-              </div>
+                  {/* Tax input */}
+                  <Controller
+                    name={`items.${index}.vat`}
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        id={`itemVat${index}`}
+                        type="text"
+                        className=""
+                      />
+                    )}
+                  />
+
+                  {errors.items?.[index]?.vat ? (
+                    <ErrorMessage>
+                      {errors.items[index].vat.message}
+                    </ErrorMessage>
+                  ) : (
+                    <InputHelperMessage>
+                      Enter a number (0-100), or any text (i.e. NP, OO, etc).
+                    </InputHelperMessage>
+                  )}
+                </div>
+              </fieldset>
 
               {/* Invoice Item Net Amount */}
               <div>
@@ -597,14 +634,14 @@ export const InvoiceItems = memo(function InvoiceItems({
                 )}
               </div>
 
-              {/* Invoice Item VAT Amount (calculated automatically) */}
+              {/* Invoice Item Tax Amount (calculated automatically) */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemVatAmount${index}`} className="">
-                    VAT Amount
+                    {taxLabelText} Amount
                   </Label>
 
-                  {/* Show/hide VAT Amount field in PDF switch (Only show for default template) */}
+                  {/* Show/hide Tax Amount field in PDF switch (Only show for default template) */}
                   {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
@@ -628,13 +665,13 @@ export const InvoiceItems = memo(function InvoiceItems({
                             Show in PDF
                           </Label>
                         }
-                        content='Show/hide the "VAT Amount" Column in the PDF'
+                        content={`Show/hide the "${taxLabelText} Amount" Column in the PDF`}
                       />
                     </div>
                   ) : null}
                 </div>
 
-                {/* VAT amount input */}
+                {/* Tax amount input */}
                 <Controller
                   name={`items.${index}.vatAmount`}
                   control={control}
@@ -660,7 +697,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                   </ErrorMessage>
                 ) : (
                   <InputHelperMessage>
-                    Calculated automatically based on Net Amount and VAT
+                    Calculated automatically based on Net Amount and{" "}
+                    {taxLabelText}
                   </InputHelperMessage>
                 )}
               </div>
@@ -727,7 +765,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                   </ErrorMessage>
                 ) : (
                   <InputHelperMessage>
-                    Calculated automatically based on Net Amount and VAT
+                    Calculated automatically based on Net Amount and{" "}
+                    {taxLabelText}
                   </InputHelperMessage>
                 )}
               </div>

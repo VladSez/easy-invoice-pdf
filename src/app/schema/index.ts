@@ -338,6 +338,19 @@ export const STRIPE_DEFAULT_DATE_FORMAT = "MMMM D, YYYY";
  */
 export type SupportedDateFormat = (typeof SUPPORTED_DATE_FORMATS)[number];
 
+/**
+ *
+ * This is the version of the app and the schema of the app's data model
+ */
+export const APP_VERSION = "1.0.0";
+
+/**
+ * Schema version
+ *
+ * This is the version of the schema (zod) of the app's data model
+ */
+export const SCHEMA_VERSION = "1.0.0";
+
 export const invoiceItemSchema = z
   .object({
     // Show/hide Number column on PDF
@@ -389,21 +402,62 @@ export const invoiceItemSchema = z
       }),
     netPriceFieldIsVisible: z.boolean().default(true),
 
-    vat: z.union([
-      z.enum(["NP", "OO"]),
-      z
-        .any()
-        .refine((val) => val !== "", {
-          message: `VAT is required. Enter a percentage (0-100), "NP" (not applicable), or "OO" (out of scope)`,
-        })
-        .refine((val) => !isNaN(Number(val)), {
-          message: `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
-        })
-        .transform(Number)
-        .refine((val) => val >= 0 && val <= 100, {
-          message: "VAT must be between 0 and 100",
-        }),
-    ]),
+    // Tax rate. Accepts numbers 0-100 or any text string (i.e. NP, OO, etc)
+    // Valid inputs and their outputs:
+    // - "23" -> 23 (number)
+    // - "100" -> 100 (number)
+    // - "NP" -> "NP" (string)
+    vat: z
+      .preprocess(
+        // z.preprocess runs before Zod does any validation, parsing, or type checking on the schema it wraps.
+        (raw) => {
+          // Handle null/undefined by returning empty string for validation
+          if (raw == null) return "";
+
+          // Trim whitespace from string inputs, pass through other types as-is
+          const val = typeof raw === "string" ? raw.trim() : raw;
+
+          // Empty strings should fail the required validation
+          if (val === "") return "";
+
+          // Attempt to convert to number
+          const num = Number(val);
+
+          // If conversion succeeds, return as number (for 0-100 validation)
+          // Otherwise, return as string (for text values like "NP", "OO", etc)
+          return Number.isNaN(num) ? val : num;
+        },
+        z.union(
+          [
+            z
+              .number()
+              .min(
+                0,
+                `Must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
+              )
+              .max(
+                100,
+                `Must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
+              ),
+            z
+              .string()
+              .min(
+                1,
+                `Field is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).`,
+              ),
+          ],
+          {
+            errorMap: () => ({
+              message:
+                "Field is required. Must be a number between 0-100 or any text (i.e. NP, OO, etc).",
+            }),
+          },
+        ),
+      )
+      .describe(
+        "Tax rate. Accepts numbers 0-100 or any text (i.e. NP, OO, etc).",
+      ),
+
     vatFieldIsVisible: z.boolean().default(true),
 
     netAmount: z.coerce.number().nonnegative("Net amount must be non-negative"),
@@ -421,86 +475,101 @@ export const invoiceItemSchema = z
 
 export type InvoiceItemData = z.infer<typeof invoiceItemSchema>;
 
-export const sellerSchema = z
-  .object({
-    id: z.string().optional(),
+export const sellerSchema = z.object({
+  id: z.string().optional(),
 
-    name: z
-      .string()
-      .min(1, "Seller name is required")
-      .max(500, "Seller name must not exceed 500 characters")
-      .trim(),
-    address: z
-      .string()
-      .min(1, "Seller address is required")
-      .max(500, "Seller address must not exceed 500 characters")
-      .trim(),
+  name: z
+    .string()
+    .min(1, "Seller name is required")
+    .max(500, "Seller name must not exceed 500 characters")
+    .trim(),
+  address: z
+    .string()
+    .min(1, "Seller address is required")
+    .max(500, "Seller address must not exceed 500 characters")
+    .trim(),
 
-    vatNo: z
-      .string()
-      .max(200, "VAT number must not exceed 200 characters")
-      .trim()
-      .optional(),
-    vatNoFieldIsVisible: z.boolean().default(true),
+  vatNo: z
+    .string()
+    .max(200, "VAT number must not exceed 200 characters")
+    .trim()
+    .optional(),
+  // not really only a vatNo anymore, it's a more general tax number (but we keep the name for simplicity, for now)
+  vatNoLabelText: z
+    .string()
+    .min(1, "Tax number label is required")
+    .max(50, "Tax number label must not exceed 50 characters")
+    .trim()
+    .default("VAT no")
+    .describe(
+      "Customizable tax number label. Defaults to ‘VAT no’, but you can change it to any text (e.g. Tax no, VAT no, etc.)",
+    ),
+  vatNoFieldIsVisible: z.boolean().default(true),
 
-    email: z.string().email("Invalid email address").trim(),
+  email: z.string().email("Invalid email address").trim(),
 
-    accountNumber: z
-      .string()
-      .max(200, "Account number must not exceed 200 characters")
-      .trim()
-      .optional(),
-    accountNumberFieldIsVisible: z.boolean().default(true),
+  accountNumber: z
+    .string()
+    .max(200, "Account number must not exceed 200 characters")
+    .trim()
+    .optional(),
+  accountNumberFieldIsVisible: z.boolean().default(true),
 
-    swiftBic: z
-      .string()
-      .max(200, "SWIFT/BIC must not exceed 200 characters")
-      .trim()
-      .optional(),
-    swiftBicFieldIsVisible: z.boolean().default(true),
+  swiftBic: z
+    .string()
+    .max(200, "SWIFT/BIC must not exceed 200 characters")
+    .trim()
+    .optional(),
+  swiftBicFieldIsVisible: z.boolean().default(true),
 
-    notes: z
-      .string()
-      .max(750, "Notes must not exceed 750 characters")
-      .trim()
-      .optional(),
-    notesFieldIsVisible: z.boolean().default(true),
-  })
-  .strict();
+  notes: z
+    .string()
+    .max(750, "Notes must not exceed 750 characters")
+    .trim()
+    .optional(),
+  notesFieldIsVisible: z.boolean().default(true),
+});
 
 export type SellerData = z.infer<typeof sellerSchema>;
 
-export const buyerSchema = z
-  .object({
-    id: z.string().optional(),
+export const buyerSchema = z.object({
+  id: z.string().optional(),
 
-    name: z
-      .string()
-      .min(1, "Buyer name is required")
-      .max(500, "Buyer name must not exceed 500 characters")
-      .trim(),
-    address: z
-      .string()
-      .min(1, "Buyer address is required")
-      .max(500, "Buyer address must not exceed 500 characters")
-      .trim(),
-    vatNo: z
-      .string()
-      .max(200, "VAT number must not exceed 200 characters")
-      .trim()
-      .optional(),
-    vatNoFieldIsVisible: z.boolean().default(true),
+  name: z
+    .string()
+    .min(1, "Buyer name is required")
+    .max(500, "Buyer name must not exceed 500 characters")
+    .trim(),
+  address: z
+    .string()
+    .min(1, "Buyer address is required")
+    .max(500, "Buyer address must not exceed 500 characters")
+    .trim(),
+  vatNo: z
+    .string()
+    .max(200, "VAT number must not exceed 200 characters")
+    .trim()
+    .optional(),
+  vatNoLabelText: z
+    .string()
+    .min(1, "Tax number label is required")
+    .max(50, "Tax number label must not exceed 50 characters")
+    .trim()
+    .default("VAT no")
+    .describe(
+      "Customizable tax number label. Defaults to ‘VAT no’, but you can change it to any text (e.g. Tax no, VAT no, etc.)",
+    ),
+  vatNoFieldIsVisible: z.boolean().default(true),
 
-    email: z.string().email("Invalid email address").trim(),
+  email: z.string().email("Invalid email address").trim(),
 
-    notes: z
-      .string()
-      .max(750, "Notes must not exceed 750 characters")
-      .trim()
-      .optional(),
-    notesFieldIsVisible: z.boolean().default(true),
-  })
-  .strict();
+  notes: z
+    .string()
+    .max(750, "Notes must not exceed 750 characters")
+    .trim()
+    .optional(),
+  notesFieldIsVisible: z.boolean().default(true),
+});
 
 export type BuyerData = z.infer<typeof buyerSchema>;
 
@@ -561,6 +630,22 @@ export const invoiceSchema = z.object({
         .trim(),
     })
     .optional(),
+
+  /**
+   * Tax label customization
+   *
+   * Allows users to customize the tax label text
+   * Default is "VAT" but can be changed to any string value i.e. "Sales Tax", "GST", "IVA", etc.
+   */
+  taxLabelText: z
+    .string()
+    .min(1, "Tax label is required i.e. 'VAT', 'GST', 'Sales Tax', etc.")
+    .max(50, "Tax label must not exceed 50 characters")
+    .trim()
+    .default("VAT")
+    .describe(
+      "Customizable tax label. Defaults to ‘VAT’, but you can change it to any text (e.g. Sales Tax, GST, IVA, etc.)",
+    ),
 
   dateOfIssue: z
     .string()
@@ -673,8 +758,6 @@ export const PDF_DATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_DATA";
  * This schema is used to store the state of the accordion in the local storage
  *
  * The accordion is used to collapse/expand the sections of the invoice form
- *
- *
  */
 export const accordionSchema = z
   .object({
@@ -688,6 +771,40 @@ export const accordionSchema = z
 export type AccordionState = z.infer<typeof accordionSchema>;
 
 export const ACCORDION_STATE_LOCAL_STORAGE_KEY = "EASY_INVOICE_ACCORDION_STATE";
+
+export const MOBILE_TABS_VALUES = ["invoice-form", "invoice-preview"] as const;
+export const DEFAULT_MOBILE_TAB = MOBILE_TABS_VALUES[0];
+
+export type MobileTabsValues = (typeof MOBILE_TABS_VALUES)[number];
+
+/**
+ * Metadata schema
+ *
+ * This schema is used to store the metadata about EasyInvoicePDF web app in the local storage
+ */
+export const metadataSchema = z.object({
+  /** the app version */
+  appVersion: z.string().default(APP_VERSION),
+  /** the schema (zod) version of the app's data model */
+  schemaVersion: z.string().default(SCHEMA_VERSION),
+  /** when the invoice was created (i.e. invoice is first created) */
+  invoiceCreatedAt: z
+    .string()
+    .datetime()
+    .default(() => dayjs().toISOString()),
+  /** when the invoice was last updated (i.e. invoice is regenerated) */
+  invoiceLastUpdatedAt: z.string().datetime().optional(),
+
+  /** the last visited mobile tab (for better UX) */
+  lastVisitedMobileTab: z
+    .enum(MOBILE_TABS_VALUES)
+    .default(DEFAULT_MOBILE_TAB)
+    .optional(),
+});
+
+export type Metadata = z.infer<typeof metadataSchema>;
+
+export const METADATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_METADATA";
 
 // __________________________________________________________
 // Validate that currencies are unique

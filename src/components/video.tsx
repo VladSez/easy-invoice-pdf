@@ -71,30 +71,21 @@ export const Video = ({ src, fallbackImg, testId = "" }: VideoProps) => {
   }, [inView]);
 
   return (
-    <div className="relative">
-      <div
-        style={{
-          // paddingBottom: (2 / 2.67) * 100 + "%", // keeps aspect ratio
-          paddingBottom: "56.3%", // keeps aspect ratio for 16:9
-        }}
-        className=""
-      />
-      <video
-        className="absolute left-0 top-0 h-full w-full cursor-pointer"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        ref={setRefs}
-        poster={fallbackImg}
-        aria-label="EasyInvoicePDF interface showing invoice creation with live preview"
-        data-testid={testId}
-      >
-        {/* #t=0.001 is needed to show thumbnail on ios devices */}
-        <source src={`${src}#t=0.001`} type="video/mp4" />
-        <p> Sorry, your browser doesn&apos;t support embedded videos.</p>
-      </video>
-    </div>
+    <video
+      className="absolute left-0 top-0 h-full w-full cursor-pointer"
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="auto"
+      ref={setRefs}
+      poster={fallbackImg}
+      aria-label="This video contains an interactive demo for sighted users. It's a demonstration of EasyInvoicePDF's interface showing the invoice creation process with live preview functionality. The demo showcases how users can create professional invoices in real-time."
+      data-testid={testId}
+    >
+      {/* #t=0.001 is needed to show thumbnail on ios devices */}
+      <source src={`${src}#t=0.001`} type="video/mp4" />
+      <p> Sorry, your browser doesn&apos;t support embedded videos.</p>
+    </video>
   );
 };

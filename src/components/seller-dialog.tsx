@@ -29,6 +29,7 @@ import { SELLERS_LOCAL_STORAGE_KEY } from "./seller-management";
 import { z } from "zod";
 import { useState, useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
+import { InputHelperMessage } from "./ui/input-helper-message";
 
 const SELLER_FORM_ID = "seller-form";
 
@@ -63,6 +64,7 @@ export function SellerDialog({
       name: initialData?.name ?? "",
       address: initialData?.address ?? "",
       vatNo: initialData?.vatNo ?? "",
+      vatNoLabelText: initialData?.vatNoLabelText ?? "VAT no",
       email: initialData?.email ?? "",
       accountNumber: initialData?.accountNumber ?? "",
       swiftBic: initialData?.swiftBic ?? "",
@@ -100,6 +102,7 @@ export function SellerDialog({
           name: "",
           address: "",
           vatNo: "",
+          vatNoLabelText: "VAT no",
           email: "",
           accountNumber: "",
           swiftBic: "",
@@ -285,49 +288,88 @@ export function SellerDialog({
                 )}
               />
 
-              <div className="flex items-end justify-between">
-                <FormField
-                  control={form.control}
-                  name="vatNo"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>VAT Number</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Enter VAT number" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <fieldset className="rounded-md border px-4 pb-4">
+                <legend className="text-base font-semibold lg:text-lg">
+                  Seller Tax Number
+                </legend>
 
-                {/* Show/Hide VAT Number Field in PDF */}
-                <div className="ml-4 flex items-center gap-2">
+                <div className="mb-2 flex items-center justify-end">
+                  {/* Show/Hide Tax Number Field in PDF */}
+                  <div className="flex items-center gap-2">
+                    <FormField
+                      control={form.control}
+                      name="vatNoFieldIsVisible"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              id="vatNoFieldIsVisible"
+                              aria-label={`Show/hide the 'Tax Number' field in the PDF`}
+                            />
+                            <CustomTooltip
+                              trigger={
+                                <Label htmlFor="vatNoFieldIsVisible">
+                                  Show in PDF
+                                </Label>
+                              }
+                              content='Show/Hide the "Tax Number" field in the PDF'
+                              className="z-[1000]"
+                            />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
                   <FormField
                     control={form.control}
-                    name="vatNoFieldIsVisible"
+                    name="vatNoLabelText"
                     render={({ field }) => (
                       <FormItem>
-                        <div className="flex items-center gap-2">
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            id="vatNoFieldIsVisible"
+                        <FormLabel>Label</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Enter Tax number label"
                           />
-                          <CustomTooltip
-                            trigger={
-                              <Label htmlFor="vatNoFieldIsVisible">
-                                Show in PDF
-                              </Label>
-                            }
-                            content='Show/Hide the "VAT Number" field in the PDF'
-                            className="z-[1000]"
+                        </FormControl>
+                        {form.formState.errors.vatNoLabelText && (
+                          <FormMessage>
+                            {form.formState.errors.vatNoLabelText.message}
+                          </FormMessage>
+                        )}
+
+                        {!form.formState.errors.vatNoLabelText && (
+                          <InputHelperMessage>
+                            Set a custom label (e.g. VAT no, Tax no, etc.)
+                          </InputHelperMessage>
+                        )}
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="vatNo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Value</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Enter Tax number value"
                           />
-                        </div>
+                        </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-              </div>
+              </fieldset>
 
               <FormField
                 control={form.control}
@@ -347,7 +389,7 @@ export function SellerDialog({
                 )}
               />
 
-              {/* VAT Number */}
+              {/* Account Number */}
               <div className="space-y-4">
                 <div className="flex items-end justify-between">
                   <FormField
@@ -379,6 +421,7 @@ export function SellerDialog({
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               id="accountNumberFieldIsVisible"
+                              aria-label={`Show/hide the 'Account Number' field in the PDF`}
                             />
                             <CustomTooltip
                               trigger={
@@ -428,6 +471,7 @@ export function SellerDialog({
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               id="swiftBicFieldIsVisible"
+                              aria-label={`Show/hide the 'SWIFT/BIC' field in the PDF`}
                             />
                             <CustomTooltip
                               trigger={
@@ -482,6 +526,7 @@ export function SellerDialog({
                                 onCheckedChange={field.onChange}
                                 id="notes-field-visibility"
                                 data-testid={`sellerNotesDialogFieldVisibilitySwitch`}
+                                aria-label={`Show/hide the 'Notes' field in the PDF`}
                               />
                             </FormControl>
                             <CustomTooltip

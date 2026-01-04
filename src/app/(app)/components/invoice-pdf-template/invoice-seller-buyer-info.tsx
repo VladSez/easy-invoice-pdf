@@ -45,7 +45,7 @@ export function InvoiceSellerBuyerInfo({
           <View style={{ marginTop: 2 }}>
             {sellerVatNoFieldIsVisible && (
               <Text style={[styles.fontSize7]}>
-                {t.seller.vatNo}:{" "}
+                {invoiceData.seller.vatNoLabelText}:{" "}
                 <Text style={[styles.boldText, styles.fontSize8]}>
                   {invoiceData?.seller.vatNo}
                 </Text>
@@ -102,7 +102,7 @@ export function InvoiceSellerBuyerInfo({
         <View style={{ marginTop: 2 }}>
           {buyerVatNoFieldIsVisible && (
             <Text style={styles.fontSize7}>
-              {t.buyer.vatNo}:{" "}
+              {invoiceData.buyer.vatNoLabelText}:{" "}
               <Text style={[styles.boldText, styles.fontSize8]}>
                 {invoiceData?.buyer.vatNo}
               </Text>

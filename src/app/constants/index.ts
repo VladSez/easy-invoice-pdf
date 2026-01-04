@@ -32,6 +32,7 @@ export const DEFAULT_SELLER_DATA = {
   address: "Seller address",
 
   vatNo: "Seller vat number",
+  vatNoLabelText: "VAT no",
   vatNoFieldIsVisible: true,
 
   email: "seller@email.com",
@@ -57,6 +58,7 @@ export const DEFAULT_BUYER_DATA = {
   address: "Buyer address",
 
   vatNo: "Buyer vat number",
+  vatNoLabelText: "VAT no",
   vatNoFieldIsVisible: true,
 
   email: "buyer@email.com",
@@ -138,4 +140,6 @@ export const INITIAL_INVOICE_DATA = {
   paymentMethodFieldIsVisible: true,
   personAuthorizedToReceiveFieldIsVisible: true,
   personAuthorizedToIssueFieldIsVisible: true,
+
+  taxLabelText: "VAT",
 } as const satisfies InvoiceData;

@@ -1,6 +1,7 @@
 "use client";
 
 import { PDFViewer } from "@react-pdf/renderer/lib/react-pdf.browser";
+import { BUG_REPORT_URL } from "@/config";
 
 export function DesktopInvoicePDFViewer({
   children,
@@ -15,7 +16,17 @@ export function DesktopInvoicePDFViewer({
         <div className="text-center">
           <p className="text-red-600">Error generating PDF preview</p>
           <p className="mt-2 text-sm text-gray-600">
-            Something went wrong. Please try again or contact support.
+            Something went wrong. Please try refreshing the page or using{" "}
+            <span className="font-bold">Chrome</span> browser. If the issue
+            persists, please fill a bug report{" "}
+            <a
+              href={BUG_REPORT_URL}
+              className="underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              here.
+            </a>
           </p>
         </div>
       </div>

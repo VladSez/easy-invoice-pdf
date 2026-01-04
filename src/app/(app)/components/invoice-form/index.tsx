@@ -42,6 +42,7 @@ import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
+import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 
 export const LOADING_BUTTON_TIMEOUT = 400;
 export const LOADING_BUTTON_TEXT = "Generating Document...";
@@ -161,9 +162,10 @@ export const InvoiceForm = memo(function InvoiceForm({
   // regenerate pdf on every input change with debounce
   const debouncedRegeneratePdfOnFormChange = useDebouncedCallback(
     (data: InvoiceData) => {
-      // submit form e.g. regenerates pdf and run form validations
+      // Submit form to regenerate PDF and run form validations
       void handleSubmit(onSubmit)(data as unknown as React.BaseSyntheticEvent);
 
+      // TODO: double check if we need this code, because we already save to local storage in the page.client.tsx (parent component) (line: 267) useEffect "Save to localStorage whenever data changes on form update"
       try {
         const validatedData = invoiceSchema.parse(data);
 
@@ -180,6 +182,8 @@ export const InvoiceForm = memo(function InvoiceForm({
     DEBOUNCE_TIMEOUT,
   );
 
+  // IMPORTANT
+  // TODO: rewrite to subscribe()? https://react-hook-form.com/docs/useform/subscribe
   // subscribe to form changes to regenerate pdf on every input change
   useEffect(() => {
     const subscription = watch((value) => {
@@ -191,6 +195,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   const template = useWatch({ control, name: "template" });
   const logo = useWatch({ control, name: "logo" });
+  const taxLabelText = useWatch({ control, name: "taxLabelText" }) || "VAT";
 
   // Disable sharing when Stripe template contains a logo (we can't put the logo base64 string in the URL due to browser URL length limits)
   useEffect(() => {
@@ -214,9 +219,18 @@ export const InvoiceForm = memo(function InvoiceForm({
     [remove, watch, debouncedRegeneratePdfOnFormChange],
   );
 
-  // TODO: refactor this and debouncedRegeneratePdfOnFormChange(), so data is saved to local storage, basically copy everything from debouncedRegeneratePdfOnFormChange() and use this onSubmit function in two places
   const onSubmit = (data: InvoiceData) => {
+    // pass the updated data to the parent component
     handleInvoiceDataChange(data);
+
+    // update the `invoiceLastUpdatedAt` timestamp when the form is submitted (i.e. invoice is regenerated)
+    // this is used to display the last updated at timestamp in the invoice preview
+    updateAppMetadata((current) => {
+      return {
+        ...current,
+        invoiceLastUpdatedAt: dayjs().toISOString(),
+      };
+    });
   };
 
   /**
@@ -284,7 +298,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   return (
     <form
-      className="mb-4 space-y-3.5"
+      className="relative mb-4 space-y-3.5"
       onSubmit={handleSubmit(onSubmit, (errors) => {
         console.error("Form validation errors:", errors);
         toast.error(
@@ -428,6 +442,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               language={language}
               append={append}
               template={template}
+              taxLabelText={taxLabelText}
             />
           </AccordionContent>
         </AccordionItem>
@@ -555,7 +570,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                     setValue("paymentDue", newPaymentDue);
                   }}
                 >
-                  <span className="text-balance">
+                  <span className="text-pretty">
                     Set payment due date to{" "}
                     {dayjs(dateOfIssue)
                       .add(14, "days")
@@ -570,24 +585,26 @@ export const InvoiceForm = memo(function InvoiceForm({
             !isPaymentDueBeforeDateOfIssue &&
             !isPaymentDue14DaysFromDateOfIssue &&
             dateOfIssue ? (
-              <ButtonHelper
-                className="whitespace-normal"
-                onClick={() => {
-                  const newPaymentDue = dayjs(dateOfIssue)
-                    .add(14, "days")
-                    .format("YYYY-MM-DD");
+              <InputHelperMessage>
+                <ButtonHelper
+                  className="whitespace-normal"
+                  onClick={() => {
+                    const newPaymentDue = dayjs(dateOfIssue)
+                      .add(14, "days")
+                      .format("YYYY-MM-DD");
 
-                  setValue("paymentDue", newPaymentDue);
-                }}
-              >
-                <span className="text-balance">
-                  Set payment due date to{" "}
-                  {dayjs(dateOfIssue)
-                    .add(14, "days")
-                    .format(selectedDateFormat)}{" "}
-                  (14 days from issue date)
-                </span>
-              </ButtonHelper>
+                    setValue("paymentDue", newPaymentDue);
+                  }}
+                >
+                  <span className="text-pretty">
+                    Set payment due date to{" "}
+                    {dayjs(dateOfIssue)
+                      .add(14, "days")
+                      .format(selectedDateFormat)}{" "}
+                    (14 days from issue date)
+                  </span>
+                </ButtonHelper>
+              </InputHelperMessage>
             ) : null}
           </div>
         </div>
@@ -647,7 +664,7 @@ export const InvoiceForm = memo(function InvoiceForm({
           <div>
             <div className="relative mt-5 space-y-4">
               {/* Show/hide Person Authorized to Receive field in PDF switch */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <Label htmlFor={`personAuthorizedToReceiveFieldIsVisible`}>
                   Show &quot;Person Authorized to Receive&quot; Signature Field
                   in the PDF
@@ -669,7 +686,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               </div>
 
               {/* Show/hide Person Authorized to Issue field in PDF switch */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <Label htmlFor={`personAuthorizedToIssueFieldIsVisible`}>
                   Show &quot;Person Authorized to Issue&quot; Signature Field in
                   the PDF
@@ -706,8 +723,16 @@ const calculateItemTotals = (item: InvoiceItemData | null) => {
   const formattedNetAmount = Number(calculatedNetAmount.toFixed(2));
 
   let vatAmount = 0;
-  if (item.vat && item.vat !== "NP" && item.vat !== "OO") {
-    vatAmount = (formattedNetAmount * Number(item.vat)) / 100;
+
+  // item.vat always come as a string, so we need to convert it to a number ("23" -> 23) to calculate the VAT amount
+  // it also can be not a number (e.g. "NP", "OO", etc), in this case we don't calculate the VAT amount and set it to 0
+  if (item?.vat) {
+    const vatValue = Number(item.vat);
+    const isVatValueANumber = !Number.isNaN(vatValue);
+
+    if (isVatValueANumber) {
+      vatAmount = (formattedNetAmount * vatValue) / 100;
+    }
   }
 
   const formattedVatAmount = Number(vatAmount.toFixed(2));

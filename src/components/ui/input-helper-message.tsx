@@ -6,12 +6,12 @@ export const InputHelperMessage = memo(function InputHelperMessage({
   children: React.ReactNode;
 }) {
   return (
-    <p
+    <div
       className="mt-1 text-pretty text-xs text-zinc-700/90"
       role="region"
       aria-live="polite"
     >
       {children}
-    </p>
+    </div>
   );
 });

@@ -11,8 +11,7 @@
     "tagline": "Generator faktur PDF z podglądem na żywo",
     "hero": {
       "title": "Twórz profesjonalne faktury w kilka sekund",
-      "description": "EasyInvoicePDF to darmowe narzędzie open-source, które pozwala tworzyć, dostosowywać i pobierać profesjonalne faktury z podglądem w czasie rzeczywistym. Działa całkowicie w Twojej przeglądarce.",
-      "noSignup": "Bez rejestracji. W 100% darmowe i open-source."
+      "description": "EasyInvoicePDF to <span>darmowe</span> narzędzie open-source, które pozwala tworzyć, dostosowywać i pobierać profesjonalne faktury z <span>podglądem w czasie rzeczywistym</span>. Działa całkowicie w Twojej przeglądarce."
     },
     "features": {
       "badge": "Funkcje",
@@ -36,9 +35,9 @@
           "title": "Wiele języków i walut",
           "description": "Twórz faktury w dziesięciu językach (angielski, polski, niemiecki, hiszpański, portugalski, rosyjski, ukraiński, francuski, włoski, holenderski) z obsługą wszystkich głównych walut i automatycznym formatowaniem."
         },
-        "vatSupport": {
-          "title": "Obsługa Europejskiego VAT",
-          "description": "Automatyczne obliczanie stawek i sum VAT dla faktur w Unii Europejskiej."
+        "taxSupport": {
+          "title": "Elastyczny System Podatkowy",
+          "description": "Obsługa dowolnego systemu podatkowego, w tym VAT, podatku od sprzedaży, GST i innych. W pełni konfigurowalny do lokalnych wymagań."
         },
         "openSource": {
           "title": "Open Source",
@@ -67,7 +66,8 @@
       "starOnGithub": "Oznacz gwiazdką na GitHub",
       "switchLanguage": "Zmień język",
       "shareFeedback": "Podziel się opinią",
-      "app": "Aplikacja"
+      "app": "Aplikacja",
+      "startInvoicing": "Rozpocznij fakturowanie"
     },
     "newsletter": {
       "title": "Zapisz się do newslettera",

@@ -13,6 +13,7 @@ import { STATIC_ASSETS_URL } from "@/config";
 import {
   BREADCRUMB_JSONLD,
   SITE_NAVIGATION_JSONLD,
+  SOFTWARE_APPLICATION_JSONLD,
   WEBSITE_JSONLD,
 } from "./constants/seo";
 
@@ -30,11 +31,21 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   // metadataBase: new URL(APP_URL),
-  title: "App | Free Invoice Generator – Live Preview, No Sign-Up",
+  title: "Create Invoice — EasyInvoicePDF",
   description:
     "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
-  keywords:
-    "invoice generator, pdf invoice, invoice maker, invoice template, online invoice, billing software, open-source, free invoice generator",
+  keywords: [
+    "invoice pdf generator",
+    "free invoice pdf",
+    "create invoice pdf",
+    "invoice generator open source",
+    "pdf invoice template",
+    "invoice generator",
+    "free invoice generator",
+    "online invoice generator",
+    "invoice maker pdf",
+    "professional invoice generator",
+  ],
   authors: [{ name: "Uladzislau Sazonau" }],
   creator: "Uladzislau Sazonau",
   publisher: "Uladzislau Sazonau",
@@ -120,6 +131,13 @@ export default async function RootLayout({
               type="application/ld+json"
               dangerouslySetInnerHTML={{
                 __html: JSON.stringify(SITE_NAVIGATION_JSONLD),
+              }}
+            />
+            <script
+              id="software-application-json-ld"
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(SOFTWARE_APPLICATION_JSONLD),
               }}
             />
           </NextIntlClientProvider>

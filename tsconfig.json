@@ -16,10 +16,12 @@
     "plugins": [
       {
         "name": "next"
-      },
-      {
-        "name": "typescript-plugin-directives"
       }
+      // this breaks autoimports/intellisense in VS Code now https://github.com/lazarv/typescript-plugin-directives/issues/2
+      // TODO: reinstall this package when the issue is fixed `pnpm -D typescript-plugin-directives`
+      // {
+      //   "name": "typescript-plugin-directives"
+      // },
     ],
     "paths": {
       "@/*": ["./src/*"]

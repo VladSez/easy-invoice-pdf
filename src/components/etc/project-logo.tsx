@@ -8,6 +8,7 @@ export function ProjectLogo({ className }: { className?: string }) {
       viewBox="0 0 46 40"
       aria-label="Project logo"
       className={cn(className)}
+      role="img"
     >
       <g id="logogram" transform="translate(0, 0)">
         <path

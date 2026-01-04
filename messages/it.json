@@ -3,8 +3,7 @@
     "tagline": "Generatore di fatture PDF con anteprima in tempo reale",
     "hero": {
       "title": "Crea fatture professionali in pochi secondi",
-      "description": "EasyInvoicePDF è uno strumento gratuito e open-source che ti permette di creare, personalizzare e scaricare fatture professionali con anteprima in tempo reale. Funziona completamente nel tuo browser.",
-      "noSignup": "Nessuna registrazione richiesta. 100% gratuito e open-source."
+      "description": "EasyInvoicePDF è uno strumento <span>gratuito</span> e open-source che ti permette di creare, personalizzare e scaricare fatture professionali con <span>anteprima in tempo reale</span>. Funziona completamente nel tuo browser."
     },
     "features": {
       "badge": "Funzionalità",
@@ -28,9 +27,9 @@
           "title": "Lingue e Valute Multiple",
           "description": "Crea fatture in dieci lingue (inglese, polacco, tedesco, spagnolo, portoghese, russo, ucraino, francese, italiano, olandese) con supporto per tutte le principali valute e formattazione automatica."
         },
-        "vatSupport": {
-          "title": "Supporto VAT Europea",
-          "description": "Calcola automaticamente le aliquote e i totali VAT europei per le tue fatture."
+        "taxSupport": {
+          "title": "Sistema Fiscale Flessibile",
+          "description": "Supporto per qualsiasi sistema fiscale incluso IVA, Sales Tax, GST e altro. Completamente personalizzabile per soddisfare i requisiti locali."
         },
         "openSource": {
           "title": "Open Source",
@@ -59,7 +58,8 @@
       "starOnGithub": "Metti una stella su GitHub",
       "switchLanguage": "Cambia lingua",
       "shareFeedback": "Condividi feedback",
-      "app": "App"
+      "app": "App",
+      "startInvoicing": "Inizia fatturazione"
     },
     "newsletter": {
       "title": "Iscriviti alla nostra newsletter",

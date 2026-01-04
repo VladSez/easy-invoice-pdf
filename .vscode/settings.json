@@ -1,6 +1,15 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib",
   "css.validate": false,
   "editor.inlayHints.enabled": "on",
-  "typescript.inlayHints.parameterNames.enabled": "all"
+  "typescript.inlayHints.parameterNames.enabled": "all",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  // "typescript.preferences.autoImportFileExcludePatterns": [
+  //   "next/router.d.ts",
+  //   "next/dist/client/router.d.ts"
+  // ],
+  "search.exclude": {
+    "**/node_modules": true
+  }
 }

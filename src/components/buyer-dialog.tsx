@@ -29,6 +29,7 @@ import { BUYERS_LOCAL_STORAGE_KEY } from "./buyer-management";
 import { z } from "zod";
 import { useState, useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
+import { InputHelperMessage } from "./ui/input-helper-message";
 
 const BUYER_FORM_ID = "buyer-form";
 
@@ -61,6 +62,7 @@ export function BuyerDialog({
       name: initialData?.name ?? "",
       address: initialData?.address ?? "",
       vatNo: initialData?.vatNo ?? "",
+      vatNoLabelText: initialData?.vatNoLabelText ?? "VAT no",
       email: initialData?.email ?? "",
       vatNoFieldIsVisible: initialData?.vatNoFieldIsVisible ?? true,
       notes: initialData?.notes ?? "",
@@ -74,9 +76,19 @@ export function BuyerDialog({
 
   const [shouldApplyFormValues, setShouldApplyFormValues] = useState(false);
 
-  // Effect to update form values when switch is toggled
+  /**
+   * Synchronizes form values based on the "Use current invoice data" switch state.
+   *
+   * When creating a new buyer (not in edit mode):
+   * - If switch is ON: Populates the form with current invoice buyer data (formValues)
+   *   to allow users to save the current invoice's buyer information as a new saved buyer.
+   * - If switch is OFF: Resets the form to empty/default values or initialData
+   *   to allow users to enter completely new buyer information from scratch.
+   *
+   * This effect does not run in edit mode to prevent overwriting the buyer being edited.
+   */
   useEffect(() => {
-    // if the switch is on and we have form values, we want to apply the form values to the form
+    // Switch is ON: Pre-fill form with current invoice buyer data
     if (shouldApplyFormValues && formValues && !isEditMode) {
       form.reset({
         ...form.getValues(),
@@ -84,7 +96,7 @@ export function BuyerDialog({
       });
     }
 
-    // if the switch is off and we have initial data, we want to apply the initial data to the form
+    // Switch is OFF: Reset form to empty state or initial data
     else if (!shouldApplyFormValues && !isEditMode) {
       form.reset(
         initialData ?? {
@@ -92,6 +104,7 @@ export function BuyerDialog({
           name: "",
           address: "",
           vatNo: "",
+          vatNoLabelText: "VAT no",
           email: "",
           vatNoFieldIsVisible: true,
           notes: "",
@@ -271,25 +284,15 @@ export function BuyerDialog({
                 )}
               />
 
-              {/* VAT Number */}
-              <div className="space-y-4">
-                <div className="flex items-end justify-between">
-                  <FormField
-                    control={form.control}
-                    name="vatNo"
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>VAT Number</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter VAT number" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              {/* Tax Number */}
+              <fieldset className="rounded-md border px-4 pb-4">
+                <legend className="text-base font-semibold lg:text-lg">
+                  Buyer Tax Number
+                </legend>
 
-                  {/* Show/Hide VAT Number Field in PDF */}
-                  <div className="ml-4 flex items-center gap-2">
+                <div className="mb-2 flex items-center justify-end">
+                  {/* Show/Hide Tax Number Field in PDF */}
+                  <div className="flex items-center gap-2">
                     <FormField
                       control={form.control}
                       name="vatNoFieldIsVisible"
@@ -300,6 +303,7 @@ export function BuyerDialog({
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               id="vatNoFieldIsVisible"
+                              aria-label={`Show/hide the 'Tax Number' field in the PDF`}
                             />
                             <CustomTooltip
                               trigger={
@@ -307,7 +311,7 @@ export function BuyerDialog({
                                   Show in PDF
                                 </Label>
                               }
-                              content='Show/Hide the "VAT Number" field in the PDF'
+                              content='Show/Hide the "Tax Number" field in the PDF'
                               className="z-[1000]"
                             />
                           </div>
@@ -316,7 +320,54 @@ export function BuyerDialog({
                     />
                   </div>
                 </div>
-              </div>
+
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="vatNoLabelText"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Label</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Enter Tax number label"
+                          />
+                        </FormControl>
+
+                        {form.formState.errors.vatNoLabelText && (
+                          <FormMessage>
+                            {form.formState.errors.vatNoLabelText.message}
+                          </FormMessage>
+                        )}
+
+                        {!form.formState.errors.vatNoLabelText && (
+                          <InputHelperMessage>
+                            Set a custom label (e.g. VAT no, Tax no, etc.)
+                          </InputHelperMessage>
+                        )}
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="vatNo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Value</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Enter Tax number value"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </fieldset>
 
               <FormField
                 control={form.control}
@@ -372,6 +423,7 @@ export function BuyerDialog({
                                 onCheckedChange={field.onChange}
                                 id="notes-field-visibility"
                                 data-testid={`buyerNotesDialogFieldVisibilitySwitch`}
+                                aria-label={`Show/hide the 'Notes' field in the PDF`}
                               />
                             </FormControl>
                             <CustomTooltip

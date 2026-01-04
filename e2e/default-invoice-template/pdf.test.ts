@@ -1,165 +1,73 @@
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import { TRANSLATIONS } from "@/app/schema/translations";
-import { expect, test } from "@playwright/test";
-import dayjs from "dayjs";
-import fs from "fs";
-import path from "path";
-import pdf from "pdf-parse";
+import fs from "node:fs";
+import path from "node:path";
 
-const PLAYWRIGHT_TEST_DOWNLOADS_DIR = "playwright-test-downloads";
+// IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
+import { test, expect } from "../utils/extended-playwright-test";
 
-const getDownloadDir = ({ browserName }: { browserName: string }) => {
-  const name = `pdf-downloads-${browserName}`;
-
-  return path.join(PLAYWRIGHT_TEST_DOWNLOADS_DIR, name);
-};
-
-const CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
-const TODAY = dayjs().format("YYYY-MM-DD");
-const LAST_DAY_OF_CURRENT_MONTH = dayjs().endOf("month").format("YYYY-MM-DD");
-
-// Payment date is 14 days from today (by default)
-const PAYMENT_DATE = dayjs().add(14, "day").format("YYYY-MM-DD");
-
-/**
- * We can't test the PDF preview because it's not supported in Playwright.
- * https://github.com/microsoft/playwright/issues/7822
- *
- * we download pdf file and parse the content to verify the invoice data
- */
-test.describe("PDF Preview", () => {
-  let downloadDir: string;
-
-  test.beforeAll(async ({ browserName }) => {
-    downloadDir = getDownloadDir({ browserName });
-
-    // Ensure browser-specific test-downloads directory exists
-    try {
-      await fs.promises.mkdir(downloadDir, { recursive: true });
-    } catch (error) {
-      // Handle specific error cases if needed
-      if ((error as NodeJS.ErrnoException).code !== "EEXIST") {
-        throw error;
-      }
-    }
-  });
-
-  //
-  test.afterAll(async () => {
-    // Remove the parent playwright-test-downloads directory
-    try {
-      await fs.promises.rm(PLAYWRIGHT_TEST_DOWNLOADS_DIR, {
-        recursive: true,
-        force: true,
-      });
-    } catch (error) {
-      // Handle specific error cases if needed
-      // ENOENT means "no such file or directory" - ignore this expected error
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-        throw error;
-      }
-    }
-  });
-
+test.describe("Default Invoice Template", () => {
   test.beforeEach(async ({ page }) => {
+    // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
+    await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
+
     await page.goto("/");
   });
 
   test("downloads PDF in English and verifies content", async ({
     page,
     browserName,
+    downloadDir,
   }) => {
-    // Set up download handler
-    const downloadPromise = page.waitForEvent("download");
-
-    const downloadButton = page.getByRole("link", {
+    const downloadPdfEnglishButton = page.getByRole("link", {
       name: "Download PDF in English",
     });
     // Wait for download button to be visible and enabled
-    await expect(downloadButton).toBeVisible();
-    await expect(downloadButton).toBeEnabled();
+    await expect(downloadPdfEnglishButton).toBeVisible();
+    await expect(downloadPdfEnglishButton).toBeEnabled();
 
-    // Click the download button
-    await downloadButton.click();
-
-    // Wait for the download to start
-    const download = await downloadPromise;
+    // Click the download button and wait for download
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfEnglishButton.click(),
+    ]);
 
     // Get the suggested filename
     const suggestedFilename = download.suggestedFilename();
 
-    // Save the file to a browser-specific temporary location
-    const tmpPath = path.join(
-      getDownloadDir({ browserName }),
-      suggestedFilename,
-    );
-    await download.saveAs(tmpPath);
-
-    // Read and verify PDF content using pdf-parse
-    const dataBuffer = await fs.promises.readFile(tmpPath);
-    const pdfData = await pdf(dataBuffer);
-
-    // Verify PDF content
-    expect(pdfData.text).toContain("Invoice No. of:");
-    expect(pdfData.text).toContain("Date of issue:");
-
-    expect(pdfData.text).toContain("Seller");
-    expect(pdfData.text).toContain("Buyer");
-
-    // Check invoice header details
-    expect(pdfData.text).toContain(
-      `Invoice No. of: 1/${CURRENT_MONTH_AND_YEAR}`,
-    );
-    expect(pdfData.text).toContain("Reverse Charge");
-    expect(pdfData.text).toContain(`Date of issue: ${TODAY}`);
-    expect(pdfData.text).toContain(
-      `Date of sales/of executing the service: ${LAST_DAY_OF_CURRENT_MONTH}`,
+    // save the file to temporary directory
+    const pdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-${suggestedFilename}`,
     );
 
-    // Check seller details
-    expect(pdfData.text).toContain("Seller name");
-    expect(pdfData.text).toContain("Seller address");
-    expect(pdfData.text).toContain("VAT no: Seller vat number");
-    expect(pdfData.text).toContain("e-mail: seller@email.com");
-    expect(pdfData.text).toContain("Account Number - Seller account number");
-    expect(pdfData.text).toContain("SWIFT/BIC number: Seller swift bic");
+    await download.saveAs(pdfFilePath);
 
-    // Check buyer details
-    expect(pdfData.text).toContain("Buyer name");
-    expect(pdfData.text).toContain("Buyer address");
-    expect(pdfData.text).toContain("VAT no: Buyer vat number");
-    expect(pdfData.text).toContain("e-mail: buyer@email.com");
+    // Convert to absolute path and use proper file URL format
+    const absolutePath = path.resolve(pdfFilePath);
+    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
 
-    // Check invoice item details
-    expect(pdfData.text).toContain("Item name");
-    expect(pdfData.text).toContain("1");
-    expect(pdfData.text).toContain("service");
-    expect(pdfData.text).toContain("0.00");
+    // Set viewport size to match the PDF Viewer UI
+    await page.setViewportSize({
+      width: 1100,
+      height: 1185,
+    });
 
-    // Check payment details
-    expect(pdfData.text).toContain("Payment method: wire transfer");
-    expect(pdfData.text).toContain(`Payment date: ${PAYMENT_DATE}`);
+    await page.goto(`file://${absolutePath}`);
 
-    // Check totals
-    expect(pdfData.text).toContain("To pay: 0.00 EUR");
-    expect(pdfData.text).toContain("Paid: 0.00 EUR");
-    expect(pdfData.text).toContain("Left to pay: 0.00 EUR");
-    expect(pdfData.text).toContain("Amount in words: zero EUR 00/100");
+    // sometimes there's a blank screen without this
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
 
-    // Check footer
-    expect(pdfData.text).toContain("Person authorized to receive");
-    expect(pdfData.text).toContain("Person authorized to issue");
-    expect(pdfData.text).toContain("Reverse charge");
-    expect(pdfData.text).toContain("Created with https://easyinvoicepdf.com");
-
-    // Check page footer and metadata
-    expect(pdfData.text).toContain(
-      `1/${CURRENT_MONTH_AND_YEAR}·€0.00 due ${PAYMENT_DATE}·Created with https://easyinvoicepdf.comPage 1 of 1`,
-    );
+    await expect(page).toHaveScreenshot(`downloads-PDF-in-English.png`, {
+      maxDiffPixelRatio: 0.01,
+    });
   });
 
   test("downloads PDF in Polish and verifies translated content", async ({
     page,
+    browserName,
+    downloadDir,
   }) => {
     // Switch to Polish
     await page
@@ -167,64 +75,167 @@ test.describe("PDF Preview", () => {
       .selectOption("pl");
 
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
-    const downloadButton = page.getByRole("link", {
+    const downloadPdfPolishButton = page.getByRole("link", {
       name: "Download PDF in Polish",
     });
 
-    await expect(downloadButton).toBeVisible();
-    await expect(downloadButton).toBeEnabled();
+    await expect(downloadPdfPolishButton).toBeVisible();
+    await expect(downloadPdfPolishButton).toBeEnabled();
 
-    // Set up download handler
-    const downloadPromise = page.waitForEvent("download");
+    const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
-    // Click the download button
-    await downloadButton.click();
+    // update name for the first invoice item
+    await invoiceItemsSection
+      .getByRole("textbox", { name: "Name" })
+      .fill("Invoice Item 1 TEST");
 
-    // Wait for the download to start
-    const download = await downloadPromise;
+    // update price and quantity for the first invoice item
+    await invoiceItemsSection
+      .getByRole("spinbutton", { name: "Amount (Quantity)" })
+      .fill("3");
+
+    await invoiceItemsSection
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+      })
+      .fill("1000");
+
+    // update VAT for the first invoice item
+    const taxSettingsFieldset = invoiceItemsSection.getByRole("group", {
+      name: "Tax Settings",
+    });
+    await taxSettingsFieldset.getByRole("textbox", { name: "VAT" }).fill("10");
+
+    // add new invoice item
+
+    await invoiceItemsSection
+      .getByRole("button", { name: "Add invoice item" })
+      .click();
+
+    const invoiceItem2Fieldset = invoiceItemsSection.getByRole("group", {
+      name: "Item 2",
+    });
+
+    // update name for the second invoice item
+    await invoiceItem2Fieldset
+      .getByRole("textbox", { name: "Name" })
+      .fill("Invoice Item 2 TEST");
+
+    // wait, because we update pdf on debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
+
+    // Check that the total is correct (should be 3,300.00)
+    const totalTextbox = page.getByRole("textbox", { name: "Total" });
+    await expect(totalTextbox).toHaveValue("3,300.00");
+
+    // Click the download button and wait for download
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfPolishButton.click(),
+    ]);
 
     // Get the suggested filename
     const suggestedFilename = download.suggestedFilename();
 
-    // Save the file to a temporary location
-    const tmpPath = path.join(downloadDir, suggestedFilename);
-    await download.saveAs(tmpPath);
-
-    // Read and verify PDF content using pdf-parse
-    const dataBuffer = await fs.promises.readFile(tmpPath);
-    const pdfData = await pdf(dataBuffer);
-
-    expect((pdfData.info as { Title: string }).Title).toContain(
-      `Faktura nr: 1/${CURRENT_MONTH_AND_YEAR} | Created with https://easyinvoicepdf.com`,
+    // save the file to temporary directory
+    const pdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-${suggestedFilename}`,
     );
 
-    // Verify PDF content
-    expect(pdfData.text).toContain("Faktura nr");
-    expect(pdfData.text).toContain("Data wystawienia");
+    await download.saveAs(pdfFilePath);
 
-    expect(pdfData.text).toContain("Sprzedawca");
-    expect(pdfData.text).toContain("Nabywca");
+    // Convert to absolute path and use proper file URL format
+    const absolutePath = path.resolve(pdfFilePath);
+    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
 
-    expect(pdfData.text).toContain("Data wystawienia:");
+    // Set viewport size to match the PDF Viewer UI
+    await page.setViewportSize({
+      width: 1100,
+      height: 1185,
+    });
 
-    const lastDayOfCurrentMonth = dayjs().endOf("month").format("YYYY-MM-DD");
-    expect(pdfData.text).toContain(
-      `Data sprzedaży / wykonania usługi: ${lastDayOfCurrentMonth}`,
+    await page.goto(`file://${absolutePath}`);
+
+    // sometimes there's a blank screen without this
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
+
+    await expect(page).toHaveScreenshot(`downloads-PDF-in-Polish.png`, {
+      maxDiffPixelRatio: 0.01,
+    });
+
+    // navigate back to the previous page
+    await page.goto("/");
+
+    /**
+     * Switch to Stripe template and download PDF in Polish with Stripe template
+     */
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+    // Verify that the Stripe template is selected
+    const templateSelect = page.getByRole("combobox", {
+      name: "Invoice Template",
+    });
+    await expect(templateSelect).toHaveValue("stripe");
+
+    // Wait for the download button to be visible and enabled for Stripe template
+    const downloadPdfStripeButton = page.getByRole("link", {
+      name: "Download PDF in Polish",
+    });
+
+    await expect(downloadPdfStripeButton).toBeVisible();
+    await expect(downloadPdfStripeButton).toBeEnabled();
+
+    // Click the download button and wait for download
+    const [stripeDownload] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfStripeButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+
+    // save the file to temporary directory
+    const stripePdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-stripe-${stripeSuggestedFilename}`,
     );
 
-    expect(pdfData.text).toContain(`Razem do zapłaty: 0.00 EUR
-Wpłacono: 0.00 EUR
-Pozostało do zapłaty: 0.00 EUR
-Kwota słownie: zero EUR 00/100`);
+    await stripeDownload.saveAs(stripePdfFilePath);
 
-    expect(pdfData.text).toContain(
-      `1/${CURRENT_MONTH_AND_YEAR}·0,00 € do zapłaty do ${PAYMENT_DATE}·Utworzono za pomocą https://easyinvoicepdf.comStrona 1 z 1`,
+    // Convert to absolute path and use proper file URL format
+    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+
+    // Set viewport size to match the PDF Viewer UI
+    await page.setViewportSize({
+      width: 1100,
+      height: 1185,
+    });
+
+    await page.goto(`file://${stripeAbsolutePath}`);
+
+    // sometimes there's a blank screen without this
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
+
+    await expect(page).toHaveScreenshot(
+      `downloads-PDF-in-Polish-stripe-template.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
     );
   });
 
   test("update pdf when invoice data changes", async ({
     page,
     browserName,
+    downloadDir,
   }) => {
     const DATE_FORMAT = "MMMM D, YYYY";
 
@@ -331,96 +342,121 @@ Kwota słownie: zero EUR 00/100`);
     // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(600);
 
-    // Set up download handler
-    const downloadPromise = page.waitForEvent("download");
-
-    const downloadButton = page.getByRole("link", {
+    const downloadPdfEnglishButton = page.getByRole("link", {
       name: "Download PDF in English",
     });
 
-    await expect(downloadButton).toBeVisible();
-    await expect(downloadButton).toBeEnabled();
+    await expect(downloadPdfEnglishButton).toBeVisible();
+    await expect(downloadPdfEnglishButton).toBeEnabled();
 
-    // Click the download button
-    await downloadButton.click();
-
-    // Wait for the download to start
-    const download = await downloadPromise;
+    // Click the download button and wait for download
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfEnglishButton.click(),
+    ]);
 
     // Get the suggested filename
     const suggestedFilename = download.suggestedFilename();
 
-    // Save the file to a browser-specific temporary location
-    const tmpPath = path.join(
-      getDownloadDir({ browserName }),
-      suggestedFilename,
-    );
-    await download.saveAs(tmpPath);
-
-    // Read and verify PDF content using pdf-parse
-    const dataBuffer = await fs.promises.readFile(tmpPath);
-    const pdfData = await pdf(dataBuffer);
-
-    const today = dayjs().format(DATE_FORMAT);
-    const lastDayOfCurrentMonth = dayjs().endOf("month").format(DATE_FORMAT);
-    const paymentDate = dayjs().add(14, "day").format(DATE_FORMAT);
-
-    // Verify PDF content
-    // Check invoice header details
-    expect(pdfData.text).toContain(
-      `Invoice No. of: 1/${CURRENT_MONTH_AND_YEAR}`,
-    );
-    expect(pdfData.text).toContain("HELLO FROM PLAYWRIGHT TEST!");
-    expect(pdfData.text).toContain(`Date of issue: ${today}`);
-    expect(pdfData.text).toContain(
-      `Date of sales/of executing the service: ${lastDayOfCurrentMonth}`,
+    // save the file to temporary directory
+    const pdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-${suggestedFilename}`,
     );
 
-    // Check seller details
-    expect(pdfData.text).toContain("PLAYWRIGHT SELLER TEST");
-    expect(pdfData.text).toContain("Seller address");
-    expect(pdfData.text).toContain("seller@email.com");
-    expect(pdfData.text).toContain("PLAYWRIGHT SELLER NOTES TEST");
+    await download.saveAs(pdfFilePath);
 
-    // Check buyer details
-    expect(pdfData.text).toContain("PLAYWRIGHT BUYER TEST");
-    expect(pdfData.text).toContain("PLAYWRIGHT BUYER ADDRESS TEST");
-    expect(pdfData.text).toContain("Buyer vat number");
-    expect(pdfData.text).toContain("TEST_BUYER_EMAIL@mail.com");
-    expect(pdfData.text).toContain("PLAYWRIGHT BUYER NOTES TEST");
+    // Convert to absolute path and use proper file URL format
+    const absolutePath = path.resolve(pdfFilePath);
+    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
 
-    // Check invoice item details
-    expect(pdfData.text).toContain("Item name");
-    expect(pdfData.text).toContain("3");
-    expect(pdfData.text).toContain("service");
-    expect(pdfData.text).toContain("1 000.00");
-    expect(pdfData.text).toContain("3 000.00");
+    // Set viewport size to match the PDF Viewer UI
+    await page.setViewportSize({
+      width: 1100,
+      height: 1185,
+    });
 
-    // Check payment details
-    expect(pdfData.text).toContain("Payment method: wire transfer");
-    expect(pdfData.text).toContain(`Payment date: ${paymentDate}`);
+    await page.goto(`file://${absolutePath}`);
 
-    // Check totals
-    expect(pdfData.text).toContain("To pay: 3 000.00 GBP");
-    expect(pdfData.text).toContain("Paid: 0.00 GBP");
-    expect(pdfData.text).toContain("Left to pay: 3 000.00 GBP");
-    expect(pdfData.text).toContain(
-      "Amount in words: three thousand GBP 00/100",
+    // sometimes there's a blank screen without this
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
+
+    await expect(page).toHaveScreenshot(
+      `update-pdf-when-invoice-data-changes.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
     );
 
-    // Check footer
-    expect(pdfData.text).toContain("Person authorized to receive");
-    expect(pdfData.text).toContain("Person authorized to issue");
-    expect(pdfData.text).toContain("Reverse charge");
+    // navigate back to the previous page
+    await page.goto("/");
 
-    expect(pdfData.text).toContain(
-      `1/${CURRENT_MONTH_AND_YEAR}·£3,000.00 due ${paymentDate}·Created with https://easyinvoicepdf.comPage 1 of 1`,
+    /**
+     * Switch to Stripe template and download PDF in English with Stripe template
+     */
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+    // Verify that the Stripe template is selected
+    const templateSelect = page.getByRole("combobox", {
+      name: "Invoice Template",
+    });
+    await expect(templateSelect).toHaveValue("stripe");
+
+    const downloadPdfStripeButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadPdfStripeButton).toBeVisible();
+
+    // Click the download button and wait for download
+    const [stripeDownload] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfStripeButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+
+    // save the file to temporary directory
+    const stripePdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-stripe-${stripeSuggestedFilename}`,
+    );
+
+    await stripeDownload.saveAs(stripePdfFilePath);
+
+    // Convert to absolute path and use proper file URL format
+    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+
+    // Set viewport size to match the PDF Viewer UI
+    await page.setViewportSize({
+      width: 1100,
+      height: 1185,
+    });
+
+    await page.goto(`file://${stripeAbsolutePath}`);
+
+    // sometimes there's a blank screen without this
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
+
+    await expect(page).toHaveScreenshot(
+      `update-pdf-when-invoice-data-changes-stripe-template.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
     );
   });
 
   test("completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French", async ({
     page,
     browserName,
+    downloadDir,
   }) => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
@@ -430,13 +466,13 @@ Kwota słownie: zero EUR 00/100`);
     await expect(page.getByRole("tab", { name: "Preview PDF" })).toBeVisible();
 
     // Download button in English is visible and enabled
-    const downloadButtonEnglish = page.getByRole("link", {
+    const downloadPdfButtonEnglish = page.getByRole("link", {
       name: "Download PDF in English",
     });
     // Wait for download button to be visible
-    await expect(downloadButtonEnglish).toBeVisible();
+    await expect(downloadPdfButtonEnglish).toBeVisible();
     // Wait for download button to be enabled
-    await expect(downloadButtonEnglish).toBeEnabled();
+    await expect(downloadPdfButtonEnglish).toBeEnabled();
 
     // Switch to French
     await page
@@ -490,12 +526,12 @@ Kwota słownie: zero EUR 00/100`);
       .fill("23");
 
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
-    const downloadButtonFrench = page.getByRole("link", {
+    const downloadPdfFrenchBtn = page.getByRole("link", {
       name: "Download PDF in French",
     });
     // Wait for download button to be visible and enabled
-    await expect(downloadButtonFrench).toBeVisible();
-    await expect(downloadButtonFrench).toBeEnabled();
+    await expect(downloadPdfFrenchBtn).toBeVisible();
+    await expect(downloadPdfFrenchBtn).toBeEnabled();
 
     // Switch to preview tab
     await page.getByRole("tab", { name: "Preview PDF" }).click();
@@ -508,48 +544,22 @@ Kwota słownie: zero EUR 00/100`);
       page.getByRole("tabpanel", { name: "Edit Invoice" }),
     ).toBeHidden();
 
-    // Set up download handler
-    const downloadPromise = page.waitForEvent("download");
-
-    // Click the download button
-    await downloadButtonFrench.click();
-
-    // Wait for the download to start
-    const download = await downloadPromise;
+    // Click the download button and wait for download
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfFrenchBtn.click(),
+    ]);
 
     // Get the suggested filename
     const suggestedFilename = download.suggestedFilename();
 
-    // Save the file to a browser-specific temporary location
-    const tmpPath = path.join(
-      getDownloadDir({ browserName }),
-      suggestedFilename,
-    );
-    await download.saveAs(tmpPath);
-
-    // Read and verify PDF content using pdf-parse
-    const dataBuffer = await fs.promises.readFile(tmpPath);
-    const pdfData = await pdf(dataBuffer);
-
-    // Verify PDF content in Polish
-    expect(pdfData.text).toContain("MOBILE-TEST-001: 2/05-2024");
-    expect(pdfData.text).toContain("Date d'émission");
-
-    expect(pdfData.text).toContain("Vendeur");
-    expect(pdfData.text).toContain("Acheteur");
-    expect(pdfData.text).toContain("Mobile Test Seller");
-    expect(pdfData.text).toContain("456 Mobile St");
-
-    const lastDayOfCurrentMonth = dayjs().endOf("month").format("YYYY-MM-DD");
-    expect(pdfData.text).toContain(
-      `Date de vente/prestation de service: ${lastDayOfCurrentMonth}`,
+    // save the file to temporary directory
+    const pdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-${suggestedFilename}`,
     );
 
-    // Verify calculations in Polish
-    expect(pdfData.text).toContain(`Total à payer: 184.50 GBP
-Payé: 0.00 GBP
-Reste à payer: 184.50 GBP
-Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
+    await download.saveAs(pdfFilePath);
 
     // Verify toast appears after download
     await expect(page.getByTestId("download-pdf-toast")).toBeVisible();
@@ -559,6 +569,36 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     ).toBeVisible();
 
     await expect(page.getByTestId("toast-cta-btn")).toBeVisible();
+
+    // Convert to absolute path and use proper file URL format
+    const absolutePath = path.resolve(pdfFilePath);
+
+    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
+
+    // Set viewport size to match the PDF Viewer UI
+    await page.setViewportSize({
+      width: 1100,
+      height: 1185,
+    });
+
+    await page.goto(`file://${absolutePath}`);
+
+    // sometimes there's a blank screen without this
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
+
+    await expect(page).toHaveScreenshot(
+      `completes-full-invoice-flow-on-mobile.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
+    );
+
+    // Navigate back to the previous page
+    await page.goto("/");
+
+    // Set mobile viewport again
+    await page.setViewportSize({ width: 375, height: 667 });
 
     // Switch back to form tab
     await page.getByRole("tab", { name: "Edit Invoice" }).click();
@@ -621,10 +661,72 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
         exact: true,
       }),
     ).toHaveValue("184.50");
+
+    /**
+     * Switch to Stripe template and download PDF in English with Stripe template
+     */
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+    // Verify that the Stripe template is selected
+    const templateSelect = page.getByRole("combobox", {
+      name: "Invoice Template",
+    });
+    await expect(templateSelect).toHaveValue("stripe");
+
+    const downloadPdfStripeButton = page.getByRole("link", {
+      name: "Download PDF in French",
+    });
+
+    await expect(downloadPdfStripeButton).toBeVisible();
+
+    // Click the download button and wait for download
+    const [stripeDownload] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfStripeButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+
+    // save the file to temporary directory
+    const stripePdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-stripe-${stripeSuggestedFilename}`,
+    );
+
+    await stripeDownload.saveAs(stripePdfFilePath);
+
+    // Convert to absolute path and use proper file URL format
+    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+
+    // Set viewport size to match the PDF Viewer UI
+    await page.setViewportSize({
+      width: 1100,
+      height: 1185,
+    });
+
+    await page.goto(`file://${stripeAbsolutePath}`);
+
+    // sometimes there's a blank screen without this
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
+
+    await expect(page).toHaveScreenshot(
+      `completes-full-invoice-flow-on-mobile-stripe-template.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
+    );
   });
 
   test("should display and persist invoice number in different languages", async ({
     page,
+    downloadDir,
+    browserName,
   }) => {
     const generalInfoSection = page.getByTestId("general-information-section");
 
@@ -644,9 +746,8 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
       INITIAL_INVOICE_DATA.invoiceNumberObject.label,
     );
 
-    await expect(invoiceNumberValueInput).toHaveValue(
-      INITIAL_INVOICE_DATA.invoiceNumberObject.value,
-    );
+    // we mock the system time to a fixed date, so that the invoice number is consistent across tests
+    await expect(invoiceNumberValueInput).toHaveValue("1/12-2025");
 
     const languageSelect = page.getByRole("combobox", {
       name: "Invoice PDF Language",
@@ -658,9 +759,8 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
       `${TRANSLATIONS.pl.invoiceNumber}:`,
     );
 
-    await expect(invoiceNumberValueInput).toHaveValue(
-      `1/${CURRENT_MONTH_AND_YEAR}`,
-    );
+    // we mock the system time to a fixed date, so that the invoice number is consistent across tests
+    await expect(invoiceNumberValueInput).toHaveValue("1/12-2025");
 
     // I can fill in a new invoice number
     await invoiceNumberLabelInput.fill("Faktura TEST:");
@@ -684,6 +784,11 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     // fill once again the invoice number
     await invoiceNumberLabelInput.fill("Faktura TEST:");
 
+    // Switch currency to CHF
+    const currencySelect = page.getByRole("combobox", { name: "Currency" });
+    await currencySelect.selectOption("CHF");
+    await expect(currencySelect).toHaveValue("CHF");
+
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
     // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(600);
@@ -694,6 +799,7 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
     // Verify that the invoice number is persisted after page reload
     await expect(invoiceNumberLabelInput).toHaveValue("Faktura TEST:");
 
+    // switch to Portuguese
     await languageSelect.selectOption("pt");
 
     await expect(invoiceNumberLabelInput).toHaveValue(
@@ -708,38 +814,122 @@ Montant en lettres: cent quatre-vingt-quatre GBP 50/100`);
       }),
     ).toBeVisible();
 
+    // Verify CHF currency is selected
+    await expect(currencySelect).toHaveValue("CHF");
+
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
-    const downloadButton = page.getByRole("link", {
+    const downloadPdfPtButton = page.getByRole("link", {
       name: "Download PDF in Portuguese",
     });
 
-    await expect(downloadButton).toBeVisible();
-    await expect(downloadButton).toBeEnabled();
+    await expect(downloadPdfPtButton).toBeVisible();
+    await expect(downloadPdfPtButton).toBeEnabled();
 
-    // Set up download handler
-    const downloadPromise = page.waitForEvent("download");
-
-    // Click the download button
-    await downloadButton.click();
-
-    // Wait for the download to start
-    const download = await downloadPromise;
+    // Click the download button and wait for download
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfPtButton.click(),
+    ]);
 
     // Get the suggested filename
     const suggestedFilename = download.suggestedFilename();
 
-    // Save the file to a temporary location
-    const tmpPath = path.join(downloadDir, suggestedFilename);
-    await download.saveAs(tmpPath);
-
-    // Read and verify PDF content using pdf-parse
-    const dataBuffer = await fs.promises.readFile(tmpPath);
-    const pdfData = await pdf(dataBuffer);
-
-    // Verify PDF content
-    expect(pdfData.text).toContain(
-      `Fatura TEST PORTUGUESE N°: 1/${CURRENT_MONTH_AND_YEAR}`,
+    // save the file to temporary directory
+    const pdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-${suggestedFilename}`,
     );
-    expect(pdfData.text).toContain("Data de emissão");
+
+    await download.saveAs(pdfFilePath);
+
+    // Convert to absolute path and use proper file URL format
+    const absolutePath = path.resolve(pdfFilePath);
+    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
+
+    // Set viewport size to match the PDF Viewer UI
+    await page.setViewportSize({
+      width: 1100,
+      height: 1185,
+    });
+
+    await page.goto(`file://${absolutePath}`);
+
+    // sometimes there's a blank screen without this
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
+
+    await expect(page).toHaveScreenshot(
+      `should-display-and-persist-invoice-number-in-different-languages.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
+    );
+
+    // navigate back to the previous page
+    await page.goto("/");
+
+    /**
+     * Switch to Stripe template and download PDF in English with Stripe template
+     */
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+    // Verify that the Stripe template is selected
+    const templateSelect = page.getByRole("combobox", {
+      name: "Invoice Template",
+    });
+    await expect(templateSelect).toHaveValue("stripe");
+
+    // Currency should be CHF after navigating back to the previous page
+    const currencySelect2 = page.getByRole("combobox", { name: "Currency" });
+    await expect(currencySelect2).toHaveValue("CHF");
+
+    const downloadPdfStripeButton = page.getByRole("link", {
+      name: "Download PDF in Portuguese",
+    });
+
+    await expect(downloadPdfStripeButton).toBeVisible();
+
+    // Click the download button and wait for download
+    const [stripeDownload] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfStripeButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+
+    // save the file to temporary directory
+    const stripePdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-stripe-${stripeSuggestedFilename}`,
+    );
+
+    await stripeDownload.saveAs(stripePdfFilePath);
+
+    // Convert to absolute path and use proper file URL format
+    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+
+    // Set viewport size to match the PDF Viewer UI
+    await page.setViewportSize({
+      width: 1100,
+      height: 1185,
+    });
+
+    await page.goto(`file://${stripeAbsolutePath}`);
+
+    // sometimes there's a blank screen without this
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
+
+    await expect(page).toHaveScreenshot(
+      `should-display-and-persist-invoice-number-in-different-languages-stripe-template.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
+    );
   });
 });

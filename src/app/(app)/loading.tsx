@@ -19,7 +19,7 @@ export default function Loading() {
           </div>
 
           {/* Right side - PDF Preview */}
-          <div className="col-span-8 h-[480px] w-full max-w-full sm:h-[690px] 2xl:h-[800px]">
+          <div className="col-span-8 h-[520px] w-full max-w-full sm:h-[690px] 2xl:h-[800px]">
             <div className="h-full animate-pulse rounded-lg bg-gray-200">
               <div className="flex items-center justify-between rounded-t-lg bg-gray-300 p-4">
                 <div className="h-6 w-full animate-pulse rounded bg-gray-400 lg:w-48" />
