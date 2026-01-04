@@ -128,9 +128,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // on mobile, we need to click the button to show the toast because it's better UX for user (you can't hover on mobile)
     await shareButton.click();
 
-    await expect(page.getByText("Unable to Share Invoice")).toBeVisible({
-      timeout: 2000,
-    });
+    await expect(page.getByText("Unable to Share Invoice")).toBeVisible();
 
     await expect(
       page.getByText(

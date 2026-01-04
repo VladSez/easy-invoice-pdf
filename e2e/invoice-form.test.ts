@@ -21,7 +21,15 @@ test.describe("Invoice Generator Page", () => {
   });
 
   test("should redirect from /:locale/app to /", async ({ page }) => {
-    await page.goto("/en/app");
+    await page.goto("/en/app", { waitUntil: "commit" });
+
+    // wait for the app page to load
+    const downloadPDFButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadPDFButton).toBeVisible();
+
     await expect(page).toHaveURL("/?template=default");
   });
 

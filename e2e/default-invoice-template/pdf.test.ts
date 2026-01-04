@@ -5,6 +5,7 @@ import path from "node:path";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { test, expect } from "../utils/extended-playwright-test";
+import { renderPdfOnCanvas } from "../utils/render-pdf-on-canvas";
 
 test.describe("Default Invoice Template", () => {
   test.beforeEach(async ({ page }) => {
@@ -47,21 +48,25 @@ test.describe("Default Invoice Template", () => {
     const absolutePath = path.resolve(pdfFilePath);
     await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
 
-    // Set viewport size to match the PDF Viewer UI
-    await page.setViewportSize({
-      width: 1100,
-      height: 1185,
-    });
+    /**
+     * Render the PDF on a canvas and take a screenshot of it
+     */
 
-    await page.goto(`file://${absolutePath}`);
+    const pdfBytes = fs.readFileSync(absolutePath);
 
-    // sometimes there's a blank screen without this
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
+    await page.goto("about:blank");
 
-    await expect(page).toHaveScreenshot(`downloads-PDF-in-English.png`, {
-      maxDiffPixelRatio: 0.01,
-    });
+    await renderPdfOnCanvas(page, pdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "downloads-PDF-in-English.png",
+    );
   });
 
   test("downloads PDF in Polish and verifies translated content", async ({
@@ -150,21 +155,21 @@ test.describe("Default Invoice Template", () => {
     const absolutePath = path.resolve(pdfFilePath);
     await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
 
-    // Set viewport size to match the PDF Viewer UI
-    await page.setViewportSize({
-      width: 1100,
-      height: 1185,
-    });
+    const pdfBytes = fs.readFileSync(absolutePath);
 
-    await page.goto(`file://${absolutePath}`);
+    await page.goto("about:blank");
 
-    // sometimes there's a blank screen without this
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
+    await renderPdfOnCanvas(page, pdfBytes);
 
-    await expect(page).toHaveScreenshot(`downloads-PDF-in-Polish.png`, {
-      maxDiffPixelRatio: 0.01,
-    });
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "downloads-PDF-in-Polish.png",
+    );
 
     // navigate back to the previous page
     await page.goto("/");
@@ -212,23 +217,20 @@ test.describe("Default Invoice Template", () => {
     const stripeAbsolutePath = path.resolve(stripePdfFilePath);
     await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
 
-    // Set viewport size to match the PDF Viewer UI
-    await page.setViewportSize({
-      width: 1100,
-      height: 1185,
-    });
+    const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
 
-    await page.goto(`file://${stripeAbsolutePath}`);
+    await page.goto("about:blank");
 
-    // sometimes there's a blank screen without this
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
+    await renderPdfOnCanvas(page, stripePdfBytes);
 
-    await expect(page).toHaveScreenshot(
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
       `downloads-PDF-in-Polish-stripe-template.png`,
-      {
-        maxDiffPixelRatio: 0.01,
-      },
     );
   });
 
@@ -374,23 +376,20 @@ test.describe("Default Invoice Template", () => {
     const absolutePath = path.resolve(pdfFilePath);
     await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
 
-    // Set viewport size to match the PDF Viewer UI
-    await page.setViewportSize({
-      width: 1100,
-      height: 1185,
-    });
+    const pdfBytes = fs.readFileSync(absolutePath);
 
-    await page.goto(`file://${absolutePath}`);
+    await page.goto("about:blank");
 
-    // sometimes there's a blank screen without this
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
+    await renderPdfOnCanvas(page, pdfBytes);
 
-    await expect(page).toHaveScreenshot(
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
       `update-pdf-when-invoice-data-changes.png`,
-      {
-        maxDiffPixelRatio: 0.01,
-      },
     );
 
     // navigate back to the previous page
@@ -437,23 +436,20 @@ test.describe("Default Invoice Template", () => {
     const stripeAbsolutePath = path.resolve(stripePdfFilePath);
     await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
 
-    // Set viewport size to match the PDF Viewer UI
-    await page.setViewportSize({
-      width: 1100,
-      height: 1185,
-    });
+    const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
 
-    await page.goto(`file://${stripeAbsolutePath}`);
+    await page.goto("about:blank");
 
-    // sometimes there's a blank screen without this
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
+    await renderPdfOnCanvas(page, stripePdfBytes);
 
-    await expect(page).toHaveScreenshot(
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
       `update-pdf-when-invoice-data-changes-stripe-template.png`,
-      {
-        maxDiffPixelRatio: 0.01,
-      },
     );
   });
 
@@ -579,23 +575,20 @@ test.describe("Default Invoice Template", () => {
 
     await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
 
-    // Set viewport size to match the PDF Viewer UI
-    await page.setViewportSize({
-      width: 1100,
-      height: 1185,
-    });
+    const pdfBytes = fs.readFileSync(absolutePath);
 
-    await page.goto(`file://${absolutePath}`);
+    await page.goto("about:blank");
 
-    // sometimes there's a blank screen without this
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
+    await renderPdfOnCanvas(page, pdfBytes);
 
-    await expect(page).toHaveScreenshot(
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
       `completes-full-invoice-flow-on-mobile.png`,
-      {
-        maxDiffPixelRatio: 0.01,
-      },
     );
 
     // Navigate back to the previous page
@@ -707,23 +700,20 @@ test.describe("Default Invoice Template", () => {
     const stripeAbsolutePath = path.resolve(stripePdfFilePath);
     await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
 
-    // Set viewport size to match the PDF Viewer UI
-    await page.setViewportSize({
-      width: 1100,
-      height: 1185,
-    });
+    const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
 
-    await page.goto(`file://${stripeAbsolutePath}`);
+    await page.goto("about:blank");
 
-    // sometimes there's a blank screen without this
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
+    await renderPdfOnCanvas(page, stripePdfBytes);
 
-    await expect(page).toHaveScreenshot(
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
       `completes-full-invoice-flow-on-mobile-stripe-template.png`,
-      {
-        maxDiffPixelRatio: 0.01,
-      },
     );
   });
 
@@ -850,23 +840,20 @@ test.describe("Default Invoice Template", () => {
     const absolutePath = path.resolve(pdfFilePath);
     await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
 
-    // Set viewport size to match the PDF Viewer UI
-    await page.setViewportSize({
-      width: 1100,
-      height: 1185,
-    });
+    const pdfBytes = fs.readFileSync(absolutePath);
 
-    await page.goto(`file://${absolutePath}`);
+    await page.goto("about:blank");
 
-    // sometimes there's a blank screen without this
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
+    await renderPdfOnCanvas(page, pdfBytes);
 
-    await expect(page).toHaveScreenshot(
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
       `should-display-and-persist-invoice-number-in-different-languages.png`,
-      {
-        maxDiffPixelRatio: 0.01,
-      },
     );
 
     // navigate back to the previous page
@@ -917,23 +904,20 @@ test.describe("Default Invoice Template", () => {
     const stripeAbsolutePath = path.resolve(stripePdfFilePath);
     await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
 
-    // Set viewport size to match the PDF Viewer UI
-    await page.setViewportSize({
-      width: 1100,
-      height: 1185,
-    });
+    const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
 
-    await page.goto(`file://${stripeAbsolutePath}`);
+    await page.goto("about:blank");
 
-    // sometimes there's a blank screen without this
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
+    await renderPdfOnCanvas(page, stripePdfBytes);
 
-    await expect(page).toHaveScreenshot(
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
       `should-display-and-persist-invoice-number-in-different-languages-stripe-template.png`,
-      {
-        maxDiffPixelRatio: 0.01,
-      },
     );
   });
 });

@@ -341,10 +341,10 @@ function FeaturesSection() {
                 key={feature.translationKey}
                 className={cn(
                   `flex h-full w-full flex-col items-start gap-6 rounded-xl bg-white md:items-center md:rounded-2xl`,
-                  isEven ? "lg:flex-row" : "lg:flex-row-reverse", // swap the video and text content for even index
+                  isEven ? "xl:flex-row" : "xl:flex-row-reverse", // swap the video and text content for even index
                 )}
               >
-                <div className="flex-1 px-8 pb-2 pt-6 xl:py-4">
+                <div className="flex-1 px-8 pb-2 pt-8 xl:py-4">
                   <h3 className="text-balance pb-4 text-xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-2xl">
                     {title}
                   </h3>

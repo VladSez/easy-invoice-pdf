@@ -10,6 +10,7 @@ import { SMALL_TEST_IMAGE_BASE64, uploadBase64LogoAsFile } from "./utils";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { expect, test } from "../utils/extended-playwright-test";
+import { renderPdfOnCanvas } from "../utils/render-pdf-on-canvas";
 
 test.describe("Stripe Invoice Template", () => {
   test.beforeEach(async ({ page }) => {
@@ -17,11 +18,6 @@ test.describe("Stripe Invoice Template", () => {
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
 
     await page.goto("/");
-  });
-
-  test.afterEach(async ({ page }) => {
-    // Clear localStorage after each test
-    await page.evaluate(() => localStorage.clear());
   });
 
   test("displays correct OG meta tags for Stripe template", async ({
@@ -797,23 +793,24 @@ test.describe("Stripe Invoice Template", () => {
     const absolutePath = path.resolve(pdfFilePath);
     await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
 
-    // Set viewport size to match the PDF Viewer UI
-    await page.setViewportSize({
-      width: 1100,
-      height: 1185,
-    });
+    /**
+     * Render the PDF on a canvas and take a screenshot of it
+     */
 
-    await page.goto(`file://${absolutePath}`);
+    const pdfBytes = fs.readFileSync(absolutePath);
 
-    // sometimes there's a blank screen without this
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
+    await page.goto("about:blank");
 
-    await expect(page).toHaveScreenshot(
-      `automatically-enables-VAT-field-visibility-and-sets-date-format-when-switching-to-Stripe-template.png`,
-      {
-        maxDiffPixelRatio: 0.01,
-      },
+    await renderPdfOnCanvas(page, pdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "automatically-enables-VAT-field-visibility-and-sets-date-format-when-switching-to-Stripe-template.png",
     );
 
     // navigate back to the previous page
@@ -926,23 +923,24 @@ test.describe("Stripe Invoice Template", () => {
     const absolutePath = path.resolve(pdfFilePath);
     await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
 
-    // Set viewport size to match the PDF Viewer UI
-    await page.setViewportSize({
-      width: 1100,
-      height: 1185,
-    });
+    /**
+     * Render the PDF on a canvas and take a screenshot of it
+     */
 
-    await page.goto(`file://${absolutePath}`);
+    const pdfBytes = fs.readFileSync(absolutePath);
 
-    // sometimes there's a blank screen without this
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
+    await page.goto("about:blank");
 
-    await expect(page).toHaveScreenshot(
-      `pdf-with-logo-and-payment-url-when-using-stripe-template.png`,
-      {
-        maxDiffPixelRatio: 0.01,
-      },
+    await renderPdfOnCanvas(page, pdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "pdf-with-logo-and-payment-url-when-using-stripe-template.png",
     );
   });
 });
