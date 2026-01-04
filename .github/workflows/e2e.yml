@@ -9,7 +9,8 @@ jobs:
 
     name: Run e2e tests via ${{ github.event_name == 'deployment_status' && 'Vercel deployment' }}
     timeout-minutes: 35
-    runs-on: ubuntu-latest
+    # we use macos-latest because I am using mac os locally and generating snapshots (screenshots) for the PDF tests locally, so we need to use the same OS on the CI
+    runs-on: macos-latest
     steps:
       - run: |
           echo "Environment URL - ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}"
