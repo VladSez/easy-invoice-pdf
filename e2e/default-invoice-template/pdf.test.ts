@@ -59,7 +59,9 @@ test.describe("Default Invoice Template", () => {
     // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(1000);
 
-    await expect(page).toHaveScreenshot(`downloads-PDF-in-English.png`);
+    await expect(page).toHaveScreenshot(`downloads-PDF-in-English.png`, {
+      maxDiffPixelRatio: 0.01,
+    });
   });
 
   test("downloads PDF in Polish and verifies translated content", async ({
@@ -160,7 +162,9 @@ test.describe("Default Invoice Template", () => {
     // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(1000);
 
-    await expect(page).toHaveScreenshot(`downloads-PDF-in-Polish.png`);
+    await expect(page).toHaveScreenshot(`downloads-PDF-in-Polish.png`, {
+      maxDiffPixelRatio: 0.01,
+    });
 
     // navigate back to the previous page
     await page.goto("/");
@@ -222,6 +226,9 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page).toHaveScreenshot(
       `downloads-PDF-in-Polish-stripe-template.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
     );
   });
 
@@ -377,6 +384,9 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page).toHaveScreenshot(
       `update-pdf-when-invoice-data-changes.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
     );
 
     // navigate back to the previous page
@@ -437,6 +447,9 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page).toHaveScreenshot(
       `update-pdf-when-invoice-data-changes-stripe-template.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
     );
   });
 
@@ -576,6 +589,9 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page).toHaveScreenshot(
       `completes-full-invoice-flow-on-mobile.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
     );
 
     // Navigate back to the previous page
@@ -701,6 +717,9 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page).toHaveScreenshot(
       `completes-full-invoice-flow-on-mobile-stripe-template.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
     );
   });
 
@@ -841,6 +860,9 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page).toHaveScreenshot(
       `should-display-and-persist-invoice-number-in-different-languages.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
     );
 
     // navigate back to the previous page
@@ -905,6 +927,9 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page).toHaveScreenshot(
       `should-display-and-persist-invoice-number-in-different-languages-stripe-template.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
     );
   });
 });

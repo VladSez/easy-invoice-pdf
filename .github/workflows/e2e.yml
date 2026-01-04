@@ -9,8 +9,8 @@ jobs:
 
     name: Run e2e tests via ${{ github.event_name == 'deployment_status' && 'Vercel deployment' }}
     timeout-minutes: 35
-    # IMPORTANT: we use "macos-14" due to the playwright snapshot updates issues on mac os vs linux (locally I use macos to generate snapshots and it's required to have the same OS for the CI)
-    runs-on: macos-14
+    # IMPORTANT: we use "macos-latest" due to the playwright snapshot updates issues on mac os vs linux (locally I use macos to generate snapshots and it's required to have the same OS for the CI)
+    runs-on: macos-latest
     steps:
       - run: |
           echo "Environment URL - ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}"
@@ -69,7 +69,8 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: playwright-output/report/
+          path: playwright-output/test-results
+          if-no-files-found: ignore
           retention-days: 3
 
       - name: 🔍 Get PR URL

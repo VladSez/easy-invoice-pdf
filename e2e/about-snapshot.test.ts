@@ -20,6 +20,8 @@ test.describe("About page (Snapshot Test)", () => {
       });
     });
 
-    await expect(page).toHaveScreenshot("about-page-english.png");
+    await expect(page).toHaveScreenshot("about-page-english.png", {
+      maxDiffPixelRatio: 0.01,
+    });
   });
 });

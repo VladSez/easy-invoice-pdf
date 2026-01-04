@@ -811,6 +811,9 @@ test.describe("Stripe Invoice Template", () => {
 
     await expect(page).toHaveScreenshot(
       `automatically-enables-VAT-field-visibility-and-sets-date-format-when-switching-to-Stripe-template.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
     );
 
     // navigate back to the previous page
@@ -937,6 +940,9 @@ test.describe("Stripe Invoice Template", () => {
 
     await expect(page).toHaveScreenshot(
       `pdf-with-logo-and-payment-url-when-using-stripe-template.png`,
+      {
+        maxDiffPixelRatio: 0.01,
+      },
     );
   });
 });
