@@ -10,7 +10,7 @@ jobs:
     name: Run e2e tests via ${{ github.event_name == 'deployment_status' && 'Vercel deployment' }}
     timeout-minutes: 35
     # IMPORTANT: we use "macos-latest" due to the playwright snapshot updates issues on mac os vs linux (locally I use macos to generate snapshots and it's required to have the same OS for the CI)
-    runs-on: macos-latest
+    runs-on: macos-14
     steps:
       - run: |
           echo "Environment URL - ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}"
