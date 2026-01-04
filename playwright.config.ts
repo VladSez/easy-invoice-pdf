@@ -65,6 +65,11 @@ export default defineConfig({
         ...devices["Desktop Chrome"],
         channel: "chromium",
         permissions: ["clipboard-read", "clipboard-write"],
+
+        // Disable GPU to prevent rendering issues in headless mode
+        launchOptions: {
+          args: ["--disable-font-subpixel-positioning", "--disable-lcd-text"],
+        },
         // Set localStorage to disable umami analytics
         storageState: {
           cookies: [],
@@ -94,6 +99,10 @@ export default defineConfig({
         ...devices["Pixel 5"],
         channel: "chromium",
         permissions: ["clipboard-read", "clipboard-write"],
+        // Disable GPU to prevent rendering issues in headless mode
+        launchOptions: {
+          args: ["--disable-font-subpixel-positioning", "--disable-lcd-text"],
+        },
         // Set localStorage to disable umami analytics
         storageState: {
           cookies: [],
@@ -116,6 +125,10 @@ export default defineConfig({
       use: {
         ...devices["iPhone 13 Pro"],
         // on iOS we don't need to grant clipboard permissions
+        // Disable GPU to prevent rendering issues in headless mode
+        launchOptions: {
+          args: ["--disable-font-subpixel-positioning", "--disable-lcd-text"],
+        },
         // Set localStorage to disable umami analytics
         storageState: {
           cookies: [],

@@ -19,10 +19,13 @@ export async function renderPdfOnCanvas(page: Page, pdfBytes: Uint8Array) {
             <canvas id="pdf"></canvas>
 
             <script type="module">
-                import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.149/pdf.mjs'
+                import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.mjs'
 
                 pdfjsLib.GlobalWorkerOptions.workerSrc =
-                    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.149/pdf.worker.mjs'
+                    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.mjs'
+
+                pdfjsLib.GlobalWorkerOptions.fontExtraProperties = true
+
 
                 const pdfData = new Uint8Array([${pdfBytes.join(",")}])
 
@@ -33,6 +36,9 @@ export async function renderPdfOnCanvas(page: Page, pdfBytes: Uint8Array) {
 
                 const canvas = document.getElementById('pdf')
                 const ctx = canvas.getContext('2d')
+                
+                ctx.imageSmoothingEnabled = false
+
 
                 canvas.width = viewport.width
                 canvas.height = viewport.height

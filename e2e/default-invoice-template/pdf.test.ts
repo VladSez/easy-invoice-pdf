@@ -451,7 +451,7 @@ test.describe("Default Invoice Template", () => {
 
     // Wait for PDF preview to regenerate after invoice data changes (debounce timeout)
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(700);
 
     const downloadPdfEnglishButton = page.getByRole("link", {
       name: "Download PDF in English",
