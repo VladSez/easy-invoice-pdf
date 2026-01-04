@@ -67,13 +67,79 @@ test.describe("Default Invoice Template", () => {
     await expect(page.locator("canvas")).toHaveScreenshot(
       "downloads-PDF-in-English.png",
     );
+
+    // navigate back to the previous page
+    await page.goto("/");
+
+    /**
+     * Switch to Stripe template and download PDF in English with Stripe template
+     */
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+    // Verify that the Stripe template is selected
+    const templateSelect = page.getByRole("combobox", {
+      name: "Invoice Template",
+    });
+    await expect(templateSelect).toHaveValue("stripe");
+
+    // Wait for the download button to be visible and enabled for Stripe template
+    const downloadPdfStripeButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadPdfStripeButton).toBeVisible();
+    await expect(downloadPdfStripeButton).toBeEnabled();
+
+    // Click the download button and wait for download
+    const [stripeDownload] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfStripeButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+
+    // save the file to temporary directory
+    const stripePdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-stripe-${stripeSuggestedFilename}`,
+    );
+
+    await stripeDownload.saveAs(stripePdfFilePath);
+
+    // Convert to absolute path and use proper file URL format
+    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+
+    /**
+     * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
+     */
+
+    const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, stripePdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      `downloads-PDF-in-English-stripe-template.png`,
+    );
   });
 
-  test("downloads PDF in Polish and verifies translated content", async ({
+  test("downloads PDF in Polish and verifies content", async ({
     page,
     browserName,
     downloadDir,
-  }) => {
+  }, testInfo) => {
     // Switch to Polish
     await page
       .getByRole("combobox", { name: "Invoice PDF Language" })
@@ -111,7 +177,7 @@ test.describe("Default Invoice Template", () => {
     });
     await taxSettingsFieldset.getByRole("textbox", { name: "VAT" }).fill("10");
 
-    // add new invoice item
+    /** ADD NEW INVOICE ITEM */
 
     await invoiceItemsSection
       .getByRole("button", { name: "Add invoice item" })
@@ -125,6 +191,15 @@ test.describe("Default Invoice Template", () => {
     await invoiceItem2Fieldset
       .getByRole("textbox", { name: "Name" })
       .fill("Invoice Item 2 TEST");
+
+    const finalSection = page.getByTestId(`final-section`);
+
+    // for better debugging screenshots, we fill in the notes field with a test note =)
+    await finalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: downloads PDF in Polish and verifies content (${testInfo.project.name})`,
+      );
 
     // wait, because we update pdf on debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
@@ -154,6 +229,10 @@ test.describe("Default Invoice Template", () => {
     // Convert to absolute path and use proper file URL format
     const absolutePath = path.resolve(pdfFilePath);
     await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
+
+    /**
+     * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
+     */
 
     const pdfBytes = fs.readFileSync(absolutePath);
 
@@ -196,6 +275,19 @@ test.describe("Default Invoice Template", () => {
     await expect(downloadPdfStripeButton).toBeVisible();
     await expect(downloadPdfStripeButton).toBeEnabled();
 
+    const notesFinalSection = page.getByTestId(`final-section`);
+
+    // for better debugging screenshots, we fill in the notes field with a test note =)
+    await notesFinalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: downloads PDF in Polish and verifies content with Stripe template (${testInfo.project.name})`,
+      );
+
+    // wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
+
     // Click the download button and wait for download
     const [stripeDownload] = await Promise.all([
       page.waitForEvent("download"),
@@ -216,6 +308,10 @@ test.describe("Default Invoice Template", () => {
     // Convert to absolute path and use proper file URL format
     const stripeAbsolutePath = path.resolve(stripePdfFilePath);
     await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+
+    /**
+     * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
+     */
 
     const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
 
@@ -238,7 +334,7 @@ test.describe("Default Invoice Template", () => {
     page,
     browserName,
     downloadDir,
-  }) => {
+  }, testInfo) => {
     const DATE_FORMAT = "MMMM D, YYYY";
 
     // Switch to another currency
@@ -344,9 +440,18 @@ test.describe("Default Invoice Template", () => {
       .getByRole("switch", { name: `Show "VAT Table Summary" in the PDF` })
       .click();
 
+    const notesFinalSection = page.getByTestId(`final-section`);
+
+    // for better debugging screenshots, we fill in the notes field with a test note =)
+    await notesFinalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: update pdf when invoice data changes (${testInfo.project.name})`,
+      );
+
     // Wait for PDF preview to regenerate after invoice data changes (debounce timeout)
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
+    await page.waitForTimeout(600);
 
     const downloadPdfEnglishButton = page.getByRole("link", {
       name: "Download PDF in English",
@@ -375,6 +480,10 @@ test.describe("Default Invoice Template", () => {
     // Convert to absolute path and use proper file URL format
     const absolutePath = path.resolve(pdfFilePath);
     await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
+
+    /**
+     * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
+     */
 
     const pdfBytes = fs.readFileSync(absolutePath);
 
@@ -414,6 +523,17 @@ test.describe("Default Invoice Template", () => {
     });
 
     await expect(downloadPdfStripeButton).toBeVisible();
+
+    // for better debugging screenshots, we fill in the notes field with a test note =)
+    await notesFinalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: update pdf when invoice data changes with Stripe template (${testInfo.project.name})`,
+      );
+
+    // wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
 
     // Click the download button and wait for download
     const [stripeDownload] = await Promise.all([
@@ -457,7 +577,7 @@ test.describe("Default Invoice Template", () => {
     page,
     browserName,
     downloadDir,
-  }) => {
+  }, testInfo) => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
 
@@ -498,9 +618,13 @@ test.describe("Default Invoice Template", () => {
     await invoiceNumberValueInput.fill("2/05-2024");
 
     const finalSection = page.getByTestId("final-section");
+
+    // for better debugging screenshots, we fill in the notes field with a test note =)
     await finalSection
       .getByRole("textbox", { name: "Notes", exact: true })
-      .fill("Mobile test note");
+      .fill(
+        `Test: completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French (${testInfo.project.name})`,
+      );
 
     // Fill in seller information
     const sellerSection = page.getByTestId("seller-information-section");
@@ -575,6 +699,10 @@ test.describe("Default Invoice Template", () => {
 
     await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
 
+    /**
+     * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
+     */
+
     const pdfBytes = fs.readFileSync(absolutePath);
 
     await page.goto("about:blank");
@@ -614,7 +742,9 @@ test.describe("Default Invoice Template", () => {
 
     await expect(
       finalSection.getByRole("textbox", { name: "Notes", exact: true }),
-    ).toHaveValue("Mobile test note");
+    ).toHaveValue(
+      `Test: completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French (${testInfo.project.name})`,
+    );
 
     // Verify seller information persists
     await expect(
@@ -679,6 +809,19 @@ test.describe("Default Invoice Template", () => {
 
     await expect(downloadPdfStripeButton).toBeVisible();
 
+    const newFinalSection = page.getByTestId(`final-section`);
+
+    // for better debugging screenshots, we fill in the notes field with a test note =)
+    await newFinalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French with Stripe template (${testInfo.project.name})`,
+      );
+
+    // wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
+
     // Click the download button and wait for download
     const [stripeDownload] = await Promise.all([
       page.waitForEvent("download"),
@@ -699,6 +842,10 @@ test.describe("Default Invoice Template", () => {
     // Convert to absolute path and use proper file URL format
     const stripeAbsolutePath = path.resolve(stripePdfFilePath);
     await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+
+    /**
+     * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
+     */
 
     const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
 
@@ -721,7 +868,7 @@ test.describe("Default Invoice Template", () => {
     page,
     downloadDir,
     browserName,
-  }) => {
+  }, testInfo) => {
     const generalInfoSection = page.getByTestId("general-information-section");
 
     const invoiceNumberFieldset = generalInfoSection.getByRole("group", {
@@ -783,6 +930,14 @@ test.describe("Default Invoice Template", () => {
     await currencySelect.selectOption("CHF");
     await expect(currencySelect).toHaveValue("CHF");
 
+    const notesFinalSection = page.getByTestId(`final-section`);
+    // for better debugging screenshots, we fill in the notes field with a test note =)
+    await notesFinalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: should display and persist invoice number in different languages (${testInfo.project.name})`,
+      );
+
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
     // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(600);
@@ -840,6 +995,10 @@ test.describe("Default Invoice Template", () => {
     const absolutePath = path.resolve(pdfFilePath);
     await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
 
+    /**
+     * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
+     */
+
     const pdfBytes = fs.readFileSync(absolutePath);
 
     await page.goto("about:blank");
@@ -867,6 +1026,7 @@ test.describe("Default Invoice Template", () => {
       .selectOption("stripe");
 
     await page.waitForURL("/?template=stripe");
+
     // Verify that the Stripe template is selected
     const templateSelect = page.getByRole("combobox", {
       name: "Invoice Template",
@@ -882,6 +1042,19 @@ test.describe("Default Invoice Template", () => {
     });
 
     await expect(downloadPdfStripeButton).toBeVisible();
+
+    const newNotesFinalSection = page.getByTestId(`final-section`);
+
+    // for better debugging screenshots, we fill in the notes field with a test note =)
+    await newNotesFinalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: should display and persist invoice number in different languages with Stripe template (${testInfo.project.name})`,
+      );
+
+    // wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
 
     // Click the download button and wait for download
     const [stripeDownload] = await Promise.all([
@@ -903,6 +1076,10 @@ test.describe("Default Invoice Template", () => {
     // Convert to absolute path and use proper file URL format
     const stripeAbsolutePath = path.resolve(stripePdfFilePath);
     await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+
+    /**
+     * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
+     */
 
     const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
 
