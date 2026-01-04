@@ -135,9 +135,16 @@ test.describe("Generate Invoice Link", () => {
 
     await taxSettingsFieldset.getByRole("textbox", { name: "VAT" }).fill("23");
 
+    // check total
+    const totalField = finalSection.getByRole("textbox", {
+      name: "Total",
+      exact: true,
+    });
+    await expect(totalField).toHaveValue("615.00");
+
     // wait for debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(700);
 
     // Generate share link
     await page
@@ -241,6 +248,7 @@ test.describe("Generate Invoice Link", () => {
         name: "Net Price (Rate or Unit Price)",
       }),
     ).toHaveValue("100");
+
     const newTaxSettingsFieldset = newInvoiceItemsSection.getByRole("group", {
       name: "Tax Settings",
     });
@@ -252,8 +260,10 @@ test.describe("Generate Invoice Link", () => {
       newTaxSettingsFieldset.getByRole("textbox", { name: "Custom VAT" }),
     ).toHaveValue("23");
 
+    const newFinalSection = newPage.getByTestId(`final-section`);
+
     await expect(
-      finalSection.getByRole("textbox", {
+      newFinalSection.getByRole("textbox", {
         name: "Total",
         exact: true,
       }),

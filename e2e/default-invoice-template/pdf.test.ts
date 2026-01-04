@@ -251,6 +251,8 @@ test.describe("Default Invoice Template", () => {
       .getByRole("textbox", { name: "Invoice Type" })
       .fill("HELLO FROM PLAYWRIGHT TEST!");
 
+    /** UPDATE SELLER INFORMATION */
+
     const sellerSection = page.getByTestId(`seller-information-section`);
 
     // Name field
@@ -288,6 +290,8 @@ test.describe("Default Invoice Template", () => {
 
     await expect(sellerNotesSwitch).toHaveRole("switch");
     await expect(sellerNotesSwitch).toBeChecked();
+
+    /** UPDATE BUYER INFORMATION */
 
     const buyerSection = page.getByTestId(`buyer-information-section`);
 
@@ -338,9 +342,9 @@ test.describe("Default Invoice Template", () => {
       .getByRole("switch", { name: `Show "VAT Table Summary" in the PDF` })
       .click();
 
-    // Wait for PDF preview to regenerate after language change (debounce timeout)
+    // Wait for PDF preview to regenerate after invoice data changes (debounce timeout)
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(700);
 
     const downloadPdfEnglishButton = page.getByRole("link", {
       name: "Download PDF in English",

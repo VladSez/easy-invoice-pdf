@@ -20,7 +20,7 @@ test.describe("Not Found page", () => {
     await expect(homeLink).toBeVisible();
     await homeLink.click();
 
-    await expect(page).toHaveURL("/");
+    await expect(page).toHaveURL("/?template=default");
   });
 
   test("should display not found page in Spanish under [locale] root layout", async ({
@@ -42,6 +42,6 @@ test.describe("Not Found page", () => {
     await expect(homeLink).toBeVisible();
     await homeLink.click();
 
-    await expect(page).toHaveURL("/");
+    await expect(page).toHaveURL("/?template=default");
   });
 });
