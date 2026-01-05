@@ -7,11 +7,6 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await page.goto("/");
   });
 
-  test.afterEach(async ({ page }) => {
-    // Clear localStorage after each test
-    await page.evaluate(() => localStorage.clear());
-  });
-
   test("can share invoice with Stripe template and *WITHOUT* logo", async ({
     page,
   }) => {
@@ -36,8 +31,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await expect(shareButton).toBeEnabled();
 
     // Click share button
-    // eslint-disable-next-line playwright/no-force-option
-    await shareButton.click({ force: true });
+    await shareButton.click();
 
     // Verify URL contains shared data
     await page.waitForURL((url) => url.searchParams.has("data"));
@@ -110,6 +104,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
+    // Upload logo
     await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
 
     // Wait for logo to be uploaded
@@ -128,9 +123,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // on mobile, we need to click the button to show the toast because it's better UX for user (you can't hover on mobile)
     await shareButton.click();
 
-    await expect(page.getByText("Unable to Share Invoice")).toBeVisible({
-      timeout: 6000,
-    });
+    await expect(page.getByText("Unable to Share Invoice")).toBeVisible();
 
     await expect(
       page.getByText(
@@ -147,32 +140,12 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
+    // Upload logo
     await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
 
-    await page.evaluate((base64Data) => {
-      const fileInput = document.querySelector(
-        "#logoUpload",
-      ) as HTMLInputElement;
-
-      if (fileInput) {
-        const byteString = atob(base64Data.split(",")[1]);
-        const mimeString = base64Data.split(",")[0].split(":")[1].split(";")[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
-        }
-        const file = new File([ab], "test-logo.png", { type: mimeString });
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        fileInput.files = dataTransfer.files;
-        fileInput.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-    }, SMALL_TEST_IMAGE_BASE64);
-
-    // Wait for logo to be uploaded
+    // Wait debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(700);
 
     const generalInfoSection = page.getByTestId("general-information-section");
     await expect(
@@ -231,26 +204,8 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    // Upload a logo
-    await page.evaluate((base64Data) => {
-      const fileInput = document.querySelector(
-        "#logoUpload",
-      ) as HTMLInputElement;
-      if (fileInput) {
-        const byteString = atob(base64Data.split(",")[1]);
-        const mimeString = base64Data.split(",")[0].split(":")[1].split(";")[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
-        }
-        const file = new File([ab], "test-logo.png", { type: mimeString });
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        fileInput.files = dataTransfer.files;
-        fileInput.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-    }, SMALL_TEST_IMAGE_BASE64);
+    // Upload logo
+    await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
 
     // Verify share button becomes disabled
     await expect(shareButton).toHaveAttribute("data-disabled", "true");
@@ -273,6 +228,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     await page.waitForURL("/?template=stripe");
 
+    // Upload logo
     await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
 
     // Wait for upload and verify share button is disabled
@@ -290,7 +246,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Wait a moment for any debounced localStorage updates
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(700);
 
     // Verify data is actually saved in localStorage
     const storedData = (await page.evaluate((key) => {
@@ -343,16 +299,17 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // Upload logo
     await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
 
+    // Wait for logo to be uploaded
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
     // Verify share button is disabled in mobile view too
     await expect(shareButton).toHaveAttribute("data-disabled", "true");
 
     // Click share button to verify toast is shown
-    // eslint-disable-next-line playwright/no-force-option
-    await shareButton.click({ force: true });
+    await shareButton.click();
 
-    await expect(page.getByText("Unable to Share Invoice")).toBeVisible({
-      timeout: 6000,
-    });
+    await expect(page.getByText("Unable to Share Invoice")).toBeVisible();
 
     await expect(
       page.getByText(
