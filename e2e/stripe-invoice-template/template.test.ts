@@ -258,10 +258,19 @@ test.describe("Stripe Invoice Template", () => {
 
     const generalInfoSection = page.getByTestId("general-information-section");
 
-    // Wait for logo to be uploaded
+    // Should show logo preview
     await expect(
       generalInfoSection.getByAltText("Company logo preview"),
     ).toBeVisible();
+    await expect(
+      generalInfoSection.getByText(
+        "Logo uploaded successfully. Click the X to remove it.",
+      ),
+    ).toBeVisible();
+
+    // Wait debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(800);
 
     // Click remove button
     await generalInfoSection
@@ -329,9 +338,22 @@ test.describe("Stripe Invoice Template", () => {
     // Upload logo
     await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
 
-    // Wait a moment for any debounced localStorage updates
+    // Wait for logo to be uploaded and PDF to regenerate
+    await expect(page.getByText("Logo uploaded successfully!")).toBeVisible();
+
+    // Should show logo preview
+    await expect(
+      generalInfoSection.getByAltText("Company logo preview"),
+    ).toBeVisible();
+    await expect(
+      generalInfoSection.getByText(
+        "Logo uploaded successfully. Click the X to remove it.",
+      ),
+    ).toBeVisible();
+
+    // Wait debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
+    await page.waitForTimeout(800);
 
     // Verify data is actually saved in localStorage
     const storedData = (await page.evaluate((key) => {
@@ -735,9 +757,9 @@ test.describe("Stripe Invoice Template", () => {
     await vatInput.clear();
     await vatInput.fill("20");
 
-    // Wait a moment for form state to update
+    // Wait debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(800);
 
     // Switch to Stripe template
     await page
@@ -869,6 +891,16 @@ test.describe("Stripe Invoice Template", () => {
 
     // Wait for logo to be uploaded and PDF to regenerate
     await expect(page.getByText("Logo uploaded successfully!")).toBeVisible();
+
+    // Should show logo preview
+    await expect(
+      generalInfoSection.getByAltText("Company logo preview"),
+    ).toBeVisible();
+    await expect(
+      generalInfoSection.getByText(
+        "Logo uploaded successfully. Click the X to remove it.",
+      ),
+    ).toBeVisible();
 
     // Add payment URL
     await generalInfoSection
