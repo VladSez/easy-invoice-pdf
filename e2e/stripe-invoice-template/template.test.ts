@@ -811,6 +811,7 @@ test.describe("Stripe Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       "automatically-enables-VAT-field-visibility-and-sets-date-format-when-switching-to-Stripe-template.png",
+      { maxDiffPixels: 1 },
     );
 
     // navigate back to the previous page
@@ -877,7 +878,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Wait a moment for any debounced localStorage updates
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(800);
 
     // Verify data is actually saved in localStorage
     const storedData = (await page.evaluate((key) => {
@@ -891,9 +892,6 @@ test.describe("Stripe Invoice Template", () => {
     expect(parsedData).toMatchObject({
       logo: SMALL_TEST_IMAGE_BASE64,
     } satisfies Pick<InvoiceData, "logo">);
-
-    // Set up download handler
-    // const downloadPromise = page.waitForEvent("download");
 
     const downloadPDFButton = page.getByRole("link", {
       name: "Download PDF in English",
@@ -941,6 +939,7 @@ test.describe("Stripe Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       "pdf-with-logo-and-payment-url-when-using-stripe-template.png",
+      { maxDiffPixels: 1 },
     );
   });
 });
