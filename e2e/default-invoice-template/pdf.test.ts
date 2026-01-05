@@ -69,7 +69,7 @@ test.describe("Default Invoice Template", () => {
     );
 
     // navigate back to the previous page
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "commit" });
 
     /**
      * Switch to Stripe template and download PDF in English with Stripe template
@@ -251,7 +251,7 @@ test.describe("Default Invoice Template", () => {
     );
 
     // navigate back to the previous page
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "commit" });
 
     /**
      * Switch to Stripe template and download PDF in Polish with Stripe template
@@ -502,7 +502,14 @@ test.describe("Default Invoice Template", () => {
     );
 
     // navigate back to the previous page
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "commit" });
+
+    // Wait for the download button to be ready after navigation
+    const newDownloadPdfButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+    await expect(newDownloadPdfButton).toBeVisible();
+    await expect(newDownloadPdfButton).toBeEnabled();
 
     /**
      * Switch to Stripe template and download PDF in English with Stripe template
@@ -512,6 +519,7 @@ test.describe("Default Invoice Template", () => {
       .selectOption("stripe");
 
     await page.waitForURL("/?template=stripe");
+
     // Verify that the Stripe template is selected
     const templateSelect = page.getByRole("combobox", {
       name: "Invoice Template",
@@ -724,7 +732,7 @@ test.describe("Default Invoice Template", () => {
     );
 
     // Navigate back to the previous page
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "commit" });
 
     // Set mobile viewport again
     await page.setViewportSize({ width: 375, height: 667 });
@@ -1047,7 +1055,7 @@ test.describe("Default Invoice Template", () => {
     );
 
     // navigate back to the previous page
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "commit" });
 
     /**
      * Switch to Stripe template and download PDF in English with Stripe template

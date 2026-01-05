@@ -17,14 +17,14 @@ test.describe("Stripe Invoice Template", () => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
 
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "commit" });
   });
 
   test("displays correct OG meta tags for Stripe template", async ({
     page,
   }) => {
     // Navigate to Stripe template
-    await page.goto("/?template=stripe");
+    await page.goto("/?template=stripe", { waitUntil: "commit" });
 
     await expect(page).toHaveURL("/?template=stripe");
 
@@ -814,7 +814,7 @@ test.describe("Stripe Invoice Template", () => {
     );
 
     // navigate back to the previous page
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "commit" });
 
     // verify that the default template is selected
     const templateCombobox = page.getByRole("combobox", {
