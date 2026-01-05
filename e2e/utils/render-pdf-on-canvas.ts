@@ -36,7 +36,7 @@ export async function renderPdfOnCanvas(page: Page, pdfBytes: Uint8Array) {
 
                 const page = await pdf.getPage(1)
 
-                const viewport = page.getViewport({ scale: 1.5 })
+                const viewport = page.getViewport({ scale: 2 })
 
                 const canvas = document.getElementById('pdf')
                 const ctx = canvas.getContext('2d')
