@@ -8,6 +8,9 @@ import { test, expect } from "../utils/extended-playwright-test";
 import { renderPdfOnCanvas } from "../utils/render-pdf-on-canvas";
 
 test.describe("Default Invoice Template", () => {
+  // we run tests in serial mode to avoid race conditions between tests
+  test.describe.configure({ mode: "serial" });
+
   test.beforeEach(async ({ page }) => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
@@ -66,7 +69,6 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       "downloads-PDF-in-English.png",
-      { maxDiffPixels: 1 },
     );
 
     // navigate back to the previous page
@@ -133,7 +135,6 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       `downloads-PDF-in-English-stripe-template.png`,
-      { maxDiffPixels: 1 },
     );
   });
 
@@ -250,7 +251,6 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       "downloads-PDF-in-Polish.png",
-      { maxDiffPixels: 1 },
     );
 
     // navigate back to the previous page
@@ -330,7 +330,6 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       `downloads-PDF-in-Polish-stripe-template.png`,
-      { maxDiffPixels: 1 },
     );
   });
 
@@ -503,7 +502,6 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       `update-pdf-when-invoice-data-changes.png`,
-      { maxDiffPixels: 1 },
     );
 
     // navigate back to the previous page
@@ -575,7 +573,6 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       `update-pdf-when-invoice-data-changes-stripe-template.png`,
-      { maxDiffPixels: 1 },
     );
   });
 
@@ -723,7 +720,6 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       `completes-full-invoice-flow-on-mobile.png`,
-      { maxDiffPixels: 1 },
     );
 
     // Navigate back to the previous page
@@ -868,7 +864,6 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       `completes-full-invoice-flow-on-mobile-stripe-template.png`,
-      { maxDiffPixels: 1 },
     );
   });
 
@@ -1025,7 +1020,6 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       `should-display-and-persist-invoice-number-in-different-languages.png`,
-      { maxDiffPixels: 1 },
     );
 
     // navigate back to the previous page
@@ -1108,7 +1102,6 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       `should-display-and-persist-invoice-number-in-different-languages-stripe-template.png`,
-      { maxDiffPixels: 1 },
     );
   });
 });
