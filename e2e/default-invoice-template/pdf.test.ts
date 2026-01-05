@@ -12,7 +12,7 @@ test.describe("Default Invoice Template", () => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
 
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "commit" });
   });
 
   test("downloads PDF in English and verifies content", async ({
@@ -201,13 +201,13 @@ test.describe("Default Invoice Template", () => {
         `Test: downloads PDF in Polish and verifies content (${testInfo.project.name})`,
       );
 
-    // wait, because we update pdf on debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
-
     // Check that the total is correct (should be 3,300.00)
     const totalTextbox = page.getByRole("textbox", { name: "Total" });
     await expect(totalTextbox).toHaveValue("3,300.00");
+
+    // wait, because we update pdf on debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
 
     // Click the download button and wait for download
     const [download] = await Promise.all([
@@ -267,14 +267,6 @@ test.describe("Default Invoice Template", () => {
     });
     await expect(templateSelect).toHaveValue("stripe");
 
-    // Wait for the download button to be visible and enabled for Stripe template
-    const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in Polish",
-    });
-
-    await expect(downloadPdfStripeButton).toBeVisible();
-    await expect(downloadPdfStripeButton).toBeEnabled();
-
     const notesFinalSection = page.getByTestId(`final-section`);
 
     // for better debugging screenshots, we fill in the notes field with a test note =)
@@ -286,7 +278,15 @@ test.describe("Default Invoice Template", () => {
 
     // wait for debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(700);
+
+    // Wait for the download button to be visible and enabled for Stripe template
+    const downloadPdfStripeButton = page.getByRole("link", {
+      name: "Download PDF in Polish",
+    });
+
+    await expect(downloadPdfStripeButton).toBeVisible();
+    await expect(downloadPdfStripeButton).toBeEnabled();
 
     // Click the download button and wait for download
     const [stripeDownload] = await Promise.all([
@@ -518,12 +518,6 @@ test.describe("Default Invoice Template", () => {
     });
     await expect(templateSelect).toHaveValue("stripe");
 
-    const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in English",
-    });
-
-    await expect(downloadPdfStripeButton).toBeVisible();
-
     // for better debugging screenshots, we fill in the notes field with a test note =)
     await notesFinalSection
       .getByRole("textbox", { name: "Notes", exact: true })
@@ -533,7 +527,13 @@ test.describe("Default Invoice Template", () => {
 
     // wait for debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(700);
+
+    const downloadPdfStripeButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadPdfStripeButton).toBeVisible();
 
     // Click the download button and wait for download
     const [stripeDownload] = await Promise.all([
@@ -803,12 +803,6 @@ test.describe("Default Invoice Template", () => {
     });
     await expect(templateSelect).toHaveValue("stripe");
 
-    const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in French",
-    });
-
-    await expect(downloadPdfStripeButton).toBeVisible();
-
     const newFinalSection = page.getByTestId(`final-section`);
 
     // for better debugging screenshots, we fill in the notes field with a test note =)
@@ -820,7 +814,13 @@ test.describe("Default Invoice Template", () => {
 
     // wait for debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(700);
+
+    const downloadPdfStripeButton = page.getByRole("link", {
+      name: "Download PDF in French",
+    });
+
+    await expect(downloadPdfStripeButton).toBeVisible();
 
     // Click the download button and wait for download
     const [stripeDownload] = await Promise.all([
@@ -940,7 +940,7 @@ test.describe("Default Invoice Template", () => {
 
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(700);
 
     // we reload the page to test that the invoice number is persisted after page reload
     await page.reload();
@@ -965,6 +965,10 @@ test.describe("Default Invoice Template", () => {
 
     // Verify CHF currency is selected
     await expect(currencySelect).toHaveValue("CHF");
+
+    // wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
 
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
     const downloadPdfPtButton = page.getByRole("link", {
@@ -1037,12 +1041,6 @@ test.describe("Default Invoice Template", () => {
     const currencySelect2 = page.getByRole("combobox", { name: "Currency" });
     await expect(currencySelect2).toHaveValue("CHF");
 
-    const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in Portuguese",
-    });
-
-    await expect(downloadPdfStripeButton).toBeVisible();
-
     const newNotesFinalSection = page.getByTestId(`final-section`);
 
     // for better debugging screenshots, we fill in the notes field with a test note =)
@@ -1054,7 +1052,13 @@ test.describe("Default Invoice Template", () => {
 
     // wait for debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(700);
+
+    const downloadPdfStripeButton = page.getByRole("link", {
+      name: "Download PDF in Portuguese",
+    });
+
+    await expect(downloadPdfStripeButton).toBeVisible();
 
     // Click the download button and wait for download
     const [stripeDownload] = await Promise.all([
