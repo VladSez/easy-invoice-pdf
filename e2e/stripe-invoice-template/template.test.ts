@@ -13,9 +13,6 @@ import { expect, test } from "../utils/extended-playwright-test";
 import { renderPdfOnCanvas } from "../utils/render-pdf-on-canvas";
 
 test.describe("Stripe Invoice Template", () => {
-  // we run tests in serial mode to avoid race conditions between tests
-  test.describe.configure({ mode: "serial" });
-
   test.beforeEach(async ({ page }) => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));

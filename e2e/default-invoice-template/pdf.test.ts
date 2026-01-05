@@ -8,9 +8,6 @@ import { test, expect } from "../utils/extended-playwright-test";
 import { renderPdfOnCanvas } from "../utils/render-pdf-on-canvas";
 
 test.describe("Default Invoice Template", () => {
-  // we run tests in serial mode to avoid race conditions between tests
-  test.describe.configure({ mode: "serial" });
-
   test.beforeEach(async ({ page }) => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
@@ -652,6 +649,10 @@ test.describe("Default Invoice Template", () => {
       .getByRole("textbox", { name: "VAT", exact: true })
       .fill("23");
 
+    // wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
     const downloadPdfFrenchBtn = page.getByRole("link", {
       name: "Download PDF in French",
@@ -948,17 +949,38 @@ test.describe("Default Invoice Template", () => {
     // we reload the page to test that the invoice number is persisted after page reload
     await page.reload();
 
+    // Verify that the download PDF button is visible after page reload
+    const downloadPdfPlButton = page.getByRole("link", {
+      name: "Download PDF in Polish",
+    });
+
+    await expect(downloadPdfPlButton).toBeVisible();
+
+    const newInvoiceNumberLabelInput = invoiceNumberFieldset.getByRole(
+      "textbox",
+      {
+        name: "Label",
+      },
+    );
+
     // Verify that the invoice number is persisted after page reload
-    await expect(invoiceNumberLabelInput).toHaveValue("Faktura TEST:");
+    await expect(newInvoiceNumberLabelInput).toHaveValue("Faktura TEST:");
+
+    const newLanguageSelect = page.getByRole("combobox", {
+      name: "Invoice PDF Language",
+    });
+
+    // Verify that the language is persisted after page reload
+    await expect(newLanguageSelect).toHaveValue("pl");
 
     // switch to Portuguese
-    await languageSelect.selectOption("pt");
+    await newLanguageSelect.selectOption("pt");
 
-    await expect(invoiceNumberLabelInput).toHaveValue(
+    await expect(newInvoiceNumberLabelInput).toHaveValue(
       `${TRANSLATIONS.pt.invoiceNumber}:`,
     );
 
-    await invoiceNumberLabelInput.fill("Fatura TEST PORTUGUESE N°:");
+    await newInvoiceNumberLabelInput.fill("Fatura TEST PORTUGUESE N°:");
 
     await expect(
       page.getByRole("button", {
@@ -966,8 +988,10 @@ test.describe("Default Invoice Template", () => {
       }),
     ).toBeVisible();
 
+    const newCurrencySelect = page.getByRole("combobox", { name: "Currency" });
+
     // Verify CHF currency is selected
-    await expect(currencySelect).toHaveValue("CHF");
+    await expect(newCurrencySelect).toHaveValue("CHF");
 
     // wait for debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
