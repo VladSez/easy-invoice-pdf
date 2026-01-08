@@ -14,7 +14,6 @@ export function InvoiceItemsTable({
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
-  const taxLabelText = invoiceData.taxLabelText || "VAT";
 
   // we need to check only the first row, because all next rows are the same
   const isInvoiceItemNumberVisible =
@@ -30,10 +29,33 @@ export function InvoiceItemsTable({
   const isPreTaxAmountFieldVisible =
     invoiceData.items[0].preTaxAmountFieldIsVisible;
 
+  /**
+   * Custom tax label text i.e. "VAT", "Sales Tax", "IVA", "GST", etc.
+   */
+  const taxLabelText = invoiceData.taxLabelText || "VAT";
+
+  /**
+   * Column labels
+   */
+  const vatAmountColumnLabel = t.invoiceItemsTable.vatAmount({
+    customTaxLabel: taxLabelText,
+  });
+  const netPriceColumnLabel = t.invoiceItemsTable.netPrice({
+    customTaxLabel: taxLabelText,
+  });
+  const netAmountColumnLabel = t.invoiceItemsTable.netAmount({
+    customTaxLabel: taxLabelText,
+  });
+  const preTaxAmountColumnLabel = t.invoiceItemsTable.preTaxAmount({
+    customTaxLabel: taxLabelText,
+  });
+
   return (
     <View style={{ marginBottom: 5, marginTop: 14 }}>
       <View style={styles.table}>
-        {/* Table header columns */}
+        {/* 
+          START: Table header columns
+        */}
         <View style={styles.tableRow}>
           {/* Number column */}
           {isInvoiceItemNumberVisible ? (
@@ -82,32 +104,28 @@ export function InvoiceItemsTable({
           {/* Net price column */}
           {isNetPriceFieldVisible ? (
             <View style={[styles.tableCol, styles.colNetPrice, styles.center]}>
-              <Text style={styles.tableCellBold}>
-                {t.invoiceItemsTable.netPrice}
-              </Text>
+              <Text style={styles.tableCellBold}>{netPriceColumnLabel}</Text>
             </View>
           ) : null}
 
           {/* VAT column */}
           {isVATFieldVisible ? (
             <View style={[styles.tableCol, styles.colVAT, styles.center]}>
-              <Text style={styles.tableCellBold}>{taxLabelText}</Text>
+              <Text style={styles.tableCellBold}>{taxLabelText.split("")}</Text>
             </View>
           ) : null}
 
           {/* Net amount column */}
           {isNetAmountFieldVisible ? (
             <View style={[styles.tableCol, styles.colNetAmount, styles.center]}>
-              <Text style={styles.tableCellBold}>
-                {t.invoiceItemsTable.netAmount}
-              </Text>
+              <Text style={styles.tableCellBold}>{netAmountColumnLabel}</Text>
             </View>
           ) : null}
 
           {/* VAT amount column */}
           {isVATAmountFieldVisible ? (
             <View style={[styles.tableCol, styles.colVATAmount, styles.center]}>
-              <Text style={styles.tableCellBold}>{taxLabelText} Amount</Text>
+              <Text style={styles.tableCellBold}>{vatAmountColumnLabel}</Text>
             </View>
           ) : null}
 
@@ -117,13 +135,18 @@ export function InvoiceItemsTable({
               style={[styles.tableCol, styles.colPreTaxAmount, styles.center]}
             >
               <Text style={[styles.tableCellBold]}>
-                {t.invoiceItemsTable.preTaxAmount}
+                {preTaxAmountColumnLabel}
               </Text>
             </View>
           ) : null}
         </View>
+        {/* 
+          END: Table header columns
+        */}
 
-        {/* Table rows */}
+        {/* 
+          START: Table rows
+        */}
         {invoiceData?.items.map((item, index) => {
           const formattedAmount = item.amount
             .toLocaleString("en-US", {
@@ -245,7 +268,9 @@ export function InvoiceItemsTable({
                     { textAlign: "center" },
                   ]}
                 >
-                  <Text style={styles.tableCell}>{formattedVat}</Text>
+                  <Text style={styles.tableCell}>
+                    {String(formattedVat).split("")}
+                  </Text>
                 </View>
               ) : null}
 
@@ -302,8 +327,13 @@ export function InvoiceItemsTable({
             </View>
           );
         })}
+        {/* 
+          END: Table rows
+        */}
 
-        {/* Table footer */}
+        {/* 
+          START: Table footer
+        */}
         <View style={styles.tableRow}>
           {/* Empty cells */}
           <View style={[styles.tableCol, { borderRight: 0 }]}></View>
@@ -343,6 +373,9 @@ export function InvoiceItemsTable({
             </Text>
           </View>
         </View>
+        {/* 
+          END: Table footer
+        */}
       </View>
     </View>
   );

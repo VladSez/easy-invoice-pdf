@@ -14,7 +14,21 @@ export function InvoiceVATSummaryTable({
 }) {
   const language = invoiceData.language;
   const t = TRANSLATIONS[language];
+
+  /**
+   * Custom tax label text i.e. "VAT", "Sales Tax", "IVA", "GST", etc.
+   */
   const taxLabelText = invoiceData.taxLabelText || "VAT";
+
+  const vatRateColumnLabel = t.vatSummaryTable.vatRate({
+    customTaxLabel: taxLabelText,
+  });
+  const netColumnLabel = t.vatSummaryTable.net({
+    customTaxLabel: taxLabelText,
+  });
+  const preTaxColumnLabel = t.vatSummaryTable.preTax({
+    customTaxLabel: taxLabelText,
+  });
 
   const sortedItems = [...(invoiceData?.items ?? [])].sort((a, b) => {
     // Handle cases where either value is a string (NP or OO)
@@ -58,23 +72,30 @@ export function InvoiceVATSummaryTable({
 
   return (
     <View style={[styles.table, { width: "100%" }]}>
-      {/* Header row */}
+      {/* 
+      START: Table header row
+      */}
       <View style={styles.tableRow}>
         <View style={[styles.tableCol, { width: "25%" }]}>
-          <Text style={styles.tableCellBold}>{taxLabelText} Rate</Text>
+          <Text style={styles.tableCellBold}>{vatRateColumnLabel}</Text>
         </View>
         <View style={[styles.tableCol, { width: "25%" }]}>
-          <Text style={styles.tableCellBold}>{t.vatSummaryTable.net}</Text>
+          <Text style={styles.tableCellBold}>{netColumnLabel}</Text>
         </View>
         <View style={[styles.tableCol, { width: "25%" }]}>
           <Text style={styles.tableCellBold}>{taxLabelText}</Text>
         </View>
         <View style={[styles.tableCol, { width: "25%" }]}>
-          <Text style={styles.tableCellBold}>{t.vatSummaryTable.preTax}</Text>
+          <Text style={styles.tableCellBold}>{preTaxColumnLabel}</Text>
         </View>
       </View>
+      {/* 
+      END: Table header row
+      */}
 
-      {/* Table body rows*/}
+      {/* 
+      START: Table body rows
+      */}
       {sortedItems?.map((item, index) => {
         const formattedNetAmount =
           typeof item.netAmount === "number"
@@ -155,8 +176,13 @@ export function InvoiceVATSummaryTable({
           </View>
         );
       })}
+      {/* 
+      END: Table body rows
+      */}
 
-      {/* Total row */}
+      {/* 
+      START: Total row
+      */}
       <View style={styles.tableRow}>
         <View style={[styles.tableCol, { width: "25%" }]}>
           <Text
@@ -190,6 +216,9 @@ export function InvoiceVATSummaryTable({
           </Text>
         </View>
       </View>
+      {/* 
+      END: Total row
+      */}
     </View>
   );
 }

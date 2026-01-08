@@ -29,11 +29,51 @@ const invoiceItemsTableTranslationSchema = z
     typeOfGTU: z.string(),
     amount: z.string(),
     unit: z.string(),
-    netPrice: z.string(),
+    /**
+     * You can pass a custom text for the net price label. i.e. for i18n
+     * @example
+     * netPrice: ({ customTaxLabel: string }) => {
+     *   return `Цена без ${customTaxLabel || "НДС"}`;
+     * }
+     */
+    netPrice: z
+      .function()
+      .args(z.object({ customTaxLabel: z.string() }))
+      .returns(z.string()),
     vat: z.string(),
-    netAmount: z.string(),
-    vatAmount: z.string(),
-    preTaxAmount: z.string(),
+    /**
+     * You can pass a custom text for the net amount label. i.e. for i18n
+     * @example
+     * netAmount: ({ customTaxLabel: string }) => {
+     *   return `Сумма без ${customTaxLabel || "НДС"}`;
+     * }
+     */
+    netAmount: z
+      .function()
+      .args(z.object({ customTaxLabel: z.string() }))
+      .returns(z.string()),
+    /**
+     * You can pass a custom text for the VAT amount label. i.e. for i18n
+     * @example
+     * vatAmount: ({ customTaxLabel: string }) => {
+     *   return `${customTaxLabel || "VAT"} Amount`;
+     * }
+     */
+    vatAmount: z
+      .function()
+      .args(z.object({ customTaxLabel: z.string() }))
+      .returns(z.string()),
+    /**
+     * You can pass a custom text for the pre-tax amount label. i.e. for i18n
+     * @example
+     * preTaxAmount: ({ customTaxLabel: string }) => {
+     *   return `Сумма с ${customTaxLabel || "НДС"}`;
+     * }
+     */
+    preTaxAmount: z
+      .function()
+      .args(z.object({ customTaxLabel: z.string() }))
+      .returns(z.string()),
     sum: z.string(),
   })
   .strict();
@@ -49,10 +89,40 @@ const paymentInfoTranslationSchema = z
 // Schema for VAT summary table translations
 const vatSummaryTableTranslationSchema = z
   .object({
-    vatRate: z.string(),
-    net: z.string(),
+    /**
+     * You can pass a custom text for the VAT rate label. i.e. for i18n
+     * @example
+     * vatRate: ({ customTaxLabel: string }) => {
+     *   return `Ставка ${customTaxLabel || "НДС"}`;
+     * }
+     */
+    vatRate: z
+      .function()
+      .args(z.object({ customTaxLabel: z.string() }))
+      .returns(z.string()),
+    /**
+     * You can pass a custom text for the net label. i.e. for i18n
+     * @example
+     * net: ({ customTaxLabel: string }) => {
+     *   return `Без ${customTaxLabel || "НДС"}`;
+     * }
+     */
+    net: z
+      .function()
+      .args(z.object({ customTaxLabel: z.string() }))
+      .returns(z.string()),
     vat: z.string(),
-    preTax: z.string(),
+    /**
+     * You can pass a custom text for the pre-tax label. i.e. for i18n
+     * @example
+     * preTax: ({ customTaxLabel: string }) => {
+     *   return `С ${customTaxLabel || "НДС"}`;
+     * }
+     */
+    preTax: z
+      .function()
+      .args(z.object({ customTaxLabel: z.string() }))
+      .returns(z.string()),
     total: z.string(),
   })
   .strict();
@@ -111,17 +181,22 @@ export const translationSchema = z
   })
   .strict();
 
-// Create a map of language to schema
-// {
-//   en: translationSchema,
-//   pl: translationSchema,
-//   de: translationSchema,
-//   ...etc
-// }
+/**
+ * Creates a map of language to schema
+ * @example
+    {
+      en: translationSchema,
+      pl: translationSchema,
+      de: translationSchema,
+      ...etc
+    }
+ */
 const languageToSchemaMap = Object.fromEntries(
   SUPPORTED_LANGUAGES.map((lang) => [lang, translationSchema]),
 );
-// Schema for all translations
+/**
+ *Schema for all translations
+ **/
 export const translationsSchema = z.object(languageToSchemaMap);
 
 // Type for a single language translation
@@ -154,11 +229,33 @@ export const TRANSLATIONS = {
       typeOfGTU: "Type of GTU",
       amount: "Amount",
       unit: "Unit",
-      netPrice: "Net price",
+      /**
+       * You can pass a custom text for the net price label. i.e. for i18n
+       * @example
+       * netPrice: ({ customTaxLabel: string }) => {
+       *   return `Цена без ${customTaxLabel || "НДС"}`;
+       * }
+       */
+      netPrice: () => {
+        return `Net price`;
+      },
       vat: "VAT",
-      netAmount: "Net\n Amount",
-      vatAmount: "VAT Amount",
-      preTaxAmount: "Pre-tax amount",
+      netAmount: () => {
+        return `Net\n Amount`;
+      },
+      /**
+       * You can pass a custom text for the VAT amount label. i.e. for i18n
+       * @example
+       * vatAmount: ({ customTaxLabel: string }) => {
+       *   return `${customTaxLabel || "VAT"} Amount`;
+       * }
+       */
+      vatAmount: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "VAT"} Amount`;
+      },
+      preTaxAmount: () => {
+        return `Pre-tax amount `;
+      },
       sum: "SUM",
     },
     paymentInfo: {
@@ -166,10 +263,37 @@ export const TRANSLATIONS = {
       paymentDate: "Payment date",
     },
     vatSummaryTable: {
-      vatRate: "VAT rate",
-      net: "Net",
+      /**
+       * You can pass a custom text for the VAT rate label. i.e. for i18n
+       * @example
+       * vatRate: ({ customTaxLabel: string }) => {
+       *   return `Ставка ${customTaxLabel || "НДС"}`;
+       * }
+       */
+      vatRate: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "VAT"} rate`;
+      },
+      /**
+       * You can pass a custom text for the net label. i.e. for i18n
+       * @example
+       * net: ({ customTaxLabel }) => {
+       *   return `Без ${customTaxLabel || "НДС"}`;
+       * }
+       */
+      net: () => {
+        return `Net`;
+      },
       vat: "VAT",
-      preTax: "Pre-tax",
+      /**
+       * You can pass a custom text for the pre-tax label. i.e. for i18n
+       * @example
+       * preTax: ({ customTaxLabel: string }) => {
+       *   return `С ${customTaxLabel || "НДС"}`;
+       * }
+       */
+      preTax: () => {
+        return `Pre-tax`;
+      },
       total: "Total",
     },
     paymentTotals: {
@@ -225,11 +349,19 @@ export const TRANSLATIONS = {
       typeOfGTU: "Typ\n GTU",
       amount: "Ilość",
       unit: "Jm",
-      netPrice: "Cena\n netto",
+      netPrice: () => {
+        return `Cena\n netto`;
+      },
       vat: "VAT",
-      netAmount: "Kwota\n netto",
-      vatAmount: "Kwota VAT",
-      preTaxAmount: "Kwota\n brutto",
+      netAmount: () => {
+        return `Kwota\n netto`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Kwota ${customTaxLabel || "VAT"}`;
+      },
+      preTaxAmount: () => {
+        return `Kwota\n brutto`;
+      },
       sum: "SUMA",
     },
     paymentInfo: {
@@ -237,10 +369,16 @@ export const TRANSLATIONS = {
       paymentDate: "Termin zapłaty",
     },
     vatSummaryTable: {
-      vatRate: "Stawka VAT",
-      net: "Netto",
+      vatRate: ({ customTaxLabel }) => {
+        return `Stawka ${customTaxLabel || "VAT"}`;
+      },
+      net: () => {
+        return `Netto`;
+      },
       vat: "VAT",
-      preTax: "Brutto",
+      preTax: () => {
+        return `Brutto`;
+      },
       total: "Razem",
     },
     paymentTotals: {
@@ -296,11 +434,19 @@ export const TRANSLATIONS = {
       typeOfGTU: "GTU-Typ",
       amount: "Menge",
       unit: "Einheit",
-      netPrice: "Nettopreis",
-      vat: "MwSt",
-      netAmount: "Netto\n Betrag",
-      vatAmount: "MwSt Betrag",
-      preTaxAmount: "Bruttobetrag",
+      netPrice: () => {
+        return `Nettopreis`;
+      },
+      vat: "MwSt.",
+      netAmount: () => {
+        return `Nettobetrag`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "MwSt."}-Betrag`;
+      },
+      preTaxAmount: () => {
+        return `Bruttobetrag`;
+      },
       sum: "SUMME",
     },
     paymentInfo: {
@@ -308,10 +454,16 @@ export const TRANSLATIONS = {
       paymentDate: "Zahlungsdatum",
     },
     vatSummaryTable: {
-      vatRate: "MwSt-Satz",
-      net: "Netto",
-      vat: "MwSt",
-      preTax: "Brutto",
+      vatRate: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "MwSt."}-Satz`;
+      },
+      net: () => {
+        return `Netto`;
+      },
+      vat: "MwSt.",
+      preTax: () => {
+        return `Brutto`;
+      },
       total: "Gesamt",
     },
     paymentTotals: {
@@ -367,11 +519,19 @@ export const TRANSLATIONS = {
       typeOfGTU: "Tipo\n GTU",
       amount: "Cantidad",
       unit: "Unidad",
-      netPrice: "Precio neto",
+      netPrice: () => {
+        return `Precio neto`;
+      },
       vat: "IVA",
-      netAmount: "Importe\n neto",
-      vatAmount: "Importe IVA",
-      preTaxAmount: "Importe bruto",
+      netAmount: () => {
+        return `Importe\n neto`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Importe ${customTaxLabel || "IVA"}`;
+      },
+      preTaxAmount: () => {
+        return `Importe bruto`;
+      },
       sum: "TOTAL",
     },
     paymentInfo: {
@@ -379,10 +539,16 @@ export const TRANSLATIONS = {
       paymentDate: "Fecha de pago",
     },
     vatSummaryTable: {
-      vatRate: "Tipo IVA",
-      net: "Neto",
+      vatRate: ({ customTaxLabel }) => {
+        return `Tipo ${customTaxLabel || "IVA"}`;
+      },
+      net: () => {
+        return `Neto`;
+      },
       vat: "IVA",
-      preTax: "Bruto",
+      preTax: () => {
+        return `Bruto`;
+      },
       total: "Total",
     },
     paymentTotals: {
@@ -438,11 +604,19 @@ export const TRANSLATIONS = {
       typeOfGTU: "Tipo\n GTU",
       amount: "Quantidade",
       unit: "Unidade",
-      netPrice: "Preço\n líquido",
+      netPrice: () => {
+        return `Preço\n líquido`;
+      },
       vat: "IVA",
-      netAmount: "Valor\n líquido",
-      vatAmount: "Valor IVA",
-      preTaxAmount: "Valor bruto",
+      netAmount: () => {
+        return `Valor\n líquido`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Valor ${customTaxLabel || "IVA"}`;
+      },
+      preTaxAmount: () => {
+        return `Valor bruto`;
+      },
       sum: "TOTAL",
     },
     paymentInfo: {
@@ -450,10 +624,16 @@ export const TRANSLATIONS = {
       paymentDate: "Data de pagamento",
     },
     vatSummaryTable: {
-      vatRate: "Taxa IVA",
-      net: "Líquido",
+      vatRate: ({ customTaxLabel }) => {
+        return `Taxa ${customTaxLabel || "IVA"}`;
+      },
+      net: () => {
+        return `Líquido`;
+      },
       vat: "IVA",
-      preTax: "Bruto",
+      preTax: () => {
+        return `Bruto`;
+      },
       total: "Total",
     },
     paymentTotals: {
@@ -509,11 +689,19 @@ export const TRANSLATIONS = {
       typeOfGTU: "Тип\n GTU",
       amount: "Количество",
       unit: "Ед.\n изм.",
-      netPrice: "Цена без НДС",
+      netPrice: ({ customTaxLabel }) => {
+        return `Цена без ${customTaxLabel || "НДС"}`;
+      },
       vat: "НДС",
-      netAmount: "Сумма\n без НДС",
-      vatAmount: "Сумма НДС",
-      preTaxAmount: "Сумма с НДС",
+      netAmount: ({ customTaxLabel }) => {
+        return `Сумма без ${customTaxLabel || "НДС"}`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Сумма ${customTaxLabel || "НДС"}`;
+      },
+      preTaxAmount: ({ customTaxLabel }) => {
+        return `Сумма с ${customTaxLabel || "НДС"}`;
+      },
       sum: "ИТОГО",
     },
     paymentInfo: {
@@ -521,10 +709,16 @@ export const TRANSLATIONS = {
       paymentDate: "Дата оплаты",
     },
     vatSummaryTable: {
-      vatRate: "Ставка НДС",
-      net: "Без НДС",
+      vatRate: ({ customTaxLabel }) => {
+        return `Ставка ${customTaxLabel || "НДС"}`;
+      },
+      net: ({ customTaxLabel }) => {
+        return `Без ${customTaxLabel || "НДС"}`;
+      },
       vat: "НДС",
-      preTax: "С НДС",
+      preTax: ({ customTaxLabel }) => {
+        return `С ${customTaxLabel || "НДС"}`;
+      },
       total: "Всего",
     },
     paymentTotals: {
@@ -580,11 +774,19 @@ export const TRANSLATIONS = {
       typeOfGTU: "Тип\n GTU",
       amount: "Кількість",
       unit: "Од.\n вим.",
-      netPrice: "Ціна без ПДВ",
+      netPrice: ({ customTaxLabel }) => {
+        return `Ціна без ${customTaxLabel || "ПДВ"}`;
+      },
       vat: "ПДВ",
-      netAmount: "Сума\n без ПДВ",
-      vatAmount: "Сума ПДВ",
-      preTaxAmount: "Сума з ПДВ",
+      netAmount: ({ customTaxLabel }) => {
+        return `Сума без ${customTaxLabel || "ПДВ"}`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Сума ${customTaxLabel || "ПДВ"}`;
+      },
+      preTaxAmount: ({ customTaxLabel }) => {
+        return `Сума з ${customTaxLabel || "ПДВ"}`;
+      },
       sum: "РАЗОМ",
     },
     paymentInfo: {
@@ -592,10 +794,16 @@ export const TRANSLATIONS = {
       paymentDate: "Дата оплати",
     },
     vatSummaryTable: {
-      vatRate: "Ставка ПДВ",
-      net: "Без ПДВ",
+      vatRate: ({ customTaxLabel }) => {
+        return `Ставка ${customTaxLabel || "ПДВ"}`;
+      },
+      net: ({ customTaxLabel }) => {
+        return `Без ${customTaxLabel || "ПДВ"}`;
+      },
       vat: "ПДВ",
-      preTax: "З ПДВ",
+      preTax: ({ customTaxLabel }) => {
+        return `З ${customTaxLabel || "ПДВ"}`;
+      },
       total: "Всього",
     },
     paymentTotals: {
@@ -651,11 +859,19 @@ export const TRANSLATIONS = {
       typeOfGTU: "Type\n GTU",
       amount: "Quantité",
       unit: "Unité",
-      netPrice: "Prix HT",
+      netPrice: () => {
+        return `Prix HT`;
+      },
       vat: "TVA",
-      netAmount: "Montant\n HT",
-      vatAmount: "Montant TVA",
-      preTaxAmount: "Montant TTC",
+      netAmount: () => {
+        return `Montant\n HT`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Montant de la ${customTaxLabel || "TVA"}`;
+      },
+      preTaxAmount: () => {
+        return `Total TTC`;
+      },
       sum: "TOTAL",
     },
     paymentInfo: {
@@ -663,10 +879,16 @@ export const TRANSLATIONS = {
       paymentDate: "Date de paiement",
     },
     vatSummaryTable: {
-      vatRate: "Taux TVA",
-      net: "HT",
+      vatRate: ({ customTaxLabel }) => {
+        return `Taux ${customTaxLabel || "TVA"}`;
+      },
+      net: () => {
+        return `HT`;
+      },
       vat: "TVA",
-      preTax: "TTC",
+      preTax: () => {
+        return `TTC`;
+      },
       total: "Total",
     },
     paymentTotals: {
@@ -722,11 +944,19 @@ export const TRANSLATIONS = {
       typeOfGTU: "Tipo\n GTU",
       amount: "Quantità",
       unit: "Unità",
-      netPrice: "Prezzo netto",
+      netPrice: () => {
+        return `Prezzo netto`;
+      },
       vat: "IVA",
-      netAmount: "Importo\n netto",
-      vatAmount: "Importo IVA",
-      preTaxAmount: "Importo lordo",
+      netAmount: () => {
+        return `Importo\n netto`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Importo ${customTaxLabel || "IVA"}`;
+      },
+      preTaxAmount: () => {
+        return `Importo lordo`;
+      },
       sum: "TOTALE",
     },
     paymentInfo: {
@@ -734,10 +964,16 @@ export const TRANSLATIONS = {
       paymentDate: "Data di pagamento",
     },
     vatSummaryTable: {
-      vatRate: "Aliquota IVA",
-      net: "Netto",
+      vatRate: ({ customTaxLabel }) => {
+        return `Aliquota ${customTaxLabel || "IVA"}`;
+      },
+      net: () => {
+        return `Netto`;
+      },
       vat: "IVA",
-      preTax: "Lordo",
+      preTax: () => {
+        return `Lordo`;
+      },
       total: "Totale",
     },
     paymentTotals: {
@@ -793,11 +1029,19 @@ export const TRANSLATIONS = {
       typeOfGTU: "GTU-type",
       amount: "Aantal",
       unit: "Eenheid",
-      netPrice: "Netto prijs",
+      netPrice: () => {
+        return `Netto prijs`;
+      },
       vat: "BTW",
-      netAmount: "Netto\n bedrag",
-      vatAmount: "BTW bedrag",
-      preTaxAmount: "Bruto bedrag",
+      netAmount: () => {
+        return `Nettobedrag`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "BTW"}-bedrag`;
+      },
+      preTaxAmount: () => {
+        return `Brutobedrag`;
+      },
       sum: "TOTAAL",
     },
     paymentInfo: {
@@ -805,10 +1049,16 @@ export const TRANSLATIONS = {
       paymentDate: "Betaaldatum",
     },
     vatSummaryTable: {
-      vatRate: "BTW-tarief",
-      net: "Netto",
+      vatRate: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "BTW"}-tarief`;
+      },
+      net: () => {
+        return `Netto`;
+      },
       vat: "BTW",
-      preTax: "Bruto",
+      preTax: () => {
+        return `Bruto`;
+      },
       total: "Totaal",
     },
     paymentTotals: {

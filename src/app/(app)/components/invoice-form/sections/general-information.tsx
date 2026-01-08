@@ -356,6 +356,14 @@ export const GeneralInformation = memo(function GeneralInformation({
                     "buyer.vatNoLabelText",
                     TRANSLATIONS[newLanguage].buyer.vatNo,
                   );
+
+                  const newTranslation =
+                    TRANSLATIONS[newLanguage].invoiceItemsTable.vat;
+
+                  // Update TAX LABEL TEXT (VAT/GST/etc.) when language changes
+                  // This ensures the tax column header in the invoice items table
+                  // displays the correct translation for the selected language
+                  setValue("taxLabelText", newTranslation);
                 }}
               >
                 {SUPPORTED_LANGUAGES.map((lang) => {

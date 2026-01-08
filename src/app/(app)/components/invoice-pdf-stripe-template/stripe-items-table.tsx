@@ -89,7 +89,7 @@ export function StripeItemsTable({
           : `${Number(item.vat)}%`;
 
         return (
-          <View style={styles.tableRow} key={index}>
+          <View style={[styles.tableRow]} key={index}>
             <View style={styles.colDescription}>
               <Text style={[styles.fontSize10]}>{item.name}</Text>
               {/* Add service period if available */}
@@ -114,9 +114,15 @@ export function StripeItemsTable({
                 </Text>
               </View>
             ) : null}
-            <View style={styles.colAmount}>
-              <Text style={[styles.fontSize11, styles.textDark]}>
-                {formattedPreTaxAmount}
+            <View style={[styles.colAmount]}>
+              <Text
+                style={[
+                  styles.fontSize11,
+                  styles.textDark,
+                  { paddingLeft: 10 },
+                ]}
+              >
+                {formattedPreTaxAmount.split("")}
               </Text>
             </View>
           </View>
