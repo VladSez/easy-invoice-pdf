@@ -1,5 +1,4 @@
 import { type InvoiceData } from "@/app/schema";
-import { STATIC_ASSETS_URL } from "@/config";
 import {
   Document,
   Font,
@@ -17,10 +16,10 @@ Font.register({
   family: fontFamily,
   fonts: [
     {
-      src: `${STATIC_ASSETS_URL}/open-sans-regular.ttf`,
+      src: `/pdf-fonts/open-sans-regular.ttf`,
     },
     {
-      src: `${STATIC_ASSETS_URL}/open-sans-700.ttf`,
+      src: `/pdf-fonts/open-sans-700.ttf`,
       fontWeight: 700,
     },
   ],
@@ -113,12 +112,12 @@ export const PDF_DEFAULT_TEMPLATE_STYLES = StyleSheet.create({
   },
   // styles for specific column widths for invoice items table
   colNo: { flex: 0.45 }, // smallest width for numbers
-  colName: { flex: 5 }, // larger width for text
+  colName: { flex: 4.8 }, // larger width for text
   colGTU: { flex: 0.9 }, // small width for codes
-  colAmount: { flex: 1.1 }, // medium width for numbers
+  colAmount: { flex: 1.2 }, // medium width for numbers
   colUnit: { flex: 1 }, // medium width for text
   colNetPrice: { flex: 1.5 }, // medium-large for prices
-  colVAT: { flex: 0.7 }, // small width for percentages
+  colVAT: { flex: 0.8 }, // small width for percentages
   colNetAmount: { flex: 1.5 }, // medium-large for amounts
   colVATAmount: { flex: 1.5 }, // medium-large for amounts
   colPreTaxAmount: { flex: 1.5 }, // medium-large for amounts

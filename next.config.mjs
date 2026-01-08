@@ -157,10 +157,26 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      // Redirect all /:locale/app requests to the root, because we changed the structure of the app
       {
-        source: "/:locale/app", // Redirect all /:locale/app requests to the root, because we changed the structure of the app
+        source: "/:locale/app",
         destination: "/",
         permanent: true,
+      },
+    ];
+  },
+
+  async headers() {
+    // Cache pdf fonts for 1 year in Browser
+    return [
+      {
+        source: "/pdf-fonts/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
       },
     ];
   },

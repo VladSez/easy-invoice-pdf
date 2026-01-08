@@ -19,7 +19,6 @@ import { StripeInvoiceInfo } from "./stripe-invoice-info";
 import { StripeItemsTable } from "./stripe-items-table";
 import { StripeSellerBuyerInfo } from "./stripe-seller-buyer-info";
 import { StripeTotals } from "./stripe-totals";
-import { STATIC_ASSETS_URL } from "@/config";
 import { formatCurrency } from "@/app/(app)/utils/format-currency";
 
 import "dayjs/locale/en";
@@ -40,17 +39,17 @@ Font.register({
   family: fontFamily,
   fonts: [
     {
-      src: `${STATIC_ASSETS_URL}/Inter-Regular.ttf`,
+      src: `/pdf-fonts/Inter-Regular.ttf`,
       fontWeight: 400,
       fontStyle: "normal",
     },
     {
-      src: `${STATIC_ASSETS_URL}/Inter-Medium.ttf`,
+      src: `/pdf-fonts/Inter-Medium.ttf`,
       fontWeight: 500,
       fontStyle: "normal",
     },
     {
-      src: `${STATIC_ASSETS_URL}/Inter-SemiBold.ttf`,
+      src: `/pdf-fonts/Inter-SemiBold.ttf`,
       fontWeight: 600,
       fontStyle: "normal",
     },
@@ -151,7 +150,7 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
   colQty: { flex: 0.8, textAlign: "center" },
   colUnitPrice: { flex: 1.2, textAlign: "right" },
   colTax: { flex: 0.8, textAlign: "right" },
-  colAmount: { flex: 1.2, textAlign: "right" },
+  colAmount: { flex: 1.3, textAlign: "right" },
   // Due amount highlight
   dueAmountBox: {
     backgroundColor: "#f9fafb",
