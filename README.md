@@ -1,12 +1,11 @@
 <div align="center">
 
-  <h3 align="center" style="font-size: 2rem;"><a href="https://easyinvoicepdf.com/?template=stripe&ref=github">EasyInvoicePDF</a></h3>
-  <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">
+  <h3 align="center" style="font-size: 3rem; margin-bottom: 15px;"><a href="https://easyinvoicepdf.com/?template=stripe&ref=github">EasyInvoicePDF</a></h3>
+  <a href="https://easyinvoicepdf.com/?template=stripe&ref=github" >
     <img src=".github/screenshots/easy-invoice-logo.svg" alt="Logo" width="80" height="80">
   </a>
   <p align="center" style="margin-top: 10px;">
        Free & Open-Source Invoice Generator
-    <br />
     <br />
     <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">App</a>
     ·
