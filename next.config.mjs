@@ -166,20 +166,20 @@ const nextConfig = {
     ];
   },
 
-  async headers() {
-    // Cache pdf fonts for 1 year in Browser
-    return [
-      {
-        source: "/pdf-fonts/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-    ];
-  },
+  // async headers() {
+  //   // Cache pdf fonts for 1 year in Browser
+  //   return [
+  //     {
+  //       source: "/pdf-fonts/:path*",
+  //       headers: [
+  //         {
+  //           key: "Cache-Control",
+  //           value: "public, max-age=31536000, immutable",
+  //         },
+  //       ],
+  //     },
+  //   ];
+  // },
 };
 
 export default withSentryConfig(withNextIntl(withMDX(nextConfig)), {

@@ -20,6 +20,7 @@ import { StripeItemsTable } from "./stripe-items-table";
 import { StripeSellerBuyerInfo } from "./stripe-seller-buyer-info";
 import { StripeTotals } from "./stripe-totals";
 import { formatCurrency } from "@/app/(app)/utils/format-currency";
+import { STATIC_ASSETS_URL } from "@/config";
 
 import "dayjs/locale/en";
 import "dayjs/locale/pl";
@@ -39,17 +40,17 @@ Font.register({
   family: fontFamily,
   fonts: [
     {
-      src: `/pdf-fonts/Inter-Regular.ttf`,
+      src: `${STATIC_ASSETS_URL}/Inter-Regular.ttf`,
       fontWeight: 400,
       fontStyle: "normal",
     },
     {
-      src: `/pdf-fonts/Inter-Medium.ttf`,
+      src: `${STATIC_ASSETS_URL}/Inter-Medium.ttf`,
       fontWeight: 500,
       fontStyle: "normal",
     },
     {
-      src: `/pdf-fonts/Inter-SemiBold.ttf`,
+      src: `${STATIC_ASSETS_URL}/Inter-SemiBold.ttf`,
       fontWeight: 600,
       fontStyle: "normal",
     },
