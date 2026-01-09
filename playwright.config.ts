@@ -32,7 +32,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 2 : undefined, // IMPORTANT: if tests are flaky locally, make `workers: 1` or `workers: 2`
+  workers: process.env.CI ? 1 : undefined, // IMPORTANT: if tests are flaky locally, make `workers: 1` or `workers: 2`
   /* timeout for expect assertions */
   expect: {
     timeout: isLocal ? 40_000 : 60_000,
