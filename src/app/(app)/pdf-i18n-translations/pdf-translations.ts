@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "./index";
+import {
+  SUPPORTED_LANGUAGES,
+  type SupportedLanguages,
+} from "../../schema/index";
 
 // Schema for seller translations
 const sellerTranslationSchema = z
@@ -197,15 +200,15 @@ const languageToSchemaMap = Object.fromEntries(
 /**
  *Schema for all translations
  **/
-export const translationsSchema = z.object(languageToSchemaMap);
+export const invoicePDFtranslationsSchema = z.object(languageToSchemaMap);
 
 // Type for a single language translation
 export type TranslationSchema = z.infer<typeof translationSchema>;
 
 // Type for all translations
-export type TranslationsSchema = z.infer<typeof translationsSchema>;
+export type TranslationsSchema = z.infer<typeof invoicePDFtranslationsSchema>;
 
-export const TRANSLATIONS = {
+export const INVOICE_PDF_TRANSLATIONS = {
   en: {
     invoiceNumber: "Invoice No. of",
     dateOfIssue: "Date of issue",

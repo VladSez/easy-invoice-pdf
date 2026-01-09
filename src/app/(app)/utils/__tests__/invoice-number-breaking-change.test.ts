@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { handleInvoiceNumberBreakingChange } from "../invoice-number-breaking-change";
 import { SUPPORTED_LANGUAGES, type InvoiceData } from "@/app/schema";
-import { TRANSLATIONS } from "@/app/schema/translations";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 
 // Mock the umami tracking function
 vi.mock("@/lib/umami-analytics-track-event", () => ({
@@ -29,7 +29,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
         language: "en",
         otherField: "preserved",
         invoiceNumberObject: {
-          label: `${TRANSLATIONS.en.invoiceNumber}:`,
+          label: `${INVOICE_PDF_TRANSLATIONS.en.invoiceNumber}:`,
           value: "INV-2024-001",
         },
       });
@@ -53,7 +53,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
       expect(result).toEqual({
         language: "pl",
         invoiceNumberObject: {
-          label: `${TRANSLATIONS.pl.invoiceNumber}:`,
+          label: `${INVOICE_PDF_TRANSLATIONS.pl.invoiceNumber}:`,
           value: "FAKT-001",
         },
       });
@@ -72,7 +72,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
       expect(result).toEqual({
         language: "de",
         invoiceNumberObject: {
-          label: `${TRANSLATIONS.de.invoiceNumber}:`,
+          label: `${INVOICE_PDF_TRANSLATIONS.de.invoiceNumber}:`,
           value: "RG-2024-001",
         },
       });
@@ -101,7 +101,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
         items: [{ name: "Product A", amount: 1 }],
         total: 100,
         invoiceNumberObject: {
-          label: `${TRANSLATIONS.en.invoiceNumber}:`,
+          label: `${INVOICE_PDF_TRANSLATIONS.en.invoiceNumber}:`,
           value: "123",
         },
       });
@@ -125,7 +125,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
       expect(result).toEqual({
         language: "invalid-lang",
         invoiceNumberObject: {
-          label: `${TRANSLATIONS[defaultLanguage].invoiceNumber}:`,
+          label: `${INVOICE_PDF_TRANSLATIONS[defaultLanguage].invoiceNumber}:`,
           value: "INV-001",
         },
       });
@@ -158,7 +158,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
       expect(result).toEqual({
         language: 123,
         invoiceNumberObject: {
-          label: `${TRANSLATIONS[defaultLanguage].invoiceNumber}:`,
+          label: `${INVOICE_PDF_TRANSLATIONS[defaultLanguage].invoiceNumber}:`,
           value: "INV-001",
         },
       });
@@ -219,7 +219,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
       expect(result).toEqual({
         language: "en",
         invoiceNumberObject: {
-          label: `${TRANSLATIONS.en.invoiceNumber}:`,
+          label: `${INVOICE_PDF_TRANSLATIONS.en.invoiceNumber}:`,
           value: "",
         },
       });
@@ -281,7 +281,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
       expect(result).toEqual({
         language: "en",
         invoiceNumberObject: {
-          label: `${TRANSLATIONS.en.invoiceNumber}:`,
+          label: `${INVOICE_PDF_TRANSLATIONS.en.invoiceNumber}:`,
           value: "OLD-001",
         },
       });
@@ -301,7 +301,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
         expect(result).toEqual({
           language: lang,
           invoiceNumberObject: {
-            label: `${TRANSLATIONS[lang].invoiceNumber}:`,
+            label: `${INVOICE_PDF_TRANSLATIONS[lang].invoiceNumber}:`,
             value: `INV-${lang}`,
           },
         });

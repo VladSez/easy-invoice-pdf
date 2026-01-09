@@ -1,42 +1,37 @@
-import { type InvoiceData } from "@/app/schema";
-import { TRANSLATIONS } from "@/app/schema/translations";
-import { PROD_WEBSITE_URL } from "@/config";
 import { Link, Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
+import { type InvoiceData } from "@/app/schema";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { PROD_WEBSITE_URL } from "@/config";
 import dayjs from "dayjs";
-import { formatCurrency } from "../../utils/format-currency";
-import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
-export function InvoiceFooter({
+import type { STRIPE_TEMPLATE_STYLES } from ".";
+
+export function StripeFooter({
   invoiceData,
+  formattedInvoiceTotal,
   styles,
 }: {
   invoiceData: InvoiceData;
-  styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
+  formattedInvoiceTotal: string;
+  styles: typeof STRIPE_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
-  const t = TRANSLATIONS[language];
+  const t = INVOICE_PDF_TRANSLATIONS[language];
 
   const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
+  const invoiceNumber = `${invoiceNumberValue}`;
 
   const paymentDueDate = dayjs(invoiceData.paymentDue).format(
     invoiceData.dateFormat,
   );
 
-  const invoiceTotal = invoiceData?.total;
-
-  const formattedInvoiceTotal = formatCurrency({
-    amount: invoiceTotal,
-    currency: invoiceData.currency,
-    language,
-  });
-
   return (
     <View style={styles.footer} fixed>
       <View style={styles.spaceBetween}>
         <View style={[styles.row, { gap: 3 }]}>
-          {invoiceNumberValue && (
+          {invoiceNumber && (
             <>
-              <Text style={[styles.fontSize8]}>{invoiceNumberValue}</Text>
+              <Text style={[styles.fontSize8]}>{invoiceNumber}</Text>
               <Text style={[styles.fontSize8]}>·</Text>
             </>
           )}

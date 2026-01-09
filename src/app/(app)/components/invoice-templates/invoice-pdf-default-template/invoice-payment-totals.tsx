@@ -1,7 +1,7 @@
 import { View, Text } from "@react-pdf/renderer/lib/react-pdf.browser";
 import type { InvoiceData } from "@/app/schema";
 
-import { TRANSLATIONS } from "@/app/schema/translations";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import {
   getAmountInWords,
   getNumberFractionalPart,
@@ -18,7 +18,7 @@ export function InvoicePaymentTotals({
   styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
-  const t = TRANSLATIONS[language];
+  const t = INVOICE_PDF_TRANSLATIONS[language];
 
   const invoiceTotalInWords = getAmountInWords({
     amount: invoiceData?.total ?? 0,

@@ -2,7 +2,7 @@ import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { type InvoiceData } from "@/app/schema";
 import dayjs from "dayjs";
 
-import { TRANSLATIONS } from "@/app/schema/translations";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
 export function InvoiceHeader({
@@ -13,7 +13,7 @@ export function InvoiceHeader({
   styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
-  const t = TRANSLATIONS[language];
+  const t = INVOICE_PDF_TRANSLATIONS[language];
 
   const dateOfIssue = dayjs(invoiceData.dateOfIssue).format(
     invoiceData.dateFormat,

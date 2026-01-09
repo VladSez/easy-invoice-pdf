@@ -1,20 +1,21 @@
-import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { formatCurrency } from "@/app/(app)/utils/format-currency";
 import type { InvoiceData } from "@/app/schema";
-import { TRANSLATIONS } from "@/app/schema/translations";
-import type { STRIPE_TEMPLATE_STYLES } from ".";
+import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import dayjs from "dayjs";
-import { formatCurrency } from "../../utils/format-currency";
 
-import "dayjs/locale/en";
-import "dayjs/locale/pl";
+import type { STRIPE_TEMPLATE_STYLES } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
+
 import "dayjs/locale/de";
+import "dayjs/locale/en";
 import "dayjs/locale/es";
-import "dayjs/locale/pt";
-import "dayjs/locale/ru";
-import "dayjs/locale/uk";
 import "dayjs/locale/fr";
 import "dayjs/locale/it";
 import "dayjs/locale/nl";
+import "dayjs/locale/pl";
+import "dayjs/locale/pt";
+import "dayjs/locale/ru";
+import "dayjs/locale/uk";
 
 export function StripeItemsTable({
   invoiceData,
@@ -24,7 +25,7 @@ export function StripeItemsTable({
   styles: typeof STRIPE_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
-  const t = TRANSLATIONS[language];
+  const t = INVOICE_PDF_TRANSLATIONS[language];
   const taxLabelText = invoiceData.taxLabelText || "VAT";
 
   // Set dayjs locale based on invoice language

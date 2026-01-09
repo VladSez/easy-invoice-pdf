@@ -1,8 +1,9 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { type InvoiceData } from "@/app/schema";
-import { TRANSLATIONS } from "@/app/schema/translations";
-import type { STRIPE_TEMPLATE_STYLES } from ".";
-import { formatCurrency } from "../../utils/format-currency";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { formatCurrency } from "@/app/(app)/utils/format-currency";
+
+import type { STRIPE_TEMPLATE_STYLES } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
 
 export function StripeTotals({
   invoiceData,
@@ -14,7 +15,7 @@ export function StripeTotals({
   styles: typeof STRIPE_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
-  const t = TRANSLATIONS[language];
+  const t = INVOICE_PDF_TRANSLATIONS[language];
   const taxLabelText = invoiceData.taxLabelText || "VAT";
 
   // Calculate subtotal (sum of all items)

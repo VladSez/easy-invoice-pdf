@@ -1,6 +1,6 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import type { InvoiceData } from "@/app/schema";
-import { TRANSLATIONS } from "@/app/schema/translations";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
 export function InvoiceVATSummaryTable({
@@ -13,7 +13,7 @@ export function InvoiceVATSummaryTable({
   styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
-  const t = TRANSLATIONS[language];
+  const t = INVOICE_PDF_TRANSLATIONS[language];
 
   /**
    * Custom tax label text i.e. "VAT", "Sales Tax", "IVA", "GST", etc.

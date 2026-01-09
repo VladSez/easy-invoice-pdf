@@ -1,5 +1,5 @@
 import { type InvoiceData } from "@/app/schema";
-import { TRANSLATIONS } from "@/app/schema/translations";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { InvoiceFooter } from "./invoice-footer";
 import { InvoiceHeader } from "./invoice-header";
@@ -10,6 +10,7 @@ import { InvoiceSellerBuyerInfo } from "./invoice-seller-buyer-info";
 import { InvoiceVATSummaryTable } from "./invoice-vat-summary-table";
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
+import dayjs from "dayjs";
 import "dayjs/locale/en";
 import "dayjs/locale/pl";
 import "dayjs/locale/de";
@@ -20,7 +21,6 @@ import "dayjs/locale/uk";
 import "dayjs/locale/fr";
 import "dayjs/locale/it";
 import "dayjs/locale/nl";
-import dayjs from "dayjs";
 
 export const InvoiceBody = ({
   invoiceData,
@@ -32,7 +32,7 @@ export const InvoiceBody = ({
   shouldLocaliseDates?: boolean;
 }) => {
   const language = invoiceData.language;
-  const t = TRANSLATIONS[language];
+  const t = INVOICE_PDF_TRANSLATIONS[language];
 
   if (shouldLocaliseDates) {
     dayjs.locale(language);

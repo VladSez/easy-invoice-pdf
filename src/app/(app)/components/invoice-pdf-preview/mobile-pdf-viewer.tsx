@@ -1,13 +1,15 @@
 "use client";
 
+import type { InvoiceData } from "@/app/schema";
 import { BlobProvider } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { Document, Page, pdfjs } from "react-pdf";
-import type { InvoiceData } from "@/app/schema";
-import { InvoicePdfTemplate } from "../invoice-pdf-template";
-import { StripeInvoicePdfTemplate } from "../invoice-pdf-stripe-template";
+
+import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
+import { StripeInvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
+
+import { BUG_REPORT_URL } from "@/config";
 import * as Sentry from "@sentry/nextjs";
 import { useMemo, useState } from "react";
-import { BUG_REPORT_URL } from "@/config";
 
 // https://github.com/wojtekmaj/react-pdf/issues/1822#issuecomment-2233334169
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;

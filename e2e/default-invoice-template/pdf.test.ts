@@ -1,5 +1,5 @@
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
-import { TRANSLATIONS } from "@/app/schema/translations";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -922,7 +922,7 @@ test.describe("Default Invoice Template", () => {
     await languageSelect.selectOption("pl");
 
     await expect(invoiceNumberLabelInput).toHaveValue(
-      `${TRANSLATIONS.pl.invoiceNumber}:`,
+      `${INVOICE_PDF_TRANSLATIONS.pl.invoiceNumber}:`,
     );
 
     // we mock the system time to a fixed date, so that the invoice number is consistent across tests
@@ -998,7 +998,7 @@ test.describe("Default Invoice Template", () => {
     await newLanguageSelect.selectOption("pt");
 
     await expect(newInvoiceNumberLabelInput).toHaveValue(
-      `${TRANSLATIONS.pt.invoiceNumber}:`,
+      `${INVOICE_PDF_TRANSLATIONS.pt.invoiceNumber}:`,
     );
 
     await newInvoiceNumberLabelInput.fill("Fatura TEST PORTUGUESE N°:");

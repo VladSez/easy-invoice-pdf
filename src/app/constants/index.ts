@@ -7,7 +7,7 @@ import {
   type SellerData,
   type BuyerData,
 } from "../schema";
-import { TRANSLATIONS } from "../schema/translations";
+import { INVOICE_PDF_TRANSLATIONS } from "../(app)/pdf-i18n-translations/pdf-translations";
 import dayjs from "dayjs";
 
 export const TODAY = dayjs().format("YYYY-MM-DD");
@@ -82,7 +82,7 @@ export const INITIAL_INVOICE_DATA = {
   stripePayOnlineUrl: "",
 
   invoiceNumberObject: {
-    label: `${TRANSLATIONS[EN].invoiceNumber}:`,
+    label: `${INVOICE_PDF_TRANSLATIONS[EN].invoiceNumber}:`,
     value: INVOICE_DEFAULT_NUMBER_VALUE,
   },
 

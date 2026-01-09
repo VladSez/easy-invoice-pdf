@@ -1,3 +1,5 @@
+import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
+import { StripeInvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
 import type { InvoiceData, MobileTabsValues } from "@/app/schema";
 import { DEFAULT_MOBILE_TAB, MOBILE_TABS_VALUES } from "@/app/schema";
 import { Button } from "@/components/ui/button";
@@ -7,11 +9,10 @@ import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import { AlertCircleIcon, FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
+
 import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
-import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
-import { InvoicePdfTemplate } from "./invoice-pdf-template";
 
 const DesktopPDFViewerModuleLoading = () => (
   <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">

@@ -27,7 +27,7 @@ import { SelectNative } from "@/components/ui/select-native";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { TRANSLATIONS } from "@/app/schema/translations";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import { Button } from "@/components/ui/button";
 import dayjs from "dayjs";
 import { AlertTriangle, Upload, X, InfoIcon } from "lucide-react";
@@ -95,7 +95,7 @@ export const GeneralInformation = memo(function GeneralInformation({
   const logo = useWatch({ control, name: "logo" });
   const selectedDateFormat = useWatch({ control, name: "dateFormat" });
 
-  const t = TRANSLATIONS[language];
+  const t = INVOICE_PDF_TRANSLATIONS[language];
   const defaultInvoiceNumber = `${t.invoiceNumber}:`;
 
   const isDateOfIssueNotToday = !dayjs(dateOfIssue).isSame(dayjs(), "day");
@@ -333,10 +333,10 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                   // Update INVOICE NUMBER and LABELS when language changes
                   const newLanguage = e.target
-                    .value as keyof typeof TRANSLATIONS;
+                    .value as keyof typeof INVOICE_PDF_TRANSLATIONS;
 
                   const newInvoiceNumberLabel =
-                    TRANSLATIONS[newLanguage].invoiceNumber;
+                    INVOICE_PDF_TRANSLATIONS[newLanguage].invoiceNumber;
 
                   // we need to keep the invoice number suffix (e.g. 1/MM-YYYY) for better user experience, when switching language
                   setValue(
@@ -348,17 +348,17 @@ export const GeneralInformation = memo(function GeneralInformation({
                   // Update SELLER VAT NO (Account Number) LABEL TEXT when language changes
                   setValue(
                     "seller.vatNoLabelText",
-                    TRANSLATIONS[newLanguage].seller.vatNo,
+                    INVOICE_PDF_TRANSLATIONS[newLanguage].seller.vatNo,
                   );
 
                   // Update BUYER VAT NO (Account Number) LABEL TEXT when language changes
                   setValue(
                     "buyer.vatNoLabelText",
-                    TRANSLATIONS[newLanguage].buyer.vatNo,
+                    INVOICE_PDF_TRANSLATIONS[newLanguage].buyer.vatNo,
                   );
 
                   const newTranslation =
-                    TRANSLATIONS[newLanguage].invoiceItemsTable.vat;
+                    INVOICE_PDF_TRANSLATIONS[newLanguage].invoiceItemsTable.vat;
 
                   // Update TAX LABEL TEXT (VAT/GST/etc.) when language changes
                   // This ensures the tax column header in the invoice items table

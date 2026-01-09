@@ -1,3 +1,5 @@
+import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
+import { StripeInvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
 import {
   LANGUAGE_TO_LABEL,
   type InvoiceData,
@@ -13,15 +15,12 @@ import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { LOADING_BUTTON_TEXT, LOADING_BUTTON_TIMEOUT } from "./invoice-form";
-import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
-import { InvoicePdfTemplate } from "./invoice-pdf-template";
 
-import { showRandomCTAToast } from "./cta-toasts";
 import { useDeviceContext } from "@/contexts/device-context";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
-import { CTA_TOAST_LAST_SHOWN_STORAGE_KEY } from "../hooks/use-show-random-cta-toast";
 import { useCTAToast } from "../contexts/cta-toast-context";
-import { CTA_TOAST_TIMEOUT } from "./cta-toasts";
+import { CTA_TOAST_LAST_SHOWN_STORAGE_KEY } from "../hooks/use-show-random-cta-toast";
+import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./cta-toasts";
 
 // Separate button states into a memoized component
 const ButtonContent = ({
