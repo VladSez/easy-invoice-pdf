@@ -101,9 +101,6 @@ importers:
       dayjs:
         specifier: 1.11.13
         version: 1.11.13
-      dotenv:
-        specifier: 17.2.3
-        version: 17.2.3
       eslint-plugin-react-hooks:
         specifier: 5.2.0
         version: 5.2.0(eslint@9.33.0(jiti@2.4.2))
@@ -210,6 +207,9 @@ importers:
       autoprefixer:
         specifier: 10.4.21
         version: 10.4.21(postcss@8.5.3)
+      dotenv:
+        specifier: 17.2.3
+        version: 17.2.3
       eslint:
         specifier: 9.33.0
         version: 9.33.0(jiti@2.4.2)
