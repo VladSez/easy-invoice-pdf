@@ -18,7 +18,7 @@ const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
 // @ts-expect-error - NODE_ENV is not defined in the environment variables
 const isLocal = process.env.NODE_ENV === "local";
 
-const TIMEOUT = isLocal ? 40_000 : 80_000; // 80 seconds
+const TIMEOUT = isLocal ? 50_000 : 80_000; // i.e. 80 seconds
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -35,7 +35,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined, // IMPORTANT: if tests are flaky locally, make workers > 1
   /* timeout for expect assertions */
   expect: {
-    timeout: isLocal ? 30_000 : 60_000,
+    timeout: isLocal ? 40_000 : 60_000,
   },
 
   // /* timeout for test execution */

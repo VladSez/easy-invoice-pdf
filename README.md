@@ -95,8 +95,8 @@ By using this software, you agree to the terms of the applicable license.
 
 ## 👨‍💻 Made By
 
-Created and maintained by [Vlad Sazon](https://vladsazon.com)
+Created and maintained by [Vlad Sazonau](https://vladsazon.com)
 
 - 🐦 Twitter: [@vladsazonau](https://twitter.com/vladsazonau)
-- 💼 LinkedIn: [Vlad Sazon](https://www.linkedin.com/in/vlad-sazonau-22a9a9126/)
+- 💼 LinkedIn: [Vlad Sazonau](https://www.linkedin.com/in/vlad-sazonau-22a9a9126/)
 - 🌐 Website: [vladsazon.com](https://vladsazon.com)
