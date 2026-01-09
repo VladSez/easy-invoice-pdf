@@ -1,11 +1,10 @@
 <div align="center">
+
+  <h3 align="center" style="font-size: 2rem;"><a href="https://easyinvoicepdf.com/?template=stripe&ref=github">EasyInvoicePDF</a></h3>
   <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">
     <img src=".github/screenshots/easy-invoice-logo.svg" alt="Logo" width="80" height="80">
   </a>
-
-  <h3 align="center"><a href="https://easyinvoicepdf.com/?template=stripe&ref=github">EasyInvoicePDF</a></h3>
-
-  <p align="center">
+  <p align="center" style="margin-top: 10px;">
        Free & Open-Source Invoice Generator
     <br />
     <br />
@@ -14,8 +13,10 @@
     <a href="https://easyinvoicepdf.com/en/about?ref=github">Landing Page</a>
     ·
     <a href="https://github.com/VladSez/easy-invoice-pdf/releases">Releases</a>
-
   </p>
+  <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">
+    <img width="1440" height="769" alt="stripe template" src=".github/screenshots/stripe-template.png" />
+  </a>
 </div>
 
 ## Introduction
@@ -23,8 +24,6 @@
 **EasyInvoicePDF** is a Free & Open-Source Invoice Generator. Create professional invoices instantly in your browser with **Live Preview**, **Multiple Templates** (including a Stripe-style design). **No Sign-Up Required**.
 
 Visit the app website at [EasyInvoicePDF.com](https://easyinvoicepdf.com/?template=stripe&ref=github)
-
-<img width="1440" height="769" alt="stripe template" src=".github/screenshots/stripe-template.png" />
 
 <img width="1440" height="769" alt="stripe template" src=".github/screenshots/default-template.png" />
 
@@ -48,7 +47,12 @@ https://github.com/user-attachments/assets/9e3194e0-3072-4c95-ae99-e66db1301dc6
 
 ## ❤️ Support the Project
 
-If you find EasyInvoicePDF useful, consider supporting the creator and project by [buying me a coffee](https://buymeacoffee.com/vladsazon) 🙏
+If you find EasyInvoicePDF useful, please consider:
+
+- ⭐ **Star this repository** on GitHub to show your support
+- ☕ [Buy me a coffee](https://buymeacoffee.com/vladsazon) to support the [creator](https://vladsazon.com)
+
+Your support helps keep this project free and open-source 🙏
 
 ## Tech Stack
 
@@ -88,3 +92,11 @@ This project is dual-licensed:
 - **Commercial license** (for proprietary use): contact [vlad@mail.easyinvoicepdf.com](mailto:vlad@mail.easyinvoicepdf.com)
 
 By using this software, you agree to the terms of the applicable license.
+
+## 👨‍💻 Made By
+
+Created and maintained by [Vlad Sazon](https://vladsazon.com)
+
+- 🐦 Twitter: [@vladsazonau](https://twitter.com/vladsazonau)
+- 💼 LinkedIn: [Vlad Sazon](https://www.linkedin.com/in/vlad-sazonau-22a9a9126/)
+- 🌐 Website: [vladsazon.com](https://vladsazon.com)
