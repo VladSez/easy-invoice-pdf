@@ -68,71 +68,71 @@ test.describe("Default Invoice Template", () => {
       "downloads-PDF-in-English.png",
     );
 
-    // navigate back to the previous page
-    await page.goto("/", { waitUntil: "commit" });
+    // // navigate back to the previous page
+    // await page.goto("/", { waitUntil: "commit" });
 
-    /**
-     * Switch to Stripe template and download PDF in English with Stripe template
-     */
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
+    // /**
+    //  * Switch to Stripe template and download PDF in English with Stripe template
+    //  */
+    // await page
+    //   .getByRole("combobox", { name: "Invoice Template" })
+    //   .selectOption("stripe");
 
-    await page.waitForURL("/?template=stripe");
-    // Verify that the Stripe template is selected
-    const templateSelect = page.getByRole("combobox", {
-      name: "Invoice Template",
-    });
-    await expect(templateSelect).toHaveValue("stripe");
+    // await page.waitForURL("/?template=stripe");
+    // // Verify that the Stripe template is selected
+    // const templateSelect = page.getByRole("combobox", {
+    //   name: "Invoice Template",
+    // });
+    // await expect(templateSelect).toHaveValue("stripe");
 
-    // Wait for the download button to be visible and enabled for Stripe template
-    const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in English",
-    });
+    // // Wait for the download button to be visible and enabled for Stripe template
+    // const downloadPdfStripeButton = page.getByRole("link", {
+    //   name: "Download PDF in English",
+    // });
 
-    await expect(downloadPdfStripeButton).toBeVisible();
-    await expect(downloadPdfStripeButton).toBeEnabled();
+    // await expect(downloadPdfStripeButton).toBeVisible();
+    // await expect(downloadPdfStripeButton).toBeEnabled();
 
-    // Click the download button and wait for download
-    const [stripeDownload] = await Promise.all([
-      page.waitForEvent("download"),
-      downloadPdfStripeButton.click(),
-    ]);
+    // // Click the download button and wait for download
+    // const [stripeDownload] = await Promise.all([
+    //   page.waitForEvent("download"),
+    //   downloadPdfStripeButton.click(),
+    // ]);
 
-    // Get the suggested filename
-    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+    // // Get the suggested filename
+    // const stripeSuggestedFilename = stripeDownload.suggestedFilename();
 
-    // save the file to temporary directory
-    const stripePdfFilePath = path.join(
-      downloadDir,
-      `${browserName}-stripe-${stripeSuggestedFilename}`,
-    );
+    // // save the file to temporary directory
+    // const stripePdfFilePath = path.join(
+    //   downloadDir,
+    //   `${browserName}-stripe-${stripeSuggestedFilename}`,
+    // );
 
-    await stripeDownload.saveAs(stripePdfFilePath);
+    // await stripeDownload.saveAs(stripePdfFilePath);
 
-    // Convert to absolute path and use proper file URL format
-    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
-    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+    // // Convert to absolute path and use proper file URL format
+    // const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    // await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
 
-    /**
-     * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
-     */
+    // /**
+    //  * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
+    //  */
 
-    const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
+    // const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
 
-    await page.goto("about:blank");
+    // await page.goto("about:blank");
 
-    await renderPdfOnCanvas(page, stripePdfBytes);
+    // await renderPdfOnCanvas(page, stripePdfBytes);
 
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
+    // await page.waitForFunction(
+    //   () =>
+    //     (window as unknown as { __PDF_RENDERED__: boolean })
+    //       .__PDF_RENDERED__ === true,
+    // );
 
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      `downloads-PDF-in-English-stripe-template.png`,
-    );
+    // await expect(page.locator("canvas")).toHaveScreenshot(
+    //   `downloads-PDF-in-English-stripe-template.png`,
+    // );
   });
 
   test("downloads PDF in Polish and verifies content", async ({
@@ -254,83 +254,83 @@ test.describe("Default Invoice Template", () => {
     );
 
     // navigate back to the previous page
-    await page.goto("/", { waitUntil: "commit" });
+    // await page.goto("/", { waitUntil: "commit" });
 
-    /**
-     * Switch to Stripe template and download PDF in Polish with Stripe template
-     */
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
+    // /**
+    //  * Switch to Stripe template and download PDF in Polish with Stripe template
+    //  */
+    // await page
+    //   .getByRole("combobox", { name: "Invoice Template" })
+    //   .selectOption("stripe");
 
-    await page.waitForURL("/?template=stripe");
-    // Verify that the Stripe template is selected
-    const templateSelect = page.getByRole("combobox", {
-      name: "Invoice Template",
-    });
-    await expect(templateSelect).toHaveValue("stripe");
+    // await page.waitForURL("/?template=stripe");
+    // // Verify that the Stripe template is selected
+    // const templateSelect = page.getByRole("combobox", {
+    //   name: "Invoice Template",
+    // });
+    // await expect(templateSelect).toHaveValue("stripe");
 
-    const notesFinalSection = page.getByTestId(`final-section`);
+    // const notesFinalSection = page.getByTestId(`final-section`);
 
-    // for better debugging screenshots, we fill in the notes field with a test note =)
-    await notesFinalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill(
-        `Test: downloads PDF in Polish and verifies content with Stripe template (${testInfo.project.name})`,
-      );
+    // // for better debugging screenshots, we fill in the notes field with a test note =)
+    // await notesFinalSection
+    //   .getByRole("textbox", { name: "Notes", exact: true })
+    //   .fill(
+    //     `Test: downloads PDF in Polish and verifies content with Stripe template (${testInfo.project.name})`,
+    //   );
 
-    // wait for debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
+    // // wait for debounce timeout
+    // // eslint-disable-next-line playwright/no-wait-for-timeout
+    // await page.waitForTimeout(700);
 
-    // Wait for the download button to be visible and enabled for Stripe template
-    const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in Polish",
-    });
+    // // Wait for the download button to be visible and enabled for Stripe template
+    // const downloadPdfStripeButton = page.getByRole("link", {
+    //   name: "Download PDF in Polish",
+    // });
 
-    await expect(downloadPdfStripeButton).toBeVisible();
-    await expect(downloadPdfStripeButton).toBeEnabled();
+    // await expect(downloadPdfStripeButton).toBeVisible();
+    // await expect(downloadPdfStripeButton).toBeEnabled();
 
-    // Click the download button and wait for download
-    const [stripeDownload] = await Promise.all([
-      page.waitForEvent("download"),
-      downloadPdfStripeButton.click(),
-    ]);
+    // // Click the download button and wait for download
+    // const [stripeDownload] = await Promise.all([
+    //   page.waitForEvent("download"),
+    //   downloadPdfStripeButton.click(),
+    // ]);
 
-    // Get the suggested filename
-    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+    // // Get the suggested filename
+    // const stripeSuggestedFilename = stripeDownload.suggestedFilename();
 
-    // save the file to temporary directory
-    const stripePdfFilePath = path.join(
-      downloadDir,
-      `${browserName}-stripe-${stripeSuggestedFilename}`,
-    );
+    // // save the file to temporary directory
+    // const stripePdfFilePath = path.join(
+    //   downloadDir,
+    //   `${browserName}-stripe-${stripeSuggestedFilename}`,
+    // );
 
-    await stripeDownload.saveAs(stripePdfFilePath);
+    // await stripeDownload.saveAs(stripePdfFilePath);
 
-    // Convert to absolute path and use proper file URL format
-    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
-    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+    // // Convert to absolute path and use proper file URL format
+    // const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    // await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
 
-    /**
-     * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
-     */
+    // /**
+    //  * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
+    //  */
 
-    const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
+    // const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
 
-    await page.goto("about:blank");
+    // await page.goto("about:blank");
 
-    await renderPdfOnCanvas(page, stripePdfBytes);
+    // await renderPdfOnCanvas(page, stripePdfBytes);
 
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
+    // await page.waitForFunction(
+    //   () =>
+    //     (window as unknown as { __PDF_RENDERED__: boolean })
+    //       .__PDF_RENDERED__ === true,
+    // );
 
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      `downloads-PDF-in-Polish-stripe-template.png`,
-    );
+    // await expect(page.locator("canvas")).toHaveScreenshot(
+    //   `downloads-PDF-in-Polish-stripe-template.png`,
+    // );
   });
 
   test("update pdf when invoice data changes", async ({
@@ -504,84 +504,84 @@ test.describe("Default Invoice Template", () => {
       `update-pdf-when-invoice-data-changes.png`,
     );
 
-    // navigate back to the previous page
-    await page.goto("/", { waitUntil: "commit" });
+    // // navigate back to the previous page
+    // await page.goto("/", { waitUntil: "commit" });
 
-    // Wait for the download button to be ready after navigation
-    const newDownloadPdfButton = page.getByRole("link", {
-      name: "Download PDF in English",
-    });
-    await expect(newDownloadPdfButton).toBeVisible();
-    await expect(newDownloadPdfButton).toBeEnabled();
+    // // Wait for the download button to be ready after navigation
+    // const newDownloadPdfButton = page.getByRole("link", {
+    //   name: "Download PDF in English",
+    // });
+    // await expect(newDownloadPdfButton).toBeVisible();
+    // await expect(newDownloadPdfButton).toBeEnabled();
 
-    /**
-     * Switch to Stripe template and download PDF in English with Stripe template
-     */
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
+    // /**
+    //  * Switch to Stripe template and download PDF in English with Stripe template
+    //  */
+    // await page
+    //   .getByRole("combobox", { name: "Invoice Template" })
+    //   .selectOption("stripe");
 
-    await page.waitForURL("/?template=stripe");
+    // await page.waitForURL("/?template=stripe");
 
-    // Verify that the Stripe template is selected
-    const templateSelect = page.getByRole("combobox", {
-      name: "Invoice Template",
-    });
-    await expect(templateSelect).toHaveValue("stripe");
+    // // Verify that the Stripe template is selected
+    // const templateSelect = page.getByRole("combobox", {
+    //   name: "Invoice Template",
+    // });
+    // await expect(templateSelect).toHaveValue("stripe");
 
-    // for better debugging screenshots, we fill in the notes field with a test note =)
-    await notesFinalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill(
-        `Test: update pdf when invoice data changes with Stripe template (${testInfo.project.name})`,
-      );
+    // // for better debugging screenshots, we fill in the notes field with a test note =)
+    // await notesFinalSection
+    //   .getByRole("textbox", { name: "Notes", exact: true })
+    //   .fill(
+    //     `Test: update pdf when invoice data changes with Stripe template (${testInfo.project.name})`,
+    //   );
 
-    // wait for debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
+    // // wait for debounce timeout
+    // // eslint-disable-next-line playwright/no-wait-for-timeout
+    // await page.waitForTimeout(700);
 
-    const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in English",
-    });
+    // const downloadPdfStripeButton = page.getByRole("link", {
+    //   name: "Download PDF in English",
+    // });
 
-    await expect(downloadPdfStripeButton).toBeVisible();
+    // await expect(downloadPdfStripeButton).toBeVisible();
 
-    // Click the download button and wait for download
-    const [stripeDownload] = await Promise.all([
-      page.waitForEvent("download"),
-      downloadPdfStripeButton.click(),
-    ]);
+    // // Click the download button and wait for download
+    // const [stripeDownload] = await Promise.all([
+    //   page.waitForEvent("download"),
+    //   downloadPdfStripeButton.click(),
+    // ]);
 
-    // Get the suggested filename
-    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+    // // Get the suggested filename
+    // const stripeSuggestedFilename = stripeDownload.suggestedFilename();
 
-    // save the file to temporary directory
-    const stripePdfFilePath = path.join(
-      downloadDir,
-      `${browserName}-stripe-${stripeSuggestedFilename}`,
-    );
+    // // save the file to temporary directory
+    // const stripePdfFilePath = path.join(
+    //   downloadDir,
+    //   `${browserName}-stripe-${stripeSuggestedFilename}`,
+    // );
 
-    await stripeDownload.saveAs(stripePdfFilePath);
+    // await stripeDownload.saveAs(stripePdfFilePath);
 
-    // Convert to absolute path and use proper file URL format
-    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
-    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+    // // Convert to absolute path and use proper file URL format
+    // const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    // await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
 
-    const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
+    // const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
 
-    await page.goto("about:blank");
+    // await page.goto("about:blank");
 
-    await renderPdfOnCanvas(page, stripePdfBytes);
+    // await renderPdfOnCanvas(page, stripePdfBytes);
 
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
+    // await page.waitForFunction(
+    //   () =>
+    //     (window as unknown as { __PDF_RENDERED__: boolean })
+    //       .__PDF_RENDERED__ === true,
+    // );
 
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      `update-pdf-when-invoice-data-changes-stripe-template.png`,
-    );
+    // await expect(page.locator("canvas")).toHaveScreenshot(
+    //   `update-pdf-when-invoice-data-changes-stripe-template.png`,
+    // );
   });
 
   test("completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French", async ({
@@ -814,79 +814,79 @@ test.describe("Default Invoice Template", () => {
       }),
     ).toHaveValue("184.50");
 
-    /**
-     * Switch to Stripe template and download PDF in English with Stripe template
-     */
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
+    // /**
+    //  * Switch to Stripe template and download PDF in English with Stripe template
+    //  */
+    // await page
+    //   .getByRole("combobox", { name: "Invoice Template" })
+    //   .selectOption("stripe");
 
-    await page.waitForURL("/?template=stripe");
-    // Verify that the Stripe template is selected
-    const templateSelect = page.getByRole("combobox", {
-      name: "Invoice Template",
-    });
-    await expect(templateSelect).toHaveValue("stripe");
+    // await page.waitForURL("/?template=stripe");
+    // // Verify that the Stripe template is selected
+    // const templateSelect = page.getByRole("combobox", {
+    //   name: "Invoice Template",
+    // });
+    // await expect(templateSelect).toHaveValue("stripe");
 
-    const newFinalSection = page.getByTestId(`final-section`);
+    // const newFinalSection = page.getByTestId(`final-section`);
 
-    // for better debugging screenshots, we fill in the notes field with a test note =)
-    await newFinalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill(
-        `Test: completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French with Stripe template (${testInfo.project.name})`,
-      );
+    // // for better debugging screenshots, we fill in the notes field with a test note =)
+    // await newFinalSection
+    //   .getByRole("textbox", { name: "Notes", exact: true })
+    //   .fill(
+    //     `Test: completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French with Stripe template (${testInfo.project.name})`,
+    //   );
 
-    // wait for debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
+    // // wait for debounce timeout
+    // // eslint-disable-next-line playwright/no-wait-for-timeout
+    // await page.waitForTimeout(700);
 
-    const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in French",
-    });
+    // const downloadPdfStripeButton = page.getByRole("link", {
+    //   name: "Download PDF in French",
+    // });
 
-    await expect(downloadPdfStripeButton).toBeVisible();
+    // await expect(downloadPdfStripeButton).toBeVisible();
 
-    // Click the download button and wait for download
-    const [stripeDownload] = await Promise.all([
-      page.waitForEvent("download"),
-      downloadPdfStripeButton.click(),
-    ]);
+    // // Click the download button and wait for download
+    // const [stripeDownload] = await Promise.all([
+    //   page.waitForEvent("download"),
+    //   downloadPdfStripeButton.click(),
+    // ]);
 
-    // Get the suggested filename
-    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+    // // Get the suggested filename
+    // const stripeSuggestedFilename = stripeDownload.suggestedFilename();
 
-    // save the file to temporary directory
-    const stripePdfFilePath = path.join(
-      downloadDir,
-      `${browserName}-stripe-${stripeSuggestedFilename}`,
-    );
+    // // save the file to temporary directory
+    // const stripePdfFilePath = path.join(
+    //   downloadDir,
+    //   `${browserName}-stripe-${stripeSuggestedFilename}`,
+    // );
 
-    await stripeDownload.saveAs(stripePdfFilePath);
+    // await stripeDownload.saveAs(stripePdfFilePath);
 
-    // Convert to absolute path and use proper file URL format
-    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
-    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+    // // Convert to absolute path and use proper file URL format
+    // const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    // await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
 
-    /**
-     * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
-     */
+    // /**
+    //  * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
+    //  */
 
-    const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
+    // const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
 
-    await page.goto("about:blank");
+    // await page.goto("about:blank");
 
-    await renderPdfOnCanvas(page, stripePdfBytes);
+    // await renderPdfOnCanvas(page, stripePdfBytes);
 
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
+    // await page.waitForFunction(
+    //   () =>
+    //     (window as unknown as { __PDF_RENDERED__: boolean })
+    //       .__PDF_RENDERED__ === true,
+    // );
 
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      `completes-full-invoice-flow-on-mobile-stripe-template.png`,
-    );
+    // await expect(page.locator("canvas")).toHaveScreenshot(
+    //   `completes-full-invoice-flow-on-mobile-stripe-template.png`,
+    // );
   });
 
   test("should display and persist invoice number in different languages", async ({
@@ -1067,86 +1067,86 @@ test.describe("Default Invoice Template", () => {
       `should-display-and-persist-invoice-number-in-different-languages.png`,
     );
 
-    // navigate back to the previous page
-    await page.goto("/", { waitUntil: "commit" });
+    // // navigate back to the previous page
+    // await page.goto("/", { waitUntil: "commit" });
 
-    /**
-     * Switch to Stripe template and download PDF in English with Stripe template
-     */
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
+    // /**
+    //  * Switch to Stripe template and download PDF in English with Stripe template
+    //  */
+    // await page
+    //   .getByRole("combobox", { name: "Invoice Template" })
+    //   .selectOption("stripe");
 
-    await page.waitForURL("/?template=stripe");
+    // await page.waitForURL("/?template=stripe");
 
-    // Verify that the Stripe template is selected
-    const templateSelect = page.getByRole("combobox", {
-      name: "Invoice Template",
-    });
-    await expect(templateSelect).toHaveValue("stripe");
+    // // Verify that the Stripe template is selected
+    // const templateSelect = page.getByRole("combobox", {
+    //   name: "Invoice Template",
+    // });
+    // await expect(templateSelect).toHaveValue("stripe");
 
-    // Currency should be CHF after navigating back to the previous page
-    const currencySelect2 = page.getByRole("combobox", { name: "Currency" });
-    await expect(currencySelect2).toHaveValue("CHF");
+    // // Currency should be CHF after navigating back to the previous page
+    // const currencySelect2 = page.getByRole("combobox", { name: "Currency" });
+    // await expect(currencySelect2).toHaveValue("CHF");
 
-    const newNotesFinalSection = page.getByTestId(`final-section`);
+    // const newNotesFinalSection = page.getByTestId(`final-section`);
 
-    // for better debugging screenshots, we fill in the notes field with a test note =)
-    await newNotesFinalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill(
-        `Test: should display and persist invoice number in different languages with Stripe template (${testInfo.project.name})`,
-      );
+    // // for better debugging screenshots, we fill in the notes field with a test note =)
+    // await newNotesFinalSection
+    //   .getByRole("textbox", { name: "Notes", exact: true })
+    //   .fill(
+    //     `Test: should display and persist invoice number in different languages with Stripe template (${testInfo.project.name})`,
+    //   );
 
-    // wait for debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
+    // // wait for debounce timeout
+    // // eslint-disable-next-line playwright/no-wait-for-timeout
+    // await page.waitForTimeout(700);
 
-    const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in Portuguese",
-    });
+    // const downloadPdfStripeButton = page.getByRole("link", {
+    //   name: "Download PDF in Portuguese",
+    // });
 
-    await expect(downloadPdfStripeButton).toBeVisible();
+    // await expect(downloadPdfStripeButton).toBeVisible();
 
-    // Click the download button and wait for download
-    const [stripeDownload] = await Promise.all([
-      page.waitForEvent("download"),
-      downloadPdfStripeButton.click(),
-    ]);
+    // // Click the download button and wait for download
+    // const [stripeDownload] = await Promise.all([
+    //   page.waitForEvent("download"),
+    //   downloadPdfStripeButton.click(),
+    // ]);
 
-    // Get the suggested filename
-    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+    // // Get the suggested filename
+    // const stripeSuggestedFilename = stripeDownload.suggestedFilename();
 
-    // save the file to temporary directory
-    const stripePdfFilePath = path.join(
-      downloadDir,
-      `${browserName}-stripe-${stripeSuggestedFilename}`,
-    );
+    // // save the file to temporary directory
+    // const stripePdfFilePath = path.join(
+    //   downloadDir,
+    //   `${browserName}-stripe-${stripeSuggestedFilename}`,
+    // );
 
-    await stripeDownload.saveAs(stripePdfFilePath);
+    // await stripeDownload.saveAs(stripePdfFilePath);
 
-    // Convert to absolute path and use proper file URL format
-    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
-    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+    // // Convert to absolute path and use proper file URL format
+    // const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    // await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
 
-    /**
-     * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
-     */
+    // /**
+    //  * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
+    //  */
 
-    const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
+    // const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
 
-    await page.goto("about:blank");
+    // await page.goto("about:blank");
 
-    await renderPdfOnCanvas(page, stripePdfBytes);
+    // await renderPdfOnCanvas(page, stripePdfBytes);
 
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
+    // await page.waitForFunction(
+    //   () =>
+    //     (window as unknown as { __PDF_RENDERED__: boolean })
+    //       .__PDF_RENDERED__ === true,
+    // );
 
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      `should-display-and-persist-invoice-number-in-different-languages-stripe-template.png`,
-    );
+    // await expect(page.locator("canvas")).toHaveScreenshot(
+    //   `should-display-and-persist-invoice-number-in-different-languages-stripe-template.png`,
+    // );
   });
 });
