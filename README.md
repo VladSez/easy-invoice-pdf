@@ -1,31 +1,20 @@
 <div align="center">
-
-  <h3 align="center" style="font-size: 30px; margin-bottom: 15px;"><a href="https://easyinvoicepdf.com/?template=stripe&ref=github">EasyInvoicePDF</a></h3>
-  <a href="https://easyinvoicepdf.com/?template=stripe&ref=github" >
-    <img src=".github/screenshots/easy-invoice-logo.svg" alt="Logo" width="80" height="80">
-  </a>
-  <p align="center" style="margin-top: 10px;">
-       Free & Open-Source Invoice Generator
-    <div>
-      <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">App</a>
+  <img src=".github/screenshots/easy-invoice-logo.svg" alt="EasyInvoicePDF Logo" width="80" height="80">
+  <h1>EasyInvoicePDF</h1>
+  <p><strong>Free & Open-Source Invoice Generator</strong></p>
+  <p>Create professional invoices instantly in your browser with <strong>Live Preview</strong>, <strong>Multiple Templates</strong> (including a Stripe-style design). <strong>No Sign-Up Required</strong>.</p>
+  
+  <p>
+      <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">Get Started</a>
       ·
       <a href="https://easyinvoicepdf.com/en/about?ref=github">About</a>
       ·
       <a href="https://github.com/VladSez/easy-invoice-pdf/releases">Releases</a>
-    </div>
-  </p>
+    </p>
   <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">
-    <img width="1440" height="769" alt="stripe template" src=".github/screenshots/stripe-template.png" />
+    <img width="1440" height="769" alt="EasyInvoicePDF Product Screenshot" src=".github/screenshots/stripe-template.png" />
   </a>
 </div>
-
-## Introduction
-
-**EasyInvoicePDF** is a Free & Open-Source Invoice Generator. Create professional invoices instantly in your browser with **Live Preview**, **Multiple Templates** (including a Stripe-style design). **No Sign-Up Required**.
-
-Start creating invoices at [EasyInvoicePDF.com](https://easyinvoicepdf.com/?template=stripe&ref=github)
-
-<img width="1440" height="769" alt="stripe template" src=".github/screenshots/default-template.png" />
 
 ## ✨ Key Features
 
@@ -38,6 +27,8 @@ Start creating invoices at [EasyInvoicePDF.com](https://easyinvoicepdf.com/?temp
 - 💰 **Flexible Tax Support**: VAT, GST, Sales Tax, and custom tax formats with automatic calculations
 - 🌍 **Multi-Language**: Support for 10+ languages and all major currencies
 - 📱 **Mobile-Friendly**: Create invoices on the go from any device
+
+<img width="1440" height="769" alt="EasyInvoicePDF Default Template Screenshot" src=".github/screenshots/default-template.png" />
 
 ## 🎥 Demo Video
 
