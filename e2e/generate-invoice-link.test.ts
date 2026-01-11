@@ -282,7 +282,7 @@ test.describe("Generate Invoice Link", () => {
     // Verify error description is shown
     await expect(
       page.getByText(
-        "Please verify that you have copied the complete invoice URL. The link may be truncated or corrupted.",
+        "Please verify that you have copied the complete invoice URL. The link may be truncated or corrupted. Try refreshing the page and generating a new link.",
       ),
     ).toBeVisible();
 
@@ -302,7 +302,7 @@ test.describe("Generate Invoice Link", () => {
 
     await expect(
       page.getByText(
-        "Please verify that you have copied the complete invoice URL. The link may be truncated or corrupted.",
+        "Please verify that you have copied the complete invoice URL. The link may be truncated or corrupted. Try refreshing the page and generating a new link.",
       ),
     ).toBeHidden();
 

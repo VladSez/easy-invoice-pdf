@@ -314,7 +314,8 @@ export function AppPageClient({
                 <div className="flex flex-col gap-2">
                   <p className="">
                     Please verify that you have copied the complete invoice URL.
-                    The link may be truncated or corrupted.
+                    The link may be truncated or corrupted. Try refreshing the
+                    page and generating a new link.
                   </p>
                   <Button
                     variant="outline"
