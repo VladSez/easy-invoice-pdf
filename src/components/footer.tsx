@@ -114,7 +114,7 @@ export function Footer({
           <p className="text-sm text-slate-700">
             {translations.footerCreatedBy}{" "}
             <Link
-              href="https://vladsazon.com"
+              href={TWITTER_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="underline hover:text-black"

@@ -13,6 +13,7 @@ import dynamic from "next/dynamic";
 import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
+import { TWITTER_URL } from "@/config";
 
 const DesktopPDFViewerModuleLoading = () => (
   <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
@@ -244,11 +245,11 @@ export function InvoiceClientPage({
               {invoiceLastUpdatedAtFormatted}
             </div>
           )}
-          <div className="mt-5 flex w-full justify-center">
+          <div className="mt-3 flex w-full justify-center">
             <span className="inline-block text-sm text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
               Made by{" "}
               <a
-                href="https://vladsazon.com"
+                href={TWITTER_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:text-black"
@@ -262,7 +263,7 @@ export function InvoiceClientPage({
         // Desktop View
         <>
           <div className="col-span-4">
-            <div className="h-[620px] overflow-auto border-b px-3 pl-0 2xl:h-[700px]">
+            <div className="h-[620px] overflow-auto border-b px-3 pl-0 shadow-[0_4px_6px_-4px_rgba(0,0,0,0.1)] 2xl:h-[700px]">
               <InvoiceForm
                 invoiceData={invoiceDataState}
                 handleInvoiceDataChange={handleInvoiceDataChange}
@@ -270,10 +271,10 @@ export function InvoiceClientPage({
               />
             </div>
 
-            <span className="mt-1 inline-block text-end text-sm text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
+            <span className="mt-1 inline-block text-end text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
               Made by{" "}
               <a
-                href="https://vladsazon.com"
+                href={TWITTER_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:text-black"

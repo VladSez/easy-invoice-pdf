@@ -39,7 +39,7 @@ https://github.com/user-attachments/assets/9e3194e0-3072-4c95-ae99-e66db1301dc6
 
 ## 👨‍💻 Made By
 
-Built by [Vlad Sazonau](https://vladsazon.com)
+Built by [Vlad Sazonau](https://x.com/vladsazonau)
 
 - 🐦 Twitter: [@vladsazonau](https://twitter.com/vladsazonau)
 - 💼 LinkedIn: [Vlad Sazonau](https://www.linkedin.com/in/vlad-sazonau-22a9a9126/)
