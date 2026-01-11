@@ -10,20 +10,14 @@ export const APP_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
 export const STATIC_ASSETS_URL = "https://static.easyinvoicepdf.com";
 
 /**
- * ImageKit CDN URL is used to serve videos on landing page
- */
-export const IMAGEKIT_CDN_URL =
-  "https://ik.imagekit.io/fl2lbswwo/easy-invoice-pdf";
-
-/**
  * Main demo video on marketing page and "How it works" dialog
  */
-export const VIDEO_DEMO_URL = `${IMAGEKIT_CDN_URL}/easy-invoice-demo-01-2026.mp4?v=1`;
+export const VIDEO_DEMO_URL = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026.mp4?v=1`;
 
 /**
  * Fallback image for main demo video on marketing page and "How it works" dialog
  */
-export const VIDEO_DEMO_FALLBACK_IMG = `${IMAGEKIT_CDN_URL}/easy-invoice-demo-01-2026-fallback-img.png`;
+export const VIDEO_DEMO_FALLBACK_IMG = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026-fallback-img.png`;
 
 export const DONATION_URL = "https://dub.sh/easyinvoice-donate";
 
@@ -42,36 +36,54 @@ export const BUG_REPORT_URL =
 export const MARKETING_FEATURES_CARDS = [
   {
     translationKey: "livePreview",
-    videoSrc: `${IMAGEKIT_CDN_URL}/live-preview.mp4?updatedAt=1764511439140`,
-    videoFallbackImg: `${IMAGEKIT_CDN_URL}/live-preview-fallback.png?updatedAt=1764511421437`,
+    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/live-preview.mp4?updatedAt=1764511439140`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/live-preview-fallback.png?updatedAt=1764511421437`,
   },
   {
     translationKey: "instantDownload",
-    videoSrc: `${IMAGEKIT_CDN_URL}/instand-download.mp4`,
-    videoFallbackImg: `${IMAGEKIT_CDN_URL}/instant-download-fallback.png`,
+    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/instand-download.mp4`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/instant-download-fallback.png`,
   },
   {
     translationKey: "shareableLinks",
-    videoSrc: `${IMAGEKIT_CDN_URL}/share-invoice.mp4`,
-    videoFallbackImg: `${IMAGEKIT_CDN_URL}/share-invoice-fallback.png`,
+    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/share-invoice.mp4`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/share-invoice-fallback.png`,
   },
   {
     translationKey: "taxSupport",
-    videoSrc: `${IMAGEKIT_CDN_URL}/tax-custom.mp4`,
-    videoFallbackImg: `${IMAGEKIT_CDN_URL}/tax-custom-fallback.png`,
+    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/tax-custom.mp4`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/tax-custom-fallback.png`,
   },
   {
     translationKey: "multiLanguage",
-    videoSrc: `${IMAGEKIT_CDN_URL}/multi-lang.mp4?updatedAt=1764535032761`,
-    videoFallbackImg: `${IMAGEKIT_CDN_URL}/multi-lang-fallback.png?updatedAt=1764535032761`,
+    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/multi-lang.mp4?updatedAt=1764535032761`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/multi-lang-fallback.png?updatedAt=1764535032761`,
   },
   {
     translationKey: "openSource",
-    videoSrc: `${IMAGEKIT_CDN_URL}/open-source.mp4`,
-    videoFallbackImg: `${IMAGEKIT_CDN_URL}/open-source-fallback.png`,
+    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/open-source.mp4`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/open-source-fallback.png`,
   },
 ] as const satisfies {
   translationKey: string;
   videoSrc: string;
   videoFallbackImg: string;
 }[];
+
+/**
+ * Fonts that we use to render invoice pdf templates via `@react-pdf/renderer`
+ */
+export const INVOICE_PDF_FONTS = {
+  DEFAULT_TEMPLATE: {
+    OPEN_SANS_REGULAR: `${STATIC_ASSETS_URL}/open-sans-regular.ttf`,
+    OPEN_SANS_700: `${STATIC_ASSETS_URL}/open-sans-700.ttf`,
+  },
+  STRIPE_TEMPLATE: {
+    INTER_REGULAR: `${STATIC_ASSETS_URL}/Inter-Regular.ttf`,
+    INTER_MEDIUM: `${STATIC_ASSETS_URL}/Inter-Medium.ttf`,
+    INTER_SEMIBOLD: `${STATIC_ASSETS_URL}/Inter-SemiBold.ttf`,
+  },
+} as const satisfies Record<
+  "DEFAULT_TEMPLATE" | "STRIPE_TEMPLATE",
+  { [key: string]: string }
+>;

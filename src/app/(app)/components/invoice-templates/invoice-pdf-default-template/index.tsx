@@ -1,4 +1,5 @@
 import { type InvoiceData } from "@/app/schema";
+import { INVOICE_PDF_FONTS } from "@/config";
 import {
   Document,
   Font,
@@ -7,7 +8,6 @@ import {
 } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { memo } from "react";
 import { InvoiceBody } from "./invoice-body";
-import { STATIC_ASSETS_URL } from "@/config";
 
 // Open sans seems to be working fine with EN and PL
 const fontFamily = "Open Sans";
@@ -17,10 +17,10 @@ Font.register({
   family: fontFamily,
   fonts: [
     {
-      src: `${STATIC_ASSETS_URL}/open-sans-regular.ttf`,
+      src: INVOICE_PDF_FONTS.DEFAULT_TEMPLATE.OPEN_SANS_REGULAR,
     },
     {
-      src: `${STATIC_ASSETS_URL}/open-sans-700.ttf`,
+      src: INVOICE_PDF_FONTS.DEFAULT_TEMPLATE.OPEN_SANS_700,
       fontWeight: 700,
     },
   ],

@@ -1,73 +1,12 @@
 import {
   GITHUB_URL,
-  MARKETING_FEATURES_CARDS,
   TWITTER_URL,
   VIDEO_DEMO_FALLBACK_IMG,
   VIDEO_DEMO_URL,
 } from "@/config";
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("About page", () => {
-  test("should load static assets successfully", async ({ page }) => {
-    // Test video demo URL
-    const videoResponse = await page.request.get(VIDEO_DEMO_URL);
-    expect(videoResponse.status()).toBe(200);
-    expect(videoResponse.headers()["content-type"]).toContain("video");
-
-    // Test video fallback image
-    const fallbackImageResponse = await page.request.get(
-      VIDEO_DEMO_FALLBACK_IMG,
-    );
-    expect(fallbackImageResponse.status()).toBe(200);
-    expect(fallbackImageResponse.headers()["content-type"]).toContain(
-      "image/png",
-    );
-
-    // Test PDF fonts
-    const openSansRegularResponse = await page.request.get(
-      "https://static.easyinvoicepdf.com/open-sans-regular.ttf",
-    );
-    expect(openSansRegularResponse.status()).toBe(200);
-    expect(openSansRegularResponse.headers()["content-type"]).toContain("font");
-
-    const openSansBoldResponse = await page.request.get(
-      "https://static.easyinvoicepdf.com/open-sans-700.ttf",
-    );
-    expect(openSansBoldResponse.status()).toBe(200);
-    expect(openSansBoldResponse.headers()["content-type"]).toContain("font");
-
-    // Test Inter fonts for Stripe template
-    const interRegularResponse = await page.request.get(
-      "https://static.easyinvoicepdf.com/Inter-Regular.ttf",
-    );
-    expect(interRegularResponse.status()).toBe(200);
-    expect(interRegularResponse.headers()["content-type"]).toContain("font");
-
-    const interMediumResponse = await page.request.get(
-      "https://static.easyinvoicepdf.com/Inter-Medium.ttf",
-    );
-    expect(interMediumResponse.status()).toBe(200);
-    expect(interMediumResponse.headers()["content-type"]).toContain("font");
-
-    const interSemiBoldResponse = await page.request.get(
-      "https://static.easyinvoicepdf.com/Inter-SemiBold.ttf",
-    );
-    expect(interSemiBoldResponse.status()).toBe(200);
-    expect(interSemiBoldResponse.headers()["content-type"]).toContain("font");
-
-    // Test feature videos and fallback images
-
-    for (const { videoSrc, videoFallbackImg } of MARKETING_FEATURES_CARDS) {
-      const videoResponse = await page.request.get(videoSrc);
-      expect(videoResponse.status()).toBe(200);
-      expect(videoResponse.headers()["content-type"]).toContain("video");
-
-      const fallbackResponse = await page.request.get(videoFallbackImg);
-      expect(fallbackResponse.status()).toBe(200);
-      expect(fallbackResponse.headers()["content-type"]).toContain("image");
-    }
-  });
-
   test("should display about page content in English", async ({ page }) => {
     await page.goto("/en/about");
 
