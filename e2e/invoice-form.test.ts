@@ -13,7 +13,7 @@ import {
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
-import { VIDEO_DEMO_URL } from "@/config";
+import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -49,7 +49,7 @@ test.describe("Invoice Generator Page", () => {
     // Check that OG image changed to Stripe template
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
       "content",
-      "https://static.easyinvoicepdf.com/easy-invoice-opengraph-image.png?v=1755773879597",
+      `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
     );
 
     // Check other meta tags for Stripe template

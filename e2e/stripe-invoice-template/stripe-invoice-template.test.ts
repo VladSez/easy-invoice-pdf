@@ -11,6 +11,7 @@ import { SMALL_TEST_IMAGE_BASE64, uploadBase64LogoAsFile } from "./utils";
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { expect, test } from "../utils/extended-playwright-test";
 import { renderPdfOnCanvas } from "../utils/render-pdf-on-canvas";
+import { STATIC_ASSETS_URL } from "@/config";
 
 test.describe("Stripe Invoice Template", () => {
   test.beforeEach(async ({ page }) => {
@@ -36,7 +37,7 @@ test.describe("Stripe Invoice Template", () => {
     // Check that OG image changed to Stripe template
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
       "content",
-      "https://static.easyinvoicepdf.com/stripe-og.png?v=1755773921680",
+      `${STATIC_ASSETS_URL}/stripe-og.png?v=1755773921680`,
     );
 
     // Check other meta tags for Stripe template

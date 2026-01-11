@@ -12,12 +12,12 @@ export const STATIC_ASSETS_URL = "https://static.easyinvoicepdf.com";
 /**
  * Main demo video on marketing page and "How it works" dialog
  */
-export const VIDEO_DEMO_URL = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026.mp4?v=1`;
+export const VIDEO_DEMO_URL = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026-v1.mp4`;
 
 /**
  * Fallback image for main demo video on marketing page and "How it works" dialog
  */
-export const VIDEO_DEMO_FALLBACK_IMG = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026-fallback-img.png`;
+export const VIDEO_DEMO_FALLBACK_IMG = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026-fallback-img-v1.png`;
 
 export const DONATION_URL = "https://dub.sh/easyinvoice-donate";
 
@@ -36,33 +36,33 @@ export const BUG_REPORT_URL =
 export const MARKETING_FEATURES_CARDS = [
   {
     translationKey: "livePreview",
-    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/live-preview.mp4?updatedAt=1764511439140`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/live-preview-fallback.png?updatedAt=1764511421437`,
+    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/live-preview-v1.mp4`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/live-preview-fallback-v1.png`,
   },
   {
     translationKey: "instantDownload",
-    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/instand-download.mp4`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/instant-download-fallback.png`,
+    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/instand-download-v1.mp4`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/instant-download-fallback-v1.png`,
   },
   {
     translationKey: "shareableLinks",
-    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/share-invoice.mp4`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/share-invoice-fallback.png`,
+    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/share-invoice-v1.mp4`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/share-invoice-fallback-v1.png`,
   },
   {
     translationKey: "taxSupport",
-    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/tax-custom.mp4`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/tax-custom-fallback.png`,
+    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/tax-custom-v1.mp4`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/tax-custom-fallback-v1.png`,
   },
   {
     translationKey: "multiLanguage",
-    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/multi-lang.mp4?updatedAt=1764535032761`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/multi-lang-fallback.png?updatedAt=1764535032761`,
+    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/multi-lang-v1.mp4`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/multi-lang-fallback-v1.png`,
   },
   {
     translationKey: "openSource",
-    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/open-source.mp4`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/open-source-fallback.png`,
+    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/open-source-v1.mp4`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/open-source-fallback-v1.png`,
   },
 ] as const satisfies {
   translationKey: string;
