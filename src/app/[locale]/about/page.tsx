@@ -10,7 +10,12 @@ import { Button } from "@/components/ui/button";
 import { BlackAnimatedGoToAppBtn } from "@/components/animated-go-to-app-btn";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Video } from "@/components/video";
-import { GITHUB_URL, IMAGEKIT_CDN_URL, VIDEO_DEMO_URL } from "@/config";
+import {
+  GITHUB_URL,
+  IMAGEKIT_CDN_URL,
+  VIDEO_DEMO_FALLBACK_IMG,
+  VIDEO_DEMO_URL,
+} from "@/config";
 import { routing } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
@@ -244,7 +249,7 @@ function HeroSection() {
               <div className="relative aspect-video w-full">
                 <Video
                   src={VIDEO_DEMO_URL}
-                  fallbackImg={`${IMAGEKIT_CDN_URL}/easy-invoice-demo-2026-fallback.png`}
+                  fallbackImg={VIDEO_DEMO_FALLBACK_IMG}
                   testId="hero-about-page-video"
                 />
               </div>

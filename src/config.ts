@@ -15,7 +15,15 @@ export const STATIC_ASSETS_URL = "https://static.easyinvoicepdf.com";
 export const IMAGEKIT_CDN_URL =
   "https://ik.imagekit.io/fl2lbswwo/easy-invoice-pdf";
 
-export const VIDEO_DEMO_URL = `${IMAGEKIT_CDN_URL}/easy-invoice-2026.mp4`;
+/**
+ * Main demo video on marketing page and "How it works" dialog
+ */
+export const VIDEO_DEMO_URL = `${IMAGEKIT_CDN_URL}/easy-invoice-demo-01-2026.mp4`;
+
+/**
+ * Fallback image for main demo video on marketing page and "How it works" dialog
+ */
+export const VIDEO_DEMO_FALLBACK_IMG = `${IMAGEKIT_CDN_URL}/easy-invoice-demo-01-2026-fallback-img.png`;
 
 export const DONATION_URL = "https://dub.sh/easyinvoice-donate";
 

@@ -1,7 +1,7 @@
 import {
   GITHUB_URL,
-  STATIC_ASSETS_URL,
   TWITTER_URL,
+  VIDEO_DEMO_FALLBACK_IMG,
   VIDEO_DEMO_URL,
 } from "@/config";
 import { test, expect } from "@playwright/test";
@@ -48,10 +48,7 @@ test.describe("About page", () => {
     const video = heroSection.getByTestId("hero-about-page-video");
 
     await expect(video).toBeVisible();
-    await expect(video).toHaveAttribute(
-      "poster",
-      `${STATIC_ASSETS_URL}/easy-invoice-video-placeholder.webp`,
-    );
+    await expect(video).toHaveAttribute("poster", VIDEO_DEMO_FALLBACK_IMG);
     await expect(video).toHaveAttribute("muted");
     await expect(video).toHaveAttribute("loop");
     await expect(video).toHaveAttribute("playsinline");
