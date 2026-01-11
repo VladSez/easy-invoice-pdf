@@ -57,7 +57,6 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
           <HeroSection />
           <FeaturesSection />
           <FaqSection />
-          {/* <SubscribeSection /> */}
           <CtaSection />
         </main>
         <Footer
