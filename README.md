@@ -35,7 +35,7 @@ Learn more about [features](https://easyinvoicepdf.com/en/about#features).
 
 Watch a quick demo of EasyInvoicePDF in action to see how easy it is to create professional invoices in seconds. The video demonstrates key features like **Live Preview**, **Instant PDF Download**, and **Customization Options**.
 
-https://github.com/user-attachments/assets/ab73045f-0643-4de5-869b-7a699dedf28e
+https://github.com/user-attachments/assets/d46c6e4e-b78a-4aa1-ab44-d20d6485b682
 
 ## 👨‍💻 Made By
 
