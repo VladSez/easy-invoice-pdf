@@ -1,4 +1,5 @@
 import {
+  LANGUAGE_TO_LABEL,
   type InvoiceData,
   type SupportedCurrencies,
   type SupportedLanguages,
@@ -27,6 +28,7 @@ import {
   getNumberFractionalPart,
 } from "@/utils/invoice.utils";
 import { Button } from "@/components/ui/button";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
@@ -528,8 +530,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                   )}
                   {!errors.taxLabelText && (
                     <InputHelperMessage>
-                      Set a custom tax label (e.g. VAT, Sales Tax, GST, IVA,
-                      etc.)
+                      Customize the tax label on your invoice (e.g., VAT, Sales
+                      Tax, IVA). {LANGUAGE_TO_LABEL[language]} default:{" "}
+                      {INVOICE_PDF_TRANSLATIONS[language].invoiceItemsTable.vat}
                     </InputHelperMessage>
                   )}
                 </div>
