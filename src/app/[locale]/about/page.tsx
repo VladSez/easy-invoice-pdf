@@ -12,7 +12,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Video } from "@/components/video";
 import {
   GITHUB_URL,
-  IMAGEKIT_CDN_URL,
+  MARKETING_FEATURES_CARDS,
   VIDEO_DEMO_FALLBACK_IMG,
   VIDEO_DEMO_URL,
 } from "@/config";
@@ -265,43 +265,6 @@ function HeroSection() {
 function FeaturesSection() {
   const t = useTranslations("About");
 
-  const FEATURES_CARDS = [
-    {
-      translationKey: "livePreview",
-      videoSrc: `${IMAGEKIT_CDN_URL}/live-preview.mp4?updatedAt=1764511439140`,
-      videoFallbackImg: `${IMAGEKIT_CDN_URL}/live-preview-fallback.png?updatedAt=1764511421437`,
-    },
-    {
-      translationKey: "instantDownload",
-      videoSrc: `${IMAGEKIT_CDN_URL}/instand-download.mp4`,
-      videoFallbackImg: `${IMAGEKIT_CDN_URL}/instant-download-fallback.png`,
-    },
-    {
-      translationKey: "shareableLinks",
-      videoSrc: `${IMAGEKIT_CDN_URL}/share-invoice.mp4`,
-      videoFallbackImg: `${IMAGEKIT_CDN_URL}/share-invoice-fallback.png`,
-    },
-    {
-      translationKey: "taxSupport",
-      videoSrc: `${IMAGEKIT_CDN_URL}/tax-custom.mp4`,
-      videoFallbackImg: `${IMAGEKIT_CDN_URL}/tax-custom-fallback.png`,
-    },
-    {
-      translationKey: "multiLanguage",
-      videoSrc: `${IMAGEKIT_CDN_URL}/multi-lang.mp4?updatedAt=1764535032761`,
-      videoFallbackImg: `${IMAGEKIT_CDN_URL}/multi-lang-fallback.png?updatedAt=1764535032761`,
-    },
-    {
-      translationKey: "openSource",
-      videoSrc: `${IMAGEKIT_CDN_URL}/open-source.mp4`,
-      videoFallbackImg: `${IMAGEKIT_CDN_URL}/open-source-fallback.png`,
-    },
-  ] as const satisfies {
-    translationKey: string;
-    videoSrc: string;
-    videoFallbackImg: string;
-  }[];
-
   return (
     <section
       id="features"
@@ -328,7 +291,7 @@ function FeaturesSection() {
 
         {/* Features cards */}
         <div className="flex flex-row flex-wrap items-center justify-center gap-6 pt-10 md:gap-10">
-          {FEATURES_CARDS.map((feature, index) => {
+          {MARKETING_FEATURES_CARDS.map((feature, index) => {
             const title = t(`features.items.${feature.translationKey}.title`);
             const description = t(
               `features.items.${feature.translationKey}.description`,

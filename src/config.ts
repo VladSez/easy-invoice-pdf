@@ -35,3 +35,43 @@ export const TWITTER_URL = "https://x.com/vladsazonau";
 
 export const BUG_REPORT_URL =
   "https://pdfinvoicegenerator.userjot.com/board/bugs";
+
+/**
+ * Marketing features cards for the about page
+ */
+export const MARKETING_FEATURES_CARDS = [
+  {
+    translationKey: "livePreview",
+    videoSrc: `${IMAGEKIT_CDN_URL}/live-preview.mp4?updatedAt=1764511439140`,
+    videoFallbackImg: `${IMAGEKIT_CDN_URL}/live-preview-fallback.png?updatedAt=1764511421437`,
+  },
+  {
+    translationKey: "instantDownload",
+    videoSrc: `${IMAGEKIT_CDN_URL}/instand-download.mp4`,
+    videoFallbackImg: `${IMAGEKIT_CDN_URL}/instant-download-fallback.png`,
+  },
+  {
+    translationKey: "shareableLinks",
+    videoSrc: `${IMAGEKIT_CDN_URL}/share-invoice.mp4`,
+    videoFallbackImg: `${IMAGEKIT_CDN_URL}/share-invoice-fallback.png`,
+  },
+  {
+    translationKey: "taxSupport",
+    videoSrc: `${IMAGEKIT_CDN_URL}/tax-custom.mp4`,
+    videoFallbackImg: `${IMAGEKIT_CDN_URL}/tax-custom-fallback.png`,
+  },
+  {
+    translationKey: "multiLanguage",
+    videoSrc: `${IMAGEKIT_CDN_URL}/multi-lang.mp4?updatedAt=1764535032761`,
+    videoFallbackImg: `${IMAGEKIT_CDN_URL}/multi-lang-fallback.png?updatedAt=1764535032761`,
+  },
+  {
+    translationKey: "openSource",
+    videoSrc: `${IMAGEKIT_CDN_URL}/open-source.mp4`,
+    videoFallbackImg: `${IMAGEKIT_CDN_URL}/open-source-fallback.png`,
+  },
+] as const satisfies {
+  translationKey: string;
+  videoSrc: string;
+  videoFallbackImg: string;
+}[];
