@@ -18,7 +18,7 @@ export const IMAGEKIT_CDN_URL =
 /**
  * Main demo video on marketing page and "How it works" dialog
  */
-export const VIDEO_DEMO_URL = `${IMAGEKIT_CDN_URL}/easy-invoice-demo-01-2026.mp4`;
+export const VIDEO_DEMO_URL = `${IMAGEKIT_CDN_URL}/easy-invoice-demo-01-2026.mp4?v=1`;
 
 /**
  * Fallback image for main demo video on marketing page and "How it works" dialog
