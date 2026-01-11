@@ -2,7 +2,7 @@
   "name": "pdf-invoice-generator",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.22.0+sha512.bf049efe995b28f527fd2b41ae0474ce29186f7edcb3bf545087bd61fbbebb2bf75362d1307fda09c2d288e1e499787ac12d4fcb617a974718a6051f2eee741c",
+  "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -21,6 +21,7 @@
     "vitest:ui": "vitest --ui",
     "e2e": "pnpm exec playwright test --reporter=list",
     "e2e:ui": "pnpm exec playwright test --ui",
+    "e2e:not-flaky": "pnpm e2e --workers=2",
     "dedupe": "pnpm dedupe",
     "lint-stage": "npx lint-staged --verbose",
     "check-meta": "pnpx check-site-meta",
@@ -99,6 +100,7 @@
     "@types/react-dom": "18.3.1",
     "@typescript/native-preview": "7.0.0-dev.20250819.1",
     "autoprefixer": "10.4.21",
+    "dotenv": "17.2.3",
     "eslint": "9.33.0",
     "eslint-config-next": "15.2.3",
     "eslint-plugin-playwright": "2.2.0",
@@ -116,7 +118,6 @@
     "tailwindcss": "3.4.14",
     "typescript": "5.9.3",
     "typescript-eslint": "8.40.0",
-    "typescript-plugin-directives": "0.0.3",
     "vitest": "3.2.4"
   }
 }

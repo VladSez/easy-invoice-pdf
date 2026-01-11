@@ -16,16 +16,19 @@ const loadTsFileViaJiti = createJiti(fileURLToPath(import.meta.url));
 loadTsFileViaJiti("./src/env");
 
 // Validate all i18n files, that are used to translate the /about page
-async function validatei18nAndTranslationFiles() {
-  // Validate our custom translations object against schema, that is used to translate pdf fields
+async function validatei18nAndInvoicePDFTranslationFiles() {
+  // Validates our custom translations object against the schema, that is used to translate PDF fields, invoice items table, etc.
   try {
     // Import the translations schema using jiti
     // @ts-ignore
-    const { translationsSchema, TRANSLATIONS } = await loadTsFileViaJiti.import(
-      "./src/app/schema/translations.ts",
-    );
+    const { invoicePDFtranslationsSchema, INVOICE_PDF_TRANSLATIONS } =
+      await loadTsFileViaJiti.import(
+        "./src/app/(app)/pdf-i18n-translations/pdf-translations.ts",
+      );
 
-    const result = translationsSchema.safeParse(TRANSLATIONS);
+    const result = invoicePDFtranslationsSchema.safeParse(
+      INVOICE_PDF_TRANSLATIONS,
+    );
 
     if (!result.success) {
       console.error("❌ Invalid translations:", result.error.message);
@@ -104,7 +107,7 @@ async function validatei18nAndTranslationFiles() {
 }
 
 // Since the function is now async, we need to handle it properly
-validatei18nAndTranslationFiles().catch((error) => {
+validatei18nAndInvoicePDFTranslationFiles().catch((error) => {
   console.error("❌ Fatal error during validation:", error);
   process.exit(1);
 });
@@ -157,8 +160,9 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      // Redirect all /:locale/app requests to the root, because we changed the structure of the app
       {
-        source: "/:locale/app", // Redirect all /:locale/app requests to the root, because we changed the structure of the app
+        source: "/:locale/app",
         destination: "/",
         permanent: true,
       },

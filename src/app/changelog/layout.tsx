@@ -91,7 +91,7 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
         translations={{
           footerDescription:
             "Create professional invoices in seconds with our free & open-source invoice maker. 100% in-browser, no sign-up required. Includes live PDF preview and a Stripe-style template - perfect for freelancers, startups, and small businesses.",
-          footerCreatedBy: "Created by",
+          footerCreatedBy: "Made by",
           product: "Product",
 
           newsletterTitle: "Subscribe to our newsletter",

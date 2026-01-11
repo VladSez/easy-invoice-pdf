@@ -22,7 +22,7 @@ const IDLE_TIME = 7_000; // in ms
  * - Any real interaction (type, click) → we mark them engaged.
  * - Once they stop interacting for X seconds (IDLE_TIME) → toast appears.
  */
-export function useShowRandomCTAToast() {
+export function useShowRandomCTAToastOnIdle() {
   const { isToastShownInSession, markToastAsShown } = useCTAToast();
 
   useEffect(() => {
@@ -57,6 +57,7 @@ export function useShowRandomCTAToast() {
 
     let timeOnPageTimer: ReturnType<typeof setTimeout> | null = null;
     let idleTimer: ReturnType<typeof setTimeout> | null = null;
+    // TODO: should be 2-3 interaction, not a single one, fix!
     let hasMeaningfulInteraction = false;
     let hasMinTimeElapsed = false;
     let triggered = false;

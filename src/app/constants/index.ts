@@ -7,7 +7,7 @@ import {
   type SellerData,
   type BuyerData,
 } from "../schema";
-import { TRANSLATIONS } from "../schema/translations";
+import { INVOICE_PDF_TRANSLATIONS } from "../(app)/pdf-i18n-translations/pdf-translations";
 import dayjs from "dayjs";
 
 export const TODAY = dayjs().format("YYYY-MM-DD");
@@ -32,6 +32,7 @@ export const DEFAULT_SELLER_DATA = {
   address: "Seller address",
 
   vatNo: "Seller vat number",
+  vatNoLabelText: "VAT no",
   vatNoFieldIsVisible: true,
 
   email: "seller@email.com",
@@ -57,6 +58,7 @@ export const DEFAULT_BUYER_DATA = {
   address: "Buyer address",
 
   vatNo: "Buyer vat number",
+  vatNoLabelText: "VAT no",
   vatNoFieldIsVisible: true,
 
   email: "buyer@email.com",
@@ -80,7 +82,7 @@ export const INITIAL_INVOICE_DATA = {
   stripePayOnlineUrl: "",
 
   invoiceNumberObject: {
-    label: `${TRANSLATIONS[EN].invoiceNumber}:`,
+    label: `${INVOICE_PDF_TRANSLATIONS[EN].invoiceNumber}:`,
     value: INVOICE_DEFAULT_NUMBER_VALUE,
   },
 
@@ -138,4 +140,6 @@ export const INITIAL_INVOICE_DATA = {
   paymentMethodFieldIsVisible: true,
   personAuthorizedToReceiveFieldIsVisible: true,
   personAuthorizedToIssueFieldIsVisible: true,
+
+  taxLabelText: "VAT",
 } as const satisfies InvoiceData;

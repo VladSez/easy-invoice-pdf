@@ -3,6 +3,7 @@
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import {
   invoiceSchema,
+  METADATA_LOCAL_STORAGE_KEY,
   PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_TEMPLATES,
   type InvoiceData,
@@ -21,6 +22,8 @@ import { useDeviceContext } from "@/contexts/device-context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { getAppMetadata } from "@/app/(app)/utils/get-app-metadata";
+import { GithubIcon } from "@/components/etc/github-logo";
 import { Footer } from "@/components/footer";
 import { GitHubStarCTA } from "@/components/github-star-cta";
 import { ProjectLogoDescription } from "@/components/project-logo-description";
@@ -28,42 +31,51 @@ import { GITHUB_URL, VIDEO_DEMO_URL } from "@/config";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
+import {
+  compressInvoiceData,
+  decompressInvoiceData,
+} from "@/utils/url-compression";
 import * as Sentry from "@sentry/nextjs";
 import { AlertCircleIcon, HeartIcon } from "lucide-react";
 import {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,
 } from "lz-string";
-import {
-  compressInvoiceData,
-  decompressInvoiceData,
-} from "@/utils/url-compression";
-import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { InvoiceClientPage } from "./components";
+import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./components/cta-toasts";
 import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
-import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
+import { useCTAToast } from "./contexts/cta-toast-context";
 import {
   CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
-  useShowRandomCTAToast,
+  useShowRandomCTAToastOnIdle,
 } from "./hooks/use-show-random-cta-toast";
-import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./components/cta-toasts";
-import { useCTAToast } from "./contexts/cta-toast-context";
+import { DEFAULT_METADATA } from "./utils/get-app-metadata";
+import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
 
-// import { DevLocalStorageView } from "./components/dev/dev-local-storage-view";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
-const DevLocalStorageView = dynamic(
-  () =>
-    import("./components/dev/dev-local-storage-view").then(
-      (mod) => mod.DevLocalStorageView,
-    ),
-  { ssr: false },
-);
-
+/**
+ * Main client component for the invoice application page.
+ *
+ * This component handles:
+ * - Loading and persisting invoice data from/to localStorage
+ * - URL-based invoice sharing via compressed data in query parameters
+ * - Template selection and validation
+ * - Invoice data state management and updates
+ * - PDF generation and download functionality
+ * - Share invoice functionality with URL generation
+ * - CTA toast notifications for user engagement
+ * - Error handling and user feedback
+ *
+ * @param props - Component props
+ * @param props.githubStarsCount - The current number of GitHub stars for the project, used for display in CTAs
+ *
+ * @returns The rendered invoice application page with form, preview, and controls
+ */
 export function AppPageClient({
   githubStarsCount,
 }: {
@@ -94,16 +106,27 @@ export function AppPageClient({
 
   const [canShareInvoice, setCanShareInvoice] = useState(true);
 
-  useShowRandomCTAToast();
+  useShowRandomCTAToastOnIdle();
 
   // Helper function to load from localStorage
   const loadFromLocalStorage = useCallback(() => {
     try {
+      const appMetadata = getAppMetadata();
+
+      // add metadata with default values if missing for all users
+      if (!appMetadata) {
+        localStorage.setItem(
+          METADATA_LOCAL_STORAGE_KEY,
+          JSON.stringify(DEFAULT_METADATA),
+        );
+      }
+
       const savedData = localStorage.getItem(PDF_DATA_LOCAL_STORAGE_KEY);
 
       if (savedData) {
         const json: unknown = JSON.parse(savedData);
 
+        // we patch the invoice number breaking change here
         // this should happen before parsing the data with zod
         const updatedJson = handleInvoiceNumberBreakingChange(json);
 
@@ -130,12 +153,13 @@ export function AppPageClient({
     } catch (error) {
       console.error("Failed to load saved invoice data:", error);
 
+      // fallback to initial data on error
       setInvoiceDataState(INITIAL_INVOICE_DATA);
 
       toast.error(
         "Unable to load your saved invoice data. For your convenience, we've reset the form to default values. Please try creating a new invoice.",
         {
-          duration: 20000,
+          duration: Infinity,
           closeButton: true,
           richColors: true,
         },
@@ -146,24 +170,11 @@ export function AppPageClient({
   }, [templateValidation.data, templateValidation.success]);
 
   useEffect(() => {
-    // CTA text in the console =)
-    // eslint-disable-next-line no-console
-    console.log(
-      "%c🚀 EasyInvoicePDF — Free & Open-Source Invoice Generator%c\n⭐ Star this project on GitHub: https://github.com/VladSez/easy-invoice-pdf",
-      "font-size:24px; font-weight:900; color: white;" +
-        "background: linear-gradient(90deg, #12E19A, #04C9B8, #1FD6FF, #ff5f6d, #ffc371);" +
-        "padding:12px 16px; border-radius:10px; text-shadow:2px 2px 6px rgba(0,0,0,0.5);" +
-        "font-family: 'American Typewriter', monospace; letter-spacing:1px;",
-      "font-size:16px; font-weight:700; color: #333;" +
-        "padding:8px 12px; border-radius:6px;" +
-        "font-family: 'Monaco', monospace;",
-    );
-
     // Scroll to top on mount
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // Initialize data from URL or localStorage on mount
+  // Initialize data from URL (via shared invoice link) or localStorage on page load
   useEffect(() => {
     const compressedInvoiceDataInUrl = searchParams.get("data");
     const urlTemplateSearchParam = searchParams.get("template");
@@ -174,30 +185,40 @@ export function AppPageClient({
       .default("default")
       .safeParse(urlTemplateSearchParam);
 
-    // first try to load from url
+    // first try to load from url i.e. if user has shared invoice link
     if (compressedInvoiceDataInUrl) {
       try {
-        const decompressed = decompressFromEncodedURIComponent(
+        const decompressedData = decompressFromEncodedURIComponent(
           compressedInvoiceDataInUrl,
         );
 
-        const parsedJSON: unknown = JSON.parse(decompressed);
+        const parsedJSON: unknown = JSON.parse(decompressedData);
 
         // Restore original keys from compressed format, we store keys in compressed format to reduce URL size i.e. {name: "John Doe"} -> {n: "John Doe"}
         const decompressedKeys = decompressInvoiceData(
           parsedJSON as Record<string, unknown>,
         );
 
-        // this should happen before parsing the data with zod
+        // we patch the invoice number breaking change here (this should happen before parsing the data with zod)
         const updatedJson = handleInvoiceNumberBreakingChange(decompressedKeys);
 
-        const validated = invoiceSchema.parse(updatedJson);
+        const validatedDataFromURL = invoiceSchema.parse(updatedJson);
 
         if (templateValidation.success) {
-          validated.template = templateValidation.data;
+          validatedDataFromURL.template = templateValidation.data;
         }
 
-        setInvoiceDataState(validated);
+        setInvoiceDataState(validatedDataFromURL);
+
+        const appMetadata = getAppMetadata();
+
+        // add metadata with default values if missing for all users
+        if (!appMetadata) {
+          localStorage.setItem(
+            METADATA_LOCAL_STORAGE_KEY,
+            JSON.stringify(DEFAULT_METADATA),
+          );
+        }
       } catch (error) {
         // fallback to local storage
         console.error("Failed to parse URL data:", error);
@@ -214,17 +235,24 @@ export function AppPageClient({
   // Save to localStorage whenever data changes on form update
   useEffect(() => {
     // Only save to localStorage if it's available
-    if (invoiceDataState && isLocalStorageAvailable) {
+    if (!isLocalStorageAvailable) {
+      Sentry.captureException(new Error("Local storage is not available"));
+
+      return;
+    }
+
+    if (invoiceDataState) {
       try {
         const newInvoiceDataValidated = invoiceSchema.parse(invoiceDataState);
 
+        // IMPORTANT
+        // TODO: double check if we need this code, because we already save to local storage in the Invoice Form component (debouncedRegeneratePdfOnFormChange fn line:165)
         localStorage.setItem(
           PDF_DATA_LOCAL_STORAGE_KEY,
           JSON.stringify(newInvoiceDataValidated),
         );
 
         // Update template in search params if it exists
-
         const newSearchParams = new URLSearchParams(searchParams);
         newSearchParams.set("template", newInvoiceDataValidated.template);
         router.replace(`/?${newSearchParams.toString()}`);
@@ -232,6 +260,7 @@ export function AppPageClient({
         // Check if URL has data i.e. if user has shared invoice link
         const urlData = searchParams.get("data");
 
+        // we want to show a toast if the invoice has changed and shared invoice link needs to be regenerated
         if (urlData) {
           try {
             const decompressed = decompressFromEncodedURIComponent(urlData);
@@ -239,16 +268,20 @@ export function AppPageClient({
             const urlParsed: unknown = JSON.parse(decompressed);
 
             // Restore original keys from compressed format
-            const decompressedKeys = decompressInvoiceData(
+            const decompressedInvoiceDataFromUrl = decompressInvoiceData(
               urlParsed as Record<string, unknown>,
             );
 
-            const urlValidated = invoiceSchema.parse(decompressedKeys);
+            const validatediInvoiceDataFromUrl = invoiceSchema.parse(
+              decompressedInvoiceDataFromUrl,
+            );
 
-            if (
-              JSON.stringify(urlValidated) !==
-              JSON.stringify(newInvoiceDataValidated)
-            ) {
+            const invoiceHasChanged =
+              JSON.stringify(validatediInvoiceDataFromUrl) !==
+              JSON.stringify(newInvoiceDataValidated);
+
+            // if invoice has changed, show toast and clean url because the link to invoice is no longer valid and needs to be regenerated
+            if (invoiceHasChanged) {
               toast.info(
                 <p className="text-pretty text-sm leading-relaxed">
                   <span className="font-semibold text-blue-600">
@@ -281,7 +314,8 @@ export function AppPageClient({
                 <div className="flex flex-col gap-2">
                   <p className="">
                     Please verify that you have copied the complete invoice URL.
-                    The link may be truncated or corrupted.
+                    The link may be truncated or corrupted. Try refreshing the
+                    page and generating a new link.
                   </p>
                   <Button
                     variant="outline"
@@ -378,6 +412,11 @@ export function AppPageClient({
         // analytics track event
         umamiTrackEvent("share_invoice_link");
 
+        // if (isToastShownInSession) {
+        //   umamiTrackEvent("cta_toast_skipped_shared_invoice_link");
+        //   return;
+        // }
+
         // Show a CTA toast
         setTimeout(() => {
           showRandomCTAToast();
@@ -407,127 +446,18 @@ export function AppPageClient({
 
   return (
     <TooltipProvider delayDuration={0}>
-      {process.env.NEXT_PUBLIC_DEBUG_LOCAL_STORAGE_UI === "true" && (
-        <DevLocalStorageView />
-      )}
-
       <div className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
-        <div className="w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 2xl:max-w-[1680px]">
-          <div data-testid="header">
-            <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
-              <div className="relative bottom-2 mt-2 flex w-full flex-col justify-center sm:bottom-4 sm:mt-0">
-                <div className="flex items-center">
-                  <ProjectLogo className="h-8 w-8" />
-
-                  <ProjectLogoDescription>
-                    Free Invoice Generator with Live PDF Preview
-                  </ProjectLogoDescription>
-                </div>
-              </div>
-              <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
-                <Button
-                  asChild
-                  variant="outline"
-                  className="group mx-2 w-full border-pink-200 bg-pink-50 text-pink-700 shadow-md transition-all duration-200 hover:border-pink-300 hover:bg-pink-100 hover:text-pink-800 hover:no-underline hover:shadow-lg focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 lg:mx-0 lg:w-auto"
-                  onClick={() => {
-                    // analytics track event
-                    umamiTrackEvent("donate_to_project_button_clicked_header");
-                  }}
-                >
-                  <Link
-                    href="https://dub.sh/easyinvoice-donate"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2"
-                  >
-                    Support Project
-                    <div className="relative select-none">
-                      <HeartIcon className="size-3 scale-110 fill-pink-500 text-pink-500 transition-all duration-200 group-hover:fill-pink-600 group-hover:text-pink-600" />
-                      <HeartIcon
-                        className={cn(
-                          "size-3 animate-ping fill-pink-500 text-pink-500 duration-1000 group-hover:fill-pink-600",
-                          "absolute inset-0 flex",
-                        )}
-                      />
-                    </div>
-                  </Link>
-                </Button>
-
-                {isDesktop ? (
-                  <>
-                    <CustomTooltip
-                      className={cn(!canShareInvoice && "bg-red-50")}
-                      trigger={
-                        <Button
-                          data-disabled={!canShareInvoice} // better UX than 'disabled'
-                          onClick={handleShareInvoice}
-                          variant="outline"
-                          className={cn(
-                            "mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto",
-                          )}
-                        >
-                          Generate a link to invoice
-                        </Button>
-                      }
-                      content={
-                        canShareInvoice ? (
-                          <div className="flex items-center gap-3 p-2">
-                            <div className="space-y-1">
-                              <p className="text-sm font-semibold text-slate-900">
-                                Share Invoice Online
-                              </p>
-                              <p className="text-pretty text-xs leading-relaxed text-slate-700">
-                                Generate a link to share this invoice with your
-                                clients. They can view and download it directly
-                                from their browser.
-                              </p>
-                            </div>
-                          </div>
-                        ) : (
-                          <div
-                            data-testid="share-invoice-tooltip-content"
-                            className="flex items-center gap-3 bg-red-50 p-3"
-                          >
-                            <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
-                            <div className="space-y-1">
-                              <p className="text-sm font-semibold text-red-800">
-                                Unable to Share Invoice
-                              </p>
-                              <p className="text-pretty text-xs leading-relaxed text-red-700">
-                                Invoices with logos cannot be shared. Please
-                                remove the logo to generate a shareable link.
-                                You can still download the invoice as PDF and
-                                share it.
-                              </p>
-                            </div>
-                          </div>
-                        )
-                      }
-                    />
-                    <InvoicePDFDownloadLink
-                      invoiceData={invoiceDataState}
-                      errorWhileGeneratingPdfIsShown={
-                        errorWhileGeneratingPdfIsShown
-                      }
-                      setErrorWhileGeneratingPdfIsShown={
-                        setErrorWhileGeneratingPdfIsShown
-                      }
-                    />
-                  </>
-                ) : null}
-
-                {/* TODO: add later when PRO version is released, this is PRO FEATURE =) */}
-                {/* {isDesktop ? (
-                <InvoicePDFDownloadMultipleLanguages
-                  invoiceData={invoiceDataState}
-                />
-              ) : null} */}
-              </div>
-            </div>
-            <div className="mb-3 mt-2 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-1">
-              <ProjectInfo />
-            </div>
-          </div>
+        <div className="w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 2xl:max-w-[1680px]">
+          <InvoicePageHeader
+            canShareInvoice={canShareInvoice}
+            handleShareInvoice={handleShareInvoice}
+            isDesktop={isDesktop}
+            invoiceDataState={invoiceDataState}
+            errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
+            setErrorWhileGeneratingPdfIsShown={
+              setErrorWhileGeneratingPdfIsShown
+            }
+          />
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
             <InvoiceClientPage
               invoiceDataState={invoiceDataState}
@@ -548,7 +478,7 @@ export function AppPageClient({
         translations={{
           footerDescription:
             "Create professional invoices in seconds with our free & open-source invoice maker. 100% in-browser, no sign-up required. Includes live PDF preview and a Stripe-style template - perfect for freelancers, startups, and small businesses.",
-          footerCreatedBy: "Created by",
+          footerCreatedBy: "Made by",
           product: "Product",
 
           newsletterTitle: "Subscribe to our newsletter",
@@ -606,6 +536,148 @@ export function AppPageClient({
   );
 }
 
+/**
+ * Header component for the invoice page.
+ * 
+ * Displays the project logo, description, and action buttons including:
+ * - Share invoice button (with conditional rendering based on shareability)
+ * - Download PDF button with error handling
+ * - Support project button
+
+ * @returns The rendered invoice page header with logo, description, and action buttons
+ */
+
+function InvoicePageHeader({
+  canShareInvoice,
+  handleShareInvoice,
+  isDesktop,
+  invoiceDataState,
+  errorWhileGeneratingPdfIsShown,
+  setErrorWhileGeneratingPdfIsShown,
+}: {
+  canShareInvoice: boolean;
+  handleShareInvoice: () => void;
+  isDesktop: boolean;
+  invoiceDataState: InvoiceData;
+  errorWhileGeneratingPdfIsShown: boolean;
+  setErrorWhileGeneratingPdfIsShown: (value: boolean) => void;
+}) {
+  return (
+    <div data-testid="header">
+      <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
+        <div className="relative bottom-2 mt-2 flex w-full flex-col justify-center sm:bottom-4 sm:mt-0">
+          <div className="flex items-center">
+            <ProjectLogo className="h-8 w-8" />
+
+            <ProjectLogoDescription>
+              Free Invoice Generator with Live PDF Preview
+            </ProjectLogoDescription>
+          </div>
+        </div>
+        <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
+          {/* Support project button (hidden on mobile) */}
+          <Button
+            asChild
+            variant="outline"
+            className="group mx-2 hidden w-full border-pink-200 bg-pink-50 text-pink-700 shadow-md transition-all duration-200 hover:border-pink-300 hover:bg-pink-100 hover:text-pink-800 hover:no-underline hover:shadow-lg focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 lg:mx-0 lg:inline-flex lg:w-auto"
+            onClick={() => {
+              // analytics track event
+              umamiTrackEvent("donate_to_project_button_clicked_header");
+            }}
+          >
+            <Link
+              href="https://dub.sh/easyinvoice-donate"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2"
+            >
+              Support Project
+              <div className="relative select-none">
+                <HeartIcon className="size-3 scale-110 fill-pink-500 text-pink-500 transition-all duration-200 group-hover:fill-pink-600 group-hover:text-pink-600" />
+                <HeartIcon
+                  className={cn(
+                    "size-3 animate-ping fill-pink-500 text-pink-500 duration-1000 group-hover:fill-pink-600",
+                    "absolute inset-0 flex",
+                  )}
+                />
+              </div>
+            </Link>
+          </Button>
+
+          {/* On mobile version, we show it in different place (bottom of the page)*/}
+          {isDesktop ? (
+            <>
+              <CustomTooltip
+                className={cn(!canShareInvoice && "bg-red-50")}
+                trigger={
+                  <Button
+                    data-disabled={!canShareInvoice} // better UX than 'disabled'
+                    onClick={handleShareInvoice}
+                    variant="outline"
+                    className={cn("mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto")}
+                  >
+                    Generate a link to invoice
+                  </Button>
+                }
+                content={
+                  canShareInvoice ? (
+                    <div className="flex items-center gap-3 p-2">
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold text-slate-900">
+                          Share Invoice Online
+                        </p>
+                        <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                          Generate a link to share this invoice with your
+                          clients. They can view and download it directly from
+                          their browser.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      data-testid="share-invoice-tooltip-content"
+                      className="flex items-center gap-3 bg-red-50 p-3"
+                    >
+                      <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold text-red-800">
+                          Unable to Share Invoice
+                        </p>
+                        <p className="text-pretty text-xs leading-relaxed text-red-700">
+                          Invoices with logos cannot be shared. Please remove
+                          the logo to generate a shareable link. You can still
+                          download the invoice as PDF and share it.
+                        </p>
+                      </div>
+                    </div>
+                  )
+                }
+              />
+              <InvoicePDFDownloadLink
+                invoiceData={invoiceDataState}
+                errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
+                setErrorWhileGeneratingPdfIsShown={
+                  setErrorWhileGeneratingPdfIsShown
+                }
+              />
+            </>
+          ) : null}
+
+          {/* TODO: add later when PRO version is released, this is PRO FEATURE =) */}
+          {/* {isDesktop ? (
+            <InvoicePDFDownloadMultipleLanguages
+              invoiceData={invoiceDataState}
+            />
+          ) : null} */}
+        </div>
+      </div>
+      <div className="mb-3 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-1">
+        <ProjectInfo />
+      </div>
+    </div>
+  );
+}
+
 function ProjectInfo() {
   const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
 
@@ -616,7 +688,7 @@ function ProjectInfo() {
 
   return (
     <>
-      <span className="relative bottom-0 text-center text-sm text-gray-900 lg:bottom-3">
+      <div className="relative bottom-0 flex flex-wrap items-center justify-center gap-1 text-center text-sm text-gray-900 lg:bottom-3">
         <button
           onClick={handleWatchDemoClick}
           className="inline-flex items-center gap-1.5 transition-colors hover:text-blue-600 hover:underline"
@@ -631,7 +703,18 @@ function ProjectInfo() {
         >
           Share your feedback
         </a>
-      </span>
+        {" | "}
+
+        <a
+          href={GITHUB_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex items-center gap-1 transition-colors hover:text-blue-600 hover:underline"
+        >
+          <GithubIcon className="size-4 transition-transform group-hover:fill-blue-600" />
+          <span className="group-hover:text-blue-600">View on GitHub</span>
+        </a>
+      </div>
 
       <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
         <DialogContent className="max-h-[calc(100vh-2rem)] gap-0 overflow-hidden p-0 sm:max-w-[800px]">

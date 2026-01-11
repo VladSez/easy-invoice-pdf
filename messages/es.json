@@ -11,8 +11,7 @@
     "tagline": "Generador de facturas PDF con vista previa en vivo",
     "hero": {
       "title": "Cree facturas profesionales en segundos",
-      "description": "EasyInvoicePDF es una herramienta gratuita de código abierto que le permite crear, personalizar y descargar facturas profesionales con vista previa en tiempo real. Funciona completamente en su navegador.",
-      "noSignup": "No requiere registro. 100% gratuito y de código abierto."
+      "description": "EasyInvoicePDF es una <span>herramienta gratuita</span> de código abierto que le permite crear, personalizar y descargar facturas profesionales con <span>vista previa en tiempo real</span>. Funciona completamente en su navegador."
     },
     "features": {
       "badge": "Características",
@@ -36,9 +35,9 @@
           "title": "Múltiples Idiomas y Monedas",
           "description": "Cree facturas en diez idiomas (inglés, polaco, alemán, español, portugués, ruso, ucraniano, francés, italiano, holandés) con soporte para todas las principales monedas y formato automático."
         },
-        "vatSupport": {
-          "title": "Soporte de VAT Europeo",
-          "description": "Calcula automáticamente las tasas y totales del VAT europeo para tus facturas."
+        "taxSupport": {
+          "title": "Sistema Fiscal Flexible",
+          "description": "Compatible con cualquier sistema fiscal incluyendo IVA, Sales Tax, GST y más. Completamente personalizable según tus requisitos locales."
         },
         "openSource": {
           "title": "Código Abierto",
@@ -67,7 +66,8 @@
       "starOnGithub": "Dar estrella en GitHub",
       "switchLanguage": "Cambiar idioma",
       "shareFeedback": "Compartir comentarios",
-      "app": "Aplicación"
+      "app": "Aplicación",
+      "startInvoicing": "Comenzar a facturar"
     },
     "newsletter": {
       "title": "Suscríbete a nuestro boletín",

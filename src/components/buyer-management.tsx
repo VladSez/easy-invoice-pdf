@@ -35,6 +35,26 @@ interface BuyerManagementProps {
   formValues?: Partial<BuyerData>;
 }
 
+/**
+ * BuyerManagement Component
+ *
+ * Manages buyer data for invoices including:
+ * - Loading and displaying saved buyers from localStorage
+ * - Creating new buyers via a dialog form
+ * - Editing existing buyer details
+ * - Deleting buyers with confirmation
+ * - Auto-populating invoice form fields when a buyer is selected
+ *
+ * When a buyer is selected from the dropdown, their details are populated into the
+ * invoice form and the form fields become read-only. Users must use the Edit Buyer
+ * button to modify saved buyer information.
+ *
+ * @param setValue - React Hook Form setter to update invoice form values
+ * @param invoiceData - Current invoice data including buyer information
+ * @param selectedBuyerId - ID of the currently selected buyer
+ * @param setSelectedBuyerId - Callback to update the selected buyer ID
+ * @param formValues - Current buyer form values (optional)
+ */
 export function BuyerManagement({
   setValue,
   invoiceData,

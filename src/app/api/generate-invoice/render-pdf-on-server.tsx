@@ -1,5 +1,6 @@
-import { PDF_DEFAULT_TEMPLATE_STYLES } from "@/app/(app)/components/invoice-pdf-template";
-import { InvoiceBody } from "@/app/(app)/components/invoice-pdf-template/invoice-body";
+import { PDF_DEFAULT_TEMPLATE_STYLES } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
+import { InvoiceBody } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template/invoice-body";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import {
   INVOICE_DEFAULT_NUMBER_VALUE,
   LAST_DAY_OF_MONTH,
@@ -7,9 +8,10 @@ import {
   TODAY,
 } from "@/app/constants";
 import { type InvoiceData, type SupportedLanguages } from "@/app/schema";
-import { TRANSLATIONS } from "@/app/schema/translations";
 import { STATIC_ASSETS_URL } from "@/config";
 import { env } from "@/env";
+
+// IMPORTANT: we use @react-pdf/renderer directly here, because we need to render the PDF on the server, not the client
 // eslint-disable-next-line no-restricted-imports
 import { Document, Font, Page } from "@react-pdf/renderer";
 
@@ -65,7 +67,7 @@ const translateInvoiceNumberLabel = ({
 }: {
   language: SupportedLanguages;
 }) => {
-  const invoiceNumberLabel = `${TRANSLATIONS[language].invoiceNumber}:`;
+  const invoiceNumberLabel = `${INVOICE_PDF_TRANSLATIONS[language].invoiceNumber}:`;
 
   return invoiceNumberLabel;
 };
@@ -93,6 +95,7 @@ export const ENGLISH_INVOICE_REAL_DATA = {
     address: env.SELLER_ADDRESS,
 
     vatNo: env.SELLER_VAT_NO,
+    vatNoLabelText: "VAT no",
     vatNoFieldIsVisible: true,
 
     email: env.SELLER_EMAIL,
@@ -109,6 +112,7 @@ export const ENGLISH_INVOICE_REAL_DATA = {
     address: env.BUYER_ADDRESS,
 
     vatNo: env.BUYER_VAT_NO,
+    vatNoLabelText: "VAT no",
     vatNoFieldIsVisible: true,
 
     email: env.BUYER_EMAIL,
@@ -148,6 +152,7 @@ export const ENGLISH_INVOICE_REAL_DATA = {
   personAuthorizedToIssueFieldIsVisible: true,
 
   template: "default",
+  taxLabelText: "VAT",
 } as const satisfies InvoiceData;
 
 export const POLISH_INVOICE_REAL_DATA = {

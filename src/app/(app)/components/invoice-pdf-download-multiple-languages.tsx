@@ -11,7 +11,7 @@ import {
   type InvoiceData,
   type SupportedLanguages,
 } from "@/app/schema";
-import { InvoicePdfTemplate } from "./invoice-pdf-template";
+import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
 
 import { MultiSelect } from "@/components/ui/multi-select";
 import { useEffect, useState } from "react";

@@ -3,8 +3,7 @@
     "tagline": "PDF-factuur generator met live preview",
     "hero": {
       "title": "Maak professionele facturen in seconden",
-      "description": "EasyInvoicePDF is een gratis, open-source tool waarmee je professionele facturen kunt maken, aanpassen en downloaden met realtime voorbeeld. Draait volledig in je browser.",
-      "noSignup": "Geen registratie vereist. 100% gratis en open-source."
+      "description": "EasyInvoicePDF is een <span>gratis</span>, open-source tool waarmee je professionele facturen kunt maken, aanpassen en downloaden met <span>realtime voorbeeld</span>. Draait volledig in je browser."
     },
     "features": {
       "badge": "Functies",
@@ -28,9 +27,9 @@
           "title": "Meerdere Talen & Valuta's",
           "description": "Maak facturen in tien talen (Engels, Pools, Duits, Spaans, Portugees, Russisch, Oekraïens, Frans, Italiaans, Nederlands) met ondersteuning voor alle belangrijke valuta's en automatische opmaak."
         },
-        "vatSupport": {
-          "title": "Europese VAT-ondersteuning",
-          "description": "Automatische berekening van Europese VAT-tarieven en totalen voor uw facturen."
+        "taxSupport": {
+          "title": "Flexibel Belastingsysteem",
+          "description": "Ondersteuning voor elk belastingsysteem inclusief BTW, Sales Tax, GST en meer. Volledig aanpasbaar aan uw lokale vereisten."
         },
         "openSource": {
           "title": "Open Source",
@@ -59,7 +58,8 @@
       "starOnGithub": "Ster geven op GitHub",
       "switchLanguage": "Verander taal",
       "shareFeedback": "Feedback delen",
-      "app": "App"
+      "app": "App",
+      "startInvoicing": "Begin met factureren"
     },
     "newsletter": {
       "title": "Abonneer op onze nieuwsbrief",

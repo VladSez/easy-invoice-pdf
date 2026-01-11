@@ -1,14 +1,19 @@
+import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
+import { StripeInvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
+import type { InvoiceData, MobileTabsValues } from "@/app/schema";
+import { DEFAULT_MOBILE_TAB, MOBILE_TABS_VALUES } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CustomTooltip } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+import dayjs from "dayjs";
 import { AlertCircleIcon, FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
-import type { InvoiceData } from "@/app/schema";
+
+import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
-import { InvoicePdfTemplate } from "./invoice-pdf-template";
-import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
-import { cn } from "@/lib/utils";
+import { TWITTER_URL } from "@/config";
 
 const DesktopPDFViewerModuleLoading = () => (
   <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
@@ -20,7 +25,7 @@ const DesktopPDFViewerModuleLoading = () => (
 );
 
 const MobileInvoicePDFViewerModuleLoading = () => (
-  <div className="flex h-[480px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+  <div className="flex h-[520px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
     <div className="text-center">
       <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
       <p className="text-gray-600">Loading PDF viewer...</p>
@@ -92,10 +97,8 @@ const PdfViewer = ({
   );
 };
 
-const TABS_VALUES = ["invoice-form", "invoice-preview"] as const;
-
-const TAB_INVOICE_FORM = TABS_VALUES[0];
-const TAB_INVOICE_PREVIEW = TABS_VALUES[1];
+const TAB_INVOICE_FORM = MOBILE_TABS_VALUES[0];
+const TAB_INVOICE_PREVIEW = MOBILE_TABS_VALUES[1];
 
 export function InvoiceClientPage({
   invoiceDataState,
@@ -116,11 +119,36 @@ export function InvoiceClientPage({
   setCanShareInvoice: (canShareInvoice: boolean) => void;
   canShareInvoice: boolean;
 }) {
+  const appMetadata = getAppMetadata();
+
+  const invoiceLastUpdatedAtFormatted = appMetadata?.invoiceLastUpdatedAt
+    ? dayjs(appMetadata.invoiceLastUpdatedAt)
+        .locale("en")
+        .format("MMM D, YYYY [at] HH:mm")
+    : null;
+
+  const defaultMobileTab =
+    appMetadata?.lastVisitedMobileTab || DEFAULT_MOBILE_TAB;
+
   return (
     <>
       {isMobile ? (
         <div>
-          <Tabs defaultValue={TAB_INVOICE_FORM} className="w-full">
+          <Tabs
+            defaultValue={defaultMobileTab}
+            className="w-full"
+            onValueChange={(value) => {
+              const newValue = value as MobileTabsValues;
+
+              // update the last visited mobile tab in the app metadata
+              updateAppMetadata((current) => {
+                return {
+                  ...current,
+                  lastVisitedMobileTab: newValue,
+                };
+              });
+            }}
+          >
             <TabsList className="w-full">
               <TabsTrigger value={TAB_INVOICE_FORM} className="flex-1">
                 <span className="flex items-center gap-1">
@@ -136,7 +164,7 @@ export function InvoiceClientPage({
               </TabsTrigger>
             </TabsList>
             <TabsContent value={TAB_INVOICE_FORM} className="mt-1">
-              <div className="h-[480px] overflow-auto rounded-lg border-b px-3 shadow-sm">
+              <div className="h-[520px] overflow-auto rounded-lg border-b px-3 shadow-sm">
                 <InvoiceForm
                   invoiceData={invoiceDataState}
                   handleInvoiceDataChange={handleInvoiceDataChange}
@@ -145,7 +173,7 @@ export function InvoiceClientPage({
               </div>
             </TabsContent>
             <TabsContent value={TAB_INVOICE_PREVIEW} className="mt-1">
-              <div className="flex h-[480px] w-full items-center justify-center">
+              <div className="flex h-[520px] w-full items-center justify-center">
                 <PdfViewer
                   invoiceData={invoiceDataState}
                   errorWhileGeneratingPdfIsShown={
@@ -211,20 +239,57 @@ export function InvoiceClientPage({
               }
             />
           </div>
+          {invoiceLastUpdatedAtFormatted && (
+            <div className="relative mt-2 text-center text-xs text-slate-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
+              <span className="font-semibold">Invoice last updated:</span>{" "}
+              {invoiceLastUpdatedAtFormatted}
+            </div>
+          )}
+          <div className="mt-3 flex w-full justify-center">
+            <span className="inline-block text-sm text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
+              Made by{" "}
+              <a
+                href={TWITTER_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-black"
+              >
+                Vlad Sazonau
+              </a>
+            </span>
+          </div>
         </div>
       ) : (
         // Desktop View
         <>
           <div className="col-span-4">
-            <div className="h-[620px] overflow-auto border-b px-3 pl-0 2xl:h-[700px]">
+            <div className="h-[620px] overflow-auto border-b px-3 pl-0 shadow-[0_4px_6px_-4px_rgba(0,0,0,0.1)] 2xl:h-[700px]">
               <InvoiceForm
                 invoiceData={invoiceDataState}
                 handleInvoiceDataChange={handleInvoiceDataChange}
                 setCanShareInvoice={setCanShareInvoice}
               />
             </div>
+
+            <span className="mt-1 inline-block text-end text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
+              Made by{" "}
+              <a
+                href={TWITTER_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-black"
+              >
+                Vlad Sazonau
+              </a>
+            </span>
           </div>
-          <div className="col-span-8 h-[620px] w-full max-w-full 2xl:h-[700px]">
+          <div className="relative col-span-8 h-[620px] w-full max-w-full 2xl:h-[700px]">
+            {invoiceLastUpdatedAtFormatted && (
+              <div className="absolute -top-5 right-0 text-center text-xs text-slate-700 duration-500 animate-in fade-in slide-in-from-bottom-2 md:-mb-5 lg:text-right">
+                <span className="font-semibold">Invoice last updated:</span>{" "}
+                {invoiceLastUpdatedAtFormatted}
+              </div>
+            )}
             <PdfViewer
               invoiceData={invoiceDataState}
               errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}

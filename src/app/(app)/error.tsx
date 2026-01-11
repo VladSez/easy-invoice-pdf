@@ -8,6 +8,7 @@ import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
 import { ErrorMessage } from "@/components/etc/error-message";
 import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema";
+import { BUG_REPORT_URL } from "@/config";
 
 export default function Error({
   error,
@@ -32,13 +33,16 @@ export default function Error({
     <div className="flex h-dvh flex-col items-center justify-center gap-4">
       <div className="flex flex-col items-center justify-center gap-4">
         <ErrorMessage>
-          Something went wrong. Please try to refresh the page or fill a bug
-          report{" "}
+          Something went wrong. Please try refreshing the page or using{" "}
+          <span className="font-bold">Chrome</span> browser. If the issue
+          persists, please fill a bug report{" "}
           <a
-            href="https://pdfinvoicegenerator.userjot.com/board/bugs"
+            href={BUG_REPORT_URL}
             className="underline"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            here
+            here.
           </a>
         </ErrorMessage>
         <Button

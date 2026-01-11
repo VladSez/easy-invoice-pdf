@@ -13,7 +13,7 @@ import {
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
-import { VIDEO_DEMO_URL } from "@/config";
+import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -21,7 +21,15 @@ test.describe("Invoice Generator Page", () => {
   });
 
   test("should redirect from /:locale/app to /", async ({ page }) => {
-    await page.goto("/en/app");
+    await page.goto("/en/app", { waitUntil: "commit" });
+
+    // wait for the app page to load
+    const downloadPDFButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadPDFButton).toBeVisible();
+
     await expect(page).toHaveURL("/?template=default");
   });
 
@@ -41,13 +49,13 @@ test.describe("Invoice Generator Page", () => {
     // Check that OG image changed to Stripe template
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
       "content",
-      "https://static.easyinvoicepdf.com/easy-invoice-opengraph-image.png?v=1755773879597",
+      `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
     );
 
     // Check other meta tags for Stripe template
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
       "content",
-      "App | Free Invoice Generator – Live Preview, No Sign-Up",
+      "Create Invoice — EasyInvoicePDF",
     );
     await expect(
       page.locator('meta[property="og:description"]'),
@@ -78,9 +86,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(page).toHaveURL("/?template=default");
 
     // Check title and branding
-    await expect(page).toHaveTitle(
-      "App | Free Invoice Generator – Live Preview, No Sign-Up",
-    );
+    await expect(page).toHaveTitle("Create Invoice — EasyInvoicePDF");
 
     const header = page.getByTestId("header");
     await expect(header).toBeVisible();
@@ -94,9 +100,6 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     // Check main action buttons
-    await expect(
-      page.getByRole("link", { name: "Support Project" }),
-    ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Generate a link to invoice" }),
     ).toBeVisible();
@@ -234,7 +237,7 @@ test.describe("Invoice Generator Page", () => {
       await expect(
         dateFormatSelect.locator(`option[value="${dateFormat}"]`),
       ).toHaveText(
-        `${dateFormat} (Preview: ${preview}) ${isDefault ? "(default)" : ""}`,
+        `${dateFormat} (${preview}) ${isDefault ? "(default)" : ""}`,
       );
     }
 
@@ -287,9 +290,12 @@ test.describe("Invoice Generator Page", () => {
       sellerSection.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.address);
 
-    // VAT Number field and visibility toggle
+    // Tax Number field and visibility toggle
+    const sellerVatFieldset = sellerSection.getByRole("group", {
+      name: "Tax Number",
+    });
     await expect(
-      sellerSection.getByRole("textbox", { name: "VAT Number" }),
+      sellerVatFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.vatNo);
     await expect(
       sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(0),
@@ -337,9 +343,12 @@ test.describe("Invoice Generator Page", () => {
       buyerSection.getByRole("textbox", { name: "Address" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.buyer.address);
 
-    // VAT Number field and visibility toggle
+    // Tax Number field and visibility toggle
+    const buyerVatFieldset = buyerSection.getByRole("group", {
+      name: "Tax Number",
+    });
     await expect(
-      buyerSection.getByRole("textbox", { name: "VAT Number" }),
+      buyerVatFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.buyer.vatNo);
 
     const buyerVatNoFieldIsVisibleSwitch = buyerSection.getByTestId(
@@ -437,9 +446,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       invoiceItemsSection
         .getByTestId(`itemVat0`)
-        .getByText(
-          'Enter "NP" (not applicable), "OO" (out of scope), or a percentage value (0-100)',
-        ),
+        .getByText("Enter a number (0-100), or any text (i.e. NP, OO, etc)."),
     ).toBeVisible();
 
     // Net Amount field (read-only) and visibility toggle
@@ -658,6 +665,11 @@ test.describe("Invoice Generator Page", () => {
     await finalSection
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Test note");
+
+    // Check that "Invoice last updated:" text is displayed after filling in the data
+    await expect(
+      page.getByText("Invoice last updated:", { exact: false }),
+    ).toBeVisible();
 
     // Wait a moment for any debounced localStorage updates
     // eslint-disable-next-line playwright/no-wait-for-timeout
@@ -976,37 +988,27 @@ test.describe("Invoice Generator Page", () => {
       exact: true,
     });
 
+    const helperText = `Must be a number between 0-100 or any text (i.e. NP, OO, etc).`;
+
     // Try invalid values
     await vatInput.fill("101");
-    await expect(page.getByText("VAT must be between 0 and 100")).toBeVisible();
+    await expect(page.getByText(helperText)).toBeVisible();
 
     await vatInput.fill("-1");
-    await expect(page.getByText("VAT must be between 0 and 100")).toBeVisible();
-
-    await vatInput.fill("abc");
-    await expect(
-      page.getByText(
-        `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
-      ),
-    ).toBeVisible();
+    await expect(page.getByText(helperText)).toBeVisible();
 
     // Try valid values
     await vatInput.fill("23");
-    await expect(page.getByText("VAT must be between 0 and 100")).toBeHidden();
+    await expect(page.getByText(helperText)).toBeHidden();
 
     await vatInput.fill("NP");
-    await expect(
-      page.getByText(
-        `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
-      ),
-    ).toBeHidden();
+    await expect(page.getByText(helperText)).toBeHidden();
 
     await vatInput.fill("OO");
-    await expect(
-      page.getByText(
-        `Must be a valid number (0-100), "NP" (not applicable), or "OO" (out of scope)`,
-      ),
-    ).toBeHidden();
+    await expect(page.getByText(helperText)).toBeHidden();
+
+    await vatInput.fill("CUSTOM");
+    await expect(page.getByText(helperText)).toBeHidden();
   });
 
   test("handles VAT calculations for different rates", async ({ page }) => {
@@ -1102,5 +1104,92 @@ test.describe("Invoice Generator Page", () => {
         }),
       ).toHaveValue(testCase.expected.total);
     }
+  });
+
+  test("displays helper messages when dates are out of date and allows updating all dates", async ({
+    page,
+  }) => {
+    // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
+    await page.clock.setSystemTime(new Date("2025-12-01T00:00:00Z"));
+
+    // Navigate to the page
+    await page.goto("/?template=default");
+
+    // Get the general information section
+    const generalInfoSection = page.getByRole("region", {
+      name: "General Information",
+    });
+
+    // Set date of issue to a past date (not today)
+    const dateOfIssueInput = generalInfoSection.getByLabel("Date of Issue");
+    await dateOfIssueInput.fill("2024-01-15");
+
+    // Verify "Date of issue is not today" message appears
+    await expect(
+      generalInfoSection.getByText("Date of issue is not today"),
+    ).toBeVisible();
+
+    const dateOfIssueBtn = generalInfoSection.getByRole("button", {
+      name: "Set date of issue to today (2025-12-01)",
+    });
+
+    // Verify the helper button to set date to today is visible
+    await expect(dateOfIssueBtn).toBeVisible();
+    await expect(dateOfIssueBtn).toBeEnabled();
+
+    // Set date of service to a date that's not the last day of current month
+    const dateOfServiceInput = generalInfoSection.getByLabel("Date of Service");
+    await dateOfServiceInput.fill("2024-01-15");
+
+    // Verify "Date of service is not the last day of the current month" message appears
+    await expect(
+      generalInfoSection.getByText(
+        "Date of service is not the last day of the current month",
+      ),
+    ).toBeVisible();
+
+    const dateOfServiceBtn = generalInfoSection.getByRole("button", {
+      name: "Set date of service to month end (2025-12-31)",
+    });
+
+    // Verify the helper button to set date to month end is visible
+    await expect(dateOfServiceBtn).toBeVisible();
+    await expect(dateOfServiceBtn).toBeEnabled();
+
+    // Verify the "Update all dates" section appears
+    await expect(
+      generalInfoSection.getByText(
+        "Some dates are out of date. Click the button to update all at once:",
+      ),
+    ).toBeVisible();
+
+    // Verify the "Update all dates" button is visible
+    const updateAllDatesButton = generalInfoSection.getByRole("button", {
+      name: "Update all dates",
+    });
+    await expect(updateAllDatesButton).toBeVisible();
+
+    // Click the "Update all dates" button
+    await updateAllDatesButton.click();
+
+    // Verify that the helper messages are no longer visible after update
+
+    await expect(
+      generalInfoSection.getByText("Date of issue is not today"),
+    ).toBeHidden();
+    await expect(dateOfIssueInput).toHaveValue("2025-12-01");
+
+    await expect(
+      generalInfoSection.getByText(
+        "Date of service is not the last day of the current month",
+      ),
+    ).toBeHidden();
+    await expect(dateOfServiceInput).toHaveValue("2025-12-31");
+
+    await expect(
+      generalInfoSection.getByText(
+        "Some dates are out of date. Click the button to update all at once:",
+      ),
+    ).toBeHidden();
   });
 });

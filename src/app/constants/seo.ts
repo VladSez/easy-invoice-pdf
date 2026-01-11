@@ -1,4 +1,8 @@
-import { type WebSite, type WithContext } from "schema-dts";
+import {
+  type SoftwareApplication,
+  type WebSite,
+  type WithContext,
+} from "schema-dts";
 import { type BreadcrumbList, type SiteNavigationElement } from "schema-dts";
 import { STATIC_ASSETS_URL } from "@/config";
 
@@ -6,34 +10,38 @@ export const WEBSITE_JSONLD = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   url: "https://easyinvoicepdf.com/",
-  name: "EasyInvoicePDF.com | Free Invoice Generator – Live Preview, No Sign-Up",
+  name: "EasyInvoicePDF | Free & Open-Source Invoice Generator – Live Preview, No Sign-Up",
   description:
-    "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
+    "Create and download professional invoices instantly with EasyInvoicePDF. Free and open-source. No signup required.",
   keywords: [
-    "invoice",
+    "invoice pdf generator",
+    "free invoice pdf",
+    "create invoice pdf",
+    "invoice generator open source",
+    "pdf invoice template",
     "invoice generator",
-    "invoice generating",
-    "invoice app",
-    "invoice generator app",
     "free invoice generator",
+    "online invoice generator",
+    "invoice maker pdf",
+    "professional invoice generator",
   ],
   image: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
   mainEntityOfPage: {
     "@type": "SoftwareApplication",
     "@id": `https://easyinvoicepdf.com/`,
-    name: "EasyInvoicePDF.com | Free Invoice Generator – Live Preview, No Sign-Up",
+    name: "EasyInvoicePDF | Free & Open-Source Invoice Generator – Live Preview, No Sign-Up",
     description:
-      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
+      "Create and download professional invoices instantly with EasyInvoicePDF. Free and open-source. No signup required.",
     featureList: [
-      "Live preview invoice generation",
-      "No sign-up required",
-      "Free and open-source",
-      "Customizable templates",
-      "Instant PDF download",
-      "Stripe-style invoice templates",
-      "Support for multiple languages and currencies",
-      "European VAT support",
-      "Secure shareable invoice links",
+      "Live Preview: See changes in real-time as you type",
+      "Shareable Links: Send invoices directly to clients without attachments",
+      "No Sign-Up Required: Start creating invoices immediately without any registration",
+      "Browser Only: No server uploads, your data stays private",
+      "Multi-Language: Support for 10+ languages and all major currencies",
+      "Flexible Tax Support: VAT, GST, Sales Tax, and custom tax formats with automatic calculations",
+      "Multiple Templates: Including modern Stripe-style design",
+      "Instant PDF: One-click download ready for printing or sending",
+      "Mobile-Friendly: Fully responsive design works perfectly on all devices",
     ],
     operatingSystem: "All",
     applicationCategory: "BusinessApplication",
@@ -52,24 +60,18 @@ export const BREADCRUMB_JSONLD = {
     {
       "@type": "ListItem",
       position: 1,
-      name: "Home",
-      item: "https://easyinvoicepdf.com/",
-    },
-    {
-      "@type": "ListItem",
-      position: 2,
       name: "Invoice Generator",
       item: "https://easyinvoicepdf.com/",
     },
     {
       "@type": "ListItem",
-      position: 3,
+      position: 2,
       name: "About",
       item: "https://easyinvoicepdf.com/en/about",
     },
     {
       "@type": "ListItem",
-      position: 4,
+      position: 3,
       name: "Changelog",
       item: "https://easyinvoicepdf.com/changelog",
     },
@@ -116,3 +118,16 @@ export const SITE_NAVIGATION_JSONLD = {
     },
   ],
 } as const satisfies WithContext<SiteNavigationElement>;
+
+export const SOFTWARE_APPLICATION_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "EasyInvoicePDF | Free & Open-Source Invoice Generator – Live Preview, No Sign-Up",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "EUR",
+  },
+} as const satisfies WithContext<SoftwareApplication>;

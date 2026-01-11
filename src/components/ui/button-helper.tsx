@@ -10,6 +10,7 @@ export const ButtonHelper = ({
 >) => {
   return (
     <Button
+      type="button"
       variant="link"
       size="sm"
       className={cn(

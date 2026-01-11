@@ -1,5 +1,5 @@
 import { SUPPORTED_LANGUAGES } from "@/app/schema";
-import { TRANSLATIONS } from "@/app/schema/translations";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { z } from "zod";
@@ -26,7 +26,7 @@ export function handleInvoiceNumberBreakingChange(json: unknown) {
   ) {
     umamiTrackEvent("breaking_change_detected");
 
-    let lang: keyof typeof TRANSLATIONS;
+    let lang: keyof typeof INVOICE_PDF_TRANSLATIONS;
 
     const invoiceLanguage = z
       .enum(SUPPORTED_LANGUAGES)
@@ -41,7 +41,7 @@ export function handleInvoiceNumberBreakingChange(json: unknown) {
       lang = invoiceLanguage.data;
     }
 
-    const invoiceNumberLabel = TRANSLATIONS[lang].invoiceNumber;
+    const invoiceNumberLabel = INVOICE_PDF_TRANSLATIONS[lang].invoiceNumber;
 
     // Create new object without invoiceNumber and with invoiceNumberObject
     const newJson = {

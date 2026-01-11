@@ -1,3 +1,5 @@
+import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
+import { StripeInvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
 import {
   LANGUAGE_TO_LABEL,
   type InvoiceData,
@@ -13,15 +15,12 @@ import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { LOADING_BUTTON_TEXT, LOADING_BUTTON_TIMEOUT } from "./invoice-form";
-import { StripeInvoicePdfTemplate } from "./invoice-pdf-stripe-template";
-import { InvoicePdfTemplate } from "./invoice-pdf-template";
 
-import { showRandomCTAToast } from "./cta-toasts";
 import { useDeviceContext } from "@/contexts/device-context";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
-import { CTA_TOAST_LAST_SHOWN_STORAGE_KEY } from "../hooks/use-show-random-cta-toast";
 import { useCTAToast } from "../contexts/cta-toast-context";
-import { CTA_TOAST_TIMEOUT } from "./cta-toasts";
+import { CTA_TOAST_LAST_SHOWN_STORAGE_KEY } from "../hooks/use-show-random-cta-toast";
+import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./cta-toasts";
 
 // Separate button states into a memoized component
 const ButtonContent = ({
@@ -64,14 +63,6 @@ export function InvoicePDFDownloadLink({
 
   const isTelegramPreviewBrowser = isTelegramInAppBrowser();
 
-  const trackDownload = useCallback(() => {
-    umamiTrackEvent("download_invoice", {
-      data: {
-        invoice_template: invoiceData.template,
-      },
-    });
-  }, [invoiceData.template]);
-
   const handleDownloadPDFClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (!url) {
@@ -105,10 +96,20 @@ export function InvoicePDFDownloadLink({
       }
 
       if (!isLoading && !error) {
-        trackDownload();
+        // track download event
+        umamiTrackEvent("download_invoice", {
+          data: {
+            invoice_template: invoiceData.template,
+          },
+        });
 
         // close all other toasts (if any)
         toast.dismiss();
+
+        // if (isToastShownInSession) {
+        //   umamiTrackEvent("cta_toast_skipped_downloaded_invoice");
+        //   return;
+        // }
 
         // Show a CTA toast
         setTimeout(() => {
@@ -129,10 +130,10 @@ export function InvoicePDFDownloadLink({
       url,
       inAppInfo?.isInApp,
       inAppInfo?.name,
+      isTelegramPreviewBrowser,
       isLoading,
       error,
-      trackDownload,
-      isTelegramPreviewBrowser,
+      invoiceData.template,
       markToastAsShown,
     ],
   );
@@ -203,11 +204,11 @@ export function InvoicePDFDownloadLink({
         description: (
           <p>
             For the best experience, please open this page in{" "}
-            <span className="underline">Safari or Chrome browser.</span>
+            <span className="font-bold">Safari or Chrome browser.</span>
           </p>
         ),
         id: "in-app-browser-toast", // To prevent duplicate toasts
-        duration: 8000,
+        duration: Infinity,
         icon: "⚠️",
       });
       setInAppBrowserToastShown(true);
