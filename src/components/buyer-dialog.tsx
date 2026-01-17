@@ -233,10 +233,10 @@ export function BuyerDialog({
                     htmlFor="apply-form-values-switch"
                     className="cursor-pointer"
                   >
-                    Use Current Form Values
+                    Pre-fill with values from the current invoice form
                   </Label>
                 }
-                content="Pre-fill with values from the current invoice form"
+                content="Use the buyer details already entered in the invoice form to pre-fill this dialog"
                 className="z-[1000]"
               />
             </div>

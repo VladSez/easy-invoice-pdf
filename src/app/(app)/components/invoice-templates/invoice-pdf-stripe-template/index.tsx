@@ -33,6 +33,7 @@ import "dayjs/locale/fr";
 import "dayjs/locale/it";
 import "dayjs/locale/nl";
 import dayjs from "dayjs";
+import { InvoiceQRCode } from "@/app/(app)/components/invoice-templates/common/invoice-qr-code";
 
 const fontFamily = "Inter";
 
@@ -197,8 +198,10 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
 
 export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
   invoiceData,
+  qrCodeDataUrl,
 }: {
   invoiceData: InvoiceData;
+  qrCodeDataUrl?: string;
 }) {
   const language = invoiceData.language;
 
@@ -220,6 +223,9 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
     invoiceData.currency === "USD" && language === "en" ? " USD" : "";
 
   const formattedInvoiceTotalWithCurrency = `${formattedInvoiceTotal}${currencyCode}`;
+
+  const isQrCodeVisible =
+    invoiceData?.qrCodeIsVisible && qrCodeDataUrl && qrCodeDataUrl.length > 0;
 
   return (
     <Document title={invoiceDocTitle}>
@@ -275,6 +281,14 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
               </Text>
             </View>
           )}
+
+          {/* QR Code - centered below notes */}
+          {isQrCodeVisible ? (
+            <InvoiceQRCode
+              qrCodeDataUrl={qrCodeDataUrl}
+              description={invoiceData.qrCodeDescription}
+            />
+          ) : null}
         </View>
 
         {/* Footer */}

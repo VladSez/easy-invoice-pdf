@@ -177,8 +177,10 @@ export const PDF_DEFAULT_TEMPLATE_STYLES = StyleSheet.create({
 // Memoize the PDF Document component
 export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
   invoiceData,
+  qrCodeDataUrl,
 }: {
   invoiceData: InvoiceData;
+  qrCodeDataUrl?: string;
 }) {
   const invoiceNumberLabel = invoiceData?.invoiceNumberObject?.label;
 
@@ -193,6 +195,7 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
         <InvoiceBody
           invoiceData={invoiceData}
           styles={PDF_DEFAULT_TEMPLATE_STYLES}
+          qrCodeDataUrl={qrCodeDataUrl}
         />
       </Page>
     </Document>

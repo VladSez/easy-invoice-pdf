@@ -21,15 +21,18 @@ import "dayjs/locale/uk";
 import "dayjs/locale/fr";
 import "dayjs/locale/it";
 import "dayjs/locale/nl";
+import { InvoiceQRCode } from "@/app/(app)/components/invoice-templates/common/invoice-qr-code";
 
 export const InvoiceBody = ({
   invoiceData,
   styles,
   shouldLocaliseDates = true,
+  qrCodeDataUrl = "",
 }: {
   invoiceData: InvoiceData;
   styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
   shouldLocaliseDates?: boolean;
+  qrCodeDataUrl?: string;
 }) => {
   const language = invoiceData.language;
   const t = INVOICE_PDF_TRANSLATIONS[language];
@@ -55,6 +58,9 @@ export const InvoiceBody = ({
     invoiceData.personAuthorizedToIssueFieldIsVisible;
 
   const vatTableSummaryIsVisible = invoiceData.vatTableSummaryIsVisible;
+
+  const isQrCodeVisible =
+    invoiceData?.qrCodeIsVisible && qrCodeDataUrl && qrCodeDataUrl.length > 0;
 
   return (
     <>
@@ -124,6 +130,14 @@ export const InvoiceBody = ({
           <Text style={styles.fontSize8}>{invoiceData?.notes}</Text>
         </View>
       )}
+
+      {/* QR Code - centered below notes */}
+      {isQrCodeVisible ? (
+        <InvoiceQRCode
+          qrCodeDataUrl={qrCodeDataUrl}
+          description={invoiceData.qrCodeDescription}
+        />
+      ) : null}
 
       {/* Footer  */}
       <InvoiceFooter invoiceData={invoiceData} styles={styles} />

@@ -158,6 +158,7 @@ export const SellerInformation = memo(function SellerInformation({
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                       disabled={isSellerSelected}
                       data-testid={`sellerVatNoFieldIsVisible`}
+                      aria-label={`Show/hide the 'Seller Tax Number' Field in the PDF`}
                     />
                   )}
                 />
@@ -317,6 +318,7 @@ export const SellerInformation = memo(function SellerInformation({
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                     disabled={isSellerSelected}
                     data-testid={`sellerAccountNumberFieldIsVisible`}
+                    aria-label={`Show/hide the 'Account Number' Field in the PDF`}
                   />
                 )}
               />
@@ -389,6 +391,7 @@ export const SellerInformation = memo(function SellerInformation({
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                     disabled={isSellerSelected}
                     data-testid={`sellerSwiftBicFieldIsVisible`}
+                    aria-label={`Show/hide the 'SWIFT/BIC' Field in the PDF`}
                   />
                 )}
               />
@@ -462,6 +465,7 @@ export const SellerInformation = memo(function SellerInformation({
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                     disabled={isSellerSelected}
                     data-testid={`sellerNotesInvoiceFormFieldVisibilitySwitch`}
+                    aria-label={`Show/hide the 'Notes' field in the PDF`}
                   />
                 )}
               />
@@ -474,7 +478,7 @@ export const SellerInformation = memo(function SellerInformation({
                 content={
                   isSellerSelected
                     ? null
-                    : "Show/Hide the 'Notes' Field in the PDF"
+                    : "Show/Hide the 'Notes' field in the PDF"
                 }
               />
             </div>

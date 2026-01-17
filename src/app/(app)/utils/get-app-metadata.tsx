@@ -6,6 +6,7 @@ import {
   SCHEMA_VERSION,
   APP_VERSION,
   type Metadata,
+  DEFAULT_MOBILE_TAB,
 } from "@/app/schema";
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
@@ -15,6 +16,7 @@ export const DEFAULT_METADATA = {
   schemaVersion: SCHEMA_VERSION,
   invoiceCreatedAt: dayjs().toISOString(),
   invoiceLastUpdatedAt: dayjs().toISOString(),
+  lastVisitedMobileTab: DEFAULT_MOBILE_TAB,
 } as const satisfies Metadata;
 
 /**

@@ -142,6 +142,25 @@ test.describe("Generate Invoice Link", () => {
     });
     await expect(totalField).toHaveValue("615.00");
 
+    // check QR code data field
+    const qrCodeFieldset = finalSection.getByRole("group", {
+      name: "QR Code",
+    });
+
+    // check QR code data field
+    const qrCodeDataField = qrCodeFieldset.getByRole("textbox", {
+      name: "Data",
+    });
+
+    await qrCodeDataField.fill("https://easyinvoicepdf.com");
+
+    // check QR code description field
+    const qrCodeDescriptionField = qrCodeFieldset.getByRole("textbox", {
+      name: "Description (optional)",
+    });
+
+    await qrCodeDescriptionField.fill("QR Code TEST Description");
+
     // wait for debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(700);
@@ -161,6 +180,9 @@ test.describe("Generate Invoice Link", () => {
     // Open URL in new tab
     const newPage = await context.newPage();
     await newPage.goto(sharedUrl);
+
+    // Verify the URL contains the shared invoice data
+    await expect(newPage).toHaveURL(/\?template=default&data=/);
 
     // Get elements from the new page context
     const newInvoiceNumberFieldset = newPage.getByRole("group", {
@@ -268,6 +290,21 @@ test.describe("Generate Invoice Link", () => {
         exact: true,
       }),
     ).toHaveValue("615.00");
+
+    // Verify QR code data field
+    const newQrCodeDataField = newPageFinalSection.getByRole("textbox", {
+      name: "Data",
+    });
+    await expect(newQrCodeDataField).toHaveValue("https://easyinvoicepdf.com");
+
+    // Verify QR code description field
+    const newQrCodeDescriptionField = newPageFinalSection.getByRole("textbox", {
+      name: "Description (optional)",
+    });
+
+    await expect(newQrCodeDescriptionField).toHaveValue(
+      "QR Code TEST Description",
+    );
   });
 
   test("shows notification when invoice link is broken", async ({ page }) => {

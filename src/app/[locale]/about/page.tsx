@@ -7,6 +7,7 @@ import {
 } from "@/components/go-to-app-button-cta";
 import { Button } from "@/components/ui/button";
 
+import { GithubStarServerWrapper } from "@/app/[locale]/about/components/GithubStarWrapper";
 import { BlackAnimatedGoToAppBtn } from "@/components/animated-go-to-app-btn";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Video } from "@/components/video";
@@ -142,7 +143,6 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
 
 function Header({ locale }: { locale: Locale }) {
   const t = useTranslations("About.buttons");
-  const tFooter = useTranslations("About.footer.links");
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
@@ -153,9 +153,7 @@ function Header({ locale }: { locale: Locale }) {
               <Logo />
             </div>
             <div className="flex items-center sm:mt-0 sm:gap-2">
-              <Button variant="ghost" className="hidden lg:inline-flex" asChild>
-                <Link href="/changelog">{tFooter("changelog")}</Link>
-              </Button>
+              <GithubStarServerWrapper />
               <LanguageSwitcher
                 locale={locale}
                 buttonText={t("switchLanguage")}

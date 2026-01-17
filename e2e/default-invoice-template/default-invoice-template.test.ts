@@ -349,7 +349,7 @@ test.describe("Default Invoice Template", () => {
       .selectOption(DATE_FORMAT);
 
     await page
-      .getByRole("textbox", { name: "Invoice Type" })
+      .getByRole("textbox", { name: "Header Notes" })
       .fill("HELLO FROM PLAYWRIGHT TEST!");
 
     /** UPDATE SELLER INFORMATION */
@@ -363,20 +363,23 @@ test.describe("Default Invoice Template", () => {
 
     // Toggle VAT Number visibility off
     await sellerSection
-      .getByRole("switch", { name: /Show in PDF/i })
-      .nth(0)
+      .getByRole("switch", {
+        name: `Show/hide the 'Seller Tax Number' Field in the PDF`,
+      })
       .click();
 
     // Toggle Account Number visibility off
     await sellerSection
-      .getByRole("switch", { name: /Show in PDF/i })
-      .nth(1)
+      .getByRole("switch", {
+        name: `Show/hide the 'Account Number' Field in the PDF`,
+      })
       .click();
 
     // Toggle SWIFT visibility off
     await sellerSection
-      .getByRole("switch", { name: /Show in PDF/i })
-      .nth(2)
+      .getByRole("switch", {
+        name: `Show/hide the 'SWIFT/BIC' Field in the PDF`,
+      })
       .click();
 
     // update notes
@@ -1147,6 +1150,207 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       `should-display-and-persist-invoice-number-in-different-languages-stripe-template.png`,
+    );
+  });
+
+  test("displays QR code in PDF when QR code data is provided", async ({
+    page,
+    browserName,
+    downloadDir,
+  }, testInfo) => {
+    const QR_CODE_TEST_DATA = {
+      data: "https://easyinvoicepdf.com",
+      description: "QR Code Description",
+    } as const satisfies {
+      data: string;
+      description: string;
+    };
+
+    // verify that we are on the default template
+    await expect(page).toHaveURL("/?template=default");
+
+    const finalSection = page.getByTestId("final-section");
+
+    const qrCodeFieldset = finalSection.getByRole("group", {
+      name: "QR Code",
+    });
+    await expect(qrCodeFieldset).toBeVisible();
+
+    // Verify that "Show QR Code in PDF" switch is on by default
+    const showQrCodeSwitch = qrCodeFieldset.getByRole("switch", {
+      name: "Show QR Code in PDF",
+    });
+    await expect(showQrCodeSwitch).toBeVisible();
+    await expect(showQrCodeSwitch).toBeEnabled();
+    await expect(showQrCodeSwitch).toBeChecked();
+
+    // Fill in the QR code data field
+    await qrCodeFieldset
+      .getByRole("textbox", { name: "Data" })
+      .fill(QR_CODE_TEST_DATA.data);
+
+    // Fill in the QR code description field
+    await qrCodeFieldset
+      .getByRole("textbox", { name: "Description (optional)" })
+      .fill(QR_CODE_TEST_DATA.description);
+
+    // for better debugging screenshots, we fill in the notes field with a test note =)
+    await finalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(`Test: ${testInfo.title} (${testInfo.project.name})`);
+
+    // Wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const downloadPdfEnglishButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadPdfEnglishButton).toBeVisible();
+    await expect(downloadPdfEnglishButton).toBeEnabled();
+
+    // Click the download button and wait for download
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfEnglishButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const suggestedFilename = download.suggestedFilename();
+
+    // save the file to temporary directory
+    const pdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-${suggestedFilename}`,
+    );
+
+    await download.saveAs(pdfFilePath);
+
+    // Convert to absolute path and use proper file URL format
+    const absolutePath = path.resolve(pdfFilePath);
+    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
+
+    /**
+     * Render the PDF on a canvas and take a screenshot of it
+     */
+    const pdfBytes = fs.readFileSync(absolutePath);
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, pdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "displays-qr-code-in-pdf-default-template.png",
+    );
+
+    /**
+     * TURN OFF QR CODE IN PDF AND DOWNLOAD PDF AGAIN
+     */
+
+    // navigate back to the previous page
+    await page.goto("/", { waitUntil: "commit" });
+
+    // verify that we are on the default template
+    await expect(page).toHaveURL("/?template=default");
+
+    const newFinalSection = page.getByTestId("final-section");
+
+    const newQrCodeFieldset = newFinalSection.getByRole("group", {
+      name: "QR Code",
+    });
+    await expect(newQrCodeFieldset).toBeVisible();
+
+    // Verify that "Show QR Code in PDF" switch is on by default
+    const newShowQrCodeSwitch = newQrCodeFieldset.getByRole("switch", {
+      name: "Show QR Code in PDF",
+    });
+
+    await expect(newShowQrCodeSwitch).toBeVisible();
+    await expect(newShowQrCodeSwitch).toBeEnabled();
+    await expect(newShowQrCodeSwitch).toBeChecked();
+
+    // toggle the switch off
+    await newShowQrCodeSwitch.click();
+
+    // verify that the switch is off
+    await expect(newShowQrCodeSwitch).not.toBeChecked();
+
+    // Verify QR Code Data field is empty after toggling off
+    const newQrCodeDataTextarea = newQrCodeFieldset.getByRole("textbox", {
+      name: "Data",
+    });
+    await expect(newQrCodeDataTextarea).toBeVisible();
+    await expect(newQrCodeDataTextarea).toHaveValue(QR_CODE_TEST_DATA.data);
+
+    // Verify QR Code Description field is empty after toggling off
+    const newQrCodeDescriptionTextarea = newQrCodeFieldset.getByRole(
+      "textbox",
+      {
+        name: "Description (optional)",
+      },
+    );
+    await expect(newQrCodeDescriptionTextarea).toBeVisible();
+    await expect(newQrCodeDescriptionTextarea).toHaveValue(
+      QR_CODE_TEST_DATA.description,
+    );
+
+    // for better debugging screenshots, we fill in the notes field with a test note =)
+    await newFinalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: ${testInfo.title} - QR code hidden in PDF (${testInfo.project.name})`,
+      );
+
+    // wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const newDownloadPdfEnglishButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    // Download the PDF again
+    const [downloadPdfWithoutQrCode] = await Promise.all([
+      page.waitForEvent("download"),
+      newDownloadPdfEnglishButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const suggestedFilenameWithoutQrCode =
+      downloadPdfWithoutQrCode.suggestedFilename();
+
+    // save the file to temporary directory
+    const pdfFilePath2 = path.join(
+      downloadDir,
+      `${browserName}-${suggestedFilenameWithoutQrCode}`,
+    );
+
+    await downloadPdfWithoutQrCode.saveAs(pdfFilePath2);
+
+    /**
+     * Render the PDF on a canvas and take a screenshot to verify QR code is not displayed
+     */
+    const pdfBytesWithoutQrCode = fs.readFileSync(pdfFilePath2);
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, pdfBytesWithoutQrCode);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "qr-code-hidden-in-pdf-default-template.png",
     );
   });
 });
