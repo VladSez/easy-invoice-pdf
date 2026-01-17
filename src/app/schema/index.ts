@@ -359,9 +359,9 @@ export const invoiceItemSchema = z
 
     name: z
       .string()
-      .min(1, "Item name is required")
       .max(500, "Item name must not exceed 500 characters")
-      .trim(),
+      .trim()
+      .optional(),
     nameFieldIsVisible: z.boolean().default(true),
 
     typeOfGTU: z

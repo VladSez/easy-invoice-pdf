@@ -7,8 +7,12 @@ import { INITIAL_INVOICE_DATA } from "../constants";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
 import { ErrorMessage } from "@/components/etc/error-message";
-import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema";
+import {
+  METADATA_LOCAL_STORAGE_KEY,
+  PDF_DATA_LOCAL_STORAGE_KEY,
+} from "@/app/schema";
 import { BUG_REPORT_URL } from "@/config";
+import { DEFAULT_METADATA } from "@/app/(app)/utils/get-app-metadata";
 
 export default function Error({
   error,
@@ -65,6 +69,12 @@ export default function Error({
               localStorage.setItem(
                 PDF_DATA_LOCAL_STORAGE_KEY,
                 JSON.stringify(INITIAL_INVOICE_DATA),
+              );
+
+              // Reset the invoice metadata to default
+              localStorage.setItem(
+                METADATA_LOCAL_STORAGE_KEY,
+                JSON.stringify(DEFAULT_METADATA),
               );
 
               // Attempt to recover by trying to re-render the segment
