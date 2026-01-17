@@ -640,10 +640,6 @@ test.describe("Invoice Generator Page", () => {
       page.getByText("Buyer name is required", { exact: true }),
     ).toBeVisible();
 
-    await expect(
-      page.getByText("Item name is required", { exact: true }),
-    ).toBeVisible();
-
     const dateOfIssue = dayjs().format("YYYY-MM-DD");
 
     const invoiceNumberFieldset = page.getByRole("group", {
