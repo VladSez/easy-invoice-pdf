@@ -23,8 +23,10 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
 export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
+  initialScale: 1, // Sets the default zoom level to 1 (100%)
+  width: "device-width", // Ensures the viewport width matches the device's screen width
+  maximumScale: 1, // Prevents users from zooming in
+  viewportFit: "cover", // Enables edge-to-edge content display on devices with rounded corners (like iPhones with a notch)
 };
 
 export const metadata: Metadata = {
