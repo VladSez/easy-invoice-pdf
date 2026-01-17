@@ -48,10 +48,12 @@ export function InvoicePDFDownloadLink({
   invoiceData,
   errorWhileGeneratingPdfIsShown,
   setErrorWhileGeneratingPdfIsShown,
+  qrCodeDataUrl,
 }: {
   invoiceData: InvoiceData;
   errorWhileGeneratingPdfIsShown: boolean;
   setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
+  qrCodeDataUrl: string;
 }) {
   const { inAppInfo } = useDeviceContext();
   const { markToastAsShown } = useCTAToast();
@@ -155,12 +157,22 @@ export function InvoicePDFDownloadLink({
   const PdfDocument = useMemo(() => {
     switch (invoiceData.template) {
       case "stripe":
-        return <StripeInvoicePdfTemplate invoiceData={invoiceData} />;
+        return (
+          <StripeInvoicePdfTemplate
+            invoiceData={invoiceData}
+            qrCodeDataUrl={qrCodeDataUrl}
+          />
+        );
       case "default":
       default:
-        return <InvoicePdfTemplate invoiceData={invoiceData} />;
+        return (
+          <InvoicePdfTemplate
+            invoiceData={invoiceData}
+            qrCodeDataUrl={qrCodeDataUrl}
+          />
+        );
     }
-  }, [invoiceData]);
+  }, [invoiceData, qrCodeDataUrl]);
 
   // Handle PDF updates
   useEffect(() => {

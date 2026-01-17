@@ -2,6 +2,7 @@ import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   CURRENCY_SYMBOLS,
   CURRENCY_TO_LABEL,
+  DEFAULT_DATE_FORMAT,
   LANGUAGE_TO_LABEL,
   PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_CURRENCIES,
@@ -13,7 +14,7 @@ import {
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
-import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
+import { GITHUB_URL, STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -151,7 +152,14 @@ test.describe("Invoice Generator Page", () => {
     ).toBeHidden();
 
     // Verify GitHub Star CTA button is visible
-    await expect(page.getByTestId("github-star-cta-button")).toBeVisible();
+    const githubStarCtaButton = page.getByRole("link", {
+      name: "Star project on GitHub",
+      exact: true,
+    });
+
+    await expect(githubStarCtaButton).toBeVisible();
+    await expect(githubStarCtaButton).toHaveAttribute("href", GITHUB_URL);
+    await expect(githubStarCtaButton).toHaveAttribute("target", "_blank");
 
     // Verify buttons are enabled
     await expect(
@@ -232,7 +240,7 @@ test.describe("Invoice Generator Page", () => {
     // Verify all supported date formats are available as options with correct labels
     for (const dateFormat of SUPPORTED_DATE_FORMATS) {
       const preview = dayjs().format(dateFormat);
-      const isDefault = dateFormat === SUPPORTED_DATE_FORMATS[0];
+      const isDefault = dateFormat === DEFAULT_DATE_FORMAT;
 
       await expect(
         dateFormatSelect.locator(`option[value="${dateFormat}"]`),
@@ -266,12 +274,14 @@ test.describe("Invoice Generator Page", () => {
 
     // Invoice Type
     await expect(
-      generalInfoSection.getByRole("textbox", { name: "Invoice Type" }),
+      generalInfoSection.getByRole("textbox", { name: "Header Notes" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.invoiceType);
 
     // Visibility toggles
     await expect(
-      generalInfoSection.getByRole("switch", { name: "Show in PDF" }),
+      generalInfoSection.getByRole("switch", {
+        name: `Show/hide the "Header Notes" Field in the PDF`,
+      }),
     ).toBeChecked();
 
     // **CHECK SELLER INFORMATION SECTION**
@@ -297,8 +307,11 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       sellerVatFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.vatNo);
+
     await expect(
-      sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(0),
+      sellerSection.getByRole("switch", {
+        name: `Show/hide the 'Seller Tax Number' Field in the PDF`,
+      }),
     ).toBeChecked();
 
     // Email field
@@ -310,16 +323,22 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       sellerSection.getByRole("textbox", { name: "Account Number" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.accountNumber);
+
     await expect(
-      sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(1),
+      sellerSection.getByRole("switch", {
+        name: `Show/hide the 'Account Number' Field in the PDF`,
+      }),
     ).toBeChecked();
 
     // SWIFT/BIC field and visibility toggle
     await expect(
       sellerSection.getByRole("textbox", { name: "SWIFT/BIC" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.swiftBic);
+
     await expect(
-      sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(2),
+      sellerSection.getByRole("switch", {
+        name: `Show/hide the 'SWIFT/BIC' Field in the PDF`,
+      }),
     ).toBeChecked();
 
     // Verify Seller Management button is present
@@ -395,7 +414,9 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("textbox", { name: "Name" }),
     ).toHaveValue(firstItem.name);
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(0),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show/hide the 'Name of Goods/Service' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // Type of GTU field and visibility toggle
@@ -403,7 +424,9 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("textbox", { name: "Type of GTU" }),
     ).toHaveValue(firstItem.typeOfGTU);
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(1),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show/hide the 'Type of GTU' Column in the PDF for item 1",
+      }),
     ).not.toBeChecked(); // we don't want to show this in PDF by default
 
     // Amount field and visibility toggle
@@ -413,7 +436,9 @@ test.describe("Invoice Generator Page", () => {
       }),
     ).toHaveValue(firstItem.amount.toString());
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(2),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show/hide the 'Amount' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // Unit field and visibility toggle
@@ -421,7 +446,9 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("textbox", { name: "Unit" }),
     ).toHaveValue(firstItem.unit);
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(3),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show/hide the 'Unit' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // Net Price field and visibility toggle
@@ -431,7 +458,9 @@ test.describe("Invoice Generator Page", () => {
       }),
     ).toHaveValue(firstItem.netPrice.toString());
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(4),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show/hide the 'Net Price' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // VAT field and visibility toggle
@@ -439,7 +468,9 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true }),
     ).toHaveValue(firstItem.vat);
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(5),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show/hide the 'VAT' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // Verify VAT helper text is displayed
@@ -462,7 +493,9 @@ test.describe("Invoice Generator Page", () => {
       }),
     );
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(6),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show/hide the 'Net Amount' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // VAT Amount field (read-only) and visibility toggle
@@ -478,7 +511,9 @@ test.describe("Invoice Generator Page", () => {
       }),
     );
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(7),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show/hide the 'VAT Amount' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // Pre-tax Amount field (read-only) and visibility toggle
@@ -494,7 +529,9 @@ test.describe("Invoice Generator Page", () => {
       }),
     );
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(8),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show/hide the 'Pre-tax Amount' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // Verify Add Invoice Item button is present
@@ -514,10 +551,11 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByText("Item 2", { exact: true }),
     ).toBeVisible();
 
-    // Fill in new item details
+    // Fill in new invoice item details
     const itemNameInput = invoiceItemsSection
       .getByRole("textbox", { name: "Name" })
       .nth(1);
+
     await itemNameInput.fill("TEST INVOICE ITEM");
     await expect(itemNameInput).toHaveValue("TEST INVOICE ITEM");
 

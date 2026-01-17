@@ -25,20 +25,32 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
  */
 export const MobileInvoicePDFViewer = ({
   invoiceData,
+  qrCodeDataUrl,
 }: {
   invoiceData: InvoiceData;
+  qrCodeDataUrl: string;
 }) => {
   const [key, setKey] = useState(0);
 
   const memoizedInvoicePdfTemplate = useMemo(() => {
     switch (invoiceData.template) {
       case "stripe":
-        return <StripeInvoicePdfTemplate invoiceData={invoiceData} />;
+        return (
+          <StripeInvoicePdfTemplate
+            invoiceData={invoiceData}
+            qrCodeDataUrl={qrCodeDataUrl}
+          />
+        );
       case "default":
       default:
-        return <InvoicePdfTemplate invoiceData={invoiceData} />;
+        return (
+          <InvoicePdfTemplate
+            invoiceData={invoiceData}
+            qrCodeDataUrl={qrCodeDataUrl}
+          />
+        );
     }
-  }, [invoiceData]);
+  }, [invoiceData, qrCodeDataUrl]);
 
   // On mobile, we need to use the 'react-pdf' (https://github.com/wojtekmaj/react-pdf) to generate a PDF preview
   // This is because the PDF viewer is not supported on Android Chrome devices
@@ -51,7 +63,7 @@ export const MobileInvoicePDFViewer = ({
             <div className="flex h-[520px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
               <div className="text-center">
                 <p className="text-red-600">Error generating PDF preview</p>
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mx-6 mt-2 text-balance text-sm text-gray-600">
                   Something went wrong. Please try refreshing the page or using{" "}
                   <span className="font-bold">Chrome</span> browser. If the
                   issue persists, please fill a bug report{" "}

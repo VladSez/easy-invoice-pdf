@@ -30,6 +30,8 @@ export const TWITTER_URL = "https://x.com/vladsazonau";
 export const BUG_REPORT_URL =
   "https://pdfinvoicegenerator.userjot.com/board/bugs";
 
+export const CONTACT_SUPPORT_EMAIL = "vlad@mail.easyinvoicepdf.com";
+
 /**
  * Marketing features cards for the about page
  */

@@ -1,3 +1,4 @@
+import { BUG_REPORT_URL, CONTACT_SUPPORT_EMAIL } from "@/config";
 import { toast } from "sonner";
 
 export function ErrorGeneratingPdfToast() {
@@ -13,16 +14,16 @@ export function ErrorGeneratingPdfToast() {
       <br />
       3. Contact support at{" "}
       <a
-        href="mailto:vladsazon27@gmail.com"
+        href={`mailto:${CONTACT_SUPPORT_EMAIL}`}
         className="underline hover:text-blue-600"
         target="_blank"
         rel="noopener noreferrer"
       >
-        vladsazon27@gmail.com
+        {CONTACT_SUPPORT_EMAIL}
       </a>{" "}
       or{" "}
       <a
-        href="https://pdfinvoicegenerator.userjot.com/board/bugs"
+        href={BUG_REPORT_URL}
         className="underline hover:text-blue-600"
         target="_blank"
         rel="noopener noreferrer"

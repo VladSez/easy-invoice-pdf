@@ -18,7 +18,26 @@ test.describe("About page", () => {
     );
 
     const header = page.getByRole("banner");
-    // Check header elements
+
+    /* CHECK HEADER ELEMENTS */
+
+    // check github star cta button in header
+    const githubStarCtaButton = header.getByRole("link", {
+      name: "Star project on GitHub",
+      exact: true,
+    });
+
+    await expect(githubStarCtaButton).toBeVisible();
+    await expect(githubStarCtaButton).toHaveAttribute("href", GITHUB_URL);
+    await expect(githubStarCtaButton).toHaveAttribute("target", "_blank");
+
+    // Check language switcher button in header
+    const languageSwitcher = header.getByRole("button", {
+      name: "Switch language",
+    });
+    await expect(languageSwitcher).toBeVisible();
+
+    // check app link button in header
     await expect(header.getByText("EasyInvoicePDF")).toBeVisible();
     const goToAppButton = header.getByRole("link", {
       name: "Go to app",

@@ -60,19 +60,31 @@ const PdfViewer = ({
   invoiceData,
   errorWhileGeneratingPdfIsShown,
   isMobile,
+  qrCodeDataUrl,
 }: {
   invoiceData: InvoiceData;
   errorWhileGeneratingPdfIsShown: boolean;
   isMobile: boolean;
+  qrCodeDataUrl: string;
 }) => {
   // Render the appropriate template based on the selected template
   const renderTemplate = () => {
     switch (invoiceData.template) {
       case "stripe":
-        return <StripeInvoicePdfTemplate invoiceData={invoiceData} />;
+        return (
+          <StripeInvoicePdfTemplate
+            invoiceData={invoiceData}
+            qrCodeDataUrl={qrCodeDataUrl}
+          />
+        );
       case "default":
       default:
-        return <InvoicePdfTemplate invoiceData={invoiceData} />;
+        return (
+          <InvoicePdfTemplate
+            invoiceData={invoiceData}
+            qrCodeDataUrl={qrCodeDataUrl}
+          />
+        );
     }
   };
 
@@ -82,7 +94,12 @@ const PdfViewer = ({
   // This is due to limitations of the standard PDF viewer in these environments
   // https://github.com/diegomura/react-pdf/issues/714
   if (isMobile) {
-    return <MobileInvoicePDFViewer invoiceData={invoiceData} />;
+    return (
+      <MobileInvoicePDFViewer
+        invoiceData={invoiceData}
+        qrCodeDataUrl={qrCodeDataUrl}
+      />
+    );
   }
 
   const template = renderTemplate();
@@ -109,6 +126,7 @@ export function InvoiceClientPage({
   setErrorWhileGeneratingPdfIsShown,
   setCanShareInvoice,
   canShareInvoice,
+  qrCodeDataUrl,
 }: {
   invoiceDataState: InvoiceData;
   handleInvoiceDataChange: (invoiceData: InvoiceData) => void;
@@ -118,6 +136,7 @@ export function InvoiceClientPage({
   setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
   setCanShareInvoice: (canShareInvoice: boolean) => void;
   canShareInvoice: boolean;
+  qrCodeDataUrl: string;
 }) {
   const appMetadata = getAppMetadata();
 
@@ -180,6 +199,7 @@ export function InvoiceClientPage({
                     errorWhileGeneratingPdfIsShown
                   }
                   isMobile={isMobile}
+                  qrCodeDataUrl={qrCodeDataUrl}
                 />
               </div>
             </TabsContent>
@@ -237,6 +257,7 @@ export function InvoiceClientPage({
               setErrorWhileGeneratingPdfIsShown={
                 setErrorWhileGeneratingPdfIsShown
               }
+              qrCodeDataUrl={qrCodeDataUrl}
             />
           </div>
           {invoiceLastUpdatedAtFormatted && (
@@ -294,6 +315,7 @@ export function InvoiceClientPage({
               invoiceData={invoiceDataState}
               errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
               isMobile={false}
+              qrCodeDataUrl={qrCodeDataUrl}
             />
           </div>
         </>

@@ -8,6 +8,7 @@ import {
 import {
   CURRENCY_SYMBOLS,
   CURRENCY_TO_LABEL,
+  DEFAULT_DATE_FORMAT,
   LANGUAGE_TO_LABEL,
   STRIPE_DEFAULT_DATE_FORMAT,
   SUPPORTED_TEMPLATES,
@@ -182,9 +183,6 @@ export const GeneralInformation = memo(function GeneralInformation({
                   if (newTemplate === "stripe") {
                     // Set date format to "MMMM D, YYYY" when template is Stripe
                     setValue("dateFormat", STRIPE_DEFAULT_DATE_FORMAT);
-
-                    // Always enable VAT field visibility for Stripe template (because we don't show Switches for items in Stripe template and we want to make sure the Tax column is visible in the PDF)
-                    setValue("items.0.vatFieldIsVisible", true);
                   } else {
                     // Clear Stripe-specific fields when not using Stripe template
                     if (errors.stripePayOnlineUrl) {
@@ -197,7 +195,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                     }
 
                     // Set date format to "YYYY-MM-DD" when template is default
-                    setValue("dateFormat", SUPPORTED_DATE_FORMATS[0]);
+                    setValue("dateFormat", DEFAULT_DATE_FORMAT);
                   }
                 }}
               >
@@ -444,7 +442,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               <SelectNative {...field} id={`dateFormat`} className="block">
                 {SUPPORTED_DATE_FORMATS.map((format) => {
                   const preview = dayjs().locale(language).format(format);
-                  const isDefault = format === SUPPORTED_DATE_FORMATS[0];
+                  const isDefault = format === DEFAULT_DATE_FORMAT;
 
                   return (
                     <option key={format} value={format}>
@@ -733,59 +731,57 @@ export const GeneralInformation = memo(function GeneralInformation({
           </div>
         ) : null}
 
-        {/* Invoice Type - We don't show this field for Stripe template */}
-        {/* TODO: rename to "Invoice Notes", probably "Invoice Type" is not the best name for this field ?*/}
-        {template !== "stripe" && (
-          <div>
-            <div className="relative mb-2 flex items-center justify-between">
-              <Label htmlFor={`invoiceType`} className="">
-                Invoice Type
-              </Label>
+        {/* Header Notes - Purpose is to add a custom text to the header of the invoice */}
+        <div>
+          <div className="relative mb-2 flex items-center justify-between">
+            <Label htmlFor={`invoiceType`} className="">
+              Header Notes
+            </Label>
 
-              {/* Show/hide Invoice Type field in PDF switch */}
-              <div className="inline-flex items-center gap-2">
-                <Controller
-                  name={`invoiceTypeFieldIsVisible`}
-                  control={control}
-                  render={({ field: { value, onChange, ...field } }) => (
-                    <Switch
-                      {...field}
-                      id={`invoiceTypeFieldIsVisible`}
-                      checked={value}
-                      onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    />
-                  )}
-                />
-                <CustomTooltip
-                  trigger={
-                    <Label htmlFor={`invoiceTypeFieldIsVisible`}>
-                      Show in PDF
-                    </Label>
-                  }
-                  content='Show/Hide the "Invoice Type" Field in the PDF'
-                />
-              </div>
+            {/* Show/hide Header Notes field in PDF switch */}
+            <div className="inline-flex items-center gap-2">
+              <Controller
+                name={`invoiceTypeFieldIsVisible`}
+                control={control}
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Switch
+                    {...field}
+                    id={`invoiceTypeFieldIsVisible`}
+                    checked={value}
+                    onCheckedChange={onChange}
+                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    aria-label={`Show/hide the "Header Notes" Field in the PDF`}
+                  />
+                )}
+              />
+              <CustomTooltip
+                trigger={
+                  <Label htmlFor={`invoiceTypeFieldIsVisible`}>
+                    Show in PDF
+                  </Label>
+                }
+                content='Show/Hide the "Header Notes" Field in the PDF'
+              />
             </div>
-
-            <Controller
-              name="invoiceType"
-              control={control}
-              render={({ field }) => (
-                <Textarea
-                  {...field}
-                  id={`invoiceType`}
-                  rows={2}
-                  className=""
-                  placeholder="Enter invoice type"
-                />
-              )}
-            />
-            {errors.invoiceType && (
-              <ErrorMessage>{errors.invoiceType.message}</ErrorMessage>
-            )}
           </div>
-        )}
+
+          <Controller
+            name="invoiceType"
+            control={control}
+            render={({ field }) => (
+              <Textarea
+                {...field}
+                id={`invoiceType`}
+                rows={2}
+                className=""
+                placeholder="Enter header notes"
+              />
+            )}
+          />
+          {errors.invoiceType && (
+            <ErrorMessage>{errors.invoiceType.message}</ErrorMessage>
+          )}
+        </div>
       </div>
     </div>
   );

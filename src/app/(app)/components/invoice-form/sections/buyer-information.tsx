@@ -156,6 +156,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                       disabled={isBuyerSelected}
                       data-testid={`buyerVatNoFieldIsVisible`}
+                      aria-label={`Show/hide the 'Buyer Tax Number' Field in the PDF`}
                     />
                   )}
                 />
@@ -315,6 +316,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                     disabled={isBuyerSelected}
                     data-testid={`buyerNotesInvoiceFormFieldVisibilitySwitch`}
+                    aria-label={`Show/hide the 'Notes' field in the PDF`}
                   />
                 )}
               />
@@ -327,7 +329,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                 content={
                   isBuyerSelected
                     ? null
-                    : "Show/Hide the 'Notes' Field in the PDF"
+                    : "Show/Hide the 'Notes' field in the PDF"
                 }
               />
             </div>

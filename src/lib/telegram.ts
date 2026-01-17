@@ -44,7 +44,11 @@ export async function sendTelegramMessage({
       for (const file of files) {
         const formData = new FormData();
         formData.append("chat_id", env.TELEGRAM_CHAT_ID);
-        formData.append("document", new Blob([file.buffer]), file.filename);
+        formData.append(
+          "document",
+          new Blob([file.buffer as unknown as BlobPart]),
+          file.filename,
+        );
 
         const fileResponse = await fetch(
           `https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendDocument`,

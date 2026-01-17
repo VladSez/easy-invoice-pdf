@@ -164,7 +164,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                            // aria-label={`Show/hide the 'Name of Goods/Service' Column in the PDF for item ${index + 1}`}
+                            aria-label={`Show/hide the 'Name of Goods/Service' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -223,7 +223,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                               checked={value}
                               onCheckedChange={onChange}
                               className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                              // aria-label={`Show/hide the 'Type of GTU' Column in the PDF for item ${index + 1}`}
+                              aria-label={`Show/hide the 'Type of GTU' Column in the PDF for item ${index + 1}`}
                             />
                           )}
                         />
@@ -282,7 +282,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                            // aria-label={`Show/hide the 'Amount' Column in the PDF for item ${index + 1}`}
+                            aria-label={`Show/hide the 'Amount' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -356,6 +356,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            aria-label={`Show/hide the 'Unit' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -406,6 +407,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            aria-label={`Show/hide the 'Net Price' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -495,6 +497,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            aria-label={`Show/hide the '${taxLabelText}' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -589,6 +592,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            aria-label={`Show/hide the 'Net Amount' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -657,6 +661,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            aria-label={`Show/hide the '${taxLabelText} Amount' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -726,6 +731,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            aria-label={`Show/hide the 'Pre-tax Amount' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />

@@ -316,16 +316,17 @@ export const LANGUAGE_TO_LABEL = {
 } as const satisfies Record<SupportedLanguages, string>;
 
 export const SUPPORTED_DATE_FORMATS = [
-  "YYYY-MM-DD", // 2024-03-20
+  "YYYY-MM-DD", // 2024-03-20 (default template date format)
   "DD/MM/YYYY", // 20/03/2024
   "MM/DD/YYYY", // 03/20/2024
   "D MMMM YYYY", // 20 March 2024
-  "MMMM D, YYYY", // March 20, 2024
+  "MMMM D, YYYY", // March 20, 2024 (Stripe template default date format)
   "DD.MM.YYYY", // 20.03.2024
   "DD-MM-YYYY", // 20-03-2024
   "YYYY.MM.DD", // 2024.03.20
 ] as const;
 
+export const DEFAULT_DATE_FORMAT = "YYYY-MM-DD";
 export const STRIPE_DEFAULT_DATE_FORMAT = "MMMM D, YYYY";
 
 /**
@@ -674,11 +675,17 @@ export const invoiceSchema = z.object({
       "Invoice date of service. Default is the last day of the current month",
     ),
 
+  /**
+   * Renamed from "Invoice Type" to "Header Notes" on UI to better reflect its purpose
+   */
   invoiceType: z
     .string()
     .max(500, "Invoice type must not exceed 500 characters")
     .trim()
     .optional(),
+  /**
+   * Renamed to "Header Notes" on UI to better reflect its purpose
+   */
   invoiceTypeFieldIsVisible: z.boolean().default(true),
 
   seller: sellerSchema,
@@ -743,6 +750,31 @@ export const invoiceSchema = z.object({
     .trim()
     .optional(),
   notesFieldIsVisible: z.boolean().default(true),
+
+  /**
+   * QR Code data field
+   *
+   * Optional text that will be encoded into a QR code and displayed on the invoice PDF
+   * Can contain any text like URLs, payment info, etc.
+   */
+  qrCodeData: z
+    .string()
+    .max(2000, "QR code data must not exceed 2000 characters")
+    .trim()
+    .optional()
+    .default(""),
+  /**
+   * QR Code description field
+   *
+   * Optional text that will be displayed below the QR code on the invoice PDF
+   */
+  qrCodeDescription: z
+    .string()
+    .max(500, "QR code description must not exceed 500 characters")
+    .trim()
+    .optional()
+    .default(""),
+  qrCodeIsVisible: z.boolean().default(true),
 
   personAuthorizedToReceiveFieldIsVisible: z.boolean().default(true),
   personAuthorizedToIssueFieldIsVisible: z.boolean().default(true),

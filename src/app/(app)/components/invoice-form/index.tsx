@@ -657,6 +657,93 @@ export const InvoiceForm = memo(function InvoiceForm({
           )}
         </div>
 
+        {/* QR Code */}
+        <fieldset className="rounded-md border px-4 pb-4">
+          <legend className="text-base font-semibold lg:text-lg">
+            QR Code
+          </legend>
+
+          <div className="mb-2 flex items-center justify-end">
+            {/* Show/hide QR Code in PDF switch */}
+            <div className="inline-flex items-center gap-2">
+              <Controller
+                name={`qrCodeIsVisible`}
+                control={control}
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Switch
+                    {...field}
+                    id={`qrCodeIsVisible`}
+                    checked={value}
+                    onCheckedChange={onChange}
+                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    aria-label="Show QR Code in PDF"
+                  />
+                )}
+              />
+              <CustomTooltip
+                trigger={<Label htmlFor={`qrCodeIsVisible`}>Show in PDF</Label>}
+                content="Show/Hide the QR Code in the PDF"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {/* QR Code Data */}
+            <div>
+              <Label htmlFor={`qrCodeData`} className="mb-2 block">
+                Data
+              </Label>
+              <Controller
+                name="qrCodeData"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    id={`qrCodeData`}
+                    type="text"
+                    placeholder="Enter URL or text to encode"
+                    data-testid="qrCodeData"
+                  />
+                )}
+              />
+              <InputHelperMessage>
+                Enter any text or URL to generate a QR code. The QR code will
+                appear in the bottom section of the invoice PDF.
+              </InputHelperMessage>
+              {errors.qrCodeData && (
+                <ErrorMessage>{errors.qrCodeData.message}</ErrorMessage>
+              )}
+            </div>
+
+            {/* QR Code Description */}
+            <div>
+              <Label htmlFor={`qrCodeDescription`} className="mb-2 block">
+                Description (optional)
+              </Label>
+              <Controller
+                name="qrCodeDescription"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    id={`qrCodeDescription`}
+                    type="text"
+                    placeholder="Enter a description for the QR code"
+                    data-testid="qrCodeDescription"
+                  />
+                )}
+              />
+              <InputHelperMessage>
+                Optional text that will be displayed below the QR code in the
+                PDF.
+              </InputHelperMessage>
+              {errors.qrCodeDescription && (
+                <ErrorMessage>{errors.qrCodeDescription.message}</ErrorMessage>
+              )}
+            </div>
+          </div>
+        </fieldset>
+
         {/*
             Stripe template doesn't have these fields
         */}
