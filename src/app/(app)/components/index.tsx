@@ -1,6 +1,6 @@
 import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
 import { StripeInvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
-import type { InvoiceData } from "@/app/schema";
+import type { InvoiceData, MobileTabsValues } from "@/app/schema";
 import { DEFAULT_MOBILE_TAB, MOBILE_TABS_VALUES } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,7 +11,7 @@ import { AlertCircleIcon, FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 
 import { TWITTER_URL } from "@/config";
-import { getAppMetadata } from "../utils/get-app-metadata";
+import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 
@@ -146,27 +146,27 @@ export function InvoiceClientPage({
         .format("MMM D, YYYY [at] HH:mm")
     : null;
 
-  // const defaultMobileTab =
-  //   appMetadata?.lastVisitedMobileTab || DEFAULT_MOBILE_TAB;
+  const defaultMobileTab =
+    appMetadata?.lastVisitedMobileTab || DEFAULT_MOBILE_TAB;
 
   return (
     <>
       {isMobile ? (
         <div>
           <Tabs
-            defaultValue={DEFAULT_MOBILE_TAB}
+            defaultValue={defaultMobileTab}
             className="w-full"
-            // onValueChange={(value) => {
-            //   const newValue = value as MobileTabsValues;
+            onValueChange={(value) => {
+              const newValue = value as MobileTabsValues;
 
-            //   // update the last visited mobile tab in the app metadata
-            //   updateAppMetadata((current) => {
-            //     return {
-            //       ...current,
-            //       lastVisitedMobileTab: newValue,
-            //     };
-            //   });
-            // }}
+              // update the last visited mobile tab in the app metadata
+              updateAppMetadata((current) => {
+                return {
+                  ...current,
+                  lastVisitedMobileTab: newValue,
+                };
+              });
+            }}
           >
             <TabsList className="w-full">
               <TabsTrigger value={TAB_INVOICE_FORM} className="flex-1">
