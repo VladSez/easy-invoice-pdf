@@ -183,10 +183,10 @@ export function AppPageClient({
     }
   }, [templateValidation.data, templateValidation.success]);
 
-  // useEffect(() => {
-  //   // Scroll to top on mount
-  //   window.scrollTo({ top: 0, behavior: "smooth" });
-  // }, []);
+  useEffect(() => {
+    // Scroll to top of the page on first render for better UX
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   // Initialize data from URL (via shared invoice link) or localStorage on page load
   useEffect(() => {
