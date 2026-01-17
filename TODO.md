@@ -20,3 +20,4 @@ Issues to follow:
 
 - https://github.com/microsoft/playwright/issues/13873
 - https://github.com/microsoft/playwright/issues/19253
+- https://github.com/wojtekmaj/react-pdf/issues/2026
