@@ -633,11 +633,25 @@ test.describe("Invoice Generator Page", () => {
     await invoiceItemsSection.getByRole("textbox", { name: "Name" }).clear();
 
     await expect(
-      page.getByText("Seller name is required", { exact: true }),
+      sellerSection.getByText("Seller name is required", { exact: true }),
+    ).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page
+        .getByLabel("Notifications alt+T")
+        .getByText("Seller name is required"),
     ).toBeVisible();
 
     await expect(
-      page.getByText("Buyer name is required", { exact: true }),
+      buyerSection.getByText("Buyer name is required", { exact: true }),
+    ).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page
+        .getByLabel("Notifications alt+T")
+        .getByText("Buyer name is required"),
     ).toBeVisible();
 
     const dateOfIssue = dayjs().format("YYYY-MM-DD");
@@ -674,12 +688,18 @@ test.describe("Invoice Generator Page", () => {
     // Check for error messages to be hidden
 
     await expect(
-      page.getByText("Seller name is required", { exact: true }),
+      sellerSection.getByText("Seller name is required", { exact: true }),
     ).toBeHidden();
 
+    // Check that notification is also hidden
+    await expect(page.getByLabel("Notifications alt+T")).toBeHidden();
+
     await expect(
-      page.getByText("Buyer name is required", { exact: true }),
+      buyerSection.getByText("Buyer name is required", { exact: true }),
     ).toBeHidden();
+
+    // Check that notification is also hidden
+    await expect(page.getByLabel("Notifications alt+T")).toBeHidden();
   });
 
   test("persists data in local storage", async ({ page }) => {
@@ -965,27 +985,49 @@ test.describe("Invoice Generator Page", () => {
 
     // Test invalid values
     await amountInput.fill("-1");
-    await expect(page.getByText("Amount must be positive")).toBeVisible();
+    await expect(
+      invoiceItemsSection.getByText("Amount must be positive"),
+    ).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page
+        .getByLabel("Notifications alt+T")
+        .getByText("Amount must be positive"),
+    ).toBeVisible();
 
     await amountInput.fill("0");
-    await expect(page.getByText("Amount must be positive")).toBeVisible();
+    await expect(
+      invoiceItemsSection.getByText("Amount must be positive"),
+    ).toBeVisible();
 
     await amountInput.fill("1000000000000"); // 1 trillion
     await expect(
-      page.getByText("Amount must not exceed 9 999 999 999.99"),
+      invoiceItemsSection.getByText("Amount must not exceed 9 999 999 999.99"),
+    ).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page
+        .getByLabel("Notifications alt+T")
+        .getByText("Amount must not exceed 9 999 999 999.99"),
     ).toBeVisible();
 
     // Test valid values
     await amountInput.fill("1");
-    await expect(page.getByText("Amount must be positive")).toBeHidden();
     await expect(
-      page.getByText("Amount must not exceed 9 999 999 999.99"),
+      invoiceItemsSection.getByText("Amount must be positive"),
+    ).toBeHidden();
+    await expect(
+      invoiceItemsSection.getByText("Amount must not exceed 9 999 999 999.99"),
     ).toBeHidden();
 
     await amountInput.fill("9999999999.99"); // Maximum valid value
-    await expect(page.getByText("Amount must be positive")).toBeHidden();
     await expect(
-      page.getByText("Amount must not exceed 9 999 999 999.99"),
+      invoiceItemsSection.getByText("Amount must be positive"),
+    ).toBeHidden();
+    await expect(
+      invoiceItemsSection.getByText("Amount must not exceed 9 999 999 999.99"),
     ).toBeHidden();
 
     // **NET PRICE FIELD**
@@ -996,23 +1038,43 @@ test.describe("Invoice Generator Page", () => {
 
     // Test negative value
     await netPriceInput.fill("-100");
-    await expect(page.getByText("Net price must be >= 0")).toBeVisible();
+    await expect(
+      invoiceItemsSection.getByText("Net price must be >= 0"),
+    ).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page
+        .getByLabel("Notifications alt+T")
+        .getByText("Net price must be >= 0"),
+    ).toBeVisible();
 
     // Test exceeding maximum value
     await netPriceInput.fill("1000000000000"); // 1 trillion
     await expect(
-      page.getByText("Net price must not exceed 100 billion"),
+      invoiceItemsSection.getByText("Net price must not exceed 100 billion"),
+    ).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page
+        .getByLabel("Notifications alt+T")
+        .getByText("Net price must not exceed 100 billion"),
     ).toBeVisible();
 
     // Test zero value
     await netPriceInput.fill("0");
-    await expect(page.getByText("Net price must be >= 0")).toBeHidden();
+    await expect(
+      invoiceItemsSection.getByText("Net price must be >= 0"),
+    ).toBeHidden();
 
     // Test valid value
     await netPriceInput.fill("1");
-    await expect(page.getByText("Net price must be >= 0")).toBeHidden();
     await expect(
-      page.getByText("Net price must not exceed 100 billion"),
+      invoiceItemsSection.getByText("Net price must be >= 0"),
+    ).toBeHidden();
+    await expect(
+      invoiceItemsSection.getByText("Net price must not exceed 100 billion"),
     ).toBeHidden();
 
     // **VAT FIELD**
@@ -1022,27 +1084,32 @@ test.describe("Invoice Generator Page", () => {
       exact: true,
     });
 
-    const helperText = `Must be a number between 0-100 or any text (i.e. NP, OO, etc).`;
+    const helperText = `Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).`;
 
     // Try invalid values
     await vatInput.fill("101");
-    await expect(page.getByText(helperText)).toBeVisible();
+    await expect(invoiceItemsSection.getByText(helperText)).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page.getByLabel("Notifications alt+T").getByText(helperText),
+    ).toBeVisible();
 
     await vatInput.fill("-1");
-    await expect(page.getByText(helperText)).toBeVisible();
+    await expect(invoiceItemsSection.getByText(helperText)).toBeVisible();
 
     // Try valid values
     await vatInput.fill("23");
-    await expect(page.getByText(helperText)).toBeHidden();
+    await expect(invoiceItemsSection.getByText(helperText)).toBeHidden();
 
     await vatInput.fill("NP");
-    await expect(page.getByText(helperText)).toBeHidden();
+    await expect(invoiceItemsSection.getByText(helperText)).toBeHidden();
 
     await vatInput.fill("OO");
-    await expect(page.getByText(helperText)).toBeHidden();
+    await expect(invoiceItemsSection.getByText(helperText)).toBeHidden();
 
     await vatInput.fill("CUSTOM");
-    await expect(page.getByText(helperText)).toBeHidden();
+    await expect(invoiceItemsSection.getByText(helperText)).toBeHidden();
   });
 
   test("handles VAT calculations for different rates", async ({ page }) => {

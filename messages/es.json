@@ -42,6 +42,10 @@
         "openSource": {
           "title": "Código Abierto",
           "description": "Completamente gratuito y de código abierto. Úselo en línea o alójelo usted mismo con acceso completo al código."
+        },
+        "qrCodeMultiPDFpageSupport": {
+          "title": "Código QR y Soporte PDF Multipágina",
+          "description": "Agregue códigos QR con enlaces de pago a sus facturas y genere PDFs de varias páginas para facturas más largas con muchos artículos."
         }
       }
     },
@@ -61,7 +65,7 @@
       "createdBy": "Creado por"
     },
     "buttons": {
-      "goToApp": "Ir a la aplicación",
+      "goToApp": "Abrir",
       "viewOnGithub": "Ver en GitHub",
       "starOnGithub": "Dar estrella en GitHub",
       "switchLanguage": "Cambiar idioma",

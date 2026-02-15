@@ -42,6 +42,10 @@
         "openSource": {
           "title": "Open Source",
           "description": "Völlig kostenlos und Open-Source. Nutzen Sie es online oder hosten Sie es selbst mit vollem Zugriff auf den Code."
+        },
+        "qrCodeMultiPDFpageSupport": {
+          "title": "QR-Code & Mehrseitige PDF-Unterstützung",
+          "description": "Fügen Sie QR-Codes mit Zahlungslinks zu Ihren Rechnungen hinzu und erstellen Sie mehrseitige PDFs für längere Rechnungen mit vielen Positionen."
         }
       }
     },
@@ -61,7 +65,7 @@
       "createdBy": "Erstellt von"
     },
     "buttons": {
-      "goToApp": "Zur App gehen",
+      "goToApp": "Öffnen",
       "viewOnGithub": "Auf GitHub ansehen",
       "starOnGithub": "Auf GitHub bewerten",
       "switchLanguage": "Sprache wechseln",

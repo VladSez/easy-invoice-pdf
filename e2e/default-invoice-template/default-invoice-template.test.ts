@@ -5,7 +5,10 @@ import path from "node:path";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { test, expect } from "../utils/extended-playwright-test";
-import { renderPdfOnCanvas } from "../utils/render-pdf-on-canvas";
+import {
+  renderPdfOnCanvas,
+  renderMultiPagePdfOnCanvas,
+} from "../utils/render-pdf-on-canvas";
 
 test.describe("Default Invoice Template", () => {
   test.beforeEach(async ({ page }) => {
@@ -1351,6 +1354,129 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       "qr-code-hidden-in-pdf-default-template.png",
+    );
+  });
+
+  test("generates multi-page PDF when invoice has many items", async ({
+    page,
+    browserName,
+    downloadDir,
+  }, testInfo) => {
+    // Verify we're on the default template
+    await expect(page).toHaveURL("/?template=default");
+
+    const invoiceItemsSection = page.getByTestId("invoice-items-section");
+
+    // Update tax label for the first item
+    const firstItemFieldset = invoiceItemsSection.getByRole("group", {
+      name: "Item 1",
+    });
+
+    const firstItemTaxSettingsFieldset = firstItemFieldset.getByRole("group", {
+      name: "Tax Settings",
+    });
+
+    await firstItemTaxSettingsFieldset
+      .getByRole("textbox", { name: "Tax Label" })
+      .fill("Sales Tax");
+
+    // Add additional invoice items to trigger multiple-page PDF
+    for (let i = 0; i < 17; i++) {
+      await invoiceItemsSection
+        .getByRole("button", { name: "Add invoice item" })
+        .click();
+
+      // Fill minimal required fields for the new item
+      const itemFieldset = invoiceItemsSection.getByRole("group", {
+        name: `Item ${i + 2}`, // Item numbers start at 1
+      });
+
+      await itemFieldset
+        .getByRole("textbox", { name: "Name" })
+        .fill(
+          `Item ${i + 2}. Some long item name that should be wrapped to the next line. Some long item name that should be wrapped to the next line. Some long item name that should be wrapped to the next line.`,
+        );
+
+      // Set VAT to 10% for each item
+      const taxSettingsFieldset = itemFieldset.getByRole("group", {
+        name: "Tax Settings",
+      });
+
+      // Use different tax rates: 10%, 20%, or 50%
+      const taxRate =
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        (i + 2) % 3 === 0 ? "50" : (i + 2) % 2 === 0 ? "20" : "10";
+
+      await taxSettingsFieldset
+        .getByRole("textbox", { name: "Sales Tax", exact: true })
+        .fill(taxRate);
+
+      await itemFieldset
+        .getByRole("spinbutton", {
+          name: "Net Price (Rate or Unit Price)",
+        })
+        .fill(`${1000 * (i + 1)}`);
+    }
+
+    const finalSection = page.getByTestId("final-section");
+
+    // for better debugging screenshots, we fill in the notes field with a test note
+    await finalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: generates multi-page PDF when invoice has many items (${testInfo.project.name})`,
+      );
+
+    // Wait for PDF preview to regenerate after invoice data changes (debounce timeout)
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const downloadPdfEnglishButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadPdfEnglishButton).toBeVisible();
+    await expect(downloadPdfEnglishButton).toBeEnabled();
+
+    // Click the download button and wait for download
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfEnglishButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const suggestedFilename = download.suggestedFilename();
+
+    // save the file to temporary directory
+    const pdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-${suggestedFilename}`,
+    );
+
+    await download.saveAs(pdfFilePath);
+
+    // Convert to absolute path and use proper file URL format
+    const absolutePath = path.resolve(pdfFilePath);
+    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
+
+    /**
+     * RENDER ALL PDF PAGES ON A SINGLE CANVAS AND TAKE SCREENSHOT
+     */
+
+    const pdfBytes = fs.readFileSync(absolutePath);
+
+    await page.goto("about:blank");
+
+    await renderMultiPagePdfOnCanvas(page, pdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "default-template-multi-pages.png",
     );
   });
 });

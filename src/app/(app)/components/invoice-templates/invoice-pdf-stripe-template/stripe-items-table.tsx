@@ -44,28 +44,32 @@ export function StripeItemsTable({
 
   return (
     <View style={[styles.table, styles.mt24]}>
-      {/* Table header */}
-      <View style={styles.tableHeader}>
+      {/* Fixed Header — repeats on every page (for better layout on page breaks) */}
+      <View style={styles.tableHeader} fixed>
         <View style={styles.colDescription}>
-          <Text style={[styles.fontSize8]}>{t.stripe.description}</Text>
+          <Text style={styles.fontSize8}>{t.stripe.description}</Text>
         </View>
+
         <View style={styles.colQty}>
-          <Text style={[styles.fontSize8]}>{t.stripe.qty}</Text>
+          <Text style={styles.fontSize8}>{t.stripe.qty}</Text>
         </View>
+
         <View style={styles.colUnitPrice}>
-          <Text style={[styles.fontSize8]}>{t.stripe.unitPrice}</Text>
+          <Text style={styles.fontSize8}>{t.stripe.unitPrice}</Text>
         </View>
+
         {vatAmountFieldIsVisible ? (
           <View style={styles.colTax}>
-            <Text style={[styles.fontSize8]}>{taxLabelText}</Text>
+            <Text style={styles.fontSize8}>{taxLabelText}</Text>
           </View>
         ) : null}
+
         <View style={styles.colAmount}>
-          <Text style={[styles.fontSize8]}>{t.stripe.amount}</Text>
+          <Text style={styles.fontSize8}>{t.stripe.amount}</Text>
         </View>
       </View>
 
-      {/* Table rows */}
+      {/* Rows */}
       {invoiceData.items.map((item, index) => {
         const formattedNetPrice = formatCurrency({
           amount: item.netPrice,
@@ -90,7 +94,12 @@ export function StripeItemsTable({
           : `${Number(item.vat)}%`;
 
         return (
-          <View style={[styles.tableRow]} key={index}>
+          <View
+            key={index}
+            style={styles.tableRow}
+            wrap={false}
+            minPresenceAhead={60}
+          >
             <View style={styles.colDescription}>
               <Text style={[styles.fontSize10]}>{item.name}</Text>
               {/* Add service period if available */}

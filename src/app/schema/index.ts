@@ -36,6 +36,9 @@ export const SUPPORTED_CURRENCIES = [
   "IDR", // Indonesian Rupiah
   "PHP", // Philippine Peso
   "VND", // Vietnamese Dong
+  "MMK", // Myanmar Kyat
+  "KHR", // Cambodian Riel
+  "LAK", // Lao Kip
 
   // Middle East & Gulf
   "AED", // UAE Dirham
@@ -50,7 +53,7 @@ export const SUPPORTED_CURRENCIES = [
   "LBP", // Lebanese Pound
   "IQD", // Iraqi Dinar
 
-  // Eastern Europe
+  // Eastern Europe & Balkans
   "CZK", // Czech Koruna
   "HUF", // Hungarian Forint
   "RON", // Romanian Leu
@@ -60,16 +63,51 @@ export const SUPPORTED_CURRENCIES = [
   "UAH", // Ukrainian Hryvnia
   "BYN", // Belarusian Ruble
   "MDL", // Moldovan Leu
+  "ALL", // Albanian Lek
+  "MKD", // Macedonian Denar
+  "BAM", // Bosnia-Herzegovina Convertible Mark
+
+  // Central Asia & Caucasus
   "GEL", // Georgian Lari
   "KZT", // Kazakhstani Tenge
+  "UZS", // Uzbekistani Som
+  "TJS", // Tajikistani Somoni
+  "TMT", // Turkmenistani Manat
 
-  // Latin America
+  // East Asia
+  "MNT", // Mongolian Tugrik
+
+  // Latin America - South America
   "ARS", // Argentine Peso
   "CLP", // Chilean Peso
   "COP", // Colombian Peso
   "PEN", // Peruvian Sol
   "UYU", // Uruguayan Peso
   "BOB", // Bolivian Boliviano
+  "PYG", // Paraguayan Guaraní
+  "SRD", // Surinamese Dollar
+  "GYD", // Guyanese Dollar
+
+  // Latin America - Central America
+  "GTQ", // Guatemalan Quetzal
+  "CRC", // Costa Rican Colón
+  "PAB", // Panamanian Balboa
+  "HNL", // Honduran Lempira
+  "NIO", // Nicaraguan Córdoba
+  "BZD", // Belize Dollar
+  "SVC", // Salvadoran Colón
+
+  // Caribbean
+  "DOP", // Dominican Peso
+  "JMD", // Jamaican Dollar
+  "TTD", // Trinidad and Tobago Dollar
+  "BBD", // Barbadian Dollar
+  "BSD", // Bahamian Dollar
+  "XCD", // East Caribbean Dollar
+  "HTG", // Haitian Gourde
+  "AWG", // Aruban Florin
+  "ANG", // Netherlands Antillean Guilder
+  "KYD", // Cayman Islands Dollar
 
   // South Asia
   "PKR", // Pakistani Rupee
@@ -84,6 +122,33 @@ export const SUPPORTED_CURRENCIES = [
   "ETB", // Ethiopian Birr
   "MAD", // Moroccan Dirham
   "TND", // Tunisian Dinar
+  "DZD", // Algerian Dinar
+  "LYD", // Libyan Dinar
+  "SDG", // Sudanese Pound
+  "SSP", // South Sudanese Pound
+  "AOA", // Angolan Kwanza
+  "XOF", // West African CFA Franc
+  "XAF", // Central African CFA Franc
+  "CDF", // Congolese Franc
+  "UGX", // Ugandan Shilling
+  "TZS", // Tanzanian Shilling
+  "RWF", // Rwandan Franc
+  "ZMW", // Zambian Kwacha
+  "MWK", // Malawian Kwacha
+  "BWP", // Botswana Pula
+  "NAD", // Namibian Dollar
+  "SZL", // Swazi Lilangeni
+  "LSL", // Lesotho Loti
+  "MUR", // Mauritian Rupee
+  "MZN", // Mozambican Metical
+  "GMD", // Gambian Dalasi
+  "MRU", // Mauritanian Ouguiya
+
+  // Pacific
+  "FJD", // Fijian Dollar
+  "PGK", // Papua New Guinea Kina
+  "WST", // Samoan Tala
+  "TOP", // Tongan Paʻanga
 
   // Other
   "ISK", // Icelandic Króna
@@ -127,6 +192,9 @@ export const CURRENCY_SYMBOLS = {
   IDR: "Rp", // Indonesian Rupiah
   PHP: "₱", // Philippine Peso
   VND: "₫", // Vietnamese Dong
+  MMK: "K", // Myanmar Kyat
+  KHR: "៛", // Cambodian Riel
+  LAK: "₭", // Lao Kip
 
   // Middle East & Gulf
   AED: "AED", // UAE Dirham
@@ -141,7 +209,7 @@ export const CURRENCY_SYMBOLS = {
   LBP: "LBP", // Lebanese Pound
   IQD: "IQD", // Iraqi Dinar
 
-  // Eastern Europe
+  // Eastern Europe & Balkans
   CZK: "Kč", // Czech Koruna
   HUF: "Ft", // Hungarian Forint
   RON: "lei", // Romanian Leu
@@ -151,16 +219,51 @@ export const CURRENCY_SYMBOLS = {
   UAH: "₴", // Ukrainian Hryvnia
   BYN: "Br", // Belarusian Ruble
   MDL: "L", // Moldovan Leu
+  ALL: "L", // Albanian Lek
+  MKD: "ден", // Macedonian Denar
+  BAM: "KM", // Bosnia-Herzegovina Convertible Mark
+
+  // Central Asia & Caucasus
   GEL: "₾", // Georgian Lari
   KZT: "₸", // Kazakhstani Tenge
+  UZS: "so'm", // Uzbekistani Som
+  TJS: "ЅМ", // Tajikistani Somoni
+  TMT: "m", // Turkmenistani Manat
 
-  // Latin America
+  // East Asia
+  MNT: "₮", // Mongolian Tugrik
+
+  // Latin America - South America
   ARS: "$", // Argentine Peso
   CLP: "$", // Chilean Peso
   COP: "$", // Colombian Peso
   PEN: "S/", // Peruvian Sol
   UYU: "$", // Uruguayan Peso
   BOB: "Bs", // Bolivian Boliviano
+  PYG: "₲", // Paraguayan Guaraní
+  SRD: "$", // Surinamese Dollar
+  GYD: "$", // Guyanese Dollar
+
+  // Latin America - Central America
+  GTQ: "Q", // Guatemalan Quetzal
+  CRC: "₡", // Costa Rican Colón
+  PAB: "B/.", // Panamanian Balboa
+  HNL: "L", // Honduran Lempira
+  NIO: "C$", // Nicaraguan Córdoba
+  BZD: "BZ$", // Belize Dollar
+  SVC: "₡", // Salvadoran Colón
+
+  // Caribbean
+  DOP: "RD$", // Dominican Peso
+  JMD: "J$", // Jamaican Dollar
+  TTD: "TT$", // Trinidad and Tobago Dollar
+  BBD: "Bds$", // Barbadian Dollar
+  BSD: "B$", // Bahamian Dollar
+  XCD: "EC$", // East Caribbean Dollar
+  HTG: "G", // Haitian Gourde
+  AWG: "ƒ", // Aruban Florin
+  ANG: "ƒ", // Netherlands Antillean Guilder
+  KYD: "CI$", // Cayman Islands Dollar
 
   // South Asia
   PKR: "₨", // Pakistani Rupee
@@ -175,6 +278,33 @@ export const CURRENCY_SYMBOLS = {
   ETB: "Br", // Ethiopian Birr
   MAD: "MAD", // Moroccan Dirham
   TND: "TND", // Tunisian Dinar
+  DZD: "دج", // Algerian Dinar
+  LYD: "LD", // Libyan Dinar
+  SDG: "SDG", // Sudanese Pound
+  SSP: "SS£", // South Sudanese Pound
+  AOA: "Kz", // Angolan Kwanza
+  XOF: "CFA", // West African CFA Franc
+  XAF: "FCFA", // Central African CFA Franc
+  CDF: "FC", // Congolese Franc
+  UGX: "USh", // Ugandan Shilling
+  TZS: "TSh", // Tanzanian Shilling
+  RWF: "FRw", // Rwandan Franc
+  ZMW: "ZK", // Zambian Kwacha
+  MWK: "MK", // Malawian Kwacha
+  BWP: "P", // Botswana Pula
+  NAD: "N$", // Namibian Dollar
+  SZL: "L", // Swazi Lilangeni
+  LSL: "L", // Lesotho Loti
+  MUR: "₨", // Mauritian Rupee
+  MZN: "MT", // Mozambican Metical
+  GMD: "D", // Gambian Dalasi
+  MRU: "UM", // Mauritanian Ouguiya
+
+  // Pacific
+  FJD: "FJ$", // Fijian Dollar
+  PGK: "K", // Papua New Guinea Kina
+  WST: "WS$", // Samoan Tala
+  TOP: "T$", // Tongan Paʻanga
 
   // Other
   ISK: "kr", // Icelandic Króna
@@ -219,6 +349,9 @@ export const CURRENCY_TO_LABEL = {
   IDR: "Indonesian Rupiah",
   PHP: "Philippine Peso",
   VND: "Vietnamese Dong",
+  MMK: "Myanmar Kyat",
+  KHR: "Cambodian Riel",
+  LAK: "Lao Kip",
 
   // Middle East & Gulf
   AED: "UAE Dirham",
@@ -233,7 +366,7 @@ export const CURRENCY_TO_LABEL = {
   LBP: "Lebanese Pound",
   IQD: "Iraqi Dinar",
 
-  // Eastern Europe
+  // Eastern Europe & Balkans
   CZK: "Czech Koruna",
   HUF: "Hungarian Forint",
   RON: "Romanian Leu",
@@ -243,16 +376,51 @@ export const CURRENCY_TO_LABEL = {
   UAH: "Ukrainian Hryvnia",
   BYN: "Belarusian Ruble",
   MDL: "Moldovan Leu",
+  ALL: "Albanian Lek",
+  MKD: "Macedonian Denar",
+  BAM: "Bosnia-Herzegovina Convertible Mark",
+
+  // Central Asia & Caucasus
   GEL: "Georgian Lari",
   KZT: "Kazakhstani Tenge",
+  UZS: "Uzbekistani Som",
+  TJS: "Tajikistani Somoni",
+  TMT: "Turkmenistani Manat",
 
-  // Latin America
+  // East Asia
+  MNT: "Mongolian Tugrik",
+
+  // Latin America - South America
   ARS: "Argentine Peso",
   CLP: "Chilean Peso",
   COP: "Colombian Peso",
   PEN: "Peruvian Sol",
   UYU: "Uruguayan Peso",
   BOB: "Bolivian Boliviano",
+  PYG: "Paraguayan Guaraní",
+  SRD: "Surinamese Dollar",
+  GYD: "Guyanese Dollar",
+
+  // Latin America - Central America
+  GTQ: "Guatemalan Quetzal",
+  CRC: "Costa Rican Colón",
+  PAB: "Panamanian Balboa",
+  HNL: "Honduran Lempira",
+  NIO: "Nicaraguan Córdoba",
+  BZD: "Belize Dollar",
+  SVC: "Salvadoran Colón",
+
+  // Caribbean
+  DOP: "Dominican Peso",
+  JMD: "Jamaican Dollar",
+  TTD: "Trinidad and Tobago Dollar",
+  BBD: "Barbadian Dollar",
+  BSD: "Bahamian Dollar",
+  XCD: "East Caribbean Dollar",
+  HTG: "Haitian Gourde",
+  AWG: "Aruban Florin",
+  ANG: "Netherlands Antillean Guilder",
+  KYD: "Cayman Islands Dollar",
 
   // South Asia
   PKR: "Pakistani Rupee",
@@ -267,6 +435,33 @@ export const CURRENCY_TO_LABEL = {
   ETB: "Ethiopian Birr",
   MAD: "Moroccan Dirham",
   TND: "Tunisian Dinar",
+  DZD: "Algerian Dinar",
+  LYD: "Libyan Dinar",
+  SDG: "Sudanese Pound",
+  SSP: "South Sudanese Pound",
+  AOA: "Angolan Kwanza",
+  XOF: "West African CFA Franc",
+  XAF: "Central African CFA Franc",
+  CDF: "Congolese Franc",
+  UGX: "Ugandan Shilling",
+  TZS: "Tanzanian Shilling",
+  RWF: "Rwandan Franc",
+  ZMW: "Zambian Kwacha",
+  MWK: "Malawian Kwacha",
+  BWP: "Botswana Pula",
+  NAD: "Namibian Dollar",
+  SZL: "Swazi Lilangeni",
+  LSL: "Lesotho Loti",
+  MUR: "Mauritian Rupee",
+  MZN: "Mozambican Metical",
+  GMD: "Gambian Dalasi",
+  MRU: "Mauritanian Ouguiya",
+
+  // Pacific
+  FJD: "Fijian Dollar",
+  PGK: "Papua New Guinea Kina",
+  WST: "Samoan Tala",
+  TOP: "Tongan Paʻanga",
 
   // Other
   ISK: "Icelandic Króna",
@@ -434,23 +629,23 @@ export const invoiceItemSchema = z
               .number()
               .min(
                 0,
-                `Must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
+                `Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
               )
               .max(
                 100,
-                `Must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
+                `Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
               ),
             z
               .string()
               .min(
                 1,
-                `Field is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).`,
+                `Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).`,
               ),
           ],
           {
             errorMap: () => ({
               message:
-                "Field is required. Must be a number between 0-100 or any text (i.e. NP, OO, etc).",
+                "Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).",
             }),
           },
         ),

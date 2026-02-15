@@ -21,16 +21,6 @@ test.describe("About page", () => {
 
     /* CHECK HEADER ELEMENTS */
 
-    // check github star cta button in header
-    const githubStarCtaButton = header.getByRole("link", {
-      name: "Star project on GitHub",
-      exact: true,
-    });
-
-    await expect(githubStarCtaButton).toBeVisible();
-    await expect(githubStarCtaButton).toHaveAttribute("href", GITHUB_URL);
-    await expect(githubStarCtaButton).toHaveAttribute("target", "_blank");
-
     // Check language switcher button in header
     const languageSwitcher = header.getByRole("button", {
       name: "Switch language",
@@ -212,8 +202,9 @@ test.describe("About page", () => {
     const header = page.getByRole("banner");
     // Check header elements in French
     await expect(header.getByText("EasyInvoicePDF")).toBeVisible();
+
     const goToAppButton = header.getByRole("link", {
-      name: "Aller à l'application",
+      name: "Ouvrir",
       exact: true,
     });
     await expect(goToAppButton).toBeVisible();
@@ -287,7 +278,7 @@ test.describe("About page", () => {
     // Check header elements in German
     await expect(header.getByText("EasyInvoicePDF")).toBeVisible();
     const goToAppButton = header.getByRole("link", {
-      name: "Zur App gehen",
+      name: "Öffnen",
       exact: true,
     });
     await expect(goToAppButton).toBeVisible();
@@ -350,7 +341,7 @@ test.describe("About page", () => {
     const header = page.getByRole("banner");
     await expect(
       header.getByRole("link", {
-        name: "Aller à l'application",
+        name: "Ouvrir",
         exact: true,
       }),
     ).toBeVisible();

@@ -5,6 +5,9 @@ import dayjs from "dayjs";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
+/**
+ * Invoice number, date of issue and date of service fields on top of the invoice
+ */
 export function InvoiceHeader({
   invoiceData,
   styles,

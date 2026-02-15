@@ -3,8 +3,7 @@
   <h1>EasyInvoicePDF</h1>
   <p><strong>Free & Open-Source Invoice Generator</strong></p>
   <p>Create professional invoices instantly in your browser with <strong>Live Preview</strong>, <strong>Multiple Templates</strong> (including a Stripe-style design). <strong>No Sign-Up Required</strong>.</p>
-  <p><a href="https://easyinvoicepdf.com/?template=stripe&ref=github">Get Started</a></p>
-  
+  <p><a href="https://easyinvoicepdf.com/?template=stripe&ref=github" style="font-weight: bold;">Get Started</a></p>
   <p>
       <a href="https://easyinvoicepdf.com/en/about?ref=github">About</a>
       ·
@@ -15,7 +14,7 @@
   </a>
 </div>
 
-## ✨ Key Features
+## ✨ Key Features of EasyInvoicePDF:
 
 - ⭐ **No Sign-Up Required**: Start creating invoices immediately without any registration
 - 📄 **Instant PDF**: One-click download ready for printing or sending
@@ -24,12 +23,79 @@
 - 🎨 **Multiple Templates**: Including modern **Stripe-style design**
 - 📱 **Browser Only**: No server uploads, your data stays private
 - 💰 **Flexible Tax Support**: VAT, GST, Sales Tax, and custom tax formats with automatic calculations
-- 🌍 **Multi-Language**: Support for 10+ languages and all major currencies
+- 🌍 **Multi-Language & Currency**: Support for 10+ languages and 120+ currencies
 - 📱 **Mobile-Friendly**: Create invoices on the go from any device
+- 🏞️ **QR Code Support**: Add payment QR codes with any invoice-related information (payment links, UPI, contact details, custom data)
+- 📑 **Multi-Page PDFs**: Seamless multi-page support with automatic pagination and page breaks
 
-Learn more about [features](https://easyinvoicepdf.com/en/about#features).
+<h4>Learn more about <a href="https://easyinvoicepdf.com/en/about#features">features</a>.</h4>
 
-<img width="1440" height="769" alt="EasyInvoicePDF Default Template Screenshot" src=".github/screenshots/default-template.png" />
+<hr />
+
+<div align="center">
+
+### 🎬 Live Preview
+
+<img src=".github/demos/live-preview.gif" width="800" alt="Live Preview Demo">
+
+_See changes in **real-time** as you type_
+
+---
+
+### 📥 Instant Download
+
+<img src=".github/demos/instant-download.gif" width="800" alt="Instant Download Demo">
+
+_**One-click PDF download** ready for printing or sending_
+
+---
+
+### 🔗 Shareable Links
+
+<img src=".github/demos/shareable-links.gif" width="800" alt="Shareable Links Demo">
+
+_**Send invoices directly to clients** without attachments_
+
+---
+
+### 📲 QR Code Support & Multi-Page PDFs
+
+<img src=".github/demos/qr-code.gif" width="800" alt="QR Code Support Demo">
+
+_**Add payment QR codes** with any invoice-related information (payment links, UPI, contact details, custom data) and **seamless multi-page support** with automatic pagination and page breaks for large invoices_
+
+---
+
+### 🏷️ Customizable Tax Settings
+
+<img src=".github/demos/tax-custom.gif" width="800" alt="Customizable Tax Settings Demo">
+
+_**Customize tax labels** (VAT, Sales Tax, IVA, etc.)_
+
+---
+
+### 🌍 Language & Currency
+
+<img src=".github/demos/lang-currency.gif" width="800" alt="Language & Currency Demo">
+
+_**Switch between 10 languages and 120+ currencies instantly** with live PDF preview updates_
+
+---
+
+### 🎨 Invoice Templates
+
+<img src=".github/demos/invoice-template.gif" width="800" alt="Invoice Templates Demo">
+
+_**Choose between multiple professional templates** to match your brand and style_
+
+</div>
+
+<!-- <img width="1440" height="769" alt="EasyInvoicePDF Default Template Screenshot" src=".github/screenshots/default-template.png" /> -->
+
+## 📢 News & Updates
+
+- **Jan 11, 2026**: Added Customizable Tax/VAT Labels. Improved i18n translations, overall improvements and bug fixes. [Release notes](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-1.0.1)
+- **Nov 19, 2025**: EasyInvoicePDF version 1.0.0 released. Welcome to try EasyInvoicePDF. Check [release notes](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-v1.0.0) for more details.
 
 ## 🎥 Demo Video
 

@@ -32,7 +32,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
 import React, { memo, useCallback, useEffect, useState } from "react";
-import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
+import {
+  Controller,
+  useFieldArray,
+  useForm,
+  useWatch,
+  type FieldErrors,
+} from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
@@ -66,12 +72,14 @@ interface InvoiceFormProps {
   invoiceData: InvoiceData;
   handleInvoiceDataChange: (updatedData: InvoiceData) => void;
   setCanShareInvoice: (canShareInvoice: boolean) => void;
+  isMobile?: boolean;
 }
 
 export const InvoiceForm = memo(function InvoiceForm({
   invoiceData,
   handleInvoiceDataChange,
   setCanShareInvoice,
+  isMobile = false,
 }: InvoiceFormProps) {
   const form = useForm<InvoiceData>({
     resolver: zodResolver(invoiceSchema),
@@ -81,10 +89,10 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   const {
     control,
-    handleSubmit,
     setValue,
     formState: { errors },
     watch,
+    trigger,
   } = form;
 
   const currency = useWatch({ control, name: "currency" });
@@ -161,17 +169,30 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   // regenerate pdf on every input change with debounce
   const debouncedRegeneratePdfOnFormChange = useDebouncedCallback(
-    (data: InvoiceData) => {
-      // Submit form to regenerate PDF and run form validations
-      void handleSubmit(onSubmit)(data as unknown as React.BaseSyntheticEvent);
+    async (data: InvoiceData) => {
+      // close all other toasts (if any)
+      toast.dismiss();
 
       // TODO: double check if we need this code, because we already save to local storage in the page.client.tsx (parent component) (line: 267) useEffect "Save to localStorage whenever data changes on form update"
       try {
+        // trigger form validations
+        const res = await trigger(undefined, { shouldFocus: true });
+
+        if (!res) {
+          // show errors to the user
+          formErrorsToToast({ errors, isMobile });
+
+          return;
+        }
+
         const validatedData = invoiceSchema.parse(data);
 
         const stringifiedData = JSON.stringify(validatedData);
 
         localStorage.setItem(PDF_DATA_LOCAL_STORAGE_KEY, stringifiedData);
+
+        // pass the updated data to the parent component, to update the invoice data state (use state hook)
+        onSubmit(validatedData);
       } catch (error) {
         console.error("Error saving to local storage:", error);
 
@@ -187,7 +208,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   // subscribe to form changes to regenerate pdf on every input change
   useEffect(() => {
     const subscription = watch((value) => {
-      debouncedRegeneratePdfOnFormChange(value as unknown as InvoiceData);
+      void debouncedRegeneratePdfOnFormChange(value as unknown as InvoiceData);
     });
 
     return () => subscription.unsubscribe();
@@ -214,7 +235,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
       // Manually trigger form submission after removal
       const currentFormData = watch();
-      debouncedRegeneratePdfOnFormChange(currentFormData);
+      void debouncedRegeneratePdfOnFormChange(currentFormData);
     },
     [remove, watch, debouncedRegeneratePdfOnFormChange],
   );
@@ -297,69 +318,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   };
 
   return (
-    <form
-      className="relative mb-4 space-y-3.5"
-      onSubmit={handleSubmit(onSubmit, (errors) => {
-        console.error("Form validation errors:", errors);
-        toast.error(
-          <div>
-            <p className="font-semibold">Please fix the following errors:</p>
-            <ul className="mt-1 list-inside list-disc">
-              {Object.entries(errors)
-                .map(([key, error]) => {
-                  // Handle nested errors (e.g., seller.name, items[0].name)
-                  if (
-                    error &&
-                    typeof error === "object" &&
-                    "message" in error
-                  ) {
-                    return (
-                      <li key={key} className="text-sm">
-                        {error?.message || "Unknown error"}
-                      </li>
-                    );
-                  }
-
-                  // Handle array errors (e.g., items array)
-                  if (Array.isArray(error)) {
-                    return error.map((item, index) =>
-                      Object.entries(
-                        item as { [key: string]: { message?: string } },
-                      ).map(([fieldName, fieldError]) => (
-                        <li
-                          key={`${key}.${index}.${fieldName}`}
-                          className="text-sm"
-                        >
-                          {fieldError?.message || "Unknown error"}
-                        </li>
-                      )),
-                    );
-                  }
-
-                  // Handle nested object errors
-                  if (error && typeof error === "object") {
-                    return Object.entries(
-                      error as { [key: string]: { message?: string } },
-                    ).map(([nestedKey, nestedError]) => {
-                      return (
-                        <li key={`${key}.${nestedKey}`} className="text-sm">
-                          {nestedError?.message || "Unknown error"}
-                        </li>
-                      );
-                    });
-                  }
-
-                  return null;
-                })
-                .flat(Infinity)}
-            </ul>
-          </div>,
-          {
-            closeButton: true,
-          },
-        );
-      })}
-    >
+    <form className="relative mb-4 space-y-3.5">
       <Accordion
         type="multiple"
         value={accordionValues}
@@ -833,4 +792,64 @@ const calculateItemTotals = (item: InvoiceItemData | null) => {
     vatAmount: formattedVatAmount,
     preTaxAmount: formattedPreTaxAmount,
   };
+};
+
+const formErrorsToToast = ({
+  errors,
+  isMobile,
+}: {
+  errors: FieldErrors<InvoiceData>;
+  isMobile: boolean;
+}) => {
+  toast.error(
+    <div>
+      <p className="font-semibold">Please fix the following errors:</p>
+      <ul className="mt-1 list-inside list-disc">
+        {Object.entries(errors)
+          .map(([key, error]) => {
+            // Handle nested errors (e.g., seller.name, items[0].name)
+            if (error && typeof error === "object" && "message" in error) {
+              return (
+                <li key={key} className="text-sm">
+                  {error?.message || "Unknown error"}
+                </li>
+              );
+            }
+
+            // Handle array errors (e.g., items array)
+            if (Array.isArray(error)) {
+              return error.map((item, index) =>
+                Object.entries(
+                  item as { [key: string]: { message?: string } },
+                ).map(([fieldName, fieldError]) => (
+                  <li key={`${key}.${index}.${fieldName}`} className="text-sm">
+                    {fieldError?.message || "Unknown error"}
+                  </li>
+                )),
+              );
+            }
+
+            // Handle nested object errors
+            if (error && typeof error === "object") {
+              return Object.entries(
+                error as { [key: string]: { message?: string } },
+              ).map(([nestedKey, nestedError]) => {
+                return (
+                  <li key={`${key}.${nestedKey}`} className="text-sm">
+                    {nestedError?.message || "Unknown error"}
+                  </li>
+                );
+              });
+            }
+
+            return null;
+          })
+          .flat(Infinity)}
+      </ul>
+    </div>,
+    {
+      duration: 15_000,
+      position: isMobile ? "top-center" : "bottom-right",
+    },
+  );
 };

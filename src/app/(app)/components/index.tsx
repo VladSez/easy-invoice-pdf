@@ -188,6 +188,7 @@ export function InvoiceClientPage({
                   invoiceData={invoiceDataState}
                   handleInvoiceDataChange={handleInvoiceDataChange}
                   setCanShareInvoice={setCanShareInvoice}
+                  isMobile
                 />
               </div>
             </TabsContent>
@@ -292,7 +293,7 @@ export function InvoiceClientPage({
               />
             </div>
 
-            <span className="mt-1 inline-block text-end text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
+            <span className="mt-1 inline-block text-end text-sm text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
               Made by{" "}
               <a
                 href={TWITTER_URL}

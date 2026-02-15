@@ -11,18 +11,29 @@ import { cn } from "@/lib/utils";
 function getCurrencyPadding(currencySymbol: CurrencySymbols) {
   if (!currencySymbol) return "ps-3";
 
-  if (
-    currencySymbol === "Br" ||
-    currencySymbol === "R$" ||
-    currencySymbol === "S$"
-  ) {
+  const symbolLength = currencySymbol.length;
+
+  // Single character symbols (€, $, £, ¥, ₹, etc.)
+  if (symbolLength === 1) {
+    return "ps-6";
+  }
+
+  // Two character symbols (R$, S$, Br, Rs, etc.)
+  if (symbolLength === 2) {
     return "ps-8";
   }
 
-  if (currencySymbol === "HK$" || currencySymbol === "NT$") {
-    return "ps-10";
+  // Three character symbols (HK$, NT$, CI$, etc.)
+  if (symbolLength === 3) {
+    return "ps-11";
   }
 
+  // Four or more character symbols (MAD, TND, SDG, etc.)
+  if (symbolLength >= 4) {
+    return "ps-12";
+  }
+
+  // Fallback
   return "ps-6";
 }
 

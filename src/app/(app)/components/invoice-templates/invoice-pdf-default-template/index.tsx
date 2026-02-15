@@ -37,6 +37,8 @@ export const PDF_DEFAULT_TEMPLATE_STYLES = StyleSheet.create({
     padding: 30,
     fontFamily: fontFamily,
     fontWeight: 400,
+
+    paddingBottom: 50, // to fix overlapping issues with the fixed footer https://github.com/diegomura/react-pdf/issues/774#issuecomment-560069810
   },
   header: {
     fontSize: 16,
@@ -80,14 +82,26 @@ export const PDF_DEFAULT_TEMPLATE_STYLES = StyleSheet.create({
     width: "100%",
     borderStyle: "solid",
     borderWidth: 1,
+    borderColor: "gray",
+
+    borderTopWidth: 0,
+    borderLeftWidth: 0,
     borderRightWidth: 0,
     borderBottomWidth: 0,
-    borderColor: "gray",
   },
 
   tableRow: {
     flexDirection: "row",
     width: "100%",
+    borderStyle: "solid",
+    borderColor: "gray",
+    borderWidth: 1,
+
+    borderLeftWidth: 1,
+
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+    borderTopWidth: 0,
   },
   tableCol: {
     borderStyle: "solid",

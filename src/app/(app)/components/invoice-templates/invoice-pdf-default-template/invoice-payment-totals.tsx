@@ -8,6 +8,9 @@ import {
 } from "@/utils/invoice.utils";
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
+/**
+ * To pay, paid, left to pay and amount in words fields
+ */
 export function InvoicePaymentTotals({
   invoiceData,
   formattedInvoiceTotal,

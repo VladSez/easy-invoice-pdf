@@ -85,7 +85,7 @@ function PremiumDonationToast(props: ToastProps) {
 
   return (
     <div
-      className="relative max-w-sm rounded-lg border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4 shadow-xl"
+      className="relative w-full rounded-lg border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4 shadow-xl lg:max-w-sm"
       data-testid="download-pdf-toast"
     >
       {/* Close button - styled like default Sonner toast */}
@@ -103,12 +103,12 @@ function PremiumDonationToast(props: ToastProps) {
         <p className="mb-4 text-xs leading-relaxed text-gray-700">
           {description}
         </p>
-        <div className="flex gap-2">
+        <div className="flex items-end justify-end gap-2">
           <Button
             size="sm"
             variant="default"
             asChild
-            className="h-8 flex-1 border-gray-300 text-xs transition-all duration-200 hover:scale-105"
+            className="h-8 max-w-[150px] flex-1 border-gray-300 text-xs transition-all duration-200 hover:scale-105"
           >
             <a
               href={GITHUB_URL}
@@ -143,7 +143,7 @@ function PremiumToastFeedbackButton(
   return (
     <Button
       size="sm"
-      className="h-8 flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
+      className="h-8 max-w-[150px] flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
       variant="secondary"
       asChild
       data-testid="toast-cta-btn"
@@ -166,7 +166,7 @@ function DefaultDonationToast(props: ToastProps) {
 
   return (
     <div
-      className="flex max-w-md items-start gap-3 rounded-lg border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4 shadow-xl"
+      className="flex w-full items-start gap-3 rounded-lg border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4 shadow-xl lg:max-w-md"
       data-testid="download-pdf-toast"
     >
       {/* Close button - styled like default Sonner toast */}
@@ -183,10 +183,10 @@ function DefaultDonationToast(props: ToastProps) {
         <p className="mb-3 text-xs leading-relaxed text-gray-600">
           {description}
         </p>
-        <div className="flex gap-2">
+        <div className="flex items-end justify-end gap-2">
           <Button
             size="sm"
-            className="group h-8 bg-gray-900 px-3 text-xs font-medium text-white transition-all duration-200 hover:scale-105 hover:bg-gray-800"
+            className="group h-8 max-w-[150px] bg-gray-900 px-3 text-xs font-medium text-white transition-all duration-200 hover:scale-105 hover:bg-gray-800"
             asChild
           >
             <a
@@ -222,7 +222,7 @@ function DefaultToastFeedbackButton(
   return (
     <Button
       size="sm"
-      className="h-8 flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
+      className="h-8 max-w-[150px] flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
       variant="secondary"
       asChild
       data-testid="toast-cta-btn"
@@ -275,4 +275,4 @@ export const showRandomCTAToast = () => {
 /**
  * Slight delay to prevent the toast from appearing too quickly
  */
-export const CTA_TOAST_TIMEOUT = 2_000; // in ms
+export const CTA_TOAST_TIMEOUT = 2_500; // in ms

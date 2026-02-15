@@ -18,7 +18,7 @@ import { StripeInvoiceHeader } from "./stripe-invoice-header";
 import { StripeInvoiceInfo } from "./stripe-invoice-info";
 import { StripeItemsTable } from "./stripe-items-table";
 import { StripeSellerBuyerInfo } from "./stripe-seller-buyer-info";
-import { StripeTotals } from "./stripe-totals";
+import { StripeVatSummaryTableTotals } from "./stripe-totals";
 import { formatCurrency } from "@/app/(app)/utils/format-currency";
 import { INVOICE_PDF_FONTS } from "@/config";
 
@@ -61,11 +61,12 @@ Font.register({
 // Stripe-inspired styles
 export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
   page: {
-    flexDirection: "column",
     backgroundColor: "#FFFFFF",
     padding: 0,
     fontFamily: fontFamily,
     fontWeight: 400,
+
+    paddingBottom: 40, // to fix overlapping issues with the fixed footer https://github.com/diegomura/react-pdf/issues/774#issuecomment-560069810
   },
   // Yellow header bar
   headerBar: {
@@ -142,6 +143,8 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     borderBottomColor: "#010000",
     paddingBottom: 6,
     marginBottom: 4,
+
+    marginTop: 16,
   },
   tableRow: {
     flexDirection: "row",
@@ -169,17 +172,6 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",
   },
-  totalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 1,
-  },
-  finalTotalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   borderTop: {
     borderTopWidth: 0.5,
     borderTopColor: "#e5e7eb",
@@ -193,6 +185,25 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     paddingTop: 8,
     borderTopWidth: 0.5,
     borderTopColor: "#e5e7eb",
+  },
+  vatTableHeader: {
+    flexDirection: "row",
+    marginBottom: 4,
+  },
+
+  vatTableRow: {
+    flexDirection: "row",
+    paddingVertical: 2,
+  },
+
+  vatColLabel: {
+    flex: 3,
+    paddingRight: 6,
+  },
+
+  vatColValue: {
+    flex: 1.3,
+    textAlign: "right",
   },
 } as const satisfies Styles);
 
@@ -254,11 +265,15 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
           />
 
           {/* Due amount highlight */}
-          <StripeDueAmount
-            invoiceData={invoiceData}
-            formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
-            styles={STRIPE_TEMPLATE_STYLES}
-          />
+          <View style={{ marginBottom: -16 }}>
+            {" "}
+            {/* negative margin to compensate for the marginTop of the items table */}
+            <StripeDueAmount
+              invoiceData={invoiceData}
+              formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
+              styles={STRIPE_TEMPLATE_STYLES}
+            />
+          </View>
 
           {/* Items table */}
           <StripeItemsTable
@@ -266,8 +281,8 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
             styles={STRIPE_TEMPLATE_STYLES}
           />
 
-          {/* Totals */}
-          <StripeTotals
+          {/* VAT summary table (VAT rates, net amounts, VAT amounts, pre-tax amounts) */}
+          <StripeVatSummaryTableTotals
             invoiceData={invoiceData}
             formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
             styles={STRIPE_TEMPLATE_STYLES}
@@ -275,7 +290,11 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
 
           {/* Notes */}
           {invoiceData.notesFieldIsVisible && invoiceData.notes && (
-            <View style={[STRIPE_TEMPLATE_STYLES.mt24]}>
+            <View
+              style={[STRIPE_TEMPLATE_STYLES.mt24]}
+              wrap={false}
+              minPresenceAhead={50}
+            >
               <Text style={[STRIPE_TEMPLATE_STYLES.fontSize10]}>
                 {invoiceData.notes}
               </Text>

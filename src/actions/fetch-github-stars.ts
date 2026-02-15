@@ -2,7 +2,16 @@
 
 import { env } from "@/env";
 
-export async function fetchGithubStars(): Promise<number> {
+import { cache } from "react";
+
+/**
+ * Fetches the current star count for the GitHub repository.
+ *
+ * This function is cached using React's `cache()` to prevent duplicate requests
+ * during the same render cycle. The data is revalidated every 60 seconds.
+ *
+ */
+export const fetchGithubStars = cache(async (): Promise<number> => {
   try {
     const res = await fetch(
       "https://api.github.com/repos/VladSez/easy-invoice-pdf",
@@ -25,4 +34,4 @@ export async function fetchGithubStars(): Promise<number> {
     console.error("Failed to fetch GitHub stars:", error);
     return 0;
   }
-}
+});

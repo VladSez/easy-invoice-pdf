@@ -27,7 +27,7 @@
     "check-meta": "pnpx check-site-meta",
     "dev:email": "email dev --dir src/emails",
     "prepare": "husky",
-    "expose-to-internet": "pnpm dlx localtunnel --port 3000",
+    "expose-to-internet": "pnpm dlx cloudflared tunnel --url http://localhost:3000",
     "corepack:enable": "corepack enable",
     "corepack:prepare": "corepack prepare pnpm@latest"
   },

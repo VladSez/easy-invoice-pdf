@@ -216,7 +216,8 @@ export function InvoicePDFDownloadLink({
         description: (
           <p>
             For the best experience, please open this page in{" "}
-            <span className="font-bold">Safari or Chrome browser.</span>
+            <span className="font-bold">Chrome</span> or{" "}
+            <span className="font-bold">Safari</span> browser.
           </p>
         ),
         id: "in-app-browser-toast", // To prevent duplicate toasts

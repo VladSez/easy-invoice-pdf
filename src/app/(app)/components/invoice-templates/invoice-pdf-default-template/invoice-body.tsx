@@ -66,6 +66,7 @@ export const InvoiceBody = ({
     <>
       <InvoiceHeader invoiceData={invoiceData} styles={styles} />
       <InvoiceSellerBuyerInfo invoiceData={invoiceData} styles={styles} />
+
       <InvoiceItemsTable
         invoiceData={invoiceData}
         formattedInvoiceTotal={formattedInvoiceTotal}
@@ -80,6 +81,7 @@ export const InvoiceBody = ({
         }}
       >
         <View style={{ width: "50%" }}>
+          {/** Payment date and payment method fields */}
           <InvoicePaymentInfo invoiceData={invoiceData} styles={styles} />
         </View>
 
@@ -94,7 +96,12 @@ export const InvoiceBody = ({
         )}
       </View>
 
-      <View style={{ marginTop: vatTableSummaryIsVisible ? 0 : 15 }}>
+      {/** To pay, paid, left to pay and amount in words fields */}
+      <View
+        style={{ marginTop: vatTableSummaryIsVisible ? 0 : 15 }}
+        wrap={false}
+        minPresenceAhead={50}
+      >
         <InvoicePaymentTotals
           invoiceData={invoiceData}
           formattedInvoiceTotal={formattedInvoiceTotal}
@@ -104,7 +111,11 @@ export const InvoiceBody = ({
 
       {/* Signature section */}
       {signatureSectionIsVisible && (
-        <View style={styles.signatureSection}>
+        <View
+          style={styles.signatureSection}
+          wrap={false}
+          minPresenceAhead={50}
+        >
           {invoiceData.personAuthorizedToReceiveFieldIsVisible && (
             <View style={styles.signatureColumn}>
               <View style={styles.signatureLine} />
