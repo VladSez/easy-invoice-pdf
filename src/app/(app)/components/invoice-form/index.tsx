@@ -167,6 +167,12 @@ export const InvoiceForm = memo(function InvoiceForm({
     });
   }, [invoiceItems, setValue]);
 
+  // top level of component
+  const debouncedShowFormErrorsToast = useDebouncedCallback(
+    () => formErrorsToToast({ errors, isMobile }),
+    1000,
+  );
+
   // regenerate pdf on every input change with debounce
   const debouncedRegeneratePdfOnFormChange = useDebouncedCallback(
     async (data: InvoiceData) => {
@@ -176,11 +182,12 @@ export const InvoiceForm = memo(function InvoiceForm({
       // TODO: double check if we need this code, because we already save to local storage in the page.client.tsx (parent component) (line: 267) useEffect "Save to localStorage whenever data changes on form update"
       try {
         // trigger form validations
-        const res = await trigger(undefined, { shouldFocus: true });
+        const ok = await trigger(undefined, { shouldFocus: true });
 
-        if (!res) {
+        if (!ok) {
           // show errors to the user
-          formErrorsToToast({ errors, isMobile });
+          // Debounce error toast to avoid showing too fast
+          debouncedShowFormErrorsToast();
 
           return;
         }
