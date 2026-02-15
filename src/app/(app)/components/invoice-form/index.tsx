@@ -170,7 +170,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   // top level of component
   const debouncedShowFormErrorsToast = useDebouncedCallback(
     () => formErrorsToToast({ errors, isMobile }),
-    1000,
+    isMobile ? 3000 : 1000,
   );
 
   // regenerate pdf on every input change with debounce
@@ -808,6 +808,10 @@ const formErrorsToToast = ({
   errors: FieldErrors<InvoiceData>;
   isMobile: boolean;
 }) => {
+  // Return early if there are no errors
+  if (!errors || Object.keys(errors).length === 0) {
+    return;
+  }
   toast.error(
     <div>
       <p className="font-semibold">Please fix the following errors:</p>

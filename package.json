@@ -22,6 +22,7 @@
     "e2e": "pnpm exec playwright test --reporter=list",
     "e2e:ui": "pnpm exec playwright test --ui",
     "e2e:not-flaky": "pnpm e2e --workers=2",
+    "e2e:update-snapshots": "pnpm e2e --update-snapshots",
     "dedupe": "pnpm dedupe",
     "lint-stage": "npx lint-staged --verbose",
     "check-meta": "pnpx check-site-meta",

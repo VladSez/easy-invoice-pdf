@@ -1285,14 +1285,14 @@ test.describe("Default Invoice Template", () => {
     // verify that the switch is off
     await expect(newShowQrCodeSwitch).not.toBeChecked();
 
-    // Verify QR Code Data field is empty after toggling off
+    // Verify QR Code Data field retains its value after toggling visibility off
     const newQrCodeDataTextarea = newQrCodeFieldset.getByRole("textbox", {
       name: "Data",
     });
     await expect(newQrCodeDataTextarea).toBeVisible();
     await expect(newQrCodeDataTextarea).toHaveValue(QR_CODE_TEST_DATA.data);
 
-    // Verify QR Code Description field is empty after toggling off
+    // Verify QR Code Description field retains its value after toggling visibility off
     const newQrCodeDescriptionTextarea = newQrCodeFieldset.getByRole(
       "textbox",
       {
