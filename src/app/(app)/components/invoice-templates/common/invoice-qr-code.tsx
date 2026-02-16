@@ -12,13 +12,16 @@ export function InvoiceQRCode({
   return (
     <View
       style={{
-        marginTop: 75,
+        marginTop: 30,
         alignItems: "center",
         justifyContent: "center",
+        paddingBottom: 10, // prevent overlapping with the fixed footer
       }}
+      wrap={false}
+      minPresenceAhead={30}
     >
       {/* eslint-disable-next-line jsx-a11y/alt-text */}
-      <Image src={qrCodeDataUrl} style={{ width: 90, height: 90 }} />
+      <Image src={qrCodeDataUrl} style={{ width: 100, height: 100 }} />
       {description ? (
         <Text
           style={{

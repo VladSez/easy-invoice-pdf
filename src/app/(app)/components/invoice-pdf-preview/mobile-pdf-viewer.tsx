@@ -31,6 +31,7 @@ export const MobileInvoicePDFViewer = ({
   qrCodeDataUrl: string;
 }) => {
   const [key, setKey] = useState(0);
+  const [numPages, setNumPages] = useState(0);
 
   const memoizedInvoicePdfTemplate = useMemo(() => {
     switch (invoiceData.template) {
@@ -107,6 +108,10 @@ export const MobileInvoicePDFViewer = ({
                 </div>
               </div>
             }
+            onLoadSuccess={({ numPages }) => {
+              // to render the correct number of pages in the PDF viewer
+              setNumPages(numPages);
+            }}
             onLoadError={(error) => {
               console.error(error);
 
@@ -133,23 +138,30 @@ export const MobileInvoicePDFViewer = ({
               </div>
             }
           >
-            <Page
-              pageNumber={1}
-              error={"Something went wrong"}
-              loading={
-                <div className="flex h-[520px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-                  <div className="text-center">
-                    <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-                    <p className="text-gray-600">Loading PDF viewer...</p>
+            {Array.from({ length: numPages }, (_, index) => (
+              <Page
+                key={`page-${index + 1}`}
+                // we add some space between pages to make it easier to see the page break
+                className={
+                  index < numPages - 1 ? "border-b-[15px] border-gray-200" : ""
+                }
+                pageNumber={index + 1}
+                error={"Something went wrong"}
+                loading={
+                  <div className="flex h-[520px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+                    <div className="text-center">
+                      <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+                      <p className="text-gray-600">Loading PDF viewer...</p>
+                    </div>
                   </div>
-                </div>
-              }
-              onLoadError={(error) => {
-                Sentry.captureException(error);
-              }}
-              height={450}
-              width={650}
-            />
+                }
+                onLoadError={(error) => {
+                  Sentry.captureException(error);
+                }}
+                height={450}
+                width={650}
+              />
+            ))}
           </Document>
         );
       }}

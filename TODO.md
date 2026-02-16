@@ -25,7 +25,7 @@ useful stuff:
 
 react-pdf/renderer quirks:
 
-- https://github.com/diegomura/react-pdf/issues/774#issuecomment-560069810
+- https://github.com/diegomura/react-pdf/issues/774#issuecomment-560069810 (Preventing other elements from crashing into a fixed footer)
 
 issues to follow:
 

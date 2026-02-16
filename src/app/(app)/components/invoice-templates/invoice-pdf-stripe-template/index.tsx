@@ -66,7 +66,7 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     fontFamily: fontFamily,
     fontWeight: 400,
 
-    paddingBottom: 40, // to fix overlapping issues with the fixed footer https://github.com/diegomura/react-pdf/issues/774#issuecomment-560069810
+    paddingBottom: 30, // to fix overlapping issues with the fixed footer https://github.com/diegomura/react-pdf/issues/774#issuecomment-560069810
   },
   // Yellow header bar
   headerBar: {
@@ -79,7 +79,6 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     paddingLeft: 30,
     paddingRight: 30,
     paddingTop: 27,
-    paddingBottom: 27,
   },
   // Typography
   fontSize8: { fontSize: 8 },
@@ -266,7 +265,6 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
 
           {/* Due amount highlight */}
           <View style={{ marginBottom: -16 }}>
-            {" "}
             {/* negative margin to compensate for the marginTop of the items table */}
             <StripeDueAmount
               invoiceData={invoiceData}
