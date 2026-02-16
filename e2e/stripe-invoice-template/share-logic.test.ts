@@ -326,4 +326,66 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await expect(shareButton).toHaveAttribute("data-disabled", "false");
     await expect(shareButton).toBeEnabled();
   });
+
+  test("shows error toast when form has validation errors and generates link after fixing", async ({
+    page,
+  }) => {
+    // Switch to Stripe template
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+
+    // Locate the Net Price input for the first invoice item
+    const netPriceInput = page.locator("#itemNetPrice0");
+    await expect(netPriceInput).toBeVisible();
+
+    // Clear the Net Price field to trigger "Net price is required" validation error
+    await netPriceInput.clear();
+
+    // Wait for debounce timeout so form validation runs and invoiceFormHasErrors becomes true
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    // Click share button — should show error toast because form has validation errors
+    const shareButton = page.getByRole("button", {
+      name: "Generate a link to invoice",
+    });
+    await shareButton.click();
+
+    // Verify the "Unable to Share Invoice" error toast for form errors is visible
+    await expect(page.getByText("Unable to Share Invoice")).toBeVisible();
+    await expect(
+      page.getByText(
+        "Please fix the errors in the invoice form to generate a shareable link.",
+      ),
+    ).toBeVisible();
+
+    // Fill back the Net Price with a valid value
+    await netPriceInput.fill("100");
+
+    // Wait for debounce timeout so form validation passes and invoiceFormHasErrors resets to false
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    // Click share button again — should succeed this time
+    await shareButton.click();
+
+    // Verify link was generated: URL should contain data param
+    await page.waitForURL((url) => url.searchParams.has("data"));
+    const url = page.url();
+    expect(url).toContain("?template=stripe&data=");
+
+    // Verify data parameter is not empty
+    const urlObj = new URL(url);
+    const dataParam = urlObj.searchParams.get("data");
+    expect(dataParam).toBeTruthy();
+    expect(dataParam).not.toBe("");
+
+    // Verify success toast is visible
+    await expect(
+      page.getByText("Invoice link copied to clipboard!"),
+    ).toBeVisible();
+  });
 });

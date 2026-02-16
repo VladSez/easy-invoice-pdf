@@ -105,6 +105,8 @@ export function AppPageClient({
 
   const [isInvoiceUrlCorrupted, setIsInvoiceUrlCorrupted] = useState(false);
 
+  const [invoiceFormHasErrors, setInvoiceFormHasErrors] = useState(false);
+
   // Refs to track original URL invoice data
   const originalUrlInvoiceDataRef = useRef<InvoiceData | null>(null);
 
@@ -462,6 +464,22 @@ export function AppPageClient({
       return;
     }
 
+    // prevent sharing invoice if there are form errors
+    if (invoiceFormHasErrors) {
+      toast.error("Unable to Share Invoice", {
+        duration: 6000,
+        position: isMobile ? "top-center" : "bottom-right",
+        description: (
+          <p className="text-pretty text-xs leading-relaxed text-red-700">
+            Please fix the errors in the invoice form to generate a shareable
+            link.
+          </p>
+        ),
+      });
+
+      return;
+    }
+
     // if invoice data state is valid, generate the shareable link and update the url
     if (invoiceDataState) {
       try {
@@ -578,6 +596,7 @@ export function AppPageClient({
               canShareInvoice={canShareInvoice}
               setCanShareInvoice={setCanShareInvoice}
               qrCodeDataUrl={qrCodeDataUrl}
+              setInvoiceFormHasErrors={setInvoiceFormHasErrors}
             />
           </div>
         </div>

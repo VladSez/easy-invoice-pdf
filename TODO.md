@@ -1,8 +1,7 @@
 TODO list
 
-- [ ] fix bug with textarea jumping when typing on ios (seems like normal inputs are not affected)
-      More context:
-      src/app/(app)/page.client.tsx (line: 252) useEffect "Save to localStorage whenever data changes on form update" is causing issues on mobile devices, when user is typing some weird scrolling is happening
+- [ ] in "Person Authorized to Receive" Signature Field add text field to type
+- [ ] in "Person Authorized to Issue" Signature Field add text field to type
 
 - [ ] in Stripe template "Unit" column is not displayed in PDF, fix it
 

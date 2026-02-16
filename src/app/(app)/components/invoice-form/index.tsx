@@ -31,7 +31,14 @@ import type { NonReadonly, Prettify } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
-import React, { memo, useCallback, useEffect, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import {
   Controller,
   useFieldArray,
@@ -73,6 +80,7 @@ interface InvoiceFormProps {
   handleInvoiceDataChange: (updatedData: InvoiceData) => void;
   setCanShareInvoice: (canShareInvoice: boolean) => void;
   isMobile?: boolean;
+  setInvoiceFormHasErrors: Dispatch<SetStateAction<boolean>>;
 }
 
 export const InvoiceForm = memo(function InvoiceForm({
@@ -80,6 +88,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   handleInvoiceDataChange,
   setCanShareInvoice,
   isMobile = false,
+  setInvoiceFormHasErrors,
 }: InvoiceFormProps) {
   const form = useForm<InvoiceData>({
     resolver: zodResolver(invoiceSchema),
@@ -178,6 +187,7 @@ export const InvoiceForm = memo(function InvoiceForm({
     async (data: InvoiceData) => {
       // close all other toasts (if any)
       toast.dismiss();
+      setInvoiceFormHasErrors(false);
 
       // TODO: double check if we need this code, because we already save to local storage in the page.client.tsx (parent component) (line: 267) useEffect "Save to localStorage whenever data changes on form update"
       try {
@@ -188,6 +198,8 @@ export const InvoiceForm = memo(function InvoiceForm({
           // show errors to the user
           // Debounce error toast to avoid showing too fast
           debouncedShowFormErrorsToast();
+
+          setInvoiceFormHasErrors(true);
 
           return;
         }

@@ -14,6 +14,7 @@ import { TWITTER_URL } from "@/config";
 import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
+import type { Dispatch, SetStateAction } from "react";
 
 const DesktopPDFViewerModuleLoading = () => (
   <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
@@ -127,6 +128,7 @@ export function InvoiceClientPage({
   setCanShareInvoice,
   canShareInvoice,
   qrCodeDataUrl,
+  setInvoiceFormHasErrors,
 }: {
   invoiceDataState: InvoiceData;
   handleInvoiceDataChange: (invoiceData: InvoiceData) => void;
@@ -137,6 +139,7 @@ export function InvoiceClientPage({
   setCanShareInvoice: (canShareInvoice: boolean) => void;
   canShareInvoice: boolean;
   qrCodeDataUrl: string;
+  setInvoiceFormHasErrors: Dispatch<SetStateAction<boolean>>;
 }) {
   const appMetadata = getAppMetadata();
 
@@ -189,6 +192,7 @@ export function InvoiceClientPage({
                   handleInvoiceDataChange={handleInvoiceDataChange}
                   setCanShareInvoice={setCanShareInvoice}
                   isMobile
+                  setInvoiceFormHasErrors={setInvoiceFormHasErrors}
                 />
               </div>
             </TabsContent>
@@ -290,6 +294,7 @@ export function InvoiceClientPage({
                 invoiceData={invoiceDataState}
                 handleInvoiceDataChange={handleInvoiceDataChange}
                 setCanShareInvoice={setCanShareInvoice}
+                setInvoiceFormHasErrors={setInvoiceFormHasErrors}
               />
             </div>
 
