@@ -1,10 +1,16 @@
 "use client";
 
+import dayjs from "dayjs";
 import { createContext, useContext, useState, useCallback } from "react";
 
+/** 3-minute cooldown between CTA toasts within the same session */
+const CTA_TOAST_COOLDOWN_MS = 3 * 60 * 1000;
+
 interface CTAToastContextValue {
-  isToastShownInSession: boolean;
-  markToastAsShown: () => void;
+  /** Whether a CTA toast can be shown (first time or 5+ min since last) */
+  canShowCTAToast: boolean;
+  /** Record that a CTA toast was just shown */
+  markCTAToastAsShown: () => void;
 }
 
 const CTAToastContext = createContext<CTAToastContextValue | undefined>(
@@ -12,16 +18,28 @@ const CTAToastContext = createContext<CTAToastContextValue | undefined>(
 );
 
 export function CTAToastProvider({ children }: { children: React.ReactNode }) {
-  const [isToastShownInSession, setIsToastShownInSession] = useState(false);
+  const [lastCTAToastShownAt, setLastCTAToastShownAt] = useState<number | null>(
+    null,
+  );
 
-  const markToastAsShown = useCallback(() => {
-    setIsToastShownInSession(true);
+  const canShowCTAToast =
+    lastCTAToastShownAt === null ||
+    Date.now() - lastCTAToastShownAt >= CTA_TOAST_COOLDOWN_MS;
+
+  const markCTAToastAsShown = useCallback(() => {
+    setLastCTAToastShownAt(Date.now());
   }, []);
 
+  console.log("[CTAToastProvider] canShowCTAToast", {
+    canShowCTAToast,
+    lastCTAToastShownAt: lastCTAToastShownAt
+      ? dayjs(lastCTAToastShownAt).format("YYYY-MM-DD HH:mm:ss")
+      : null,
+    CTA_TOAST_COOLDOWN_MS,
+  });
+
   return (
-    <CTAToastContext.Provider
-      value={{ isToastShownInSession, markToastAsShown }}
-    >
+    <CTAToastContext.Provider value={{ canShowCTAToast, markCTAToastAsShown }}>
       {children}
     </CTAToastContext.Provider>
   );

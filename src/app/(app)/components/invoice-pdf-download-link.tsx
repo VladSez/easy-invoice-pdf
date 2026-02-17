@@ -56,7 +56,7 @@ export function InvoicePDFDownloadLink({
   qrCodeDataUrl: string;
 }) {
   const { inAppInfo } = useDeviceContext();
-  const { markToastAsShown } = useCTAToast();
+  const { canShowCTAToast, markCTAToastAsShown } = useCTAToast();
 
   const [{ loading: pdfLoading, url, error }, updatePdfInstance] = usePDF();
   const [isLoading, setIsLoading] = useState(false);
@@ -108,24 +108,21 @@ export function InvoicePDFDownloadLink({
         // close all other toasts (if any)
         toast.dismiss();
 
-        // if (isToastShownInSession) {
-        //   umamiTrackEvent("cta_toast_skipped_downloaded_invoice");
-        //   return;
-        // }
+        // Show a CTA toast (respects 5-min cooldown)
+        if (canShowCTAToast) {
+          setTimeout(() => {
+            showRandomCTAToast();
 
-        // Show a CTA toast
-        setTimeout(() => {
-          showRandomCTAToast();
+            // Mark toast as shown to start the 5-min cooldown
+            markCTAToastAsShown();
 
-          // Mark toast as shown in session to prevent duplicate toasts
-          markToastAsShown();
-
-          // Update timestamp to prevent other CTA toasts from showing for 7 days
-          localStorage.setItem(
-            CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
-            String(Date.now()),
-          );
-        }, CTA_TOAST_TIMEOUT);
+            // Update timestamp to prevent random CTA toasts from showing too often
+            localStorage.setItem(
+              CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
+              String(Date.now()),
+            );
+          }, CTA_TOAST_TIMEOUT);
+        }
       }
     },
     [
@@ -136,7 +133,8 @@ export function InvoicePDFDownloadLink({
       isLoading,
       error,
       invoiceData.template,
-      markToastAsShown,
+      canShowCTAToast,
+      markCTAToastAsShown,
     ],
   );
 

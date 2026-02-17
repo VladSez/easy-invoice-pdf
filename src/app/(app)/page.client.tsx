@@ -69,7 +69,7 @@ export function AppPageClient({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const { markToastAsShown } = useCTAToast();
+  const { canShowCTAToast, markCTAToastAsShown } = useCTAToast();
 
   const urlTemplateSearchParam = searchParams.get("template");
 
@@ -536,24 +536,21 @@ export function AppPageClient({
         // analytics track event
         umamiTrackEvent("share_invoice_link");
 
-        // if (isToastShownInSession) {
-        //   umamiTrackEvent("cta_toast_skipped_shared_invoice_link");
-        //   return;
-        // }
+        // Show a CTA toast (respects 5-min cooldown)
+        if (canShowCTAToast) {
+          setTimeout(() => {
+            showRandomCTAToast();
 
-        // Show a CTA toast
-        setTimeout(() => {
-          showRandomCTAToast();
+            // Mark toast as shown to start the 5-min cooldown
+            markCTAToastAsShown();
 
-          // Mark toast as shown in session to prevent duplicate toasts
-          markToastAsShown();
-
-          // Update timestamp to prevent other CTA toasts from showing
-          localStorage.setItem(
-            CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
-            String(Date.now()),
-          );
-        }, CTA_TOAST_TIMEOUT);
+            // Update timestamp to prevent rantom CTA toast from showing too often
+            localStorage.setItem(
+              CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
+              String(Date.now()),
+            );
+          }, CTA_TOAST_TIMEOUT);
+        }
       } catch (error) {
         console.error("Failed to share invoice:", error);
         toast.error("Failed to generate shareable link");

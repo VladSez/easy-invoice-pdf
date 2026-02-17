@@ -754,7 +754,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                         Show in PDF
                       </Label>
                     }
-                    content="Show/Hide the Person Authorized to Receive signature field in the PDF"
+                    content="Show the Person Authorized to Receive signature field in the PDF"
                   />
                 </div>
               </div>
@@ -817,7 +817,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                         Show in PDF
                       </Label>
                     }
-                    content="Show/Hide the Person Authorized to Issue signature field in the PDF"
+                    content="Show the Person Authorized to Issue signature field in the PDF"
                   />
                 </div>
               </div>

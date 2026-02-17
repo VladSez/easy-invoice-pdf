@@ -1,7 +1,6 @@
 TODO list
 
-- [ ] in "Person Authorized to Receive" Signature Field add text field to type
-- [ ] in "Person Authorized to Issue" Signature Field add text field to type
+- [ ] make toast with github cta, less annoying (add 1 week cooldown for showing)
 
 - [ ] in Stripe template "Unit" column is not displayed in PDF, fix it
 

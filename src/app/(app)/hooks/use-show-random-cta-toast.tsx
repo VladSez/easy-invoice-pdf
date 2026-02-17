@@ -11,26 +11,31 @@ dayjs.extend(duration);
 
 export const CTA_TOAST_LAST_SHOWN_STORAGE_KEY =
   "EASY_INVOICE_CTA_LAST_SHOWN_AT";
-const COOLDOWN_DAYS = 7;
+
+const COOLDOWN_DAYS = 3;
 const MIN_TIME_ON_PAGE = 10_000; // in ms
-const IDLE_TIME = 7_000; // in ms
+const IDLE_TIME = 5000; // in ms
+
+/** i.e. clicks, typing text */
+const MIN_INTERACTIONS = 3;
 
 /**
  * This hook is used to show a CTA toast after a certain number of interactions with the page.
  *
  * - User stays on page Xs (MIN_TIME_ON_PAGE) → we consider them "present".
- * - Any real interaction (type, click) → we mark them engaged.
- * - Once they stop interacting for X seconds (IDLE_TIME) → toast appears.
+ * - 3 Any real interaction (type, click) → we consider them engaged.
+ * - Once they stop interacting for X seconds (IDLE_TIME) → if they are engaged, toast appears.
  */
 export function useShowRandomCTAToastOnIdle() {
-  const { isToastShownInSession, markToastAsShown } = useCTAToast();
+  const { canShowCTAToast, markCTAToastAsShown } = useCTAToast();
 
   useEffect(() => {
-    // Skip if a CTA toast was already shown in this session (e.g., from PDF download)
-    if (isToastShownInSession) {
+    /* SKIP if CTA toast was shown recently */
+    if (!canShowCTAToast) {
       umamiTrackEvent("cta_toast_skipped_session");
       return;
     }
+
     const last = localStorage.getItem(CTA_TOAST_LAST_SHOWN_STORAGE_KEY);
 
     // Check if the last time the CTA toast was shown was less than 7 days ago
@@ -57,21 +62,21 @@ export function useShowRandomCTAToastOnIdle() {
 
     let timeOnPageTimer: ReturnType<typeof setTimeout> | null = null;
     let idleTimer: ReturnType<typeof setTimeout> | null = null;
-    // TODO: should be 2-3 interaction, not a single one, fix!
-    let hasMeaningfulInteraction = false;
+
+    let meaningfulInteractionCount = 0;
     let hasMinTimeElapsed = false;
     let triggered = false;
 
     function tryTrigger() {
       if (triggered) return;
-      if (!hasMeaningfulInteraction) return;
+      if (meaningfulInteractionCount < MIN_INTERACTIONS) return;
       if (!hasMinTimeElapsed) return;
 
       triggered = true;
       showRandomCTAToast();
 
-      // mark toast as shown in session to prevent duplicate toasts
-      markToastAsShown();
+      // mark toast as shown to start the IDLE_TIME cooldown
+      markCTAToastAsShown();
 
       // save last shown timestamp to localStorage
       localStorage.setItem(
@@ -95,12 +100,16 @@ export function useShowRandomCTAToastOnIdle() {
     }
 
     function handleMeaningfulInteraction() {
-      hasMeaningfulInteraction = true;
+      meaningfulInteractionCount++;
+      console.log("[useShowRandomCTAToastOnIdle] interaction", {
+        meaningfulInteractionCount,
+        MIN_INTERACTIONS,
+        hasMinTimeElapsed,
+      });
     }
 
     // start tracking
     timeOnPageTimer = setTimeout(() => {
-      // user has been here long enough, now wait for idle
       hasMinTimeElapsed = true;
       handleIdle();
     }, MIN_TIME_ON_PAGE);
@@ -108,10 +117,7 @@ export function useShowRandomCTAToastOnIdle() {
     // interaction types
     window.addEventListener("pointerdown", handleMeaningfulInteraction);
     window.addEventListener("keydown", handleMeaningfulInteraction);
-    // window.addEventListener("scroll", resetIdle, {
-    //   passive: true,
-    //   capture: true,
-    // });
+
     window.addEventListener("pointerdown", resetIdle);
     window.addEventListener("keydown", resetIdle);
 
@@ -121,9 +127,9 @@ export function useShowRandomCTAToastOnIdle() {
 
       window.removeEventListener("pointerdown", handleMeaningfulInteraction);
       window.removeEventListener("keydown", handleMeaningfulInteraction);
-      // window.removeEventListener("scroll", resetIdle);
+
       window.removeEventListener("pointerdown", resetIdle);
       window.removeEventListener("keydown", resetIdle);
     };
-  }, [isToastShownInSession, markToastAsShown]);
+  }, [canShowCTAToast, markCTAToastAsShown]);
 }
