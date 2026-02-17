@@ -66,7 +66,9 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   qrCodeIsVisible: "4",
   qrCodeDescription: "5",
 
+  personAuthorizedToReceiveName: "6",
   personAuthorizedToReceiveFieldIsVisible: "v",
+  personAuthorizedToIssueName: "7",
   personAuthorizedToIssueFieldIsVisible: "w",
   taxLabelText: "1",
 

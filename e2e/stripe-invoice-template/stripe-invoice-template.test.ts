@@ -403,23 +403,50 @@ test.describe("Stripe Invoice Template", () => {
 
     const finalSection = page.getByTestId("final-section");
 
-    // Get the signature field switches
-    const personAuthorizedToReceiveSwitch = finalSection.getByRole("switch", {
-      name: 'Show "Person Authorized to Receive" Signature Field in the PDF',
+    /** TEST PERSON AUTHORIZED TO RECEIVE FIELD TO BE VISIBLE */
+    const personAuthorizedToReceiveFieldset = finalSection.getByRole("group", {
+      name: "Person Authorized to Receive",
     });
 
-    const personAuthorizedToIssueSwitch = finalSection.getByRole("switch", {
-      name: 'Show "Person Authorized to Issue" Signature Field in the PDF',
-    });
+    await expect(personAuthorizedToReceiveFieldset).toBeVisible();
 
-    // Verify both switches are visible and enabled
+    const personAuthorizedToReceiveNameInput =
+      personAuthorizedToReceiveFieldset.getByRole("textbox", {
+        name: "Name",
+      });
+
+    await expect(personAuthorizedToReceiveNameInput).toBeVisible();
+
+    const personAuthorizedToReceiveSwitch =
+      personAuthorizedToReceiveFieldset.getByRole("switch", {
+        name: "Show Person Authorized to Receive in PDF",
+      });
+
     await expect(personAuthorizedToReceiveSwitch).toBeVisible();
     await expect(personAuthorizedToReceiveSwitch).toBeEnabled();
+    await expect(personAuthorizedToReceiveSwitch).toBeChecked();
+
+    /** TEST PERSON AUTHORIZED TO ISSUE FIELD TO BE VISIBLE */
+    const personAuthorizedToIssueFieldset = finalSection.getByRole("group", {
+      name: "Person Authorized to Issue",
+    });
+
+    await expect(personAuthorizedToIssueFieldset).toBeVisible();
+
+    const personAuthorizedToIssueNameInput =
+      personAuthorizedToIssueFieldset.getByRole("textbox", {
+        name: "Name",
+      });
+
+    await expect(personAuthorizedToIssueNameInput).toBeVisible();
+
+    const personAuthorizedToIssueSwitch =
+      personAuthorizedToIssueFieldset.getByRole("switch", {
+        name: "Show Person Authorized to Issue in PDF",
+      });
+
     await expect(personAuthorizedToIssueSwitch).toBeVisible();
     await expect(personAuthorizedToIssueSwitch).toBeEnabled();
-
-    // Verify initial state (should be checked by default based on initial data)
-    await expect(personAuthorizedToReceiveSwitch).toBeChecked();
     await expect(personAuthorizedToIssueSwitch).toBeChecked();
 
     // Switch to Stripe template to verify switches become hidden
@@ -429,9 +456,23 @@ test.describe("Stripe Invoice Template", () => {
 
     await page.waitForURL("/?template=stripe");
 
-    // Verify switches are now hidden
-    await expect(personAuthorizedToReceiveSwitch).toBeHidden();
-    await expect(personAuthorizedToIssueSwitch).toBeHidden();
+    /** VERIFY SIGNATURE FIELDS ARE NOW HIDDEN */
+
+    const newPersonAuthorizedToReceiveFieldset = finalSection.getByRole(
+      "group",
+      {
+        name: "Person Authorized to Receive",
+      },
+    );
+
+    await expect(newPersonAuthorizedToReceiveFieldset).toBeHidden();
+
+    /** VERIFY PERSON AUTHORIZED TO ISSUE FIELD TO BE HIDDEN */
+    const newPersonAuthorizedToIssueFieldset = finalSection.getByRole("group", {
+      name: "Person Authorized to Issue",
+    });
+
+    await expect(newPersonAuthorizedToIssueFieldset).toBeHidden();
   });
 
   test("Invoice items fields and switches only appear for default template (except for Tax Settings field)", async ({

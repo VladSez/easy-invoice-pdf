@@ -118,6 +118,11 @@ export const InvoiceBody = ({
         >
           {invoiceData.personAuthorizedToReceiveFieldIsVisible && (
             <View style={styles.signatureColumn}>
+              {invoiceData.personAuthorizedToReceiveName ? (
+                <Text style={[styles.signatureText, { marginTop: -13 }]}>
+                  {invoiceData.personAuthorizedToReceiveName}
+                </Text>
+              ) : null}
               <View style={styles.signatureLine} />
               <Text style={styles.signatureText}>
                 {t.personAuthorizedToReceive}
@@ -126,6 +131,11 @@ export const InvoiceBody = ({
           )}
           {invoiceData.personAuthorizedToIssueFieldIsVisible && (
             <View style={styles.signatureColumn}>
+              {invoiceData.personAuthorizedToIssueName ? (
+                <Text style={[styles.signatureText, { marginTop: -13 }]}>
+                  {invoiceData.personAuthorizedToIssueName}
+                </Text>
+              ) : null}
               <View style={styles.signatureLine} />
               <Text style={styles.signatureText}>
                 {t.personAuthorizedToIssue}

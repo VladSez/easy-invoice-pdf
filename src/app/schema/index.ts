@@ -971,7 +971,20 @@ export const invoiceSchema = z.object({
     .default(""),
   qrCodeIsVisible: z.boolean().default(true),
 
+  personAuthorizedToReceiveName: z
+    .string()
+    .max(200, "Name must not exceed 200 characters")
+    .trim()
+    .optional()
+    .default(""),
   personAuthorizedToReceiveFieldIsVisible: z.boolean().default(true),
+
+  personAuthorizedToIssueName: z
+    .string()
+    .max(200, "Name must not exceed 200 characters")
+    .trim()
+    .optional()
+    .default(""),
   personAuthorizedToIssueFieldIsVisible: z.boolean().default(true),
 });
 

@@ -79,18 +79,19 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     const finalSection = newPage.getByTestId(`final-section`);
 
-    // Verify that signature fields are hidden (there are only for default template)
-    await expect(
-      finalSection.getByRole("switch", {
-        name: 'Show "Person Authorized to Receive" Signature Field in the PDF',
-      }),
-    ).toBeHidden();
+    /** TEST PERSON AUTHORIZED TO RECEIVE FIELD TO BE HIDDEN (there are only for default template)*/
+    const personAuthorizedToReceiveFieldset = finalSection.getByRole("group", {
+      name: "Person Authorized to Receive",
+    });
 
-    await expect(
-      finalSection.getByRole("switch", {
-        name: 'Show "Person Authorized to Issue" Signature Field in the PDF',
-      }),
-    ).toBeHidden();
+    await expect(personAuthorizedToReceiveFieldset).toBeHidden();
+
+    /** TEST PERSON AUTHORIZED TO ISSUE FIELD TO BE HIDDEN (there are only for default template)*/
+    const personAuthorizedToIssueFieldset = finalSection.getByRole("group", {
+      name: "Person Authorized to Issue",
+    });
+
+    await expect(personAuthorizedToIssueFieldset).toBeHidden();
 
     // Close the new page
     await newPage.close();

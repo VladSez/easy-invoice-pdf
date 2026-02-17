@@ -86,7 +86,9 @@ export const MOCK_INVOICE_DATA = {
   qrCodeDescription: "",
   qrCodeIsVisible: true,
 
+  personAuthorizedToReceiveName: "",
   personAuthorizedToReceiveFieldIsVisible: true,
+  personAuthorizedToIssueName: "",
   personAuthorizedToIssueFieldIsVisible: true,
   taxLabelText: "VAT",
 } as const satisfies InvoiceData;

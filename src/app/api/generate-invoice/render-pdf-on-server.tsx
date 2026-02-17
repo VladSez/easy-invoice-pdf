@@ -153,7 +153,9 @@ export const ENGLISH_INVOICE_REAL_DATA = {
   qrCodeDescription: "",
   qrCodeIsVisible: true,
 
+  personAuthorizedToReceiveName: "",
   personAuthorizedToReceiveFieldIsVisible: true,
+  personAuthorizedToIssueName: "",
   personAuthorizedToIssueFieldIsVisible: true,
 
   template: "default",

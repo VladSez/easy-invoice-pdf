@@ -158,6 +158,7 @@ export const PDF_DEFAULT_TEMPLATE_STYLES = StyleSheet.create({
   signatureText: {
     fontSize: 8,
     textAlign: "center",
+    marginBottom: 2,
   },
   footer: {
     position: "absolute",

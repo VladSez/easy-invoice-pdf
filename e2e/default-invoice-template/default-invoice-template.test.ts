@@ -211,6 +211,46 @@ test.describe("Default Invoice Template", () => {
     const totalTextbox = page.getByRole("textbox", { name: "Total" });
     await expect(totalTextbox).toHaveValue("3,300.00");
 
+    /** TEST PERSON AUTHORIZED TO RECEIVE FIELD */
+    const personAuthorizedToReceiveFieldset = finalSection.getByRole("group", {
+      name: "Person Authorized to Receive",
+    });
+
+    // Verify that "Show Person Authorized to Receive in PDF" switch is on by default
+    const showPersonAuthorizedToReceiveSwitch =
+      personAuthorizedToReceiveFieldset.getByRole("switch", {
+        name: "Show Person Authorized to Receive in PDF",
+      });
+    await expect(showPersonAuthorizedToReceiveSwitch).toBeVisible();
+    await expect(showPersonAuthorizedToReceiveSwitch).toBeEnabled();
+    await expect(showPersonAuthorizedToReceiveSwitch).toBeChecked();
+
+    const personAuthorizedToReceiveNameInput =
+      personAuthorizedToReceiveFieldset.getByRole("textbox", {
+        name: "Name",
+      });
+
+    await personAuthorizedToReceiveNameInput.fill("John Doe");
+
+    /** TEST PERSON AUTHORIZED TO ISSUE FIELD */
+    const personAuthorizedToIssueFieldset = finalSection.getByRole("group", {
+      name: "Person Authorized to Issue",
+    });
+
+    const showPersonAuthorizedToIssueSwitch =
+      personAuthorizedToIssueFieldset.getByRole("switch", {
+        name: "Show Person Authorized to Issue in PDF",
+      });
+    await expect(showPersonAuthorizedToIssueSwitch).toBeVisible();
+    await expect(showPersonAuthorizedToIssueSwitch).toBeEnabled();
+    await expect(showPersonAuthorizedToIssueSwitch).toBeChecked();
+
+    const personAuthorizedToIssueNameInput =
+      personAuthorizedToIssueFieldset.getByRole("textbox", {
+        name: "Name",
+      });
+    await personAuthorizedToIssueNameInput.fill("Adam Smith");
+
     // wait, because we update pdf on debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(700);

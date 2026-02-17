@@ -141,7 +141,10 @@ export const INITIAL_INVOICE_DATA = {
 
   vatTableSummaryIsVisible: true,
   paymentMethodFieldIsVisible: true,
+
+  personAuthorizedToReceiveName: "",
   personAuthorizedToReceiveFieldIsVisible: true,
+  personAuthorizedToIssueName: "",
   personAuthorizedToIssueFieldIsVisible: true,
 
   taxLabelText: "VAT",

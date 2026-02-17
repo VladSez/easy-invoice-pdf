@@ -726,53 +726,133 @@ export const InvoiceForm = memo(function InvoiceForm({
             Stripe template doesn't have these fields
         */}
         {invoiceData.template === "default" && (
-          <div>
-            <div className="relative mt-5 space-y-4">
-              {/* Show/hide Person Authorized to Receive field in PDF switch */}
-              <div className="flex items-center justify-between gap-2">
-                <Label htmlFor={`personAuthorizedToReceiveFieldIsVisible`}>
-                  Show &quot;Person Authorized to Receive&quot; Signature Field
-                  in the PDF
-                </Label>
+          <>
+            <fieldset className="rounded-md border px-4 pb-4">
+              <legend className="text-base font-semibold lg:text-lg">
+                Person Authorized to Receive
+              </legend>
 
+              <div className="mb-2 flex items-center justify-end">
+                <div className="inline-flex items-center gap-2">
+                  <Controller
+                    name="personAuthorizedToReceiveFieldIsVisible"
+                    control={control}
+                    render={({ field: { value, onChange, ...field } }) => (
+                      <Switch
+                        {...field}
+                        id="personAuthorizedToReceiveFieldIsVisible"
+                        checked={value}
+                        onCheckedChange={onChange}
+                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        aria-label="Show Person Authorized to Receive in PDF"
+                      />
+                    )}
+                  />
+                  <CustomTooltip
+                    trigger={
+                      <Label htmlFor="personAuthorizedToReceiveFieldIsVisible">
+                        Show in PDF
+                      </Label>
+                    }
+                    content="Show/Hide the Person Authorized to Receive signature field in the PDF"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label
+                  htmlFor="personAuthorizedToReceiveName"
+                  className="mb-2 block"
+                >
+                  Name
+                </Label>
                 <Controller
-                  name={`personAuthorizedToReceiveFieldIsVisible`}
+                  name="personAuthorizedToReceiveName"
                   control={control}
-                  render={({ field: { value, onChange, ...field } }) => (
-                    <Switch
+                  render={({ field }) => (
+                    <Input
                       {...field}
-                      id={`personAuthorizedToReceiveFieldIsVisible`}
-                      checked={value}
-                      onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      id="personAuthorizedToReceiveName"
+                      type="text"
+                      placeholder="Enter name of person authorized to receive"
+                      data-testid="personAuthorizedToReceiveName"
                     />
                   )}
                 />
+                <InputHelperMessage>
+                  Name displayed above the signature line in the PDF.
+                </InputHelperMessage>
+                {errors.personAuthorizedToReceiveName && (
+                  <ErrorMessage>
+                    {errors.personAuthorizedToReceiveName.message}
+                  </ErrorMessage>
+                )}
+              </div>
+            </fieldset>
+
+            <fieldset className="rounded-md border px-4 pb-4">
+              <legend className="text-base font-semibold lg:text-lg">
+                Person Authorized to Issue
+              </legend>
+
+              <div className="mb-2 flex items-center justify-end">
+                <div className="inline-flex items-center gap-2">
+                  <Controller
+                    name="personAuthorizedToIssueFieldIsVisible"
+                    control={control}
+                    render={({ field: { value, onChange, ...field } }) => (
+                      <Switch
+                        {...field}
+                        id="personAuthorizedToIssueFieldIsVisible"
+                        checked={value}
+                        onCheckedChange={onChange}
+                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        aria-label="Show Person Authorized to Issue in PDF"
+                      />
+                    )}
+                  />
+                  <CustomTooltip
+                    trigger={
+                      <Label htmlFor="personAuthorizedToIssueFieldIsVisible">
+                        Show in PDF
+                      </Label>
+                    }
+                    content="Show/Hide the Person Authorized to Issue signature field in the PDF"
+                  />
+                </div>
               </div>
 
-              {/* Show/hide Person Authorized to Issue field in PDF switch */}
-              <div className="flex items-center justify-between gap-2">
-                <Label htmlFor={`personAuthorizedToIssueFieldIsVisible`}>
-                  Show &quot;Person Authorized to Issue&quot; Signature Field in
-                  the PDF
+              <div>
+                <Label
+                  htmlFor="personAuthorizedToIssueName"
+                  className="mb-2 block"
+                >
+                  Name
                 </Label>
-
                 <Controller
-                  name={`personAuthorizedToIssueFieldIsVisible`}
+                  name="personAuthorizedToIssueName"
                   control={control}
-                  render={({ field: { value, onChange, ...field } }) => (
-                    <Switch
+                  render={({ field }) => (
+                    <Input
                       {...field}
-                      id={`personAuthorizedToIssueFieldIsVisible`}
-                      checked={value}
-                      onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      id="personAuthorizedToIssueName"
+                      type="text"
+                      placeholder="Enter name of person authorized to issue"
+                      data-testid="personAuthorizedToIssueName"
                     />
                   )}
                 />
+                <InputHelperMessage>
+                  Name displayed above the signature line in the PDF.
+                </InputHelperMessage>
+                {errors.personAuthorizedToIssueName && (
+                  <ErrorMessage>
+                    {errors.personAuthorizedToIssueName.message}
+                  </ErrorMessage>
+                )}
               </div>
-            </div>
-          </div>
+            </fieldset>
+          </>
         )}
       </div>
     </form>
