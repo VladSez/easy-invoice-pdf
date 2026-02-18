@@ -150,8 +150,17 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     paddingVertical: 4,
   },
   // Column widths for Stripe-style table
-  colDescription: { flex: 3 },
-  colQty: { flex: 0.8, textAlign: "center" },
+  colDescription: { flex: 3, textAlign: "left" },
+  colQty: {
+    flex: 0.3,
+    textAlign: "right",
+    marginRight: 16,
+  },
+  colUnit: {
+    flex: 0.7,
+    textAlign: "left",
+    marginLeft: 16,
+  },
   colUnitPrice: { flex: 1.2, textAlign: "right" },
   colTax: { flex: 0.8, textAlign: "right" },
   colAmount: { flex: 1.3, textAlign: "right" },

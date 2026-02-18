@@ -1,9 +1,5 @@
 TODO list
 
-- [ ] make toast with github cta, less annoying (add 1 week cooldown for showing)
-
-- [ ] in Stripe template "Unit" column is not displayed in PDF, fix it
-
 - [ ] replace native select for currencies with Combobox (https://ui.shadcn.com/docs/components/radix/combobox) i.e. make it searchable? (also add Groups - Major, EU, Africa, Asia, Latin America, etc.)
 
 IMPORTANT:

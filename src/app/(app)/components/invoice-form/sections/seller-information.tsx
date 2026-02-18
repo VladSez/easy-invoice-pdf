@@ -141,7 +141,7 @@ export const SellerInformation = memo(function SellerInformation({
             </legend>
 
             <div className="mb-2 flex items-center justify-end">
-              {/* Show/hide Seller Tax Number field in PDF switch */}
+              {/* Show Seller Tax Number field in PDF switch */}
               <div
                 className="inline-flex items-center gap-2"
                 title={HTML_TITLE_CONTENT}
@@ -158,7 +158,7 @@ export const SellerInformation = memo(function SellerInformation({
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                       disabled={isSellerSelected}
                       data-testid={`sellerVatNoFieldIsVisible`}
-                      aria-label={`Show/hide the 'Seller Tax Number' Field in the PDF`}
+                      aria-label={`Show the 'Seller Tax Number' Field in the PDF`}
                     />
                   )}
                 />
@@ -171,7 +171,7 @@ export const SellerInformation = memo(function SellerInformation({
                   content={
                     isSellerSelected
                       ? null
-                      : "Show/Hide the 'Seller Tax Number' Field in the PDF"
+                      : "Show the 'Seller Tax Number' Field in the PDF"
                   }
                 />
               </div>
@@ -301,7 +301,7 @@ export const SellerInformation = memo(function SellerInformation({
               </Label>
             )}
 
-            {/* Show/hide Account Number field in PDF switch */}
+            {/* Show Account Number field in PDF switch */}
             <div
               className="inline-flex items-center gap-2"
               title={HTML_TITLE_CONTENT}
@@ -318,7 +318,7 @@ export const SellerInformation = memo(function SellerInformation({
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                     disabled={isSellerSelected}
                     data-testid={`sellerAccountNumberFieldIsVisible`}
-                    aria-label={`Show/hide the 'Account Number' Field in the PDF`}
+                    aria-label={`Show the 'Account Number' Field in the PDF`}
                   />
                 )}
               />
@@ -331,7 +331,7 @@ export const SellerInformation = memo(function SellerInformation({
                 content={
                   isSellerSelected
                     ? null
-                    : "Show/Hide the 'Account Number' Field in the PDF"
+                    : "Show the 'Account Number' Field in the PDF"
                 }
               />
             </div>
@@ -374,7 +374,7 @@ export const SellerInformation = memo(function SellerInformation({
               </Label>
             )}
 
-            {/* Show/hide SWIFT/BIC field in PDF switch */}
+            {/* Show SWIFT/BIC field in PDF switch */}
             <div
               className="inline-flex items-center gap-2"
               title={HTML_TITLE_CONTENT}
@@ -391,7 +391,7 @@ export const SellerInformation = memo(function SellerInformation({
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                     disabled={isSellerSelected}
                     data-testid={`sellerSwiftBicFieldIsVisible`}
-                    aria-label={`Show/hide the 'SWIFT/BIC' Field in the PDF`}
+                    aria-label={`Show the 'SWIFT/BIC' Field in the PDF`}
                   />
                 )}
               />
@@ -404,7 +404,7 @@ export const SellerInformation = memo(function SellerInformation({
                 content={
                   isSellerSelected
                     ? null
-                    : "Show/Hide the 'SWIFT/BIC' Field in the PDF"
+                    : "Show the 'SWIFT/BIC' Field in the PDF"
                 }
               />
             </div>
@@ -448,7 +448,7 @@ export const SellerInformation = memo(function SellerInformation({
               </Label>
             )}
 
-            {/* Show/hide Notes field in PDF switch */}
+            {/* Show Notes field in PDF switch */}
             <div
               className="inline-flex items-center gap-2"
               title={HTML_TITLE_CONTENT}
@@ -465,7 +465,7 @@ export const SellerInformation = memo(function SellerInformation({
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                     disabled={isSellerSelected}
                     data-testid={`sellerNotesInvoiceFormFieldVisibilitySwitch`}
-                    aria-label={`Show/hide the 'Notes' field in the PDF`}
+                    aria-label={`Show the 'Notes' field in the PDF`}
                   />
                 )}
               />
@@ -476,9 +476,7 @@ export const SellerInformation = memo(function SellerInformation({
                   </Label>
                 }
                 content={
-                  isSellerSelected
-                    ? null
-                    : "Show/Hide the 'Notes' field in the PDF"
+                  isSellerSelected ? null : "Show the 'Notes' field in the PDF"
                 }
               />
             </div>

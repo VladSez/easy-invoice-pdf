@@ -72,7 +72,7 @@ test.describe("Buyer management", () => {
       .fill(TEST_BUYER_DATA.email);
 
     const taxNumberSwitchInDialogForm = manageBuyerDialog.getByRole("switch", {
-      name: `Show/hide the 'Tax Number' field in the PDF`,
+      name: `Show the 'Tax Number' field in the PDF`,
     });
 
     // Verify VAT visibility switch is checked by default
@@ -89,7 +89,7 @@ test.describe("Buyer management", () => {
       .fill(TEST_BUYER_DATA.notes);
 
     const notesSwitchInDialogForm = manageBuyerDialog.getByRole("switch", {
-      name: `Show/hide the 'Notes' field in the PDF`,
+      name: `Show the 'Notes' field in the PDF`,
     });
 
     // Verify notes visibility switch is CHECKED by default
@@ -279,7 +279,7 @@ test.describe("Buyer management", () => {
 
     await expect(notesSwitchInDialogForm).toHaveRole("switch");
     await expect(notesSwitchInDialogForm).toHaveAccessibleName(
-      `Show/hide the 'Notes' field in the PDF`,
+      `Show the 'Notes' field in the PDF`,
     );
 
     await expect(notesSwitchInDialogForm).toBeChecked();

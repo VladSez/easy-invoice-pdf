@@ -86,17 +86,17 @@ test.describe("Seller management", () => {
       .fill(TEST_SELLER_DATA.swiftBic);
 
     const taxNumberSwitchInDialogForm = manageSellerDialog.getByRole("switch", {
-      name: `Show/hide the 'Tax Number' field in the PDF`,
+      name: `Show the 'Tax Number' field in the PDF`,
     });
 
     const accountNumberSwitchInDialogForm = manageSellerDialog.getByRole(
       "switch",
       {
-        name: `Show/hide the 'Account Number' field in the PDF`,
+        name: `Show the 'Account Number' field in the PDF`,
       },
     );
     const swiftBicSwitchInDialogForm = manageSellerDialog.getByRole("switch", {
-      name: `Show/hide the 'SWIFT/BIC' field in the PDF`,
+      name: `Show the 'SWIFT/BIC' field in the PDF`,
     });
 
     // Verify all switches are checked by default

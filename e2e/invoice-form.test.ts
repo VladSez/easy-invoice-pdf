@@ -280,7 +280,7 @@ test.describe("Invoice Generator Page", () => {
     // Visibility toggles
     await expect(
       generalInfoSection.getByRole("switch", {
-        name: `Show/hide the "Header Notes" Field in the PDF`,
+        name: `Show the "Header Notes" Field in the PDF`,
       }),
     ).toBeChecked();
 
@@ -310,7 +310,7 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(
       sellerSection.getByRole("switch", {
-        name: `Show/hide the 'Seller Tax Number' Field in the PDF`,
+        name: `Show the 'Seller Tax Number' Field in the PDF`,
       }),
     ).toBeChecked();
 
@@ -326,7 +326,7 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(
       sellerSection.getByRole("switch", {
-        name: `Show/hide the 'Account Number' Field in the PDF`,
+        name: `Show the 'Account Number' Field in the PDF`,
       }),
     ).toBeChecked();
 
@@ -337,7 +337,7 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(
       sellerSection.getByRole("switch", {
-        name: `Show/hide the 'SWIFT/BIC' Field in the PDF`,
+        name: `Show the 'SWIFT/BIC' Field in the PDF`,
       }),
     ).toBeChecked();
 
@@ -415,7 +415,7 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue(firstItem.name);
     await expect(
       invoiceItemsSection.getByRole("switch", {
-        name: "Show/hide the 'Name of Goods/Service' Column in the PDF for item 1",
+        name: "Show the 'Name of Goods/Service' Column in the PDF for item 1",
       }),
     ).toBeChecked();
 
@@ -425,7 +425,7 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue(firstItem.typeOfGTU);
     await expect(
       invoiceItemsSection.getByRole("switch", {
-        name: "Show/hide the 'Type of GTU' Column in the PDF for item 1",
+        name: "Show the 'Type of GTU' Column in the PDF for item 1",
       }),
     ).not.toBeChecked(); // we don't want to show this in PDF by default
 
@@ -437,7 +437,7 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue(firstItem.amount.toString());
     await expect(
       invoiceItemsSection.getByRole("switch", {
-        name: "Show/hide the 'Amount' Column in the PDF for item 1",
+        name: "Show the 'Amount' Column in the PDF for item 1",
       }),
     ).toBeChecked();
 
@@ -447,7 +447,7 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue(firstItem.unit);
     await expect(
       invoiceItemsSection.getByRole("switch", {
-        name: "Show/hide the 'Unit' Column in the PDF for item 1",
+        name: "Show the 'Unit' Column in the PDF for item 1",
       }),
     ).toBeChecked();
 
@@ -459,7 +459,7 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue(firstItem.netPrice.toString());
     await expect(
       invoiceItemsSection.getByRole("switch", {
-        name: "Show/hide the 'Net Price' Column in the PDF for item 1",
+        name: "Show the 'Net Price' Column in the PDF for item 1",
       }),
     ).toBeChecked();
 
@@ -469,7 +469,7 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue(firstItem.vat);
     await expect(
       invoiceItemsSection.getByRole("switch", {
-        name: "Show/hide the 'VAT' Column in the PDF for item 1",
+        name: "Show the 'VAT' Column in the PDF for item 1",
       }),
     ).toBeChecked();
 
@@ -494,7 +494,7 @@ test.describe("Invoice Generator Page", () => {
     );
     await expect(
       invoiceItemsSection.getByRole("switch", {
-        name: "Show/hide the 'Net Amount' Column in the PDF for item 1",
+        name: "Show the 'Net Amount' Column in the PDF for item 1",
       }),
     ).toBeChecked();
 
@@ -512,7 +512,7 @@ test.describe("Invoice Generator Page", () => {
     );
     await expect(
       invoiceItemsSection.getByRole("switch", {
-        name: "Show/hide the 'VAT Amount' Column in the PDF for item 1",
+        name: "Show the 'VAT Amount' Column in the PDF for item 1",
       }),
     ).toBeChecked();
 
@@ -530,7 +530,7 @@ test.describe("Invoice Generator Page", () => {
     );
     await expect(
       invoiceItemsSection.getByRole("switch", {
-        name: "Show/hide the 'Pre-tax Amount' Column in the PDF for item 1",
+        name: "Show the 'Pre-tax Amount' Column in the PDF for item 1",
       }),
     ).toBeChecked();
 

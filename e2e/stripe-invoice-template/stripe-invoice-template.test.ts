@@ -508,31 +508,31 @@ test.describe("Stripe Invoice Template", () => {
     // Get all "Show in PDF" switches for individual fields (these are the ones that only show for first item)
 
     const nameFieldSwitch = invoiceItemsSection.getByRole("switch", {
-      name: "Show/hide the 'Name of Goods/Service' Column in the PDF for item 1",
+      name: "Show the 'Name of Goods/Service' Column in the PDF for item 1",
     });
     const typeOfGTUFieldSwitch = invoiceItemsSection.getByRole("switch", {
-      name: "Show/hide the 'Type of GTU' Column in the PDF for item 1",
+      name: "Show the 'Type of GTU' Column in the PDF for item 1",
     });
     const amountFieldSwitch = invoiceItemsSection.getByRole("switch", {
-      name: "Show/hide the 'Amount' Column in the PDF for item 1",
+      name: "Show the 'Amount' Column in the PDF for item 1",
     });
     const unitFieldSwitch = invoiceItemsSection.getByRole("switch", {
-      name: "Show/hide the 'Unit' Column in the PDF for item 1",
+      name: "Show the 'Unit' Column in the PDF for item 1",
     });
     const netPriceFieldSwitch = invoiceItemsSection.getByRole("switch", {
-      name: "Show/hide the 'Net Price' Column in the PDF for item 1",
+      name: "Show the 'Net Price' Column in the PDF for item 1",
     });
     const vatFieldSwitch = invoiceItemsSection.getByRole("switch", {
-      name: "Show/hide the 'VAT' Column in the PDF for item 1",
+      name: "Show the 'VAT' Column in the PDF for item 1",
     });
     const netAmountFieldSwitch = invoiceItemsSection.getByRole("switch", {
-      name: "Show/hide the 'Net Amount' Column in the PDF for item 1",
+      name: "Show the 'Net Amount' Column in the PDF for item 1",
     });
     const vatAmountFieldSwitch = invoiceItemsSection.getByRole("switch", {
-      name: "Show/hide the 'VAT Amount' Column in the PDF for item 1",
+      name: "Show the 'VAT Amount' Column in the PDF for item 1",
     });
     const preTaxAmountFieldSwitch = invoiceItemsSection.getByRole("switch", {
-      name: "Show/hide the 'Pre-tax Amount' Column in the PDF for item 1",
+      name: "Show the 'Pre-tax Amount' Column in the PDF for item 1",
     });
     // Verify all field switches are visible and enabled
     const fieldSwitches = [
@@ -613,10 +613,13 @@ test.describe("Stripe Invoice Template", () => {
     await expect(nameFieldSwitch).toBeHidden();
     await expect(typeOfGTUFieldSwitch).toBeHidden();
     await expect(amountFieldSwitch).toBeHidden();
-    await expect(unitFieldSwitch).toBeHidden();
+
+    // NOTE: Unit field switch is visible in stripe template
+    await expect(unitFieldSwitch).toBeVisible();
+
     await expect(netPriceFieldSwitch).toBeHidden();
 
-    // NOTE: we expect vat field switch to be visible because it is the only field that is visible in stripe template
+    // NOTE: VAT (Tax Settings) field switch is visible in stripe template
     await expect(vatFieldSwitch).toBeVisible();
 
     await expect(netAmountFieldSwitch).toBeHidden();
@@ -718,7 +721,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Get the VAT field switch
     const vatFieldSwitch = invoiceItemsSection.getByRole("switch", {
-      name: "Show/hide the 'VAT' Column in the PDF for item 1",
+      name: "Show the 'VAT' Column in the PDF for item 1",
     });
 
     // Verify VAT switch is visible and checked by default
@@ -761,7 +764,7 @@ test.describe("Stripe Invoice Template", () => {
     const newInvoiceItemsSection = page.getByTestId("invoice-items-section");
 
     const newVatFieldSwitch = newInvoiceItemsSection.getByRole("switch", {
-      name: "Show/hide the 'VAT' Column in the PDF for item 1",
+      name: "Show the 'VAT' Column in the PDF for item 1",
     });
 
     await expect(newVatFieldSwitch).toBeVisible();

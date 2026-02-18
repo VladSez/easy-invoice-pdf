@@ -183,7 +183,12 @@ export const GeneralInformation = memo(function GeneralInformation({
                   if (newTemplate === "stripe") {
                     // Set date format to "MMMM D, YYYY" when template is Stripe
                     setValue("dateFormat", STRIPE_DEFAULT_DATE_FORMAT);
+
+                    // Set unit field to be hidden by default for Stripe template (backwards compatibility)
+                    setValue("items.0.unitFieldIsVisible", false);
                   } else {
+                    // DEFAULT TEMPLATE
+
                     // Clear Stripe-specific fields when not using Stripe template
                     if (errors.stripePayOnlineUrl) {
                       setValue("stripePayOnlineUrl", "");
@@ -738,7 +743,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               Header Notes
             </Label>
 
-            {/* Show/hide Header Notes field in PDF switch */}
+            {/* Show Header Notes field in PDF switch */}
             <div className="inline-flex items-center gap-2">
               <Controller
                 name={`invoiceTypeFieldIsVisible`}
@@ -750,7 +755,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    aria-label={`Show/hide the "Header Notes" Field in the PDF`}
+                    aria-label={`Show the "Header Notes" Field in the PDF`}
                   />
                 )}
               />
@@ -760,7 +765,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                     Show in PDF
                   </Label>
                 }
-                content='Show/Hide the "Header Notes" Field in the PDF'
+                content='Show the "Header Notes" Field in the PDF'
               />
             </div>
           </div>

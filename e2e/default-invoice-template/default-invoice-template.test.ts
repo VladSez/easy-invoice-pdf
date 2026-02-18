@@ -407,21 +407,21 @@ test.describe("Default Invoice Template", () => {
     // Toggle VAT Number visibility off
     await sellerSection
       .getByRole("switch", {
-        name: `Show/hide the 'Seller Tax Number' Field in the PDF`,
+        name: `Show the 'Seller Tax Number' Field in the PDF`,
       })
       .click();
 
     // Toggle Account Number visibility off
     await sellerSection
       .getByRole("switch", {
-        name: `Show/hide the 'Account Number' Field in the PDF`,
+        name: `Show the 'Account Number' Field in the PDF`,
       })
       .click();
 
     // Toggle SWIFT visibility off
     await sellerSection
       .getByRole("switch", {
-        name: `Show/hide the 'SWIFT/BIC' Field in the PDF`,
+        name: `Show the 'SWIFT/BIC' Field in the PDF`,
       })
       .click();
 

@@ -1,5 +1,5 @@
 import { GithubIcon } from "@/components/etc/github-logo";
-import { ProjectLogo } from "@/components/etc/project-logo";
+// import { ProjectLogo } from "@/components/etc/project-logo";
 import { Footer } from "@/components/footer";
 import {
   BlackGoToAppButton,
@@ -503,7 +503,7 @@ function Logo() {
       {/* </div> */}
       <div className="flex items-center gap-1.5 md:gap-2">
         {/* <ProjectLogo className="size-7 flex-shrink-0 sm:size-8" /> */}
-        <FinalProjectLogo className="size-7 md:size-8" />
+        <FinalProjectLogo className="size-6 md:size-7" />
         <p className="text-balance text-center text-xl font-bold text-zinc-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
           <a
             href="https://easyinvoicepdf.com"

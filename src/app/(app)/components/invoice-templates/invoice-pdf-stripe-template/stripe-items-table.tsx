@@ -40,6 +40,7 @@ export function StripeItemsTable({
     invoiceData.dateFormat,
   );
 
+  const unitFieldIsVisible = invoiceData.items[0].unitFieldIsVisible;
   const vatAmountFieldIsVisible = invoiceData.items[0].vatFieldIsVisible;
 
   return (
@@ -53,6 +54,12 @@ export function StripeItemsTable({
         <View style={styles.colQty}>
           <Text style={styles.fontSize8}>{t.stripe.qty}</Text>
         </View>
+
+        {unitFieldIsVisible ? (
+          <View style={styles.colUnit}>
+            <Text style={styles.fontSize8}>{t.stripe.unit}</Text>
+          </View>
+        ) : null}
 
         <View style={styles.colUnitPrice}>
           <Text style={styles.fontSize8}>{t.stripe.unitPrice}</Text>
@@ -112,6 +119,13 @@ export function StripeItemsTable({
                 {formattedAmount}
               </Text>
             </View>
+            {unitFieldIsVisible ? (
+              <View style={styles.colUnit}>
+                <Text style={[styles.fontSize11, styles.textDark]}>
+                  {item.unit}
+                </Text>
+              </View>
+            ) : null}
             <View style={styles.colUnitPrice}>
               <Text style={[styles.fontSize11, styles.textDark]}>
                 {formattedNetPrice}

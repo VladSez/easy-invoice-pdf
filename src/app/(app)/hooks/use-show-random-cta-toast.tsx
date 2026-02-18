@@ -12,9 +12,9 @@ dayjs.extend(duration);
 export const CTA_TOAST_LAST_SHOWN_STORAGE_KEY =
   "EASY_INVOICE_CTA_LAST_SHOWN_AT";
 
-const COOLDOWN_DAYS = 3;
+const COOLDOWN_DAYS = 7;
 const MIN_TIME_ON_PAGE = 10_000; // in ms
-const IDLE_TIME = 5000; // in ms
+const IDLE_TIME = 10_000; // in ms
 
 /** i.e. clicks, typing text */
 const MIN_INTERACTIONS = 3;
@@ -104,6 +104,7 @@ export function useShowRandomCTAToastOnIdle() {
       console.log("[useShowRandomCTAToastOnIdle] interaction", {
         meaningfulInteractionCount,
         MIN_INTERACTIONS,
+        IDLE_TIME,
         hasMinTimeElapsed,
       });
     }

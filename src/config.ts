@@ -19,7 +19,7 @@ export const VIDEO_DEMO_URL = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-dem
  */
 export const VIDEO_DEMO_FALLBACK_IMG = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026-fallback-img-v1.png`;
 
-export const DONATION_URL = "https://dub.sh/easyinvoice-donate";
+// const DONATION_URL = "https://dub.sh/easyinvoice-donate";
 
 export const PROD_WEBSITE_URL = "https://easyinvoicepdf.com";
 

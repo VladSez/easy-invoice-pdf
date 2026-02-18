@@ -469,7 +469,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                 Payment Method
               </Label>
 
-              {/* Show/hide Payment Method field in PDF switch */}
+              {/* Show Payment Method field in PDF switch */}
               <div className="inline-flex items-center gap-2">
                 <Controller
                   name={`paymentMethodFieldIsVisible`}
@@ -491,7 +491,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                       Show in PDF
                     </Label>
                   }
-                  content='Show/Hide the "Payment Method" Field in the PDF'
+                  content='Show the "Payment Method" Field in the PDF'
                 />
               </div>
             </div>
@@ -594,7 +594,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               Notes
             </Label>
 
-            {/* Show/hide Notes field in PDF switch */}
+            {/* Show Notes field in PDF switch */}
             <div className="inline-flex items-center gap-2">
               <Controller
                 name={`notesFieldIsVisible`}
@@ -613,7 +613,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                 trigger={
                   <Label htmlFor={`notesFieldIsVisible`}>Show in PDF</Label>
                 }
-                content='Show/Hide the "Notes" Field in the PDF'
+                content='Show the "Notes" Field in the PDF'
               />
             </div>
           </div>
@@ -642,7 +642,7 @@ export const InvoiceForm = memo(function InvoiceForm({
           </legend>
 
           <div className="mb-2 flex items-center justify-end">
-            {/* Show/hide QR Code in PDF switch */}
+            {/* Show QR Code in PDF switch */}
             <div className="inline-flex items-center gap-2">
               <Controller
                 name={`qrCodeIsVisible`}
@@ -660,7 +660,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               />
               <CustomTooltip
                 trigger={<Label htmlFor={`qrCodeIsVisible`}>Show in PDF</Label>}
-                content="Show/Hide the QR Code in the PDF"
+                content="Show the QR Code in the PDF"
               />
             </div>
           </div>
