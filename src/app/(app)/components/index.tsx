@@ -272,7 +272,7 @@ export function InvoiceClientPage({
             </div>
           )}
           <div className="mt-3 flex w-full justify-center">
-            <span className="inline-block text-sm text-zinc-900 duration-500 animate-in fade-in slide-in-from-bottom-2">
+            <span className="inline-block text-xs text-zinc-900 duration-500 animate-in fade-in slide-in-from-bottom-2">
               Made by{" "}
               <a
                 href={TWITTER_URL}
@@ -298,7 +298,7 @@ export function InvoiceClientPage({
               />
             </div>
 
-            <span className="mt-1 inline-block text-end text-sm text-zinc-900 duration-500 animate-in fade-in slide-in-from-bottom-2">
+            <span className="mt-1 inline-block text-end text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
               Made by{" "}
               <a
                 href={TWITTER_URL}
