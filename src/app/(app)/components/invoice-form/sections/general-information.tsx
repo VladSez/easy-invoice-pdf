@@ -535,7 +535,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
               {!isInvoiceNumberInCurrentMonth &&
                 !errors.invoiceNumberObject?.value && (
-                  <div className="mt-1 flex flex-col items-start text-balance text-xs text-zinc-700/90">
+                  <InputHelperMessage>
                     <span className="flex items-center text-amber-800">
                       <AlertIcon />
                       Invoice number does not match current month
@@ -550,13 +550,13 @@ export const GeneralInformation = memo(function GeneralInformation({
                       }}
                     >
                       <span className="text-pretty">
-                        Set Invoice No. as{" "}
+                        Set invoice number as{" "}
                         <span className="font-bold">
                           current month ({`1/${CURRENT_MONTH_AND_YEAR}`})
                         </span>
                       </span>
                     </ButtonHelper>
-                  </div>
+                  </InputHelperMessage>
                 )}
             </div>
           </div>
@@ -655,8 +655,9 @@ export const GeneralInformation = memo(function GeneralInformation({
                 <InfoIcon className="mt-0.5 inline-block size-3.5 shrink-0 text-blue-800" />
                 <div>
                   <span className="mb-2 inline-block">
-                    Some dates are out of date. Click the button to update all
-                    at once:
+                    Some dates are out of date.{" "}
+                    <span className="underline">Click the button below</span> to
+                    update all dates at once:
                   </span>
                   <ul className="list-disc space-y-1 text-balance pl-5">
                     <li>

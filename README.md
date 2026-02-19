@@ -1,9 +1,9 @@
 <div align="center">
-  <img src=".github/screenshots/easy-invoice-logo.svg" alt="EasyInvoicePDF Logo" width="80" height="80">
+  <img src=".github/screenshots/easy-invoice-new-logo.png" alt="EasyInvoicePDF Logo" width="160" height="160">
   <h1>EasyInvoicePDF</h1>
   <p><strong>Free & Open-Source Invoice Generator</strong></p>
   <p>Create professional invoices instantly in your browser with <strong>Live Preview</strong>, <strong>Multiple Templates</strong> (including a Stripe-style design). <strong>No Sign-Up Required</strong>.</p>
-  <p><a href="https://easyinvoicepdf.com/?template=stripe&ref=github" style="font-weight: bold;">Get Started</a></p>
+  <p><a href="https://easyinvoicepdf.com/?template=stripe&ref=github"><strong>Get Started</strong></a></p>
   <p>
       <a href="https://easyinvoicepdf.com/en/about?ref=github">About</a>
       ·
@@ -30,7 +30,7 @@
 
 <h4>Learn more about <a href="https://easyinvoicepdf.com/en/about#features">features</a>.</h4>
 
-<hr />
+---
 
 <div align="center">
 
@@ -86,7 +86,11 @@ _**Switch between 10 languages and 120+ currencies instantly** with live PDF pre
 
 <img src=".github/demos/invoice-template.gif" width="800" alt="Invoice Templates Demo">
 
-_**Choose between multiple professional templates** to match your brand and style_
+_**Choose between multiple professional templates** (Default and Stripe) to match your brand and style_
+
+|                                           Default Template                                           |                                          Stripe Template                                           |
+| :--------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------: |
+| <img src=".github/screenshots/default-template.png" width="600" height="400" alt="Default Template"> | <img src=".github/screenshots/stripe-template.png" width="600" height="400" alt="Stripe Template"> |
 
 </div>
 

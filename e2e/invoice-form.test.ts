@@ -1260,7 +1260,7 @@ test.describe("Invoice Generator Page", () => {
     // Verify the "Update all dates" section appears
     await expect(
       generalInfoSection.getByText(
-        "Some dates are out of date. Click the button to update all at once:",
+        "Some dates are out of date. Click the button below to update all dates at once:",
       ),
     ).toBeVisible();
 
@@ -1289,7 +1289,7 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(
       generalInfoSection.getByText(
-        "Some dates are out of date. Click the button to update all at once:",
+        "Some dates are out of date. Click the button below to update all dates at once:",
       ),
     ).toBeHidden();
   });

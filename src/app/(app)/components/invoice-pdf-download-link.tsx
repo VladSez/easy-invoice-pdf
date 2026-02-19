@@ -19,7 +19,6 @@ import { LOADING_BUTTON_TEXT, LOADING_BUTTON_TIMEOUT } from "./invoice-form";
 import { useDeviceContext } from "@/contexts/device-context";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
 import { useCTAToast } from "../contexts/cta-toast-context";
-import { CTA_TOAST_LAST_SHOWN_STORAGE_KEY } from "../hooks/use-show-random-cta-toast";
 import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./cta-toasts";
 
 // Separate button states into a memoized component
@@ -56,7 +55,7 @@ export function InvoicePDFDownloadLink({
   qrCodeDataUrl: string;
 }) {
   const { inAppInfo } = useDeviceContext();
-  const { canShowCTAToast, markCTAToastAsShown } = useCTAToast();
+  const { markCTAActionTriggered } = useCTAToast();
 
   const [{ loading: pdfLoading, url, error }, updatePdfInstance] = usePDF();
   const [isLoading, setIsLoading] = useState(false);
@@ -108,21 +107,11 @@ export function InvoicePDFDownloadLink({
         // close all other toasts (if any)
         toast.dismiss();
 
-        // Show a CTA toast (respects 5-min cooldown)
-        if (canShowCTAToast) {
-          setTimeout(() => {
-            showRandomCTAToast();
+        markCTAActionTriggered();
 
-            // Mark toast as shown to start the 5-min cooldown
-            markCTAToastAsShown();
-
-            // Update timestamp to prevent random CTA toasts from showing too often
-            localStorage.setItem(
-              CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
-              String(Date.now()),
-            );
-          }, CTA_TOAST_TIMEOUT);
-        }
+        setTimeout(() => {
+          showRandomCTAToast();
+        }, CTA_TOAST_TIMEOUT);
       }
     },
     [
@@ -133,8 +122,7 @@ export function InvoicePDFDownloadLink({
       isLoading,
       error,
       invoiceData.template,
-      canShowCTAToast,
-      markCTAToastAsShown,
+      markCTAActionTriggered,
     ],
   );
 

@@ -243,14 +243,14 @@ function DefaultToastFeedbackButton(
 export const CTA_TOASTS = [
   {
     id: "premium-donation-toast-client-page",
-    title: "Support My Work",
+    title: "Support Open Source",
     description:
-      "Your contribution helps me maintain and improve this project for everyone! 🚀",
+      "Your contribution helps me maintain and improve this open-source project for everyone! 🚀",
     show: customPremiumToast,
   },
   {
     id: "default-donation-toast-client-page",
-    title: "Love this project?",
+    title: "Love this open-source project?",
     description:
       "Help me keep this free tool running! Your support enables me to add new features and maintain the service. 🙏",
     show: customDefaultToast,

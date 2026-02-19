@@ -34,10 +34,7 @@ import { z } from "zod";
 import { InvoiceClientPage } from "./components";
 import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./components/cta-toasts";
 import { useCTAToast } from "./contexts/cta-toast-context";
-import {
-  CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
-  useShowRandomCTAToastOnIdle,
-} from "./hooks/use-show-random-cta-toast";
+import { useShowRandomCTAToastOnIdle } from "./hooks/use-show-random-cta-toast";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { DEFAULT_METADATA } from "./utils/get-app-metadata";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
@@ -69,7 +66,7 @@ export function AppPageClient({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const { canShowCTAToast, markCTAToastAsShown } = useCTAToast();
+  const { markCTAActionTriggered, incrementInteractionCount } = useCTAToast();
 
   const urlTemplateSearchParam = searchParams.get("template");
 
@@ -431,6 +428,9 @@ export function AppPageClient({
     setInvoiceDataState(updatedData);
     checkForInvoiceChanges(updatedData);
 
+    // this is used to show CTA toast
+    incrementInteractionCount();
+
     const currentTemplate = searchParams.get("template");
 
     // update the url with the new template
@@ -446,6 +446,7 @@ export function AppPageClient({
     }
   };
 
+  /** Generate a shareable invoice link */
   const handleShareInvoice = async () => {
     if (!canShareInvoice) {
       toast.error("Unable to Share Invoice", {
@@ -536,21 +537,11 @@ export function AppPageClient({
         // analytics track event
         umamiTrackEvent("share_invoice_link");
 
-        // Show a CTA toast (respects 5-min cooldown)
-        if (canShowCTAToast) {
-          setTimeout(() => {
-            showRandomCTAToast();
+        markCTAActionTriggered();
 
-            // Mark toast as shown to start the 5-min cooldown
-            markCTAToastAsShown();
-
-            // Update timestamp to prevent rantom CTA toast from showing too often
-            localStorage.setItem(
-              CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
-              String(Date.now()),
-            );
-          }, CTA_TOAST_TIMEOUT);
-        }
+        setTimeout(() => {
+          showRandomCTAToast();
+        }, CTA_TOAST_TIMEOUT);
       } catch (error) {
         console.error("Failed to share invoice:", error);
         toast.error("Failed to generate shareable link");

@@ -1,16 +1,16 @@
 "use client";
 
-import dayjs from "dayjs";
 import { createContext, useContext, useState, useCallback } from "react";
 
-/** 3-minute cooldown between CTA toasts within the same session */
-const CTA_TOAST_COOLDOWN_MS = 3 * 60 * 1000;
-
 interface CTAToastContextValue {
-  /** Whether a CTA toast can be shown (first time or 5+ min since last) */
-  canShowCTAToast: boolean;
-  /** Record that a CTA toast was just shown */
-  markCTAToastAsShown: () => void;
+  /** Whether the user has triggered a CTA-eligible action (PDF download or link generation) this session */
+  hasTriggeredCTAAction: boolean;
+  /** Mark that a CTA-eligible action was triggered (disables idle toast) */
+  markCTAActionTriggered: () => void;
+  /** Number of meaningful interactions (form updates) this session (used to determine if we should show CTA toast) */
+  interactionCount: number;
+  /** Increment the interaction counter (call on each form update/pdf re-render) - used to determine if we should show CTA toast */
+  incrementInteractionCount: () => void;
 }
 
 const CTAToastContext = createContext<CTAToastContextValue | undefined>(
@@ -18,28 +18,26 @@ const CTAToastContext = createContext<CTAToastContextValue | undefined>(
 );
 
 export function CTAToastProvider({ children }: { children: React.ReactNode }) {
-  const [lastCTAToastShownAt, setLastCTAToastShownAt] = useState<number | null>(
-    null,
-  );
+  const [hasTriggeredCTAAction, setHasTriggeredCTAAction] = useState(false);
+  const [interactionCount, setInteractionCount] = useState(0);
 
-  const canShowCTAToast =
-    lastCTAToastShownAt === null ||
-    Date.now() - lastCTAToastShownAt >= CTA_TOAST_COOLDOWN_MS;
-
-  const markCTAToastAsShown = useCallback(() => {
-    setLastCTAToastShownAt(Date.now());
+  const markCTAActionTriggered = useCallback(() => {
+    setHasTriggeredCTAAction(true);
   }, []);
 
-  console.log("[CTAToastProvider] canShowCTAToast", {
-    canShowCTAToast,
-    lastCTAToastShownAt: lastCTAToastShownAt
-      ? dayjs(lastCTAToastShownAt).format("YYYY-MM-DD HH:mm:ss")
-      : null,
-    CTA_TOAST_COOLDOWN_MS,
-  });
+  const incrementInteractionCount = useCallback(() => {
+    setInteractionCount((prevCount) => prevCount + 1);
+  }, []);
 
   return (
-    <CTAToastContext.Provider value={{ canShowCTAToast, markCTAToastAsShown }}>
+    <CTAToastContext.Provider
+      value={{
+        hasTriggeredCTAAction,
+        markCTAActionTriggered,
+        interactionCount,
+        incrementInteractionCount,
+      }}
+    >
       {children}
     </CTAToastContext.Provider>
   );
