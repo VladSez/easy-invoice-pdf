@@ -88,13 +88,11 @@ _**Switch between 10 languages and 120+ currencies instantly** with live PDF pre
 
 _**Choose between multiple professional templates** (Default and Stripe) to match your brand and style_
 
-|                                           Default Template                                           |                                          Stripe Template                                           |
-| :--------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------: |
-| <img src=".github/screenshots/default-template.png" width="600" height="400" alt="Default Template"> | <img src=".github/screenshots/stripe-template.png" width="600" height="400" alt="Stripe Template"> |
+|                                           Default Invoice Template                                            |                                           Stripe Invoice Template                                           |
+| :-----------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------: |
+| <img src=".github/screenshots/default-template.png" width="1200" height="960" alt="Default Invoice Template"> | <img src=".github/screenshots/stripe-template.png" width="1200" height="960" alt="Stripe Invoice Template"> |
 
 </div>
-
-<!-- <img width="1440" height="769" alt="EasyInvoicePDF Default Template Screenshot" src=".github/screenshots/default-template.png" /> -->
 
 ## 📢 News & Updates
 
