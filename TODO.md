@@ -21,6 +21,10 @@ react-pdf/renderer quirks:
 
 - https://github.com/diegomura/react-pdf/issues/774#issuecomment-560069810 (Preventing other elements from crashing into a fixed footer)
 
+react-pdf quirks (non-desktop pdf viewer):
+
+- https://github.com/wojtekmaj/react-pdf/issues/1824
+
 issues to follow:
 
 - https://github.com/microsoft/playwright/issues/13873

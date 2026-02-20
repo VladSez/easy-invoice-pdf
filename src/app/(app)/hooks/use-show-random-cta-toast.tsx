@@ -5,11 +5,11 @@ import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { showRandomCTAToast } from "../components/cta-toasts";
 import { useCTAToast } from "../contexts/cta-toast-context";
 
-const MIN_TIME_ON_PAGE = 10_000; // in ms
+const MIN_TIME_ON_PAGE = 7_000; // in ms
 const IDLE_TIME = 3_000; // in ms
 
 /** One interaction = one form update (PDF re-render) */
-const MIN_INTERACTIONS = 3;
+const MIN_INTERACTIONS = 2;
 
 /**
  * Shows a CTA toast after the user has been idle, but only if they haven't

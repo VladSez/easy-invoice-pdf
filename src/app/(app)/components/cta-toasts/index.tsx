@@ -250,7 +250,7 @@ export const CTA_TOASTS = [
   },
   {
     id: "default-donation-toast-client-page",
-    title: "Love this open-source project?",
+    title: "Like this open-source project?",
     description:
       "Help me keep this free tool running! Your support enables me to add new features and maintain the service. 🙏",
     show: customDefaultToast,

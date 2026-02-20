@@ -34,7 +34,7 @@
 
 <div align="center">
 
-### 🎬 Live Preview
+### 🎬 Invoice PDF Live Preview
 
 <img src=".github/demos/live-preview.gif" width="800" alt="Live Preview Demo">
 
@@ -42,7 +42,7 @@ _See changes in **real-time** as you type_
 
 ---
 
-### 📥 Instant Download
+### 📥 Instant PDF Download
 
 <img src=".github/demos/instant-download.gif" width="800" alt="Instant Download Demo">
 
@@ -58,7 +58,7 @@ _**Send invoices directly to clients** without attachments_
 
 ---
 
-### 📲 QR Code Support & Multi-Page PDFs
+### 📲 QR Codes & Advanced Multi-Page PDF Support
 
 <img src=".github/demos/qr-code.gif" width="800" alt="QR Code Support Demo">
 
@@ -82,7 +82,7 @@ _**Switch between 10 languages and 120+ currencies instantly** with live PDF pre
 
 ---
 
-### 🎨 Invoice Templates
+### 🎨 Professional Invoice Templates
 
 <img src=".github/demos/invoice-template.gif" width="800" alt="Invoice Templates Demo">
 
