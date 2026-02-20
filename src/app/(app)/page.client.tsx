@@ -539,9 +539,10 @@ export function AppPageClient({
 
         markCTAActionTriggered();
 
+        // show CTA toast after 6 seconds (after invoice link notification is shown)
         setTimeout(() => {
           showRandomCTAToast();
-        }, CTA_TOAST_TIMEOUT);
+        }, 6_000);
       } catch (error) {
         console.error("Failed to share invoice:", error);
         toast.error("Failed to generate shareable link");
