@@ -29,6 +29,7 @@
     "dev:email": "email dev --dir src/emails",
     "prepare": "husky",
     "expose-to-internet": "pnpm dlx cloudflared tunnel --url http://localhost:3000",
+    "cloudflared:tunnel": "pnpm dlx cloudflared tunnel run easy-invoice-pdf-local-dev",
     "corepack:enable": "corepack enable",
     "corepack:prepare": "corepack prepare pnpm@latest"
   },

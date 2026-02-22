@@ -186,8 +186,14 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     expect(dataParam).toBeTruthy();
     expect(dataParam).not.toBe("");
 
+    // Verify the share invoice link description toast appears after generating the link
+    const toast = page.getByTestId("share-invoice-link-description-toast");
+    await expect(toast).toBeVisible();
+
     await expect(
-      page.getByText("Invoice link copied to clipboard!"),
+      page.getByText(
+        "Share this link to let others view and edit this invoice",
+      ),
     ).toBeVisible();
   });
 
@@ -384,9 +390,14 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     expect(dataParam).toBeTruthy();
     expect(dataParam).not.toBe("");
 
-    // Verify success toast is visible
+    // Verify the share invoice link description toast appears after generating the link
+    const toast = page.getByTestId("share-invoice-link-description-toast");
+    await expect(toast).toBeVisible();
+
     await expect(
-      page.getByText("Invoice link copied to clipboard!"),
+      page.getByText(
+        "Share this link to let others view and edit this invoice",
+      ),
     ).toBeVisible();
   });
 });

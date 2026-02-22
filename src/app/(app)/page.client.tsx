@@ -32,7 +32,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { InvoiceClientPage } from "./components";
-import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./components/cta-toasts";
+import { showRandomCTAToast } from "./components/cta-toasts";
 import { useCTAToast } from "./contexts/cta-toast-context";
 import { useShowRandomCTAToastOnIdle } from "./hooks/use-show-random-cta-toast";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
@@ -76,7 +76,7 @@ export function AppPageClient({
     .default("default")
     .safeParse(urlTemplateSearchParam);
 
-  const { isDesktop } = useDeviceContext();
+  const { isDesktop, isUADesktop } = useDeviceContext();
   const isMobile = !isDesktop;
 
   /**
@@ -176,6 +176,7 @@ export function AppPageClient({
       toast.error(
         "Unable to load your saved invoice data. For your convenience, we've reset the form to default values. Please try creating a new invoice.",
         {
+          id: "unable-to-load-saved-invoice-data-error-toast",
           duration: Infinity,
           closeButton: true,
           richColors: true,
@@ -366,6 +367,7 @@ export function AppPageClient({
             </p>
           </div>,
           {
+            id: "invoice-has-changed-toast",
             duration: 20_000,
             closeButton: true,
             position: isMobile ? "top-center" : "bottom-right",
@@ -415,6 +417,7 @@ export function AppPageClient({
           </p>
         </div>,
         {
+          id: "corrupted-url-cleared-toast",
           duration: 15_000,
           closeButton: true,
           position: isMobile ? "top-center" : "bottom-right",
@@ -450,6 +453,7 @@ export function AppPageClient({
   const handleShareInvoice = async () => {
     if (!canShareInvoice) {
       toast.error("Unable to Share Invoice", {
+        id: "unable-to-share-invoice-error-toast",
         duration: 5000,
         description: (
           <>
@@ -468,6 +472,7 @@ export function AppPageClient({
     // prevent sharing invoice if there are form errors
     if (invoiceFormHasErrors) {
       toast.error("Unable to Share Invoice", {
+        id: "unable-to-share-invoice-form-errors-error-toast",
         duration: 6000,
         position: isMobile ? "top-center" : "bottom-right",
         description: (
@@ -503,6 +508,7 @@ export function AppPageClient({
 
         if (estimatedUrlLength > URL_LENGTH_LIMIT) {
           toast.error("Invoice data is too large to share via URL", {
+            id: "invoice-data-too-large-to-share-via-url-error-toast",
             description:
               "Download the invoice as PDF instead or remove some invoice items and try again.",
             duration: 10_000,
@@ -522,30 +528,84 @@ export function AppPageClient({
         const newFullUrl = `${window.location.origin}/?${currentParams.toString()}`;
 
         // Copy to clipboard
-        await navigator.clipboard.writeText(newFullUrl);
+        if (!isUADesktop && navigator?.share) {
+          // MOBILE + TABLET
+          try {
+            toast.success("Invoice link generated - Share invoice", {
+              id: "invoice-link-generated-share-invoice-success-toast",
+              description: (
+                <p data-testid="share-invoice-link-description-toast">
+                  Share this link to let others view and edit this invoice
+                </p>
+              ),
+              position: isMobile ? "top-center" : "bottom-right",
+              duration: 10_000,
+            });
 
-        // Dismiss any existing toast before showing new one
-        toast.dismiss();
+            await navigator
+              ?.share({
+                title: "Invoice link generated - Share invoice",
+                url: newFullUrl,
+              })
+              .catch((err) => {
+                console.error(
+                  "[handleShareInvoice] failed to share invoice:",
+                  err,
+                );
 
-        toast.success("Invoice link copied to clipboard!", {
-          description:
-            "Share this link to let others view and edit this invoice",
-          position: isMobile ? "top-center" : "bottom-right",
-          duration: 5_000,
-        });
+                toast.error("Failed to share invoice", {
+                  id: "failed-to-share-invoice-error-toast",
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                  description: `Please try again. Error: ${err?.message || "Unknown error"}`,
+                  position: isMobile ? "top-center" : "bottom-right",
+                  duration: 5_000,
+                });
+              });
+          } catch (shareError) {
+            console.error(
+              "[handleShareInvoice] failed to share invoice:",
+              shareError,
+            );
+            // Optionally fall back to clipboard on share cancel/error
+            await navigator?.clipboard?.writeText(newFullUrl);
+          }
+        } else {
+          // DESKTOP
+
+          // on desktop, copy to clipboard
+          await navigator?.clipboard
+            ?.writeText(newFullUrl)
+            .then(() => {
+              toast.success("Invoice link copied to clipboard!", {
+                id: "invoice-link-copied-to-clipboard-success-toast",
+                description: (
+                  <p data-testid="share-invoice-link-description-toast">
+                    Share this link to let others view and edit this invoice
+                  </p>
+                ),
+                position: isMobile ? "top-center" : "bottom-right",
+                duration: 5_000,
+              });
+            })
+            .catch((err) => {
+              Sentry.captureException(err);
+            });
+        }
+
+        // show CTA toast after 6 seconds (after invoice link notification is shown)
+        setTimeout(() => {
+          showRandomCTAToast();
+        }, 5_000);
 
         // analytics track event
         umamiTrackEvent("share_invoice_link");
 
         markCTAActionTriggered();
-
-        // show CTA toast after 6 seconds (after invoice link notification is shown)
-        setTimeout(() => {
-          showRandomCTAToast();
-        }, 6_000);
       } catch (error) {
         console.error("Failed to share invoice:", error);
-        toast.error("Failed to generate shareable link");
+        toast.error("Failed to generate shareable link", {
+          id: "failed-to-generate-shareable-link-error-toast",
+        });
 
         Sentry.captureException(error);
       }

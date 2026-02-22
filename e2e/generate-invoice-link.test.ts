@@ -638,10 +638,9 @@ test.describe("Generate Invoice Link", () => {
     // Wait for URL to update with share data
     await page.waitForURL((url) => url.searchParams.has("data"));
 
-    // Verify the success toast appears after generating the link
-    await expect(
-      page.getByText("Invoice link copied to clipboard!"),
-    ).toBeVisible();
+    // Verify the share invoice link description toast appears after generating the link
+    const toast = page.getByTestId("share-invoice-link-description-toast");
+    await expect(toast).toBeVisible();
 
     await expect(
       page.getByText(
