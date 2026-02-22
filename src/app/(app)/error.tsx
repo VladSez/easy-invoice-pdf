@@ -27,6 +27,7 @@ export default function Error({
     toast.error(
       "Something went wrong! Please try to refresh the page or fill a bug report.",
       {
+        id: "app-error-toast",
         closeButton: true,
         richColors: true,
       },
@@ -81,6 +82,7 @@ export default function Error({
               reset();
 
               toast.success("Invoice data cleared", {
+                id: "app-error-toast-clear-invoice-data-success",
                 closeButton: true,
                 richColors: true,
               });
@@ -90,6 +92,7 @@ export default function Error({
               console.error(error);
 
               toast.error("Error clearing the invoice data", {
+                id: "app-error-toast-clear-invoice-data",
                 closeButton: true,
                 richColors: true,
               });

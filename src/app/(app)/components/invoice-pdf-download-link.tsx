@@ -71,6 +71,9 @@ export function InvoicePDFDownloadLink({
 
         toast.error(
           "File not available. Please try again in different browser.",
+          {
+            id: "file-not-available-error-toast",
+          },
         );
         return;
       }
@@ -80,7 +83,7 @@ export function InvoicePDFDownloadLink({
 
         toast(
           `Downloads are blocked inside ${inAppInfo?.name ?? "this app"}. Open in your browser to save.`,
-          { icon: "📱" },
+          { icon: "📱", id: "downloads-blocked-inside-app-toast" },
         );
 
         return;
@@ -90,7 +93,7 @@ export function InvoicePDFDownloadLink({
         e.preventDefault();
         toast(
           `Downloads are blocked inside Telegram. Open in your browser to save.`,
-          { icon: "📱" },
+          { icon: "📱", id: "downloads-blocked-inside-telegram-toast" },
         );
 
         return;

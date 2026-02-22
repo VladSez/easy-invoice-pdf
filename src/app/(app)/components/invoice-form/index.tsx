@@ -951,6 +951,7 @@ const formErrorsToToast = ({
       </ul>
     </div>,
     {
+      id: "form-errors-error-toast",
       duration: 15_000,
       position: isMobile ? "top-center" : "bottom-right",
     },

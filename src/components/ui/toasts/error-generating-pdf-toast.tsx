@@ -32,6 +32,7 @@ export function ErrorGeneratingPdfToast() {
       </a>
     </span>,
     {
+      id: "error-generating-pdf-toast",
       duration: Infinity,
     },
   );

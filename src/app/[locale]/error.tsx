@@ -19,6 +19,7 @@ export default function Error({ error, reset }: Props) {
     toast.error(
       "Something went wrong! Please try to refresh the page or fill a bug report.",
       {
+        id: "global-error-toast",
         closeButton: true,
         richColors: true,
       },
