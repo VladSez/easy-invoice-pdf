@@ -547,7 +547,7 @@ export function AppPageClient({
         router.replace(`?${currentParams.toString()}`, { scroll: false });
 
         // Construct full URL with locale and compressed data
-        const newFullUrl = `${window.location.origin}/?${currentParams.toString()}`;
+        const newGeneratedLinkFullUrl = `${window.location.origin}/?${currentParams.toString()}`;
 
         // Copy to clipboard
         if (!isUADesktop && navigator?.share) {
@@ -567,13 +567,19 @@ export function AppPageClient({
             await navigator
               ?.share({
                 title: "Invoice link generated - Share invoice",
-                url: newFullUrl,
+                url: newGeneratedLinkFullUrl,
+              })
+              .then(() => {
+                umamiTrackEvent("share_invoice_link_mobile");
               })
               .catch((err) => {
                 console.error(
                   "[handleShareInvoice] failed to share invoice:",
                   err,
                 );
+
+                // dismiss all other toasts
+                toast.dismiss();
 
                 toast.error("Failed to share invoice", {
                   id: "failed-to-share-invoice-error-toast",
@@ -589,14 +595,14 @@ export function AppPageClient({
               shareError,
             );
             // Optionally fall back to clipboard on share cancel/error
-            await navigator?.clipboard?.writeText(newFullUrl);
+            await navigator?.clipboard?.writeText(newGeneratedLinkFullUrl);
           }
         } else {
           // DESKTOP
 
           // on desktop, copy to clipboard
           await navigator?.clipboard
-            ?.writeText(newFullUrl)
+            ?.writeText(newGeneratedLinkFullUrl)
             .then(() => {
               toast.success("Invoice link copied to clipboard!", {
                 id: "invoice-link-copied-to-clipboard-success-toast",
@@ -608,19 +614,18 @@ export function AppPageClient({
                 position: isMobile ? "top-center" : "bottom-right",
                 duration: 5_000,
               });
+
+              umamiTrackEvent("share_invoice_link");
             })
             .catch((err) => {
               Sentry.captureException(err);
             });
         }
 
-        // show CTA toast after 6 seconds (after invoice link notification is shown)
+        // show CTA toast after x seconds (after invoice link notification is shown)
         setTimeout(() => {
           showRandomCTAToast();
         }, 5_000);
-
-        // analytics track event
-        umamiTrackEvent("share_invoice_link");
 
         markCTAActionTriggered();
       } catch (error) {
