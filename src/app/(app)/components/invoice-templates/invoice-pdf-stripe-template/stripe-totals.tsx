@@ -84,7 +84,9 @@ export function StripeVatSummaryTableTotals({
               minPresenceAhead={MIN_PRESENCE_AHEAD}
             >
               <View style={styles.vatColLabel}>
-                <Text style={styles.fontSize9}>Total excluding tax</Text>
+                <Text style={styles.fontSize9}>
+                  {t.stripe.totalExcludingTax}
+                </Text>
               </View>
               <View style={styles.vatColValue}>
                 <Text style={[styles.fontSize9, styles.textDark]}>

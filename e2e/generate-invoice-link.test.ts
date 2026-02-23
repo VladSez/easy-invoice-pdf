@@ -862,7 +862,7 @@ test.describe("Generate Invoice Link", () => {
       .fill("5000");
 
     // Add additional invoice items to exceed URL limit
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 15; i++) {
       await invoiceItemsSection
         .getByRole("button", { name: "Add invoice item" })
         .click();

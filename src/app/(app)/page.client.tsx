@@ -109,18 +109,40 @@ export function AppPageClient({
 
   // Generate QR code data URL when qrCodeData changes
   useEffect(() => {
+    // Flag to detect if the component is still mounted and effect is active
+    let active = true;
+
+    /**
+     * Generates a QR code image as a data URL when QR code data is available and visible.
+     * If qrCodeData or its visibility flag is missing, resets the QR code image state.
+     * Handles component unmount by checking `active`.
+     */
     const generateQrCode = async () => {
-      if (invoiceDataState?.qrCodeData && invoiceDataState?.qrCodeIsVisible) {
-        const dataUrl = await generateQrCodeDataUrl(
-          invoiceDataState.qrCodeData,
-        );
+      // If no QR code data or QR code display is not enabled, clear the QR code image
+      if (!invoiceDataState?.qrCodeData || !invoiceDataState?.qrCodeIsVisible) {
+        if (active) {
+          setQrCodeDataUrl("");
+        }
+        return;
+      }
+
+      // Generate the QR code image as a data URL for the provided data string
+      const dataUrl = await generateQrCodeDataUrl(invoiceDataState.qrCodeData);
+
+      // Set the generated QR code image if the component is still mounted
+      if (active) {
         setQrCodeDataUrl(dataUrl);
-      } else {
-        setQrCodeDataUrl("");
       }
     };
 
+    // Call generateQrCode when invoiceDataState.qrCodeData or invoiceDataState.qrCodeIsVisible changes
     void generateQrCode();
+
+    // Cleanup function to set active as false on component unmount,
+    // preventing state updates on an unmounted component
+    return () => {
+      active = false;
+    };
   }, [invoiceDataState?.qrCodeData, invoiceDataState?.qrCodeIsVisible]);
 
   useShowRandomCTAToastOnIdle();
