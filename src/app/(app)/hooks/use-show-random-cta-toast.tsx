@@ -6,10 +6,10 @@ import { showRandomCTAToast } from "../components/cta-toasts";
 import { useCTAToast } from "../contexts/cta-toast-context";
 
 const MIN_TIME_ON_PAGE = 7_000; // in ms
-const IDLE_TIME = 3_000; // in ms
+const IDLE_TIME = 5_000; // in ms
 
 /** One interaction = one form update (PDF re-render) */
-const MIN_INTERACTIONS = 2;
+const MIN_INTERACTIONS = 3;
 
 /**
  * Shows a CTA toast after the user has been idle, but only if they haven't
