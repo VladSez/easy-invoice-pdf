@@ -1,5 +1,4 @@
 import {
-  LANGUAGE_TO_LABEL,
   type InvoiceData,
   type SupportedCurrencies,
   type SupportedLanguages,
