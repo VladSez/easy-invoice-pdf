@@ -534,7 +534,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                   {!errors.taxLabelText && (
                     <InputHelperMessage>
                       Customize the tax label on your invoice (e.g., VAT, Sales
-                      Tax, IVA). {LANGUAGE_TO_LABEL[language]} default:{" "}
+                      Tax, IVA). Default:{" "}
                       {INVOICE_PDF_TRANSLATIONS[language].invoiceItemsTable.vat}
                     </InputHelperMessage>
                   )}
