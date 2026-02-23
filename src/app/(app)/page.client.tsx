@@ -40,7 +40,7 @@ import { DEFAULT_METADATA } from "./utils/get-app-metadata";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
 import { InvoicePageHeader } from "@/app/(app)/components/invoice-page-header";
 import { Button } from "@/components/ui/button";
-
+// TODO: enable later when PRO version is released, this is PRO FEATURE =)
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 /**

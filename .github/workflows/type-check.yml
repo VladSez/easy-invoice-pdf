@@ -1,4 +1,4 @@
-name: 🧪 Vitest Unit Tests
+name: 📝 TypeScript Type Check
 on:
   push:
     branches: [main]
@@ -6,9 +6,9 @@ on:
     branches: [main]
 
 jobs:
-  unit-tests:
-    name: Run unit tests
-    timeout-minutes: 10
+  type-check:
+    name: Run type check
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
       # we use pinned versions because there are safer to use: https://x.com/paulmillr/status/1900948425325031448
@@ -27,9 +27,8 @@ jobs:
       - name: 🚚 Install dependencies
         run: pnpm install
 
-      - name: 🧪 Run Vitest tests
-        id: vitest
-        run: pnpm vitest run --reporter=verbose
+      - name: 🔍 Run type check
+        run: pnpm type-check:go
 
       - name: 🔍 Get PR URL
         if: failure()
@@ -54,9 +53,9 @@ jobs:
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: ❌ Unit Tests Failed for ${{ github.repository }}
+          subject: ❌ Type Check Failed for ${{ github.repository }}
           body: |
-            Unit tests for ${{ github.repository }} have failed.
+            Type check for ${{ github.repository }} has failed.
 
             Branch: ${{ github.ref_name }}
             Commit: ${{ github.sha }}

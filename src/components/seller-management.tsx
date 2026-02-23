@@ -72,10 +72,12 @@ export function SellerManagement({
   const [isSellerDialogOpen, setIsSellerDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  // State to store the list of saved sellers for the dropdown selection.
   const [sellersSelectOptions, setSellersSelectOptions] = useState<
     SellerData[]
   >([]);
-  // const [selectedSellerIndex, setSelectedSellerIndex] = useState("");
+
+  // State to track the seller currently being edited (null if not editing).
   const [editingSeller, setEditingSeller] = useState<SellerData | null>(null);
 
   const sellerSelectId = useId();
@@ -126,7 +128,7 @@ export function SellerManagement({
         ...newSeller,
         // Generate a unique ID for the new seller (IMPORTANT!) =)
         id: Date.now().toString(),
-      };
+      } satisfies SellerData;
 
       const newSellers = [...sellersSelectOptions, newSellerWithId];
 
