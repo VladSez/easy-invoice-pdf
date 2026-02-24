@@ -8,6 +8,7 @@ import {
 import {
   CURRENCY_SYMBOLS,
   CURRENCY_TO_LABEL,
+  DEFAULT_DATE_FORMAT,
   LANGUAGE_TO_LABEL,
   STRIPE_DEFAULT_DATE_FORMAT,
   SUPPORTED_TEMPLATES,
@@ -183,9 +184,11 @@ export const GeneralInformation = memo(function GeneralInformation({
                     // Set date format to "MMMM D, YYYY" when template is Stripe
                     setValue("dateFormat", STRIPE_DEFAULT_DATE_FORMAT);
 
-                    // Always enable VAT field visibility for Stripe template (because we don't show Switches for items in Stripe template and we want to make sure the Tax column is visible in the PDF)
-                    setValue("items.0.vatFieldIsVisible", true);
+                    // Set unit field to be hidden by default for Stripe template (backwards compatibility)
+                    setValue("items.0.unitFieldIsVisible", false);
                   } else {
+                    // DEFAULT TEMPLATE
+
                     // Clear Stripe-specific fields when not using Stripe template
                     if (errors.stripePayOnlineUrl) {
                       setValue("stripePayOnlineUrl", "");
@@ -197,7 +200,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                     }
 
                     // Set date format to "YYYY-MM-DD" when template is default
-                    setValue("dateFormat", SUPPORTED_DATE_FORMATS[0]);
+                    setValue("dateFormat", DEFAULT_DATE_FORMAT);
                   }
                 }}
               >
@@ -444,7 +447,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               <SelectNative {...field} id={`dateFormat`} className="block">
                 {SUPPORTED_DATE_FORMATS.map((format) => {
                   const preview = dayjs().locale(language).format(format);
-                  const isDefault = format === SUPPORTED_DATE_FORMATS[0];
+                  const isDefault = format === DEFAULT_DATE_FORMAT;
 
                   return (
                     <option key={format} value={format}>
@@ -532,7 +535,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
               {!isInvoiceNumberInCurrentMonth &&
                 !errors.invoiceNumberObject?.value && (
-                  <div className="mt-1 flex flex-col items-start text-balance text-xs text-zinc-700/90">
+                  <InputHelperMessage>
                     <span className="flex items-center text-amber-800">
                       <AlertIcon />
                       Invoice number does not match current month
@@ -547,13 +550,13 @@ export const GeneralInformation = memo(function GeneralInformation({
                       }}
                     >
                       <span className="text-pretty">
-                        Set Invoice No. as{" "}
+                        Set invoice number as{" "}
                         <span className="font-bold">
                           current month ({`1/${CURRENT_MONTH_AND_YEAR}`})
                         </span>
                       </span>
                     </ButtonHelper>
-                  </div>
+                  </InputHelperMessage>
                 )}
             </div>
           </div>
@@ -652,8 +655,9 @@ export const GeneralInformation = memo(function GeneralInformation({
                 <InfoIcon className="mt-0.5 inline-block size-3.5 shrink-0 text-blue-800" />
                 <div>
                   <span className="mb-2 inline-block">
-                    Some dates are out of date. Click the button to update all
-                    at once:
+                    Some dates are out of date.{" "}
+                    <span className="underline">Click the button below</span> to
+                    update all dates at once:
                   </span>
                   <ul className="list-disc space-y-1 text-balance pl-5">
                     <li>
@@ -733,59 +737,57 @@ export const GeneralInformation = memo(function GeneralInformation({
           </div>
         ) : null}
 
-        {/* Invoice Type - We don't show this field for Stripe template */}
-        {/* TODO: rename to "Invoice Notes", probably "Invoice Type" is not the best name for this field ?*/}
-        {template !== "stripe" && (
-          <div>
-            <div className="relative mb-2 flex items-center justify-between">
-              <Label htmlFor={`invoiceType`} className="">
-                Invoice Type
-              </Label>
+        {/* Header Notes - Purpose is to add a custom text to the header of the invoice */}
+        <div>
+          <div className="relative mb-2 flex items-center justify-between">
+            <Label htmlFor={`invoiceType`} className="">
+              Header Notes
+            </Label>
 
-              {/* Show/hide Invoice Type field in PDF switch */}
-              <div className="inline-flex items-center gap-2">
-                <Controller
-                  name={`invoiceTypeFieldIsVisible`}
-                  control={control}
-                  render={({ field: { value, onChange, ...field } }) => (
-                    <Switch
-                      {...field}
-                      id={`invoiceTypeFieldIsVisible`}
-                      checked={value}
-                      onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    />
-                  )}
-                />
-                <CustomTooltip
-                  trigger={
-                    <Label htmlFor={`invoiceTypeFieldIsVisible`}>
-                      Show in PDF
-                    </Label>
-                  }
-                  content='Show/Hide the "Invoice Type" Field in the PDF'
-                />
-              </div>
+            {/* Show Header Notes field in PDF switch */}
+            <div className="inline-flex items-center gap-2">
+              <Controller
+                name={`invoiceTypeFieldIsVisible`}
+                control={control}
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Switch
+                    {...field}
+                    id={`invoiceTypeFieldIsVisible`}
+                    checked={value}
+                    onCheckedChange={onChange}
+                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    aria-label={`Show the "Header Notes" Field in the PDF`}
+                  />
+                )}
+              />
+              <CustomTooltip
+                trigger={
+                  <Label htmlFor={`invoiceTypeFieldIsVisible`}>
+                    Show in PDF
+                  </Label>
+                }
+                content='Show the "Header Notes" Field in the PDF'
+              />
             </div>
-
-            <Controller
-              name="invoiceType"
-              control={control}
-              render={({ field }) => (
-                <Textarea
-                  {...field}
-                  id={`invoiceType`}
-                  rows={2}
-                  className=""
-                  placeholder="Enter invoice type"
-                />
-              )}
-            />
-            {errors.invoiceType && (
-              <ErrorMessage>{errors.invoiceType.message}</ErrorMessage>
-            )}
           </div>
-        )}
+
+          <Controller
+            name="invoiceType"
+            control={control}
+            render={({ field }) => (
+              <Textarea
+                {...field}
+                id={`invoiceType`}
+                rows={2}
+                className=""
+                placeholder="Enter header notes"
+              />
+            )}
+          />
+          {errors.invoiceType && (
+            <ErrorMessage>{errors.invoiceType.message}</ErrorMessage>
+          )}
+        </div>
       </div>
     </div>
   );

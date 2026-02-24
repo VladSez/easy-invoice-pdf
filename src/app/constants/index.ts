@@ -1,8 +1,8 @@
 import {
   SUPPORTED_CURRENCIES,
   SUPPORTED_LANGUAGES,
-  SUPPORTED_DATE_FORMATS,
   SUPPORTED_TEMPLATES,
+  DEFAULT_DATE_FORMAT,
   type InvoiceData,
   type SellerData,
   type BuyerData,
@@ -17,7 +17,6 @@ const INVOICE_CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
 
 const EUR = SUPPORTED_CURRENCIES[0];
 const EN = SUPPORTED_LANGUAGES[0];
-const DEFAULT_DATE_FORMAT = SUPPORTED_DATE_FORMATS[0];
 const DEFAULT_TEMPLATE = SUPPORTED_TEMPLATES[0];
 
 export const INVOICE_DEFAULT_NUMBER_VALUE = `1/${INVOICE_CURRENT_MONTH_AND_YEAR}`;
@@ -90,7 +89,7 @@ export const INITIAL_INVOICE_DATA = {
   dateOfService: LAST_DAY_OF_MONTH,
   dateFormat: DEFAULT_DATE_FORMAT,
 
-  invoiceType: "Reverse Charge",
+  invoiceType: "",
   invoiceTypeFieldIsVisible: true,
 
   seller: DEFAULT_SELLER_DATA,
@@ -136,9 +135,16 @@ export const INITIAL_INVOICE_DATA = {
   notes: "Reverse charge",
   notesFieldIsVisible: true,
 
+  qrCodeData: "",
+  qrCodeDescription: "",
+  qrCodeIsVisible: true,
+
   vatTableSummaryIsVisible: true,
   paymentMethodFieldIsVisible: true,
+
+  personAuthorizedToReceiveName: "",
   personAuthorizedToReceiveFieldIsVisible: true,
+  personAuthorizedToIssueName: "",
   personAuthorizedToIssueFieldIsVisible: true,
 
   taxLabelText: "VAT",

@@ -1,0 +1,66 @@
+name: 📝 TypeScript Type Check
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  type-check:
+    name: Run type check
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      # we use pinned versions because there are safer to use: https://x.com/paulmillr/status/1900948425325031448
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        name: 🛎️ Checkout repository
+
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        name: 📦 Setup pnpm
+
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # 4.3.0
+        name: 📚 Setup Node.js
+        with:
+          node-version: lts/*
+          cache: "pnpm"
+
+      - name: 🚚 Install dependencies
+        run: pnpm install
+
+      - name: 🔍 Run type check
+        run: pnpm type-check:go
+
+      - name: 🔍 Get PR URL
+        if: failure()
+        id: pr-url
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_URL=$(curl -s \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository_owner }}:${{ github.ref_name }}" \
+            | jq -r '.[0].html_url')
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+
+      - name: 📧 Send email on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@611879133a9569642c41be66f4a323286e9b8a3b # v4
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          from: GitHub Actions
+          to: ${{ secrets.EMAIL_USERNAME }}
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: ❌ Type Check Failed for ${{ github.repository }}
+          body: |
+            Type check for ${{ github.repository }} has failed.
+
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+
+            For more details, please check:
+            - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
+            - Commit: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}

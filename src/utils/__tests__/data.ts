@@ -81,7 +81,14 @@ export const MOCK_INVOICE_DATA = {
   stripePayOnlineUrl: "https://checkout.stripe.com/pay/cs_123",
   notes: "Thank you for your business",
   notesFieldIsVisible: true,
+
+  qrCodeData: "",
+  qrCodeDescription: "",
+  qrCodeIsVisible: true,
+
+  personAuthorizedToReceiveName: "",
   personAuthorizedToReceiveFieldIsVisible: true,
+  personAuthorizedToIssueName: "",
   personAuthorizedToIssueFieldIsVisible: true,
   taxLabelText: "VAT",
 } as const satisfies InvoiceData;

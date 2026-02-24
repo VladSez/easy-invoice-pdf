@@ -101,7 +101,6 @@ export default async function RootLayout({
             {/* should only be enabled in production */}
             {process.env.VERCEL_ENV === "production" && (
               <>
-                {/* https://vercel.com/vladsazon27s-projects/pdf-invoice-generator/speed-insights */}
                 <SpeedInsights />
                 {/* https://eu.umami.is/dashboard */}
                 <Script

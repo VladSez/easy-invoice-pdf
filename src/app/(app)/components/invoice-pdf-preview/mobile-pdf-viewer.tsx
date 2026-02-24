@@ -1,8 +1,6 @@
-"use client";
-
 import type { InvoiceData } from "@/app/schema";
 import { BlobProvider } from "@react-pdf/renderer/lib/react-pdf.browser";
-import { Document, Page, pdfjs } from "react-pdf";
+import { Document, Page } from "react-pdf";
 
 import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
 import { StripeInvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
@@ -11,8 +9,8 @@ import { BUG_REPORT_URL } from "@/config";
 import * as Sentry from "@sentry/nextjs";
 import { useMemo, useState } from "react";
 
-// https://github.com/wojtekmaj/react-pdf/issues/1822#issuecomment-2233334169
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// https://github.com/wojtekmaj/react-pdf/issues/1824#issuecomment-2266150831
+import "pdfjs-dist/build/pdf.worker.min.mjs";
 
 /**
  * Mobile PDF viewer.
@@ -25,20 +23,33 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
  */
 export const MobileInvoicePDFViewer = ({
   invoiceData,
+  qrCodeDataUrl,
 }: {
   invoiceData: InvoiceData;
+  qrCodeDataUrl: string;
 }) => {
   const [key, setKey] = useState(0);
+  const [numPages, setNumPages] = useState(0);
 
   const memoizedInvoicePdfTemplate = useMemo(() => {
     switch (invoiceData.template) {
       case "stripe":
-        return <StripeInvoicePdfTemplate invoiceData={invoiceData} />;
+        return (
+          <StripeInvoicePdfTemplate
+            invoiceData={invoiceData}
+            qrCodeDataUrl={qrCodeDataUrl}
+          />
+        );
       case "default":
       default:
-        return <InvoicePdfTemplate invoiceData={invoiceData} />;
+        return (
+          <InvoicePdfTemplate
+            invoiceData={invoiceData}
+            qrCodeDataUrl={qrCodeDataUrl}
+          />
+        );
     }
-  }, [invoiceData]);
+  }, [invoiceData, qrCodeDataUrl]);
 
   // On mobile, we need to use the 'react-pdf' (https://github.com/wojtekmaj/react-pdf) to generate a PDF preview
   // This is because the PDF viewer is not supported on Android Chrome devices
@@ -51,7 +62,7 @@ export const MobileInvoicePDFViewer = ({
             <div className="flex h-[520px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
               <div className="text-center">
                 <p className="text-red-600">Error generating PDF preview</p>
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mx-6 mt-2 text-balance text-sm text-gray-600">
                   Something went wrong. Please try refreshing the page or using{" "}
                   <span className="font-bold">Chrome</span> browser. If the
                   issue persists, please fill a bug report{" "}
@@ -95,6 +106,10 @@ export const MobileInvoicePDFViewer = ({
                 </div>
               </div>
             }
+            onLoadSuccess={({ numPages }) => {
+              // to render the correct number of pages in the PDF viewer
+              setNumPages(numPages);
+            }}
             onLoadError={(error) => {
               console.error(error);
 
@@ -121,23 +136,30 @@ export const MobileInvoicePDFViewer = ({
               </div>
             }
           >
-            <Page
-              pageNumber={1}
-              error={"Something went wrong"}
-              loading={
-                <div className="flex h-[520px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-                  <div className="text-center">
-                    <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-                    <p className="text-gray-600">Loading PDF viewer...</p>
+            {Array.from({ length: numPages }, (_, index) => (
+              <Page
+                key={`page-${index + 1}`}
+                // we add some space between pages to make it easier to see the page break
+                className={
+                  index < numPages - 1 ? "border-b-[15px] border-gray-200" : ""
+                }
+                pageNumber={index + 1}
+                error={"Something went wrong"}
+                loading={
+                  <div className="flex h-[520px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+                    <div className="text-center">
+                      <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+                      <p className="text-gray-600">Loading PDF viewer...</p>
+                    </div>
                   </div>
-                </div>
-              }
-              onLoadError={(error) => {
-                Sentry.captureException(error);
-              }}
-              height={450}
-              width={650}
-            />
+                }
+                onLoadError={(error) => {
+                  Sentry.captureException(error);
+                }}
+                height={450}
+                width={650}
+              />
+            ))}
           </Document>
         );
       }}

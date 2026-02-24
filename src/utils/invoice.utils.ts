@@ -35,7 +35,9 @@ export function getAmountInWords({
 
   if (!result.success) {
     console.error("Validation error:", result.error);
-    toast.error("Invalid input data");
+    toast.error("Invalid input data for amount in words", {
+      id: "get-amount-in-words-invalid-input-data-error-toast",
+    });
 
     return "-/-";
   }
@@ -47,7 +49,9 @@ export function getAmountInWords({
     });
   } catch (error) {
     console.error("Failed to convert number to words:", error);
-    toast.error("Failed to convert number to words");
+    toast.error("Failed to convert number to words", {
+      id: "get-amount-in-words-failed-to-convert-number-to-words-error-toast",
+    });
 
     if (error instanceof Error) {
       umamiTrackEvent("error_converting_number_to_words", {
@@ -77,7 +81,9 @@ export function getNumberFractionalPart(total = 0) {
 
   if (!parsedTotal.success) {
     console.error("Validation error:", parsedTotal.error);
-    toast.error("Invalid input data");
+    toast.error("Invalid input data for number fractional part", {
+      id: "get-number-fractional-part-invalid-input-data-error-toast",
+    });
 
     return "-/-";
   }

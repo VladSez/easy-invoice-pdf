@@ -6,6 +6,7 @@ import {
   SCHEMA_VERSION,
   APP_VERSION,
   type Metadata,
+  DEFAULT_MOBILE_TAB,
 } from "@/app/schema";
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
@@ -13,8 +14,15 @@ import dayjs from "dayjs";
 export const DEFAULT_METADATA = {
   appVersion: APP_VERSION,
   schemaVersion: SCHEMA_VERSION,
+  /** when the invoice was created (i.e. invoice is first created) */
   invoiceCreatedAt: dayjs().toISOString(),
+  /** when the invoice was last updated (i.e. invoice is regenerated) */
   invoiceLastUpdatedAt: dayjs().toISOString(),
+  lastVisitedMobileTab: DEFAULT_MOBILE_TAB,
+  /** how many times the invoice PDF has been downloaded */
+  invoiceDownloadCount: 0,
+  /** how many times the invoice has been shared via link */
+  invoiceSharedCount: 0,
 } as const satisfies Metadata;
 
 /**

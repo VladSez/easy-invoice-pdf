@@ -79,18 +79,19 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     const finalSection = newPage.getByTestId(`final-section`);
 
-    // Verify that signature fields are hidden (there are only for default template)
-    await expect(
-      finalSection.getByRole("switch", {
-        name: 'Show "Person Authorized to Receive" Signature Field in the PDF',
-      }),
-    ).toBeHidden();
+    /** TEST PERSON AUTHORIZED TO RECEIVE FIELD TO BE HIDDEN (there are only for default template)*/
+    const personAuthorizedToReceiveFieldset = finalSection.getByRole("group", {
+      name: "Person Authorized to Receive",
+    });
 
-    await expect(
-      finalSection.getByRole("switch", {
-        name: 'Show "Person Authorized to Issue" Signature Field in the PDF',
-      }),
-    ).toBeHidden();
+    await expect(personAuthorizedToReceiveFieldset).toBeHidden();
+
+    /** TEST PERSON AUTHORIZED TO ISSUE FIELD TO BE HIDDEN (there are only for default template)*/
+    const personAuthorizedToIssueFieldset = finalSection.getByRole("group", {
+      name: "Person Authorized to Issue",
+    });
+
+    await expect(personAuthorizedToIssueFieldset).toBeHidden();
 
     // Close the new page
     await newPage.close();
@@ -185,8 +186,14 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     expect(dataParam).toBeTruthy();
     expect(dataParam).not.toBe("");
 
+    // Verify the share invoice link description toast appears after generating the link
+    const toast = page.getByTestId("share-invoice-link-description-toast");
+    await expect(toast).toBeVisible();
+
     await expect(
-      page.getByText("Invoice link copied to clipboard!"),
+      page.getByText(
+        "Share this link to let others view and edit this invoice",
+      ),
     ).toBeVisible();
   });
 
@@ -325,5 +332,72 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     await expect(shareButton).toHaveAttribute("data-disabled", "false");
     await expect(shareButton).toBeEnabled();
+  });
+
+  test("shows error toast when form has validation errors and generates link after fixing", async ({
+    page,
+  }) => {
+    // Switch to Stripe template
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+
+    // Locate the Net Price input for the first invoice item
+    const netPriceInput = page.locator("#itemNetPrice0");
+    await expect(netPriceInput).toBeVisible();
+
+    // Clear the Net Price field to trigger "Net price is required" validation error
+    await netPriceInput.clear();
+
+    // Wait for debounce timeout so form validation runs and invoiceFormHasErrors becomes true
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    // Click share button — should show error toast because form has validation errors
+    const shareButton = page.getByRole("button", {
+      name: "Generate a link to invoice",
+    });
+    await shareButton.click();
+
+    // Verify the "Unable to Share Invoice" error toast for form errors is visible
+    await expect(page.getByText("Unable to Share Invoice")).toBeVisible();
+    await expect(
+      page.getByText(
+        "Please fix the errors in the invoice form to generate a shareable link.",
+      ),
+    ).toBeVisible();
+
+    // Fill back the Net Price with a valid value
+    await netPriceInput.fill("100");
+
+    // Wait for debounce timeout so form validation passes and invoiceFormHasErrors resets to false
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    // Click share button again — should succeed this time
+    await shareButton.click();
+
+    // Verify link was generated: URL should contain data param
+    await page.waitForURL((url) => url.searchParams.has("data"));
+    const url = page.url();
+    expect(url).toContain("?template=stripe&data=");
+
+    // Verify data parameter is not empty
+    const urlObj = new URL(url);
+    const dataParam = urlObj.searchParams.get("data");
+    expect(dataParam).toBeTruthy();
+    expect(dataParam).not.toBe("");
+
+    // Verify the share invoice link description toast appears after generating the link
+    const toast = page.getByTestId("share-invoice-link-description-toast");
+    await expect(toast).toBeVisible();
+
+    await expect(
+      page.getByText(
+        "Share this link to let others view and edit this invoice",
+      ),
+    ).toBeVisible();
   });
 });

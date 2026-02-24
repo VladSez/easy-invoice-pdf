@@ -35,6 +35,10 @@
         "openSource": {
           "title": "Open Source",
           "description": "Completely free and open-source. Use it online or host it yourself with full access to the code."
+        },
+        "qrCodeMultiPDFpageSupport": {
+          "title": "QR Code & Multi-Page PDF Support",
+          "description": "Add QR codes with payment links to your invoices and generate multi-page PDFs for longer invoices with many line items."
         }
       }
     },

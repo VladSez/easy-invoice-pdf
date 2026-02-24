@@ -1,5 +1,5 @@
 import { GithubIcon } from "@/components/etc/github-logo";
-import { ProjectLogo } from "@/components/etc/project-logo";
+// import { ProjectLogo } from "@/components/etc/project-logo";
 import { Footer } from "@/components/footer";
 import {
   BlackGoToAppButton,
@@ -24,6 +24,10 @@ import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { type Graph } from "schema-dts";
 import { LanguageSwitcher } from "./components/language-switcher";
+import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
+import { GithubStarCtaMarketingPageHeader } from "@/app/[locale]/about/components/github-star-cta-header";
+import { FinalProjectLogo } from "@/components/etc/final-project-logo";
+// import { ProjectLogoDescription } from "@/components/project-logo-description";
 
 // statically generate the pages for all locales
 export function generateStaticParams() {
@@ -61,6 +65,9 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
         <main>
           <HeroSection />
           <FeaturesSection />
+          <div className="flex justify-center py-8 pb-10 lg:py-6 lg:pb-16">
+            <GithubStarCtaMarketingPageBody />
+          </div>
           <FaqSection />
           <CtaSection />
         </main>
@@ -142,20 +149,20 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
 
 function Header({ locale }: { locale: Locale }) {
   const t = useTranslations("About.buttons");
-  const tFooter = useTranslations("About.footer.links");
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
       <div className="flex items-center justify-center">
-        <div className="container h-auto px-3 py-2 sm:h-16 sm:py-0">
+        <div className="container h-auto px-4 py-2 sm:h-16 sm:py-0 md:px-6">
           <div className="flex h-full flex-row flex-wrap items-center justify-between gap-2">
             <div className="w-[53%] sm:w-auto">
               <Logo />
             </div>
             <div className="flex items-center sm:mt-0 sm:gap-2">
-              <Button variant="ghost" className="hidden lg:inline-flex" asChild>
-                <Link href="/changelog">{tFooter("changelog")}</Link>
-              </Button>
+              {/** show only on desktop */}
+              <div className="hidden sm:block">
+                <GithubStarCtaMarketingPageHeader />
+              </div>
               <LanguageSwitcher
                 locale={locale}
                 buttonText={t("switchLanguage")}
@@ -494,9 +501,10 @@ function Logo() {
         </div> */}
       {/* <ProjectLogoDescription>{t("tagline")}</ProjectLogoDescription> */}
       {/* </div> */}
-      <div className="flex items-center">
-        <ProjectLogo className="size-7 flex-shrink-0 sm:size-8" />
-        <p className="text-balance text-center text-xl font-bold text-slate-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
+      <div className="flex items-center gap-1.5 md:gap-2">
+        {/* <ProjectLogo className="size-7 flex-shrink-0 sm:size-8" /> */}
+        <FinalProjectLogo className="size-6 md:size-7" />
+        <p className="text-balance text-center text-xl font-bold text-zinc-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
           <a
             href="https://easyinvoicepdf.com"
             target="_blank"
@@ -505,6 +513,7 @@ function Logo() {
             EasyInvoicePDF
           </a>
         </p>
+        {/* <ProjectLogoDescription>{t("tagline")}</ProjectLogoDescription> */}
       </div>
     </div>
   );

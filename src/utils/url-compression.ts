@@ -61,7 +61,14 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   stripePayOnlineUrl: "s",
   notes: "t",
   notesFieldIsVisible: "u",
+
+  qrCodeData: "3",
+  qrCodeIsVisible: "4",
+  qrCodeDescription: "5",
+
+  personAuthorizedToReceiveName: "6",
   personAuthorizedToReceiveFieldIsVisible: "v",
+  personAuthorizedToIssueName: "7",
   personAuthorizedToIssueFieldIsVisible: "w",
   taxLabelText: "1",
 

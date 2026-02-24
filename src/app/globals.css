@@ -16,6 +16,33 @@ body {
   }
 }
 
+@layer components {
+  .border-glow-mask {
+    border-radius: inherit;
+    pointer-events: none;
+    position: absolute;
+    inset: -1px;
+    padding: 1px;
+    -webkit-mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000);
+    mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000);
+    -webkit-mask-clip: content-box, border-box;
+    mask-clip: content-box, border-box;
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  .border-glow-shine {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 500px;
+    height: 500px;
+    transform-origin: 0 0;
+    background: conic-gradient(transparent 0%, #7d5bfff2 10%, #7d5bff59, transparent 20%);
+    filter: drop-shadow(0 0 6px rgba(125, 91, 255, 0.7)) drop-shadow(0 0 14px rgba(125, 91, 255, 0.45));
+  }
+}
+
 @layer base {
   :root {
     --radius: 0.5rem;

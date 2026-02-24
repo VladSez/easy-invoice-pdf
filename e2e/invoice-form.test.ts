@@ -2,6 +2,7 @@ import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   CURRENCY_SYMBOLS,
   CURRENCY_TO_LABEL,
+  DEFAULT_DATE_FORMAT,
   LANGUAGE_TO_LABEL,
   PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_CURRENCIES,
@@ -13,7 +14,7 @@ import {
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
-import { STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
+import { GITHUB_URL, STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -151,7 +152,14 @@ test.describe("Invoice Generator Page", () => {
     ).toBeHidden();
 
     // Verify GitHub Star CTA button is visible
-    await expect(page.getByTestId("github-star-cta-button")).toBeVisible();
+    const githubStarCtaButton = page.getByRole("link", {
+      name: "Star project on GitHub",
+      exact: true,
+    });
+
+    await expect(githubStarCtaButton).toBeVisible();
+    await expect(githubStarCtaButton).toHaveAttribute("href", GITHUB_URL);
+    await expect(githubStarCtaButton).toHaveAttribute("target", "_blank");
 
     // Verify buttons are enabled
     await expect(
@@ -232,7 +240,7 @@ test.describe("Invoice Generator Page", () => {
     // Verify all supported date formats are available as options with correct labels
     for (const dateFormat of SUPPORTED_DATE_FORMATS) {
       const preview = dayjs().format(dateFormat);
-      const isDefault = dateFormat === SUPPORTED_DATE_FORMATS[0];
+      const isDefault = dateFormat === DEFAULT_DATE_FORMAT;
 
       await expect(
         dateFormatSelect.locator(`option[value="${dateFormat}"]`),
@@ -266,12 +274,14 @@ test.describe("Invoice Generator Page", () => {
 
     // Invoice Type
     await expect(
-      generalInfoSection.getByRole("textbox", { name: "Invoice Type" }),
+      generalInfoSection.getByRole("textbox", { name: "Header Notes" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.invoiceType);
 
     // Visibility toggles
     await expect(
-      generalInfoSection.getByRole("switch", { name: "Show in PDF" }),
+      generalInfoSection.getByRole("switch", {
+        name: `Show the "Header Notes" Field in the PDF`,
+      }),
     ).toBeChecked();
 
     // **CHECK SELLER INFORMATION SECTION**
@@ -297,8 +307,11 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       sellerVatFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.vatNo);
+
     await expect(
-      sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(0),
+      sellerSection.getByRole("switch", {
+        name: `Show the 'Seller Tax Number' Field in the PDF`,
+      }),
     ).toBeChecked();
 
     // Email field
@@ -310,16 +323,22 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       sellerSection.getByRole("textbox", { name: "Account Number" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.accountNumber);
+
     await expect(
-      sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(1),
+      sellerSection.getByRole("switch", {
+        name: `Show the 'Account Number' Field in the PDF`,
+      }),
     ).toBeChecked();
 
     // SWIFT/BIC field and visibility toggle
     await expect(
       sellerSection.getByRole("textbox", { name: "SWIFT/BIC" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.swiftBic);
+
     await expect(
-      sellerSection.getByRole("switch", { name: /Show in PDF/i }).nth(2),
+      sellerSection.getByRole("switch", {
+        name: `Show the 'SWIFT/BIC' Field in the PDF`,
+      }),
     ).toBeChecked();
 
     // Verify Seller Management button is present
@@ -395,7 +414,9 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("textbox", { name: "Name" }),
     ).toHaveValue(firstItem.name);
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(0),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show the 'Name of Goods/Service' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // Type of GTU field and visibility toggle
@@ -403,7 +424,9 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("textbox", { name: "Type of GTU" }),
     ).toHaveValue(firstItem.typeOfGTU);
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(1),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show the 'Type of GTU' Column in the PDF for item 1",
+      }),
     ).not.toBeChecked(); // we don't want to show this in PDF by default
 
     // Amount field and visibility toggle
@@ -413,7 +436,9 @@ test.describe("Invoice Generator Page", () => {
       }),
     ).toHaveValue(firstItem.amount.toString());
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(2),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show the 'Amount' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // Unit field and visibility toggle
@@ -421,7 +446,9 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("textbox", { name: "Unit" }),
     ).toHaveValue(firstItem.unit);
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(3),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show the 'Unit' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // Net Price field and visibility toggle
@@ -431,7 +458,9 @@ test.describe("Invoice Generator Page", () => {
       }),
     ).toHaveValue(firstItem.netPrice.toString());
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(4),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show the 'Net Price' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // VAT field and visibility toggle
@@ -439,7 +468,9 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true }),
     ).toHaveValue(firstItem.vat);
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(5),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show the 'VAT' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // Verify VAT helper text is displayed
@@ -462,7 +493,9 @@ test.describe("Invoice Generator Page", () => {
       }),
     );
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(6),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show the 'Net Amount' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // VAT Amount field (read-only) and visibility toggle
@@ -478,7 +511,9 @@ test.describe("Invoice Generator Page", () => {
       }),
     );
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(7),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show the 'VAT Amount' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // Pre-tax Amount field (read-only) and visibility toggle
@@ -494,7 +529,9 @@ test.describe("Invoice Generator Page", () => {
       }),
     );
     await expect(
-      invoiceItemsSection.getByRole("switch", { name: /Show in PDF/i }).nth(8),
+      invoiceItemsSection.getByRole("switch", {
+        name: "Show the 'Pre-tax Amount' Column in the PDF for item 1",
+      }),
     ).toBeChecked();
 
     // Verify Add Invoice Item button is present
@@ -514,10 +551,11 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByText("Item 2", { exact: true }),
     ).toBeVisible();
 
-    // Fill in new item details
+    // Fill in new invoice item details
     const itemNameInput = invoiceItemsSection
       .getByRole("textbox", { name: "Name" })
       .nth(1);
+
     await itemNameInput.fill("TEST INVOICE ITEM");
     await expect(itemNameInput).toHaveValue("TEST INVOICE ITEM");
 
@@ -595,15 +633,25 @@ test.describe("Invoice Generator Page", () => {
     await invoiceItemsSection.getByRole("textbox", { name: "Name" }).clear();
 
     await expect(
-      page.getByText("Seller name is required", { exact: true }),
+      sellerSection.getByText("Seller name is required", { exact: true }),
+    ).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page
+        .getByLabel("Notifications alt+T")
+        .getByText("Seller name is required"),
     ).toBeVisible();
 
     await expect(
-      page.getByText("Buyer name is required", { exact: true }),
+      buyerSection.getByText("Buyer name is required", { exact: true }),
     ).toBeVisible();
 
+    // Check that notification is also visible
     await expect(
-      page.getByText("Item name is required", { exact: true }),
+      page
+        .getByLabel("Notifications alt+T")
+        .getByText("Buyer name is required"),
     ).toBeVisible();
 
     const dateOfIssue = dayjs().format("YYYY-MM-DD");
@@ -640,12 +688,18 @@ test.describe("Invoice Generator Page", () => {
     // Check for error messages to be hidden
 
     await expect(
-      page.getByText("Seller name is required", { exact: true }),
+      sellerSection.getByText("Seller name is required", { exact: true }),
     ).toBeHidden();
 
+    // Check that notification is also hidden
+    await expect(page.getByLabel("Notifications alt+T")).toBeHidden();
+
     await expect(
-      page.getByText("Buyer name is required", { exact: true }),
+      buyerSection.getByText("Buyer name is required", { exact: true }),
     ).toBeHidden();
+
+    // Check that notification is also hidden
+    await expect(page.getByLabel("Notifications alt+T")).toBeHidden();
   });
 
   test("persists data in local storage", async ({ page }) => {
@@ -931,27 +985,49 @@ test.describe("Invoice Generator Page", () => {
 
     // Test invalid values
     await amountInput.fill("-1");
-    await expect(page.getByText("Amount must be positive")).toBeVisible();
+    await expect(
+      invoiceItemsSection.getByText("Amount must be positive"),
+    ).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page
+        .getByLabel("Notifications alt+T")
+        .getByText("Amount must be positive"),
+    ).toBeVisible();
 
     await amountInput.fill("0");
-    await expect(page.getByText("Amount must be positive")).toBeVisible();
+    await expect(
+      invoiceItemsSection.getByText("Amount must be positive"),
+    ).toBeVisible();
 
     await amountInput.fill("1000000000000"); // 1 trillion
     await expect(
-      page.getByText("Amount must not exceed 9 999 999 999.99"),
+      invoiceItemsSection.getByText("Amount must not exceed 9 999 999 999.99"),
+    ).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page
+        .getByLabel("Notifications alt+T")
+        .getByText("Amount must not exceed 9 999 999 999.99"),
     ).toBeVisible();
 
     // Test valid values
     await amountInput.fill("1");
-    await expect(page.getByText("Amount must be positive")).toBeHidden();
     await expect(
-      page.getByText("Amount must not exceed 9 999 999 999.99"),
+      invoiceItemsSection.getByText("Amount must be positive"),
+    ).toBeHidden();
+    await expect(
+      invoiceItemsSection.getByText("Amount must not exceed 9 999 999 999.99"),
     ).toBeHidden();
 
     await amountInput.fill("9999999999.99"); // Maximum valid value
-    await expect(page.getByText("Amount must be positive")).toBeHidden();
     await expect(
-      page.getByText("Amount must not exceed 9 999 999 999.99"),
+      invoiceItemsSection.getByText("Amount must be positive"),
+    ).toBeHidden();
+    await expect(
+      invoiceItemsSection.getByText("Amount must not exceed 9 999 999 999.99"),
     ).toBeHidden();
 
     // **NET PRICE FIELD**
@@ -962,23 +1038,43 @@ test.describe("Invoice Generator Page", () => {
 
     // Test negative value
     await netPriceInput.fill("-100");
-    await expect(page.getByText("Net price must be >= 0")).toBeVisible();
+    await expect(
+      invoiceItemsSection.getByText("Net price must be >= 0"),
+    ).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page
+        .getByLabel("Notifications alt+T")
+        .getByText("Net price must be >= 0"),
+    ).toBeVisible();
 
     // Test exceeding maximum value
     await netPriceInput.fill("1000000000000"); // 1 trillion
     await expect(
-      page.getByText("Net price must not exceed 100 billion"),
+      invoiceItemsSection.getByText("Net price must not exceed 100 billion"),
+    ).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page
+        .getByLabel("Notifications alt+T")
+        .getByText("Net price must not exceed 100 billion"),
     ).toBeVisible();
 
     // Test zero value
     await netPriceInput.fill("0");
-    await expect(page.getByText("Net price must be >= 0")).toBeHidden();
+    await expect(
+      invoiceItemsSection.getByText("Net price must be >= 0"),
+    ).toBeHidden();
 
     // Test valid value
     await netPriceInput.fill("1");
-    await expect(page.getByText("Net price must be >= 0")).toBeHidden();
     await expect(
-      page.getByText("Net price must not exceed 100 billion"),
+      invoiceItemsSection.getByText("Net price must be >= 0"),
+    ).toBeHidden();
+    await expect(
+      invoiceItemsSection.getByText("Net price must not exceed 100 billion"),
     ).toBeHidden();
 
     // **VAT FIELD**
@@ -988,27 +1084,32 @@ test.describe("Invoice Generator Page", () => {
       exact: true,
     });
 
-    const helperText = `Must be a number between 0-100 or any text (i.e. NP, OO, etc).`;
+    const helperText = `Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).`;
 
     // Try invalid values
     await vatInput.fill("101");
-    await expect(page.getByText(helperText)).toBeVisible();
+    await expect(invoiceItemsSection.getByText(helperText)).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page.getByLabel("Notifications alt+T").getByText(helperText),
+    ).toBeVisible();
 
     await vatInput.fill("-1");
-    await expect(page.getByText(helperText)).toBeVisible();
+    await expect(invoiceItemsSection.getByText(helperText)).toBeVisible();
 
     // Try valid values
     await vatInput.fill("23");
-    await expect(page.getByText(helperText)).toBeHidden();
+    await expect(invoiceItemsSection.getByText(helperText)).toBeHidden();
 
     await vatInput.fill("NP");
-    await expect(page.getByText(helperText)).toBeHidden();
+    await expect(invoiceItemsSection.getByText(helperText)).toBeHidden();
 
     await vatInput.fill("OO");
-    await expect(page.getByText(helperText)).toBeHidden();
+    await expect(invoiceItemsSection.getByText(helperText)).toBeHidden();
 
     await vatInput.fill("CUSTOM");
-    await expect(page.getByText(helperText)).toBeHidden();
+    await expect(invoiceItemsSection.getByText(helperText)).toBeHidden();
   });
 
   test("handles VAT calculations for different rates", async ({ page }) => {
@@ -1159,7 +1260,7 @@ test.describe("Invoice Generator Page", () => {
     // Verify the "Update all dates" section appears
     await expect(
       generalInfoSection.getByText(
-        "Some dates are out of date. Click the button to update all at once:",
+        "Some dates are out of date. Click the button below to update all dates at once:",
       ),
     ).toBeVisible();
 
@@ -1188,7 +1289,7 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(
       generalInfoSection.getByText(
-        "Some dates are out of date. Click the button to update all at once:",
+        "Some dates are out of date. Click the button below to update all dates at once:",
       ),
     ).toBeHidden();
   });

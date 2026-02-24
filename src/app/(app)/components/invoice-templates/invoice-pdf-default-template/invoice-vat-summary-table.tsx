@@ -73,9 +73,9 @@ export function InvoiceVATSummaryTable({
   return (
     <View style={[styles.table, { width: "100%" }]}>
       {/* 
-      START: Table header row
+      START: Table header row (top of the VAT summary table)
       */}
-      <View style={styles.tableRow}>
+      <View style={[styles.tableRow, { borderTopWidth: 1 }]} fixed>
         <View style={[styles.tableCol, { width: "25%" }]}>
           <Text style={styles.tableCellBold}>{vatRateColumnLabel}</Text>
         </View>
@@ -127,8 +127,14 @@ export function InvoiceVATSummaryTable({
                 .replaceAll(",", " ")
             : "0.00";
 
+        // Table row start
         return (
-          <View style={styles.tableRow} key={index}>
+          <View
+            style={styles.tableRow}
+            key={index}
+            wrap={false}
+            minPresenceAhead={30}
+          >
             {/* VAT rate */}
             <View style={[styles.tableCol, { width: "25%" }]}>
               <Text
@@ -181,7 +187,7 @@ export function InvoiceVATSummaryTable({
       */}
 
       {/* 
-      START: Total row
+      START: Total row (bottom of the VAT summary table)
       */}
       <View style={styles.tableRow}>
         <View style={[styles.tableCol, { width: "25%" }]}>

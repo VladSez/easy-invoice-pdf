@@ -21,15 +21,18 @@ import "dayjs/locale/uk";
 import "dayjs/locale/fr";
 import "dayjs/locale/it";
 import "dayjs/locale/nl";
+import { InvoiceQRCode } from "@/app/(app)/components/invoice-templates/common/invoice-qr-code";
 
 export const InvoiceBody = ({
   invoiceData,
   styles,
   shouldLocaliseDates = true,
+  qrCodeDataUrl = "",
 }: {
   invoiceData: InvoiceData;
   styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
   shouldLocaliseDates?: boolean;
+  qrCodeDataUrl?: string;
 }) => {
   const language = invoiceData.language;
   const t = INVOICE_PDF_TRANSLATIONS[language];
@@ -56,10 +59,14 @@ export const InvoiceBody = ({
 
   const vatTableSummaryIsVisible = invoiceData.vatTableSummaryIsVisible;
 
+  const isQrCodeVisible =
+    invoiceData?.qrCodeIsVisible && qrCodeDataUrl && qrCodeDataUrl.length > 0;
+
   return (
     <>
       <InvoiceHeader invoiceData={invoiceData} styles={styles} />
       <InvoiceSellerBuyerInfo invoiceData={invoiceData} styles={styles} />
+
       <InvoiceItemsTable
         invoiceData={invoiceData}
         formattedInvoiceTotal={formattedInvoiceTotal}
@@ -74,6 +81,7 @@ export const InvoiceBody = ({
         }}
       >
         <View style={{ width: "50%" }}>
+          {/** Payment date and payment method fields */}
           <InvoicePaymentInfo invoiceData={invoiceData} styles={styles} />
         </View>
 
@@ -88,7 +96,12 @@ export const InvoiceBody = ({
         )}
       </View>
 
-      <View style={{ marginTop: vatTableSummaryIsVisible ? 0 : 15 }}>
+      {/** To pay, paid, left to pay and amount in words fields */}
+      <View
+        style={{ marginTop: vatTableSummaryIsVisible ? 0 : 15 }}
+        wrap={false}
+        minPresenceAhead={50}
+      >
         <InvoicePaymentTotals
           invoiceData={invoiceData}
           formattedInvoiceTotal={formattedInvoiceTotal}
@@ -98,9 +111,18 @@ export const InvoiceBody = ({
 
       {/* Signature section */}
       {signatureSectionIsVisible && (
-        <View style={styles.signatureSection}>
+        <View
+          style={styles.signatureSection}
+          wrap={false}
+          minPresenceAhead={50}
+        >
           {invoiceData.personAuthorizedToReceiveFieldIsVisible && (
             <View style={styles.signatureColumn}>
+              {invoiceData.personAuthorizedToReceiveName ? (
+                <Text style={[styles.signatureText, { marginTop: -13 }]}>
+                  {invoiceData.personAuthorizedToReceiveName}
+                </Text>
+              ) : null}
               <View style={styles.signatureLine} />
               <Text style={styles.signatureText}>
                 {t.personAuthorizedToReceive}
@@ -109,6 +131,11 @@ export const InvoiceBody = ({
           )}
           {invoiceData.personAuthorizedToIssueFieldIsVisible && (
             <View style={styles.signatureColumn}>
+              {invoiceData.personAuthorizedToIssueName ? (
+                <Text style={[styles.signatureText, { marginTop: -13 }]}>
+                  {invoiceData.personAuthorizedToIssueName}
+                </Text>
+              ) : null}
               <View style={styles.signatureLine} />
               <Text style={styles.signatureText}>
                 {t.personAuthorizedToIssue}
@@ -124,6 +151,14 @@ export const InvoiceBody = ({
           <Text style={styles.fontSize8}>{invoiceData?.notes}</Text>
         </View>
       )}
+
+      {/* QR Code - centered below notes */}
+      {isQrCodeVisible ? (
+        <InvoiceQRCode
+          qrCodeDataUrl={qrCodeDataUrl}
+          description={invoiceData.qrCodeDescription}
+        />
+      ) : null}
 
       {/* Footer  */}
       <InvoiceFooter invoiceData={invoiceData} styles={styles} />

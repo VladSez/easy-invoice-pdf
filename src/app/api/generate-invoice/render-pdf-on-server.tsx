@@ -8,7 +8,7 @@ import {
   TODAY,
 } from "@/app/constants";
 import { type InvoiceData, type SupportedLanguages } from "@/app/schema";
-import { STATIC_ASSETS_URL } from "@/config";
+import { INVOICE_PDF_FONTS } from "@/config";
 import { env } from "@/env";
 
 // IMPORTANT: we use @react-pdf/renderer directly here, because we need to render the PDF on the server, not the client
@@ -23,10 +23,10 @@ Font.register({
   family: fontFamily,
   fonts: [
     {
-      src: `${STATIC_ASSETS_URL}/open-sans-regular.ttf`,
+      src: INVOICE_PDF_FONTS.DEFAULT_TEMPLATE.OPEN_SANS_REGULAR,
     },
     {
-      src: `${STATIC_ASSETS_URL}/open-sans-700.ttf`,
+      src: INVOICE_PDF_FONTS.DEFAULT_TEMPLATE.OPEN_SANS_700,
       fontWeight: 700,
     },
   ],
@@ -148,7 +148,14 @@ export const ENGLISH_INVOICE_REAL_DATA = {
 
   notes: "Reverse charge",
   notesFieldIsVisible: true,
+
+  qrCodeData: "",
+  qrCodeDescription: "",
+  qrCodeIsVisible: true,
+
+  personAuthorizedToReceiveName: "",
   personAuthorizedToReceiveFieldIsVisible: true,
+  personAuthorizedToIssueName: "",
   personAuthorizedToIssueFieldIsVisible: true,
 
   template: "default",

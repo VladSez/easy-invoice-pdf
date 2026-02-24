@@ -30,8 +30,10 @@ const SUPPORTED_LANGUAGES_OPTIONS = SUPPORTED_LANGUAGES.map((language) => {
  */
 export function InvoicePDFDownloadMultipleLanguages({
   invoiceData,
+  qrCodeDataUrl,
 }: {
   invoiceData: InvoiceData;
+  qrCodeDataUrl: string;
 }) {
   const language = invoiceData.language;
 
@@ -54,6 +56,7 @@ export function InvoicePDFDownloadMultipleLanguages({
         const document = (
           <InvoicePdfTemplate
             invoiceData={{ ...invoiceData, language: lang }}
+            qrCodeDataUrl={qrCodeDataUrl}
           />
         );
         return pdf(document).toBlob();

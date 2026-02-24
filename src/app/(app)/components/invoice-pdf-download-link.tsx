@@ -18,8 +18,8 @@ import { LOADING_BUTTON_TEXT, LOADING_BUTTON_TIMEOUT } from "./invoice-form";
 
 import { useDeviceContext } from "@/contexts/device-context";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
+import { updateAppMetadata } from "../utils/get-app-metadata";
 import { useCTAToast } from "../contexts/cta-toast-context";
-import { CTA_TOAST_LAST_SHOWN_STORAGE_KEY } from "../hooks/use-show-random-cta-toast";
 import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./cta-toasts";
 
 // Separate button states into a memoized component
@@ -48,13 +48,15 @@ export function InvoicePDFDownloadLink({
   invoiceData,
   errorWhileGeneratingPdfIsShown,
   setErrorWhileGeneratingPdfIsShown,
+  qrCodeDataUrl,
 }: {
   invoiceData: InvoiceData;
   errorWhileGeneratingPdfIsShown: boolean;
   setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
+  qrCodeDataUrl: string;
 }) {
   const { inAppInfo } = useDeviceContext();
-  const { markToastAsShown } = useCTAToast();
+  const { markCTAActionTriggered } = useCTAToast();
 
   const [{ loading: pdfLoading, url, error }, updatePdfInstance] = usePDF();
   const [isLoading, setIsLoading] = useState(false);
@@ -70,6 +72,9 @@ export function InvoicePDFDownloadLink({
 
         toast.error(
           "File not available. Please try again in different browser.",
+          {
+            id: "file-not-available-error-toast",
+          },
         );
         return;
       }
@@ -79,7 +84,7 @@ export function InvoicePDFDownloadLink({
 
         toast(
           `Downloads are blocked inside ${inAppInfo?.name ?? "this app"}. Open in your browser to save.`,
-          { icon: "📱" },
+          { icon: "📱", id: "downloads-blocked-inside-app-toast" },
         );
 
         return;
@@ -89,7 +94,7 @@ export function InvoicePDFDownloadLink({
         e.preventDefault();
         toast(
           `Downloads are blocked inside Telegram. Open in your browser to save.`,
-          { icon: "📱" },
+          { icon: "📱", id: "downloads-blocked-inside-telegram-toast" },
         );
 
         return;
@@ -103,26 +108,18 @@ export function InvoicePDFDownloadLink({
           },
         });
 
+        updateAppMetadata((current) => ({
+          ...current,
+          invoiceDownloadCount: (current?.invoiceDownloadCount ?? 0) + 1,
+        }));
+
         // close all other toasts (if any)
         toast.dismiss();
 
-        // if (isToastShownInSession) {
-        //   umamiTrackEvent("cta_toast_skipped_downloaded_invoice");
-        //   return;
-        // }
+        markCTAActionTriggered();
 
-        // Show a CTA toast
         setTimeout(() => {
           showRandomCTAToast();
-
-          // Mark toast as shown in session to prevent duplicate toasts
-          markToastAsShown();
-
-          // Update timestamp to prevent other CTA toasts from showing for 7 days
-          localStorage.setItem(
-            CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
-            String(Date.now()),
-          );
         }, CTA_TOAST_TIMEOUT);
       }
     },
@@ -134,7 +131,7 @@ export function InvoicePDFDownloadLink({
       isLoading,
       error,
       invoiceData.template,
-      markToastAsShown,
+      markCTAActionTriggered,
     ],
   );
 
@@ -155,12 +152,22 @@ export function InvoicePDFDownloadLink({
   const PdfDocument = useMemo(() => {
     switch (invoiceData.template) {
       case "stripe":
-        return <StripeInvoicePdfTemplate invoiceData={invoiceData} />;
+        return (
+          <StripeInvoicePdfTemplate
+            invoiceData={invoiceData}
+            qrCodeDataUrl={qrCodeDataUrl}
+          />
+        );
       case "default":
       default:
-        return <InvoicePdfTemplate invoiceData={invoiceData} />;
+        return (
+          <InvoicePdfTemplate
+            invoiceData={invoiceData}
+            qrCodeDataUrl={qrCodeDataUrl}
+          />
+        );
     }
-  }, [invoiceData]);
+  }, [invoiceData, qrCodeDataUrl]);
 
   // Handle PDF updates
   useEffect(() => {
@@ -204,7 +211,8 @@ export function InvoicePDFDownloadLink({
         description: (
           <p>
             For the best experience, please open this page in{" "}
-            <span className="font-bold">Safari or Chrome browser.</span>
+            <span className="font-bold">Chrome</span> or{" "}
+            <span className="font-bold">Safari</span> browser.
           </p>
         ),
         id: "in-app-browser-toast", // To prevent duplicate toasts

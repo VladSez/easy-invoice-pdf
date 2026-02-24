@@ -18,7 +18,7 @@ import { StripeInvoiceHeader } from "./stripe-invoice-header";
 import { StripeInvoiceInfo } from "./stripe-invoice-info";
 import { StripeItemsTable } from "./stripe-items-table";
 import { StripeSellerBuyerInfo } from "./stripe-seller-buyer-info";
-import { StripeTotals } from "./stripe-totals";
+import { StripeVatSummaryTableTotals } from "./stripe-totals";
 import { formatCurrency } from "@/app/(app)/utils/format-currency";
 import { INVOICE_PDF_FONTS } from "@/config";
 
@@ -33,6 +33,7 @@ import "dayjs/locale/fr";
 import "dayjs/locale/it";
 import "dayjs/locale/nl";
 import dayjs from "dayjs";
+import { InvoiceQRCode } from "@/app/(app)/components/invoice-templates/common/invoice-qr-code";
 
 const fontFamily = "Inter";
 
@@ -60,11 +61,12 @@ Font.register({
 // Stripe-inspired styles
 export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
   page: {
-    flexDirection: "column",
     backgroundColor: "#FFFFFF",
     padding: 0,
     fontFamily: fontFamily,
     fontWeight: 400,
+
+    paddingBottom: 30, // to fix overlapping issues with the fixed footer https://github.com/diegomura/react-pdf/issues/774#issuecomment-560069810
   },
   // Yellow header bar
   headerBar: {
@@ -77,7 +79,6 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     paddingLeft: 30,
     paddingRight: 30,
     paddingTop: 27,
-    paddingBottom: 27,
   },
   // Typography
   fontSize8: { fontSize: 8 },
@@ -141,14 +142,25 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     borderBottomColor: "#010000",
     paddingBottom: 6,
     marginBottom: 4,
+
+    marginTop: 16,
   },
   tableRow: {
     flexDirection: "row",
     paddingVertical: 4,
   },
   // Column widths for Stripe-style table
-  colDescription: { flex: 3 },
-  colQty: { flex: 0.8, textAlign: "center" },
+  colDescription: { flex: 3, textAlign: "left" },
+  colQty: {
+    flex: 0.3,
+    textAlign: "right",
+    marginRight: 16,
+  },
+  colUnit: {
+    flex: 0.7,
+    textAlign: "left",
+    marginLeft: 16,
+  },
   colUnitPrice: { flex: 1.2, textAlign: "right" },
   colTax: { flex: 0.8, textAlign: "right" },
   colAmount: { flex: 1.3, textAlign: "right" },
@@ -168,17 +180,6 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",
   },
-  totalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 1,
-  },
-  finalTotalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   borderTop: {
     borderTopWidth: 0.5,
     borderTopColor: "#e5e7eb",
@@ -193,12 +194,33 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     borderTopWidth: 0.5,
     borderTopColor: "#e5e7eb",
   },
+  vatTableHeader: {
+    flexDirection: "row",
+    marginBottom: 4,
+  },
+
+  vatTableRow: {
+    flexDirection: "row",
+    paddingVertical: 2,
+  },
+
+  vatColLabel: {
+    flex: 3,
+    paddingRight: 6,
+  },
+
+  vatColValue: {
+    flex: 1.3,
+    textAlign: "right",
+  },
 } as const satisfies Styles);
 
 export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
   invoiceData,
+  qrCodeDataUrl,
 }: {
   invoiceData: InvoiceData;
+  qrCodeDataUrl?: string;
 }) {
   const language = invoiceData.language;
 
@@ -220,6 +242,9 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
     invoiceData.currency === "USD" && language === "en" ? " USD" : "";
 
   const formattedInvoiceTotalWithCurrency = `${formattedInvoiceTotal}${currencyCode}`;
+
+  const isQrCodeVisible =
+    invoiceData?.qrCodeIsVisible && qrCodeDataUrl && qrCodeDataUrl.length > 0;
 
   return (
     <Document title={invoiceDocTitle}>
@@ -248,11 +273,14 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
           />
 
           {/* Due amount highlight */}
-          <StripeDueAmount
-            invoiceData={invoiceData}
-            formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
-            styles={STRIPE_TEMPLATE_STYLES}
-          />
+          <View style={{ marginBottom: -16 }}>
+            {/* negative margin to compensate for the marginTop of the items table */}
+            <StripeDueAmount
+              invoiceData={invoiceData}
+              formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
+              styles={STRIPE_TEMPLATE_STYLES}
+            />
+          </View>
 
           {/* Items table */}
           <StripeItemsTable
@@ -260,8 +288,8 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
             styles={STRIPE_TEMPLATE_STYLES}
           />
 
-          {/* Totals */}
-          <StripeTotals
+          {/* VAT summary table (VAT rates, net amounts, VAT amounts, pre-tax amounts) */}
+          <StripeVatSummaryTableTotals
             invoiceData={invoiceData}
             formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
             styles={STRIPE_TEMPLATE_STYLES}
@@ -269,12 +297,24 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
 
           {/* Notes */}
           {invoiceData.notesFieldIsVisible && invoiceData.notes && (
-            <View style={[STRIPE_TEMPLATE_STYLES.mt24]}>
+            <View
+              style={[STRIPE_TEMPLATE_STYLES.mt24]}
+              wrap={false}
+              minPresenceAhead={50}
+            >
               <Text style={[STRIPE_TEMPLATE_STYLES.fontSize10]}>
                 {invoiceData.notes}
               </Text>
             </View>
           )}
+
+          {/* QR Code - centered below notes */}
+          {isQrCodeVisible ? (
+            <InvoiceQRCode
+              qrCodeDataUrl={qrCodeDataUrl}
+              description={invoiceData.qrCodeDescription}
+            />
+          ) : null}
         </View>
 
         {/* Footer */}

@@ -31,8 +31,21 @@ import type { NonReadonly, Prettify } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
-import React, { memo, useCallback, useEffect, useState } from "react";
-import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
+import {
+  Controller,
+  useFieldArray,
+  useForm,
+  useWatch,
+  type FieldErrors,
+} from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
@@ -66,12 +79,16 @@ interface InvoiceFormProps {
   invoiceData: InvoiceData;
   handleInvoiceDataChange: (updatedData: InvoiceData) => void;
   setCanShareInvoice: (canShareInvoice: boolean) => void;
+  isMobile?: boolean;
+  setInvoiceFormHasErrors: Dispatch<SetStateAction<boolean>>;
 }
 
 export const InvoiceForm = memo(function InvoiceForm({
   invoiceData,
   handleInvoiceDataChange,
   setCanShareInvoice,
+  isMobile = false,
+  setInvoiceFormHasErrors,
 }: InvoiceFormProps) {
   const form = useForm<InvoiceData>({
     resolver: zodResolver(invoiceSchema),
@@ -81,10 +98,10 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   const {
     control,
-    handleSubmit,
     setValue,
     formState: { errors },
     watch,
+    trigger,
   } = form;
 
   const currency = useWatch({ control, name: "currency" });
@@ -159,19 +176,42 @@ export const InvoiceForm = memo(function InvoiceForm({
     });
   }, [invoiceItems, setValue]);
 
+  // top level of component
+  const debouncedShowFormErrorsToast = useDebouncedCallback(
+    () => formErrorsToToast({ errors, isMobile }),
+    isMobile ? 3000 : 1000,
+  );
+
   // regenerate pdf on every input change with debounce
   const debouncedRegeneratePdfOnFormChange = useDebouncedCallback(
-    (data: InvoiceData) => {
-      // Submit form to regenerate PDF and run form validations
-      void handleSubmit(onSubmit)(data as unknown as React.BaseSyntheticEvent);
+    async (data: InvoiceData) => {
+      // close all other toasts (if any)
+      toast.dismiss();
+      setInvoiceFormHasErrors(false);
 
       // TODO: double check if we need this code, because we already save to local storage in the page.client.tsx (parent component) (line: 267) useEffect "Save to localStorage whenever data changes on form update"
       try {
+        // trigger form validations
+        const ok = await trigger(undefined, { shouldFocus: true });
+
+        if (!ok) {
+          // show errors to the user
+          // Debounce error toast to avoid showing too fast
+          debouncedShowFormErrorsToast();
+
+          setInvoiceFormHasErrors(true);
+
+          return;
+        }
+
         const validatedData = invoiceSchema.parse(data);
 
         const stringifiedData = JSON.stringify(validatedData);
 
         localStorage.setItem(PDF_DATA_LOCAL_STORAGE_KEY, stringifiedData);
+
+        // pass the updated data to the parent component, to update the invoice data state (use state hook)
+        onSubmit(validatedData);
       } catch (error) {
         console.error("Error saving to local storage:", error);
 
@@ -187,7 +227,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   // subscribe to form changes to regenerate pdf on every input change
   useEffect(() => {
     const subscription = watch((value) => {
-      debouncedRegeneratePdfOnFormChange(value as unknown as InvoiceData);
+      void debouncedRegeneratePdfOnFormChange(value as unknown as InvoiceData);
     });
 
     return () => subscription.unsubscribe();
@@ -214,7 +254,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
       // Manually trigger form submission after removal
       const currentFormData = watch();
-      debouncedRegeneratePdfOnFormChange(currentFormData);
+      void debouncedRegeneratePdfOnFormChange(currentFormData);
     },
     [remove, watch, debouncedRegeneratePdfOnFormChange],
   );
@@ -297,69 +337,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   };
 
   return (
-    <form
-      className="relative mb-4 space-y-3.5"
-      onSubmit={handleSubmit(onSubmit, (errors) => {
-        console.error("Form validation errors:", errors);
-        toast.error(
-          <div>
-            <p className="font-semibold">Please fix the following errors:</p>
-            <ul className="mt-1 list-inside list-disc">
-              {Object.entries(errors)
-                .map(([key, error]) => {
-                  // Handle nested errors (e.g., seller.name, items[0].name)
-                  if (
-                    error &&
-                    typeof error === "object" &&
-                    "message" in error
-                  ) {
-                    return (
-                      <li key={key} className="text-sm">
-                        {error?.message || "Unknown error"}
-                      </li>
-                    );
-                  }
-
-                  // Handle array errors (e.g., items array)
-                  if (Array.isArray(error)) {
-                    return error.map((item, index) =>
-                      Object.entries(
-                        item as { [key: string]: { message?: string } },
-                      ).map(([fieldName, fieldError]) => (
-                        <li
-                          key={`${key}.${index}.${fieldName}`}
-                          className="text-sm"
-                        >
-                          {fieldError?.message || "Unknown error"}
-                        </li>
-                      )),
-                    );
-                  }
-
-                  // Handle nested object errors
-                  if (error && typeof error === "object") {
-                    return Object.entries(
-                      error as { [key: string]: { message?: string } },
-                    ).map(([nestedKey, nestedError]) => {
-                      return (
-                        <li key={`${key}.${nestedKey}`} className="text-sm">
-                          {nestedError?.message || "Unknown error"}
-                        </li>
-                      );
-                    });
-                  }
-
-                  return null;
-                })
-                .flat(Infinity)}
-            </ul>
-          </div>,
-          {
-            closeButton: true,
-          },
-        );
-      })}
-    >
+    <form className="relative mb-4 space-y-3.5">
       <Accordion
         type="multiple"
         value={accordionValues}
@@ -491,7 +469,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                 Payment Method
               </Label>
 
-              {/* Show/hide Payment Method field in PDF switch */}
+              {/* Show Payment Method field in PDF switch */}
               <div className="inline-flex items-center gap-2">
                 <Controller
                   name={`paymentMethodFieldIsVisible`}
@@ -513,7 +491,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                       Show in PDF
                     </Label>
                   }
-                  content='Show/Hide the "Payment Method" Field in the PDF'
+                  content='Show the "Payment Method" Field in the PDF'
                 />
               </div>
             </div>
@@ -616,7 +594,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               Notes
             </Label>
 
-            {/* Show/hide Notes field in PDF switch */}
+            {/* Show Notes field in PDF switch */}
             <div className="inline-flex items-center gap-2">
               <Controller
                 name={`notesFieldIsVisible`}
@@ -635,7 +613,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                 trigger={
                   <Label htmlFor={`notesFieldIsVisible`}>Show in PDF</Label>
                 }
-                content='Show/Hide the "Notes" Field in the PDF'
+                content='Show the "Notes" Field in the PDF'
               />
             </div>
           </div>
@@ -657,57 +635,224 @@ export const InvoiceForm = memo(function InvoiceForm({
           )}
         </div>
 
+        {/* QR Code */}
+        <fieldset className="rounded-md border px-4 pb-4">
+          <legend className="text-base font-semibold lg:text-lg">
+            QR Code
+          </legend>
+
+          <div className="mb-2 flex items-center justify-end">
+            {/* Show QR Code in PDF switch */}
+            <div className="inline-flex items-center gap-2">
+              <Controller
+                name={`qrCodeIsVisible`}
+                control={control}
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Switch
+                    {...field}
+                    id={`qrCodeIsVisible`}
+                    checked={value}
+                    onCheckedChange={onChange}
+                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    aria-label="Show QR Code in PDF"
+                  />
+                )}
+              />
+              <CustomTooltip
+                trigger={<Label htmlFor={`qrCodeIsVisible`}>Show in PDF</Label>}
+                content="Show the QR Code in the PDF"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {/* QR Code Data */}
+            <div>
+              <Label htmlFor={`qrCodeData`} className="mb-2 block">
+                Data
+              </Label>
+              <Controller
+                name="qrCodeData"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    id={`qrCodeData`}
+                    type="text"
+                    placeholder="Enter URL or text to encode"
+                    data-testid="qrCodeData"
+                  />
+                )}
+              />
+              <InputHelperMessage>
+                Enter any text or URL to generate a QR code. The QR code will
+                appear in the bottom section of the invoice PDF.
+              </InputHelperMessage>
+              {errors.qrCodeData && (
+                <ErrorMessage>{errors.qrCodeData.message}</ErrorMessage>
+              )}
+            </div>
+
+            {/* QR Code Description */}
+            <div>
+              <Label htmlFor={`qrCodeDescription`} className="mb-2 block">
+                Description (optional)
+              </Label>
+              <Controller
+                name="qrCodeDescription"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    id={`qrCodeDescription`}
+                    type="text"
+                    placeholder="Enter a description for the QR code"
+                    data-testid="qrCodeDescription"
+                  />
+                )}
+              />
+              <InputHelperMessage>
+                Optional text that will be displayed below the QR code in the
+                PDF.
+              </InputHelperMessage>
+              {errors.qrCodeDescription && (
+                <ErrorMessage>{errors.qrCodeDescription.message}</ErrorMessage>
+              )}
+            </div>
+          </div>
+        </fieldset>
+
         {/*
             Stripe template doesn't have these fields
         */}
         {invoiceData.template === "default" && (
-          <div>
-            <div className="relative mt-5 space-y-4">
-              {/* Show/hide Person Authorized to Receive field in PDF switch */}
-              <div className="flex items-center justify-between gap-2">
-                <Label htmlFor={`personAuthorizedToReceiveFieldIsVisible`}>
-                  Show &quot;Person Authorized to Receive&quot; Signature Field
-                  in the PDF
-                </Label>
+          <>
+            <fieldset className="rounded-md border px-4 pb-4">
+              <legend className="text-base font-semibold lg:text-lg">
+                Person Authorized to Receive
+              </legend>
 
+              <div className="mb-2 flex items-center justify-end">
+                <div className="inline-flex items-center gap-2">
+                  <Controller
+                    name="personAuthorizedToReceiveFieldIsVisible"
+                    control={control}
+                    render={({ field: { value, onChange, ...field } }) => (
+                      <Switch
+                        {...field}
+                        id="personAuthorizedToReceiveFieldIsVisible"
+                        checked={value}
+                        onCheckedChange={onChange}
+                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        aria-label="Show Person Authorized to Receive in PDF"
+                      />
+                    )}
+                  />
+                  <CustomTooltip
+                    trigger={
+                      <Label htmlFor="personAuthorizedToReceiveFieldIsVisible">
+                        Show in PDF
+                      </Label>
+                    }
+                    content="Show the Person Authorized to Receive signature field in the PDF"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label
+                  htmlFor="personAuthorizedToReceiveName"
+                  className="mb-2 block"
+                >
+                  Name
+                </Label>
                 <Controller
-                  name={`personAuthorizedToReceiveFieldIsVisible`}
+                  name="personAuthorizedToReceiveName"
                   control={control}
-                  render={({ field: { value, onChange, ...field } }) => (
-                    <Switch
+                  render={({ field }) => (
+                    <Input
                       {...field}
-                      id={`personAuthorizedToReceiveFieldIsVisible`}
-                      checked={value}
-                      onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      id="personAuthorizedToReceiveName"
+                      type="text"
+                      placeholder="Enter name of person authorized to receive"
+                      data-testid="personAuthorizedToReceiveName"
                     />
                   )}
                 />
+                <InputHelperMessage>
+                  Name displayed above the signature line in the PDF.
+                </InputHelperMessage>
+                {errors.personAuthorizedToReceiveName && (
+                  <ErrorMessage>
+                    {errors.personAuthorizedToReceiveName.message}
+                  </ErrorMessage>
+                )}
+              </div>
+            </fieldset>
+
+            <fieldset className="rounded-md border px-4 pb-4">
+              <legend className="text-base font-semibold lg:text-lg">
+                Person Authorized to Issue
+              </legend>
+
+              <div className="mb-2 flex items-center justify-end">
+                <div className="inline-flex items-center gap-2">
+                  <Controller
+                    name="personAuthorizedToIssueFieldIsVisible"
+                    control={control}
+                    render={({ field: { value, onChange, ...field } }) => (
+                      <Switch
+                        {...field}
+                        id="personAuthorizedToIssueFieldIsVisible"
+                        checked={value}
+                        onCheckedChange={onChange}
+                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        aria-label="Show Person Authorized to Issue in PDF"
+                      />
+                    )}
+                  />
+                  <CustomTooltip
+                    trigger={
+                      <Label htmlFor="personAuthorizedToIssueFieldIsVisible">
+                        Show in PDF
+                      </Label>
+                    }
+                    content="Show the Person Authorized to Issue signature field in the PDF"
+                  />
+                </div>
               </div>
 
-              {/* Show/hide Person Authorized to Issue field in PDF switch */}
-              <div className="flex items-center justify-between gap-2">
-                <Label htmlFor={`personAuthorizedToIssueFieldIsVisible`}>
-                  Show &quot;Person Authorized to Issue&quot; Signature Field in
-                  the PDF
+              <div>
+                <Label
+                  htmlFor="personAuthorizedToIssueName"
+                  className="mb-2 block"
+                >
+                  Name
                 </Label>
-
                 <Controller
-                  name={`personAuthorizedToIssueFieldIsVisible`}
+                  name="personAuthorizedToIssueName"
                   control={control}
-                  render={({ field: { value, onChange, ...field } }) => (
-                    <Switch
+                  render={({ field }) => (
+                    <Input
                       {...field}
-                      id={`personAuthorizedToIssueFieldIsVisible`}
-                      checked={value}
-                      onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      id="personAuthorizedToIssueName"
+                      type="text"
+                      placeholder="Enter name of person authorized to issue"
+                      data-testid="personAuthorizedToIssueName"
                     />
                   )}
                 />
+                <InputHelperMessage>
+                  Name displayed above the signature line in the PDF.
+                </InputHelperMessage>
+                {errors.personAuthorizedToIssueName && (
+                  <ErrorMessage>
+                    {errors.personAuthorizedToIssueName.message}
+                  </ErrorMessage>
+                )}
               </div>
-            </div>
-          </div>
+            </fieldset>
+          </>
         )}
       </div>
     </form>
@@ -746,4 +891,69 @@ const calculateItemTotals = (item: InvoiceItemData | null) => {
     vatAmount: formattedVatAmount,
     preTaxAmount: formattedPreTaxAmount,
   };
+};
+
+const formErrorsToToast = ({
+  errors,
+  isMobile,
+}: {
+  errors: FieldErrors<InvoiceData>;
+  isMobile: boolean;
+}) => {
+  // Return early if there are no errors
+  if (!errors || Object.keys(errors).length === 0) {
+    return;
+  }
+  toast.error(
+    <div>
+      <p className="font-semibold">Please fix the following errors:</p>
+      <ul className="mt-1 list-inside list-disc">
+        {Object.entries(errors)
+          .map(([key, error]) => {
+            // Handle nested errors (e.g., seller.name, items[0].name)
+            if (error && typeof error === "object" && "message" in error) {
+              return (
+                <li key={key} className="text-sm">
+                  {error?.message || "Unknown error"}
+                </li>
+              );
+            }
+
+            // Handle array errors (e.g., items array)
+            if (Array.isArray(error)) {
+              return error.map((item, index) =>
+                Object.entries(
+                  item as { [key: string]: { message?: string } },
+                ).map(([fieldName, fieldError]) => (
+                  <li key={`${key}.${index}.${fieldName}`} className="text-sm">
+                    {fieldError?.message || "Unknown error"}
+                  </li>
+                )),
+              );
+            }
+
+            // Handle nested object errors
+            if (error && typeof error === "object") {
+              return Object.entries(
+                error as { [key: string]: { message?: string } },
+              ).map(([nestedKey, nestedError]) => {
+                return (
+                  <li key={`${key}.${nestedKey}`} className="text-sm">
+                    {nestedError?.message || "Unknown error"}
+                  </li>
+                );
+              });
+            }
+
+            return null;
+          })
+          .flat(Infinity)}
+      </ul>
+    </div>,
+    {
+      id: "form-errors-error-toast",
+      duration: 15_000,
+      position: isMobile ? "top-center" : "bottom-right",
+    },
+  );
 };

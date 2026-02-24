@@ -1,24 +1,20 @@
 "use client";
 
-import { animate, motion, useMotionValue, useTransform } from "motion/react";
-import { useEffect } from "react";
-
 type Props = {
   number: number;
 };
 
-export function CountUpNumber({ number }: Props) {
-  const count = useMotionValue(0);
-  const rounded = useTransform(count, (latest) => Math.round(latest));
+const formatter = new Intl.NumberFormat("en-US", {
+  notation: "compact",
+  compactDisplay: "short",
+});
 
-  useEffect(() => {
-    const animation = animate(count, number, { duration: 2, delay: 0.5 });
-    return animation.stop;
-  }, [count, number]);
+export function CountUpNumber({ number }: Props) {
+  const formattedNumber = formatter.format(number).toLowerCase();
 
   return (
-    <motion.span className="min-w-[25px] text-center text-sm font-medium tabular-nums text-slate-950">
-      {rounded}
-    </motion.span>
+    <span className="min-w-[27px] text-center text-sm font-medium tabular-nums text-slate-950">
+      {formattedNumber}
+    </span>
   );
 }

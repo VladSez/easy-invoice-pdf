@@ -27,8 +27,24 @@ test.describe("Buyer management", () => {
       notes: "This is a test note",
     } as const satisfies BuyerData;
 
-    // ------- TEST BUYER MANAGEMENT DIALOG FORM -------
+    /*
+     * TEST BUYER MANAGEMENT DIALOG FORM
+     */
     const manageBuyerDialog = page.getByTestId(`manage-buyer-dialog`);
+
+    // Verify "Pre-fill with values from the current invoice form" switch is visible
+    const prefillSwitch = manageBuyerDialog.getByRole("switch", {
+      name: `Pre-fill with values from the current invoice form`,
+    });
+    await expect(prefillSwitch).toBeVisible();
+    await expect(prefillSwitch).not.toBeChecked();
+
+    // Verify the label is visible
+    await expect(
+      manageBuyerDialog.getByLabel(
+        "Pre-fill with values from the current invoice form",
+      ),
+    ).toBeVisible();
 
     // Fill in form fields
     await manageBuyerDialog
@@ -56,7 +72,7 @@ test.describe("Buyer management", () => {
       .fill(TEST_BUYER_DATA.email);
 
     const taxNumberSwitchInDialogForm = manageBuyerDialog.getByRole("switch", {
-      name: `Show/hide the 'Tax Number' field in the PDF`,
+      name: `Show the 'Tax Number' field in the PDF`,
     });
 
     // Verify VAT visibility switch is checked by default
@@ -73,7 +89,7 @@ test.describe("Buyer management", () => {
       .fill(TEST_BUYER_DATA.notes);
 
     const notesSwitchInDialogForm = manageBuyerDialog.getByRole("switch", {
-      name: `Show/hide the 'Notes' field in the PDF`,
+      name: `Show the 'Notes' field in the PDF`,
     });
 
     // Verify notes visibility switch is CHECKED by default
@@ -121,7 +137,10 @@ test.describe("Buyer management", () => {
       notesFieldIsVisible: true,
     } satisfies BuyerData);
 
-    // ------- TEST SAVED DETAILS IN INVOICE FORM -------
+    /*
+     * TEST SAVED DETAILS IN INVOICE FORM AFTER SAVING BUYER
+     */
+
     // Verify all saved details in the Buyer Information section form
     const buyerForm = page.getByTestId(`buyer-information-section`);
 
@@ -218,7 +237,10 @@ test.describe("Buyer management", () => {
       buyerForm.getByRole("combobox", { name: "Select Buyer" }),
     ).toContainText(TEST_BUYER_DATA.name);
 
-    // ------- TEST EDIT FUNCTIONALITY -------
+    /*
+     * TEST EDIT FUNCTIONALITY IN BUYER MANAGEMENT DIALOG
+     */
+
     await buyerForm.getByRole("button", { name: "Edit buyer" }).click();
 
     // Verify all fields are populated in edit dialog
@@ -257,7 +279,7 @@ test.describe("Buyer management", () => {
 
     await expect(notesSwitchInDialogForm).toHaveRole("switch");
     await expect(notesSwitchInDialogForm).toHaveAccessibleName(
-      `Show/hide the 'Notes' field in the PDF`,
+      `Show the 'Notes' field in the PDF`,
     );
 
     await expect(notesSwitchInDialogForm).toBeChecked();
@@ -283,7 +305,10 @@ test.describe("Buyer management", () => {
       page.getByText("Buyer updated successfully", { exact: true }),
     ).toBeVisible();
 
-    // ------- TEST UPDATED INFORMATION IN INVOICE FORM -------
+    /*
+     * TEST UPDATED INFORMATION IN INVOICE FORM AFTER UPDATING BUYER IN DIALOG
+     */
+
     // Verify updated information is displayed
     await expect(buyerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
       updatedName,

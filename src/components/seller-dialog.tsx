@@ -1,3 +1,4 @@
+import { sellerSchema, type SellerData } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,12 +9,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { sellerSchema, type SellerData } from "@/app/schema";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -22,13 +17,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { toast } from "sonner";
-import { SELLERS_LOCAL_STORAGE_KEY } from "./seller-management";
-import { z } from "zod";
-import { useState, useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { SELLERS_LOCAL_STORAGE_KEY } from "./seller-management";
 import { InputHelperMessage } from "./ui/input-helper-message";
 
 const SELLER_FORM_ID = "seller-form";
@@ -294,7 +294,7 @@ export function SellerDialog({
                 </legend>
 
                 <div className="mb-2 flex items-center justify-end">
-                  {/* Show/Hide Tax Number Field in PDF */}
+                  {/* Show Tax Number Field in PDF */}
                   <div className="flex items-center gap-2">
                     <FormField
                       control={form.control}
@@ -306,7 +306,7 @@ export function SellerDialog({
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               id="vatNoFieldIsVisible"
-                              aria-label={`Show/hide the 'Tax Number' field in the PDF`}
+                              aria-label={`Show the 'Tax Number' field in the PDF`}
                             />
                             <CustomTooltip
                               trigger={
@@ -314,7 +314,7 @@ export function SellerDialog({
                                   Show in PDF
                                 </Label>
                               }
-                              content='Show/Hide the "Tax Number" field in the PDF'
+                              content='Show the "Tax Number" field in the PDF'
                               className="z-[1000]"
                             />
                           </div>
@@ -421,7 +421,7 @@ export function SellerDialog({
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               id="accountNumberFieldIsVisible"
-                              aria-label={`Show/hide the 'Account Number' field in the PDF`}
+                              aria-label={`Show the 'Account Number' field in the PDF`}
                             />
                             <CustomTooltip
                               trigger={
@@ -429,7 +429,7 @@ export function SellerDialog({
                                   Show in PDF
                                 </Label>
                               }
-                              content='Show/Hide the "Account Number" field in the PDF'
+                              content='Show the "Account Number" field in the PDF'
                               className="z-[1000]"
                             />
                           </div>
@@ -459,7 +459,7 @@ export function SellerDialog({
                     )}
                   />
 
-                  {/* Show/Hide SWIFT/BIC Field in PDF */}
+                  {/* Show SWIFT/BIC Field in PDF */}
                   <div className="ml-4 flex items-center gap-2">
                     <FormField
                       control={form.control}
@@ -471,7 +471,7 @@ export function SellerDialog({
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               id="swiftBicFieldIsVisible"
-                              aria-label={`Show/hide the 'SWIFT/BIC' field in the PDF`}
+                              aria-label={`Show the 'SWIFT/BIC' field in the PDF`}
                             />
                             <CustomTooltip
                               trigger={
@@ -479,7 +479,7 @@ export function SellerDialog({
                                   Show in PDF
                                 </Label>
                               }
-                              content='Show/Hide the "SWIFT/BIC" field in the PDF'
+                              content='Show the "SWIFT/BIC" field in the PDF'
                               className="z-[1000]"
                             />
                           </div>
@@ -512,7 +512,7 @@ export function SellerDialog({
                     )}
                   />
 
-                  {/* Show/Hide Notes Field in PDF */}
+                  {/* Show Notes Field in PDF */}
                   <div className="ml-4 flex items-center gap-2">
                     <FormField
                       control={form.control}
@@ -526,7 +526,7 @@ export function SellerDialog({
                                 onCheckedChange={field.onChange}
                                 id="notes-field-visibility"
                                 data-testid={`sellerNotesDialogFieldVisibilitySwitch`}
-                                aria-label={`Show/hide the 'Notes' field in the PDF`}
+                                aria-label={`Show the 'Notes' field in the PDF`}
                               />
                             </FormControl>
                             <CustomTooltip
@@ -535,7 +535,7 @@ export function SellerDialog({
                                   Show in PDF
                                 </Label>
                               }
-                              content="Show/Hide the notes field in the PDF"
+                              content="Show the notes field in the PDF"
                               className="z-[1000]"
                             />
                           </div>

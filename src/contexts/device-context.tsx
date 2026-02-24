@@ -9,6 +9,10 @@ interface DeviceContextType {
   isAndroid: boolean;
   isMobile: boolean;
   inAppInfo: InAppInfo;
+  /**
+   * we use this when generating the invoice link, to show navigagor.share or copy to clipboard
+   */
+  isUADesktop: boolean;
 }
 
 const DeviceContext = createContext<DeviceContextType | null>(null);
@@ -28,15 +32,19 @@ export function DeviceContextProvider({
   isAndroid,
   isMobile,
   inAppInfo,
-}: DeviceContextType & { children: React.ReactNode }) {
+}: Omit<DeviceContextType, "isUADesktop"> & { children: React.ReactNode }) {
+  // we use this to show either desktop or mobile (tabs) UI
   const [isDesktopClient, setIsDesktopClient] = useState(isDesktop);
+
+  // we use this when generating the invoice link, to show navigagor.share or copy to clipboard
+  const [isUADesktop] = useState(isDesktop);
 
   // Check media query on client side as an additional check
   const isMediaQueryDesktop = useIsDesktop();
 
   /**
    * Update the client state if the media query is defined
-   * This is to ensure that the client state is always up to date
+   * This is to ensure that the client state is always up to date, we use this to show either desktop or mobile (tabs) UI
    */
   useEffect(() => {
     if (isMediaQueryDesktop !== undefined) {
@@ -51,6 +59,10 @@ export function DeviceContextProvider({
         isAndroid,
         isMobile,
         inAppInfo,
+        /**
+         * we use this when generating the invoice link, to show navigagor.share or copy to clipboard
+         */
+        isUADesktop,
       }}
     >
       {children}

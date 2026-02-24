@@ -15,6 +15,9 @@ import "dayjs/locale/fr";
 import "dayjs/locale/it";
 import "dayjs/locale/nl";
 
+/**
+ *  Invoice total and payment due date + pay online link fields (optional)
+ */
 export function StripeDueAmount({
   invoiceData,
   formattedInvoiceTotal,

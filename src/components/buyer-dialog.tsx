@@ -233,10 +233,10 @@ export function BuyerDialog({
                     htmlFor="apply-form-values-switch"
                     className="cursor-pointer"
                   >
-                    Use Current Form Values
+                    Pre-fill with values from the current invoice form
                   </Label>
                 }
-                content="Pre-fill with values from the current invoice form"
+                content="Use the buyer details already entered in the invoice form to pre-fill this dialog"
                 className="z-[1000]"
               />
             </div>
@@ -291,7 +291,7 @@ export function BuyerDialog({
                 </legend>
 
                 <div className="mb-2 flex items-center justify-end">
-                  {/* Show/Hide Tax Number Field in PDF */}
+                  {/* Show Tax Number Field in PDF */}
                   <div className="flex items-center gap-2">
                     <FormField
                       control={form.control}
@@ -303,7 +303,7 @@ export function BuyerDialog({
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               id="vatNoFieldIsVisible"
-                              aria-label={`Show/hide the 'Tax Number' field in the PDF`}
+                              aria-label={`Show the 'Tax Number' field in the PDF`}
                             />
                             <CustomTooltip
                               trigger={
@@ -311,7 +311,7 @@ export function BuyerDialog({
                                   Show in PDF
                                 </Label>
                               }
-                              content='Show/Hide the "Tax Number" field in the PDF'
+                              content='Show the "Tax Number" field in the PDF'
                               className="z-[1000]"
                             />
                           </div>
@@ -409,7 +409,7 @@ export function BuyerDialog({
                     )}
                   />
 
-                  {/* Show/Hide Notes Field in PDF */}
+                  {/* Show Notes Field in PDF */}
                   <div className="ml-4 flex items-center gap-2">
                     <FormField
                       control={form.control}
@@ -423,7 +423,7 @@ export function BuyerDialog({
                                 onCheckedChange={field.onChange}
                                 id="notes-field-visibility"
                                 data-testid={`buyerNotesDialogFieldVisibilitySwitch`}
-                                aria-label={`Show/hide the 'Notes' field in the PDF`}
+                                aria-label={`Show the 'Notes' field in the PDF`}
                               />
                             </FormControl>
                             <CustomTooltip
@@ -432,7 +432,7 @@ export function BuyerDialog({
                                   Show in PDF
                                 </Label>
                               }
-                              content="Show/Hide the notes field in the PDF"
+                              content="Show the notes field in the PDF"
                               className="z-[1000]"
                             />
                           </div>

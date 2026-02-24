@@ -1,5 +1,4 @@
 import {
-  LANGUAGE_TO_LABEL,
   type InvoiceData,
   type SupportedCurrencies,
   type SupportedLanguages,
@@ -151,7 +150,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     Name
                   </Label>
 
-                  {/* Show/hide Name field in PDF switch (Only show for default template) */}
+                  {/* Show Name field in PDF switch (Only show for default template) */}
                   {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
@@ -164,7 +163,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                            // aria-label={`Show/hide the 'Name of Goods/Service' Column in the PDF for item ${index + 1}`}
+                            aria-label={`Show the 'Name of Goods/Service' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -174,7 +173,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             Show in PDF
                           </Label>
                         }
-                        content="Show/hide the 'Name of Goods/Service' Column in the PDF"
+                        content="Show the 'Name of Goods/Service' Column in the PDF"
                       />
                     </div>
                   ) : null}
@@ -208,7 +207,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                       Type of GTU
                     </Label>
 
-                    {/* Show/hide Type of GTU field in PDF switch */}
+                    {/* Show Type of GTU field in PDF switch */}
                     {isFirstItem ? (
                       <div className="inline-flex items-center gap-2">
                         <Controller
@@ -223,7 +222,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                               checked={value}
                               onCheckedChange={onChange}
                               className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                              // aria-label={`Show/hide the 'Type of GTU' Column in the PDF for item ${index + 1}`}
+                              aria-label={`Show the 'Type of GTU' Column in the PDF for item ${index + 1}`}
                             />
                           )}
                         />
@@ -235,7 +234,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                               Show in PDF
                             </Label>
                           }
-                          content='Show/hide the "Type of GTU" Column in the PDF'
+                          content='Show the "Type of GTU" Column in the PDF'
                         />
                       </div>
                     ) : null}
@@ -269,7 +268,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     Amount (Quantity)
                   </Label>
 
-                  {/* Show/hide Amount field in PDF switch (Only show for default template) */}
+                  {/* Show Amount field in PDF switch (Only show for default template) */}
                   {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
@@ -282,7 +281,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                            // aria-label={`Show/hide the 'Amount' Column in the PDF for item ${index + 1}`}
+                            aria-label={`Show the 'Amount' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -292,7 +291,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             Show in PDF
                           </Label>
                         }
-                        content='Show/hide the "Amount" Column in the PDF'
+                        content='Show the "Amount" Column in the PDF'
                       />
                     </div>
                   ) : null}
@@ -343,8 +342,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                     Unit
                   </Label>
 
-                  {/* Show/hide Unit field in PDF switch (Only show for default template) */}
-                  {isFirstItem && template === "default" ? (
+                  {/* Show Unit field in PDF switch */}
+                  {isFirstItem ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
                         name={`items.${index}.unitFieldIsVisible`}
@@ -356,6 +355,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            aria-label={`Show the 'Unit' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -365,7 +365,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             Show in PDF
                           </Label>
                         }
-                        content='Show/hide the "Unit" Column in the PDF'
+                        content='Show the "Unit" Column in the PDF'
                       />
                     </div>
                   ) : null}
@@ -393,7 +393,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     Net Price (Rate or Unit Price)
                   </Label>
 
-                  {/* Show/hide Net Price field in PDF switch (Only show for default template) */}
+                  {/* Show Net Price field in PDF switch (Only show for default template) */}
                   {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
@@ -406,6 +406,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            aria-label={`Show the 'Net Price' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -415,7 +416,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             Show in PDF
                           </Label>
                         }
-                        content='Show/hide the "Net Price" Column in the PDF'
+                        content='Show the "Net Price" Column in the PDF'
                       />
                     </div>
                   ) : null}
@@ -495,6 +496,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            aria-label={`Show the '${taxLabelText}' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -504,7 +506,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             Show in PDF
                           </Label>
                         }
-                        content={`Show/hide the "${taxLabelText}" Column in the PDF`}
+                        content={`Show the "${taxLabelText}" Column in the PDF`}
                       />
                     </div>
                   ) : null}
@@ -531,7 +533,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                   {!errors.taxLabelText && (
                     <InputHelperMessage>
                       Customize the tax label on your invoice (e.g., VAT, Sales
-                      Tax, IVA). {LANGUAGE_TO_LABEL[language]} default:{" "}
+                      Tax, IVA). Default:{" "}
                       {INVOICE_PDF_TRANSLATIONS[language].invoiceItemsTable.vat}
                     </InputHelperMessage>
                   )}
@@ -576,7 +578,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     Net Amount
                   </Label>
 
-                  {/* Show/hide Net Amount field in PDF switch (Only show for default template) */}
+                  {/* Show Net Amount field in PDF switch (Only show for default template) */}
                   {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
@@ -589,6 +591,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            aria-label={`Show the 'Net Amount' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -600,7 +603,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             Show in PDF
                           </Label>
                         }
-                        content='Show/hide the "Net Amount" Column in the PDF'
+                        content='Show the "Net Amount" Column in the PDF'
                       />
                     </div>
                   ) : null}
@@ -644,7 +647,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     {taxLabelText} Amount
                   </Label>
 
-                  {/* Show/hide Tax Amount field in PDF switch (Only show for default template) */}
+                  {/* Show Tax Amount field in PDF switch (Only show for default template) */}
                   {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
@@ -657,6 +660,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            aria-label={`Show the '${taxLabelText} Amount' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -668,7 +672,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             Show in PDF
                           </Label>
                         }
-                        content={`Show/hide the "${taxLabelText} Amount" Column in the PDF`}
+                        content={`Show the "${taxLabelText} Amount" Column in the PDF`}
                       />
                     </div>
                   ) : null}
@@ -713,7 +717,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     Pre-tax Amount
                   </Label>
 
-                  {/* Show/hide Pre-tax Amount field in PDF switch (Only show for default template) */}
+                  {/* Show Pre-tax Amount field in PDF switch (Only show for default template) */}
                   {isFirstItem && template === "default" ? (
                     <div className="inline-flex items-center gap-2">
                       <Controller
@@ -726,6 +730,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             checked={value}
                             onCheckedChange={onChange}
                             className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            aria-label={`Show the 'Pre-tax Amount' Column in the PDF for item ${index + 1}`}
                           />
                         )}
                       />
@@ -737,7 +742,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                             Show in PDF
                           </Label>
                         }
-                        content='Show/hide the "Pre-tax Amount" Column in the PDF'
+                        content='Show the "Pre-tax Amount" Column in the PDF'
                       />
                     </div>
                   ) : null}

@@ -78,13 +78,29 @@ const config: Config = {
               "drop-shadow(0 2px 4px rgb(255 215 0 / 0.3)) drop-shadow(0 1px 2px rgb(255 165 0 / 0.2)) brightness(1.1)",
           },
         },
+        "rotate-shine": {
+          "0%": {
+            opacity: "0",
+            transform: "rotate(0deg) translate(-50%, -50%)",
+          },
+          "68%": {
+            opacity: "0",
+            transform: "rotate(0deg) translate(-50%, -50%)",
+          },
+          "72%": { opacity: "1" },
+          "100%": {
+            opacity: "0",
+            transform: "rotate(360deg) translate(-50%, -50%)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        heartbeat: "heartbeat 3s ease-in-out infinite 5s", // 3s = duration of animation, infinite = repeat forever, 25s = delay before starting animation,
+        heartbeat: "heartbeat 3s ease-in-out infinite 5s", // 3s = duration of animation, infinite = repeat forever, 5s = delay before starting animation,
         "pulse-arrow": "pulse-arrow 5s infinite",
         "star-hover": "star-hover 2s ease-in-out infinite 6s",
+        "rotate-shine": "rotate-shine 4s linear infinite",
       },
     },
   },

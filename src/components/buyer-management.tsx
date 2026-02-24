@@ -65,10 +65,12 @@ export function BuyerManagement({
   const [isBuyerDialogOpen, setIsBuyerDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  // State to store the list of saved buyers for the dropdown selection.
   const [buyersSelectOptions, setBuyersSelectOptions] = useState<BuyerData[]>(
     [],
   );
-  // const [selectedBuyerId, setSelectedBuyerId] = useState("");
+
+  // State to track the buyer currently being edited (null if not editing).
   const [editingBuyer, setEditingBuyer] = useState<BuyerData | null>(null);
 
   const buyerSelectId = useId();
@@ -113,7 +115,7 @@ export function BuyerManagement({
         ...newBuyer,
         // Generate a unique ID for the new buyer (IMPORTANT!) =)
         id: Date.now().toString(),
-      };
+      } satisfies BuyerData;
 
       const newBuyers = [...buyersSelectOptions, newBuyerWithId];
 

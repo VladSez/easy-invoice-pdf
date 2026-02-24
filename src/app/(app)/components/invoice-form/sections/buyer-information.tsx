@@ -139,7 +139,7 @@ export const BuyerInformation = memo(function BuyerInformation({
             </legend>
 
             <div className="mb-2 flex items-center justify-end">
-              {/* Show/hide Buyer Tax Number field in PDF switch */}
+              {/* Show Buyer Tax Number field in PDF switch */}
               <div
                 className="inline-flex items-center gap-2"
                 title={HTML_TITLE_CONTENT}
@@ -156,6 +156,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                       disabled={isBuyerSelected}
                       data-testid={`buyerVatNoFieldIsVisible`}
+                      aria-label={`Show the 'Buyer Tax Number' Field in the PDF`}
                     />
                   )}
                 />
@@ -168,7 +169,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                   content={
                     isBuyerSelected
                       ? null
-                      : "Show/Hide the 'Buyer Tax Number' Field in the PDF"
+                      : "Show the 'Buyer Tax Number' Field in the PDF"
                   }
                 />
               </div>
@@ -298,7 +299,7 @@ export const BuyerInformation = memo(function BuyerInformation({
               </Label>
             )}
 
-            {/* Show/hide Notes field in PDF switch */}
+            {/* Show Notes field in PDF switch */}
             <div
               className="inline-flex items-center gap-2"
               title={HTML_TITLE_CONTENT}
@@ -315,6 +316,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                     disabled={isBuyerSelected}
                     data-testid={`buyerNotesInvoiceFormFieldVisibilitySwitch`}
+                    aria-label={`Show the 'Notes' field in the PDF`}
                   />
                 )}
               />
@@ -325,9 +327,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                   </Label>
                 }
                 content={
-                  isBuyerSelected
-                    ? null
-                    : "Show/Hide the 'Notes' Field in the PDF"
+                  isBuyerSelected ? null : "Show the 'Notes' field in the PDF"
                 }
               />
             </div>

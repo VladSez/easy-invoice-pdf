@@ -34,6 +34,7 @@ const aboutFeaturesSchema = z
         multiLanguage: aboutFeaturesItemSchema,
         taxSupport: aboutFeaturesItemSchema,
         openSource: aboutFeaturesItemSchema,
+        qrCodeMultiPDFpageSupport: aboutFeaturesItemSchema,
       })
       .strict(),
   })

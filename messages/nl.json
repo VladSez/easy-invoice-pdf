@@ -34,6 +34,10 @@
         "openSource": {
           "title": "Open Source",
           "description": "Volledig gratis en open-source. Gebruik het online of host het zelf met volledige toegang tot de code."
+        },
+        "qrCodeMultiPDFpageSupport": {
+          "title": "QR-code & Meerdere Pagina's PDF-ondersteuning",
+          "description": "Voeg QR-codes met betaallinks toe aan je facturen en genereer PDF's met meerdere pagina's voor langere facturen met veel items."
         }
       }
     },
@@ -53,7 +57,7 @@
       "createdBy": "Gemaakt door"
     },
     "buttons": {
-      "goToApp": "Ga naar app",
+      "goToApp": "Open",
       "viewOnGithub": "Bekijk op GitHub",
       "starOnGithub": "Ster geven op GitHub",
       "switchLanguage": "Verander taal",

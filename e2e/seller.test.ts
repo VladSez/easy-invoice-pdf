@@ -35,7 +35,24 @@ test.describe("Seller management", () => {
 
     const manageSellerDialog = page.getByTestId(`manage-seller-dialog`);
 
-    // ------- TEST SELLER MANAGEMENT DIALOG FORM -------
+    // Verify "Pre-fill with values from the current invoice form" switch is visible
+    const prefillSwitch = manageSellerDialog.getByRole("switch", {
+      name: `Pre-fill with values from the current invoice form`,
+    });
+    await expect(prefillSwitch).toBeVisible();
+    await expect(prefillSwitch).not.toBeChecked();
+
+    // Verify the label is visible
+    await expect(
+      manageSellerDialog.getByLabel(
+        "Pre-fill with values from the current invoice form",
+      ),
+    ).toBeVisible();
+
+    /*
+     * TEST SELLER MANAGEMENT DIALOG FORM
+     */
+
     // Fill in form fields
     await manageSellerDialog
       .getByRole("textbox", { name: "Name" })
@@ -69,17 +86,17 @@ test.describe("Seller management", () => {
       .fill(TEST_SELLER_DATA.swiftBic);
 
     const taxNumberSwitchInDialogForm = manageSellerDialog.getByRole("switch", {
-      name: `Show/hide the 'Tax Number' field in the PDF`,
+      name: `Show the 'Tax Number' field in the PDF`,
     });
 
     const accountNumberSwitchInDialogForm = manageSellerDialog.getByRole(
       "switch",
       {
-        name: `Show/hide the 'Account Number' field in the PDF`,
+        name: `Show the 'Account Number' field in the PDF`,
       },
     );
     const swiftBicSwitchInDialogForm = manageSellerDialog.getByRole("switch", {
-      name: `Show/hide the 'SWIFT/BIC' field in the PDF`,
+      name: `Show the 'SWIFT/BIC' field in the PDF`,
     });
 
     // Verify all switches are checked by default
@@ -159,7 +176,10 @@ test.describe("Seller management", () => {
       page.getByText("Seller added successfully", { exact: true }),
     ).toBeVisible();
 
-    // ------- TEST SAVED DETAILS IN INVOICE FORM -------
+    /*
+     * TEST SAVED DETAILS IN INVOICE FORM AFTER SAVING SELLER IN DIALOG
+     */
+
     // Verify all saved details in the Seller Information section form
     const sellerForm = page.getByTestId(`seller-information-section`);
 
@@ -265,7 +285,10 @@ test.describe("Seller management", () => {
     // Test edit functionality
     await sellerForm.getByRole("button", { name: "Edit seller" }).click();
 
-    // ------- TEST EDIT FUNCTIONALITY IN SELLER MANAGEMENT DIALOG -------
+    /*
+     * TEST EDIT FUNCTIONALITY IN SELLER MANAGEMENT DIALOG
+     */
+
     // Verify all fields are populated in edit dialog
     await expect(
       manageSellerDialog.getByRole("textbox", { name: "Name" }),

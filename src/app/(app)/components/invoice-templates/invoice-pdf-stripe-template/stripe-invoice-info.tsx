@@ -77,6 +77,13 @@ export function StripeInvoiceInfo({
           {paymentDueDate}
         </Text>
       </View>
+
+      {/* Header Notes */}
+      {invoiceData.invoiceType && invoiceData.invoiceTypeFieldIsVisible && (
+        <View style={[styles.mb1, styles.row, { alignItems: "baseline" }]}>
+          <Text style={[styles.fontSize9]}>{invoiceData.invoiceType}</Text>
+        </View>
+      )}
     </View>
   );
 }

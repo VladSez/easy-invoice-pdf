@@ -8,54 +8,42 @@ import {
   SUPPORTED_TEMPLATES,
   type InvoiceData,
 } from "@/app/schema";
-import { ProjectLogo } from "@/components/etc/project-logo";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { CustomTooltip, TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useDeviceContext } from "@/contexts/device-context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { getAppMetadata } from "@/app/(app)/utils/get-app-metadata";
-import { GithubIcon } from "@/components/etc/github-logo";
+import {
+  DEFAULT_METADATA,
+  getAppMetadata,
+  updateAppMetadata,
+} from "@/app/(app)/utils/get-app-metadata";
 import { Footer } from "@/components/footer";
 import { GitHubStarCTA } from "@/components/github-star-cta";
-import { ProjectLogoDescription } from "@/components/project-logo-description";
-import { GITHUB_URL, VIDEO_DEMO_URL } from "@/config";
-import { isLocalStorageAvailable } from "@/lib/check-local-storage";
+import { GITHUB_URL } from "@/config";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { cn } from "@/lib/utils";
 import {
   compressInvoiceData,
   decompressInvoiceData,
 } from "@/utils/url-compression";
 import * as Sentry from "@sentry/nextjs";
-import { AlertCircleIcon, HeartIcon } from "lucide-react";
 import {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,
 } from "lz-string";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { InvoiceClientPage } from "./components";
-import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./components/cta-toasts";
-import { InvoicePDFDownloadLink } from "./components/invoice-pdf-download-link";
+import { showRandomCTAToast } from "./components/cta-toasts";
 import { useCTAToast } from "./contexts/cta-toast-context";
-import {
-  CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
-  useShowRandomCTAToastOnIdle,
-} from "./hooks/use-show-random-cta-toast";
-import { DEFAULT_METADATA } from "./utils/get-app-metadata";
+import { useShowRandomCTAToastOnIdle } from "./hooks/use-show-random-cta-toast";
+import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
-
+import { InvoicePageHeader } from "@/app/(app)/components/invoice-page-header";
+import { Button } from "@/components/ui/button";
+// TODO: enable later when PRO version is released, this is PRO FEATURE =)
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 /**
@@ -71,9 +59,6 @@ import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaki
  * - CTA toast notifications for user engagement
  * - Error handling and user feedback
  *
- * @param props - Component props
- * @param props.githubStarsCount - The current number of GitHub stars for the project, used for display in CTAs
- *
  * @returns The rendered invoice application page with form, preview, and controls
  */
 export function AppPageClient({
@@ -84,7 +69,7 @@ export function AppPageClient({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const { markToastAsShown } = useCTAToast();
+  const { markCTAActionTriggered, incrementInteractionCount } = useCTAToast();
 
   const urlTemplateSearchParam = searchParams.get("template");
 
@@ -94,9 +79,19 @@ export function AppPageClient({
     .default("default")
     .safeParse(urlTemplateSearchParam);
 
-  const { isDesktop } = useDeviceContext();
+  const { isDesktop, isUADesktop } = useDeviceContext();
   const isMobile = !isDesktop;
 
+  /**
+   * State for storing the current invoice data.
+   *
+   * Initialized as null and populated from:
+   * - localStorage on component mount
+   * - URL query parameters when sharing invoice
+   * - User input through the invoice form
+   *
+   * This state is persisted to localStorage on updates and used to generate the PDF preview.
+   */
   const [invoiceDataState, setInvoiceDataState] = useState<InvoiceData | null>(
     null,
   );
@@ -105,6 +100,53 @@ export function AppPageClient({
     useState(false);
 
   const [canShareInvoice, setCanShareInvoice] = useState(true);
+
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
+
+  const [isInvoiceUrlCorrupted, setIsInvoiceUrlCorrupted] = useState(false);
+
+  const [invoiceFormHasErrors, setInvoiceFormHasErrors] = useState(false);
+
+  // Refs to track original URL invoice data
+  const originalUrlInvoiceDataRef = useRef<InvoiceData | null>(null);
+
+  // Generate QR code data URL when qrCodeData changes
+  useEffect(() => {
+    // Flag to detect if the component is still mounted and effect is active
+    let active = true;
+
+    /**
+     * Generates a QR code image as a data URL when QR code data is available and visible.
+     * If qrCodeData or its visibility flag is missing, resets the QR code image state.
+     * Handles component unmount by checking `active`.
+     */
+    const generateQrCode = async () => {
+      // If no QR code data or QR code display is not enabled, clear the QR code image
+      if (!invoiceDataState?.qrCodeData || !invoiceDataState?.qrCodeIsVisible) {
+        if (active) {
+          setQrCodeDataUrl("");
+        }
+        return;
+      }
+
+      // Generate the QR code image as a data URL for the provided data string
+      const dataUrl = await generateQrCodeDataUrl(invoiceDataState.qrCodeData);
+
+      // Set the generated QR code image if the component is still mounted
+      if (active) {
+        setQrCodeDataUrl(dataUrl);
+      }
+    };
+
+    // Call generateQrCode when invoiceDataState.qrCodeData or invoiceDataState.qrCodeIsVisible changes
+    void generateQrCode();
+
+    // Cleanup function to set active as false on component unmount,
+    // preventing state updates on an unmounted component
+    return () => {
+      active = false;
+    };
+  }, [invoiceDataState?.qrCodeData, invoiceDataState?.qrCodeIsVisible]);
 
   useShowRandomCTAToastOnIdle();
 
@@ -159,6 +201,7 @@ export function AppPageClient({
       toast.error(
         "Unable to load your saved invoice data. For your convenience, we've reset the form to default values. Please try creating a new invoice.",
         {
+          id: "unable-to-load-saved-invoice-data-error-toast",
           duration: Infinity,
           closeButton: true,
           richColors: true,
@@ -170,7 +213,7 @@ export function AppPageClient({
   }, [templateValidation.data, templateValidation.success]);
 
   useEffect(() => {
-    // Scroll to top on mount
+    // Scroll to top of the page on first render for better UX
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
@@ -187,6 +230,8 @@ export function AppPageClient({
 
     // first try to load from url i.e. if user has shared invoice link
     if (compressedInvoiceDataInUrl) {
+      console.log("[useEffect] [initialize invoice data from ** URL **]");
+
       try {
         const decompressedData = decompressFromEncodedURIComponent(
           compressedInvoiceDataInUrl,
@@ -204,11 +249,18 @@ export function AppPageClient({
 
         const validatedDataFromURL = invoiceSchema.parse(updatedJson);
 
+        // Override template from URL parameter if present for better UX
+        // The ?template parameter provides a cleaner URL and better user experience
+        // while ?data contains the actual invoice data including the template
+        // ?template=" " has higher priority than ?data=" " =)
         if (templateValidation.success) {
           validatedDataFromURL.template = templateValidation.data;
         }
 
         setInvoiceDataState(validatedDataFromURL);
+
+        // Store the original URL invoice data for change detection
+        originalUrlInvoiceDataRef.current = validatedDataFromURL;
 
         const appMetadata = getAppMetadata();
 
@@ -220,138 +272,222 @@ export function AppPageClient({
           );
         }
       } catch (error) {
-        // fallback to local storage
-        console.error("Failed to parse URL data:", error);
+        console.error(
+          "[useEffect] [initialize invoice data from ** URL **] Failed to parse URL data:",
+          error,
+        );
+        // fallback to local storage in case of error
         loadFromLocalStorage();
+
+        setIsInvoiceUrlCorrupted(true);
+
+        toast.error("The shared invoice URL appears to be incorrect", {
+          id: "invalid-invoice-url-error-toast", // prevent duplicate toasts
+          description: (
+            <div className="flex flex-col gap-2">
+              <p className="">
+                Please verify that you have copied the complete invoice URL. The
+                link may be truncated or corrupted.
+              </p>
+              <p className="">Try generating a new link.</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const currentTemplate =
+                    searchParams.get("template") || "default";
+                  router.replace(`/?template=${currentTemplate}`, {
+                    scroll: false,
+                  });
+
+                  toast.dismiss();
+                }}
+              >
+                Clear URL
+              </Button>
+            </div>
+          ),
+          duration: 20000,
+          closeButton: true,
+        });
 
         Sentry.captureException(error);
       }
     } else {
+      console.log(
+        "[useEffect] [initialize invoice data from ** LOCAL STORAGE **]",
+      );
+
       // if no data in url, load from local storage
       loadFromLocalStorage();
     }
-  }, [loadFromLocalStorage, searchParams]);
+  }, [loadFromLocalStorage, router, searchParams]);
 
-  // Save to localStorage whenever data changes on form update
+  // IMPORTANT: 🔥🔥🔥 DOUBLE check if below useEffect works as expected 🔥🔥🔥
+  /**
+   * Ensures the template query parameter is present in the URL (for better user experience)
+   * If missing, adds it based on the current invoice data state.
+   */
   useEffect(() => {
-    // Only save to localStorage if it's available
-    if (!isLocalStorageAvailable) {
-      Sentry.captureException(new Error("Local storage is not available"));
-
+    // Only run if we have invoice data and no template in URL
+    if (!invoiceDataState || searchParams.get("template")) {
       return;
     }
 
-    if (invoiceDataState) {
-      try {
-        const newInvoiceDataValidated = invoiceSchema.parse(invoiceDataState);
+    console.log("[useEffect] [add missing template to URL]", {
+      template: invoiceDataState.template,
+    });
 
-        // IMPORTANT
-        // TODO: double check if we need this code, because we already save to local storage in the Invoice Form component (debouncedRegeneratePdfOnFormChange fn line:165)
-        localStorage.setItem(
-          PDF_DATA_LOCAL_STORAGE_KEY,
-          JSON.stringify(newInvoiceDataValidated),
+    // Create a new URLSearchParams object from the current search parameters
+    const currentParams = new URLSearchParams(searchParams.toString());
+
+    // Add the template parameter from the invoice data
+    currentParams.set("template", invoiceDataState.template);
+
+    // Update the browser URL without triggering a page reload or scroll
+    router.replace(`?${currentParams.toString()}`, { scroll: false });
+  }, [invoiceDataState, searchParams, router]);
+
+  /**
+   * Checks if the invoice has changed from the original shared URL version.
+   * Shows a toast notification once and cleans the URL when changes are detected.
+   */
+  const checkForInvoiceChanges = useCallback(
+    (currentData: InvoiceData) => {
+      console.log("[checkForInvoiceChanges]", currentData.template, {
+        originalUrlInvoiceDataRef: originalUrlInvoiceDataRef.current,
+      });
+
+      // Check if URL has data i.e. if user has shared invoice link
+      const urlData = searchParams.get("data");
+
+      // Skip if no original URL data or no data in url
+      if (!originalUrlInvoiceDataRef.current || !urlData) {
+        console.log("[checkForInvoiceChanges] skipping");
+
+        return;
+      }
+
+      // TODO: Improve this check, by using more reliable way to compare the invoice data (i.e. using npm lib)
+      const invoiceHasChanged =
+        JSON.stringify(originalUrlInvoiceDataRef.current) !==
+        JSON.stringify(currentData);
+
+      if (invoiceHasChanged) {
+        console.log("[checkForInvoiceChanges] invoice has changed");
+
+        toast.info(
+          <div className="space-y-2">
+            <p className="text-sm font-semibold">Invoice Updated</p>
+            <p className="text-muted-foreground text-pretty leading-relaxed">
+              Your changes have modified this invoice from its shared version.
+            </p>
+
+            <p className="text-muted-foreground text-pretty leading-relaxed">
+              Click{" "}
+              <span className="font-semibold text-foreground">
+                &apos;Generate a link to invoice&apos;
+              </span>{" "}
+              to create an updated shareable link.
+            </p>
+          </div>,
+          {
+            id: "invoice-has-changed-toast",
+            duration: 20_000,
+            closeButton: true,
+            position: isMobile ? "top-center" : "bottom-right",
+          },
         );
 
-        // Update template in search params if it exists
-        const newSearchParams = new URLSearchParams(searchParams);
-        newSearchParams.set("template", newInvoiceDataValidated.template);
-        router.replace(`/?${newSearchParams.toString()}`);
+        // Remove the ?data parameter from URL since the invoice has been modified (clean url, because it's no longer valid)
+        const currentParams = new URLSearchParams(searchParams.toString());
+        currentParams.delete("data");
 
-        // Check if URL has data i.e. if user has shared invoice link
-        const urlData = searchParams.get("data");
-
-        // we want to show a toast if the invoice has changed and shared invoice link needs to be regenerated
-        if (urlData) {
-          try {
-            const decompressed = decompressFromEncodedURIComponent(urlData);
-
-            const urlParsed: unknown = JSON.parse(decompressed);
-
-            // Restore original keys from compressed format
-            const decompressedInvoiceDataFromUrl = decompressInvoiceData(
-              urlParsed as Record<string, unknown>,
-            );
-
-            const validatediInvoiceDataFromUrl = invoiceSchema.parse(
-              decompressedInvoiceDataFromUrl,
-            );
-
-            const invoiceHasChanged =
-              JSON.stringify(validatediInvoiceDataFromUrl) !==
-              JSON.stringify(newInvoiceDataValidated);
-
-            // if invoice has changed, show toast and clean url because the link to invoice is no longer valid and needs to be regenerated
-            if (invoiceHasChanged) {
-              toast.info(
-                <p className="text-pretty text-sm leading-relaxed">
-                  <span className="font-semibold text-blue-600">
-                    Invoice Updated:
-                  </span>{" "}
-                  Your changes have modified this invoice from its shared
-                  version. Click{" "}
-                  <span className="font-semibold">
-                    &apos;Generate a link to invoice&apos;
-                  </span>{" "}
-                  button to create an updated shareable link.
-                </p>,
-                {
-                  duration: 10000,
-                  closeButton: true,
-                  richColors: true,
-                },
-              );
-
-              // Clean URL if data differs
-              router.replace("/");
-            }
-          } catch (error) {
-            console.error("Failed to compare with URL data:", error);
-
-            // TODO: move to 'Initialize data from URL or localStorage on mount' useEffect?
-            toast.error("The shared invoice URL appears to be incorrect", {
-              id: "invalid-invoice-url-error-toast", // prevent duplicate toasts
-              description: (
-                <div className="flex flex-col gap-2">
-                  <p className="">
-                    Please verify that you have copied the complete invoice URL.
-                    The link may be truncated or corrupted. Try refreshing the
-                    page and generating a new link.
-                  </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      router.replace("/?template=default");
-                      toast.dismiss();
-                    }}
-                  >
-                    Clear URL
-                  </Button>
-                </div>
-              ),
-              duration: 20000,
-              closeButton: true,
-            });
-
-            Sentry.captureException(error);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to save invoice data:", error);
-        toast.error("Failed to save invoice data");
-
-        Sentry.captureException(error);
+        // Update the browser URL without triggering a page reload or scroll
+        // This keeps the URL in sync with the invoice state while maintaining user position
+        router.replace(`?${currentParams.toString()}`, { scroll: false });
       }
-    }
-  }, [invoiceDataState, router, searchParams]);
+    },
+    [router, isMobile, searchParams],
+  );
 
+  /**
+   * Handles changes to the invoice data.
+   *
+   * This function:
+   * - Updates the invoice state (useState hook) with the new data
+   * - Handles invoice URL corruption by clearing invalid URL parameters and notifying the user
+   * - Triggers change detection to show toast if invoice is modified from the URL-loaded version
+   *
+   */
   const handleInvoiceDataChange = (updatedData: InvoiceData) => {
+    console.log("[handleInvoiceDataChange]");
+
+    if (isInvoiceUrlCorrupted) {
+      console.log("[handleInvoiceDataChange] clearing url due to corruption");
+
+      /** CLEAR URL IN CASE OF CORRUPTED INVOICE URL (i.e. "/?data=") for better UX and consistency */
+
+      // Remove the ?data parameter from URL since the invoice has been modified (clean url, because it's no longer valid)
+      const currentParams = new URLSearchParams(searchParams.toString());
+      currentParams.delete("data");
+
+      // update the url
+      router.replace(`?${currentParams.toString()}`, { scroll: false });
+
+      // Show notification that URL was cleared due to corruption
+      toast.info(
+        <div className="space-y-2">
+          <p className="text-sm font-semibold">Corrupted URL Cleared</p>
+          <p className="text-muted-foreground text-pretty leading-relaxed">
+            The invalid invoice URL has been removed from the address bar.
+          </p>
+          <p className="text-muted-foreground text-pretty leading-relaxed">
+            Click{" "}
+            <span className="font-semibold text-foreground">
+              &apos;Generate a link to invoice&apos;
+            </span>{" "}
+            to create a new shareable link.
+          </p>
+        </div>,
+        {
+          id: "corrupted-url-cleared-toast",
+          duration: 15_000,
+          closeButton: true,
+          position: isMobile ? "top-center" : "bottom-right",
+        },
+      );
+
+      // Reset the invoice url corruption state
+      setIsInvoiceUrlCorrupted(false);
+    }
+
     setInvoiceDataState(updatedData);
+    checkForInvoiceChanges(updatedData);
+
+    // this is used to show CTA toast
+    incrementInteractionCount();
+
+    const currentTemplate = searchParams.get("template");
+
+    // update the url with the new template
+    if (currentTemplate !== updatedData.template) {
+      console.log("[handleInvoiceDataChange] update url with new template", {
+        currentTemplate,
+        updatedDataTemplate: updatedData.template,
+      });
+
+      router.replace(`/?template=${updatedData.template}`, { scroll: false });
+    } else {
+      console.log("[handleInvoiceDataChange] invoice template did not change");
+    }
   };
 
+  /** Generate a shareable invoice link */
   const handleShareInvoice = async () => {
     if (!canShareInvoice) {
       toast.error("Unable to Share Invoice", {
+        id: "unable-to-share-invoice-error-toast",
         duration: 5000,
         description: (
           <>
@@ -367,6 +503,24 @@ export function AppPageClient({
       return;
     }
 
+    // prevent sharing invoice if there are form errors
+    if (invoiceFormHasErrors) {
+      toast.error("Unable to Share Invoice", {
+        id: "unable-to-share-invoice-form-errors-error-toast",
+        duration: 6000,
+        position: isMobile ? "top-center" : "bottom-right",
+        description: (
+          <p className="text-pretty text-xs leading-relaxed text-red-700">
+            Please fix the errors in the invoice form to generate a shareable
+            link.
+          </p>
+        ),
+      });
+
+      return;
+    }
+
+    // if invoice data state is valid, generate the shareable link and update the url
     if (invoiceDataState) {
       try {
         const newInvoiceDataValidated = invoiceSchema.parse(invoiceDataState);
@@ -377,62 +531,130 @@ export function AppPageClient({
 
         const compressedData = compressToEncodedURIComponent(compressedJson);
 
-        // Check if the compressed data length exceeds browser URL limits
-        // Most browsers have a limit around 2000 characters for URLs
-        // With key compression, we can fit much larger invoices within this limit
-        const URL_LENGTH_LIMIT = 2000;
+        /**
+         * Check if the compressed data length exceeds browser URL limits.
+         * With key compression, we can fit much larger invoices within this limit.
+         */
+        const URL_LENGTH_LIMIT = 4096;
+
         const estimatedUrlLength =
           window.location.origin.length + 7 + compressedData.length; // 7 for "/?data="
 
         if (estimatedUrlLength > URL_LENGTH_LIMIT) {
           toast.error("Invoice data is too large to share via URL", {
-            description: "Try removing some items or simplifying the invoice",
+            id: "invoice-data-too-large-to-share-via-url-error-toast",
+            description:
+              "Download the invoice as PDF instead or remove some invoice items and try again.",
+            duration: 10_000,
+            position: isMobile ? "top-center" : "bottom-right",
           });
+
           return;
         }
 
-        router.push(
-          `/?template=${newInvoiceDataValidated.template}&data=${compressedData}`,
-        );
+        const currentParams = new URLSearchParams(searchParams.toString());
+        currentParams.set("template", invoiceDataState.template);
+        currentParams.set("data", compressedData);
+
+        router.replace(`?${currentParams.toString()}`, { scroll: false });
 
         // Construct full URL with locale and compressed data
-        const newFullUrl = `${window.location.origin}/?template=${newInvoiceDataValidated.template}&data=${compressedData}`;
+        const newGeneratedLinkFullUrl = `${window.location.origin}/?${currentParams.toString()}`;
 
         // Copy to clipboard
-        await navigator.clipboard.writeText(newFullUrl);
+        if (!isUADesktop && navigator?.share) {
+          // MOBILE + TABLET
+          try {
+            toast.success("Invoice link generated - Share invoice", {
+              id: "invoice-link-generated-share-invoice-success-toast",
+              description: (
+                <p data-testid="share-invoice-link-description-toast">
+                  Share this link to let others view and edit this invoice
+                </p>
+              ),
+              position: isMobile ? "top-center" : "bottom-right",
+              duration: 10_000,
+            });
 
-        // Dismiss any existing toast before showing new one
-        toast.dismiss();
+            await navigator
+              ?.share({
+                title: "Invoice link generated - Share invoice",
+                url: newGeneratedLinkFullUrl,
+              })
+              .then(() => {
+                umamiTrackEvent("share_invoice_link_mobile");
 
-        toast.success("Invoice link copied to clipboard!", {
-          description:
-            "Share this link to let others view and edit this invoice",
-        });
+                updateAppMetadata((current) => ({
+                  ...current,
+                  invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
+                }));
+              })
+              .catch((err) => {
+                console.error(
+                  "[handleShareInvoice] failed to share invoice:",
+                  err,
+                );
 
-        // analytics track event
-        umamiTrackEvent("share_invoice_link");
+                // dismiss all other toasts
+                toast.dismiss();
 
-        // if (isToastShownInSession) {
-        //   umamiTrackEvent("cta_toast_skipped_shared_invoice_link");
-        //   return;
-        // }
+                toast.error("Failed to share invoice", {
+                  id: "failed-to-share-invoice-error-toast",
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                  description: `Please try again. Error: ${err?.message || "Unknown error"}`,
+                  position: isMobile ? "top-center" : "bottom-right",
+                  duration: 5_000,
+                });
+              });
+          } catch (shareError) {
+            console.error(
+              "[handleShareInvoice] failed to share invoice:",
+              shareError,
+            );
+            // Optionally fall back to clipboard on share cancel/error
+            await navigator?.clipboard?.writeText(newGeneratedLinkFullUrl);
+          }
+        } else {
+          // DESKTOP
 
-        // Show a CTA toast
+          // on desktop, copy to clipboard
+          await navigator?.clipboard
+            ?.writeText(newGeneratedLinkFullUrl)
+            .then(() => {
+              toast.success("Invoice link copied to clipboard!", {
+                id: "invoice-link-copied-to-clipboard-success-toast",
+                description: (
+                  <p data-testid="share-invoice-link-description-toast">
+                    Share this link to let others view and edit this invoice
+                  </p>
+                ),
+                position: isMobile ? "top-center" : "bottom-right",
+                duration: 5_000,
+              });
+
+              umamiTrackEvent("share_invoice_link");
+
+              updateAppMetadata((current) => ({
+                ...current,
+                invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
+              }));
+            })
+            .catch((err) => {
+              Sentry.captureException(err);
+            });
+        }
+
+        // show CTA toast after x seconds (after invoice link notification is shown)
         setTimeout(() => {
           showRandomCTAToast();
+        }, 5_000);
 
-          // Mark toast as shown in session to prevent duplicate toasts
-          markToastAsShown();
-
-          // Update timestamp to prevent other CTA toasts from showing
-          localStorage.setItem(
-            CTA_TOAST_LAST_SHOWN_STORAGE_KEY,
-            String(Date.now()),
-          );
-        }, CTA_TOAST_TIMEOUT);
+        markCTAActionTriggered();
       } catch (error) {
         console.error("Failed to share invoice:", error);
-        toast.error("Failed to generate shareable link");
+        toast.error("Failed to generate shareable link", {
+          id: "failed-to-generate-shareable-link-error-toast",
+        });
 
         Sentry.captureException(error);
       }
@@ -457,6 +679,7 @@ export function AppPageClient({
             setErrorWhileGeneratingPdfIsShown={
               setErrorWhileGeneratingPdfIsShown
             }
+            qrCodeDataUrl={qrCodeDataUrl}
           />
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
             <InvoiceClientPage
@@ -470,6 +693,8 @@ export function AppPageClient({
               }
               canShareInvoice={canShareInvoice}
               setCanShareInvoice={setCanShareInvoice}
+              qrCodeDataUrl={qrCodeDataUrl}
+              setInvoiceFormHasErrors={setInvoiceFormHasErrors}
             />
           </div>
         </div>
@@ -531,213 +756,9 @@ export function AppPageClient({
           </ul>
         }
       />
-      <GitHubStarCTA githubStarsCount={githubStarsCount} />
+      <div className="fixed right-2 top-2 z-50 duration-500 animate-in fade-in slide-in-from-top-4">
+        <GitHubStarCTA githubStarsCount={githubStarsCount} />
+      </div>
     </TooltipProvider>
-  );
-}
-
-/**
- * Header component for the invoice page.
- * 
- * Displays the project logo, description, and action buttons including:
- * - Share invoice button (with conditional rendering based on shareability)
- * - Download PDF button with error handling
- * - Support project button
-
- * @returns The rendered invoice page header with logo, description, and action buttons
- */
-
-function InvoicePageHeader({
-  canShareInvoice,
-  handleShareInvoice,
-  isDesktop,
-  invoiceDataState,
-  errorWhileGeneratingPdfIsShown,
-  setErrorWhileGeneratingPdfIsShown,
-}: {
-  canShareInvoice: boolean;
-  handleShareInvoice: () => void;
-  isDesktop: boolean;
-  invoiceDataState: InvoiceData;
-  errorWhileGeneratingPdfIsShown: boolean;
-  setErrorWhileGeneratingPdfIsShown: (value: boolean) => void;
-}) {
-  return (
-    <div data-testid="header">
-      <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
-        <div className="relative bottom-2 mt-2 flex w-full flex-col justify-center sm:bottom-4 sm:mt-0">
-          <div className="flex items-center">
-            <ProjectLogo className="h-8 w-8" />
-
-            <ProjectLogoDescription>
-              Free Invoice Generator with Live PDF Preview
-            </ProjectLogoDescription>
-          </div>
-        </div>
-        <div className="mb-1 flex w-full flex-wrap justify-center gap-3 lg:flex-nowrap lg:justify-end">
-          {/* Support project button (hidden on mobile) */}
-          <Button
-            asChild
-            variant="outline"
-            className="group mx-2 hidden w-full border-pink-200 bg-pink-50 text-pink-700 shadow-md transition-all duration-200 hover:border-pink-300 hover:bg-pink-100 hover:text-pink-800 hover:no-underline hover:shadow-lg focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 lg:mx-0 lg:inline-flex lg:w-auto"
-            onClick={() => {
-              // analytics track event
-              umamiTrackEvent("donate_to_project_button_clicked_header");
-            }}
-          >
-            <Link
-              href="https://dub.sh/easyinvoice-donate"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2"
-            >
-              Support Project
-              <div className="relative select-none">
-                <HeartIcon className="size-3 scale-110 fill-pink-500 text-pink-500 transition-all duration-200 group-hover:fill-pink-600 group-hover:text-pink-600" />
-                <HeartIcon
-                  className={cn(
-                    "size-3 animate-ping fill-pink-500 text-pink-500 duration-1000 group-hover:fill-pink-600",
-                    "absolute inset-0 flex",
-                  )}
-                />
-              </div>
-            </Link>
-          </Button>
-
-          {/* On mobile version, we show it in different place (bottom of the page)*/}
-          {isDesktop ? (
-            <>
-              <CustomTooltip
-                className={cn(!canShareInvoice && "bg-red-50")}
-                trigger={
-                  <Button
-                    data-disabled={!canShareInvoice} // better UX than 'disabled'
-                    onClick={handleShareInvoice}
-                    variant="outline"
-                    className={cn("mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto")}
-                  >
-                    Generate a link to invoice
-                  </Button>
-                }
-                content={
-                  canShareInvoice ? (
-                    <div className="flex items-center gap-3 p-2">
-                      <div className="space-y-1">
-                        <p className="text-sm font-semibold text-slate-900">
-                          Share Invoice Online
-                        </p>
-                        <p className="text-pretty text-xs leading-relaxed text-slate-700">
-                          Generate a link to share this invoice with your
-                          clients. They can view and download it directly from
-                          their browser.
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      data-testid="share-invoice-tooltip-content"
-                      className="flex items-center gap-3 bg-red-50 p-3"
-                    >
-                      <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
-                      <div className="space-y-1">
-                        <p className="text-sm font-semibold text-red-800">
-                          Unable to Share Invoice
-                        </p>
-                        <p className="text-pretty text-xs leading-relaxed text-red-700">
-                          Invoices with logos cannot be shared. Please remove
-                          the logo to generate a shareable link. You can still
-                          download the invoice as PDF and share it.
-                        </p>
-                      </div>
-                    </div>
-                  )
-                }
-              />
-              <InvoicePDFDownloadLink
-                invoiceData={invoiceDataState}
-                errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
-                setErrorWhileGeneratingPdfIsShown={
-                  setErrorWhileGeneratingPdfIsShown
-                }
-              />
-            </>
-          ) : null}
-
-          {/* TODO: add later when PRO version is released, this is PRO FEATURE =) */}
-          {/* {isDesktop ? (
-            <InvoicePDFDownloadMultipleLanguages
-              invoiceData={invoiceDataState}
-            />
-          ) : null} */}
-        </div>
-      </div>
-      <div className="mb-3 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-1">
-        <ProjectInfo />
-      </div>
-    </div>
-  );
-}
-
-function ProjectInfo() {
-  const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
-
-  const handleWatchDemoClick = () => {
-    setIsVideoDialogOpen(true);
-    umamiTrackEvent("watch_demo_button_clicked");
-  };
-
-  return (
-    <>
-      <div className="relative bottom-0 flex flex-wrap items-center justify-center gap-1 text-center text-sm text-gray-900 lg:bottom-3">
-        <button
-          onClick={handleWatchDemoClick}
-          className="inline-flex items-center gap-1.5 transition-colors hover:text-blue-600 hover:underline"
-        >
-          <span>How it works</span>
-        </button>
-        {" | "}
-        <a
-          href="https://dub.sh/easy-invoice-pdf-feedback"
-          className="transition-colors hover:text-blue-600 hover:underline"
-          target="_blank"
-        >
-          Share your feedback
-        </a>
-        {" | "}
-
-        <a
-          href={GITHUB_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group inline-flex items-center gap-1 transition-colors hover:text-blue-600 hover:underline"
-        >
-          <GithubIcon className="size-4 transition-transform group-hover:fill-blue-600" />
-          <span className="group-hover:text-blue-600">View on GitHub</span>
-        </a>
-      </div>
-
-      <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
-        <DialogContent className="max-h-[calc(100vh-2rem)] gap-0 overflow-hidden p-0 sm:max-w-[800px]">
-          <DialogHeader className="p-6 pb-4">
-            <DialogTitle>How EasyInvoicePDF Works</DialogTitle>
-            <DialogDescription>
-              Watch this quick demo to learn how to create and customize your
-              invoices.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="aspect-video w-full overflow-hidden">
-            <video
-              src={VIDEO_DEMO_URL}
-              muted
-              controls
-              autoPlay
-              playsInline
-              className="h-full w-full object-cover"
-              data-testid="how-it-works-video"
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
   );
 }

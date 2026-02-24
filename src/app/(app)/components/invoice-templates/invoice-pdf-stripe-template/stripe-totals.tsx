@@ -5,7 +5,10 @@ import { formatCurrency } from "@/app/(app)/utils/format-currency";
 
 import type { STRIPE_TEMPLATE_STYLES } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
 
-export function StripeTotals({
+/**
+ * Subtotal, total excluding tax, VAT, total and amount due fields
+ */
+export function StripeVatSummaryTableTotals({
   invoiceData,
   formattedInvoiceTotal,
   styles,
@@ -40,39 +43,61 @@ export function StripeTotals({
     (item) => typeof item.vat === "number",
   );
 
+  // we use .reverse() to mimic stripe behavior
+  const vatRows = [...(invoiceData?.items ?? [])].reverse();
+
   return (
     <View style={{ alignItems: "flex-end", marginTop: 24 }}>
       <View style={{ width: "50%" }}>
+        {/* Empty header row (for better layout on page breaks) */}
+        <View style={styles.vatTableHeader} fixed>
+          <View style={styles.vatColLabel}>
+            <Text style={styles.fontSize8}> </Text>
+          </View>
+          <View style={styles.vatColValue}>
+            <Text style={styles.fontSize8}> </Text>
+          </View>
+        </View>
+
         {/* Subtotal */}
         <View
-          style={[styles.totalRow, styles.borderTop, { paddingVertical: 1.5 }]}
+          style={[styles.vatTableRow, styles.borderTop]}
+          wrap={false}
+          minPresenceAhead={MIN_PRESENCE_AHEAD}
         >
-          <Text style={[styles.fontSize9]}>{t.stripe.subtotal}</Text>
-          <Text style={[styles.fontSize9, styles.textDark]}>
-            {formattedSubtotal}
-          </Text>
+          <View style={styles.vatColLabel}>
+            <Text style={styles.fontSize9}>{t.stripe.subtotal}</Text>
+          </View>
+          <View style={styles.vatColValue}>
+            <Text style={[styles.fontSize9, styles.textDark]}>
+              {formattedSubtotal}
+            </Text>
+          </View>
         </View>
 
         {hasNumericVat && (
           <>
+            {/* Total excluding tax */}
             <View
-              style={[
-                styles.totalRow,
-                styles.borderTop,
-                { paddingVertical: 1.5 },
-              ]}
+              style={[styles.vatTableRow, styles.borderTop]}
+              wrap={false}
+              minPresenceAhead={MIN_PRESENCE_AHEAD}
             >
-              <Text style={[styles.fontSize9]}>Total excluding tax</Text>
-              <Text style={[styles.fontSize9, styles.textDark]}>
-                {formattedSubtotal}
-              </Text>
+              <View style={styles.vatColLabel}>
+                <Text style={styles.fontSize9}>
+                  {t.stripe.totalExcludingTax}
+                </Text>
+              </View>
+              <View style={styles.vatColValue}>
+                <Text style={[styles.fontSize9, styles.textDark]}>
+                  {formattedSubtotal}
+                </Text>
+              </View>
             </View>
 
-            {/* VAT, we use .reverse() to mimic stripe behavior */}
-            {[...(invoiceData?.items ?? [])].reverse().map((item, index) => {
-              if (typeof item.vat !== "number") {
-                return null;
-              }
+            {/* VAT rows */}
+            {vatRows.map((item, index) => {
+              if (typeof item.vat !== "number") return null;
 
               const formattedVatAmount = formatCurrency({
                 amount: item.vatAmount,
@@ -89,18 +114,20 @@ export function StripeTotals({
               return (
                 <View
                   key={index}
-                  style={[
-                    styles.totalRow,
-                    styles.borderTop,
-                    { paddingVertical: 1.5 },
-                  ]}
+                  style={[styles.vatTableRow, styles.borderTop]}
+                  wrap={false}
+                  minPresenceAhead={MIN_PRESENCE_AHEAD}
                 >
-                  <Text style={[styles.fontSize9]}>
-                    {taxLabelText} ({item.vat}% on {formattedNetAmount})
-                  </Text>
-                  <Text style={[styles.fontSize9, styles.textDark]}>
-                    {formattedVatAmount}
-                  </Text>
+                  <View style={styles.vatColLabel}>
+                    <Text style={styles.fontSize9}>
+                      {taxLabelText} ({item.vat}% on {formattedNetAmount})
+                    </Text>
+                  </View>
+                  <View style={styles.vatColValue}>
+                    <Text style={[styles.fontSize9, styles.textDark]}>
+                      {formattedVatAmount}
+                    </Text>
+                  </View>
                 </View>
               );
             })}
@@ -109,27 +136,40 @@ export function StripeTotals({
 
         {/* Total */}
         <View
-          style={[styles.totalRow, styles.borderTop, { paddingVertical: 1.5 }]}
+          style={[styles.vatTableRow, styles.borderTop]}
+          wrap={false}
+          minPresenceAhead={40}
         >
-          <Text style={[styles.fontSize9]}>{t.stripe.total}</Text>
-          <Text style={[styles.fontSize9, styles.textDark]}>
-            {/* USD is not needed for the total */}
-            {invoiceTotal}
-          </Text>
+          <View style={styles.vatColLabel}>
+            <Text style={styles.fontSize9}>{t.stripe.total}</Text>
+          </View>
+          <View style={styles.vatColValue}>
+            <Text style={[styles.fontSize9, styles.textDark]}>
+              {invoiceTotal}
+            </Text>
+          </View>
         </View>
 
         {/* Amount due */}
         <View
-          style={[styles.totalRow, styles.borderTop, { paddingVertical: 1.5 }]}
+          style={[styles.vatTableRow, styles.borderTop]}
+          wrap={false}
+          minPresenceAhead={40}
         >
-          <Text style={[styles.fontSize9, styles.fontBold, styles.textDark]}>
-            {t.stripe.amountDue}
-          </Text>
-          <Text style={[styles.fontSize9, styles.fontBold, styles.textDark]}>
-            {formattedInvoiceTotal}
-          </Text>
+          <View style={styles.vatColLabel}>
+            <Text style={[styles.fontSize9, styles.fontBold, styles.textDark]}>
+              {t.stripe.amountDue}
+            </Text>
+          </View>
+          <View style={styles.vatColValue}>
+            <Text style={[styles.fontSize9, styles.fontBold, styles.textDark]}>
+              {formattedInvoiceTotal}
+            </Text>
+          </View>
         </View>
       </View>
     </View>
   );
 }
+
+const MIN_PRESENCE_AHEAD = 15;

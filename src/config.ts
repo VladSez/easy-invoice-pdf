@@ -19,7 +19,7 @@ export const VIDEO_DEMO_URL = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-dem
  */
 export const VIDEO_DEMO_FALLBACK_IMG = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026-fallback-img-v1.png`;
 
-export const DONATION_URL = "https://dub.sh/easyinvoice-donate";
+// const DONATION_URL = "https://dub.sh/easyinvoice-donate";
 
 export const PROD_WEBSITE_URL = "https://easyinvoicepdf.com";
 
@@ -29,6 +29,8 @@ export const TWITTER_URL = "https://x.com/vladsazonau";
 
 export const BUG_REPORT_URL =
   "https://pdfinvoicegenerator.userjot.com/board/bugs";
+
+export const CONTACT_SUPPORT_EMAIL = "vlad@mail.easyinvoicepdf.com";
 
 /**
  * Marketing features cards for the about page
@@ -63,6 +65,11 @@ export const MARKETING_FEATURES_CARDS = [
     translationKey: "openSource",
     videoSrc: `${STATIC_ASSETS_URL}/demo-videos/open-source-v1.mp4`,
     videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/open-source-fallback-v1.png`,
+  },
+  {
+    translationKey: "qrCodeMultiPDFpageSupport",
+    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/qr-code-and-multi-page-pdf-v1.mp4`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/qr-code-fallback-img-v1.png`,
   },
 ] as const satisfies {
   translationKey: string;

@@ -1,7 +1,7 @@
 import {
+  DEFAULT_DATE_FORMAT,
   PDF_DATA_LOCAL_STORAGE_KEY,
   STRIPE_DEFAULT_DATE_FORMAT,
-  SUPPORTED_DATE_FORMATS,
   type InvoiceData,
 } from "@/app/schema";
 import fs from "node:fs";
@@ -10,7 +10,10 @@ import { SMALL_TEST_IMAGE_BASE64, uploadBase64LogoAsFile } from "./utils";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { expect, test } from "../utils/extended-playwright-test";
-import { renderPdfOnCanvas } from "../utils/render-pdf-on-canvas";
+import {
+  renderPdfOnCanvas,
+  renderMultiPagePdfOnCanvas,
+} from "../utils/render-pdf-on-canvas";
 import { STATIC_ASSETS_URL } from "@/config";
 
 test.describe("Stripe Invoice Template", () => {
@@ -400,23 +403,50 @@ test.describe("Stripe Invoice Template", () => {
 
     const finalSection = page.getByTestId("final-section");
 
-    // Get the signature field switches
-    const personAuthorizedToReceiveSwitch = finalSection.getByRole("switch", {
-      name: 'Show "Person Authorized to Receive" Signature Field in the PDF',
+    /** TEST PERSON AUTHORIZED TO RECEIVE FIELD TO BE VISIBLE */
+    const personAuthorizedToReceiveFieldset = finalSection.getByRole("group", {
+      name: "Person Authorized to Receive",
     });
 
-    const personAuthorizedToIssueSwitch = finalSection.getByRole("switch", {
-      name: 'Show "Person Authorized to Issue" Signature Field in the PDF',
-    });
+    await expect(personAuthorizedToReceiveFieldset).toBeVisible();
 
-    // Verify both switches are visible and enabled
+    const personAuthorizedToReceiveNameInput =
+      personAuthorizedToReceiveFieldset.getByRole("textbox", {
+        name: "Name",
+      });
+
+    await expect(personAuthorizedToReceiveNameInput).toBeVisible();
+
+    const personAuthorizedToReceiveSwitch =
+      personAuthorizedToReceiveFieldset.getByRole("switch", {
+        name: "Show Person Authorized to Receive in PDF",
+      });
+
     await expect(personAuthorizedToReceiveSwitch).toBeVisible();
     await expect(personAuthorizedToReceiveSwitch).toBeEnabled();
+    await expect(personAuthorizedToReceiveSwitch).toBeChecked();
+
+    /** TEST PERSON AUTHORIZED TO ISSUE FIELD TO BE VISIBLE */
+    const personAuthorizedToIssueFieldset = finalSection.getByRole("group", {
+      name: "Person Authorized to Issue",
+    });
+
+    await expect(personAuthorizedToIssueFieldset).toBeVisible();
+
+    const personAuthorizedToIssueNameInput =
+      personAuthorizedToIssueFieldset.getByRole("textbox", {
+        name: "Name",
+      });
+
+    await expect(personAuthorizedToIssueNameInput).toBeVisible();
+
+    const personAuthorizedToIssueSwitch =
+      personAuthorizedToIssueFieldset.getByRole("switch", {
+        name: "Show Person Authorized to Issue in PDF",
+      });
+
     await expect(personAuthorizedToIssueSwitch).toBeVisible();
     await expect(personAuthorizedToIssueSwitch).toBeEnabled();
-
-    // Verify initial state (should be checked by default based on initial data)
-    await expect(personAuthorizedToReceiveSwitch).toBeChecked();
     await expect(personAuthorizedToIssueSwitch).toBeChecked();
 
     // Switch to Stripe template to verify switches become hidden
@@ -426,72 +456,23 @@ test.describe("Stripe Invoice Template", () => {
 
     await page.waitForURL("/?template=stripe");
 
-    // Verify switches are now hidden
-    await expect(personAuthorizedToReceiveSwitch).toBeHidden();
-    await expect(personAuthorizedToIssueSwitch).toBeHidden();
-  });
+    /** VERIFY SIGNATURE FIELDS ARE NOW HIDDEN */
 
-  test("Invoice Type field only appears for default template", async ({
-    page,
-  }) => {
-    // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    const newPersonAuthorizedToReceiveFieldset = finalSection.getByRole(
+      "group",
+      {
+        name: "Person Authorized to Receive",
+      },
+    );
 
-    const generalInfoSection = page.getByTestId("general-information-section");
+    await expect(newPersonAuthorizedToReceiveFieldset).toBeHidden();
 
-    // Get the Invoice Type field and its visibility switch
-    const invoiceTypeField = generalInfoSection.getByRole("textbox", {
-      name: "Invoice Type",
-    });
-    const invoiceTypeVisibilitySwitch = generalInfoSection.getByRole("switch", {
-      name: "Show in PDF",
+    /** VERIFY PERSON AUTHORIZED TO ISSUE FIELD TO BE HIDDEN */
+    const newPersonAuthorizedToIssueFieldset = finalSection.getByRole("group", {
+      name: "Person Authorized to Issue",
     });
 
-    // Verify field and switch are visible and enabled
-    await expect(invoiceTypeField).toBeVisible();
-    await expect(invoiceTypeField).toBeEnabled();
-    await expect(invoiceTypeVisibilitySwitch).toBeVisible();
-    await expect(invoiceTypeVisibilitySwitch).toBeEnabled();
-
-    // Verify initial state (should be checked by default)
-    await expect(invoiceTypeVisibilitySwitch).toBeChecked();
-
-    // Test filling in the Invoice Type field
-    await invoiceTypeField.fill("Test Invoice Type");
-    await expect(invoiceTypeField).toHaveValue("Test Invoice Type");
-
-    // Test toggling the visibility switch
-    await invoiceTypeVisibilitySwitch.click();
-    await expect(invoiceTypeVisibilitySwitch).not.toBeChecked();
-
-    // Toggle it back
-    await invoiceTypeVisibilitySwitch.click();
-    await expect(invoiceTypeVisibilitySwitch).toBeChecked();
-
-    // Clear the field and verify it's empty
-    await invoiceTypeField.clear();
-    await expect(invoiceTypeField).toHaveValue("");
-
-    // Switch to Stripe template to verify field becomes hidden
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
-
-    await page.waitForURL("/?template=stripe");
-
-    // Verify Invoice Type field is now hidden
-    await expect(invoiceTypeField).toBeHidden();
-
-    // Switch back to default template
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("default");
-
-    // Verify field is visible again and data persists
-    await expect(invoiceTypeField).toBeVisible();
-    await expect(invoiceTypeField).toHaveValue(""); // Should be empty as we cleared it
-    await expect(invoiceTypeVisibilitySwitch).toBeVisible();
-    await expect(invoiceTypeVisibilitySwitch).toBeChecked(); // Should maintain its state
+    await expect(newPersonAuthorizedToIssueFieldset).toBeHidden();
   });
 
   test("Invoice items fields and switches only appear for default template (except for Tax Settings field)", async ({
@@ -525,34 +506,34 @@ test.describe("Stripe Invoice Template", () => {
     // =============== ITEM FIELD SWITCHES TESTING ===============
 
     // Get all "Show in PDF" switches for individual fields (these are the ones that only show for first item)
-    const nameFieldSwitch = invoiceItemsSection
-      .getByRole("switch", { name: /Show in PDF/i })
-      .nth(0);
-    const typeOfGTUFieldSwitch = invoiceItemsSection
-      .getByRole("switch", { name: /Show in PDF/i })
-      .nth(1);
-    const amountFieldSwitch = invoiceItemsSection
-      .getByRole("switch", { name: /Show in PDF/i })
-      .nth(2);
-    const unitFieldSwitch = invoiceItemsSection
-      .getByRole("switch", { name: /Show in PDF/i })
-      .nth(3);
-    const netPriceFieldSwitch = invoiceItemsSection
-      .getByRole("switch", { name: /Show in PDF/i })
-      .nth(4);
-    const vatFieldSwitch = invoiceItemsSection
-      .getByRole("switch", { name: /Show in PDF/i })
-      .nth(5);
-    const netAmountFieldSwitch = invoiceItemsSection
-      .getByRole("switch", { name: /Show in PDF/i })
-      .nth(6);
-    const vatAmountFieldSwitch = invoiceItemsSection
-      .getByRole("switch", { name: /Show in PDF/i })
-      .nth(7);
-    const preTaxAmountFieldSwitch = invoiceItemsSection
-      .getByRole("switch", { name: /Show in PDF/i })
-      .nth(8);
 
+    const nameFieldSwitch = invoiceItemsSection.getByRole("switch", {
+      name: "Show the 'Name of Goods/Service' Column in the PDF for item 1",
+    });
+    const typeOfGTUFieldSwitch = invoiceItemsSection.getByRole("switch", {
+      name: "Show the 'Type of GTU' Column in the PDF for item 1",
+    });
+    const amountFieldSwitch = invoiceItemsSection.getByRole("switch", {
+      name: "Show the 'Amount' Column in the PDF for item 1",
+    });
+    const unitFieldSwitch = invoiceItemsSection.getByRole("switch", {
+      name: "Show the 'Unit' Column in the PDF for item 1",
+    });
+    const netPriceFieldSwitch = invoiceItemsSection.getByRole("switch", {
+      name: "Show the 'Net Price' Column in the PDF for item 1",
+    });
+    const vatFieldSwitch = invoiceItemsSection.getByRole("switch", {
+      name: "Show the 'VAT' Column in the PDF for item 1",
+    });
+    const netAmountFieldSwitch = invoiceItemsSection.getByRole("switch", {
+      name: "Show the 'Net Amount' Column in the PDF for item 1",
+    });
+    const vatAmountFieldSwitch = invoiceItemsSection.getByRole("switch", {
+      name: "Show the 'VAT Amount' Column in the PDF for item 1",
+    });
+    const preTaxAmountFieldSwitch = invoiceItemsSection.getByRole("switch", {
+      name: "Show the 'Pre-tax Amount' Column in the PDF for item 1",
+    });
     // Verify all field switches are visible and enabled
     const fieldSwitches = [
       nameFieldSwitch,
@@ -629,19 +610,21 @@ test.describe("Stripe Invoice Template", () => {
     await expect(showVatTableSummarySwitch).toBeHidden();
     await expect(typeOfGTUField).toBeHidden();
 
-    // TODO: fix below conditions
-    // await expect(nameFieldSwitch).toBeHidden();
-    // await expect(typeOfGTUFieldSwitch).toBeHidden();
-    // await expect(amountFieldSwitch).toBeHidden();
-    // await expect(unitFieldSwitch).toBeHidden();
-    // await expect(netPriceFieldSwitch).toBeHidden();
+    await expect(nameFieldSwitch).toBeHidden();
+    await expect(typeOfGTUFieldSwitch).toBeHidden();
+    await expect(amountFieldSwitch).toBeHidden();
 
-    // // we expect vat field switch to be visible because it is the only field that is visible in stripe template
-    // await expect(vatFieldSwitch).toBeVisible();
+    // NOTE: Unit field switch is visible in stripe template
+    await expect(unitFieldSwitch).toBeVisible();
 
-    // await expect(netAmountFieldSwitch).toBeHidden();
-    // await expect(vatAmountFieldSwitch).toBeHidden();
-    // await expect(preTaxAmountFieldSwitch).toBeHidden();
+    await expect(netPriceFieldSwitch).toBeHidden();
+
+    // NOTE: VAT (Tax Settings) field switch is visible in stripe template
+    await expect(vatFieldSwitch).toBeVisible();
+
+    await expect(netAmountFieldSwitch).toBeHidden();
+    await expect(vatAmountFieldSwitch).toBeHidden();
+    await expect(preTaxAmountFieldSwitch).toBeHidden();
 
     // =============== BACK TO DEFAULT TEMPLATE TESTING ===============
 
@@ -726,7 +709,7 @@ test.describe("Stripe Invoice Template", () => {
     await expect(paymentMethodVisibilitySwitch).toBeChecked(); // Should maintain its state
   });
 
-  test("automatically enables VAT field visibility and sets date format when switching to Stripe template", async ({
+  test("automatically sets date format when switching to Stripe template", async ({
     page,
     browserName,
     downloadDir,
@@ -736,10 +719,10 @@ test.describe("Stripe Invoice Template", () => {
 
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
-    // Get the VAT field switch (5th "Show in PDF" switch)
-    const vatFieldSwitch = invoiceItemsSection
-      .getByRole("switch", { name: /Show in PDF/i })
-      .nth(5);
+    // Get the VAT field switch
+    const vatFieldSwitch = invoiceItemsSection.getByRole("switch", {
+      name: "Show the 'VAT' Column in the PDF for item 1",
+    });
 
     // Verify VAT switch is visible and checked by default
     await expect(vatFieldSwitch).toBeVisible();
@@ -750,7 +733,15 @@ test.describe("Stripe Invoice Template", () => {
     await vatFieldSwitch.click();
     await expect(vatFieldSwitch).not.toBeChecked();
 
-    // Set VAT to a numeric value to make Tax column potentially visible in Stripe
+    // Get the date format select and verify initial value
+    const dateFormatSelect = page.getByRole("combobox", {
+      name: "Date Format",
+    });
+
+    // Verify date format is set to default format (YYYY-MM-DD)
+    await expect(dateFormatSelect).toHaveValue(DEFAULT_DATE_FORMAT);
+
+    // Set VAT to a numeric value to make Tax column  visible in Stripe
     const vatInput = invoiceItemsSection.getByRole("textbox", {
       name: "VAT",
       exact: true,
@@ -760,7 +751,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Wait debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(800);
+    await page.waitForTimeout(700);
 
     // Switch to Stripe template
     await page
@@ -770,11 +761,22 @@ test.describe("Stripe Invoice Template", () => {
     // Wait for URL to be updated
     await page.waitForURL("/?template=stripe");
 
-    // VAT field switch should now be hidden (since most switches are hidden in Stripe)
-    await expect(vatFieldSwitch).toBeHidden();
+    const newInvoiceItemsSection = page.getByTestId("invoice-items-section");
 
-    // BUT the VAT field visibility should be automatically enabled
-    // Let's verify this by checking the localStorage data
+    const newVatFieldSwitch = newInvoiceItemsSection.getByRole("switch", {
+      name: "Show the 'VAT' Column in the PDF for item 1",
+    });
+
+    await expect(newVatFieldSwitch).toBeVisible();
+    // because we toggle VAT field visibility off in default template, it should be unchecked in Stripe template
+    await expect(newVatFieldSwitch).not.toBeChecked();
+
+    // Verify date format is set to Stripe default format (MMMM D, YYYY)
+    const newDateFormatSelect = page.getByRole("combobox", {
+      name: "Date Format",
+    });
+    await expect(newDateFormatSelect).toHaveValue(STRIPE_DEFAULT_DATE_FORMAT);
+
     const storedData = (await page.evaluate((key) => {
       return localStorage.getItem(key);
     }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
@@ -782,8 +784,7 @@ test.describe("Stripe Invoice Template", () => {
     expect(storedData).toBeTruthy();
     const parsedData = JSON.parse(storedData) as InvoiceData;
 
-    // The VAT field should be automatically enabled for Stripe template
-    expect(parsedData.items[0].vatFieldIsVisible).toBe(true);
+    expect(parsedData.items[0].vatFieldIsVisible).toBe(false);
 
     // The date format should be automatically set to Stripe default format
     expect(parsedData.dateFormat).toBe(STRIPE_DEFAULT_DATE_FORMAT);
@@ -833,13 +834,13 @@ test.describe("Stripe Invoice Template", () => {
     );
 
     await expect(page.locator("canvas")).toHaveScreenshot(
-      "automatically-enables-VAT-field-visibility-and-sets-date-format-when-switching-to-Stripe-template.png",
+      "automatically-sets-date-format-when-switching-to-Stripe-template.png",
     );
 
     // navigate back to the previous page
     await page.goto("/", { waitUntil: "commit" });
 
-    // verify that the default template is selected
+    // verify that the stripe template is selected
     const templateCombobox = page.getByRole("combobox", {
       name: "Invoice Template",
     });
@@ -853,14 +854,20 @@ test.describe("Stripe Invoice Template", () => {
     // Wait for URL to be updated
     await page.waitForURL("/?template=default");
 
-    // VAT switch should be visible again and should maintain the enabled state
-    await expect(vatFieldSwitch).toBeVisible();
-    await expect(vatFieldSwitch).toBeChecked(); // Should be re-enabled due to Stripe template logic
+    const newVatInput = page.getByRole("textbox", {
+      name: "VAT",
+      exact: true,
+    });
 
     // Verify VAT input still has the numeric value
-    await expect(vatInput).toHaveValue("20");
+    await expect(newVatInput).toHaveValue("20");
 
     // Verify that date format is restored to default template format
+    const finalDateFormatSelect = page.getByRole("combobox", {
+      name: "Date Format",
+    });
+    await expect(finalDateFormatSelect).toHaveValue(DEFAULT_DATE_FORMAT);
+
     const finalStoredData = (await page.evaluate((key) => {
       return localStorage.getItem(key);
     }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
@@ -869,7 +876,7 @@ test.describe("Stripe Invoice Template", () => {
     const finalParsedData = JSON.parse(finalStoredData) as InvoiceData;
 
     // The date format should be restored to default format
-    expect(finalParsedData.dateFormat).toBe(SUPPORTED_DATE_FORMATS[0]);
+    expect(finalParsedData.dateFormat).toBe(DEFAULT_DATE_FORMAT);
   });
 
   test("generates PDF with logo and payment URL when using Stripe template", async ({
@@ -971,6 +978,344 @@ test.describe("Stripe Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       "pdf-with-logo-and-payment-url-when-using-stripe-template.png",
+    );
+  });
+
+  test("displays QR code in PDF when QR code data is provided", async ({
+    page,
+    browserName,
+    downloadDir,
+  }, testInfo) => {
+    const QR_CODE_TEST_DATA = {
+      data: "https://easyinvoicepdf.com",
+      description: "QR Code Description",
+    } as const satisfies {
+      data: string;
+      description: string;
+    };
+
+    // Switch to Stripe template
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+
+    const finalSection = page.getByTestId("final-section");
+
+    const qrCodeFieldset = finalSection.getByRole("group", {
+      name: "QR Code",
+    });
+    await expect(qrCodeFieldset).toBeVisible();
+
+    // Verify that "Show QR Code in PDF" switch is on by default
+    const showQrCodeSwitch = qrCodeFieldset.getByRole("switch", {
+      name: "Show QR Code in PDF",
+    });
+    await expect(showQrCodeSwitch).toBeVisible();
+    await expect(showQrCodeSwitch).toBeEnabled();
+    await expect(showQrCodeSwitch).toBeChecked();
+
+    // Verify QR Code Data field is empty by default
+    const qrCodeDataTextarea = qrCodeFieldset.getByRole("textbox", {
+      name: "Data",
+    });
+    await expect(qrCodeDataTextarea).toBeVisible();
+    await expect(qrCodeDataTextarea).toHaveValue("");
+
+    // Fill in the QR code data field
+    await qrCodeDataTextarea.fill(QR_CODE_TEST_DATA.data);
+
+    // Verify QR Code Description field is empty by default
+    const qrCodeDescriptionTextarea = qrCodeFieldset.getByRole("textbox", {
+      name: "Description (optional)",
+    });
+    await expect(qrCodeDescriptionTextarea).toBeVisible();
+    await expect(qrCodeDescriptionTextarea).toHaveValue("");
+
+    // Fill in the QR code description field
+    await qrCodeDescriptionTextarea.fill(QR_CODE_TEST_DATA.description);
+
+    // for better debugging screenshots, we fill in the notes field with a test note =)
+    await finalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(`Test: ${testInfo.title} (${testInfo.project.name})`);
+
+    // Wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const downloadPdfEnglishButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadPdfEnglishButton).toBeVisible();
+    await expect(downloadPdfEnglishButton).toBeEnabled();
+
+    // Click the download button and wait for download
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfEnglishButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const suggestedFilename = download.suggestedFilename();
+
+    // save the file to temporary directory
+    const pdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-${suggestedFilename}`,
+    );
+
+    await download.saveAs(pdfFilePath);
+
+    // Convert to absolute path and use proper file URL format
+    const absolutePath = path.resolve(pdfFilePath);
+    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
+
+    /**
+     * Render the PDF on a canvas and take a screenshot of it
+     */
+    const pdfBytes = fs.readFileSync(absolutePath);
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, pdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "displays-qr-code-in-pdf-stripe-template.png",
+    );
+
+    /**
+     * TURN OFF QR CODE IN PDF AND DOWNLOAD PDF AGAIN
+     */
+
+    // navigate back to the previous page
+    await page.goto("/", { waitUntil: "commit" });
+
+    // verify that we are on the default template
+    await expect(page).toHaveURL("/?template=stripe");
+
+    const newFinalSection = page.getByTestId("final-section");
+
+    const newQrCodeFieldset = newFinalSection.getByRole("group", {
+      name: "QR Code",
+    });
+    await expect(newQrCodeFieldset).toBeVisible();
+
+    // Verify that "Show QR Code in PDF" switch is on by default
+    const newShowQrCodeSwitch = newQrCodeFieldset.getByRole("switch", {
+      name: "Show QR Code in PDF",
+    });
+
+    await expect(newShowQrCodeSwitch).toBeVisible();
+    await expect(newShowQrCodeSwitch).toBeEnabled();
+    await expect(newShowQrCodeSwitch).toBeChecked();
+
+    // toggle the switch off
+    await newShowQrCodeSwitch.click();
+
+    // verify that the switch is off
+    await expect(newShowQrCodeSwitch).not.toBeChecked();
+
+    // Verify QR Code Data field is empty after toggling off
+    const newQrCodeDataTextarea = newQrCodeFieldset.getByRole("textbox", {
+      name: "Data",
+    });
+    await expect(newQrCodeDataTextarea).toBeVisible();
+    await expect(newQrCodeDataTextarea).toHaveValue(QR_CODE_TEST_DATA.data);
+
+    // Verify QR Code Description field is empty after toggling off
+    const newQrCodeDescriptionTextarea = newQrCodeFieldset.getByRole(
+      "textbox",
+      {
+        name: "Description (optional)",
+      },
+    );
+    await expect(newQrCodeDescriptionTextarea).toBeVisible();
+    await expect(newQrCodeDescriptionTextarea).toHaveValue(
+      QR_CODE_TEST_DATA.description,
+    );
+
+    // for better debugging screenshots, we fill in the notes field with a test note =)
+    await newFinalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: ${testInfo.title} - QR code hidden in PDF (${testInfo.project.name})`,
+      );
+
+    // wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const newDownloadPdfEnglishButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    // Download the PDF again
+    const [downloadPdfWithoutQrCode] = await Promise.all([
+      page.waitForEvent("download"),
+      newDownloadPdfEnglishButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const suggestedFilenameWithoutQrCode =
+      downloadPdfWithoutQrCode.suggestedFilename();
+
+    // save the file to temporary directory
+    const pdfFilePath2 = path.join(
+      downloadDir,
+      `${browserName}-${suggestedFilenameWithoutQrCode}`,
+    );
+
+    await downloadPdfWithoutQrCode.saveAs(pdfFilePath2);
+
+    /**
+     * Render the PDF on a canvas and take a screenshot to verify QR code is not displayed
+     */
+    const pdfBytesWithoutQrCode = fs.readFileSync(pdfFilePath2);
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, pdfBytesWithoutQrCode);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "qr-code-hidden-in-pdf-stripe-template.png",
+    );
+  });
+
+  test("generates multi-page PDF when invoice has many items", async ({
+    page,
+    browserName,
+    downloadDir,
+  }, testInfo) => {
+    // Switch to Stripe template
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    // Wait for URL to be updated
+    await page.waitForURL("/?template=stripe");
+
+    // Verify we're on the Stripe template
+    await expect(page).toHaveURL("/?template=stripe");
+
+    const invoiceItemsSection = page.getByTestId("invoice-items-section");
+
+    // Add  additional invoice items to trigger 2-page PDF
+    for (let i = 0; i < 17; i++) {
+      await invoiceItemsSection
+        .getByRole("button", { name: "Add invoice item" })
+        .click();
+
+      // Fill minimal required fields for the new item
+      const itemFieldset = invoiceItemsSection.getByRole("group", {
+        name: `Item ${i + 2}`, // Item numbers start at 1
+      });
+
+      // Add longer descriptions only to odd-numbered items to test mixed content layout
+      // This verifies that the PDF template handles varying text lengths correctly
+      // and maintains proper spacing between short and long item descriptions
+      const itemName =
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        (i + 2) % 2 === 1
+          ? `Item ${i + 2} - Professional consulting services including detailed analysis, comprehensive reporting, and ongoing support for enterprise-level implementations`
+          : `Item ${i + 2}`;
+
+      await itemFieldset.getByRole("textbox", { name: "Name" }).fill(itemName);
+
+      // Set VAT to 10% for each item
+      const taxSettingsFieldset = itemFieldset.getByRole("group", {
+        name: "Tax Settings",
+      });
+
+      // Use different tax rates: 10%, 20%, or 50%
+      const taxRate =
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        (i + 2) % 3 === 0 ? "50" : (i + 2) % 2 === 0 ? "20" : "10";
+
+      await taxSettingsFieldset
+        .getByRole("textbox", { name: "VAT", exact: true })
+        .fill(taxRate);
+
+      await itemFieldset
+        .getByRole("spinbutton", {
+          name: "Net Price (Rate or Unit Price)",
+        })
+        .fill(`${100 * (i + 1)}`);
+    }
+
+    const finalSection = page.getByTestId("final-section");
+
+    // for better debugging screenshots, we fill in the notes field with a test note
+    await finalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: generates multi-page PDF when invoice has many items (${testInfo.project.name})`,
+      );
+
+    // Wait for PDF preview to regenerate after invoice data changes (debounce timeout)
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const downloadPdfEnglishButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadPdfEnglishButton).toBeVisible();
+    await expect(downloadPdfEnglishButton).toBeEnabled();
+
+    // Click the download button and wait for download
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfEnglishButton.click(),
+    ]);
+
+    // Get the suggested filename
+    const suggestedFilename = download.suggestedFilename();
+
+    // save the file to temporary directory
+    const pdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-${suggestedFilename}`,
+    );
+
+    await download.saveAs(pdfFilePath);
+
+    // Convert to absolute path and use proper file URL format
+    const absolutePath = path.resolve(pdfFilePath);
+    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
+
+    /**
+     * RENDER ALL PDF PAGES ON A SINGLE CANVAS AND TAKE SCREENSHOT
+     */
+
+    const pdfBytes = fs.readFileSync(absolutePath);
+
+    await page.goto("about:blank");
+
+    await renderMultiPagePdfOnCanvas(page, pdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "stripe-template-multi-pages.png",
     );
   });
 });

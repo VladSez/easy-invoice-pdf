@@ -54,9 +54,9 @@ export function InvoiceItemsTable({
     <View style={{ marginBottom: 5, marginTop: 14 }}>
       <View style={styles.table}>
         {/* 
-          START: Table header columns
+          START: Table header row with columns
         */}
-        <View style={styles.tableRow}>
+        <View style={[styles.tableRow, { borderTopWidth: 1 }]} fixed>
           {/* Number column */}
           {isInvoiceItemNumberVisible ? (
             <View style={[styles.tableCol, styles.colNo, styles.center]}>
@@ -141,11 +141,11 @@ export function InvoiceItemsTable({
           ) : null}
         </View>
         {/* 
-          END: Table header columns
+            END: Table header columns
         */}
 
         {/* 
-          START: Table rows
+          START: Table body rows
         */}
         {invoiceData?.items.map((item, index) => {
           const formattedAmount = item.amount
@@ -189,7 +189,12 @@ export function InvoiceItemsTable({
 
           // Table row
           return (
-            <View style={styles.tableRow} key={index}>
+            <View
+              style={styles.tableRow}
+              key={index}
+              wrap={false}
+              minPresenceAhead={60}
+            >
               {/* Number */}
               {isInvoiceItemNumberVisible ? (
                 <View style={[styles.tableCol, styles.colNo]}>
@@ -328,13 +333,13 @@ export function InvoiceItemsTable({
           );
         })}
         {/* 
-          END: Table rows
+          END: Table body rows
         */}
 
         {/* 
           START: Table footer
         */}
-        <View style={styles.tableRow}>
+        <View style={styles.tableRow} wrap={false} minPresenceAhead={60}>
           {/* Empty cells */}
           <View style={[styles.tableCol, { borderRight: 0 }]}></View>
 
