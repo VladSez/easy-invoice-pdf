@@ -52,7 +52,7 @@ _**One-click PDF download** ready for printing or sending_
 
 ### 🔗 Shareable Links
 
-<img src=".github/demos/shareable-links.gif" width="800" alt="Shareable Links Demo">
+<img src=".github/demos/share-link.gif" width="800" alt="Shareable Links Demo">
 
 _**Send invoices directly to clients** without attachments_
 
@@ -96,8 +96,8 @@ _**Choose between multiple professional templates** (Default and Stripe) to matc
 
 ## 📢 News & Updates
 
-- **Jan 11, 2026**: Added Customizable Tax/VAT Labels. Improved i18n translations, overall improvements and bug fixes. [Release notes](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-1.0.1)
-- **Nov 19, 2025**: EasyInvoicePDF version 1.0.0 released. Welcome to try EasyInvoicePDF. Check [release notes](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-v1.0.0) for more details.
+- **Jan 11, 2026**: Added customizable tax/VAT labels, improved internationalization (i18n) translations, enhanced overall performance, and fixed multiple bugs. [Release notes for v1.0.1](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-1.0.1)
+- **Nov 19, 2025**: EasyInvoicePDF version 1.0.0 released! Create professional invoices in seconds. Welcome to try EasyInvoicePDF. [Release notes for v1.0.0](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-v1.0.0)
 
 ## 🎥 Demo Video
 

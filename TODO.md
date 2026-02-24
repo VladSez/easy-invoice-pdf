@@ -30,3 +30,9 @@ issues to follow:
 - https://github.com/microsoft/playwright/issues/13873
 - https://github.com/microsoft/playwright/issues/19253
 - https://github.com/wojtekmaj/react-pdf/issues/2026
+
+---
+
+To create GIFs for README.md, you can use:
+
+- https://www.freeconvert.com/mov-to-gif (set width to 1200px and Compression to 1)
