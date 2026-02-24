@@ -1040,6 +1040,11 @@ export const metadataSchema = z.object({
     .enum(MOBILE_TABS_VALUES)
     .default(DEFAULT_MOBILE_TAB)
     .optional(),
+
+  /** how many times the invoice PDF has been downloaded */
+  invoiceDownloadCount: z.number().int().nonnegative().default(0),
+  /** how many times the invoice has been shared via link */
+  invoiceSharedCount: z.number().int().nonnegative().default(0),
 });
 
 export type Metadata = z.infer<typeof metadataSchema>;

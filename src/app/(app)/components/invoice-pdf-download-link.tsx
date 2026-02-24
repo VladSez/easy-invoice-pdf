@@ -18,6 +18,7 @@ import { LOADING_BUTTON_TEXT, LOADING_BUTTON_TIMEOUT } from "./invoice-form";
 
 import { useDeviceContext } from "@/contexts/device-context";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
+import { updateAppMetadata } from "../utils/get-app-metadata";
 import { useCTAToast } from "../contexts/cta-toast-context";
 import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./cta-toasts";
 
@@ -106,6 +107,11 @@ export function InvoicePDFDownloadLink({
             invoice_template: invoiceData.template,
           },
         });
+
+        updateAppMetadata((current) => ({
+          ...current,
+          invoiceDownloadCount: (current?.invoiceDownloadCount ?? 0) + 1,
+        }));
 
         // close all other toasts (if any)
         toast.dismiss();

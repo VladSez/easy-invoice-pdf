@@ -13,7 +13,11 @@ import { useDeviceContext } from "@/contexts/device-context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { getAppMetadata } from "@/app/(app)/utils/get-app-metadata";
+import {
+  DEFAULT_METADATA,
+  getAppMetadata,
+  updateAppMetadata,
+} from "@/app/(app)/utils/get-app-metadata";
 import { Footer } from "@/components/footer";
 import { GitHubStarCTA } from "@/components/github-star-cta";
 import { GITHUB_URL } from "@/config";
@@ -36,7 +40,6 @@ import { showRandomCTAToast } from "./components/cta-toasts";
 import { useCTAToast } from "./contexts/cta-toast-context";
 import { useShowRandomCTAToastOnIdle } from "./hooks/use-show-random-cta-toast";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
-import { DEFAULT_METADATA } from "./utils/get-app-metadata";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
 import { InvoicePageHeader } from "@/app/(app)/components/invoice-page-header";
 import { Button } from "@/components/ui/button";
@@ -408,6 +411,15 @@ export function AppPageClient({
     [router, isMobile, searchParams],
   );
 
+  /**
+   * Handles changes to the invoice data.
+   *
+   * This function:
+   * - Updates the invoice state (useState hook) with the new data
+   * - Handles invoice URL corruption by clearing invalid URL parameters and notifying the user
+   * - Triggers change detection to show toast if invoice is modified from the URL-loaded version
+   *
+   */
   const handleInvoiceDataChange = (updatedData: InvoiceData) => {
     console.log("[handleInvoiceDataChange]");
 
@@ -571,6 +583,11 @@ export function AppPageClient({
               })
               .then(() => {
                 umamiTrackEvent("share_invoice_link_mobile");
+
+                updateAppMetadata((current) => ({
+                  ...current,
+                  invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
+                }));
               })
               .catch((err) => {
                 console.error(
@@ -616,6 +633,11 @@ export function AppPageClient({
               });
 
               umamiTrackEvent("share_invoice_link");
+
+              updateAppMetadata((current) => ({
+                ...current,
+                invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
+              }));
             })
             .catch((err) => {
               Sentry.captureException(err);
