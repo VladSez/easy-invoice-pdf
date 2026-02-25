@@ -101,7 +101,9 @@ export default async function RootLayout({
             {/* should only be enabled in production */}
             {process.env.VERCEL_ENV === "production" && (
               <>
-                <SpeedInsights />
+                <SpeedInsights
+                  sampleRate={0.3} // send only x% of the requests to Speed Insights (for cost-saving)
+                />
                 {/* https://eu.umami.is/dashboard */}
                 <Script
                   // we proxy umami check next.config.mjs rewrites

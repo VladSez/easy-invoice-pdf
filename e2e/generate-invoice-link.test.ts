@@ -311,7 +311,7 @@ test.describe("Generate Invoice Link", () => {
     page,
   }) => {
     // Navigate to page with invalid data parameter
-    await page.goto("/?data=invalid-data-string");
+    await page.goto("/?data=invalid-data-string", { waitUntil: "commit" });
 
     await expect(page).toHaveURL("/?data=invalid-data-string&template=default");
 
@@ -369,7 +369,7 @@ test.describe("Generate Invoice Link", () => {
     page,
   }) => {
     // Navigate to page with invalid data parameter
-    await page.goto("/?data=corrupted-url");
+    await page.goto("/?data=corrupted-url", { waitUntil: "commit" });
 
     await expect(page).toHaveURL("/?data=corrupted-url&template=default");
 
@@ -448,7 +448,7 @@ test.describe("Generate Invoice Link", () => {
       "N4IgNghgdg5grhGBTEAuEAHMIA0IAmEALkgGID2ATgLbFogCyTDABACI4sCaPXuIAYziVKSKAICe9AKoBlNvxLUsxFOgDORSgEsMKPGHIxy9ftqgA3ctoFIAcnGoAjJJQDyTgFZIBRNKEgXbHRSCABrImEIFihKdDwLCDA4NRAARgB6AAYADgBaACYsgoBWEABfPEISNwAzAEl1dRT6ItK83Ly0sqrVOtlXCxtUtpKO-IBmNLNLa1sAFQk9egAlJAtXdSQWAGEACwhKZBmrYcW9Um0kMHxGgDVtdW0nMDUtFLwtsFfKfxBtfD0NIAdgALFkAGw5UElCagiZZHogKAQaipABS5D2UHY5H0IAg+Hwoia9AAMuQoPhKZxpABpfiJIh2EzoNIFOElCGM4gsy7XW7qB5PF5vSgfEBIWjaYIgTxYqAAAWlYAAdAJyNR+BABBq4FBmY4XL82RyYdy8Dq9QaHM5XPybvdHs9Xmh3khPgB3bS1IgAIRsQLNXP46m9voDAgdguFLrFEqg5BI6noyb8eETyejTpFrtQtSSW0qICccAkrj+AKBwNhoIhWRhJWBDf4KLR9AAggI0bsTJaiSSU+g7EhPdwqGFOHYuLTZB2eczWelgxaQEy+VdHULnaK3eKPZKVfQdWjlRAZerNa2k0ghyBr1nNzGd3n3cXtEohwBtUDmU62eolFtY0czjPcE1RVJZHIX1PUObY2HWa5yAwNEDVbSDs23XN4wPIgliQOoAHF5mkUw8HwvRiNIrDY13fNCwPVFyH1PxUDSS1qBYg1aJfXC8H1D96C2SghlsfhBKIXicPAg8oCQIgAAUdHE9iSiyDSMwU5ThmksDUHdBI6GHRSFz0+jDORBSOy41i0G6DSsi0ogbO4qSn1Aiz9yMlzbPQ1AnLXYhXNY8zX28zBRHmCAAA8Qv8hzNMipBorivz3IFTzwpScoAF0KKTJJ7PUpKmWi0VZEcWhKAkLL+MwCAJDQogGAUvZyEBdBvVEFgtGgdRagrPAMEa5rWqIdr8DC+qRqasQiDYFp0FGcZClBUMtF0JBFMatwoDAcwkGkShZQfW9ViQygthYAQDiOfFM1vabZOGzZKQ7OAJqobQAC8kHweZyDWWxtA2Z6DIivQrvez72p0P6AfIRpmjIDzsP0t8gA";
 
     //  Navigate to old uncompressed URL
-    await page.goto(`/?data=${OLD_UNCOMPRESSED_URL}`);
+    await page.goto(`/?data=${OLD_UNCOMPRESSED_URL}`, { waitUntil: "commit" });
 
     // Verify the page loads without error
     await expect(page).toHaveURL(
@@ -509,7 +509,7 @@ test.describe("Generate Invoice Link", () => {
     const newCompressedUrl =
       "/?template=stripe&data=N4IghiBcIA4DYgDQgEZRAWSxgBAEURwE0SikQBjdAVQGU9yATdAZwBcAnASxgFNz+0cgDMooAB7oAYmADWbAK4cwOAHYdoyAJ7oAjAHoADAA4AtACZD5gKwgAvsgDm6SzdMnTu28gAWLq9buZgDMuuRc6ABKvABuvBwsvDgAwj5gHI78yABWUJwKvMiyYiAAXnoA7AAshgBsxlXWwVXBht4gAILoAFIA9j6q+L1ZIABC6AAyvaqM04TUANLkyXrmzda15AyQ+YUgAKLo2f2qAAIAtmBccAB0FL3n5FKr65vIAOJ5HAXIABIvjTeIAAkl8fiA2Og2Lx2OQFFBhGA4IkHCAEJBQOVoLoKk0qrVDI1rBVCeQutAOhRzklkr1yONoAA5XgAd2IvQ4skIjKI81oXWQK2xa0BWzBe0O0DAVN4Fyut3uj2QkKEyHhO2+vFRj0gAG1QIZxchukbOuhaL1hGwWekknhYrw4L0YNTVJDkEsNeCJuhyBgEUjEshGVBdMgAPKmgAKrHiMS4FBGAEVTZFQ9ZDJnkLRTQAVdCMmPIaimgBq6czhmQAHVTQANKBVkBkL17ABaFczdgAushVJ2m3TW8gYOgWVwOElOGBVCxhPFyABHU0cfxuDzmKrkFi+5VRB0JJIUNIZEbq3bIGKmlniuxAA";
 
-    await page.goto(newCompressedUrl);
+    await page.goto(newCompressedUrl, { waitUntil: "commit" });
 
     // Verify the page loads without error
     await expect(page).toHaveURL(newCompressedUrl);

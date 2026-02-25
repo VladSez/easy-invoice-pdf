@@ -560,7 +560,7 @@ export function AppPageClient({
         // Construct full URL with locale and compressed data
         const newGeneratedLinkFullUrl = `${window.location.origin}/?${currentParams.toString()}`;
 
-        // Copy to clipboard
+        // allow sharing invoice via navigator.share (on mobile and tablet) or copy to clipboard (on desktop)
         if (!isUADesktop && navigator?.share) {
           // MOBILE + TABLET
           try {
@@ -588,10 +588,13 @@ export function AppPageClient({
                   invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
                 }));
 
-                // show CTA toast after x seconds (after invoice link notification is shown)
+                // dismiss other toasts when navigator.share is successful (for better UX)
+                toast.dismiss();
+
+                // show CTA toast after x seconds
                 setTimeout(() => {
                   showRandomCTAToast();
-                }, 5_500);
+                }, 2_500);
               })
               .catch((err) => {
                 console.error(
