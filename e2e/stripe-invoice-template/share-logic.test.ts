@@ -100,6 +100,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
   test("cannot share invoice with Stripe template and *WITH* logo", async ({
     page,
   }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/?template=default");
+
     // Switch to Stripe template
     await page
       .getByRole("combobox", { name: "Invoice Template" })
@@ -136,6 +139,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
   test("share button becomes enabled again after removing logo", async ({
     page,
   }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/?template=default");
+
     // Switch to Stripe template and upload logo
     await page
       .getByRole("combobox", { name: "Invoice Template" })
@@ -175,16 +181,6 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Test that sharing works
     await shareButton.click();
-    await page.waitForURL((url) => url.searchParams.has("data"));
-
-    const url = page.url();
-    expect(url).toContain(`?template=stripe&data=`);
-
-    // Verify data parameter is not empty
-    const urlObj = new URL(url);
-    const dataParam = urlObj.searchParams.get("data");
-    expect(dataParam).toBeTruthy();
-    expect(dataParam).not.toBe("");
 
     // Verify the share invoice link description toast appears after generating the link
     const toast = page.getByTestId("share-invoice-link-description-toast");
@@ -195,11 +191,25 @@ test.describe("Stripe Invoice Sharing Logic", () => {
         "Share this link to let others view and edit this invoice",
       ),
     ).toBeVisible();
+
+    await page.waitForURL((url) => url.searchParams.has("data"));
+
+    const url = page.url();
+    expect(url).toContain(`?template=stripe&data=`);
+
+    // Verify data parameter is not empty
+    const urlObj = new URL(url);
+    const dataParam = urlObj.searchParams.get("data");
+    expect(dataParam).toBeTruthy();
+    expect(dataParam).not.toBe("");
   });
 
   test("share button becomes disabled when switching to Stripe template with existing logo", async ({
     page,
   }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/?template=default");
+
     // Start with default template and verify share button is enabled
     const shareButton = page.getByRole("button", {
       name: "Generate a link to invoice",
@@ -228,6 +238,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
   });
 
   test("preserves sharing state after page reload", async ({ page }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/?template=default");
+
     // Switch to Stripe template and upload logo
     await page
       .getByRole("combobox", { name: "Invoice Template" })
@@ -288,6 +301,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
   test("sharing functionality works correctly in mobile view (mobile UI is a bit different)", async ({
     page,
   }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/?template=default");
+
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
 
@@ -337,6 +353,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
   test("shows error toast when form has validation errors and generates link after fixing", async ({
     page,
   }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/?template=default");
+
     // Switch to Stripe template
     await page
       .getByRole("combobox", { name: "Invoice Template" })

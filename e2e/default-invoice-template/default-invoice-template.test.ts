@@ -15,7 +15,8 @@ test.describe("Default Invoice Template", () => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
 
-    await page.goto("/", { waitUntil: "commit" });
+    await page.goto("/");
+    await expect(page).toHaveURL("/?template=default");
   });
 
   test("downloads PDF in English and verifies content", async ({
@@ -72,7 +73,8 @@ test.describe("Default Invoice Template", () => {
     );
 
     // navigate back to the previous page
-    await page.goto("/", { waitUntil: "commit" });
+    await page.goto("/");
+    await expect(page).toHaveURL("/?template=default");
 
     /**
      * Switch to Stripe template and download PDF in English with Stripe template
@@ -297,7 +299,8 @@ test.describe("Default Invoice Template", () => {
     );
 
     // navigate back to the previous page
-    await page.goto("/", { waitUntil: "commit" });
+    await page.goto("/");
+    await expect(page).toHaveURL("/?template=default");
 
     /**
      * Switch to Stripe template and download PDF in Polish with Stripe template
@@ -551,7 +554,8 @@ test.describe("Default Invoice Template", () => {
     );
 
     // navigate back to the previous page
-    await page.goto("/", { waitUntil: "commit" });
+    await page.goto("/");
+    await expect(page).toHaveURL("/?template=default");
 
     // Wait for the download button to be ready after navigation
     const newDownloadPdfButton = page.getByRole("link", {
@@ -786,7 +790,8 @@ test.describe("Default Invoice Template", () => {
     );
 
     // Navigate back to the previous page
-    await page.goto("/", { waitUntil: "commit" });
+    await page.goto("/");
+    await expect(page).toHaveURL("/?template=default");
 
     // Set mobile viewport again
     await page.setViewportSize({ width: 375, height: 667 });
@@ -1114,7 +1119,8 @@ test.describe("Default Invoice Template", () => {
     );
 
     // navigate back to the previous page
-    await page.goto("/", { waitUntil: "commit" });
+    await page.goto("/");
+    await expect(page).toHaveURL("/?template=default");
 
     /**
      * Switch to Stripe template and download PDF in English with Stripe template
@@ -1298,7 +1304,8 @@ test.describe("Default Invoice Template", () => {
      */
 
     // navigate back to the previous page
-    await page.goto("/", { waitUntil: "commit" });
+    await page.goto("/");
+    await expect(page).toHaveURL("/?template=default");
 
     // verify that we are on the default template
     await expect(page).toHaveURL("/?template=default");

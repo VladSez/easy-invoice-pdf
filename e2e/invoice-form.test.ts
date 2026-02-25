@@ -22,7 +22,10 @@ test.describe("Invoice Generator Page", () => {
   });
 
   test("should redirect from /:locale/app to /", async ({ page }) => {
-    await page.goto("/en/app", { waitUntil: "commit" });
+    // old url structure
+    await page.goto("/en/app");
+
+    await expect(page).toHaveURL("/?template=default");
 
     // wait for the app page to load
     const downloadPDFButton = page.getByRole("link", {
@@ -39,7 +42,6 @@ test.describe("Invoice Generator Page", () => {
   }) => {
     // Navigate to default template
     await page.goto("/?template=default");
-
     await expect(page).toHaveURL("/?template=default");
 
     const templateCombobox = page.getByRole("combobox", {
@@ -1215,6 +1217,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Navigate to the page
     await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
 
     // Get the general information section
     const generalInfoSection = page.getByRole("region", {

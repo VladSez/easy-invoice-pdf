@@ -63,6 +63,7 @@ test.describe("Static assets (fonts, images, videos) should be accessible", () =
     });
 
     await page.goto("/");
+    await expect(page).toHaveURL("/?template=default");
 
     expect(failed).toEqual([]);
   });
@@ -78,6 +79,7 @@ test.describe("Static assets (fonts, images, videos) should be accessible", () =
     });
 
     await page.goto("/en/about");
+    await expect(page).toHaveURL("/en/about");
 
     expect(failed).toEqual([]);
   });

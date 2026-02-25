@@ -32,6 +32,7 @@ test.describe("Changelog page", () => {
 
   test("should navigate to individual changelog entry", async ({ page }) => {
     await page.goto("/changelog");
+    await expect(page).toHaveURL("/changelog");
 
     // Find and click on the first changelog entry title link
     // Find first changelog entry link and get its href
@@ -58,6 +59,7 @@ test.describe("Changelog page", () => {
   }) => {
     // Navigate to changelog and then to first entry
     await page.goto("/changelog");
+    await expect(page).toHaveURL("/changelog");
 
     // Find and click on the first changelog entry title link
     // Find first changelog entry link and get its href
@@ -114,6 +116,8 @@ test.describe("Changelog page", () => {
   }) => {
     // Navigate to an individual entry
     await page.goto("/changelog");
+    await expect(page).toHaveURL("/changelog");
+
     const firstEntryLink = page
       .getByRole("link")
       .filter({ has: page.getByRole("heading", { level: 2 }) })
@@ -143,11 +147,14 @@ test.describe("Changelog page", () => {
     // Try to navigate directly to a changelog entry
     // First get the slug from the main page
     await page.goto("/changelog");
+    await expect(page).toHaveURL("/changelog");
+
     const firstEntryLink = page.locator('a[href^="/changelog/"]').first();
     const href = await firstEntryLink.getAttribute("href");
 
     // Navigate directly to the entry
     await page.goto(href!);
+    await expect(page).toHaveURL(href!);
 
     // Verify the page loads correctly
     await expect(

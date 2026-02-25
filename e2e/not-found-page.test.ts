@@ -5,7 +5,6 @@ test.describe("Not Found page", () => {
     page,
   }) => {
     await page.goto("/non-existent-page");
-
     // Verify URL is correct
     await expect(page).toHaveURL("/non-existent-page");
 
@@ -27,7 +26,6 @@ test.describe("Not Found page", () => {
     page,
   }) => {
     await page.goto("/es/non-existent-page");
-
     // Verify URL is correct
     await expect(page).toHaveURL("/es/non-existent-page");
 
