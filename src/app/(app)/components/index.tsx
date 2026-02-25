@@ -266,7 +266,7 @@ export function InvoiceClientPage({
             />
           </div>
           {invoiceLastUpdatedAtFormatted && (
-            <div className="relative mt-2 text-center text-xs text-slate-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
+            <div className="relative mt-2 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
               <span className="font-semibold">Invoice last updated:</span>{" "}
               {invoiceLastUpdatedAtFormatted}
             </div>
@@ -312,7 +312,7 @@ export function InvoiceClientPage({
           </div>
           <div className="relative col-span-8 h-[620px] w-full max-w-full 2xl:h-[700px]">
             {invoiceLastUpdatedAtFormatted && (
-              <div className="absolute -top-5 right-0 text-center text-xs text-slate-700 duration-500 animate-in fade-in slide-in-from-bottom-2 md:-mb-5 lg:text-right">
+              <div className="absolute -top-5 right-0 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2 md:-mb-5 lg:text-right">
                 <span className="font-semibold">Invoice last updated:</span>{" "}
                 {invoiceLastUpdatedAtFormatted}
               </div>

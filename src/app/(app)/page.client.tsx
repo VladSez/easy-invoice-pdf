@@ -323,7 +323,6 @@ export function AppPageClient({
     }
   }, [loadFromLocalStorage, router, searchParams]);
 
-  // IMPORTANT: 🔥🔥🔥 DOUBLE check if below useEffect works as expected 🔥🔥🔥
   /**
    * Ensures the template query parameter is present in the URL (for better user experience)
    * If missing, adds it based on the current invoice data state.
@@ -588,6 +587,11 @@ export function AppPageClient({
                   ...current,
                   invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
                 }));
+
+                // show CTA toast after x seconds (after invoice link notification is shown)
+                setTimeout(() => {
+                  showRandomCTAToast();
+                }, 5_500);
               })
               .catch((err) => {
                 console.error(
@@ -595,16 +599,18 @@ export function AppPageClient({
                   err,
                 );
 
-                // dismiss all other toasts
-                toast.dismiss();
+                // Only show error if it's not an abort error (user cancelled the share)
+                if (err instanceof Error && err?.name !== "AbortError") {
+                  // dismiss all other toasts
+                  toast.dismiss();
 
-                toast.error("Failed to share invoice", {
-                  id: "failed-to-share-invoice-error-toast",
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                  description: `Please try again. Error: ${err?.message || "Unknown error"}`,
-                  position: isMobile ? "top-center" : "bottom-right",
-                  duration: 5_000,
-                });
+                  toast.error("Failed to share invoice", {
+                    id: "failed-to-share-invoice-error-toast",
+                    description: `Please try again. Error: ${err?.message || "Unknown error"}`,
+                    position: isMobile ? "top-center" : "bottom-right",
+                    duration: 5_000,
+                  });
+                }
               });
           } catch (shareError) {
             console.error(
@@ -638,16 +644,16 @@ export function AppPageClient({
                 ...current,
                 invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
               }));
+
+              // show CTA toast after x seconds (after invoice link notification is shown)
+              setTimeout(() => {
+                showRandomCTAToast();
+              }, 5_500);
             })
             .catch((err) => {
               Sentry.captureException(err);
             });
         }
-
-        // show CTA toast after x seconds (after invoice link notification is shown)
-        setTimeout(() => {
-          showRandomCTAToast();
-        }, 5_000);
 
         markCTAActionTriggered();
       } catch (error) {
