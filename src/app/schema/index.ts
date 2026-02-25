@@ -954,7 +954,7 @@ export const invoiceSchema = z.object({
    */
   qrCodeData: z
     .string()
-    .max(2000, "QR code data must not exceed 2000 characters")
+    .max(500, "QR code data must not exceed 500 characters")
     .trim()
     .optional()
     .default(""),

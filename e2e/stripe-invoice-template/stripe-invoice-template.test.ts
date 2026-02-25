@@ -1099,7 +1099,7 @@ test.describe("Stripe Invoice Template", () => {
     // navigate back to the previous page
     await page.goto("/", { waitUntil: "commit" });
 
-    // verify that we are on the default template
+    // verify that we are on the STRIPE template
     await expect(page).toHaveURL("/?template=stripe");
 
     const newFinalSection = page.getByTestId("final-section");
@@ -1124,14 +1124,14 @@ test.describe("Stripe Invoice Template", () => {
     // verify that the switch is off
     await expect(newShowQrCodeSwitch).not.toBeChecked();
 
-    // Verify QR Code Data field is empty after toggling off
+    // Verify QR Code Data field retains its value after toggling off
     const newQrCodeDataTextarea = newQrCodeFieldset.getByRole("textbox", {
       name: "Data",
     });
     await expect(newQrCodeDataTextarea).toBeVisible();
     await expect(newQrCodeDataTextarea).toHaveValue(QR_CODE_TEST_DATA.data);
 
-    // Verify QR Code Description field is empty after toggling off
+    // Verify QR Code Description field retains its value after toggling off
     const newQrCodeDescriptionTextarea = newQrCodeFieldset.getByRole(
       "textbox",
       {

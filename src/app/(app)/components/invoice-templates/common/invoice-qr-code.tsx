@@ -21,7 +21,7 @@ export function InvoiceQRCode({
       minPresenceAhead={30}
     >
       {/* eslint-disable-next-line jsx-a11y/alt-text */}
-      <Image src={qrCodeDataUrl} style={{ width: 100, height: 100 }} />
+      <Image src={qrCodeDataUrl} style={{ width: 120, height: 120 }} />
       {description ? (
         <Text
           style={{
