@@ -3,6 +3,7 @@
 import { env } from "@/env";
 
 import { cache } from "react";
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * Fetches the current star count for the GitHub repository.
@@ -24,6 +25,12 @@ export const fetchGithubStars = cache(async (): Promise<number> => {
     );
 
     if (!res.ok) {
+      Sentry.captureException(
+        new Error(
+          `[fetchGithubStars] Failed to fetch GitHub stars, status: ${res?.status ?? "Unknown status"}`,
+        ),
+      );
+
       return 0;
     }
 
@@ -31,7 +38,10 @@ export const fetchGithubStars = cache(async (): Promise<number> => {
 
     return data?.stargazers_count || 0;
   } catch (error) {
-    console.error("Failed to fetch GitHub stars:", error);
+    console.error("[fetchGithubStars] Failed to fetch GitHub stars:", error);
+
+    Sentry.captureException(error);
+
     return 0;
   }
 });

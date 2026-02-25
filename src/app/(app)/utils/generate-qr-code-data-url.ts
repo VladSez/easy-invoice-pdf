@@ -15,7 +15,7 @@ export async function generateQrCodeDataUrl(data: string): Promise<string> {
     const dataUrl = await QRCode.toDataURL(data, {
       errorCorrectionLevel: "M",
       margin: 2,
-      width: 200, // Generate at 2x resolution for crisp rendering at 80-100px
+      width: 200, // Generate at 2x resolution for crisp rendering
       color: {
         dark: "#000000",
         light: "#ffffff",

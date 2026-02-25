@@ -599,11 +599,11 @@ export function AppPageClient({
                   err,
                 );
 
+                // dismiss all other toasts for better UX
+                toast.dismiss();
+
                 // Only show error if it's not an abort error (user cancelled the share)
                 if (err instanceof Error && err?.name !== "AbortError") {
-                  // dismiss all other toasts
-                  toast.dismiss();
-
                   toast.error("Failed to share invoice", {
                     id: "failed-to-share-invoice-error-toast",
                     description: `Please try again. Error: ${err?.message || "Unknown error"}`,
