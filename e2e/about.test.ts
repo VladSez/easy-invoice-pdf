@@ -352,6 +352,7 @@ test.describe("About page", () => {
     page,
   }) => {
     await page.goto("/en/about");
+    await expect(page).toHaveURL("/en/about");
 
     // Click the Go to App button in header
     const header = page.getByRole("banner");

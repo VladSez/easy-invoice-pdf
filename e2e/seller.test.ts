@@ -6,6 +6,8 @@ import { expect, test } from "@playwright/test";
 test.describe("Seller management", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
+
+    await expect(page).toHaveURL("/?template=default");
   });
 
   test("create/edit seller", async ({ page }) => {

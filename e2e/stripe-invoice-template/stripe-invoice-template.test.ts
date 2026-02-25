@@ -21,15 +21,14 @@ test.describe("Stripe Invoice Template", () => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
 
-    await page.goto("/", { waitUntil: "commit" });
+    await page.goto("/");
   });
 
   test("displays correct OG meta tags for Stripe template", async ({
     page,
   }) => {
     // Navigate to Stripe template
-    await page.goto("/?template=stripe", { waitUntil: "commit" });
-
+    await page.goto("/?template=stripe");
     await expect(page).toHaveURL("/?template=stripe");
 
     const templateCombobox = page.getByRole("combobox", {
@@ -838,7 +837,8 @@ test.describe("Stripe Invoice Template", () => {
     );
 
     // navigate back to the previous page
-    await page.goto("/", { waitUntil: "commit" });
+    await page.goto("/");
+    await expect(page).toHaveURL("/?template=stripe");
 
     // verify that the stripe template is selected
     const templateCombobox = page.getByRole("combobox", {
@@ -846,7 +846,9 @@ test.describe("Stripe Invoice Template", () => {
     });
     await expect(templateCombobox).toHaveValue("stripe");
 
-    // Switch back to default template
+    /**
+     * Switch back to default template
+     */
     await page
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("default");
@@ -1097,7 +1099,7 @@ test.describe("Stripe Invoice Template", () => {
      */
 
     // navigate back to the previous page
-    await page.goto("/", { waitUntil: "commit" });
+    await page.goto("/");
 
     // verify that we are on the STRIPE template
     await expect(page).toHaveURL("/?template=stripe");
