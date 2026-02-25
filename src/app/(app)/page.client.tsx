@@ -606,10 +606,12 @@ export function AppPageClient({
                 if (err instanceof Error && err?.name !== "AbortError") {
                   toast.error("Failed to share invoice", {
                     id: "failed-to-share-invoice-error-toast",
-                    description: `Please try again. Error: ${err?.message || "Unknown error"}`,
+                    description: `Please try again or copy the link manually from the address bar`,
                     position: isMobile ? "top-center" : "bottom-right",
                     duration: 5_000,
                   });
+
+                  Sentry.captureException(err);
                 }
               });
           } catch (shareError) {
