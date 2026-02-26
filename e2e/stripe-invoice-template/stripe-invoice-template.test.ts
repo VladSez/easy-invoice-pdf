@@ -16,6 +16,9 @@ import {
 } from "../utils/render-pdf-on-canvas";
 import { STATIC_ASSETS_URL } from "@/config";
 
+// IMPORTANT: we want to run tests in serial mode for enhanced stability
+test.describe.configure({ mode: "serial" });
+
 test.describe("Stripe Invoice Template", () => {
   test.beforeEach(async ({ page }) => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
