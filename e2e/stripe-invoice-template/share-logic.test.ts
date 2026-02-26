@@ -2,9 +2,6 @@ import { PDF_DATA_LOCAL_STORAGE_KEY, type InvoiceData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
 import { SMALL_TEST_IMAGE_BASE64, uploadBase64LogoAsFile } from "./utils";
 
-// IMPORTANT: we want to run tests in serial mode for enhanced stability
-test.describe.configure({ mode: "serial" });
-
 test.describe("Stripe Invoice Sharing Logic", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");

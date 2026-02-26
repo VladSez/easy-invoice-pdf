@@ -18,8 +18,6 @@ const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
 // @ts-expect-error - NODE_ENV is not defined in the environment variables
 const isLocal = process.env.NODE_ENV === "local";
 
-const TIMEOUT = isLocal ? 50_000 : 80_000; // i.e. 80 seconds
-
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -32,14 +30,14 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 2 : undefined, // IMPORTANT: if tests are flaky locally, make `workers: 1` or `workers: 2`
+  workers: process.env.CI ? 1 : undefined, // IMPORTANT: if tests are flaky locally, make `workers: 1` or `workers: 2`
   /* timeout for expect assertions */
   expect: {
-    timeout: isLocal ? 40_000 : 60_000,
+    timeout: isLocal ? 10_000 : 15_000,
   },
 
   // /* timeout for test execution */
-  timeout: TIMEOUT,
+  timeout: isLocal ? 40_000 : 60_000, // i.e. 60 seconds,
 
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [["html", { outputFolder: "playwright-output/report" }]],
@@ -58,6 +56,11 @@ export default defineConfig({
 
     // set timezone to Europe/Warsaw by default for consistent date handling across local machines and CI
     timezoneId: "Europe/Warsaw",
+
+    // applies to: page.goto(), redirects, page.waitForURL(), clicking links that trigger navigation, form submits that navigate
+    navigationTimeout: 30_000,
+    // Applies to interactions: locator.click(), fill(), check(), hover(), press(), dragTo()
+    actionTimeout: 15_000,
   },
 
   /* Configure projects for major browsers */
