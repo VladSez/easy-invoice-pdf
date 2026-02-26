@@ -564,7 +564,7 @@ export function AppPageClient({
         if (!isUADesktop && navigator?.share) {
           // MOBILE + TABLET
           try {
-            toast.success("Invoice link generated - Share invoice", {
+            toast.success("Your invoice link is ready. Share it now.", {
               id: "invoice-link-generated-share-invoice-success-toast",
               description: (
                 <p data-testid="share-invoice-link-description-toast">
@@ -577,7 +577,7 @@ export function AppPageClient({
 
             await navigator
               ?.share({
-                title: "Invoice link generated - Share invoice",
+                title: "Your invoice link is ready. Share it now.",
                 url: newGeneratedLinkFullUrl,
               })
               .then(() => {
@@ -589,7 +589,9 @@ export function AppPageClient({
                 }));
 
                 // dismiss other toasts when navigator.share is successful (for better UX)
-                toast.dismiss();
+                setTimeout(() => {
+                  toast.dismiss();
+                }, 1000);
 
                 // show CTA toast after x seconds
                 setTimeout(() => {
@@ -632,7 +634,7 @@ export function AppPageClient({
           await navigator?.clipboard
             ?.writeText(newGeneratedLinkFullUrl)
             .then(() => {
-              toast.success("Invoice link copied to clipboard!", {
+              toast.success("Invoice link generated and copied to clipboard!", {
                 id: "invoice-link-copied-to-clipboard-success-toast",
                 description: (
                   <p data-testid="share-invoice-link-description-toast">
