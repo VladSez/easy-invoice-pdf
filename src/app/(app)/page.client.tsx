@@ -591,7 +591,7 @@ export function AppPageClient({
                 // dismiss other toasts when navigator.share is successful (for better UX)
                 setTimeout(() => {
                   toast.dismiss();
-                }, 1000);
+                }, 1_500);
 
                 // show CTA toast after x seconds
                 setTimeout(() => {
