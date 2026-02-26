@@ -148,6 +148,7 @@ export function SellerManagement({
       }
 
       toast.success("Seller added successfully", {
+        id: "add_seller_success_toast",
         richColors: true,
       });
 
@@ -157,6 +158,7 @@ export function SellerManagement({
       console.error("Failed to add seller:", error);
 
       toast.error("Failed to add seller", {
+        id: "add_seller_error_toast",
         closeButton: true,
       });
 
@@ -183,6 +185,7 @@ export function SellerManagement({
       setEditingSeller(null);
 
       toast.success("Seller updated successfully", {
+        id: "edit_seller_success_toast",
         richColors: true,
       });
 
@@ -192,6 +195,7 @@ export function SellerManagement({
       console.error("Failed to edit seller:", error);
 
       toast.error("Failed to edit seller", {
+        id: "edit_seller_error_toast",
         closeButton: true,
       });
 
@@ -243,6 +247,7 @@ export function SellerManagement({
       setIsDeleteDialogOpen(false);
 
       toast.success("Seller deleted successfully", {
+        id: "delete_seller_success_toast",
         richColors: true,
       });
 
@@ -252,6 +257,7 @@ export function SellerManagement({
       console.error("Failed to delete seller:", error);
 
       toast.error("Failed to delete seller", {
+        id: "delete_seller_error_toast",
         closeButton: true,
       });
 

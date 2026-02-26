@@ -148,7 +148,11 @@ export function AppPageClient({
     };
   }, [invoiceDataState?.qrCodeData, invoiceDataState?.qrCodeIsVisible]);
 
-  useShowRandomCTAToastOnIdle();
+  // Only show CTA toast on idle in non-CI environments
+  if (!process.env.CI) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useShowRandomCTAToastOnIdle();
+  }
 
   // Helper function to load from localStorage
   const loadFromLocalStorage = useCallback(() => {
@@ -505,7 +509,7 @@ export function AppPageClient({
     // prevent sharing invoice if there are form errors
     if (invoiceFormHasErrors) {
       toast.error("Unable to Share Invoice", {
-        id: "unable-to-share-invoice-form-errors-error-toast",
+        id: "unable-to-share-invoice-form-errors-toast",
         duration: 6000,
         position: isMobile ? "top-center" : "bottom-right",
         description: (
