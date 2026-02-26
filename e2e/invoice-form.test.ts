@@ -23,7 +23,7 @@ test.describe("Invoice Generator Page", () => {
 
   test("should redirect from /:locale/app to /", async ({ page }) => {
     // old url structure
-    await page.goto("/en/app");
+    await page.goto("/en/app", { waitUntil: "commit" });
 
     await expect(page).toHaveURL("/?template=default");
 

@@ -101,7 +101,7 @@ jobs:
 
             Result: ${{ steps.playwright.outcome == 'success' && '✅ Passed' || '❌ Failed' }}
             Playwright Browser Binaries Installation Time: ${{ steps.playwright-install.outputs.duration_formatted }}
-            ${{ steps.playwright.outcome == 'success' && format('Playwright Tests Duration: {0}', steps.playwright.outputs.duration_formatted) }}
+            ${{ steps.playwright.outputs.duration_formatted && format('Playwright Tests Duration: {0}', steps.playwright.outputs.duration_formatted) || '' }}
 
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

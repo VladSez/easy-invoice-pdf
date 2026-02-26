@@ -560,11 +560,11 @@ export function AppPageClient({
         // Construct full URL with locale and compressed data
         const newGeneratedLinkFullUrl = `${window.location.origin}/?${currentParams.toString()}`;
 
-        // Copy to clipboard
+        // allow sharing invoice via navigator.share (on mobile and tablet) or copy to clipboard (on desktop)
         if (!isUADesktop && navigator?.share) {
           // MOBILE + TABLET
           try {
-            toast.success("Invoice link generated - Share invoice", {
+            toast.success("Your invoice link is ready. Share it now.", {
               id: "invoice-link-generated-share-invoice-success-toast",
               description: (
                 <p data-testid="share-invoice-link-description-toast">
@@ -577,7 +577,7 @@ export function AppPageClient({
 
             await navigator
               ?.share({
-                title: "Invoice link generated - Share invoice",
+                title: "Your invoice link is ready. Share it now.",
                 url: newGeneratedLinkFullUrl,
               })
               .then(() => {
@@ -588,10 +588,15 @@ export function AppPageClient({
                   invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
                 }));
 
-                // show CTA toast after x seconds (after invoice link notification is shown)
+                // dismiss other toasts when navigator.share is successful (for better UX)
+                setTimeout(() => {
+                  toast.dismiss();
+                }, 1000);
+
+                // show CTA toast after x seconds
                 setTimeout(() => {
                   showRandomCTAToast();
-                }, 5_500);
+                }, 2_500);
               })
               .catch((err) => {
                 console.error(
@@ -629,7 +634,7 @@ export function AppPageClient({
           await navigator?.clipboard
             ?.writeText(newGeneratedLinkFullUrl)
             .then(() => {
-              toast.success("Invoice link copied to clipboard!", {
+              toast.success("Invoice link generated and copied to clipboard!", {
                 id: "invoice-link-copied-to-clipboard-success-toast",
                 description: (
                   <p data-testid="share-invoice-link-description-toast">

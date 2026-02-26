@@ -105,6 +105,10 @@ Watch a quick demo of EasyInvoicePDF in action to see how easy it is to create p
 
 https://github.com/user-attachments/assets/d46c6e4e-b78a-4aa1-ab44-d20d6485b682
 
+## 🌟 Star History
+
+[![RepoStars](https://repostars.dev/api/embed?repo=VladSez%2Feasy-invoice-pdf&theme=dark)](https://repostars.dev/?repos=VladSez%2Feasy-invoice-pdf&theme=dark)
+
 ## 👨‍💻 Made By
 
 Built by [Vlad Sazonau](https://x.com/vladsazonau)
