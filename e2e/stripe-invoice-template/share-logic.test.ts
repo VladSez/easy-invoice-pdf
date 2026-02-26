@@ -192,6 +192,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       ),
     ).toBeVisible();
 
+    // verify URL contains data parameter
     await page.waitForURL((url) => url.searchParams.has("data"));
 
     const url = page.url();
@@ -361,7 +362,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    await page.waitForURL("/?template=stripe");
+    await expect(page).toHaveURL("/?template=stripe");
 
     // Locate the Net Price input for the first invoice item
     const netPriceInput = page.locator("#itemNetPrice0");
@@ -398,6 +399,16 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // Click share button again — should succeed this time
     await shareButton.click();
 
+    // Verify the share invoice link description toast appears after generating the link
+    const toast = page.getByTestId("share-invoice-link-description-toast");
+    await expect(toast).toBeVisible();
+
+    await expect(
+      page.getByText(
+        "Share this link to let others view and edit this invoice",
+      ),
+    ).toBeVisible();
+
     // Verify link was generated: URL should contain data param
     await page.waitForURL((url) => url.searchParams.has("data"));
     const url = page.url();
@@ -408,15 +419,5 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     const dataParam = urlObj.searchParams.get("data");
     expect(dataParam).toBeTruthy();
     expect(dataParam).not.toBe("");
-
-    // Verify the share invoice link description toast appears after generating the link
-    const toast = page.getByTestId("share-invoice-link-description-toast");
-    await expect(toast).toBeVisible();
-
-    await expect(
-      page.getByText(
-        "Share this link to let others view and edit this invoice",
-      ),
-    ).toBeVisible();
   });
 });

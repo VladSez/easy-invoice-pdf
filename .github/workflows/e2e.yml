@@ -62,7 +62,6 @@ jobs:
           minutes=$((duration / 60))
           seconds=$((duration % 60))
 
-          echo "duration=${duration}" >> "$GITHUB_OUTPUT"
           echo "duration_formatted=${minutes}m ${seconds}s" >> "$GITHUB_OUTPUT"
 
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 #4.6.1
@@ -101,8 +100,8 @@ jobs:
             E2E tests for ${{ github.repository }} have completed.
 
             Result: ${{ steps.playwright.outcome == 'success' && '✅ Passed' || '❌ Failed' }}
-            Playwright Browser Binaries Installation Time: ${{ steps.playwright-install.outputs.duration > 90 && '🔴 SLOW' || '' }} ${{ steps.playwright-install.outputs.duration_formatted }}
-            ${{ steps.playwright.outputs.duration_formatted && format('Playwright Tests Duration: {0} {1}', steps.playwright.outputs.duration > 1200 && '🔴 SLOW' || '', steps.playwright.outputs.duration_formatted) || '' }}
+            Playwright Browser Binaries Installation Time: ${{ steps.playwright-install.outputs.duration_formatted }}
+            ${{ steps.playwright.outputs.duration_formatted && format('Playwright Tests Duration: {0}', steps.playwright.outputs.duration_formatted) || '' }}
 
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

@@ -38,6 +38,8 @@ const TEST_BUYER_DATA = {
 test.describe("Generate Invoice Link", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
+
+    await expect(page).toHaveURL("/?template=default");
   });
 
   test("can share invoice and data is persisted in new tab", async ({
@@ -635,9 +637,6 @@ test.describe("Generate Invoice Link", () => {
       .getByRole("button", { name: "Generate a link to invoice" })
       .click();
 
-    // Wait for URL to update with share data
-    await page.waitForURL((url) => url.searchParams.has("data"));
-
     // Verify the share invoice link description toast appears after generating the link
     const toast = page.getByTestId("share-invoice-link-description-toast");
     await expect(toast).toBeVisible();
@@ -647,6 +646,9 @@ test.describe("Generate Invoice Link", () => {
         "Share this link to let others view and edit this invoice",
       ),
     ).toBeVisible();
+
+    // Wait for URL to update with share data
+    await page.waitForURL((url) => url.searchParams.has("data"));
 
     // Get the current URL which should now contain the share data
     const sharedUrl = page.url();
