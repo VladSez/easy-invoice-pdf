@@ -132,6 +132,7 @@ export function BuyerManagement({
       }
 
       toast.success("Buyer added successfully", {
+        id: "add_buyer_success_toast",
         richColors: true,
       });
 
@@ -141,6 +142,7 @@ export function BuyerManagement({
       console.error("Failed to add buyer:", error);
 
       toast.error("Failed to add buyer", {
+        id: "add_buyer_error_toast",
         closeButton: true,
       });
 
@@ -167,6 +169,7 @@ export function BuyerManagement({
       setEditingBuyer(null);
 
       toast.success("Buyer updated successfully", {
+        id: "edit_buyer_success_toast",
         richColors: true,
       });
 
@@ -176,6 +179,7 @@ export function BuyerManagement({
       console.error("Failed to edit buyer:", error);
 
       toast.error("Failed to edit buyer", {
+        id: "edit_buyer_error_toast",
         closeButton: true,
       });
 
@@ -227,6 +231,7 @@ export function BuyerManagement({
       setIsDeleteDialogOpen(false);
 
       toast.success("Buyer deleted successfully", {
+        id: "delete_buyer_success_toast",
         richColors: true,
       });
 
@@ -236,6 +241,7 @@ export function BuyerManagement({
       console.error("Failed to delete buyer:", error);
 
       toast.error("Failed to delete buyer", {
+        id: "delete_buyer_error_toast",
         closeButton: true,
       });
 

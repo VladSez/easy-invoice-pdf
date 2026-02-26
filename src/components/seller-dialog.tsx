@@ -137,6 +137,7 @@ export function SellerDialog({
 
         // Show error toast
         toast.error("Error loading existing sellers", {
+          id: "error-loading-existing-sellers-error-toast",
           richColors: true,
           description: "Please try again",
         });
@@ -166,7 +167,9 @@ export function SellerDialog({
 
         // Show error toast
         toast.error("A seller with this name already exists", {
+          id: "seller-name-already-exists-error-toast",
           richColors: true,
+          description: "Please try again",
         });
 
         return;
@@ -189,6 +192,7 @@ export function SellerDialog({
       console.error("Failed to save seller:", error);
 
       toast.error("Failed to save seller", {
+        id: "failed-to-save-seller-error-toast",
         description: "Please try again",
         richColors: true,
       });
