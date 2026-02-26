@@ -11,6 +11,8 @@ jobs:
     timeout-minutes: 35
     # we use macos-latest because I am using mac os locally and generating snapshots (screenshots) for the PDF tests locally, so we need to use the same OS on the CI. https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job#choosing-github-hosted-runners
     runs-on: macos-latest
+    env:
+      TZ: Europe/Warsaw # we use Europe/Warsaw timezone for consistent date handling across local machines and CI
     steps:
       - run: |
           echo "Environment URL - ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}"

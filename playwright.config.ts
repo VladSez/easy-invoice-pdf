@@ -18,6 +18,8 @@ const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
 // @ts-expect-error - NODE_ENV is not defined in the environment variables
 const isLocal = process.env.NODE_ENV === "local";
 
+console.log(`[Playwright Config] Using timezone: ${process.env.TZ}`);
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -53,9 +55,6 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "retain-on-failure",
-
-    // set timezone to Europe/Warsaw by default for consistent date handling across local machines and CI
-    timezoneId: "Europe/Warsaw",
 
     // applies to: page.goto(), redirects, page.waitForURL(), clicking links that trigger navigation, form submits that navigate
     navigationTimeout: 30_000,
