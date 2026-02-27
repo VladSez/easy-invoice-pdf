@@ -22,10 +22,13 @@ test.describe("Invoice Generator Page", () => {
   });
 
   test("should redirect from /:locale/app to /", async ({ page }) => {
-    // old url structure
-    await page.goto("/en/app", { waitUntil: "commit" });
-
-    await expect(page).toHaveURL("/?template=default");
+    // listener starts FIRST
+    // navigation starts SECOND
+    // should eliminate flakiness
+    await Promise.all([
+      page.waitForURL("**/?template=default"),
+      page.goto("/en/app"),
+    ]);
 
     // wait for the app page to load
     const downloadPDFButton = page.getByRole("link", {
@@ -33,8 +36,7 @@ test.describe("Invoice Generator Page", () => {
     });
 
     await expect(downloadPDFButton).toBeVisible();
-
-    await expect(page).toHaveURL("/?template=default");
+    await expect(downloadPDFButton).toBeEnabled();
   });
 
   test("displays correct OG meta tags for default template", async ({

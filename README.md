@@ -94,6 +94,10 @@ _**Choose between multiple professional templates** (Default and Stripe) to matc
 
 </div>
 
+## 🌟 Star History
+
+[![RepoStars](https://repostars.dev/api/embed?repo=VladSez%2Feasy-invoice-pdf&theme=dark)](https://repostars.dev/?repos=VladSez%2Feasy-invoice-pdf&theme=dark)
+
 ## 📢 News & Updates
 
 - **Jan 11, 2026**: Added customizable tax/VAT labels, improved internationalization (i18n) translations, enhanced overall performance, and fixed multiple bugs. [Release notes for v1.0.1](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-1.0.1)
@@ -112,10 +116,6 @@ Built by [Vlad Sazonau](https://x.com/vladsazonau)
 - 🐦 Twitter: [@vladsazonau](https://twitter.com/vladsazonau)
 - 💼 LinkedIn: [Vlad Sazonau](https://www.linkedin.com/in/vlad-sazonau-22a9a9126/)
 - 🌐 Website: [vladsazon.com](https://vladsazon.com)
-
-## 🌟 Star History
-
-[![RepoStars](https://repostars.dev/api/embed?repo=VladSez%2Feasy-invoice-pdf&theme=dark)](https://repostars.dev/?repos=VladSez%2Feasy-invoice-pdf&theme=dark)
 
 ## ❤️ Support the Project
 

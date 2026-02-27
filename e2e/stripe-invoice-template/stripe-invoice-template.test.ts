@@ -27,6 +27,8 @@ test.describe("Stripe Invoice Template", () => {
   test("displays correct OG meta tags for Stripe template", async ({
     page,
   }) => {
+    await expect(page).toHaveURL("/?template=default");
+
     // Navigate to Stripe template
     await page.goto("/?template=stripe");
     await expect(page).toHaveURL("/?template=stripe");
