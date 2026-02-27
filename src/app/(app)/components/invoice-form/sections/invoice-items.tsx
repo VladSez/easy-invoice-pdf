@@ -541,7 +541,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                 <div data-testid={`itemVat${index}`} className="mt-4">
                   <div className="mb-2 flex items-center justify-between">
                     <Label htmlFor={`itemVat${index}`} className="">
-                      {taxLabelText}
+                      {taxLabelText} Rate
                     </Label>
                   </div>
 
@@ -565,7 +565,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     </ErrorMessage>
                   ) : (
                     <InputHelperMessage>
-                      Enter a number (0-100), or any text (i.e. NP, OO, etc).
+                      Enter a number (0-100) or text (e.g., NP, OO, etc).
                     </InputHelperMessage>
                   )}
                 </div>

@@ -481,7 +481,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       invoiceItemsSection
         .getByTestId(`itemVat0`)
-        .getByText("Enter a number (0-100), or any text (i.e. NP, OO, etc)."),
+        .getByText("Enter a number (0-100) or text (e.g., NP, OO, etc)."),
     ).toBeVisible();
 
     // Net Amount field (read-only) and visibility toggle

@@ -180,7 +180,10 @@ test.describe("Default Invoice Template", () => {
     const taxSettingsFieldset = invoiceItemsSection.getByRole("group", {
       name: "Tax Settings",
     });
-    await taxSettingsFieldset.getByRole("textbox", { name: "VAT" }).fill("10");
+    await taxSettingsFieldset
+      .getByRole("textbox", { name: "VAT Rate" })
+      .fill("10");
+
     await taxSettingsFieldset
       .getByRole("textbox", { name: "Tax Label" })
       .fill("Custom TEST TAX LABEL");
@@ -712,7 +715,7 @@ test.describe("Default Invoice Template", () => {
     });
 
     await taxSettingsFieldset
-      .getByRole("textbox", { name: "TVA", exact: true })
+      .getByRole("textbox", { name: "TVA Rate", exact: true })
       .fill("23");
 
     // wait for debounce timeout
@@ -842,7 +845,10 @@ test.describe("Default Invoice Template", () => {
     });
 
     await expect(
-      newTaxSettingsFieldset.getByRole("textbox", { name: "TVA", exact: true }),
+      newTaxSettingsFieldset.getByRole("textbox", {
+        name: "TVA Rate",
+        exact: true,
+      }),
     ).toHaveValue("23");
 
     // Verify calculations are correct
@@ -1455,7 +1461,7 @@ test.describe("Default Invoice Template", () => {
         (i + 2) % 3 === 0 ? "50" : (i + 2) % 2 === 0 ? "20" : "10";
 
       await taxSettingsFieldset
-        .getByRole("textbox", { name: "Sales Tax", exact: true })
+        .getByRole("textbox", { name: "Sales Tax Rate", exact: true })
         .fill(taxRate);
 
       await itemFieldset

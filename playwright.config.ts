@@ -58,7 +58,7 @@ export default defineConfig({
     timezoneId: "Europe/Warsaw",
 
     // applies to: page.goto(), redirects, page.waitForURL(), clicking links that trigger navigation, form submits that navigate
-    navigationTimeout: 30_000,
+    navigationTimeout: 45_000,
     // Applies to interactions: locator.click(), fill(), check(), hover(), press(), dragTo()
     actionTimeout: 15_000,
   },

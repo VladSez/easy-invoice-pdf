@@ -135,7 +135,9 @@ test.describe("Generate Invoice Link", () => {
       .getByRole("textbox", { name: "Tax Label" })
       .fill("Custom VAT");
 
-    await taxSettingsFieldset.getByRole("textbox", { name: "VAT" }).fill("23");
+    await taxSettingsFieldset
+      .getByRole("textbox", { name: "VAT Rate" })
+      .fill("23");
 
     // check total
     const totalField = finalSection.getByRole("textbox", {
@@ -281,7 +283,7 @@ test.describe("Generate Invoice Link", () => {
     ).toHaveValue("Custom VAT");
 
     await expect(
-      newTaxSettingsFieldset.getByRole("textbox", { name: "Custom VAT" }),
+      newTaxSettingsFieldset.getByRole("textbox", { name: "Custom VAT Rate" }),
     ).toHaveValue("23");
 
     const newFinalSection = newPage.getByTestId(`final-section`);
@@ -854,7 +856,7 @@ test.describe("Generate Invoice Link", () => {
       );
 
     await firstItemTaxSettingsFieldset
-      .getByRole("textbox", { name: "Sales Tax", exact: true })
+      .getByRole("textbox", { name: "Sales Tax Rate", exact: true })
       .fill("20");
 
     await firstItemFieldset
