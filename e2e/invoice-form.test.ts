@@ -469,7 +469,10 @@ test.describe("Invoice Generator Page", () => {
 
     // VAT field and visibility toggle
     await expect(
-      invoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true }),
+      invoiceItemsSection.getByRole("textbox", {
+        name: "VAT Rate",
+        exact: true,
+      }),
     ).toHaveValue(firstItem.vat);
     await expect(
       invoiceItemsSection.getByRole("switch", {
@@ -595,7 +598,7 @@ test.describe("Invoice Generator Page", () => {
       })
       .fill("100");
     await invoiceItemsSection
-      .getByRole("textbox", { name: "VAT", exact: true })
+      .getByRole("textbox", { name: "VAT Rate", exact: true })
       .fill("23");
 
     // Check calculated values
@@ -1084,7 +1087,7 @@ test.describe("Invoice Generator Page", () => {
     // **VAT FIELD**
 
     const vatInput = invoiceItemsSection.getByRole("textbox", {
-      name: "VAT",
+      name: "VAT Rate",
       exact: true,
     });
 
@@ -1170,7 +1173,7 @@ test.describe("Invoice Generator Page", () => {
       exact: true,
     });
     const vatInput = invoiceItemsSection.getByRole("textbox", {
-      name: "VAT",
+      name: "VAT Rate",
       exact: true,
     });
 
