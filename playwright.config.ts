@@ -54,7 +54,7 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "retain-on-failure",
 
-    // set timezone to Europe/Warsaw by default for consistent date handling across local machines and CI
+    // set timezone to Europe/Warsaw by default for consistent date handling across local machines and CI inside browser
     timezoneId: "Europe/Warsaw",
 
     // applies to: page.goto(), redirects, page.waitForURL(), clicking links that trigger navigation, form submits that navigate
