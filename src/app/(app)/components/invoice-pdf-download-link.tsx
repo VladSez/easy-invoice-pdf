@@ -21,6 +21,7 @@ import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
 import { updateAppMetadata } from "../utils/get-app-metadata";
 import { useCTAToast } from "../contexts/cta-toast-context";
 import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./cta-toasts";
+import { haptic } from "@/lib/haptic";
 
 // Separate button states into a memoized component
 const ButtonContent = ({
@@ -101,6 +102,8 @@ export function InvoicePDFDownloadLink({
       }
 
       if (!isLoading && !error) {
+        haptic();
+
         // track download event
         umamiTrackEvent("download_invoice", {
           data: {

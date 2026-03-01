@@ -106,7 +106,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Check main action buttons
     await expect(
-      page.getByRole("button", { name: "Generate a link to invoice" }),
+      page.getByRole("button", { name: "Generate invoice link" }),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Download PDF in English" }),
@@ -167,7 +167,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Verify buttons are enabled
     await expect(
-      page.getByRole("button", { name: "Generate a link to invoice" }),
+      page.getByRole("button", { name: "Generate invoice link" }),
     ).toBeEnabled();
     await expect(
       page.getByRole("link", { name: "Download PDF in English" }),

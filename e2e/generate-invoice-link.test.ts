@@ -170,9 +170,7 @@ test.describe("Generate Invoice Link", () => {
     await page.waitForTimeout(700);
 
     // Generate share link
-    await page
-      .getByRole("button", { name: "Generate a link to invoice" })
-      .click();
+    await page.getByRole("button", { name: "Generate invoice link" }).click();
 
     // Wait for URL to update with share data
     await page.waitForURL((url) => url.searchParams.has("data"));
@@ -430,7 +428,7 @@ test.describe("Generate Invoice Link", () => {
 
     await expect(
       page.getByText(
-        "Click 'Generate a link to invoice' to create a new shareable link.",
+        "Click 'Generate invoice link' to create a new shareable link.",
       ),
     ).toBeVisible();
 
@@ -635,9 +633,7 @@ test.describe("Generate Invoice Link", () => {
     await page.waitForTimeout(700);
 
     // Generate share link
-    await page
-      .getByRole("button", { name: "Generate a link to invoice" })
-      .click();
+    await page.getByRole("button", { name: "Generate invoice link" }).click();
 
     // Verify the share invoice link description toast appears after generating the link
     const toast = page.getByTestId("share-invoice-link-description-toast");
@@ -923,9 +919,7 @@ test.describe("Generate Invoice Link", () => {
     await page.waitForTimeout(700);
 
     // Try to generate share link - should fail with error toast
-    await page
-      .getByRole("button", { name: "Generate a link to invoice" })
-      .click();
+    await page.getByRole("button", { name: "Generate invoice link" }).click();
 
     // Verify error toast appears with correct text
     await expect(
