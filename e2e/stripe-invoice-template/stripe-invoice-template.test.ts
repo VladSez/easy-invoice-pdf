@@ -27,6 +27,8 @@ test.describe("Stripe Invoice Template", () => {
   test("displays correct OG meta tags for Stripe template", async ({
     page,
   }) => {
+    await expect(page).toHaveURL("/?template=default");
+
     // Navigate to Stripe template
     await page.goto("/?template=stripe");
     await expect(page).toHaveURL("/?template=stripe");
@@ -742,7 +744,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Set VAT to a numeric value to make Tax column  visible in Stripe
     const vatInput = invoiceItemsSection.getByRole("textbox", {
-      name: "VAT",
+      name: "VAT Rate",
       exact: true,
     });
     await vatInput.clear();
@@ -857,7 +859,7 @@ test.describe("Stripe Invoice Template", () => {
     await page.waitForURL("/?template=default");
 
     const newVatInput = page.getByRole("textbox", {
-      name: "VAT",
+      name: "VAT Rate",
       exact: true,
     });
 
@@ -1249,7 +1251,7 @@ test.describe("Stripe Invoice Template", () => {
         (i + 2) % 3 === 0 ? "50" : (i + 2) % 2 === 0 ? "20" : "10";
 
       await taxSettingsFieldset
-        .getByRole("textbox", { name: "VAT", exact: true })
+        .getByRole("textbox", { name: "VAT Rate", exact: true })
         .fill(taxRate);
 
       await itemFieldset

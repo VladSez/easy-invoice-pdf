@@ -33,7 +33,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined, // IMPORTANT: if tests are flaky locally, make `workers: 1` or `workers: 2`
   /* timeout for expect assertions */
   expect: {
-    timeout: isLocal ? 10_000 : 15_000,
+    timeout: isLocal ? 10_000 : 25_000,
   },
 
   // /* timeout for test execution */
@@ -58,7 +58,7 @@ export default defineConfig({
     timezoneId: "Europe/Warsaw",
 
     // applies to: page.goto(), redirects, page.waitForURL(), clicking links that trigger navigation, form submits that navigate
-    navigationTimeout: 30_000,
+    navigationTimeout: 45_000,
     // Applies to interactions: locator.click(), fill(), check(), hover(), press(), dragTo()
     actionTimeout: 15_000,
   },

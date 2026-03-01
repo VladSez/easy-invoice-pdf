@@ -22,10 +22,13 @@ test.describe("Invoice Generator Page", () => {
   });
 
   test("should redirect from /:locale/app to /", async ({ page }) => {
-    // old url structure
-    await page.goto("/en/app", { waitUntil: "commit" });
-
-    await expect(page).toHaveURL("/?template=default");
+    // listener starts FIRST
+    // navigation starts SECOND
+    // should eliminate flakiness
+    await Promise.all([
+      page.waitForURL("**/?template=default"),
+      page.goto("/en/app"),
+    ]);
 
     // wait for the app page to load
     const downloadPDFButton = page.getByRole("link", {
@@ -33,8 +36,7 @@ test.describe("Invoice Generator Page", () => {
     });
 
     await expect(downloadPDFButton).toBeVisible();
-
-    await expect(page).toHaveURL("/?template=default");
+    await expect(downloadPDFButton).toBeEnabled();
   });
 
   test("displays correct OG meta tags for default template", async ({
@@ -104,7 +106,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Check main action buttons
     await expect(
-      page.getByRole("button", { name: "Generate a link to invoice" }),
+      page.getByRole("button", { name: "Generate invoice link" }),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Download PDF in English" }),
@@ -165,7 +167,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Verify buttons are enabled
     await expect(
-      page.getByRole("button", { name: "Generate a link to invoice" }),
+      page.getByRole("button", { name: "Generate invoice link" }),
     ).toBeEnabled();
     await expect(
       page.getByRole("link", { name: "Download PDF in English" }),
@@ -467,7 +469,10 @@ test.describe("Invoice Generator Page", () => {
 
     // VAT field and visibility toggle
     await expect(
-      invoiceItemsSection.getByRole("textbox", { name: "VAT", exact: true }),
+      invoiceItemsSection.getByRole("textbox", {
+        name: "VAT Rate",
+        exact: true,
+      }),
     ).toHaveValue(firstItem.vat);
     await expect(
       invoiceItemsSection.getByRole("switch", {
@@ -479,7 +484,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       invoiceItemsSection
         .getByTestId(`itemVat0`)
-        .getByText("Enter a number (0-100), or any text (i.e. NP, OO, etc)."),
+        .getByText("Enter a number (0-100) or text (e.g., NP, OO, etc)."),
     ).toBeVisible();
 
     // Net Amount field (read-only) and visibility toggle
@@ -593,7 +598,7 @@ test.describe("Invoice Generator Page", () => {
       })
       .fill("100");
     await invoiceItemsSection
-      .getByRole("textbox", { name: "VAT", exact: true })
+      .getByRole("textbox", { name: "VAT Rate", exact: true })
       .fill("23");
 
     // Check calculated values
@@ -1082,7 +1087,7 @@ test.describe("Invoice Generator Page", () => {
     // **VAT FIELD**
 
     const vatInput = invoiceItemsSection.getByRole("textbox", {
-      name: "VAT",
+      name: "VAT Rate",
       exact: true,
     });
 
@@ -1168,7 +1173,7 @@ test.describe("Invoice Generator Page", () => {
       exact: true,
     });
     const vatInput = invoiceItemsSection.getByRole("textbox", {
-      name: "VAT",
+      name: "VAT Rate",
       exact: true,
     });
 

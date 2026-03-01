@@ -43,6 +43,7 @@ import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
 import { InvoicePageHeader } from "@/app/(app)/components/invoice-page-header";
 import { Button } from "@/components/ui/button";
+import { haptic } from "@/lib/haptic";
 // TODO: enable later when PRO version is released, this is PRO FEATURE =)
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
@@ -389,7 +390,7 @@ export function AppPageClient({
             <p className="text-muted-foreground text-pretty leading-relaxed">
               Click{" "}
               <span className="font-semibold text-foreground">
-                &apos;Generate a link to invoice&apos;
+                &apos;Generate invoice link&apos;
               </span>{" "}
               to create an updated shareable link.
             </p>
@@ -448,7 +449,7 @@ export function AppPageClient({
           <p className="text-muted-foreground text-pretty leading-relaxed">
             Click{" "}
             <span className="font-semibold text-foreground">
-              &apos;Generate a link to invoice&apos;
+              &apos;Generate invoice link&apos;
             </span>{" "}
             to create a new shareable link.
           </p>
@@ -527,6 +528,9 @@ export function AppPageClient({
     if (invoiceDataState) {
       try {
         const newInvoiceDataValidated = invoiceSchema.parse(invoiceDataState);
+
+        // trigger haptic feedback on mobile devices
+        haptic();
 
         // Compress JSON keys before stringifying to reduce URL size
         const compressedKeys = compressInvoiceData(newInvoiceDataValidated);

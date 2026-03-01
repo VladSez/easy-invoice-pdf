@@ -219,7 +219,7 @@ export function InvoiceClientPage({
                   variant="outline"
                   className={cn("mx-2 w-full")}
                 >
-                  Generate a link to invoice
+                  Generate invoice link
                 </Button>
               }
               content={
