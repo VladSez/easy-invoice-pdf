@@ -122,7 +122,7 @@ export const InvoiceForm = memo(function InvoiceForm({
     dayjs(paymentDue).isAfter(dayjs(dateOfIssue).add(14, "days")) ||
     dayjs(paymentDue).isSame(dayjs(dateOfIssue).add(14, "days"));
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append } = useFieldArray({
     control,
     name: "items",
   });
@@ -145,6 +145,15 @@ export const InvoiceForm = memo(function InvoiceForm({
             .toFixed(2),
         )
       : 0;
+
+    console.log(
+      "[useEffect] recalculating totals because invoice items changed",
+      {
+        invoiceItems,
+        validatedItems,
+        total,
+      },
+    );
 
     // Update total first
     setValue("total", total, { shouldValidate: true });
@@ -244,19 +253,27 @@ export const InvoiceForm = memo(function InvoiceForm({
     setCanShareInvoice(canShareInvoice);
   }, [template, logo, setCanShareInvoice]);
 
-  // Add a wrapper function for remove item that triggers the form update
+  /**
+   * Remove an invoice item from the form and trigger the form update
+   *
+   * @param index - The index of the invoice item to remove
+   */
   const handleRemoveItem = useCallback(
     (index: number) => {
-      remove(index);
-
       // analytics track event
       umamiTrackEvent("remove_invoice_item");
 
-      // Manually trigger form submission after removal
-      const currentFormData = watch();
-      void debouncedRegeneratePdfOnFormChange(currentFormData);
+      setValue(
+        "items",
+        invoiceItems.filter((_, i) => i !== index),
+        {
+          shouldValidate: true,
+          shouldTouch: true,
+          shouldDirty: true,
+        },
+      );
     },
-    [remove, watch, debouncedRegeneratePdfOnFormChange],
+    [invoiceItems, setValue],
   );
 
   const onSubmit = (data: InvoiceData) => {

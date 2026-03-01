@@ -5,7 +5,7 @@ import {
 } from "@/app/schema";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { memo } from "react";
+import { memo, useState } from "react";
 import {
   type Control,
   Controller,
@@ -27,6 +27,16 @@ import {
   getNumberFractionalPart,
 } from "@/utils/invoice.utils";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
@@ -56,6 +66,8 @@ export const InvoiceItems = memo(function InvoiceItems({
   template,
   taxLabelText,
 }: InvoiceItemsSettingsProps) {
+  const [deleteItemIndex, setDeleteItemIndex] = useState<number | null>(null);
+
   return (
     <>
       {/** we only want to show these settings for default template */}
@@ -120,15 +132,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                   trigger={
                     <button
                       type="button"
-                      onClick={() => {
-                        const canDelete = window.confirm(
-                          `Are you sure you want to delete invoice item #${index + 1}?`,
-                        );
-
-                        if (canDelete) {
-                          handleRemoveItem(index);
-                        }
-                      }}
+                      onClick={() => setDeleteItemIndex(index)}
                       className="flex items-center justify-center rounded-full bg-red-600 p-2 transition-colors hover:bg-red-700 active:scale-[98%] active:transition-transform"
                     >
                       <span className="sr-only">
@@ -814,6 +818,61 @@ export const InvoiceItems = memo(function InvoiceItems({
         <Plus className="mr-2 h-4 w-4" />
         Add invoice item
       </Button>
+
+      <DeleteInvoiceItemConfirmationDialog
+        deleteItemIndex={deleteItemIndex}
+        setDeleteItemIndex={setDeleteItemIndex}
+        handleRemoveItem={handleRemoveItem}
+      />
     </>
   );
 });
+
+interface DeleteInvoiceItemConfirmationDialogProps {
+  deleteItemIndex: number | null;
+  setDeleteItemIndex: (index: number | null) => void;
+  handleRemoveItem: (index: number) => void;
+}
+
+/**
+ * A confirmation dialog for deleting an invoice item.
+ */
+function DeleteInvoiceItemConfirmationDialog({
+  deleteItemIndex,
+  setDeleteItemIndex,
+  handleRemoveItem,
+}: DeleteInvoiceItemConfirmationDialogProps) {
+  return (
+    <AlertDialog
+      open={deleteItemIndex !== null}
+      onOpenChange={(open) => {
+        if (!open) setDeleteItemIndex(null);
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Invoice Item</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete invoice{" "}
+            <strong>&quot;Item {(deleteItemIndex ?? 0) + 1}&quot;</strong>? This
+            action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              if (deleteItemIndex !== null) {
+                handleRemoveItem(deleteItemIndex);
+                setDeleteItemIndex(null);
+              }
+            }}
+            className="bg-red-500 text-red-50 hover:bg-red-500/90"
+          >
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}

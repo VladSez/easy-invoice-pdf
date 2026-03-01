@@ -547,7 +547,9 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
   });
 
-  test("can add and remove invoice items", async ({ page }) => {
+  test("can add and remove invoice items and recalculates totals correctly", async ({
+    page,
+  }) => {
     const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
 
     // Add new invoice item
@@ -566,22 +568,63 @@ test.describe("Invoice Generator Page", () => {
     await itemNameInput.fill("TEST INVOICE ITEM");
     await expect(itemNameInput).toHaveValue("TEST INVOICE ITEM");
 
-    // Set up dialog handler before triggering the action
-    page.on("dialog", async (dialog) => {
-      expect(dialog.message()).toBe(
-        "Are you sure you want to delete invoice item #2?",
-      );
-      await dialog.accept();
-    });
+    const finalSection = page.getByTestId(`final-section`);
 
-    // Remove the added item
+    // Fill in net price for Item 1 (5000)
+    await invoiceItemsSection
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+        exact: true,
+      })
+      .nth(0)
+      .fill("5000");
+
+    // Verify total reflects Item 1 only (1 * 5000 = 5000, vat is "NP")
+    await expect(
+      finalSection.getByRole("textbox", { name: "Total", exact: true }),
+    ).toHaveValue("5,000.00");
+
+    // Fill in amount and net price for Item 2 (3 * 10000 = 30000)
+    await invoiceItemsSection
+      .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
+      .nth(1)
+      .fill("3");
+    await invoiceItemsSection
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+        exact: true,
+      })
+      .nth(1)
+      .fill("10000");
+
+    // Verify total is updated (5000 + 3*10000 = 35000, vat is "NP" so no tax)
+    await expect(
+      finalSection.getByRole("textbox", { name: "Total", exact: true }),
+    ).toHaveValue("35,000.00");
+
+    // Click delete button to open confirmation dialog
     await invoiceItemsSection
       .getByRole("button", { name: "Delete Invoice Item 2" })
       .click();
 
+    // Verify confirmation dialog appears
+    await expect(page.getByRole("alertdialog")).toBeVisible();
+    await expect(
+      page.getByText('Are you sure you want to delete invoice "Item 2"?'),
+    ).toBeVisible();
+
+    // Confirm deletion
+    await page.getByRole("button", { name: "Delete" }).click();
+
+    // Verify item is removed
     await expect(
       invoiceItemsSection.getByText("Item 2", { exact: true }),
     ).toBeHidden();
+
+    // Verify total reverts to Item 1 only after deletion (5000)
+    await expect(
+      finalSection.getByRole("textbox", { name: "Total", exact: true }),
+    ).toHaveValue("5,000.00");
   });
 
   test("calculates totals correctly", async ({ page }) => {
