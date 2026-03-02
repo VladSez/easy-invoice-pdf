@@ -53,6 +53,7 @@ interface InvoiceItemsSettingsProps {
   language: SupportedLanguages;
   template: InvoiceData["template"];
   taxLabelText: string;
+  invoiceData: InvoiceData;
 }
 
 export const InvoiceItems = memo(function InvoiceItems({
@@ -65,6 +66,7 @@ export const InvoiceItems = memo(function InvoiceItems({
   append,
   template,
   taxLabelText,
+  invoiceData,
 }: InvoiceItemsSettingsProps) {
   const [deleteItemIndex, setDeleteItemIndex] = useState<number | null>(null);
 
@@ -823,6 +825,7 @@ export const InvoiceItems = memo(function InvoiceItems({
         deleteItemIndex={deleteItemIndex}
         setDeleteItemIndex={setDeleteItemIndex}
         handleRemoveItem={handleRemoveItem}
+        invoiceData={invoiceData}
       />
     </>
   );
@@ -832,16 +835,23 @@ interface DeleteInvoiceItemConfirmationDialogProps {
   deleteItemIndex: number | null;
   setDeleteItemIndex: (index: number | null) => void;
   handleRemoveItem: (index: number) => void;
+  invoiceData: InvoiceData;
 }
 
 /**
  * A confirmation dialog for deleting an invoice item.
  */
 function DeleteInvoiceItemConfirmationDialog({
-  deleteItemIndex,
+  deleteItemIndex = 0,
   setDeleteItemIndex,
   handleRemoveItem,
+  invoiceData,
 }: DeleteInvoiceItemConfirmationDialogProps) {
+  const itemNumber = deleteItemIndex ?? 0;
+
+  const itemName =
+    invoiceData?.items?.[itemNumber]?.name || `#${itemNumber + 1}`;
+
   return (
     <AlertDialog
       open={deleteItemIndex !== null}
@@ -853,9 +863,9 @@ function DeleteInvoiceItemConfirmationDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Invoice Item</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete invoice{" "}
-            <strong>&quot;Item {(deleteItemIndex ?? 0) + 1}&quot;</strong>? This
-            action cannot be undone.
+            Are you sure you want to delete the invoice item{" "}
+            <strong>&quot;{itemName}&quot;</strong>? This action cannot be
+            undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

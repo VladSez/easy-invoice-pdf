@@ -438,6 +438,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               append={append}
               template={template}
               taxLabelText={taxLabelText}
+              invoiceData={invoiceData}
             />
           </AccordionContent>
         </AccordionItem>
