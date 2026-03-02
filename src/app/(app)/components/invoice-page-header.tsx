@@ -167,7 +167,7 @@ export function InvoicePageHeader({
   );
 }
 
-export function ProjectInfoLinks() {
+function ProjectInfoLinks() {
   const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
 
   const handleWatchDemoClick = () => {

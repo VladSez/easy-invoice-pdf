@@ -18,7 +18,7 @@ export interface ChangelogEntry {
 }
 
 // Validate metadata with Zod schema
-export const changelogEntryMetadataSchema = z.object({
+const changelogEntryMetadataSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   date: z.string().date(),

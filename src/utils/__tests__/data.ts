@@ -6,7 +6,7 @@ import type {
 } from "@/app/schema";
 
 // Test data fixtures
-export const MOCK_SELLER_DATA = {
+const MOCK_SELLER_DATA = {
   id: "seller-123",
   name: "ACME Corp",
   address: "123 Main St, City, 12345",
@@ -22,7 +22,7 @@ export const MOCK_SELLER_DATA = {
   vatNoLabelText: "VAT no",
 } as const satisfies SellerData;
 
-export const MOCK_BUYER_DATA = {
+const MOCK_BUYER_DATA = {
   id: "buyer-456",
   name: "XYZ Ltd",
   address: "456 Oak Ave, Town, 67890",

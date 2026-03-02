@@ -1,6 +1,6 @@
 "use client";
 
-export const supportsHaptic =
+const supportsHaptic =
   typeof window !== "undefined"
     ? window.matchMedia("(pointer: coarse)").matches
     : false;

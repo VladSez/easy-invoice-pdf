@@ -15,7 +15,7 @@ import type {
 /**
  * Type that extracts all possible keys from InvoiceData and its nested objects
  */
-export type AllInvoiceKeys =
+type AllInvoiceKeys =
   // Root level InvoiceData keys
   | keyof InvoiceData
   // Invoice number object keys
