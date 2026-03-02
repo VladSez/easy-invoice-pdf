@@ -3,6 +3,7 @@ import type { KnipConfig } from "knip";
 // https://knip.dev/reference/configuration#_top
 const config: KnipConfig = {
   ignoreDependencies: [
+    "shadcn",
     "@radix-ui/react-separator",
     "@types/ua-parser-js",
     "cmdk",
@@ -13,19 +14,18 @@ const config: KnipConfig = {
     "@types/file-saver",
     "eslint-config-next",
     "@ianvs/prettier-plugin-sort-imports",
-    "react-email",
     "react-scan",
+    "pdfjs-dist",
   ],
   ignore: [
-    "lint-staged.config.js",
     "src/app/**/invoice-pdf-download-multiple-languages.tsx",
     "src/components/ui/**/*.tsx",
     "global.ts",
-    "i18n-messages/**/*",
     "src/i18n/**/*",
     "src/app/schema/**/*",
     "src/**/dev/**/*",
     "src/app/changelog/content/**/*",
+    "src/app/(app)/pdf-i18n-translations/pdf-translations.ts",
   ],
   includeEntryExports: true,
   // ignore tags

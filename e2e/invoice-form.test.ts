@@ -547,7 +547,9 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
   });
 
-  test("can add and remove invoice items", async ({ page }) => {
+  test("can add and remove invoice items and recalculates totals correctly", async ({
+    page,
+  }) => {
     const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
 
     // Add new invoice item
@@ -566,62 +568,166 @@ test.describe("Invoice Generator Page", () => {
     await itemNameInput.fill("TEST INVOICE ITEM");
     await expect(itemNameInput).toHaveValue("TEST INVOICE ITEM");
 
-    // Set up dialog handler before triggering the action
-    page.on("dialog", async (dialog) => {
-      expect(dialog.message()).toBe(
-        "Are you sure you want to delete invoice item #2?",
-      );
-      await dialog.accept();
-    });
+    const finalSection = page.getByTestId(`final-section`);
 
-    // Remove the added item
+    // Fill in net price for Item 1 (5000)
+    await invoiceItemsSection
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+        exact: true,
+      })
+      .nth(0)
+      .fill("5000");
+
+    // Verify total reflects Item 1 only (1 * 5000 = 5000, vat is "NP")
+    await expect(
+      finalSection.getByRole("textbox", { name: "Total", exact: true }),
+    ).toHaveValue("5,000.00");
+
+    // Fill in amount and net price for Item 2 (3 * 10000 = 30000)
+    await invoiceItemsSection
+      .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
+      .nth(1)
+      .fill("3");
+    await invoiceItemsSection
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+        exact: true,
+      })
+      .nth(1)
+      .fill("10000");
+
+    // Verify total is updated (5000 + 3*10000 = 35000, vat is "NP" so no tax)
+    await expect(
+      finalSection.getByRole("textbox", { name: "Total", exact: true }),
+    ).toHaveValue("35,000.00");
+
+    // Click delete button to open confirmation dialog
     await invoiceItemsSection
       .getByRole("button", { name: "Delete Invoice Item 2" })
       .click();
 
+    // Verify confirmation dialog appears
+    await expect(page.getByRole("alertdialog")).toBeVisible();
+    await expect(
+      page.getByText('Are you sure you want to delete the invoice item "#2"?'),
+    ).toBeVisible();
+
+    // Confirm deletion
+    await page.getByRole("button", { name: "Delete" }).click();
+
+    // Verify item is removed
     await expect(
       invoiceItemsSection.getByText("Item 2", { exact: true }),
     ).toBeHidden();
+
+    // Verify total reverts to Item 1 only after deletion (5000)
+    await expect(
+      finalSection.getByRole("textbox", { name: "Total", exact: true }),
+    ).toHaveValue("5,000.00");
   });
 
   test("calculates totals correctly", async ({ page }) => {
     const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
+    const finalSection = page.getByTestId(`final-section`);
 
-    // Fill in item details
+    // Item 1: qty=2, price=500, VAT=23% → net=1000, vat=230
     await invoiceItemsSection
       .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
+      .nth(0)
       .fill("2");
     await invoiceItemsSection
       .getByRole("spinbutton", {
         name: "Net Price (Rate or Unit Price)",
         exact: true,
       })
-      .fill("100");
+      .nth(0)
+      .fill("500");
     await invoiceItemsSection
       .getByRole("textbox", { name: "VAT Rate", exact: true })
+      .nth(0)
       .fill("23");
 
-    // Check calculated values
     await expect(
-      invoiceItemsSection.getByRole("textbox", {
-        name: "Net Amount",
-        exact: true,
-      }),
-    ).toHaveValue("200.00");
+      invoiceItemsSection
+        .getByRole("textbox", { name: "Net Amount", exact: true })
+        .nth(0),
+    ).toHaveValue("1,000.00");
     await expect(
-      invoiceItemsSection.getByRole("textbox", {
-        name: "VAT Amount",
-        exact: true,
-      }),
-    ).toHaveValue("46.00");
+      invoiceItemsSection
+        .getByRole("textbox", { name: "VAT Amount", exact: true })
+        .nth(0),
+    ).toHaveValue("230.00");
 
-    const finalSection = page.getByTestId(`final-section`);
+    // Add Item 2: qty=5, price=1000, VAT=NP → net=5000, vat=0
+    await invoiceItemsSection
+      .getByRole("button", { name: "Add invoice item" })
+      .click();
+    await expect(
+      invoiceItemsSection.getByText("Item 2", { exact: true }),
+    ).toBeVisible();
+
+    await invoiceItemsSection
+      .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
+      .nth(1)
+      .fill("5");
+    await invoiceItemsSection
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+        exact: true,
+      })
+      .nth(1)
+      .fill("1000");
+
+    await expect(
+      invoiceItemsSection
+        .getByRole("textbox", { name: "Net Amount", exact: true })
+        .nth(1),
+    ).toHaveValue("5,000.00");
+    await expect(
+      invoiceItemsSection
+        .getByRole("textbox", { name: "VAT Amount", exact: true })
+        .nth(1),
+    ).toHaveValue("0.00");
+
+    // Add Item 3: qty=1, price=10000, VAT=10% → net=10000, vat=1000
+    await invoiceItemsSection
+      .getByRole("button", { name: "Add invoice item" })
+      .click();
+    await expect(
+      invoiceItemsSection.getByText("Item 3", { exact: true }),
+    ).toBeVisible();
+
+    await invoiceItemsSection
+      .getByRole("spinbutton", {
+        name: "Net Price (Rate or Unit Price)",
+        exact: true,
+      })
+      .nth(2)
+      .fill("10000");
+    await invoiceItemsSection
+      .getByRole("textbox", { name: "VAT Rate", exact: true })
+      .nth(2)
+      .fill("10");
+
+    await expect(
+      invoiceItemsSection
+        .getByRole("textbox", { name: "Net Amount", exact: true })
+        .nth(2),
+    ).toHaveValue("10,000.00");
+    await expect(
+      invoiceItemsSection
+        .getByRole("textbox", { name: "VAT Amount", exact: true })
+        .nth(2),
+    ).toHaveValue("1,000.00");
+
+    // Grand total = 1230 + 5000 + 11000 = 17,230.00
     await expect(
       finalSection.getByRole("textbox", {
         name: "Total",
         exact: true,
       }),
-    ).toHaveValue("246.00");
+    ).toHaveValue("17,230.00");
   });
 
   test("handles form validation", async ({ page }) => {

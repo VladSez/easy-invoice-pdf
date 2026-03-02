@@ -24,7 +24,7 @@ interface ToastProps {
 /**
  * Renders a premium donation toast
  */
-export function customPremiumToast(toast: ToastProps) {
+function customPremiumToast(toast: ToastProps) {
   // dismiss any existing toasts
   sonnerToast.dismiss();
 
@@ -45,7 +45,7 @@ export function customPremiumToast(toast: ToastProps) {
 /**
  * Renders a default donation toast
  */
-export function customDefaultToast(toast: ToastProps) {
+function customDefaultToast(toast: ToastProps) {
   // dismiss any existing toasts
   sonnerToast.dismiss();
 
@@ -240,7 +240,7 @@ function DefaultToastFeedbackButton(
   );
 }
 
-export const CTA_TOASTS = [
+const CTA_TOASTS = [
   {
     id: "premium-donation-toast-client-page",
     title: "Support Open Source",

@@ -208,7 +208,7 @@ export const invoicePDFtranslationsSchema = z.object(languageToSchemaMap);
 type TranslationSchema = z.infer<typeof translationSchema>;
 
 // Type for all translations
-export type TranslationsSchema = z.infer<typeof invoicePDFtranslationsSchema>;
+// export type TranslationsSchema = z.infer<typeof invoicePDFtranslationsSchema>;
 
 export const INVOICE_PDF_TRANSLATIONS = {
   en: {
