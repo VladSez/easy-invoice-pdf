@@ -862,7 +862,7 @@ function DeleteInvoiceItemConfirmationDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Invoice Item</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogDescription className="text-balance">
             Are you sure you want to delete the invoice item{" "}
             <strong>&quot;{itemName}&quot;</strong>? This action cannot be
             undone.

@@ -617,6 +617,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // NOTE: Unit field switch is visible in stripe template
     await expect(unitFieldSwitch).toBeVisible();
+    await expect(unitFieldSwitch).not.toBeChecked(); // should be unchecked by default to match stripe template behaviour (and for backwards compatibility)
 
     await expect(netPriceFieldSwitch).toBeHidden();
 

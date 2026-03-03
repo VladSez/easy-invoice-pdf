@@ -58,13 +58,17 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // only send email if the query parameter "sendEmail" is not "false" (for backwards compatibility), we want to send email by default, but allow to disable it for testing purposes
+    const shouldSendEmail =
+      req.nextUrl.searchParams.get("sendEmail") !== "false";
+
     const GENERATED_ENGLISH_INVOICE_PDF_DOCUMENT = renderToBuffer(
       <InvoicePdfTemplateToRenderOnBackend
         invoiceData={ENGLISH_INVOICE_REAL_DATA}
       />,
     ).catch((err) => {
       console.error(
-        "\n\n_________________________Error during `renderToBuffer` for English invoice:",
+        "\n\n_________________________[generate-invoice] Error during `renderToBuffer` for ENGLISH invoice:",
         err,
       );
 
@@ -77,7 +81,7 @@ export async function GET(req: NextRequest) {
       />,
     ).catch((err) => {
       console.error(
-        "\n\n_________________________Error during `renderToBuffer` for Polish invoice:",
+        "\n\n_________________________[generate-invoice] Error during `renderToBuffer` for POLISH invoice:",
         err,
       );
 
@@ -134,7 +138,7 @@ export async function GET(req: NextRequest) {
 
     if (!ATTACHMENTS.length) {
       return NextResponse.json(
-        { error: "No attachments found" },
+        { error: "[generate-invoice] No attachments found" },
         { status: 400 },
       );
     }
@@ -188,12 +192,14 @@ export async function GET(req: NextRequest) {
 
     if (failedUploads.length > 0) {
       console.error(
-        "Some files failed to upload to Google Drive:",
+        "[generate-invoice] Some files failed to upload to Google Drive:",
         failedUploads,
       );
 
       return NextResponse.json(
-        { error: "Failed to upload invoices to Google Drive" },
+        {
+          error: "[generate-invoice] Failed to upload invoices to Google Drive",
+        },
         { status: 500 },
       );
     }
@@ -211,8 +217,7 @@ export async function GET(req: NextRequest) {
     // *___________SEND NOTIFICATIONS___________*
 
     // Send notifications in parallel
-    const notificationResults = await Promise.allSettled([
-      // Send Telegram notification with PDFs
+    const notifications: Promise<unknown>[] = [
       sendTelegramMessage({
         message: `📝 *Invoices for ${monthAndYear}*
 
@@ -235,13 +240,15 @@ EasyInvoicePDF.com`,
           buffer: Buffer.from(attachment.content),
         })),
       }),
+    ];
 
-      // Send email with PDF attachment
-      resend.emails.send({
-        from: "Vlad from EasyInvoicePDF.com <vlad@updates.easyinvoicepdf.com>",
-        to: env.INVOICE_EMAIL_RECIPIENT,
-        subject: `📝 Invoices for ${monthAndYear}`,
-        html: `<p>Hello,</p>
+    if (shouldSendEmail) {
+      notifications.push(
+        resend.emails.send({
+          from: "Vlad from EasyInvoicePDF.com <vlad@updates.easyinvoicepdf.com>",
+          to: env.INVOICE_EMAIL_RECIPIENT,
+          subject: `📝 Invoices for ${monthAndYear}`,
+          html: `<p>Hello,</p>
     <span>Invoice No. of: <b>${invoiceNumberValue}</b><br/>
     Date: <b>${dayjs().format("MMMM D, YYYY")}</b>
     <br/>
@@ -262,18 +269,41 @@ EasyInvoicePDF.com`,
 
     Have a nice day!<br/><br/>
     Best regards,<br/>EasyInvoicePDF.com</span>`,
-        attachments: ATTACHMENTS,
-      }),
-    ]);
+          attachments: ATTACHMENTS,
+        }),
+      );
+    }
+
+    const notificationResults = await Promise.allSettled(notifications);
 
     const failedNotifications = notificationResults.filter(
       (result): result is PromiseRejectedResult => result.status === "rejected",
     );
 
     if (failedNotifications.length > 0) {
-      console.error("Some notifications failed to send:", failedNotifications);
+      const errorMessage = `Some notifications failed to send:\n${JSON.stringify(
+        failedNotifications,
+        null,
+        2,
+      )}`;
 
-      throw new Error("Failed to send some notifications");
+      console.error("[generate-invoice] Error in route:", errorMessage);
+
+      // Send error to Telegram
+      try {
+        await sendTelegramMessage({
+          message: `🚨 Error in generate-invoice API route\n\n${errorMessage}`,
+        });
+      } catch (telegramError) {
+        console.error(
+          "Failed to send error notification to Telegram:",
+          telegramError,
+        );
+      }
+
+      throw new Error("[generate-invoice] Failed to send notifications", {
+        cause: errorMessage,
+      });
     }
 
     return NextResponse.json(
@@ -281,10 +311,10 @@ EasyInvoicePDF.com`,
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error in generate-invoice route:", error);
+    console.error("[generate-invoice] Error in route:", error);
 
     return NextResponse.json(
-      { error: "Failed to generate and send invoice" },
+      { error: "[generate-invoice] Failed to generate and send invoice" },
       { status: 500 },
     );
   }

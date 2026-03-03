@@ -184,7 +184,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                     // Set date format to "MMMM D, YYYY" when template is Stripe
                     setValue("dateFormat", STRIPE_DEFAULT_DATE_FORMAT);
 
-                    // Set unit field to be hidden by default for Stripe template (backwards compatibility)
+                    // Set unit field to be HIDDEN by default for Stripe template (matches stripe template behaviour)
                     setValue("items.0.unitFieldIsVisible", false);
                   } else {
                     // DEFAULT TEMPLATE
@@ -201,6 +201,9 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                     // Set date format to "YYYY-MM-DD" when template is default
                     setValue("dateFormat", DEFAULT_DATE_FORMAT);
+
+                    // Set unit field to be VISIBLE for default template
+                    setValue("items.0.unitFieldIsVisible", true);
                   }
                 }}
               >

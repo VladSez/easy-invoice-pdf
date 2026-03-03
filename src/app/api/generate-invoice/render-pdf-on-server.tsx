@@ -169,4 +169,12 @@ export const POLISH_INVOICE_REAL_DATA = {
     label: translateInvoiceNumberLabel({ language: "pl" }),
     value: INVOICE_DEFAULT_NUMBER_VALUE,
   },
+  buyer: {
+    ...ENGLISH_INVOICE_REAL_DATA.buyer,
+    vatNoLabelText: "NIP", // on polish invoices, we use "NIP" instead of "VAT"
+  },
+  seller: {
+    ...ENGLISH_INVOICE_REAL_DATA.seller,
+    vatNoLabelText: "NIP", // on polish invoices, we use "NIP" instead of "VAT"
+  },
 } as const satisfies InvoiceData;

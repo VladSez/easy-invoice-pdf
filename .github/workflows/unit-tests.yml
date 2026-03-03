@@ -58,9 +58,6 @@ jobs:
           body: |
             Unit tests for ${{ github.repository }} have failed.
 
-            Branch: ${{ github.ref_name }}
-            Commit: ${{ github.sha }}
-
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
