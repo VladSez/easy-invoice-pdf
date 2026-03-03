@@ -22,13 +22,8 @@ test.describe("Invoice Generator Page", () => {
   });
 
   test("should redirect from /:locale/app to /", async ({ page }) => {
-    // listener starts FIRST
-    // navigation starts SECOND
-    // should eliminate flakiness
-    await Promise.all([
-      page.waitForURL("**/?template=default"),
-      page.goto("/en/app"),
-    ]);
+    await page.goto("/en/app");
+    await page.waitForURL("**/?template=default");
 
     // wait for the app page to load
     const downloadPDFButton = page.getByRole("link", {
@@ -37,6 +32,20 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(downloadPDFButton).toBeVisible();
     await expect(downloadPDFButton).toBeEnabled();
+  });
+
+  test("returns permanent redirect from /:locale/app to /", async ({
+    request,
+  }) => {
+    const response = await request.get("/en/app", {
+      maxRedirects: 0, // IMPORTANT
+    });
+
+    // this is a Next.js permanent redirect defined in next.config.mjs
+    expect(response.status()).toBe(308); // Next.js permanent redirect
+    expect(response.statusText()).toBe("Permanent Redirect");
+    // we expect the redirect to the root URL
+    expect(response.headers().location).toBe("/");
   });
 
   test("displays correct OG meta tags for default template", async ({
