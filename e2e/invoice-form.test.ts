@@ -604,9 +604,42 @@ test.describe("Invoice Generator Page", () => {
       .click();
 
     // Verify confirmation dialog appears
-    await expect(page.getByRole("alertdialog")).toBeVisible();
+    await expect(
+      page.getByTestId("delete-invoice-item-confirmation-dialog"),
+    ).toBeVisible();
+
     await expect(
       page.getByText('Are you sure you want to delete the invoice item "#2"?'),
+    ).toBeVisible();
+
+    // --- Test cancel flow first ---
+
+    // Click cancel button in dialog
+    await page.getByRole("button", { name: "Cancel" }).click();
+
+    // Dialog should disappear
+    await expect(
+      page.getByTestId("delete-invoice-item-confirmation-dialog"),
+    ).toBeHidden();
+
+    await expect(
+      page.getByText('Are you sure you want to delete the invoice item "#2"?'),
+    ).toBeHidden();
+
+    // Item should still be present
+    await expect(
+      invoiceItemsSection.getByText("Item 2", { exact: true }),
+    ).toBeVisible();
+
+    // --- Now confirm deletion flow ---
+
+    // Open the dialog again
+    await invoiceItemsSection
+      .getByRole("button", { name: "Delete Invoice Item 2" })
+      .click();
+
+    await expect(
+      page.getByTestId("delete-invoice-item-confirmation-dialog"),
     ).toBeVisible();
 
     // Confirm deletion
