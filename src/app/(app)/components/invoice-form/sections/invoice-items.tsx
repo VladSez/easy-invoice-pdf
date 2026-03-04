@@ -46,7 +46,7 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
 interface InvoiceItemsSettingsProps {
   control: Control<InvoiceData>;
   fields: FieldArrayWithId<InvoiceData, "items", "id">[];
-  handleRemoveItem: (index: number) => void;
+  handleRemoveInvoiceItem: (index: number) => void;
   append: UseFieldArrayAppend<InvoiceData, "items">;
   errors: FieldErrors<InvoiceData>;
   currency: SupportedCurrencies;
@@ -59,7 +59,7 @@ interface InvoiceItemsSettingsProps {
 export const InvoiceItems = memo(function InvoiceItems({
   control,
   fields,
-  handleRemoveItem,
+  handleRemoveInvoiceItem,
   errors,
   currency,
   language,
@@ -824,7 +824,7 @@ export const InvoiceItems = memo(function InvoiceItems({
       <DeleteInvoiceItemConfirmationDialog
         deleteItemIndex={deleteItemIndex}
         setDeleteItemIndex={setDeleteItemIndex}
-        handleRemoveItem={handleRemoveItem}
+        handleRemoveInvoiceItem={handleRemoveInvoiceItem}
         invoiceData={invoiceData}
       />
     </>
@@ -834,7 +834,7 @@ export const InvoiceItems = memo(function InvoiceItems({
 interface DeleteInvoiceItemConfirmationDialogProps {
   deleteItemIndex: number | null;
   setDeleteItemIndex: (index: number | null) => void;
-  handleRemoveItem: (index: number) => void;
+  handleRemoveInvoiceItem: (index: number) => void;
   invoiceData: InvoiceData;
 }
 
@@ -844,7 +844,7 @@ interface DeleteInvoiceItemConfirmationDialogProps {
 function DeleteInvoiceItemConfirmationDialog({
   deleteItemIndex = 0,
   setDeleteItemIndex,
-  handleRemoveItem,
+  handleRemoveInvoiceItem,
   invoiceData,
 }: DeleteInvoiceItemConfirmationDialogProps) {
   const itemNumber = deleteItemIndex ?? 0;
@@ -873,7 +873,7 @@ function DeleteInvoiceItemConfirmationDialog({
           <AlertDialogAction
             onClick={() => {
               if (deleteItemIndex !== null) {
-                handleRemoveItem(deleteItemIndex);
+                handleRemoveInvoiceItem(deleteItemIndex);
                 setDeleteItemIndex(null);
               }
             }}

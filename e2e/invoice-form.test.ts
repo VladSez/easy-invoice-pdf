@@ -21,19 +21,6 @@ test.describe("Invoice Generator Page", () => {
     await page.goto("/");
   });
 
-  test("should redirect from /:locale/app to /", async ({ page }) => {
-    await page.goto("/en/app");
-    await page.waitForURL("**/?template=default");
-
-    // wait for the app page to load
-    const downloadPDFButton = page.getByRole("link", {
-      name: "Download PDF in English",
-    });
-
-    await expect(downloadPDFButton).toBeVisible();
-    await expect(downloadPDFButton).toBeEnabled();
-  });
-
   test("returns permanent redirect from /:locale/app to /", async ({
     request,
   }) => {
@@ -624,6 +611,11 @@ test.describe("Invoice Generator Page", () => {
 
     // Confirm deletion
     await page.getByRole("button", { name: "Delete" }).click();
+
+    // Verify success message
+    await expect(
+      page.getByText("Invoice item removed successfully", { exact: true }),
+    ).toBeVisible();
 
     // Verify item is removed
     await expect(
