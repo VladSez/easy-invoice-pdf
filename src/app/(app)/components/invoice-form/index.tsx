@@ -258,11 +258,8 @@ export const InvoiceForm = memo(function InvoiceForm({
    *
    * @param index - The index of the invoice item to remove
    */
-  const handleRemoveItem = useCallback(
+  const handleRemoveInvoiceItem = useCallback(
     (index: number) => {
-      // analytics track event
-      umamiTrackEvent("remove_invoice_item");
-
       setValue(
         "items",
         invoiceItems.filter((_, i) => i !== index),
@@ -272,8 +269,18 @@ export const InvoiceForm = memo(function InvoiceForm({
           shouldDirty: true,
         },
       );
+
+      toast.success("Invoice item removed successfully", {
+        id: "invoice-item-removed-success",
+        closeButton: true,
+        richColors: true,
+        position: isMobile ? "top-center" : "bottom-right",
+      });
+
+      // analytics track event
+      umamiTrackEvent("remove_invoice_item");
     },
-    [invoiceItems, setValue],
+    [invoiceItems, setValue, isMobile],
   );
 
   const onSubmit = (data: InvoiceData) => {
@@ -431,7 +438,7 @@ export const InvoiceForm = memo(function InvoiceForm({
             <InvoiceItems
               control={control}
               fields={fields}
-              handleRemoveItem={handleRemoveItem}
+              handleRemoveInvoiceItem={handleRemoveInvoiceItem}
               errors={errors}
               currency={currency}
               language={language}
