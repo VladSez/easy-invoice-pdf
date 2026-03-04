@@ -194,8 +194,6 @@ export const InvoiceForm = memo(function InvoiceForm({
   // regenerate pdf on every input change with debounce
   const debouncedRegeneratePdfOnFormChange = useDebouncedCallback(
     async (data: InvoiceData) => {
-      // close all other toasts (if any)
-      toast.dismiss();
       setInvoiceFormHasErrors(false);
 
       // TODO: double check if we need this code, because we already save to local storage in the page.client.tsx (parent component) (line: 267) useEffect "Save to localStorage whenever data changes on form update"
