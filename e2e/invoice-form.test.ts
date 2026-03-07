@@ -220,6 +220,11 @@ test.describe("Invoice Generator Page", () => {
       `${defaultCurrency} ${CURRENCY_SYMBOLS[defaultCurrency]} ${CURRENCY_TO_LABEL[defaultCurrency]}`.trim();
     await expect(currencyCombobox).toContainText(defaultCurrencyLabel);
 
+    // check that value is saved in the hidden input
+    await expect(page.locator('input[name="currency"]')).toHaveValue(
+      INITIAL_INVOICE_DATA.currency,
+    );
+
     // Open the combobox to verify all supported currencies are listed
     await currencyCombobox.click();
 
@@ -943,7 +948,11 @@ test.describe("Invoice Generator Page", () => {
     // Switch currency via combobox
     await currencyCombobox.click();
     await page.getByRole("option", { name: /^USD\s/ }).click();
+
     await expect(currencyCombobox).toContainText("USD");
+
+    // check that value is saved in the hidden input
+    await expect(page.locator('input[name="currency"]')).toHaveValue("USD");
 
     // Verify calculations with new currency
     await invoiceItemsSection

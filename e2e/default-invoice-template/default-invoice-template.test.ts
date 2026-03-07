@@ -400,6 +400,9 @@ test.describe("Default Invoice Template", () => {
 
     await expect(currencyCombobox).toContainText("GBP");
 
+    // check that value is saved in the hidden input
+    await expect(page.locator('input[name="currency"]')).toHaveValue("GBP");
+
     // Switch to another date format
     await page
       .getByRole("combobox", { name: "Date format" })
@@ -677,7 +680,11 @@ test.describe("Default Invoice Template", () => {
     });
     await mobileCurrencyCombobox.click();
     await page.getByRole("option", { name: /^GBP\s/ }).click();
+
     await expect(mobileCurrencyCombobox).toContainText("GBP");
+
+    // check that value is saved in the hidden input
+    await expect(page.locator('input[name="currency"]')).toHaveValue("GBP");
 
     const invoiceNumberFieldset = page.getByRole("group", {
       name: "Invoice Number",
@@ -1026,6 +1033,9 @@ test.describe("Default Invoice Template", () => {
     await page.getByRole("option", { name: /^CHF\s/ }).click();
     await expect(currencyCombobox2).toContainText("CHF");
 
+    // check that value is saved in the hidden input
+    await expect(page.locator('input[name="currency"]')).toHaveValue("CHF");
+
     const notesFinalSection = page.getByTestId(`final-section`);
     // for better debugging screenshots, we fill in the notes field with a test note =)
     await notesFinalSection
@@ -1086,6 +1096,9 @@ test.describe("Default Invoice Template", () => {
 
     // Verify CHF currency is selected
     await expect(newCurrencyCombobox).toContainText("CHF");
+
+    // check that value is saved in the hidden input
+    await expect(page.locator('input[name="currency"]')).toHaveValue("CHF");
 
     // wait for debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
@@ -1162,6 +1175,9 @@ test.describe("Default Invoice Template", () => {
     // Currency should be CHF after navigating back to the previous page
     const currencyCombobox3 = page.getByRole("combobox", { name: "Currency" });
     await expect(currencyCombobox3).toContainText("CHF");
+
+    // check that value is saved in the hidden input
+    await expect(page.locator('input[name="currency"]')).toHaveValue("CHF");
 
     const newNotesFinalSection = page.getByTestId(`final-section`);
 
