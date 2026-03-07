@@ -1,25 +1,16 @@
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import {
-  type Control,
-  Controller,
-  type FieldErrors,
-  type UseFormSetValue,
-  useWatch,
-} from "react-hook-form";
-import {
-  CURRENCY_SYMBOLS,
-  CURRENCY_TO_LABEL,
   DEFAULT_DATE_FORMAT,
+  type InvoiceData,
   LANGUAGE_TO_LABEL,
   STRIPE_DEFAULT_DATE_FORMAT,
-  SUPPORTED_TEMPLATES,
-  TEMPLATE_TO_LABEL,
-  type InvoiceData,
-} from "@/app/schema";
-import {
-  SUPPORTED_CURRENCIES,
   SUPPORTED_DATE_FORMATS,
   SUPPORTED_LANGUAGES,
+  SUPPORTED_TEMPLATES,
+  TEMPLATE_TO_LABEL,
 } from "@/app/schema";
+import { CurrencyCombobox } from "@/components/currency-combobox";
+import { Button } from "@/components/ui/button";
 import { ButtonHelper } from "@/components/ui/button-helper";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
@@ -28,11 +19,16 @@ import { SelectNative } from "@/components/ui/select-native";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-import { Button } from "@/components/ui/button";
 import dayjs from "dayjs";
-import { AlertTriangle, Upload, X, InfoIcon } from "lucide-react";
+import { AlertTriangle, InfoIcon, Upload, X } from "lucide-react";
 import { memo, useCallback, useRef } from "react";
+import {
+  type Control,
+  Controller,
+  type FieldErrors,
+  type UseFormSetValue,
+  useWatch,
+} from "react-hook-form";
 import { toast } from "sonner";
 
 const AlertIcon = () => {
@@ -405,30 +401,14 @@ export const GeneralInformation = memo(function GeneralInformation({
           <Controller
             name="currency"
             control={control}
-            render={({ field }) => {
-              return (
-                <SelectNative {...field} id={`currency`} className="block">
-                  {SUPPORTED_CURRENCIES.map((currency) => {
-                    const currencySymbol = CURRENCY_SYMBOLS[currency] || null;
-
-                    const currencyFullName =
-                      CURRENCY_TO_LABEL[currency] || null;
-
-                    return (
-                      <option
-                        key={currency}
-                        value={currency}
-                        defaultValue={SUPPORTED_CURRENCIES[0]}
-                      >
-                        {currency} {currencySymbol} {currencyFullName}
-                      </option>
-                    );
-                  })}
-                </SelectNative>
-              );
-            }}
+            render={({ field }) => (
+              <CurrencyCombobox
+                id={`currency`}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
           />
-
           {errors.currency ? (
             <ErrorMessage>{errors.currency.message}</ErrorMessage>
           ) : (

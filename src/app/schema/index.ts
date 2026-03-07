@@ -471,6 +471,181 @@ export const CURRENCY_TO_LABEL = {
 export type CurrencyLabels =
   (typeof CURRENCY_TO_LABEL)[keyof typeof CURRENCY_TO_LABEL];
 
+interface CurrencyGroup {
+  label: string;
+  currencies: SupportedCurrencies[];
+}
+
+export const CURRENCY_GROUPS = [
+  { label: "Most Popular", currencies: ["EUR", "USD", "PLN", "GBP"] },
+  {
+    label: "Major Global",
+    currencies: [
+      "JPY",
+      "AUD",
+      "CAD",
+      "CHF",
+      "CNY",
+      "HKD",
+      "SGD",
+      "SEK",
+      "NOK",
+      "DKK",
+      "NZD",
+    ],
+  },
+  {
+    label: "Europe",
+    currencies: [
+      "CZK",
+      "HUF",
+      "RON",
+      "BGN",
+      "HRK",
+      "RSD",
+      "UAH",
+      "BYN",
+      "MDL",
+      "ALL",
+      "MKD",
+      "BAM",
+      "ISK",
+      "RUB",
+      "TRY",
+    ],
+  },
+  {
+    label: "Asia & Pacific",
+    currencies: [
+      "INR",
+      "KRW",
+      "THB",
+      "MYR",
+      "IDR",
+      "PHP",
+      "VND",
+      "MMK",
+      "KHR",
+      "LAK",
+      "PKR",
+      "BDT",
+      "LKR",
+      "NPR",
+      "MNT",
+      "TWD",
+      "GEL",
+      "KZT",
+      "UZS",
+      "TJS",
+      "TMT",
+      "FJD",
+      "PGK",
+      "WST",
+      "TOP",
+    ],
+  },
+  {
+    label: "Middle East & Gulf",
+    currencies: [
+      "AED",
+      "SAR",
+      "ILS",
+      "QAR",
+      "KWD",
+      "BHD",
+      "OMR",
+      "JOD",
+      "EGP",
+      "LBP",
+      "IQD",
+    ],
+  },
+  {
+    label: "Latin America & Caribbean",
+    currencies: [
+      "MXN",
+      "BRL",
+      "ARS",
+      "CLP",
+      "COP",
+      "PEN",
+      "UYU",
+      "BOB",
+      "PYG",
+      "SRD",
+      "GYD",
+      "GTQ",
+      "CRC",
+      "PAB",
+      "HNL",
+      "NIO",
+      "BZD",
+      "SVC",
+      "DOP",
+      "JMD",
+      "TTD",
+      "BBD",
+      "BSD",
+      "XCD",
+      "HTG",
+      "AWG",
+      "ANG",
+      "KYD",
+    ],
+  },
+  {
+    label: "Africa",
+    currencies: [
+      "ZAR",
+      "NGN",
+      "KES",
+      "GHS",
+      "ETB",
+      "MAD",
+      "TND",
+      "DZD",
+      "LYD",
+      "SDG",
+      "SSP",
+      "AOA",
+      "XOF",
+      "XAF",
+      "CDF",
+      "UGX",
+      "TZS",
+      "RWF",
+      "ZMW",
+      "MWK",
+      "BWP",
+      "NAD",
+      "SZL",
+      "LSL",
+      "MUR",
+      "MZN",
+      "GMD",
+      "MRU",
+    ],
+  },
+] as const satisfies CurrencyGroup[];
+
+export interface CurrencyComboboxItem {
+  code: SupportedCurrencies;
+  searchLabel: string;
+}
+
+export interface CurrencyComboboxGroup {
+  value: string;
+  items: CurrencyComboboxItem[];
+}
+
+export const CURRENCY_COMBOBOX_GROUPS = CURRENCY_GROUPS.map((group) => ({
+  value: group.label,
+  items: group.currencies.map((code) => ({
+    code,
+    searchLabel: `${code} ${CURRENCY_SYMBOLS[code]} ${CURRENCY_TO_LABEL[code]}`,
+  })),
+})) satisfies CurrencyComboboxGroup[];
+
 export const SUPPORTED_TEMPLATES = ["default", "stripe"] as const;
 
 export type SupportedTemplates = (typeof SUPPORTED_TEMPLATES)[number];

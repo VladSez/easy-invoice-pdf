@@ -210,14 +210,19 @@ test.describe("Invoice Generator Page", () => {
       ).toHaveText(languageName);
     }
 
-    // Currency selection
-    const currencySelect = generalInfoSection.getByRole("combobox", {
+    // Currency selection (combobox with popover)
+    const currencyCombobox = generalInfoSection.getByRole("combobox", {
       name: "Currency",
     });
 
-    await expect(currencySelect).toHaveValue(INITIAL_INVOICE_DATA.currency);
+    const defaultCurrency = INITIAL_INVOICE_DATA.currency;
+    const defaultCurrencyLabel =
+      `${defaultCurrency} ${CURRENCY_SYMBOLS[defaultCurrency]} ${CURRENCY_TO_LABEL[defaultCurrency]}`.trim();
+    await expect(currencyCombobox).toContainText(defaultCurrencyLabel);
 
-    // Verify all supported currencies are available as options with correct labels
+    // Open the combobox to verify all supported currencies are listed
+    await currencyCombobox.click();
+
     for (const currency of SUPPORTED_CURRENCIES) {
       const currencySymbol = CURRENCY_SYMBOLS[currency];
       const currencyFullName = CURRENCY_TO_LABEL[currency];
@@ -226,9 +231,12 @@ test.describe("Invoice Generator Page", () => {
         `${currency} ${currencySymbol} ${currencyFullName}`.trim();
 
       await expect(
-        currencySelect.locator(`option[value="${currency}"]`),
-      ).toHaveText(expectedLabel);
+        page.getByRole("option", { name: expectedLabel }),
+      ).toBeVisible();
     }
+
+    // Close the combobox
+    await currencyCombobox.click();
 
     // Date Format selection
     const dateFormatSelect = generalInfoSection.getByRole("combobox", {
@@ -930,11 +938,12 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByText("Preview: €0.00 (zero EUR 00/100)"),
     ).toBeVisible();
 
-    const currencySelect = page.getByRole("combobox", { name: "Currency" });
+    const currencyCombobox = page.getByRole("combobox", { name: "Currency" });
 
-    // Switch currency
-    await currencySelect.selectOption("USD");
-    await expect(currencySelect).toHaveValue("USD");
+    // Switch currency via combobox
+    await currencyCombobox.click();
+    await page.getByRole("option", { name: /^USD\s/ }).click();
+    await expect(currencyCombobox).toContainText("USD");
 
     // Verify calculations with new currency
     await invoiceItemsSection

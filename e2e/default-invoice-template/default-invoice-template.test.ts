@@ -389,8 +389,16 @@ test.describe("Default Invoice Template", () => {
   }, testInfo) => {
     const DATE_FORMAT = "MMMM D, YYYY";
 
-    // Switch to another currency
-    await page.getByRole("combobox", { name: "Currency" }).selectOption("GBP");
+    // Switch to another currency via combobox
+    const currencyCombobox = page.getByRole("combobox", { name: "Currency" });
+
+    // Open the combobox to select the currency
+    await currencyCombobox.click();
+
+    // Select the GBP currency
+    await page.getByRole("option", { name: /^GBP\s/ }).click();
+
+    await expect(currencyCombobox).toContainText("GBP");
 
     // Switch to another date format
     await page
@@ -663,8 +671,13 @@ test.describe("Default Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice PDF Language" })
       .selectOption("fr");
 
-    // Switch currency to GBP
-    await page.getByRole("combobox", { name: "Currency" }).selectOption("GBP");
+    // Switch currency to GBP via combobox
+    const mobileCurrencyCombobox = page.getByRole("combobox", {
+      name: "Currency",
+    });
+    await mobileCurrencyCombobox.click();
+    await page.getByRole("option", { name: /^GBP\s/ }).click();
+    await expect(mobileCurrencyCombobox).toContainText("GBP");
 
     const invoiceNumberFieldset = page.getByRole("group", {
       name: "Invoice Number",
@@ -1007,10 +1020,11 @@ test.describe("Default Invoice Template", () => {
     // fill once again the invoice number
     await invoiceNumberLabelInput.fill("Faktura TEST:");
 
-    // Switch currency to CHF
-    const currencySelect = page.getByRole("combobox", { name: "Currency" });
-    await currencySelect.selectOption("CHF");
-    await expect(currencySelect).toHaveValue("CHF");
+    // Switch currency to CHF via combobox
+    const currencyCombobox2 = page.getByRole("combobox", { name: "Currency" });
+    await currencyCombobox2.click();
+    await page.getByRole("option", { name: /^CHF\s/ }).click();
+    await expect(currencyCombobox2).toContainText("CHF");
 
     const notesFinalSection = page.getByTestId(`final-section`);
     // for better debugging screenshots, we fill in the notes field with a test note =)
@@ -1066,10 +1080,12 @@ test.describe("Default Invoice Template", () => {
       }),
     ).toBeVisible();
 
-    const newCurrencySelect = page.getByRole("combobox", { name: "Currency" });
+    const newCurrencyCombobox = page.getByRole("combobox", {
+      name: "Currency",
+    });
 
     // Verify CHF currency is selected
-    await expect(newCurrencySelect).toHaveValue("CHF");
+    await expect(newCurrencyCombobox).toContainText("CHF");
 
     // wait for debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
@@ -1144,8 +1160,8 @@ test.describe("Default Invoice Template", () => {
     await expect(templateSelect).toHaveValue("stripe");
 
     // Currency should be CHF after navigating back to the previous page
-    const currencySelect2 = page.getByRole("combobox", { name: "Currency" });
-    await expect(currencySelect2).toHaveValue("CHF");
+    const currencyCombobox3 = page.getByRole("combobox", { name: "Currency" });
+    await expect(currencyCombobox3).toContainText("CHF");
 
     const newNotesFinalSection = page.getByTestId(`final-section`);
 
