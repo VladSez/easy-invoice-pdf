@@ -58,6 +58,13 @@ export async function renderPdfOnCanvas(page: Page, pdfBytes: Uint8Array) {
 
                 pdfjsLib.GlobalWorkerOptions.fontExtraProperties = true
 
+                await Promise.all([
+                    document.fonts.load('400 16px "Open Sans"'),
+                    document.fonts.load('700 16px "Open Sans"'),
+                    document.fonts.load('400 16px "Inter"'),
+                    document.fonts.load('500 16px "Inter"'),
+                    document.fonts.load('600 16px "Inter"'),
+                ]);
                 await document.fonts.ready;
 
                 const pdfData = new Uint8Array([${pdfBytes.join(",")}])
@@ -116,6 +123,13 @@ export async function renderMultiPagePdfOnCanvas(
 
                 pdfjsLib.GlobalWorkerOptions.fontExtraProperties = true
 
+                await Promise.all([
+                    document.fonts.load('400 16px "Open Sans"'),
+                    document.fonts.load('700 16px "Open Sans"'),
+                    document.fonts.load('400 16px "Inter"'),
+                    document.fonts.load('500 16px "Inter"'),
+                    document.fonts.load('600 16px "Inter"'),
+                ]);
                 await document.fonts.ready;
 
                 const pdfData = new Uint8Array([${pdfBytes.join(",")}])
