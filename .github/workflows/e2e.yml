@@ -33,7 +33,7 @@ jobs:
             -e BASE_URL \
             -e SENTRY_ENABLED=false \
             -e NEXT_PUBLIC_SENTRY_ENABLED=false \
-            playwright bash -c "corepack enable && pnpm install --frozen-lockfile && npx playwright test --reporter=html,list --workers=2"
+            playwright bash -c "fc-cache -f -v && corepack enable && pnpm install --frozen-lockfile && npx playwright test --reporter=html,list --workers=2"
 
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 #4.6.1
         name: 🎲 Upload Playwright report

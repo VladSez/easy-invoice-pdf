@@ -115,6 +115,7 @@ export default defineConfig({
       name: "Mobile Safari",
       use: {
         ...devices["iPhone 13 Pro"],
+        deviceScaleFactor: 2,
         // on iOS we don't need to grant clipboard permissions
         // Set localStorage to disable umami analytics
         storageState: {

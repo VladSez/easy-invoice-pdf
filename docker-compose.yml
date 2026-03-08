@@ -13,6 +13,9 @@ services:
       - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
       - BASE_URL=${BASE_URL:-http://host.docker.internal:3000}
       - CI
+      - LIBGL_ALWAYS_SOFTWARE=1
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
     extra_hosts:
       - "host.docker.internal:host-gateway"
     entrypoint: []
