@@ -2,6 +2,12 @@ name: 🎭 Playwright E2E tests
 on:
   deployment_status:
 
+# The concurrency block ensures that only one Playwright E2E test workflow runs per branch or pull request at a time.
+# If a new run is triggered (for example, by a commit push), any currently running workflow for that same branch will be cancelled.
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   e2e:
     # https://vercel.com/guides/how-can-i-run-end-to-end-tests-after-my-vercel-preview-deployment
@@ -33,18 +39,7 @@ jobs:
         run: pnpm install
 
       - name: 📦 Install Playwright browser binaries & OS dependencies
-        id: playwright-install
-        run: |
-          start_time=$(date +%s)
-
-          pnpm exec playwright install chromium webkit --with-deps
-
-          end_time=$(date +%s)
-          duration=$((end_time - start_time))
-          minutes=$((duration / 60))
-          seconds=$((duration % 60))
-
-          echo "duration_formatted=${minutes}m ${seconds}s" >> "$GITHUB_OUTPUT"
+        run: pnpm exec playwright install chromium webkit --with-deps
 
       - name: 🎭 Run Playwright tests
         id: playwright
@@ -53,18 +48,7 @@ jobs:
           SENTRY_ENABLED: false
           NEXT_PUBLIC_SENTRY_ENABLED: false
         continue-on-error: true
-        # calculate duration of the job and runs playwright test
-        run: |
-          start_time=$(date +%s)
-
-          pnpm exec playwright test --reporter=html,list
-
-          end_time=$(date +%s)
-          duration=$((end_time - start_time))
-          minutes=$((duration / 60))
-          seconds=$((duration % 60))
-
-          echo "duration_formatted=${minutes}m ${seconds}s" >> "$GITHUB_OUTPUT"
+        run: pnpm exec playwright test --reporter=html,list
 
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 #4.6.1
         name: 🎲 Upload Playwright report
@@ -84,7 +68,7 @@ jobs:
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository_owner }}:${{ github.ref_name }}" \
-            | jq -r '.[0].html_url')
+            | jq -r '.[0].html_url // empty')
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
       - name: 📧 Send email
@@ -102,8 +86,6 @@ jobs:
             E2E tests for ${{ github.repository }} have completed.
 
             Result: ${{ steps.playwright.outcome == 'success' && '✅ Passed' || '❌ Failed' }}
-            Playwright Browser Binaries Installation Time: ${{ steps.playwright-install.outputs.duration_formatted }}
-            ${{ steps.playwright.outputs.duration_formatted && format('Playwright Tests Duration: {0}', steps.playwright.outputs.duration_formatted) || '' }}
 
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

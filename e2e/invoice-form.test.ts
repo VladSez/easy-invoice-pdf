@@ -38,8 +38,6 @@ test.describe("Invoice Generator Page", () => {
   test("displays correct OG meta tags for default template", async ({
     page,
   }) => {
-    // Navigate to default template
-    await page.goto("/?template=default");
     await expect(page).toHaveURL("/?template=default");
 
     const templateCombobox = page.getByRole("combobox", {
