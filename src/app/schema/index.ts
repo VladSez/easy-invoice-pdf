@@ -1229,6 +1229,7 @@ export const METADATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_METADATA";
 // __________________________________________________________
 // Validate that currencies are unique
 // __________________________________________________________
+
 const uniqueCurrencies = new Set(SUPPORTED_CURRENCIES);
 
 if (uniqueCurrencies.size !== SUPPORTED_CURRENCIES.length) {
@@ -1244,5 +1245,29 @@ if (uniqueCurrencies.size !== SUPPORTED_CURRENCIES.length) {
 
   throw new Error(
     `SUPPORTED_CURRENCIES contains duplicate entries: ${currencyFullNames.join(", ")}`,
+  );
+}
+
+// Validate that all supported currencies are in exactly one group
+const currenciesInGroups = CURRENCY_GROUPS.flatMap((g) => g.currencies);
+const currenciesInGroupsSet = new Set(currenciesInGroups);
+
+// Check for duplicates within groups
+if (currenciesInGroupsSet.size !== currenciesInGroups.length) {
+  const duplicates = currenciesInGroups.filter(
+    (currency, index) => currenciesInGroups.indexOf(currency) !== index,
+  );
+  throw new Error(
+    `CURRENCY_GROUPS contains duplicate entries: ${duplicates.join(", ")}`,
+  );
+}
+
+// Check for missing currencies
+const missingCurrencies = SUPPORTED_CURRENCIES.filter(
+  (c) => !currenciesInGroupsSet.has(c),
+);
+if (missingCurrencies.length > 0) {
+  throw new Error(
+    `CURRENCY_GROUPS is missing currencies: ${missingCurrencies.join(", ")}`,
   );
 }
