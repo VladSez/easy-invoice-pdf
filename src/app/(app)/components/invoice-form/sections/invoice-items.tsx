@@ -859,7 +859,7 @@ function DeleteInvoiceItemConfirmationDialog({
         if (!open) setDeleteItemIndex(null);
       }}
     >
-      <AlertDialogContent>
+      <AlertDialogContent data-testid="delete-invoice-item-confirmation-dialog">
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Invoice Item</AlertDialogTitle>
           <AlertDialogDescription className="text-balance">

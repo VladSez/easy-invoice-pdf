@@ -35,6 +35,7 @@ import React, {
   memo,
   useCallback,
   useEffect,
+  useRef,
   useState,
   type Dispatch,
   type SetStateAction,
@@ -127,6 +128,8 @@ export const InvoiceForm = memo(function InvoiceForm({
     name: "items",
   });
 
+  const isDeletingInvoiceItemRef = useRef(false);
+
   // calculate totals and other values when invoice items change
   useEffect(() => {
     // run validations before calculations because user can input invalid data
@@ -194,8 +197,14 @@ export const InvoiceForm = memo(function InvoiceForm({
   // regenerate pdf on every input change with debounce
   const debouncedRegeneratePdfOnFormChange = useDebouncedCallback(
     async (data: InvoiceData) => {
-      // close all other toasts (if any)
-      toast.dismiss();
+      // if we are deleting an invoice item, we don't want to close success notification
+      if (isDeletingInvoiceItemRef.current) {
+        isDeletingInvoiceItemRef.current = false;
+      } else {
+        // close all other toasts, for example when user is updating the invoice form and we are showing the info notification that the invoice has been updated, we want to close the info notification for better UX
+        toast.dismiss();
+      }
+
       setInvoiceFormHasErrors(false);
 
       // TODO: double check if we need this code, because we already save to local storage in the page.client.tsx (parent component) (line: 267) useEffect "Save to localStorage whenever data changes on form update"
@@ -260,6 +269,8 @@ export const InvoiceForm = memo(function InvoiceForm({
    */
   const handleRemoveInvoiceItem = useCallback(
     (index: number) => {
+      isDeletingInvoiceItemRef.current = true;
+
       setValue(
         "items",
         invoiceItems.filter((_, i) => i !== index),

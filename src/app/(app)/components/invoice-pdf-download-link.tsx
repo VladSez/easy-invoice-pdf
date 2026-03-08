@@ -50,11 +50,13 @@ export function InvoicePDFDownloadLink({
   errorWhileGeneratingPdfIsShown,
   setErrorWhileGeneratingPdfIsShown,
   qrCodeDataUrl,
+  isMobile,
 }: {
   invoiceData: InvoiceData;
   errorWhileGeneratingPdfIsShown: boolean;
   setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
   qrCodeDataUrl: string;
+  isMobile: boolean;
 }) {
   const { inAppInfo } = useDeviceContext();
   const { markCTAActionTriggered } = useCTAToast();
@@ -75,6 +77,7 @@ export function InvoicePDFDownloadLink({
           "File not available. Please try again in different browser.",
           {
             id: "file-not-available-error-toast",
+            position: isMobile ? "top-center" : "bottom-right",
           },
         );
         return;
@@ -85,7 +88,11 @@ export function InvoicePDFDownloadLink({
 
         toast(
           `Downloads are blocked inside ${inAppInfo?.name ?? "this app"}. Open in your browser to save.`,
-          { icon: "📱", id: "downloads-blocked-inside-app-toast" },
+          {
+            icon: "📱",
+            id: "downloads-blocked-inside-app-toast",
+            position: isMobile ? "top-center" : "bottom-right",
+          },
         );
 
         return;
@@ -95,7 +102,11 @@ export function InvoicePDFDownloadLink({
         e.preventDefault();
         toast(
           `Downloads are blocked inside Telegram. Open in your browser to save.`,
-          { icon: "📱", id: "downloads-blocked-inside-telegram-toast" },
+          {
+            icon: "📱",
+            id: "downloads-blocked-inside-telegram-toast",
+            position: isMobile ? "top-center" : "bottom-right",
+          },
         );
 
         return;
@@ -133,6 +144,7 @@ export function InvoicePDFDownloadLink({
       isTelegramPreviewBrowser,
       isLoading,
       error,
+      isMobile,
       invoiceData.template,
       markCTAActionTriggered,
     ],
@@ -221,10 +233,16 @@ export function InvoicePDFDownloadLink({
         id: "in-app-browser-toast", // To prevent duplicate toasts
         duration: Infinity,
         icon: "⚠️",
+        position: isMobile ? "top-center" : "bottom-right",
       });
       setInAppBrowserToastShown(true);
     }
-  }, [inAppInfo?.isInApp, inAppBrowserToastShown, isTelegramPreviewBrowser]);
+  }, [
+    inAppInfo?.isInApp,
+    inAppBrowserToastShown,
+    isTelegramPreviewBrowser,
+    isMobile,
+  ]);
 
   return (
     <>

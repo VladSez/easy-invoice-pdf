@@ -1,6 +1,6 @@
 TODO list
 
-- [ ] replace native select for currencies with Combobox (https://ui.shadcn.com/docs/components/radix/combobox) i.e. make it searchable? (also add Groups - Major, EU, Africa, Asia, Latin America, etc.)
+- [] on mobile, when switching between tabs, scroll to the last position of the invoice form section for better UX
 
 IMPORTANT:
 
