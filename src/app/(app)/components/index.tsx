@@ -263,6 +263,7 @@ export function InvoiceClientPage({
                 setErrorWhileGeneratingPdfIsShown
               }
               qrCodeDataUrl={qrCodeDataUrl}
+              isMobile={isMobile}
             />
           </div>
           {invoiceLastUpdatedAtFormatted && (

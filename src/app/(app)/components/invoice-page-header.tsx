@@ -40,6 +40,7 @@ export function InvoicePageHeader({
   errorWhileGeneratingPdfIsShown,
   setErrorWhileGeneratingPdfIsShown,
   qrCodeDataUrl,
+  isMobile,
 }: {
   canShareInvoice: boolean;
   handleShareInvoice: () => void;
@@ -48,6 +49,7 @@ export function InvoicePageHeader({
   errorWhileGeneratingPdfIsShown: boolean;
   setErrorWhileGeneratingPdfIsShown: (value: boolean) => void;
   qrCodeDataUrl: string;
+  isMobile: boolean;
 }) {
   return (
     <div data-testid="header">
@@ -148,6 +150,7 @@ export function InvoicePageHeader({
                   setErrorWhileGeneratingPdfIsShown
                 }
                 qrCodeDataUrl={qrCodeDataUrl}
+                isMobile={isMobile}
               />
             </>
           ) : null}
