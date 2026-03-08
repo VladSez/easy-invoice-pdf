@@ -1,4 +1,4 @@
-# for locally running playwright tests in docker (as close to CI environment as possible)
+# single source of truth for running playwright tests in docker (used locally and in CI)
 
 services:
   playwright:
@@ -10,6 +10,7 @@ services:
       - .:/work
     environment:
       - TZ=Europe/Warsaw
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
       - BASE_URL=${BASE_URL:-http://host.docker.internal:3000}
       - CI
     extra_hosts:
