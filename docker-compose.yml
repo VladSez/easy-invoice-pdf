@@ -1,0 +1,19 @@
+# for locally running playwright tests in docker (as close to CI environment as possible)
+
+services:
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.56.1-noble
+    init: true
+    ipc: host
+    working_dir: /work
+    volumes:
+      - .:/work
+    environment:
+      - TZ=Europe/Warsaw
+      - BASE_URL=${BASE_URL:-http://host.docker.internal:3000}
+      - CI
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    entrypoint: []
+    tty: true
+    stdin_open: true
