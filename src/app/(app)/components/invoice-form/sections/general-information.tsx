@@ -219,36 +219,6 @@ export const GeneralInformation = memo(function GeneralInformation({
           )}
         </div>
 
-        {/* Pay Online URL - Only for Stripe template */}
-        {template === "stripe" && (
-          <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
-            <Label htmlFor={`stripePayOnlineUrl`} className="">
-              Payment Link URL (Optional)
-            </Label>
-
-            <Controller
-              name="stripePayOnlineUrl"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  id={`stripePayOnlineUrl`}
-                  type="url"
-                  className="mt-1"
-                />
-              )}
-            />
-            {errors.stripePayOnlineUrl ? (
-              <ErrorMessage>{errors.stripePayOnlineUrl.message}</ErrorMessage>
-            ) : (
-              <InputHelperMessage>
-                Enter your payment URL. This adds a &quot;Pay Online&quot;
-                button to the PDF invoice.
-              </InputHelperMessage>
-            )}
-          </div>
-        )}
-
         {/* Language PDF Select */}
         <div>
           <Label htmlFor={`language`} className="mb-1">
@@ -765,6 +735,36 @@ export const GeneralInformation = memo(function GeneralInformation({
             <ErrorMessage>{errors.logo.message}</ErrorMessage>
           ) : null}
         </div>
+
+        {/* Pay Online URL - Only for Stripe template */}
+        {template === "stripe" && (
+          <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
+            <Label htmlFor={`stripePayOnlineUrl`} className="">
+              Payment Link URL (Optional)
+            </Label>
+
+            <Controller
+              name="stripePayOnlineUrl"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  id={`stripePayOnlineUrl`}
+                  type="url"
+                  className="mt-1"
+                />
+              )}
+            />
+            {errors.stripePayOnlineUrl ? (
+              <ErrorMessage>{errors.stripePayOnlineUrl.message}</ErrorMessage>
+            ) : (
+              <InputHelperMessage>
+                Enter your payment URL. This adds a &quot;Pay Online&quot;
+                button to the PDF invoice.
+              </InputHelperMessage>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
