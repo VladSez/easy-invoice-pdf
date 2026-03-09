@@ -790,6 +790,7 @@ export const InvoiceItems = memo(function InvoiceItems({
       })}
       <Button
         onClick={() => {
+          // add new invoice item
           append({
             invoiceItemNumberIsVisible: true,
             name: "",
@@ -817,7 +818,7 @@ export const InvoiceItems = memo(function InvoiceItems({
         }}
         variant="outline"
       >
-        <Plus className="mr-2 h-4 w-4" />
+        <Plus className="mr-2 size-3" />
         Add invoice item
       </Button>
 

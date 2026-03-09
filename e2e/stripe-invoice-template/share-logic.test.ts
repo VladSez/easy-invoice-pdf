@@ -205,7 +205,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     expect(dataParam).not.toBe("");
   });
 
-  test("share button becomes disabled when switching to Stripe template with existing logo", async ({
+  test("share button stays disabled after switching templates when logo exists, re-enables after removing logo", async ({
     page,
   }) => {
     // Verify default template is selected by default
@@ -233,7 +233,16 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("default");
 
-    // Verify share button is enabled again (logo is cleared when switching away from Stripe)
+    // Logo persists across template switches, so share button stays disabled
+    await expect(shareButton).toHaveAttribute("data-disabled", "true");
+
+    // Remove the logo to re-enable sharing
+    const generalInfoSection = page.getByTestId("general-information-section");
+    await generalInfoSection
+      .getByRole("button", { name: "Remove logo" })
+      .click();
+
+    // Verify share button is enabled again after logo removal
     await expect(shareButton).toHaveAttribute("data-disabled", "false");
     await expect(shareButton).toBeEnabled();
   });

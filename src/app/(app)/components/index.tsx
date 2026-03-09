@@ -125,7 +125,6 @@ export function InvoiceClientPage({
   isMobile,
   errorWhileGeneratingPdfIsShown,
   setErrorWhileGeneratingPdfIsShown,
-  setCanShareInvoice,
   canShareInvoice,
   qrCodeDataUrl,
   setInvoiceFormHasErrors,
@@ -136,7 +135,6 @@ export function InvoiceClientPage({
   isMobile: boolean;
   errorWhileGeneratingPdfIsShown: boolean;
   setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
-  setCanShareInvoice: (canShareInvoice: boolean) => void;
   canShareInvoice: boolean;
   qrCodeDataUrl: string;
   setInvoiceFormHasErrors: Dispatch<SetStateAction<boolean>>;
@@ -190,7 +188,6 @@ export function InvoiceClientPage({
                 <InvoiceForm
                   invoiceData={invoiceDataState}
                   handleInvoiceDataChange={handleInvoiceDataChange}
-                  setCanShareInvoice={setCanShareInvoice}
                   isMobile
                   setInvoiceFormHasErrors={setInvoiceFormHasErrors}
                 />
@@ -294,7 +291,6 @@ export function InvoiceClientPage({
               <InvoiceForm
                 invoiceData={invoiceDataState}
                 handleInvoiceDataChange={handleInvoiceDataChange}
-                setCanShareInvoice={setCanShareInvoice}
                 setInvoiceFormHasErrors={setInvoiceFormHasErrors}
               />
             </div>

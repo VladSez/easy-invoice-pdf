@@ -100,7 +100,7 @@ export function AppPageClient({
   const [errorWhileGeneratingPdfIsShown, setErrorWhileGeneratingPdfIsShown] =
     useState(false);
 
-  const [canShareInvoice, setCanShareInvoice] = useState(true);
+  const canShareInvoice = !invoiceDataState?.logo;
 
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
 
@@ -714,7 +714,6 @@ export function AppPageClient({
                 setErrorWhileGeneratingPdfIsShown
               }
               canShareInvoice={canShareInvoice}
-              setCanShareInvoice={setCanShareInvoice}
               qrCodeDataUrl={qrCodeDataUrl}
               setInvoiceFormHasErrors={setInvoiceFormHasErrors}
             />

@@ -2,6 +2,10 @@ import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import fs from "node:fs";
 import path from "node:path";
+import {
+  SMALL_TEST_IMAGE_BASE64,
+  uploadBase64LogoAsFile,
+} from "../stripe-invoice-template/utils";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { test, expect } from "../utils/extended-playwright-test";
@@ -1562,6 +1566,151 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       "default-template-multi-pages.png",
+    );
+  });
+
+  test("generates PDF with logo when using default template", async ({
+    page,
+    browserName,
+    downloadDir,
+  }) => {
+    await expect(page).toHaveURL("/?template=default");
+
+    const generalInfoSection = page.getByTestId("general-information-section");
+
+    // Upload a valid logo
+    await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
+
+    // Verify logo preview is visible
+    await expect(page.getByText("Logo uploaded successfully!")).toBeVisible();
+    await expect(
+      generalInfoSection.getByAltText("Company logo preview"),
+    ).toBeVisible();
+    await expect(
+      generalInfoSection.getByText(
+        "Logo uploaded successfully. Click the X to remove it.",
+      ),
+    ).toBeVisible();
+
+    // Wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(800);
+
+    const downloadPDFButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadPDFButton).toBeVisible();
+    await expect(downloadPDFButton).toBeEnabled();
+
+    // Click the download button and wait for download
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPDFButton.click(),
+    ]);
+
+    const suggestedFilename = download.suggestedFilename();
+
+    const pdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-${suggestedFilename}`,
+    );
+
+    await download.saveAs(pdfFilePath);
+
+    const absolutePath = path.resolve(pdfFilePath);
+    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
+
+    const pdfBytes = fs.readFileSync(absolutePath);
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, pdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "pdf-with-logo-default-template.png",
+    );
+
+    /**
+     * VERIFY LOGO PERSISTS AFTER NAVIGATING BACK TO DEFAULT TEMPLATE
+     */
+
+    // Navigate back and switch to Stripe template to verify logo persists
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
+
+    // Verify logo is still present after navigation
+    const newGeneralInfoSection = page.getByTestId(
+      "general-information-section",
+    );
+    await expect(
+      newGeneralInfoSection.getByAltText("Company logo preview"),
+    ).toBeVisible();
+
+    /**
+     * VERIFY LOGO PERSISTS AFTER SWITCHING TO STRIPE TEMPLATE
+     */
+
+    // Switch to Stripe template
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await page.waitForURL("/?template=stripe");
+
+    // Verify logo persists after template switch
+    await expect(
+      newGeneralInfoSection.getByAltText("Company logo preview"),
+    ).toBeVisible();
+
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(800);
+
+    // Download PDF with Stripe template + logo
+    const stripeDownloadPDFButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(stripeDownloadPDFButton).toBeVisible();
+    await expect(stripeDownloadPDFButton).toBeEnabled();
+
+    const [stripeDownload] = await Promise.all([
+      page.waitForEvent("download"),
+      stripeDownloadPDFButton.click(),
+    ]);
+
+    const stripeSuggestedFilename = stripeDownload.suggestedFilename();
+
+    const stripePdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-stripe-${stripeSuggestedFilename}`,
+    );
+
+    await stripeDownload.saveAs(stripePdfFilePath);
+
+    const stripeAbsolutePath = path.resolve(stripePdfFilePath);
+    await expect.poll(() => fs.existsSync(stripeAbsolutePath)).toBe(true);
+
+    const stripePdfBytes = fs.readFileSync(stripeAbsolutePath);
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, stripePdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "pdf-with-logo-stripe-template-after-switch.png",
     );
   });
 });

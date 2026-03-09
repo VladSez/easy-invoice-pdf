@@ -73,7 +73,7 @@ test.describe("Stripe Invoice Template", () => {
     );
   });
 
-  test("logo upload section and payment link URL section only appear for Stripe template", async ({
+  test("logo upload appears for all templates; payment link URL only for Stripe", async ({
     page,
   }) => {
     // Verify default template is selected by default
@@ -81,15 +81,15 @@ test.describe("Stripe Invoice Template", () => {
 
     const generalInfoSection = page.getByTestId("general-information-section");
 
-    // Initially default template - logo section should not be visible
+    // Logo section is visible on default template
     await expect(
       generalInfoSection.getByText("Company Logo (Optional)"),
-    ).toBeHidden();
+    ).toBeVisible();
     await expect(
-      generalInfoSection.getByTestId("stripe-logo-upload-input"),
-    ).toBeHidden();
+      generalInfoSection.getByTestId("logo-upload-input"),
+    ).toBeVisible();
 
-    // Payment URL section should not be visible
+    // Payment URL section should not be visible on default template
     await expect(
       generalInfoSection.getByRole("textbox", {
         name: "Payment Link URL (Optional)",
@@ -106,9 +106,9 @@ test.describe("Stripe Invoice Template", () => {
 
     await expect(page).toHaveURL("/?template=stripe");
 
-    // Logo section should now be visible
+    // Logo section should still be visible on Stripe template
     await expect(
-      generalInfoSection.getByTestId("stripe-logo-upload-input"),
+      generalInfoSection.getByTestId("logo-upload-input"),
     ).toBeVisible();
 
     await expect(
@@ -121,7 +121,7 @@ test.describe("Stripe Invoice Template", () => {
       generalInfoSection.getByText("JPEG, PNG or WebP (max 3MB)"),
     ).toBeVisible();
 
-    // Payment URL section should now be visible
+    // Payment URL section should now be visible on Stripe template
     await expect(
       generalInfoSection.getByRole("textbox", {
         name: "Payment Link URL (Optional)",
@@ -133,16 +133,16 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("default");
 
-    // Logo section should be hidden again
+    // Logo section remains visible on default template
     await expect(
       generalInfoSection.getByText("Company Logo (Optional)"),
-    ).toBeHidden();
+    ).toBeVisible();
 
     await expect(
-      generalInfoSection.getByTestId("stripe-logo-upload-input"),
-    ).toBeHidden();
+      generalInfoSection.getByTestId("logo-upload-input"),
+    ).toBeVisible();
 
-    // Payment URL section should be hidden again
+    // Payment URL section should be hidden again on default template
     await expect(
       generalInfoSection.getByRole("textbox", {
         name: "Payment Link URL (Optional)",
