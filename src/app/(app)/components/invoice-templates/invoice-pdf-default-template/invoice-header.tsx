@@ -1,4 +1,4 @@
-import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
+import { Image, Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { type InvoiceData } from "@/app/schema";
 import dayjs from "dayjs";
 
@@ -31,44 +31,97 @@ export function InvoiceHeader({
 
   const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`;
 
-  return (
-    <View
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-        marginBottom: 7,
-      }}
-    >
-      <View>
-        <Text style={[styles.header]}>{invoiceNumber}</Text>
+  const hasLogo = invoiceData.logo && invoiceData.logo.length > 0;
 
-        {invoiceData?.invoiceType && invoiceData.invoiceTypeFieldIsVisible && (
-          <Text
-            style={[styles.fontBold, styles.fontSize8, { maxWidth: "250px" }]}
+  return (
+    <View style={{ marginBottom: 7 }}>
+      {/* Logo + Dates row */}
+      {hasLogo ? (
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: 15,
+          }}
+        >
+          <View style={{ alignItems: "flex-start" }}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+            <Image
+              src={invoiceData.logo}
+              style={{
+                maxWidth: 110,
+                maxHeight: 40,
+                objectFit: "contain",
+              }}
+            />
+          </View>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+            }}
           >
-            {invoiceData?.invoiceType}
-          </Text>
-        )}
-      </View>
+            <Text style={styles.fontSize7}>
+              {t.dateOfIssue}:{" "}
+              <Text style={[styles.fontBold, styles.fontSize8]}>
+                {dateOfIssue}
+              </Text>
+            </Text>
+            <Text style={styles.fontSize7}>
+              {t.dateOfService}:{" "}
+              <Text style={[styles.fontBold, styles.fontSize8]}>
+                {dateOfService}
+              </Text>
+            </Text>
+          </View>
+        </View>
+      ) : null}
+
+      {/* Invoice number + Dates (when no logo) row */}
       <View
         style={{
           display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-end",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
         }}
       >
-        <Text style={styles.fontSize7}>
-          {t.dateOfIssue}:{" "}
-          <Text style={[styles.fontBold, styles.fontSize8]}>{dateOfIssue}</Text>
-        </Text>
-        <Text style={styles.fontSize7}>
-          {t.dateOfService}:{" "}
-          <Text style={[styles.fontBold, styles.fontSize8]}>
-            {dateOfService}
-          </Text>
-        </Text>
+        <View>
+          <Text style={[styles.header]}>{invoiceNumber}</Text>
+
+          {invoiceData?.invoiceType && invoiceData.invoiceTypeFieldIsVisible ? (
+            <Text
+              style={[styles.fontBold, styles.fontSize8, { maxWidth: "250px" }]}
+            >
+              {invoiceData?.invoiceType}
+            </Text>
+          ) : null}
+        </View>
+        {!hasLogo ? (
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+            }}
+          >
+            <Text style={styles.fontSize7}>
+              {t.dateOfIssue}:{" "}
+              <Text style={[styles.fontBold, styles.fontSize8]}>
+                {dateOfIssue}
+              </Text>
+            </Text>
+            <Text style={styles.fontSize7}>
+              {t.dateOfService}:{" "}
+              <Text style={[styles.fontBold, styles.fontSize8]}>
+                {dateOfService}
+              </Text>
+            </Text>
+          </View>
+        ) : null}
       </View>
     </View>
   );

@@ -79,7 +79,6 @@ type AccordionKeys = Array<(typeof DEFAULT_ACCORDION_VALUES)[number]>;
 interface InvoiceFormProps {
   invoiceData: InvoiceData;
   handleInvoiceDataChange: (updatedData: InvoiceData) => void;
-  setCanShareInvoice: (canShareInvoice: boolean) => void;
   isMobile?: boolean;
   setInvoiceFormHasErrors: Dispatch<SetStateAction<boolean>>;
 }
@@ -87,7 +86,6 @@ interface InvoiceFormProps {
 export const InvoiceForm = memo(function InvoiceForm({
   invoiceData,
   handleInvoiceDataChange,
-  setCanShareInvoice,
   isMobile = false,
   setInvoiceFormHasErrors,
 }: InvoiceFormProps) {
@@ -252,15 +250,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   }, [debouncedRegeneratePdfOnFormChange, watch]);
 
   const template = useWatch({ control, name: "template" });
-  const logo = useWatch({ control, name: "logo" });
   const taxLabelText = useWatch({ control, name: "taxLabelText" }) || "VAT";
-
-  // Disable sharing when Stripe template contains a logo (we can't put the logo base64 string in the URL due to browser URL length limits)
-  useEffect(() => {
-    const canShareInvoice = !(template === "stripe" && Boolean(logo));
-
-    setCanShareInvoice(canShareInvoice);
-  }, [template, logo, setCanShareInvoice]);
 
   /**
    * Remove an invoice item from the form and trigger the form update

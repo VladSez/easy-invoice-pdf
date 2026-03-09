@@ -788,38 +788,45 @@ export const InvoiceItems = memo(function InvoiceItems({
           </fieldset>
         );
       })}
-      <Button
-        onClick={() => {
-          append({
-            invoiceItemNumberIsVisible: true,
-            name: "",
-            nameFieldIsVisible: true,
-            amount: 1,
-            amountFieldIsVisible: true,
-            unit: "",
-            unitFieldIsVisible: true,
-            netPrice: 0,
-            netPriceFieldIsVisible: true,
-            vat: "NP",
-            vatFieldIsVisible: true,
-            netAmount: 0,
-            netAmountFieldIsVisible: true,
-            vatAmount: 0,
-            vatAmountFieldIsVisible: true,
-            preTaxAmount: 0,
-            preTaxAmountFieldIsVisible: true,
-            typeOfGTU: "",
-            typeOfGTUFieldIsVisible: true,
-          });
+      <CustomTooltip
+        trigger={
+          <Button
+            onClick={() => {
+              append({
+                invoiceItemNumberIsVisible: true,
+                name: "",
+                nameFieldIsVisible: true,
+                amount: 1,
+                amountFieldIsVisible: true,
+                unit: "",
+                unitFieldIsVisible: true,
+                netPrice: 0,
+                netPriceFieldIsVisible: true,
+                vat: "NP",
+                vatFieldIsVisible: true,
+                netAmount: 0,
+                netAmountFieldIsVisible: true,
+                vatAmount: 0,
+                vatAmountFieldIsVisible: true,
+                preTaxAmount: 0,
+                preTaxAmountFieldIsVisible: true,
+                typeOfGTU: "",
+                typeOfGTUFieldIsVisible: true,
+              });
 
-          // analytics track event
-          umamiTrackEvent("add_invoice_item");
-        }}
-        variant="outline"
-      >
-        <Plus className="mr-2 h-4 w-4" />
-        Add invoice item
-      </Button>
+              umamiTrackEvent("add_invoice_item");
+            }}
+            variant="default"
+            className="w-full gap-2"
+          >
+            <Plus className="size-4" />
+            Add invoice item
+          </Button>
+        }
+        content="Add a new line item with name, quantity, price and tax details"
+        side="bottom"
+        showArrow
+      />
 
       <DeleteInvoiceItemConfirmationDialog
         deleteItemIndex={deleteItemIndex}

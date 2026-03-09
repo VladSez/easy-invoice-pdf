@@ -190,11 +190,6 @@ export const GeneralInformation = memo(function GeneralInformation({
                       setValue("stripePayOnlineUrl", "");
                     }
 
-                    // Clear logo when template is default
-                    if (logo) {
-                      setValue("logo", "");
-                    }
-
                     // Set date format to "YYYY-MM-DD" when template is default
                     setValue("dateFormat", DEFAULT_DATE_FORMAT);
 
@@ -223,67 +218,6 @@ export const GeneralInformation = memo(function GeneralInformation({
             </InputHelperMessage>
           )}
         </div>
-
-        {/* Logo Upload - Only for Stripe template */}
-        {template === "stripe" && (
-          <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
-            <Label htmlFor="logoUpload" className="mb-2">
-              Company Logo (Optional)
-            </Label>
-
-            {logo ? (
-              <div className="space-y-2">
-                {/* Logo preview */}
-                <div className="relative inline-block">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={logo}
-                    alt="Company logo preview"
-                    className="h-28 max-w-40 rounded-lg border-2 border-gray-200 object-contain p-2 shadow-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleLogoRemove}
-                    className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-colors hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                    aria-label="Remove logo"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-                <InputHelperMessage>
-                  Logo uploaded successfully. Click the X to remove it.
-                </InputHelperMessage>
-              </div>
-            ) : (
-              <div data-testid="stripe-logo-upload-input">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  id="logoUpload"
-                  accept="image/jpeg,image/jpg,image/png,image/webp"
-                  onChange={handleLogoUpload}
-                  className="hidden"
-                />
-                <label
-                  htmlFor="logoUpload"
-                  className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-8 transition-colors hover:border-gray-400 hover:bg-gray-50"
-                >
-                  <div className="text-center">
-                    <Upload className="mx-auto h-4 w-4 text-gray-400" />
-                    <p className="mt-3 text-sm font-medium text-gray-600">
-                      Click to upload your company logo
-                    </p>
-                    <p className="mt-1 text-xs text-gray-500">
-                      JPEG, PNG or WebP (max 3MB)
-                    </p>
-                  </div>
-                </label>
-              </div>
-            )}
-
-            {errors.logo && <ErrorMessage>{errors.logo.message}</ErrorMessage>}
-          </div>
-        )}
 
         {/* Pay Online URL - Only for Stripe template */}
         {template === "stripe" && (
@@ -770,6 +704,66 @@ export const GeneralInformation = memo(function GeneralInformation({
           {errors.invoiceType && (
             <ErrorMessage>{errors.invoiceType.message}</ErrorMessage>
           )}
+        </div>
+        {/* Logo Upload */}
+        <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
+          <Label htmlFor="logoUpload" className="mb-2">
+            Company Logo (Optional)
+          </Label>
+
+          {logo ? (
+            <div className="space-y-2">
+              {/* Logo preview */}
+              <div className="relative inline-block">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={logo}
+                  alt="Company logo preview"
+                  className="h-28 max-w-40 rounded-lg border-2 border-gray-200 object-contain p-2 shadow-sm"
+                />
+                <button
+                  type="button"
+                  onClick={handleLogoRemove}
+                  className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-colors hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  aria-label="Remove logo"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <InputHelperMessage>
+                Logo uploaded successfully. Click the X to remove it.
+              </InputHelperMessage>
+            </div>
+          ) : (
+            <div data-testid="logo-upload-input">
+              <input
+                ref={fileInputRef}
+                type="file"
+                id="logoUpload"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                onChange={handleLogoUpload}
+                className="hidden"
+              />
+              <label
+                htmlFor="logoUpload"
+                className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-8 transition-colors hover:border-gray-400 hover:bg-gray-50"
+              >
+                <div className="text-center">
+                  <Upload className="mx-auto h-4 w-4 text-gray-400" />
+                  <p className="mt-3 text-sm font-medium text-gray-600">
+                    Click to upload your company logo
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    JPEG, PNG or WebP (max 3MB)
+                  </p>
+                </div>
+              </label>
+            </div>
+          )}
+
+          {errors.logo ? (
+            <ErrorMessage>{errors.logo.message}</ErrorMessage>
+          ) : null}
         </div>
       </div>
     </div>

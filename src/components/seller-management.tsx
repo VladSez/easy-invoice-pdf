@@ -376,7 +376,7 @@ export function SellerManagement({
               aria-disabled={!isLocalStorageAvailable} // better UX than 'disabled'
             >
               New Seller
-              <Plus className="ml-1 h-3 w-3" />
+              <Plus className="ml-1 size-3" />
             </Button>
           }
           content={
