@@ -28,7 +28,10 @@ test.describe("About page", () => {
     await expect(languageSwitcher).toBeVisible();
 
     // check app link button in header
-    await expect(header.getByText("EasyInvoicePDF")).toBeVisible();
+    await expect(
+      header.getByRole("link", { name: "EasyInvoicePDF" }),
+    ).toBeVisible();
+
     const goToAppButton = header.getByRole("link", {
       name: "Go to app",
       exact: true,
@@ -201,7 +204,9 @@ test.describe("About page", () => {
 
     const header = page.getByRole("banner");
     // Check header elements in French
-    await expect(header.getByText("EasyInvoicePDF")).toBeVisible();
+    await expect(
+      header.getByRole("link", { name: "EasyInvoicePDF" }),
+    ).toBeVisible();
 
     const goToAppButton = header.getByRole("link", {
       name: "Ouvrir",
@@ -276,7 +281,10 @@ test.describe("About page", () => {
 
     const header = page.getByRole("banner");
     // Check header elements in German
-    await expect(header.getByText("EasyInvoicePDF")).toBeVisible();
+    await expect(
+      header.getByRole("link", { name: "EasyInvoicePDF" }),
+    ).toBeVisible();
+
     const goToAppButton = header.getByRole("link", {
       name: "Öffnen",
       exact: true,
