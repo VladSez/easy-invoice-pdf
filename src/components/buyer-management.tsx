@@ -335,7 +335,7 @@ export function BuyerManagement({
           className={cn(!isLocalStorageAvailable && "bg-red-50")}
           trigger={
             <Button
-              variant="outline"
+              variant="default"
               size="sm"
               onClick={() => {
                 if (isLocalStorageAvailable) {

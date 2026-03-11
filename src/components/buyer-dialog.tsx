@@ -221,24 +221,25 @@ export function BuyerDialog({
         <div className="overflow-y-auto px-6 py-4">
           {/* Add Use Current Form Values switch */}
           {!isEditMode && (
-            <div className="mb-4 flex items-center gap-2">
-              <Switch
-                checked={shouldApplyFormValues}
-                onCheckedChange={setShouldApplyFormValues}
-                id="apply-form-values-switch"
-              />
-              <CustomTooltip
-                trigger={
-                  <Label
-                    htmlFor="apply-form-values-switch"
-                    className="cursor-pointer"
-                  >
-                    Pre-fill with values from the current invoice form
-                  </Label>
-                }
-                content="Use the buyer details already entered in the invoice form to pre-fill this dialog"
-                className="z-[1000]"
-              />
+            <div className="mb-4">
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={shouldApplyFormValues}
+                  onCheckedChange={setShouldApplyFormValues}
+                  id="apply-form-values-switch"
+                />
+                <Label
+                  htmlFor="apply-form-values-switch"
+                  className="cursor-pointer"
+                >
+                  Pre-fill with values from the current invoice form
+                </Label>
+              </div>
+              <span className="mt-1.5 inline-block text-xs text-slate-500">
+                When enabled, this will automatically fill in the buyer details
+                dialog with the information you&apos;ve already entered in your
+                current invoice form.
+              </span>
             </div>
           )}
 
@@ -389,7 +390,7 @@ export function BuyerDialog({
 
               {/* Notes */}
               <div className="space-y-4">
-                <div className="flex items-end justify-between">
+                <div className="flex flex-col gap-4">
                   <FormField
                     control={form.control}
                     name="notes"
@@ -410,7 +411,7 @@ export function BuyerDialog({
                   />
 
                   {/* Show Notes Field in PDF */}
-                  <div className="ml-4 flex items-center gap-2">
+                  <div className="flex items-center gap-2">
                     <FormField
                       control={form.control}
                       name="notesFieldIsVisible"
@@ -429,7 +430,7 @@ export function BuyerDialog({
                             <CustomTooltip
                               trigger={
                                 <Label htmlFor="notes-field-visibility">
-                                  Show in PDF
+                                  Show Buyer Notes in PDF
                                 </Label>
                               }
                               content="Show the notes field in the PDF"
@@ -447,24 +448,25 @@ export function BuyerDialog({
 
           {/* Apply to Current Invoice switch remains at bottom */}
           {!isEditMode && (
-            <div className="mt-4 flex items-center gap-2 border-t pt-4">
-              <Switch
-                checked={shouldApplyNewBuyerToInvoice}
-                onCheckedChange={setShouldApplyNewBuyerToInvoice}
-                id="apply-buyer-to-current-invoice-switch"
-              />
-              <CustomTooltip
-                trigger={
-                  <Label
-                    htmlFor="apply-buyer-to-current-invoice-switch"
-                    className="cursor-pointer"
-                  >
-                    Apply to Current Invoice
-                  </Label>
-                }
-                content="When enabled, the newly created buyer will be automatically applied to your current invoice form"
-                className="z-[1000]"
-              />
+            <div className="mt-4 flex flex-col gap-1 border-t pt-4">
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={shouldApplyNewBuyerToInvoice}
+                  onCheckedChange={setShouldApplyNewBuyerToInvoice}
+                  id="apply-buyer-to-current-invoice-switch"
+                />
+                <Label
+                  htmlFor="apply-buyer-to-current-invoice-switch"
+                  className="cursor-pointer"
+                >
+                  Apply to Current Invoice
+                </Label>
+              </div>
+              <span className="mt-1.5 text-xs text-slate-500">
+                When enabled, the newly created buyer will be automatically
+                applied to your current invoice form and reflected in the
+                generated PDF.
+              </span>
             </div>
           )}
         </div>

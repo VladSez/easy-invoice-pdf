@@ -676,7 +676,7 @@ export const GeneralInformation = memo(function GeneralInformation({
           )}
         </div>
         {/* Logo Upload */}
-        <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
+        <div className="">
           <Label htmlFor="logoUpload" className="mb-2">
             Company Logo (Optional)
           </Label>
@@ -738,7 +738,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
         {/* Pay Online URL - Only for Stripe template */}
         {template === "stripe" && (
-          <div className="duration-500 animate-in fade-in slide-in-from-bottom-2">
+          <div className="">
             <Label htmlFor={`stripePayOnlineUrl`} className="">
               Payment Link URL (Optional)
             </Label>
