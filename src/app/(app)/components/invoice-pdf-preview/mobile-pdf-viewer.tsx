@@ -9,7 +9,9 @@ import { BUG_REPORT_URL } from "@/config";
 import * as Sentry from "@sentry/nextjs";
 import { useMemo, useState } from "react";
 
+// This import registers the PDF.js worker globally so that react-pdf can render PDFs in the browser.
 // https://github.com/wojtekmaj/react-pdf/issues/1824#issuecomment-2266150831
+// https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#configure-pdfjs-worker
 import "pdfjs-dist/build/pdf.worker.min.mjs";
 
 /**

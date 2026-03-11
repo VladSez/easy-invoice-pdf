@@ -27,6 +27,7 @@ import { LanguageSwitcher } from "./components/language-switcher";
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
 import { GithubStarCtaMarketingPageHeader } from "@/app/[locale]/about/components/github-star-cta-header";
 import { FinalProjectLogo } from "@/components/etc/final-project-logo";
+import { ProjectLogoDescription } from "@/components/project-logo-description";
 // import { ProjectLogoDescription } from "@/components/project-logo-description";
 
 // statically generate the pages for all locales
@@ -482,38 +483,30 @@ function CtaSection() {
 }
 
 function Logo() {
-  // const t = useTranslations("About");
+  const t = useTranslations("About");
 
   return (
     <div>
-      {/* <div className="flex items-center gap-1">
-        <ProjectLogo className="size-7 flex-shrink-0 sm:size-8" />
-        <div className="flex flex-col">
-          <h1 className="text-balance text-xl font-bold text-slate-800 lg:text-2xl">
+      <div className="flex items-center gap-1.5 md:gap-2">
+        <FinalProjectLogo className="size-6 md:size-7" />
+
+        {/* show app logo and description on desktop */}
+        <div className="hidden sm:block">
+          <ProjectLogoDescription>{t("tagline")}</ProjectLogoDescription>
+        </div>
+
+        {/* show only app name on mobile (to save space) */}
+        <div className="block sm:hidden">
+          <p className="text-balance text-center text-xl font-bold text-zinc-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
             <a
-              href="https://dub.sh/easy-invoice?ref=about-page"
+              href="https://easyinvoicepdf.com"
               target="_blank"
               rel="noopener noreferrer"
             >
               EasyInvoicePDF
             </a>
-          </h1>
-        </div> */}
-      {/* <ProjectLogoDescription>{t("tagline")}</ProjectLogoDescription> */}
-      {/* </div> */}
-      <div className="flex items-center gap-1.5 md:gap-2">
-        {/* <ProjectLogo className="size-7 flex-shrink-0 sm:size-8" /> */}
-        <FinalProjectLogo className="size-6 md:size-7" />
-        <p className="text-balance text-center text-xl font-bold text-zinc-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
-          <a
-            href="https://easyinvoicepdf.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            EasyInvoicePDF
-          </a>
-        </p>
-        {/* <ProjectLogoDescription>{t("tagline")}</ProjectLogoDescription> */}
+          </p>
+        </div>
       </div>
     </div>
   );

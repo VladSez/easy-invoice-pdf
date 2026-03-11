@@ -14,6 +14,7 @@ import { TWITTER_URL } from "@/config";
 import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
+import { MobileFormScrollContainer } from "./mobile-form-scroll-container";
 import type { Dispatch, SetStateAction } from "react";
 
 const DesktopPDFViewerModuleLoading = () => (
@@ -184,14 +185,14 @@ export function InvoiceClientPage({
               </TabsTrigger>
             </TabsList>
             <TabsContent value={TAB_INVOICE_FORM} className="mt-1">
-              <div className="h-[520px] overflow-auto rounded-lg border-b px-3 shadow-sm">
+              <MobileFormScrollContainer className="h-[520px] overflow-auto rounded-lg border-b px-3 shadow-sm">
                 <InvoiceForm
                   invoiceData={invoiceDataState}
                   handleInvoiceDataChange={handleInvoiceDataChange}
                   isMobile
                   setInvoiceFormHasErrors={setInvoiceFormHasErrors}
                 />
-              </div>
+              </MobileFormScrollContainer>
             </TabsContent>
             <TabsContent value={TAB_INVOICE_PREVIEW} className="mt-1">
               <div className="flex h-[520px] w-full items-center justify-center">

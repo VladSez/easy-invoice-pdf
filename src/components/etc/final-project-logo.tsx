@@ -25,10 +25,10 @@ export function FinalProjectLogo({ className }: { className?: string }) {
           y2="367.849"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#3F3F3F" />
-          <stop offset="0.5" stop-color="#AAAAAA" />
-          <stop offset="0.75" stop-color="#5F5F5F" />
-          <stop offset="1" stop-color="#4B4B4B" />
+          <stop stopColor="#3F3F3F" />
+          <stop offset="0.5" stopColor="#AAAAAA" />
+          <stop offset="0.75" stopColor="#5F5F5F" />
+          <stop offset="1" stopColor="#4B4B4B" />
         </linearGradient>
       </defs>
     </svg>

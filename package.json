@@ -1,6 +1,6 @@
 {
   "name": "pdf-invoice-generator",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "packageManager": "pnpm@10.30.1+sha512.3590e550d5384caa39bd5c7c739f72270234b2f6059e13018f975c313b1eb9fefcc09714048765d4d9efe961382c312e624572c0420762bdc5d5940cdf9be73a",
   "scripts": {
@@ -21,7 +21,7 @@
     "e2e:not-flaky": "pnpm e2e --workers=2",
     "e2e:update-snapshots": "pnpm e2e --update-snapshots",
     "dedupe": "pnpm dedupe",
-    "lint-stage": "npx lint-staged --verbose",
+    "lint-stage": "pnpm dlx lint-staged --verbose",
     "check-meta": "pnpx check-site-meta",
     "dev:email": "email dev --dir src/emails",
     "prepare": "husky",

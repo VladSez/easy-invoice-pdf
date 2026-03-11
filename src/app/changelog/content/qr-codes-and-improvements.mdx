@@ -1,0 +1,59 @@
+export const metadata = {
+  title:
+    "QR Code Support, Logo Upload for the Default Invoice Template and Many More",
+  description:
+    "QR code generation for invoices, logo upload for the default template, searchable currency combobox, and improved multi-page PDF support",
+  date: "2026-03-10",
+  version: "1.0.2",
+  type: "minor",
+};
+
+![QR Code Support](https://github.com/user-attachments/assets/9516a709-3863-48fc-a1e8-fcfbd0bb195b)
+
+## ✨ Highlights
+
+- **QR code generation** for invoices with customizable descriptions and visibility toggles, supported in both default and Stripe templates
+- **Logo upload for the default invoice template** (previously available only in the Stripe template)
+- **Searchable currency combobox** with grouped categories, replacing the native dropdown for faster selection
+- **Improved multi-page PDF support** with automatic pagination and page breaks
+
+---
+
+### Changed
+
+- Increased QR code size and improved rendering quality for better scannability
+- Enhanced invoice template text color and visuals for improved readability
+- Reorganized Stripe payment link input position in the form for better flow
+- Improved user feedback during invoice item deletion with better toast notification handling
+- Enhanced error handling to reset invoice metadata to defaults on errors
+- Clearer error messages when invoice sharing fails
+- Tooltip on the "Add invoice item" button for contextual guidance
+- Sentry error tracking integration for invoice sharing and GitHub stars features
+
+### Fixed
+
+- i18n issue when generating PDF via the API route
+- Delete invoice item flow not working correctly
+- Item name field validation too strict (now optional for flexibility)
+
+### What's Changed
+
+- feat: add QR code functionality to invoice templates and other improvements + bug fixes by @VladSez in [#165](https://github.com/VladSez/easy-invoice-pdf/pull/165)
+- improvement: update QR code images and enhance invoice template visuals by @VladSez in [#172](https://github.com/VladSez/easy-invoice-pdf/pull/172)
+- test: enhance URL verification in e2e tests for various pages by @VladSez in [#174](https://github.com/VladSez/easy-invoice-pdf/pull/174)
+- test: update navigation wait strategy in e2e tests for improved reliability by @VladSez in [#175](https://github.com/VladSez/easy-invoice-pdf/pull/175)
+- feat: update Playwright configuration and enhance e2e tests by @VladSez in [#176](https://github.com/VladSez/easy-invoice-pdf/pull/176)
+- chore: adjust Playwright configuration and e2e test settings for stability by @VladSez in [#177](https://github.com/VladSez/easy-invoice-pdf/pull/177)
+- chore: set timezone environment variable in e2e workflow to fix timezone issue in node js server env by @VladSez in [#178](https://github.com/VladSez/easy-invoice-pdf/pull/178)
+- docs: add Star History section to README and improve e2e test navigation strategy by @VladSez in [#179](https://github.com/VladSez/easy-invoice-pdf/pull/179)
+- fix: delete invoice item flow by @VladSez in [#180](https://github.com/VladSez/easy-invoice-pdf/pull/180)
+- fix: fix i18n issue with generating pdf via api + other improvements by @VladSez in [#181](https://github.com/VladSez/easy-invoice-pdf/pull/181)
+- refactor: rename item removal handler and enhance user feedback in invoice form by @VladSez in [#182](https://github.com/VladSez/easy-invoice-pdf/pull/182)
+- refactor: currency searchable combobox by @VladSez in [#183](https://github.com/VladSez/easy-invoice-pdf/pull/183)
+- feat: expand TODO list with discounts feature and improve e2e workflow by @VladSez in [#186](https://github.com/VladSez/easy-invoice-pdf/pull/186)
+- feat: upload logo for default invoice templates, improve add invoice btn styles, add more e2e tests by @VladSez in [#189](https://github.com/VladSez/easy-invoice-pdf/pull/189)
+- fix: update README logo and refactor invoice form for Stripe payment link by @VladSez in [#190](https://github.com/VladSez/easy-invoice-pdf/pull/190)
+
+---
+
+**Full Changelog**: [`EasyInvoicePDF-1.0.1...v1.0.2`](https://github.com/VladSez/easy-invoice-pdf/compare/EasyInvoicePDF-1.0.1...v1.0.2)

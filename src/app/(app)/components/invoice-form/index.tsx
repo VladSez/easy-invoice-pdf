@@ -758,7 +758,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                 Person Authorized to Receive
               </legend>
 
-              <div className="mb-2 flex items-center justify-end">
+              <div className="mb-2 mt-2 flex items-center justify-end">
                 <div className="inline-flex items-center gap-2">
                   <Controller
                     name="personAuthorizedToReceiveFieldIsVisible"
@@ -821,7 +821,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                 Person Authorized to Issue
               </legend>
 
-              <div className="mb-2 flex items-center justify-end">
+              <div className="mb-2 mt-2 flex items-center justify-end">
                 <div className="inline-flex items-center gap-2">
                   <Controller
                     name="personAuthorizedToIssueFieldIsVisible"
