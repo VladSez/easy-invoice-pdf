@@ -389,59 +389,53 @@ export function BuyerDialog({
               />
 
               {/* Notes */}
-              <div className="space-y-4">
-                <div className="flex flex-col gap-4">
-                  <FormField
-                    control={form.control}
-                    name="notes"
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Notes</FormLabel>
+              <div className="space-y-3 rounded-md border p-4">
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="mb-2 font-medium">Notes</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          rows={3}
+                          placeholder="Enter notes (max 750 characters)"
+                          maxLength={750}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="notesFieldIsVisible"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center gap-2">
                         <FormControl>
-                          <Textarea
-                            {...field}
-                            rows={3}
-                            placeholder="Enter notes (max 750 characters)"
-                            maxLength={750}
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            id="notes-field-visibility"
+                            data-testid={`buyerNotesDialogFieldVisibilitySwitch`}
+                            aria-label={`Show the 'Notes' field in the PDF`}
                           />
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Show Notes Field in PDF */}
-                  <div className="flex items-center gap-2">
-                    <FormField
-                      control={form.control}
-                      name="notesFieldIsVisible"
-                      render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center gap-2">
-                            <FormControl>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                                id="notes-field-visibility"
-                                data-testid={`buyerNotesDialogFieldVisibilitySwitch`}
-                                aria-label={`Show the 'Notes' field in the PDF`}
-                              />
-                            </FormControl>
-                            <CustomTooltip
-                              trigger={
-                                <Label htmlFor="notes-field-visibility">
-                                  Show Buyer Notes in PDF
-                                </Label>
-                              }
-                              content="Show the notes field in the PDF"
-                              className="z-[1000]"
-                            />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
+                        <CustomTooltip
+                          trigger={
+                            <Label htmlFor="notes-field-visibility">
+                              Show Buyer Notes in PDF
+                            </Label>
+                          }
+                          content="Show the notes field in the PDF"
+                          className="z-[1000]"
+                        />
+                      </div>
+                    </FormItem>
+                  )}
+                />
               </div>
             </form>
           </Form>
