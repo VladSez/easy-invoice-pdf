@@ -40,6 +40,7 @@ interface SellerManagementProps {
   selectedSellerId: string;
   setSelectedSellerId: Dispatch<SetStateAction<string>>;
   formValues?: Partial<SellerData>;
+  isMobile: boolean;
 }
 
 /**
@@ -68,6 +69,7 @@ export function SellerManagement({
   selectedSellerId,
   setSelectedSellerId,
   formValues,
+  isMobile,
 }: SellerManagementProps) {
   const [isSellerDialogOpen, setIsSellerDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -147,10 +149,16 @@ export function SellerManagement({
         setSelectedSellerId(newSellerWithId?.id);
       }
 
-      toast.success("Seller added successfully", {
-        id: "add_seller_success_toast",
-        richColors: true,
-      });
+      toast.success(
+        shouldApplyNewSellerToInvoice
+          ? "Seller added and applied to invoice"
+          : "Seller added successfully",
+        {
+          id: "add_seller_success_toast",
+          richColors: true,
+          position: isMobile ? "top-center" : "bottom-right",
+        },
+      );
 
       // analytics track event
       umamiTrackEvent("add_seller_success");
@@ -159,7 +167,9 @@ export function SellerManagement({
 
       toast.error("Failed to add seller", {
         id: "add_seller_error_toast",
+        description: "Please try again",
         closeButton: true,
+        position: isMobile ? "top-center" : "bottom-right",
       });
 
       Sentry.captureException(error);
@@ -187,6 +197,7 @@ export function SellerManagement({
       toast.success("Seller updated successfully", {
         id: "edit_seller_success_toast",
         richColors: true,
+        position: isMobile ? "top-center" : "bottom-right",
       });
 
       // analytics track event
@@ -196,7 +207,9 @@ export function SellerManagement({
 
       toast.error("Failed to edit seller", {
         id: "edit_seller_error_toast",
+        description: "Please try again",
         closeButton: true,
+        position: isMobile ? "top-center" : "bottom-right",
       });
 
       Sentry.captureException(error);
@@ -214,11 +227,22 @@ export function SellerManagement({
 
       if (selectedSeller) {
         setValue("seller", selectedSeller);
+        toast.success(`Seller "${selectedSeller.name}" applied to invoice`, {
+          id: "change_seller_success_toast",
+          richColors: true,
+          position: isMobile ? "top-center" : "bottom-right",
+        });
       }
     } else {
       // Clear the seller from the form if the user selects the empty option
       setSelectedSellerId("");
       setValue("seller", DEFAULT_SELLER_DATA);
+
+      toast.success("Seller restored to default", {
+        id: "reset_seller_success_toast",
+        richColors: true,
+        position: isMobile ? "top-center" : "bottom-right",
+      });
     }
 
     // analytics track event
@@ -249,6 +273,7 @@ export function SellerManagement({
       toast.success("Seller deleted successfully", {
         id: "delete_seller_success_toast",
         richColors: true,
+        position: isMobile ? "top-center" : "bottom-right",
       });
 
       // analytics track event
@@ -258,7 +283,9 @@ export function SellerManagement({
 
       toast.error("Failed to delete seller", {
         id: "delete_seller_error_toast",
+        description: "Please try again",
         closeButton: true,
+        position: isMobile ? "top-center" : "bottom-right",
       });
 
       Sentry.captureException(error);
@@ -362,6 +389,8 @@ export function SellerManagement({
                   setIsSellerDialogOpen(true);
                 } else {
                   toast.error("Unable to add seller", {
+                    id: "unable-to-add-seller-error-toast",
+                    closeButton: true,
                     description: (
                       <>
                         <p className="text-pretty text-xs leading-relaxed text-red-700">
@@ -370,6 +399,7 @@ export function SellerManagement({
                         </p>
                       </>
                     ),
+                    position: isMobile ? "top-center" : "bottom-right",
                   });
                 }
               }}

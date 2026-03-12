@@ -492,7 +492,7 @@ export function AppPageClient({
     if (!canShareInvoice) {
       toast.error("Unable to Share Invoice", {
         id: "unable-to-share-invoice-error-toast",
-        duration: 5000,
+        duration: 10_000,
         description: (
           <>
             <p className="text-pretty text-xs leading-relaxed text-red-700">

@@ -66,6 +66,7 @@ interface GeneralInformationProps {
   errors: FieldErrors<InvoiceData>;
   setValue: UseFormSetValue<InvoiceData>;
   dateOfIssue: string;
+  isMobile: boolean;
 }
 
 export const GeneralInformation = memo(function GeneralInformation({
@@ -73,6 +74,7 @@ export const GeneralInformation = memo(function GeneralInformation({
   errors,
   setValue,
   dateOfIssue,
+  isMobile,
 }: GeneralInformationProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -136,13 +138,23 @@ export const GeneralInformation = memo(function GeneralInformation({
       try {
         const base64 = await convertFileToBase64(file);
         setValue("logo", base64);
-        toast.success("Logo uploaded successfully!");
+        toast.success("Logo uploaded successfully!", {
+          id: "logo-uploaded-success-toast",
+          closeButton: true,
+          richColors: true,
+          position: isMobile ? "top-center" : "bottom-right",
+        });
       } catch (error) {
         console.error("Error converting file to base64:", error);
-        toast.error("Error uploading image. Please try again.");
+        toast.error("Error uploading image", {
+          description: "Please try again",
+          closeButton: true,
+          richColors: true,
+          position: isMobile ? "top-center" : "bottom-right",
+        });
       }
     },
-    [setValue],
+    [isMobile, setValue],
   );
 
   const handleLogoRemove = useCallback(() => {
@@ -150,8 +162,13 @@ export const GeneralInformation = memo(function GeneralInformation({
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-    toast.success("Logo removed successfully!");
-  }, [setValue]);
+    toast.success("Logo removed successfully!", {
+      id: "logo-removed-success-toast",
+      closeButton: true,
+      richColors: true,
+      position: isMobile ? "top-center" : "bottom-right",
+    });
+  }, [isMobile, setValue]);
 
   return (
     <div>

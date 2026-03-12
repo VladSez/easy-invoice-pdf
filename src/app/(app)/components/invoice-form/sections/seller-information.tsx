@@ -27,6 +27,7 @@ interface SellerInformationProps {
   errors: FieldErrors<InvoiceData>;
   setValue: UseFormSetValue<InvoiceData>;
   invoiceData: InvoiceData;
+  isMobile: boolean;
 }
 
 export const SellerInformation = memo(function SellerInformation({
@@ -34,6 +35,7 @@ export const SellerInformation = memo(function SellerInformation({
   errors,
   setValue,
   invoiceData,
+  isMobile,
 }: SellerInformationProps) {
   const [selectedSellerId, setSelectedSellerId] = useState("");
   const isSellerSelected = !!selectedSellerId;
@@ -65,6 +67,7 @@ export const SellerInformation = memo(function SellerInformation({
           selectedSellerId={selectedSellerId}
           setSelectedSellerId={setSelectedSellerId}
           formValues={currentFormValues}
+          isMobile={isMobile}
         />
       </div>
       <fieldset className="mt-5 space-y-4">
