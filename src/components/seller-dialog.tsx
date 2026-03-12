@@ -395,160 +395,149 @@ export function SellerDialog({
               />
 
               {/* Account Number */}
-              <div className="space-y-4">
-                <div className="flex flex-col gap-4">
-                  <FormField
-                    control={form.control}
-                    name="accountNumber"
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Account Number</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            {...field}
-                            rows={3}
-                            placeholder="Enter account number"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <div className="space-y-3 rounded-md border p-4">
+                <FormField
+                  control={form.control}
+                  name="accountNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="mb-2 font-medium">
+                        Account Number
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          rows={3}
+                          placeholder="Enter account number"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="accountNumberFieldIsVisible"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          id="accountNumberFieldIsVisible"
+                          aria-label={`Show the 'Account Number' field in the PDF`}
+                        />
+                        <CustomTooltip
+                          trigger={
+                            <Label htmlFor="accountNumberFieldIsVisible">
+                              Show Seller Account Number in PDF
+                            </Label>
+                          }
+                          content='Show the "Account Number" field in the PDF'
+                          className="z-[1000]"
+                        />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-                  <div className="flex items-center gap-2">
-                    <FormField
-                      control={form.control}
-                      name="accountNumberFieldIsVisible"
-                      render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              id="accountNumberFieldIsVisible"
-                              aria-label={`Show the 'Account Number' field in the PDF`}
-                            />
-                            <CustomTooltip
-                              trigger={
-                                <Label htmlFor="accountNumberFieldIsVisible">
-                                  Show Seller Account Number in PDF
-                                </Label>
-                              }
-                              content='Show the "Account Number" field in the PDF'
-                              className="z-[1000]"
-                            />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-
-                {/* SWIFT/BIC */}
-                <div className="flex flex-col gap-4">
-                  <FormField
-                    control={form.control}
-                    name="swiftBic"
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>SWIFT/BIC</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            {...field}
-                            rows={3}
-                            placeholder="Enter SWIFT/BIC code"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Show SWIFT/BIC Field in PDF */}
-                  <div className="flex items-center gap-2">
-                    <FormField
-                      control={form.control}
-                      name="swiftBicFieldIsVisible"
-                      render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              id="swiftBicFieldIsVisible"
-                              aria-label={`Show the 'SWIFT/BIC' field in the PDF`}
-                            />
-                            <CustomTooltip
-                              trigger={
-                                <Label htmlFor="swiftBicFieldIsVisible">
-                                  Show Seller SWIFT/BIC in PDF
-                                </Label>
-                              }
-                              content='Show the "SWIFT/BIC" field in the PDF'
-                              className="z-[1000]"
-                            />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
+              {/* SWIFT/BIC */}
+              <div className="space-y-3 rounded-md border p-4">
+                <FormField
+                  control={form.control}
+                  name="swiftBic"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="mb-2 font-medium">
+                        SWIFT/BIC
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          rows={3}
+                          placeholder="Enter SWIFT/BIC code"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="swiftBicFieldIsVisible"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          id="swiftBicFieldIsVisible"
+                          aria-label={`Show the 'SWIFT/BIC' field in the PDF`}
+                        />
+                        <CustomTooltip
+                          trigger={
+                            <Label htmlFor="swiftBicFieldIsVisible">
+                              Show Seller SWIFT/BIC in PDF
+                            </Label>
+                          }
+                          content='Show the "SWIFT/BIC" field in the PDF'
+                          className="z-[1000]"
+                        />
+                      </div>
+                    </FormItem>
+                  )}
+                />
               </div>
 
               {/* Notes */}
-              <div className="space-y-4">
-                <div className="flex flex-col gap-4">
-                  <FormField
-                    control={form.control}
-                    name="notes"
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Notes</FormLabel>
+              <div className="space-y-3 rounded-md border p-4">
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="mb-2 font-medium">Notes</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          rows={3}
+                          placeholder="Enter notes (max 750 characters)"
+                          maxLength={750}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="notesFieldIsVisible"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center gap-2">
                         <FormControl>
-                          <Textarea
-                            {...field}
-                            rows={3}
-                            placeholder="Enter notes (max 750 characters)"
-                            maxLength={750}
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            id="notes-field-visibility"
+                            data-testid={`sellerNotesDialogFieldVisibilitySwitch`}
+                            aria-label={`Show the 'Notes' field in the PDF`}
                           />
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Show Notes Field in PDF */}
-                  <div className="flex items-center gap-2">
-                    <FormField
-                      control={form.control}
-                      name="notesFieldIsVisible"
-                      render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center gap-2">
-                            <FormControl>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                                id="notes-field-visibility"
-                                data-testid={`sellerNotesDialogFieldVisibilitySwitch`}
-                                aria-label={`Show the 'Notes' field in the PDF`}
-                              />
-                            </FormControl>
-                            <CustomTooltip
-                              trigger={
-                                <Label htmlFor="notes-field-visibility">
-                                  Show Seller Notes in PDF
-                                </Label>
-                              }
-                              content="Show the notes field in the PDF"
-                              className="z-[1000]"
-                            />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
+                        <CustomTooltip
+                          trigger={
+                            <Label htmlFor="notes-field-visibility">
+                              Show Seller Notes in PDF
+                            </Label>
+                          }
+                          content="Show the notes field in the PDF"
+                          className="z-[1000]"
+                        />
+                      </div>
+                    </FormItem>
+                  )}
+                />
               </div>
             </form>
           </Form>
