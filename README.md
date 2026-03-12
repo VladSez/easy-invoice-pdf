@@ -100,6 +100,7 @@ _**Choose between multiple professional templates** (Default and Stripe) to matc
 
 ## 📢 News & Updates
 
+- **Mar 10, 2026**: Added QR code support, logo upload for the default template, searchable currency combobox, and improved multi-page PDF support. [Release notes for v1.0.2](https://github.com/VladSez/easy-invoice-pdf/releases/tag/v1.0.2)
 - **Jan 11, 2026**: Added customizable tax/VAT labels, improved internationalization (i18n) translations, enhanced overall performance, and fixed multiple bugs. [Release notes for v1.0.1](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-1.0.1)
 - **Nov 19, 2025**: EasyInvoicePDF version 1.0.0 released! Create professional invoices in seconds. Welcome to try EasyInvoicePDF. [Release notes for v1.0.0](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-v1.0.0)
 
