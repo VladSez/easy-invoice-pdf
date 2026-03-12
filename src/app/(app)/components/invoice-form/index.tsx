@@ -35,7 +35,6 @@ import React, {
   memo,
   useCallback,
   useEffect,
-  useRef,
   useState,
   type Dispatch,
   type SetStateAction,
@@ -126,8 +125,6 @@ export const InvoiceForm = memo(function InvoiceForm({
     name: "items",
   });
 
-  const isDeletingInvoiceItemRef = useRef(false);
-
   // calculate totals and other values when invoice items change
   useEffect(() => {
     // run validations before calculations because user can input invalid data
@@ -195,13 +192,11 @@ export const InvoiceForm = memo(function InvoiceForm({
   // regenerate pdf on every input change with debounce
   const debouncedRegeneratePdfOnFormChange = useDebouncedCallback(
     async (data: InvoiceData) => {
-      // if we are deleting an invoice item, we don't want to close success notification
-      if (isDeletingInvoiceItemRef.current) {
-        isDeletingInvoiceItemRef.current = false;
-      } else {
-        // close all other toasts, for example when user is updating the invoice form and we are showing the info notification that the invoice has been updated, we want to close the info notification for better UX
-        toast.dismiss();
-      }
+      // close those toasts after user has made changes to the form for better UX
+      toast.dismiss("form-errors-error-toast");
+      toast.dismiss("invoice-has-changed-toast");
+      toast.dismiss("invalid-invoice-url-error-toast");
+      toast.dismiss("unable-to-share-invoice-form-errors-toast");
 
       setInvoiceFormHasErrors(false);
 
@@ -259,8 +254,6 @@ export const InvoiceForm = memo(function InvoiceForm({
    */
   const handleRemoveInvoiceItem = useCallback(
     (index: number) => {
-      isDeletingInvoiceItemRef.current = true;
-
       setValue(
         "items",
         invoiceItems.filter((_, i) => i !== index),
