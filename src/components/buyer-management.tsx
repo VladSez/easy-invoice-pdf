@@ -33,6 +33,7 @@ interface BuyerManagementProps {
   selectedBuyerId: string;
   setSelectedBuyerId: (id: string) => void;
   formValues?: Partial<BuyerData>;
+  isMobile: boolean;
 }
 
 /**
@@ -61,6 +62,7 @@ export function BuyerManagement({
   selectedBuyerId,
   setSelectedBuyerId,
   formValues,
+  isMobile,
 }: BuyerManagementProps) {
   const [isBuyerDialogOpen, setIsBuyerDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -131,10 +133,16 @@ export function BuyerManagement({
         setSelectedBuyerId(newBuyerWithId?.id);
       }
 
-      toast.success("Buyer added successfully", {
-        id: "add_buyer_success_toast",
-        richColors: true,
-      });
+      toast.success(
+        shouldApplyNewBuyerToInvoice
+          ? "Buyer added and applied to invoice"
+          : "Buyer added successfully",
+        {
+          id: "add_buyer_success_toast",
+          richColors: true,
+          position: isMobile ? "top-center" : "bottom-right",
+        },
+      );
 
       // analytics track event
       umamiTrackEvent("add_buyer_success");
@@ -143,7 +151,9 @@ export function BuyerManagement({
 
       toast.error("Failed to add buyer", {
         id: "add_buyer_error_toast",
+        description: "Please try again",
         closeButton: true,
+        position: isMobile ? "top-center" : "bottom-right",
       });
 
       Sentry.captureException(error);
@@ -171,6 +181,7 @@ export function BuyerManagement({
       toast.success("Buyer updated successfully", {
         id: "edit_buyer_success_toast",
         richColors: true,
+        position: isMobile ? "top-center" : "bottom-right",
       });
 
       // analytics track event
@@ -180,7 +191,9 @@ export function BuyerManagement({
 
       toast.error("Failed to edit buyer", {
         id: "edit_buyer_error_toast",
+        description: "Please try again",
         closeButton: true,
+        position: isMobile ? "top-center" : "bottom-right",
       });
 
       Sentry.captureException(error);
@@ -198,11 +211,22 @@ export function BuyerManagement({
 
       if (selectedBuyer) {
         setValue("buyer", selectedBuyer);
+        toast.success(`Buyer "${selectedBuyer.name}" applied to invoice`, {
+          id: "change_buyer_success_toast",
+          richColors: true,
+          position: isMobile ? "top-center" : "bottom-right",
+        });
       }
     } else {
       // Clear the buyer from the form if the user selects the empty option
       setSelectedBuyerId("");
       setValue("buyer", DEFAULT_BUYER_DATA);
+
+      toast.success("Buyer restored to default", {
+        id: "reset_buyer_success_toast",
+        richColors: true,
+        position: isMobile ? "top-center" : "bottom-right",
+      });
     }
 
     // analytics track event
@@ -233,6 +257,7 @@ export function BuyerManagement({
       toast.success("Buyer deleted successfully", {
         id: "delete_buyer_success_toast",
         richColors: true,
+        position: isMobile ? "top-center" : "bottom-right",
       });
 
       // analytics track event
@@ -242,7 +267,9 @@ export function BuyerManagement({
 
       toast.error("Failed to delete buyer", {
         id: "delete_buyer_error_toast",
+        description: "Please try again",
         closeButton: true,
+        position: isMobile ? "top-center" : "bottom-right",
       });
 
       Sentry.captureException(error);
@@ -346,6 +373,7 @@ export function BuyerManagement({
                   setIsBuyerDialogOpen(true);
                 } else {
                   toast.error("Unable to add buyer", {
+                    id: "unable-to-add-buyer-error-toast",
                     description: (
                       <>
                         <p className="text-pretty text-xs leading-relaxed text-red-700">
@@ -354,6 +382,7 @@ export function BuyerManagement({
                         </p>
                       </>
                     ),
+                    position: isMobile ? "top-center" : "bottom-right",
                   });
                 }
               }}

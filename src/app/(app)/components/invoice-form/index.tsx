@@ -377,6 +377,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               errors={errors}
               setValue={setValue}
               dateOfIssue={dateOfIssue}
+              isMobile={isMobile}
             />
           </AccordionContent>
         </AccordionItem>
@@ -396,6 +397,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               errors={errors}
               setValue={setValue}
               invoiceData={invoiceData}
+              isMobile={isMobile}
             />
           </AccordionContent>
         </AccordionItem>
@@ -415,6 +417,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               errors={errors}
               setValue={setValue}
               invoiceData={invoiceData}
+              isMobile={isMobile}
             />
           </AccordionContent>
         </AccordionItem>

@@ -175,7 +175,7 @@ test.describe("Seller management", () => {
 
     // Verify success toast message is visible
     await expect(
-      page.getByText("Seller added successfully", { exact: true }),
+      page.getByText("Seller added and applied to invoice", { exact: true }),
     ).toBeVisible();
 
     /*
@@ -338,6 +338,171 @@ test.describe("Seller management", () => {
 
     await expect(notesManageSellerDialogFormSwitch).toBeChecked();
     await expect(notesManageSellerDialogFormSwitch).toBeEnabled();
+  });
+
+  test("add seller without applying to invoice", async ({ page }) => {
+    await page.getByRole("button", { name: "New Seller" }).click();
+
+    const TEST_SELLER_DATA = {
+      name: "Unapplied Test Seller",
+      address: "99 Unapplied Street",
+      email: "unapplied@seller.com",
+
+      vatNoFieldIsVisible: true,
+      vatNo: "VAT999",
+      vatNoLabelText: "Tax Number",
+
+      accountNumberFieldIsVisible: true,
+      accountNumber: "ACCT-999",
+
+      swiftBicFieldIsVisible: true,
+      swiftBic: "SWIFT999",
+
+      notesFieldIsVisible: true,
+      notes: "",
+    } as const satisfies SellerData;
+
+    const manageSellerDialog = page.getByTestId(`manage-seller-dialog`);
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill(TEST_SELLER_DATA.name);
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill(TEST_SELLER_DATA.address);
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Email" })
+      .fill(TEST_SELLER_DATA.email);
+
+    // Uncheck "Apply to Current Invoice" switch
+    const applyToInvoiceSwitch = manageSellerDialog.getByRole("switch", {
+      name: "Apply to Current Invoice",
+    });
+    await expect(applyToInvoiceSwitch).toBeChecked();
+    await applyToInvoiceSwitch.click();
+    await expect(applyToInvoiceSwitch).not.toBeChecked();
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    // Verify "Seller added successfully" toast (NOT "applied to invoice")
+    await expect(
+      page.getByText("Seller added successfully", { exact: true }),
+    ).toBeVisible();
+
+    const sellerForm = page.getByTestId(`seller-information-section`);
+
+    // Seller should appear in dropdown options but not be selected
+    await expect(
+      sellerForm.getByRole("combobox", { name: "Select Seller" }),
+    ).toBeVisible();
+    await expect(
+      sellerForm.getByRole("combobox", { name: "Select Seller" }),
+    ).toHaveValue("");
+
+    // Form fields should still contain default values (seller was not applied)
+    await expect(sellerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
+      DEFAULT_SELLER_DATA.name,
+    );
+    await expect(
+      sellerForm.getByRole("textbox", { name: "Address" }),
+    ).toHaveValue(DEFAULT_SELLER_DATA.address);
+    await expect(
+      sellerForm.getByRole("textbox", { name: "Email" }),
+    ).toHaveValue(DEFAULT_SELLER_DATA.email);
+  });
+
+  test("switch and restore seller via dropdown", async ({ page }) => {
+    // Add a seller with "Apply to Current Invoice" checked (default)
+    await page.getByRole("button", { name: "New Seller" }).click();
+
+    const TEST_SELLER_DATA = {
+      name: "Dropdown Test Seller",
+      address: "42 Dropdown Lane",
+      email: "dropdown@seller.com",
+
+      vatNoFieldIsVisible: true,
+      vatNo: "VAT-DROP-001",
+      vatNoLabelText: "Tax Number",
+
+      accountNumberFieldIsVisible: true,
+      accountNumber: "ACCT-DROP-001",
+
+      swiftBicFieldIsVisible: true,
+      swiftBic: "SWIFTDROP",
+
+      notesFieldIsVisible: true,
+      notes: "",
+    } as const satisfies SellerData;
+
+    const manageSellerDialog = page.getByTestId(`manage-seller-dialog`);
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill(TEST_SELLER_DATA.name);
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill(TEST_SELLER_DATA.address);
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Email" })
+      .fill(TEST_SELLER_DATA.email);
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    const sellerForm = page.getByTestId(`seller-information-section`);
+    const sellerDropdown = sellerForm.getByRole("combobox", {
+      name: "Select Seller",
+    });
+
+    // Seller is currently selected in dropdown
+    await expect(sellerDropdown).not.toHaveValue("");
+
+    // Restore to default by selecting the empty option
+    await sellerDropdown.selectOption("");
+
+    // Verify "Seller restored to default" toast
+    await expect(
+      page.getByText("Seller restored to default", { exact: true }),
+    ).toBeVisible();
+
+    // Verify form reset to default values
+    await expect(sellerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
+      DEFAULT_SELLER_DATA.name,
+    );
+    await expect(
+      sellerForm.getByRole("textbox", { name: "Address" }),
+    ).toHaveValue(DEFAULT_SELLER_DATA.address);
+    await expect(
+      sellerForm.getByRole("textbox", { name: "Email" }),
+    ).toHaveValue(DEFAULT_SELLER_DATA.email);
+
+    // Reselect the saved seller from the dropdown
+    await sellerDropdown.selectOption({ label: TEST_SELLER_DATA.name });
+
+    // Verify `Seller "${name}" applied to invoice` toast
+    await expect(
+      page.getByText(`Seller "${TEST_SELLER_DATA.name}" applied to invoice`, {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    // Verify form fields are populated with the seller's data
+    await expect(sellerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
+      TEST_SELLER_DATA.name,
+    );
+    await expect(
+      sellerForm.getByRole("textbox", { name: "Address" }),
+    ).toHaveValue(TEST_SELLER_DATA.address);
+    await expect(
+      sellerForm.getByRole("textbox", { name: "Email" }),
+    ).toHaveValue(TEST_SELLER_DATA.email);
   });
 
   test("delete seller", async ({ page }) => {

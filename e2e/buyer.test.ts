@@ -112,7 +112,7 @@ test.describe("Buyer management", () => {
 
     // Verify success toast message is visible
     await expect(
-      page.getByText("Buyer added successfully", { exact: true }),
+      page.getByText("Buyer added and applied to invoice", { exact: true }),
     ).toBeVisible();
 
     // Verify buyer data is actually saved in localStorage
@@ -321,6 +321,155 @@ test.describe("Buyer management", () => {
 
     // Verify notes visibility switch is unchecked
     await expect(notesSwitchNotInDialog).not.toBeChecked();
+  });
+
+  test("add buyer without applying to invoice", async ({ page }) => {
+    await page.getByRole("button", { name: "New Buyer" }).click();
+
+    const TEST_BUYER_DATA = {
+      name: "Unapplied Test Client",
+      address: "99 Unapplied Avenue",
+      email: "unapplied@client.com",
+
+      vatNoFieldIsVisible: true,
+      vatNo: "VAT999",
+      vatNoLabelText: "Tax Number",
+
+      notesFieldIsVisible: true,
+      notes: "",
+    } as const satisfies BuyerData;
+
+    const manageBuyerDialog = page.getByTestId(`manage-buyer-dialog`);
+
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill(TEST_BUYER_DATA.name);
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill(TEST_BUYER_DATA.address);
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Email" })
+      .fill(TEST_BUYER_DATA.email);
+
+    // Uncheck "Apply to Current Invoice" switch
+    const applyToInvoiceSwitch = manageBuyerDialog.getByRole("switch", {
+      name: "Apply to Current Invoice",
+    });
+    await expect(applyToInvoiceSwitch).toBeChecked();
+    await applyToInvoiceSwitch.click();
+    await expect(applyToInvoiceSwitch).not.toBeChecked();
+
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
+    // Verify "Buyer added successfully" toast (NOT "applied to invoice")
+    await expect(
+      page.getByText("Buyer added successfully", { exact: true }),
+    ).toBeVisible();
+
+    const buyerForm = page.getByTestId(`buyer-information-section`);
+
+    // Buyer should appear in dropdown options but not be selected
+    await expect(
+      buyerForm.getByRole("combobox", { name: "Select Buyer" }),
+    ).toBeVisible();
+    await expect(
+      buyerForm.getByRole("combobox", { name: "Select Buyer" }),
+    ).toHaveValue("");
+
+    // Form fields should still contain default values (buyer was not applied)
+    await expect(buyerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
+      DEFAULT_BUYER_DATA.name,
+    );
+    await expect(
+      buyerForm.getByRole("textbox", { name: "Address" }),
+    ).toHaveValue(DEFAULT_BUYER_DATA.address);
+    await expect(buyerForm.getByRole("textbox", { name: "Email" })).toHaveValue(
+      DEFAULT_BUYER_DATA.email,
+    );
+  });
+
+  test("switch and restore buyer via dropdown", async ({ page }) => {
+    // Add a buyer with "Apply to Current Invoice" checked (default)
+    await page.getByRole("button", { name: "New Buyer" }).click();
+
+    const TEST_BUYER_DATA = {
+      name: "Dropdown Test Client",
+      address: "42 Dropdown Boulevard",
+      email: "dropdown@client.com",
+
+      vatNoFieldIsVisible: true,
+      vatNo: "VAT-DROP-001",
+      vatNoLabelText: "Tax Number",
+
+      notesFieldIsVisible: true,
+      notes: "",
+    } as const satisfies BuyerData;
+
+    const manageBuyerDialog = page.getByTestId(`manage-buyer-dialog`);
+
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill(TEST_BUYER_DATA.name);
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill(TEST_BUYER_DATA.address);
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Email" })
+      .fill(TEST_BUYER_DATA.email);
+
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
+    await expect(
+      page.getByText("Buyer added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    const buyerForm = page.getByTestId(`buyer-information-section`);
+    const buyerDropdown = buyerForm.getByRole("combobox", {
+      name: "Select Buyer",
+    });
+
+    // Buyer is currently selected in dropdown
+    await expect(buyerDropdown).not.toHaveValue("");
+
+    // Restore to default by selecting the empty option
+    await buyerDropdown.selectOption("");
+
+    // Verify "Buyer restored to default" toast
+    await expect(
+      page.getByText("Buyer restored to default", { exact: true }),
+    ).toBeVisible();
+
+    // Verify form reset to default values
+    await expect(buyerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
+      DEFAULT_BUYER_DATA.name,
+    );
+    await expect(
+      buyerForm.getByRole("textbox", { name: "Address" }),
+    ).toHaveValue(DEFAULT_BUYER_DATA.address);
+    await expect(buyerForm.getByRole("textbox", { name: "Email" })).toHaveValue(
+      DEFAULT_BUYER_DATA.email,
+    );
+
+    // Reselect the saved buyer from the dropdown
+    await buyerDropdown.selectOption({ label: TEST_BUYER_DATA.name });
+
+    // Verify `Buyer "${name}" applied to invoice` toast
+    await expect(
+      page.getByText(`Buyer "${TEST_BUYER_DATA.name}" applied to invoice`, {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    // Verify form fields are populated with the buyer's data
+    await expect(buyerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
+      TEST_BUYER_DATA.name,
+    );
+    await expect(
+      buyerForm.getByRole("textbox", { name: "Address" }),
+    ).toHaveValue(TEST_BUYER_DATA.address);
+    await expect(buyerForm.getByRole("textbox", { name: "Email" })).toHaveValue(
+      TEST_BUYER_DATA.email,
+    );
   });
 
   test("delete buyer", async ({ page }) => {
