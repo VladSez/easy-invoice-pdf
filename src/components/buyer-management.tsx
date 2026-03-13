@@ -222,7 +222,7 @@ export function BuyerManagement({
       setSelectedBuyerId("");
       setValue("buyer", DEFAULT_BUYER_DATA);
 
-      toast.success("Buyer restored to default", {
+      toast.success("Buyer information reset to default", {
         id: "reset_buyer_success_toast",
         richColors: true,
         position: isMobile ? "top-center" : "bottom-right",

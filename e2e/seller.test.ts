@@ -469,7 +469,7 @@ test.describe("Seller management", () => {
 
     // Verify "Seller restored to default" toast
     await expect(
-      page.getByText("Seller restored to default", { exact: true }),
+      page.getByText("Seller information reset to default", { exact: true }),
     ).toBeVisible();
 
     // Verify form reset to default values

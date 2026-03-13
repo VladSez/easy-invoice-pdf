@@ -238,7 +238,7 @@ export function SellerManagement({
       setSelectedSellerId("");
       setValue("seller", DEFAULT_SELLER_DATA);
 
-      toast.success("Seller restored to default", {
+      toast.success("Seller information reset to default", {
         id: "reset_seller_success_toast",
         richColors: true,
         position: isMobile ? "top-center" : "bottom-right",

@@ -436,7 +436,7 @@ test.describe("Buyer management", () => {
 
     // Verify "Buyer restored to default" toast
     await expect(
-      page.getByText("Buyer restored to default", { exact: true }),
+      page.getByText("Buyer information reset to default", { exact: true }),
     ).toBeVisible();
 
     // Verify form reset to default values
