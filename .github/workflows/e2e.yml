@@ -2,8 +2,6 @@ name: 🎭 Playwright E2E tests
 on:
   deployment_status:
 
-# The concurrency block ensures that only one Playwright E2E test workflow runs per branch or pull request at a time.
-# If a new run is triggered (for example, by a commit push), any currently running workflow for that same branch will be cancelled.
 concurrency:
   group: e2e-${{ github.ref }}
   cancel-in-progress: true
@@ -15,10 +13,8 @@ jobs:
 
     name: Run e2e tests via ${{ github.event_name == 'deployment_status' && 'Vercel deployment' }}
     timeout-minutes: 35
-    # we use macos-latest because I am using mac os locally and generating snapshots (screenshots) for the PDF tests locally, so we need to use the same OS on the CI. https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job#choosing-github-hosted-runners
-    runs-on: macos-latest
-    env:
-      TZ: Europe/Warsaw # we use Europe/Warsaw timezone for consistent date handling across local machines and CI
+    # https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job#choosing-github-hosted-runners
+    runs-on: ubuntu-24.04
     steps:
       - run: |
           echo "Environment URL - ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}"
@@ -26,29 +22,18 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         name: 🛎️ Checkout repository
 
-      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-        name: 📦 Setup pnpm
-
-      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # 4.3.0
-        name: 📚 Setup Node.js
-        with:
-          node-version: lts/*
-          cache: "pnpm"
-
-      - name: 🚚 Install dependencies
-        run: pnpm install
-
-      - name: 📦 Install Playwright browser binaries & OS dependencies
-        run: pnpm exec playwright install chromium webkit --with-deps
-
       - name: 🎭 Run Playwright tests
         id: playwright
         env:
-          BASE_URL: ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}
-          SENTRY_ENABLED: false
-          NEXT_PUBLIC_SENTRY_ENABLED: false
+          BASE_URL: ${{ github.event.deployment_status.environment_url }}
         continue-on-error: true
-        run: pnpm exec playwright test --reporter=html,list
+        run: |
+          docker compose run --rm -T \
+            -e CI=true \
+            -e BASE_URL \
+            -e SENTRY_ENABLED=false \
+            -e NEXT_PUBLIC_SENTRY_ENABLED=false \
+            playwright bash -c "fc-cache -f -v && corepack enable && pnpm install --frozen-lockfile && npx playwright test --reporter=html,list --workers=2"
 
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 #4.6.1
         name: 🎲 Upload Playwright report

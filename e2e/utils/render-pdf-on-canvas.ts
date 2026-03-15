@@ -1,4 +1,33 @@
 import type { Page } from "@playwright/test";
+import { INVOICE_PDF_FONTS } from "@/config";
+
+const FONT_FACE_CSS = `
+  @font-face {
+    font-family: 'Open Sans';
+    font-weight: 400;
+    src: url('${INVOICE_PDF_FONTS.DEFAULT_TEMPLATE.OPEN_SANS_REGULAR}') format('truetype');
+  }
+  @font-face {
+    font-family: 'Open Sans';
+    font-weight: 700;
+    src: url('${INVOICE_PDF_FONTS.DEFAULT_TEMPLATE.OPEN_SANS_700}') format('truetype');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 400;
+    src: url('${INVOICE_PDF_FONTS.STRIPE_TEMPLATE.INTER_REGULAR}') format('truetype');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 500;
+    src: url('${INVOICE_PDF_FONTS.STRIPE_TEMPLATE.INTER_MEDIUM}') format('truetype');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 600;
+    src: url('${INVOICE_PDF_FONTS.STRIPE_TEMPLATE.INTER_SEMIBOLD}') format('truetype');
+  }
+`;
 
 /**
  * The most **reliable** way (cross-browser and cross-platform) to screenshot a PDF is to use a canvas and render the PDF to it
@@ -15,6 +44,7 @@ export async function renderPdfOnCanvas(page: Page, pdfBytes: Uint8Array) {
             <style>
                 body { margin: 0 }
                 canvas { display: block }
+                ${FONT_FACE_CSS}
             </style>
         </head>
         <body>
@@ -28,11 +58,18 @@ export async function renderPdfOnCanvas(page: Page, pdfBytes: Uint8Array) {
 
                 pdfjsLib.GlobalWorkerOptions.fontExtraProperties = true
 
+                await Promise.all([
+                    document.fonts.load('400 16px "Open Sans"'),
+                    document.fonts.load('700 16px "Open Sans"'),
+                    document.fonts.load('400 16px "Inter"'),
+                    document.fonts.load('500 16px "Inter"'),
+                    document.fonts.load('600 16px "Inter"'),
+                ]);
+                await document.fonts.ready;
 
                 const pdfData = new Uint8Array([${pdfBytes.join(",")}])
 
-                const pdf = await pdfjsLib.getDocument({ data: pdfData, disableFontFace: true }).promise;
-
+                const pdf = await pdfjsLib.getDocument({ data: pdfData, disableFontFace: false, useSystemFonts: false }).promise;
 
                 const page = await pdf.getPage(1)
 
@@ -42,7 +79,6 @@ export async function renderPdfOnCanvas(page: Page, pdfBytes: Uint8Array) {
                 const ctx = canvas.getContext('2d')
                 
                 ctx.imageSmoothingEnabled = false
-
 
                 canvas.width = viewport.width
                 canvas.height = viewport.height
@@ -73,6 +109,7 @@ export async function renderMultiPagePdfOnCanvas(
             <style>
                 body { margin: 0 }
                 canvas { display: block }
+                ${FONT_FACE_CSS}
             </style>
         </head>
         <body>
@@ -86,9 +123,18 @@ export async function renderMultiPagePdfOnCanvas(
 
                 pdfjsLib.GlobalWorkerOptions.fontExtraProperties = true
 
+                await Promise.all([
+                    document.fonts.load('400 16px "Open Sans"'),
+                    document.fonts.load('700 16px "Open Sans"'),
+                    document.fonts.load('400 16px "Inter"'),
+                    document.fonts.load('500 16px "Inter"'),
+                    document.fonts.load('600 16px "Inter"'),
+                ]);
+                await document.fonts.ready;
+
                 const pdfData = new Uint8Array([${pdfBytes.join(",")}])
 
-                const pdf = await pdfjsLib.getDocument({ data: pdfData, disableFontFace: true }).promise;
+                const pdf = await pdfjsLib.getDocument({ data: pdfData, disableFontFace: false, useSystemFonts: false }).promise;
 
                 const numPages = pdf.numPages
                 const pageGap = 40 // Space between pages in pixels

@@ -1,0 +1,23 @@
+# single source of truth for running playwright tests in docker (used locally and in CI)
+
+services:
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.56.1-noble
+    init: true
+    ipc: host
+    working_dir: /work
+    volumes:
+      - .:/work
+    environment:
+      - TZ=Europe/Warsaw
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+      - BASE_URL=${BASE_URL:-http://host.docker.internal:3000}
+      - CI
+      - LIBGL_ALWAYS_SOFTWARE=1
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    entrypoint: []
+    tty: true
+    stdin_open: true
