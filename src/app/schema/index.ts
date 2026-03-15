@@ -877,7 +877,14 @@ export const sellerSchema = z.object({
     ),
   vatNoFieldIsVisible: z.boolean().default(true),
 
-  email: z.string().email("Invalid email address").trim(),
+  email: z
+    .string()
+    .trim()
+    .refine((val) => val === "" || z.string().email().safeParse(val).success, {
+      message: "Invalid email address",
+    })
+    .optional(),
+  emailFieldIsVisible: z.boolean().default(true),
 
   accountNumber: z
     .string()
@@ -932,7 +939,14 @@ export const buyerSchema = z.object({
     ),
   vatNoFieldIsVisible: z.boolean().default(true),
 
-  email: z.string().email("Invalid email address").trim(),
+  email: z
+    .string()
+    .trim()
+    .refine((val) => val === "" || z.string().email().safeParse(val).success, {
+      message: "Invalid email address",
+    })
+    .optional(),
+  emailFieldIsVisible: z.boolean().default(true),
 
   notes: z
     .string()
@@ -1177,11 +1191,9 @@ export const PDF_DATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_DATA";
 export const accordionSchema = z
   .object({
     general: z.boolean(),
-    seller: z.boolean(),
-    buyer: z.boolean(),
     invoiceItems: z.boolean(),
   })
-  .strict();
+  .strip();
 
 export type AccordionState = z.infer<typeof accordionSchema>;
 

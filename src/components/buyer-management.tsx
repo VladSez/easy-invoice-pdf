@@ -32,36 +32,18 @@ interface BuyerManagementProps {
   invoiceData: InvoiceData;
   selectedBuyerId: string;
   setSelectedBuyerId: (id: string) => void;
-  formValues?: Partial<BuyerData>;
   isMobile: boolean;
 }
 
 /**
- * BuyerManagement Component
- *
- * Manages buyer data for invoices including:
- * - Loading and displaying saved buyers from localStorage
- * - Creating new buyers via a dialog form
- * - Editing existing buyer details
- * - Deleting buyers with confirmation
- * - Auto-populating invoice form fields when a buyer is selected
- *
- * When a buyer is selected from the dropdown, their details are populated into the
- * invoice form and the form fields become read-only. Users must use the Edit Buyer
- * button to modify saved buyer information.
- *
- * @param setValue - React Hook Form setter to update invoice form values
- * @param invoiceData - Current invoice data including buyer information
- * @param selectedBuyerId - ID of the currently selected buyer
- * @param setSelectedBuyerId - Callback to update the selected buyer ID
- * @param formValues - Current buyer form values (optional)
+ * BuyerManagement component allows users to select, add, edit, and delete buyers for invoices.
+ * Handles buyer state management, selection, and persistence to localStorage.
  */
 export function BuyerManagement({
   setValue,
   invoiceData,
   selectedBuyerId,
   setSelectedBuyerId,
-  formValues,
   isMobile,
 }: BuyerManagementProps) {
   const [isBuyerDialogOpen, setIsBuyerDialogOpen] = useState(false);
@@ -98,8 +80,14 @@ export function BuyerManagement({
         return buyer?.id === invoiceData?.buyer?.id;
       });
 
+      // Populate the buyers dropdown with the valid buyers loaded from localStorage
       setBuyersSelectOptions(validationResult.data);
-      setSelectedBuyerId(selectedBuyer?.id ?? "");
+
+      // If a buyer on the invoice matches one from storage, select it.
+      // Otherwise default to the first buyer in the list, or blank if none.
+      setSelectedBuyerId(
+        selectedBuyer?.id ?? validationResult.data[0]?.id ?? "",
+      );
     } catch (error) {
       console.error("Failed to load buyers:", error);
 
@@ -217,16 +205,6 @@ export function BuyerManagement({
           position: isMobile ? "top-center" : "bottom-right",
         });
       }
-    } else {
-      // Clear the buyer from the form if the user selects the empty option
-      setSelectedBuyerId("");
-      setValue("buyer", DEFAULT_BUYER_DATA);
-
-      toast.success("Buyer information reset to default", {
-        id: "reset_buyer_success_toast",
-        richColors: true,
-        position: isMobile ? "top-center" : "bottom-right",
-      });
     }
 
     // analytics track event
@@ -235,21 +213,31 @@ export function BuyerManagement({
 
   const handleDeleteBuyer = () => {
     try {
-      setBuyersSelectOptions((prevBuyers) => {
-        const updatedBuyers = prevBuyers.filter(
-          (buyer) => buyer.id !== selectedBuyerId,
-        );
+      const updatedBuyers = buyersSelectOptions.filter(
+        (buyer) => buyer.id !== selectedBuyerId,
+      );
 
-        localStorage.setItem(
-          BUYERS_LOCAL_STORAGE_KEY,
-          JSON.stringify(updatedBuyers),
-        );
-        return updatedBuyers;
-      });
-      // Clear the selected buyer index
-      setSelectedBuyerId("");
-      // Clear the buyer from the form if it was selected
-      setValue("buyer", DEFAULT_BUYER_DATA);
+      localStorage.setItem(
+        BUYERS_LOCAL_STORAGE_KEY,
+        JSON.stringify(updatedBuyers),
+      );
+      setBuyersSelectOptions(updatedBuyers);
+
+      // After deleting a buyer, pick the first buyer in the updated list (if any).
+      // If a buyer exists, select them and update the form value;
+      // otherwise, clear the selection and reset to default data.
+      const nextBuyer = updatedBuyers?.[0];
+
+      // If there is a next buyer available after deletion,
+      // update selection to that buyer and set the form value accordingly.
+      if (nextBuyer?.id) {
+        setSelectedBuyerId(nextBuyer.id);
+        setValue("buyer", nextBuyer);
+      } else {
+        // If no buyers are left, clear selection and reset to default buyer data.
+        setSelectedBuyerId("");
+        setValue("buyer", DEFAULT_BUYER_DATA);
+      }
 
       // Close the delete dialog
       setIsDeleteDialogOpen(false);
@@ -293,15 +281,11 @@ export function BuyerManagement({
             <div className="flex gap-2">
               <SelectNative
                 id={buyerSelectId}
-                className={cn(
-                  "block h-8 max-w-[200px] text-[12px]",
-                  !selectedBuyerId && "italic text-gray-700",
-                )}
+                className="block h-8 min-w-0 flex-1 text-[12px]"
                 onChange={handleBuyerChange}
                 value={selectedBuyerId}
                 title={activeBuyer?.name}
               >
-                <option value="">No buyer selected (default)</option>
                 {buyersSelectOptions.map((buyer) => (
                   <option key={buyer.id} value={buyer.id}>
                     {buyer.name}
@@ -435,7 +419,7 @@ export function BuyerManagement({
         handleBuyerEdit={handleBuyerEdit}
         initialData={editingBuyer}
         isEditMode={isEditMode}
-        formValues={formValues}
+        isFirstEntry={buyersSelectOptions?.length === 0}
       />
 
       {/* Delete alert buyer dialog */}

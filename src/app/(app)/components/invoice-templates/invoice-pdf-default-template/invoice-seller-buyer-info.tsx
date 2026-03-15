@@ -51,12 +51,14 @@ export function InvoiceSellerBuyerInfo({
                 </Text>
               </Text>
             )}
-            <Text style={styles.fontSize7}>
-              {t.seller.email}:{" "}
-              <Text style={[styles.boldText, styles.fontSize8]}>
-                {invoiceData?.seller.email}
+            {invoiceData.seller.emailFieldIsVisible && (
+              <Text style={styles.fontSize7}>
+                {t.seller.email}:{" "}
+                <Text style={[styles.boldText, styles.fontSize8]}>
+                  {invoiceData?.seller.email}
+                </Text>
               </Text>
-            </Text>
+            )}
           </View>
         </View>
 
@@ -108,12 +110,14 @@ export function InvoiceSellerBuyerInfo({
               </Text>
             </Text>
           )}
-          <Text style={styles.fontSize7}>
-            {t.buyer.email}:{" "}
-            <Text style={[styles.boldText, styles.fontSize8]}>
-              {invoiceData?.buyer.email}
+          {invoiceData.buyer.emailFieldIsVisible && (
+            <Text style={styles.fontSize7}>
+              {t.buyer.email}:{" "}
+              <Text style={[styles.boldText, styles.fontSize8]}>
+                {invoiceData?.buyer.email}
+              </Text>
             </Text>
-          </Text>
+          )}
         </View>
 
         {buyerNotesFieldIsVisible && invoiceData?.buyer.notes && (

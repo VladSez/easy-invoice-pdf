@@ -61,17 +61,10 @@ export const LOADING_BUTTON_TIMEOUT = 400;
 export const LOADING_BUTTON_TEXT = "Generating Document...";
 const DEBOUNCE_TIMEOUT = 500;
 
-const DEFAULT_ACCORDION_VALUES = [
-  "general",
-  "seller",
-  "buyer",
-  "invoiceItems",
-] as const;
+const DEFAULT_ACCORDION_VALUES = ["general", "invoiceItems"] as const;
 
 const ACCORDION_GENERAL = DEFAULT_ACCORDION_VALUES[0];
-const ACCORDION_SELLER = DEFAULT_ACCORDION_VALUES[1];
-const ACCORDION_BUYER = DEFAULT_ACCORDION_VALUES[2];
-const ACCORDION_ITEMS = DEFAULT_ACCORDION_VALUES[3];
+const ACCORDION_ITEMS = DEFAULT_ACCORDION_VALUES[1];
 
 type AccordionKeys = Array<(typeof DEFAULT_ACCORDION_VALUES)[number]>;
 
@@ -338,8 +331,6 @@ export const InvoiceForm = memo(function InvoiceForm({
       // parse the value to the accordion schema
       const stateToSave = accordionSchema.parse({
         general: value.includes(ACCORDION_GENERAL),
-        seller: value.includes(ACCORDION_SELLER),
-        buyer: value.includes(ACCORDION_BUYER),
         invoiceItems: value.includes(ACCORDION_ITEMS),
       });
 
@@ -366,7 +357,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         <AccordionItem
           value={ACCORDION_GENERAL}
           className="rounded-lg border shadow"
-          data-testid={`general-information-section`}
+          data-testid="general-information-section"
         >
           <AccordionTrigger className="px-4 py-3">
             <Legend>General Information</Legend>
@@ -383,50 +374,36 @@ export const InvoiceForm = memo(function InvoiceForm({
         </AccordionItem>
 
         {/* Seller Information */}
-        <AccordionItem
-          value={ACCORDION_SELLER}
-          className="rounded-lg border shadow"
-          data-testid={`seller-information-section`}
+        <div
+          className="rounded-lg border p-4 shadow"
+          data-testid="seller-information-section"
         >
-          <AccordionTrigger className="px-4 py-3">
-            <Legend>Seller Information</Legend>
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <SellerInformation
-              control={control}
-              errors={errors}
-              setValue={setValue}
-              invoiceData={invoiceData}
-              isMobile={isMobile}
-            />
-          </AccordionContent>
-        </AccordionItem>
+          <Legend className="mb-3">Seller Information</Legend>
+          <SellerInformation
+            setValue={setValue}
+            invoiceData={invoiceData}
+            isMobile={isMobile}
+          />
+        </div>
 
         {/* Buyer Information */}
-        <AccordionItem
-          value={ACCORDION_BUYER}
-          className="rounded-lg border shadow"
-          data-testid={`buyer-information-section`}
+        <div
+          className="rounded-lg border p-4 shadow"
+          data-testid="buyer-information-section"
         >
-          <AccordionTrigger className="px-4 py-3">
-            <Legend>Buyer Information</Legend>
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <BuyerInformation
-              control={control}
-              errors={errors}
-              setValue={setValue}
-              invoiceData={invoiceData}
-              isMobile={isMobile}
-            />
-          </AccordionContent>
-        </AccordionItem>
+          <Legend className="mb-3">Buyer Information</Legend>
+          <BuyerInformation
+            setValue={setValue}
+            invoiceData={invoiceData}
+            isMobile={isMobile}
+          />
+        </div>
 
         {/* Invoice Items */}
         <AccordionItem
           value={ACCORDION_ITEMS}
           className="rounded-lg border shadow"
-          data-testid={`invoice-items-section`}
+          data-testid="invoice-items-section"
         >
           <AccordionTrigger className="px-4 py-3">
             <Legend>Invoice Items</Legend>

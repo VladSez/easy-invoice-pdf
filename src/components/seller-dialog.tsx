@@ -24,7 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -45,7 +45,7 @@ interface SellerDialogProps {
   handleSellerEdit?: (seller: SellerData) => void;
   initialData: SellerData | null;
   isEditMode: boolean;
-  formValues?: Partial<SellerData>;
+  isFirstEntry: boolean;
 }
 
 export function SellerDialog({
@@ -55,7 +55,7 @@ export function SellerDialog({
   handleSellerEdit,
   initialData,
   isEditMode,
-  formValues,
+  isFirstEntry,
 }: SellerDialogProps) {
   const form = useForm<SellerData>({
     resolver: zodResolver(sellerSchema),
@@ -66,6 +66,7 @@ export function SellerDialog({
       vatNo: initialData?.vatNo ?? "",
       vatNoLabelText: initialData?.vatNoLabelText ?? "VAT no",
       email: initialData?.email ?? "",
+      emailFieldIsVisible: initialData?.emailFieldIsVisible ?? true,
       accountNumber: initialData?.accountNumber ?? "",
       swiftBic: initialData?.swiftBic ?? "",
       vatNoFieldIsVisible: initialData?.vatNoFieldIsVisible ?? true,
@@ -80,41 +81,6 @@ export function SellerDialog({
   // by default, we want to apply the new seller to the current invoice
   const [shouldApplyNewSellerToInvoice, setShouldApplyNewSellerToInvoice] =
     useState(true);
-
-  // Add state for applying form values
-  const [shouldApplyFormValues, setShouldApplyFormValues] = useState(false);
-
-  // Effect to update form values when switch is toggled
-  useEffect(() => {
-    // if the switch is on and we have form values, we want to apply the form values to the form
-    if (shouldApplyFormValues && formValues && !isEditMode) {
-      form.reset({
-        ...form.getValues(),
-        ...formValues,
-      });
-    }
-
-    // if the switch is off and we have initial data, we want to apply the initial data to the form
-    else if (!shouldApplyFormValues && !isEditMode) {
-      form.reset(
-        initialData ?? {
-          id: "",
-          name: "",
-          address: "",
-          vatNo: "",
-          vatNoLabelText: "VAT no",
-          email: "",
-          accountNumber: "",
-          swiftBic: "",
-          vatNoFieldIsVisible: true,
-          accountNumberFieldIsVisible: true,
-          swiftBicFieldIsVisible: true,
-          notes: "",
-          notesFieldIsVisible: true,
-        },
-      );
-    }
-  }, [shouldApplyFormValues, formValues, initialData, isEditMode, form]);
 
   function onSubmit(formValues: SellerData) {
     try {
@@ -180,7 +146,10 @@ export function SellerDialog({
         handleSellerEdit?.(formValues);
       } else {
         // Add new seller
-        handleSellerAdd?.(formValues, { shouldApplyNewSellerToInvoice });
+        handleSellerAdd?.(formValues, {
+          shouldApplyNewSellerToInvoice:
+            isFirstEntry || shouldApplyNewSellerToInvoice,
+        });
       }
 
       // Close dialog
@@ -222,35 +191,11 @@ export function SellerDialog({
           <DialogDescription>
             {isEditMode
               ? "Edit the seller details"
-              : "Add a new seller to use later in your invoices"}
+              : "Add a new seller to use in future invoices"}
           </DialogDescription>
         </DialogHeader>
 
         <div className="overflow-y-auto px-6 py-4">
-          {/* Show Use Current Form Values switch only when creating new seller */}
-          {!isEditMode && (
-            <div className="mb-4">
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={shouldApplyFormValues}
-                  onCheckedChange={setShouldApplyFormValues}
-                  id="apply-form-values-switch"
-                />
-                <Label
-                  htmlFor="apply-form-values-switch"
-                  className="cursor-pointer"
-                >
-                  Pre-fill with values from the current invoice form
-                </Label>
-              </div>
-              <span className="mt-1.5 inline-block text-xs text-slate-500">
-                When enabled, this will automatically fill in the seller details
-                dialog with the information you&apos;ve already entered in your
-                current invoice form.
-              </span>
-            </div>
-          )}
-
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
@@ -262,7 +207,7 @@ export function SellerDialog({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>Name (Required)</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -280,7 +225,7 @@ export function SellerDialog({
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel>Address (Required)</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -376,23 +321,50 @@ export function SellerDialog({
                 </div>
               </fieldset>
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="email"
-                        placeholder="seller@email.com"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-3 rounded-md border p-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="mb-2 font-medium">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="email"
+                          placeholder="seller@email.com"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="emailFieldIsVisible"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          id="emailFieldIsVisible"
+                          aria-label={`Show the 'Email' field in the PDF`}
+                        />
+                        <CustomTooltip
+                          trigger={
+                            <Label htmlFor="emailFieldIsVisible">
+                              Show Seller Email in PDF
+                            </Label>
+                          }
+                          content='Show the "Email" field in the PDF'
+                          className="z-[1000]"
+                        />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Account Number */}
               <div className="space-y-3 rounded-md border p-4">
@@ -543,7 +515,7 @@ export function SellerDialog({
           </Form>
 
           {/* Apply to Current Invoice switch remains at the bottom */}
-          {!isEditMode && (
+          {!isEditMode && !isFirstEntry && (
             <div className="mt-4 flex flex-col gap-1 border-t pt-4">
               <div className="flex items-center gap-2">
                 <Switch

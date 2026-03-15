@@ -10,6 +10,7 @@ const TEST_SELLER_DATA = {
   vatNoLabelText: "SELLER TEST TAX no label",
 
   email: "seller@test.com",
+  emailFieldIsVisible: true,
 
   accountNumberFieldIsVisible: true,
   accountNumber: "1234 seller test account number",
@@ -26,6 +27,7 @@ const TEST_BUYER_DATA = {
   address: "456 Buyer Ave",
 
   email: "buyer@test.com",
+  emailFieldIsVisible: true,
 
   vatNoFieldIsVisible: true,
   vatNo: "1234 buyer test tax number",

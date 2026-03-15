@@ -301,57 +301,6 @@ test.describe("Invoice Generator Page", () => {
       sellerSection.getByText("Seller Information", { exact: true }),
     ).toBeVisible();
 
-    // Name field
-    await expect(
-      sellerSection.getByRole("textbox", { name: "Name" }),
-    ).toHaveValue(INITIAL_INVOICE_DATA.seller.name);
-
-    // Address field
-    await expect(
-      sellerSection.getByRole("textbox", { name: "Address" }),
-    ).toHaveValue(INITIAL_INVOICE_DATA.seller.address);
-
-    // Tax Number field and visibility toggle
-    const sellerVatFieldset = sellerSection.getByRole("group", {
-      name: "Tax Number",
-    });
-    await expect(
-      sellerVatFieldset.getByRole("textbox", { name: "Value" }),
-    ).toHaveValue(INITIAL_INVOICE_DATA.seller.vatNo);
-
-    await expect(
-      sellerSection.getByRole("switch", {
-        name: `Show the 'Seller Tax Number' Field in the PDF`,
-      }),
-    ).toBeChecked();
-
-    // Email field
-    await expect(
-      sellerSection.getByRole("textbox", { name: "Email" }),
-    ).toHaveValue(INITIAL_INVOICE_DATA.seller.email);
-
-    // Account Number field and visibility toggle
-    await expect(
-      sellerSection.getByRole("textbox", { name: "Account Number" }),
-    ).toHaveValue(INITIAL_INVOICE_DATA.seller.accountNumber);
-
-    await expect(
-      sellerSection.getByRole("switch", {
-        name: `Show the 'Account Number' Field in the PDF`,
-      }),
-    ).toBeChecked();
-
-    // SWIFT/BIC field and visibility toggle
-    await expect(
-      sellerSection.getByRole("textbox", { name: "SWIFT/BIC" }),
-    ).toHaveValue(INITIAL_INVOICE_DATA.seller.swiftBic);
-
-    await expect(
-      sellerSection.getByRole("switch", {
-        name: `Show the 'SWIFT/BIC' Field in the PDF`,
-      }),
-    ).toBeChecked();
-
     // Verify Seller Management button is present
     await expect(
       sellerSection.getByRole("button", { name: "New Seller" }),
@@ -362,36 +311,6 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       buyerSection.getByText("Buyer Information", { exact: true }),
     ).toBeVisible();
-
-    // Name field
-    await expect(
-      buyerSection.getByRole("textbox", { name: "Name" }),
-    ).toHaveValue(INITIAL_INVOICE_DATA.buyer.name);
-
-    // Address field
-    await expect(
-      buyerSection.getByRole("textbox", { name: "Address" }),
-    ).toHaveValue(INITIAL_INVOICE_DATA.buyer.address);
-
-    // Tax Number field and visibility toggle
-    const buyerVatFieldset = buyerSection.getByRole("group", {
-      name: "Tax Number",
-    });
-    await expect(
-      buyerVatFieldset.getByRole("textbox", { name: "Value" }),
-    ).toHaveValue(INITIAL_INVOICE_DATA.buyer.vatNo);
-
-    const buyerVatNoFieldIsVisibleSwitch = buyerSection.getByTestId(
-      `buyerVatNoFieldIsVisible`,
-    );
-
-    await expect(buyerVatNoFieldIsVisibleSwitch).toHaveRole("switch");
-    await expect(buyerVatNoFieldIsVisibleSwitch).toBeChecked();
-
-    // Email field
-    await expect(
-      buyerSection.getByRole("textbox", { name: "Email" }),
-    ).toHaveValue(INITIAL_INVOICE_DATA.buyer.email);
 
     // Verify Buyer Management button is present
     await expect(
@@ -779,38 +698,9 @@ test.describe("Invoice Generator Page", () => {
     // Clear required fields
     await page.getByRole("textbox", { name: "Date of Issue" }).clear();
 
-    // Clear name field on the seller section
-    const sellerSection = page.getByTestId(`seller-information-section`);
-    await sellerSection.getByRole("textbox", { name: "Name" }).clear();
-
-    const buyerSection = page.getByTestId(`buyer-information-section`);
-    await buyerSection.getByRole("textbox", { name: "Name" }).clear();
-
     // Clear name field on the first invoice item
     const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
     await invoiceItemsSection.getByRole("textbox", { name: "Name" }).clear();
-
-    await expect(
-      sellerSection.getByText("Seller name is required", { exact: true }),
-    ).toBeVisible();
-
-    // Check that notification is also visible
-    await expect(
-      page
-        .getByLabel("Notifications alt+T")
-        .getByText("Seller name is required"),
-    ).toBeVisible();
-
-    await expect(
-      buyerSection.getByText("Buyer name is required", { exact: true }),
-    ).toBeVisible();
-
-    // Check that notification is also visible
-    await expect(
-      page
-        .getByLabel("Notifications alt+T")
-        .getByText("Buyer name is required"),
-    ).toBeVisible();
 
     const dateOfIssue = dayjs().format("YYYY-MM-DD");
 
@@ -832,32 +722,6 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       page.getByRole("textbox", { name: "Date of Issue" }),
     ).toHaveValue(dateOfIssue);
-
-    // Fill in seller name
-    await sellerSection
-      .getByRole("textbox", { name: "Name" })
-      .fill("Test Seller");
-
-    // Fill in buyer name
-    await buyerSection
-      .getByRole("textbox", { name: "Name" })
-      .fill("Test Buyer");
-
-    // Check for error messages to be hidden
-
-    await expect(
-      sellerSection.getByText("Seller name is required", { exact: true }),
-    ).toBeHidden();
-
-    // Check that notification is also hidden
-    await expect(page.getByLabel("Notifications alt+T")).toBeHidden();
-
-    await expect(
-      buyerSection.getByText("Buyer name is required", { exact: true }),
-    ).toBeHidden();
-
-    // Check that notification is also hidden
-    await expect(page.getByLabel("Notifications alt+T")).toBeHidden();
   });
 
   test("persists data in local storage", async ({ page }) => {
@@ -987,15 +851,13 @@ test.describe("Invoice Generator Page", () => {
   test("accordion items are visible, collapsible and saved in the local storage", async ({
     page,
   }) => {
-    // Define sections with their labels
+    // Define accordion sections with their labels (seller/buyer are no longer accordion items)
     const sections = [
       { id: "general-information-section", label: "General Information" },
-      { id: "seller-information-section", label: "Seller Information" },
-      { id: "buyer-information-section", label: "Buyer Information" },
       { id: "invoice-items-section", label: "Invoice Items" },
     ] as const;
 
-    // Verify all sections are initially visible and expanded
+    // Verify all accordion sections are initially visible and expanded
     for (const section of sections) {
       const sectionElement = page.getByTestId(section.id);
       await expect(sectionElement).toBeVisible();
@@ -1004,34 +866,17 @@ test.describe("Invoice Generator Page", () => {
       ).toBeVisible();
     }
 
-    // Collapse specific sections to create mixed state
-    await page
-      .getByTestId("seller-information-section")
-      .getByRole("button", { name: "Seller Information" })
-      .click();
-
+    // Collapse invoice-items section to create mixed state
     await page
       .getByTestId("invoice-items-section")
       .getByRole("button", { name: "Invoice Items" })
       .click();
 
-    // Verify mixed state: general and buyer expanded, seller and items collapsed
+    // Verify mixed state: general expanded, items collapsed
     await expect(
       page
         .getByTestId("general-information-section")
         .getByRole("region", { name: "General Information" }),
-    ).toBeVisible();
-
-    await expect(
-      page
-        .getByTestId("seller-information-section")
-        .getByRole("region", { name: "Seller Information" }),
-    ).toBeHidden();
-
-    await expect(
-      page
-        .getByTestId("buyer-information-section")
-        .getByRole("region", { name: "Buyer Information" }),
     ).toBeVisible();
 
     await expect(
@@ -1051,8 +896,6 @@ test.describe("Invoice Generator Page", () => {
 
     expect(parsedState).toEqual({
       general: true,
-      seller: false,
-      buyer: true,
       invoiceItems: false,
     } as const satisfies AccordionState);
 
@@ -1068,51 +911,22 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(
       page
-        .getByTestId("seller-information-section")
-        .getByRole("region", { name: "Seller Information" }),
-    ).toBeHidden();
-
-    await expect(
-      page
-        .getByTestId("buyer-information-section")
-        .getByRole("region", { name: "Buyer Information" }),
-    ).toBeVisible();
-
-    await expect(
-      page
         .getByTestId("invoice-items-section")
         .getByRole("region", { name: "Invoice Items" }),
     ).toBeHidden();
 
-    // Toggle states after reload
+    // Toggle general section after reload
     await page
       .getByTestId("general-information-section")
       .getByRole("button", { name: "General Information" })
       .click();
 
-    await page
-      .getByTestId("seller-information-section")
-      .getByRole("button", { name: "Seller Information" })
-      .click();
-
-    // Verify new toggled state
+    // Verify new toggled state: general collapsed, items still collapsed
     await expect(
       page
         .getByTestId("general-information-section")
         .getByRole("region", { name: "General Information" }),
     ).toBeHidden();
-
-    await expect(
-      page
-        .getByTestId("seller-information-section")
-        .getByRole("region", { name: "Seller Information" }),
-    ).toBeVisible();
-
-    await expect(
-      page
-        .getByTestId("buyer-information-section")
-        .getByRole("region", { name: "Buyer Information" }),
-    ).toBeVisible();
 
     await expect(
       page
@@ -1130,8 +944,6 @@ test.describe("Invoice Generator Page", () => {
     const updatedParsedState = JSON.parse(updatedStoredState) as AccordionState;
     expect(updatedParsedState).toEqual({
       general: false,
-      seller: true,
-      buyer: true,
       invoiceItems: false,
     } as const satisfies AccordionState);
   });

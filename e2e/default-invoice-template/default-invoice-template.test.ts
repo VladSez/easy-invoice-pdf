@@ -419,77 +419,89 @@ test.describe("Default Invoice Template", () => {
     /** UPDATE SELLER INFORMATION */
 
     const sellerSection = page.getByTestId(`seller-information-section`);
+    const manageSellerDialog = page.getByTestId(`manage-seller-dialog`);
 
-    // Name field
-    await sellerSection
-      .getByRole("textbox", { name: "Name" })
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
       .fill("PLAYWRIGHT SELLER TEST");
 
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("PLAYWRIGHT SELLER ADDRESS TEST");
+
     // Toggle VAT Number visibility off
-    await sellerSection
-      .getByRole("switch", {
-        name: `Show the 'Seller Tax Number' Field in the PDF`,
-      })
+    await manageSellerDialog
+      .getByRole("switch", { name: `Show the 'Tax Number' field in the PDF` })
       .click();
 
     // Toggle Account Number visibility off
-    await sellerSection
+    await manageSellerDialog
       .getByRole("switch", {
-        name: `Show the 'Account Number' Field in the PDF`,
+        name: `Show the 'Account Number' field in the PDF`,
       })
       .click();
 
     // Toggle SWIFT visibility off
-    await sellerSection
-      .getByRole("switch", {
-        name: `Show the 'SWIFT/BIC' Field in the PDF`,
-      })
+    await manageSellerDialog
+      .getByRole("switch", { name: `Show the 'SWIFT/BIC' field in the PDF` })
       .click();
 
-    // update notes
-    await sellerSection
+    // fill notes
+    await manageSellerDialog
       .getByRole("textbox", { name: "Notes" })
       .fill("PLAYWRIGHT SELLER NOTES TEST");
 
-    // Toggle notes visibility on
-    const sellerNotesSwitch = sellerSection.getByTestId(
-      `sellerNotesInvoiceFormFieldVisibilitySwitch`,
-    );
+    // Notes visibility switch is ON by default
+    await expect(
+      manageSellerDialog.getByRole("switch", {
+        name: `Show the 'Notes' field in the PDF`,
+      }),
+    ).toBeChecked();
 
-    await expect(sellerNotesSwitch).toHaveRole("switch");
-    await expect(sellerNotesSwitch).toBeChecked();
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    // Wait for toast notification to appear after saving seller
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+    // await expect(manageSellerDialog).toBeHidden();
 
     /** UPDATE BUYER INFORMATION */
 
     const buyerSection = page.getByTestId(`buyer-information-section`);
+    const manageBuyerDialog = page.getByTestId(`manage-buyer-dialog`);
 
-    // Name field
-    await buyerSection
-      .getByRole("textbox", { name: "Name" })
+    await buyerSection.getByRole("button", { name: "New Buyer" }).click();
+
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
       .fill("PLAYWRIGHT BUYER TEST");
 
-    // // Address field
-    await buyerSection
-      .getByRole("textbox", { name: "Address" })
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
       .fill("PLAYWRIGHT BUYER ADDRESS TEST");
 
-    // // Email field
-    await buyerSection
+    await manageBuyerDialog
       .getByRole("textbox", { name: "Email" })
       .fill("TEST_BUYER_EMAIL@mail.com");
 
-    // update notes
-    await buyerSection
+    await manageBuyerDialog
       .getByRole("textbox", { name: "Notes" })
       .fill("PLAYWRIGHT BUYER NOTES TEST");
 
-    // Toggle notes visibility on
-    const buyerNotesSwitch = buyerSection.getByTestId(
-      `buyerNotesInvoiceFormFieldVisibilitySwitch`,
-    );
+    // Notes visibility switch is ON by default
+    await expect(
+      manageBuyerDialog.getByRole("switch", {
+        name: `Show the 'Notes' field in the PDF`,
+      }),
+    ).toBeChecked();
 
-    await expect(buyerNotesSwitch).toHaveRole("switch");
-    await expect(buyerNotesSwitch).toBeChecked();
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+    await expect(manageBuyerDialog).toBeHidden();
 
     const invoiceSection = page.getByTestId(`invoice-items-section`);
 
@@ -714,14 +726,21 @@ test.describe("Default Invoice Template", () => {
         `Test: completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French (${testInfo.project.name})`,
       );
 
-    // Fill in seller information
+    // Fill in seller information via dialog
     const sellerSection = page.getByTestId("seller-information-section");
-    await sellerSection
-      .getByRole("textbox", { name: "Name" })
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
       .fill("Mobile Test Seller");
-    await sellerSection
-      .getByRole("textbox", { name: "Address" })
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
       .fill("456 Mobile St");
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+    await expect(manageSellerDialog).toBeHidden();
 
     // Fill in an invoice item
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
@@ -844,13 +863,10 @@ test.describe("Default Invoice Template", () => {
       `Test: completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French (${testInfo.project.name})`,
     );
 
-    // Verify seller information persists
+    // Verify seller information persists (shown in dropdown)
     await expect(
-      sellerSection.getByRole("textbox", { name: "Name" }),
-    ).toHaveValue("Mobile Test Seller");
-    await expect(
-      sellerSection.getByRole("textbox", { name: "Address" }),
-    ).toHaveValue("456 Mobile St");
+      sellerSection.getByRole("combobox", { name: "Select Seller" }),
+    ).toContainText("Mobile Test Seller");
 
     // Verify invoice item persists
     await expect(
@@ -1711,6 +1727,321 @@ test.describe("Default Invoice Template", () => {
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       "pdf-with-logo-stripe-template-after-switch.png",
+    );
+  });
+
+  test("removes SELLER and auto-applies next seller in PDF (after deletion)", async ({
+    page,
+    downloadDir,
+    browserName,
+  }) => {
+    const sellerForm = page.getByTestId(`seller-information-section`);
+    const manageSellerDialog = page.getByTestId(`manage-seller-dialog`);
+
+    // Add Seller (applied after delete) — will remain after deletion
+    await page.getByRole("button", { name: "New Seller" }).click();
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Seller A (applied after delete)");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("1 A Street");
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    await expect(
+      sellerForm.getByRole("combobox", {
+        name: "Select Seller",
+      }),
+    ).toContainText("Seller A (applied after delete)");
+
+    // Add Seller B (applied before delete) — will be deleted
+    await sellerForm.getByRole("button", { name: "New Seller" }).click();
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Seller B (applied before delete)");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("2 B Street");
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+    await expect(manageSellerDialog).toBeHidden();
+
+    // Verify Seller (applied before delete) is currently selected (most recently applied)
+    const sellerDropdown = sellerForm.getByRole("combobox", {
+      name: "Select Seller",
+    });
+
+    await expect(sellerDropdown).toContainText(
+      "Seller B (applied before delete)",
+    );
+
+    // Take a "before" screenshot of the PDF showing Seller B (applied before delete)
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+    const [downloadBefore] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("link", { name: "Download PDF in English" }).click(),
+    ]);
+    const beforePdfPath = path.join(
+      downloadDir,
+      `${browserName}-seller-before-delete-${downloadBefore.suggestedFilename()}`,
+    );
+    await downloadBefore.saveAs(beforePdfPath);
+    const beforePdfBytes = fs.readFileSync(path.resolve(beforePdfPath));
+    await page.goto("about:blank");
+    await renderPdfOnCanvas(page, beforePdfBytes);
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "seller-before-delete.png",
+    );
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
+
+    // Delete Seller B (applied before delete) — currently selected
+    await sellerForm.getByRole("button", { name: "Delete seller" }).click();
+    await expect(page.getByRole("alertdialog")).toBeVisible();
+    await page.getByRole("button", { name: "Delete" }).click();
+
+    await expect(
+      page.getByText("Seller deleted successfully", { exact: true }),
+    ).toBeVisible();
+
+    const newSellerDropdown = sellerForm.getByRole("combobox", {
+      name: "Select Seller",
+    });
+    // Verify Seller A (applied after delete) is now auto-selected in the dropdown
+    await expect(newSellerDropdown).toBeVisible();
+    await expect(newSellerDropdown).toContainText(
+      "Seller A (applied after delete)",
+    );
+
+    // Take an "after" screenshot of the PDF showing Seller A (applied after delete)
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+    const [downloadAfter] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("link", { name: "Download PDF in English" }).click(),
+    ]);
+    const afterPdfPath = path.join(
+      downloadDir,
+      `${browserName}-seller-after-delete-${downloadAfter.suggestedFilename()}`,
+    );
+    await downloadAfter.saveAs(afterPdfPath);
+    const afterPdfBytes = fs.readFileSync(path.resolve(afterPdfPath));
+    await page.goto("about:blank");
+    await renderPdfOnCanvas(page, afterPdfBytes);
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "seller-after-delete.png",
+    );
+
+    // Navigate back to the app
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
+
+    // Delete the last remaining seller (Seller A)
+    await sellerForm.getByRole("button", { name: "Delete seller" }).click();
+    await expect(page.getByRole("alertdialog")).toBeVisible();
+    await page.getByRole("button", { name: "Delete" }).click();
+    await expect(
+      page.getByText("Seller deleted successfully", { exact: true }),
+    ).toBeVisible();
+
+    // Combobox should be hidden — no sellers left
+    await expect(
+      sellerForm.getByRole("combobox", { name: "Select Seller" }),
+    ).toBeHidden();
+
+    // Download PDF and verify it shows default seller values
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+    const [downloadDefault] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("link", { name: "Download PDF in English" }).click(),
+    ]);
+    const defaultPdfPath = path.join(
+      downloadDir,
+      `${browserName}-seller-default-${downloadDefault.suggestedFilename()}`,
+    );
+    await downloadDefault.saveAs(defaultPdfPath);
+    const defaultPdfBytes = fs.readFileSync(path.resolve(defaultPdfPath));
+    await page.goto("about:blank");
+    await renderPdfOnCanvas(page, defaultPdfBytes);
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "seller-default-after-all-deleted.png",
+    );
+  });
+
+  test("removes BUYER and auto-applies next buyer in PDF (after deletion)", async ({
+    page,
+    downloadDir,
+    browserName,
+  }) => {
+    const buyerForm = page.getByTestId(`buyer-information-section`);
+    const manageBuyerDialog = page.getByTestId(`manage-buyer-dialog`);
+
+    // Add Buyer (applied after delete) — will remain after deletion
+    await page.getByRole("button", { name: "New Buyer" }).click();
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Buyer A (applied after delete)");
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("1 A Avenue");
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+    await expect(
+      page.getByText("Buyer added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    const buyerDropdown = buyerForm.getByRole("combobox", {
+      name: "Select Buyer",
+    });
+    await expect(buyerDropdown).toContainText("Buyer A (applied after delete)");
+
+    // Add Buyer B (applied before delete) — will be deleted
+    await buyerForm.getByRole("button", { name: "New Buyer" }).click();
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Buyer B (applied before delete)");
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("2 B Avenue");
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+    await expect(manageBuyerDialog).toBeHidden();
+
+    // Verify Buyer (applied before delete) is currently selected (most recently applied)
+    await expect(buyerDropdown).toContainText(
+      "Buyer B (applied before delete)",
+    );
+
+    // Take a "before" screenshot of the PDF showing Buyer B (applied before delete)
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+    const [downloadBefore] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("link", { name: "Download PDF in English" }).click(),
+    ]);
+    const beforePdfPath = path.join(
+      downloadDir,
+      `${browserName}-buyer-before-delete-${downloadBefore.suggestedFilename()}`,
+    );
+    await downloadBefore.saveAs(beforePdfPath);
+    const beforePdfBytes = fs.readFileSync(path.resolve(beforePdfPath));
+    await page.goto("about:blank");
+    await renderPdfOnCanvas(page, beforePdfBytes);
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "buyer-before-delete.png",
+    );
+    await page.goto("/");
+    await expect(page).toHaveURL("/?template=default");
+
+    // Delete Buyer B (applied before delete) — currently selected
+    await buyerForm.getByRole("button", { name: "Delete buyer" }).click();
+    await expect(page.getByRole("alertdialog")).toBeVisible();
+    await page.getByRole("button", { name: "Delete" }).click();
+
+    await expect(
+      page.getByText("Buyer deleted successfully", { exact: true }),
+    ).toBeVisible();
+
+    const newBuyerDropdown = buyerForm.getByRole("combobox", {
+      name: "Select Buyer",
+    });
+    // Verify Buyer A (applied after delete) is now auto-selected in the dropdown
+    await expect(newBuyerDropdown).toBeVisible();
+    await expect(newBuyerDropdown).toContainText(
+      "Buyer A (applied after delete)",
+    );
+
+    // Take an "after" screenshot of the PDF showing Buyer A (applied after delete)
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+    const [downloadAfter] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("link", { name: "Download PDF in English" }).click(),
+    ]);
+    const afterPdfPath = path.join(
+      downloadDir,
+      `${browserName}-buyer-after-delete-${downloadAfter.suggestedFilename()}`,
+    );
+    await downloadAfter.saveAs(afterPdfPath);
+    const afterPdfBytes = fs.readFileSync(path.resolve(afterPdfPath));
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, afterPdfBytes);
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "buyer-after-delete.png",
+    );
+
+    // Navigate back to the app
+    await page.goto("/");
+    await expect(page).toHaveURL("/?template=default");
+
+    // Delete the last remaining buyer (Buyer A)
+    await buyerForm.getByRole("button", { name: "Delete buyer" }).click();
+    await expect(page.getByRole("alertdialog")).toBeVisible();
+    await page.getByRole("button", { name: "Delete" }).click();
+    await expect(
+      page.getByText("Buyer deleted successfully", { exact: true }),
+    ).toBeVisible();
+
+    // Combobox should be hidden — no buyers left
+    await expect(
+      buyerForm.getByRole("combobox", { name: "Select Buyer" }),
+    ).toBeHidden();
+
+    // Download PDF and verify it shows default buyer values
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+    const [downloadDefault] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("link", { name: "Download PDF in English" }).click(),
+    ]);
+    const defaultPdfPath = path.join(
+      downloadDir,
+      `${browserName}-buyer-default-${downloadDefault.suggestedFilename()}`,
+    );
+    await downloadDefault.saveAs(defaultPdfPath);
+    const defaultPdfBytes = fs.readFileSync(path.resolve(defaultPdfPath));
+    await page.goto("about:blank");
+    await renderPdfOnCanvas(page, defaultPdfBytes);
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "buyer-default-after-all-deleted.png",
     );
   });
 });

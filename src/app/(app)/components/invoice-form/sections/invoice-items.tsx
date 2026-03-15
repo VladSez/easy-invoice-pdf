@@ -72,52 +72,6 @@ export const InvoiceItems = memo(function InvoiceItems({
 
   return (
     <>
-      {/** we only want to show these settings for default template */}
-      {template === "default" && (
-        <div className="mb-3 space-y-4">
-          {/* Show Number column on PDF switch */}
-          <div className="relative flex items-center justify-between">
-            <Label htmlFor={`itemInvoiceItemNumberIsVisible0`}>
-              Show &quot;Number&quot; Column in the Invoice Items Table
-            </Label>
-
-            <Controller
-              name={`items.0.invoiceItemNumberIsVisible`}
-              control={control}
-              render={({ field: { value, onChange, ...field } }) => (
-                <Switch
-                  {...field}
-                  id={`itemInvoiceItemNumberIsVisible0`}
-                  checked={value}
-                  onCheckedChange={onChange}
-                  className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                />
-              )}
-            />
-          </div>
-
-          {/* Show Tax Table Summary in PDF switch */}
-          <div className="relative flex items-center justify-between">
-            <Label htmlFor={`vatTableSummaryIsVisible`}>
-              Show &quot;{taxLabelText} Table Summary&quot; in the PDF
-            </Label>
-
-            <Controller
-              name={`vatTableSummaryIsVisible`}
-              control={control}
-              render={({ field: { value, onChange, ...field } }) => (
-                <Switch
-                  {...field}
-                  id={`vatTableSummaryIsVisible`}
-                  checked={value}
-                  onCheckedChange={onChange}
-                  className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                />
-              )}
-            />
-          </div>
-        </div>
-      )}
       {fields.map((field, index) => {
         const isNotFirstItem = index > 0;
         const isFirstItem = index === 0;
@@ -788,6 +742,7 @@ export const InvoiceItems = memo(function InvoiceItems({
           </fieldset>
         );
       })}
+
       <CustomTooltip
         trigger={
           <Button
@@ -827,6 +782,59 @@ export const InvoiceItems = memo(function InvoiceItems({
         side="bottom"
         showArrow
       />
+
+      {/** we only want to show "Show Number Column" and "Show Tax Table Summary" settings for default template */}
+      {template === "default" && (
+        <div className="mt-6 space-y-4 rounded-md border p-4">
+          {/* Show Number column on PDF switch */}
+          <div className="relative flex items-center justify-between gap-2">
+            <Label
+              htmlFor={`itemInvoiceItemNumberIsVisible0`}
+              className="text-balance font-medium"
+            >
+              Show &quot;Number&quot; Column in the Invoice Items Table
+            </Label>
+
+            <Controller
+              name={`items.0.invoiceItemNumberIsVisible`}
+              control={control}
+              render={({ field: { value, onChange, ...field } }) => (
+                <Switch
+                  {...field}
+                  id={`itemInvoiceItemNumberIsVisible0`}
+                  checked={value}
+                  onCheckedChange={onChange}
+                  className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                />
+              )}
+            />
+          </div>
+
+          {/* Show Tax Table Summary in PDF switch */}
+          <div className="relative flex items-center justify-between gap-2">
+            <Label
+              htmlFor={`vatTableSummaryIsVisible`}
+              className="text-balance"
+            >
+              Show &quot;{taxLabelText} Table Summary&quot; in the PDF
+            </Label>
+
+            <Controller
+              name={`vatTableSummaryIsVisible`}
+              control={control}
+              render={({ field: { value, onChange, ...field } }) => (
+                <Switch
+                  {...field}
+                  id={`vatTableSummaryIsVisible`}
+                  checked={value}
+                  onCheckedChange={onChange}
+                  className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                />
+              )}
+            />
+          </div>
+        </div>
+      )}
 
       <DeleteInvoiceItemConfirmationDialog
         deleteItemIndex={deleteItemIndex}

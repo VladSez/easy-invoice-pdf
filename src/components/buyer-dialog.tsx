@@ -27,7 +27,7 @@ import { CustomTooltip } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { BUYERS_LOCAL_STORAGE_KEY } from "./buyer-management";
 import { z } from "zod";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import * as Sentry from "@sentry/nextjs";
 import { InputHelperMessage } from "./ui/input-helper-message";
 
@@ -43,7 +43,7 @@ interface BuyerDialogProps {
   handleBuyerEdit?: (buyer: BuyerData) => void;
   initialData: BuyerData | null;
   isEditMode: boolean;
-  formValues?: Partial<BuyerData>;
+  isFirstEntry: boolean;
 }
 
 export function BuyerDialog({
@@ -53,7 +53,7 @@ export function BuyerDialog({
   handleBuyerEdit,
   initialData,
   isEditMode,
-  formValues,
+  isFirstEntry,
 }: BuyerDialogProps) {
   const form = useForm<BuyerData>({
     resolver: zodResolver(buyerSchema),
@@ -64,6 +64,7 @@ export function BuyerDialog({
       vatNo: initialData?.vatNo ?? "",
       vatNoLabelText: initialData?.vatNoLabelText ?? "VAT no",
       email: initialData?.email ?? "",
+      emailFieldIsVisible: initialData?.emailFieldIsVisible ?? true,
       vatNoFieldIsVisible: initialData?.vatNoFieldIsVisible ?? true,
       notes: initialData?.notes ?? "",
       notesFieldIsVisible: initialData?.notesFieldIsVisible ?? true,
@@ -73,46 +74,6 @@ export function BuyerDialog({
   // by default, we want to apply the new buyer to the current invoice
   const [shouldApplyNewBuyerToInvoice, setShouldApplyNewBuyerToInvoice] =
     useState(true);
-
-  const [shouldApplyFormValues, setShouldApplyFormValues] = useState(false);
-
-  /**
-   * Synchronizes form values based on the "Use current invoice data" switch state.
-   *
-   * When creating a new buyer (not in edit mode):
-   * - If switch is ON: Populates the form with current invoice buyer data (formValues)
-   *   to allow users to save the current invoice's buyer information as a new saved buyer.
-   * - If switch is OFF: Resets the form to empty/default values or initialData
-   *   to allow users to enter completely new buyer information from scratch.
-   *
-   * This effect does not run in edit mode to prevent overwriting the buyer being edited.
-   */
-  useEffect(() => {
-    // Switch is ON: Pre-fill form with current invoice buyer data
-    if (shouldApplyFormValues && formValues && !isEditMode) {
-      form.reset({
-        ...form.getValues(),
-        ...formValues,
-      });
-    }
-
-    // Switch is OFF: Reset form to empty state or initial data
-    else if (!shouldApplyFormValues && !isEditMode) {
-      form.reset(
-        initialData ?? {
-          id: "",
-          name: "",
-          address: "",
-          vatNo: "",
-          vatNoLabelText: "VAT no",
-          email: "",
-          vatNoFieldIsVisible: true,
-          notes: "",
-          notesFieldIsVisible: true,
-        },
-      );
-    }
-  }, [shouldApplyFormValues, formValues, initialData, isEditMode, form]);
 
   function onSubmit(formValues: BuyerData) {
     try {
@@ -173,7 +134,10 @@ export function BuyerDialog({
         handleBuyerEdit?.(formValues);
       } else {
         // Add new buyer
-        handleBuyerAdd?.(formValues, { shouldApplyNewBuyerToInvoice });
+        handleBuyerAdd?.(formValues, {
+          shouldApplyNewBuyerToInvoice:
+            isFirstEntry || shouldApplyNewBuyerToInvoice,
+        });
       }
 
       // Close dialog
@@ -214,35 +178,11 @@ export function BuyerDialog({
           <DialogDescription>
             {isEditMode
               ? "Edit the buyer details"
-              : "Add a new buyer to use later in your invoices"}
+              : "Add a new buyer to use in future invoices"}
           </DialogDescription>
         </DialogHeader>
 
         <div className="overflow-y-auto px-6 py-4">
-          {/* Add Use Current Form Values switch */}
-          {!isEditMode && (
-            <div className="mb-4">
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={shouldApplyFormValues}
-                  onCheckedChange={setShouldApplyFormValues}
-                  id="apply-form-values-switch"
-                />
-                <Label
-                  htmlFor="apply-form-values-switch"
-                  className="cursor-pointer"
-                >
-                  Pre-fill with values from the current invoice form
-                </Label>
-              </div>
-              <span className="mt-1.5 inline-block text-xs text-slate-500">
-                When enabled, this will automatically fill in the buyer details
-                dialog with the information you&apos;ve already entered in your
-                current invoice form.
-              </span>
-            </div>
-          )}
-
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
@@ -254,7 +194,7 @@ export function BuyerDialog({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>Name (Required)</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -272,7 +212,7 @@ export function BuyerDialog({
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel>Address (Required)</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -370,23 +310,50 @@ export function BuyerDialog({
                 </div>
               </fieldset>
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="email"
-                        placeholder="buyer@email.com"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-3 rounded-md border p-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="mb-2 font-medium">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="email"
+                          placeholder="buyer@email.com"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="emailFieldIsVisible"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          id="emailFieldIsVisible"
+                          aria-label={`Show the 'Email' field in the PDF`}
+                        />
+                        <CustomTooltip
+                          trigger={
+                            <Label htmlFor="emailFieldIsVisible">
+                              Show Buyer Email in PDF
+                            </Label>
+                          }
+                          content='Show the "Email" field in the PDF'
+                          className="z-[1000]"
+                        />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Notes */}
               <div className="space-y-3 rounded-md border p-4">
@@ -441,7 +408,7 @@ export function BuyerDialog({
           </Form>
 
           {/* Apply to Current Invoice switch remains at bottom */}
-          {!isEditMode && (
+          {!isEditMode && !isFirstEntry && (
             <div className="mt-4 flex flex-col gap-1 border-t pt-4">
               <div className="flex items-center gap-2">
                 <Switch

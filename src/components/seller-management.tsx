@@ -39,36 +39,18 @@ interface SellerManagementProps {
   invoiceData: InvoiceData;
   selectedSellerId: string;
   setSelectedSellerId: Dispatch<SetStateAction<string>>;
-  formValues?: Partial<SellerData>;
   isMobile: boolean;
 }
 
 /**
- * SellerManagement Component
- *
- * Manages seller data for invoices including:
- * - Loading and displaying saved sellers from localStorage
- * - Creating new sellers via a dialog form
- * - Editing existing seller details
- * - Deleting sellers with confirmation
- * - Auto-populating invoice form fields when a seller is selected
- *
- * When a seller is selected from the dropdown, their details are populated into the
- * invoice form and the form fields become read-only. Users must use the Edit Seller
- * button to modify saved seller information.
- *
- * @param setValue - React Hook Form setter to update invoice form values
- * @param invoiceData - Current invoice data including seller information
- * @param selectedSellerId - ID of the currently selected seller
- * @param setSelectedSellerId - Callback to update the selected seller ID
- * @param formValues - Current seller form values (optional)
+ * SellerManagement component allows users to select, add, edit, and delete sellers for invoices.
+ * Handles seller state management, selection, and persistence to localStorage.
  */
 export function SellerManagement({
   setValue,
   invoiceData,
   selectedSellerId,
   setSelectedSellerId,
-  formValues,
   isMobile,
 }: SellerManagementProps) {
   const [isSellerDialogOpen, setIsSellerDialogOpen] = useState(false);
@@ -109,8 +91,14 @@ export function SellerManagement({
         },
       );
 
+      // Populate the sellers dropdown with the valid sellers loaded from localStorage
       setSellersSelectOptions(validationResult.data);
-      setSelectedSellerId(selectedSeller?.id ?? "");
+
+      // If a seller on the invoice matches one from storage, select it.
+      // Otherwise default to the first seller in the list, or blank if none.
+      setSelectedSellerId(
+        selectedSeller?.id ?? validationResult.data[0]?.id ?? "",
+      );
     } catch (error) {
       console.error("Failed to load sellers:", error);
 
@@ -233,16 +221,6 @@ export function SellerManagement({
           position: isMobile ? "top-center" : "bottom-right",
         });
       }
-    } else {
-      // Clear the seller from the form if the user selects the empty option
-      setSelectedSellerId("");
-      setValue("seller", DEFAULT_SELLER_DATA);
-
-      toast.success("Seller information reset to default", {
-        id: "reset_seller_success_toast",
-        richColors: true,
-        position: isMobile ? "top-center" : "bottom-right",
-      });
     }
 
     // analytics track event
@@ -251,21 +229,27 @@ export function SellerManagement({
 
   const handleDeleteSeller = () => {
     try {
-      setSellersSelectOptions((prevSellers) => {
-        const updatedSellers = prevSellers.filter(
-          (seller) => seller.id !== selectedSellerId,
-        );
+      const updatedSellers = sellersSelectOptions.filter(
+        (seller) => seller.id !== selectedSellerId,
+      );
 
-        localStorage.setItem(
-          SELLERS_LOCAL_STORAGE_KEY,
-          JSON.stringify(updatedSellers),
-        );
-        return updatedSellers;
-      });
-      // Clear the selected seller index
-      setSelectedSellerId("");
-      // Clear the seller from the form if it was selected
-      setValue("seller", DEFAULT_SELLER_DATA);
+      localStorage.setItem(
+        SELLERS_LOCAL_STORAGE_KEY,
+        JSON.stringify(updatedSellers),
+      );
+      setSellersSelectOptions(updatedSellers);
+
+      const nextSeller = updatedSellers?.[0];
+
+      // If there is another seller available after deletion, select it and update the form value
+      if (nextSeller?.id) {
+        setSelectedSellerId(nextSeller.id);
+        setValue("seller", nextSeller);
+      } else {
+        // If no sellers remain, reset the selectedSellerId and set the form to default seller data
+        setSelectedSellerId("");
+        setValue("seller", DEFAULT_SELLER_DATA);
+      }
 
       // Close the delete dialog
       setIsDeleteDialogOpen(false);
@@ -309,15 +293,11 @@ export function SellerManagement({
             <div className="flex gap-2">
               <SelectNative
                 id={sellerSelectId}
-                className={cn(
-                  "block h-8 max-w-[200px] text-[12px]",
-                  !selectedSellerId && "italic text-gray-700",
-                )}
+                className="block h-8 min-w-0 flex-1 text-[12px]"
                 onChange={handleSellerChange}
                 value={selectedSellerId}
                 title={activeSeller?.name}
               >
-                <option value="">No seller selected (default)</option>
                 {sellersSelectOptions.map((seller) => (
                   <option key={seller.id} value={seller.id}>
                     {seller.name}
@@ -452,7 +432,7 @@ export function SellerManagement({
         handleSellerEdit={handleSellerEdit}
         initialData={editingSeller}
         isEditMode={isEditMode}
-        formValues={formValues}
+        isFirstEntry={sellersSelectOptions?.length === 0}
       />
 
       {/* Delete alert seller dialog */}

@@ -254,6 +254,11 @@ export function AppPageClient({
 
         const validatedDataFromURL = invoiceSchema.parse(updatedJson);
 
+        console.log(
+          "[useEffect] [initialize invoice data from ** URL **] validatedDataFromURL",
+          validatedDataFromURL,
+        );
+
         // Override template from URL parameter if present for better UX
         // The ?template parameter provides a cleaner URL and better user experience
         // while ?data contains the actual invoice data including the template
