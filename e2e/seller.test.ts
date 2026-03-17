@@ -397,6 +397,380 @@ test.describe("Seller management", () => {
     ).toBeHidden();
   });
 
+  test("shared invoice with *UNMATCHED* seller shows banner and allows changing via select", async ({
+    page,
+  }) => {
+    const SHARED_URL_SELLER_NAME = "John Doe";
+
+    const SHARED_INVOICE_URL =
+      "/?data=N4IgNghgdg5grhGBTEAuEAHMIA0IAmEALkgGID2ATgLbFogCyTDABACI4sCaPXuIAYziVKSKAICe9AKoBlNvxLUsxFOgDORSgEsMKPGHIxy9ftqgA3ctoFIAcnGoAjJJQDyTgFZIBRNKEgXbHRSCABrImEIFihKdDwLCDA4NRAARgB6AAYADgBaACYsgoBWEABfPEISNwAzAEl1dRT6ItK83Ly0sqrVOtlXCxtUtpKO-IBmNLNLa1sAFQk9egAlJAtXdSQWAGEACwhKZBmrYcW9Um0kMHxGgDVtdW0nMDUtFLwtsFfKfxBtfD0NIAdgALFkAGw5UElCagiZZHogKAQaipABS5D2UHY5H0IAg+Hwoia9AAMuQoPhKZxpABpfiJIh2EzoNIFOElCGM4gsy7XW7qB5PF5vSgfEBIWjaYIgTxYqAAAWlYAAdAJyNR+BABBq4FBmY4XL82RyYdy8Dq9QaHM5XPybvdHs9Xmh3khPgB3bS1IgAIRsQLNXP46m9voDAgdguFLrFEqg5BI6noyb8eETyejTpFrtQtSSW0qICccAkrj+AKBwNhoIhWRhJWBDf4KLR9AAggI0bsTJaiSSU+g7EhPdwqGFOHYuLTZB2eczWelgxaQEy+VdHULnaK3eKPZKVfQdWjlRAZerNa2k0ghyBr1nNzGd3n3cXtEohwBtUDmU62eolFtY0czjPcE1RVJZHIX1PUObY2HWa5yAwNEDVbSDs23XN4wPIgliQOoAHF5mkUw8HwvRiNIrDY13fNCwPVFyH1PxUDSS1qBYg1aJfXC8H1D96C2SghlsfhBKIXicPAg8oCQIgAAUdHE9iSiyDSMwU5ThmksDUHdBI6GHRSFz0+jDORBSOy41i0G6DSsi0ogbO4qSn1Aiz9yMlzbPQ1AnLXYhXNY8zX28zBRHmCAAA8Qv8hzNMipBorivz3IFTzwpScoAF0KKTJJ7PUpKmWi0VZEcWhKAkLL+MwCAJDQogGAUvZyEBdBvVEFgtGgdRagrPAMEa5rWqIdr8DC+qRqasQiDYFp0FGcZClBUMtF0JBFMatwoDAcwkGkShZQfW9ViQygthYAQDiOfFM1vabZOGzZKQ7OAJqobQAC8kHweZyDWWxtA2Z6DIivQrvez72p0P6AfIRpmjIDzsP0t8gA";
+
+    const sellerSection = page.getByTestId("seller-information-section");
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    // Step 1: Save a local seller (different name than the one in the shared URL)
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("My Local Seller");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("123 Local Street");
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // Step 2: Navigate to a shared invoice URL containing seller "John Doe"
+    await page.goto(SHARED_INVOICE_URL, { waitUntil: "commit" });
+
+    // Step 3: Verify the shared seller info banner is visible
+    const sharedSellerBanner = sellerSection.getByTestId(
+      "shared-seller-info-banner",
+    );
+    await expect(sharedSellerBanner).toBeVisible();
+    await expect(sharedSellerBanner).toContainText(
+      `Seller "${SHARED_URL_SELLER_NAME}" is from a shared invoice and isn't saved locally.`,
+    );
+
+    // Step 4: Verify the select dropdown is visible (because we have a saved seller)
+    const sellerDropdown = sellerSection.getByRole("combobox", {
+      name: "Select Seller",
+    });
+    await expect(sellerDropdown).toBeVisible();
+
+    // Step 5: Verify no seller is pre-selected (placeholder shown)
+    await expect(sellerDropdown).toHaveValue("");
+    await expect(sellerDropdown).toContainText("— Select seller —");
+
+    // Step 6: Select the local seller from the dropdown
+    await sellerDropdown.selectOption({ label: "My Local Seller" });
+
+    // Step 7: Verify the banner disappears after selecting a local seller
+    await expect(sharedSellerBanner).toBeHidden();
+
+    // Step 8: Verify the toast confirming the seller was applied
+    await expect(
+      page.getByText('Seller "My Local Seller" applied to invoice', {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    // Verify the dropdown now shows the selected seller
+    await expect(sellerDropdown).toContainText("My Local Seller");
+
+    await expect(sellerDropdown).not.toHaveValue("");
+    await expect(sellerDropdown).toHaveAttribute("title", "My Local Seller");
+  });
+
+  test("shared invoice with *MATCHING* seller auto-selects saved seller", async ({
+    page,
+    context,
+  }) => {
+    const sellerSection = page.getByTestId("seller-information-section");
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    // Step 1: Save a seller and generate a share link
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Matched Seller Co");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("456 Matched Ave");
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // Step 2: Add another seller (so there are two sellers stored locally)
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Second Seller LLC");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("789 Seller Road");
+
+    const applyToInvoiceSwitch = manageSellerDialog.getByRole("switch", {
+      name: "Apply to Current Invoice",
+    });
+    await expect(applyToInvoiceSwitch).toBeChecked();
+
+    // Uncheck "Apply to Current Invoice" so the second seller is not auto-applied
+    await applyToInvoiceSwitch.click();
+    await expect(applyToInvoiceSwitch).not.toBeChecked();
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    await expect(
+      page.getByText("Seller added successfully", { exact: true }),
+    ).toBeVisible();
+
+    // Wait for debounce before generating the link
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    // Step 2: Generate a share link
+    await page.getByRole("button", { name: "Generate invoice link" }).click();
+    await page.waitForURL((url) => url.searchParams.has("data"));
+    const sharedUrl = page.url();
+
+    // Step 3: Open the shared URL in a new tab (same browser context = shared localStorage)
+    const newPage = await context.newPage();
+    await newPage.goto(sharedUrl);
+
+    // Step 4: Verify NO shared seller info banner is shown, because we have a saved seller matching the one in the shared URL
+    const newSellerSection = newPage.getByTestId("seller-information-section");
+
+    await expect(
+      newSellerSection.getByTestId("shared-seller-info-banner"),
+    ).toBeHidden();
+
+    // Step 5: Verify the seller dropdown is visible and has the matching seller selected
+    const sellerDropdown = newSellerSection.getByRole("combobox", {
+      name: "Select Seller",
+    });
+    await expect(sellerDropdown).toBeVisible();
+
+    // Verify the dropdown contains both sellers
+    await expect(sellerDropdown).toContainText("Matched Seller Co");
+    await expect(sellerDropdown).toContainText("Second Seller LLC");
+
+    await expect(sellerDropdown).not.toHaveValue("");
+
+    await expect(sellerDropdown).toHaveAttribute("title", "Matched Seller Co");
+  });
+
+  test("switch between multiple saved sellers", async ({ page }) => {
+    const sellerSection = page.getByTestId("seller-information-section");
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    // Add first seller (auto-applied as first entry)
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Seller A");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("1 Alpha Street");
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    const sellerDropdown = sellerSection.getByRole("combobox", {
+      name: "Select Seller",
+    });
+    await expect(sellerDropdown).toContainText("Seller A");
+    await expect(sellerDropdown).toHaveAttribute("title", "Seller A");
+
+    // Add second seller with "Apply to Current Invoice" checked (default)
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Seller B");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("2 Beta Street");
+
+    await expect(
+      manageSellerDialog.getByRole("switch", {
+        name: "Apply to Current Invoice",
+      }),
+    ).toBeChecked();
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // Dropdown should now show Seller B
+    await expect(sellerDropdown).toContainText("Seller B");
+    await expect(sellerDropdown).toHaveAttribute("title", "Seller B");
+
+    // Switch back to Seller A via the dropdown
+    await sellerDropdown.selectOption({ label: "Seller A" });
+
+    await expect(
+      page.getByText('Seller "Seller A" applied to invoice', { exact: true }),
+    ).toBeVisible();
+    await expect(sellerDropdown).toContainText("Seller A");
+
+    // Switch back to Seller B
+    await sellerDropdown.selectOption({ label: "Seller B" });
+
+    await expect(
+      page.getByText('Seller "Seller B" applied to invoice', { exact: true }),
+    ).toBeVisible();
+    await expect(sellerDropdown).toContainText("Seller B");
+
+    await expect(sellerDropdown).toHaveAttribute("title", "Seller B");
+
+    // Wait for debounce before reloading the page
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
+
+    // Reload the page to simulate persistence or refresh
+    await page.reload();
+
+    // Verify the dropdown is still visible and shows "Seller B" as selected
+    const sellerDropdownAfterReload = sellerSection.getByRole("combobox", {
+      name: "Select Seller",
+    });
+    await expect(sellerDropdownAfterReload).toBeVisible();
+    await expect(sellerDropdownAfterReload).toContainText("Seller A");
+    await expect(sellerDropdownAfterReload).toContainText("Seller B");
+
+    await expect(sellerDropdownAfterReload).not.toHaveValue("");
+    await expect(sellerDropdownAfterReload).toHaveAttribute(
+      "title",
+      "Seller B",
+    );
+  });
+
+  test("save shared seller from banner", async ({ page }) => {
+    const SHARED_INVOICE_URL =
+      "/?data=N4IgNghgdg5grhGBTEAuEAHMIA0IAmEALkgGID2ATgLbFogCyTDABACI4sCaPXuIAYziVKSKAICe9AKoBlNvxLUsxFOgDORSgEsMKPGHIxy9ftqgA3ctoFIAcnGoAjJJQDyTgFZIBRNKEgXbHRSCABrImEIFihKdDwLCDA4NRAARgB6AAYADgBaACYsgoBWEABfPEISNwAzAEl1dRT6ItK83Ly0sqrVOtlXCxtUtpKO-IBmNLNLa1sAFQk9egAlJAtXdSQWAGEACwhKZBmrYcW9Um0kMHxGgDVtdW0nMDUtFLwtsFfKfxBtfD0NIAdgALFkAGw5UElCagiZZHogKAQaipABS5D2UHY5H0IAg+Hwoia9AAMuQoPhKZxpABpfiJIh2EzoNIFOElCGM4gsy7XW7qB5PF5vSgfEBIWjaYIgTxYqAAAWlYAAdAJyNR+BABBq4FBmY4XL82RyYdy8Dq9QaHM5XPybvdHs9Xmh3khPgB3bS1IgAIRsQLNXP46m9voDAgdguFLrFEqg5BI6noyb8eETyejTpFrtQtSSW0qICccAkrj+AKBwNhoIhWRhJWBDf4KLR9AAggI0bsTJaiSSU+g7EhPdwqGFOHYuLTZB2eczWelgxaQEy+VdHULnaK3eKPZKVfQdWjlRAZerNa2k0ghyBr1nNzGd3n3cXtEohwBtUDmU62eolFtY0czjPcE1RVJZHIX1PUObY2HWa5yAwNEDVbSDs23XN4wPIgliQOoAHF5mkUw8HwvRiNIrDY13fNCwPVFyH1PxUDSS1qBYg1aJfXC8H1D96C2SghlsfhBKIXicPAg8oCQIgAAUdHE9iSiyDSMwU5ThmksDUHdBI6GHRSFz0+jDORBSOy41i0G6DSsi0ogbO4qSn1Aiz9yMlzbPQ1AnLXYhXNY8zX28zBRHmCAAA8Qv8hzNMipBorivz3IFTzwpScoAF0KKTJJ7PUpKmWi0VZEcWhKAkLL+MwCAJDQogGAUvZyEBdBvVEFgtGgdRagrPAMEa5rWqIdr8DC+qRqasQiDYFp0FGcZClBUMtF0JBFMatwoDAcwkGkShZQfW9ViQygthYAQDiOfFM1vabZOGzZKQ7OAJqobQAC8kHweZyDWWxtA2Z6DIivQrvez72p0P6AfIRpmjIDzsP0t8gA";
+
+    // Navigate to shared URL with no saved sellers (fresh state)
+    await page.goto(SHARED_INVOICE_URL, { waitUntil: "commit" });
+
+    const sellerSection = page.getByTestId("seller-information-section");
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    // Verify the banner is visible
+    const sharedSellerBanner = sellerSection.getByTestId(
+      "shared-seller-info-banner",
+    );
+    await expect(sharedSellerBanner).toBeVisible();
+    await expect(sharedSellerBanner).toContainText(
+      'Seller "John Doe" is from a shared invoice and isn\'t saved locally.',
+    );
+
+    // Verify the dropdown is hidden (no saved sellers)
+    await expect(
+      sellerSection.getByRole("combobox", { name: "Select Seller" }),
+    ).toBeHidden();
+
+    // Click "Save Seller" on the banner
+    await sharedSellerBanner
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    // Verify the dialog opens with "Add New Seller" title and prefilled data
+    const saveSellerDialog = page.getByRole("dialog", {
+      name: "Add New Seller",
+    });
+    await expect(saveSellerDialog).toBeVisible();
+    await expect(
+      saveSellerDialog.getByRole("textbox", { name: "Name (Required)" }),
+    ).toHaveValue("John Doe");
+    await expect(
+      saveSellerDialog.getByRole("textbox", { name: "Address (Required)" }),
+    ).toHaveValue("London, UK");
+
+    // Save the prefilled seller
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    // Verify success toast (first entry = always applied)
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // Verify the banner disappears
+    await expect(sharedSellerBanner).toBeHidden();
+
+    // Verify the dropdown is now visible and shows "John Doe" as selected
+    const sellerDropdown = sellerSection.getByRole("combobox", {
+      name: "Select Seller",
+    });
+    await expect(sellerDropdown).toBeVisible();
+    await expect(sellerDropdown).toContainText("John Doe");
+    await expect(sellerDropdown).not.toHaveValue("");
+
+    // Reload the page to simulate persistence or refresh
+    await page.reload();
+
+    // Verify the dropdown is still visible and shows "John Doe" as selected
+    const sellerDropdownAfterReload = sellerSection.getByRole("combobox", {
+      name: "Select Seller",
+    });
+    await expect(sellerDropdownAfterReload).toBeVisible();
+    await expect(sellerDropdownAfterReload).toContainText("John Doe");
+
+    await expect(sellerDropdownAfterReload).not.toHaveValue("");
+    await expect(sellerDropdownAfterReload).toHaveAttribute(
+      "title",
+      "John Doe",
+    );
+  });
+
+  test("duplicate seller name validation", async ({ page }) => {
+    const sellerSection = page.getByTestId("seller-information-section");
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    // Add first seller
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Duplicate Test Seller");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("1 Duplicate Street");
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // Try to add another seller with the same name
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Duplicate Test Seller");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("2 Different Street");
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    // Verify error toast appears
+    await expect(
+      manageSellerDialog.getByText("A seller with this name already exists", {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    // Verify the dialog remains open (not dismissed)
+    await expect(manageSellerDialog).toBeVisible();
+
+    // Verify inline form validation error on name field
+    await expect(
+      manageSellerDialog.getByText("A seller with this name already exists", {
+        exact: true,
+      }),
+    ).toBeVisible();
+  });
+
   test("first seller is always applied to invoice (switch hidden)", async ({
     page,
   }) => {

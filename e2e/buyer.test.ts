@@ -359,6 +359,374 @@ test.describe("Buyer management", () => {
     ).toBeHidden();
   });
 
+  test("shared invoice with *UNMATCHED* buyer shows banner and allows changing via select", async ({
+    page,
+  }) => {
+    const SHARED_URL_BUYER_NAME = "Acme Co";
+
+    const SHARED_INVOICE_URL =
+      "/?data=N4IgNghgdg5grhGBTEAuEAHMIA0IAmEALkgGID2ATgLbFogCyTDABACI4sCaPXuIAYziVKSKAICe9AKoBlNvxLUsxFOgDORSgEsMKPGHIxy9ftqgA3ctoFIAcnGoAjJJQDyTgFZIBRNKEgXbHRSCABrImEIFihKdDwLCDA4NRAARgB6AAYADgBaACYsgoBWEABfPEISNwAzAEl1dRT6ItK83Ly0sqrVOtlXCxtUtpKO-IBmNLNLa1sAFQk9egAlJAtXdSQWAGEACwhKZBmrYcW9Um0kMHxGgDVtdW0nMDUtFLwtsFfKfxBtfD0NIAdgALFkAGw5UElCagiZZHogKAQaipABS5D2UHY5H0IAg+Hwoia9AAMuQoPhKZxpABpfiJIh2EzoNIFOElCGM4gsy7XW7qB5PF5vSgfEBIWjaYIgTxYqAAAWlYAAdAJyNR+BABBq4FBmY4XL82RyYdy8Dq9QaHM5XPybvdHs9Xmh3khPgB3bS1IgAIRsQLNXP46m9voDAgdguFLrFEqg5BI6noyb8eETyejTpFrtQtSSW0qICccAkrj+AKBwNhoIhWRhJWBDf4KLR9AAggI0bsTJaiSSU+g7EhPdwqGFOHYuLTZB2eczWelgxaQEy+VdHULnaK3eKPZKVfQdWjlRAZerNa2k0ghyBr1nNzGd3n3cXtEohwBtUDmU62eolFtY0czjPcE1RVJZHIX1PUObY2HWa5yAwNEDVbSDs23XN4wPIgliQOoAHF5mkUw8HwvRiNIrDY13fNCwPVFyH1PxUDSS1qBYg1aJfXC8H1D96C2SghlsfhBKIXicPAg8oCQIgAAUdHE9iSiyDSMwU5ThmksDUHdBI6GHRSFz0+jDORBSOy41i0G6DSsi0ogbO4qSn1Aiz9yMlzbPQ1AnLXYhXNY8zX28zBRHmCAAA8Qv8hzNMipBorivz3IFTzwpScoAF0KKTJJ7PUpKmWi0VZEcWhKAkLL+MwCAJDQogGAUvZyEBdBvVEFgtGgdRagrPAMEa5rWqIdr8DC+qRqasQiDYFp0FGcZClBUMtF0JBFMatwoDAcwkGkShZQfW9ViQygthYAQDiOfFM1vabZOGzZKQ7OAJqobQAC8kHweZyDWWxtA2Z6DIivQrvez72p0P6AfIRpmjIDzsP0t8gA";
+
+    const buyerSection = page.getByTestId("buyer-information-section");
+    const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+
+    // Step 1: Save a local buyer (different name than the one in the shared URL)
+    await buyerSection.getByRole("button", { name: "New Buyer" }).click();
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("My Local Buyer");
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("789 Local Avenue");
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+    await expect(
+      page.getByText("Buyer added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // Step 2: Navigate to a shared invoice URL containing buyer "Acme Co"
+    await page.goto(SHARED_INVOICE_URL, { waitUntil: "commit" });
+
+    // Step 3: Verify the shared buyer info banner is visible
+    const sharedBuyerBanner = buyerSection.getByTestId(
+      "shared-buyer-info-banner",
+    );
+    await expect(sharedBuyerBanner).toBeVisible();
+    await expect(sharedBuyerBanner).toContainText(
+      `Buyer "${SHARED_URL_BUYER_NAME}" is from a shared invoice and isn't saved locally.`,
+    );
+
+    // Step 4: Verify the select dropdown is visible (because we have a saved buyer)
+    const buyerDropdown = buyerSection.getByRole("combobox", {
+      name: "Select Buyer",
+    });
+    await expect(buyerDropdown).toBeVisible();
+
+    // Step 5: Verify no buyer is pre-selected (placeholder shown)
+    await expect(buyerDropdown).toHaveValue("");
+    await expect(buyerDropdown).toContainText("— Select buyer —");
+
+    // Step 6: Select the local buyer from the dropdown
+    await buyerDropdown.selectOption({ label: "My Local Buyer" });
+
+    // Step 7: Verify the banner disappears after selecting a local buyer
+    await expect(sharedBuyerBanner).toBeHidden();
+
+    // Step 8: Verify the toast confirming the buyer was applied
+    await expect(
+      page.getByText('Buyer "My Local Buyer" applied to invoice', {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    // Verify the dropdown now shows the selected buyer
+    await expect(buyerDropdown).toContainText("My Local Buyer");
+    await expect(buyerDropdown).not.toHaveValue("");
+  });
+
+  test("shared invoice with *MATCHING* buyer auto-selects saved buyer", async ({
+    page,
+    context,
+  }) => {
+    const buyerSection = page.getByTestId("buyer-information-section");
+    const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+
+    // Step 1: Save a buyer and generate a share link
+    await buyerSection.getByRole("button", { name: "New Buyer" }).click();
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Matched Buyer Inc");
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("321 Matched Blvd");
+
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
+    await expect(
+      page.getByText("Buyer added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // Step 2: Add another buyer (so there are two buyers stored locally)
+    await buyerSection.getByRole("button", { name: "New Buyer" }).click();
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Second Buyer LLC");
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("789 Buyer Road");
+
+    const applyToInvoiceSwitch = manageBuyerDialog.getByRole("switch", {
+      name: "Apply to Current Invoice",
+    });
+    await expect(applyToInvoiceSwitch).toBeChecked();
+
+    // Uncheck "Apply to Current Invoice" so the second buyer is not auto-applied
+    await applyToInvoiceSwitch.click();
+    await expect(applyToInvoiceSwitch).not.toBeChecked();
+
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
+    await expect(
+      page.getByText("Buyer added successfully", { exact: true }),
+    ).toBeVisible();
+
+    // We also need a SELLER to generate a valid invoice link
+    const sellerSection = page.getByTestId("seller-information-section");
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Test Seller");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("1 Seller St");
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // Wait for debounce before generating the link
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    // Step 2: Generate a share link
+    await page.getByRole("button", { name: "Generate invoice link" }).click();
+    await page.waitForURL((url) => url.searchParams.has("data"));
+    const sharedUrl = page.url();
+
+    // Step 3: Open the shared URL in a new tab (same browser context = shared localStorage)
+    const newPage = await context.newPage();
+    await newPage.goto(sharedUrl);
+
+    // Step 4: Verify NO shared buyer info banner is shown
+    const newBuyerSection = newPage.getByTestId("buyer-information-section");
+    await expect(
+      newBuyerSection.getByTestId("shared-buyer-info-banner"),
+    ).toBeHidden();
+
+    // Step 5: Verify the buyer dropdown is visible and has the matching buyer selected
+    const buyerDropdown = newBuyerSection.getByRole("combobox", {
+      name: "Select Buyer",
+    });
+    await expect(buyerDropdown).toBeVisible();
+
+    // Verify the dropdown contains both buyers
+    await expect(buyerDropdown).toContainText("Matched Buyer Inc");
+    await expect(buyerDropdown).toContainText("Second Buyer LLC");
+
+    await expect(buyerDropdown).toHaveAttribute("title", "Matched Buyer Inc");
+    await expect(buyerDropdown).not.toHaveValue("");
+  });
+
+  test("switch between multiple saved buyers", async ({ page }) => {
+    const buyerSection = page.getByTestId("buyer-information-section");
+    const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+
+    // Add first buyer (auto-applied as first entry)
+    await buyerSection.getByRole("button", { name: "New Buyer" }).click();
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Buyer A");
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("1 Alpha Avenue");
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+    await expect(
+      page.getByText("Buyer added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    const buyerDropdown = buyerSection.getByRole("combobox", {
+      name: "Select Buyer",
+    });
+    await expect(buyerDropdown).toContainText("Buyer A");
+
+    // Add second buyer with "Apply to Current Invoice" checked (default)
+    await buyerSection.getByRole("button", { name: "New Buyer" }).click();
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Buyer B");
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("2 Beta Avenue");
+
+    await expect(
+      manageBuyerDialog.getByRole("switch", {
+        name: "Apply to Current Invoice",
+      }),
+    ).toBeChecked();
+
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+    await expect(
+      page.getByText("Buyer added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // Dropdown should now show Buyer B
+    await expect(buyerDropdown).toContainText("Buyer B");
+
+    // Switch back to Buyer A via the dropdown
+    await buyerDropdown.selectOption({ label: "Buyer A" });
+
+    await expect(
+      page.getByText('Buyer "Buyer A" applied to invoice', { exact: true }),
+    ).toBeVisible();
+    await expect(buyerDropdown).toContainText("Buyer A");
+    await expect(buyerDropdown).toHaveAttribute("title", "Buyer A");
+
+    // Switch back to Buyer B
+    await buyerDropdown.selectOption({ label: "Buyer B" });
+
+    await expect(
+      page.getByText('Buyer "Buyer B" applied to invoice', { exact: true }),
+    ).toBeVisible();
+    await expect(buyerDropdown).toContainText("Buyer B");
+
+    await expect(buyerDropdown).toHaveAttribute("title", "Buyer B");
+
+    // Wait for debounce before reloading the page
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(600);
+
+    // Reload the page to simulate persistence or refresh
+    await page.reload();
+
+    // Locate the buyer dropdown again after reload
+    const buyerSectionAfterReload = page.getByTestId(
+      "buyer-information-section",
+    );
+    const buyerDropdownAfterReload = buyerSectionAfterReload.getByRole(
+      "combobox",
+      {
+        name: "Select Buyer",
+      },
+    );
+
+    // Verify dropdown still contains both buyers after reload
+    await expect(buyerDropdownAfterReload).toContainText("Buyer A");
+    await expect(buyerDropdownAfterReload).toContainText("Buyer B");
+    await expect(buyerDropdownAfterReload).toHaveAttribute("title", "Buyer B");
+  });
+
+  test("save shared buyer from banner", async ({ page }) => {
+    const SHARED_INVOICE_URL =
+      "/?data=N4IgNghgdg5grhGBTEAuEAHMIA0IAmEALkgGID2ATgLbFogCyTDABACI4sCaPXuIAYziVKSKAICe9AKoBlNvxLUsxFOgDORSgEsMKPGHIxy9ftqgA3ctoFIAcnGoAjJJQDyTgFZIBRNKEgXbHRSCABrImEIFihKdDwLCDA4NRAARgB6AAYADgBaACYsgoBWEABfPEISNwAzAEl1dRT6ItK83Ly0sqrVOtlXCxtUtpKO-IBmNLNLa1sAFQk9egAlJAtXdSQWAGEACwhKZBmrYcW9Um0kMHxGgDVtdW0nMDUtFLwtsFfKfxBtfD0NIAdgALFkAGw5UElCagiZZHogKAQaipABS5D2UHY5H0IAg+Hwoia9AAMuQoPhKZxpABpfiJIh2EzoNIFOElCGM4gsy7XW7qB5PF5vSgfEBIWjaYIgTxYqAAAWlYAAdAJyNR+BABBq4FBmY4XL82RyYdy8Dq9QaHM5XPybvdHs9Xmh3khPgB3bS1IgAIRsQLNXP46m9voDAgdguFLrFEqg5BI6noyb8eETyejTpFrtQtSSW0qICccAkrj+AKBwNhoIhWRhJWBDf4KLR9AAggI0bsTJaiSSU+g7EhPdwqGFOHYuLTZB2eczWelgxaQEy+VdHULnaK3eKPZKVfQdWjlRAZerNa2k0ghyBr1nNzGd3n3cXtEohwBtUDmU62eolFtY0czjPcE1RVJZHIX1PUObY2HWa5yAwNEDVbSDs23XN4wPIgliQOoAHF5mkUw8HwvRiNIrDY13fNCwPVFyH1PxUDSS1qBYg1aJfXC8H1D96C2SghlsfhBKIXicPAg8oCQIgAAUdHE9iSiyDSMwU5ThmksDUHdBI6GHRSFz0+jDORBSOy41i0G6DSsi0ogbO4qSn1Aiz9yMlzbPQ1AnLXYhXNY8zX28zBRHmCAAA8Qv8hzNMipBorivz3IFTzwpScoAF0KKTJJ7PUpKmWi0VZEcWhKAkLL+MwCAJDQogGAUvZyEBdBvVEFgtGgdRagrPAMEa5rWqIdr8DC+qRqasQiDYFp0FGcZClBUMtF0JBFMatwoDAcwkGkShZQfW9ViQygthYAQDiOfFM1vabZOGzZKQ7OAJqobQAC8kHweZyDWWxtA2Z6DIivQrvez72p0P6AfIRpmjIDzsP0t8gA";
+
+    // Navigate to shared URL with no saved buyers (fresh state)
+    await page.goto(SHARED_INVOICE_URL, { waitUntil: "commit" });
+
+    const buyerSection = page.getByTestId("buyer-information-section");
+    const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+
+    // Verify the banner is visible
+    const sharedBuyerBanner = buyerSection.getByTestId(
+      "shared-buyer-info-banner",
+    );
+    await expect(sharedBuyerBanner).toBeVisible();
+    await expect(sharedBuyerBanner).toContainText(
+      'Buyer "Acme Co" is from a shared invoice and isn\'t saved locally.',
+    );
+
+    // Verify the dropdown is hidden (no saved buyers)
+    await expect(
+      buyerSection.getByRole("combobox", { name: "Select Buyer" }),
+    ).toBeHidden();
+
+    // Click "Save Buyer" on the banner
+    await sharedBuyerBanner.getByRole("button", { name: "Save Buyer" }).click();
+
+    // Verify the dialog opens with "Add New Buyer" title and prefilled data
+    const saveBuyerDialog = page.getByRole("dialog", {
+      name: "Add New Buyer",
+    });
+    await expect(saveBuyerDialog).toBeVisible();
+    await expect(
+      saveBuyerDialog.getByRole("textbox", { name: "Name (Required)" }),
+    ).toHaveValue("Acme Co");
+    await expect(
+      saveBuyerDialog.getByRole("textbox", { name: "Address (Required)" }),
+    ).toHaveValue("New York, NY, USA");
+
+    // Save the prefilled buyer
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
+    // Verify success toast (first entry = always applied)
+    await expect(
+      page.getByText("Buyer added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // Verify the banner disappears
+    await expect(sharedBuyerBanner).toBeHidden();
+
+    // Verify the dropdown is now visible and shows "Acme Co" as selected
+    const buyerDropdown = buyerSection.getByRole("combobox", {
+      name: "Select Buyer",
+    });
+    await expect(buyerDropdown).toBeVisible();
+    await expect(buyerDropdown).toContainText("Acme Co");
+    await expect(buyerDropdown).not.toHaveValue("");
+
+    // Reload the page to simulate persistence or refresh
+    await page.reload();
+
+    // Verify the dropdown is still visible and shows "Acme Co" as selected
+    const buyerDropdownAfterReload = buyerSection.getByRole("combobox", {
+      name: "Select Buyer",
+    });
+    await expect(buyerDropdownAfterReload).toBeVisible();
+    await expect(buyerDropdownAfterReload).toContainText("Acme Co");
+    await expect(buyerDropdownAfterReload).not.toHaveValue("");
+    await expect(buyerDropdownAfterReload).toHaveAttribute("title", "Acme Co");
+  });
+
+  test("duplicate buyer name validation", async ({ page }) => {
+    const buyerSection = page.getByTestId("buyer-information-section");
+    const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+
+    // Add first buyer
+    await buyerSection.getByRole("button", { name: "New Buyer" }).click();
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Duplicate Test Buyer");
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("1 Duplicate Avenue");
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+    await expect(
+      page.getByText("Buyer added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // Try to add another buyer with the same name
+    await buyerSection.getByRole("button", { name: "New Buyer" }).click();
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Duplicate Test Buyer");
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("2 Different Avenue");
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
+    // Verify error toast appears
+    await expect(
+      manageBuyerDialog.getByText("A buyer with this name already exists", {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    // Verify the dialog remains open (not dismissed)
+    await expect(manageBuyerDialog).toBeVisible();
+
+    // Verify inline form validation error on name field
+    await expect(
+      manageBuyerDialog.getByText("A buyer with this name already exists", {
+        exact: true,
+      }),
+    ).toBeVisible();
+  });
+
   test("first buyer is always applied to invoice (switch hidden)", async ({
     page,
   }) => {

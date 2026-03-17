@@ -1,4 +1,4 @@
-import type { BuyerData, SellerData } from "@/app/schema";
+import { type BuyerData, type SellerData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
 
 const TEST_SELLER_DATA = {
@@ -65,20 +65,26 @@ test.describe("Generate Invoice Link", () => {
       .getByRole("textbox", { name: "Notes", exact: true })
       .fill("Test note for sharing");
 
-    // Fill in seller information
+    /*
+     * FILL IN SELLER INFORMATION VIA DIALOG
+     */
     const sellerSection = page.getByTestId("seller-information-section");
-    await sellerSection
-      .getByRole("textbox", { name: "Name" })
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
       .fill(TEST_SELLER_DATA.name);
-    await sellerSection
-      .getByRole("textbox", { name: "Address" })
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
       .fill(TEST_SELLER_DATA.address);
-    await sellerSection
+    await manageSellerDialog
       .getByRole("textbox", { name: "Email" })
       .fill(TEST_SELLER_DATA.email);
 
     // fill in seller tax number
-    const sellerVatNumberFieldset = sellerSection.getByRole("group", {
+    const sellerVatNumberFieldset = manageSellerDialog.getByRole("group", {
       name: "Seller Tax Number",
     });
 
@@ -90,20 +96,30 @@ test.describe("Generate Invoice Link", () => {
       .getByRole("textbox", { name: "Value" })
       .fill(TEST_SELLER_DATA.vatNo);
 
-    // Fill in buyer information
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+    await expect(manageSellerDialog).toBeHidden();
+
+    /*
+     * FILL IN BUYER INFORMATION VIA DIALOG
+     */
     const buyerSection = page.getByTestId("buyer-information-section");
-    await buyerSection
-      .getByRole("textbox", { name: "Name" })
+    const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+
+    await buyerSection.getByRole("button", { name: "New Buyer" }).click();
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
       .fill(TEST_BUYER_DATA.name);
-    await buyerSection
-      .getByRole("textbox", { name: "Address" })
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
       .fill(TEST_BUYER_DATA.address);
-    await buyerSection
+    await manageBuyerDialog
       .getByRole("textbox", { name: "Email" })
       .fill(TEST_BUYER_DATA.email);
 
     // fill in buyer tax number
-    const buyerVatNumberFieldset = buyerSection.getByRole("group", {
+    const buyerVatNumberFieldset = manageBuyerDialog.getByRole("group", {
       name: "Buyer Tax Number",
     });
 
@@ -115,7 +131,12 @@ test.describe("Generate Invoice Link", () => {
       .getByRole("textbox", { name: "Value" })
       .fill(TEST_BUYER_DATA.vatNo);
 
-    // Fill in an invoice item
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+    await expect(manageBuyerDialog).toBeHidden();
+
+    /*
+     * FILL IN INVOICE ITEMS
+     */
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
     await invoiceItemsSection
@@ -181,7 +202,7 @@ test.describe("Generate Invoice Link", () => {
     const sharedUrl = page.url();
     expect(sharedUrl).toContain("?template=default&data=");
 
-    // Open URL in new tab
+    /* OPEN URL IN NEW TAB */
     const newPage = await context.newPage();
     await newPage.goto(sharedUrl);
 
@@ -205,61 +226,96 @@ test.describe("Generate Invoice Link", () => {
       newPageFinalSection.getByRole("textbox", { name: "Notes", exact: true }),
     ).toHaveValue("Test note for sharing");
 
-    // Verify seller information
+    /* VERIFY SELLER INFORMATION */
     const newSellerSection = newPage.getByTestId("seller-information-section");
+    const newSellerDropdown = newSellerSection.getByRole("combobox", {
+      name: "Select Seller",
+    });
+    await expect(newSellerDropdown).toContainText(TEST_SELLER_DATA.name);
+
+    /**
+     * OPEN THE SELLER "ADD/EDIT" DIALOG AND VERIFY THE SELLER INFORMATION IS PRE-FILLED
+     */
+
+    // Click the "Edit" (pencil) button for the current seller
+    await newSellerSection.getByRole("button", { name: "Edit seller" }).click();
+
+    const sellerDialogOnNewPage = newPage.getByTestId(`manage-seller-dialog`);
+    await expect(sellerDialogOnNewPage).toBeVisible();
 
     await expect(
-      newSellerSection.getByRole("textbox", { name: "Name" }),
+      sellerDialogOnNewPage.getByText("Edit the seller details"),
+    ).toBeVisible();
+
+    // Check if the seller form fields are pre-filled with correct data
+    await expect(
+      sellerDialogOnNewPage.getByRole("textbox", { name: "Name (Required)" }),
     ).toHaveValue(TEST_SELLER_DATA.name);
 
     await expect(
-      newSellerSection.getByRole("textbox", { name: "Address" }),
+      sellerDialogOnNewPage.getByRole("textbox", {
+        name: "Address (Required)",
+      }),
     ).toHaveValue(TEST_SELLER_DATA.address);
 
     await expect(
-      newSellerSection.getByRole("textbox", { name: "Email" }),
+      sellerDialogOnNewPage.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(TEST_SELLER_DATA.email);
 
-    // Verify seller tax number
-    const newSellerVatNumberFieldset = newSellerSection.getByRole("group", {
+    // Verify seller tax number info in the dialog
+    const sellerDialogVatFieldset = sellerDialogOnNewPage.getByRole("group", {
       name: "Seller Tax Number",
     });
-
     await expect(
-      newSellerVatNumberFieldset.getByRole("textbox", { name: "Label" }),
+      sellerDialogVatFieldset.getByRole("textbox", { name: "Label" }),
     ).toHaveValue(TEST_SELLER_DATA.vatNoLabelText);
-
     await expect(
-      newSellerVatNumberFieldset.getByRole("textbox", { name: "Value" }),
+      sellerDialogVatFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue(TEST_SELLER_DATA.vatNo);
 
-    // Verify buyer information
+    // Click the "Cancel" button to close the seller dialog
+    await sellerDialogOnNewPage.getByRole("button", { name: "Cancel" }).click();
+
+    /* VERIFY BUYER INFORMATION */
     const newBuyerSection = newPage.getByTestId("buyer-information-section");
+    const newBuyerDropdown = newBuyerSection.getByRole("combobox", {
+      name: "Select Buyer",
+    });
+    await expect(newBuyerDropdown).toContainText(TEST_BUYER_DATA.name);
+
+    /* OPEN THE BUYER "ADD/EDIT" DIALOG AND VERIFY THE BUYER INFORMATION IS PRE-FILLED */
+    await newBuyerSection.getByRole("button", { name: "Edit buyer" }).click();
+
+    const buyerDialogOnNewPage = newPage.getByTestId(`manage-buyer-dialog`);
+
+    await expect(buyerDialogOnNewPage).toBeVisible();
+    await expect(buyerDialogOnNewPage).toContainText("Edit the buyer details");
 
     await expect(
-      newBuyerSection.getByRole("textbox", { name: "Name" }),
+      buyerDialogOnNewPage.getByRole("textbox", { name: "Name (Required)" }),
     ).toHaveValue(TEST_BUYER_DATA.name);
 
     await expect(
-      newBuyerSection.getByRole("textbox", { name: "Address" }),
+      buyerDialogOnNewPage.getByRole("textbox", { name: "Address (Required)" }),
     ).toHaveValue(TEST_BUYER_DATA.address);
 
     await expect(
-      newBuyerSection.getByRole("textbox", { name: "Email" }),
+      buyerDialogOnNewPage.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(TEST_BUYER_DATA.email);
 
-    // Verify buyer tax number
-    const newBuyerVatNumberFieldset = newBuyerSection.getByRole("group", {
+    // Verify buyer tax number info in the dialog
+    const buyerDialogVatFieldset = buyerDialogOnNewPage.getByRole("group", {
       name: "Buyer Tax Number",
     });
-
     await expect(
-      newBuyerVatNumberFieldset.getByRole("textbox", { name: "Label" }),
+      buyerDialogVatFieldset.getByRole("textbox", { name: "Label" }),
     ).toHaveValue(TEST_BUYER_DATA.vatNoLabelText);
-
     await expect(
-      newBuyerVatNumberFieldset.getByRole("textbox", { name: "Value" }),
+      buyerDialogVatFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue(TEST_BUYER_DATA.vatNo);
+
+    // Click the "Cancel" button to close the buyer dialog
+    await buyerDialogOnNewPage.getByRole("button", { name: "Cancel" }).click();
 
     // Verify invoice item
     const newInvoiceItemsSection = newPage.getByTestId("invoice-items-section");
@@ -487,17 +543,201 @@ test.describe("Generate Invoice Link", () => {
       invoiceNumberFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue("1/08-2025");
 
-    // Verify seller information is loaded
+    /* VERIFY SELLER INFORMATION */
     const sellerSection = page.getByTestId("seller-information-section");
-    const sellerNameField = sellerSection.getByRole("textbox", {
-      name: "Name",
-    });
-    await expect(sellerNameField).toHaveValue("John Doe");
+    const sharedSellerBanner = sellerSection.getByTestId(
+      "shared-seller-info-banner",
+    );
 
-    // Verify buyer information is loaded
+    await expect(sharedSellerBanner).toBeVisible();
+
+    await expect(sharedSellerBanner).toContainText(
+      'Seller "John Doe" is from a shared invoice and isn\'t saved locally.',
+    );
+
+    // Check that the "Save Seller" button is visible under the shared seller info banner
+    const saveSellerButton = sharedSellerBanner.getByRole("button", {
+      name: "Save Seller",
+    });
+    await expect(saveSellerButton).toBeVisible();
+
+    // Click the "Save Seller" button to open the save seller dialog
+    await saveSellerButton.click();
+
+    /**
+     * SELLER INFORMATION VERIFICATION START
+     *
+     * VERIFY SELLER FORM FIELDS ARE PRE-FILLED WITH CORRECT DATA FROM THE SHARED INVOICE
+     *
+     */
+
+    // Wait for the dialog to appear
+    const saveSellerDialog = page.getByRole("dialog", {
+      name: "Add New Seller",
+    });
+    await expect(saveSellerDialog).toBeVisible();
+
+    // Check that the seller form fields are pre-filled with correct data from the shared invoice
+    await expect(
+      saveSellerDialog.getByRole("textbox", { name: "Name (Required)" }),
+    ).toHaveValue("John Doe");
+
+    await expect(
+      saveSellerDialog.getByRole("textbox", {
+        name: "Address (Required)",
+      }),
+    ).toHaveValue("London, UK");
+
+    // Check that the email input is pre-filled with the correct data from the shared invoice
+    await expect(
+      saveSellerDialog.getByRole("textbox", { name: "Email" }),
+    ).toHaveValue("john@mail.com");
+
+    const emailSwitch = saveSellerDialog.getByRole("switch", {
+      name: "Show the 'Email' field in the PDF",
+    });
+    await expect(emailSwitch).toBeChecked();
+
+    // Check that the seller tax number info is pre-filled with the correct data from the shared invoice
+    const saveSellerDialogVatFieldset = saveSellerDialog.getByRole("group", {
+      name: "Seller Tax Number",
+    });
+
+    const vatNoSwitch = saveSellerDialogVatFieldset.getByRole("switch", {
+      name: "Show the 'Tax Number' field in the PDF",
+    });
+    await expect(vatNoSwitch).toBeChecked();
+
+    await expect(
+      saveSellerDialogVatFieldset.getByRole("textbox", { name: "Label" }),
+    ).toHaveValue("VAT no");
+
+    await expect(
+      saveSellerDialogVatFieldset.getByRole("textbox", { name: "Value" }),
+    ).toHaveValue("123456");
+
+    // Account number field
+    await expect(
+      saveSellerDialog.getByRole("textbox", {
+        name: "Account Number",
+      }),
+    ).toHaveValue("123456");
+
+    const accountNumberSwitch = saveSellerDialog.getByRole("switch", {
+      name: "Show the 'Account Number' field in the PDF",
+    });
+    await expect(accountNumberSwitch).toBeChecked();
+
+    // Swift BIC field
+    await expect(
+      saveSellerDialog.getByRole("textbox", {
+        name: "SWIFT/BIC",
+      }),
+    ).toHaveValue("123456");
+    const swiftBicSwitch = saveSellerDialog.getByRole("switch", {
+      name: "Show the 'SWIFT/BIC' field in the PDF",
+    });
+    await expect(swiftBicSwitch).toBeChecked();
+
+    // Notes field
+    await expect(
+      saveSellerDialog.getByRole("textbox", {
+        name: "Notes",
+      }),
+    ).toHaveValue("test");
+
+    const notesSwitch = saveSellerDialog.getByRole("switch", {
+      name: "Show the 'Notes' field in the PDF",
+    });
+
+    // field is not checked by default
+    await expect(notesSwitch).not.toBeChecked();
+
+    // close the dialog
+    await saveSellerDialog.getByRole("button", { name: "Cancel" }).click();
+
+    /** SELLER INFORMATION VERIFICATION END */
+
+    /* VERIFY BUYER INFORMATION START */
     const buyerSection = page.getByTestId("buyer-information-section");
-    const buyerNameField = buyerSection.getByRole("textbox", { name: "Name" });
-    await expect(buyerNameField).toHaveValue("Acme Co");
+    const sharedBuyerBanner = buyerSection.getByTestId(
+      "shared-buyer-info-banner",
+    );
+
+    await expect(sharedBuyerBanner).toBeVisible();
+
+    await expect(sharedBuyerBanner).toContainText(
+      'Buyer "Acme Co" is from a shared invoice and isn\'t saved locally.',
+    );
+
+    // Check that the "Save Buyer" button is visible under the shared buyer info banner
+    const saveBuyerButton = sharedBuyerBanner.getByRole("button", {
+      name: "Save Buyer",
+    });
+    await expect(saveBuyerButton).toBeVisible();
+    await expect(saveBuyerButton).toBeEnabled();
+
+    // Click the "Save Buyer" button to open the save buyer dialog
+    await saveBuyerButton.click();
+
+    /**
+     * BUYER INFORMATION VERIFICATION START
+     *
+     * VERIFY BUYER FORM FIELDS ARE PRE-FILLED WITH CORRECT DATA FROM THE SHARED INVOICE
+     *
+     */
+
+    // Wait for the dialog to appear
+    const saveBuyerDialog = page.getByRole("dialog", {
+      name: "Add New Buyer",
+    });
+    await expect(saveBuyerDialog).toBeVisible();
+
+    // Check that the buyer form fields are pre-filled with correct data from the shared invoice
+    await expect(
+      saveBuyerDialog.getByRole("textbox", { name: "Name (Required)" }),
+    ).toHaveValue("Acme Co");
+
+    await expect(
+      saveBuyerDialog.getByRole("textbox", { name: "Address (Required)" }),
+    ).toHaveValue("New York, NY, USA");
+
+    const buyerVatNumberFieldset = saveBuyerDialog.getByRole("group", {
+      name: "Buyer Tax Number",
+    });
+
+    await expect(
+      buyerVatNumberFieldset.getByRole("textbox", { name: "Label" }),
+    ).toHaveValue("VAT no");
+
+    await expect(
+      buyerVatNumberFieldset.getByRole("textbox", { name: "Value" }),
+    ).toHaveValue("123456");
+
+    // Email field
+    await expect(
+      saveBuyerDialog.getByRole("textbox", { name: "Email" }),
+    ).toHaveValue("acme@mail.com");
+
+    const buyerEmailSwitch = saveBuyerDialog.getByRole("switch", {
+      name: "Show the 'Email' field in the PDF",
+    });
+    await expect(buyerEmailSwitch).toBeChecked();
+
+    // Notes field
+    await expect(
+      saveBuyerDialog.getByRole("textbox", { name: "Notes" }),
+    ).toHaveValue("");
+
+    const buyerNotesSwitch = saveBuyerDialog.getByRole("switch", {
+      name: "Show the 'Notes' field in the PDF",
+    });
+    await expect(buyerNotesSwitch).toBeChecked();
+
+    // close the dialog
+    await saveBuyerDialog.getByRole("button", { name: "Cancel" }).click();
+
+    /** BUYER INFORMATION VERIFICATION END */
 
     // Verify invoice items are loaded
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
@@ -513,7 +753,7 @@ test.describe("Generate Invoice Link", () => {
     const newCompressedUrl =
       "/?template=stripe&data=N4IghiBcIA4DYgDQgEZRAWSxgBAEURwE0SikQBjdAVQGU9yATdAZwBcAnASxgFNz+0cgDMooAB7oAYmADWbAK4cwOAHYdoyAJ7oAjAHoADAA4AtACZD5gKwgAvsgDm6SzdMnTu28gAWLq9buZgDMuuRc6ABKvABuvBwsvDgAwj5gHI78yABWUJwKvMiyYiAAXnoA7AAshgBsxlXWwVXBht4gAILoAFIA9j6q+L1ZIABC6AAyvaqM04TUANLkyXrmzda15AyQ+YUgAKLo2f2qAAIAtmBccAB0FL3n5FKr65vIAOJ5HAXIABIvjTeIAAkl8fiA2Og2Lx2OQFFBhGA4IkHCAEJBQOVoLoKk0qrVDI1rBVCeQutAOhRzklkr1yONoAA5XgAd2IvQ4skIjKI81oXWQK2xa0BWzBe0O0DAVN4Fyut3uj2QkKEyHhO2+vFRj0gAG1QIZxchukbOuhaL1hGwWekknhYrw4L0YNTVJDkEsNeCJuhyBgEUjEshGVBdMgAPKmgAKrHiMS4FBGAEVTZFQ9ZDJnkLRTQAVdCMmPIaimgBq6czhmQAHVTQANKBVkBkL17ABaFczdgAushVJ2m3TW8gYOgWVwOElOGBVCxhPFyABHU0cfxuDzmKrkFi+5VRB0JJIUNIZEbq3bIGKmlniuxAA";
 
-    await page.goto(newCompressedUrl, { waitUntil: "commit" });
+    await page.goto(newCompressedUrl);
 
     // Verify the page loads without error
     await expect(page).toHaveURL(newCompressedUrl);
@@ -550,17 +790,41 @@ test.describe("Generate Invoice Link", () => {
 
     // Verify seller information is loaded
     const newSellerSection = page.getByTestId("seller-information-section");
-    const newSellerNameField = newSellerSection.getByRole("textbox", {
-      name: "Name",
-    });
-    await expect(newSellerNameField).toHaveValue("John Doe");
+    const newSharedSellerBanner = newSellerSection.getByTestId(
+      "shared-seller-info-banner",
+    );
 
-    // Verify buyer information is loaded
-    const newBuyerSection = page.getByTestId("buyer-information-section");
-    const newBuyerNameField = newBuyerSection.getByRole("textbox", {
-      name: "Name",
+    await expect(newSharedSellerBanner).toBeVisible();
+
+    await expect(newSharedSellerBanner).toContainText(
+      'Seller "John Doe" is from a shared invoice and isn\'t saved locally.',
+    );
+
+    // Check that the "Save Seller" button is visible under the shared seller info banner
+    const newSaveSellerButton = newSharedSellerBanner.getByRole("button", {
+      name: "Save Seller",
     });
-    await expect(newBuyerNameField).toHaveValue("Acme Co");
+    await expect(newSaveSellerButton).toBeVisible();
+    await expect(newSaveSellerButton).toBeEnabled();
+
+    // // Verify buyer information is loaded
+    const newBuyerSection = page.getByTestId("buyer-information-section");
+    const newSharedBuyerBanner = newBuyerSection.getByTestId(
+      "shared-buyer-info-banner",
+    );
+
+    await expect(newSharedBuyerBanner).toBeVisible();
+
+    await expect(newSharedBuyerBanner).toContainText(
+      'Buyer "Acme Co" is from a shared invoice and isn\'t saved locally.',
+    );
+
+    // Check that the "Save Buyer" button is visible under the shared buyer info banner
+    const newSaveBuyerButton = newSharedBuyerBanner.getByRole("button", {
+      name: "Save Buyer",
+    });
+    await expect(newSaveBuyerButton).toBeVisible();
+    await expect(newSaveBuyerButton).toBeEnabled();
 
     // Verify invoice items are loaded
     const newInvoiceItemsSection = page.getByTestId("invoice-items-section");
@@ -605,17 +869,43 @@ test.describe("Generate Invoice Link", () => {
 
     await invoiceNumberValueField.fill(INVOICE_TEST_DATA.invoiceNumber);
 
-    // Fill in seller information
+    // Fill in seller information via dialog
     const sellerSection = page.getByTestId("seller-information-section");
-    await sellerSection
-      .getByRole("textbox", { name: "Name" })
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
       .fill(TEST_SELLER_DATA.name);
 
-    // Fill in buyer information
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill(TEST_SELLER_DATA.address);
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    // Wait for toast notification to appear after saving seller
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // Fill in buyer information via dialog
     const buyerSection = page.getByTestId("buyer-information-section");
-    await buyerSection
-      .getByRole("textbox", { name: "Name" })
+    const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+
+    await buyerSection.getByRole("button", { name: "New Buyer" }).click();
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
       .fill(TEST_BUYER_DATA.name);
+
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill(TEST_BUYER_DATA.address);
+
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+    await expect(manageBuyerDialog).toBeHidden();
 
     // Fill in an invoice item
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
@@ -688,15 +978,17 @@ test.describe("Generate Invoice Link", () => {
 
     // Verify seller information is loaded
     const newSellerSection = newPage.getByTestId("seller-information-section");
-    await expect(
-      newSellerSection.getByRole("textbox", { name: "Name" }),
-    ).toHaveValue(TEST_SELLER_DATA.name);
+    const newSellerDropdown = newSellerSection.getByRole("combobox", {
+      name: "Select Seller",
+    });
+    await expect(newSellerDropdown).toContainText(TEST_SELLER_DATA.name);
 
     // Verify buyer information is loaded
     const newBuyerSection = newPage.getByTestId("buyer-information-section");
-    await expect(
-      newBuyerSection.getByRole("textbox", { name: "Name" }),
-    ).toHaveValue(TEST_BUYER_DATA.name);
+    const newBuyerDropdown = newBuyerSection.getByRole("combobox", {
+      name: "Select Buyer",
+    });
+    await expect(newBuyerDropdown).toContainText(TEST_BUYER_DATA.name);
 
     // Verify invoice item data is loaded
     const newInvoiceItemsSection = newPage.getByTestId("invoice-items-section");
@@ -750,28 +1042,32 @@ test.describe("Generate Invoice Link", () => {
       .fill("URL-LIMIT-TEST-001");
 
     /**
-     * FILL IN SELLER INFORMATION WITH LONG DATA
+     * FILL IN SELLER INFORMATION WITH LONG DATA via dialog
      */
 
     const sellerSection = page.getByTestId("seller-information-section");
-    await sellerSection
-      .getByRole("textbox", { name: "Name" })
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
       .fill(
         "Very Long Seller Company Name With Many Words To Increase Data Size For Testing URL Limits Corporation Ltd",
       );
 
-    await sellerSection
-      .getByRole("textbox", { name: "Address" })
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
       .fill(
         "123 Very Long Street Name With Apartment Number And Additional Details, Building A, Floor 5, Suite 500, Business District, Metropolitan Area, State Province, Country Name With Long Description",
       );
 
-    await sellerSection
+    await manageSellerDialog
       .getByRole("textbox", { name: "Email" })
       .fill("seller-with-very-long-email-address@example-company.com");
 
     // Fill in seller tax number
-    const sellerVatNumberFieldset = sellerSection.getByRole("group", {
+    const sellerVatNumberFieldset = manageSellerDialog.getByRole("group", {
       name: "Seller Tax Number",
     });
 
@@ -784,41 +1080,50 @@ test.describe("Generate Invoice Link", () => {
       .fill("SELLER-TAX-123456789-LONG-FORMAT");
 
     // Fill in seller account number
-    await sellerSection
+    await manageSellerDialog
       .getByRole("textbox", { name: "Account Number" })
       .fill(
         "SELLER-LONG-ACCOUNT-NUMBER-IBAN-GB12-BANK-1234-5678-9012-3456-7890-1234",
       );
 
     // Fill in seller SWIFT/BIC
-    await sellerSection
+    await manageSellerDialog
       .getByRole("textbox", { name: "SWIFT/BIC" })
       .fill(
         "SELLER-LONG-SWIFT-BIC-BANKGB12XXX-WITH-MANY-CHARACTERS-FOR-URL-LIMIT-TESTING",
       );
 
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+    await expect(manageSellerDialog).toBeHidden();
+
     /**
-     * FILL IN BUYER INFORMATION WITH LONG DATA
+     * FILL IN BUYER INFORMATION WITH LONG DATA via dialog
      */
 
     const buyerSection = page.getByTestId("buyer-information-section");
-    await buyerSection
-      .getByRole("textbox", { name: "Name" })
+    const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+
+    await buyerSection.getByRole("button", { name: "New Buyer" }).click();
+
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
       .fill(
         "Very Long Buyer Company Name With Many Words To Increase Data Size For Testing URL Limits International Inc",
       );
 
-    await buyerSection
-      .getByRole("textbox", { name: "Address" })
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
       .fill(
         "456 Another Very Long Street Name With Apartment Details, Building B, Floor 10, Suite 1000, Downtown District, Urban Metropolitan Area, State Province Region, Country Name With Extended Description",
       );
 
-    await buyerSection
+    await manageBuyerDialog
       .getByRole("textbox", { name: "Email" })
       .fill("buyer-with-very-long-email-address@example-corporation.com");
 
-    const buyerVatNumberFieldset = buyerSection.getByRole("group", {
+    const buyerVatNumberFieldset = manageBuyerDialog.getByRole("group", {
       name: "Buyer Tax Number",
     });
 
@@ -829,6 +1134,9 @@ test.describe("Generate Invoice Link", () => {
     await buyerVatNumberFieldset
       .getByRole("textbox", { name: "Value" })
       .fill("BUYER-TAX-987654321-LONG-FORMAT");
+
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+    await expect(manageBuyerDialog).toBeHidden();
 
     // Generate many invoice items with long descriptions
     const invoiceItemsSection = page.getByTestId("invoice-items-section");

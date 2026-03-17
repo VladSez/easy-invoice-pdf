@@ -1188,11 +1188,9 @@ test.describe("Invoice Generator Page", () => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-01T00:00:00Z"));
 
-    // Navigate to the page
     await page.goto("/?template=default");
     await expect(page).toHaveURL("/?template=default");
 
-    // Get the general information section
     const generalInfoSection = page.getByRole("region", {
       name: "General Information",
     });
@@ -1201,7 +1199,7 @@ test.describe("Invoice Generator Page", () => {
     const dateOfIssueInput = generalInfoSection.getByLabel("Date of Issue");
     await dateOfIssueInput.fill("2024-01-15");
 
-    // Verify "Date of issue is not today" message appears
+    // Verify per-field "Date of issue is not today" inline helper message
     await expect(
       generalInfoSection.getByText("Date of issue is not today"),
     ).toBeVisible();
@@ -1209,16 +1207,14 @@ test.describe("Invoice Generator Page", () => {
     const dateOfIssueBtn = generalInfoSection.getByRole("button", {
       name: "Set date of issue to today (2025-12-01)",
     });
-
-    // Verify the helper button to set date to today is visible
     await expect(dateOfIssueBtn).toBeVisible();
     await expect(dateOfIssueBtn).toBeEnabled();
 
     // Set date of service to a date that's not the last day of current month
     const dateOfServiceInput = generalInfoSection.getByLabel("Date of Service");
-    await dateOfServiceInput.fill("2024-01-15");
+    await dateOfServiceInput.fill("2024-01-20");
 
-    // Verify "Date of service is not the last day of the current month" message appears
+    // Verify per-field "Date of service is not the last day of the current month" inline helper message
     await expect(
       generalInfoSection.getByText(
         "Date of service is not the last day of the current month",
@@ -1228,45 +1224,104 @@ test.describe("Invoice Generator Page", () => {
     const dateOfServiceBtn = generalInfoSection.getByRole("button", {
       name: "Set date of service to month end (2025-12-31)",
     });
-
-    // Verify the helper button to set date to month end is visible
     await expect(dateOfServiceBtn).toBeVisible();
     await expect(dateOfServiceBtn).toBeEnabled();
 
-    // Verify the "Update all dates" section appears
+    // Set invoice number to an old month to trigger stale state
+    const invoiceNumberInput = generalInfoSection.getByLabel("Value");
+    await invoiceNumberInput.fill("1/01-2024");
+
+    // Verify per-field "Invoice number does not match current month" inline helper message
     await expect(
       generalInfoSection.getByText(
-        "Some dates are out of date. Click the button below to update all dates at once:",
+        "Invoice number does not match current month",
       ),
     ).toBeVisible();
 
-    // Verify the "Update all dates" button is visible
-    const updateAllDatesButton = generalInfoSection.getByRole("button", {
-      name: "Update all dates",
+    const invoiceNumberBtn = generalInfoSection.getByRole("button", {
+      name: "Set invoice number to current month (1/12-2025)",
+    });
+    await expect(invoiceNumberBtn).toBeVisible();
+    await expect(invoiceNumberBtn).toBeEnabled();
+
+    // Set payment due to a stale date (date of issue + 1 day instead of + 14 days)
+    const paymentDueInput = page.getByLabel("Payment Due");
+    await paymentDueInput.fill("2024-01-16");
+
+    const paymentDueBtn = page.getByRole("button", {
+      name: "Set payment due date to 2024-01-29 (14 days from issue date)",
+    });
+    await expect(paymentDueBtn).toBeVisible();
+    await expect(paymentDueBtn).toBeEnabled();
+
+    // Verify the OutOfDateDatesHelper component appears with the table-based UI
+    const outOfDateHelper = page.getByTestId("out-of-date-dates-helper");
+    await expect(outOfDateHelper).toBeVisible();
+
+    // Verify the header shows the correct count of stale fields
+    await expect(
+      outOfDateHelper.getByText("4 fields are out of date"),
+    ).toBeVisible();
+
+    // Verify each stale field appears as a row in the table
+    await expect(
+      outOfDateHelper.getByText("Date of issue", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      outOfDateHelper.getByText("Date of service", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      outOfDateHelper.getByText("Invoice number", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      outOfDateHelper.getByText("Payment due", { exact: true }),
+    ).toBeVisible();
+
+    // Verify the table shows old → new values for date fields
+    await expect(outOfDateHelper.getByText("2024-01-15")).toBeVisible();
+    await expect(outOfDateHelper.getByText("2024-01-20")).toBeVisible();
+    await expect(outOfDateHelper.getByText("2025-12-01")).toBeVisible();
+    await expect(outOfDateHelper.getByText("2025-12-31")).toBeVisible();
+
+    // Verify old and new invoice number values in the table
+    await expect(outOfDateHelper.getByText("1/01-2024")).toBeVisible();
+    await expect(outOfDateHelper.getByText("1/12-2025")).toBeVisible();
+
+    // Verify old and new payment due values in the table
+    await expect(outOfDateHelper.getByText("2024-01-16")).toBeVisible();
+    await expect(outOfDateHelper.getByText("2025-12-15")).toBeVisible();
+
+    // Verify the "Update All Dates" button is visible
+    const updateAllDatesButton = outOfDateHelper.getByRole("button", {
+      name: "Update All Dates",
     });
     await expect(updateAllDatesButton).toBeVisible();
 
-    // Click the "Update all dates" button
+    // Click the "Update All Dates" button
     await updateAllDatesButton.click();
 
-    // Verify that the helper messages are no longer visible after update
+    // Verify the OutOfDateDatesHelper component disappears
+    await expect(outOfDateHelper).toBeHidden();
 
+    // Verify the success toast is visible
+    await expect(
+      page.getByText("All dates updated successfully"),
+    ).toBeVisible();
+
+    // Verify per-field inline helper messages are gone
     await expect(
       generalInfoSection.getByText("Date of issue is not today"),
     ).toBeHidden();
-    await expect(dateOfIssueInput).toHaveValue("2025-12-01");
-
     await expect(
       generalInfoSection.getByText(
         "Date of service is not the last day of the current month",
       ),
     ).toBeHidden();
-    await expect(dateOfServiceInput).toHaveValue("2025-12-31");
 
-    await expect(
-      generalInfoSection.getByText(
-        "Some dates are out of date. Click the button below to update all dates at once:",
-      ),
-    ).toBeHidden();
+    // Verify all fields were updated to correct values
+    await expect(dateOfIssueInput).toHaveValue("2025-12-01");
+    await expect(dateOfServiceInput).toHaveValue("2025-12-31");
+    await expect(invoiceNumberInput).toHaveValue("1/12-2025");
+    await expect(paymentDueInput).toHaveValue("2025-12-15");
   });
 });

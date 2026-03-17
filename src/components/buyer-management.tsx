@@ -1,4 +1,4 @@
-import { Plus, Trash2, Pencil, AlertCircleIcon } from "lucide-react";
+import { Plus, Trash2, Pencil, AlertCircleIcon, InfoIcon } from "lucide-react";
 import { useId, useState, useEffect } from "react";
 import { CustomTooltip } from "./ui/tooltip";
 import { SelectNative } from "./ui/select-native";
@@ -57,6 +57,12 @@ export function BuyerManagement({
   // State to track the buyer currently being edited (null if not editing).
   const [editingBuyer, setEditingBuyer] = useState<BuyerData | null>(null);
 
+  // Prefill data for the dialog when saving a shared-link buyer (add mode, not edit mode)
+  const [prefillData, setPrefillData] = useState<BuyerData | null>(null);
+
+  // True when the invoice contains a buyer from a shared link that isn't in localStorage
+  const [hasUnmatchedSharedBuyer, setHasUnmatchedSharedBuyer] = useState(false);
+
   const buyerSelectId = useId();
 
   const isEditMode = Boolean(editingBuyer);
@@ -69,31 +75,51 @@ export function BuyerManagement({
 
       // Validate buyers array with Zod
       const buyersSchema = z.array(buyerSchema);
-      const validationResult = buyersSchema.safeParse(parsedBuyers);
+      const buyersValidationResult = buyersSchema.safeParse(parsedBuyers);
 
-      if (!validationResult.success) {
-        console.error("Invalid buyers data:", validationResult.error);
+      if (!buyersValidationResult.success) {
+        console.error("Invalid buyers data:", buyersValidationResult.error);
         return;
       }
 
-      const selectedBuyer = validationResult.data.find((buyer: BuyerData) => {
-        return buyer?.id === invoiceData?.buyer?.id;
-      });
+      const buyers = buyersValidationResult.data;
 
-      // Populate the buyers dropdown with the valid buyers loaded from localStorage
-      setBuyersSelectOptions(validationResult.data);
+      const invoiceBuyer = invoiceData?.buyer;
 
-      // If a buyer on the invoice matches one from storage, select it.
-      // Otherwise default to the first buyer in the list, or blank if none.
+      // Match by name (we don't allow to save buyers with the same name)
+      const matchedBuyer = buyers.find((b) => b.name === invoiceBuyer?.name);
+
+      // Check if the invoice has a buyer from a shared link that isn't saved locally
+      const hasUnmatchedSharedBuyer = !matchedBuyer && invoiceBuyer?.id;
+
+      // If the invoice has a buyer from a shared link that isn't saved locally,
+      // flag it so we can show an info banner instead of silently auto-saving
+      if (hasUnmatchedSharedBuyer) {
+        setHasUnmatchedSharedBuyer(true);
+      } else {
+        setHasUnmatchedSharedBuyer(false);
+      }
+
+      // Update the buyers select options
+      setBuyersSelectOptions(buyers);
+
+      // If there is an invoice buyer with an id, but no matched buyer from localStorage,
+      // set the selected buyer to an empty string ("") to force user selection.
+      // Otherwise, select the found matched buyer's id, or fall back:
+      // - to the first buyer in the list, or
+      // - to an empty string if there are no buyers at all.
+      // eslint-disable-next-line react-you-might-not-need-an-effect/you-might-not-need-an-effect
       setSelectedBuyerId(
-        selectedBuyer?.id ?? validationResult.data[0]?.id ?? "",
+        hasUnmatchedSharedBuyer
+          ? ""
+          : (matchedBuyer?.id ?? buyers[0]?.id ?? ""),
       );
     } catch (error) {
       console.error("Failed to load buyers:", error);
 
       Sentry.captureException(error);
     }
-  }, [invoiceData?.buyer?.id, setSelectedBuyerId]);
+  }, [invoiceData?.buyer, invoiceData?.buyer?.id, setSelectedBuyerId]);
 
   // Update buyers when a new one is added
   const handleBuyerAdd = (
@@ -119,6 +145,7 @@ export function BuyerManagement({
       if (shouldApplyNewBuyerToInvoice) {
         setValue("buyer", newBuyerWithId);
         setSelectedBuyerId(newBuyerWithId?.id);
+        setHasUnmatchedSharedBuyer(false);
       }
 
       toast.success(
@@ -199,6 +226,7 @@ export function BuyerManagement({
 
       if (selectedBuyer) {
         setValue("buyer", selectedBuyer);
+        setHasUnmatchedSharedBuyer(false);
         toast.success(`Buyer "${selectedBuyer.name}" applied to invoice`, {
           id: "change_buyer_success_toast",
           richColors: true,
@@ -271,6 +299,14 @@ export function BuyerManagement({
   return (
     <>
       <div className="flex flex-col gap-2">
+        {hasUnmatchedSharedBuyer ? (
+          <UnmatchedSharedBuyerInfoBanner
+            invoiceData={invoiceData}
+            setPrefillData={setPrefillData}
+            setIsBuyerDialogOpen={setIsBuyerDialogOpen}
+          />
+        ) : null}
+
         {buyersSelectOptions.length > 0 ? (
           <div className="space-y-1">
             <div className="flex items-center gap-1">
@@ -286,6 +322,7 @@ export function BuyerManagement({
                 value={selectedBuyerId}
                 title={activeBuyer?.name}
               >
+                {!selectedBuyerId && <option value="">— Select buyer —</option>}
                 {buyersSelectOptions.map((buyer) => (
                   <option key={buyer.id} value={buyer.id}>
                     {buyer.name}
@@ -408,16 +445,16 @@ export function BuyerManagement({
       </div>
 
       <BuyerDialog
-        // we need to rerender the dialog when the editingBuyer changes
-        key={editingBuyer?.id}
+        key={(editingBuyer ?? prefillData)?.id}
         isOpen={isBuyerDialogOpen}
         onClose={() => {
           setIsBuyerDialogOpen(false);
           setEditingBuyer(null);
+          setPrefillData(null);
         }}
         handleBuyerAdd={handleBuyerAdd}
         handleBuyerEdit={handleBuyerEdit}
-        initialData={editingBuyer}
+        initialData={editingBuyer ?? prefillData}
         isEditMode={isEditMode}
         isFirstEntry={buyersSelectOptions?.length === 0}
       />
@@ -448,5 +485,55 @@ export function BuyerManagement({
         </AlertDialogContent>
       </AlertDialog>
     </>
+  );
+}
+
+/**
+ * UnmatchedSharedBuyerInfoBanner component is used to display a banner when the invoice contains a buyer from a shared link that isn't saved locally.
+ * It allows the user to save the buyer to their local storage.
+ */
+function UnmatchedSharedBuyerInfoBanner({
+  invoiceData,
+  setPrefillData,
+  setIsBuyerDialogOpen,
+}: {
+  invoiceData: InvoiceData;
+  setPrefillData: (data: BuyerData) => void;
+  setIsBuyerDialogOpen: (open: boolean) => void;
+}) {
+  return (
+    <div
+      className="space-y-3 rounded-md border border-blue-200 bg-blue-50 p-3 shadow-sm shadow-blue-200/50 duration-500 animate-in fade-in slide-in-from-bottom-2"
+      data-testid="shared-buyer-info-banner"
+    >
+      <div className="flex items-start gap-2">
+        <InfoIcon className="mt-0.5 size-3.5 shrink-0 text-blue-600" />
+        <div className="flex-1 space-y-1">
+          <p className="text-balance text-sm leading-snug text-blue-800">
+            Buyer{" "}
+            <span className="font-semibold">
+              &quot;{invoiceData.buyer.name}&quot;
+            </span>{" "}
+            is from a shared invoice and isn&apos;t saved locally.
+          </p>
+          <p className="text-xs text-blue-600">
+            Save it to reuse in future invoices.
+          </p>
+        </div>
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        className="mt-2"
+        onClick={() => {
+          toast.dismiss();
+          setPrefillData(invoiceData.buyer);
+          setIsBuyerDialogOpen(true);
+        }}
+      >
+        <Plus className="mr-1 h-3 w-3" />
+        Save Buyer
+      </Button>
+    </div>
   );
 }

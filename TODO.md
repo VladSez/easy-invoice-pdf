@@ -1,5 +1,29 @@
 TODO list
 
+- [ ] Rework Seller/Buyer Information sections:
+
+  @src/app/(app)/components/invoice-form/index.tsx:385-424 I want to rework and simplify Seller/Buyer Information sections.
+
+  1. By default (if no sellers/buyer were saved) I want to show a button "New Seller/Buyer" which opens a dialog where you can fill the form
+  2. when seller/buyer was saved, we show a native select where you can select a seller/buyer add/edit/delete
+
+  the idea is that we remove the buyer/seller from main UI and only allow to edit via dialog to save space on main UI
+
+  Use cases:
+
+  (new seller/buyer usage scenarios)
+
+  - [] I have no seller/buyer, I see a button "New Seller/Buyer" which opens a dialog where you can fill the form. I can add multiple sellers/buyers.
+  - [] I have seller/buyer saved, I see a native select where you can select a seller/buyer add/edit/delete
+
+  (shared invoice usage scenarios)
+
+  - [] I have no seller/buyer, invoice is shared with me, I see a banner saying "Seller/Buyer from shared invoice is not saved in your browser. Save it to reuse in future invoices."
+  - [] I have seller/buyer saved, invoice is shared with me, but does not have the same seller/buyer, I see a banner saying "Seller/Buyer from shared invoice is not saved in your browser. Save it to reuse in future invoices.". I'm allowed to change the seller/buyer via select because I already have a saved seller/buyer. Also select is reset to empty string ("") because there is no match.
+  - [] I have seller/buyer saved, invoice is shared with me, and has the same seller/buyer, I see a select with the saved seller/buyer option applied if there is a match.
+
+---
+
 DISCOUNTS FEATURE:
 
 - should be per item based discount, not total based discount

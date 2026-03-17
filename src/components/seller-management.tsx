@@ -1,4 +1,4 @@
-import { Plus, Trash2, Pencil, AlertCircleIcon } from "lucide-react";
+import { Plus, Trash2, Pencil, AlertCircleIcon, InfoIcon } from "lucide-react";
 
 import {
   useId,
@@ -64,6 +64,13 @@ export function SellerManagement({
   // State to track the seller currently being edited (null if not editing).
   const [editingSeller, setEditingSeller] = useState<SellerData | null>(null);
 
+  // Prefill data for the dialog when saving a shared-link seller (add mode, not edit mode)
+  const [prefillData, setPrefillData] = useState<SellerData | null>(null);
+
+  // True when the invoice contains a seller from a shared link that isn't in localStorage
+  const [hasUnmatchedSharedSeller, setHasUnmatchedSharedSeller] =
+    useState(false);
+
   const sellerSelectId = useId();
 
   const isEditMode = Boolean(editingSeller);
@@ -78,33 +85,55 @@ export function SellerManagement({
 
       // Validate sellers array with Zod
       const sellersSchema = z.array(sellerSchema);
-      const validationResult = sellersSchema.safeParse(parsedSellers);
+      const sellersValidationResult = sellersSchema.safeParse(parsedSellers);
 
-      if (!validationResult.success) {
-        console.error("Invalid sellers data:", validationResult.error);
+      console.log(
+        "[useEffect] [load sellers from localStorage] validationResult",
+        sellersValidationResult,
+      );
+
+      if (!sellersValidationResult.success) {
+        console.error("Invalid sellers data:", sellersValidationResult.error);
         return;
       }
 
-      const selectedSeller = validationResult.data.find(
-        (seller: SellerData) => {
-          return seller?.id === invoiceData?.seller?.id;
-        },
-      );
+      // at this point, there are validated sellers from localStorage
+      const sellers = sellersValidationResult.data;
 
-      // Populate the sellers dropdown with the valid sellers loaded from localStorage
-      setSellersSelectOptions(validationResult.data);
+      const invoiceSeller = invoiceData?.seller;
 
-      // If a seller on the invoice matches one from storage, select it.
-      // Otherwise default to the first seller in the list, or blank if none.
+      // Match by name (we don't allow to save sellers with the same name)
+      const matchedSeller = sellers.find((s) => s.name === invoiceSeller?.name);
+
+      // Check if the invoice has a seller from a shared link that isn't saved locally
+      const hasUnmatchedSharedSeller = !matchedSeller && invoiceSeller?.id;
+
+      // If the invoice has a seller from a shared link that isn't saved locally,
+      // flag it so we can show an info banner instead of silently auto-saving
+      if (hasUnmatchedSharedSeller) {
+        setHasUnmatchedSharedSeller(true);
+      } else {
+        setHasUnmatchedSharedSeller(false);
+      }
+
+      // Update the sellers select options
+      setSellersSelectOptions(sellers);
+
+      // Set the selected seller for the invoice. If the seller from the invoice is not matched locally
+      // (i.e., it's from a shared link and not saved), then clear the selection (""). Otherwise, select the
+      // matched seller's id, or fall back to the first seller's id in the list (if they exist).
+      // eslint-disable-next-line react-you-might-not-need-an-effect/you-might-not-need-an-effect
       setSelectedSellerId(
-        selectedSeller?.id ?? validationResult.data[0]?.id ?? "",
+        hasUnmatchedSharedSeller
+          ? ""
+          : (matchedSeller?.id ?? sellers[0]?.id ?? ""),
       );
     } catch (error) {
       console.error("Failed to load sellers:", error);
 
       Sentry.captureException(error);
     }
-  }, [invoiceData?.seller?.id, setSelectedSellerId]);
+  }, [invoiceData?.seller, invoiceData?.seller?.id, setSelectedSellerId]);
 
   // Update sellers when a new one is added
   const handleSellerAdd = (
@@ -135,6 +164,7 @@ export function SellerManagement({
       if (shouldApplyNewSellerToInvoice) {
         setValue("seller", newSellerWithId);
         setSelectedSellerId(newSellerWithId?.id);
+        setHasUnmatchedSharedSeller(false);
       }
 
       toast.success(
@@ -215,6 +245,7 @@ export function SellerManagement({
 
       if (selectedSeller) {
         setValue("seller", selectedSeller);
+        setHasUnmatchedSharedSeller(false);
         toast.success(`Seller "${selectedSeller.name}" applied to invoice`, {
           id: "change_seller_success_toast",
           richColors: true,
@@ -283,6 +314,14 @@ export function SellerManagement({
   return (
     <>
       <div className="flex flex-col gap-2">
+        {hasUnmatchedSharedSeller ? (
+          <UnmatchedSharedSellerInfoBanner
+            invoiceData={invoiceData}
+            setPrefillData={setPrefillData}
+            setIsSellerDialogOpen={setIsSellerDialogOpen}
+          />
+        ) : null}
+
         {sellersSelectOptions.length > 0 ? (
           <div className="space-y-1">
             <div className="flex items-center gap-1">
@@ -298,6 +337,9 @@ export function SellerManagement({
                 value={selectedSellerId}
                 title={activeSeller?.name}
               >
+                {!selectedSellerId && (
+                  <option value="">— Select seller —</option>
+                )}
                 {sellersSelectOptions.map((seller) => (
                   <option key={seller.id} value={seller.id}>
                     {seller.name}
@@ -421,16 +463,16 @@ export function SellerManagement({
       </div>
 
       <SellerDialog
-        // we need to rerender the dialog when the editingSeller changes
-        key={editingSeller?.id}
+        key={(editingSeller ?? prefillData)?.id}
         isOpen={isSellerDialogOpen}
         onClose={() => {
           setIsSellerDialogOpen(false);
           setEditingSeller(null);
+          setPrefillData(null);
         }}
         handleSellerAdd={handleSellerAdd}
         handleSellerEdit={handleSellerEdit}
-        initialData={editingSeller}
+        initialData={editingSeller ?? prefillData}
         isEditMode={isEditMode}
         isFirstEntry={sellersSelectOptions?.length === 0}
       />
@@ -463,5 +505,55 @@ export function SellerManagement({
         </AlertDialogContent>
       </AlertDialog>
     </>
+  );
+}
+
+/**
+ * UnmatchedSharedSellerInfoBanner component is used to display a banner when the invoice contains a seller from a shared link that isn't saved locally.
+ * It allows the user to save the seller to their local storage.
+ */
+function UnmatchedSharedSellerInfoBanner({
+  invoiceData,
+  setPrefillData,
+  setIsSellerDialogOpen,
+}: {
+  invoiceData: InvoiceData;
+  setPrefillData: (data: SellerData) => void;
+  setIsSellerDialogOpen: (open: boolean) => void;
+}) {
+  return (
+    <div
+      className="space-y-3 rounded-md border border-blue-200 bg-blue-50 p-3 shadow-sm shadow-blue-200/50 duration-500 animate-in fade-in slide-in-from-bottom-2"
+      data-testid="shared-seller-info-banner"
+    >
+      <div className="flex items-start gap-2">
+        <InfoIcon className="mt-0.5 size-3.5 shrink-0 text-blue-600" />
+        <div className="flex-1 space-y-1">
+          <p className="text-balance text-sm leading-snug text-blue-800">
+            Seller{" "}
+            <span className="font-semibold">
+              &quot;{invoiceData.seller.name}&quot;
+            </span>{" "}
+            is from a shared invoice and isn&apos;t saved locally.
+          </p>
+          <p className="text-xs text-blue-600">
+            Save it to reuse in future invoices.
+          </p>
+        </div>
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        className="mt-2"
+        onClick={() => {
+          toast.dismiss();
+          setPrefillData(invoiceData.seller);
+          setIsSellerDialogOpen(true);
+        }}
+      >
+        <Plus className="mr-1 h-3 w-3" />
+        Save Seller
+      </Button>
+    </div>
   );
 }
