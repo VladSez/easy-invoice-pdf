@@ -32,6 +32,10 @@ import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
 import { DEFAULT_SELLER_DATA } from "@/app/constants";
 
+/**
+ * localStorage key for storing the list of saved sellers.
+ * Used to persist seller data across sessions.
+ */
 export const SELLERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_SELLERS";
 
 interface SellerManagementProps {
@@ -87,11 +91,6 @@ export function SellerManagement({
       const sellersSchema = z.array(sellerSchema);
       const sellersValidationResult = sellersSchema.safeParse(parsedSellers);
 
-      console.log(
-        "[useEffect] [load sellers from localStorage] validationResult",
-        sellersValidationResult,
-      );
-
       if (!sellersValidationResult.success) {
         console.error("Invalid sellers data:", sellersValidationResult.error);
         return;
@@ -119,14 +118,17 @@ export function SellerManagement({
       // Update the sellers select options
       setSellersSelectOptions(sellers);
 
-      // Set the selected seller for the invoice. If the seller from the invoice is not matched locally
-      // (i.e., it's from a shared link and not saved), then clear the selection (""). Otherwise, select the
-      // matched seller's id, or fall back to the first seller's id in the list (if they exist).
+      // Determine which seller should be selected in the dropdown:
+      // 1. If the invoice has a shared-link seller that doesn't exist locally (hasUnmatchedSharedSeller),
+      //    set to empty string to force the user to explicitly choose or save it
+      // 2. If we found a matching seller in localStorage, select it
+      // 3. Otherwise, auto-select the first seller in the list (if any exist)
+      // 4. If no sellers exist at all, set to empty string (no selection)
       // eslint-disable-next-line react-you-might-not-need-an-effect/you-might-not-need-an-effect
       setSelectedSellerId(
         hasUnmatchedSharedSeller
-          ? ""
-          : (matchedSeller?.id ?? sellers[0]?.id ?? ""),
+          ? "" // Force user to choose another seller, save the shared seller, or add a new seller
+          : (matchedSeller?.id ?? sellers?.[0]?.id ?? ""),
       );
     } catch (error) {
       console.error("Failed to load sellers:", error);

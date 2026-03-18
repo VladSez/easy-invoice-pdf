@@ -2033,8 +2033,11 @@ test.describe("Default Invoice Template", () => {
     );
     await downloadDefault.saveAs(defaultPdfPath);
     const defaultPdfBytes = fs.readFileSync(path.resolve(defaultPdfPath));
+
     await page.goto("about:blank");
+
     await renderPdfOnCanvas(page, defaultPdfBytes);
+
     await page.waitForFunction(
       () =>
         (window as unknown as { __PDF_RENDERED__: boolean })
@@ -2042,6 +2045,391 @@ test.describe("Default Invoice Template", () => {
     );
     await expect(page.locator("canvas")).toHaveScreenshot(
       "buyer-default-after-all-deleted.png",
+    );
+  });
+
+  test("shared SELLER from shared invoice updates PDF + switching sellers updates PDF", async ({
+    page,
+    downloadDir,
+    browserName,
+  }) => {
+    /**
+     * Overview:
+     *
+     * 1. Create and save a local seller ("Existing Seller")
+     * 2. Navigate to a shared invoice URL containing a different seller ("John Doe (From Shared Invoice)")
+     * 3. Download the PDF with the shared seller
+     * 4. Switch back to the local seller using the dropdown
+     * 5. Download another PDF with the local seller
+     */
+
+    const SHARED_INVOICE_URL =
+      "/?data=N4IgjCBcIGoIIBUQBoQGYohSALFALgE4CuApqgKybYBs1qA7PSAIaYAOANtgEaYCyg-gAIAIsmEBNaZOwBjTAFUAyqOwATTAGciAS3alsh6NgBmUUAA9MAMRYBrfMUIthAO0LRUAT0xgA9AAMABwAtABMgeFUAL6oAOaYkdGhIaFgVKgAFklRFKlhaBCoupgASqQAbqSEWqTCAMJZLITxhqgAVgQk5CD2FiDhmPAI7gD22MHdZKgAXn4MDGjBFGA4DDQrdKhwmABSY1luYmP1ABQ2hGMAtsLKzYSk6sIAkm6VY7pypACU2ABCmAAMmM3OpQRJFABpbANPzhNA4CjbEBqSBEGYgACimA6hzcAAFrixdJwAHRyG7YGzwxHI7AAcWmvQAErSkSiXszUPhMPhSDpsMQoKYWJw6nEQNxIKAhtARuNJtyQPNoGAGBRETRAkiKAwddhdtA4HJrvUGhNUIDoAA5UgAdykY0I9gkNskkOUu1QcLVCI52DRGN6OOgLFNpCJJPJlOu2F5JlQwvRPUlccgAG1QIFlXtlUaQMoxqZ8PaWvVRFVSJwxuwzW5eagYSnMUDmPwRWK6qgbVAwKgAPLKgAK2hqlS%2B7RAAEVlWU%2BxRAkvUMplUhbaPUIplTAF0vAqgAOrKgAaUAPIFkLd6AC090uYgBdVBue8XibX1DsTD23SPYRECwbhaKYNTYAAjsqhC5CkaThHgqBaMwCYgBU1S1PUcgPG0QrKpUyr2syMRAA";
+
+    const sellerSection = page.getByTestId("seller-information-section");
+
+    /*
+       Step 1: Save a local seller (auto-applied as first entry)
+    */
+    await sellerSection.getByRole("button", { name: "New Seller" }).click();
+
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Existing Seller");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("100 Existing St");
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    /*
+       Step 2: Navigate to the shared invoice URL seller = "John Doe (From Shared Invoice)
+    */
+    await page.goto(SHARED_INVOICE_URL);
+
+    await expect(page).toHaveURL(`${SHARED_INVOICE_URL}&template=stripe`);
+
+    // Wait for PDF download button to appear
+    await expect(
+      page.getByRole("link", { name: "Download PDF in Polish" }),
+    ).toBeVisible();
+
+    // // eslint-disable-next-line playwright/no-wait-for-timeout
+    // await page.waitForTimeout(700);
+
+    // Step 3: Download PDF — shared seller "John Doe (From Shared Invoice)" should appear
+    const [downloadShared] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("link", { name: "Download PDF in Polish" }).click(),
+    ]);
+
+    const sharedPdfPath = path.join(
+      downloadDir,
+      `${browserName}-shared-seller-${downloadShared.suggestedFilename()}`,
+    );
+
+    await downloadShared.saveAs(sharedPdfPath);
+    const sharedPdfBytes = fs.readFileSync(path.resolve(sharedPdfPath));
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, sharedPdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "shared-seller-on-pdf.png",
+    );
+
+    // Navigate back to the shared invoice URL
+    await page.goto(SHARED_INVOICE_URL);
+
+    await expect(page).toHaveURL(`${SHARED_INVOICE_URL}&template=stripe`);
+
+    // Wait for PDF download button to appear
+    await expect(
+      page.getByRole("link", { name: "Download PDF in Polish" }),
+    ).toBeVisible();
+
+    // Step 4: Verify the shared seller info banner
+    const sharedSellerBanner = sellerSection.getByTestId(
+      "shared-seller-info-banner",
+    );
+    await expect(sharedSellerBanner).toBeVisible();
+
+    await expect(sharedSellerBanner).toContainText(
+      'Seller "John Doe (From Shared Invoice)" is from a shared invoice and isn\'t saved locally.',
+    );
+
+    // Step 5: Save the shared seller from the banner
+    await sharedSellerBanner
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    const saveSellerDialog = page.getByRole("dialog", {
+      name: "Add New Seller",
+    });
+    await expect(saveSellerDialog).toBeVisible();
+
+    await expect(
+      saveSellerDialog.getByRole("textbox", { name: "Name (Required)" }),
+    ).toHaveValue("John Doe (From Shared Invoice)");
+
+    await expect(
+      saveSellerDialog.getByRole("textbox", { name: "Address (Required)" }),
+    ).toHaveValue("London, UK");
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    /*
+       Step 6: Verify toast, banner disappears, dropdown shows "John Doe (From Shared Invoice)"
+    */
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    await expect(sharedSellerBanner).toBeHidden();
+
+    const sellerDropdown = sellerSection.getByRole("combobox", {
+      name: "Select Seller",
+    });
+
+    await expect(sellerDropdown).toBeVisible();
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      "John Doe (From Shared Invoice)",
+    );
+
+    // Step 7: Switch to "Existing Seller" via dropdown
+    await sellerDropdown.selectOption({ label: "Existing Seller" });
+
+    await expect(
+      page.getByText('Seller "Existing Seller" applied to invoice', {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      "Existing Seller",
+    );
+
+    // Step 8: Download PDF — "Existing Seller" should appear
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const [downloadExisting] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("link", { name: "Download PDF in Polish" }).click(),
+    ]);
+    const existingPdfPath = path.join(
+      downloadDir,
+      `${browserName}-existing-seller-${downloadExisting.suggestedFilename()}`,
+    );
+
+    await downloadExisting.saveAs(existingPdfPath);
+    const existingPdfBytes = fs.readFileSync(path.resolve(existingPdfPath));
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, existingPdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "shared-seller-switch-to-existing.png",
+    );
+  });
+
+  test("shared BUYER from shared invoice updates PDF + switching buyers updates PDF", async ({
+    page,
+    downloadDir,
+    browserName,
+  }) => {
+    /**
+     * Overview:
+     *
+     * 1. Create and save a local buyer ("Existing Buyer")
+     * 2. Navigate to a shared invoice URL containing a different buyer ("Buyer Co (From Shared Invoice)")
+     * 3. Download the PDF with the shared buyer
+     * 4. Switch back to the local buyer using the dropdown
+     * 5. Download another PDF with the local buyer
+     */
+
+    const SHARED_INVOICE_URL =
+      "/?data=N4IgjCBcIGoIIBUQBoQGYohSALFALgE4CuApqgKybYBs1qA7PSAIaYAOANtgEaYCyg-gAIAIsmEBNaZOwBjTAFUAyqOwATTAGciAS3alsh6NgBmUUAA9MAMRYBrfMUIthAO0LRUAT0xgA9AAMABwAtABMgeFUAL6oAOaYkdGhIaFgVKgAFklRFKlhaBCoupgASqQAbqSEWqTCAMJZLITxhqgAVgQk5CD2FiDhmPAI7gD22MHdZKgAXn4MOIE0wTgUaDhogZkgcJgAUmNZbmJj7SAAQpgAMmNu6ncSigDS2A1%2B4RsUdKhqkEQzEAAUUwHSObgAAgBbFi6TgAOjkYyh2BsHy%2BPxAAHFpr0ABLotaYgCSuNQ%2BEw%2BFIOmwxCgphYnDqcRA3EgoCG0BG40mZJA82gYAYDDQwRogRwAE5Vjgpqg9tALsRvDVGmNhAAKGyEZHCZTNQikdTCYluSpjXRyUgASmwV2gADlSAB3KRjQj2CQOyRPZR7VDvQWfInYP4A3og6AsORQ0ihLQGo2hXRmi1W6GwhFIlHk5h0-49FkoyAAbVAgT5%2Bz5CpAyjGpnwzpa9VEVVInDG7FjbgpqFeBcB12Y-HpjLqqAdUDAqAA8nyAAraGqVS3nACKfLKU4ogV3qGUfKQjsXqEUfJg293gVQAHU%2BQANKDXkCyAe9ABal93MQAuqg3F%2Bz4TG%2BqDsJgzq6IawhECwbhaKYNTYAAjnyhC5CkaThHgqBaMwFLQBU1S1PUcgGm0tJ8pUfLOriMRAA";
+
+    const buyerSection = page.getByTestId("buyer-information-section");
+
+    /*
+       Step 1: Save a local buyer (auto-applied as first entry)
+    */
+    await buyerSection.getByRole("button", { name: "New Buyer" }).click();
+
+    const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Existing Buyer");
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("200 Existing Ave");
+
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Email" })
+      .fill("existing.buyer@example.com");
+
+    // fill in seller tax number
+    const buyerVatNumberFieldset = manageBuyerDialog.getByRole("group", {
+      name: "Buyer Tax Number",
+    });
+
+    await buyerVatNumberFieldset
+      .getByRole("textbox", { name: "Label" })
+      .fill("Existing Buyer Tax Number");
+
+    await buyerVatNumberFieldset
+      .getByRole("textbox", { name: "Value" })
+      .fill("1234-EXISTING-BUYER-TAX-NUMBER");
+
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
+    await expect(
+      page.getByText("Buyer added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    /*
+       Step 2: Navigate to the shared invoice URL buyer = "Buyer Co (From Shared Invoice)"
+    */
+    await page.goto(SHARED_INVOICE_URL);
+
+    await expect(page).toHaveURL(`${SHARED_INVOICE_URL}&template=stripe`);
+
+    await expect(
+      page.getByRole("link", { name: "Download PDF in Polish" }),
+    ).toBeVisible();
+
+    // Step 3: Download PDF — shared buyer "Buyer Co (From Shared Invoice)" should appear
+    const [downloadShared] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("link", { name: "Download PDF in Polish" }).click(),
+    ]);
+
+    const sharedPdfPath = path.join(
+      downloadDir,
+      `${browserName}-shared-buyer-${downloadShared.suggestedFilename()}`,
+    );
+
+    await downloadShared.saveAs(sharedPdfPath);
+    const sharedPdfBytes = fs.readFileSync(path.resolve(sharedPdfPath));
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, sharedPdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "shared-buyer-on-pdf.png",
+    );
+
+    // Navigate back to the shared invoice URL
+    await page.goto(SHARED_INVOICE_URL);
+
+    await expect(page).toHaveURL(`${SHARED_INVOICE_URL}&template=stripe`);
+
+    await expect(
+      page.getByRole("link", { name: "Download PDF in Polish" }),
+    ).toBeVisible();
+
+    // Step 4: Verify the shared buyer info banner
+    const sharedBuyerBanner = buyerSection.getByTestId(
+      "shared-buyer-info-banner",
+    );
+    await expect(sharedBuyerBanner).toBeVisible();
+
+    await expect(sharedBuyerBanner).toContainText(
+      'Buyer "Buyer Co (From Shared Invoice)" is from a shared invoice and isn\'t saved locally.',
+    );
+
+    // Step 5: Save the shared buyer from the banner
+    await sharedBuyerBanner.getByRole("button", { name: "Save Buyer" }).click();
+
+    const saveBuyerDialog = page.getByRole("dialog", {
+      name: "Add New Buyer",
+    });
+    await expect(saveBuyerDialog).toBeVisible();
+
+    await expect(
+      saveBuyerDialog.getByRole("textbox", { name: "Name (Required)" }),
+    ).toHaveValue("Buyer Co (From Shared Invoice)");
+
+    await expect(
+      saveBuyerDialog.getByRole("textbox", { name: "Address (Required)" }),
+    ).toHaveValue("New York, NY, USA");
+
+    await expect(
+      saveBuyerDialog.getByRole("textbox", { name: "Email" }),
+    ).toHaveValue("acme-shared-invoice@mail.com");
+
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
+    /*
+       Step 6: Verify toast, banner disappears, dropdown shows "Buyer Co (From Shared Invoice)"
+    */
+    await expect(
+      page.getByText("Buyer added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    await expect(sharedBuyerBanner).toBeHidden();
+
+    const buyerDropdown = buyerSection.getByRole("combobox", {
+      name: "Select Buyer",
+    });
+
+    await expect(buyerDropdown).toBeVisible();
+    await expect(buyerDropdown.locator("option:checked")).toHaveText(
+      "Buyer Co (From Shared Invoice)",
+    );
+
+    // Step 7: Switch to "Existing Buyer" via dropdown
+    await buyerDropdown.selectOption({ label: "Existing Buyer" });
+
+    await expect(
+      page.getByText('Buyer "Existing Buyer" applied to invoice', {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    await expect(buyerDropdown.locator("option:checked")).toHaveText(
+      "Existing Buyer",
+    );
+
+    // Step 8: Download PDF — "Existing Buyer" should appear
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const [downloadExisting] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("link", { name: "Download PDF in Polish" }).click(),
+    ]);
+    const existingPdfPath = path.join(
+      downloadDir,
+      `${browserName}-existing-buyer-${downloadExisting.suggestedFilename()}`,
+    );
+
+    await downloadExisting.saveAs(existingPdfPath);
+    const existingPdfBytes = fs.readFileSync(path.resolve(existingPdfPath));
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, existingPdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "shared-buyer-switch-to-existing.png",
     );
   });
 });

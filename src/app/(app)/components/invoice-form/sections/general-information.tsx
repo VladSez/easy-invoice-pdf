@@ -874,7 +874,7 @@ function OutOfDateDatesHelper({
               </td>
 
               <td className="text-pretty px-2.5 py-1.5 pr-0">
-                <span className="bg-red-200/80 text-amber-700/90 line-through decoration-amber-700/50">
+                <span className="bg-red-100 text-amber-800/90 line-through decoration-amber-700/50">
                   {item.oldValue}
                 </span>
                 <span className="mx-1 text-amber-700">→</span>

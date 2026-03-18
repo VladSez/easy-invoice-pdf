@@ -25,6 +25,10 @@ import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
 import { DEFAULT_BUYER_DATA } from "@/app/constants";
 
+/**
+ * localStorage key for storing the list of saved buyers.
+ * Used to persist buyer data across sessions.
+ */
 export const BUYERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_BUYERS";
 
 interface BuyerManagementProps {
@@ -86,7 +90,9 @@ export function BuyerManagement({
 
       const invoiceBuyer = invoiceData?.buyer;
 
-      // Match by name (we don't allow to save buyers with the same name)
+      // Check if the invoice's buyer already exists in localStorage by matching names.
+      // We use name matching because buyer names must be unique in localStorage,
+      // and this helps us identify if a shared-link buyer is already saved locally.
       const matchedBuyer = buyers.find((b) => b.name === invoiceBuyer?.name);
 
       // Check if the invoice has a buyer from a shared link that isn't saved locally
@@ -103,16 +109,17 @@ export function BuyerManagement({
       // Update the buyers select options
       setBuyersSelectOptions(buyers);
 
-      // If there is an invoice buyer with an id, but no matched buyer from localStorage,
-      // set the selected buyer to an empty string ("") to force user selection.
-      // Otherwise, select the found matched buyer's id, or fall back:
-      // - to the first buyer in the list, or
-      // - to an empty string if there are no buyers at all.
+      // Determine which buyer should be selected in the dropdown:
+      // 1. If the invoice has a shared-link buyer that doesn't exist locally (hasUnmatchedSharedBuyer),
+      //    set to empty string to force the user to explicitly choose or save it
+      // 2. If we found a matching buyer in localStorage, select it
+      // 3. Otherwise, auto-select the first buyer in the list (if any exist)
+      // 4. If no buyers exist at all, set to empty string (no selection)
       // eslint-disable-next-line react-you-might-not-need-an-effect/you-might-not-need-an-effect
       setSelectedBuyerId(
         hasUnmatchedSharedBuyer
-          ? ""
-          : (matchedBuyer?.id ?? buyers[0]?.id ?? ""),
+          ? "" // Force user to choose another buyer, save the shared buyer, or add a new buyer
+          : (matchedBuyer?.id ?? buyers?.[0]?.id ?? ""),
       );
     } catch (error) {
       console.error("Failed to load buyers:", error);

@@ -426,15 +426,20 @@ test.describe("Seller management", () => {
     ).toBeVisible();
 
     // Step 2: Navigate to a shared invoice URL containing seller "John Doe"
-    await page.goto(SHARED_INVOICE_URL, { waitUntil: "commit" });
+    await page.goto(SHARED_INVOICE_URL);
 
     // Step 3: Verify the shared seller info banner is visible
     const sharedSellerBanner = sellerSection.getByTestId(
       "shared-seller-info-banner",
     );
+
     await expect(sharedSellerBanner).toBeVisible();
+
     await expect(sharedSellerBanner).toContainText(
       `Seller "${SHARED_URL_SELLER_NAME}" is from a shared invoice and isn't saved locally.`,
+    );
+    await expect(sharedSellerBanner).toContainText(
+      "Save it to reuse in future invoices.",
     );
 
     // Step 4: Verify the select dropdown is visible (because we have a saved seller)
@@ -444,8 +449,11 @@ test.describe("Seller management", () => {
     await expect(sellerDropdown).toBeVisible();
 
     // Step 5: Verify no seller is pre-selected (placeholder shown)
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      "— Select seller —",
+    );
+
     await expect(sellerDropdown).toHaveValue("");
-    await expect(sellerDropdown).toContainText("— Select seller —");
 
     // Step 6: Select the local seller from the dropdown
     await sellerDropdown.selectOption({ label: "My Local Seller" });
@@ -460,11 +468,17 @@ test.describe("Seller management", () => {
       }),
     ).toBeVisible();
 
-    // Verify the dropdown now shows the selected seller
-    await expect(sellerDropdown).toContainText("My Local Seller");
+    // Verify the dropdown contains only local seller, because we didn't save the seller from shared URL
+    const sellerOptions = sellerDropdown.locator("option");
 
-    await expect(sellerDropdown).not.toHaveValue("");
-    await expect(sellerDropdown).toHaveAttribute("title", "My Local Seller");
+    await expect(sellerOptions).toHaveCount(1);
+
+    await expect(sellerOptions.nth(0)).toHaveText("My Local Seller");
+
+    // Verify the dropdown now shows the selected seller
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      "My Local Seller",
+    );
   });
 
   test("shared invoice with *MATCHING* seller auto-selects saved seller", async ({
@@ -544,12 +558,16 @@ test.describe("Seller management", () => {
     await expect(sellerDropdown).toBeVisible();
 
     // Verify the dropdown contains both sellers
-    await expect(sellerDropdown).toContainText("Matched Seller Co");
-    await expect(sellerDropdown).toContainText("Second Seller LLC");
+    const sellerOptions = sellerDropdown.locator("option");
 
-    await expect(sellerDropdown).not.toHaveValue("");
+    await expect(sellerOptions).toHaveCount(2);
+    await expect(sellerOptions.nth(0)).toHaveText("Matched Seller Co");
+    await expect(sellerOptions.nth(1)).toHaveText("Second Seller LLC");
 
-    await expect(sellerDropdown).toHaveAttribute("title", "Matched Seller Co");
+    // Verify the selected seller is "Matched Seller Co"
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      "Matched Seller Co",
+    );
   });
 
   test("switch between multiple saved sellers", async ({ page }) => {
@@ -564,9 +582,11 @@ test.describe("Seller management", () => {
     await manageSellerDialog
       .getByRole("textbox", { name: "Address (Required)" })
       .fill("1 Alpha Street");
+
     await manageSellerDialog
       .getByRole("button", { name: "Save Seller" })
       .click();
+
     await expect(
       page.getByText("Seller added and applied to invoice", { exact: true }),
     ).toBeVisible();
@@ -574,8 +594,11 @@ test.describe("Seller management", () => {
     const sellerDropdown = sellerSection.getByRole("combobox", {
       name: "Select Seller",
     });
-    await expect(sellerDropdown).toContainText("Seller A");
-    await expect(sellerDropdown).toHaveAttribute("title", "Seller A");
+
+    // Verify the selected seller is "John Doe"
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      "Seller A",
+    );
 
     // Add second seller with "Apply to Current Invoice" checked (default)
     await sellerSection.getByRole("button", { name: "New Seller" }).click();
@@ -595,13 +618,23 @@ test.describe("Seller management", () => {
     await manageSellerDialog
       .getByRole("button", { name: "Save Seller" })
       .click();
+
     await expect(
       page.getByText("Seller added and applied to invoice", { exact: true }),
     ).toBeVisible();
 
     // Dropdown should now show Seller B
-    await expect(sellerDropdown).toContainText("Seller B");
-    await expect(sellerDropdown).toHaveAttribute("title", "Seller B");
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      "Seller B",
+    );
+
+    // Verify dropdown contains both sellers
+    const sellerOptionsAfterAdd = sellerDropdown.locator("option");
+
+    await expect(sellerOptionsAfterAdd).toHaveCount(2);
+
+    await expect(sellerOptionsAfterAdd.nth(0)).toHaveText("Seller A");
+    await expect(sellerOptionsAfterAdd.nth(1)).toHaveText("Seller B");
 
     // Switch back to Seller A via the dropdown
     await sellerDropdown.selectOption({ label: "Seller A" });
@@ -609,7 +642,10 @@ test.describe("Seller management", () => {
     await expect(
       page.getByText('Seller "Seller A" applied to invoice', { exact: true }),
     ).toBeVisible();
-    await expect(sellerDropdown).toContainText("Seller A");
+
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      "Seller A",
+    );
 
     // Switch back to Seller B
     await sellerDropdown.selectOption({ label: "Seller B" });
@@ -617,9 +653,10 @@ test.describe("Seller management", () => {
     await expect(
       page.getByText('Seller "Seller B" applied to invoice', { exact: true }),
     ).toBeVisible();
-    await expect(sellerDropdown).toContainText("Seller B");
 
-    await expect(sellerDropdown).toHaveAttribute("title", "Seller B");
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      "Seller B",
+    );
 
     // Wait for debounce before reloading the page
     // eslint-disable-next-line playwright/no-wait-for-timeout
@@ -633,14 +670,18 @@ test.describe("Seller management", () => {
       name: "Select Seller",
     });
     await expect(sellerDropdownAfterReload).toBeVisible();
-    await expect(sellerDropdownAfterReload).toContainText("Seller A");
-    await expect(sellerDropdownAfterReload).toContainText("Seller B");
 
-    await expect(sellerDropdownAfterReload).not.toHaveValue("");
-    await expect(sellerDropdownAfterReload).toHaveAttribute(
-      "title",
-      "Seller B",
-    );
+    const sellerOptions = sellerDropdownAfterReload.locator("option");
+
+    await expect(sellerOptions).toHaveCount(2);
+
+    await expect(sellerOptions.nth(0)).toHaveText("Seller A");
+    await expect(sellerOptions.nth(1)).toHaveText("Seller B");
+
+    // Verify the selected seller is "Seller B"
+    await expect(
+      sellerDropdownAfterReload.locator("option:checked"),
+    ).toHaveText("Seller B");
   });
 
   test("save shared seller from banner", async ({ page }) => {
@@ -702,8 +743,11 @@ test.describe("Seller management", () => {
       name: "Select Seller",
     });
     await expect(sellerDropdown).toBeVisible();
-    await expect(sellerDropdown).toContainText("John Doe");
-    await expect(sellerDropdown).not.toHaveValue("");
+
+    // Verify the selected seller is "John Doe"
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      "John Doe",
+    );
 
     // Reload the page to simulate persistence or refresh
     await page.reload();
@@ -713,13 +757,17 @@ test.describe("Seller management", () => {
       name: "Select Seller",
     });
     await expect(sellerDropdownAfterReload).toBeVisible();
-    await expect(sellerDropdownAfterReload).toContainText("John Doe");
 
-    await expect(sellerDropdownAfterReload).not.toHaveValue("");
-    await expect(sellerDropdownAfterReload).toHaveAttribute(
-      "title",
-      "John Doe",
-    );
+    const sellerOptions = sellerDropdownAfterReload.locator("option");
+
+    // Verify the dropdown contains only the saved seller
+    await expect(sellerOptions).toHaveCount(1);
+    await expect(sellerOptions.nth(0)).toHaveText("John Doe");
+
+    // Verify the selected seller is "John Doe"
+    await expect(
+      sellerDropdownAfterReload.locator("option:checked"),
+    ).toHaveText("John Doe");
   });
 
   test("duplicate seller name validation", async ({ page }) => {
@@ -807,6 +855,8 @@ test.describe("Seller management", () => {
     const sellerDropdown = sellerForm.getByRole("combobox", {
       name: "Select Seller",
     });
-    await expect(sellerDropdown).toContainText("Auto Applied Seller");
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      "Auto Applied Seller",
+    );
   });
 });

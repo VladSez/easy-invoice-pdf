@@ -378,7 +378,9 @@ test.describe("Buyer management", () => {
     await manageBuyerDialog
       .getByRole("textbox", { name: "Address (Required)" })
       .fill("789 Local Avenue");
+
     await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
     await expect(
       page.getByText("Buyer added and applied to invoice", { exact: true }),
     ).toBeVisible();
@@ -395,6 +397,10 @@ test.describe("Buyer management", () => {
       `Buyer "${SHARED_URL_BUYER_NAME}" is from a shared invoice and isn't saved locally.`,
     );
 
+    await expect(sharedBuyerBanner).toContainText(
+      "Save it to reuse in future invoices.",
+    );
+
     // Step 4: Verify the select dropdown is visible (because we have a saved buyer)
     const buyerDropdown = buyerSection.getByRole("combobox", {
       name: "Select Buyer",
@@ -403,7 +409,11 @@ test.describe("Buyer management", () => {
 
     // Step 5: Verify no buyer is pre-selected (placeholder shown)
     await expect(buyerDropdown).toHaveValue("");
-    await expect(buyerDropdown).toContainText("— Select buyer —");
+
+    // Verify the selected buyer is "— Select buyer —"
+    await expect(buyerDropdown.locator("option:checked")).toHaveText(
+      "— Select buyer —",
+    );
 
     // Step 6: Select the local buyer from the dropdown
     await buyerDropdown.selectOption({ label: "My Local Buyer" });
@@ -419,8 +429,15 @@ test.describe("Buyer management", () => {
     ).toBeVisible();
 
     // Verify the dropdown now shows the selected buyer
-    await expect(buyerDropdown).toContainText("My Local Buyer");
-    await expect(buyerDropdown).not.toHaveValue("");
+    await expect(buyerDropdown.locator("option:checked")).toHaveText(
+      "My Local Buyer",
+    );
+
+    // Verify dropdown contains only the local buyer
+    const buyerOptions = buyerDropdown.locator("option");
+
+    await expect(buyerOptions).toHaveCount(1);
+    await expect(buyerOptions.nth(0)).toHaveText("My Local Buyer");
   });
 
   test("shared invoice with *MATCHING* buyer auto-selects saved buyer", async ({
@@ -515,12 +532,15 @@ test.describe("Buyer management", () => {
     });
     await expect(buyerDropdown).toBeVisible();
 
-    // Verify the dropdown contains both buyers
-    await expect(buyerDropdown).toContainText("Matched Buyer Inc");
-    await expect(buyerDropdown).toContainText("Second Buyer LLC");
+    // Verify the dropdown contains both saved buyers as options
+    const buyerOptions = buyerDropdown.locator("option");
+    await expect(buyerOptions).toHaveCount(2);
+    await expect(buyerOptions.nth(0)).toHaveText("Matched Buyer Inc");
+    await expect(buyerOptions.nth(1)).toHaveText("Second Buyer LLC");
 
-    await expect(buyerDropdown).toHaveAttribute("title", "Matched Buyer Inc");
-    await expect(buyerDropdown).not.toHaveValue("");
+    await expect(buyerDropdown.locator("option:checked")).toHaveText(
+      "Matched Buyer Inc",
+    );
   });
 
   test("switch between multiple saved buyers", async ({ page }) => {
@@ -535,7 +555,9 @@ test.describe("Buyer management", () => {
     await manageBuyerDialog
       .getByRole("textbox", { name: "Address (Required)" })
       .fill("1 Alpha Avenue");
+
     await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
     await expect(
       page.getByText("Buyer added and applied to invoice", { exact: true }),
     ).toBeVisible();
@@ -543,7 +565,8 @@ test.describe("Buyer management", () => {
     const buyerDropdown = buyerSection.getByRole("combobox", {
       name: "Select Buyer",
     });
-    await expect(buyerDropdown).toContainText("Buyer A");
+
+    await expect(buyerDropdown.locator("option:checked")).toHaveText("Buyer A");
 
     // Add second buyer with "Apply to Current Invoice" checked (default)
     await buyerSection.getByRole("button", { name: "New Buyer" }).click();
@@ -566,7 +589,15 @@ test.describe("Buyer management", () => {
     ).toBeVisible();
 
     // Dropdown should now show Buyer B
-    await expect(buyerDropdown).toContainText("Buyer B");
+    await expect(buyerDropdown.locator("option:checked")).toHaveText("Buyer B");
+
+    // Verify dropdown contains both buyers
+    const buyerOptionsAfterAdd = buyerDropdown.locator("option");
+
+    await expect(buyerOptionsAfterAdd).toHaveCount(2);
+
+    await expect(buyerOptionsAfterAdd.nth(0)).toHaveText("Buyer A");
+    await expect(buyerOptionsAfterAdd.nth(1)).toHaveText("Buyer B");
 
     // Switch back to Buyer A via the dropdown
     await buyerDropdown.selectOption({ label: "Buyer A" });
@@ -574,8 +605,7 @@ test.describe("Buyer management", () => {
     await expect(
       page.getByText('Buyer "Buyer A" applied to invoice', { exact: true }),
     ).toBeVisible();
-    await expect(buyerDropdown).toContainText("Buyer A");
-    await expect(buyerDropdown).toHaveAttribute("title", "Buyer A");
+    await expect(buyerDropdown.locator("option:checked")).toHaveText("Buyer A");
 
     // Switch back to Buyer B
     await buyerDropdown.selectOption({ label: "Buyer B" });
@@ -583,9 +613,8 @@ test.describe("Buyer management", () => {
     await expect(
       page.getByText('Buyer "Buyer B" applied to invoice', { exact: true }),
     ).toBeVisible();
-    await expect(buyerDropdown).toContainText("Buyer B");
 
-    await expect(buyerDropdown).toHaveAttribute("title", "Buyer B");
+    await expect(buyerDropdown.locator("option:checked")).toHaveText("Buyer B");
 
     // Wait for debounce before reloading the page
     // eslint-disable-next-line playwright/no-wait-for-timeout
@@ -606,9 +635,15 @@ test.describe("Buyer management", () => {
     );
 
     // Verify dropdown still contains both buyers after reload
-    await expect(buyerDropdownAfterReload).toContainText("Buyer A");
-    await expect(buyerDropdownAfterReload).toContainText("Buyer B");
-    await expect(buyerDropdownAfterReload).toHaveAttribute("title", "Buyer B");
+    const buyerOptions = buyerDropdownAfterReload.locator("option");
+
+    await expect(buyerOptions).toHaveCount(2);
+    await expect(buyerOptions.nth(0)).toHaveText("Buyer A");
+    await expect(buyerOptions.nth(1)).toHaveText("Buyer B");
+
+    await expect(buyerDropdownAfterReload.locator("option:checked")).toHaveText(
+      "Buyer B",
+    );
   });
 
   test("save shared buyer from banner", async ({ page }) => {
@@ -666,8 +701,9 @@ test.describe("Buyer management", () => {
       name: "Select Buyer",
     });
     await expect(buyerDropdown).toBeVisible();
-    await expect(buyerDropdown).toContainText("Acme Co");
-    await expect(buyerDropdown).not.toHaveValue("");
+
+    // verify the selected buyer is "Acme Co"
+    await expect(buyerDropdown.locator("option:checked")).toHaveText("Acme Co");
 
     // Reload the page to simulate persistence or refresh
     await page.reload();
@@ -677,9 +713,16 @@ test.describe("Buyer management", () => {
       name: "Select Buyer",
     });
     await expect(buyerDropdownAfterReload).toBeVisible();
-    await expect(buyerDropdownAfterReload).toContainText("Acme Co");
-    await expect(buyerDropdownAfterReload).not.toHaveValue("");
-    await expect(buyerDropdownAfterReload).toHaveAttribute("title", "Acme Co");
+
+    const buyerOptions = buyerDropdownAfterReload.locator("option");
+
+    await expect(buyerOptions).toHaveCount(1);
+    await expect(buyerOptions.nth(0)).toHaveText("Acme Co");
+
+    // Verify the selected buyer is "Acme Co"
+    await expect(buyerDropdownAfterReload.locator("option:checked")).toHaveText(
+      "Acme Co",
+    );
   });
 
   test("duplicate buyer name validation", async ({ page }) => {
@@ -758,9 +801,18 @@ test.describe("Buyer management", () => {
 
     // Verify buyer is selected in dropdown
     const buyerForm = page.getByTestId(`buyer-information-section`);
+
     const buyerDropdown = buyerForm.getByRole("combobox", {
       name: "Select Buyer",
     });
-    await expect(buyerDropdown).toContainText("Auto Applied Buyer");
+
+    const buyerOptions = buyerDropdown.locator("option");
+    await expect(buyerOptions).toHaveCount(1);
+    await expect(buyerOptions.nth(0)).toHaveText("Auto Applied Buyer");
+
+    // Verify the selected buyer is "Auto Applied Buyer"
+    await expect(buyerDropdown.locator("option:checked")).toHaveText(
+      "Auto Applied Buyer",
+    );
   });
 });
