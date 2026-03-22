@@ -9,12 +9,12 @@ Great interfaces rarely come from a single thing. It's usually a collection of s
 
 ## Quick Reference
 
-| Category | When to Use |
-| --- | --- |
-| [Typography](typography.md) | Text wrapping, font smoothing, tabular numbers |
-| [Surfaces](surfaces.md) | Border radius, optical alignment, shadows, image outlines, hit areas |
-| [Animations](animations.md) | Interruptible animations, enter/exit transitions, icon animations, scale on press |
-| [Performance](performance.md) | Transition specificity, `will-change` usage |
+| Category                      | When to Use                                                                       |
+| ----------------------------- | --------------------------------------------------------------------------------- |
+| [Typography](typography.md)   | Text wrapping, font smoothing, tabular numbers                                    |
+| [Surfaces](surfaces.md)       | Border radius, optical alignment, shadows, image outlines, hit areas              |
+| [Animations](animations.md)   | Interruptible animations, enter/exit transitions, icon animations, scale on press |
+| [Performance](performance.md) | Transition specificity, `will-change` usage                                       |
 
 ## Core Principles
 
@@ -84,18 +84,18 @@ Interactive elements need at least 40×40px hit area. Extend with a pseudo-eleme
 
 ## Common Mistakes
 
-| Mistake | Fix |
-| --- | --- |
-| Same border radius on parent and child | Calculate `outerRadius = innerRadius + padding` |
-| Icons look off-center | Adjust optically with padding or fix SVG directly |
-| Hard borders between sections | Use layered `box-shadow` with transparency |
-| Jarring enter/exit animations | Split, stagger, and keep exits subtle |
-| Numbers cause layout shift | Apply `tabular-nums` |
-| Heavy text on macOS | Apply `antialiased` to root |
-| Animation plays on page load | Add `initial={false}` to `AnimatePresence` |
-| `transition: all` on elements | Specify exact properties |
-| First-frame animation stutter | Add `will-change: transform` (sparingly) |
-| Tiny hit areas on small controls | Extend with pseudo-element to 40×40px |
+| Mistake                                | Fix                                               |
+| -------------------------------------- | ------------------------------------------------- |
+| Same border radius on parent and child | Calculate `outerRadius = innerRadius + padding`   |
+| Icons look off-center                  | Adjust optically with padding or fix SVG directly |
+| Hard borders between sections          | Use layered `box-shadow` with transparency        |
+| Jarring enter/exit animations          | Split, stagger, and keep exits subtle             |
+| Numbers cause layout shift             | Apply `tabular-nums`                              |
+| Heavy text on macOS                    | Apply `antialiased` to root                       |
+| Animation plays on page load           | Add `initial={false}` to `AnimatePresence`        |
+| `transition: all` on elements          | Specify exact properties                          |
+| First-frame animation stutter          | Add `will-change: transform` (sparingly)          |
+| Tiny hit areas on small controls       | Extend with pseudo-element to 40×40px             |
 
 ## Review Checklist
 

@@ -8,12 +8,12 @@ Users change intent mid-interaction. If animations aren't interruptible, the int
 
 ### CSS Transitions vs. Keyframes
 
-| | CSS Transitions | CSS Keyframe Animations |
-| --- | --- | --- |
-| **Behavior** | Interpolate toward latest state | Run on a fixed timeline |
-| **Interruptible** | Yes — retargets mid-animation | No — restarts from beginning |
-| **Use for** | Interactive state changes (hover, toggle, open/close) | Staged sequences that run once (enter animations, loading) |
-| **Duration** | Adapts to remaining distance | Fixed regardless of state |
+|                   | CSS Transitions                                       | CSS Keyframe Animations                                    |
+| ----------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
+| **Behavior**      | Interpolate toward latest state                       | Run on a fixed timeline                                    |
+| **Interruptible** | Yes — retargets mid-animation                         | No — restarts from beginning                               |
+| **Use for**       | Interactive state changes (hover, toggle, open/close) | Staged sequences that run once (enter animations, loading) |
+| **Duration**      | Adapts to remaining distance                          | Fixed regardless of state                                  |
 
 ```css
 /* Good — interruptible transition for a toggle */
@@ -104,9 +104,15 @@ function PageHeader() {
   animation: fadeInUp 400ms ease-out forwards;
 }
 
-.stagger-item:nth-child(1) { animation-delay: 0ms; }
-.stagger-item:nth-child(2) { animation-delay: 100ms; }
-.stagger-item:nth-child(3) { animation-delay: 200ms; }
+.stagger-item:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger-item:nth-child(2) {
+  animation-delay: 100ms;
+}
+.stagger-item:nth-child(3) {
+  animation-delay: 200ms;
+}
 
 @keyframes fadeInUp {
   to {
@@ -160,7 +166,9 @@ Exit animations should be softer and less attention-grabbing than enter animatio
 .item-exit {
   opacity: 0;
   transform: translateY(-12px);
-  transition: opacity 150ms ease-in, transform 150ms ease-in;
+  transition:
+    opacity 150ms ease-in,
+    transform 150ms ease-in;
 }
 
 /* Bad — dramatic exit that steals focus */
@@ -177,6 +185,7 @@ Exit animations should be softer and less attention-grabbing than enter animatio
 ```
 
 **Key points:**
+
 - Use a small fixed `translateY` (e.g., `-12px`) instead of the full container height
 - Keep some directional movement to indicate where the element went
 - Exit duration should be shorter than enter duration (150ms vs 300ms)
@@ -228,7 +237,7 @@ function IconButton({ isActive, ActiveIcon, InactiveIcon }) {
             "cubic-bezier(0.2, 0, 0, 1)",
             isActive
               ? "scale-100 opacity-100 blur-0"
-              : "scale-[0.25] opacity-0 blur-[4px]"
+              : "scale-[0.25] opacity-0 blur-[4px]",
           )}
         >
           <ActiveIcon />
@@ -239,7 +248,7 @@ function IconButton({ isActive, ActiveIcon, InactiveIcon }) {
             "cubic-bezier(0.2, 0, 0, 1)",
             isActive
               ? "scale-[0.25] opacity-0 blur-[4px]"
-              : "scale-100 opacity-100 blur-0"
+              : "scale-100 opacity-100 blur-0",
           )}
         >
           <InactiveIcon />
@@ -254,25 +263,26 @@ The non-absolute icon (InactiveIcon) defines the layout size. The absolute icon 
 
 ### Choosing Between Motion and CSS
 
-| | Motion (Framer Motion) | CSS transitions (both icons in DOM) |
-| --- | --- | --- |
-| **Enter animation** | Yes | Yes |
-| **Exit animation** | Yes (via `AnimatePresence`) | Yes (cross-fade — icon never unmounts) |
-| **Spring physics** | Yes | No — use `cubic-bezier(0.2, 0, 0, 1)` as approximation |
-| **When to use** | Project already uses `motion/react` | No motion dependency, or keeping bundle small |
+|                     | Motion (Framer Motion)              | CSS transitions (both icons in DOM)                    |
+| ------------------- | ----------------------------------- | ------------------------------------------------------ |
+| **Enter animation** | Yes                                 | Yes                                                    |
+| **Exit animation**  | Yes (via `AnimatePresence`)         | Yes (cross-fade — icon never unmounts)                 |
+| **Spring physics**  | Yes                                 | No — use `cubic-bezier(0.2, 0, 0, 1)` as approximation |
+| **When to use**     | Project already uses `motion/react` | No motion dependency, or keeping bundle small          |
 
 **Rule:** Check the project's `package.json` for `motion` or `framer-motion`. If present, use the Motion approach. If not, use the CSS cross-fade pattern — don't add a dependency just for icon transitions.
 
 ### When to Animate Icons
 
-| Animate | Don't animate |
-| --- | --- |
-| Icons that appear on hover (action buttons) | Static navigation icons |
-| State change icons (play → pause, like → liked) | Decorative icons |
-| Icons in contextual toolbars | Icons that are always visible |
-| Loading/success state indicators | Icon labels (text next to icon) |
+| Animate                                         | Don't animate                   |
+| ----------------------------------------------- | ------------------------------- |
+| Icons that appear on hover (action buttons)     | Static navigation icons         |
+| State change icons (play → pause, like → liked) | Decorative icons                |
+| Icons in contextual toolbars                    | Icons that are always visible   |
+| Loading/success state indicators                | Icon labels (text next to icon) |
 
 **Important:** Always use exactly these values for contextual icon animations — do not deviate:
+
 - `scale`: `0.25` → `1` (never use `0.5` or `0.6`)
 - `opacity`: `0` → `1`
 - `filter`: `"blur(4px)"` → `"blur(0px)"`
@@ -309,9 +319,7 @@ Not every button needs this. Add a `static` prop to your button component that d
 ### Motion Example
 
 ```tsx
-<motion.button whileTap={{ scale: 0.96 }}>
-  Click me
-</motion.button>
+<motion.button whileTap={{ scale: 0.96 }}>Click me</motion.button>
 ```
 
 ### Static Prop Pattern

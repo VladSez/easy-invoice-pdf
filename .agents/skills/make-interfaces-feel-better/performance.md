@@ -74,14 +74,14 @@ This particularly helps when an element is changing `scale`, `rotation`, or movi
 
 ### Useful Properties
 
-| Property | GPU-compositable | Worth using `will-change` |
-| --- | --- | --- |
-| `transform` | Yes | Yes |
-| `opacity` | Yes | Yes |
-| `filter` (blur, brightness) | Yes | Yes |
-| `clip-path` | Yes | Yes |
-| `top`, `left`, `width`, `height` | No | No |
-| `background`, `border`, `color` | No | No |
+| Property                         | GPU-compositable | Worth using `will-change` |
+| -------------------------------- | ---------------- | ------------------------- |
+| `transform`                      | Yes              | Yes                       |
+| `opacity`                        | Yes              | Yes                       |
+| `filter` (blur, brightness)      | Yes              | Yes                       |
+| `clip-path`                      | Yes              | Yes                       |
+| `top`, `left`, `width`, `height` | No               | No                        |
+| `background`, `border`, `color`  | No               | No                        |
 
 ### When to Skip
 

@@ -78,7 +78,7 @@ Use slightly less padding on the icon side to make the button feel balanced. A r
 
 ```tsx
 // Tailwind
-<button className="pl-4 pr-3.5 flex items-center gap-2">
+<button className="flex items-center gap-2 pl-4 pr-3.5">
   <span>Continue</span>
   <ArrowRightIcon />
 </button>
@@ -127,12 +127,10 @@ The shadow is comprised of three layers. The first acts as a 1px border ring, th
 ```css
 :root {
   --shadow-border:
-    0px 0px 0px 1px rgba(0, 0, 0, 0.06),
-    0px 1px 2px -1px rgba(0, 0, 0, 0.06),
+    0px 0px 0px 1px rgba(0, 0, 0, 0.06), 0px 1px 2px -1px rgba(0, 0, 0, 0.06),
     0px 2px 4px 0px rgba(0, 0, 0, 0.04);
   --shadow-border-hover:
-    0px 0px 0px 1px rgba(0, 0, 0, 0.08),
-    0px 1px 2px -1px rgba(0, 0, 0, 0.08),
+    0px 0px 0px 1px rgba(0, 0, 0, 0.08), 0px 1px 2px -1px rgba(0, 0, 0, 0.08),
     0px 2px 4px 0px rgba(0, 0, 0, 0.06);
 }
 ```
@@ -167,13 +165,13 @@ Apply the variable and add `transition-[box-shadow]` for a smooth hover:
 
 ### When to Use Shadows vs. Borders
 
-| Use shadows | Use borders |
-| --- | --- |
-| Cards, containers with depth | Dividers between list items |
-| Buttons with bordered styles | Table cell boundaries |
+| Use shadows                           | Use borders                             |
+| ------------------------------------- | --------------------------------------- |
+| Cards, containers with depth          | Dividers between list items             |
+| Buttons with bordered styles          | Table cell boundaries                   |
 | Elevated elements (dropdowns, modals) | Form input outlines (for accessibility) |
-| Elements on varied backgrounds | Hairline separators in dense UI |
-| Hover/focus states for lift effect | |
+| Elements on varied backgrounds        | Hairline separators in dense UI         |
+| Hover/focus states for lift effect    |                                         |
 
 ## Image Outlines
 
@@ -237,7 +235,7 @@ Interactive elements should have a minimum hit area of 44×44px (WCAG) or at lea
 ### Tailwind Example
 
 ```tsx
-<button className="relative size-5 after:absolute after:top-1/2 after:left-1/2 after:size-10 after:-translate-1/2">
+<button className="after:-translate-1/2 relative size-5 after:absolute after:left-1/2 after:top-1/2 after:size-10">
   <CheckIcon />
 </button>
 ```
