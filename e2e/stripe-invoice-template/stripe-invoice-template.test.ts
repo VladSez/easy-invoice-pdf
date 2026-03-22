@@ -1323,4 +1323,234 @@ test.describe("Stripe Invoice Template", () => {
       "stripe-template-multi-pages.png",
     );
   });
+
+  test("toggles seller and buyer email visibility in PDF", async ({
+    page,
+    browserName,
+    downloadDir,
+  }, testInfo) => {
+    await expect(page).toHaveURL("/?template=default");
+
+    // Switch to Stripe template
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await expect(page).toHaveURL("/?template=stripe");
+
+    /*
+     * PHASE 1: Fill inline form with email switch OFF -> PDF screenshot (emails hidden)
+     */
+
+    const sellerSection = page.getByTestId("seller-information-section");
+    const buyerSection = page.getByTestId("buyer-information-section");
+
+    // Fill seller fields inline (no saved seller selected, so switch is enabled)
+    await sellerSection
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Email Visibility Test Seller");
+
+    await sellerSection
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("123 Seller Street\nSeller City, 10001");
+
+    await sellerSection
+      .getByRole("textbox", { name: "Email" })
+      .fill("VISIBLE-SELLER@test.com");
+
+    // Toggle seller email switch OFF via inline form
+    const sellerEmailSwitch = sellerSection.getByRole("switch", {
+      name: "Show the 'Email' field in the PDF",
+    });
+    await expect(sellerEmailSwitch).toBeChecked();
+    await sellerEmailSwitch.click();
+    await expect(sellerEmailSwitch).not.toBeChecked();
+
+    // Fill buyer fields inline (no saved buyer selected, so switch is enabled)
+    await buyerSection
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Email Visibility Test Buyer");
+
+    await buyerSection
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("456 Buyer Avenue\nBuyer City, 20002");
+
+    await buyerSection
+      .getByRole("textbox", { name: "Email" })
+      .fill("VISIBLE-BUYER@test.com");
+
+    // Toggle buyer email switch OFF via inline form
+    const buyerEmailSwitch = buyerSection.getByRole("switch", {
+      name: "Show the 'Email' field in the PDF",
+    });
+    await expect(buyerEmailSwitch).toBeChecked();
+    await buyerEmailSwitch.click();
+    await expect(buyerEmailSwitch).not.toBeChecked();
+
+    const finalSection = page.getByTestId("final-section");
+    await finalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: ${testInfo.title} - emails hidden (${testInfo.project.name})`,
+      );
+
+    // wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const downloadPdfButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+    await expect(downloadPdfButton).toBeVisible();
+    await expect(downloadPdfButton).toBeEnabled();
+
+    // Download PDF with emails hidden (toggled off via inline form)
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfButton.click(),
+    ]);
+
+    const pdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-${download.suggestedFilename()}`,
+    );
+    await download.saveAs(pdfFilePath);
+
+    const absolutePath = path.resolve(pdfFilePath);
+    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
+
+    const pdfBytes = fs.readFileSync(absolutePath);
+    await page.goto("about:blank");
+    await renderPdfOnCanvas(page, pdfBytes);
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "email-hidden-in-pdf-stripe-template.png",
+    );
+
+    /*
+     * PHASE 2: Save seller/buyer via dialog with email ON -> PDF screenshot (emails visible)
+     */
+
+    await page.goto("/");
+    await expect(page).toHaveURL("/?template=stripe");
+
+    // Create seller via dialog with email visible
+    await page.getByRole("button", { name: "New Seller" }).click();
+
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Email Visibility Test Seller");
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("123 Seller Street\nSeller City, 10001");
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Email" })
+      .fill("VISIBLE-SELLER@test.com");
+
+    // Verify email visibility switch is checked by default in dialog
+    const sellerEmailSwitchInDialog = manageSellerDialog.getByRole("switch", {
+      name: "Show the 'Email' field in the PDF",
+    });
+    await expect(sellerEmailSwitchInDialog).toBeVisible();
+    await expect(sellerEmailSwitchInDialog).toBeChecked();
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    await expect(manageSellerDialog).toBeHidden();
+
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // wait for debounce timeout
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    // Create buyer via dialog with email visible
+    await page.getByRole("button", { name: "New Buyer" }).click();
+
+    const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name (Required)" })
+      .fill("Email Visibility Test Buyer");
+
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address (Required)" })
+      .fill("456 Buyer Avenue\nBuyer City, 20002");
+
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Email" })
+      .fill("VISIBLE-BUYER@test.com");
+
+    // Verify email visibility switch is checked by default in dialog
+    const buyerEmailSwitchInDialog = manageBuyerDialog.getByRole("switch", {
+      name: "Show the 'Email' field in the PDF",
+    });
+    await expect(buyerEmailSwitchInDialog).toBeVisible();
+    await expect(buyerEmailSwitchInDialog).toBeChecked();
+
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
+    await expect(manageBuyerDialog).toBeHidden();
+
+    await expect(
+      page.getByText("Buyer added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    const newFinalSection = page.getByTestId("final-section");
+    await newFinalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: ${testInfo.title} - emails visible (${testInfo.project.name})`,
+      );
+
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const newDownloadPdfButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+    await expect(newDownloadPdfButton).toBeVisible();
+    await expect(newDownloadPdfButton).toBeEnabled();
+
+    // Download PDF with emails visible (saved via dialog)
+    const [downloadVisible] = await Promise.all([
+      page.waitForEvent("download"),
+      newDownloadPdfButton.click(),
+    ]);
+
+    const visiblePdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-visible-${downloadVisible.suggestedFilename()}`,
+    );
+    await downloadVisible.saveAs(visiblePdfFilePath);
+
+    const visibleAbsolutePath = path.resolve(visiblePdfFilePath);
+    await expect.poll(() => fs.existsSync(visibleAbsolutePath)).toBe(true);
+
+    const visiblePdfBytes = fs.readFileSync(visibleAbsolutePath);
+    await page.goto("about:blank");
+    await renderPdfOnCanvas(page, visiblePdfBytes);
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "email-visible-in-pdf-stripe-template.png",
+    );
+  });
 });
