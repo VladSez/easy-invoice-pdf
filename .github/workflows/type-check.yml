@@ -28,9 +28,12 @@ jobs:
         run: pnpm install
 
       - name: 🔍 Run type check
+        id: type-check
+        continue-on-error: true
         run: pnpm type-check:go
 
       - name: 🔍 Get PR URL
+        if: steps.type-check.outcome == 'failure'
         id: pr-url
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -43,7 +46,7 @@ jobs:
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
       - name: 📧 Send email
-        if: always()
+        if: steps.type-check.outcome == 'failure'
         uses: dawidd6/action-send-mail@611879133a9569642c41be66f4a323286e9b8a3b # v4
         with:
           server_address: smtp.gmail.com
