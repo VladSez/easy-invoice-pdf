@@ -28,9 +28,11 @@ export function StripeSellerBuyerInfo({
         <Text style={[styles.fontSize9, styles.mb3]}>
           {invoiceData.seller.address}
         </Text>
-        <Text style={[styles.fontSize9, styles.mb3]}>
-          {invoiceData.seller.email}
-        </Text>
+        {invoiceData.seller.emailFieldIsVisible && (
+          <Text style={[styles.fontSize9, styles.mb3]}>
+            {invoiceData.seller.email}
+          </Text>
+        )}
         {invoiceData.seller.vatNoFieldIsVisible && (
           <Text style={[styles.fontSize9, styles.mb3]}>
             {invoiceData.seller.vatNoLabelText}: {invoiceData.seller.vatNo}
@@ -65,9 +67,11 @@ export function StripeSellerBuyerInfo({
         <Text style={[styles.fontSize9, styles.mb3]}>
           {invoiceData.buyer.address}
         </Text>
-        <Text style={[styles.fontSize9, styles.mb3]}>
-          {invoiceData.buyer.email}
-        </Text>
+        {invoiceData.buyer.emailFieldIsVisible && (
+          <Text style={[styles.fontSize9, styles.mb3]}>
+            {invoiceData.buyer.email}
+          </Text>
+        )}
 
         {invoiceData.buyer.vatNoFieldIsVisible && (
           <Text style={[styles.fontSize9, styles.mb3]}>

@@ -877,7 +877,14 @@ export const sellerSchema = z.object({
     ),
   vatNoFieldIsVisible: z.boolean().default(true),
 
-  email: z.string().email("Invalid email address").trim(),
+  email: z
+    .string()
+    .trim()
+    .refine((val) => val === "" || z.string().email().safeParse(val).success, {
+      message: "Invalid email address",
+    })
+    .optional(),
+  emailFieldIsVisible: z.boolean().default(true),
 
   accountNumber: z
     .string()
@@ -932,7 +939,14 @@ export const buyerSchema = z.object({
     ),
   vatNoFieldIsVisible: z.boolean().default(true),
 
-  email: z.string().email("Invalid email address").trim(),
+  email: z
+    .string()
+    .trim()
+    .refine((val) => val === "" || z.string().email().safeParse(val).success, {
+      message: "Invalid email address",
+    })
+    .optional(),
+  emailFieldIsVisible: z.boolean().default(true),
 
   notes: z
     .string()

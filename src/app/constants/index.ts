@@ -35,6 +35,7 @@ export const DEFAULT_SELLER_DATA = {
   vatNoFieldIsVisible: true,
 
   email: "seller@email.com",
+  emailFieldIsVisible: true,
 
   accountNumber: "Seller account number",
   accountNumberFieldIsVisible: true,
@@ -61,6 +62,7 @@ export const DEFAULT_BUYER_DATA = {
   vatNoFieldIsVisible: true,
 
   email: "buyer@email.com",
+  emailFieldIsVisible: true,
 
   // field for additional notes about the buyer (not visible by default)
   notes: "",

@@ -99,6 +99,7 @@ export const ENGLISH_INVOICE_REAL_DATA = {
     vatNoFieldIsVisible: true,
 
     email: env.SELLER_EMAIL,
+    emailFieldIsVisible: true,
     accountNumber: env.SELLER_ACCOUNT_NUMBER,
     accountNumberFieldIsVisible: true,
 
@@ -116,6 +117,7 @@ export const ENGLISH_INVOICE_REAL_DATA = {
     vatNoFieldIsVisible: true,
 
     email: env.BUYER_EMAIL,
+    emailFieldIsVisible: true,
     notesFieldIsVisible: true,
   },
   items: [
