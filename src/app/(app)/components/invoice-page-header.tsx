@@ -68,10 +68,27 @@ export function InvoicePageHeader({
         {/* this section is hidden on mobile and shown on desktop */}
         <div className="mb-1 hidden w-full flex-wrap justify-center gap-3 lg:flex lg:flex-nowrap lg:justify-end">
           {isSharedInvoice ? (
-            <span className="flex w-[115px] items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 shadow duration-500 animate-in fade-in slide-in-from-top-2">
-              <LinkIcon className="size-3" />
-              Shared invoice
-            </span>
+            <CustomTooltip
+              trigger={
+                <span className="flex w-[115px] items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 shadow duration-500 animate-in fade-in slide-in-from-top-2">
+                  <LinkIcon className="size-3" />
+                  Shared invoice
+                </span>
+              }
+              content={
+                <div className="flex items-center gap-3 p-2">
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-slate-900">
+                      Viewing Shared Invoice
+                    </p>
+                    <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                      You are viewing an invoice that was shared with you. You
+                      can edit and download it.
+                    </p>
+                  </div>
+                </div>
+              }
+            />
           ) : null}
           {/* Support project button (hidden on mobile) */}
           <Button
