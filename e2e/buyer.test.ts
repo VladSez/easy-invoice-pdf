@@ -231,9 +231,9 @@ test.describe("Buyer management", () => {
       TEST_BUYER_DATA.email,
     );
 
-    const emailSwitchNotInDialog = buyerForm.getByTestId(
-      `buyerEmailFieldIsVisible`,
-    );
+    const emailSwitchNotInDialog = buyerForm.getByRole("switch", {
+      name: `Show the 'Email' field in the PDF`,
+    });
     // Verify Email switch is not checked as we toggled it off
     await expect(emailSwitchNotInDialog).not.toBeChecked();
     await expect(emailSwitchNotInDialog).toBeDisabled();

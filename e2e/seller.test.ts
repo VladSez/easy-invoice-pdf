@@ -246,9 +246,9 @@ test.describe("Seller management", () => {
       sellerForm.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(TEST_SELLER_DATA.email);
 
-    const emailSwitchNotInDialog = sellerForm.getByTestId(
-      `sellerEmailFieldIsVisible`,
-    );
+    const emailSwitchNotInDialog = sellerForm.getByRole("switch", {
+      name: `Show the 'Email' field in the PDF`,
+    });
     // Verify Email switch is not checked as we toggled it off
     await expect(emailSwitchNotInDialog).not.toBeChecked();
     await expect(emailSwitchNotInDialog).toBeDisabled();
