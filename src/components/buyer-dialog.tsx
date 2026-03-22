@@ -64,6 +64,7 @@ export function BuyerDialog({
       vatNo: initialData?.vatNo ?? "",
       vatNoLabelText: initialData?.vatNoLabelText ?? "VAT no",
       email: initialData?.email ?? "",
+      emailFieldIsVisible: initialData?.emailFieldIsVisible ?? true,
       vatNoFieldIsVisible: initialData?.vatNoFieldIsVisible ?? true,
       notes: initialData?.notes ?? "",
       notesFieldIsVisible: initialData?.notesFieldIsVisible ?? true,
@@ -106,6 +107,7 @@ export function BuyerDialog({
           vatNo: "",
           vatNoLabelText: "VAT no",
           email: "",
+          emailFieldIsVisible: true,
           vatNoFieldIsVisible: true,
           notes: "",
           notesFieldIsVisible: true,
@@ -254,7 +256,7 @@ export function BuyerDialog({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>Name (Required)</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -272,7 +274,7 @@ export function BuyerDialog({
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel>Address (Required)</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -370,23 +372,54 @@ export function BuyerDialog({
                 </div>
               </fieldset>
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="email"
-                        placeholder="buyer@email.com"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Email */}
+              <div className="space-y-3 rounded-md border p-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="mb-2 font-medium">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="email"
+                          placeholder="buyer@email.com"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="emailFieldIsVisible"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center gap-2">
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            id="emailFieldIsVisible"
+                            data-testid={`buyerEmailDialogFieldVisibilitySwitch`}
+                            aria-label={`Show the 'Email' field in the PDF`}
+                          />
+                        </FormControl>
+                        <CustomTooltip
+                          trigger={
+                            <Label htmlFor="emailFieldIsVisible">
+                              Show Buyer Email in PDF
+                            </Label>
+                          }
+                          content='Show the "Email" field in the PDF'
+                          className="z-[1000]"
+                        />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Notes */}
               <div className="space-y-3 rounded-md border p-4">

@@ -49,6 +49,7 @@ export const SellerInformation = memo(function SellerInformation({
     vatNo: invoiceData.seller.vatNo,
     vatNoLabelText: invoiceData.seller.vatNoLabelText,
     email: invoiceData.seller.email,
+    emailFieldIsVisible: invoiceData.seller.emailFieldIsVisible,
     accountNumber: invoiceData.seller.accountNumber,
     swiftBic: invoiceData.seller.swiftBic,
     vatNoFieldIsVisible: invoiceData.seller.vatNoFieldIsVisible,
@@ -77,11 +78,11 @@ export const SellerInformation = memo(function SellerInformation({
               htmlFor={`sellerName`}
               content={SELLER_TOOLTIP_CONTENT}
             >
-              Name
+              Name (Required)
             </LabelWithEditIcon>
           ) : (
             <Label htmlFor={`sellerName`} className="mb-1">
-              Name
+              Name (Required)
             </Label>
           )}
           <Controller
@@ -110,11 +111,11 @@ export const SellerInformation = memo(function SellerInformation({
               htmlFor={`sellerAddress`}
               content={SELLER_TOOLTIP_CONTENT}
             >
-              Address
+              Address (Required)
             </LabelWithEditIcon>
           ) : (
             <Label htmlFor={`sellerAddress`} className="mb-1">
-              Address
+              Address (Required)
             </Label>
           )}
           <Controller
@@ -255,19 +256,55 @@ export const SellerInformation = memo(function SellerInformation({
           </fieldset>
         </div>
 
+        {/* Email */}
         <div>
-          {isSellerSelected ? (
-            <LabelWithEditIcon
-              htmlFor={`sellerEmail`}
-              content={SELLER_TOOLTIP_CONTENT}
+          <div className="relative mb-2 flex items-center justify-between">
+            {isSellerSelected ? (
+              <LabelWithEditIcon
+                htmlFor={`sellerEmail`}
+                content={SELLER_TOOLTIP_CONTENT}
+              >
+                Email
+              </LabelWithEditIcon>
+            ) : (
+              <Label htmlFor={`sellerEmail`} className="">
+                Email
+              </Label>
+            )}
+
+            {/* Show Email field in PDF switch */}
+            <div
+              className="inline-flex items-center gap-2"
+              title={HTML_TITLE_CONTENT}
             >
-              Email
-            </LabelWithEditIcon>
-          ) : (
-            <Label htmlFor={`sellerEmail`} className="mb-1">
-              Email
-            </Label>
-          )}
+              <Controller
+                name={`seller.emailFieldIsVisible`}
+                control={control}
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Switch
+                    {...field}
+                    id={`sellerEmailFieldIsVisible`}
+                    checked={value}
+                    onCheckedChange={onChange}
+                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    disabled={isSellerSelected}
+                    data-testid={`sellerEmailFieldIsVisible`}
+                    aria-label={`Show the 'Email' field in the PDF`}
+                  />
+                )}
+              />
+              <CustomTooltip
+                trigger={
+                  <Label htmlFor={`sellerEmailFieldIsVisible`}>
+                    Show in PDF
+                  </Label>
+                }
+                content={
+                  isSellerSelected ? null : "Show the 'Email' field in the PDF"
+                }
+              />
+            </div>
+          </div>
           <Controller
             name="seller.email"
             control={control}

@@ -24,6 +24,7 @@ test.describe("Seller management", () => {
       vatNoLabelText: "Tax Number",
 
       email: "test@company.com",
+      emailFieldIsVisible: true,
 
       accountNumberFieldIsVisible: true,
       accountNumber: "1234-5678-9012-3456",
@@ -87,6 +88,10 @@ test.describe("Seller management", () => {
       .getByRole("textbox", { name: "SWIFT/BIC" })
       .fill(TEST_SELLER_DATA.swiftBic);
 
+    const emailSwitchInDialogForm = manageSellerDialog.getByRole("switch", {
+      name: `Show the 'Email' field in the PDF`,
+    });
+
     const taxNumberSwitchInDialogForm = manageSellerDialog.getByRole("switch", {
       name: `Show the 'Tax Number' field in the PDF`,
     });
@@ -102,9 +107,15 @@ test.describe("Seller management", () => {
     });
 
     // Verify all switches are checked by default
+    await expect(emailSwitchInDialogForm).toBeChecked();
     await expect(taxNumberSwitchInDialogForm).toBeChecked();
     await expect(accountNumberSwitchInDialogForm).toBeChecked();
     await expect(swiftBicSwitchInDialogForm).toBeChecked();
+
+    // Toggle Email visibility switch
+    await emailSwitchInDialogForm.click();
+
+    await expect(emailSwitchInDialogForm).not.toBeChecked();
 
     // Toggle some visibility switches
     await accountNumberSwitchInDialogForm.click(); // Toggle Account Number visibility
@@ -162,6 +173,7 @@ test.describe("Seller management", () => {
       vatNoLabelText: TEST_SELLER_DATA.vatNoLabelText,
 
       email: TEST_SELLER_DATA.email,
+      emailFieldIsVisible: false,
 
       accountNumber: TEST_SELLER_DATA.accountNumber,
       accountNumberFieldIsVisible: false,
@@ -233,6 +245,13 @@ test.describe("Seller management", () => {
     await expect(
       sellerForm.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(TEST_SELLER_DATA.email);
+
+    const emailSwitchNotInDialog = sellerForm.getByTestId(
+      `sellerEmailFieldIsVisible`,
+    );
+    // Verify Email switch is not checked as we toggled it off
+    await expect(emailSwitchNotInDialog).not.toBeChecked();
+    await expect(emailSwitchNotInDialog).toBeDisabled();
 
     // Seller Account Number
     await expect(
@@ -322,6 +341,7 @@ test.describe("Seller management", () => {
     ).toHaveValue(TEST_SELLER_DATA.swiftBic);
 
     // Verify visibility switches state persisted in edit dialog
+    await expect(emailSwitchInDialogForm).not.toBeChecked();
     await expect(taxNumberSwitchInDialogForm).toBeChecked();
     await expect(accountNumberSwitchInDialogForm).not.toBeChecked();
     await expect(swiftBicSwitchInDialogForm).not.toBeChecked();
@@ -347,6 +367,7 @@ test.describe("Seller management", () => {
       name: "Unapplied Test Seller",
       address: "99 Unapplied Street",
       email: "unapplied@seller.com",
+      emailFieldIsVisible: true,
 
       vatNoFieldIsVisible: true,
       vatNo: "VAT999",
@@ -421,6 +442,7 @@ test.describe("Seller management", () => {
       name: "Dropdown Test Seller",
       address: "42 Dropdown Lane",
       email: "dropdown@seller.com",
+      emailFieldIsVisible: true,
 
       vatNoFieldIsVisible: true,
       vatNo: "VAT-DROP-001",
@@ -513,6 +535,7 @@ test.describe("Seller management", () => {
       name: "Test Delete Seller",
       address: "123 Delete Street",
       email: "delete@test.com",
+      emailFieldIsVisible: true,
 
       vatNoFieldIsVisible: true,
       vatNo: "123456789",

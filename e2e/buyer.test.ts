@@ -22,6 +22,7 @@ test.describe("Buyer management", () => {
       vatNoLabelText: "Tax Number",
 
       email: "client@example.com",
+      emailFieldIsVisible: true,
 
       notesFieldIsVisible: true,
       notes: "This is a test note",
@@ -70,6 +71,18 @@ test.describe("Buyer management", () => {
     await manageBuyerDialog
       .getByRole("textbox", { name: "Email" })
       .fill(TEST_BUYER_DATA.email);
+
+    const emailSwitchInDialogForm = manageBuyerDialog.getByRole("switch", {
+      name: `Show the 'Email' field in the PDF`,
+    });
+
+    // Verify Email visibility switch is checked by default
+    await expect(emailSwitchInDialogForm).toBeChecked();
+
+    // Toggle Email visibility switch
+    await emailSwitchInDialogForm.click();
+
+    await expect(emailSwitchInDialogForm).not.toBeChecked();
 
     const taxNumberSwitchInDialogForm = manageBuyerDialog.getByRole("switch", {
       name: `Show the 'Tax Number' field in the PDF`,
@@ -132,6 +145,7 @@ test.describe("Buyer management", () => {
       vatNoFieldIsVisible: false,
 
       email: TEST_BUYER_DATA.email,
+      emailFieldIsVisible: false,
 
       notes: TEST_BUYER_DATA.notes,
       notesFieldIsVisible: true,
@@ -217,6 +231,13 @@ test.describe("Buyer management", () => {
       TEST_BUYER_DATA.email,
     );
 
+    const emailSwitchNotInDialog = buyerForm.getByTestId(
+      `buyerEmailFieldIsVisible`,
+    );
+    // Verify Email switch is not checked as we toggled it off
+    await expect(emailSwitchNotInDialog).not.toBeChecked();
+    await expect(emailSwitchNotInDialog).toBeDisabled();
+
     // Buyer Notes
     await expect(
       buyerForm.getByRole("textbox", { name: "Notes" }),
@@ -267,6 +288,9 @@ test.describe("Buyer management", () => {
       manageBuyerDialog.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(TEST_BUYER_DATA.email);
 
+    // Verify email visibility switch state persisted in edit dialog
+    await expect(emailSwitchInDialogForm).not.toBeChecked();
+
     // Verify visibility switch state persisted in edit dialog
     await expect(taxNumberSwitchInDialogForm).not.toBeChecked();
 
@@ -291,6 +315,9 @@ test.describe("Buyer management", () => {
       .getByRole("textbox", { name: "Name" })
       .fill(updatedName);
 
+    // Re-enable Email visibility
+    await emailSwitchInDialogForm.click();
+
     // Re-enable VAT visibility
     await taxNumberSwitchInDialogForm.click();
 
@@ -314,6 +341,9 @@ test.describe("Buyer management", () => {
       updatedName,
     );
 
+    // Verify Email visibility is now enabled
+    await expect(emailSwitchNotInDialog).toBeChecked();
+
     // Verify VAT visibility is now enabled
     await expect(
       buyerForm.getByTestId(`buyerVatNoFieldIsVisible`),
@@ -330,6 +360,7 @@ test.describe("Buyer management", () => {
       name: "Unapplied Test Client",
       address: "99 Unapplied Avenue",
       email: "unapplied@client.com",
+      emailFieldIsVisible: true,
 
       vatNoFieldIsVisible: true,
       vatNo: "VAT999",
@@ -396,6 +427,7 @@ test.describe("Buyer management", () => {
       name: "Dropdown Test Client",
       address: "42 Dropdown Boulevard",
       email: "dropdown@client.com",
+      emailFieldIsVisible: true,
 
       vatNoFieldIsVisible: true,
       vatNo: "VAT-DROP-001",
@@ -480,6 +512,7 @@ test.describe("Buyer management", () => {
       name: "Test Delete Buyer",
       address: "456 Delete Avenue",
       email: "delete@buyer.com",
+      emailFieldIsVisible: true,
 
       vatNoFieldIsVisible: true,
       vatNo: "123456789",

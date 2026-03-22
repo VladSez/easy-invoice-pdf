@@ -66,6 +66,7 @@ export function SellerDialog({
       vatNo: initialData?.vatNo ?? "",
       vatNoLabelText: initialData?.vatNoLabelText ?? "VAT no",
       email: initialData?.email ?? "",
+      emailFieldIsVisible: initialData?.emailFieldIsVisible ?? true,
       accountNumber: initialData?.accountNumber ?? "",
       swiftBic: initialData?.swiftBic ?? "",
       vatNoFieldIsVisible: initialData?.vatNoFieldIsVisible ?? true,
@@ -104,6 +105,7 @@ export function SellerDialog({
           vatNo: "",
           vatNoLabelText: "VAT no",
           email: "",
+          emailFieldIsVisible: true,
           accountNumber: "",
           swiftBic: "",
           vatNoFieldIsVisible: true,
@@ -262,7 +264,7 @@ export function SellerDialog({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>Name (Required)</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -280,7 +282,7 @@ export function SellerDialog({
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel>Address (Required)</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -376,23 +378,54 @@ export function SellerDialog({
                 </div>
               </fieldset>
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="email"
-                        placeholder="seller@email.com"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Email */}
+              <div className="space-y-3 rounded-md border p-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="mb-2 font-medium">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="email"
+                          placeholder="seller@email.com"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="emailFieldIsVisible"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center gap-2">
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            id="emailFieldIsVisible"
+                            data-testid={`sellerEmailDialogFieldVisibilitySwitch`}
+                            aria-label={`Show the 'Email' field in the PDF`}
+                          />
+                        </FormControl>
+                        <CustomTooltip
+                          trigger={
+                            <Label htmlFor="emailFieldIsVisible">
+                              Show Seller Email in PDF
+                            </Label>
+                          }
+                          content='Show the "Email" field in the PDF'
+                          className="z-[1000]"
+                        />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Account Number */}
               <div className="space-y-3 rounded-md border p-4">
