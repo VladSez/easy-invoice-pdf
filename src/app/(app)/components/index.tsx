@@ -198,7 +198,6 @@ export function InvoiceClientPage({
                   handleInvoiceDataChange={handleInvoiceDataChange}
                   isMobile
                   setInvoiceFormHasErrors={setInvoiceFormHasErrors}
-                  isSharedInvoice={isSharedInvoice}
                 />
               </MobileFormScrollContainer>
             </TabsContent>
@@ -311,7 +310,6 @@ export function InvoiceClientPage({
                 invoiceData={invoiceDataState}
                 handleInvoiceDataChange={handleInvoiceDataChange}
                 setInvoiceFormHasErrors={setInvoiceFormHasErrors}
-                isSharedInvoice={isSharedInvoice}
               />
             </div>
 

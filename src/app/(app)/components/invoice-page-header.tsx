@@ -75,19 +75,7 @@ export function InvoicePageHeader({
                   Shared invoice
                 </span>
               }
-              content={
-                <div className="flex items-center gap-3 p-2">
-                  <div className="space-y-1">
-                    <p className="text-sm font-semibold text-slate-900">
-                      Viewing Shared Invoice
-                    </p>
-                    <p className="text-pretty text-xs leading-relaxed text-slate-700">
-                      You are viewing an invoice that was shared with you. You
-                      can edit and download it.
-                    </p>
-                  </div>
-                </div>
-              }
+              content={"Viewing shared invoice"}
             />
           ) : null}
           {/* Support project button (hidden on mobile) */}

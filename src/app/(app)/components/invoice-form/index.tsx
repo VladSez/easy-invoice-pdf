@@ -80,7 +80,6 @@ interface InvoiceFormProps {
   handleInvoiceDataChange: (updatedData: InvoiceData) => void;
   isMobile?: boolean;
   setInvoiceFormHasErrors: Dispatch<SetStateAction<boolean>>;
-  isSharedInvoice: boolean;
 }
 
 export const InvoiceForm = memo(function InvoiceForm({
@@ -88,7 +87,6 @@ export const InvoiceForm = memo(function InvoiceForm({
   handleInvoiceDataChange,
   isMobile = false,
   setInvoiceFormHasErrors,
-  isSharedInvoice,
 }: InvoiceFormProps) {
   const form = useForm<InvoiceData>({
     resolver: zodResolver(invoiceSchema),
@@ -393,16 +391,6 @@ export const InvoiceForm = memo(function InvoiceForm({
           <AccordionTrigger className="px-4 py-3">
             <div className="flex items-center gap-2">
               <Legend>Seller Information</Legend>
-              {isSharedInvoice && (
-                <CustomTooltip
-                  trigger={
-                    <span className="rounded-md bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 hover:bg-blue-100/90">
-                      Shared Seller
-                    </span>
-                  }
-                  content="This seller is shared from another invoice. You can save it to your account if needed."
-                />
-              )}
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
@@ -425,16 +413,6 @@ export const InvoiceForm = memo(function InvoiceForm({
           <AccordionTrigger className="px-4 py-3">
             <div className="flex items-center gap-2">
               <Legend>Buyer Information</Legend>
-              {isSharedInvoice && (
-                <CustomTooltip
-                  trigger={
-                    <span className="rounded-md bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 hover:bg-blue-100/90">
-                      Shared Buyer
-                    </span>
-                  }
-                  content="This buyer is shared from another invoice. You can save it to your account if needed."
-                />
-              )}
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
