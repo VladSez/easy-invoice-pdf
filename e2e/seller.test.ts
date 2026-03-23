@@ -1,4 +1,3 @@
-import { SELLER_TOOLTIP_CONTENT } from "@/app/(app)/components/invoice-form/sections/seller-information";
 import { DEFAULT_SELLER_DATA } from "@/app/constants";
 import { type SellerData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
@@ -24,6 +23,7 @@ test.describe("Seller management", () => {
       vatNoLabelText: "Tax Number",
 
       email: "test@company.com",
+      emailFieldIsVisible: true,
 
       accountNumberFieldIsVisible: true,
       accountNumber: "1234-5678-9012-3456",
@@ -87,6 +87,10 @@ test.describe("Seller management", () => {
       .getByRole("textbox", { name: "SWIFT/BIC" })
       .fill(TEST_SELLER_DATA.swiftBic);
 
+    const emailSwitchInDialogForm = manageSellerDialog.getByRole("switch", {
+      name: `Show the 'Email' field in the PDF`,
+    });
+
     const taxNumberSwitchInDialogForm = manageSellerDialog.getByRole("switch", {
       name: `Show the 'Tax Number' field in the PDF`,
     });
@@ -102,9 +106,15 @@ test.describe("Seller management", () => {
     });
 
     // Verify all switches are checked by default
+    await expect(emailSwitchInDialogForm).toBeChecked();
     await expect(taxNumberSwitchInDialogForm).toBeChecked();
     await expect(accountNumberSwitchInDialogForm).toBeChecked();
     await expect(swiftBicSwitchInDialogForm).toBeChecked();
+
+    // Toggle Email visibility switch
+    await emailSwitchInDialogForm.click();
+
+    await expect(emailSwitchInDialogForm).not.toBeChecked();
 
     // Toggle some visibility switches
     await accountNumberSwitchInDialogForm.click(); // Toggle Account Number visibility
@@ -162,6 +172,7 @@ test.describe("Seller management", () => {
       vatNoLabelText: TEST_SELLER_DATA.vatNoLabelText,
 
       email: TEST_SELLER_DATA.email,
+      emailFieldIsVisible: false,
 
       accountNumber: TEST_SELLER_DATA.accountNumber,
       accountNumberFieldIsVisible: false,
@@ -185,20 +196,21 @@ test.describe("Seller management", () => {
     // Verify all saved details in the Seller Information section form
     const sellerForm = page.getByTestId(`seller-information-section`);
 
-    // Check that HTML title attributes contain the tooltip message on input fields
-    const nameInput = sellerForm.getByRole("textbox", { name: "Name" });
-    await expect(nameInput).toHaveAttribute("title", SELLER_TOOLTIP_CONTENT);
+    // Verify the locked banner is visible with correct text
+    const sellerLockedBanner = sellerForm.getByTestId("seller-locked-banner");
+    await expect(sellerLockedBanner).toBeVisible();
+    await expect(sellerLockedBanner).toContainText(
+      'To modify seller details, click the "Edit seller" button (pencil icon) next to the dropdown above.',
+    );
 
     // Seller Name
-    await expect(nameInput).toHaveAttribute("aria-readonly", "true");
-    await expect(nameInput).toHaveValue(TEST_SELLER_DATA.name);
+    await expect(
+      sellerForm.getByRole("textbox", { name: "Name (Required)" }),
+    ).toHaveValue(TEST_SELLER_DATA.name);
 
     // Seller Address
     await expect(
-      sellerForm.getByRole("textbox", { name: "Address" }),
-    ).toHaveAttribute("aria-readonly", "true");
-    await expect(
-      sellerForm.getByRole("textbox", { name: "Address" }),
+      sellerForm.getByRole("textbox", { name: "Address (Required)" }),
     ).toHaveValue(TEST_SELLER_DATA.address);
 
     // Seller Tax Number
@@ -208,14 +220,7 @@ test.describe("Seller management", () => {
 
     await expect(
       sellerVatFieldset.getByRole("textbox", { name: "Label" }),
-    ).toHaveAttribute("aria-readonly", "true");
-    await expect(
-      sellerVatFieldset.getByRole("textbox", { name: "Label" }),
     ).toHaveValue(TEST_SELLER_DATA.vatNoLabelText);
-
-    await expect(
-      sellerVatFieldset.getByRole("textbox", { name: "Value" }),
-    ).toHaveAttribute("aria-readonly", "true");
 
     await expect(
       sellerVatFieldset.getByRole("textbox", { name: "Value" }),
@@ -229,15 +234,16 @@ test.describe("Seller management", () => {
     // Seller Email
     await expect(
       sellerForm.getByRole("textbox", { name: "Email" }),
-    ).toHaveAttribute("aria-readonly", "true");
-    await expect(
-      sellerForm.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(TEST_SELLER_DATA.email);
 
+    const emailSwitchNotInDialog = sellerForm.getByRole("switch", {
+      name: `Show the 'Email' field in the PDF`,
+    });
+    // Verify Email switch is not checked as we toggled it off
+    await expect(emailSwitchNotInDialog).not.toBeChecked();
+    await expect(emailSwitchNotInDialog).toBeDisabled();
+
     // Seller Account Number
-    await expect(
-      sellerForm.getByRole("textbox", { name: "Account Number" }),
-    ).toHaveAttribute("aria-readonly", "true");
     await expect(
       sellerForm.getByRole("textbox", { name: "Account Number" }),
     ).toHaveValue(TEST_SELLER_DATA.accountNumber);
@@ -252,9 +258,6 @@ test.describe("Seller management", () => {
     // Seller SWIFT/BIC
     await expect(
       sellerForm.getByRole("textbox", { name: "SWIFT/BIC" }),
-    ).toHaveAttribute("aria-readonly", "true");
-    await expect(
-      sellerForm.getByRole("textbox", { name: "SWIFT/BIC" }),
     ).toHaveValue(TEST_SELLER_DATA.swiftBic);
 
     const swiftBicSwitchNotInDialog = sellerForm.getByTestId(
@@ -265,9 +268,6 @@ test.describe("Seller management", () => {
     await expect(swiftBicSwitchNotInDialog).toBeDisabled();
 
     // Seller Notes
-    await expect(
-      sellerForm.getByRole("textbox", { name: "Notes" }),
-    ).toHaveAttribute("aria-readonly", "true");
     await expect(
       sellerForm.getByRole("textbox", { name: "Notes" }),
     ).toHaveValue(TEST_SELLER_DATA.notes);
@@ -322,6 +322,7 @@ test.describe("Seller management", () => {
     ).toHaveValue(TEST_SELLER_DATA.swiftBic);
 
     // Verify visibility switches state persisted in edit dialog
+    await expect(emailSwitchInDialogForm).not.toBeChecked();
     await expect(taxNumberSwitchInDialogForm).toBeChecked();
     await expect(accountNumberSwitchInDialogForm).not.toBeChecked();
     await expect(swiftBicSwitchInDialogForm).not.toBeChecked();
@@ -347,6 +348,7 @@ test.describe("Seller management", () => {
       name: "Unapplied Test Seller",
       address: "99 Unapplied Street",
       email: "unapplied@seller.com",
+      emailFieldIsVisible: true,
 
       vatNoFieldIsVisible: true,
       vatNo: "VAT999",
@@ -421,6 +423,7 @@ test.describe("Seller management", () => {
       name: "Dropdown Test Seller",
       address: "42 Dropdown Lane",
       email: "dropdown@seller.com",
+      emailFieldIsVisible: true,
 
       vatNoFieldIsVisible: true,
       vatNo: "VAT-DROP-001",
@@ -464,6 +467,9 @@ test.describe("Seller management", () => {
     // Seller is currently selected in dropdown
     await expect(sellerDropdown).not.toHaveValue("");
 
+    // Verify locked banner is visible when seller is selected
+    await expect(sellerForm.getByTestId("seller-locked-banner")).toBeVisible();
+
     // Restore to default by selecting the empty option
     await sellerDropdown.selectOption("");
 
@@ -471,6 +477,9 @@ test.describe("Seller management", () => {
     await expect(
       page.getByText("Seller restored to default", { exact: true }),
     ).toBeVisible();
+
+    // Verify locked banner is hidden after deselecting seller
+    await expect(sellerForm.getByTestId("seller-locked-banner")).toBeHidden();
 
     // Verify form reset to default values
     await expect(sellerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
@@ -493,6 +502,9 @@ test.describe("Seller management", () => {
       }),
     ).toBeVisible();
 
+    // Verify locked banner is visible again after reselecting seller
+    await expect(sellerForm.getByTestId("seller-locked-banner")).toBeVisible();
+
     // Verify form fields are populated with the seller's data
     await expect(sellerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
       TEST_SELLER_DATA.name,
@@ -513,6 +525,7 @@ test.describe("Seller management", () => {
       name: "Test Delete Seller",
       address: "123 Delete Street",
       email: "delete@test.com",
+      emailFieldIsVisible: true,
 
       vatNoFieldIsVisible: true,
       vatNo: "123456789",

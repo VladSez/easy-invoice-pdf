@@ -13,7 +13,7 @@ export interface SelectPropsNative
 const SelectNative = React.forwardRef<HTMLSelectElement, SelectPropsNative>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div className="relative">
+      <div className="relative w-full">
         <select
           className={cn(
             "peer block w-full cursor-pointer appearance-none items-center rounded-md border border-gray-300 bg-white text-sm text-slate-950 shadow-sm shadow-black/5 transition-all hover:bg-slate-100/80 focus-visible:border-indigo-500 focus-visible:ring focus-visible:ring-indigo-200 focus-visible:ring-opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 has-[option[disabled]:checked]:text-slate-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 dark:focus-visible:border-slate-300 dark:focus-visible:ring-slate-300/20 dark:has-[option[disabled]:checked]:text-slate-400",

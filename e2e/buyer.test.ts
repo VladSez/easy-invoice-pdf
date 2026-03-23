@@ -1,4 +1,3 @@
-import { BUYER_TOOLTIP_CONTENT } from "@/app/(app)/components/invoice-form/sections/buyer-information";
 import { DEFAULT_BUYER_DATA } from "@/app/constants";
 import { type BuyerData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
@@ -22,6 +21,7 @@ test.describe("Buyer management", () => {
       vatNoLabelText: "Tax Number",
 
       email: "client@example.com",
+      emailFieldIsVisible: true,
 
       notesFieldIsVisible: true,
       notes: "This is a test note",
@@ -70,6 +70,18 @@ test.describe("Buyer management", () => {
     await manageBuyerDialog
       .getByRole("textbox", { name: "Email" })
       .fill(TEST_BUYER_DATA.email);
+
+    const emailSwitchInDialogForm = manageBuyerDialog.getByRole("switch", {
+      name: `Show the 'Email' field in the PDF`,
+    });
+
+    // Verify Email visibility switch is checked by default
+    await expect(emailSwitchInDialogForm).toBeChecked();
+
+    // Toggle Email visibility switch
+    await emailSwitchInDialogForm.click();
+
+    await expect(emailSwitchInDialogForm).not.toBeChecked();
 
     const taxNumberSwitchInDialogForm = manageBuyerDialog.getByRole("switch", {
       name: `Show the 'Tax Number' field in the PDF`,
@@ -132,6 +144,7 @@ test.describe("Buyer management", () => {
       vatNoFieldIsVisible: false,
 
       email: TEST_BUYER_DATA.email,
+      emailFieldIsVisible: false,
 
       notes: TEST_BUYER_DATA.notes,
       notesFieldIsVisible: true,
@@ -144,42 +157,23 @@ test.describe("Buyer management", () => {
     // Verify all saved details in the Buyer Information section form
     const buyerForm = page.getByTestId(`buyer-information-section`);
 
-    // Try to find desktop tooltip icon first
-    const desktopTooltipExists =
-      (await buyerForm
-        .getByTestId("form-section-tooltip-info-icon-desktop")
-        .count()) > 0;
+    // Verify the locked banner is visible with correct text
+    const buyerLockedBanner = buyerForm.getByTestId("buyer-locked-banner");
+    await expect(buyerLockedBanner).toBeVisible();
+    await expect(buyerLockedBanner).toContainText(
+      'To modify buyer details, click the "Edit buyer" button (pencil icon) next to the dropdown above.',
+    );
 
-    // If desktop tooltip exists, hover over it; otherwise find and click mobile tooltip
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    if (desktopTooltipExists) {
-      // Get desktop tooltip icons and hover over the first one because we use tooltip
-      const desktopTooltips = buyerForm.getByTestId(
-        "form-section-tooltip-info-icon-desktop",
-      );
-      await desktopTooltips.first().hover();
-    } else {
-      // Get mobile tooltip icons and click the first one because we use popover
-      const mobileTooltips = buyerForm.getByTestId(
-        "form-section-tooltip-info-icon-mobile",
-      );
-      await mobileTooltips.first().click();
-    }
-
-    // Check that HTML title attributes contain the tooltip message on input fields
-    const nameInput = buyerForm.getByRole("textbox", { name: "Name" });
-    await expect(nameInput).toHaveAttribute("title", BUYER_TOOLTIP_CONTENT);
+    const nameInput = buyerForm.getByRole("textbox", {
+      name: "Name (Required)",
+    });
 
     // Buyer Name
-    await expect(nameInput).toHaveAttribute("aria-readonly", "true");
     await expect(nameInput).toHaveValue(TEST_BUYER_DATA.name);
 
     // Buyer Address
     await expect(
-      buyerForm.getByRole("textbox", { name: "Address" }),
-    ).toHaveAttribute("aria-readonly", "true");
-    await expect(
-      buyerForm.getByRole("textbox", { name: "Address" }),
+      buyerForm.getByRole("textbox", { name: "Address (Required)" }),
     ).toHaveValue(TEST_BUYER_DATA.address);
 
     // Buyer VAT Number
@@ -189,15 +183,8 @@ test.describe("Buyer management", () => {
 
     await expect(
       buyerVatFieldset.getByRole("textbox", { name: "Label" }),
-    ).toHaveAttribute("aria-readonly", "true");
-
-    await expect(
-      buyerVatFieldset.getByRole("textbox", { name: "Label" }),
     ).toHaveValue(TEST_BUYER_DATA.vatNoLabelText);
 
-    await expect(
-      buyerVatFieldset.getByRole("textbox", { name: "Value" }),
-    ).toHaveAttribute("aria-readonly", "true");
     await expect(
       buyerVatFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue(TEST_BUYER_DATA.vatNo);
@@ -210,18 +197,18 @@ test.describe("Buyer management", () => {
     await expect(vatNumberSwitchNotInDialog).toBeDisabled();
 
     // Buyer Email
-    await expect(
-      buyerForm.getByRole("textbox", { name: "Email" }),
-    ).toHaveAttribute("aria-readonly", "true");
     await expect(buyerForm.getByRole("textbox", { name: "Email" })).toHaveValue(
       TEST_BUYER_DATA.email,
     );
 
-    // Buyer Notes
-    await expect(
-      buyerForm.getByRole("textbox", { name: "Notes" }),
-    ).toHaveAttribute("aria-readonly", "true");
+    const emailSwitchNotInDialog = buyerForm.getByRole("switch", {
+      name: `Show the 'Email' field in the PDF`,
+    });
+    // Verify Email switch is not checked as we toggled it off
+    await expect(emailSwitchNotInDialog).not.toBeChecked();
+    await expect(emailSwitchNotInDialog).toBeDisabled();
 
+    // Buyer Notes
     await expect(buyerForm.getByRole("textbox", { name: "Notes" })).toHaveValue(
       TEST_BUYER_DATA.notes,
     );
@@ -267,6 +254,9 @@ test.describe("Buyer management", () => {
       manageBuyerDialog.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(TEST_BUYER_DATA.email);
 
+    // Verify email visibility switch state persisted in edit dialog
+    await expect(emailSwitchInDialogForm).not.toBeChecked();
+
     // Verify visibility switch state persisted in edit dialog
     await expect(taxNumberSwitchInDialogForm).not.toBeChecked();
 
@@ -291,6 +281,9 @@ test.describe("Buyer management", () => {
       .getByRole("textbox", { name: "Name" })
       .fill(updatedName);
 
+    // Re-enable Email visibility
+    await emailSwitchInDialogForm.click();
+
     // Re-enable VAT visibility
     await taxNumberSwitchInDialogForm.click();
 
@@ -314,6 +307,9 @@ test.describe("Buyer management", () => {
       updatedName,
     );
 
+    // Verify Email visibility is now enabled
+    await expect(emailSwitchNotInDialog).toBeChecked();
+
     // Verify VAT visibility is now enabled
     await expect(
       buyerForm.getByTestId(`buyerVatNoFieldIsVisible`),
@@ -330,6 +326,7 @@ test.describe("Buyer management", () => {
       name: "Unapplied Test Client",
       address: "99 Unapplied Avenue",
       email: "unapplied@client.com",
+      emailFieldIsVisible: true,
 
       vatNoFieldIsVisible: true,
       vatNo: "VAT999",
@@ -396,6 +393,7 @@ test.describe("Buyer management", () => {
       name: "Dropdown Test Client",
       address: "42 Dropdown Boulevard",
       email: "dropdown@client.com",
+      emailFieldIsVisible: true,
 
       vatNoFieldIsVisible: true,
       vatNo: "VAT-DROP-001",
@@ -431,6 +429,9 @@ test.describe("Buyer management", () => {
     // Buyer is currently selected in dropdown
     await expect(buyerDropdown).not.toHaveValue("");
 
+    // Verify locked banner is visible when buyer is selected
+    await expect(buyerForm.getByTestId("buyer-locked-banner")).toBeVisible();
+
     // Restore to default by selecting the empty option
     await buyerDropdown.selectOption("");
 
@@ -438,6 +439,9 @@ test.describe("Buyer management", () => {
     await expect(
       page.getByText("Buyer restored to default", { exact: true }),
     ).toBeVisible();
+
+    // Verify locked banner is hidden after deselecting buyer
+    await expect(buyerForm.getByTestId("buyer-locked-banner")).toBeHidden();
 
     // Verify form reset to default values
     await expect(buyerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
@@ -460,6 +464,9 @@ test.describe("Buyer management", () => {
       }),
     ).toBeVisible();
 
+    // Verify locked banner is visible again after reselecting buyer
+    await expect(buyerForm.getByTestId("buyer-locked-banner")).toBeVisible();
+
     // Verify form fields are populated with the buyer's data
     await expect(buyerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
       TEST_BUYER_DATA.name,
@@ -480,6 +487,7 @@ test.describe("Buyer management", () => {
       name: "Test Delete Buyer",
       address: "456 Delete Avenue",
       email: "delete@buyer.com",
+      emailFieldIsVisible: true,
 
       vatNoFieldIsVisible: true,
       vatNo: "123456789",

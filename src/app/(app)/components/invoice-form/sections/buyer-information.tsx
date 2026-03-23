@@ -2,13 +2,14 @@
 
 import { type BuyerData, type InvoiceData } from "@/app/schema";
 import { BuyerManagement } from "@/components/buyer-management";
-import { LabelWithEditIcon } from "@/components/label-with-edit-icon";
+import { AccordionContent } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 import { memo, useState } from "react";
 import {
   type Control,
@@ -20,9 +21,6 @@ import {
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
 };
-
-export const BUYER_TOOLTIP_CONTENT =
-  "Buyer details are locked. Click the Edit Buyer button (Pencil icon) next to the 'Select Buyer' dropdown to modify buyer details. Any changes will be automatically saved.";
 
 interface BuyerInformationProps {
   control: Control<InvoiceData>;
@@ -42,15 +40,13 @@ export const BuyerInformation = memo(function BuyerInformation({
   const [selectedBuyerId, setSelectedBuyerId] = useState("");
   const isBuyerSelected = !!selectedBuyerId;
 
-  const HTML_TITLE_CONTENT = isBuyerSelected ? BUYER_TOOLTIP_CONTENT : "";
-
-  // Get current form values to pass to BuyerManagement
   const currentFormValues = {
     name: invoiceData.buyer.name,
     address: invoiceData.buyer.address,
     vatNo: invoiceData.buyer.vatNo,
     vatNoLabelText: invoiceData.buyer.vatNoLabelText,
     email: invoiceData.buyer.email,
+    emailFieldIsVisible: invoiceData.buyer.emailFieldIsVisible,
     vatNoFieldIsVisible: invoiceData.buyer.vatNoFieldIsVisible,
     notes: invoiceData.buyer.notes,
     notesFieldIsVisible: invoiceData.buyer.notesFieldIsVisible,
@@ -68,297 +64,239 @@ export const BuyerInformation = memo(function BuyerInformation({
           isMobile={isMobile}
         />
       </div>
-      <fieldset className="mt-5 space-y-4" disabled={isBuyerSelected}>
-        <div>
+      <AccordionContent className="">
+        <fieldset className="mt-5 space-y-4" disabled={isBuyerSelected}>
           {isBuyerSelected ? (
-            <LabelWithEditIcon
-              htmlFor={`buyerName`}
-              content={BUYER_TOOLTIP_CONTENT}
+            <div
+              className="flex gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800"
+              data-testid="buyer-locked-banner"
             >
-              Name
-            </LabelWithEditIcon>
-          ) : (
-            <Label htmlFor={`buyerName`} className="mb-1">
-              Name
+              <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              <p className="">
+                To modify buyer details, click the &quot;Edit buyer&quot; button
+                (pencil icon) next to the dropdown above.
+              </p>
+            </div>
+          ) : null}
+
+          <div>
+            <Label htmlFor="buyerName" className="mb-1">
+              Name (Required)
             </Label>
-          )}
-          <Controller
-            name="buyer.name"
-            control={control}
-            render={({ field }) => (
-              <Textarea
-                {...field}
-                id={`buyerName`}
-                rows={3}
-                className=""
-                readOnly={isBuyerSelected}
-                aria-readonly={isBuyerSelected}
-                title={HTML_TITLE_CONTENT}
-              />
+            <Controller
+              name="buyer.name"
+              control={control}
+              render={({ field }) => (
+                <Textarea {...field} id="buyerName" rows={3} />
+              )}
+            />
+            {errors.buyer?.name && (
+              <ErrorMessage>{errors.buyer.name.message}</ErrorMessage>
             )}
-          />
-          {errors.buyer?.name && (
-            <ErrorMessage>{errors.buyer.name.message}</ErrorMessage>
-          )}
-        </div>
+          </div>
 
-        <div>
-          {isBuyerSelected ? (
-            <LabelWithEditIcon
-              htmlFor={`buyerAddress`}
-              content={BUYER_TOOLTIP_CONTENT}
-            >
-              Address
-            </LabelWithEditIcon>
-          ) : (
-            <Label htmlFor={`buyerAddress`} className="mb-1">
-              Address
+          <div>
+            <Label htmlFor="buyerAddress" className="mb-1">
+              Address (Required)
             </Label>
-          )}
-          <Controller
-            name="buyer.address"
-            control={control}
-            render={({ field }) => (
-              <Textarea
-                {...field}
-                id={`buyerAddress`}
-                rows={3}
-                className=""
-                readOnly={isBuyerSelected}
-                aria-readonly={isBuyerSelected}
-                title={HTML_TITLE_CONTENT}
-              />
+            <Controller
+              name="buyer.address"
+              control={control}
+              render={({ field }) => (
+                <Textarea {...field} id="buyerAddress" rows={3} />
+              )}
+            />
+            {errors.buyer?.address && (
+              <ErrorMessage>{errors.buyer.address.message}</ErrorMessage>
             )}
-          />
-          {errors.buyer?.address && (
-            <ErrorMessage>{errors.buyer.address.message}</ErrorMessage>
-          )}
-        </div>
+          </div>
 
-        <div>
-          <fieldset className="rounded-md border px-4 pb-4">
-            <legend className="text-base font-semibold lg:text-lg">
-              Buyer Tax Number
-            </legend>
+          <div>
+            <fieldset className="rounded-md border px-4 pb-4">
+              <legend className="text-base font-semibold lg:text-lg">
+                Buyer Tax Number
+              </legend>
 
-            <div className="mb-2 flex items-center justify-end">
-              {/* Show Buyer Tax Number field in PDF switch */}
-              <div
-                className="inline-flex items-center gap-2"
-                title={HTML_TITLE_CONTENT}
-              >
+              <div className="mb-2 flex items-center justify-end">
+                <div className="inline-flex items-center gap-2">
+                  <Controller
+                    name="buyer.vatNoFieldIsVisible"
+                    control={control}
+                    render={({ field: { value, onChange, ...field } }) => (
+                      <Switch
+                        {...field}
+                        id="buyerVatNoFieldIsVisible"
+                        checked={value}
+                        onCheckedChange={onChange}
+                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        data-testid="buyerVatNoFieldIsVisible"
+                        aria-label="Show the 'Buyer Tax Number' Field in the PDF"
+                      />
+                    )}
+                  />
+                  <CustomTooltip
+                    trigger={
+                      <Label htmlFor="buyerVatNoFieldIsVisible">
+                        Show in PDF
+                      </Label>
+                    }
+                    content={
+                      isBuyerSelected
+                        ? null
+                        : "Show the 'Buyer Tax Number' Field in the PDF"
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="buyerVatNoLabel">Label</Label>
+                  <Controller
+                    name="buyer.vatNoLabelText"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        type="text"
+                        id="buyerVatNoLabel"
+                        placeholder="Enter Tax number label"
+                        className="mt-1 block w-full"
+                      />
+                    )}
+                  />
+                  {errors.buyer?.vatNoLabelText && (
+                    <ErrorMessage>
+                      {errors.buyer.vatNoLabelText.message}
+                    </ErrorMessage>
+                  )}
+                  {!errors.buyer?.vatNoLabelText && (
+                    <InputHelperMessage>
+                      Set a custom label (e.g. VAT no, Tax no, etc.)
+                    </InputHelperMessage>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="buyerVatNo">Value</Label>
+                  <Controller
+                    name="buyer.vatNo"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        id="buyerVatNo"
+                        type="text"
+                        placeholder="Enter Tax number value"
+                        className="mt-1 block w-full"
+                      />
+                    )}
+                  />
+                  {errors.buyer?.vatNo && (
+                    <ErrorMessage>{errors.buyer.vatNo.message}</ErrorMessage>
+                  )}
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          {/* Email */}
+          <div>
+            <div className="relative mb-2 flex items-center justify-between">
+              <Label htmlFor="buyerEmail">Email</Label>
+
+              <div className="inline-flex items-center gap-2">
                 <Controller
-                  name={`buyer.vatNoFieldIsVisible`}
+                  name="buyer.emailFieldIsVisible"
                   control={control}
                   render={({ field: { value, onChange, ...field } }) => (
                     <Switch
                       {...field}
-                      id={`buyerVatNoFieldIsVisible`}
+                      id="buyerEmailFieldIsVisible"
                       checked={value}
                       onCheckedChange={onChange}
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                      disabled={isBuyerSelected}
-                      data-testid={`buyerVatNoFieldIsVisible`}
-                      aria-label={`Show the 'Buyer Tax Number' Field in the PDF`}
+                      data-testid="buyerEmailFieldIsVisible"
+                      aria-label="Show the 'Email' field in the PDF"
                     />
                   )}
                 />
                 <CustomTooltip
                   trigger={
-                    <Label htmlFor={`buyerVatNoFieldIsVisible`}>
+                    <Label htmlFor="buyerEmailFieldIsVisible">
                       Show in PDF
                     </Label>
                   }
                   content={
-                    isBuyerSelected
-                      ? null
-                      : "Show the 'Buyer Tax Number' Field in the PDF"
+                    isBuyerSelected ? null : "Show the 'Email' field in the PDF"
+                  }
+                />
+              </div>
+            </div>
+            <Controller
+              name="buyer.email"
+              control={control}
+              render={({ field }) => (
+                <Input {...field} id="buyerEmail" type="email" />
+              )}
+            />
+            {errors.buyer?.email && (
+              <ErrorMessage>{errors.buyer.email.message}</ErrorMessage>
+            )}
+          </div>
+
+          {/* Notes */}
+          <div>
+            <div className="relative mb-2 flex items-center justify-between">
+              <Label htmlFor="buyerNotes">Notes</Label>
+
+              <div className="inline-flex items-center gap-2">
+                <Controller
+                  name="buyer.notesFieldIsVisible"
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Switch
+                      {...field}
+                      id="buyerNotesFieldIsVisible"
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      data-testid="buyerNotesInvoiceFormFieldVisibilitySwitch"
+                      aria-label="Show the 'Notes' field in the PDF"
+                    />
+                  )}
+                />
+                <CustomTooltip
+                  trigger={
+                    <Label htmlFor="buyerNotesFieldIsVisible">
+                      Show in PDF
+                    </Label>
+                  }
+                  content={
+                    isBuyerSelected ? null : "Show the 'Notes' field in the PDF"
                   }
                 />
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                {isBuyerSelected ? (
-                  <LabelWithEditIcon
-                    htmlFor="buyerVatNoLabel"
-                    content={BUYER_TOOLTIP_CONTENT}
-                  >
-                    Label
-                  </LabelWithEditIcon>
-                ) : (
-                  <Label htmlFor="buyerVatNoLabel">Label</Label>
-                )}
-                <Controller
-                  name="buyer.vatNoLabelText"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      type="text"
-                      id="buyerVatNoLabel"
-                      placeholder="Enter Tax number label"
-                      className="mt-1 block w-full"
-                      readOnly={isBuyerSelected}
-                      aria-readonly={isBuyerSelected}
-                      title={HTML_TITLE_CONTENT}
-                    />
-                  )}
-                />
-                {errors.buyer?.vatNoLabelText && (
-                  <ErrorMessage>
-                    {errors.buyer.vatNoLabelText.message}
-                  </ErrorMessage>
-                )}
-                {!errors.buyer?.vatNoLabelText && (
-                  <InputHelperMessage>
-                    Set a custom label (e.g. VAT no, Tax no, etc.)
-                  </InputHelperMessage>
-                )}
-              </div>
-
-              <div>
-                {isBuyerSelected ? (
-                  <LabelWithEditIcon
-                    htmlFor={`buyerVatNo`}
-                    content={BUYER_TOOLTIP_CONTENT}
-                  >
-                    Value
-                  </LabelWithEditIcon>
-                ) : (
-                  <Label htmlFor={`buyerVatNo`}>Value</Label>
-                )}
-                <Controller
-                  name="buyer.vatNo"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id={`buyerVatNo`}
-                      type="text"
-                      placeholder="Enter Tax number value"
-                      className="mt-1 block w-full"
-                      readOnly={isBuyerSelected}
-                      aria-readonly={isBuyerSelected}
-                      title={HTML_TITLE_CONTENT}
-                    />
-                  )}
-                />
-                {errors.buyer?.vatNo && (
-                  <ErrorMessage>{errors.buyer.vatNo.message}</ErrorMessage>
-                )}
-              </div>
-            </div>
-          </fieldset>
-        </div>
-
-        <div>
-          {isBuyerSelected ? (
-            <LabelWithEditIcon
-              htmlFor={`buyerEmail`}
-              content={BUYER_TOOLTIP_CONTENT}
-            >
-              Email
-            </LabelWithEditIcon>
-          ) : (
-            <Label htmlFor={`buyerEmail`} className="mb-1">
-              Email
-            </Label>
-          )}
-          <Controller
-            name="buyer.email"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                id={`buyerEmail`}
-                type="email"
-                className=""
-                readOnly={isBuyerSelected}
-                aria-readonly={isBuyerSelected}
-                title={HTML_TITLE_CONTENT}
-              />
-            )}
-          />
-          {errors.buyer?.email && (
-            <ErrorMessage>{errors.buyer.email.message}</ErrorMessage>
-          )}
-        </div>
-
-        {/* Notes */}
-        <div>
-          <div className="relative mb-2 flex items-center justify-between">
-            {isBuyerSelected ? (
-              <LabelWithEditIcon
-                htmlFor={`buyerNotes`}
-                content={BUYER_TOOLTIP_CONTENT}
-              >
-                Notes
-              </LabelWithEditIcon>
-            ) : (
-              <Label htmlFor={`buyerNotes`} className="">
-                Notes
-              </Label>
-            )}
-
-            {/* Show Notes field in PDF switch */}
-            <div
-              className="inline-flex items-center gap-2"
-              title={HTML_TITLE_CONTENT}
-            >
-              <Controller
-                name={`buyer.notesFieldIsVisible`}
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`buyerNotesFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    disabled={isBuyerSelected}
-                    data-testid={`buyerNotesInvoiceFormFieldVisibilitySwitch`}
-                    aria-label={`Show the 'Notes' field in the PDF`}
-                  />
-                )}
-              />
-              <CustomTooltip
-                trigger={
-                  <Label htmlFor={`buyerNotesFieldIsVisible`}>
-                    Show in PDF
-                  </Label>
-                }
-                content={
-                  isBuyerSelected ? null : "Show the 'Notes' field in the PDF"
-                }
-              />
-            </div>
-          </div>
-
-          <Controller
-            name="buyer.notes"
-            control={control}
-            render={({ field }) => {
-              return (
+            <Controller
+              name="buyer.notes"
+              control={control}
+              render={({ field }) => (
                 <Textarea
                   {...field}
-                  id={`buyerNotes`}
+                  id="buyerNotes"
                   rows={3}
-                  className=""
-                  readOnly={isBuyerSelected}
-                  aria-readonly={isBuyerSelected}
-                  title={HTML_TITLE_CONTENT}
                   placeholder="Additional information about the buyer"
                 />
-              );
-            }}
-          />
-          {errors.buyer?.notes && (
-            <ErrorMessage>{errors.buyer.notes.message}</ErrorMessage>
-          )}
-        </div>
-      </fieldset>
+              )}
+            />
+            {errors.buyer?.notes && (
+              <ErrorMessage>{errors.buyer.notes.message}</ErrorMessage>
+            )}
+          </div>
+        </fieldset>
+      </AccordionContent>
     </div>
   );
 });

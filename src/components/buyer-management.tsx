@@ -280,21 +280,28 @@ export function BuyerManagement({
     (buyer) => buyer.id === selectedBuyerId,
   );
 
+  const hasBuyers = buyersSelectOptions.length > 0;
+
   return (
     <>
-      <div className="flex flex-col gap-2">
-        {buyersSelectOptions.length > 0 ? (
-          <div className="space-y-1">
+      <div
+        className={cn(
+          "flex w-full flex-col gap-2",
+          hasBuyers ? "rounded-md border p-4" : "mt-3",
+        )}
+      >
+        {hasBuyers ? (
+          <div className="w-full space-y-1">
             <div className="flex items-center gap-1">
               <Label htmlFor={buyerSelectId} className="">
                 Select Buyer
               </Label>
             </div>
-            <div className="flex gap-2">
+            <div className="flex w-full gap-2">
               <SelectNative
                 id={buyerSelectId}
                 className={cn(
-                  "block h-8 max-w-[200px] text-[12px]",
+                  "block h-8 w-full text-[12px]",
                   !selectedBuyerId && "italic text-gray-700",
                 )}
                 onChange={handleBuyerChange}
@@ -325,10 +332,10 @@ export function BuyerManagement({
                             setIsBuyerDialogOpen(true);
                           }
                         }}
-                        className="h-8 px-2"
+                        className="size-8 px-2"
                       >
                         <span className="sr-only">Edit buyer</span>
-                        <Pencil className="h-3 w-3" />
+                        <Pencil className="size-3.5" />
                       </Button>
                     }
                     content="Edit buyer"
@@ -344,10 +351,10 @@ export function BuyerManagement({
 
                           setIsDeleteDialogOpen(true);
                         }}
-                        className="h-8 px-2"
+                        className="size-8 px-2"
                       >
                         <span className="sr-only">Delete buyer</span>
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="size-3.5" />
                       </Button>
                     }
                     content="Delete buyer"
@@ -359,6 +366,7 @@ export function BuyerManagement({
         ) : null}
 
         <CustomTooltip
+          side="bottom"
           className={cn(!isLocalStorageAvailable && "bg-red-50")}
           trigger={
             <Button

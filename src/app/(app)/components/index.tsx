@@ -11,11 +11,11 @@ import { AlertCircleIcon, FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 
 import { TWITTER_URL } from "@/config";
+import type { Dispatch, SetStateAction } from "react";
 import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { MobileFormScrollContainer } from "./mobile-form-scroll-container";
-import type { Dispatch, SetStateAction } from "react";
 
 const DesktopPDFViewerModuleLoading = () => (
   <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
@@ -264,12 +264,14 @@ export function InvoiceClientPage({
               isMobile={isMobile}
             />
           </div>
+          {/** Mobile version */}
           {invoiceLastUpdatedAtFormatted && (
             <div className="relative mt-2 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
               <span className="font-semibold">Invoice last updated:</span>{" "}
               {invoiceLastUpdatedAtFormatted}
             </div>
           )}
+          {/** Mobile version */}
           <div className="mt-3 flex w-full justify-center">
             <span className="inline-block text-xs text-zinc-900 duration-500 animate-in fade-in slide-in-from-bottom-2">
               Made by{" "}

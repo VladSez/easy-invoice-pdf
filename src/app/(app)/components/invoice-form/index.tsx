@@ -389,9 +389,11 @@ export const InvoiceForm = memo(function InvoiceForm({
           data-testid={`seller-information-section`}
         >
           <AccordionTrigger className="px-4 py-3">
-            <Legend>Seller Information</Legend>
+            <div className="flex items-center gap-2">
+              <Legend>Seller Information</Legend>
+            </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
+          <div className="px-4 pb-4">
             <SellerInformation
               control={control}
               errors={errors}
@@ -399,7 +401,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               invoiceData={invoiceData}
               isMobile={isMobile}
             />
-          </AccordionContent>
+          </div>
         </AccordionItem>
 
         {/* Buyer Information */}
@@ -409,9 +411,11 @@ export const InvoiceForm = memo(function InvoiceForm({
           data-testid={`buyer-information-section`}
         >
           <AccordionTrigger className="px-4 py-3">
-            <Legend>Buyer Information</Legend>
+            <div className="flex items-center gap-2">
+              <Legend>Buyer Information</Legend>
+            </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
+          <div className="px-4 pb-4">
             <BuyerInformation
               control={control}
               errors={errors}
@@ -419,7 +423,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               invoiceData={invoiceData}
               isMobile={isMobile}
             />
-          </AccordionContent>
+          </div>
         </AccordionItem>
 
         {/* Invoice Items */}

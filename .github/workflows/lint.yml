@@ -28,10 +28,12 @@ jobs:
         run: pnpm install
 
       - name: 🔎 Run linting
+        id: lint
+        continue-on-error: true
         run: pnpm eslint .
 
       - name: 🔍 Get PR URL
-        if: failure()
+        if: steps.lint.outcome == 'failure'
         id: pr-url
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -43,8 +45,8 @@ jobs:
             | jq -r '.[0].html_url')
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
-      - name: 📧 Send email on failure
-        if: failure()
+      - name: 📧 Send email
+        if: steps.lint.outcome == 'failure'
         uses: dawidd6/action-send-mail@611879133a9569642c41be66f4a323286e9b8a3b # v4
         with:
           server_address: smtp.gmail.com
@@ -60,4 +62,3 @@ jobs:
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
-            - Commit: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}

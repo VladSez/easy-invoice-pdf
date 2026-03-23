@@ -106,6 +106,9 @@ export function AppPageClient({
 
   const [isInvoiceUrlCorrupted, setIsInvoiceUrlCorrupted] = useState(false);
 
+  const isViewingSharedInvoice =
+    searchParams.get("data") !== null && !isInvoiceUrlCorrupted;
+
   const [invoiceFormHasErrors, setInvoiceFormHasErrors] = useState(false);
 
   // Refs to track original URL invoice data
@@ -253,6 +256,11 @@ export function AppPageClient({
         const updatedJson = handleInvoiceNumberBreakingChange(decompressedKeys);
 
         const validatedDataFromURL = invoiceSchema.parse(updatedJson);
+
+        console.log(
+          "[useEffect] [initialize invoice data from ** URL **] validatedDataFromURL",
+          validatedDataFromURL,
+        );
 
         // Override template from URL parameter if present for better UX
         // The ?template parameter provides a cleaner URL and better user experience
@@ -702,6 +710,7 @@ export function AppPageClient({
             }
             qrCodeDataUrl={qrCodeDataUrl}
             isMobile={isMobile}
+            isSharedInvoice={isViewingSharedInvoice}
           />
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
             <InvoiceClientPage

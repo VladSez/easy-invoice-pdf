@@ -10,6 +10,7 @@ const TEST_SELLER_DATA = {
   vatNoLabelText: "SELLER TEST TAX no label",
 
   email: "seller@test.com",
+  emailFieldIsVisible: true,
 
   accountNumberFieldIsVisible: true,
   accountNumber: "1234 seller test account number",
@@ -26,6 +27,7 @@ const TEST_BUYER_DATA = {
   address: "456 Buyer Ave",
 
   email: "buyer@test.com",
+  emailFieldIsVisible: true,
 
   vatNoFieldIsVisible: true,
   vatNo: "1234 buyer test tax number",
@@ -46,6 +48,9 @@ test.describe("Generate Invoice Link", () => {
     page,
     context,
   }) => {
+    // Verify shared invoice badge is NOT visible before sharing
+    await expect(page.getByTestId("shared-invoice-badge")).toBeHidden();
+
     // Fill in some test data
     const invoiceNumberFieldset = page.getByRole("group", {
       name: "Invoice Number",
@@ -307,6 +312,12 @@ test.describe("Generate Invoice Link", () => {
     await expect(newQrCodeDescriptionField).toHaveValue(
       "QR Code TEST Description",
     );
+
+    // Verify shared invoice badge is visible on the new page
+    const sharedInvoiceBadge = newPage.getByTestId("shared-invoice-badge");
+
+    await expect(sharedInvoiceBadge).toBeVisible();
+    await expect(sharedInvoiceBadge).toHaveText("Shared invoice");
   });
 
   test("shows error notification when invoice link is broken", async ({
@@ -711,6 +722,9 @@ test.describe("Generate Invoice Link", () => {
       }),
     ).toHaveValue(INVOICE_TEST_DATA.invoiceItemAmount);
 
+    // Verify shared invoice badge is visible before modification
+    await expect(newPage.getByTestId("shared-invoice-badge")).toBeVisible();
+
     /**
      * MODIFY INVOICE DATA AND TRIGGER TOAST
      */
@@ -733,6 +747,9 @@ test.describe("Generate Invoice Link", () => {
 
     // Verify the data parameter is removed from URL after modification
     await expect(newPage).toHaveURL("?template=default");
+
+    // Verify shared invoice badge is hidden after modification
+    await expect(newPage.getByTestId("shared-invoice-badge")).toBeHidden();
   });
 
   test("shows error toast when invoice data exceeds URL size limit", async ({

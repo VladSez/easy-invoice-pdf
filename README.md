@@ -1,5 +1,5 @@
 <div align="center">
-  <img src=".github/screenshots/easy-invoice-logo-readme.png" alt="EasyInvoicePDF Logo" width="160" height="160">
+  <img src=".github/screenshots/easy-invoice-logo-readme.png" alt="EasyInvoicePDF Logo" width="80" height="80">
   <h1>EasyInvoicePDF</h1>
   <h3>Free & Open-Source Invoice Generator</h3>
   <p>Create professional invoices instantly in your browser with <strong>Live Preview</strong>, <strong>Multiple Templates</strong> (including a Stripe-style design). <strong>No Sign-Up Required</strong>.</p>

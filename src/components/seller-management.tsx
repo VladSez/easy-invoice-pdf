@@ -296,21 +296,28 @@ export function SellerManagement({
     (seller) => seller.id === selectedSellerId,
   );
 
+  const hasSellers = sellersSelectOptions.length > 0;
+
   return (
     <>
-      <div className="flex flex-col gap-2">
-        {sellersSelectOptions.length > 0 ? (
-          <div className="space-y-1">
+      <div
+        className={cn(
+          "flex w-full flex-col gap-2",
+          hasSellers ? "rounded-md border p-4" : "mt-3",
+        )}
+      >
+        {hasSellers ? (
+          <div className="w-full space-y-1">
             <div className="flex items-center gap-1">
               <Label htmlFor={sellerSelectId} className="">
                 Select Seller
               </Label>
             </div>
-            <div className="flex gap-2">
+            <div className="flex w-full gap-2">
               <SelectNative
                 id={sellerSelectId}
                 className={cn(
-                  "block h-8 max-w-[200px] text-[12px]",
+                  "block h-8 w-full text-[12px]",
                   !selectedSellerId && "italic text-gray-700",
                 )}
                 onChange={handleSellerChange}
@@ -341,10 +348,10 @@ export function SellerManagement({
                             setIsSellerDialogOpen(true);
                           }
                         }}
-                        className="h-8 px-2"
+                        className="size-8 px-2"
                       >
                         <span className="sr-only">Edit seller</span>
-                        <Pencil className="h-3 w-3" />
+                        <Pencil className="size-3.5" />
                       </Button>
                     }
                     content="Edit seller"
@@ -360,10 +367,10 @@ export function SellerManagement({
 
                           setIsDeleteDialogOpen(true);
                         }}
-                        className="h-8 px-2"
+                        className="size-8 px-2"
                       >
                         <span className="sr-only">Delete seller</span>
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="size-3.5" />
                       </Button>
                     }
                     content="Delete seller"
@@ -375,6 +382,7 @@ export function SellerManagement({
         ) : null}
 
         <CustomTooltip
+          side="bottom"
           className={cn(!isLocalStorageAvailable && "bg-red-50")}
           trigger={
             <Button

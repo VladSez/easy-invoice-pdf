@@ -83,6 +83,7 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   vatNo: "C",
   vatNoFieldIsVisible: "D",
   email: "E",
+  emailFieldIsVisible: "8",
   accountNumber: "F",
   accountNumberFieldIsVisible: "G",
   swiftBic: "H",
