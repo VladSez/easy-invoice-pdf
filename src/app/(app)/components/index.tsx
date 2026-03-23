@@ -7,20 +7,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import {
-  AlertCircleIcon,
-  FileTextIcon,
-  LinkIcon,
-  PencilIcon,
-} from "lucide-react";
+import { AlertCircleIcon, FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 
 import { TWITTER_URL } from "@/config";
+import type { Dispatch, SetStateAction } from "react";
 import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { MobileFormScrollContainer } from "./mobile-form-scroll-container";
-import type { Dispatch, SetStateAction } from "react";
 
 const DesktopPDFViewerModuleLoading = () => (
   <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
@@ -134,7 +129,6 @@ export function InvoiceClientPage({
   canShareInvoice,
   qrCodeDataUrl,
   setInvoiceFormHasErrors,
-  isSharedInvoice,
 }: {
   invoiceDataState: InvoiceData;
   handleInvoiceDataChange: (invoiceData: InvoiceData) => void;
@@ -145,7 +139,6 @@ export function InvoiceClientPage({
   canShareInvoice: boolean;
   qrCodeDataUrl: string;
   setInvoiceFormHasErrors: Dispatch<SetStateAction<boolean>>;
-  isSharedInvoice: boolean;
 }) {
   const appMetadata = getAppMetadata();
 
@@ -279,14 +272,6 @@ export function InvoiceClientPage({
             </div>
           )}
           {/** Mobile version */}
-          {isSharedInvoice ? (
-            <div className="my-3 flex flex-row items-center justify-center lg:hidden">
-              <span className="flex w-[115px] items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 shadow duration-500 animate-in fade-in slide-in-from-top-2">
-                <LinkIcon className="size-3" />
-                Shared invoice
-              </span>
-            </div>
-          ) : null}
           <div className="mt-3 flex w-full justify-center">
             <span className="inline-block text-xs text-zinc-900 duration-500 animate-in fade-in slide-in-from-bottom-2">
               Made by{" "}

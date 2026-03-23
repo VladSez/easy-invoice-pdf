@@ -725,7 +725,6 @@ export function AppPageClient({
               canShareInvoice={canShareInvoice}
               qrCodeDataUrl={qrCodeDataUrl}
               setInvoiceFormHasErrors={setInvoiceFormHasErrors}
-              isSharedInvoice={isViewingSharedInvoice}
             />
           </div>
         </div>

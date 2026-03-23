@@ -157,8 +157,12 @@ test.describe("Buyer management", () => {
     // Verify all saved details in the Buyer Information section form
     const buyerForm = page.getByTestId(`buyer-information-section`);
 
-    // Verify the locked banner is visible
-    await expect(buyerForm.getByTestId("buyer-locked-banner")).toBeVisible();
+    // Verify the locked banner is visible with correct text
+    const buyerLockedBanner = buyerForm.getByTestId("buyer-locked-banner");
+    await expect(buyerLockedBanner).toBeVisible();
+    await expect(buyerLockedBanner).toContainText(
+      'To modify buyer details, click the "Edit buyer" button (pencil icon) next to the dropdown above.',
+    );
 
     const nameInput = buyerForm.getByRole("textbox", {
       name: "Name (Required)",
@@ -425,6 +429,9 @@ test.describe("Buyer management", () => {
     // Buyer is currently selected in dropdown
     await expect(buyerDropdown).not.toHaveValue("");
 
+    // Verify locked banner is visible when buyer is selected
+    await expect(buyerForm.getByTestId("buyer-locked-banner")).toBeVisible();
+
     // Restore to default by selecting the empty option
     await buyerDropdown.selectOption("");
 
@@ -432,6 +439,9 @@ test.describe("Buyer management", () => {
     await expect(
       page.getByText("Buyer restored to default", { exact: true }),
     ).toBeVisible();
+
+    // Verify locked banner is hidden after deselecting buyer
+    await expect(buyerForm.getByTestId("buyer-locked-banner")).toBeHidden();
 
     // Verify form reset to default values
     await expect(buyerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
@@ -453,6 +463,9 @@ test.describe("Buyer management", () => {
         exact: true,
       }),
     ).toBeVisible();
+
+    // Verify locked banner is visible again after reselecting buyer
+    await expect(buyerForm.getByTestId("buyer-locked-banner")).toBeVisible();
 
     // Verify form fields are populated with the buyer's data
     await expect(buyerForm.getByRole("textbox", { name: "Name" })).toHaveValue(

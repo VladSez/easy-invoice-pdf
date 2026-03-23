@@ -65,12 +65,15 @@ export function InvoicePageHeader({
             </ProjectLogoDescription>
           </div>
         </div>
-        {/* this section is hidden on mobile and shown on desktop */}
+        {/* desktop only section (hidden on mobile) */}
         <div className="mb-1 hidden w-full flex-wrap justify-center gap-3 lg:flex lg:flex-nowrap lg:justify-end">
-          {isSharedInvoice ? (
+          {isSharedInvoice && isDesktop ? (
             <CustomTooltip
               trigger={
-                <span className="flex w-[115px] items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 shadow duration-500 animate-in fade-in slide-in-from-top-2">
+                <span
+                  data-testid="shared-invoice-badge"
+                  className="flex w-[115px] items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 shadow duration-500 animate-in fade-in slide-in-from-top-2"
+                >
                   <LinkIcon className="size-3" />
                   Shared invoice
                 </span>
@@ -179,6 +182,19 @@ export function InvoicePageHeader({
       <div className="mb-3 mt-1 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-1">
         <ProjectInfoLinks />
       </div>
+
+      {/* mobile only section (hidden on desktop) */}
+      {isSharedInvoice && isMobile ? (
+        <div className="mb-3 flex flex-row items-center justify-center">
+          <span
+            data-testid="shared-invoice-badge"
+            className="flex w-[115px] items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 shadow duration-500 animate-in fade-in slide-in-from-top-2"
+          >
+            <LinkIcon className="size-3" />
+            Shared invoice
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }

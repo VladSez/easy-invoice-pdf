@@ -196,8 +196,12 @@ test.describe("Seller management", () => {
     // Verify all saved details in the Seller Information section form
     const sellerForm = page.getByTestId(`seller-information-section`);
 
-    // Verify the locked banner is visible
-    await expect(sellerForm.getByTestId("seller-locked-banner")).toBeVisible();
+    // Verify the locked banner is visible with correct text
+    const sellerLockedBanner = sellerForm.getByTestId("seller-locked-banner");
+    await expect(sellerLockedBanner).toBeVisible();
+    await expect(sellerLockedBanner).toContainText(
+      'To modify seller details, click the "Edit seller" button (pencil icon) next to the dropdown above.',
+    );
 
     // Seller Name
     await expect(
@@ -463,6 +467,9 @@ test.describe("Seller management", () => {
     // Seller is currently selected in dropdown
     await expect(sellerDropdown).not.toHaveValue("");
 
+    // Verify locked banner is visible when seller is selected
+    await expect(sellerForm.getByTestId("seller-locked-banner")).toBeVisible();
+
     // Restore to default by selecting the empty option
     await sellerDropdown.selectOption("");
 
@@ -470,6 +477,9 @@ test.describe("Seller management", () => {
     await expect(
       page.getByText("Seller restored to default", { exact: true }),
     ).toBeVisible();
+
+    // Verify locked banner is hidden after deselecting seller
+    await expect(sellerForm.getByTestId("seller-locked-banner")).toBeHidden();
 
     // Verify form reset to default values
     await expect(sellerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
@@ -491,6 +501,9 @@ test.describe("Seller management", () => {
         exact: true,
       }),
     ).toBeVisible();
+
+    // Verify locked banner is visible again after reselecting seller
+    await expect(sellerForm.getByTestId("seller-locked-banner")).toBeVisible();
 
     // Verify form fields are populated with the seller's data
     await expect(sellerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
