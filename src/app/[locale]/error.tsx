@@ -30,8 +30,8 @@ export default function Error({ error, reset }: Props) {
     <div className="flex h-dvh flex-col items-center justify-center gap-4">
       <div className="flex flex-col items-center justify-center gap-4">
         <ErrorMessage>
-          Something went wrong. Please try to refresh the page or fill a bug
-          report{" "}
+          Something went wrong.
+          <br /> Please try to refresh the page or fill a bug report{" "}
           <a
             href="https://pdfinvoicegenerator.userjot.com/board/bugs"
             className="underline"

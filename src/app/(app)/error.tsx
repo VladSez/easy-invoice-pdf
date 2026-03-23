@@ -49,11 +49,13 @@ export default function Error({
     <div className="flex h-dvh flex-col items-center justify-center gap-4">
       <div className="flex flex-col items-center justify-center gap-4">
         <ErrorMessage>
-          Something went wrong. Please try refreshing the page or using{" "}
-          <span className="font-bold">Chrome</span> browser. You can also try
-          resetting your invoice data below and filling it in again. If the
-          issue persists, try clearing your browser&apos;s local storage
-          manually or fill a bug report{" "}
+          Something went wrong.
+          <br /> Please try refreshing the page or using the Chrome browser.
+        </ErrorMessage>
+        <ErrorMessage>
+          You can also try resetting your invoice data below and filling it in
+          again. <br /> If the issue persists, try clearing your browser&apos;s
+          local storage manually or fill a bug report{" "}
           <a
             href={BUG_REPORT_URL}
             className="underline"
