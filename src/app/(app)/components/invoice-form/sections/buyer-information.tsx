@@ -2,7 +2,6 @@
 
 import { type BuyerData, type InvoiceData } from "@/app/schema";
 import { BuyerManagement } from "@/components/buyer-management";
-import { LabelWithEditIcon } from "@/components/label-with-edit-icon";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
 import { Label } from "@/components/ui/label";
@@ -20,9 +19,6 @@ import {
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
 };
-
-export const BUYER_TOOLTIP_CONTENT =
-  "Buyer details are locked. Click the Edit Buyer button (Pencil icon) next to the 'Select Buyer' dropdown to modify buyer details. Any changes will be automatically saved.";
 
 interface BuyerInformationProps {
   control: Control<InvoiceData>;
@@ -42,9 +38,6 @@ export const BuyerInformation = memo(function BuyerInformation({
   const [selectedBuyerId, setSelectedBuyerId] = useState("");
   const isBuyerSelected = !!selectedBuyerId;
 
-  const HTML_TITLE_CONTENT = isBuyerSelected ? BUYER_TOOLTIP_CONTENT : "";
-
-  // Get current form values to pass to BuyerManagement
   const currentFormValues = {
     name: invoiceData.buyer.name,
     address: invoiceData.buyer.address,
@@ -70,32 +63,25 @@ export const BuyerInformation = memo(function BuyerInformation({
         />
       </div>
       <fieldset className="mt-5 space-y-4" disabled={isBuyerSelected}>
+        {isBuyerSelected ? (
+          <p
+            className="text-pretty rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800"
+            data-testid="buyer-locked-banner"
+          >
+            To modify buyer details, click the &quot;Edit buyer&quot; button
+            (pencil icon) next to the dropdown above.
+          </p>
+        ) : null}
+
         <div>
-          {isBuyerSelected ? (
-            <LabelWithEditIcon
-              htmlFor={`buyerName`}
-              content={BUYER_TOOLTIP_CONTENT}
-            >
-              Name (Required)
-            </LabelWithEditIcon>
-          ) : (
-            <Label htmlFor={`buyerName`} className="mb-1">
-              Name (Required)
-            </Label>
-          )}
+          <Label htmlFor="buyerName" className="mb-1">
+            Name (Required)
+          </Label>
           <Controller
             name="buyer.name"
             control={control}
             render={({ field }) => (
-              <Textarea
-                {...field}
-                id={`buyerName`}
-                rows={3}
-                className=""
-                readOnly={isBuyerSelected}
-                aria-readonly={isBuyerSelected}
-                title={HTML_TITLE_CONTENT}
-              />
+              <Textarea {...field} id="buyerName" rows={3} />
             )}
           />
           {errors.buyer?.name && (
@@ -104,31 +90,14 @@ export const BuyerInformation = memo(function BuyerInformation({
         </div>
 
         <div>
-          {isBuyerSelected ? (
-            <LabelWithEditIcon
-              htmlFor={`buyerAddress`}
-              content={BUYER_TOOLTIP_CONTENT}
-            >
-              Address (Required)
-            </LabelWithEditIcon>
-          ) : (
-            <Label htmlFor={`buyerAddress`} className="mb-1">
-              Address (Required)
-            </Label>
-          )}
+          <Label htmlFor="buyerAddress" className="mb-1">
+            Address (Required)
+          </Label>
           <Controller
             name="buyer.address"
             control={control}
             render={({ field }) => (
-              <Textarea
-                {...field}
-                id={`buyerAddress`}
-                rows={3}
-                className=""
-                readOnly={isBuyerSelected}
-                aria-readonly={isBuyerSelected}
-                title={HTML_TITLE_CONTENT}
-              />
+              <Textarea {...field} id="buyerAddress" rows={3} />
             )}
           />
           {errors.buyer?.address && (
@@ -143,30 +112,25 @@ export const BuyerInformation = memo(function BuyerInformation({
             </legend>
 
             <div className="mb-2 flex items-center justify-end">
-              {/* Show Buyer Tax Number field in PDF switch */}
-              <div
-                className="inline-flex items-center gap-2"
-                title={HTML_TITLE_CONTENT}
-              >
+              <div className="inline-flex items-center gap-2">
                 <Controller
-                  name={`buyer.vatNoFieldIsVisible`}
+                  name="buyer.vatNoFieldIsVisible"
                   control={control}
                   render={({ field: { value, onChange, ...field } }) => (
                     <Switch
                       {...field}
-                      id={`buyerVatNoFieldIsVisible`}
+                      id="buyerVatNoFieldIsVisible"
                       checked={value}
                       onCheckedChange={onChange}
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                      disabled={isBuyerSelected}
-                      data-testid={`buyerVatNoFieldIsVisible`}
-                      aria-label={`Show the 'Buyer Tax Number' Field in the PDF`}
+                      data-testid="buyerVatNoFieldIsVisible"
+                      aria-label="Show the 'Buyer Tax Number' Field in the PDF"
                     />
                   )}
                 />
                 <CustomTooltip
                   trigger={
-                    <Label htmlFor={`buyerVatNoFieldIsVisible`}>
+                    <Label htmlFor="buyerVatNoFieldIsVisible">
                       Show in PDF
                     </Label>
                   }
@@ -181,16 +145,7 @@ export const BuyerInformation = memo(function BuyerInformation({
 
             <div className="space-y-4">
               <div>
-                {isBuyerSelected ? (
-                  <LabelWithEditIcon
-                    htmlFor="buyerVatNoLabel"
-                    content={BUYER_TOOLTIP_CONTENT}
-                  >
-                    Label
-                  </LabelWithEditIcon>
-                ) : (
-                  <Label htmlFor="buyerVatNoLabel">Label</Label>
-                )}
+                <Label htmlFor="buyerVatNoLabel">Label</Label>
                 <Controller
                   name="buyer.vatNoLabelText"
                   control={control}
@@ -201,9 +156,6 @@ export const BuyerInformation = memo(function BuyerInformation({
                       id="buyerVatNoLabel"
                       placeholder="Enter Tax number label"
                       className="mt-1 block w-full"
-                      readOnly={isBuyerSelected}
-                      aria-readonly={isBuyerSelected}
-                      title={HTML_TITLE_CONTENT}
                     />
                   )}
                 />
@@ -220,29 +172,17 @@ export const BuyerInformation = memo(function BuyerInformation({
               </div>
 
               <div>
-                {isBuyerSelected ? (
-                  <LabelWithEditIcon
-                    htmlFor={`buyerVatNo`}
-                    content={BUYER_TOOLTIP_CONTENT}
-                  >
-                    Value
-                  </LabelWithEditIcon>
-                ) : (
-                  <Label htmlFor={`buyerVatNo`}>Value</Label>
-                )}
+                <Label htmlFor="buyerVatNo">Value</Label>
                 <Controller
                   name="buyer.vatNo"
                   control={control}
                   render={({ field }) => (
                     <Input
                       {...field}
-                      id={`buyerVatNo`}
+                      id="buyerVatNo"
                       type="text"
                       placeholder="Enter Tax number value"
                       className="mt-1 block w-full"
-                      readOnly={isBuyerSelected}
-                      aria-readonly={isBuyerSelected}
-                      title={HTML_TITLE_CONTENT}
                     />
                   )}
                 />
@@ -257,45 +197,27 @@ export const BuyerInformation = memo(function BuyerInformation({
         {/* Email */}
         <div>
           <div className="relative mb-2 flex items-center justify-between">
-            {isBuyerSelected ? (
-              <LabelWithEditIcon
-                htmlFor={`buyerEmail`}
-                content={BUYER_TOOLTIP_CONTENT}
-              >
-                Email
-              </LabelWithEditIcon>
-            ) : (
-              <Label htmlFor={`buyerEmail`} className="">
-                Email
-              </Label>
-            )}
+            <Label htmlFor="buyerEmail">Email</Label>
 
-            {/* Show Email field in PDF switch */}
-            <div
-              className="inline-flex items-center gap-2"
-              title={HTML_TITLE_CONTENT}
-            >
+            <div className="inline-flex items-center gap-2">
               <Controller
-                name={`buyer.emailFieldIsVisible`}
+                name="buyer.emailFieldIsVisible"
                 control={control}
                 render={({ field: { value, onChange, ...field } }) => (
                   <Switch
                     {...field}
-                    id={`buyerEmailFieldIsVisible`}
+                    id="buyerEmailFieldIsVisible"
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    disabled={isBuyerSelected}
-                    data-testid={`buyerEmailFieldIsVisible`}
-                    aria-label={`Show the 'Email' field in the PDF`}
+                    data-testid="buyerEmailFieldIsVisible"
+                    aria-label="Show the 'Email' field in the PDF"
                   />
                 )}
               />
               <CustomTooltip
                 trigger={
-                  <Label htmlFor={`buyerEmailFieldIsVisible`}>
-                    Show in PDF
-                  </Label>
+                  <Label htmlFor="buyerEmailFieldIsVisible">Show in PDF</Label>
                 }
                 content={
                   isBuyerSelected ? null : "Show the 'Email' field in the PDF"
@@ -307,15 +229,7 @@ export const BuyerInformation = memo(function BuyerInformation({
             name="buyer.email"
             control={control}
             render={({ field }) => (
-              <Input
-                {...field}
-                id={`buyerEmail`}
-                type="email"
-                className=""
-                readOnly={isBuyerSelected}
-                aria-readonly={isBuyerSelected}
-                title={HTML_TITLE_CONTENT}
-              />
+              <Input {...field} id="buyerEmail" type="email" />
             )}
           />
           {errors.buyer?.email && (
@@ -326,45 +240,27 @@ export const BuyerInformation = memo(function BuyerInformation({
         {/* Notes */}
         <div>
           <div className="relative mb-2 flex items-center justify-between">
-            {isBuyerSelected ? (
-              <LabelWithEditIcon
-                htmlFor={`buyerNotes`}
-                content={BUYER_TOOLTIP_CONTENT}
-              >
-                Notes
-              </LabelWithEditIcon>
-            ) : (
-              <Label htmlFor={`buyerNotes`} className="">
-                Notes
-              </Label>
-            )}
+            <Label htmlFor="buyerNotes">Notes</Label>
 
-            {/* Show Notes field in PDF switch */}
-            <div
-              className="inline-flex items-center gap-2"
-              title={HTML_TITLE_CONTENT}
-            >
+            <div className="inline-flex items-center gap-2">
               <Controller
-                name={`buyer.notesFieldIsVisible`}
+                name="buyer.notesFieldIsVisible"
                 control={control}
                 render={({ field: { value, onChange, ...field } }) => (
                   <Switch
                     {...field}
-                    id={`buyerNotesFieldIsVisible`}
+                    id="buyerNotesFieldIsVisible"
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    disabled={isBuyerSelected}
-                    data-testid={`buyerNotesInvoiceFormFieldVisibilitySwitch`}
-                    aria-label={`Show the 'Notes' field in the PDF`}
+                    data-testid="buyerNotesInvoiceFormFieldVisibilitySwitch"
+                    aria-label="Show the 'Notes' field in the PDF"
                   />
                 )}
               />
               <CustomTooltip
                 trigger={
-                  <Label htmlFor={`buyerNotesFieldIsVisible`}>
-                    Show in PDF
-                  </Label>
+                  <Label htmlFor="buyerNotesFieldIsVisible">Show in PDF</Label>
                 }
                 content={
                   isBuyerSelected ? null : "Show the 'Notes' field in the PDF"
@@ -376,20 +272,14 @@ export const BuyerInformation = memo(function BuyerInformation({
           <Controller
             name="buyer.notes"
             control={control}
-            render={({ field }) => {
-              return (
-                <Textarea
-                  {...field}
-                  id={`buyerNotes`}
-                  rows={3}
-                  className=""
-                  readOnly={isBuyerSelected}
-                  aria-readonly={isBuyerSelected}
-                  title={HTML_TITLE_CONTENT}
-                  placeholder="Additional information about the buyer"
-                />
-              );
-            }}
+            render={({ field }) => (
+              <Textarea
+                {...field}
+                id="buyerNotes"
+                rows={3}
+                placeholder="Additional information about the buyer"
+              />
+            )}
           />
           {errors.buyer?.notes && (
             <ErrorMessage>{errors.buyer.notes.message}</ErrorMessage>

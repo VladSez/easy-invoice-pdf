@@ -400,7 +400,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                       Shared Seller
                     </span>
                   }
-                  content="This seller is shared from another invoice"
+                  content="This seller is shared from another invoice. You can save it to your account if needed."
                 />
               )}
             </div>
@@ -432,7 +432,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                       Shared Buyer
                     </span>
                   }
-                  content="This buyer is shared from another invoice"
+                  content="This buyer is shared from another invoice. You can save it to your account if needed."
                 />
               )}
             </div>

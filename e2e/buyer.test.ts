@@ -1,4 +1,3 @@
-import { BUYER_TOOLTIP_CONTENT } from "@/app/(app)/components/invoice-form/sections/buyer-information";
 import { DEFAULT_BUYER_DATA } from "@/app/constants";
 import { type BuyerData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
@@ -158,42 +157,19 @@ test.describe("Buyer management", () => {
     // Verify all saved details in the Buyer Information section form
     const buyerForm = page.getByTestId(`buyer-information-section`);
 
-    // Try to find desktop tooltip icon first
-    const desktopTooltipExists =
-      (await buyerForm
-        .getByTestId("form-section-tooltip-info-icon-desktop")
-        .count()) > 0;
+    // Verify the locked banner is visible
+    await expect(buyerForm.getByTestId("buyer-locked-banner")).toBeVisible();
 
-    // If desktop tooltip exists, hover over it; otherwise find and click mobile tooltip
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    if (desktopTooltipExists) {
-      // Get desktop tooltip icons and hover over the first one because we use tooltip
-      const desktopTooltips = buyerForm.getByTestId(
-        "form-section-tooltip-info-icon-desktop",
-      );
-      await desktopTooltips.first().hover();
-    } else {
-      // Get mobile tooltip icons and click the first one because we use popover
-      const mobileTooltips = buyerForm.getByTestId(
-        "form-section-tooltip-info-icon-mobile",
-      );
-      await mobileTooltips.first().click();
-    }
-
-    // Check that HTML title attributes contain the tooltip message on input fields
-    const nameInput = buyerForm.getByRole("textbox", { name: "Name" });
-    await expect(nameInput).toHaveAttribute("title", BUYER_TOOLTIP_CONTENT);
+    const nameInput = buyerForm.getByRole("textbox", {
+      name: "Name (Required)",
+    });
 
     // Buyer Name
-    await expect(nameInput).toHaveAttribute("aria-readonly", "true");
     await expect(nameInput).toHaveValue(TEST_BUYER_DATA.name);
 
     // Buyer Address
     await expect(
-      buyerForm.getByRole("textbox", { name: "Address" }),
-    ).toHaveAttribute("aria-readonly", "true");
-    await expect(
-      buyerForm.getByRole("textbox", { name: "Address" }),
+      buyerForm.getByRole("textbox", { name: "Address (Required)" }),
     ).toHaveValue(TEST_BUYER_DATA.address);
 
     // Buyer VAT Number
@@ -203,15 +179,8 @@ test.describe("Buyer management", () => {
 
     await expect(
       buyerVatFieldset.getByRole("textbox", { name: "Label" }),
-    ).toHaveAttribute("aria-readonly", "true");
-
-    await expect(
-      buyerVatFieldset.getByRole("textbox", { name: "Label" }),
     ).toHaveValue(TEST_BUYER_DATA.vatNoLabelText);
 
-    await expect(
-      buyerVatFieldset.getByRole("textbox", { name: "Value" }),
-    ).toHaveAttribute("aria-readonly", "true");
     await expect(
       buyerVatFieldset.getByRole("textbox", { name: "Value" }),
     ).toHaveValue(TEST_BUYER_DATA.vatNo);
@@ -224,9 +193,6 @@ test.describe("Buyer management", () => {
     await expect(vatNumberSwitchNotInDialog).toBeDisabled();
 
     // Buyer Email
-    await expect(
-      buyerForm.getByRole("textbox", { name: "Email" }),
-    ).toHaveAttribute("aria-readonly", "true");
     await expect(buyerForm.getByRole("textbox", { name: "Email" })).toHaveValue(
       TEST_BUYER_DATA.email,
     );
@@ -239,10 +205,6 @@ test.describe("Buyer management", () => {
     await expect(emailSwitchNotInDialog).toBeDisabled();
 
     // Buyer Notes
-    await expect(
-      buyerForm.getByRole("textbox", { name: "Notes" }),
-    ).toHaveAttribute("aria-readonly", "true");
-
     await expect(buyerForm.getByRole("textbox", { name: "Notes" })).toHaveValue(
       TEST_BUYER_DATA.notes,
     );

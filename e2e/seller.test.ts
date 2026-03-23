@@ -1,4 +1,3 @@
-import { SELLER_TOOLTIP_CONTENT } from "@/app/(app)/components/invoice-form/sections/seller-information";
 import { DEFAULT_SELLER_DATA } from "@/app/constants";
 import { type SellerData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
@@ -197,20 +196,17 @@ test.describe("Seller management", () => {
     // Verify all saved details in the Seller Information section form
     const sellerForm = page.getByTestId(`seller-information-section`);
 
-    // Check that HTML title attributes contain the tooltip message on input fields
-    const nameInput = sellerForm.getByRole("textbox", { name: "Name" });
-    await expect(nameInput).toHaveAttribute("title", SELLER_TOOLTIP_CONTENT);
+    // Verify the locked banner is visible
+    await expect(sellerForm.getByTestId("seller-locked-banner")).toBeVisible();
 
     // Seller Name
-    await expect(nameInput).toHaveAttribute("aria-readonly", "true");
-    await expect(nameInput).toHaveValue(TEST_SELLER_DATA.name);
+    await expect(
+      sellerForm.getByRole("textbox", { name: "Name (Required)" }),
+    ).toHaveValue(TEST_SELLER_DATA.name);
 
     // Seller Address
     await expect(
-      sellerForm.getByRole("textbox", { name: "Address" }),
-    ).toHaveAttribute("aria-readonly", "true");
-    await expect(
-      sellerForm.getByRole("textbox", { name: "Address" }),
+      sellerForm.getByRole("textbox", { name: "Address (Required)" }),
     ).toHaveValue(TEST_SELLER_DATA.address);
 
     // Seller Tax Number
@@ -220,14 +216,7 @@ test.describe("Seller management", () => {
 
     await expect(
       sellerVatFieldset.getByRole("textbox", { name: "Label" }),
-    ).toHaveAttribute("aria-readonly", "true");
-    await expect(
-      sellerVatFieldset.getByRole("textbox", { name: "Label" }),
     ).toHaveValue(TEST_SELLER_DATA.vatNoLabelText);
-
-    await expect(
-      sellerVatFieldset.getByRole("textbox", { name: "Value" }),
-    ).toHaveAttribute("aria-readonly", "true");
 
     await expect(
       sellerVatFieldset.getByRole("textbox", { name: "Value" }),
@@ -239,9 +228,6 @@ test.describe("Seller management", () => {
     await expect(vatNumberSwitch).toBeDisabled();
 
     // Seller Email
-    await expect(
-      sellerForm.getByRole("textbox", { name: "Email" }),
-    ).toHaveAttribute("aria-readonly", "true");
     await expect(
       sellerForm.getByRole("textbox", { name: "Email" }),
     ).toHaveValue(TEST_SELLER_DATA.email);
@@ -256,9 +242,6 @@ test.describe("Seller management", () => {
     // Seller Account Number
     await expect(
       sellerForm.getByRole("textbox", { name: "Account Number" }),
-    ).toHaveAttribute("aria-readonly", "true");
-    await expect(
-      sellerForm.getByRole("textbox", { name: "Account Number" }),
     ).toHaveValue(TEST_SELLER_DATA.accountNumber);
 
     const accountNumberSwitchNotInDialog = sellerForm.getByTestId(
@@ -271,9 +254,6 @@ test.describe("Seller management", () => {
     // Seller SWIFT/BIC
     await expect(
       sellerForm.getByRole("textbox", { name: "SWIFT/BIC" }),
-    ).toHaveAttribute("aria-readonly", "true");
-    await expect(
-      sellerForm.getByRole("textbox", { name: "SWIFT/BIC" }),
     ).toHaveValue(TEST_SELLER_DATA.swiftBic);
 
     const swiftBicSwitchNotInDialog = sellerForm.getByTestId(
@@ -284,9 +264,6 @@ test.describe("Seller management", () => {
     await expect(swiftBicSwitchNotInDialog).toBeDisabled();
 
     // Seller Notes
-    await expect(
-      sellerForm.getByRole("textbox", { name: "Notes" }),
-    ).toHaveAttribute("aria-readonly", "true");
     await expect(
       sellerForm.getByRole("textbox", { name: "Notes" }),
     ).toHaveValue(TEST_SELLER_DATA.notes);

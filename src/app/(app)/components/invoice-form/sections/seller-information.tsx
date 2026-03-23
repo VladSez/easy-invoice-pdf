@@ -1,5 +1,4 @@
 import { type InvoiceData, type SellerData } from "@/app/schema";
-import { LabelWithEditIcon } from "@/components/label-with-edit-icon";
 import { SellerManagement } from "@/components/seller-management";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
@@ -19,9 +18,6 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
 };
 
-export const SELLER_TOOLTIP_CONTENT =
-  "Seller details are locked. Click the Edit Seller button (Pencil icon) next to the 'Select Seller' dropdown to modify seller details.";
-
 interface SellerInformationProps {
   control: Control<InvoiceData>;
   errors: FieldErrors<InvoiceData>;
@@ -40,9 +36,6 @@ export const SellerInformation = memo(function SellerInformation({
   const [selectedSellerId, setSelectedSellerId] = useState("");
   const isSellerSelected = !!selectedSellerId;
 
-  const HTML_TITLE_CONTENT = isSellerSelected ? SELLER_TOOLTIP_CONTENT : "";
-
-  // Get current form values to pass to SellerManagement
   const currentFormValues = {
     name: invoiceData.seller.name,
     address: invoiceData.seller.address,
@@ -71,33 +64,26 @@ export const SellerInformation = memo(function SellerInformation({
           isMobile={isMobile}
         />
       </div>
-      <fieldset className="mt-5 space-y-4">
+      <fieldset className="mt-5 space-y-4" disabled={isSellerSelected}>
+        {isSellerSelected ? (
+          <p
+            className="text-pretty rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800"
+            data-testid="seller-locked-banner"
+          >
+            To modify seller details, click the &quot;Edit seller&quot; button
+            (pencil icon) next to the dropdown above.
+          </p>
+        ) : null}
+
         <div>
-          {isSellerSelected ? (
-            <LabelWithEditIcon
-              htmlFor={`sellerName`}
-              content={SELLER_TOOLTIP_CONTENT}
-            >
-              Name (Required)
-            </LabelWithEditIcon>
-          ) : (
-            <Label htmlFor={`sellerName`} className="mb-1">
-              Name (Required)
-            </Label>
-          )}
+          <Label htmlFor="sellerName" className="mb-1">
+            Name (Required)
+          </Label>
           <Controller
             name="seller.name"
             control={control}
             render={({ field }) => (
-              <Textarea
-                {...field}
-                id={`sellerName`}
-                rows={3}
-                className=""
-                readOnly={isSellerSelected}
-                aria-readonly={isSellerSelected}
-                title={HTML_TITLE_CONTENT}
-              />
+              <Textarea {...field} id="sellerName" rows={3} />
             )}
           />
           {errors.seller?.name && (
@@ -106,31 +92,14 @@ export const SellerInformation = memo(function SellerInformation({
         </div>
 
         <div>
-          {isSellerSelected ? (
-            <LabelWithEditIcon
-              htmlFor={`sellerAddress`}
-              content={SELLER_TOOLTIP_CONTENT}
-            >
-              Address (Required)
-            </LabelWithEditIcon>
-          ) : (
-            <Label htmlFor={`sellerAddress`} className="mb-1">
-              Address (Required)
-            </Label>
-          )}
+          <Label htmlFor="sellerAddress" className="mb-1">
+            Address (Required)
+          </Label>
           <Controller
             name="seller.address"
             control={control}
             render={({ field }) => (
-              <Textarea
-                {...field}
-                id={`sellerAddress`}
-                rows={3}
-                className=""
-                readOnly={isSellerSelected}
-                aria-readonly={isSellerSelected}
-                title={HTML_TITLE_CONTENT}
-              />
+              <Textarea {...field} id="sellerAddress" rows={3} />
             )}
           />
           {errors.seller?.address && (
@@ -145,30 +114,25 @@ export const SellerInformation = memo(function SellerInformation({
             </legend>
 
             <div className="mb-2 flex items-center justify-end">
-              {/* Show Seller Tax Number field in PDF switch */}
-              <div
-                className="inline-flex items-center gap-2"
-                title={HTML_TITLE_CONTENT}
-              >
+              <div className="inline-flex items-center gap-2">
                 <Controller
-                  name={`seller.vatNoFieldIsVisible`}
+                  name="seller.vatNoFieldIsVisible"
                   control={control}
                   render={({ field: { value, onChange, ...field } }) => (
                     <Switch
                       {...field}
-                      id={`sellerVatNoFieldIsVisible`}
+                      id="sellerVatNoFieldIsVisible"
                       checked={value}
                       onCheckedChange={onChange}
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                      disabled={isSellerSelected}
-                      data-testid={`sellerVatNoFieldIsVisible`}
-                      aria-label={`Show the 'Seller Tax Number' Field in the PDF`}
+                      data-testid="sellerVatNoFieldIsVisible"
+                      aria-label="Show the 'Seller Tax Number' Field in the PDF"
                     />
                   )}
                 />
                 <CustomTooltip
                   trigger={
-                    <Label htmlFor={`sellerVatNoFieldIsVisible`}>
+                    <Label htmlFor="sellerVatNoFieldIsVisible">
                       Show in PDF
                     </Label>
                   }
@@ -183,16 +147,7 @@ export const SellerInformation = memo(function SellerInformation({
 
             <div className="space-y-4">
               <div>
-                {isSellerSelected ? (
-                  <LabelWithEditIcon
-                    htmlFor="sellerVatNoLabel"
-                    content={SELLER_TOOLTIP_CONTENT}
-                  >
-                    Label
-                  </LabelWithEditIcon>
-                ) : (
-                  <Label htmlFor="sellerVatNoLabel">Label</Label>
-                )}
+                <Label htmlFor="sellerVatNoLabel">Label</Label>
                 <Controller
                   name="seller.vatNoLabelText"
                   control={control}
@@ -203,9 +158,6 @@ export const SellerInformation = memo(function SellerInformation({
                       id="sellerVatNoLabel"
                       placeholder="Enter Tax number label"
                       className="mt-1 block w-full"
-                      readOnly={isSellerSelected}
-                      aria-readonly={isSellerSelected}
-                      title={HTML_TITLE_CONTENT}
                     />
                   )}
                 />
@@ -222,29 +174,17 @@ export const SellerInformation = memo(function SellerInformation({
               </div>
 
               <div>
-                {isSellerSelected ? (
-                  <LabelWithEditIcon
-                    htmlFor={`sellerVatNo`}
-                    content={SELLER_TOOLTIP_CONTENT}
-                  >
-                    Value
-                  </LabelWithEditIcon>
-                ) : (
-                  <Label htmlFor={`sellerVatNo`}>Value</Label>
-                )}
+                <Label htmlFor="sellerVatNo">Value</Label>
                 <Controller
                   name="seller.vatNo"
                   control={control}
                   render={({ field }) => (
                     <Input
                       {...field}
-                      id={`sellerVatNo`}
+                      id="sellerVatNo"
                       type="text"
                       placeholder="Enter Tax number value"
                       className="mt-1 block w-full"
-                      readOnly={isSellerSelected}
-                      aria-readonly={isSellerSelected}
-                      title={HTML_TITLE_CONTENT}
                     />
                   )}
                 />
@@ -259,45 +199,27 @@ export const SellerInformation = memo(function SellerInformation({
         {/* Email */}
         <div>
           <div className="relative mb-2 flex items-center justify-between">
-            {isSellerSelected ? (
-              <LabelWithEditIcon
-                htmlFor={`sellerEmail`}
-                content={SELLER_TOOLTIP_CONTENT}
-              >
-                Email
-              </LabelWithEditIcon>
-            ) : (
-              <Label htmlFor={`sellerEmail`} className="">
-                Email
-              </Label>
-            )}
+            <Label htmlFor="sellerEmail">Email</Label>
 
-            {/* Show Email field in PDF switch */}
-            <div
-              className="inline-flex items-center gap-2"
-              title={HTML_TITLE_CONTENT}
-            >
+            <div className="inline-flex items-center gap-2">
               <Controller
-                name={`seller.emailFieldIsVisible`}
+                name="seller.emailFieldIsVisible"
                 control={control}
                 render={({ field: { value, onChange, ...field } }) => (
                   <Switch
                     {...field}
-                    id={`sellerEmailFieldIsVisible`}
+                    id="sellerEmailFieldIsVisible"
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    disabled={isSellerSelected}
-                    data-testid={`sellerEmailFieldIsVisible`}
-                    aria-label={`Show the 'Email' field in the PDF`}
+                    data-testid="sellerEmailFieldIsVisible"
+                    aria-label="Show the 'Email' field in the PDF"
                   />
                 )}
               />
               <CustomTooltip
                 trigger={
-                  <Label htmlFor={`sellerEmailFieldIsVisible`}>
-                    Show in PDF
-                  </Label>
+                  <Label htmlFor="sellerEmailFieldIsVisible">Show in PDF</Label>
                 }
                 content={
                   isSellerSelected ? null : "Show the 'Email' field in the PDF"
@@ -309,15 +231,7 @@ export const SellerInformation = memo(function SellerInformation({
             name="seller.email"
             control={control}
             render={({ field }) => (
-              <Input
-                {...field}
-                id={`sellerEmail`}
-                type="email"
-                className=""
-                readOnly={isSellerSelected}
-                aria-readonly={isSellerSelected}
-                title={HTML_TITLE_CONTENT}
-              />
+              <Input {...field} id="sellerEmail" type="email" />
             )}
           />
           {errors.seller?.email && (
@@ -328,43 +242,27 @@ export const SellerInformation = memo(function SellerInformation({
         {/* Account Number */}
         <div>
           <div className="relative mb-2 flex items-center justify-between">
-            {isSellerSelected ? (
-              <LabelWithEditIcon
-                htmlFor={`sellerAccountNumber`}
-                content={SELLER_TOOLTIP_CONTENT}
-              >
-                Account Number
-              </LabelWithEditIcon>
-            ) : (
-              <Label htmlFor={`sellerAccountNumber`} className="">
-                Account Number
-              </Label>
-            )}
+            <Label htmlFor="sellerAccountNumber">Account Number</Label>
 
-            {/* Show Account Number field in PDF switch */}
-            <div
-              className="inline-flex items-center gap-2"
-              title={HTML_TITLE_CONTENT}
-            >
+            <div className="inline-flex items-center gap-2">
               <Controller
-                name={`seller.accountNumberFieldIsVisible`}
+                name="seller.accountNumberFieldIsVisible"
                 control={control}
                 render={({ field: { value, onChange, ...field } }) => (
                   <Switch
                     {...field}
-                    id={`sellerAccountNumberFieldIsVisible`}
+                    id="sellerAccountNumberFieldIsVisible"
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    disabled={isSellerSelected}
-                    data-testid={`sellerAccountNumberFieldIsVisible`}
-                    aria-label={`Show the 'Account Number' Field in the PDF`}
+                    data-testid="sellerAccountNumberFieldIsVisible"
+                    aria-label="Show the 'Account Number' Field in the PDF"
                   />
                 )}
               />
               <CustomTooltip
                 trigger={
-                  <Label htmlFor={`sellerAccountNumberFieldIsVisible`}>
+                  <Label htmlFor="sellerAccountNumberFieldIsVisible">
                     Show in PDF
                   </Label>
                 }
@@ -379,19 +277,9 @@ export const SellerInformation = memo(function SellerInformation({
           <Controller
             name="seller.accountNumber"
             control={control}
-            render={({ field }) => {
-              return (
-                <Textarea
-                  {...field}
-                  id={`sellerAccountNumber`}
-                  rows={3}
-                  className=""
-                  readOnly={isSellerSelected}
-                  aria-readonly={isSellerSelected}
-                  title={HTML_TITLE_CONTENT}
-                />
-              );
-            }}
+            render={({ field }) => (
+              <Textarea {...field} id="sellerAccountNumber" rows={3} />
+            )}
           />
           {errors.seller?.accountNumber && (
             <ErrorMessage>{errors.seller.accountNumber.message}</ErrorMessage>
@@ -401,43 +289,27 @@ export const SellerInformation = memo(function SellerInformation({
         {/* SWIFT/BIC */}
         <div>
           <div className="relative mb-2 flex items-center justify-between">
-            {isSellerSelected ? (
-              <LabelWithEditIcon
-                htmlFor={`sellerSwiftBic`}
-                content={SELLER_TOOLTIP_CONTENT}
-              >
-                SWIFT/BIC
-              </LabelWithEditIcon>
-            ) : (
-              <Label htmlFor={`sellerSwiftBic`} className="">
-                SWIFT/BIC
-              </Label>
-            )}
+            <Label htmlFor="sellerSwiftBic">SWIFT/BIC</Label>
 
-            {/* Show SWIFT/BIC field in PDF switch */}
-            <div
-              className="inline-flex items-center gap-2"
-              title={HTML_TITLE_CONTENT}
-            >
+            <div className="inline-flex items-center gap-2">
               <Controller
-                name={`seller.swiftBicFieldIsVisible`}
+                name="seller.swiftBicFieldIsVisible"
                 control={control}
                 render={({ field: { value, onChange, ...field } }) => (
                   <Switch
                     {...field}
-                    id={`sellerSwiftBicFieldIsVisible`}
+                    id="sellerSwiftBicFieldIsVisible"
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    disabled={isSellerSelected}
-                    data-testid={`sellerSwiftBicFieldIsVisible`}
-                    aria-label={`Show the 'SWIFT/BIC' Field in the PDF`}
+                    data-testid="sellerSwiftBicFieldIsVisible"
+                    aria-label="Show the 'SWIFT/BIC' Field in the PDF"
                   />
                 )}
               />
               <CustomTooltip
                 trigger={
-                  <Label htmlFor={`sellerSwiftBicFieldIsVisible`}>
+                  <Label htmlFor="sellerSwiftBicFieldIsVisible">
                     Show in PDF
                   </Label>
                 }
@@ -453,19 +325,9 @@ export const SellerInformation = memo(function SellerInformation({
           <Controller
             name="seller.swiftBic"
             control={control}
-            render={({ field }) => {
-              return (
-                <Textarea
-                  {...field}
-                  id={`sellerSwiftBic`}
-                  rows={3}
-                  className=""
-                  readOnly={isSellerSelected}
-                  aria-readonly={isSellerSelected}
-                  title={HTML_TITLE_CONTENT}
-                />
-              );
-            }}
+            render={({ field }) => (
+              <Textarea {...field} id="sellerSwiftBic" rows={3} />
+            )}
           />
           {errors.seller?.swiftBic && (
             <ErrorMessage>{errors.seller.swiftBic.message}</ErrorMessage>
@@ -475,45 +337,26 @@ export const SellerInformation = memo(function SellerInformation({
         {/* Notes */}
         <div>
           <div className="relative mb-2 flex items-center justify-between">
-            {isSellerSelected ? (
-              <LabelWithEditIcon
-                htmlFor={`sellerNotes`}
-                content={SELLER_TOOLTIP_CONTENT}
-              >
-                Notes
-              </LabelWithEditIcon>
-            ) : (
-              <Label htmlFor={`sellerNotes`} className="">
-                Notes
-              </Label>
-            )}
-
-            {/* Show Notes field in PDF switch */}
-            <div
-              className="inline-flex items-center gap-2"
-              title={HTML_TITLE_CONTENT}
-            >
+            <Label htmlFor="sellerNotes">Notes</Label>
+            <div className="inline-flex items-center gap-2">
               <Controller
-                name={`seller.notesFieldIsVisible`}
+                name="seller.notesFieldIsVisible"
                 control={control}
                 render={({ field: { value, onChange, ...field } }) => (
                   <Switch
                     {...field}
-                    id={`sellerNotesFieldIsVisible`}
+                    id="sellerNotesFieldIsVisible"
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    disabled={isSellerSelected}
-                    data-testid={`sellerNotesInvoiceFormFieldVisibilitySwitch`}
-                    aria-label={`Show the 'Notes' field in the PDF`}
+                    data-testid="sellerNotesInvoiceFormFieldVisibilitySwitch"
+                    aria-label="Show the 'Notes' field in the PDF"
                   />
                 )}
               />
               <CustomTooltip
                 trigger={
-                  <Label htmlFor={`sellerNotesFieldIsVisible`}>
-                    Show in PDF
-                  </Label>
+                  <Label htmlFor="sellerNotesFieldIsVisible">Show in PDF</Label>
                 }
                 content={
                   isSellerSelected ? null : "Show the 'Notes' field in the PDF"
@@ -525,20 +368,9 @@ export const SellerInformation = memo(function SellerInformation({
           <Controller
             name="seller.notes"
             control={control}
-            render={({ field }) => {
-              return (
-                <Textarea
-                  {...field}
-                  id={`sellerNotes`}
-                  rows={3}
-                  className=""
-                  readOnly={isSellerSelected}
-                  aria-readonly={isSellerSelected}
-                  title={HTML_TITLE_CONTENT}
-                  placeholder="Additional information about the seller"
-                />
-              );
-            }}
+            render={({ field }) => (
+              <Textarea {...field} id="sellerNotes" rows={3} />
+            )}
           />
           {errors.seller?.notes && (
             <ErrorMessage>{errors.seller.notes.message}</ErrorMessage>
