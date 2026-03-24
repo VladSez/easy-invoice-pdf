@@ -73,11 +73,12 @@ jobs:
 
       - name: 📧 Send email
         if: always()
+        # https://github.com/dawidd6/action-send-mail
         uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
         with:
           server_address: smtp.gmail.com
           server_port: 587
-          from: GitHub Actions
+          from: "GitHub Actions (no-reply) <${{ secrets.EMAIL_USERNAME }}>"
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}

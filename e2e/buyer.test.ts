@@ -691,6 +691,12 @@ test.describe("Buyer management", () => {
       await nameInput.fill("Unsaved Buyer");
 
       page.once("dialog", async (dialog) => {
+        expect(dialog.type()).toBe("confirm");
+        expect(dialog.message()).toBe(
+          "You have unsaved changes. Discard them?",
+        );
+
+        // Dismiss the dialog to keep the form values intact
         await dialog.dismiss();
       });
 

@@ -42,16 +42,17 @@ jobs:
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository_owner }}:${{ github.ref_name }}" \
-            | jq -r '.[0].html_url')
+            | jq -r '.[0].html_url // empty')
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
       - name: 📧 Send email
         if: steps.type-check.outcome == 'failure'
+        # https://github.com/dawidd6/action-send-mail
         uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
         with:
           server_address: smtp.gmail.com
           server_port: 587
-          from: GitHub Actions
+          from: "GitHub Actions (no-reply) <${{ secrets.EMAIL_USERNAME }}>"
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
