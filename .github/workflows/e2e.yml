@@ -92,3 +92,7 @@ jobs:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
           attachments: playwright-output/report/index.html
+
+      - name: ❌ Mark workflow failed on E2E Tests failure
+        if: steps.playwright.outcome == 'failure'
+        run: exit 1

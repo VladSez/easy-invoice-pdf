@@ -63,3 +63,7 @@ jobs:
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
+
+      - name: ❌ Mark workflow failed on Unit Tests failure
+        if: steps.vitest.outcome == 'failure'
+        run: exit 1

@@ -238,7 +238,9 @@ export function SellerDialog({
           // dialog from closing by returning early.
           if (
             isDirty &&
-            !window.confirm("You have unsaved changes. Discard them?")
+            !window.confirm(
+              "You have unsaved changes in seller details. Discard them?",
+            )
           ) {
             return;
           }
@@ -643,7 +645,9 @@ export function SellerDialog({
               // prevent the dialog from closing by returning early.
               if (
                 isDirty &&
-                !window.confirm("You have unsaved changes. Discard them?")
+                !window.confirm(
+                  "You have unsaved changes in seller details. Discard them?",
+                )
               ) {
                 return;
               }

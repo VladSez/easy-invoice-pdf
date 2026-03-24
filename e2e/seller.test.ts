@@ -733,7 +733,7 @@ test.describe("Seller management", () => {
 
         // Verify the dialog shows the expected discard warning message
         expect(dialog.message()).toBe(
-          "You have unsaved changes. Discard them?",
+          "You have unsaved changes in seller details. Discard them?",
         );
 
         // Accept the dialog to confirm discarding changes
@@ -761,7 +761,7 @@ test.describe("Seller management", () => {
       page.once("dialog", async (dialog) => {
         expect(dialog.type()).toBe("confirm");
         expect(dialog.message()).toBe(
-          "You have unsaved changes. Discard them?",
+          "You have unsaved changes in seller details. Discard them?",
         );
 
         // Dismiss the dialog to keep the form values intact
@@ -787,7 +787,7 @@ test.describe("Seller management", () => {
       page.once("dialog", async (dialog) => {
         expect(dialog.type()).toBe("confirm");
         expect(dialog.message()).toBe(
-          "You have unsaved changes. Discard them?",
+          "You have unsaved changes in seller details. Discard them?",
         );
         await dialog.accept();
       });
@@ -810,7 +810,7 @@ test.describe("Seller management", () => {
       page.once("dialog", async (dialog) => {
         expect(dialog.type()).toBe("confirm");
         expect(dialog.message()).toBe(
-          "You have unsaved changes. Discard them?",
+          "You have unsaved changes in seller details. Discard them?",
         );
         await dialog.accept();
       });

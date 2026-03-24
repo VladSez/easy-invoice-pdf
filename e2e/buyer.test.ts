@@ -669,7 +669,7 @@ test.describe("Buyer management", () => {
       page.once("dialog", async (dialog) => {
         expect(dialog.type()).toBe("confirm");
         expect(dialog.message()).toBe(
-          "You have unsaved changes. Discard them?",
+          "You have unsaved changes in buyer details. Discard them?",
         );
         await dialog.accept();
       });
@@ -693,7 +693,7 @@ test.describe("Buyer management", () => {
       page.once("dialog", async (dialog) => {
         expect(dialog.type()).toBe("confirm");
         expect(dialog.message()).toBe(
-          "You have unsaved changes. Discard them?",
+          "You have unsaved changes in buyer details. Discard them?",
         );
 
         // Dismiss the dialog to keep the form values intact
@@ -719,7 +719,7 @@ test.describe("Buyer management", () => {
       page.once("dialog", async (dialog) => {
         expect(dialog.type()).toBe("confirm");
         expect(dialog.message()).toBe(
-          "You have unsaved changes. Discard them?",
+          "You have unsaved changes in buyer details. Discard them?",
         );
         await dialog.accept();
       });
@@ -742,7 +742,7 @@ test.describe("Buyer management", () => {
       page.once("dialog", async (dialog) => {
         expect(dialog.type()).toBe("confirm");
         expect(dialog.message()).toBe(
-          "You have unsaved changes. Discard them?",
+          "You have unsaved changes in buyer details. Discard them?",
         );
         await dialog.accept();
       });
