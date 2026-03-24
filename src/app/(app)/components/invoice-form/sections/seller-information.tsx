@@ -70,13 +70,14 @@ export const SellerInformation = memo(function SellerInformation({
         <fieldset className="mt-5 space-y-4" disabled={isSellerSelected}>
           {isSellerSelected ? (
             <div
-              className="flex gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800"
+              className="flex gap-2 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 shadow-md shadow-blue-200/10"
               data-testid="seller-locked-banner"
             >
               <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
               <p className="">
-                To modify seller details, click the &quot;Edit seller&quot;
-                button (pencil icon) next to the dropdown above.
+                To modify seller details, click the{" "}
+                <span className="font-semibold">Edit seller</span> button
+                (pencil icon) next to the dropdown above.
               </p>
             </div>
           ) : null}

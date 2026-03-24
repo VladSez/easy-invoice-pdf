@@ -287,7 +287,9 @@ export function BuyerManagement({
       <div
         className={cn(
           "flex w-full flex-col gap-2",
-          hasBuyers ? "rounded-md border p-4" : "mt-3",
+          hasBuyers
+            ? "rounded-md border p-4 shadow shadow-slate-400/10"
+            : "mt-3",
         )}
       >
         {hasBuyers ? (
