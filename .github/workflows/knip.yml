@@ -1,4 +1,4 @@
-name: 📝 TypeScript Type Check
+name: 🔍 Knip
 on:
   push:
     branches: [main]
@@ -6,8 +6,8 @@ on:
     branches: [main]
 
 jobs:
-  type-check:
-    name: Run type check
+  knip:
+    name: Run Knip
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
@@ -27,13 +27,13 @@ jobs:
       - name: 🚚 Install dependencies
         run: pnpm install
 
-      - name: 🔍 Run type check
-        id: type-check
+      - name: 🔎 Run Knip
+        id: knip
         continue-on-error: true
-        run: pnpm type-check:go
+        run: pnpm knip
 
       - name: 🔍 Get PR URL
-        if: steps.type-check.outcome == 'failure'
+        if: steps.knip.outcome == 'failure'
         id: pr-url
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -46,7 +46,7 @@ jobs:
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
       - name: 📧 Send email
-        if: steps.type-check.outcome == 'failure'
+        if: steps.knip.outcome == 'failure'
         uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
         with:
           server_address: smtp.gmail.com
@@ -55,9 +55,9 @@ jobs:
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: ❌ Type Check Failed for ${{ github.repository }}
+          subject: ❌ Knip Failed for ${{ github.repository }}
           body: |
-            Type check for ${{ github.repository }} has failed.
+            Knip for ${{ github.repository }} has failed.
 
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
