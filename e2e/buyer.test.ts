@@ -219,10 +219,12 @@ test.describe("Buyer management", () => {
     await expect(notesSwitchNotInDialog).toBeChecked();
     await expect(notesSwitchNotInDialog).toBeDisabled();
 
-    // Verify the buyer appears in the dropdown
+    // Verify the buyer is selected in dropdown
     await expect(
-      buyerForm.getByRole("combobox", { name: "Select Buyer" }),
-    ).toContainText(TEST_BUYER_DATA.name);
+      buyerForm
+        .getByRole("combobox", { name: "Select Buyer" })
+        .locator("option:checked"),
+    ).toHaveText(TEST_BUYER_DATA.name);
 
     /*
      * TEST EDIT FUNCTIONALITY IN BUYER MANAGEMENT DIALOG
@@ -277,6 +279,7 @@ test.describe("Buyer management", () => {
 
     // Update some data in edit mode
     const updatedName = "Updated Client Corp";
+
     await manageBuyerDialog
       .getByRole("textbox", { name: "Name" })
       .fill(updatedName);
@@ -297,6 +300,13 @@ test.describe("Buyer management", () => {
     await expect(
       page.getByText("Buyer updated successfully", { exact: true }),
     ).toBeVisible();
+
+    // Verify buyer is selected in dropdown
+    await expect(
+      buyerForm
+        .getByRole("combobox", { name: "Select Buyer" })
+        .locator("option:checked"),
+    ).toHaveText(updatedName);
 
     /*
      * TEST UPDATED INFORMATION IN INVOICE FORM AFTER UPDATING BUYER IN DIALOG
@@ -365,10 +375,18 @@ test.describe("Buyer management", () => {
 
     const buyerForm = page.getByTestId(`buyer-information-section`);
 
+    // Verify buyer is not selected in dropdown
+    await expect(
+      buyerForm
+        .getByRole("combobox", { name: "Select Buyer" })
+        .locator("option:checked"),
+    ).toHaveText("No buyer selected (default)");
+
     // Buyer should appear in dropdown options but not be selected
     await expect(
       buyerForm.getByRole("combobox", { name: "Select Buyer" }),
     ).toBeVisible();
+
     await expect(
       buyerForm.getByRole("combobox", { name: "Select Buyer" }),
     ).toHaveValue("");
@@ -427,7 +445,9 @@ test.describe("Buyer management", () => {
     });
 
     // Buyer is currently selected in dropdown
-    await expect(buyerDropdown).not.toHaveValue("");
+    await expect(buyerDropdown.locator("option:checked")).toHaveText(
+      TEST_BUYER_DATA.name,
+    );
 
     // Verify locked banner is visible when buyer is selected
     await expect(buyerForm.getByTestId("buyer-locked-banner")).toBeVisible();
@@ -439,6 +459,11 @@ test.describe("Buyer management", () => {
     await expect(
       page.getByText("Buyer restored to default", { exact: true }),
     ).toBeVisible();
+
+    // Verify buyer is not selected in dropdown
+    await expect(buyerDropdown.locator("option:checked")).toHaveText(
+      "No buyer selected (default)",
+    );
 
     // Verify locked banner is hidden after deselecting buyer
     await expect(buyerForm.getByTestId("buyer-locked-banner")).toBeHidden();
@@ -463,6 +488,11 @@ test.describe("Buyer management", () => {
         exact: true,
       }),
     ).toBeVisible();
+
+    // Verify buyer is selected in dropdown
+    await expect(buyerDropdown.locator("option:checked")).toHaveText(
+      TEST_BUYER_DATA.name,
+    );
 
     // Verify locked banner is visible again after reselecting buyer
     await expect(buyerForm.getByTestId("buyer-locked-banner")).toBeVisible();
@@ -564,6 +594,12 @@ test.describe("Buyer management", () => {
       buyerForm.getByRole("combobox", { name: "Select Buyer" }),
     ).toBeHidden();
 
+    // Verify "New Buyer" button is visible after deletion
+    const newBuyerButton = buyerForm.getByRole("button", { name: "New Buyer" });
+
+    await expect(newBuyerButton).toBeVisible();
+    await expect(newBuyerButton).toBeEnabled();
+
     // Verify form is reset to default values
     await expect(buyerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
       DEFAULT_BUYER_DATA.name,
@@ -582,5 +618,132 @@ test.describe("Buyer management", () => {
         .getByRole("group", { name: "Buyer Tax Number" })
         .getByRole("textbox", { name: "Value" }),
     ).toHaveValue(DEFAULT_BUYER_DATA.vatNo);
+  });
+
+  test.describe("discard changes confirmation", () => {
+    test("clean form - Cancel closes without confirm", async ({ page }) => {
+      await page.getByRole("button", { name: "New Buyer" }).click();
+
+      const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+      await expect(manageBuyerDialog).toBeVisible();
+
+      // No changes made — Cancel should close immediately, no dialog fired
+      let confirmFired = false;
+      page.once("dialog", () => {
+        confirmFired = true;
+      });
+
+      await manageBuyerDialog.getByRole("button", { name: "Cancel" }).click();
+
+      await expect(manageBuyerDialog).toBeHidden();
+      expect(confirmFired).toBe(false);
+    });
+
+    test("clean form - X button closes without confirm", async ({ page }) => {
+      await page.getByRole("button", { name: "New Buyer" }).click();
+
+      const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+      await expect(manageBuyerDialog).toBeVisible();
+
+      let confirmFired = false;
+      page.once("dialog", () => {
+        confirmFired = true;
+      });
+
+      await manageBuyerDialog.getByRole("button", { name: "Close" }).click();
+
+      await expect(manageBuyerDialog).toBeHidden();
+      expect(confirmFired).toBe(false);
+    });
+
+    test("dirty form - Cancel - accept discards changes and closes", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Buyer" }).click();
+
+      const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+      await manageBuyerDialog
+        .getByRole("textbox", { name: "Name" })
+        .fill("Unsaved Buyer");
+
+      page.once("dialog", async (dialog) => {
+        expect(dialog.type()).toBe("confirm");
+        expect(dialog.message()).toBe(
+          "You have unsaved changes. Discard them?",
+        );
+        await dialog.accept();
+      });
+
+      await manageBuyerDialog.getByRole("button", { name: "Cancel" }).click();
+
+      await expect(manageBuyerDialog).toBeHidden();
+    });
+
+    test("dirty form - Cancel - dismiss keeps dialog open with values intact", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Buyer" }).click();
+
+      const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+      const nameInput = manageBuyerDialog.getByRole("textbox", {
+        name: "Name",
+      });
+      await nameInput.fill("Unsaved Buyer");
+
+      page.once("dialog", async (dialog) => {
+        await dialog.dismiss();
+      });
+
+      await manageBuyerDialog.getByRole("button", { name: "Cancel" }).click();
+
+      await expect(manageBuyerDialog).toBeVisible();
+      await expect(nameInput).toHaveValue("Unsaved Buyer");
+    });
+
+    test("dirty form - X button - accept discards changes and closes", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Buyer" }).click();
+
+      const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+      await manageBuyerDialog
+        .getByRole("textbox", { name: "Name" })
+        .fill("Unsaved Buyer");
+
+      page.once("dialog", async (dialog) => {
+        expect(dialog.type()).toBe("confirm");
+        expect(dialog.message()).toBe(
+          "You have unsaved changes. Discard them?",
+        );
+        await dialog.accept();
+      });
+
+      await manageBuyerDialog.getByRole("button", { name: "Close" }).click();
+
+      await expect(manageBuyerDialog).toBeHidden();
+    });
+
+    test("dirty form - Escape - accept discards changes and closes", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Buyer" }).click();
+
+      const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+      await manageBuyerDialog
+        .getByRole("textbox", { name: "Name" })
+        .fill("Unsaved Buyer");
+
+      page.once("dialog", async (dialog) => {
+        expect(dialog.type()).toBe("confirm");
+        expect(dialog.message()).toBe(
+          "You have unsaved changes. Discard them?",
+        );
+        await dialog.accept();
+      });
+
+      await page.keyboard.press("Escape");
+
+      await expect(manageBuyerDialog).toBeHidden();
+    });
   });
 });

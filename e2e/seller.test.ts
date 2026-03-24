@@ -196,6 +196,16 @@ test.describe("Seller management", () => {
     // Verify all saved details in the Seller Information section form
     const sellerForm = page.getByTestId(`seller-information-section`);
 
+    // Verify the seller appears in the dropdown
+    const sellerDropdown = sellerForm.getByRole("combobox", {
+      name: "Select Seller",
+    });
+
+    // Verify the seller is selected in dropdown
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      TEST_SELLER_DATA.name,
+    );
+
     // Verify the locked banner is visible with correct text
     const sellerLockedBanner = sellerForm.getByTestId("seller-locked-banner");
     await expect(sellerLockedBanner).toBeVisible();
@@ -380,6 +390,7 @@ test.describe("Seller management", () => {
     const applyToInvoiceSwitch = manageSellerDialog.getByRole("switch", {
       name: "Apply to Current Invoice",
     });
+
     await expect(applyToInvoiceSwitch).toBeChecked();
     await applyToInvoiceSwitch.click();
     await expect(applyToInvoiceSwitch).not.toBeChecked();
@@ -395,13 +406,17 @@ test.describe("Seller management", () => {
 
     const sellerForm = page.getByTestId(`seller-information-section`);
 
+    const sellerDropdown = sellerForm.getByRole("combobox", {
+      name: "Select Seller",
+    });
+
     // Seller should appear in dropdown options but not be selected
-    await expect(
-      sellerForm.getByRole("combobox", { name: "Select Seller" }),
-    ).toBeVisible();
-    await expect(
-      sellerForm.getByRole("combobox", { name: "Select Seller" }),
-    ).toHaveValue("");
+    await expect(sellerDropdown).toBeVisible();
+
+    // Verify the seller is not selected in dropdown
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      "No seller selected (default)",
+    );
 
     // Form fields should still contain default values (seller was not applied)
     await expect(sellerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
@@ -465,7 +480,9 @@ test.describe("Seller management", () => {
     });
 
     // Seller is currently selected in dropdown
-    await expect(sellerDropdown).not.toHaveValue("");
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      TEST_SELLER_DATA.name,
+    );
 
     // Verify locked banner is visible when seller is selected
     await expect(sellerForm.getByTestId("seller-locked-banner")).toBeVisible();
@@ -477,6 +494,11 @@ test.describe("Seller management", () => {
     await expect(
       page.getByText("Seller restored to default", { exact: true }),
     ).toBeVisible();
+
+    // Verify seller is not selected in dropdown
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      "No seller selected (default)",
+    );
 
     // Verify locked banner is hidden after deselecting seller
     await expect(sellerForm.getByTestId("seller-locked-banner")).toBeHidden();
@@ -501,6 +523,11 @@ test.describe("Seller management", () => {
         exact: true,
       }),
     ).toBeVisible();
+
+    // Verify seller is selected in dropdown
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      TEST_SELLER_DATA.name,
+    );
 
     // Verify locked banner is visible again after reselecting seller
     await expect(sellerForm.getByTestId("seller-locked-banner")).toBeVisible();
@@ -561,9 +588,14 @@ test.describe("Seller management", () => {
 
     // Verify seller was added
     const sellerForm = page.getByTestId(`seller-information-section`);
-    await expect(
-      sellerForm.getByRole("combobox", { name: "Select Seller" }),
-    ).toContainText(testData.name);
+
+    const sellerDropdown = sellerForm.getByRole("combobox", {
+      name: "Select Seller",
+    });
+
+    await expect(sellerDropdown.locator("option:checked")).toHaveText(
+      testData.name,
+    );
 
     // Click delete button
     await sellerForm.getByRole("button", { name: "Delete seller" }).click();
@@ -606,6 +638,14 @@ test.describe("Seller management", () => {
       sellerForm.getByRole("combobox", { name: "Select Seller" }),
     ).toBeHidden();
 
+    // Verify "New Seller" button is visible after deletion
+    const newSellerButton = sellerForm.getByRole("button", {
+      name: "New Seller",
+    });
+
+    await expect(newSellerButton).toBeVisible();
+    await expect(newSellerButton).toBeEnabled();
+
     // Verify form is reset to default values
     await expect(sellerForm.getByRole("textbox", { name: "Name" })).toHaveValue(
       DEFAULT_SELLER_DATA.name,
@@ -637,5 +677,141 @@ test.describe("Seller management", () => {
     await expect(
       sellerForm.getByRole("textbox", { name: "SWIFT/BIC" }),
     ).toHaveValue(DEFAULT_SELLER_DATA.swiftBic);
+  });
+
+  test.describe("discard changes confirmation", () => {
+    test("clean form - Cancel closes without confirm", async ({ page }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      await expect(manageSellerDialog).toBeVisible();
+
+      // No changes made — Cancel should close immediately, no dialog fired
+      let confirmFired = false;
+      page.once("dialog", () => {
+        confirmFired = true;
+      });
+
+      await manageSellerDialog.getByRole("button", { name: "Cancel" }).click();
+
+      await expect(manageSellerDialog).toBeHidden();
+      expect(confirmFired).toBe(false);
+    });
+
+    test("clean form - X button closes without confirm", async ({ page }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      await expect(manageSellerDialog).toBeVisible();
+
+      let confirmFired = false;
+      page.once("dialog", () => {
+        confirmFired = true;
+      });
+
+      await manageSellerDialog.getByRole("button", { name: "Close" }).click();
+
+      await expect(manageSellerDialog).toBeHidden();
+      expect(confirmFired).toBe(false);
+    });
+
+    test("dirty form - Cancel - accept discards changes and closes", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      await manageSellerDialog
+        .getByRole("textbox", { name: "Name" })
+        .fill("Unsaved Seller");
+
+      // Set up a listener for the browser's native confirm dialog
+      // This must be registered BEFORE the action that triggers it
+      page.once("dialog", async (dialog) => {
+        // Verify it's a confirmation dialog (not alert or prompt)
+        expect(dialog.type()).toBe("confirm");
+
+        // Verify the dialog shows the expected discard warning message
+        expect(dialog.message()).toBe(
+          "You have unsaved changes. Discard them?",
+        );
+
+        // Accept the dialog to confirm discarding changes
+        await dialog.accept();
+      });
+
+      // Click Cancel button, which should trigger the confirm dialog
+      // because the form has unsaved changes (is "dirty")
+      await manageSellerDialog.getByRole("button", { name: "Cancel" }).click();
+
+      await expect(manageSellerDialog).toBeHidden();
+    });
+
+    test("dirty form - Cancel - dismiss keeps dialog open with values intact", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      const nameInput = manageSellerDialog.getByRole("textbox", {
+        name: "Name",
+      });
+      await nameInput.fill("Unsaved Seller");
+
+      page.once("dialog", async (dialog) => {
+        await dialog.dismiss();
+      });
+
+      await manageSellerDialog.getByRole("button", { name: "Cancel" }).click();
+
+      await expect(manageSellerDialog).toBeVisible();
+      await expect(nameInput).toHaveValue("Unsaved Seller");
+    });
+
+    test("dirty form - X button - accept discards changes and closes", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      await manageSellerDialog
+        .getByRole("textbox", { name: "Name" })
+        .fill("Unsaved Seller");
+
+      page.once("dialog", async (dialog) => {
+        expect(dialog.type()).toBe("confirm");
+        expect(dialog.message()).toBe(
+          "You have unsaved changes. Discard them?",
+        );
+        await dialog.accept();
+      });
+
+      await manageSellerDialog.getByRole("button", { name: "Close" }).click();
+
+      await expect(manageSellerDialog).toBeHidden();
+    });
+
+    test("dirty form - Escape - accept discards changes and closes", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      await manageSellerDialog
+        .getByRole("textbox", { name: "Name" })
+        .fill("Unsaved Seller");
+
+      page.once("dialog", async (dialog) => {
+        expect(dialog.type()).toBe("confirm");
+        expect(dialog.message()).toBe(
+          "You have unsaved changes. Discard them?",
+        );
+        await dialog.accept();
+      });
+
+      await page.keyboard.press("Escape");
+
+      await expect(manageSellerDialog).toBeHidden();
+    });
   });
 });

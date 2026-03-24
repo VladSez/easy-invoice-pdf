@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -71,6 +70,8 @@ export function BuyerDialog({
     },
   });
 
+  const { isDirty } = form.formState;
+
   // by default, we want to apply the new buyer to the current invoice
   const [shouldApplyNewBuyerToInvoice, setShouldApplyNewBuyerToInvoice] =
     useState(true);
@@ -115,6 +116,32 @@ export function BuyerDialog({
       );
     }
   }, [shouldApplyFormValues, formValues, initialData, isEditMode, form]);
+
+  /**
+   * Prevents accidental data loss by warning users before leaving the page with unsaved changes.
+   *
+   * This effect sets up a browser-level warning that triggers when:
+   * - The form has unsaved changes (isDirty is true)
+   * - The user attempts to navigate away, refresh, or close the tab/window
+   */
+  useEffect(() => {
+    function handler(e: BeforeUnloadEvent) {
+      if (!isDirty) return;
+      e.preventDefault();
+      e.returnValue = ""; // required for Chrome
+    }
+
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty]);
+
+  /**
+   * Closes the buyer dialog and resets the form to its default state.
+   */
+  function closeDialog() {
+    form.reset();
+    onClose(false);
+  }
 
   function onSubmit(formValues: BuyerData) {
     try {
@@ -179,10 +206,7 @@ export function BuyerDialog({
       }
 
       // Close dialog
-      onClose(false);
-
-      // Reset form
-      form.reset();
+      closeDialog();
     } catch (error) {
       console.error("Failed to save buyer:", error);
 
@@ -200,8 +224,17 @@ export function BuyerDialog({
       open={isOpen}
       onOpenChange={(open) => {
         if (!open) {
-          onClose(false);
-          form.reset();
+          // When the user attempts to close the dialog, check if the form has unsaved changes.
+          // If the form is dirty (has been modified), prompt the user with a confirmation dialog
+          // to prevent accidental data loss. If the user cancels the confirmation, prevent the
+          // dialog from closing by returning early.
+          if (
+            isDirty &&
+            !window.confirm("You have unsaved changes. Discard them?")
+          ) {
+            return;
+          }
+          closeDialog();
         }
       }}
     >
@@ -498,11 +531,26 @@ export function BuyerDialog({
           )}
         </div>
         <DialogFooter className="border-border border-t px-6 py-4">
-          <DialogClose asChild>
-            <Button type="button" variant="outline">
-              Cancel
-            </Button>
-          </DialogClose>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              // Check if the form has been modified (isDirty flag from react-hook-form).
+              // If there are unsaved changes, show a browser confirmation dialog to prevent
+              // accidental data loss. If the user clicks "Cancel" in the confirmation dialog,
+              // prevent the dialog from closing by returning early.
+              if (
+                isDirty &&
+                !window.confirm("You have unsaved changes. Discard them?")
+              ) {
+                return;
+              }
+
+              closeDialog();
+            }}
+          >
+            Cancel
+          </Button>
           <Button
             type="button"
             onClick={async () => {
