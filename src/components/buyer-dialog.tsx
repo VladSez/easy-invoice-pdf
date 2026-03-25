@@ -45,6 +45,21 @@ interface BuyerDialogProps {
   formValues?: Partial<BuyerData>;
 }
 
+/**
+ * BuyerDialog component for adding or editing buyer information.
+ *
+ * This dialog provides a form interface for managing buyer data, including:
+ * - Basic information (name, address, VAT number)
+ * - Contact details (email)
+ * - Additional notes
+ *
+ * Features:
+ * - Pre-fill form with current invoice values (when creating new buyer)
+ * - Apply newly created buyer to current invoice
+ * - Validation for duplicate buyer names
+ * - Unsaved changes warning on dialog close
+ * - Field visibility toggles for optional information
+ */
 export function BuyerDialog({
   isOpen,
   onClose,

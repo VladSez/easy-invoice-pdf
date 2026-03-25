@@ -47,6 +47,22 @@ interface SellerDialogProps {
   formValues?: Partial<SellerData>;
 }
 
+/**
+ * SellerDialog component for adding or editing seller information.
+ *
+ * This dialog provides a form interface for managing seller data, including:
+ * - Basic information (name, address, VAT number)
+ * - Contact details (email)
+ * - Banking information (account number, SWIFT/BIC)
+ * - Additional notes
+ *
+ * Features:
+ * - Pre-fill form with current invoice values (when creating new seller)
+ * - Apply newly created seller to current invoice
+ * - Validation for duplicate seller names
+ * - Unsaved changes warning on dialog close
+ * - Field visibility toggles for optional information
+ */
 export function SellerDialog({
   isOpen,
   onClose,
