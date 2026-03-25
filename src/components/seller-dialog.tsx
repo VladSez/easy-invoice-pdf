@@ -158,6 +158,7 @@ export function SellerDialog({
    */
   function closeDialog() {
     form.reset();
+    setShouldApplyFormValues(false);
     onClose(false);
   }
 

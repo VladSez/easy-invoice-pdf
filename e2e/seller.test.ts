@@ -679,6 +679,35 @@ test.describe("Seller management", () => {
     ).toHaveValue(DEFAULT_SELLER_DATA.swiftBic);
   });
 
+  test("pre-fill switch resets to off after dialog close and reopen", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "New Seller" }).click();
+
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+    const prefillSwitch = manageSellerDialog.getByRole("switch", {
+      name: "Pre-fill with values from the current invoice form",
+    });
+
+    await expect(prefillSwitch).not.toBeChecked();
+    await prefillSwitch.click();
+    await expect(prefillSwitch).toBeChecked();
+
+    // Close the dialog via Cancel
+    await manageSellerDialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(manageSellerDialog).toBeHidden();
+
+    // Reopen the dialog
+    await page.getByRole("button", { name: "New Seller" }).click();
+    await expect(manageSellerDialog).toBeVisible();
+
+    // Pre-fill switch must be off and form must be empty
+    await expect(prefillSwitch).not.toBeChecked();
+    await expect(
+      manageSellerDialog.getByRole("textbox", { name: "Name" }),
+    ).toHaveValue("");
+  });
+
   test.describe("discard changes confirmation", () => {
     test("clean form - Cancel closes without confirm", async ({ page }) => {
       await page.getByRole("button", { name: "New Seller" }).click();
