@@ -155,6 +155,7 @@ export function BuyerDialog({
    */
   function closeDialog() {
     form.reset();
+    setShouldApplyFormValues(false);
     onClose(false);
   }
 
