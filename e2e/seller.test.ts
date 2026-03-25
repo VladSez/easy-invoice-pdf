@@ -210,7 +210,7 @@ test.describe("Seller management", () => {
     const sellerLockedBanner = sellerForm.getByTestId("seller-locked-banner");
     await expect(sellerLockedBanner).toBeVisible();
     await expect(sellerLockedBanner).toContainText(
-      'To modify seller details, click the "Edit seller" button (pencil icon) next to the dropdown above.',
+      "To modify seller details, click the Edit seller button (pencil icon) next to the dropdown above.",
     );
 
     // Seller Name

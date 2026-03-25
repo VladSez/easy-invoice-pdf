@@ -161,7 +161,7 @@ test.describe("Buyer management", () => {
     const buyerLockedBanner = buyerForm.getByTestId("buyer-locked-banner");
     await expect(buyerLockedBanner).toBeVisible();
     await expect(buyerLockedBanner).toContainText(
-      'To modify buyer details, click the "Edit buyer" button (pencil icon) next to the dropdown above.',
+      "To modify buyer details, click the Edit buyer button (pencil icon) next to the dropdown above.",
     );
 
     const nameInput = buyerForm.getByRole("textbox", {
