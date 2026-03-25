@@ -1,4 +1,4 @@
-name: 🧪 Vitest Unit Tests
+name: 🔍 Knip
 on:
   push:
     branches: [main]
@@ -6,9 +6,9 @@ on:
     branches: [main]
 
 jobs:
-  unit-tests:
-    name: Run unit tests
-    timeout-minutes: 10
+  knip:
+    name: Run Knip
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
       # we use pinned versions because there are safer to use: https://x.com/paulmillr/status/1900948425325031448
@@ -27,13 +27,13 @@ jobs:
       - name: 🚚 Install dependencies
         run: pnpm install
 
-      - name: 🧪 Run Vitest tests
-        id: vitest
-        run: pnpm vitest run --reporter=verbose
+      - name: 🔎 Run Knip
+        id: knip
         continue-on-error: true
+        run: pnpm knip
 
       - name: 🔍 Get PR URL
-        if: steps.vitest.outcome == 'failure'
+        if: steps.knip.outcome == 'failure'
         id: pr-url
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -46,7 +46,7 @@ jobs:
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
       - name: 📧 Send email
-        if: steps.vitest.outcome == 'failure'
+        if: steps.knip.outcome == 'failure'
         # https://github.com/dawidd6/action-send-mail
         uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
         with:
@@ -56,14 +56,14 @@ jobs:
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: ❌ Unit Tests Failed for ${{ github.repository }}
+          subject: ❌ Knip Failed for ${{ github.repository }}
           body: |
-            Unit tests for ${{ github.repository }} have failed.
+            Knip for ${{ github.repository }} has failed.
 
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
 
-      - name: ❌ Mark workflow failed on Unit Tests failure
-        if: steps.vitest.outcome == 'failure'
+      - name: ❌ Mark workflow failed on Knip failure
+        if: steps.knip.outcome == 'failure'
         run: exit 1

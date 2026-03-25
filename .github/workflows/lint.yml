@@ -12,13 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # we use pinned versions because there are safer to use: https://x.com/paulmillr/status/1900948425325031448
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         name: 🛎️ Checkout repository
 
-      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
         name: 📦 Setup pnpm
 
-      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # 4.3.0
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         name: 📚 Setup Node.js
         with:
           node-version: lts/*
@@ -42,16 +42,17 @@ jobs:
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository_owner }}:${{ github.ref_name }}" \
-            | jq -r '.[0].html_url')
+            | jq -r '.[0].html_url // empty')
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
       - name: 📧 Send email
         if: steps.lint.outcome == 'failure'
-        uses: dawidd6/action-send-mail@611879133a9569642c41be66f4a323286e9b8a3b # v4
+        # https://github.com/dawidd6/action-send-mail
+        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
         with:
           server_address: smtp.gmail.com
           server_port: 587
-          from: GitHub Actions
+          from: "GitHub Actions (no-reply) <${{ secrets.EMAIL_USERNAME }}>"
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
@@ -62,3 +63,7 @@ jobs:
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
+
+      - name: ❌ Mark workflow failed on Linting failure
+        if: steps.lint.outcome == 'failure'
+        run: exit 1
