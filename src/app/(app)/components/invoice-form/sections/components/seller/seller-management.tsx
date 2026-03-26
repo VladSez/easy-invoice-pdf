@@ -7,10 +7,9 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
-import { CustomTooltip } from "./ui/tooltip";
-import { SelectNative } from "./ui/select-native";
-import { Button } from "./ui/button";
-import { SellerDialog } from "./seller-dialog";
+import { CustomTooltip } from "@/components/ui/tooltip";
+import { SelectNative } from "@/components/ui/select-native";
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,17 +19,18 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "./ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 import type { UseFormSetValue } from "react-hook-form";
 import { sellerSchema, type InvoiceData, type SellerData } from "@/app/schema";
 import { z } from "zod";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { Label } from "./ui/label";
+import { Label } from "@/components/ui/label";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
 import { DEFAULT_SELLER_DATA } from "@/app/constants";
+import { SellerDialog } from "@/app/(app)/components/invoice-form/sections/components/seller/seller-dialog";
 
 export const SELLERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_SELLERS";
 

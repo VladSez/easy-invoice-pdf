@@ -1,7 +1,7 @@
 "use client";
 
 import { type BuyerData, type InvoiceData } from "@/app/schema";
-import { BuyerManagement } from "@/components/buyer-management";
+import { BuyerManagement } from "@/app/(app)/components/invoice-form/sections/components/buyer/buyer-management";
 import { AccordionContent } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";

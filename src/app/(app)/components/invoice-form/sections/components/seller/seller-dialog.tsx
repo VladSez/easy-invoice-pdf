@@ -1,3 +1,4 @@
+import { sellerSchema, type SellerData } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -7,12 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { buyerSchema, type BuyerData } from "@/app/schema";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -21,57 +16,66 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { toast } from "sonner";
-import { ConfirmDiscardDialog } from "./confirm-discard-dialog";
-import { BUYERS_LOCAL_STORAGE_KEY } from "./buyer-management";
-import { z } from "zod";
-import { useState, useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
-import { InputHelperMessage } from "./ui/input-helper-message";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { ConfirmDiscardDialog } from "../confirm-discard-dialog";
+import { SELLERS_LOCAL_STORAGE_KEY } from "./seller-management";
+import { InputHelperMessage } from "../../../../../../../components/ui/input-helper-message";
+import { useConfirmDiscard } from "@/app/(app)/components/invoice-form/sections/hooks/use-confirm-discard";
 
-const BUYER_FORM_ID = "buyer-form";
+const SELLER_FORM_ID = "seller-form";
 
-interface BuyerDialogProps {
+interface SellerDialogProps {
   isOpen: boolean;
   onClose: React.Dispatch<React.SetStateAction<boolean>>;
-  handleBuyerAdd?: (
-    buyer: BuyerData,
-    { shouldApplyNewBuyerToInvoice }: { shouldApplyNewBuyerToInvoice: boolean },
+  handleSellerAdd?: (
+    seller: SellerData,
+    {
+      shouldApplyNewSellerToInvoice,
+    }: { shouldApplyNewSellerToInvoice: boolean },
   ) => void;
-  handleBuyerEdit?: (buyer: BuyerData) => void;
-  initialData: BuyerData | null;
+  handleSellerEdit?: (seller: SellerData) => void;
+  initialData: SellerData | null;
   isEditMode: boolean;
-  formValues?: Partial<BuyerData>;
+  formValues?: Partial<SellerData>;
 }
 
 /**
- * BuyerDialog component for adding or editing buyer information.
+ * SellerDialog component for adding or editing seller information.
  *
- * This dialog provides a form interface for managing buyer data, including:
+ * This dialog provides a form interface for managing seller data, including:
  * - Basic information (name, address, VAT number)
  * - Contact details (email)
+ * - Banking information (account number, SWIFT/BIC)
  * - Additional notes
  *
  * Features:
- * - Pre-fill form with current invoice values (when creating new buyer)
- * - Apply newly created buyer to current invoice
- * - Validation for duplicate buyer names
+ * - Pre-fill form with current invoice values (when creating new seller)
+ * - Apply newly created seller to current invoice
+ * - Validation for duplicate seller names
  * - Unsaved changes warning on dialog close
  * - Field visibility toggles for optional information
  */
-export function BuyerDialog({
+export function SellerDialog({
   isOpen,
   onClose,
-  handleBuyerAdd,
-  handleBuyerEdit,
+  handleSellerAdd,
+  handleSellerEdit,
   initialData,
   isEditMode,
   formValues,
-}: BuyerDialogProps) {
-  const form = useForm<BuyerData>({
-    resolver: zodResolver(buyerSchema),
+}: SellerDialogProps) {
+  const form = useForm<SellerData>({
+    resolver: zodResolver(sellerSchema),
     defaultValues: {
       id: initialData?.id ?? "",
       name: initialData?.name ?? "",
@@ -80,7 +84,12 @@ export function BuyerDialog({
       vatNoLabelText: initialData?.vatNoLabelText ?? "VAT no",
       email: initialData?.email ?? "",
       emailFieldIsVisible: initialData?.emailFieldIsVisible ?? true,
+      accountNumber: initialData?.accountNumber ?? "",
+      swiftBic: initialData?.swiftBic ?? "",
       vatNoFieldIsVisible: initialData?.vatNoFieldIsVisible ?? true,
+      accountNumberFieldIsVisible:
+        initialData?.accountNumberFieldIsVisible ?? true,
+      swiftBicFieldIsVisible: initialData?.swiftBicFieldIsVisible ?? true,
       notes: initialData?.notes ?? "",
       notesFieldIsVisible: initialData?.notesFieldIsVisible ?? true,
     },
@@ -88,27 +97,19 @@ export function BuyerDialog({
 
   const { isDirty } = form.formState;
 
-  const [isConfirmDiscardOpen, setIsConfirmDiscardOpen] = useState(false);
+  const { isConfirmDiscardDialogOpen, setIsConfirmDiscardDialogOpen } =
+    useConfirmDiscard();
 
-  // by default, we want to apply the new buyer to the current invoice
-  const [shouldApplyNewBuyerToInvoice, setShouldApplyNewBuyerToInvoice] =
+  // by default, we want to apply the new seller to the current invoice
+  const [shouldApplyNewSellerToInvoice, setShouldApplyNewSellerToInvoice] =
     useState(true);
 
+  // Add state for applying form values
   const [shouldApplyFormValues, setShouldApplyFormValues] = useState(false);
 
-  /**
-   * Synchronizes form values based on the "Use current invoice data" switch state.
-   *
-   * When creating a new buyer (not in edit mode):
-   * - If switch is ON: Populates the form with current invoice buyer data (formValues)
-   *   to allow users to save the current invoice's buyer information as a new saved buyer.
-   * - If switch is OFF: Resets the form to empty/default values or initialData
-   *   to allow users to enter completely new buyer information from scratch.
-   *
-   * This effect does not run in edit mode to prevent overwriting the buyer being edited.
-   */
+  // Effect to update form values when switch is toggled
   useEffect(() => {
-    // Switch is ON: Pre-fill form with current invoice buyer data
+    // if the switch is on and we have form values, we want to apply the form values to the form
     if (shouldApplyFormValues && formValues && !isEditMode) {
       form.reset({
         ...form.getValues(),
@@ -116,7 +117,7 @@ export function BuyerDialog({
       });
     }
 
-    // Switch is OFF: Reset form to empty state or initial data
+    // if the switch is off and we have initial data, we want to apply the initial data to the form
     else if (!shouldApplyFormValues && !isEditMode) {
       form.reset(
         initialData ?? {
@@ -127,7 +128,11 @@ export function BuyerDialog({
           vatNoLabelText: "VAT no",
           email: "",
           emailFieldIsVisible: true,
+          accountNumber: "",
+          swiftBic: "",
           vatNoFieldIsVisible: true,
+          accountNumberFieldIsVisible: true,
+          swiftBicFieldIsVisible: true,
           notes: "",
           notesFieldIsVisible: true,
         },
@@ -154,7 +159,7 @@ export function BuyerDialog({
   }, [isDirty]);
 
   /**
-   * Closes the buyer dialog and resets the form to its default state.
+   * Closes the seller dialog and resets the form to its default state.
    */
   function closeDialog() {
     form.reset();
@@ -162,74 +167,80 @@ export function BuyerDialog({
     onClose(false);
   }
 
-  function onSubmit(formValues: BuyerData) {
+  function onSubmit(formValues: SellerData) {
     try {
       // **RUNNING SOME VALIDATIONS FIRST**
 
-      // Get existing buyers or initialize empty array
-      const buyers = localStorage.getItem(BUYERS_LOCAL_STORAGE_KEY);
-      const existingBuyers: unknown = buyers ? JSON.parse(buyers) : [];
+      // Get existing sellers or initialize empty array
+      const sellers = localStorage.getItem(SELLERS_LOCAL_STORAGE_KEY);
+      const existingSellers: unknown = sellers ? JSON.parse(sellers) : [];
 
-      // Validate existing buyers array with Zod
-      const existingBuyersValidationResult = z
-        .array(buyerSchema)
-        .safeParse(existingBuyers);
+      // Validate existing sellers array with Zod
+      const existingSellersValidationResult = z
+        .array(sellerSchema)
+        .safeParse(existingSellers);
 
-      if (!existingBuyersValidationResult.success) {
+      if (!existingSellersValidationResult.success) {
         console.error(
-          "Invalid existing buyers data:",
-          existingBuyersValidationResult.error,
+          "Invalid existing sellers data:",
+          existingSellersValidationResult.error,
         );
 
         // Show error toast
-        toast.error("Error loading existing buyers", {
+        toast.error("Error loading existing sellers", {
+          id: "error-loading-existing-sellers-error-toast",
           richColors: true,
           description: "Please try again",
         });
 
         // Reset localStorage if validation fails
-        localStorage.setItem(BUYERS_LOCAL_STORAGE_KEY, JSON.stringify([]));
+        localStorage.setItem(SELLERS_LOCAL_STORAGE_KEY, JSON.stringify([]));
 
         return;
       }
 
-      // Validate buyer data against existing buyers
-      const isDuplicateName = existingBuyersValidationResult.data.some(
-        (buyer: BuyerData) =>
-          buyer.name === formValues.name && buyer.id !== formValues.id,
+      // we don't need to validate the name if we are editing an existing seller
+
+      // Validate seller data against existing sellers
+      const isDuplicateName = existingSellersValidationResult.data.some(
+        (seller: SellerData) =>
+          seller.name === formValues.name && seller.id !== formValues.id,
       );
 
       if (isDuplicateName) {
         form.setError("name", {
           type: "manual",
-          message: "A buyer with this name already exists",
+          message: "A seller with this name already exists",
         });
 
         // Focus on the name input field for user to fix the error
         form.setFocus("name");
 
         // Show error toast
-        toast.error("A buyer with this name already exists", {
+        toast.error("A seller with this name already exists", {
+          id: "seller-name-already-exists-error-toast",
           richColors: true,
+          description: "Please try again",
         });
 
         return;
       }
 
       if (isEditMode) {
-        // Edit buyer
-        handleBuyerEdit?.(formValues);
+        // Edit seller
+        handleSellerEdit?.(formValues);
       } else {
-        // Add new buyer
-        handleBuyerAdd?.(formValues, { shouldApplyNewBuyerToInvoice });
+        // Add new seller
+        handleSellerAdd?.(formValues, { shouldApplyNewSellerToInvoice });
       }
 
       // Close dialog
       closeDialog();
     } catch (error) {
-      console.error("Failed to save buyer:", error);
+      console.error("Failed to save seller:", error);
 
-      toast.error("Failed to save buyer", {
+      toast.error("Failed to save seller", {
+        id: "failed-to-save-seller-error-toast",
         description: "Please try again",
         richColors: true,
       });
@@ -245,8 +256,10 @@ export function BuyerDialog({
         onOpenChange={(open) => {
           if (!open) {
             // check if the form has unsaved changes and open the confirm discard dialog
+            // If there are unsaved changes (isDirty), opens the confirmation dialog.
+            // Otherwise, closes the dialog immediately.
             if (isDirty) {
-              setIsConfirmDiscardOpen(true);
+              setIsConfirmDiscardDialogOpen(true);
               return;
             }
             closeDialog();
@@ -255,21 +268,21 @@ export function BuyerDialog({
       >
         <DialogContent
           className="flex flex-col gap-0 overflow-y-visible p-0 sm:max-w-lg [&>button:last-child]:top-3.5"
-          data-testid={`manage-buyer-dialog`}
+          data-testid={`manage-seller-dialog`}
         >
           <DialogHeader className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
             <DialogTitle className="text-base">
-              {isEditMode ? "Edit Buyer" : "Add New Buyer"}
+              {isEditMode ? "Edit Seller" : "Add New Seller"}
             </DialogTitle>
             <DialogDescription>
               {isEditMode
-                ? "Edit the buyer details"
-                : "Add a new buyer to use later in your invoices"}
+                ? "Edit the seller details"
+                : "Add a new seller to use later in your invoices"}
             </DialogDescription>
           </DialogHeader>
 
           <div className="overflow-y-auto px-6 py-4">
-            {/* Add Use Current Form Values switch */}
+            {/* Show Use Current Form Values switch only when creating new seller */}
             {!isEditMode && (
               <div className="mb-4">
                 <div className="flex items-center gap-2">
@@ -286,7 +299,7 @@ export function BuyerDialog({
                   </Label>
                 </div>
                 <span className="mt-1.5 inline-block text-xs text-slate-500">
-                  When enabled, this will automatically fill in the buyer
+                  When enabled, this will automatically fill in the seller
                   details dialog with the information you&apos;ve already
                   entered in your current invoice form.
                 </span>
@@ -297,7 +310,7 @@ export function BuyerDialog({
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4"
-                id={BUYER_FORM_ID}
+                id={SELLER_FORM_ID}
               >
                 <FormField
                   control={form.control}
@@ -309,7 +322,7 @@ export function BuyerDialog({
                         <Textarea
                           {...field}
                           rows={3}
-                          placeholder="Enter buyer name"
+                          placeholder="Enter seller name"
                         />
                       </FormControl>
                       <FormMessage />
@@ -327,7 +340,7 @@ export function BuyerDialog({
                         <Textarea
                           {...field}
                           rows={3}
-                          placeholder="Enter buyer address"
+                          placeholder="Enter seller address"
                         />
                       </FormControl>
                       <FormMessage />
@@ -335,10 +348,9 @@ export function BuyerDialog({
                   )}
                 />
 
-                {/* Tax Number */}
                 <fieldset className="rounded-md border px-4 pb-4">
                   <legend className="text-base font-semibold lg:text-lg">
-                    Buyer Tax Number
+                    Seller Tax Number
                   </legend>
 
                   <div className="mb-2 flex items-center justify-end">
@@ -385,7 +397,6 @@ export function BuyerDialog({
                               placeholder="Enter Tax number label"
                             />
                           </FormControl>
-
                           {form.formState.errors.vatNoLabelText && (
                             <FormMessage>
                               {form.formState.errors.vatNoLabelText.message}
@@ -434,7 +445,7 @@ export function BuyerDialog({
                           <Input
                             {...field}
                             type="email"
-                            placeholder="buyer@email.com"
+                            placeholder="seller@email.com"
                           />
                         </FormControl>
                         <FormMessage />
@@ -452,17 +463,113 @@ export function BuyerDialog({
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               id="emailFieldIsVisible"
-                              data-testid={`buyerEmailDialogFieldVisibilitySwitch`}
+                              data-testid={`sellerEmailDialogFieldVisibilitySwitch`}
                               aria-label={`Show the 'Email' field in the PDF`}
                             />
                           </FormControl>
                           <CustomTooltip
                             trigger={
                               <Label htmlFor="emailFieldIsVisible">
-                                Show Buyer Email in PDF
+                                Show Seller Email in PDF
                               </Label>
                             }
                             content='Show the "Email" field in the PDF'
+                            className="z-[1000]"
+                          />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Account Number */}
+                <div className="space-y-3 rounded-md border p-4">
+                  <FormField
+                    control={form.control}
+                    name="accountNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="mb-2 font-medium">
+                          Account Number
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            rows={3}
+                            placeholder="Enter account number"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="accountNumberFieldIsVisible"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            id="accountNumberFieldIsVisible"
+                            aria-label={`Show the 'Account Number' field in the PDF`}
+                          />
+                          <CustomTooltip
+                            trigger={
+                              <Label htmlFor="accountNumberFieldIsVisible">
+                                Show Seller Account Number in PDF
+                              </Label>
+                            }
+                            content='Show the "Account Number" field in the PDF'
+                            className="z-[1000]"
+                          />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* SWIFT/BIC */}
+                <div className="space-y-3 rounded-md border p-4">
+                  <FormField
+                    control={form.control}
+                    name="swiftBic"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="mb-2 font-medium">
+                          SWIFT/BIC
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            rows={3}
+                            placeholder="Enter SWIFT/BIC code"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="swiftBicFieldIsVisible"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            id="swiftBicFieldIsVisible"
+                            aria-label={`Show the 'SWIFT/BIC' field in the PDF`}
+                          />
+                          <CustomTooltip
+                            trigger={
+                              <Label htmlFor="swiftBicFieldIsVisible">
+                                Show Seller SWIFT/BIC in PDF
+                              </Label>
+                            }
+                            content='Show the "SWIFT/BIC" field in the PDF'
                             className="z-[1000]"
                           />
                         </div>
@@ -504,14 +611,14 @@ export function BuyerDialog({
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               id="notes-field-visibility"
-                              data-testid={`buyerNotesDialogFieldVisibilitySwitch`}
+                              data-testid={`sellerNotesDialogFieldVisibilitySwitch`}
                               aria-label={`Show the 'Notes' field in the PDF`}
                             />
                           </FormControl>
                           <CustomTooltip
                             trigger={
                               <Label htmlFor="notes-field-visibility">
-                                Show Buyer Notes in PDF
+                                Show Seller Notes in PDF
                               </Label>
                             }
                             content="Show the notes field in the PDF"
@@ -525,24 +632,24 @@ export function BuyerDialog({
               </form>
             </Form>
 
-            {/* Apply to Current Invoice switch remains at bottom */}
+            {/* Apply to Current Invoice switch remains at the bottom */}
             {!isEditMode && (
               <div className="mt-4 flex flex-col gap-1 border-t pt-4">
                 <div className="flex items-center gap-2">
                   <Switch
-                    checked={shouldApplyNewBuyerToInvoice}
-                    onCheckedChange={setShouldApplyNewBuyerToInvoice}
-                    id="apply-buyer-to-current-invoice-switch"
+                    checked={shouldApplyNewSellerToInvoice}
+                    onCheckedChange={setShouldApplyNewSellerToInvoice}
+                    id="apply-seller-to-current-invoice-switch"
                   />
                   <Label
-                    htmlFor="apply-buyer-to-current-invoice-switch"
+                    htmlFor="apply-seller-to-current-invoice-switch"
                     className="cursor-pointer"
                   >
                     Apply to Current Invoice
                   </Label>
                 </div>
                 <span className="mt-1.5 text-xs text-slate-500">
-                  When enabled, the newly created buyer will be automatically
+                  When enabled, the newly created seller will be automatically
                   applied to your current invoice form and reflected in the
                   generated PDF.
                 </span>
@@ -555,8 +662,10 @@ export function BuyerDialog({
               variant="outline"
               onClick={() => {
                 // check if the form has unsaved changes and open the confirm discard dialog
+                // If there are unsaved changes (isDirty), opens the confirmation dialog.
+                // Otherwise, closes the dialog immediately.
                 if (isDirty) {
-                  setIsConfirmDiscardOpen(true);
+                  setIsConfirmDiscardDialogOpen(true);
                   return;
                 }
                 closeDialog();
@@ -565,8 +674,11 @@ export function BuyerDialog({
               Cancel
             </Button>
             <Button
+              // we don't want to use type="submit" because it will cause unnecessary re-render of the invoice pdf preview
               type="button"
               onClick={async () => {
+                // we manually trigger the form validation and submit the form
+
                 // Validate form and focus first error field
                 const result = await form.trigger(undefined, {
                   shouldFocus: true,
@@ -576,18 +688,18 @@ export function BuyerDialog({
                 // submit the form
                 onSubmit(form.getValues());
               }}
-              form={BUYER_FORM_ID}
+              form={SELLER_FORM_ID}
             >
-              Save Buyer
+              Save Seller
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
       <ConfirmDiscardDialog
-        open={isConfirmDiscardOpen}
-        onOpenChange={setIsConfirmDiscardOpen}
+        open={isConfirmDiscardDialogOpen}
+        onOpenChange={setIsConfirmDiscardDialogOpen}
         onDiscard={closeDialog}
-        entityName="buyer"
+        entityName="seller"
       />
     </>
   );
