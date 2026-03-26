@@ -95,6 +95,7 @@ jobs:
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
+            - Vercel deployment: ${{ github.event.deployment_status.environment_url }}
           attachments: playwright-output/report/index.html
 
       - name: ❌ Mark workflow failed on E2E Tests failure
