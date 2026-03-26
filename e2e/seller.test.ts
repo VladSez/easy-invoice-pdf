@@ -715,16 +715,12 @@ test.describe("Seller management", () => {
       const manageSellerDialog = page.getByTestId("manage-seller-dialog");
       await expect(manageSellerDialog).toBeVisible();
 
-      // No changes made — Cancel should close immediately, no dialog fired
-      let confirmFired = false;
-      page.once("dialog", () => {
-        confirmFired = true;
-      });
-
       await manageSellerDialog.getByRole("button", { name: "Cancel" }).click();
 
       await expect(manageSellerDialog).toBeHidden();
-      expect(confirmFired).toBe(false);
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeHidden();
     });
 
     test("clean form - X button closes without confirm", async ({ page }) => {
@@ -733,15 +729,12 @@ test.describe("Seller management", () => {
       const manageSellerDialog = page.getByTestId("manage-seller-dialog");
       await expect(manageSellerDialog).toBeVisible();
 
-      let confirmFired = false;
-      page.once("dialog", () => {
-        confirmFired = true;
-      });
-
       await manageSellerDialog.getByRole("button", { name: "Close" }).click();
 
       await expect(manageSellerDialog).toBeHidden();
-      expect(confirmFired).toBe(false);
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeHidden();
     });
 
     test("dirty form - Cancel - accept discards changes and closes", async ({
@@ -754,25 +747,28 @@ test.describe("Seller management", () => {
         .getByRole("textbox", { name: "Name" })
         .fill("Unsaved Seller");
 
-      // Set up a listener for the browser's native confirm dialog
-      // This must be registered BEFORE the action that triggers it
-      page.once("dialog", async (dialog) => {
-        // Verify it's a confirmation dialog (not alert or prompt)
-        expect(dialog.type()).toBe("confirm");
-
-        // Verify the dialog shows the expected discard warning message
-        expect(dialog.message()).toBe(
-          "You have unsaved changes in seller details. Discard them?",
-        );
-
-        // Accept the dialog to confirm discarding changes
-        await dialog.accept();
-      });
-
-      // Click Cancel button, which should trigger the confirm dialog
-      // because the form has unsaved changes (is "dirty")
       await manageSellerDialog.getByRole("button", { name: "Cancel" }).click();
 
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+
+      await expect(confirmDialog).toBeVisible();
+      await expect(
+        confirmDialog.getByText("Discard changes to seller?"),
+      ).toBeVisible();
+
+      await expect(
+        confirmDialog.getByText("You have unsaved changes. They will be lost."),
+      ).toBeVisible();
+
+      await expect(
+        confirmDialog.getByRole("button", { name: "Discard changes" }),
+      ).toBeVisible();
+
+      await confirmDialog
+        .getByRole("button", { name: "Discard changes" })
+        .click();
+
+      await expect(confirmDialog).toBeHidden();
       await expect(manageSellerDialog).toBeHidden();
     });
 
@@ -787,17 +783,15 @@ test.describe("Seller management", () => {
       });
       await nameInput.fill("Unsaved Seller");
 
-      page.once("dialog", async (dialog) => {
-        expect(dialog.type()).toBe("confirm");
-        expect(dialog.message()).toBe(
-          "You have unsaved changes in seller details. Discard them?",
-        );
-
-        // Dismiss the dialog to keep the form values intact
-        await dialog.dismiss();
-      });
-
       await manageSellerDialog.getByRole("button", { name: "Cancel" }).click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+
+      await expect(confirmDialog).toBeVisible();
+
+      await confirmDialog.getByRole("button", { name: "Keep editing" }).click();
+
+      await expect(confirmDialog).toBeHidden();
 
       await expect(manageSellerDialog).toBeVisible();
       await expect(nameInput).toHaveValue("Unsaved Seller");
@@ -813,16 +807,15 @@ test.describe("Seller management", () => {
         .getByRole("textbox", { name: "Name" })
         .fill("Unsaved Seller");
 
-      page.once("dialog", async (dialog) => {
-        expect(dialog.type()).toBe("confirm");
-        expect(dialog.message()).toBe(
-          "You have unsaved changes in seller details. Discard them?",
-        );
-        await dialog.accept();
-      });
-
       await manageSellerDialog.getByRole("button", { name: "Close" }).click();
 
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+      await confirmDialog
+        .getByRole("button", { name: "Discard changes" })
+        .click();
+
+      await expect(confirmDialog).toBeHidden();
       await expect(manageSellerDialog).toBeHidden();
     });
 
@@ -836,16 +829,15 @@ test.describe("Seller management", () => {
         .getByRole("textbox", { name: "Name" })
         .fill("Unsaved Seller");
 
-      page.once("dialog", async (dialog) => {
-        expect(dialog.type()).toBe("confirm");
-        expect(dialog.message()).toBe(
-          "You have unsaved changes in seller details. Discard them?",
-        );
-        await dialog.accept();
-      });
-
       await page.keyboard.press("Escape");
 
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+      await confirmDialog
+        .getByRole("button", { name: "Discard changes" })
+        .click();
+
+      await expect(confirmDialog).toBeHidden();
       await expect(manageSellerDialog).toBeHidden();
     });
   });

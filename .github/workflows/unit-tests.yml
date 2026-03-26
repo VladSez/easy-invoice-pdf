@@ -5,6 +5,10 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   unit-tests:
     name: Run unit tests
