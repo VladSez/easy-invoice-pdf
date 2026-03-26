@@ -841,4 +841,221 @@ test.describe("Seller management", () => {
       await expect(manageSellerDialog).toBeHidden();
     });
   });
+
+  test.describe("pre-fill switch dirty guard", () => {
+    test("toggling switch ON with dirty form shows confirm dialog", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      await manageSellerDialog
+        .getByRole("textbox", { name: "Name" })
+        .fill("Draft Seller");
+
+      const prefillSwitch = manageSellerDialog.getByRole("switch", {
+        name: "Pre-fill with values from the current invoice form",
+      });
+      await expect(prefillSwitch).not.toBeChecked();
+
+      await prefillSwitch.click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+
+      // Switch has not changed yet — still OFF while dialog is open
+      await expect(
+        page.getByTestId("manage-seller-dialog").getByRole("switch", {
+          name: "Pre-fill with values from the current invoice form",
+          includeHidden: true, // dialog is still open, but on one level deeper
+        }),
+      ).not.toBeChecked();
+
+      // Dialog is still open
+      await expect(manageSellerDialog).toBeVisible();
+    });
+
+    test("toggling switch ON with dirty form - confirm applies pre-fill and clears draft", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+      // Dirty the form
+      const nameInput = manageSellerDialog.getByRole("textbox", {
+        name: "Name",
+      });
+      await nameInput.fill("Draft Seller");
+
+      const prefillSwitch = manageSellerDialog.getByRole("switch", {
+        name: "Pre-fill with values from the current invoice form",
+      });
+      await prefillSwitch.click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+
+      await confirmDialog
+        .getByRole("button", { name: "Discard changes" })
+        .click();
+
+      await expect(confirmDialog).toBeHidden();
+
+      // Switch is now ON
+      await expect(prefillSwitch).toBeChecked();
+
+      // Dialog remains open (we only reset the form, not close the dialog)
+      await expect(manageSellerDialog).toBeVisible();
+
+      // Draft text is gone — form was reset with pre-fill values
+      await expect(nameInput).not.toHaveValue("Draft Seller");
+      await expect(nameInput).toHaveValue(DEFAULT_SELLER_DATA.name);
+    });
+
+    test("toggling switch ON with dirty form - Keep editing preserves draft and switch stays OFF", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      const nameInput = manageSellerDialog.getByRole("textbox", {
+        name: "Name",
+      });
+      await nameInput.fill("Draft Seller");
+
+      const prefillSwitch = manageSellerDialog.getByRole("switch", {
+        name: "Pre-fill with values from the current invoice form",
+      });
+      await prefillSwitch.click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+
+      await confirmDialog.getByRole("button", { name: "Keep editing" }).click();
+
+      await expect(confirmDialog).toBeHidden();
+
+      // Switch remains OFF — the toggle was cancelled
+      await expect(prefillSwitch).not.toBeChecked();
+
+      // Dialog still open with draft intact
+      await expect(manageSellerDialog).toBeVisible();
+      await expect(nameInput).toHaveValue("Draft Seller");
+    });
+
+    test("toggling switch OFF (while ON + dirty) shows confirm dialog", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      const prefillSwitch = manageSellerDialog.getByRole("switch", {
+        name: "Pre-fill with values from the current invoice form",
+      });
+
+      // Enable pre-fill while form is clean
+      await prefillSwitch.click();
+      await expect(prefillSwitch).toBeChecked();
+
+      // Dirty the form
+      await manageSellerDialog
+        .getByRole("textbox", { name: "Name" })
+        .fill("Edited after pre-fill");
+
+      // Toggle switch OFF while dirty
+      await prefillSwitch.click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+
+      // Switch remains ON while dialog is open
+      await expect(
+        page.getByTestId("manage-seller-dialog").getByRole("switch", {
+          name: "Pre-fill with values from the current invoice form",
+          includeHidden: true, // dialog is still open, but on one level deeper
+        }),
+      ).toBeChecked();
+    });
+
+    test("toggling switch OFF with dirty form - confirm resets to empty form", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      const prefillSwitch = manageSellerDialog.getByRole("switch", {
+        name: "Pre-fill with values from the current invoice form",
+      });
+      const nameInput = manageSellerDialog.getByRole("textbox", {
+        name: "Name",
+      });
+
+      // Enable pre-fill while form is clean
+      await prefillSwitch.click();
+      await expect(prefillSwitch).toBeChecked();
+
+      // Dirty the form
+      await nameInput.fill("Edited after pre-fill");
+
+      // Toggle switch OFF while dirty
+      await prefillSwitch.click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+
+      await confirmDialog
+        .getByRole("button", { name: "Discard changes" })
+        .click();
+
+      await expect(confirmDialog).toBeHidden();
+
+      // Switch is now OFF
+      await expect(prefillSwitch).not.toBeChecked();
+
+      // Dialog remains open
+      await expect(manageSellerDialog).toBeVisible();
+
+      // Form was reset to empty (no pre-fill values, no edited text)
+      await expect(nameInput).toHaveValue("");
+    });
+
+    test("toggling switch OFF with dirty form - Keep editing preserves draft and switch stays ON", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      const prefillSwitch = manageSellerDialog.getByRole("switch", {
+        name: "Pre-fill with values from the current invoice form",
+      });
+      const nameInput = manageSellerDialog.getByRole("textbox", {
+        name: "Name",
+      });
+
+      // Enable pre-fill while form is clean
+      await prefillSwitch.click();
+      await expect(prefillSwitch).toBeChecked();
+
+      // Dirty the form
+      await nameInput.fill("Edited after pre-fill");
+
+      // Toggle switch OFF while dirty
+      await prefillSwitch.click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+
+      await confirmDialog.getByRole("button", { name: "Keep editing" }).click();
+
+      await expect(confirmDialog).toBeHidden();
+
+      // Switch remains ON
+      await expect(prefillSwitch).toBeChecked();
+
+      // Dialog still open with draft intact
+      await expect(manageSellerDialog).toBeVisible();
+      await expect(nameInput).toHaveValue("Edited after pre-fill");
+    });
+  });
 });

@@ -107,6 +107,15 @@ export function SellerDialog({
   // Add state for applying form values
   const [shouldApplyFormValues, setShouldApplyFormValues] = useState(false);
 
+  // Stores a pending action to execute after user confirms discard in the ConfirmDiscardDialog.
+  // Uses currying (() => () => void) because React state setters require a function that returns
+  // the new state value. When we call setPendingDiscardAction(() => closeDialog), we're storing
+  // a function that returns closeDialog, not calling closeDialog immediately. This prevents
+  // premature execution and allows us to defer the action until the user confirms.
+  const [pendingDiscardAction, setPendingDiscardAction] = useState<
+    (() => void) | null
+  >(null);
+
   // Effect to update form values when switch is toggled
   useEffect(() => {
     // if the switch is on and we have form values, we want to apply the form values to the form
@@ -139,6 +148,22 @@ export function SellerDialog({
       );
     }
   }, [shouldApplyFormValues, formValues, initialData, isEditMode, form]);
+
+  /**
+   * Guards the pre-fill switch toggle against dirty form state.
+   *
+   * When the form has unsaved changes, opens the ConfirmDiscardDialog before
+   * applying the switch change. Only updates shouldApplyFormValues (and thus
+   * triggers form.reset via the effect above) after the user confirms discard.
+   */
+  function handlePrefillSwitchToggle(newValue: boolean) {
+    if (isDirty) {
+      setPendingDiscardAction(() => () => setShouldApplyFormValues(newValue));
+      setIsConfirmDiscardDialogOpen(true);
+      return;
+    }
+    setShouldApplyFormValues(newValue);
+  }
 
   /**
    * Prevents accidental data loss by warning users before leaving the page with unsaved changes.
@@ -259,6 +284,7 @@ export function SellerDialog({
             // If there are unsaved changes (isDirty), opens the confirmation dialog.
             // Otherwise, closes the dialog immediately.
             if (isDirty) {
+              setPendingDiscardAction(() => closeDialog);
               setIsConfirmDiscardDialogOpen(true);
               return;
             }
@@ -288,7 +314,7 @@ export function SellerDialog({
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={shouldApplyFormValues}
-                    onCheckedChange={setShouldApplyFormValues}
+                    onCheckedChange={handlePrefillSwitchToggle}
                     id="apply-form-values-switch"
                   />
                   <Label
@@ -665,6 +691,7 @@ export function SellerDialog({
                 // If there are unsaved changes (isDirty), opens the confirmation dialog.
                 // Otherwise, closes the dialog immediately.
                 if (isDirty) {
+                  setPendingDiscardAction(() => closeDialog);
                   setIsConfirmDiscardDialogOpen(true);
                   return;
                 }
@@ -698,7 +725,10 @@ export function SellerDialog({
       <ConfirmDiscardDialog
         open={isConfirmDiscardDialogOpen}
         onOpenChange={setIsConfirmDiscardDialogOpen}
-        onDiscard={closeDialog}
+        onDiscard={() => {
+          pendingDiscardAction?.();
+          setPendingDiscardAction(null);
+        }}
         entityName="seller"
       />
     </>
