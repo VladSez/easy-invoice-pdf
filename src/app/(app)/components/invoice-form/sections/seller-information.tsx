@@ -1,5 +1,5 @@
+import { SellerManagement } from "@/app/(app)/components/invoice-form/sections/components/seller/seller-management";
 import { type InvoiceData, type SellerData } from "@/app/schema";
-import { SellerManagement } from "@/components/seller-management";
 import { AccordionContent } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";

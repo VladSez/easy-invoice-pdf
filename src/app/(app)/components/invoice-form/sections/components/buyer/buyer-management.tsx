@@ -1,8 +1,8 @@
 import { Plus, Trash2, Pencil, AlertCircleIcon } from "lucide-react";
 import { useId, useState, useEffect } from "react";
-import { CustomTooltip } from "./ui/tooltip";
-import { SelectNative } from "./ui/select-native";
-import { Button } from "./ui/button";
+import { CustomTooltip } from "@/components/ui/tooltip";
+import { SelectNative } from "@/components/ui/select-native";
+import { Button } from "@/components/ui/button";
 import { BuyerDialog } from "./buyer-dialog";
 import {
   AlertDialog,
@@ -13,13 +13,12 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "./ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 import type { UseFormSetValue } from "react-hook-form";
 import { buyerSchema, type InvoiceData, type BuyerData } from "@/app/schema";
-import { z } from "zod";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { Label } from "./ui/label";
+import { Label } from "@/components/ui/label";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
@@ -85,20 +84,50 @@ export function BuyerManagement({
       const savedBuyers = localStorage.getItem(BUYERS_LOCAL_STORAGE_KEY);
       const parsedBuyers: unknown = savedBuyers ? JSON.parse(savedBuyers) : [];
 
-      // Validate buyers array with Zod
-      const buyersSchema = z.array(buyerSchema);
-      const validationResult = buyersSchema.safeParse(parsedBuyers);
+      const rawBuyers = Array.isArray(parsedBuyers) ? parsedBuyers : [];
 
-      if (!validationResult.success) {
-        console.error("Invalid buyers data:", validationResult.error);
-        return;
+      const validBuyers: BuyerData[] = [];
+      const invalidBuyers: BuyerData[] = [];
+
+      // Validate each buyer individually — drop only invalid items
+      for (const item of rawBuyers) {
+        const result = buyerSchema.safeParse(item);
+        if (result.success) {
+          validBuyers.push(result.data);
+        } else {
+          invalidBuyers.push(item as BuyerData);
+
+          console.error(
+            "[buyer-management] Invalid buyer entry:",
+            result.error,
+          );
+        }
       }
 
-      const selectedBuyer = validationResult.data.find((buyer: BuyerData) => {
+      // If we have invalid buyers, drop them and save the valid buyers back to localStorage
+      if (invalidBuyers.length > 0) {
+        console.error(
+          `[buyer-management] Dropped ${invalidBuyers.length} invalid buyer entries:`,
+          invalidBuyers,
+        );
+
+        Sentry.captureException(
+          new Error(
+            `[buyer-management] Invalid buyer data in localStorage: ${rawBuyers.length - validBuyers.length} items dropped`,
+          ),
+        );
+
+        localStorage.setItem(
+          BUYERS_LOCAL_STORAGE_KEY,
+          JSON.stringify(validBuyers),
+        );
+      }
+
+      const selectedBuyer = validBuyers.find((buyer: BuyerData) => {
         return buyer?.id === invoiceData?.buyer?.id;
       });
 
-      setBuyersSelectOptions(validationResult.data);
+      setBuyersSelectOptions(validBuyers);
       setSelectedBuyerId(selectedBuyer?.id ?? "");
     } catch (error) {
       console.error("Failed to load buyers:", error);

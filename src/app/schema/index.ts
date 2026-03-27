@@ -846,115 +846,125 @@ export const invoiceItemSchema = z
 
 export type InvoiceItemData = z.infer<typeof invoiceItemSchema>;
 
-export const sellerSchema = z.object({
-  id: z.string().optional(),
+export const sellerSchema = z
+  .object({
+    id: z.string().optional(),
 
-  name: z
-    .string()
-    .min(1, "Seller name is required")
-    .max(500, "Seller name must not exceed 500 characters")
-    .trim(),
-  address: z
-    .string()
-    .min(1, "Seller address is required")
-    .max(500, "Seller address must not exceed 500 characters")
-    .trim(),
+    name: z
+      .string()
+      .min(1, "Seller name is required")
+      .max(500, "Seller name must not exceed 500 characters")
+      .trim(),
+    address: z
+      .string()
+      .min(1, "Seller address is required")
+      .max(500, "Seller address must not exceed 500 characters")
+      .trim(),
 
-  vatNo: z
-    .string()
-    .max(200, "VAT number must not exceed 200 characters")
-    .trim()
-    .optional(),
-  // not really only a vatNo anymore, it's a more general tax number (but we keep the name for simplicity, for now)
-  vatNoLabelText: z
-    .string()
-    .min(1, "Tax number label is required")
-    .max(50, "Tax number label must not exceed 50 characters")
-    .trim()
-    .default("VAT no")
-    .describe(
-      "Customizable tax number label. Defaults to ‘VAT no’, but you can change it to any text (e.g. Tax no, VAT no, etc.)",
-    ),
-  vatNoFieldIsVisible: z.boolean().default(true),
+    vatNo: z
+      .string()
+      .max(200, "VAT number must not exceed 200 characters")
+      .trim()
+      .optional(),
+    // not really only a vatNo anymore, it's a more general tax number (but we keep the name for simplicity, for now)
+    vatNoLabelText: z
+      .string()
+      .min(1, "Tax number label is required")
+      .max(50, "Tax number label must not exceed 50 characters")
+      .trim()
+      .default("VAT no")
+      .describe(
+        "Customizable tax number label. Defaults to ‘VAT no’, but you can change it to any text (e.g. Tax no, VAT no, etc.)",
+      ),
+    vatNoFieldIsVisible: z.boolean().default(true),
 
-  email: z
-    .string()
-    .trim()
-    .refine((val) => val === "" || z.string().email().safeParse(val).success, {
-      message: "Invalid email address",
-    })
-    .optional(),
-  emailFieldIsVisible: z.boolean().default(true),
+    email: z
+      .string()
+      .trim()
+      .refine(
+        (val) => val === "" || z.string().email().safeParse(val).success,
+        {
+          message: "Invalid email address",
+        },
+      )
+      .optional(),
+    emailFieldIsVisible: z.boolean().default(true),
 
-  accountNumber: z
-    .string()
-    .max(200, "Account number must not exceed 200 characters")
-    .trim()
-    .optional(),
-  accountNumberFieldIsVisible: z.boolean().default(true),
+    accountNumber: z
+      .string()
+      .max(200, "Account number must not exceed 200 characters")
+      .trim()
+      .optional(),
+    accountNumberFieldIsVisible: z.boolean().default(true),
 
-  swiftBic: z
-    .string()
-    .max(200, "SWIFT/BIC must not exceed 200 characters")
-    .trim()
-    .optional(),
-  swiftBicFieldIsVisible: z.boolean().default(true),
+    swiftBic: z
+      .string()
+      .max(200, "SWIFT/BIC must not exceed 200 characters")
+      .trim()
+      .optional(),
+    swiftBicFieldIsVisible: z.boolean().default(true),
 
-  notes: z
-    .string()
-    .max(750, "Notes must not exceed 750 characters")
-    .trim()
-    .optional(),
-  notesFieldIsVisible: z.boolean().default(true),
-});
+    notes: z
+      .string()
+      .max(750, "Notes must not exceed 750 characters")
+      .trim()
+      .optional(),
+    notesFieldIsVisible: z.boolean().default(true),
+  })
+  .strict();
 
 export type SellerData = z.infer<typeof sellerSchema>;
 
-export const buyerSchema = z.object({
-  id: z.string().optional(),
+export const buyerSchema = z
+  .object({
+    id: z.string().optional(),
 
-  name: z
-    .string()
-    .min(1, "Buyer name is required")
-    .max(500, "Buyer name must not exceed 500 characters")
-    .trim(),
-  address: z
-    .string()
-    .min(1, "Buyer address is required")
-    .max(500, "Buyer address must not exceed 500 characters")
-    .trim(),
-  vatNo: z
-    .string()
-    .max(200, "VAT number must not exceed 200 characters")
-    .trim()
-    .optional(),
-  vatNoLabelText: z
-    .string()
-    .min(1, "Tax number label is required")
-    .max(50, "Tax number label must not exceed 50 characters")
-    .trim()
-    .default("VAT no")
-    .describe(
-      "Customizable tax number label. Defaults to ‘VAT no’, but you can change it to any text (e.g. Tax no, VAT no, etc.)",
-    ),
-  vatNoFieldIsVisible: z.boolean().default(true),
+    name: z
+      .string()
+      .min(1, "Buyer name is required")
+      .max(500, "Buyer name must not exceed 500 characters")
+      .trim(),
+    address: z
+      .string()
+      .min(1, "Buyer address is required")
+      .max(500, "Buyer address must not exceed 500 characters")
+      .trim(),
+    vatNo: z
+      .string()
+      .max(200, "VAT number must not exceed 200 characters")
+      .trim()
+      .optional(),
+    vatNoLabelText: z
+      .string()
+      .min(1, "Tax number label is required")
+      .max(50, "Tax number label must not exceed 50 characters")
+      .trim()
+      .default("VAT no")
+      .describe(
+        "Customizable tax number label. Defaults to ‘VAT no’, but you can change it to any text (e.g. Tax no, VAT no, etc.)",
+      ),
+    vatNoFieldIsVisible: z.boolean().default(true),
 
-  email: z
-    .string()
-    .trim()
-    .refine((val) => val === "" || z.string().email().safeParse(val).success, {
-      message: "Invalid email address",
-    })
-    .optional(),
-  emailFieldIsVisible: z.boolean().default(true),
+    email: z
+      .string()
+      .trim()
+      .refine(
+        (val) => val === "" || z.string().email().safeParse(val).success,
+        {
+          message: "Invalid email address",
+        },
+      )
+      .optional(),
+    emailFieldIsVisible: z.boolean().default(true),
 
-  notes: z
-    .string()
-    .max(750, "Notes must not exceed 750 characters")
-    .trim()
-    .optional(),
-  notesFieldIsVisible: z.boolean().default(true),
-});
+    notes: z
+      .string()
+      .max(750, "Notes must not exceed 750 characters")
+      .trim()
+      .optional(),
+    notesFieldIsVisible: z.boolean().default(true),
+  })
+  .strict();
 
 export type BuyerData = z.infer<typeof buyerSchema>;
 

@@ -679,7 +679,7 @@ test.describe("Seller management", () => {
     ).toHaveValue(DEFAULT_SELLER_DATA.swiftBic);
   });
 
-  test("pre-fill switch resets to off after dialog close and reopen", async ({
+  test("switches reset to defaults after dialog close and reopen", async ({
     page,
   }) => {
     await page.getByRole("button", { name: "New Seller" }).click();
@@ -688,10 +688,19 @@ test.describe("Seller management", () => {
     const prefillSwitch = manageSellerDialog.getByRole("switch", {
       name: "Pre-fill with values from the current invoice form",
     });
+    const applyToInvoiceSwitch = manageSellerDialog.getByRole("switch", {
+      name: "Apply to Current Invoice",
+    });
 
+    // Pre-fill switch defaults to off; toggle it on
     await expect(prefillSwitch).not.toBeChecked();
     await prefillSwitch.click();
     await expect(prefillSwitch).toBeChecked();
+
+    // "Apply to Current Invoice" switch defaults to on; toggle it off
+    await expect(applyToInvoiceSwitch).toBeChecked();
+    await applyToInvoiceSwitch.click();
+    await expect(applyToInvoiceSwitch).not.toBeChecked();
 
     // Close the dialog via Cancel
     await manageSellerDialog.getByRole("button", { name: "Cancel" }).click();
@@ -701,8 +710,9 @@ test.describe("Seller management", () => {
     await page.getByRole("button", { name: "New Seller" }).click();
     await expect(manageSellerDialog).toBeVisible();
 
-    // Pre-fill switch must be off and form must be empty
+    // Both switches must have reset to their defaults and form must be empty
     await expect(prefillSwitch).not.toBeChecked();
+    await expect(applyToInvoiceSwitch).toBeChecked();
     await expect(
       manageSellerDialog.getByRole("textbox", { name: "Name" }),
     ).toHaveValue("");
@@ -715,16 +725,12 @@ test.describe("Seller management", () => {
       const manageSellerDialog = page.getByTestId("manage-seller-dialog");
       await expect(manageSellerDialog).toBeVisible();
 
-      // No changes made — Cancel should close immediately, no dialog fired
-      let confirmFired = false;
-      page.once("dialog", () => {
-        confirmFired = true;
-      });
-
       await manageSellerDialog.getByRole("button", { name: "Cancel" }).click();
 
       await expect(manageSellerDialog).toBeHidden();
-      expect(confirmFired).toBe(false);
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeHidden();
     });
 
     test("clean form - X button closes without confirm", async ({ page }) => {
@@ -733,15 +739,12 @@ test.describe("Seller management", () => {
       const manageSellerDialog = page.getByTestId("manage-seller-dialog");
       await expect(manageSellerDialog).toBeVisible();
 
-      let confirmFired = false;
-      page.once("dialog", () => {
-        confirmFired = true;
-      });
-
       await manageSellerDialog.getByRole("button", { name: "Close" }).click();
 
       await expect(manageSellerDialog).toBeHidden();
-      expect(confirmFired).toBe(false);
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeHidden();
     });
 
     test("dirty form - Cancel - accept discards changes and closes", async ({
@@ -754,25 +757,28 @@ test.describe("Seller management", () => {
         .getByRole("textbox", { name: "Name" })
         .fill("Unsaved Seller");
 
-      // Set up a listener for the browser's native confirm dialog
-      // This must be registered BEFORE the action that triggers it
-      page.once("dialog", async (dialog) => {
-        // Verify it's a confirmation dialog (not alert or prompt)
-        expect(dialog.type()).toBe("confirm");
-
-        // Verify the dialog shows the expected discard warning message
-        expect(dialog.message()).toBe(
-          "You have unsaved changes in seller details. Discard them?",
-        );
-
-        // Accept the dialog to confirm discarding changes
-        await dialog.accept();
-      });
-
-      // Click Cancel button, which should trigger the confirm dialog
-      // because the form has unsaved changes (is "dirty")
       await manageSellerDialog.getByRole("button", { name: "Cancel" }).click();
 
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+
+      await expect(confirmDialog).toBeVisible();
+      await expect(
+        confirmDialog.getByText("Discard changes to seller?"),
+      ).toBeVisible();
+
+      await expect(
+        confirmDialog.getByText("You have unsaved changes. They will be lost."),
+      ).toBeVisible();
+
+      await expect(
+        confirmDialog.getByRole("button", { name: "Discard changes" }),
+      ).toBeVisible();
+
+      await confirmDialog
+        .getByRole("button", { name: "Discard changes" })
+        .click();
+
+      await expect(confirmDialog).toBeHidden();
       await expect(manageSellerDialog).toBeHidden();
     });
 
@@ -787,17 +793,15 @@ test.describe("Seller management", () => {
       });
       await nameInput.fill("Unsaved Seller");
 
-      page.once("dialog", async (dialog) => {
-        expect(dialog.type()).toBe("confirm");
-        expect(dialog.message()).toBe(
-          "You have unsaved changes in seller details. Discard them?",
-        );
-
-        // Dismiss the dialog to keep the form values intact
-        await dialog.dismiss();
-      });
-
       await manageSellerDialog.getByRole("button", { name: "Cancel" }).click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+
+      await expect(confirmDialog).toBeVisible();
+
+      await confirmDialog.getByRole("button", { name: "Keep editing" }).click();
+
+      await expect(confirmDialog).toBeHidden();
 
       await expect(manageSellerDialog).toBeVisible();
       await expect(nameInput).toHaveValue("Unsaved Seller");
@@ -813,16 +817,15 @@ test.describe("Seller management", () => {
         .getByRole("textbox", { name: "Name" })
         .fill("Unsaved Seller");
 
-      page.once("dialog", async (dialog) => {
-        expect(dialog.type()).toBe("confirm");
-        expect(dialog.message()).toBe(
-          "You have unsaved changes in seller details. Discard them?",
-        );
-        await dialog.accept();
-      });
-
       await manageSellerDialog.getByRole("button", { name: "Close" }).click();
 
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+      await confirmDialog
+        .getByRole("button", { name: "Discard changes" })
+        .click();
+
+      await expect(confirmDialog).toBeHidden();
       await expect(manageSellerDialog).toBeHidden();
     });
 
@@ -836,17 +839,393 @@ test.describe("Seller management", () => {
         .getByRole("textbox", { name: "Name" })
         .fill("Unsaved Seller");
 
-      page.once("dialog", async (dialog) => {
-        expect(dialog.type()).toBe("confirm");
-        expect(dialog.message()).toBe(
-          "You have unsaved changes in seller details. Discard them?",
-        );
-        await dialog.accept();
-      });
-
       await page.keyboard.press("Escape");
 
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+      await confirmDialog
+        .getByRole("button", { name: "Discard changes" })
+        .click();
+
+      await expect(confirmDialog).toBeHidden();
       await expect(manageSellerDialog).toBeHidden();
     });
+  });
+
+  test.describe("pre-fill switch dirty guard", () => {
+    test("toggling switch ON with dirty form shows confirm dialog", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      await manageSellerDialog
+        .getByRole("textbox", { name: "Name" })
+        .fill("Draft Seller");
+
+      const prefillSwitch = manageSellerDialog.getByRole("switch", {
+        name: "Pre-fill with values from the current invoice form",
+      });
+      await expect(prefillSwitch).not.toBeChecked();
+
+      await prefillSwitch.click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+
+      // Switch has not changed yet — still OFF while dialog is open
+      await expect(
+        page.getByTestId("manage-seller-dialog").getByRole("switch", {
+          name: "Pre-fill with values from the current invoice form",
+          includeHidden: true, // dialog is still open, but on one level deeper
+        }),
+      ).not.toBeChecked();
+
+      // Dialog is still open
+      await expect(manageSellerDialog).toBeVisible();
+    });
+
+    test("toggling switch ON with dirty form - confirm applies pre-fill and clears draft", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+      // Dirty the form
+      const nameInput = manageSellerDialog.getByRole("textbox", {
+        name: "Name",
+      });
+      await nameInput.fill("Draft Seller");
+
+      const prefillSwitch = manageSellerDialog.getByRole("switch", {
+        name: "Pre-fill with values from the current invoice form",
+      });
+      await prefillSwitch.click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+
+      await confirmDialog
+        .getByRole("button", { name: "Discard changes" })
+        .click();
+
+      await expect(confirmDialog).toBeHidden();
+
+      // Switch is now ON
+      await expect(prefillSwitch).toBeChecked();
+
+      // Dialog remains open (we only reset the form, not close the dialog)
+      await expect(manageSellerDialog).toBeVisible();
+
+      // Draft text is gone — form was reset with pre-fill values
+      await expect(nameInput).not.toHaveValue("Draft Seller");
+      await expect(nameInput).toHaveValue(DEFAULT_SELLER_DATA.name);
+    });
+
+    test("toggling switch ON with dirty form - Keep editing preserves draft and switch stays OFF", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      const nameInput = manageSellerDialog.getByRole("textbox", {
+        name: "Name",
+      });
+      await nameInput.fill("Draft Seller");
+
+      const prefillSwitch = manageSellerDialog.getByRole("switch", {
+        name: "Pre-fill with values from the current invoice form",
+      });
+      await prefillSwitch.click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+
+      await confirmDialog.getByRole("button", { name: "Keep editing" }).click();
+
+      await expect(confirmDialog).toBeHidden();
+
+      // Switch remains OFF — the toggle was cancelled
+      await expect(prefillSwitch).not.toBeChecked();
+
+      // Dialog still open with draft intact
+      await expect(manageSellerDialog).toBeVisible();
+      await expect(nameInput).toHaveValue("Draft Seller");
+    });
+
+    test("toggling switch OFF (while ON + dirty) shows confirm dialog", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      const prefillSwitch = manageSellerDialog.getByRole("switch", {
+        name: "Pre-fill with values from the current invoice form",
+      });
+
+      // Enable pre-fill while form is clean
+      await prefillSwitch.click();
+      await expect(prefillSwitch).toBeChecked();
+
+      // Dirty the form
+      await manageSellerDialog
+        .getByRole("textbox", { name: "Name" })
+        .fill("Edited after pre-fill");
+
+      // Toggle switch OFF while dirty
+      await prefillSwitch.click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+
+      // Switch remains ON while dialog is open
+      await expect(
+        page.getByTestId("manage-seller-dialog").getByRole("switch", {
+          name: "Pre-fill with values from the current invoice form",
+          includeHidden: true, // dialog is still open, but on one level deeper
+        }),
+      ).toBeChecked();
+    });
+
+    test("toggling switch OFF with dirty form - confirm resets to empty form", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      const prefillSwitch = manageSellerDialog.getByRole("switch", {
+        name: "Pre-fill with values from the current invoice form",
+      });
+      const nameInput = manageSellerDialog.getByRole("textbox", {
+        name: "Name",
+      });
+
+      // Enable pre-fill while form is clean
+      await prefillSwitch.click();
+      await expect(prefillSwitch).toBeChecked();
+
+      // Dirty the form
+      await nameInput.fill("Edited after pre-fill");
+
+      // Toggle switch OFF while dirty
+      await prefillSwitch.click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+
+      await confirmDialog
+        .getByRole("button", { name: "Discard changes" })
+        .click();
+
+      await expect(confirmDialog).toBeHidden();
+
+      // Switch is now OFF
+      await expect(prefillSwitch).not.toBeChecked();
+
+      // Dialog remains open
+      await expect(manageSellerDialog).toBeVisible();
+
+      // Form was reset to empty (no pre-fill values, no edited text)
+      await expect(nameInput).toHaveValue("");
+    });
+
+    test("toggling switch OFF with dirty form - Keep editing preserves draft and switch stays ON", async ({
+      page,
+    }) => {
+      await page.getByRole("button", { name: "New Seller" }).click();
+
+      const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+      const prefillSwitch = manageSellerDialog.getByRole("switch", {
+        name: "Pre-fill with values from the current invoice form",
+      });
+      const nameInput = manageSellerDialog.getByRole("textbox", {
+        name: "Name",
+      });
+
+      // Enable pre-fill while form is clean
+      await prefillSwitch.click();
+      await expect(prefillSwitch).toBeChecked();
+
+      // Dirty the form
+      await nameInput.fill("Edited after pre-fill");
+
+      // Toggle switch OFF while dirty
+      await prefillSwitch.click();
+
+      const confirmDialog = page.getByTestId("confirm-discard-dialog");
+      await expect(confirmDialog).toBeVisible();
+
+      await confirmDialog.getByRole("button", { name: "Keep editing" }).click();
+
+      await expect(confirmDialog).toBeHidden();
+
+      // Switch remains ON
+      await expect(prefillSwitch).toBeChecked();
+
+      // Dialog still open with draft intact
+      await expect(manageSellerDialog).toBeVisible();
+      await expect(nameInput).toHaveValue("Edited after pre-fill");
+    });
+  });
+
+  test("trims whitespace from name and other fields before saving", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "New Seller" }).click();
+
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill("  Acme Corp  ");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill("  123 Main St  ");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Email" })
+      .fill("  hi@acme.com  ");
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    const storedData = (await page.evaluate(() =>
+      localStorage.getItem("EASY_INVOICE_PDF_SELLERS"),
+    )) as string;
+    const parsedData = JSON.parse(storedData) as SellerData[];
+
+    expect(parsedData).toHaveLength(1);
+    expect(parsedData[0].name).toBe("Acme Corp");
+    expect(parsedData[0].address).toBe("123 Main St");
+    expect(parsedData[0].email).toBe("hi@acme.com");
+  });
+
+  test("rejects whitespace-padded name that duplicates an existing seller", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const sellers = [
+        {
+          id: "existing-seller-id",
+          name: "Acme Corp",
+          address: "1 Road",
+          email: "",
+          emailFieldIsVisible: true,
+          vatNo: "",
+          vatNoLabelText: "Tax Number",
+          vatNoFieldIsVisible: true,
+          accountNumber: "",
+          accountNumberFieldIsVisible: true,
+          swiftBic: "",
+          swiftBicFieldIsVisible: true,
+          notes: "",
+          notesFieldIsVisible: true,
+        },
+      ];
+      localStorage.setItem("EASY_INVOICE_PDF_SELLERS", JSON.stringify(sellers));
+    });
+
+    await page.goto("/?template=default");
+
+    await page.getByRole("button", { name: "New Seller" }).click();
+
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill("  Acme Corp  ");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill("2 Avenue");
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    await expect(
+      manageSellerDialog.getByText("A seller with this name already exists", {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    // Dialog should remain open
+    await expect(manageSellerDialog).toBeVisible();
+
+    // Only the pre-seeded seller should exist in localStorage
+    const storedData = (await page.evaluate(() =>
+      localStorage.getItem("EASY_INVOICE_PDF_SELLERS"),
+    )) as string;
+    const parsedData = JSON.parse(storedData) as SellerData[];
+
+    expect(parsedData).toHaveLength(1);
+    expect(parsedData[0].name).toBe("Acme Corp");
+  });
+
+  test("drops invalid localStorage entries and preserves valid ones on save", async ({
+    page,
+  }) => {
+    // Seed: one valid + one corrupt seller (component already mounted with empty localStorage,
+    // so "New Seller" button is still visible — onSubmit reads localStorage fresh)
+    await page.evaluate(() => {
+      const sellers = [
+        {
+          id: "pre-seeded-valid",
+          name: "Pre-seeded Valid Seller",
+          address: "1 Valid Road",
+          email: "valid@pre-seeded.com",
+          emailFieldIsVisible: true,
+          vatNo: "VATPRE",
+          vatNoLabelText: "Tax Number",
+          vatNoFieldIsVisible: true,
+          accountNumber: "ACCTPRE",
+          accountNumberFieldIsVisible: true,
+          swiftBic: "SWIFTPRE",
+          swiftBicFieldIsVisible: true,
+          notes: "",
+          notesFieldIsVisible: true,
+        },
+        { corrupt: true, notASeller: 42 },
+      ];
+      localStorage.setItem("EASY_INVOICE_PDF_SELLERS", JSON.stringify(sellers));
+    });
+
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
+
+    await page.getByRole("button", { name: "New Seller" }).click();
+
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill("Brand New Seller");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill("99 Fresh Lane");
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    // Submit succeeds — no error toast
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // localStorage: valid entry preserved, corrupt entry dropped, new entry added
+    const storedData = (await page.evaluate(() =>
+      localStorage.getItem("EASY_INVOICE_PDF_SELLERS"),
+    )) as string;
+    const parsedData = JSON.parse(storedData) as SellerData[];
+
+    expect(parsedData).toHaveLength(2);
+    expect(parsedData.some((s) => s.name === "Pre-seeded Valid Seller")).toBe(
+      true,
+    );
+    expect(parsedData.some((s) => s.name === "Brand New Seller")).toBe(true);
   });
 });
