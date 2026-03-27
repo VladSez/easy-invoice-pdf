@@ -98,13 +98,13 @@ export function BuyerManagement({
           invalidBuyers.push(item as BuyerData);
 
           console.error(
-            "[buyer-management] Dropped invalid buyer entry:",
+            "[buyer-management] Invalid buyer entry:",
             result.error,
           );
         }
       }
 
-      // If we had invalid buyers, drop them and save the valid buyers back to localStorage
+      // If we have invalid buyers, drop them and save the valid buyers back to localStorage
       if (invalidBuyers.length > 0) {
         console.error(
           `[buyer-management] Dropped ${invalidBuyers.length} invalid buyer entries:`,

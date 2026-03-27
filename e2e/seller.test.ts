@@ -679,7 +679,7 @@ test.describe("Seller management", () => {
     ).toHaveValue(DEFAULT_SELLER_DATA.swiftBic);
   });
 
-  test("pre-fill switch resets to off after dialog close and reopen", async ({
+  test("switches reset to defaults after dialog close and reopen", async ({
     page,
   }) => {
     await page.getByRole("button", { name: "New Seller" }).click();
@@ -688,10 +688,19 @@ test.describe("Seller management", () => {
     const prefillSwitch = manageSellerDialog.getByRole("switch", {
       name: "Pre-fill with values from the current invoice form",
     });
+    const applyToInvoiceSwitch = manageSellerDialog.getByRole("switch", {
+      name: "Apply to Current Invoice",
+    });
 
+    // Pre-fill switch defaults to off; toggle it on
     await expect(prefillSwitch).not.toBeChecked();
     await prefillSwitch.click();
     await expect(prefillSwitch).toBeChecked();
+
+    // "Apply to Current Invoice" switch defaults to on; toggle it off
+    await expect(applyToInvoiceSwitch).toBeChecked();
+    await applyToInvoiceSwitch.click();
+    await expect(applyToInvoiceSwitch).not.toBeChecked();
 
     // Close the dialog via Cancel
     await manageSellerDialog.getByRole("button", { name: "Cancel" }).click();
@@ -701,8 +710,9 @@ test.describe("Seller management", () => {
     await page.getByRole("button", { name: "New Seller" }).click();
     await expect(manageSellerDialog).toBeVisible();
 
-    // Pre-fill switch must be off and form must be empty
+    // Both switches must have reset to their defaults and form must be empty
     await expect(prefillSwitch).not.toBeChecked();
+    await expect(applyToInvoiceSwitch).toBeChecked();
     await expect(
       manageSellerDialog.getByRole("textbox", { name: "Name" }),
     ).toHaveValue("");
@@ -1057,6 +1067,103 @@ test.describe("Seller management", () => {
       await expect(manageSellerDialog).toBeVisible();
       await expect(nameInput).toHaveValue("Edited after pre-fill");
     });
+  });
+
+  test("trims whitespace from name and other fields before saving", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "New Seller" }).click();
+
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill("  Acme Corp  ");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill("  123 Main St  ");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Email" })
+      .fill("  hi@acme.com  ");
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    const storedData = (await page.evaluate(() =>
+      localStorage.getItem("EASY_INVOICE_PDF_SELLERS"),
+    )) as string;
+    const parsedData = JSON.parse(storedData) as SellerData[];
+
+    expect(parsedData).toHaveLength(1);
+    expect(parsedData[0].name).toBe("Acme Corp");
+    expect(parsedData[0].address).toBe("123 Main St");
+    expect(parsedData[0].email).toBe("hi@acme.com");
+  });
+
+  test("rejects whitespace-padded name that duplicates an existing seller", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const sellers = [
+        {
+          id: "existing-seller-id",
+          name: "Acme Corp",
+          address: "1 Road",
+          email: "",
+          emailFieldIsVisible: true,
+          vatNo: "",
+          vatNoLabelText: "Tax Number",
+          vatNoFieldIsVisible: true,
+          accountNumber: "",
+          accountNumberFieldIsVisible: true,
+          swiftBic: "",
+          swiftBicFieldIsVisible: true,
+          notes: "",
+          notesFieldIsVisible: true,
+        },
+      ];
+      localStorage.setItem("EASY_INVOICE_PDF_SELLERS", JSON.stringify(sellers));
+    });
+
+    await page.goto("/?template=default");
+
+    await page.getByRole("button", { name: "New Seller" }).click();
+
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill("  Acme Corp  ");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill("2 Avenue");
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    await expect(
+      manageSellerDialog.getByText("A seller with this name already exists", {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    // Dialog should remain open
+    await expect(manageSellerDialog).toBeVisible();
+
+    // Only the pre-seeded seller should exist in localStorage
+    const storedData = (await page.evaluate(() =>
+      localStorage.getItem("EASY_INVOICE_PDF_SELLERS"),
+    )) as string;
+    const parsedData = JSON.parse(storedData) as SellerData[];
+
+    expect(parsedData).toHaveLength(1);
+    expect(parsedData[0].name).toBe("Acme Corp");
   });
 
   test("drops invalid localStorage entries and preserves valid ones on save", async ({

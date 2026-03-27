@@ -95,7 +95,9 @@ export function BuyerDialog({
   const [shouldApplyNewBuyerToInvoice, setShouldApplyNewBuyerToInvoice] =
     useState(true);
 
-  const [shouldApplyFormValues, setShouldApplyFormValues] = useState(false);
+  // should apply inline form values to the dialog form
+  const [shouldApplyInlineFormValues, setShouldApplyInlineFormValues] =
+    useState(false);
 
   // Stores a pending action to execute after user confirms discard in the ConfirmDiscardDialog.
   // Uses currying (() => () => void) because React state setters require a function that returns
@@ -119,7 +121,7 @@ export function BuyerDialog({
    */
   useEffect(() => {
     // Switch is ON: Pre-fill form with current invoice buyer data
-    if (shouldApplyFormValues && formValues && !isEditMode) {
+    if (shouldApplyInlineFormValues && formValues && !isEditMode) {
       form.reset({
         ...form.getValues(),
         ...formValues,
@@ -127,7 +129,7 @@ export function BuyerDialog({
     }
 
     // Switch is OFF: Reset form to empty state or initial data
-    else if (!shouldApplyFormValues && !isEditMode) {
+    else if (!shouldApplyInlineFormValues && !isEditMode) {
       form.reset(
         initialData ?? {
           id: "",
@@ -143,7 +145,7 @@ export function BuyerDialog({
         },
       );
     }
-  }, [shouldApplyFormValues, formValues, initialData, isEditMode, form]);
+  }, [shouldApplyInlineFormValues, formValues, initialData, isEditMode, form]);
 
   /**
    * Guards the pre-fill switch toggle against dirty form state.
@@ -154,37 +156,26 @@ export function BuyerDialog({
    */
   function handlePrefillSwitchToggle(newValue: boolean) {
     if (isDirty) {
-      setPendingDiscardAction(() => () => setShouldApplyFormValues(newValue));
+      setPendingDiscardAction(
+        () => () => setShouldApplyInlineFormValues(newValue),
+      );
       setIsConfirmDiscardDialogOpen(true);
       return;
     }
-    setShouldApplyFormValues(newValue);
+    setShouldApplyInlineFormValues(newValue);
   }
-
-  /**
-   * Prevents accidental data loss by warning users before leaving the page with unsaved changes.
-   *
-   * This effect sets up a browser-level warning that triggers when:
-   * - The form has unsaved changes (isDirty is true)
-   * - The user attempts to navigate away, refresh, or close the tab/window
-   */
-  useEffect(() => {
-    function handler(e: BeforeUnloadEvent) {
-      if (!isDirty) return;
-      e.preventDefault();
-      e.returnValue = ""; // required for Chrome
-    }
-
-    window.addEventListener("beforeunload", handler);
-    return () => window.removeEventListener("beforeunload", handler);
-  }, [isDirty]);
 
   /**
    * Closes the buyer dialog and resets the form to its default state.
    */
   function closeDialog() {
     form.reset();
-    setShouldApplyFormValues(false);
+
+    // by default, we don't want to apply the inline form values to the dialog form
+    setShouldApplyInlineFormValues(false);
+    // by default, we want to apply the new buyer to the current invoice
+    setShouldApplyNewBuyerToInvoice(true);
+
     onClose(false);
   }
 
@@ -315,7 +306,7 @@ export function BuyerDialog({
               <div className="mb-4">
                 <div className="flex items-center gap-2">
                   <Switch
-                    checked={shouldApplyFormValues}
+                    checked={shouldApplyInlineFormValues}
                     onCheckedChange={handlePrefillSwitchToggle}
                     id="apply-form-values-switch"
                   />
@@ -611,14 +602,8 @@ export function BuyerDialog({
             <Button
               type="button"
               onClick={async () => {
-                // Validate form and focus first error field
-                const result = await form.trigger(undefined, {
-                  shouldFocus: true,
-                });
-                if (!result) return;
-
-                // submit the form
-                onSubmit(form.getValues());
+                // trigger validations and submit the form and handle errors
+                void form.handleSubmit(onSubmit)();
               }}
               form={BUYER_FORM_ID}
             >

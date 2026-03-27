@@ -107,13 +107,13 @@ export function SellerManagement({
           invalidSellers.push(item as SellerData);
 
           console.error(
-            "[seller-management] Dropped invalid seller entry:",
+            "[seller-management] Invalid seller entry:",
             result.error,
           );
         }
       }
 
-      // If we had invalid sellers, drop them and save the valid sellers back to localStorage
+      // If we have invalid sellers, drop them and save the valid sellers back to localStorage
       if (invalidSellers.length > 0) {
         console.error(
           `[seller-management] Dropped ${invalidSellers.length} invalid seller entries:`,

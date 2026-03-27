@@ -103,8 +103,9 @@ export function SellerDialog({
   const [shouldApplyNewSellerToInvoice, setShouldApplyNewSellerToInvoice] =
     useState(true);
 
-  // Add state for applying form values
-  const [shouldApplyFormValues, setShouldApplyFormValues] = useState(false);
+  // Add state for applying inline form values to dialog form
+  const [shouldApplyInlineFormValues, setShouldApplyInlineFormValues] =
+    useState(false);
 
   // Stores a pending action to execute after user confirms discard in the ConfirmDiscardDialog.
   // Uses currying (() => () => void) because React state setters require a function that returns
@@ -118,7 +119,7 @@ export function SellerDialog({
   // Effect to update form values when switch is toggled
   useEffect(() => {
     // if the switch is on and we have form values, we want to apply the form values to the form
-    if (shouldApplyFormValues && formValues && !isEditMode) {
+    if (shouldApplyInlineFormValues && formValues && !isEditMode) {
       form.reset({
         ...form.getValues(),
         ...formValues,
@@ -126,7 +127,7 @@ export function SellerDialog({
     }
 
     // if the switch is off and we have initial data, we want to apply the initial data to the form
-    else if (!shouldApplyFormValues && !isEditMode) {
+    else if (!shouldApplyInlineFormValues && !isEditMode) {
       form.reset(
         initialData ?? {
           id: "",
@@ -146,7 +147,7 @@ export function SellerDialog({
         },
       );
     }
-  }, [shouldApplyFormValues, formValues, initialData, isEditMode, form]);
+  }, [shouldApplyInlineFormValues, formValues, initialData, isEditMode, form]);
 
   /**
    * Guards the pre-fill switch toggle against dirty form state.
@@ -157,37 +158,26 @@ export function SellerDialog({
    */
   function handlePrefillSwitchToggle(newValue: boolean) {
     if (isDirty) {
-      setPendingDiscardAction(() => () => setShouldApplyFormValues(newValue));
+      setPendingDiscardAction(
+        () => () => setShouldApplyInlineFormValues(newValue),
+      );
       setIsConfirmDiscardDialogOpen(true);
       return;
     }
-    setShouldApplyFormValues(newValue);
+    setShouldApplyInlineFormValues(newValue);
   }
-
-  /**
-   * Prevents accidental data loss by warning users before leaving the page with unsaved changes.
-   *
-   * This effect sets up a browser-level warning that triggers when:
-   * - The form has unsaved changes (isDirty is true)
-   * - The user attempts to navigate away, refresh, or close the tab/window
-   */
-  useEffect(() => {
-    function handler(e: BeforeUnloadEvent) {
-      if (!isDirty) return;
-      e.preventDefault();
-      e.returnValue = ""; // required for Chrome
-    }
-
-    window.addEventListener("beforeunload", handler);
-    return () => window.removeEventListener("beforeunload", handler);
-  }, [isDirty]);
 
   /**
    * Closes the seller dialog and resets the form to its default state.
    */
   function closeDialog() {
     form.reset();
-    setShouldApplyFormValues(false);
+
+    // by default, we don't want to apply the inline form values to the dialog form
+    setShouldApplyInlineFormValues(false);
+    // by default, we want to apply the new seller to the current invoice
+    setShouldApplyNewSellerToInvoice(true);
+
     onClose(false);
   }
 
@@ -322,7 +312,7 @@ export function SellerDialog({
               <div className="mb-4">
                 <div className="flex items-center gap-2">
                   <Switch
-                    checked={shouldApplyFormValues}
+                    checked={shouldApplyInlineFormValues}
                     onCheckedChange={handlePrefillSwitchToggle}
                     id="apply-form-values-switch"
                   />
@@ -713,16 +703,8 @@ export function SellerDialog({
               // we don't want to use type="submit" because it will cause unnecessary re-render of the invoice pdf preview
               type="button"
               onClick={async () => {
-                // we manually trigger the form validation and submit the form
-
-                // Validate form and focus first error field
-                const result = await form.trigger(undefined, {
-                  shouldFocus: true,
-                });
-                if (!result) return;
-
-                // submit the form
-                onSubmit(form.getValues());
+                // trigger validations and submit the form
+                void form.handleSubmit(onSubmit)();
               }}
               form={SELLER_FORM_ID}
             >
