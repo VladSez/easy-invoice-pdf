@@ -1000,4 +1000,61 @@ test.describe("Buyer management", () => {
       await expect(nameInput).toHaveValue("Edited after pre-fill");
     });
   });
+
+  test("drops invalid localStorage entries and preserves valid ones on save", async ({
+    page,
+  }) => {
+    // Seed: one valid + one corrupt buyer (component already mounted with empty localStorage,
+    // so "New Buyer" button is still visible — onSubmit reads localStorage fresh)
+    await page.addInitScript(() => {
+      const buyers = [
+        {
+          id: "pre-seeded-valid",
+          name: "Pre-seeded Valid Buyer",
+          address: "1 Valid Avenue",
+          email: "valid@pre-seeded.com",
+          emailFieldIsVisible: true,
+          vatNo: "VATPRE",
+          vatNoLabelText: "Tax Number",
+          vatNoFieldIsVisible: true,
+          notes: "",
+          notesFieldIsVisible: true,
+        },
+        { corrupt: true, notABuyer: 42 },
+      ];
+      localStorage.setItem("EASY_INVOICE_PDF_BUYERS", JSON.stringify(buyers));
+    });
+
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
+
+    await page.getByRole("button", { name: "New Buyer" }).click();
+
+    const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill("Brand New Buyer");
+    await manageBuyerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill("99 Fresh Boulevard");
+
+    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
+
+    // Submit succeeds — no error toast
+    await expect(
+      page.getByText("Buyer added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // localStorage: valid entry preserved, corrupt entry dropped, new entry added
+    const storedData = (await page.evaluate(() =>
+      localStorage.getItem("EASY_INVOICE_PDF_BUYERS"),
+    )) as string;
+    const parsedData = JSON.parse(storedData) as BuyerData[];
+
+    expect(parsedData).toHaveLength(2);
+    expect(parsedData.some((b) => b.name === "Pre-seeded Valid Buyer")).toBe(
+      true,
+    );
+    expect(parsedData.some((b) => b.name === "Brand New Buyer")).toBe(true);
+  });
 });

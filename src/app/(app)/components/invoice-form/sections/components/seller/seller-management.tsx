@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import type { UseFormSetValue } from "react-hook-form";
 import { sellerSchema, type InvoiceData, type SellerData } from "@/app/schema";
-import { z } from "zod";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -94,22 +93,50 @@ export function SellerManagement({
         ? JSON.parse(savedSellers)
         : [];
 
-      // Validate sellers array with Zod
-      const sellersSchema = z.array(sellerSchema);
-      const validationResult = sellersSchema.safeParse(parsedSellers);
+      const rawSellers = Array.isArray(parsedSellers) ? parsedSellers : [];
 
-      if (!validationResult.success) {
-        console.error("Invalid sellers data:", validationResult.error);
-        return;
+      const validSellers: SellerData[] = [];
+      const invalidSellers: SellerData[] = [];
+
+      // Validate each seller individually — drop only invalid items
+      for (const item of rawSellers) {
+        const result = sellerSchema.safeParse(item);
+        if (result.success) {
+          validSellers.push(result.data);
+        } else {
+          invalidSellers.push(item as SellerData);
+
+          console.error(
+            "[seller-management] Dropped invalid seller entry:",
+            result.error,
+          );
+        }
       }
 
-      const selectedSeller = validationResult.data.find(
-        (seller: SellerData) => {
-          return seller?.id === invoiceData?.seller?.id;
-        },
-      );
+      // If we had invalid sellers, drop them and save the valid sellers back to localStorage
+      if (invalidSellers.length > 0) {
+        console.error(
+          `[seller-management] Dropped ${invalidSellers.length} invalid seller entries:`,
+          invalidSellers,
+        );
 
-      setSellersSelectOptions(validationResult.data);
+        Sentry.captureException(
+          new Error(
+            `[seller-management] Invalid seller data in localStorage: ${rawSellers.length - validSellers.length} items dropped`,
+          ),
+        );
+
+        localStorage.setItem(
+          SELLERS_LOCAL_STORAGE_KEY,
+          JSON.stringify(validSellers),
+        );
+      }
+
+      const selectedSeller = validSellers.find((seller: SellerData) => {
+        return seller?.id === invoiceData?.seller?.id;
+      });
+
+      setSellersSelectOptions(validSellers);
       setSelectedSellerId(selectedSeller?.id ?? "");
     } catch (error) {
       console.error("Failed to load sellers:", error);

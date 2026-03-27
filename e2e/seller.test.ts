@@ -1058,4 +1058,67 @@ test.describe("Seller management", () => {
       await expect(nameInput).toHaveValue("Edited after pre-fill");
     });
   });
+
+  test("drops invalid localStorage entries and preserves valid ones on save", async ({
+    page,
+  }) => {
+    // Seed: one valid + one corrupt seller (component already mounted with empty localStorage,
+    // so "New Seller" button is still visible — onSubmit reads localStorage fresh)
+    await page.evaluate(() => {
+      const sellers = [
+        {
+          id: "pre-seeded-valid",
+          name: "Pre-seeded Valid Seller",
+          address: "1 Valid Road",
+          email: "valid@pre-seeded.com",
+          emailFieldIsVisible: true,
+          vatNo: "VATPRE",
+          vatNoLabelText: "Tax Number",
+          vatNoFieldIsVisible: true,
+          accountNumber: "ACCTPRE",
+          accountNumberFieldIsVisible: true,
+          swiftBic: "SWIFTPRE",
+          swiftBicFieldIsVisible: true,
+          notes: "",
+          notesFieldIsVisible: true,
+        },
+        { corrupt: true, notASeller: 42 },
+      ];
+      localStorage.setItem("EASY_INVOICE_PDF_SELLERS", JSON.stringify(sellers));
+    });
+
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
+
+    await page.getByRole("button", { name: "New Seller" }).click();
+
+    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Name" })
+      .fill("Brand New Seller");
+    await manageSellerDialog
+      .getByRole("textbox", { name: "Address" })
+      .fill("99 Fresh Lane");
+
+    await manageSellerDialog
+      .getByRole("button", { name: "Save Seller" })
+      .click();
+
+    // Submit succeeds — no error toast
+    await expect(
+      page.getByText("Seller added and applied to invoice", { exact: true }),
+    ).toBeVisible();
+
+    // localStorage: valid entry preserved, corrupt entry dropped, new entry added
+    const storedData = (await page.evaluate(() =>
+      localStorage.getItem("EASY_INVOICE_PDF_SELLERS"),
+    )) as string;
+    const parsedData = JSON.parse(storedData) as SellerData[];
+
+    expect(parsedData).toHaveLength(2);
+    expect(parsedData.some((s) => s.name === "Pre-seeded Valid Seller")).toBe(
+      true,
+    );
+    expect(parsedData.some((s) => s.name === "Brand New Seller")).toBe(true);
+  });
 });

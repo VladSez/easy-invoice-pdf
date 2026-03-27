@@ -26,7 +26,6 @@ import * as Sentry from "@sentry/nextjs";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 import { ConfirmDiscardDialog } from "../confirm-discard-dialog";
 import { SELLERS_LOCAL_STORAGE_KEY } from "./seller-management";
 import { InputHelperMessage } from "../../../../../../../components/ui/input-helper-message";
@@ -200,34 +199,44 @@ export function SellerDialog({
       const sellers = localStorage.getItem(SELLERS_LOCAL_STORAGE_KEY);
       const existingSellers: unknown = sellers ? JSON.parse(sellers) : [];
 
-      // Validate existing sellers array with Zod
-      const existingSellersValidationResult = z
-        .array(sellerSchema)
-        .safeParse(existingSellers);
+      const rawSellers = Array.isArray(existingSellers) ? existingSellers : [];
 
-      if (!existingSellersValidationResult.success) {
-        console.error(
-          "Invalid existing sellers data:",
-          existingSellersValidationResult.error,
+      const validSellers: SellerData[] = [];
+      let hadInvalidSellers = false;
+
+      // Validate each seller individually — drop only invalid items
+      for (const item of rawSellers) {
+        const result = sellerSchema.safeParse(item);
+        if (result.success) {
+          validSellers.push(result.data);
+        } else {
+          hadInvalidSellers = true;
+
+          Sentry.captureException(
+            new Error(
+              `[seller-dialog] Invalid seller data in localStorage: ${rawSellers.length - validSellers.length} items dropped`,
+            ),
+          );
+
+          console.error(
+            "[seller-dialog] Dropped invalid seller entry:",
+            result.error,
+          );
+        }
+      }
+
+      // If we had invalid sellers, save the valid sellers back to localStorage
+      if (hadInvalidSellers) {
+        localStorage.setItem(
+          SELLERS_LOCAL_STORAGE_KEY,
+          JSON.stringify(validSellers),
         );
-
-        // Show error toast
-        toast.error("Error loading existing sellers", {
-          id: "error-loading-existing-sellers-error-toast",
-          richColors: true,
-          description: "Please try again",
-        });
-
-        // Reset localStorage if validation fails
-        localStorage.setItem(SELLERS_LOCAL_STORAGE_KEY, JSON.stringify([]));
-
-        return;
       }
 
       // we don't need to validate the name if we are editing an existing seller
 
       // Validate seller data against existing sellers
-      const isDuplicateName = existingSellersValidationResult.data.some(
+      const isDuplicateName = validSellers.some(
         (seller: SellerData) =>
           seller.name === formValues.name && seller.id !== formValues.id,
       );

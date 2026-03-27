@@ -26,7 +26,6 @@ import { CustomTooltip } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { ConfirmDiscardDialog } from "../confirm-discard-dialog";
 import { BUYERS_LOCAL_STORAGE_KEY } from "./buyer-management";
-import { z } from "zod";
 import { useState, useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
 import { InputHelperMessage } from "../../../../../../../components/ui/input-helper-message";
@@ -197,31 +196,43 @@ export function BuyerDialog({
       const buyers = localStorage.getItem(BUYERS_LOCAL_STORAGE_KEY);
       const existingBuyers: unknown = buyers ? JSON.parse(buyers) : [];
 
-      // Validate existing buyers array with Zod
-      const existingBuyersValidationResult = z
-        .array(buyerSchema)
-        .safeParse(existingBuyers);
+      const rawBuyers = Array.isArray(existingBuyers) ? existingBuyers : [];
 
-      if (!existingBuyersValidationResult.success) {
-        console.error(
-          "Invalid existing buyers data:",
-          existingBuyersValidationResult.error,
+      const validBuyers: BuyerData[] = [];
+      let hadInvalidBuyers = false;
+
+      // Validate each buyer individually — drop only invalid items
+      for (const item of rawBuyers) {
+        const result = buyerSchema.safeParse(item);
+
+        if (result.success) {
+          validBuyers.push(result.data);
+        } else {
+          hadInvalidBuyers = true;
+
+          console.error(
+            "[buyer-dialog] Dropped invalid buyer entry:",
+            result.error,
+          );
+
+          Sentry.captureException(
+            new Error(
+              `[buyer-dialog] Invalid buyer data in localStorage: ${rawBuyers.length - validBuyers.length} items dropped`,
+            ),
+          );
+        }
+      }
+
+      // If we had invalid buyers, save the valid buyers back to localStorage
+      if (hadInvalidBuyers) {
+        localStorage.setItem(
+          BUYERS_LOCAL_STORAGE_KEY,
+          JSON.stringify(validBuyers),
         );
-
-        // Show error toast
-        toast.error("Error loading existing buyers", {
-          richColors: true,
-          description: "Please try again",
-        });
-
-        // Reset localStorage if validation fails
-        localStorage.setItem(BUYERS_LOCAL_STORAGE_KEY, JSON.stringify([]));
-
-        return;
       }
 
       // Validate buyer data against existing buyers
-      const isDuplicateName = existingBuyersValidationResult.data.some(
+      const isDuplicateName = validBuyers.some(
         (buyer: BuyerData) =>
           buyer.name === formValues.name && buyer.id !== formValues.id,
       );
