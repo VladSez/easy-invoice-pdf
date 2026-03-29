@@ -1,0 +1,55 @@
+export const metadata = {
+  title: "Seller & Buyer Improvements, Email Visibility Toggle and More",
+  description:
+    "Email visibility toggle for seller/buyer sections, reworked form layouts with locked-state banners, ConfirmDiscardDialog, and auto-scroll on mobile",
+  date: "2026-03-29",
+  version: "1.0.3",
+  type: "minor",
+};
+
+## ✨ Highlights
+
+- **Email visibility toggle** for seller and buyer sections — control whether the email address appears in the generated PDF
+- **`ConfirmDiscardDialog`** component to warn users about unsaved changes when closing the buyer/seller dialogs
+- **Reworked seller and buyer information form sections** with improved layout, locked-state banners, and cleaner field grouping
+- **Auto-scroll the invoice form on mobile** when switching between tabs (UX improvement)
+- **Out-of-Date dates helper** improved with more accurate state detection
+
+<video
+  src="https://github.com/user-attachments/assets/1b39eb6f-e2be-493f-9825-cbce3dc6fa16"
+  controls
+  style={{ width: "100%", borderRadius: "8px" }}
+/>
+
+---
+
+### Changed
+
+- Invalid localStorage entries for buyers and sellers are now validated and silently dropped instead of causing errors
+- Error message component layout and copy updated for better readability
+- GitHub Actions workflows updated to latest action versions; failure handling added to all CI jobs
+- Added knip GitHub CI job for automated dead-code and unused-dependency detection
+
+### Fixed
+
+- Pre-fill switch in buyer/seller dialogs no longer retains its state after the dialog is closed and reopened
+- Buyer and seller dialogs now reset form values and pre-fill switch to their defaults when closed
+- Buyer and seller names are trimmed of whitespace before saving; whitespace-padded duplicates are rejected
+
+### What's Changed
+
+- feat: auto-scroll form on mobile when switching between tabs, fix loading placeholder by @VladSez in [#191](https://github.com/VladSez/easy-invoice-pdf/pull/191)
+- refactor: update layout and improve accessibility in invoice-related components by @VladSez in [#192](https://github.com/VladSez/easy-invoice-pdf/pull/192)
+- refactor: improve layout in BuyerDialog and SellerDialog components by @VladSez in [#193](https://github.com/VladSez/easy-invoice-pdf/pull/193)
+- refactor: streamline toast management in InvoiceForm component by @VladSez in [#194](https://github.com/VladSez/easy-invoice-pdf/pull/194)
+- feat: enhance buyer and seller management with new functionality and improved toast notifications by @VladSez in [#195](https://github.com/VladSez/easy-invoice-pdf/pull/195)
+- feat: reworked seller/buyer sections, email visibility switch field, shared invoice indicator, improved Out-of-Date helper + minor things by @VladSez in [#197](https://github.com/VladSez/easy-invoice-pdf/pull/197)
+- feat: add cancel confirm dialog for seller/buyer dialog, update gh actions, added new script update-github-actions in package.json by @VladSez in [#198](https://github.com/VladSez/easy-invoice-pdf/pull/198)
+- fix: update GitHub Actions script and fix buyer/seller dialog pre-fill bug by @VladSez in [#199](https://github.com/VladSez/easy-invoice-pdf/pull/199)
+- feat: replaced window.confirm with alert discard dialog for buyer and seller management by @VladSez in [#200](https://github.com/VladSez/easy-invoice-pdf/pull/200)
+
+---
+
+**Full Changelog**: [`v1.0.2...v1.0.3`](https://github.com/VladSez/easy-invoice-pdf/compare/v1.0.2...v1.0.3)
+
+[View Release Notes for v1.0.3 on GitHub](https://github.com/VladSez/easy-invoice-pdf/releases/tag/v1.0.3)

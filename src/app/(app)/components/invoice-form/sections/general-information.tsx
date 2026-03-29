@@ -656,7 +656,7 @@ export const GeneralInformation = memo(function GeneralInformation({
         {/* Logo Upload */}
         <div className="">
           <Label htmlFor="logoUpload" className="mb-2">
-            Company Logo (Optional)
+            Company Logo
           </Label>
 
           {logo ? (
@@ -718,7 +718,7 @@ export const GeneralInformation = memo(function GeneralInformation({
         {template === "stripe" && (
           <div className="">
             <Label htmlFor={`stripePayOnlineUrl`} className="">
-              Payment Link URL (Optional)
+              Payment Link URL
             </Label>
 
             <Controller
