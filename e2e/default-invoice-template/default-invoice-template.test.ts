@@ -2,10 +2,7 @@ import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import fs from "node:fs";
 import path from "node:path";
-import {
-  SMALL_TEST_IMAGE_BASE64,
-  uploadBase64LogoAsFile,
-} from "../stripe-invoice-template/utils";
+import { uploadLogoFile } from "../stripe-invoice-template/utils";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { test, expect } from "../utils/extended-playwright-test";
@@ -19,7 +16,7 @@ test.describe("Default Invoice Template", () => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
 
-    await page.goto("/");
+    await page.goto("/?template=default");
     await expect(page).toHaveURL("/?template=default");
   });
 
@@ -1579,7 +1576,7 @@ test.describe("Default Invoice Template", () => {
     const generalInfoSection = page.getByTestId("general-information-section");
 
     // Upload a valid logo
-    await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
+    await uploadLogoFile(page);
 
     // Verify logo preview is visible
     await expect(page.getByText("Logo uploaded successfully!")).toBeVisible();

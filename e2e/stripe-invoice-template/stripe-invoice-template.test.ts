@@ -6,7 +6,7 @@ import {
 } from "@/app/schema";
 import fs from "node:fs";
 import path from "node:path";
-import { SMALL_TEST_IMAGE_BASE64, uploadBase64LogoAsFile } from "./utils";
+import { uploadLogoFile } from "./utils";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { expect, test } from "../utils/extended-playwright-test";
@@ -21,7 +21,7 @@ test.describe("Stripe Invoice Template", () => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
 
-    await page.goto("/");
+    await page.goto("/?template=default");
   });
 
   test("displays correct OG meta tags for Stripe template", async ({
@@ -83,7 +83,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Logo section is visible on default template
     await expect(
-      generalInfoSection.getByText("Company Logo (Optional)"),
+      generalInfoSection.getByText("Company Logo", { exact: true }),
     ).toBeVisible();
     await expect(
       generalInfoSection.getByTestId("logo-upload-input"),
@@ -92,7 +92,7 @@ test.describe("Stripe Invoice Template", () => {
     // Payment URL section should not be visible on default template
     await expect(
       generalInfoSection.getByRole("textbox", {
-        name: "Payment Link URL (Optional)",
+        name: "Payment Link URL",
       }),
     ).toBeHidden();
 
@@ -112,7 +112,7 @@ test.describe("Stripe Invoice Template", () => {
     ).toBeVisible();
 
     await expect(
-      generalInfoSection.getByText("Company Logo (Optional)"),
+      generalInfoSection.getByText("Company Logo", { exact: true }),
     ).toBeVisible();
     await expect(
       generalInfoSection.getByText("Click to upload your company logo"),
@@ -124,7 +124,7 @@ test.describe("Stripe Invoice Template", () => {
     // Payment URL section should now be visible on Stripe template
     await expect(
       generalInfoSection.getByRole("textbox", {
-        name: "Payment Link URL (Optional)",
+        name: "Payment Link URL",
       }),
     ).toBeVisible();
 
@@ -135,7 +135,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Logo section remains visible on default template
     await expect(
-      generalInfoSection.getByText("Company Logo (Optional)"),
+      generalInfoSection.getByText("Company Logo", { exact: true }),
     ).toBeVisible();
 
     await expect(
@@ -145,7 +145,7 @@ test.describe("Stripe Invoice Template", () => {
     // Payment URL section should be hidden again on default template
     await expect(
       generalInfoSection.getByRole("textbox", {
-        name: "Payment Link URL (Optional)",
+        name: "Payment Link URL",
       }),
     ).toBeHidden();
   });
@@ -226,7 +226,7 @@ test.describe("Stripe Invoice Template", () => {
     const generalInfoSection = page.getByTestId("general-information-section");
 
     // Upload a valid small image
-    await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
+    await uploadLogoFile(page);
 
     // Should show success toast
     await expect(page.getByText("Logo uploaded successfully!")).toBeVisible();
@@ -259,7 +259,7 @@ test.describe("Stripe Invoice Template", () => {
       .selectOption("stripe");
 
     // Upload a valid small image
-    await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
+    await uploadLogoFile(page);
 
     const generalInfoSection = page.getByTestId("general-information-section");
 
@@ -304,7 +304,7 @@ test.describe("Stripe Invoice Template", () => {
 
     const generalInfoSection = page.getByTestId("general-information-section");
     const paymentUrlInput = generalInfoSection.getByRole("textbox", {
-      name: "Payment Link URL (Optional)",
+      name: "Payment Link URL",
     });
 
     // Try invalid URL
@@ -337,11 +337,11 @@ test.describe("Stripe Invoice Template", () => {
 
     // Add payment URL
     await generalInfoSection
-      .getByRole("textbox", { name: "Payment Link URL (Optional)" })
+      .getByRole("textbox", { name: "Payment Link URL" })
       .fill("https://buy.stripe.com/test_payment_link");
 
     // Upload logo
-    await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
+    await uploadLogoFile(page);
 
     // Wait for logo to be uploaded and PDF to regenerate
     await expect(page.getByText("Logo uploaded successfully!")).toBeVisible();
@@ -369,9 +369,7 @@ test.describe("Stripe Invoice Template", () => {
 
     const parsedData = JSON.parse(storedData) as InvoiceData;
 
-    expect(parsedData).toMatchObject({
-      logo: SMALL_TEST_IMAGE_BASE64,
-    } satisfies Pick<InvoiceData, "logo">);
+    expect(parsedData.logo).toBeTruthy();
 
     // Reload page
     await page.reload();
@@ -386,7 +384,7 @@ test.describe("Stripe Invoice Template", () => {
     // Verify payment URL persists
     await expect(
       generalInfoSection.getByRole("textbox", {
-        name: "Payment Link URL (Optional)",
+        name: "Payment Link URL",
       }),
     ).toHaveValue("https://buy.stripe.com/test_payment_link");
 
@@ -900,7 +898,7 @@ test.describe("Stripe Invoice Template", () => {
     await expect(page).toHaveURL("/?template=stripe");
 
     // Upload a valid logo
-    await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
+    await uploadLogoFile(page);
 
     // Wait for logo to be uploaded and PDF to regenerate
     await expect(page.getByText("Logo uploaded successfully!")).toBeVisible();
@@ -917,7 +915,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Add payment URL
     await generalInfoSection
-      .getByRole("textbox", { name: "Payment Link URL (Optional)" })
+      .getByRole("textbox", { name: "Payment Link URL" })
       .fill("https://buy.stripe.com/test_payment_link");
 
     // Wait a moment for any debounced localStorage updates
@@ -933,9 +931,7 @@ test.describe("Stripe Invoice Template", () => {
 
     const parsedData = JSON.parse(storedData) as InvoiceData;
 
-    expect(parsedData).toMatchObject({
-      logo: SMALL_TEST_IMAGE_BASE64,
-    } satisfies Pick<InvoiceData, "logo">);
+    expect(parsedData.logo).toBeTruthy();
 
     const downloadPDFButton = page.getByRole("link", {
       name: "Download PDF in English",

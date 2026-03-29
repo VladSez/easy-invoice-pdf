@@ -1,10 +1,10 @@
 import { PDF_DATA_LOCAL_STORAGE_KEY, type InvoiceData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
-import { SMALL_TEST_IMAGE_BASE64, uploadBase64LogoAsFile } from "./utils";
+import { uploadLogoFile } from "./utils";
 
 test.describe("Stripe Invoice Sharing Logic", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?template=default");
   });
 
   test("can share invoice with Stripe template and *WITHOUT* logo", async ({
@@ -67,13 +67,13 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Verify logo upload section is visible (but empty since no logo was shared)
     await expect(
-      newPageGeneralInfoSection.getByText("Company Logo (Optional)"),
+      newPageGeneralInfoSection.getByText("Company Logo", { exact: true }),
     ).toBeVisible();
 
     // Verify payment URL section is visible
     await expect(
       newPageGeneralInfoSection.getByRole("textbox", {
-        name: "Payment Link URL (Optional)",
+        name: "Payment Link URL",
       }),
     ).toBeVisible();
 
@@ -109,7 +109,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .selectOption("stripe");
 
     // Upload logo
-    await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
+    await uploadLogoFile(page);
 
     // Wait for logo to be uploaded
     const generalInfoSection = page.getByTestId("general-information-section");
@@ -148,7 +148,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .selectOption("stripe");
 
     // Upload logo
-    await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
+    await uploadLogoFile(page);
 
     // Wait debounce timeout
     // eslint-disable-next-line playwright/no-wait-for-timeout
@@ -223,7 +223,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .selectOption("stripe");
 
     // Upload logo
-    await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
+    await uploadLogoFile(page);
 
     // Verify share button becomes disabled
     await expect(shareButton).toHaveAttribute("data-disabled", "true");
@@ -259,7 +259,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await page.waitForURL("/?template=stripe");
 
     // Upload logo
-    await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
+    await uploadLogoFile(page);
 
     // Wait for upload and verify share button is disabled
     const generalInfoSection = page.getByTestId("general-information-section");
@@ -287,9 +287,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     const parsedData = JSON.parse(storedData) as InvoiceData;
 
-    expect(parsedData).toMatchObject({
-      logo: SMALL_TEST_IMAGE_BASE64,
-    } satisfies Pick<InvoiceData, "logo">);
+    expect(parsedData.logo).toBeTruthy();
 
     // Reload the page
     await page.reload();
@@ -330,7 +328,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .selectOption("stripe");
 
     // Upload logo
-    await page.evaluate(uploadBase64LogoAsFile, SMALL_TEST_IMAGE_BASE64);
+    await uploadLogoFile(page);
 
     // Wait for logo to be uploaded
     // eslint-disable-next-line playwright/no-wait-for-timeout

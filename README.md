@@ -94,15 +94,51 @@ _**Choose between multiple professional templates** (Default and Stripe) to matc
 
 </div>
 
+## 📢 What's New
+
+**v1.0.3 — Seller & Buyer Improvements (Mar 2026)**
+
+- **Email visibility toggle** — control whether email addresses appear in the generated PDF
+- **Confirm discard dialog** — warns about unsaved changes when closing buyer/seller dialogs
+- **Improved seller & buyer forms** — reworked layout, locked-state banners, and cleaner field grouping
+
+[Full release notes for v1.0.3](https://github.com/VladSez/easy-invoice-pdf/releases/tag/v1.0.3)
+
+---
+
+**v1.0.2 — QR Codes & Multi-Page PDFs (Mar 2026)**
+
+- **QR code support** — add payment QR codes with custom descriptions to both templates
+- **Logo upload for default template** — previously available only in the Stripe template
+- **Searchable currency combobox** — grouped categories replace the native dropdown
+- **Improved multi-page PDFs** — automatic pagination and page breaks for large invoices
+
+[Full release notes for v1.0.2](https://github.com/VladSez/easy-invoice-pdf/releases/tag/v1.0.2)
+
+---
+
+**v1.0.1 — Stripe Template & Tax Customization (Jan 2026)**
+
+- **Stripe-inspired invoice template** — professional styling with logo upload and payment URL field
+- **Customizable tax labels** — set VAT, GST, Sales Tax, or any custom label per invoice language
+- **Improved i18n** — dynamic tax label updates and better locale-based currency handling
+
+[Full release notes for v1.0.1](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-1.0.1)
+
+---
+
+**v1.0.0 — Initial Release (Nov 2025)**
+
+- **Live preview** — invoice updates in real-time as you type
+- **Instant PDF download** — one-click, no sign-up required
+- **Shareable links** — send invoices directly to clients without attachments
+- **10 languages & 120+ currencies** — full multi-language and currency support out of the box
+
+[Full release notes for v1.0.0](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-v1.0.0)
+
 ## 🌟 Star History
 
 [![RepoStars](https://repostars.dev/api/embed?repo=VladSez%2Feasy-invoice-pdf&theme=dark)](https://repostars.dev/?repos=VladSez%2Feasy-invoice-pdf&theme=dark)
-
-## 📢 News & Updates
-
-- **Mar 10, 2026**: Added QR code support, logo upload for the default template, searchable currency combobox, and improved multi-page PDF support. [Release notes for v1.0.2](https://github.com/VladSez/easy-invoice-pdf/releases/tag/v1.0.2)
-- **Jan 11, 2026**: Added customizable tax/VAT labels, improved internationalization (i18n) translations, enhanced overall performance, and fixed multiple bugs. [Release notes for v1.0.1](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-1.0.1)
-- **Nov 19, 2025**: EasyInvoicePDF version 1.0.0 released! Create professional invoices in seconds. Welcome to try EasyInvoicePDF. [Release notes for v1.0.0](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-v1.0.0)
 
 ## 🎥 Demo Video
 
