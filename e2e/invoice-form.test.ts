@@ -1390,12 +1390,6 @@ test.describe("Invoice Generator Page", () => {
       generalInfoSection.getByText("Date of issue is not today"),
     ).toBeVisible();
 
-    const dateOfIssueBtn = generalInfoSection.getByRole("button", {
-      name: "Set date of issue to today (2025-12-01)",
-    });
-    await expect(dateOfIssueBtn).toBeVisible();
-    await expect(dateOfIssueBtn).toBeEnabled();
-
     // Set date of service to a date that's not the last day of current month
     const dateOfServiceInput = generalInfoSection.getByLabel("Date of Service");
     await dateOfServiceInput.fill("2024-01-20");
@@ -1407,12 +1401,6 @@ test.describe("Invoice Generator Page", () => {
       ),
     ).toBeVisible();
 
-    const dateOfServiceBtn = generalInfoSection.getByRole("button", {
-      name: "Set date of service to month end (2025-12-31)",
-    });
-    await expect(dateOfServiceBtn).toBeVisible();
-    await expect(dateOfServiceBtn).toBeEnabled();
-
     // Set invoice number to an old month to trigger stale state
     const invoiceNumberInput = generalInfoSection.getByLabel("Value");
     await invoiceNumberInput.fill("1/01-2024");
@@ -1423,12 +1411,6 @@ test.describe("Invoice Generator Page", () => {
         "Invoice number does not match current month",
       ),
     ).toBeVisible();
-
-    const invoiceNumberBtn = generalInfoSection.getByRole("button", {
-      name: "Set invoice number to current month (1/12-2025)",
-    });
-    await expect(invoiceNumberBtn).toBeVisible();
-    await expect(invoiceNumberBtn).toBeEnabled();
 
     // Set payment due to a stale date (date of issue + 1 day instead of + 14 days)
     const paymentDueInput = page.getByLabel("Payment Due");

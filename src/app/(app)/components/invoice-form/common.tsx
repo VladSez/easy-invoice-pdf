@@ -5,5 +5,7 @@ export const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const AlertIcon = () => {
-  return <AlertTriangle className="mr-1 inline-block h-3 w-3 text-amber-500" />;
+  return (
+    <AlertTriangle className="mr-1 inline-block size-3.5 shrink-0 text-amber-500" />
+  );
 };
