@@ -1,3 +1,7 @@
+import {
+  AlertIcon,
+  ErrorMessage,
+} from "@/app/(app)/components/invoice-form/common";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import {
   DEFAULT_DATE_FORMAT,
@@ -31,35 +35,7 @@ import {
 } from "react-hook-form";
 import { toast } from "sonner";
 
-const AlertIcon = () => {
-  return (
-    <AlertTriangle className="mr-1 inline-block size-3.5 shrink-0 text-amber-500" />
-  );
-};
-
-const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
-  return <p className="mt-1 text-xs text-red-600">{children}</p>;
-};
-
 const CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
-
-// Logo helper functions
-const validateImageSize = (file: File): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const maxSize = 3 * 1024 * 1024; // 3MB in bytes
-
-    resolve(file.size <= maxSize);
-  });
-};
-
-const convertFileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-};
 
 interface GeneralInformationProps {
   control: Control<InvoiceData>;
@@ -455,22 +431,6 @@ export const GeneralInformation = memo(function GeneralInformation({
                       <AlertIcon />
                       Invoice number does not match current month
                     </span>
-
-                    <ButtonHelper
-                      onClick={() => {
-                        setValue(
-                          "invoiceNumberObject.value",
-                          `1/${CURRENT_MONTH_AND_YEAR}`,
-                        );
-                      }}
-                    >
-                      <span className="text-pretty">
-                        Set invoice number to{" "}
-                        <span className="font-bold">
-                          current month ({`1/${CURRENT_MONTH_AND_YEAR}`})
-                        </span>
-                      </span>
-                    </ButtonHelper>
                   </InputHelperMessage>
                 )}
             </div>
@@ -516,32 +476,6 @@ export const GeneralInformation = memo(function GeneralInformation({
                 <AlertIcon />
                 Date of issue is not today
               </span>
-
-              <ButtonHelper
-                onClick={() => {
-                  const currentMonth = dayjs().format("YYYY-MM-DD"); // default browser date input format is YYYY-MM-DD
-
-                  setValue("dateOfIssue", currentMonth);
-
-                  // Automatically update payment due date to 14 days after the new date of issue for better UX
-                  setValue(
-                    "paymentDue",
-                    dayjs(currentMonth).add(14, "days").format("YYYY-MM-DD"),
-                  );
-                }}
-              >
-                <span className="text-pretty">
-                  Set date of issue to{" "}
-                  <span className="font-bold">
-                    today ({dayjs().format(selectedDateFormat)})
-                  </span>{" "}
-                  and update payment due to{" "}
-                  <span className="font-bold">
-                    +14 days (
-                    {dayjs().add(14, "days").format(selectedDateFormat)})
-                  </span>
-                </span>
-              </ButtonHelper>
             </InputHelperMessage>
           ) : null}
         </div>
@@ -568,28 +502,11 @@ export const GeneralInformation = memo(function GeneralInformation({
                 <AlertIcon />
                 Date of service is not the last day of the current month
               </span>
-
-              <ButtonHelper
-                onClick={() => {
-                  const lastDayOfCurrentMonth = dayjs()
-                    .endOf("month")
-                    .format("YYYY-MM-DD"); // default browser date input format is YYYY-MM-DD
-
-                  setValue("dateOfService", lastDayOfCurrentMonth);
-                }}
-              >
-                <span className="text-pretty">
-                  Set date of service to{" "}
-                  <span className="font-bold">
-                    month end (
-                    {dayjs().endOf("month").format(selectedDateFormat)})
-                  </span>
-                </span>
-              </ButtonHelper>
             </InputHelperMessage>
           ) : null}
         </div>
 
+        {/* Out of Date Dates Helper */}
         {canShowOutOfDateDatesHelper ? (
           <OutOfDateDatesHelper
             dateOfIssue={dateOfIssue}
@@ -924,3 +841,21 @@ function OutOfDateDatesHelper({
     </div>
   );
 }
+
+// Logo helper functions
+const validateImageSize = (file: File): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const maxSize = 3 * 1024 * 1024; // 3MB in bytes
+
+    resolve(file.size <= maxSize);
+  });
+};
+
+const convertFileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
