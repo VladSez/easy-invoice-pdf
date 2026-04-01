@@ -10,7 +10,8 @@
       <a href="https://github.com/VladSez/easy-invoice-pdf/releases">Releases</a>
     </p>
   <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">
-    <img width="1440" height="769" alt="EasyInvoicePDF Product Screenshot" src=".github/screenshots/stripe-template.png" />
+    <!-- source:  .github/screenshots/stripe-template.png -->
+    <img width="1440" height="769" alt="EasyInvoicePDF Product Screenshot" src="https://github.com/user-attachments/assets/6f0e2156-24e0-4f8b-b8f1-1d2bf5ac157a" />
   </a>
 </div>
 
@@ -36,7 +37,9 @@
 
 ### 🎬 Invoice PDF Live Preview
 
-<img src=".github/demos/live-preview.gif" width="800" alt="Live Preview Demo">
+<!-- source: .gifs/demos/live-preview.gif -->
+
+<img src="https://github.com/user-attachments/assets/03c57879-2f71-4c75-88ca-0abc937585c6" width="800" alt="Live Preview Demo">
 
 _See changes in **real-time** as you type_
 
@@ -44,7 +47,9 @@ _See changes in **real-time** as you type_
 
 ### 📥 Instant PDF Download
 
-<img src=".github/demos/instant-download.gif" width="800" alt="Instant Download Demo">
+<!-- source: .gifs/demos/instant-download.gif -->
+
+<img src="https://github.com/user-attachments/assets/d85710c5-ac72-4d80-9c43-aeef980d0734" width="800" alt="Instant Download Demo">
 
 _**One-click PDF download** ready for printing or sending_
 
@@ -52,7 +57,9 @@ _**One-click PDF download** ready for printing or sending_
 
 ### 🌍 Language & Currency
 
-<img src=".github/demos/lang-currency.gif" width="800" alt="Language & Currency Demo">
+<!-- source: .gifs/demos/lang-currency.gif -->
+
+<img src="https://github.com/user-attachments/assets/719f74a1-9be0-4b95-a8c1-a2749246aff3" width="800" alt="Language & Currency Demo">
 
 _**Switch between 10 languages and 120+ currencies instantly** with live PDF preview updates_
 
@@ -60,7 +67,9 @@ _**Switch between 10 languages and 120+ currencies instantly** with live PDF pre
 
 ### 🔗 Shareable Links
 
-<img src=".github/demos/shared-links.gif" width="800" alt="Shareable Links Demo">
+<!-- source: .gifs/demos/shared-links.gif -->
+
+<img src="https://github.com/user-attachments/assets/78f3c560-8dde-4f73-8832-4d74a38a2cee" width="800" alt="Shareable Links Demo">
 
 _**Send invoices directly to clients** without attachments_
 
