@@ -723,7 +723,23 @@ function OutOfDateDatesHelper({
     .format(selectedDateFormat);
   const targetInvoiceNumber = `1/${CURRENT_MONTH_AND_YEAR}`;
 
-  const staleItems = [
+  /**
+   * Array of items to check for staleness.
+   * Each item is either false (not stale) or an object containing:
+   * - label: Display name of the field
+   * - oldValue: Current/outdated value
+   * - newValue: Suggested updated value
+   * - hint: Description of what the new value represents
+   */
+  const ITEMS: (
+    | boolean
+    | {
+        label: string;
+        oldValue: string;
+        newValue: string;
+        hint: string;
+      }
+  )[] = [
     isDateOfIssueStale && {
       label: "Date of issue",
       oldValue: formatDate(dateOfIssue),
@@ -740,7 +756,7 @@ function OutOfDateDatesHelper({
       label: "Invoice number",
       oldValue: invoiceNumberValue || "—",
       newValue: targetInvoiceNumber,
-      hint: undefined,
+      hint: "current month",
     },
     isPaymentDueStale && {
       label: "Payment due",
@@ -748,11 +764,13 @@ function OutOfDateDatesHelper({
       newValue: targetPaymentDue,
       hint: "date of issue + 14 days",
     },
-  ].filter(Boolean) as {
+  ];
+
+  const staleItems = ITEMS.filter(Boolean) as {
     label: string;
     oldValue: string;
     newValue: string;
-    hint?: string;
+    hint: string;
   }[];
 
   return (

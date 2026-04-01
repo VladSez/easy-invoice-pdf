@@ -50,30 +50,6 @@ _**One-click PDF download** ready for printing or sending_
 
 ---
 
-### 🔗 Shareable Links
-
-<img src=".github/demos/share-link.gif" width="800" alt="Shareable Links Demo">
-
-_**Send invoices directly to clients** without attachments_
-
----
-
-### 📲 QR Codes & Advanced Multi-Page PDF Support
-
-<img src=".github/demos/qr-code.gif" width="800" alt="QR Code Support Demo">
-
-_**Add payment QR codes** with any invoice-related information (payment links, UPI, contact details, custom data) and **seamless multi-page support** with automatic pagination and page breaks for large invoices_
-
----
-
-### 🏷️ Customizable Tax Settings
-
-<img src=".github/demos/tax-custom.gif" width="800" alt="Customizable Tax Settings Demo">
-
-_**Customize tax labels** (VAT, Sales Tax, IVA, etc.)_
-
----
-
 ### 🌍 Language & Currency
 
 <img src=".github/demos/lang-currency.gif" width="800" alt="Language & Currency Demo">
@@ -82,11 +58,13 @@ _**Switch between 10 languages and 120+ currencies instantly** with live PDF pre
 
 ---
 
-### 🎨 Professional Invoice Templates
+### 🔗 Shareable Links
 
-<img src=".github/demos/invoice-template.gif" width="800" alt="Invoice Templates Demo">
+<img src=".github/demos/shared-links.gif" width="800" alt="Shareable Links Demo">
 
-_**Choose between multiple professional templates** (Default and Stripe) to match your brand and style_
+_**Send invoices directly to clients** without attachments_
+
+---
 
 |                                           Default Invoice Template                                            |                                           Stripe Invoice Template                                           |
 | :-----------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------: |
