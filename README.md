@@ -76,6 +76,26 @@ _**Send invoices directly to clients** without attachments_
 
 ---
 
+### 💰 Customizable Tax Settings
+
+<!-- source: .github/demos/tax-custom.gif -->
+
+<img src="https://github.com/user-attachments/assets/dab10991-6e76-4851-ab4f-25f52da2b6ed" width="800" alt="Customizable Tax Settings Demo">
+
+_**Customize tax labels** (VAT, Sales Tax, IVA, etc.)_
+
+---
+
+### 🏞️ QR Codes & Advanced Multi-Page PDF Support
+
+<!-- source: .github/demos/qr-code.gif -->
+
+<img src="https://github.com/user-attachments/assets/2baf6c39-16a8-47c2-8f08-d03de6d9e593" width="800" alt="QR Code Support Demo">
+
+_**Add payment QR codes** with any invoice-related information (payment links, UPI, contact details, custom data) and **seamless multi-page support** with automatic pagination and page breaks for large invoices_
+
+---
+
 <!-- source: .github/screenshots/default-template.png -->
 <!-- source: .github/screenshots/stripe-template.png -->
 
