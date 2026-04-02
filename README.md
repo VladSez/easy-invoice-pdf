@@ -1,5 +1,6 @@
 <div align="center">
-  <img src=".github/screenshots/easy-invoice-logo-readme.png" alt="EasyInvoicePDF Logo" width="80" height="80">
+  <!-- source:  .github/screenshots/easy-invoice-logo-readme.png -->
+  <img src="https://github.com/user-attachments/assets/cb9bcc91-b4c8-40b1-b406-bc606c5d9315" alt="EasyInvoicePDF Logo" width="80" height="80">
   <h1>EasyInvoicePDF</h1>
   <h3>Free & Open-Source Invoice Generator</h3>
   <p>Create professional invoices instantly in your browser with <strong>Live Preview</strong>, <strong>Multiple Templates</strong> (including a Stripe-style design). <strong>No Sign-Up Required</strong>.</p>
@@ -17,14 +18,14 @@
 
 ## ✨ Key Features of EasyInvoicePDF:
 
+- 📺 **Live Preview**: See changes in real-time as you type
 - ⭐ **No Sign-Up Required**: Start creating invoices immediately without any registration
 - 📄 **Instant PDF**: One-click download ready for printing or sending
-- ⚡ **Live Preview**: See changes in real-time as you type
 - 🔗 **Shareable Links**: Send invoices directly to clients without attachments
 - 🎨 **Multiple Templates**: Including modern **Stripe-style design**
-- 📱 **Browser Only**: No server uploads, your data stays private
-- 💰 **Flexible Tax Support**: VAT, GST, Sales Tax, and custom tax formats with automatic calculations
 - 🌍 **Multi-Language & Currency**: Support for 10+ languages and 120+ currencies
+- 🖥️ **Browser Only**: No server uploads, your data stays private
+- 💰 **Flexible Tax Support**: VAT, GST, Sales Tax, and custom tax formats with automatic calculations
 - 📱 **Mobile-Friendly**: Create invoices on the go from any device
 - 🏞️ **QR Code Support**: Add payment QR codes with any invoice-related information (payment links, UPI, contact details, custom data)
 - 📑 **Multi-Page PDFs**: Seamless multi-page support with automatic pagination and page breaks
@@ -37,7 +38,7 @@
 
 ### 🎬 Invoice PDF Live Preview
 
-<!-- source: .gifs/demos/live-preview.gif -->
+<!-- source: .github/demos/live-preview.gif -->
 
 <img src="https://github.com/user-attachments/assets/03c57879-2f71-4c75-88ca-0abc937585c6" width="800" alt="Live Preview Demo">
 
@@ -47,7 +48,7 @@ _See changes in **real-time** as you type_
 
 ### 📥 Instant PDF Download
 
-<!-- source: .gifs/demos/instant-download.gif -->
+<!-- source: .github/demos/instant-download.gif -->
 
 <img src="https://github.com/user-attachments/assets/d85710c5-ac72-4d80-9c43-aeef980d0734" width="800" alt="Instant Download Demo">
 
@@ -57,7 +58,7 @@ _**One-click PDF download** ready for printing or sending_
 
 ### 🌍 Language & Currency
 
-<!-- source: .gifs/demos/lang-currency.gif -->
+<!-- source: .github/demos/lang-currency.gif -->
 
 <img src="https://github.com/user-attachments/assets/719f74a1-9be0-4b95-a8c1-a2749246aff3" width="800" alt="Language & Currency Demo">
 
@@ -67,7 +68,7 @@ _**Switch between 10 languages and 120+ currencies instantly** with live PDF pre
 
 ### 🔗 Shareable Links
 
-<!-- source: .gifs/demos/shared-links.gif -->
+<!-- source: .github/demos/shared-links.gif -->
 
 <img src="https://github.com/user-attachments/assets/78f3c560-8dde-4f73-8832-4d74a38a2cee" width="800" alt="Shareable Links Demo">
 
@@ -75,9 +76,12 @@ _**Send invoices directly to clients** without attachments_
 
 ---
 
+<!-- source: .github/screenshots/default-template.png -->
+<!-- source: .github/screenshots/stripe-template.png -->
+
 |                                           Default Invoice Template                                            |                                           Stripe Invoice Template                                           |
 | :-----------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------: |
-| <img src=".github/screenshots/default-template.png" width="1200" height="960" alt="Default Invoice Template"> | <img src=".github/screenshots/stripe-template.png" width="1200" height="960" alt="Stripe Invoice Template"> |
+| <img src="https://github.com/user-attachments/assets/7779cd52-e2a9-442a-8ac8-262387319b3e" width="1200" height="960" alt="Default Invoice Template"> | <img src="https://github.com/user-attachments/assets/ee8d5337-89fc-461c-b1c1-2680287df514" width="1200" height="960" alt="Stripe Invoice Template"> |
 
 </div>
 
