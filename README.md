@@ -18,7 +18,7 @@
 
 ## ✨ Key Features of EasyInvoicePDF:
 
-- 📺 **Live Preview**: See changes in real-time as you type
+- 📺 **Live PDF Preview**: See changes in real-time as you type
 - ⭐ **No Sign-Up Required**: Start creating invoices immediately without any registration
 - 📄 **Instant PDF**: One-click download ready for printing or sending
 - 🔗 **Shareable Links**: Send invoices directly to clients without attachments
