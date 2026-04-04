@@ -1,9 +1,4 @@
-import {
-  GITHUB_URL,
-  TWITTER_URL,
-  VIDEO_DEMO_FALLBACK_IMG,
-  VIDEO_DEMO_URL,
-} from "@/config";
+import { GITHUB_URL, TWITTER_URL, VIDEO_DEMO_FALLBACK_IMG } from "@/config";
 import { expect, test } from "@playwright/test";
 
 test.describe("About page", () => {
@@ -64,15 +59,8 @@ test.describe("About page", () => {
     await expect(video).toHaveAttribute("muted");
     await expect(video).toHaveAttribute("loop");
     await expect(video).toHaveAttribute("playsinline");
-    await expect(video).toHaveAttribute("preload", "auto");
-    await expect(video).toHaveAttribute("autoplay");
-
-    const videoSource = video.locator("source");
-    await expect(videoSource).toHaveAttribute(
-      "src",
-      `${VIDEO_DEMO_URL}#t=0.001`,
-    );
-    await expect(videoSource).toHaveAttribute("type", "video/mp4");
+    await expect(video).toHaveAttribute("preload", "none");
+    await expect(video).not.toHaveAttribute("autoplay");
 
     // Check Features section
     const featuresSection = page.locator("#features");
