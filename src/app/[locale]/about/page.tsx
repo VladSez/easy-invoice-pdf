@@ -278,7 +278,7 @@ function FeaturesSection() {
       id="features"
       className="mt-6 flex w-full items-center justify-center bg-slate-50 py-4 lg:py-8 xl:mt-16 xl:py-16"
     >
-      <div className="container">
+      <div className="container lg:max-w-[53rem] xl:max-w-[1280px] 2xl:max-w-[1536px]">
         {/* Features section title and description */}
         <div className="flex flex-col items-center justify-center space-y-8 px-4 text-center md:px-6">
           <div className="space-y-5">
@@ -314,7 +314,8 @@ function FeaturesSection() {
                   isEven ? "xl:flex-row" : "xl:flex-row-reverse", // swap the video and text content for even index
                 )}
               >
-                <div className="mb-[-5px] flex-1 px-8 pt-6 xl:mb-0 xl:py-4">
+                {/* text content */}
+                <div className="mb-[-5px] flex-1 px-8 pt-6 md:pt-7 xl:mb-0 xl:py-4">
                   <h3 className="text-balance pb-4 text-xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-2xl">
                     {title}
                   </h3>
@@ -323,7 +324,8 @@ function FeaturesSection() {
                   </p>
                 </div>
 
-                <div className="relative w-full max-w-[800px] px-2 pb-3 lg:p-0 xl:mx-0">
+                {/* video container */}
+                <div className="relative w-full max-w-[800px] px-2 pb-3 lg:px-0 lg:pb-4 xl:mx-0 xl:pb-0">
                   {/* Mac OS Frame around the video */}
                   <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
                     {/* Browser chrome bar */}
