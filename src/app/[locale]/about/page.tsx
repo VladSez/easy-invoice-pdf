@@ -1,5 +1,5 @@
-import { GithubIcon } from "@/components/etc/github-logo";
 // import { ProjectLogo } from "@/components/etc/project-logo";
+import { GithubIcon } from "@/components/etc/github-logo";
 import { Footer } from "@/components/footer";
 import {
   BlackGoToAppButton,
@@ -7,7 +7,6 @@ import {
 } from "@/components/go-to-app-button-cta";
 import { Button } from "@/components/ui/button";
 
-import { BlackAnimatedGoToAppBtn } from "@/components/animated-go-to-app-btn";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Video } from "@/components/video";
 import {
@@ -23,12 +22,8 @@ import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { type Graph } from "schema-dts";
-import { LanguageSwitcher } from "./components/language-switcher";
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
-import { GithubStarCtaMarketingPageHeader } from "@/app/[locale]/about/components/github-star-cta-header";
-import { FinalProjectLogo } from "@/components/etc/final-project-logo";
-import { ProjectLogoDescription } from "@/components/project-logo-description";
-// import { ProjectLogoDescription } from "@/components/project-logo-description";
+import { Header } from "./components/header";
 
 // statically generate the pages for all locales
 export function generateStaticParams() {
@@ -52,6 +47,20 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const newsletterErrorMessage = tNewsletter("error");
   const newsletterEmailLanguageInfo = tNewsletter("emailLanguageInfo");
 
+  const navLinks = {
+    features: t("footer.links.features"),
+    faq: "FAQ",
+    github: t("footer.links.github"),
+    githubUrl: GITHUB_URL,
+  };
+
+  const switchLanguageText = t("buttons.switchLanguage");
+  const goToAppText = t("buttons.goToApp");
+
+  const startInvoicingButtonText = t("buttons.startInvoicing");
+
+  const changelogLinkText = t("footer.links.changelog");
+
   return (
     <TooltipProvider>
       <script
@@ -62,7 +71,17 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
         }}
       />
       <div className="flex min-h-screen flex-col bg-slate-50">
-        <Header locale={locale} />
+        <Header
+          locale={locale}
+          // we need to pass the translations to the header to avoid stale translations issue during language switching
+          translations={{
+            navLinks,
+            switchLanguageText,
+            goToAppText,
+            startInvoicingButtonText,
+            changelogLinkText,
+          }}
+        />
         <main>
           <HeroSection />
           <FeaturesSection />
@@ -148,36 +167,6 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
   );
 }
 
-function Header({ locale }: { locale: Locale }) {
-  const t = useTranslations("About.buttons");
-
-  return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
-      <div className="flex items-center justify-center">
-        <div className="container h-auto px-4 py-2 sm:h-16 sm:py-0 md:px-6">
-          <div className="flex h-full flex-row flex-wrap items-center justify-between gap-2">
-            <div className="w-[53%] sm:w-auto">
-              <Logo />
-            </div>
-            <div className="flex items-center sm:mt-0 sm:gap-2">
-              {/** show only on desktop */}
-              <div className="hidden sm:block">
-                <GithubStarCtaMarketingPageHeader />
-              </div>
-              <LanguageSwitcher
-                locale={locale}
-                buttonText={t("switchLanguage")}
-              />
-
-              <BlackAnimatedGoToAppBtn>{t("goToApp")}</BlackAnimatedGoToAppBtn>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-}
-
 function HeroSection() {
   const t = useTranslations("About");
 
@@ -257,7 +246,7 @@ function HeroSection() {
               <div className="relative aspect-video w-full">
                 <Video
                   src={VIDEO_DEMO_URL}
-                  fallbackImg={VIDEO_DEMO_FALLBACK_IMG}
+                  posterImg={VIDEO_DEMO_FALLBACK_IMG}
                   testId="hero-about-page-video"
                 />
               </div>
@@ -342,7 +331,7 @@ function FeaturesSection() {
                     <div className="relative aspect-[16.6/8.9] h-full w-full lg:aspect-[16.99/9.1]">
                       <Video
                         src={feature.videoSrc}
-                        fallbackImg={feature.videoFallbackImg}
+                        posterImg={feature.videoFallbackImg}
                         testId={`${feature.translationKey}-demo-video`}
                       />
                     </div>
@@ -481,36 +470,6 @@ function CtaSection() {
         </div>
       </div>
     </section>
-  );
-}
-
-function Logo() {
-  const t = useTranslations("About");
-
-  return (
-    <div>
-      <div className="flex items-center gap-1.5 md:gap-2">
-        <FinalProjectLogo className="size-6 md:size-7" />
-
-        {/* show app logo and description on desktop */}
-        <div className="hidden sm:block">
-          <ProjectLogoDescription>{t("tagline")}</ProjectLogoDescription>
-        </div>
-
-        {/* show only app name on mobile (to save space) */}
-        <div className="block sm:hidden">
-          <p className="text-balance text-center text-xl font-bold text-zinc-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
-            <a
-              href="https://easyinvoicepdf.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              EasyInvoicePDF
-            </a>
-          </p>
-        </div>
-      </div>
-    </div>
   );
 }
 

@@ -4,6 +4,10 @@
 
 html {
   scroll-behavior: smooth;
+  /* Reserve space for scrollbar to prevent layout shift when content overflows.
+     Without this, the page width changes when scrollbar appears/disappears,
+     causing horizontal content jumps. 'stable' ensures consistent layout. */
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -55,6 +59,12 @@ body {
     --radius: 0.5rem;
   }
 
+  /* Custom text selection styling
+   * ::selection targets text highlighted by the user
+   * background-color: Sets the highlight color to brand purple (rgba(125, 91, 255))
+   * color: Sets the selected text color to white (#ffffff) for contrast
+   * This creates a branded selection experience across the entire site
+   */
   ::selection {
     background-color: rgba(125, 91, 255);
     color: #ffffff;

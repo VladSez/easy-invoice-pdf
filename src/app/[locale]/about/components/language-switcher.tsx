@@ -38,11 +38,13 @@ type LanguageLabel = (typeof MAP_LOCALE_TO_LANGUAGE)[SupportedLocale];
 interface LanguageSwitcherProps {
   locale: SupportedLocale;
   buttonText: string;
+  onSelect?: () => void;
 }
 
 export function LanguageSwitcher({
   locale,
   buttonText,
+  onSelect,
 }: LanguageSwitcherProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -82,6 +84,7 @@ export function LanguageSwitcher({
             <DropdownMenuItem
               key={itemLocale}
               onClick={() => {
+                onSelect?.();
                 startTransition(() => {
                   const pathnameWithoutLocale = pathname.replace(
                     `/${locale}`,
