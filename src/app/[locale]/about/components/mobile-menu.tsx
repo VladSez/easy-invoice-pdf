@@ -77,7 +77,7 @@ export function MobileMenu({
           </div>
         </header>
 
-        <nav className="container flex flex-col gap-1 px-6 py-6">
+        <nav className="container flex flex-col gap-1 px-6 py-4 md:px-10">
           <SheetClose asChild>
             <a
               href="#features"

@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Video } from "@/components/video";
+import { AutoPlayVideo, ManualPlayVideo } from "@/components/video";
 import {
   GITHUB_URL,
   MARKETING_FEATURES_CARDS,
@@ -193,11 +193,29 @@ function HeroSection() {
               <div className="flex justify-center xl:justify-start">
                 <p className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
                   {t.rich("hero.description", {
-                    span: (chunks) => (
-                      <span className="bg-yellow-300 px-0.5 font-bold text-slate-900 dark:bg-yellow-600">
-                        {chunks}
-                      </span>
-                    ),
+                    span: (chunks) => {
+                      const colors = [
+                        "bg-yellow-300 dark:bg-yellow-600 text-slate-900 dark:text-slate-900",
+                        "bg-blue-500 dark:bg-blue-500 text-white dark:text-white",
+                        "bg-green-400 dark:bg-green-500 text-slate-900 dark:text-white",
+                        "bg-purple-500 dark:bg-purple-500 text-white dark:text-white",
+                      ] as const;
+
+                      // Generate a random index to select a highlight color from the colors array
+                      const colorIndex = Math.floor(
+                        Math.random() * colors.length,
+                      );
+
+                      // Retrieve the color class string at the randomly selected index
+                      // This will be one of: yellow, blue, green, or purple background variants
+                      const color = colors[colorIndex];
+
+                      return (
+                        <span className={`${color} px-0.5 font-bold`}>
+                          {chunks}
+                        </span>
+                      );
+                    },
                   })}
                 </p>
               </div>
@@ -244,10 +262,11 @@ function HeroSection() {
               </div>
               {/* Video container */}
               <div className="relative aspect-video w-full">
-                <Video
+                <AutoPlayVideo
                   src={VIDEO_DEMO_URL}
                   posterImg={VIDEO_DEMO_FALLBACK_IMG}
                   testId="hero-about-page-video"
+                  description="How to create an invoice and download it as a PDF in Easy Invoice"
                 />
               </div>
             </div>
@@ -304,7 +323,7 @@ function FeaturesSection() {
                 )}
               >
                 {/* text content */}
-                <div className="mb-[-5px] flex-1 px-8 pt-6 md:pt-7 xl:mb-0 xl:py-4">
+                <div className="mb-[-5px] max-w-[700px] flex-1 px-8 pt-6 md:pt-7 xl:mb-0 xl:py-4">
                   <h3 className="text-balance pb-4 text-xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-2xl">
                     {title}
                   </h3>
@@ -329,9 +348,20 @@ function FeaturesSection() {
                     </div>
                     {/* Video container */}
                     <div className="relative aspect-[16.6/8.9] h-full w-full lg:aspect-[16.99/9.1]">
-                      <Video
+                      {/* Auto play video for desktop */}
+                      <AutoPlayVideo
+                        className="hidden xl:block"
                         src={feature.videoSrc}
                         posterImg={feature.videoFallbackImg}
+                        description={feature.videoDescription}
+                        testId={`${feature.translationKey}-demo-video`}
+                      />
+                      {/* Manual play video for mobile for better UX */}
+                      <ManualPlayVideo
+                        className="xl:hidden"
+                        src={feature.videoSrc}
+                        posterImg={feature.videoFallbackImg}
+                        description={feature.videoDescription}
                         testId={`${feature.translationKey}-demo-video`}
                       />
                     </div>

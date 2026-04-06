@@ -4,10 +4,6 @@
 
 html {
   scroll-behavior: smooth;
-  /* Reserve space for scrollbar to prevent layout shift when content overflows.
-     Without this, the page width changes when scrollbar appears/disappears,
-     causing horizontal content jumps. 'stable' ensures consistent layout. */
-  scrollbar-gutter: stable;
 }
 
 body {
