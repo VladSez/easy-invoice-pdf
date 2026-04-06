@@ -6,7 +6,6 @@ const config: KnipConfig = {
     "shadcn",
     "@radix-ui/react-separator",
     "@types/ua-parser-js",
-    "cmdk",
     "eslint-plugin-react-hooks",
     "file-saver",
     "jszip",

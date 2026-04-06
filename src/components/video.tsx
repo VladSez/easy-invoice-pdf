@@ -174,10 +174,24 @@ export function ManualPlayVideo({
   testId = "",
   ...props
 }: ManualPlayVideoProps) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const descriptionID = useId();
   const videoId = useId();
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const { ref: inViewRef, inView } = useInView({ threshold: 0.3 });
+
+  // Effect: Pauses video when it scrolls out of view
+  // This prevents videos from playing audio/consuming resources when not visible
+  // Only triggers when video is currently playing to avoid unnecessary operations
+  useEffect(() => {
+    if (!inView && isPlaying) {
+      videoRef.current?.pause();
+      setIsPlaying(false);
+    }
+  }, [inView, isPlaying]);
 
   // Effect: Ensures only one video plays at a time across the page
   // When any video starts playing, it dispatches a "video-play" event with its unique ID.
@@ -215,6 +229,7 @@ export function ManualPlayVideo({
 
   return (
     <div
+      ref={inViewRef}
       className={cn("absolute left-0 top-0 h-full w-full", className)}
       {...props}
     >

@@ -71,6 +71,7 @@ export function Header({ locale, translations }: HeaderProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                  aria-label="View on GitHub"
                 >
                   <GithubIcon className="size-4" />
                   {translations.navLinks.github}

@@ -108,6 +108,7 @@ export function MobileMenu({
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 rounded-lg px-4 py-4 text-lg font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              aria-label="View on GitHub"
             >
               <GithubIcon className="size-5" />
               {translations.navLinks.github}
@@ -115,12 +116,12 @@ export function MobileMenu({
           </SheetClose>
 
           {/* Start Invoicing CTA Button */}
-          <div className="pt-2" onClick={() => onOpenChange(false)}>
+          <div className="w-fit pt-2" onClick={() => onOpenChange(false)}>
             <Button
               size="lg"
               variant="outline"
               className={
-                "group relative overflow-hidden bg-zinc-900 px-3 text-white transition-all duration-300 hover:scale-[1.02] hover:bg-zinc-800 hover:text-white active:scale-[0.98] sm:px-8"
+                "group relative overflow-hidden bg-zinc-900 px-5 py-6 text-lg text-white transition-all duration-300 hover:scale-[1.02] hover:bg-zinc-800 hover:text-white active:scale-[0.98] sm:px-8"
               }
               asChild
             >
@@ -129,7 +130,7 @@ export function MobileMenu({
                 scroll={false}
                 className="flex items-center"
               >
-                <ArrowRightIcon className="mr-2 size-5 group-hover:scale-110" />
+                <ArrowRightIcon className="mr-2 size-6 group-hover:scale-110" />
 
                 {translations.startInvoicingButtonText}
               </Link>
