@@ -1,13 +1,13 @@
-import {
-  GITHUB_URL,
-  TWITTER_URL,
-  VIDEO_DEMO_FALLBACK_IMG,
-  VIDEO_DEMO_URL,
-} from "@/config";
+/* eslint-disable playwright/no-conditional-expect */
+/* eslint-disable playwright/no-conditional-in-test */
+import { GITHUB_URL, TWITTER_URL, VIDEO_DEMO_FALLBACK_IMG } from "@/config";
 import { expect, test } from "@playwright/test";
 
 test.describe("About page", () => {
-  test("should display about page content in English", async ({ page }) => {
+  test("should display about page content in English", async ({
+    page,
+    isMobile,
+  }) => {
     await page.goto("/en/about");
 
     // Verify the page is loaded
@@ -21,11 +21,59 @@ test.describe("About page", () => {
 
     /* CHECK HEADER ELEMENTS */
 
-    // Check language switcher button in header
-    const languageSwitcher = header.getByRole("button", {
-      name: "Switch language",
-    });
-    await expect(languageSwitcher).toBeVisible();
+    if (isMobile) {
+      // Mobile: burger button visible, nav links and language switcher hidden in header
+      await expect(
+        header.getByRole("button", { name: "Open menu" }),
+      ).toBeVisible();
+
+      await expect(
+        header.getByRole("button", { name: "Switch language" }),
+      ).toBeHidden();
+
+      await expect(
+        header.getByRole("link", { name: "Features", exact: true }),
+      ).toBeHidden();
+    } else {
+      // Desktop: nav links and language switcher visible inline, burger button hidden
+      await expect(
+        header.getByRole("button", { name: "Switch language" }),
+      ).toBeVisible();
+
+      const featuresLink = header.getByRole("link", {
+        name: "Features",
+        exact: true,
+      });
+
+      await expect(featuresLink).toBeVisible();
+      await expect(featuresLink).toHaveAttribute("href", "#features");
+
+      const faqLink = header.getByRole("link", { name: "FAQ", exact: true });
+
+      await expect(faqLink).toBeVisible();
+      await expect(faqLink).toHaveAttribute("href", "#faq");
+
+      const changelogLink = header.getByRole("link", {
+        name: "Changelog",
+        exact: true,
+      });
+
+      await expect(changelogLink).toBeVisible();
+      await expect(changelogLink).toHaveAttribute("href", "/changelog");
+
+      const githubLink = header.getByRole("link", {
+        name: "View on GitHub",
+        exact: true,
+      });
+
+      await expect(githubLink).toBeVisible();
+      await expect(githubLink).toHaveAttribute("href", GITHUB_URL);
+
+      // hidden on desktop
+      await expect(
+        header.getByRole("button", { name: "Open menu" }),
+      ).toBeHidden();
+    }
 
     // check app link button in header
     await expect(
@@ -64,15 +112,7 @@ test.describe("About page", () => {
     await expect(video).toHaveAttribute("muted");
     await expect(video).toHaveAttribute("loop");
     await expect(video).toHaveAttribute("playsinline");
-    await expect(video).toHaveAttribute("preload", "auto");
-    await expect(video).toHaveAttribute("autoplay");
-
-    const videoSource = video.locator("source");
-    await expect(videoSource).toHaveAttribute(
-      "src",
-      `${VIDEO_DEMO_URL}#t=0.001`,
-    );
-    await expect(videoSource).toHaveAttribute("type", "video/mp4");
+    await expect(video).toHaveAttribute("preload", "none");
 
     // Check Features section
     const featuresSection = page.locator("#features");
@@ -335,25 +375,30 @@ test.describe("About page", () => {
     ).toBeVisible();
   });
 
-  test("should handle language switching", async ({ page }) => {
+  test("should handle language switching", async ({ page, isMobile }) => {
     // Start with English
     await page.goto("/en/about");
     await expect(page).toHaveURL("/en/about");
 
-    // Switch to French
+    // On mobile, open the mobile menu first
+    if (isMobile) await page.getByRole("button", { name: "Open menu" }).click();
+
+    // Then switch to French
     await page
       .getByRole("button", { name: "Switch language", exact: true })
       .click();
     await page.getByText("Français").click();
 
+    await expect(page).toHaveURL("/fr/about");
+
     const header = page.getByRole("banner");
+
     await expect(
       header.getByRole("link", {
         name: "Ouvrir",
         exact: true,
       }),
     ).toBeVisible();
-    await expect(page).toHaveURL("/fr/about");
   });
 
   test("should navigate to app when clicking Go to App button", async ({
@@ -372,5 +417,106 @@ test.describe("About page", () => {
 
     await headerGoToAppButton.click();
     await expect(page).toHaveURL("/?template=default");
+  });
+
+  test("should show desktop nav links in header (ON MOBILE TEST WILL BE SKIPPED)", async ({
+    page,
+    isMobile,
+  }) => {
+    // skip test on mobile
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(isMobile, "Desktop nav only exists on desktop viewport");
+
+    await page.goto("/en/about");
+
+    const header = page.getByRole("banner");
+
+    await expect(
+      header.getByRole("link", { name: "Features", exact: true }),
+    ).toBeVisible();
+
+    await expect(
+      header.getByRole("link", { name: "FAQ", exact: true }),
+    ).toBeVisible();
+
+    await expect(
+      header.getByRole("link", { name: "Changelog", exact: true }),
+    ).toBeVisible();
+
+    await expect(
+      header.getByRole("link", { name: "View on GitHub", exact: true }),
+    ).toBeVisible();
+
+    await expect(
+      header.getByRole("button", { name: "Switch language" }),
+    ).toBeVisible();
+
+    // hidden on desktop
+    await expect(
+      header.getByRole("button", { name: "Open menu" }),
+    ).toBeHidden();
+  });
+
+  test("should show mobile menu with nav links and language switcher (ON DESKTOP TEST WILL BE SKIPPED)", async ({
+    page,
+    isMobile,
+  }) => {
+    // skip test on desktop
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(!isMobile, "Mobile menu only exists on mobile viewport");
+
+    await page.goto("/en/about");
+
+    const header = page.getByRole("banner");
+    const burgerButton = header.getByRole("button", { name: "Open menu" });
+
+    // Burger button visible on MOBILE, nav links and language switcher not visible in header
+    await expect(burgerButton).toBeVisible();
+
+    await expect(
+      header.getByRole("link", { name: "Features", exact: true }),
+    ).toBeHidden();
+
+    await expect(
+      header.getByRole("button", { name: "Switch language" }),
+    ).toBeHidden();
+
+    // Open the mobile menu
+    await burgerButton.click();
+
+    const sheet = page.getByRole("dialog", { name: "Mobile Menu" });
+
+    const featuresLink = sheet.getByRole("link", {
+      name: "Features",
+      exact: true,
+    });
+    await expect(featuresLink).toBeVisible();
+    await expect(featuresLink).toHaveAttribute("href", "#features");
+
+    const faqLink = sheet.getByRole("link", { name: "FAQ", exact: true });
+    await expect(faqLink).toBeVisible();
+    await expect(faqLink).toHaveAttribute("href", "#faq");
+
+    const changelogLink = sheet.getByRole("link", {
+      name: "Changelog",
+      exact: true,
+    });
+    await expect(changelogLink).toBeVisible();
+    await expect(changelogLink).toHaveAttribute("href", "/changelog");
+
+    const githubLink = sheet.getByRole("link", {
+      name: "View on GitHub",
+      exact: true,
+    });
+    await expect(githubLink).toBeVisible();
+    await expect(githubLink).toHaveAttribute("href", GITHUB_URL);
+
+    await expect(
+      sheet.getByRole("button", { name: "Switch language" }),
+    ).toBeVisible();
+
+    // Close the menu and verify burger button is accessible again
+    await sheet.getByRole("button", { name: "Close menu" }).click();
+    await expect(burgerButton).toBeVisible();
   });
 });

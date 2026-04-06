@@ -1,5 +1,5 @@
-import { GithubIcon } from "@/components/etc/github-logo";
 // import { ProjectLogo } from "@/components/etc/project-logo";
+import { GithubIcon } from "@/components/etc/github-logo";
 import { Footer } from "@/components/footer";
 import {
   BlackGoToAppButton,
@@ -7,9 +7,8 @@ import {
 } from "@/components/go-to-app-button-cta";
 import { Button } from "@/components/ui/button";
 
-import { BlackAnimatedGoToAppBtn } from "@/components/animated-go-to-app-btn";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Video } from "@/components/video";
+import { AutoPlayVideo, ManualPlayVideo } from "@/components/video";
 import {
   GITHUB_URL,
   MARKETING_FEATURES_CARDS,
@@ -23,12 +22,8 @@ import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { type Graph } from "schema-dts";
-import { LanguageSwitcher } from "./components/language-switcher";
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
-import { GithubStarCtaMarketingPageHeader } from "@/app/[locale]/about/components/github-star-cta-header";
-import { FinalProjectLogo } from "@/components/etc/final-project-logo";
-import { ProjectLogoDescription } from "@/components/project-logo-description";
-// import { ProjectLogoDescription } from "@/components/project-logo-description";
+import { Header } from "./components/header";
 
 // statically generate the pages for all locales
 export function generateStaticParams() {
@@ -52,6 +47,20 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const newsletterErrorMessage = tNewsletter("error");
   const newsletterEmailLanguageInfo = tNewsletter("emailLanguageInfo");
 
+  const navLinks = {
+    features: t("footer.links.features"),
+    faq: "FAQ",
+    github: t("footer.links.github"),
+    githubUrl: GITHUB_URL,
+  };
+
+  const switchLanguageText = t("buttons.switchLanguage");
+  const goToAppText = t("buttons.goToApp");
+
+  const startInvoicingButtonText = t("buttons.startInvoicing");
+
+  const changelogLinkText = t("footer.links.changelog");
+
   return (
     <TooltipProvider>
       <script
@@ -62,7 +71,17 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
         }}
       />
       <div className="flex min-h-screen flex-col bg-slate-50">
-        <Header locale={locale} />
+        <Header
+          locale={locale}
+          // we need to pass the translations to the header to avoid stale translations issue during language switching
+          translations={{
+            navLinks,
+            switchLanguageText,
+            goToAppText,
+            startInvoicingButtonText,
+            changelogLinkText,
+          }}
+        />
         <main>
           <HeroSection />
           <FeaturesSection />
@@ -148,36 +167,6 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
   );
 }
 
-function Header({ locale }: { locale: Locale }) {
-  const t = useTranslations("About.buttons");
-
-  return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
-      <div className="flex items-center justify-center">
-        <div className="container h-auto px-4 py-2 sm:h-16 sm:py-0 md:px-6">
-          <div className="flex h-full flex-row flex-wrap items-center justify-between gap-2">
-            <div className="w-[53%] sm:w-auto">
-              <Logo />
-            </div>
-            <div className="flex items-center sm:mt-0 sm:gap-2">
-              {/** show only on desktop */}
-              <div className="hidden sm:block">
-                <GithubStarCtaMarketingPageHeader />
-              </div>
-              <LanguageSwitcher
-                locale={locale}
-                buttonText={t("switchLanguage")}
-              />
-
-              <BlackAnimatedGoToAppBtn>{t("goToApp")}</BlackAnimatedGoToAppBtn>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-}
-
 function HeroSection() {
   const t = useTranslations("About");
 
@@ -203,13 +192,31 @@ function HeroSection() {
 
               <div className="flex justify-center xl:justify-start">
                 <p className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
-                  {t.rich("hero.description", {
-                    span: (chunks) => (
-                      <span className="bg-yellow-300 px-0.5 font-bold text-slate-900 dark:bg-yellow-600">
-                        {chunks}
-                      </span>
-                    ),
-                  })}
+                  {(() => {
+                    let colorIndex = 0;
+
+                    return t.rich("hero.description", {
+                      span: (chunks) => {
+                        const colors = [
+                          "bg-yellow-300 dark:bg-yellow-600 text-slate-900 dark:text-slate-900",
+                          "bg-blue-500 dark:bg-blue-500 text-white dark:text-white",
+                          "bg-purple-500 dark:bg-purple-500 text-white dark:text-white",
+                        ] as const;
+
+                        // Get the current color from the array using modulo to cycle through colors
+                        // colorIndex starts at 0 and increments with each <span> element
+                        const color = colors[colorIndex % colors.length];
+                        // Increment for the next span element
+                        colorIndex++;
+
+                        return (
+                          <span className={`${color} px-0.5 font-bold`}>
+                            {chunks}
+                          </span>
+                        );
+                      },
+                    });
+                  })()}
                 </p>
               </div>
             </div>
@@ -255,10 +262,11 @@ function HeroSection() {
               </div>
               {/* Video container */}
               <div className="relative aspect-video w-full">
-                <Video
+                <AutoPlayVideo
                   src={VIDEO_DEMO_URL}
-                  fallbackImg={VIDEO_DEMO_FALLBACK_IMG}
+                  posterImg={VIDEO_DEMO_FALLBACK_IMG}
                   testId="hero-about-page-video"
+                  description="How to create an invoice and download it as a PDF in Easy Invoice"
                 />
               </div>
             </div>
@@ -278,7 +286,7 @@ function FeaturesSection() {
       id="features"
       className="mt-6 flex w-full items-center justify-center bg-slate-50 py-4 lg:py-8 xl:mt-16 xl:py-16"
     >
-      <div className="container">
+      <div className="container lg:max-w-[53rem] xl:max-w-[1280px] 2xl:max-w-[1536px]">
         {/* Features section title and description */}
         <div className="flex flex-col items-center justify-center space-y-8 px-4 text-center md:px-6">
           <div className="space-y-5">
@@ -314,7 +322,8 @@ function FeaturesSection() {
                   isEven ? "xl:flex-row" : "xl:flex-row-reverse", // swap the video and text content for even index
                 )}
               >
-                <div className="mb-[-5px] flex-1 px-8 pt-6 xl:mb-0 xl:py-4">
+                {/* text content */}
+                <div className="mb-[-5px] max-w-[700px] flex-1 px-8 pt-6 md:pt-7 xl:mb-0 xl:py-4">
                   <h3 className="text-balance pb-4 text-xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-2xl">
                     {title}
                   </h3>
@@ -323,7 +332,8 @@ function FeaturesSection() {
                   </p>
                 </div>
 
-                <div className="relative w-full max-w-[800px] px-2 pb-3 lg:p-0 xl:mx-0">
+                {/* video container */}
+                <div className="relative w-full max-w-[800px] px-2 pb-3 lg:px-0 lg:pb-4 xl:mx-0 xl:pb-0">
                   {/* Mac OS Frame around the video */}
                   <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
                     {/* Browser chrome bar */}
@@ -338,9 +348,20 @@ function FeaturesSection() {
                     </div>
                     {/* Video container */}
                     <div className="relative aspect-[16.6/8.9] h-full w-full lg:aspect-[16.99/9.1]">
-                      <Video
+                      {/* Auto play video for desktop */}
+                      <AutoPlayVideo
+                        className="hidden xl:block"
                         src={feature.videoSrc}
-                        fallbackImg={feature.videoFallbackImg}
+                        posterImg={feature.videoFallbackImg}
+                        description={feature.videoDescription}
+                        testId={`${feature.translationKey}-demo-video`}
+                      />
+                      {/* Manual play video for mobile for better UX */}
+                      <ManualPlayVideo
+                        className="xl:hidden"
+                        src={feature.videoSrc}
+                        posterImg={feature.videoFallbackImg}
+                        description={feature.videoDescription}
                         testId={`${feature.translationKey}-demo-video`}
                       />
                     </div>
@@ -479,36 +500,6 @@ function CtaSection() {
         </div>
       </div>
     </section>
-  );
-}
-
-function Logo() {
-  const t = useTranslations("About");
-
-  return (
-    <div>
-      <div className="flex items-center gap-1.5 md:gap-2">
-        <FinalProjectLogo className="size-6 md:size-7" />
-
-        {/* show app logo and description on desktop */}
-        <div className="hidden sm:block">
-          <ProjectLogoDescription>{t("tagline")}</ProjectLogoDescription>
-        </div>
-
-        {/* show only app name on mobile (to save space) */}
-        <div className="block sm:hidden">
-          <p className="text-balance text-center text-xl font-bold text-zinc-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
-            <a
-              href="https://easyinvoicepdf.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              EasyInvoicePDF
-            </a>
-          </p>
-        </div>
-      </div>
-    </div>
   );
 }
 

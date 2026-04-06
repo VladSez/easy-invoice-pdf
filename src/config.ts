@@ -40,41 +40,43 @@ export const MARKETING_FEATURES_CARDS = [
     translationKey: "livePreview",
     videoSrc: `${STATIC_ASSETS_URL}/demo-videos/live-preview-v1.mp4`,
     videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/live-preview-fallback-v1.png`,
+    videoDescription: "Live preview of the invoice as you make changes",
   },
   {
     translationKey: "instantDownload",
     videoSrc: `${STATIC_ASSETS_URL}/demo-videos/instand-download-v1.mp4`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/instant-download-fallback-v1.png`,
+    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/instant-download-fallback-04-03-2026.png`,
+    videoDescription: "Instant download of the invoice as a PDF file",
   },
   {
     translationKey: "shareableLinks",
     videoSrc: `${STATIC_ASSETS_URL}/demo-videos/share-invoice-v1.mp4`,
     videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/share-invoice-fallback-v1.png`,
+    videoDescription: "Shareable links to your invoice",
   },
   {
     translationKey: "taxSupport",
     videoSrc: `${STATIC_ASSETS_URL}/demo-videos/tax-custom-v1.mp4`,
     videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/tax-custom-fallback-v1.png`,
+    videoDescription: "Customizable tax system support",
   },
   {
     translationKey: "multiLanguage",
     videoSrc: `${STATIC_ASSETS_URL}/demo-videos/multi-lang-v1.mp4`,
     videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/multi-lang-fallback-v1.png`,
+    videoDescription: "Multiple languages and currencies support",
   },
   {
     translationKey: "openSource",
     videoSrc: `${STATIC_ASSETS_URL}/demo-videos/open-source-v1.mp4`,
     videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/open-source-fallback-v1.png`,
-  },
-  {
-    translationKey: "qrCodeMultiPDFpageSupport",
-    videoSrc: `${STATIC_ASSETS_URL}/demo-videos/qr-code-and-multi-page-pdf-v1.mp4`,
-    videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/qr-code-fallback-img-v1.png`,
+    videoDescription: "Open source invoice generator",
   },
 ] as const satisfies {
   translationKey: string;
   videoSrc: string;
   videoFallbackImg: string;
+  videoDescription: string;
 }[];
 
 /**
