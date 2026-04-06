@@ -192,31 +192,31 @@ function HeroSection() {
 
               <div className="flex justify-center xl:justify-start">
                 <p className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
-                  {t.rich("hero.description", {
-                    span: (chunks) => {
-                      const colors = [
-                        "bg-yellow-300 dark:bg-yellow-600 text-slate-900 dark:text-slate-900",
-                        "bg-blue-500 dark:bg-blue-500 text-white dark:text-white",
-                        "bg-green-400 dark:bg-green-500 text-slate-900 dark:text-white",
-                        "bg-purple-500 dark:bg-purple-500 text-white dark:text-white",
-                      ] as const;
+                  {(() => {
+                    let colorIndex = 0;
 
-                      // Generate a random index to select a highlight color from the colors array
-                      const colorIndex = Math.floor(
-                        Math.random() * colors.length,
-                      );
+                    return t.rich("hero.description", {
+                      span: (chunks) => {
+                        const colors = [
+                          "bg-yellow-300 dark:bg-yellow-600 text-slate-900 dark:text-slate-900",
+                          "bg-blue-500 dark:bg-blue-500 text-white dark:text-white",
+                          "bg-purple-500 dark:bg-purple-500 text-white dark:text-white",
+                        ] as const;
 
-                      // Retrieve the color class string at the randomly selected index
-                      // This will be one of: yellow, blue, green, or purple background variants
-                      const color = colors[colorIndex];
+                        // Get the current color from the array using modulo to cycle through colors
+                        // colorIndex starts at 0 and increments with each <span> element
+                        const color = colors[colorIndex % colors.length];
+                        // Increment for the next span element
+                        colorIndex++;
 
-                      return (
-                        <span className={`${color} px-0.5 font-bold`}>
-                          {chunks}
-                        </span>
-                      );
-                    },
-                  })}
+                        return (
+                          <span className={`${color} px-0.5 font-bold`}>
+                            {chunks}
+                          </span>
+                        );
+                      },
+                    });
+                  })()}
                 </p>
               </div>
             </div>
