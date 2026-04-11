@@ -179,7 +179,7 @@ export function InvoicePageHeader({
             ) : null} */}
         </div>
       </div>
-      <div className="mb-3 mt-1 flex flex-row items-center justify-center lg:mb-0 lg:mt-4 lg:justify-start xl:mt-1">
+      <div className="mb-2.5 flex flex-row items-center justify-center lg:-mb-1.5 lg:mt-4 lg:justify-start xl:mt-1">
         <ProjectInfoLinks />
       </div>
 
@@ -199,6 +199,10 @@ export function InvoicePageHeader({
   );
 }
 
+/**
+ * Renders project information links including demo video, feedback, and GitHub links.
+ * Manages video dialog state for the "How it works" demo.
+ */
 function ProjectInfoLinks() {
   const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
 
@@ -209,31 +213,33 @@ function ProjectInfoLinks() {
 
   return (
     <>
-      <div className="relative bottom-0 flex flex-wrap items-center justify-center gap-1 text-center text-sm text-gray-900 lg:bottom-3">
+      <div className="relative bottom-0 flex flex-wrap items-center justify-center gap-1.5 text-center text-sm text-gray-900 lg:bottom-4">
         <button
           onClick={handleWatchDemoClick}
-          className="inline-flex items-center gap-1.5 transition-colors hover:text-blue-600 hover:underline"
+          className="inline-flex cursor-pointer items-center transition duration-200 hover:text-blue-600 hover:underline active:scale-[0.96]"
         >
-          <span>How it works</span>
+          How it works
         </button>
-        {" | "}
+        <span className="h-3 w-px bg-slate-500" aria-hidden="true" />
         <a
           href="https://dub.sh/easy-invoice-pdf-feedback"
-          className="transition-colors hover:text-blue-600 hover:underline"
+          className="inline-flex items-center transition duration-200 hover:text-blue-600 hover:underline active:scale-[0.96]"
           target="_blank"
         >
           Share your feedback
         </a>
-        {" | "}
+        <span className="h-3 w-px bg-slate-500" aria-hidden="true" />
 
         <a
           href={GITHUB_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="group inline-flex items-center gap-1 transition-colors hover:text-blue-600 hover:underline"
+          className="group inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-900 shadow-sm transition-[colors,transform,border-color] duration-200 hover:border-blue-300 hover:text-blue-600 active:scale-[0.96]"
         >
-          <GithubIcon className="size-4 transition-transform group-hover:fill-blue-600" />
-          <span className="group-hover:text-blue-600">View on GitHub</span>
+          <GithubIcon className="size-4 transition-[transform,fill] duration-200 group-hover:scale-105 group-hover:fill-blue-600" />
+          <span className="transition-colors duration-200 group-hover:text-blue-600">
+            View on GitHub
+          </span>
         </a>
       </div>
 

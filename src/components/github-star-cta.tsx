@@ -23,28 +23,31 @@ export function GitHubStarCTA({
           href={GITHUB_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="relative flex items-center gap-2 overflow-visible rounded-full border border-slate-300/70 bg-white px-3 py-1.5 text-sm shadow-sm transition-colors hover:border-slate-400/50 hover:bg-slate-50 hover:text-black"
+          className="group relative inline-flex h-9 items-center overflow-hidden rounded-lg bg-slate-900 text-sm font-medium text-white shadow-sm shadow-black/5 transition-[transform,background-color] duration-200 ease-out hover:bg-slate-900/90 active:scale-[0.96]"
           onClick={handleStarClick}
           aria-label="Star project on GitHub"
           data-testid="github-star-cta-button"
         >
-          <div className="border-glow-mask z-10" aria-hidden="true">
-            <div className="border-glow-shine animate-rotate-shine" />
-          </div>
-          <GithubIcon className="size-4 transition-all duration-300 ease-in-out" />
-          {githubStarsCount > 0 ? (
-            <span className="inline-flex items-center">
-              <CountUpNumber number={githubStarsCount} />
+          <span className="flex items-center gap-1.5 px-4">
+            <span className="relative size-4">
+              <GithubIcon className="absolute inset-0 size-4 fill-white transition-[opacity,transform,filter] duration-200 ease-out group-hover:scale-75 group-hover:opacity-0 group-hover:blur-[4px]" />
+              <Star className="absolute inset-0 size-4 scale-[0.25] fill-yellow-400 text-yellow-400 opacity-0 blur-[4px] transition-[opacity,transform,filter] duration-200 ease-out group-hover:scale-100 group-hover:opacity-100 group-hover:blur-0" />
             </span>
-          ) : (
-            "View on GitHub"
-          )}
+            {githubStarsCount > 0 ? (
+              <>
+                <span className="h-3.5 w-px bg-white/25" aria-hidden="true" />
+                <CountUpNumber number={githubStarsCount} />
+              </>
+            ) : (
+              <span>Star on GitHub</span>
+            )}
+          </span>
         </a>
       </TooltipTrigger>
       <TooltipContent>
         <p className="flex items-center gap-1.5">
           <Star className="size-4 fill-yellow-400 text-yellow-500" />
-          Give us a star on GitHub
+          Star on GitHub
         </p>
       </TooltipContent>
     </Tooltip>

@@ -160,7 +160,7 @@ function Header() {
             </div>
             <div className="flex items-center sm:mt-0 sm:gap-2">
               <Button variant="ghost" className="hidden lg:inline-flex" asChild>
-                <Link href="/en/about">About product</Link>
+                <Link href="/en/about">About</Link>
               </Button>
               <Button variant="ghost" className="hidden lg:inline-flex" asChild>
                 <Link

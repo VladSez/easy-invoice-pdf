@@ -786,7 +786,7 @@ export function AppPageClient({
           </ul>
         }
       />
-      <div className="fixed right-2 top-2 z-50 duration-500 animate-in fade-in slide-in-from-top-4">
+      <div className="fixed right-1.5 top-1.5 z-50 duration-500 animate-in fade-in slide-in-from-top-4">
         <GitHubStarCTA githubStarsCount={githubStarsCount} />
       </div>
     </TooltipProvider>

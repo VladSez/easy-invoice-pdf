@@ -12,6 +12,14 @@ import { DateTime } from "./components/date-time";
 export const dynamic = "force-static";
 
 // https://nextjs.org/docs/app/guides/mdx
+
+/**
+ * Changelog page component that displays all changelog entries in a timeline layout.
+ * Fetches and renders changelog entries with dates, titles, and content.
+ * Returns 404 if no entries are found.
+ *
+ * @returns The changelog page with all entries
+ */
 export default async function ChangelogPage() {
   const entries = await getChangelogEntries();
 
@@ -45,6 +53,12 @@ export default async function ChangelogPage() {
   );
 }
 
+/**
+ * Renders a single changelog entry card with date, title, and content.
+ * On desktop, the date is sticky in the left column. On mobile, it appears above the title.
+ *
+ * @param entry - The changelog entry to display
+ */
 function ChangelogEntryCard({ entry }: { entry: ChangelogEntry }) {
   const formattedDate = formatChangelogDate(entry.metadata.date);
 
@@ -70,6 +84,15 @@ function ChangelogEntryCard({ entry }: { entry: ChangelogEntry }) {
             {entry.metadata.title || `Update ${formattedDate}`}
           </h2>
         </Link>
+
+        {/* Version Badge */}
+        {entry.metadata.version ? (
+          <div className="mt-2 flex items-center gap-2">
+            <span className="inline-flex items-center rounded-full border border-slate-300 bg-slate-50 px-2.5 py-1 text-sm font-medium text-slate-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+              v{entry.metadata.version}
+            </span>
+          </div>
+        ) : null}
 
         {/* Article Content */}
         <article
