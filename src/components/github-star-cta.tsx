@@ -23,7 +23,7 @@ export function GitHubStarCTA({
           href={GITHUB_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="group relative inline-flex h-9 items-center overflow-hidden rounded-lg bg-slate-900 text-sm font-medium text-white shadow-sm shadow-black/5 transition-[transform,background-color] duration-200 ease-out hover:bg-slate-900/90 active:scale-[0.96]"
+          className="group relative inline-flex h-9 items-center overflow-hidden rounded-full bg-slate-900 text-sm font-medium text-white shadow-sm shadow-black/5 transition-[transform,background-color] duration-200 ease-out hover:bg-slate-900/90 active:scale-[0.96]"
           onClick={handleStarClick}
           aria-label="Star project on GitHub"
           data-testid="github-star-cta-button"
