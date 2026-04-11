@@ -266,7 +266,7 @@ function HeroSection() {
                   src={VIDEO_DEMO_URL}
                   posterImg={VIDEO_DEMO_FALLBACK_IMG}
                   testId="hero-about-page-video"
-                  description="How to create an invoice and download it as a PDF in Easy Invoice"
+                  description="How to create and download an invoice as a PDF in EasyInvoicePDF.com"
                 />
               </div>
             </div>

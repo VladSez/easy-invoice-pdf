@@ -1,6 +1,8 @@
 <div align="center">
   <!-- source:  .github/screenshots/easy-invoice-logo-readme.png -->
-  <img src="https://github.com/user-attachments/assets/cb9bcc91-b4c8-40b1-b406-bc606c5d9315" alt="EasyInvoicePDF Logo" width="80" height="80">
+  <a href="https://easyinvoicepdf.com/?ref=github">
+    <img src="https://github.com/user-attachments/assets/cb9bcc91-b4c8-40b1-b406-bc606c5d9315" alt="EasyInvoicePDF Logo" width="80" height="80">
+  </a>
   <h1>EasyInvoicePDF</h1>
   <h3>Free & Open-Source Invoice Generator</h3>
   <p>Create professional invoices instantly in your browser with <strong>Live Preview</strong>, <strong>Multiple Templates</strong> (including a Stripe-style design). <strong>No Sign-Up Required</strong>.</p>
@@ -99,51 +101,61 @@ _**Add payment QR codes** with any invoice-related information (payment links, U
 <!-- source: .github/screenshots/default-template.png -->
 <!-- source: .github/screenshots/stripe-template.png -->
 
-|                                           Default Invoice Template                                            |                                           Stripe Invoice Template                                           |
-| :-----------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------: |
+|                                                               Default Invoice Template                                                               |                                                               Stripe Invoice Template                                                               |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <img src="https://github.com/user-attachments/assets/7779cd52-e2a9-442a-8ac8-262387319b3e" width="1200" height="960" alt="Default Invoice Template"> | <img src="https://github.com/user-attachments/assets/ee8d5337-89fc-461c-b1c1-2680287df514" width="1200" height="960" alt="Stripe Invoice Template"> |
 
 </div>
 
 ## 📢 What's New
 
-**v1.0.3 — Seller & Buyer Improvements (Mar 2026)**
+### EasyInvoicePDF v1.0.3 — Seller & Buyer Improvements (March 29, 2026)
 
-- **Email visibility toggle** — control whether email addresses appear in the generated PDF
+- **Seller & Buyer Email visibility toggle** — control whether email addresses appear in the generated PDF
 - **Confirm discard dialog** — warns about unsaved changes when closing buyer/seller dialogs
 - **Improved seller & buyer forms** — reworked layout, locked-state banners, and cleaner field grouping
+- **Out-of-Date dates helper** shows outdated fields and provides a button to update all dates at once
+- **Auto-scroll (to the last position) the invoice form on mobile** when switching between tabs (UX improvement)
+
+https://github.com/user-attachments/assets/1b39eb6f-e2be-493f-9825-cbce3dc6fa16
 
 [Full release notes for v1.0.3](https://github.com/VladSez/easy-invoice-pdf/releases/tag/v1.0.3)
 
 ---
 
-**v1.0.2 — QR Codes & Multi-Page PDFs (Mar 2026)**
+### EasyInvoicePDF v1.0.2 — QR Codes & Multi-Page PDFs (March 10, 2026)
 
 - **QR code support** — add payment QR codes with custom descriptions to both templates
-- **Logo upload for default template** — previously available only in the Stripe template
-- **Searchable currency combobox** — grouped categories replace the native dropdown
+- **Logo upload for default template** — add a logo to the default invoice template
+- **Searchable currency combobox** — search by currency code, symbol, or name, grouped into categories replacing the native dropdown
 - **Improved multi-page PDFs** — automatic pagination and page breaks for large invoices
+
+![qr-code](https://github.com/user-attachments/assets/9516a709-3863-48fc-a1e8-fcfbd0bb195b)
 
 [Full release notes for v1.0.2](https://github.com/VladSez/easy-invoice-pdf/releases/tag/v1.0.2)
 
 ---
 
-**v1.0.1 — Stripe Template & Tax Customization (Jan 2026)**
+### EasyInvoicePDF v1.0.1 — Stripe Template & Tax Customization (June 12, 2025)
 
 - **Stripe-inspired invoice template** — professional styling with logo upload and payment URL field
 - **Customizable tax labels** — set VAT, GST, Sales Tax, or any custom label per invoice language
 - **Improved i18n** — dynamic tax label updates and better locale-based currency handling
 
+https://github.com/user-attachments/assets/4eef2b90-678b-4a55-9ee5-8fcf195c993a
+
 [Full release notes for v1.0.1](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-1.0.1)
 
 ---
 
-**v1.0.0 — Initial Release (Nov 2025)**
+### EasyInvoicePDF v1.0.0 — Initial Release (November 19, 2025)
 
 - **Live preview** — invoice updates in real-time as you type
 - **Instant PDF download** — one-click, no sign-up required
 - **Shareable links** — send invoices directly to clients without attachments
 - **10 languages & 120+ currencies** — full multi-language and currency support out of the box
+
+https://github.com/user-attachments/assets/23bb5448-c9fb-4ff2-98f3-0b80d75b7683
 
 [Full release notes for v1.0.0](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-v1.0.0)
 
