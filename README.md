@@ -111,9 +111,11 @@ _**Add payment QR codes** with any invoice-related information (payment links, U
 
 ### EasyInvoicePDF v1.0.3 — Seller & Buyer Improvements (March 29, 2026)
 
-- **Email visibility toggle** — control whether email addresses appear in the generated PDF
+- **Seller & Buyer Email visibility toggle** — control whether email addresses appear in the generated PDF
 - **Confirm discard dialog** — warns about unsaved changes when closing buyer/seller dialogs
 - **Improved seller & buyer forms** — reworked layout, locked-state banners, and cleaner field grouping
+- **Out-of-Date dates helper** shows outdated fields and provides a button to update all dates at once
+- **Auto-scroll (to the last position) the invoice form on mobile** when switching between tabs (UX improvement)
 
 https://github.com/user-attachments/assets/1b39eb6f-e2be-493f-9825-cbce3dc6fa16
 
@@ -124,8 +126,8 @@ https://github.com/user-attachments/assets/1b39eb6f-e2be-493f-9825-cbce3dc6fa16
 ### EasyInvoicePDF v1.0.2 — QR Codes & Multi-Page PDFs (March 10, 2026)
 
 - **QR code support** — add payment QR codes with custom descriptions to both templates
-- **Logo upload for default template** — previously available only in the Stripe template
-- **Searchable currency combobox** — grouped categories replace the native dropdown
+- **Logo upload for default template** — add a logo to the default invoice template
+- **Searchable currency combobox** — search by currency code, symbol, or name, grouped into categories replacing the native dropdown
 - **Improved multi-page PDFs** — automatic pagination and page breaks for large invoices
 
 ![qr-code](https://github.com/user-attachments/assets/9516a709-3863-48fc-a1e8-fcfbd0bb195b)
