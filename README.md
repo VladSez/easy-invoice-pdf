@@ -128,7 +128,7 @@ https://github.com/user-attachments/assets/1b39eb6f-e2be-493f-9825-cbce3dc6fa16
 - **Searchable currency combobox** — grouped categories replace the native dropdown
 - **Improved multi-page PDFs** — automatic pagination and page breaks for large invoices
 
-https://github.com/user-attachments/assets/9516a709-3863-48fc-a1e8-fcfbd0bb195b
+[QR Code Support Demo](https://github.com/user-attachments/assets/9516a709-3863-48fc-a1e8-fcfbd0bb195b)
 
 [Full release notes for v1.0.2](https://github.com/VladSez/easy-invoice-pdf/releases/tag/v1.0.2)
 
