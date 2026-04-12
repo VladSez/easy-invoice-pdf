@@ -1,3 +1,4 @@
+
 <div align="center">
   <!-- source:  .github/screenshots/easy-invoice-logo-readme.png -->
   <a href="https://easyinvoicepdf.com/?ref=github">
@@ -12,10 +13,14 @@
       ·
       <a href="https://github.com/VladSez/easy-invoice-pdf/releases">Releases</a>
     </p>
+
   <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">
     <!-- source:  .github/screenshots/stripe-template.png -->
     <img width="1440" height="769" alt="EasyInvoicePDF Product Screenshot" src="https://github.com/user-attachments/assets/6f0e2156-24e0-4f8b-b8f1-1d2bf5ac157a" />
   </a>
+
+<hr/>
+  <img src="https://github.com/user-attachments/assets/450fcdc8-32fc-4f41-bc4b-54d6ac96e03c" width="1440" alt="EasyInvoicePDF demo">
 </div>
 
 ## ✨ Key Features of EasyInvoicePDF:
@@ -42,7 +47,7 @@
 
 <!-- source: .github/demos/live-preview.gif -->
 
-<img src="https://github.com/user-attachments/assets/03c57879-2f71-4c75-88ca-0abc937585c6" width="800" alt="Live Preview Demo">
+<img src="https://github.com/user-attachments/assets/bddb4b73-630a-4bc5-981b-d470971cd4c6" width="800" alt="Live Preview Demo">
 
 _See changes in **real-time** as you type_
 
