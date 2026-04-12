@@ -75,7 +75,7 @@ export function StripeVatSummaryTableTotals({
           </View>
         </View>
 
-        {hasNumericVat && (
+        {hasNumericVat ? (
           <>
             {/* Total excluding tax */}
             <View
@@ -132,7 +132,7 @@ export function StripeVatSummaryTableTotals({
               );
             })}
           </>
-        )}
+        ) : null}
 
         {/* Total */}
         <View

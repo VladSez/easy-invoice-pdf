@@ -65,7 +65,7 @@ function ChangelogEntryCard({ entry }: { entry: ChangelogEntry }) {
   return (
     <div className="grid pb-20 pt-4 sm:pt-12 md:grid-cols-4">
       {/* Sticky Date Column - Desktop Only */}
-      <div className="sticky top-28 hidden self-start md:col-span-1 md:block">
+      <div className="sticky top-28 hidden self-start md:col-span-1 md:mt-[6px] md:block">
         <Link href={`/changelog/${entry.slug}`}>
           <DateTime dateTime={entry.metadata.date}>{formattedDate}</DateTime>
         </Link>

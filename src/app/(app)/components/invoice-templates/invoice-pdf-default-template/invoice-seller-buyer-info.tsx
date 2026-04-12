@@ -13,14 +13,6 @@ export function InvoiceSellerBuyerInfo({
   const language = invoiceData.language;
   const t = INVOICE_PDF_TRANSLATIONS[language];
 
-  const swiftBicFieldIsVisible = invoiceData.seller.swiftBicFieldIsVisible;
-  const sellerVatNoFieldIsVisible = invoiceData.seller.vatNoFieldIsVisible;
-  const buyerVatNoFieldIsVisible = invoiceData.buyer.vatNoFieldIsVisible;
-  const sellerAccountNumberFieldIsVisible =
-    invoiceData.seller.accountNumberFieldIsVisible;
-  const sellerNotesFieldIsVisible = invoiceData.seller.notesFieldIsVisible;
-  const buyerNotesFieldIsVisible = invoiceData.buyer.notesFieldIsVisible;
-
   return (
     <View
       style={{
@@ -43,49 +35,50 @@ export function InvoiceSellerBuyerInfo({
           </Text>
 
           <View style={{ marginTop: 2 }}>
-            {sellerVatNoFieldIsVisible && (
+            {invoiceData.seller.vatNoFieldIsVisible ? (
               <Text style={[styles.fontSize7]}>
                 {invoiceData.seller.vatNoLabelText}:{" "}
                 <Text style={[styles.boldText, styles.fontSize8]}>
                   {invoiceData?.seller.vatNo}
                 </Text>
               </Text>
-            )}
-            {invoiceData.seller.emailFieldIsVisible && (
+            ) : null}
+            {invoiceData.seller.emailFieldIsVisible ? (
               <Text style={styles.fontSize7}>
                 {t.seller.email}:{" "}
                 <Text style={[styles.boldText, styles.fontSize8]}>
                   {invoiceData?.seller.email}
                 </Text>
               </Text>
-            )}
+            ) : null}
           </View>
         </View>
 
         <View style={{ marginTop: 10 }}>
-          {sellerAccountNumberFieldIsVisible && (
+          {invoiceData.seller.accountNumberFieldIsVisible ? (
             <Text style={styles.fontSize8}>
               {t.seller.accountNumber} -{" "}
               <Text style={[styles.boldText, styles.fontSize8]}>
                 {invoiceData?.seller.accountNumber}
               </Text>
             </Text>
-          )}
-          {swiftBicFieldIsVisible && (
+          ) : null}
+          {invoiceData.seller.swiftBicFieldIsVisible ? (
             <Text style={styles.fontSize8}>
               {t.seller.swiftBic}:{" "}
               <Text style={[styles.boldText, styles.fontSize8]}>
                 {invoiceData?.seller.swiftBic}
               </Text>
             </Text>
-          )}
-          {sellerNotesFieldIsVisible && invoiceData?.seller.notes && (
+          ) : null}
+          {invoiceData.seller.notesFieldIsVisible &&
+          invoiceData?.seller.notes ? (
             <View style={{ marginTop: 10 }}>
               <Text style={[styles.fontSize8]}>
                 {invoiceData?.seller.notes}
               </Text>
             </View>
-          )}
+          ) : null}
         </View>
       </View>
 
@@ -102,29 +95,29 @@ export function InvoiceSellerBuyerInfo({
         </Text>
 
         <View style={{ marginTop: 2 }}>
-          {buyerVatNoFieldIsVisible && (
+          {invoiceData.buyer.vatNoFieldIsVisible ? (
             <Text style={styles.fontSize7}>
               {invoiceData.buyer.vatNoLabelText}:{" "}
               <Text style={[styles.boldText, styles.fontSize8]}>
                 {invoiceData?.buyer.vatNo}
               </Text>
             </Text>
-          )}
-          {invoiceData.buyer.emailFieldIsVisible && (
+          ) : null}
+          {invoiceData.buyer.emailFieldIsVisible ? (
             <Text style={styles.fontSize7}>
               {t.buyer.email}:{" "}
               <Text style={[styles.boldText, styles.fontSize8]}>
                 {invoiceData?.buyer.email}
               </Text>
             </Text>
-          )}
+          ) : null}
         </View>
 
-        {buyerNotesFieldIsVisible && invoiceData?.buyer.notes && (
+        {invoiceData.buyer.notesFieldIsVisible && invoiceData?.buyer.notes ? (
           <View style={{ marginTop: 20 }}>
             <Text style={[styles.fontSize8]}>{invoiceData?.buyer.notes}</Text>
           </View>
-        )}
+        ) : null}
       </View>
     </View>
   );

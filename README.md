@@ -1,4 +1,3 @@
-
 <div align="center">
   <!-- source:  .github/screenshots/easy-invoice-logo-readme.png -->
   <a href="https://easyinvoicepdf.com/?ref=github">
@@ -20,6 +19,7 @@
   </a>
 
 <hr/>
+  <!-- source:  .github/demos/easy-invoice-github-demo.gif -->
   <img src="https://github.com/user-attachments/assets/450fcdc8-32fc-4f41-bc4b-54d6ac96e03c" width="1440" alt="EasyInvoicePDF demo">
 </div>
 
@@ -45,7 +45,7 @@
 
 ### 🎬 Invoice PDF Live Preview
 
-<!-- source: .github/demos/live-preview.gif -->
+<!-- source: .github/demos/live-pdf-preview.gif -->
 
 <img src="https://github.com/user-attachments/assets/bddb4b73-630a-4bc5-981b-d470971cd4c6" width="800" alt="Live Preview Demo">
 

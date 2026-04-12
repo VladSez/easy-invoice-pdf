@@ -26,14 +26,14 @@ export function InvoicePaymentInfo({
 
   return (
     <View style={{ maxWidth: "250px" }}>
-      {paymentMethodIsVisible && (
+      {paymentMethodIsVisible ? (
         <Text style={styles.fontSize7}>
           {t.paymentInfo.paymentMethod}:{" "}
           <Text style={[styles.boldText, styles.fontSize8]}>
             {invoiceData?.paymentMethod}
           </Text>
         </Text>
-      )}
+      ) : null}
       <Text
         style={[
           styles.fontSize7,

@@ -296,7 +296,7 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
           />
 
           {/* Notes */}
-          {invoiceData.notesFieldIsVisible && invoiceData.notes && (
+          {invoiceData.notesFieldIsVisible && invoiceData.notes ? (
             <View
               style={[STRIPE_TEMPLATE_STYLES.mt24]}
               wrap={false}
@@ -306,7 +306,7 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
                 {invoiceData.notes}
               </Text>
             </View>
-          )}
+          ) : null}
 
           {/* QR Code - centered below notes */}
           {isQrCodeVisible ? (
