@@ -28,32 +28,32 @@ export function StripeSellerBuyerInfo({
         <Text style={[styles.fontSize9, styles.mb3]}>
           {invoiceData.seller.address}
         </Text>
-        {invoiceData.seller.emailFieldIsVisible && (
+        {invoiceData.seller.emailFieldIsVisible ? (
           <Text style={[styles.fontSize9, styles.mb3]}>
             {invoiceData.seller.email}
           </Text>
-        )}
-        {invoiceData.seller.vatNoFieldIsVisible && (
+        ) : null}
+        {invoiceData.seller.vatNoFieldIsVisible ? (
           <Text style={[styles.fontSize9, styles.mb3]}>
             {invoiceData.seller.vatNoLabelText}: {invoiceData.seller.vatNo}
           </Text>
-        )}
-        {invoiceData.seller.accountNumberFieldIsVisible && (
+        ) : null}
+        {invoiceData.seller.accountNumberFieldIsVisible ? (
           <Text style={[styles.fontSize9, styles.mb3]}>
             {t.seller.accountNumber}: {invoiceData.seller.accountNumber}
           </Text>
-        )}
-        {invoiceData.seller.swiftBicFieldIsVisible && (
+        ) : null}
+        {invoiceData.seller.swiftBicFieldIsVisible ? (
           <Text style={[styles.fontSize9, styles.mb3]}>
             {t.seller.swiftBic}: {invoiceData.seller.swiftBic}
           </Text>
-        )}
+        ) : null}
 
-        {invoiceData.seller.notesFieldIsVisible && (
+        {invoiceData.seller.notesFieldIsVisible ? (
           <Text style={[styles.fontSize9, styles.mb3]}>
             {invoiceData.seller.notes}
           </Text>
-        )}
+        ) : null}
       </View>
 
       {/* Buyer info */}
@@ -67,23 +67,23 @@ export function StripeSellerBuyerInfo({
         <Text style={[styles.fontSize9, styles.mb3]}>
           {invoiceData.buyer.address}
         </Text>
-        {invoiceData.buyer.emailFieldIsVisible && (
+        {invoiceData.buyer.emailFieldIsVisible ? (
           <Text style={[styles.fontSize9, styles.mb3]}>
             {invoiceData.buyer.email}
           </Text>
-        )}
+        ) : null}
 
-        {invoiceData.buyer.vatNoFieldIsVisible && (
+        {invoiceData.buyer.vatNoFieldIsVisible ? (
           <Text style={[styles.fontSize9, styles.mb3]}>
             {invoiceData.buyer.vatNoLabelText}: {invoiceData.buyer.vatNo}
           </Text>
-        )}
+        ) : null}
 
-        {invoiceData.buyer.notesFieldIsVisible && (
+        {invoiceData.buyer.notesFieldIsVisible ? (
           <Text style={[styles.fontSize9, styles.mb3]}>
             {invoiceData.buyer.notes}
           </Text>
-        )}
+        ) : null}
       </View>
     </View>
   );

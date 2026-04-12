@@ -34,12 +34,12 @@ export function InvoiceFooter({
     <View style={styles.footer} fixed>
       <View style={styles.spaceBetween}>
         <View style={[styles.row, { gap: 3 }]}>
-          {invoiceNumberValue && (
+          {invoiceNumberValue ? (
             <>
               <Text style={[styles.fontSize8]}>{invoiceNumberValue}</Text>
               <Text style={[styles.fontSize8]}>·</Text>
             </>
-          )}
+          ) : null}
           <Text style={[styles.fontSize8]}>
             {formattedInvoiceTotal} {t.stripe.due} {paymentDueDate}
           </Text>

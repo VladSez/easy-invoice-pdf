@@ -40,7 +40,7 @@
 
 ### 🎬 Invoice PDF Live Preview
 
-<!-- source: .github/demos/live-preview.gif -->
+<!-- source: .github/demos/live-pdf-preview.gif -->
 
 <img src="https://github.com/user-attachments/assets/03c57879-2f71-4c75-88ca-0abc937585c6" width="800" alt="Live Preview Demo">
 
