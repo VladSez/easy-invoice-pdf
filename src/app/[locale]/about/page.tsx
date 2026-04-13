@@ -173,7 +173,7 @@ function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative flex w-full items-center justify-center overflow-hidden bg-gradient-to-b from-white to-slate-50 py-10 md:py-16 lg:py-24"
+      className="relative flex w-full items-center justify-center overflow-hidden bg-gradient-to-b from-white to-slate-50 py-10 md:py-16 xl:py-24"
     >
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">

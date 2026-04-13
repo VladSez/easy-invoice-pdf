@@ -62,6 +62,7 @@ export default tseslint.config(
           ],
         },
       ],
+      "@next/next/no-img-element": "off",
     },
   },
   {

@@ -29,13 +29,15 @@ export function GitHubStarCTA({
           data-testid="github-star-cta-button"
         >
           <span className="flex items-center gap-1.5 px-4">
+            {/* Icon container with relative positioning for layered animation */}
             <span className="relative size-4">
+              {/* GitHub icon - visible by default, fades out and shrinks on hover */}
               <GithubIcon className="absolute inset-0 size-4 fill-white transition-[opacity,transform,filter] duration-200 ease-out group-hover:scale-75 group-hover:opacity-0 group-hover:blur-[4px]" />
+              {/* Star icon - hidden by default, scales up and fades in on hover to replace GitHub icon */}
               <Star className="absolute inset-0 size-4 scale-[0.25] fill-yellow-400 text-yellow-400 opacity-0 blur-[4px] transition-[opacity,transform,filter] duration-200 ease-out group-hover:scale-100 group-hover:opacity-100 group-hover:blur-0" />
             </span>
             {githubStarsCount > 0 ? (
               <>
-                <span className="h-3.5 w-px bg-white/25" aria-hidden="true" />
                 <CountUpNumber number={githubStarsCount} />
               </>
             ) : (

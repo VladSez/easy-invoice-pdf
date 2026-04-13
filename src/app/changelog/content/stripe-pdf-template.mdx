@@ -1,50 +1,54 @@
 export const metadata = {
   title:
-    "EasyInvoicePDF v1.0.1 - Stripe Invoice Template & Landing Page Improvements",
+    "EasyInvoicePDF v1.0.1 - Customizable Tax/VAT Labels & Major Improvements",
   description:
-    "Introducing a modern, Stripe-inspired invoice template with professional styling and layout optimizations",
-  date: "2025-06-12",
+    "Customizable tax and VAT labels, per-language tax labels, stronger VAT validation, localization updates, PDF performance, e2e and CI improvements, and bug fixes.",
+  date: "2026-01-12",
   version: "1.0.1",
-  type: "major",
+  type: "minor",
 };
 
-![New Stripe Invoice Template](https://ik.imagekit.io/fl2lbswwo/CHANGELOG/stripe-pdf-template/stripe-template.png?updatedAt=1751032495134)
+<video
+  src="https://github.com/user-attachments/assets/4eef2b90-678b-4a55-9ee5-8fcf195c993a"
+  controls
+  style={{ width: "100%", borderRadius: "8px" }}
+/>
 
-## 🚀 New Features
+### ✨ New Features
 
-### Stripe-inspired Invoice Template
+- **Customizable tax label**: Users can personalize the tax/VAT label text on invoices (for example VAT, GST, Sales Tax)
+- **Customizable tax number label**: Support for custom tax number labels in buyer and seller information sections
+- **Dynamic tax label per language**: Tax labels update automatically based on the selected invoice language
 
-- 🤩 **Stripe template support**: Introduced a modern, Stripe-inspired invoice template with professional styling and layout optimizations
-- **Dynamic template selection**: Introduced template selection functionality in the invoice form
-- **Logo upload**: Added logo upload capability for the **Stripe** template with validation
-- **Payment links**: Integrated Stripe payment URL field for enhanced invoice functionality
+### 🛠️ Improvements
 
-![Landing Page](https://ik.imagekit.io/fl2lbswwo/CHANGELOG/stripe-pdf-template/landing.png?updatedAt=1751032507925)
+- Enhanced validation for VAT input to accept both numeric values and specific strings
+- Improved user interface messages for clarity regarding VAT input requirements
+- Updated README with enhanced project description, links, and feature presentation
+- Better localization across all supported languages (EN, DE, ES, FR, IT, NL, PL, PT, RU, UK)
+- Streamlined PDF font handling with improved caching for better performance
+- Enhanced invoice PDF rendering quality
 
-### User Experience & Design
+### 🧪 Testing & Infrastructure
 
-- **Landing page cleanup**: Refined About section and footer for better layout and accessibility
-- **Call-to-action toasts**: Added custom, randomized CTA toasts encouraging user support (40-second timer)
-- **Currency expansion**: Added support for more currencies with improved date handling
-- **Improved tooltips**: Enhanced tooltips with detailed explanations and improved styling
+- Added comprehensive E2E tests for new tax label features
+- Improved Playwright test stability with refined screenshot assertions
+- Updated CI/CD to use macOS runners for consistent snapshot generation
+- Added static assets tests for better reliability
 
-{/* prettier-ignore-start */}
-| Before | After |
-|--------|-------|
-| ![before](https://ik.imagekit.io/fl2lbswwo/CHANGELOG/stripe-pdf-template/before1.png?updatedAt=1751028191085) | ![after](https://ik.imagekit.io/fl2lbswwo/CHANGELOG/stripe-pdf-template/after1.png?updatedAt=1751028191085) |
-| ![before2](https://ik.imagekit.io/fl2lbswwo/CHANGELOG/stripe-pdf-template/before2.png?updatedAt=1751028191085) | ![after2](https://ik.imagekit.io/fl2lbswwo/CHANGELOG/stripe-pdf-template/after2.png?updatedAt=1751028191085) |
-{/* prettier-ignore-end */}
+### 🐛 Bug Fixes
 
-- **Invoice deletion**: Added confirmation dialog for invoice item deletion
-- **Form validation**: Relaxed date validations for better user experience
-- **Improved PDF viewers**: Enhanced PDF rendering with better error handling and fallback UI
-- **Accessibility**: Improved button component accessibility with proper disabled state handling
-- **Detailed Invoice Footers**: Added comprehensive invoice footer and payment info sections
+- Fixed accordion bug
+- Fixed invoice link generation error message to include a refresh suggestion
+- Improved invoice item tax label helper text
+- Various UI polish and consistency fixes
 
-![Invoice Footer](https://ik.imagekit.io/fl2lbswwo/CHANGELOG/stripe-pdf-template/invoice-footer.png?updatedAt=1751028191085)
+## What's Changed
+
+- feat: customizable tax/VAT label text + a lot of other improvements and bug fixes by [@VladSez](https://github.com/VladSez) in https://github.com/VladSez/easy-invoice-pdf/pull/163
 
 ---
 
-**Full Changeset**: [`63b097b...7ae733b`](https://github.com/VladSez/easy-invoice-pdf/compare/63b097b...7ae733b)
+**Full Changelog**: [EasyInvoicePDF-v1.0.0...EasyInvoicePDF-1.0.1](https://github.com/VladSez/easy-invoice-pdf/compare/EasyInvoicePDF-v1.0.0...EasyInvoicePDF-1.0.1)
 
-[View Release Notes for v1.0.1 on GitHub](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-1.0.1)
+[View release notes for v1.0.1 on GitHub](https://github.com/VladSez/easy-invoice-pdf/releases/tag/EasyInvoicePDF-1.0.1)

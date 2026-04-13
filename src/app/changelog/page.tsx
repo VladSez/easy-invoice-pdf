@@ -6,6 +6,8 @@ import {
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ChangelogAuthorByline } from "./components/changelog-author-byline";
+import { ChangelogVersionBadgeLink } from "./components/changelog-version-badge-link";
 import { DateTime } from "./components/date-time";
 
 // Enable static generation for this page
@@ -88,11 +90,13 @@ function ChangelogEntryCard({ entry }: { entry: ChangelogEntry }) {
         {/* Version Badge */}
         {entry.metadata.version ? (
           <div className="mt-2 flex items-center gap-2">
-            <span className="inline-flex items-center rounded-full border border-slate-300 bg-slate-50 px-2.5 py-1 text-sm font-medium text-slate-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-              v{entry.metadata.version}
-            </span>
+            <ChangelogVersionBadgeLink version={entry.metadata.version} />
           </div>
         ) : null}
+
+        <div className="not-prose mb-2 mt-4">
+          <ChangelogAuthorByline />
+        </div>
 
         {/* Article Content */}
         <article

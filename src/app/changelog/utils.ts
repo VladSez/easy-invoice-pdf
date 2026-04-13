@@ -1,6 +1,28 @@
+import { GITHUB_URL } from "@/config";
 import { readdir } from "fs/promises";
 import { join } from "path";
 import { z } from "zod";
+
+/** Maps metadata `version` (e.g. "1.0.1") to the GitHub release tag name. */
+const changelogVersionToReleaseTag: Record<string, string> = {
+  "1.0.0": "EasyInvoicePDF-v1.0.0",
+  "1.0.1": "EasyInvoicePDF-1.0.1",
+  "1.0.2": "v1.0.2",
+  "1.0.3": "v1.0.3",
+};
+
+/**
+ * GitHub release URL for changelog entries. Unknown versions default to `v{version}`.
+ */
+export function getChangelogReleaseNotesUrl(version: string) {
+  const tag = changelogVersionToReleaseTag[version];
+
+  if (!tag) {
+    return null;
+  }
+
+  return `${GITHUB_URL}/releases/tag/${tag}`;
+}
 
 interface ChangelogMetadata {
   title: string;
