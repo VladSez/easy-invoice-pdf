@@ -141,11 +141,11 @@ https://github.com/user-attachments/assets/1b39eb6f-e2be-493f-9825-cbce3dc6fa16
 
 ---
 
-### EasyInvoicePDF v1.0.1 — Stripe Template & Tax Customization (June 12, 2025)
+### EasyInvoicePDF v1.0.1 — Customizable Tax/VAT Labels & Major Improvements (January 12, 2026)
 
-- **Stripe-inspired invoice template** — professional styling with logo upload and payment URL field
 - **Customizable tax labels** — set VAT, GST, Sales Tax, or any custom label per invoice language
 - **Improved i18n** — dynamic tax label updates and better locale-based currency handling
+- **Enhanced VAT validation** — accepts numeric values and specific strings
 
 https://github.com/user-attachments/assets/4eef2b90-678b-4a55-9ee5-8fcf195c993a
 
@@ -157,6 +157,7 @@ https://github.com/user-attachments/assets/4eef2b90-678b-4a55-9ee5-8fcf195c993a
 
 - **Live preview** — invoice updates in real-time as you type
 - **Instant PDF download** — one-click, no sign-up required
+- **Default and Stripe-inspired invoice templates** — choose the look you want
 - **Shareable links** — send invoices directly to clients without attachments
 - **10 languages & 120+ currencies** — full multi-language and currency support out of the box
 
