@@ -282,6 +282,8 @@ export function InvoiceClientPage({
                   className="size-6 rounded-full"
                   height="24"
                   width="24"
+                  loading="lazy"
+                  decoding="async"
                 />
               </a>
               <span>
@@ -319,6 +321,8 @@ export function InvoiceClientPage({
                   className="size-6 rounded-full"
                   height="24"
                   width="24"
+                  loading="lazy"
+                  decoding="async"
                 />
               </a>
               <span>

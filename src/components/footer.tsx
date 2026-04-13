@@ -97,12 +97,13 @@ export function Footer({
             href="https://startupfa.me/s/easyinvoicepdf?utm_source=easyinvoicepdf.com"
             target="_blank"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://startupfa.me/badges/featured-badge-small.webp"
               alt="Featured on Startup Fame"
               width="224"
               height="36"
+              loading="lazy"
+              decoding="async"
             />
           </a>
         </div>
