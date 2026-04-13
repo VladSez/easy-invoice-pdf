@@ -14,6 +14,7 @@ import { TWITTER_URL } from "@/config";
 import type { Dispatch, SetStateAction } from "react";
 import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
+
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { MobileFormScrollContainer } from "./mobile-form-scroll-container";
 
@@ -271,19 +272,32 @@ export function InvoiceClientPage({
               {invoiceLastUpdatedAtFormatted}
             </div>
           )}
-          {/** Mobile version */}
+          {/* Founders info section (Mobile version) */}
           <div className="mt-3 flex w-full justify-center">
-            <span className="inline-block text-xs text-zinc-900 duration-500 animate-in fade-in slide-in-from-bottom-2">
-              Made by{" "}
-              <a
-                href={TWITTER_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-black"
-              >
-                Vlad Sazonau
+            <div className="flex items-center gap-1.5 text-xs text-zinc-900 duration-500 animate-in fade-in slide-in-from-bottom-2">
+              <a href={TWITTER_URL} target="_blank" rel="noopener noreferrer">
+                <img
+                  src="https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459"
+                  alt="Vlad Sazonau"
+                  className="size-6 rounded-full"
+                  height="24"
+                  width="24"
+                  loading="lazy"
+                  decoding="async"
+                />
               </a>
-            </span>
+              <span>
+                Made by{" "}
+                <a
+                  href={TWITTER_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-black"
+                >
+                  Vlad Sazonau
+                </a>
+              </span>
+            </div>
           </div>
         </div>
       ) : (
@@ -298,17 +312,31 @@ export function InvoiceClientPage({
               />
             </div>
 
-            <span className="mt-1 inline-block text-end text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
-              Made by{" "}
-              <a
-                href={TWITTER_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-black"
-              >
-                Vlad Sazonau
+            {/* Founders info section (Desktop version) */}
+            <div className="mt-1 flex items-center gap-1.5 text-xs text-zinc-800 duration-500 animate-in fade-in slide-in-from-bottom-2">
+              <a href={TWITTER_URL} target="_blank" rel="noopener noreferrer">
+                <img
+                  src="https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459"
+                  alt="Vlad Sazonau"
+                  className="size-6 rounded-full"
+                  height="24"
+                  width="24"
+                  loading="lazy"
+                  decoding="async"
+                />
               </a>
-            </span>
+              <span>
+                Made by{" "}
+                <a
+                  href={TWITTER_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-black"
+                >
+                  Vlad Sazonau
+                </a>
+              </span>
+            </div>
           </div>
           <div className="relative col-span-8 h-[620px] w-full max-w-full 2xl:h-[700px]">
             {invoiceLastUpdatedAtFormatted && (

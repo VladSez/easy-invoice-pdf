@@ -1,6 +1,12 @@
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { GITHUB_URL } from "@/config";
 
+/**
+ * Server component that renders a GitHub star CTA button for the marketing/about page.
+ * Fetches the current GitHub star count and displays it alongside a call-to-action.
+ *
+ * @returns A styled button linking to the GitHub repository with star count
+ */
 export async function GithubStarCtaMarketingPageBody() {
   const githubStarsCount = await fetchGithubStars();
 

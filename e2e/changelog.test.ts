@@ -101,14 +101,14 @@ test.describe("Changelog page", () => {
     );
     await expect(linkedinShareLink).toBeVisible();
 
-    // Check "Go to App" CTA button
+    // Check CTA button
     const goToAppButtonContainer = page.getByTestId(
       "go-to-app-button-container",
     );
 
-    const goToAppButton = goToAppButtonContainer.getByRole("link");
-    await expect(goToAppButton).toBeVisible();
-    await expect(goToAppButton).toHaveText("Go to App");
+    const ctaButton = goToAppButtonContainer.getByRole("link");
+    await expect(ctaButton).toBeVisible();
+    await expect(ctaButton).toHaveText("Start Invoicing");
   });
 
   test("should navigate back to changelog from individual entry", async ({

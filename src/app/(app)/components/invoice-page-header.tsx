@@ -234,11 +234,11 @@ function ProjectInfoLinks() {
           href={GITHUB_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="group inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-900 shadow-sm transition-[colors,transform,border-color] duration-200 hover:border-blue-300 hover:text-blue-600 active:scale-[0.96]"
+          className="group inline-flex items-center gap-1.5 rounded-full border border-slate-300 px-3 py-1 text-xs font-medium text-slate-900 shadow transition-[colors,transform,border-color] duration-200 hover:border-blue-300 hover:text-blue-600 active:scale-[0.96]"
         >
           <GithubIcon className="size-4 transition-[transform,fill] duration-200 group-hover:scale-105 group-hover:fill-blue-600" />
           <span className="transition-colors duration-200 group-hover:text-blue-600">
-            View on GitHub
+            Star on GitHub
           </span>
         </a>
       </div>

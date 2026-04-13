@@ -264,7 +264,7 @@ export function ManualPlayVideo({
             <button
               type="button"
               aria-label={description ? description : "Play video"}
-              className="absolute inset-0 flex items-center justify-center backdrop-blur-[2px]"
+              className="absolute inset-0 flex items-center justify-center backdrop-blur-[1px]"
               onClick={handlePlay}
             >
               <span className="flex size-14 items-center justify-center rounded-full bg-slate-800/90 shadow-lg transition-transform duration-150 hover:scale-110 active:scale-95">

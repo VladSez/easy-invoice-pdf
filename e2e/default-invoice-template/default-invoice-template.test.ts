@@ -779,14 +779,16 @@ test.describe("Default Invoice Template", () => {
 
     await download.saveAs(pdfFilePath);
 
+    const downloadPdfToast = page.getByTestId("download-pdf-toast");
+
     // Verify toast appears after download
-    await expect(page.getByTestId("download-pdf-toast")).toBeVisible();
+    await expect(downloadPdfToast).toBeVisible();
 
     await expect(
-      page.getByRole("link", { name: "Star on GitHub" }),
+      downloadPdfToast.getByRole("link", { name: "Star on GitHub" }),
     ).toBeVisible();
 
-    await expect(page.getByTestId("toast-cta-btn")).toBeVisible();
+    await expect(downloadPdfToast.getByTestId("toast-cta-btn")).toBeVisible();
 
     // Convert to absolute path and use proper file URL format
     const absolutePath = path.resolve(pdfFilePath);

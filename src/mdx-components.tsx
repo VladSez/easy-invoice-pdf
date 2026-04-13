@@ -59,7 +59,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
     // Enhanced image styling with responsive design
     img: ({ alt, src, ...props }) => (
-      // eslint-disable-next-line @next/next/no-img-element
       <img
         {...props}
         src={src}

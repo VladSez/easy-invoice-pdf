@@ -11,6 +11,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ChangelogAuthorByline } from "../components/changelog-author-byline";
+import { ChangelogVersionBadgeLink } from "../components/changelog-version-badge-link";
 import { DateTime } from "../components/date-time";
 import { BlackGoToAppButton } from "@/components/go-to-app-button-cta";
 import * as Sentry from "@sentry/nextjs";
@@ -163,7 +165,12 @@ export default async function ChangelogEntryPage({
                 {entry.metadata.title || `Update ${formattedDate}`}
               </h1>
             </div>
-            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+            {entry.metadata.version ? (
+              <div className="mt-2 flex items-center gap-2">
+                <ChangelogVersionBadgeLink version={entry.metadata.version} />
+              </div>
+            ) : null}
+            <div className="mt-2 flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
               <DateTime dateTime={entry.metadata.date}>
                 {formattedDate}
               </DateTime>
@@ -173,50 +180,7 @@ export default async function ChangelogEntryPage({
           {/* Author and social sharing */}
           <div className="my-4 flex flex-col justify-between sm:my-8 sm:flex-row sm:items-center">
             <div className="flex items-center gap-x-8">
-              <div
-                className="flex items-center space-x-3"
-                data-testid="author-info-img"
-              >
-                <Link
-                  href="https://dub.sh/vldszn-x.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    alt="Vlad Sazonau"
-                    loading="lazy"
-                    width="36"
-                    height="36"
-                    decoding="async"
-                    className="rounded-full blur-0 transition-all group-hover:brightness-95"
-                    src={
-                      "https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459"
-                    }
-                  />
-                </Link>
-                <div className="flex flex-col" data-testid="author-info-text">
-                  <Link
-                    href="https://dub.sh/vldszn-x.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-neutral-800 no-underline hover:underline hover:underline-offset-2 dark:text-neutral-300"
-                  >
-                    Vlad Sazonau
-                  </Link>
-                  <span className="text-sm text-slate-500 dark:text-neutral-400">
-                    Founder,{" "}
-                    <Link
-                      href="/?template=default"
-                      className="text-slate-500 no-underline hover:underline hover:underline-offset-2 dark:text-neutral-400"
-                    >
-                      {" "}
-                      EasyInvoicePDF
-                    </Link>
-                  </span>
-                </div>
-              </div>
+              <ChangelogAuthorByline />
             </div>
             <div className="flex items-center gap-x-6">
               {/* Twitter/X share */}
@@ -330,7 +294,7 @@ export default async function ChangelogEntryPage({
           data-testid="go-to-app-button-container"
         >
           <BlackGoToAppButton className="w-full py-6 text-lg">
-            Go to App
+            Start Invoicing
           </BlackGoToAppButton>
         </div>
 
