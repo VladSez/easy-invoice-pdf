@@ -10,7 +10,7 @@ export function ChangelogAuthorByline() {
   return (
     <div className="flex items-center space-x-3" data-testid="author-info-img">
       <Link
-        href="https://dub.sh/vldszn-x.com"
+        href="https://x.com/vladsazonau"
         target="_blank"
         rel="noopener noreferrer"
         className="group"
