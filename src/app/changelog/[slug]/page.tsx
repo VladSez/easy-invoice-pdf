@@ -160,6 +160,11 @@ export default async function ChangelogEntryPage({
         {/* Entry header */}
         <article className="prose prose-gray max-w-none dark:prose-invert">
           <header className="not-prose mb-4 sm:mb-8">
+            <div className="mb-4 flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+              <DateTime dateTime={entry.metadata.date}>
+                {formattedDate}
+              </DateTime>
+            </div>
             <div className="mb-4 flex items-center gap-3">
               <h1 className="text-pretty text-3xl font-bold text-gray-900 dark:text-gray-100 sm:text-4xl">
                 {entry.metadata.title || `Update ${formattedDate}`}
@@ -170,11 +175,6 @@ export default async function ChangelogEntryPage({
                 <ChangelogVersionBadgeLink version={entry.metadata.version} />
               </div>
             ) : null}
-            <div className="mt-2 flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-              <DateTime dateTime={entry.metadata.date}>
-                {formattedDate}
-              </DateTime>
-            </div>
           </header>
 
           {/* Author and social sharing */}
