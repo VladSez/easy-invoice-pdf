@@ -365,7 +365,7 @@ export function InvoiceClientPage({
               isMobile={false}
               qrCodeDataUrl={qrCodeDataUrl}
             />
-            <div className="absolute -bottom-6 right-0 text-right text-xs text-zinc-900">
+            <div className="absolute -bottom-6 right-0 text-right text-xs text-zinc-800">
               <Link
                 href="/tos"
                 className="underline hover:text-black"
