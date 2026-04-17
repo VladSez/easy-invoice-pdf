@@ -5,7 +5,7 @@ import Link from "next/link";
 interface FooterProps {
   links: React.ReactNode;
   translations: {
-    footerDescription: string;
+    footerDescription: React.ReactNode;
     footerCreatedBy: string;
     product: string;
   };
