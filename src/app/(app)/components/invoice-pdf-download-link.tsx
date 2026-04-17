@@ -247,7 +247,19 @@ export function InvoicePDFDownloadLink({
 
   return (
     <CustomTooltip
-      content="You are responsible for invoice compliance."
+      content={
+        <div className="flex items-center gap-3 p-2">
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-slate-900">
+              Your Responsibility
+            </p>
+            <p className="text-pretty text-xs leading-relaxed text-slate-700">
+              Ensure this invoice complies with your local tax and accounting
+              regulations before sending to clients.
+            </p>
+          </div>
+        </div>
+      }
       delayDuration={0}
       trigger={
         <a
