@@ -60,7 +60,9 @@
       "links": {
         "features": "Можливості",
         "github": "GitHub",
-        "changelog": "Що нового"
+        "changelog": "Що нового",
+        "founder": "Засновник",
+        "termsOfService": "Умови використання"
       },
       "createdBy": "Створено"
     },
@@ -72,15 +74,6 @@
       "shareFeedback": "Поділитися відгуком",
       "app": "Додаток",
       "startInvoicing": "Перейти до додатку"
-    },
-    "newsletter": {
-      "title": "Підпишіться на нашу розсилку",
-      "description": "Отримуйте оновлення про нові функції та покращення EasyInvoicePDF.com",
-      "subscribe": "Підписатися",
-      "placeholder": "Введіть ваш email",
-      "success": "Дякуємо за підписку!",
-      "error": "Не вдалося підписатися. Будь ласка, спробуйте ще раз.",
-      "emailLanguageInfo": "Всі листи надсилатимуться англійською мовою"
     }
   },
   "FAQ": {

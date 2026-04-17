@@ -15,7 +15,7 @@ import Link from "next/link";
 
 import { GithubIcon } from "@/components/etc/github-logo";
 import { ProjectLogoDescription } from "@/components/project-logo-description";
-import { GITHUB_URL, VIDEO_DEMO_URL } from "@/config";
+import { GITHUB_URL, VIDEO_DEMO_YOUTUBE_URL } from "@/config";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
 import { AlertCircleIcon, HeartIcon, LinkIcon } from "lucide-react";
@@ -234,7 +234,7 @@ function ProjectInfoLinks() {
           href={GITHUB_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="group inline-flex items-center gap-1.5 rounded-full border border-slate-300 px-3 py-1 text-xs font-medium text-slate-900 shadow transition-[colors,transform,border-color] duration-200 hover:border-blue-300 hover:text-blue-600 active:scale-[0.96]"
+          className="group inline-flex items-center gap-1.5 rounded-full border border-slate-400 px-3 py-1 text-xs font-medium text-slate-900 shadow transition-[colors,transform,border-color] duration-200 hover:border-blue-300 hover:text-blue-600 active:scale-[0.96]"
         >
           <GithubIcon className="size-4 transition-[transform,fill] duration-200 group-hover:scale-105 group-hover:fill-blue-600" />
           <span className="transition-colors duration-200 group-hover:text-blue-600">
@@ -253,13 +253,13 @@ function ProjectInfoLinks() {
             </DialogDescription>
           </DialogHeader>
           <div className="aspect-video w-full overflow-hidden">
-            <video
-              src={VIDEO_DEMO_URL}
-              muted
-              controls
-              autoPlay
-              playsInline
-              className="h-full w-full object-cover"
+            <iframe
+              src={VIDEO_DEMO_YOUTUBE_URL}
+              title="EasyInvoicePDF Demo Video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+              className="h-full w-full border-0"
               data-testid="how-it-works-video"
             />
           </div>

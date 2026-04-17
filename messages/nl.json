@@ -52,7 +52,9 @@
       "links": {
         "features": "Functies",
         "github": "GitHub",
-        "changelog": "Nieuw"
+        "changelog": "Nieuw",
+        "founder": "Oprichter",
+        "termsOfService": "Servicevoorwaarden"
       },
       "createdBy": "Gemaakt door"
     },
@@ -64,15 +66,6 @@
       "shareFeedback": "Feedback delen",
       "app": "App",
       "startInvoicing": "Begin met factureren"
-    },
-    "newsletter": {
-      "title": "Abonneer op onze nieuwsbrief",
-      "description": "Ontvang updates over nieuwe functies en verbeteringen van EasyInvoicePDF.com",
-      "subscribe": "Abonneren",
-      "placeholder": "Voer je e-mailadres in",
-      "success": "Bedankt voor je aanmelding!",
-      "error": "Aanmelding mislukt. Probeer het opnieuw.",
-      "emailLanguageInfo": "Alle e-mails worden in het Engels verzonden"
     }
   },
   "Metadata": {

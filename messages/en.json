@@ -53,27 +53,20 @@
       "links": {
         "features": "Features",
         "github": "GitHub",
-        "changelog": "Changelog"
+        "changelog": "Changelog",
+        "founder": "Founder",
+        "termsOfService": "Terms of Service"
       },
       "createdBy": "Made by"
     },
     "buttons": {
-      "goToApp": "Go to app",
+      "goToApp": "Open app",
       "viewOnGithub": "View on GitHub",
       "starOnGithub": "Star on GitHub",
       "switchLanguage": "Switch language",
       "shareFeedback": "Share feedback",
       "app": "App",
       "startInvoicing": "Start Invoicing"
-    },
-    "newsletter": {
-      "title": "Subscribe to our newsletter",
-      "description": "Get updates on new features and improvements from EasyInvoicePDF.com",
-      "subscribe": "Subscribe",
-      "placeholder": "Enter your email",
-      "success": "Thank you for subscribing!",
-      "error": "Failed to subscribe. Please try again.",
-      "emailLanguageInfo": "All emails will be sent in English"
     }
   },
   "Metadata": {

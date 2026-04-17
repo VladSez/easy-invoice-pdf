@@ -60,7 +60,9 @@
       "links": {
         "features": "Funktionen",
         "github": "GitHub",
-        "changelog": "Änderungen"
+        "changelog": "Änderungen",
+        "founder": "Gründer",
+        "termsOfService": "Nutzungsbedingungen"
       },
       "createdBy": "Erstellt von"
     },
@@ -72,15 +74,6 @@
       "shareFeedback": "Feedback teilen",
       "app": "App",
       "startInvoicing": "Zur App gehen"
-    },
-    "newsletter": {
-      "title": "Newsletter abonnieren",
-      "description": "Erhalten Sie Updates zu neuen Funktionen und Verbesserungen von EasyInvoicePDF.com",
-      "subscribe": "Abonnieren",
-      "placeholder": "E-Mail eingeben",
-      "success": "Vielen Dank für Ihr Abonnement!",
-      "error": "Abonnement fehlgeschlagen. Bitte versuchen Sie es erneut.",
-      "emailLanguageInfo": "Alle E-Mails werden in englischer Sprache versendet"
     }
   },
   "FAQ": {

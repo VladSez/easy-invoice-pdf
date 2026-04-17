@@ -60,7 +60,9 @@
       "links": {
         "features": "Возможности",
         "github": "GitHub",
-        "changelog": "Что нового"
+        "changelog": "Что нового",
+        "founder": "Основатель",
+        "termsOfService": "Условия использования"
       },
       "createdBy": "Создано"
     },
@@ -72,15 +74,6 @@
       "shareFeedback": "Поделиться отзывом",
       "app": "Приложение",
       "startInvoicing": "Перейти в приложение"
-    },
-    "newsletter": {
-      "title": "Подпишитесь на нашу рассылку",
-      "description": "Получайте обновления о новых функциях и улучшениях EasyInvoicePDF.com",
-      "subscribe": "Подписаться",
-      "placeholder": "Введите ваш email",
-      "success": "Спасибо за подписку!",
-      "error": "Не удалось подписаться. Пожалуйста, попробуйте снова.",
-      "emailLanguageInfo": "Все письма будут отправляться на английском языке"
     }
   },
   "FAQ": {

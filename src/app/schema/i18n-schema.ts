@@ -66,6 +66,8 @@ const aboutSchema = z
             features: z.string(),
             github: z.string(),
             changelog: z.string(),
+            founder: z.string(),
+            termsOfService: z.string(),
           })
           .strict(),
         createdBy: z.string(),
@@ -80,17 +82,6 @@ const aboutSchema = z
         shareFeedback: z.string(),
         app: z.string(),
         startInvoicing: z.string(),
-      })
-      .strict(),
-    newsletter: z
-      .object({
-        title: z.string(),
-        description: z.string(),
-        subscribe: z.string(),
-        placeholder: z.string(),
-        success: z.string(),
-        error: z.string(),
-        emailLanguageInfo: z.string(),
       })
       .strict(),
   })
