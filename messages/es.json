@@ -55,12 +55,14 @@
       "noSignup": "No requiere registro. 100% gratuito y de código abierto."
     },
     "footer": {
-      "description": "Una herramienta gratuita de código abierto para crear facturas PDF profesionales con vista previa en tiempo real.",
+      "description": "Una herramienta gratuita de codigo abierto para crear facturas PDF profesionales con vista previa en tiempo real. No es software de contabilidad. Sin garantias de cumplimiento. Se aplican los terminos. Por favor, revise nuestros Terminos de Servicio para mas detalles.",
       "product": "Producto",
       "links": {
         "features": "Características",
         "github": "GitHub",
-        "changelog": "Novedades"
+        "changelog": "Novedades",
+        "founder": "Fundador",
+        "termsOfService": "Términos del servicio"
       },
       "createdBy": "Creado por"
     },
@@ -72,15 +74,6 @@
       "shareFeedback": "Compartir comentarios",
       "app": "Aplicación",
       "startInvoicing": "Comenzar a facturar"
-    },
-    "newsletter": {
-      "title": "Suscríbete a nuestro boletín",
-      "description": "Recibe actualizaciones sobre nuevas funciones y mejoras de EasyInvoicePDF.com",
-      "subscribe": "Suscribirse",
-      "placeholder": "Introduce tu email",
-      "success": "¡Gracias por suscribirte!",
-      "error": "Error al suscribirse. Por favor, inténtalo de nuevo.",
-      "emailLanguageInfo": "Todos los correos se enviarán en inglés"
     }
   },
   "FAQ": {

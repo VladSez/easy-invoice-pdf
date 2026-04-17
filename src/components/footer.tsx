@@ -2,26 +2,15 @@ import { ProjectLogo } from "@/components/etc/project-logo";
 import { GITHUB_URL, TWITTER_URL } from "@/config";
 import Link from "next/link";
 
-export function Footer({
-  links,
-  translations,
-}: {
+interface FooterProps {
   links: React.ReactNode;
   translations: {
-    footerDescription: string;
+    footerDescription: React.ReactNode;
     footerCreatedBy: string;
-
     product: string;
-
-    newsletterTitle: string;
-    newsletterDescription: string;
-    newsletterSubscribe: string;
-    newsletterPlaceholder: string;
-    newsletterSuccessMessage: string;
-    newsletterErrorMessage: string;
-    newsletterEmailLanguageInfo: string;
   };
-}) {
+}
+export function Footer({ links, translations }: FooterProps) {
   return (
     <footer className="w-full border-t border-slate-200 bg-white py-12 md:py-16">
       <div className="container mx-auto px-4 md:px-6">

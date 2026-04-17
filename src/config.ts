@@ -19,11 +19,20 @@ export const VIDEO_DEMO_URL = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-dem
  */
 export const VIDEO_DEMO_FALLBACK_IMG = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026-fallback-img-v1.png`;
 
+/**
+ * YouTube URL for main demo video on marketing page and "How it works" dialog
+ */
+export const VIDEO_DEMO_YOUTUBE_URL =
+  "https://www.youtube.com/embed/iAROeCIcZ40?si=EyJKCsUr43Z8zY1f";
+
 // const DONATION_URL = "https://dub.sh/easyinvoice-donate";
 
 export const PROD_WEBSITE_URL = "https://easyinvoicepdf.com";
 
 export const GITHUB_URL = "https://github.com/VladSez/easy-invoice-pdf";
+
+export const LINKEDIN_URL =
+  "https://www.linkedin.com/in/vlad-sazonau-22a9a9126/";
 
 export const TWITTER_URL = "https://x.com/vladsazonau";
 

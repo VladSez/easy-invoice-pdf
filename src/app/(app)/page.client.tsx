@@ -731,19 +731,26 @@ export function AppPageClient({
       </div>
       <Footer
         translations={{
-          footerDescription:
-            "Create professional invoices in seconds with our free & open-source invoice maker. 100% in-browser, no sign-up required. Includes live PDF preview and a Stripe-style template - perfect for freelancers, startups, and small businesses.",
+          footerDescription: (
+            <>
+              Create professional invoices in seconds with our free &
+              open-source invoice maker. 100% in-browser, no sign-up required.
+              Includes live PDF preview and a Stripe-style template - perfect
+              for freelancers, startups, and small businesses.
+              <br /> <br />
+              Not accounting software. No compliance guarantees. Terms apply.
+              Please review our{" "}
+              <Link
+                href="/tos"
+                className="text-slate-700 underline hover:text-slate-900"
+              >
+                Terms of Service
+              </Link>{" "}
+              for more details.
+            </>
+          ),
           footerCreatedBy: "Made by",
           product: "Product",
-
-          newsletterTitle: "Subscribe to our newsletter",
-          newsletterDescription:
-            "Get the latest updates and news from EasyInvoicePDF.com",
-          newsletterSubscribe: "Subscribe",
-          newsletterPlaceholder: "Enter your email",
-          newsletterSuccessMessage: "Thank you for subscribing!",
-          newsletterErrorMessage: "Failed to subscribe. Please try again.",
-          newsletterEmailLanguageInfo: "All emails will be sent in English",
         }}
         links={
           <ul className="space-y-2">
@@ -753,14 +760,6 @@ export function AppPageClient({
                 className="text-sm text-slate-500 hover:text-slate-900"
               >
                 About
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/changelog"
-                className="text-sm text-slate-500 hover:text-slate-900"
-              >
-                Changelog
               </Link>
             </li>
             <li>
@@ -775,12 +774,36 @@ export function AppPageClient({
             </li>
             <li>
               <Link
+                href="/changelog"
+                className="text-sm text-slate-500 hover:text-slate-900"
+              >
+                Changelog
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/tos"
+                className="text-sm text-slate-500 hover:text-slate-900"
+              >
+                Terms of Service
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-slate-500 hover:text-slate-900"
               >
                 Share feedback
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/founder"
+                className="text-sm text-slate-500 hover:text-slate-900"
+              >
+                Founder
               </Link>
             </li>
           </ul>

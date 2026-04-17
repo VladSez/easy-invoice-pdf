@@ -49,7 +49,7 @@ const DialogContent = React.forwardRef<
         title="Close"
       >
         <X
-          size={16}
+          size={18}
           strokeWidth={2}
           className="opacity-60 transition-opacity group-hover:opacity-100"
         />

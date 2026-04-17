@@ -1,4 +1,3 @@
-// import { ProjectLogo } from "@/components/etc/project-logo";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { Footer } from "@/components/footer";
 import {
@@ -23,7 +22,7 @@ import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { type Graph } from "schema-dts";
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
-import { Header } from "./components/header";
+import { Header } from "@/app/(components)/header";
 
 // statically generate the pages for all locales
 export function generateStaticParams() {
@@ -37,15 +36,6 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
   setRequestLocale(locale);
 
   const t = useTranslations("About");
-  const tNewsletter = useTranslations("About.newsletter");
-
-  const newsletterTitle = tNewsletter("title");
-  const newsletterDescription = tNewsletter("description");
-  const newsletterSubscribe = tNewsletter("subscribe");
-  const newsletterPlaceholder = tNewsletter("placeholder");
-  const newsletterSuccessMessage = tNewsletter("success");
-  const newsletterErrorMessage = tNewsletter("error");
-  const newsletterEmailLanguageInfo = tNewsletter("emailLanguageInfo");
 
   const navLinks = {
     features: t("footer.links.features"),
@@ -60,6 +50,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const startInvoicingButtonText = t("buttons.startInvoicing");
 
   const changelogLinkText = t("footer.links.changelog");
+  const termsOfServiceLinkText = t("footer.links.termsOfService");
 
   return (
     <TooltipProvider>
@@ -80,6 +71,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
             goToAppText,
             startInvoicingButtonText,
             changelogLinkText,
+            termsOfServiceLinkText,
           }}
         />
         <main>
@@ -100,6 +92,16 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
                   className="text-sm text-slate-500 hover:text-slate-900"
                 >
                   {t("buttons.app")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={GITHUB_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-slate-500 hover:text-slate-900"
+                >
+                  {t("footer.links.github")}
                 </Link>
               </li>
               <li>
@@ -126,6 +128,15 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
                   {t("footer.links.changelog")}
                 </Link>
               </li>
+
+              <li>
+                <Link
+                  href="/tos"
+                  className="text-sm text-slate-500 hover:text-slate-900"
+                >
+                  {t("footer.links.termsOfService")}
+                </Link>
+              </li>
               <li>
                 <Link
                   href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
@@ -138,12 +149,10 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
               </li>
               <li>
                 <Link
-                  href={GITHUB_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/founder"
                   className="text-sm text-slate-500 hover:text-slate-900"
                 >
-                  {t("footer.links.github")}
+                  {t("footer.links.founder")}
                 </Link>
               </li>
             </ul>
@@ -152,14 +161,6 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
             footerDescription: t("footer.description"),
             footerCreatedBy: t("footer.createdBy"),
             product: t("footer.product"),
-
-            newsletterTitle: newsletterTitle,
-            newsletterDescription: newsletterDescription,
-            newsletterSubscribe: newsletterSubscribe,
-            newsletterPlaceholder: newsletterPlaceholder,
-            newsletterSuccessMessage: newsletterSuccessMessage,
-            newsletterErrorMessage: newsletterErrorMessage,
-            newsletterEmailLanguageInfo: newsletterEmailLanguageInfo,
           }}
         />
       </div>

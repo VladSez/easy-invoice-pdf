@@ -16,6 +16,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { LOADING_BUTTON_TEXT, LOADING_BUTTON_TIMEOUT } from "./invoice-form";
 
+import { CustomTooltip } from "@/components/ui/tooltip";
 import { useDeviceContext } from "@/contexts/device-context";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
 import { updateAppMetadata } from "../utils/get-app-metadata";
@@ -245,25 +246,32 @@ export function InvoicePDFDownloadLink({
   ]);
 
   return (
-    <>
-      <a
-        translate="no"
-        href={url || "#"}
-        download={url ? filename : undefined}
-        onClick={handleDownloadPDFClick}
-        className={cn(
-          "h-[36px] w-full rounded-lg bg-slate-900 px-4 py-2 text-center text-sm font-medium text-white",
-          "shadow-sm shadow-black/5 outline-offset-2 hover:bg-slate-900/90 active:scale-[98%] active:transition-transform",
-          "focus-visible:border-indigo-500 focus-visible:ring focus-visible:ring-indigo-200 focus-visible:ring-opacity-50",
-          "dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 lg:mb-0 lg:w-[210px]",
-          {
-            "pointer-events-none opacity-70": isLoading,
-            "lg:w-[240px]": invoiceData.language === "pt",
-          },
-        )}
-      >
-        <ButtonContent isLoading={isLoading} language={invoiceData.language} />
-      </a>
-    </>
+    <CustomTooltip
+      content="You are responsible for invoice compliance."
+      delayDuration={0}
+      trigger={
+        <a
+          translate="no"
+          href={url || "#"}
+          download={url ? filename : undefined}
+          onClick={handleDownloadPDFClick}
+          className={cn(
+            "h-[36px] w-full rounded-lg bg-slate-900 px-4 py-2 text-center text-sm font-medium text-white",
+            "shadow-sm shadow-black/5 outline-offset-2 hover:bg-slate-900/90 active:scale-[98%] active:transition-transform",
+            "focus-visible:border-indigo-500 focus-visible:ring focus-visible:ring-indigo-200 focus-visible:ring-opacity-50",
+            "dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 lg:mb-0 lg:w-[210px]",
+            {
+              "pointer-events-none opacity-70": isLoading,
+              "lg:w-[240px]": invoiceData.language === "pt",
+            },
+          )}
+        >
+          <ButtonContent
+            isLoading={isLoading}
+            language={invoiceData.language}
+          />
+        </a>
+      }
+    />
   );
 }

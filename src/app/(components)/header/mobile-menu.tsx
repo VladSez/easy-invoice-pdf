@@ -3,25 +3,29 @@
 import { GithubIcon } from "@/components/etc/github-logo";
 import { BlackAnimatedGoToAppBtn } from "@/components/animated-go-to-app-btn";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetDescription,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import type { Locale } from "next-intl";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ArrowRightIcon, Menu, X } from "lucide-react";
 import { LanguageSwitcher } from "./language-switcher";
 import { Logo } from "./logo";
-import type { HeaderProps } from "@/app/[locale]/about/components/header";
+import type { HeaderProps } from ".";
 
 interface MobileMenuProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   locale: Locale;
   translations: HeaderProps["translations"];
+  hideLanguageSwitcher?: boolean;
 }
 
 export function MobileMenu({
@@ -29,7 +33,16 @@ export function MobileMenu({
   onOpenChange,
   locale,
   translations,
+  hideLanguageSwitcher,
 }: MobileMenuProps) {
+  const pathname = usePathname();
+
+  const isChangelogActive = pathname === "/changelog";
+  const isTosActive = pathname === "/tos";
+
+  const mobileNavLinkClass =
+    "flex items-center rounded-lg px-4 py-4 text-lg font-medium transition-colors hover:bg-slate-100/90 hover:text-black";
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>
@@ -50,6 +63,10 @@ export function MobileMenu({
         showCloseButton={false}
       >
         <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
+        <SheetDescription className="sr-only">
+          Navigation menu with links to features, FAQ, changelog, terms of
+          service, and language settings
+        </SheetDescription>
 
         {/* Faux header row mirroring the page header */}
         <header className="w-full border-b bg-white shadow-sm">
@@ -79,17 +96,19 @@ export function MobileMenu({
 
         <nav className="container flex flex-col gap-1 px-6 py-4 md:px-10">
           <SheetClose asChild>
+            {/* this is only reliable way to scroll to a section on route navigation*/}
             <a
-              href="#features"
-              className="flex items-center rounded-lg px-4 py-4 text-lg font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              href={`/${locale}/about#features`}
+              className={cn(mobileNavLinkClass, "text-slate-700")}
             >
               {translations.navLinks.features}
             </a>
           </SheetClose>
           <SheetClose asChild>
+            {/* this is only reliable way to scroll to a section on route navigation*/}
             <a
-              href="#faq"
-              className="flex items-center rounded-lg px-4 py-4 text-lg font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              href={`/${locale}/about#faq`}
+              className={cn(mobileNavLinkClass, "text-slate-700")}
             >
               {translations.navLinks.faq}
             </a>
@@ -97,10 +116,27 @@ export function MobileMenu({
           <SheetClose asChild>
             <Link
               href="/changelog"
-              className="flex items-center rounded-lg px-4 py-4 text-lg font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              className={cn(
+                mobileNavLinkClass,
+                isChangelogActive
+                  ? "bg-slate-100 text-black"
+                  : "text-slate-700",
+              )}
             >
               {translations.changelogLinkText}
             </Link>
+          </SheetClose>
+          <SheetClose asChild>
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+            <a
+              href="/tos"
+              className={cn(
+                mobileNavLinkClass,
+                isTosActive ? "bg-slate-100 text-black" : "text-slate-700",
+              )}
+            >
+              {translations.termsOfServiceLinkText}
+            </a>
           </SheetClose>
           <SheetClose asChild>
             <Link
@@ -116,7 +152,7 @@ export function MobileMenu({
           </SheetClose>
 
           {/* Start Invoicing CTA Button */}
-          <div className="w-fit pt-2" onClick={() => onOpenChange(false)}>
+          <div className="w-fit pt-4" onClick={() => onOpenChange(false)}>
             <Button
               size="lg"
               variant="outline"
@@ -138,18 +174,20 @@ export function MobileMenu({
           </div>
         </nav>
 
-        <div className="mt-auto border-t border-slate-200 px-6 pb-6 pt-5">
-          <div className="flex items-center gap-2 px-2">
-            <span className="text-sm text-slate-700">
-              {translations.switchLanguageText}
-            </span>
-            <LanguageSwitcher
-              locale={locale}
-              buttonText={translations.switchLanguageText}
-              onSelect={() => onOpenChange(false)}
-            />
+        {!hideLanguageSwitcher && (
+          <div className="mt-auto border-t border-slate-200 px-6 pb-6 pt-5">
+            <div className="flex items-center gap-2 px-2">
+              <span className="text-sm text-slate-700">
+                {translations.switchLanguageText}
+              </span>
+              <LanguageSwitcher
+                locale={locale}
+                buttonText={translations.switchLanguageText}
+                onSelect={() => onOpenChange(false)}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </SheetContent>
     </Sheet>
   );

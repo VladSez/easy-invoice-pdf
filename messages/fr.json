@@ -47,12 +47,14 @@
       "noSignup": "Aucune inscription requise. 100% gratuit et open-source."
     },
     "footer": {
-      "description": "Un outil gratuit et open-source pour créer des factures PDF professionnelles avec aperçu en temps réel.",
+      "description": "Un outil gratuit et open-source pour créer des factures PDF professionnelles avec aperçu en temps réel. Pas un logiciel de comptabilite. Aucune garantie de conformite. Les conditions s'appliquent. Veuillez consulter nos Conditions d'utilisation pour plus de details.",
       "product": "Produit",
       "links": {
         "features": "Fonctionnalités",
         "github": "GitHub",
-        "changelog": "Nouveautés"
+        "changelog": "Nouveautés",
+        "founder": "Fondateur",
+        "termsOfService": "Conditions d'utilisation"
       },
       "createdBy": "Créé par"
     },
@@ -64,15 +66,6 @@
       "shareFeedback": "Partager un avis",
       "app": "Application",
       "startInvoicing": "Commencer la facturation"
-    },
-    "newsletter": {
-      "title": "Abonnez-vous à notre newsletter",
-      "description": "Recevez des mises à jour sur les nouvelles fonctionnalités et améliorations de EasyInvoicePDF.com",
-      "subscribe": "S'abonner",
-      "placeholder": "Entrez votre email",
-      "success": "Merci de votre abonnement !",
-      "error": "Échec de l'abonnement. Veuillez réessayer.",
-      "emailLanguageInfo": "Tous les emails seront envoyés en anglais"
     }
   },
   "Metadata": {

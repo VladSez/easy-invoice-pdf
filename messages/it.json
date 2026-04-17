@@ -47,12 +47,14 @@
       "noSignup": "Nessuna registrazione richiesta. 100% gratuito e open-source."
     },
     "footer": {
-      "description": "Uno strumento gratuito e open-source per creare fatture PDF professionali con anteprima in tempo reale.",
+      "description": "Uno strumento gratuito e open-source per creare fatture PDF professionali con anteprima in tempo reale. Non e un software di contabilita. Nessuna garanzia di conformita. Si applicano i termini. Si prega di consultare i nostri Termini di Servizio per ulteriori dettagli.",
       "product": "Prodotto",
       "links": {
         "features": "Funzionalità",
         "github": "GitHub",
-        "changelog": "Novità"
+        "changelog": "Novità",
+        "founder": "Fondatore",
+        "termsOfService": "Termini di servizio"
       },
       "createdBy": "Creato da"
     },
@@ -64,15 +66,6 @@
       "shareFeedback": "Condividi feedback",
       "app": "App",
       "startInvoicing": "Inizia fatturazione"
-    },
-    "newsletter": {
-      "title": "Iscriviti alla nostra newsletter",
-      "description": "Ricevi aggiornamenti sulle nuove funzionalità e i miglioramenti di EasyInvoicePDF.com",
-      "subscribe": "Iscriviti",
-      "placeholder": "Inserisci la tua email",
-      "success": "Grazie per l'iscrizione!",
-      "error": "Iscrizione fallita. Per favore riprova.",
-      "emailLanguageInfo": "Tutte le email saranno inviate in inglese"
     }
   },
   "Metadata": {

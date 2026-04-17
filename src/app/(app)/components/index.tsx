@@ -11,6 +11,7 @@ import { AlertCircleIcon, FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 
 import { TWITTER_URL } from "@/config";
+import Link from "next/link";
 import type { Dispatch, SetStateAction } from "react";
 import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
@@ -299,10 +300,20 @@ export function InvoiceClientPage({
               </span>
             </div>
           </div>
+          <div className="mt-1 flex justify-center text-xs text-zinc-900">
+            <Link
+              href="/tos"
+              className="underline hover:text-black"
+              data-testid="mobile-terms-of-service-link"
+            >
+              Terms of Service
+            </Link>
+          </div>
         </div>
       ) : (
         // Desktop View
         <>
+          {/* Invoice form section i.e. left column (Desktop version) */}
           <div className="col-span-4">
             <div className="h-[620px] overflow-auto border-b px-3 pl-0 shadow-[0_4px_6px_-4px_rgba(0,0,0,0.1)] 2xl:h-[700px]">
               <InvoiceForm
@@ -338,11 +349,14 @@ export function InvoiceClientPage({
               </span>
             </div>
           </div>
+          {/* Invoice preview section i.e. right column (Desktop version) */}
           <div className="relative col-span-8 h-[620px] w-full max-w-full 2xl:h-[700px]">
             {invoiceLastUpdatedAtFormatted && (
-              <div className="absolute -top-5 right-0 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2 md:-mb-5 lg:text-right">
-                <span className="font-semibold">Invoice last updated:</span>{" "}
-                {invoiceLastUpdatedAtFormatted}
+              <div className="relative">
+                <div className="absolute -top-5 right-0 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2 md:-mb-5 lg:text-right">
+                  <span className="font-semibold">Invoice last updated:</span>{" "}
+                  {invoiceLastUpdatedAtFormatted}
+                </div>
               </div>
             )}
             <PdfViewer
@@ -351,6 +365,15 @@ export function InvoiceClientPage({
               isMobile={false}
               qrCodeDataUrl={qrCodeDataUrl}
             />
+            <div className="absolute -bottom-6 right-0 text-right text-xs text-zinc-900">
+              <Link
+                href="/tos"
+                className="underline hover:text-black"
+                data-testid="desktop-terms-of-service-link"
+              >
+                Terms of Service
+              </Link>
+            </div>
           </div>
         </>
       )}

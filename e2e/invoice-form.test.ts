@@ -14,7 +14,11 @@ import {
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
-import { GITHUB_URL, STATIC_ASSETS_URL, VIDEO_DEMO_URL } from "@/config";
+import {
+  GITHUB_URL,
+  STATIC_ASSETS_URL,
+  VIDEO_DEMO_YOUTUBE_URL,
+} from "@/config";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -129,18 +133,16 @@ test.describe("Invoice Generator Page", () => {
       ),
     ).toBeVisible();
 
-    // Check that video is displayed in dialog
+    // Check that demo embed is displayed in dialog
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
 
-    const video = dialog.getByTestId("how-it-works-video");
+    const embed = dialog.getByTestId("how-it-works-video");
 
-    await expect(video).toBeVisible();
+    await expect(embed).toBeVisible();
 
-    await expect(video).toHaveAttribute("src", VIDEO_DEMO_URL);
-    await expect(video).toHaveAttribute("autoplay", "");
-    await expect(video).toHaveAttribute("controls", "");
-    await expect(video).toHaveAttribute("playsInline", "");
+    await expect(embed).toHaveAttribute("src", VIDEO_DEMO_YOUTUBE_URL);
+    await expect(embed).toHaveAttribute("title", "EasyInvoicePDF Demo Video");
 
     await dialog.getByRole("button", { name: "Close" }).click();
     await expect(dialog).toBeHidden();
@@ -176,12 +178,26 @@ test.describe("Invoice Generator Page", () => {
     await expect(page.getByRole("tab", { name: "Edit Invoice" })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Preview PDF" })).toBeVisible();
 
+    const termsOfServiceLink = page.getByTestId("mobile-terms-of-service-link");
+    // Check that Terms of Service are displayed
+    await expect(termsOfServiceLink).toBeVisible();
+    await expect(termsOfServiceLink).toHaveText("Terms of Service");
+    await expect(termsOfServiceLink).toHaveAttribute("href", "/tos");
+
     // Test desktop view
     await page.setViewportSize({ width: 1280, height: 800 });
 
     // check that tabs are not visible in desktop view
     await expect(page.getByRole("tab", { name: "Edit Invoice" })).toBeHidden();
     await expect(page.getByRole("tab", { name: "Preview PDF" })).toBeHidden();
+
+    const termsOfServiceLink2 = page.getByTestId(
+      "desktop-terms-of-service-link",
+    );
+    // Check that Terms of Service are displayed
+    await expect(termsOfServiceLink2).toBeVisible();
+    await expect(termsOfServiceLink2).toHaveText("Terms of Service");
+    await expect(termsOfServiceLink2).toHaveAttribute("href", "/tos");
   });
 
   test("displays initial form state correctly", async ({ page }) => {

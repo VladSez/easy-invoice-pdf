@@ -6,6 +6,7 @@ import { GITHUB_URL } from "@/config";
 import { cn } from "@/lib/utils";
 import { type Locale } from "next-intl";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { LanguageSwitcher } from "./language-switcher";
 import { Logo } from "./logo";
@@ -24,10 +25,24 @@ export interface HeaderProps {
     goToAppText: string;
     startInvoicingButtonText: string;
     changelogLinkText: string;
+    termsOfServiceLinkText: string;
   };
+  hideLanguageSwitcher?: boolean;
 }
-export function Header({ locale, translations }: HeaderProps) {
+
+export function Header({
+  locale,
+  translations,
+  hideLanguageSwitcher = false,
+}: HeaderProps) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isChangelogActive = pathname === "/changelog";
+  const isTosActive = pathname === "/tos";
+
+  const desktopNavLinkClass =
+    "rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-slate-100/90 hover:text-black";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
@@ -47,24 +62,40 @@ export function Header({ locale, translations }: HeaderProps) {
             <div className="flex items-center gap-1">
               {/* Desktop nav */}
               <nav className="hidden items-center justify-end gap-1 lg:flex">
+                {/* a href this is only reliable way to scroll to a section on route navigation*/}
                 <a
-                  href="#features"
-                  className="rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                  href={`/${locale}/about#features`}
+                  className={cn(desktopNavLinkClass, "text-slate-600")}
                 >
                   {translations.navLinks.features}
                 </a>
+                {/* a href this is only reliable way to scroll to a section on route navigation*/}
                 <a
-                  href="#faq"
-                  className="rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                  href={`/${locale}/about#faq`}
+                  className={cn(desktopNavLinkClass, "text-slate-600")}
                 >
                   {translations.navLinks.faq}
                 </a>
 
                 <Link
                   href="/changelog"
-                  className="rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                  className={cn(
+                    desktopNavLinkClass,
+                    isChangelogActive
+                      ? "bg-slate-100 text-black"
+                      : "text-slate-600",
+                  )}
                 >
                   {translations.changelogLinkText}
+                </Link>
+                <Link
+                  href="/tos"
+                  className={cn(
+                    desktopNavLinkClass,
+                    isTosActive ? "bg-slate-100 text-black" : "text-slate-600",
+                  )}
+                >
+                  {translations.termsOfServiceLinkText}
                 </Link>
                 <Link
                   href={GITHUB_URL}
@@ -79,11 +110,13 @@ export function Header({ locale, translations }: HeaderProps) {
               </nav>
 
               {/* Language switcher -- desktop only */}
-              <div className="hidden lg:block">
-                <LanguageSwitcher
-                  locale={locale}
-                  buttonText={translations.switchLanguageText}
-                />
+              <div className="hidden min-w-[36px] lg:block">
+                {!hideLanguageSwitcher && (
+                  <LanguageSwitcher
+                    locale={locale}
+                    buttonText={translations.switchLanguageText}
+                  />
+                )}
               </div>
 
               {/* CTA button - hidden from header on mobile when sheet is open */}
@@ -112,6 +145,7 @@ export function Header({ locale, translations }: HeaderProps) {
                   onOpenChange={setOpen}
                   locale={locale}
                   translations={translations}
+                  hideLanguageSwitcher={hideLanguageSwitcher}
                 />
               </div>
             </div>

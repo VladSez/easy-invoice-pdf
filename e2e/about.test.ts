@@ -46,12 +46,12 @@ test.describe("About page", () => {
       });
 
       await expect(featuresLink).toBeVisible();
-      await expect(featuresLink).toHaveAttribute("href", "#features");
+      await expect(featuresLink).toHaveAttribute("href", "/en/about#features");
 
       const faqLink = header.getByRole("link", { name: "FAQ", exact: true });
 
       await expect(faqLink).toBeVisible();
-      await expect(faqLink).toHaveAttribute("href", "#faq");
+      await expect(faqLink).toHaveAttribute("href", "/en/about#faq");
 
       const changelogLink = header.getByRole("link", {
         name: "Changelog",
@@ -81,7 +81,7 @@ test.describe("About page", () => {
     ).toBeVisible();
 
     const goToAppButton = header.getByRole("link", {
-      name: "Go to app",
+      name: "Open app",
       exact: true,
     });
     await expect(goToAppButton).toBeVisible();
@@ -212,6 +212,24 @@ test.describe("About page", () => {
     await expect(changelogLink).toHaveAttribute("href", "/changelog");
     await expect(changelogLink).not.toHaveAttribute("target", "_blank");
 
+    const founderLink = footerLinks.getByRole("link", {
+      name: "Founder",
+      exact: true,
+    });
+
+    await expect(founderLink).toBeVisible();
+    await expect(founderLink).toHaveAttribute("href", "/founder");
+    await expect(founderLink).not.toHaveAttribute("target", "_blank");
+
+    const termsOfServiceLink = footerLinks.getByRole("link", {
+      name: "Terms of Service",
+      exact: true,
+    });
+
+    await expect(termsOfServiceLink).toBeVisible();
+    await expect(termsOfServiceLink).toHaveAttribute("href", "/tos");
+    await expect(termsOfServiceLink).not.toHaveAttribute("target", "_blank");
+
     const shareFeedbackLink = footerLinks.getByRole("link", {
       name: "Share feedback",
       exact: true,
@@ -311,6 +329,15 @@ test.describe("About page", () => {
     await expect(featuresLink).toBeVisible();
     await expect(featuresLink).toHaveAttribute("href", "#features");
     await expect(featuresLink).not.toHaveAttribute("target", "_blank");
+
+    const termsOfServiceLinkFr = footerLinks.getByRole("link", {
+      name: "Conditions d'utilisation",
+      exact: true,
+    });
+
+    await expect(termsOfServiceLinkFr).toBeVisible();
+    await expect(termsOfServiceLinkFr).toHaveAttribute("href", "/tos");
+    await expect(termsOfServiceLinkFr).not.toHaveAttribute("target", "_blank");
   });
 
   test("should display about page content in German", async ({ page }) => {
@@ -373,6 +400,15 @@ test.describe("About page", () => {
     await expect(
       footerLinks.getByRole("link", { name: "Funktionen", exact: true }),
     ).toBeVisible();
+
+    const termsOfServiceLinkDe = footerLinks.getByRole("link", {
+      name: "Nutzungsbedingungen",
+      exact: true,
+    });
+
+    await expect(termsOfServiceLinkDe).toBeVisible();
+    await expect(termsOfServiceLinkDe).toHaveAttribute("href", "/tos");
+    await expect(termsOfServiceLinkDe).not.toHaveAttribute("target", "_blank");
   });
 
   test("should handle language switching", async ({ page, isMobile }) => {
@@ -411,7 +447,7 @@ test.describe("About page", () => {
     const header = page.getByRole("banner");
 
     const headerGoToAppButton = header.getByRole("link", {
-      name: "Go to app",
+      name: "Open app",
       exact: true,
     });
 
@@ -444,8 +480,17 @@ test.describe("About page", () => {
     ).toBeVisible();
 
     await expect(
+      header.getByRole("link", { name: "Terms of Service", exact: true }),
+    ).toBeVisible();
+
+    await expect(
       header.getByRole("link", { name: "View on GitHub", exact: true }),
     ).toBeVisible();
+
+    // we don't show founder link in header
+    await expect(
+      header.getByRole("link", { name: "Founder", exact: true }),
+    ).toBeHidden();
 
     await expect(
       header.getByRole("button", { name: "Switch language" }),
@@ -491,11 +536,11 @@ test.describe("About page", () => {
       exact: true,
     });
     await expect(featuresLink).toBeVisible();
-    await expect(featuresLink).toHaveAttribute("href", "#features");
+    await expect(featuresLink).toHaveAttribute("href", "/en/about#features");
 
     const faqLink = sheet.getByRole("link", { name: "FAQ", exact: true });
     await expect(faqLink).toBeVisible();
-    await expect(faqLink).toHaveAttribute("href", "#faq");
+    await expect(faqLink).toHaveAttribute("href", "/en/about#faq");
 
     const changelogLink = sheet.getByRole("link", {
       name: "Changelog",
@@ -504,12 +549,26 @@ test.describe("About page", () => {
     await expect(changelogLink).toBeVisible();
     await expect(changelogLink).toHaveAttribute("href", "/changelog");
 
+    const termsLinkMobile = sheet.getByRole("link", {
+      name: "Terms of Service",
+      exact: true,
+    });
+    await expect(termsLinkMobile).toBeVisible();
+    await expect(termsLinkMobile).toHaveAttribute("href", "/tos");
+
     const githubLink = sheet.getByRole("link", {
       name: "View on GitHub",
       exact: true,
     });
     await expect(githubLink).toBeVisible();
     await expect(githubLink).toHaveAttribute("href", GITHUB_URL);
+
+    // we don't show founder link in mobile menu
+    const founderLinkMobile = sheet.getByRole("link", {
+      name: "Founder",
+      exact: true,
+    });
+    await expect(founderLinkMobile).toBeHidden();
 
     await expect(
       sheet.getByRole("button", { name: "Switch language" }),
