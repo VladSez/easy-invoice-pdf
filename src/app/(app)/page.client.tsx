@@ -698,7 +698,7 @@ export function AppPageClient({
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
-        <div className="w-full max-w-7xl bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1">
+        <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 xl:max-w-7xl 2xl:max-w-[1680px]">
           <InvoicePageHeader
             canShareInvoice={canShareInvoice}
             handleShareInvoice={handleShareInvoice}
