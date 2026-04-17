@@ -55,7 +55,7 @@
       "noSignup": "Não requer cadastro. 100% gratuito e de código aberto."
     },
     "footer": {
-      "description": "Uma ferramenta gratuita de codigo aberto para criar faturas PDF profissionais com pre-visualizacao em tempo real. Nao e um software de contabilidade. Sem garantias de conformidade. Os termos se aplicam. Por favor, revise nossos Termos de Servico para mais detalhes.",
+      "description": "Uma ferramenta gratuita de codigo aberto para criar faturas PDF profissionais com pre-visualizacao em tempo real.<br></br><br></br>Nao e um software de contabilidade. Sem garantias de conformidade. Ao usar esta ferramenta, voce concorda com os <tosLink>Termos de serviço</tosLink>.",
       "product": "Produto",
       "links": {
         "features": "Recursos",

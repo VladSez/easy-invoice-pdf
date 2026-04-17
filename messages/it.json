@@ -47,7 +47,7 @@
       "noSignup": "Nessuna registrazione richiesta. 100% gratuito e open-source."
     },
     "footer": {
-      "description": "Uno strumento gratuito e open-source per creare fatture PDF professionali con anteprima in tempo reale. Non e un software di contabilita. Nessuna garanzia di conformita. Si applicano i termini. Si prega di consultare i nostri Termini di Servizio per ulteriori dettagli.",
+      "description": "Uno strumento gratuito e open-source per creare fatture PDF professionali con anteprima in tempo reale.<br></br><br></br>Non e un software di contabilita. Nessuna garanzia di conformita. Utilizzando questo strumento, accetti i <tosLink>Termini di servizio</tosLink>.",
       "product": "Prodotto",
       "links": {
         "features": "Funzionalità",

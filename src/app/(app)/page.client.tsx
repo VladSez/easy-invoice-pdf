@@ -738,15 +738,14 @@ export function AppPageClient({
               Includes live PDF preview and a Stripe-style template - perfect
               for freelancers, startups, and small businesses.
               <br /> <br />
-              Not accounting software. No compliance guarantees. Terms apply.
-              Please review our{" "}
+              Not accounting software. No compliance guarantees. By using this
+              tool, you agree to the{" "}
               <Link
                 href="/tos"
                 className="text-slate-700 underline hover:text-slate-900"
               >
                 Terms of Service
-              </Link>{" "}
-              for more details.
+              </Link>
             </>
           ),
           footerCreatedBy: "Made by",
