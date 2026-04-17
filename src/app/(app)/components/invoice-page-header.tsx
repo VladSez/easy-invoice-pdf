@@ -230,17 +230,22 @@ function ProjectInfoLinks() {
         </a>
         <span className="h-3 w-px bg-slate-500" aria-hidden="true" />
 
-        <a
-          href={GITHUB_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group inline-flex items-center gap-1.5 rounded-full border border-slate-400 px-3 py-1 text-xs font-medium text-slate-900 shadow transition-[colors,transform,border-color] duration-200 hover:border-blue-300 hover:text-blue-600 active:scale-[0.96]"
-        >
-          <GithubIcon className="size-4 transition-[transform,fill] duration-200 group-hover:scale-105 group-hover:fill-blue-600" />
-          <span className="transition-colors duration-200 group-hover:text-blue-600">
-            Star on GitHub
-          </span>
-        </a>
+        <div className="relative overflow-hidden">
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative flex items-center gap-1.5 overflow-visible rounded-full border border-slate-300/80 bg-white px-3 py-1 text-xs shadow-sm transition-[colors,transform,border-color] duration-200 hover:border-slate-400/50 hover:bg-slate-50 hover:text-black active:scale-[0.96]"
+          >
+            <div className="border-glow-mask z-10" aria-hidden="true">
+              <div className="border-glow-shine animate-rotate-shine" />
+            </div>
+            <GithubIcon className="size-4 transition-[transform,fill] duration-200 group-hover:scale-105 group-hover:fill-blue-600" />
+            <span className="transition-colors duration-200 group-hover:text-blue-600">
+              Star on GitHub
+            </span>
+          </a>
+        </div>
       </div>
 
       <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
