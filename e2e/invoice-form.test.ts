@@ -181,7 +181,7 @@ test.describe("Invoice Generator Page", () => {
     const termsOfServiceLink = page.getByTestId("mobile-terms-of-service-link");
     // Check that Terms of Service are displayed
     await expect(termsOfServiceLink).toBeVisible();
-    await expect(termsOfServiceLink).toHaveText("Terms of service");
+    await expect(termsOfServiceLink).toHaveText("Terms of Service");
     await expect(termsOfServiceLink).toHaveAttribute("href", "/tos");
 
     // Test desktop view
@@ -196,7 +196,7 @@ test.describe("Invoice Generator Page", () => {
     );
     // Check that Terms of Service are displayed
     await expect(termsOfServiceLink2).toBeVisible();
-    await expect(termsOfServiceLink2).toHaveText("Terms of service");
+    await expect(termsOfServiceLink2).toHaveText("Terms of Service");
     await expect(termsOfServiceLink2).toHaveAttribute("href", "/tos");
   });
 

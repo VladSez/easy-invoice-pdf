@@ -48,7 +48,7 @@
       "noSignup": "No sign-up required. 100% free and open-source."
     },
     "footer": {
-      "description": "Create professional invoices in seconds with our free & open-source invoice maker. 100% in-browser, no sign-up required. Includes live PDF preview and a Stripe-style template - perfect for freelancers, startups, and small businesses.",
+      "description": "Create professional invoices in seconds with our free & open-source invoice maker. 100% in-browser, no sign-up required. Includes live PDF preview and a Stripe-style template - perfect for freelancers, startups, and small businesses. Not accounting software. No compliance guarantees. Terms apply. Please review our Terms of Service for more details.",
       "product": "Product",
       "links": {
         "features": "Features",

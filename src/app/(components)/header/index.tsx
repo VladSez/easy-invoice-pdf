@@ -25,7 +25,6 @@ export interface HeaderProps {
     goToAppText: string;
     startInvoicingButtonText: string;
     changelogLinkText: string;
-    founderLinkText: string;
     termsOfServiceLinkText: string;
   };
   hideLanguageSwitcher?: boolean;

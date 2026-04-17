@@ -50,7 +50,6 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const startInvoicingButtonText = t("buttons.startInvoicing");
 
   const changelogLinkText = t("footer.links.changelog");
-  const founderLinkText = t("footer.links.founder");
   const termsOfServiceLinkText = t("footer.links.termsOfService");
 
   return (
@@ -72,7 +71,6 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
             goToAppText,
             startInvoicingButtonText,
             changelogLinkText,
-            founderLinkText,
             termsOfServiceLinkText,
           }}
         />

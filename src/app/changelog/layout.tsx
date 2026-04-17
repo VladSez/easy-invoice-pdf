@@ -95,7 +95,6 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
           goToAppText: "Open app",
           startInvoicingButtonText: "Start Invoicing",
           changelogLinkText: "Changelog",
-          founderLinkText: "Founder",
           termsOfServiceLinkText: "Terms of Service",
         }}
         hideLanguageSwitcher={true}

@@ -64,8 +64,8 @@ export function MobileMenu({
       >
         <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
         <SheetDescription className="sr-only">
-          Navigation menu with links to features, FAQ, changelog, founder, terms
-          of service, and language settings
+          Navigation menu with links to features, FAQ, changelog, terms of
+          service, and language settings
         </SheetDescription>
 
         {/* Faux header row mirroring the page header */}

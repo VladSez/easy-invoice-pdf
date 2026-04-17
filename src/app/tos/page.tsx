@@ -84,7 +84,6 @@ export default function TermsOfServicePage() {
           goToAppText: "Open app",
           startInvoicingButtonText: "Start Invoicing",
           changelogLinkText: "Changelog",
-          founderLinkText: "Founder",
           termsOfServiceLinkText: "Terms of Service",
         }}
         hideLanguageSwitcher={true}

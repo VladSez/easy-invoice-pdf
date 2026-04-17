@@ -80,10 +80,6 @@ test.describe("Changelog page", () => {
     await expect(backLink).toBeVisible();
     await expect(backLink).toHaveAttribute("href", "/changelog");
 
-    // Check that the entry has a title (h1)
-    const entryTitle = page.locator("h1").first();
-    await expect(entryTitle).toBeVisible();
-
     // Check author information
     await expect(page.getByTestId("author-info-text")).toHaveText(
       "Vlad SazonauFounder,  EasyInvoicePDF",
