@@ -52,7 +52,8 @@ jobs:
           SENTRY_ENABLED: false
           NEXT_PUBLIC_SENTRY_ENABLED: false
         continue-on-error: true
-        run: pnpm exec playwright test --reporter=html,list
+        # https://playwright.dev/docs/test-reporters#line-reporter
+        run: pnpm exec playwright test --reporter=html,line
 
       - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         name: 🎲 Upload Playwright report

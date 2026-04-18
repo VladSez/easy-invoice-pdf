@@ -178,11 +178,17 @@ test.describe("Invoice Generator Page", () => {
     await expect(page.getByRole("tab", { name: "Edit Invoice" })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Preview PDF" })).toBeVisible();
 
-    const termsOfServiceLink = page.getByTestId("mobile-terms-of-service-link");
+    const termsOfServiceMobile = page.getByTestId(
+      "mobile-terms-of-service-link",
+    );
+    const termsOfServiceLinkMobile = termsOfServiceMobile.getByRole("link");
+
     // Check that Terms of Service are displayed
-    await expect(termsOfServiceLink).toBeVisible();
-    await expect(termsOfServiceLink).toHaveText("Terms of Service apply");
-    await expect(termsOfServiceLink).toHaveAttribute("href", "/tos");
+    await expect(termsOfServiceMobile).toBeVisible();
+    await expect(termsOfServiceMobile).toHaveText(
+      "By using this tool, you agree to the Terms of Service",
+    );
+    await expect(termsOfServiceLinkMobile).toHaveAttribute("href", "/tos");
 
     // Test desktop view
     await page.setViewportSize({ width: 1280, height: 800 });
@@ -191,13 +197,17 @@ test.describe("Invoice Generator Page", () => {
     await expect(page.getByRole("tab", { name: "Edit Invoice" })).toBeHidden();
     await expect(page.getByRole("tab", { name: "Preview PDF" })).toBeHidden();
 
-    const termsOfServiceLink2 = page.getByTestId(
+    const termsOfServiceDesktop = page.getByTestId(
       "desktop-terms-of-service-link",
     );
+    const termsOfServiceLinkDesktop = termsOfServiceDesktop.getByRole("link");
+
     // Check that Terms of Service are displayed
-    await expect(termsOfServiceLink2).toBeVisible();
-    await expect(termsOfServiceLink2).toHaveText("Terms of Service apply");
-    await expect(termsOfServiceLink2).toHaveAttribute("href", "/tos");
+    await expect(termsOfServiceDesktop).toBeVisible();
+    await expect(termsOfServiceDesktop).toHaveText(
+      "By using this tool, you agree to the Terms of Service",
+    );
+    await expect(termsOfServiceLinkDesktop).toHaveAttribute("href", "/tos");
   });
 
   test("displays initial form state correctly", async ({ page }) => {
