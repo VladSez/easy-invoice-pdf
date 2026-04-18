@@ -117,6 +117,7 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
               >
                 Terms of Service
               </Link>
+              .
             </>
           ),
           footerCreatedBy: "Made by",
