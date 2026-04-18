@@ -306,7 +306,7 @@ export function InvoiceClientPage({
               className="underline hover:text-black"
               data-testid="mobile-terms-of-service-link"
             >
-              Terms of Service
+              Terms of Service apply
             </Link>
           </div>
         </div>
@@ -371,7 +371,7 @@ export function InvoiceClientPage({
                 className="underline hover:text-black"
                 data-testid="desktop-terms-of-service-link"
               >
-                Terms of Service
+                Terms of Service apply
               </Link>
             </div>
           </div>

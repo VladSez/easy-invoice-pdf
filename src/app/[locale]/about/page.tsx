@@ -158,7 +158,17 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
             </ul>
           }
           translations={{
-            footerDescription: t("footer.description"),
+            footerDescription: t.rich("footer.description", {
+              br: () => <br />,
+              tosLink: (chunks) => (
+                <Link
+                  href="/tos"
+                  className="text-slate-700 underline hover:text-slate-900"
+                >
+                  {chunks}
+                </Link>
+              ),
+            }),
             footerCreatedBy: t("footer.createdBy"),
             product: t("footer.product"),
           }}

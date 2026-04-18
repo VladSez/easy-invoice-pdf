@@ -55,7 +55,7 @@
       "noSignup": "Bez rejestracji. W 100% darmowe i open-source."
     },
     "footer": {
-      "description": "Darmowe narzedzie open-source do tworzenia profesjonalnych faktur PDF z podgladem w czasie rzeczywistym. Nie jest oprogramowaniem ksiegowym. Brak gwarancji zgodnosci. Obowiazuja warunki. Prosimy zapoznac sie z naszymi Warunkami korzystania z uslugi, aby uzyskac wiecej informacji.",
+      "description": "Darmowe narzędzie open-source do tworzenia profesjonalnych faktur PDF z podglądem w czasie rzeczywistym.<br></br><br></br>Nie jest oprogramowaniem księgowym. Brak gwarancji zgodności. Korzystając z tego narzędzia, akceptujesz <tosLink>Regulamin</tosLink>.",
       "product": "Produkt",
       "links": {
         "features": "Funkcje",

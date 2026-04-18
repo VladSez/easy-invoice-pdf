@@ -3,7 +3,6 @@
     "tagline": "Free Invoice Generator with Live PDF Preview",
     "hero": {
       "title": "Create professional invoices in seconds",
-
       "description": "EasyInvoicePDF is a <span>free, open-source</span> invoice generator with <span>real-time preview</span>. Create, customize, and download professional invoices. <span>No sign-up required.</span>"
     },
     "features": {
@@ -48,7 +47,7 @@
       "noSignup": "No sign-up required. 100% free and open-source."
     },
     "footer": {
-      "description": "Create professional invoices in seconds with our free & open-source invoice maker. 100% in-browser, no sign-up required. Includes live PDF preview and a Stripe-style template - perfect for freelancers, startups, and small businesses. Not accounting software. No compliance guarantees. Terms apply. Please review our Terms of Service for more details.",
+      "description": "Create professional invoices in seconds with our free & open-source invoice maker. 100% in-browser, no sign-up required. Includes live PDF preview and a Stripe-style template - perfect for freelancers, startups, and small businesses.<br></br><br></br>Not accounting software. No compliance guarantees. By using this tool, you agree to the <tosLink>Terms of Service</tosLink>.",
       "product": "Product",
       "links": {
         "features": "Features",

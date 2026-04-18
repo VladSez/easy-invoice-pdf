@@ -55,7 +55,7 @@
       "noSignup": "Keine Anmeldung erforderlich. 100% kostenlos und Open-Source."
     },
     "footer": {
-      "description": "Ein kostenloses Open-Source-Tool zur Erstellung professioneller PDF-Rechnungen mit Live-Vorschau. Keine Buchhaltungssoftware. Keine Compliance-Garantien. Es gelten die Nutzungsbedingungen. Bitte lesen Sie unsere Nutzungsbedingungen fur weitere Details.",
+      "description": "Ein kostenloses Open-Source-Tool zur Erstellung professioneller PDF-Rechnungen mit Live-Vorschau.<br></br><br></br>Keine Buchhaltungssoftware. Keine Compliance-Garantien. Durch die Nutzung dieses Tools stimmen Sie den <tosLink>Nutzungsbedingungen</tosLink> zu.",
       "product": "Produkt",
       "links": {
         "features": "Funktionen",
