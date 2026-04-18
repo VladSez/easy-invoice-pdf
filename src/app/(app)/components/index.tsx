@@ -300,13 +300,12 @@ export function InvoiceClientPage({
               </span>
             </div>
           </div>
-          <div className="mt-3 flex flex-wrap justify-center gap-1 text-xs text-zinc-900">
+          <div
+            className="mt-3 flex flex-wrap justify-center gap-1 text-xs text-zinc-900"
+            data-testid="mobile-terms-of-service-link"
+          >
             By using this tool, you agree to the{" "}
-            <Link
-              href="/tos"
-              className="underline hover:text-black"
-              data-testid="mobile-terms-of-service-link"
-            >
+            <Link href="/tos" className="underline hover:text-black">
               Terms of Service
             </Link>
           </div>
@@ -366,13 +365,12 @@ export function InvoiceClientPage({
               isMobile={false}
               qrCodeDataUrl={qrCodeDataUrl}
             />
-            <div className="absolute -bottom-6 right-0 text-right text-xs text-zinc-800">
+            <div
+              className="absolute -bottom-6 right-0 text-right text-xs text-zinc-800"
+              data-testid="desktop-terms-of-service-link"
+            >
               By using this tool, you agree to the{" "}
-              <Link
-                href="/tos"
-                className="underline hover:text-black"
-                data-testid="mobile-terms-of-service-link"
-              >
+              <Link href="/tos" className="underline hover:text-black">
                 Terms of Service
               </Link>
             </div>
