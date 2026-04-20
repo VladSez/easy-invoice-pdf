@@ -15,7 +15,7 @@
 
   <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">
     <!-- source:  .github/screenshots/stripe-template.png -->
-    <img width="1440" height="769" alt="EasyInvoicePDF Product Screenshot" src="https://github.com/user-attachments/assets/6f0e2156-24e0-4f8b-b8f1-1d2bf5ac157a" />
+    <img width="1920" height="1536" alt="EasyInvoicePDF Product Screenshot" src="https://github.com/user-attachments/assets/6f0e2156-24e0-4f8b-b8f1-1d2bf5ac157a" />
   </a>
 
 <hr/>
