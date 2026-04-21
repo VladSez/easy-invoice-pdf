@@ -750,7 +750,7 @@ function OutOfDateDatesHelper({
       label: "Date of service",
       oldValue: formatDate(dateOfService),
       newValue: targetEndOfMonth,
-      hint: "end of month",
+      hint: "end of current month",
     },
     isInvoiceNumberStale && {
       label: "Invoice number",

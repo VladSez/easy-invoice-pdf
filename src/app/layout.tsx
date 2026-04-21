@@ -2,6 +2,7 @@ import { DeviceContextProvider } from "@/contexts/device-context";
 import { checkDeviceUserAgent } from "@/lib/check-device.server";
 import { NextIntlClientProvider } from "next-intl";
 // import { ReactScan } from "@/components/dev/react-scan";
+import { ResponsiveIndicator } from "@/components/dev/responsive-indicator";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
@@ -98,6 +99,10 @@ export default async function RootLayout({
 
             {/* https://sonner.emilkowal.ski/ */}
             <Toaster visibleToasts={1} richColors closeButton />
+            {/* show responsive indicator(tailwind breakpoint) for debugging responsive designs */}
+            {process.env.NODE_ENV === "development" ? (
+              <ResponsiveIndicator />
+            ) : null}
             {/* should only be enabled in production */}
             {process.env.VERCEL_ENV === "production" && (
               <>

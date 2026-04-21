@@ -41,12 +41,16 @@ body {
     transform-origin: 0 0;
     background: conic-gradient(
       transparent 0%,
-      #7d5bfff2 10%,
-      #7d5bff59,
-      transparent 20%
+      rgba(125, 91, 255, 0.15) 4%,
+      rgba(180, 140, 255, 0.9) 7%,
+      rgba(125, 91, 255, 0.95) 9%,
+      rgba(125, 91, 255, 0.4) 13%,
+      transparent 18%
     );
-    filter: drop-shadow(0 0 6px rgba(125, 91, 255, 0.7))
-      drop-shadow(0 0 14px rgba(125, 91, 255, 0.45));
+    filter: drop-shadow(0 0 4px rgba(125, 91, 255, 0.9))
+      drop-shadow(0 0 12px rgba(125, 91, 255, 0.5))
+      drop-shadow(0 0 24px rgba(125, 91, 255, 0.2));
+    will-change: transform;
   }
 }
 
