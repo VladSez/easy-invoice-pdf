@@ -17,6 +17,10 @@ export default function robots(): MetadataRoute.Robots {
           // Allow changelog pages
           "/changelog",
           "/changelog/*",
+          // Allow terms of service page
+          "/tos",
+          // Allow founder page
+          "/founder",
         ],
         disallow: [
           // Disallow shared invoice URLs, like /?data=*

@@ -353,7 +353,7 @@ export function InvoiceClientPage({
           <div className="relative col-span-8 h-[620px] w-full max-w-full 2xl:h-[700px]">
             {invoiceLastUpdatedAtFormatted && (
               <div className="relative">
-                <div className="absolute -top-5 right-0 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2 md:-mb-5 lg:text-right">
+                <div className="absolute -top-5 right-0 z-10 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2 md:-mb-5 lg:text-right">
                   <span className="font-semibold">Invoice last updated:</span>{" "}
                   {invoiceLastUpdatedAtFormatted}
                 </div>

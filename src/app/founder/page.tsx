@@ -1,5 +1,11 @@
 import { Header } from "@/app/(components)/header";
-import { GITHUB_URL, LINKEDIN_URL, STATIC_ASSETS_URL, TWITTER_URL } from "@/config";
+import { AnimatedSignature } from "@/app/founder/components/animated-signature";
+import {
+  GITHUB_URL,
+  LINKEDIN_URL,
+  STATIC_ASSETS_URL,
+  TWITTER_URL,
+} from "@/config";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -158,6 +164,9 @@ export default function ContactPage() {
               >
                 GitHub
               </Link>
+            </div>
+            <div className="mt-8 md:mt-12">
+              <AnimatedSignature />
             </div>
           </div>
         </div>

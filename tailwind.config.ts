@@ -83,11 +83,14 @@ const config: Config = {
             opacity: "0",
             transform: "rotate(0deg) translate(-50%, -50%)",
           },
-          "68%": {
+          "60%": {
             opacity: "0",
             transform: "rotate(0deg) translate(-50%, -50%)",
           },
+          "66%": { opacity: "0.15" },
           "72%": { opacity: "1" },
+          "80%": { opacity: "1" },
+          "92%": { opacity: "0" },
           "100%": {
             opacity: "0",
             transform: "rotate(360deg) translate(-50%, -50%)",
@@ -100,7 +103,7 @@ const config: Config = {
         heartbeat: "heartbeat 3s ease-in-out infinite 5s", // 3s = duration of animation, infinite = repeat forever, 5s = delay before starting animation,
         "pulse-arrow": "pulse-arrow 5s infinite",
         "star-hover": "star-hover 2s ease-in-out infinite 6s",
-        "rotate-shine": "rotate-shine 4s linear infinite",
+        "rotate-shine": "rotate-shine 5s ease-in-out infinite",
       },
     },
   },

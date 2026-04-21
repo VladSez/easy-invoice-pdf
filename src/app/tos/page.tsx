@@ -1,7 +1,6 @@
 import { Header } from "@/app/(components)/header";
 import { GITHUB_URL, STATIC_ASSETS_URL } from "@/config";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 export const dynamic = "force-static";
 
@@ -40,6 +39,7 @@ export const metadata: Metadata = {
     siteName: "EasyInvoicePDF.com | Free Invoice Generator",
     type: "website",
     locale: "en_US",
+    url: "https://easyinvoicepdf.com/tos",
     images: [
       {
         url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
@@ -243,9 +243,9 @@ export default function TermsOfServicePage() {
             <h2>12. Contact</h2>
             <p>
               For questions, contact:{" "}
-              <Link href="mailto:vlad@mail.easyinvoicepdf.com">
+              <a href="mailto:vlad@mail.easyinvoicepdf.com">
                 vlad@mail.easyinvoicepdf.com
-              </Link>
+              </a>
             </p>
           </article>
         </div>

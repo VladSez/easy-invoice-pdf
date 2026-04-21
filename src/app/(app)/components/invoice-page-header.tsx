@@ -235,7 +235,7 @@ function ProjectInfoLinks() {
             href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative flex items-center gap-1.5 overflow-visible rounded-full border border-slate-300/80 bg-white px-3 py-1 text-xs shadow-sm transition-[colors,transform,border-color] duration-200 hover:border-slate-400/50 hover:bg-slate-50 hover:text-black active:scale-[0.96]"
+            className="group relative flex items-center gap-1.5 overflow-visible rounded-full border border-slate-200 bg-white px-3 py-1 text-xs shadow-sm transition-[colors,transform,border-color] duration-200 hover:border-slate-400/50 hover:bg-slate-50 hover:text-black active:scale-[0.96]"
           >
             <div className="border-glow-mask z-10" aria-hidden="true">
               <div className="border-glow-shine animate-rotate-shine" />
