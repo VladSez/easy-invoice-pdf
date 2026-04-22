@@ -10,7 +10,6 @@ import dayjs from "dayjs";
 import { AlertCircleIcon, FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 
-import { TWITTER_URL } from "@/config";
 import Link from "next/link";
 import type { Dispatch, SetStateAction } from "react";
 import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
@@ -276,7 +275,7 @@ export function InvoiceClientPage({
           {/* Founders info section (Mobile version) */}
           <div className="mt-3 flex w-full justify-center">
             <div className="flex items-center gap-1.5 text-xs text-zinc-900 duration-500 animate-in fade-in slide-in-from-bottom-2">
-              <a href={TWITTER_URL} target="_blank" rel="noopener noreferrer">
+              <a href={"/founder"}>
                 <img
                   src="https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459"
                   alt="Vlad Sazonau"
@@ -289,12 +288,7 @@ export function InvoiceClientPage({
               </a>
               <span>
                 Made by{" "}
-                <a
-                  href={TWITTER_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-black"
-                >
+                <a href={"/founder"} className="underline hover:text-black">
                   Vlad Sazonau
                 </a>
               </span>
@@ -325,7 +319,7 @@ export function InvoiceClientPage({
 
             {/* Founders info section (Desktop version) */}
             <div className="mt-1 flex items-center gap-1.5 text-xs text-zinc-800 duration-500 animate-in fade-in slide-in-from-bottom-2">
-              <a href={TWITTER_URL} target="_blank" rel="noopener noreferrer">
+              <a href={"/founder"}>
                 <img
                   src="https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459"
                   alt="Vlad Sazonau"
@@ -338,12 +332,7 @@ export function InvoiceClientPage({
               </a>
               <span>
                 Made by{" "}
-                <a
-                  href={TWITTER_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-black"
-                >
+                <a href={"/founder"} className="underline hover:text-black">
                   Vlad Sazonau
                 </a>
               </span>

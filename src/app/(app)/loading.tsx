@@ -1,7 +1,7 @@
 export default function Loading() {
   return (
     <div className="flex flex-col items-center justify-start bg-gray-100 sm:p-4 md:justify-center lg:min-h-screen">
-      <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 xl:max-w-7xl 2xl:max-w-[1680px]">
+      <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 min-[1400px]:max-w-7xl 2xl:max-w-[1480px]">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           {/* Left side - Form */}
           <div className="col-span-8 w-full space-y-6 lg:col-span-4">
