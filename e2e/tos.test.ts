@@ -6,9 +6,7 @@ test.describe("Terms of Service page", () => {
 
     await expect(page).toHaveURL("/tos");
 
-    await expect(page).toHaveTitle(
-      "Terms of Service | EasyInvoicePDF - Free & Open-Source Invoice Generator",
-    );
+    await expect(page).toHaveTitle("Terms of Service | EasyInvoicePDF");
 
     await expect(
       page.getByRole("heading", {
