@@ -1,33 +1,28 @@
-import { Header } from "@/app/(components)/header";
 import { Footer } from "@/app/(components)/footer";
+import { Header } from "@/app/(components)/header";
 import { GITHUB_URL, STATIC_ASSETS_URL } from "@/config";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-// Enable static generation for changelog layout
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
-  title: "Changelog  | EasyInvoicePDF - Free & Open-Source Invoice Generator",
+  title: "Vlad Sazonau | Founder of EasyInvoicePDF",
   description:
-    "Explore the latest updates, new features, and improvements to EasyInvoicePDF.com - the free, open-source invoice generator. Track our development progress and upcoming features.",
+    "Meet Vlad Sazonau, the founder of EasyInvoicePDF. Pragmatic engineer and builder.",
   keywords: [
-    "changelog",
-    "updates",
-    "releases",
-    "features",
-    "bug fixes",
-    "pdf invoice generator",
+    "Vlad Sazonau",
+    "EasyInvoicePDF founder",
+    "product engineer",
+    "indie developer",
     "easyinvoicepdf",
-    "easy invoice pdf changelog",
   ],
   authors: [{ name: "Uladzislau Sazonau" }],
   creator: "Uladzislau Sazonau",
   publisher: "Uladzislau Sazonau",
   alternates: {
-    canonical: "https://easyinvoicepdf.com/changelog",
+    canonical: "https://easyinvoicepdf.com/founder",
   },
-
   robots: {
     index: true,
     follow: true,
@@ -40,12 +35,13 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Changelog | EasyInvoicePDF - Free & Open-Source Invoice Generator",
+    title: "Vlad Sazonau | Founder of EasyInvoicePDF",
     description:
-      "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
+      "Meet Vlad Sazonau, the founder of EasyInvoicePDF. Pragmatic engineer and builder.",
     siteName: "EasyInvoicePDF.com | Free Invoice Generator",
-    type: "website",
+    type: "profile",
     locale: "en_US",
+    url: "https://easyinvoicepdf.com/founder",
     images: [
       {
         url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
@@ -58,9 +54,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Changelog | Free Invoice Generator – Live Preview, No Sign-Up",
+    title: "Vlad Sazonau | Founder of EasyInvoicePDF",
     description:
-      "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.com",
+      "Meet Vlad Sazonau, the founder of EasyInvoicePDF. Pragmatic engineer and builder.",
     creator: "@vlad_sazon",
     images: [
       {
@@ -74,12 +70,11 @@ export const metadata: Metadata = {
   },
 };
 
-interface ChangelogLayoutProps {
+interface FounderLayoutProps {
   children: React.ReactNode;
 }
 
-// https://nextjs.org/docs/app/guides/mdx
-export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
+export default function FounderLayout({ children }: FounderLayoutProps) {
   return (
     <>
       <Header

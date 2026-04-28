@@ -14,7 +14,7 @@ import { Suspense } from "react";
 import { ChangelogAuthorByline } from "../components/changelog-author-byline";
 import { ChangelogVersionBadgeLink } from "../components/changelog-version-badge-link";
 import { DateTime } from "../components/date-time";
-import { BlackGoToAppButton } from "@/components/go-to-app-button-cta";
+import { BlackGoToAppButton } from "@/app/(components)/header/go-to-app-button-cta";
 import * as Sentry from "@sentry/nextjs";
 
 interface ChangelogPageProps {

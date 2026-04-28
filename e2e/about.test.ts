@@ -557,7 +557,7 @@ test.describe("About page", () => {
     await expect(termsLinkMobile).toHaveAttribute("href", "/tos");
 
     const githubLink = sheet.getByRole("link", {
-      name: "View on GitHub",
+      name: "Star on GitHub",
       exact: true,
     });
     await expect(githubLink).toBeVisible();

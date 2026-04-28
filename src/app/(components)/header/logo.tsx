@@ -1,7 +1,7 @@
 "use client";
 
 import { FinalProjectLogo } from "@/components/etc/final-project-logo";
-import { ProjectLogoDescription } from "@/components/project-logo-description";
+import { ProjectLogoDescription } from "@/app/(components)/project-logo-description";
 import { useTranslations } from "next-intl";
 
 export function Logo() {

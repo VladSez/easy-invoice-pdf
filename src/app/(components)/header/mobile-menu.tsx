@@ -1,7 +1,7 @@
 "use client";
 
 import { GithubIcon } from "@/components/etc/github-logo";
-import { BlackAnimatedGoToAppBtn } from "@/components/animated-go-to-app-btn";
+import { BlackAnimatedGoToAppBtn } from "@/app/(components)/header/animated-go-to-app-btn";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -147,7 +147,7 @@ export function MobileMenu({
               aria-label="View on GitHub"
             >
               <GithubIcon className="size-5" />
-              {translations.navLinks.github}
+              {translations.navLinks.githubCTA}
             </Link>
           </SheetClose>
 

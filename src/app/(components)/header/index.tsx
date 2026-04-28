@@ -1,6 +1,6 @@
 "use client";
 
-import { BlackAnimatedGoToAppBtn } from "@/components/animated-go-to-app-btn";
+import { BlackAnimatedGoToAppBtn } from "@/app/(components)/header/animated-go-to-app-btn";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { GITHUB_URL } from "@/config";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,7 @@ export interface HeaderProps {
       faq: string;
       github: string;
       githubUrl: string;
+      githubCTA: string;
     };
     switchLanguageText: string;
     goToAppText: string;

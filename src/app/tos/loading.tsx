@@ -1,10 +1,6 @@
-import { HeaderSkeleton } from "@/app/(components)/header/header-skeleton";
-
 export default function Loading() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
-      <HeaderSkeleton />
-
       <div className="container mx-auto max-w-3xl px-4 py-12 md:px-6 md:py-16">
         <div className="space-y-8">
           {/* Title */}
