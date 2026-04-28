@@ -2,6 +2,7 @@
 
 import { BlackAnimatedGoToAppBtn } from "@/app/(components)/header/animated-go-to-app-btn";
 import { GithubIcon } from "@/components/etc/github-logo";
+import { Button } from "@/components/ui/button";
 import { GITHUB_URL } from "@/config";
 import { cn } from "@/lib/utils";
 import { type Locale } from "next-intl";
@@ -10,7 +11,8 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { LanguageSwitcher } from "./language-switcher";
 import { Logo } from "./logo";
-import { MobileMenu } from "./mobile-menu";
+import { MobileMenuPanel } from "./mobile-menu";
+import { MorphingMenuIcon } from "./morphing-menu-icon";
 
 export interface HeaderProps {
   locale: Locale;
@@ -36,7 +38,8 @@ export function Header({
   translations,
   hideLanguageSwitcher = false,
 }: HeaderProps) {
-  const [open, setOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const pathname = usePathname();
 
   const isChangelogActive = pathname === "/changelog";
@@ -50,14 +53,8 @@ export function Header({
       <div className="flex items-center justify-center">
         <div className="container h-16 px-4 md:px-6">
           <div className="flex h-full items-center justify-between gap-4">
-            {/* Logo - hidden from header when sheet is open */}
-            <div
-              className={cn(open && "pointer-events-none invisible")}
-              aria-hidden={open ? true : undefined}
-              tabIndex={open ? -1 : undefined}
-            >
-              <Logo />
-            </div>
+            {/* App logo  */}
+            <Logo />
 
             {/* Right side actions */}
             <div className="flex items-center gap-1">
@@ -120,39 +117,45 @@ export function Header({
                 )}
               </div>
 
-              {/* CTA button - hidden from header on mobile when sheet is open */}
-              <div
-                className={cn(
-                  open &&
-                    "pointer-events-none invisible lg:pointer-events-auto lg:visible",
-                )}
-                aria-hidden={open ? true : undefined}
-              >
-                <BlackAnimatedGoToAppBtn>
-                  {translations.goToAppText}
-                </BlackAnimatedGoToAppBtn>
-              </div>
+              {/* CTA button  */}
+              <BlackAnimatedGoToAppBtn>
+                {translations.goToAppText}
+              </BlackAnimatedGoToAppBtn>
 
-              {/* Burger menu -- mobile only; hidden when sheet is open (X is inside sheet) */}
-              <div
-                className={cn(
-                  "relative lg:hidden",
-                  open && "pointer-events-none invisible",
-                )}
-                aria-hidden={open ? true : undefined}
-              >
-                <MobileMenu
-                  open={open}
-                  onOpenChange={setOpen}
-                  locale={locale}
-                  translations={translations}
-                  hideLanguageSwitcher={hideLanguageSwitcher}
-                />
+              {/* Mobile menu toggle: hamburger or X; panel opens below header */}
+              <div className="relative lg:hidden">
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="rounded-full shadow-none"
+                  aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+                  aria-expanded={isMobileMenuOpen}
+                  {...(!isMobileMenuOpen
+                    ? { "aria-haspopup": "dialog" as const }
+                    : {})}
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                  <MorphingMenuIcon
+                    isOpen={isMobileMenuOpen}
+                    className="size-5"
+                    aria-hidden
+                  />
+                </Button>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {isMobileMenuOpen ? (
+        <MobileMenuPanel
+          onOpenChange={setIsMobileMenuOpen}
+          locale={locale}
+          translations={translations}
+          hideLanguageSwitcher={hideLanguageSwitcher}
+        />
+      ) : null}
     </header>
   );
 }

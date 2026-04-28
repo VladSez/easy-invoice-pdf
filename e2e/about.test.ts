@@ -455,6 +455,8 @@ test.describe("About page", () => {
     await expect(page).toHaveURL("/?template=default");
   });
 
+  // we don't show nav links and language switcher in header on mobile
+  // we test mobile menu separately
   test("should show desktop nav links in header (ON MOBILE TEST WILL BE SKIPPED)", async ({
     page,
     isMobile,
@@ -502,6 +504,8 @@ test.describe("About page", () => {
     ).toBeHidden();
   });
 
+  // we don't show nav links and language switcher in header on mobile
+  // we test desktop nav links separately
   test("should show mobile menu with nav links and language switcher (ON DESKTOP TEST WILL BE SKIPPED)", async ({
     page,
     isMobile,
@@ -575,7 +579,7 @@ test.describe("About page", () => {
     ).toBeVisible();
 
     // Close the menu and verify burger button is accessible again
-    await sheet.getByRole("button", { name: "Close menu" }).click();
+    await page.getByRole("button", { name: "Close menu" }).click();
     await expect(burgerButton).toBeVisible();
   });
 });

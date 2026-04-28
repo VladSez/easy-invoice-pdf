@@ -6,7 +6,7 @@
   <h1>EasyInvoicePDF</h1>
   <h3>Free & Open-Source Invoice Generator</h3>
   <p>Create professional invoices instantly in your browser with <strong>Live Preview</strong>, <strong>Multiple Templates</strong> (including a Stripe-style design). <strong>No Sign-Up Required</strong>.</p>
-  <p><a href="https://easyinvoicepdf.com/?template=stripe&ref=github"><strong>Get Started</strong></a></p>
+  <p><a href="https://easyinvoicepdf.com/?template=stripe&ref=github"><strong>Start Invoicing</strong></a></p>
   <p>
       <a href="https://easyinvoicepdf.com/en/about?ref=github">About</a>
       ·
