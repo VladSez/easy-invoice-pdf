@@ -28,6 +28,9 @@ interface MobileMenuProps {
   hideLanguageSwitcher?: boolean;
 }
 
+/**
+ * Mobile menu component for navigation
+ */
 export function MobileMenu({
   open,
   onOpenChange,
@@ -144,7 +147,7 @@ export function MobileMenu({
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 rounded-lg px-4 py-4 text-lg font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
-              aria-label="View on GitHub"
+              aria-label={translations.navLinks.githubCTA}
             >
               <GithubIcon className="size-5" />
               {translations.navLinks.githubCTA}
