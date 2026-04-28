@@ -455,6 +455,8 @@ test.describe("About page", () => {
     await expect(page).toHaveURL("/?template=default");
   });
 
+  // we don't show nav links and language switcher in header on mobile
+  // we test mobile menu separately
   test("should show desktop nav links in header (ON MOBILE TEST WILL BE SKIPPED)", async ({
     page,
     isMobile,
@@ -502,6 +504,8 @@ test.describe("About page", () => {
     ).toBeHidden();
   });
 
+  // we don't show nav links and language switcher in header on mobile
+  // we test desktop nav links separately
   test("should show mobile menu with nav links and language switcher (ON DESKTOP TEST WILL BE SKIPPED)", async ({
     page,
     isMobile,
@@ -557,7 +561,7 @@ test.describe("About page", () => {
     await expect(termsLinkMobile).toHaveAttribute("href", "/tos");
 
     const githubLink = sheet.getByRole("link", {
-      name: "View on GitHub",
+      name: "Star on GitHub",
       exact: true,
     });
     await expect(githubLink).toBeVisible();
@@ -575,7 +579,17 @@ test.describe("About page", () => {
     ).toBeVisible();
 
     // Close the menu and verify burger button is accessible again
-    await sheet.getByRole("button", { name: "Close menu" }).click();
+    await page.getByRole("button", { name: "Close menu" }).click();
     await expect(burgerButton).toBeVisible();
+
+    // Verify mobile menu is closed
+    await expect(
+      page.getByRole("dialog", { name: "Mobile Menu" }),
+    ).toBeHidden();
+
+    // Verify burger button is visible again
+    await expect(
+      header.getByRole("button", { name: "Open menu" }),
+    ).toBeVisible();
   });
 });

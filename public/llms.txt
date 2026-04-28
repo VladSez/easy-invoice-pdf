@@ -1,17 +1,60 @@
 # EasyInvoicePDF
 
-[EasyInvoicePDF](https://easyinvoicepdf.com) is a free and open-source invoice generator that runs entirely in your browser. It offers live previews, shareable links, instant PDF downloads, and supports multiple languages and currencies, including European VAT calculations. Built with React, TypeScript, Next.js, and TailwindCSS, it ensures privacy and security by processing data client-side.
+[EasyInvoicePDF](https://easyinvoicepdf.com) is a free, open-source web app for creating professional invoices with a live PDF preview, instant download, and shareable links that encode invoice state in the URL. It ships multiple templates (including a Stripe-inspired layout), supports customizable tax labels (VAT, GST, sales tax, and similar), QR codes on invoices, and multi-page PDFs. The UI is built with React, TypeScript, Next.js, Tailwind CSS, shadcn/ui, Origin UI, and [@react-pdf/renderer](https://github.com/diegomura/react-pdf). You can start without signing up. The project is maintained by [Vlad Sazonau](https://vladsazon.com).
 
-## Features
+## Who it is for
 
-- **Live Previews**: Real-time updates as you make changes.
-- **Shareable Links**: Easily share invoices with clients.
-- **Instant PDF Downloads**: Download invoices with one click.
-- **Multi-language and Currency Support**: Create invoices in English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, Dutch and other languages, with support for all major currencies.
-- **European VAT Calculations**: Automatic VAT rate calculations.
+- Freelancers and agencies invoicing clients in different countries
+- Small businesses that want a fast, template-based PDF workflow
+- Teams that share invoices via a link instead of email attachments
+- Users who need European-style VAT handling and flexible tax labeling
+- Developers and organizations evaluating AGPL-3.0 source code or a commercial license for proprietary use
 
-## Main Pages
+## Licensing and availability
+
+- **Web app**: Free to use at [easyinvoicepdf.com](https://easyinvoicepdf.com).
+- **Open source**: Source code is licensed under [GNU AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html) for open-source or compliant use.
+- **Commercial use**: A separate commercial license is available for proprietary deployments. Contact [vlad@mail.easyinvoicepdf.com](mailto:vlad@mail.easyinvoicepdf.com) for details.
+
+## Key features
+
+- **Live PDF preview**: Invoice updates as you edit fields.
+- **No sign-up**: Open the app and generate invoices immediately.
+- **Instant PDF download**: Client-side PDF generation for quick export.
+- **Shareable links**: Encode invoice data in the URL for easy sharing (sharing is disabled when certain assets, such as a logo on the default template, make the payload unsuitable for links).
+- **Templates**: Default layout plus a Stripe-style template; logo support on the default template.
+- **Logo upload**: Add custom branding by uploading your company logo to invoices.
+- **Languages**: Ten UI locales: English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, and Dutch.
+- **Currencies**: 120+ currencies with a searchable selector.
+- **Tax and dates**: Customizable tax labels per language, multiple date formats, and validation helpers for VAT-style values.
+- **QR codes**: Optional QR blocks for payment links, UPI, contact data, or custom payloads.
+- **Multi-page PDFs**: Automatic pagination and page breaks for long invoices.
+- **Mobile-friendly**: Responsive layout and mobile-oriented UX patterns.
+
+## Key differentiators
+
+- Live PDF preview: see invoice changes instantly as you type.
+- No account wall: editing and preview stay lightweight for occasional use.
+- Shareable URL model for collaboration and review.
+- Strong internationalization (10 languages) and broad currency coverage out of the box.
+- Dual template story (classic plus Stripe-inspired) for different brand aesthetics.
+- Mobile-friendly design: responsive layout and touch-optimized UX for phones and tablets.
+- Open-source codebase with a clear AGPL-3.0 plus commercial licensing path.
+
+## Links
 
 - [Home](https://easyinvoicepdf.com)
-- [Features](https://easyinvoicepdf.com/en/about)
-- [FAQ](https://easyinvoicepdf.com/en/about#faq)
+- [GitHub repository](https://github.com/VladSez/easy-invoice-pdf)
+- [About / marketing](https://easyinvoicepdf.com/en/about)
+- [Features (on About)](https://easyinvoicepdf.com/en/about#features)
+- [FAQ (on About)](https://easyinvoicepdf.com/en/about#faq)
+- [Changelog](https://easyinvoicepdf.com/changelog)
+- [Founder](https://easyinvoicepdf.com/founder)
+- [Terms of Service](https://easyinvoicepdf.com/tos)
+- [GitHub releases](https://github.com/VladSez/easy-invoice-pdf/releases)
+- [EasyInvoicePDF on X](https://x.com/EasyInvoicePDF)
+- [Vlad Sazonau on X](https://x.com/vladsazonau)
+- [Demo video (YouTube)](https://www.youtube.com/watch?v=iAROeCIcZ40)
+- [Share feedback](https://dub.sh/easy-invoice-pdf-feedback)
+- [Bug reports / feature board](https://pdfinvoicegenerator.userjot.com/board/bugs)
+- [Buy Me a Coffee](https://buymeacoffee.com/vladsazon)

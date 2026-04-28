@@ -1,9 +1,9 @@
 import { GithubIcon } from "@/components/etc/github-logo";
-import { Footer } from "@/components/footer";
+import { Footer } from "@/app/(components)/footer";
 import {
   BlackGoToAppButton,
   GoToAppButton,
-} from "@/components/go-to-app-button-cta";
+} from "@/app/(components)/header/go-to-app-button-cta";
 import { Button } from "@/components/ui/button";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,7 +22,7 @@ import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { type Graph } from "schema-dts";
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
-import { Header } from "@/app/(components)/header";
+import { Header, type HeaderProps } from "@/app/(components)/header";
 
 // statically generate the pages for all locales
 export function generateStaticParams() {
@@ -42,7 +42,8 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
     faq: "FAQ",
     github: t("footer.links.github"),
     githubUrl: GITHUB_URL,
-  };
+    githubCTA: t("buttons.viewOnGithub"),
+  } as const satisfies HeaderProps["translations"]["navLinks"];
 
   const switchLanguageText = t("buttons.switchLanguage");
   const goToAppText = t("buttons.goToApp");

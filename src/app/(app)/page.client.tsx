@@ -18,7 +18,7 @@ import {
   getAppMetadata,
   updateAppMetadata,
 } from "@/app/(app)/utils/get-app-metadata";
-import { Footer } from "@/components/footer";
+import { Footer } from "@/app/(components)/footer";
 import { GitHubStarCTA } from "@/components/github-star-cta";
 import { GITHUB_URL } from "@/config";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";

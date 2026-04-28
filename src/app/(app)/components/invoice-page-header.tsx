@@ -14,7 +14,7 @@ import { CustomTooltip } from "@/components/ui/tooltip";
 import Link from "next/link";
 
 import { GithubIcon } from "@/components/etc/github-logo";
-import { ProjectLogoDescription } from "@/components/project-logo-description";
+import { ProjectLogoDescription } from "@/app/(components)/project-logo-description";
 import { GITHUB_URL, VIDEO_DEMO_YOUTUBE_URL } from "@/config";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";

@@ -37,9 +37,9 @@ export function ResponsiveIndicator() {
               : "XS";
 
   return (
-    <div className="fixed left-2 top-2 z-[9999] flex items-center gap-1.5 rounded-md bg-black/80 px-2 py-1 font-mono text-xs text-white backdrop-blur-sm duration-300 animate-in fade-in slide-in-from-left-2">
+    <div className="fixed left-2 top-2 z-[9999] flex items-center gap-1 rounded-md bg-blue-600/90 px-2 py-1 font-mono text-xs text-white shadow-lg duration-300 animate-in fade-in slide-in-from-left-2">
       <span className="font-bold">{breakpoint}</span>
-      <span className="text-white/50">|</span>
+      <span className="text-blue-200">|</span>
       <span>{width}px</span>
     </div>
   );

@@ -1,33 +1,26 @@
-import { Header } from "@/app/(components)/header";
 import { Footer } from "@/app/(components)/footer";
+import { Header } from "@/app/(components)/header";
 import { GITHUB_URL, STATIC_ASSETS_URL } from "@/config";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-// Enable static generation for changelog layout
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
-  title: "Changelog  | EasyInvoicePDF - Free & Open-Source Invoice Generator",
-  description:
-    "Explore the latest updates, new features, and improvements to EasyInvoicePDF.com - the free, open-source invoice generator. Track our development progress and upcoming features.",
+  title: "Terms of Service | EasyInvoicePDF",
+  description: "Terms of Service for EasyInvoicePDF.com",
   keywords: [
-    "changelog",
-    "updates",
-    "releases",
-    "features",
-    "bug fixes",
-    "pdf invoice generator",
+    "terms of service",
     "easyinvoicepdf",
-    "easy invoice pdf changelog",
+    "invoice generator",
+    "legal",
   ],
   authors: [{ name: "Uladzislau Sazonau" }],
   creator: "Uladzislau Sazonau",
   publisher: "Uladzislau Sazonau",
   alternates: {
-    canonical: "https://easyinvoicepdf.com/changelog",
+    canonical: "https://easyinvoicepdf.com/tos",
   },
-
   robots: {
     index: true,
     follow: true,
@@ -40,12 +33,13 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Changelog | EasyInvoicePDF - Free & Open-Source Invoice Generator",
+    title: "Terms of Service | EasyInvoicePDF",
     description:
-      "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
+      "Terms of Service for EasyInvoicePDF.com. Browser-based invoice PDF tool.",
     siteName: "EasyInvoicePDF.com | Free Invoice Generator",
     type: "website",
     locale: "en_US",
+    url: "https://easyinvoicepdf.com/tos",
     images: [
       {
         url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
@@ -58,9 +52,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Changelog | Free Invoice Generator – Live Preview, No Sign-Up",
+    title: "Terms of Service | EasyInvoicePDF",
     description:
-      "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.com",
+      "Terms of Service for EasyInvoicePDF.com. Browser-based invoice PDF tool.",
     creator: "@vlad_sazon",
     images: [
       {
@@ -74,12 +68,11 @@ export const metadata: Metadata = {
   },
 };
 
-interface ChangelogLayoutProps {
+interface TosLayoutProps {
   children: React.ReactNode;
 }
 
-// https://nextjs.org/docs/app/guides/mdx
-export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
+export default function TosLayout({ children }: TosLayoutProps) {
   return (
     <>
       <Header
