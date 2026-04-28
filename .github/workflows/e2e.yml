@@ -77,7 +77,8 @@ jobs:
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
       - name: 📧 Send email
-        if: always()
+        ## send email only if the workflow is not cancelled (success or failure)
+        if: always() && !cancelled()
         # https://github.com/dawidd6/action-send-mail
         uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
         with:
