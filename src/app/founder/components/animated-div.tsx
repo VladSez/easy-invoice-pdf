@@ -14,8 +14,7 @@ export function blockEnterSpring(delay: number): Transition {
   };
 }
 
-export interface AnimatedDivProps
-  extends Omit<HTMLMotionProps<"div">, "children"> {
+interface AnimatedDivProps extends Omit<HTMLMotionProps<"div">, "children"> {
   children: React.ReactNode;
   transition: Transition;
 }
