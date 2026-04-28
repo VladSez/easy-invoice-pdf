@@ -581,5 +581,15 @@ test.describe("About page", () => {
     // Close the menu and verify burger button is accessible again
     await page.getByRole("button", { name: "Close menu" }).click();
     await expect(burgerButton).toBeVisible();
+
+    // Verify mobile menu is closed
+    await expect(
+      page.getByRole("dialog", { name: "Mobile Menu" }),
+    ).toBeHidden();
+
+    // Verify burger button is visible again
+    await expect(
+      header.getByRole("button", { name: "Open menu" }),
+    ).toBeVisible();
   });
 });

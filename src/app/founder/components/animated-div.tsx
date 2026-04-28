@@ -2,7 +2,7 @@
 
 import { motion, type HTMLMotionProps, type Transition } from "motion/react";
 
-export function blockEnterSpring(delay: number): Transition {
+export function blockEnterSpring(delay = 0.05): Transition {
   return {
     type: "spring",
     stiffness: 100,
