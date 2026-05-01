@@ -67,6 +67,7 @@ const aboutSchema = z
             github: z.string(),
             changelog: z.string(),
             founder: z.string(),
+            resources: z.string(),
             termsOfService: z.string(),
           })
           .strict(),
@@ -82,6 +83,7 @@ const aboutSchema = z
         shareFeedback: z.string(),
         app: z.string(),
         startInvoicing: z.string(),
+        home: z.string(),
       })
       .strict(),
   })

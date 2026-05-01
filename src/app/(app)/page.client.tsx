@@ -750,7 +750,7 @@ export function AppPageClient({
             </>
           ),
           footerCreatedBy: "Made by",
-          product: "Product",
+          resources: "Resources",
         }}
         links={
           <ul className="space-y-2">

@@ -1,12 +1,7 @@
-"use client";
-
 import { FinalProjectLogo } from "@/components/etc/final-project-logo";
 import { ProjectLogoDescription } from "@/app/(components)/project-logo-description";
-import { useTranslations } from "next-intl";
 
-export function Logo() {
-  const t = useTranslations("About");
-
+export function Logo({ text }: { text: string }) {
   return (
     <div>
       <div className="flex items-center gap-1.5 md:gap-2">
@@ -14,7 +9,7 @@ export function Logo() {
 
         {/* show app logo and description on desktop */}
         <div className="hidden sm:block">
-          <ProjectLogoDescription>{t("tagline")}</ProjectLogoDescription>
+          <ProjectLogoDescription text={text} />
         </div>
 
         {/* show only app name on mobile (to save space) */}

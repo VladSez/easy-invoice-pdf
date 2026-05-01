@@ -14,7 +14,7 @@ test.describe("About page", () => {
     await expect(page).toHaveURL("/en/about");
 
     await expect(page).toHaveTitle(
-      "About EasyInvoicePDF — Free Invoice Generator",
+      "Free PDF invoice generator - About EasyInvoicePDF",
     );
 
     const header = page.getByRole("banner");
@@ -32,7 +32,7 @@ test.describe("About page", () => {
       ).toBeHidden();
 
       await expect(
-        header.getByRole("link", { name: "Features", exact: true }),
+        header.getByRole("link", { name: "Product", exact: true }),
       ).toBeHidden();
     } else {
       // Desktop: nav links and language switcher visible inline, burger button hidden
@@ -40,18 +40,13 @@ test.describe("About page", () => {
         header.getByRole("button", { name: "Switch language" }),
       ).toBeVisible();
 
-      const featuresLink = header.getByRole("link", {
-        name: "Features",
+      const productLink = header.getByRole("link", {
+        name: "Product",
         exact: true,
       });
 
-      await expect(featuresLink).toBeVisible();
-      await expect(featuresLink).toHaveAttribute("href", "/en/about#features");
-
-      const faqLink = header.getByRole("link", { name: "FAQ", exact: true });
-
-      await expect(faqLink).toBeVisible();
-      await expect(faqLink).toHaveAttribute("href", "/en/about#faq");
+      await expect(productLink).toBeVisible();
+      await expect(productLink).toHaveAttribute("href", "/en/about");
 
       const changelogLink = header.getByRole("link", {
         name: "Changelog",
@@ -62,7 +57,7 @@ test.describe("About page", () => {
       await expect(changelogLink).toHaveAttribute("href", "/changelog");
 
       const githubLink = header.getByRole("link", {
-        name: "View on GitHub",
+        name: "GitHub",
         exact: true,
       });
 
@@ -469,34 +464,46 @@ test.describe("About page", () => {
 
     const header = page.getByRole("banner");
 
-    await expect(
-      header.getByRole("link", { name: "Features", exact: true }),
-    ).toBeVisible();
+    const productLink = header.getByRole("link", {
+      name: "Product",
+      exact: true,
+    });
 
-    await expect(
-      header.getByRole("link", { name: "FAQ", exact: true }),
-    ).toBeVisible();
+    await expect(productLink).toBeVisible();
+    await expect(productLink).toHaveAttribute("href", "/en/about");
 
-    await expect(
-      header.getByRole("link", { name: "Changelog", exact: true }),
-    ).toBeVisible();
+    const changelogLink = header.getByRole("link", {
+      name: "Changelog",
+      exact: true,
+    });
+    await expect(changelogLink).toBeVisible();
+    await expect(changelogLink).toHaveAttribute("href", "/changelog");
 
-    await expect(
-      header.getByRole("link", { name: "Terms of Service", exact: true }),
-    ).toBeVisible();
+    const termsOfServiceLink = header.getByRole("link", {
+      name: "Terms of Service",
+      exact: true,
+    });
+    await expect(termsOfServiceLink).toBeVisible();
+    await expect(termsOfServiceLink).toHaveAttribute("href", "/tos");
 
-    await expect(
-      header.getByRole("link", { name: "View on GitHub", exact: true }),
-    ).toBeVisible();
+    const githubLink = header.getByRole("link", {
+      name: "GitHub",
+      exact: true,
+    });
+    await expect(githubLink).toBeVisible();
+    await expect(githubLink).toHaveAttribute("href", GITHUB_URL);
 
     // we don't show founder link in header
-    await expect(
-      header.getByRole("link", { name: "Founder", exact: true }),
-    ).toBeHidden();
+    const founderLink = header.getByRole("link", {
+      name: "Founder",
+      exact: true,
+    });
+    await expect(founderLink).toBeHidden();
 
-    await expect(
-      header.getByRole("button", { name: "Switch language" }),
-    ).toBeVisible();
+    const switchLanguageButton = header.getByRole("button", {
+      name: "Switch language",
+    });
+    await expect(switchLanguageButton).toBeVisible();
 
     // hidden on desktop
     await expect(
@@ -522,8 +529,15 @@ test.describe("About page", () => {
     // Burger button visible on MOBILE, nav links and language switcher not visible in header
     await expect(burgerButton).toBeVisible();
 
+    const goToAppButton = header.getByRole("link", {
+      name: "Open app",
+      exact: true,
+    });
+    await expect(goToAppButton).toBeVisible();
+    await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
+
     await expect(
-      header.getByRole("link", { name: "Features", exact: true }),
+      header.getByRole("link", { name: "Product", exact: true }),
     ).toBeHidden();
 
     await expect(
@@ -535,16 +549,12 @@ test.describe("About page", () => {
 
     const sheet = page.getByRole("dialog", { name: "Mobile Menu" });
 
-    const featuresLink = sheet.getByRole("link", {
-      name: "Features",
+    const productLink = sheet.getByRole("link", {
+      name: "Product",
       exact: true,
     });
-    await expect(featuresLink).toBeVisible();
-    await expect(featuresLink).toHaveAttribute("href", "/en/about#features");
-
-    const faqLink = sheet.getByRole("link", { name: "FAQ", exact: true });
-    await expect(faqLink).toBeVisible();
-    await expect(faqLink).toHaveAttribute("href", "/en/about#faq");
+    await expect(productLink).toBeVisible();
+    await expect(productLink).toHaveAttribute("href", "/en/about");
 
     const changelogLink = sheet.getByRole("link", {
       name: "Changelog",

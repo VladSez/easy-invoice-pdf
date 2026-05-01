@@ -1,6 +1,6 @@
 {
   "About": {
-    "tagline": "Générateur de factures PDF avec aperçu en direct",
+    "tagline": "Générateur de factures gratuit",
     "hero": {
       "title": "Créez des factures professionnelles en quelques secondes",
       "description": "EasyInvoicePDF est un outil <span>gratuit</span> et open-source qui vous permet de créer, personnaliser et télécharger des factures professionnelles avec <span>aperçu en temps réel</span>. Fonctionne entièrement dans votre navigateur."
@@ -54,12 +54,14 @@
         "github": "GitHub",
         "changelog": "Nouveautés",
         "founder": "Fondateur",
+        "resources": "Ressources",
         "termsOfService": "Conditions d'utilisation"
       },
       "createdBy": "Créé par"
     },
     "buttons": {
       "goToApp": "Ouvrir",
+      "home": "Produit",
       "viewOnGithub": "Voir sur GitHub",
       "starOnGithub": "Mettre une étoile sur GitHub",
       "switchLanguage": "Changer de langue",
@@ -70,19 +72,19 @@
   },
   "Metadata": {
     "about": {
-      "title": "Générateur de Factures Gratuit – Sans Inscription",
-      "description": "Créez et téléchargez des factures professionnelles instantanément avec EasyInvoicePDF.com. Gratuit et open-source. Aucune inscription requise.",
-      "keywords": "outil de facturation, générateur de factures gratuit, factures PDF, créateur de factures, logiciel de facturation",
+      "title": "Générateur de factures PDF gratuit - À propos d'EasyInvoicePDF",
+      "description": "EasyInvoicePDF en bref : factures PDF gratuites, aperçu en direct, traitement dans le navigateur, modèles et liens partageables. Open source, sans inscription. Ouvrez le générateur.",
+      "keywords": "générateur de factures gratuit, facture PDF en ligne, outil de facturation, logiciel de facturation, facture open source",
       "siteName": "EasyInvoicePDF.com | Générateur de Factures Gratuit"
     }
   },
   "FAQ": {
     "title": "Questions Fréquemment Posées",
-    "description": "Trouvez des réponses aux questions courantes sur EasyInvoicePDF",
+    "description": "Réponses sur le tarif (gratuit), la confidentialité, le téléchargement PDF, l'utilisation sans compte et le partage avec les clients.",
     "items": {
       "whatIs": {
         "question": "Qu'est-ce qu'EasyInvoicePDF ?",
-        "answer": "EasyInvoicePDF est un outil gratuit et open-source qui vous aide à créer instantanément des factures PDF professionnelles. Il propose un aperçu en temps réel, des modèles personnalisables et prend en charge plusieurs langues et devises."
+        "answer": "EasyInvoicePDF est un créateur de factures gratuit et open source pour produire rapidement des factures PDF professionnelles. Il inclut un aperçu PDF en direct, des modèles personnalisables et la prise en charge de plusieurs langues et devises."
       },
       "isFree": {
         "question": "Est-ce vraiment gratuit ?",
@@ -90,19 +92,19 @@
       },
       "accountNeeded": {
         "question": "Dois-je créer un compte ?",
-        "answer": "Non, vous n'avez pas besoin de créer un compte ou de vous inscrire. Vous pouvez commencer à créer des factures immédiatement sans aucun processus d'inscription."
+        "answer": "Aucun compte ni inscription n'est nécessaire. Vous créez des factures et téléchargez le PDF en un clic immédiatement."
       },
       "customization": {
         "question": "Puis-je personnaliser le modèle de facture ?",
-        "answer": "Oui, vous pouvez personnaliser divers aspects de votre facture, y compris les détails de l'entreprise, la devise et la langue. De nouvelles options de personnalisation sont ajoutées régulièrement."
+        "answer": "Oui. Vous modifiez les informations d'entreprise, la devise, la langue, les taxes et la mise en page dans l'éditeur. De nouvelles options de modèle sont ajoutées régulièrement."
       },
       "dataSecurity": {
         "question": "Mes données sont-elles sécurisées ?",
-        "answer": "Votre confidentialité est importante pour nous. Toutes les données de facturation sont traitées entièrement dans votre navigateur - nous ne stockons aucune de vos informations sur nos serveurs. Vous pouvez même utiliser l'outil hors ligne une fois chargé."
+        "answer": "Les données de facturation sont traitées dans le navigateur pour l'aperçu et la génération du PDF. Nous ne stockons pas le contenu de vos factures sur nos serveurs."
       },
       "sharing": {
         "question": "Puis-je partager des factures avec d'autres personnes ?",
-        "answer": "Oui, vous pouvez générer des liens partageables pour vos factures que d'autres peuvent consulter et télécharger. Ces liens sont sécurisés et uniquement accessibles aux personnes avec qui vous les partagez."
+        "answer": "Oui. Vous créez un lien partageable pour que les clients consultent la facture et téléchargent le PDF. Seules les personnes disposant du lien peuvent l'ouvrir."
       }
     }
   }

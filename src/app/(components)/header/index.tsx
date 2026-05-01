@@ -18,11 +18,13 @@ export interface HeaderProps {
   locale: Locale;
   translations: {
     navLinks: {
+      home: string;
       features: string;
       faq: string;
       github: string;
       githubUrl: string;
       githubCTA: string;
+      tagline: string;
     };
     switchLanguageText: string;
     goToAppText: string;
@@ -32,6 +34,12 @@ export interface HeaderProps {
   };
   hideLanguageSwitcher?: boolean;
 }
+
+const desktopNavLinkClass =
+  "rounded-md px-3 py-1.5 text-sm font-medium hover:bg-slate-100 hover:text-black active:scale-[0.97] transition-all duration-300";
+
+const activeDesktopNavLinkClass =
+  "bg-slate-200/70 text-black hover:bg-slate-200/80";
 
 export function Header({
   locale,
@@ -44,9 +52,7 @@ export function Header({
 
   const isChangelogActive = pathname === "/changelog";
   const isTosActive = pathname === "/tos";
-
-  const desktopNavLinkClass =
-    "rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-slate-100/90 hover:text-black";
+  const isHomeActive = pathname === `/${locale}/about`;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
@@ -54,57 +60,72 @@ export function Header({
         <div className="container h-16 px-4 md:px-6">
           <div className="flex h-full items-center justify-between gap-4">
             {/* App logo  */}
-            <Logo />
+            <Logo text={translations.navLinks.tagline} />
 
             {/* Right side actions */}
             <div className="flex items-center gap-1">
               {/* Desktop nav */}
               <nav className="hidden items-center justify-end gap-1 lg:flex">
-                {/* a href this is only reliable way to scroll to a section on route navigation*/}
-                <a
-                  href={`/${locale}/about#features`}
-                  className={cn(desktopNavLinkClass, "text-slate-600")}
-                >
-                  {translations.navLinks.features}
-                </a>
-                {/* a href this is only reliable way to scroll to a section on route navigation*/}
-                <a
-                  href={`/${locale}/about#faq`}
-                  className={cn(desktopNavLinkClass, "text-slate-600")}
-                >
-                  {translations.navLinks.faq}
-                </a>
-
-                <Link
-                  href="/changelog"
-                  className={cn(
-                    desktopNavLinkClass,
-                    isChangelogActive
-                      ? "bg-slate-100 text-black"
-                      : "text-slate-600",
-                  )}
-                >
-                  {translations.changelogLinkText}
-                </Link>
-                <Link
-                  href="/tos"
-                  className={cn(
-                    desktopNavLinkClass,
-                    isTosActive ? "bg-slate-100 text-black" : "text-slate-600",
-                  )}
-                >
-                  {translations.termsOfServiceLinkText}
-                </Link>
                 <Link
                   href={GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
-                  aria-label="View on GitHub"
+                  className={cn(
+                    desktopNavLinkClass,
+                    "flex items-center gap-1.5 text-slate-800",
+                  )}
+                  aria-label={translations.navLinks.github}
                 >
                   <GithubIcon className="size-4" />
                   {translations.navLinks.github}
                 </Link>
+                {/* a href this is only reliable way to scroll to a section on route navigation*/}
+                {/* <a
+                  href={`/${locale}/about#features`}
+                  className={cn(desktopNavLinkClass, "text-slate-800")}
+                >
+                  {translations.navLinks.features}
+                </a> */}
+                {/* a href this is only reliable way to scroll to a section on route navigation*/}
+                {/* <a
+                  href={`/${locale}/about#faq`}
+                  className={cn(desktopNavLinkClass, "text-slate-800")}
+                >
+                  {translations.navLinks.faq}
+                </a> */}
+
+                <a
+                  href={`/${locale}/about`}
+                  className={cn(
+                    desktopNavLinkClass,
+                    isHomeActive ? activeDesktopNavLinkClass : "text-slate-800",
+                  )}
+                >
+                  {translations.navLinks.home}
+                </a>
+
+                {/*  eslint-disable-next-line @next/next/no-html-link-for-pages */}
+                <a
+                  href="/changelog"
+                  className={cn(
+                    desktopNavLinkClass,
+                    isChangelogActive
+                      ? activeDesktopNavLinkClass
+                      : "text-slate-800",
+                  )}
+                >
+                  {translations.changelogLinkText}
+                </a>
+                {/*  eslint-disable-next-line @next/next/no-html-link-for-pages */}
+                <a
+                  href="/tos"
+                  className={cn(
+                    desktopNavLinkClass,
+                    isTosActive ? activeDesktopNavLinkClass : "text-slate-800",
+                  )}
+                >
+                  {translations.termsOfServiceLinkText}
+                </a>
               </nav>
 
               {/* Language switcher -- desktop only */}

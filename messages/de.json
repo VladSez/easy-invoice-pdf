@@ -1,14 +1,14 @@
 {
   "Metadata": {
     "about": {
-      "title": "Kostenloser Rechnungsgenerator – Ohne Anmeldung",
-      "description": "Erstellen und laden Sie professionelle Rechnungen sofort mit EasyInvoicePDF.com herunter. Kostenlos und Open-Source. Keine Anmeldung erforderlich.",
-      "keywords": "Rechnungstool, kostenloser Rechnungsgenerator, PDF-Rechnungen, Rechnungsersteller, Abrechnungssoftware",
+      "title": "Kostenloser PDF-Rechnungsgenerator – Über EasyInvoicePDF",
+      "description": "EasyInvoicePDF erklärt: kostenlose PDF-Rechnungen, Live-Vorschau, Verarbeitung im Browser, Vorlagen und teilbare Links. Open Source, ohne Anmeldung. Öffnen Sie den Generator.",
+      "keywords": "kostenloser Rechnungsgenerator, PDF-Rechnung erstellen, Online-Rechnungstool, Abrechnungssoftware, Open-Source-Rechnung",
       "siteName": "EasyInvoicePDF.com | Kostenloser Rechnungsgenerator"
     }
   },
   "About": {
-    "tagline": "Rechnungs-PDF-Generator mit Live-Vorschau",
+    "tagline": "Kostenloser Rechnungsgenerator",
     "hero": {
       "title": "Erstellen Sie professionelle Rechnungen in Sekunden",
       "description": "EasyInvoicePDF ist ein <span>kostenloses</span> Open-Source-Tool, mit dem Sie professionelle Rechnungen mit <span>Echtzeit-Vorschau</span> erstellen, anpassen und herunterladen können. Läuft vollständig in Ihrem Browser."
@@ -62,12 +62,14 @@
         "github": "GitHub",
         "changelog": "Änderungen",
         "founder": "Gründer",
+        "resources": "Ressourcen",
         "termsOfService": "Nutzungsbedingungen"
       },
       "createdBy": "Erstellt von"
     },
     "buttons": {
       "goToApp": "Öffnen",
+      "home": "Produkt",
       "viewOnGithub": "Auf GitHub ansehen",
       "starOnGithub": "Auf GitHub bewerten",
       "switchLanguage": "Sprache wechseln",
@@ -78,11 +80,11 @@
   },
   "FAQ": {
     "title": "Häufig gestellte Fragen",
-    "description": "Finden Sie Antworten auf häufige Fragen zu EasyInvoicePDF",
+    "description": "Antworten zu Kostenlosigkeit, Datenschutz, PDF-Download, Nutzung ohne Konto und Teilen von Rechnungen mit Kunden.",
     "items": {
       "whatIs": {
         "question": "Was ist EasyInvoicePDF?",
-        "answer": "EasyInvoicePDF ist ein kostenloses, Open-Source-Tool, mit dem Sie sofort professionelle PDF-Rechnungen erstellen können. Es bietet eine Echtzeit-Vorschau, anpassbare Vorlagen und unterstützt mehrere Sprachen und Währungen."
+        "answer": "EasyInvoicePDF ist ein kostenloses, Open-Source-Programm zum Erstellen professioneller PDF-Rechnungen in kurzer Zeit. Es enthält eine Live-PDF-Vorschau, anpassbare Vorlagen sowie Unterstützung für mehrere Sprachen und Währungen."
       },
       "isFree": {
         "question": "Ist es wirklich kostenlos?",
@@ -90,19 +92,19 @@
       },
       "accountNeeded": {
         "question": "Muss ich ein Konto erstellen?",
-        "answer": "Nein, Sie müssen kein Konto erstellen oder sich registrieren. Sie können sofort ohne Registrierungsprozess mit der Erstellung von Rechnungen beginnen."
+        "answer": "Nein, weder Konto noch Registrierung sind nötig. Sie können sofort Rechnungen erstellen und PDFs mit einem Klick herunterladen."
       },
       "customization": {
         "question": "Kann ich die Rechnungsvorlage anpassen?",
-        "answer": "Ja, Sie können verschiedene Aspekte Ihrer Rechnung anpassen, einschließlich Firmendetails, Währung und Sprache. Weitere Anpassungsoptionen werden regelmäßig hinzugefügt."
+        "answer": "Ja. Sie passen Firmendaten, Währung, Sprache, Steuern und Layout im Editor an. Weitere Vorlagenoptionen werden regelmäßig ergänzt."
       },
       "dataSecurity": {
         "question": "Sind meine Daten sicher?",
-        "answer": "Ihre Privatsphäre ist uns wichtig. Alle Rechnungsdaten werden vollständig in Ihrem Browser verarbeitet - wir speichern keine Ihrer Informationen auf unseren Servern."
+        "answer": "Rechnungsdaten werden für Vorschau und PDF-Erstellung clientseitig in Ihrem Browser verarbeitet. Wir speichern Ihre Rechnungsinhalte nicht auf unseren Servern."
       },
       "sharing": {
         "question": "Kann ich Rechnungen mit anderen teilen?",
-        "answer": "Ja, Sie können teilbare Links für Ihre Rechnungen generieren, die andere ansehen und herunterladen können. Diese Links sind sicher und nur für Personen zugänglich, mit denen Sie sie teilen."
+        "answer": "Ja. Sie erstellen einen teilbaren Link, damit Kunden die Rechnung sehen und das PDF herunterladen können. Nur Personen mit dem Link haben Zugriff."
       }
     }
   }

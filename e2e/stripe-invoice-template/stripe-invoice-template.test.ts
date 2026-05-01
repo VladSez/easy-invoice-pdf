@@ -57,7 +57,7 @@ test.describe("Stripe Invoice Template", () => {
     );
     await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
       "content",
-      "EasyInvoicePDF.com | Free Invoice Generator",
+      "EasyInvoicePDF.com | Free Invoice PDF Generator",
     );
 
     // Verify OG image dimensions

@@ -1,6 +1,6 @@
 {
   "About": {
-    "tagline": "PDF-factuur generator met live preview",
+    "tagline": "Gratis factuurgenerator",
     "hero": {
       "title": "Maak professionele facturen in seconden",
       "description": "EasyInvoicePDF is een <span>gratis</span>, open-source tool waarmee je professionele facturen kunt maken, aanpassen en downloaden met <span>realtime voorbeeld</span>. Draait volledig in je browser."
@@ -54,12 +54,14 @@
         "github": "GitHub",
         "changelog": "Nieuw",
         "founder": "Oprichter",
+        "resources": "Bronnen",
         "termsOfService": "Servicevoorwaarden"
       },
       "createdBy": "Gemaakt door"
     },
     "buttons": {
       "goToApp": "Open",
+      "home": "Product",
       "viewOnGithub": "Bekijk op GitHub",
       "starOnGithub": "Ster geven op GitHub",
       "switchLanguage": "Verander taal",
@@ -70,19 +72,19 @@
   },
   "Metadata": {
     "about": {
-      "title": "Gratis Factuur Generator – Geen Registratie",
-      "description": "Maak en download direct professionele facturen met EasyInvoicePDF.com. Gratis en open-source. Geen registratie vereist.",
-      "keywords": "factuurtool, gratis factuur generator, PDF facturen, factuur maker, facturatie software",
+      "title": "Gratis PDF-factuurgenerator - Over EasyInvoicePDF",
+      "description": "EasyInvoicePDF in het kort: gratis PDF-facturen, live preview, verwerking in de browser, sjablonen en deelbare links. Open source, geen registratie. Open de generator.",
+      "keywords": "gratis factuurgenerator, PDF-factuur online, facturatieprogramma, billingsoftware, open source factuur",
       "siteName": "EasyInvoicePDF.com | Gratis Factuur Generator"
     }
   },
   "FAQ": {
     "title": "Veelgestelde Vragen",
-    "description": "Vind antwoorden op veelgestelde vragen over EasyInvoicePDF",
+    "description": "Antwoorden over gratis gebruik, privacy, PDF-download, gebruik zonder account en facturen delen met klanten.",
     "items": {
       "whatIs": {
         "question": "Wat is EasyInvoicePDF?",
-        "answer": "EasyInvoicePDF is een gratis, open-source tool die je helpt om direct professionele PDF-facturen te maken. Het biedt een live preview, aanpasbare sjablonen en ondersteunt meerdere talen en valuta's."
+        "answer": "EasyInvoicePDF is een gratis, open-source factuurmaker om snel professionele PDF-facturen te maken. Er is live PDF-voorbeeld, aanpasbare sjablonen en ondersteuning voor meerdere talen en valuta's."
       },
       "isFree": {
         "question": "Is het echt gratis?",
@@ -90,19 +92,19 @@
       },
       "accountNeeded": {
         "question": "Moet ik een account aanmaken?",
-        "answer": "Nee, je hoeft geen account aan te maken of je te registreren. Je kunt direct beginnen met het maken van facturen zonder registratieproces."
+        "answer": "Geen account of registratie nodig. Je maakt meteen facturen en downloadt de PDF met één klik."
       },
       "customization": {
         "question": "Kan ik de factuursjabloon aanpassen?",
-        "answer": "Ja, je kunt verschillende aspecten van je factuur aanpassen, waaronder bedrijfsgegevens, valuta en taal. Er worden regelmatig nieuwe aanpassingsopties toegevoegd."
+        "answer": "Ja. Pas bedrijfsgegevens, valuta, taal, belastingen en lay-out in de editor aan. We voegen regelmatig extra sjabloonopties toe."
       },
       "dataSecurity": {
         "question": "Zijn mijn gegevens veilig?",
-        "answer": "Je privacy is belangrijk voor ons. Alle factuurgegevens worden volledig in je browser verwerkt - we slaan geen informatie op onze servers op."
+        "answer": "Factuurgegevens worden in de browser verwerkt voor voorbeeld en PDF-generatie. We slaan de inhoud van je facturen niet op onze servers op."
       },
       "sharing": {
         "question": "Kan ik facturen delen met anderen?",
-        "answer": "Ja, je kunt deelbare links genereren voor je facturen die anderen kunnen bekijken en downloaden. Deze links zijn veilig en alleen toegankelijk voor mensen met wie je ze deelt."
+        "answer": "Ja. Je maakt een deelbare link zodat klanten de factuur zien en de PDF downloaden. Alleen mensen met de link kunnen deze openen."
       }
     }
   }

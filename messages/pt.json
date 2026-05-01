@@ -1,14 +1,14 @@
 {
   "Metadata": {
     "about": {
-      "title": "Gerador de Faturas Gratuito – Sem Registro",
-      "description": "Crie e baixe faturas profissionais instantaneamente com EasyInvoicePDF.com. Gratuito e código aberto. Sem necessidade de registro.",
-      "keywords": "ferramenta de fatura, gerador de faturas gratuito, faturas PDF, criador de faturas, software de faturamento",
+      "title": "Gerador gratuito de faturas PDF - Sobre o EasyInvoicePDF",
+      "description": "EasyInvoicePDF em resumo: faturas PDF gratuitas, pré-visualização ao vivo, dados no navegador, modelos e ligações partilháveis. Open source, sem registo. Abra o gerador.",
+      "keywords": "gerador de faturas grátis, fatura PDF online, ferramenta de faturação, software de faturação, fatura open source",
       "siteName": "EasyInvoicePDF.com | Gerador de Faturas Gratuito"
     }
   },
   "About": {
-    "tagline": "Gerador de faturas PDF com pré-visualização em tempo real",
+    "tagline": "Gerador de faturas gratuito",
     "hero": {
       "title": "Crie faturas profissionais em segundos",
       "description": "EasyInvoicePDF é uma <span>ferramenta gratuita</span> de código aberto que permite criar, personalizar e baixar faturas profissionais com <span>pré-visualização em tempo real</span>. Funciona completamente no seu navegador."
@@ -62,12 +62,14 @@
         "github": "GitHub",
         "changelog": "Novidades",
         "founder": "Fundador",
+        "resources": "Materiais",
         "termsOfService": "Termos de serviço"
       },
       "createdBy": "Criado por"
     },
     "buttons": {
       "goToApp": "Abrir",
+      "home": "Produto",
       "viewOnGithub": "Ver no GitHub",
       "starOnGithub": "Dar estrela no GitHub",
       "switchLanguage": "Mudar idioma",
@@ -78,11 +80,11 @@
   },
   "FAQ": {
     "title": "Perguntas Frequentes",
-    "description": "Encontre respostas para perguntas comuns sobre o EasyInvoicePDF",
+    "description": "Respostas sobre preço (grátis), privacidade, download em PDF, uso sem conta e compartilhar faturas com clientes.",
     "items": {
       "whatIs": {
         "question": "O que é o EasyInvoicePDF?",
-        "answer": "EasyInvoicePDF é uma ferramenta gratuita e de código aberto que ajuda você a criar faturas PDF profissionais instantaneamente. Possui visualização em tempo real, modelos personalizáveis e suporta múltiplos idiomas e moedas."
+        "answer": "EasyInvoicePDF é um criador de faturas gratuito e de código aberto para gerar faturas PDF profissionais com rapidez. Inclui pré-visualização de PDF ao vivo, modelos personalizáveis e suporte a vários idiomas e moedas."
       },
       "isFree": {
         "question": "É realmente gratuito?",
@@ -90,19 +92,19 @@
       },
       "accountNeeded": {
         "question": "Preciso criar uma conta?",
-        "answer": "Não, você não precisa criar uma conta ou se registrar. Você pode começar a criar faturas imediatamente sem nenhum processo de registro."
+        "answer": "Não é necessário conta ou cadastro. Você começa a criar faturas e baixa o PDF com um clique na hora."
       },
       "customization": {
         "question": "Posso personalizar o modelo da fatura?",
-        "answer": "Sim, você pode personalizar vários aspectos da sua fatura, incluindo detalhes da empresa, moeda e idioma. Mais opções de personalização estão sendo adicionadas regularmente."
+        "answer": "Sim. Ajuste dados da empresa, moeda, idioma, impostos e layout no editor. Adicionamos mais controles de modelo com frequência."
       },
       "dataSecurity": {
         "question": "Meus dados estão seguros?",
-        "answer": "Sua privacidade é importante para nós. Todos os dados das faturas são processados inteiramente no seu navegador - não armazenamos nenhuma informação em nossos servidores."
+        "answer": "Os dados da fatura são processados no navegador para pré-visualização e geração do PDF. Não armazenamos o conteúdo das suas faturas em nossos servidores."
       },
       "sharing": {
         "question": "Posso compartilhar faturas com outros?",
-        "answer": "Sim, você pode gerar links compartilháveis para suas faturas que outros podem visualizar e baixar. Esses links são seguros e acessíveis apenas para pessoas com quem você compartilha."
+        "answer": "Sim. Você cria um link compartilhável para clientes verem a fatura e baixarem o PDF. Só quem tem o link pode abrir."
       }
     }
   }

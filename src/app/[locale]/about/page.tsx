@@ -20,7 +20,6 @@ import { ChevronDown } from "lucide-react";
 import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
-import { type Graph } from "schema-dts";
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
 import { Header, type HeaderProps } from "@/app/(components)/header";
 
@@ -38,11 +37,13 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
   const t = useTranslations("About");
 
   const navLinks = {
+    home: t("buttons.home"),
     features: t("footer.links.features"),
     faq: "FAQ",
     github: t("footer.links.github"),
     githubUrl: GITHUB_URL,
     githubCTA: t("buttons.viewOnGithub"),
+    tagline: t("tagline"),
   } as const satisfies HeaderProps["translations"]["navLinks"];
 
   const switchLanguageText = t("buttons.switchLanguage");
@@ -55,13 +56,6 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
 
   return (
     <TooltipProvider>
-      <script
-        id="json-ld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(JSON_LD),
-        }}
-      />
       <div className="flex min-h-screen flex-col bg-slate-50">
         <Header
           locale={locale}
@@ -85,6 +79,21 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
           <CtaSection />
         </main>
         <Footer
+          translations={{
+            footerDescription: t.rich("footer.description", {
+              br: () => <br />,
+              tosLink: (chunks) => (
+                <Link
+                  href="/tos"
+                  className="text-slate-700 underline hover:text-slate-900"
+                >
+                  {chunks}
+                </Link>
+              ),
+            }),
+            footerCreatedBy: t("footer.createdBy"),
+            resources: t("footer.links.resources"),
+          }}
           links={
             <ul className="space-y-2">
               <li>
@@ -158,21 +167,6 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
               </li>
             </ul>
           }
-          translations={{
-            footerDescription: t.rich("footer.description", {
-              br: () => <br />,
-              tosLink: (chunks) => (
-                <Link
-                  href="/tos"
-                  className="text-slate-700 underline hover:text-slate-900"
-                >
-                  {chunks}
-                </Link>
-              ),
-            }),
-            footerCreatedBy: t("footer.createdBy"),
-            product: t("footer.product"),
-          }}
         />
       </div>
     </TooltipProvider>
@@ -514,74 +508,3 @@ function CtaSection() {
     </section>
   );
 }
-
-const JSON_LD: Graph = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebPage",
-      "@id": "https://easyinvoicepdf.com/en/about",
-      url: "https://easyinvoicepdf.com/en/about",
-      name: "About | Free Invoice Generator – Live Preview, No Sign-Up",
-      description:
-        "EasyInvoicePDF is a free, open-source tool to create professional invoices with real-time PDF preview, no sign-up required.",
-      mainEntity: {
-        "@id": "https://easyinvoicepdf.com/en/about",
-      },
-    },
-    {
-      "@type": "FAQPage",
-      "@id": "https://easyinvoicepdf.com/en/about#faq",
-      mainEntity: [
-        {
-          "@type": "Question",
-          name: "What is EasyInvoicePDF?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "EasyInvoicePDF is a free, open-source tool that helps you create professional invoices instantly. It features a live preview, customizable templates, and supports multiple languages and currencies.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Is it really free?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Yes, EasyInvoicePDF is completely free to use. The entire project is open-source and available on GitHub.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Do I need to create an account?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "No, you don't need to create an account or sign up. You can start creating invoices immediately without any registration process.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Can I customize the invoice template?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Yes, you can customize various aspects of your invoice including company details, currency, and language. More customization options are being added regularly.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Is my data secure?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Your privacy is important to us. All invoice data is processed entirely in your browser - we don't store any of your information on our servers.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Can I share invoices with others?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Yes, you can generate shareable links for your invoices that others can view and download. These links are secure and only accessible to people you share them with.",
-          },
-        },
-      ],
-    },
-  ],
-};

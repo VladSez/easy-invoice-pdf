@@ -52,8 +52,7 @@ export async function generateMetadata({
         canonical: `https://easyinvoicepdf.com/changelog/${slug}`,
       },
       openGraph: {
-        title:
-          "Changelog | EasyInvoicePDF - Free & Open-Source Invoice Generator",
+        title: "Changelog | EasyInvoicePDF - Free Invoice PDF Generator",
         description:
           "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
         type: "website",
@@ -61,7 +60,7 @@ export async function generateMetadata({
       },
       twitter: {
         card: "summary_large_image",
-        title: "Changelog | Free Invoice Generator – Live Preview, No Sign-Up",
+        title: "Changelog | Free Invoice PDF Generator",
         description:
           "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
         creator: "@vlad_sazon",
@@ -101,7 +100,7 @@ export async function generateMetadata({
           type: "image/png",
           width: 1200,
           height: 630,
-          alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
+          alt: "EasyInvoicePDF.com - Free Invoice PDF Generator",
         },
       ],
     },
@@ -115,7 +114,7 @@ export async function generateMetadata({
           type: "image/png",
           width: 1200,
           height: 630,
-          alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
+          alt: "EasyInvoicePDF.com - Free Invoice PDF Generator",
         },
       ],
     },
