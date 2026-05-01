@@ -1,14 +1,14 @@
 {
   "Metadata": {
     "about": {
-      "title": "Darmowy Generator Faktur – Bez Rejestracji",
-      "description": "Twórz i pobieraj profesjonalne faktury natychmiast z EasyInvoicePDF.com. Darmowe i open-source. Bez wymaganej rejestracji.",
-      "keywords": "narzędzie do faktur, darmowy generator faktur, faktury PDF, kreator faktur, oprogramowanie do fakturowania",
+      "title": "Darmowy generator faktur PDF – o EasyInvoicePDF",
+      "description": "EasyInvoicePDF w skrócie: darmowe faktury PDF, podgląd na żywo, dane przetwarzane w przeglądarce, szablony i linki do udostępniania. Open source, bez rejestracji. Otwórz generator.",
+      "keywords": "darmowy generator faktur, faktura PDF online, narzędzie do faktur, oprogramowanie billingowe, faktura open source",
       "siteName": "EasyInvoicePDF.com | Darmowy Generator Faktur"
     }
   },
   "About": {
-    "tagline": "Generator faktur PDF z podglądem na żywo",
+    "tagline": "Darmowy generator faktur",
     "hero": {
       "title": "Twórz profesjonalne faktury w kilka sekund",
       "description": "EasyInvoicePDF to <span>darmowe</span> narzędzie open-source, które pozwala tworzyć, dostosowywać i pobierać profesjonalne faktury z <span>podglądem w czasie rzeczywistym</span>. Działa całkowicie w Twojej przeglądarce."
@@ -62,12 +62,14 @@
         "github": "GitHub",
         "changelog": "Dziennik zmian",
         "founder": "Założyciel",
+        "resources": "Zasoby",
         "termsOfService": "Regulamin"
       },
       "createdBy": "Stworzone przez"
     },
     "buttons": {
       "goToApp": "Otwórz",
+      "home": "Produkt",
       "viewOnGithub": "Zobacz na GitHub",
       "starOnGithub": "Oznacz gwiazdką na GitHub",
       "switchLanguage": "Zmień język",
@@ -78,11 +80,11 @@
   },
   "FAQ": {
     "title": "Często Zadawane Pytania",
-    "description": "Znajdź odpowiedzi na często zadawane pytania o EasyInvoicePDF",
+    "description": "Odpowiedzi o cenach (za darmo), prywatności, pobieraniu PDF, korzystaniu bez konta i udostępnianiu faktur klientom.",
     "items": {
       "whatIs": {
         "question": "Czym jest EasyInvoicePDF?",
-        "answer": "EasyInvoicePDF to darmowe narzędzie open-source, które pomaga tworzyć profesjonalne faktury PDF. Oferuje podgląd na żywo, konfigurowalne szablony oraz obsługuje wiele języków i walut."
+        "answer": "EasyInvoicePDF to darmowy program open-source do szybkiego tworzenia profesjonalnych faktur PDF. Zawiera podgląd PDF na żywo, konfigurowalne szablony oraz obsługę wielu języków i walut."
       },
       "isFree": {
         "question": "Czy to naprawdę jest darmowe?",
@@ -90,19 +92,19 @@
       },
       "accountNeeded": {
         "question": "Czy muszę założyć konto?",
-        "answer": "Nie, nie musisz zakładać konta ani się rejestrować. Możesz od razu zacząć tworzyć faktury bez procesu rejestracji."
+        "answer": "Nie potrzebujesz konta ani rejestracji. Od razu tworzysz faktury i pobierasz PDF jednym kliknięciem."
       },
       "customization": {
         "question": "Czy mogę dostosować szablon faktury?",
-        "answer": "Tak, możesz dostosować różne aspekty swojej faktury, w tym dane firmy, walutę i język. Regularnie dodawane są nowe opcje personalizacji."
+        "answer": "Tak. W edytorze zmienisz dane firmy, walutę, język, podatki i układ. Nowe opcje szablonów dodajemy regularnie."
       },
       "dataSecurity": {
         "question": "Czy moje dane są bezpieczne?",
-        "answer": "Twoja prywatność jest dla nas ważna. Wszystkie dane faktur są przetwarzane wyłącznie w Twojej przeglądarce - nie przechowujemy żadnych informacji na naszych serwerach."
+        "answer": "Dane faktur są przetwarzane po stronie przeglądarki przy podglądzie i generowaniu PDF. Nie przechowujemy treści faktur na naszych serwerach."
       },
       "sharing": {
         "question": "Czy mogę udostępniać faktury innym?",
-        "answer": "Tak, możesz generować linki do udostępniania swoich faktur, które inni mogą przeglądać i pobierać. Te linki są bezpieczne i dostępne tylko dla osób, którym je udostępnisz."
+        "answer": "Tak. Tworzysz link do udostępnienia, aby klienci zobaczyli fakturę i pobrali PDF. Dostęp mają tylko osoby z linkiem."
       }
     }
   }

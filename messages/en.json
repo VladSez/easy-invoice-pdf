@@ -1,6 +1,6 @@
 {
   "About": {
-    "tagline": "Free Invoice Generator with Live PDF Preview",
+    "tagline": "Free & Open-Source Invoice Generator",
     "hero": {
       "title": "Create professional invoices in seconds",
       "description": "EasyInvoicePDF is a <span>free, open-source</span> invoice generator with <span>real-time preview</span>. Create, customize, and download professional invoices. <span>No sign-up required.</span>"
@@ -54,12 +54,14 @@
         "github": "GitHub",
         "changelog": "Changelog",
         "founder": "Founder",
+        "resources": "Resources",
         "termsOfService": "Terms of Service"
       },
       "createdBy": "Made by"
     },
     "buttons": {
       "goToApp": "Open app",
+      "home": "Product",
       "viewOnGithub": "Star on GitHub",
       "starOnGithub": "Star on GitHub",
       "switchLanguage": "Switch language",
@@ -70,19 +72,19 @@
   },
   "Metadata": {
     "about": {
-      "title": "About EasyInvoicePDF — Free Invoice Generator",
-      "description": "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
-      "keywords": "invoice tool, free invoice generator, PDF invoices, invoice creator, billing software",
+      "title": "Free PDF invoice generator - About EasyInvoicePDF",
+      "description": "EasyInvoicePDF explained: free PDF invoices, live preview, client-side privacy, templates, and shareable links. Open source, no signup. Open the generator.",
+      "keywords": "free invoice generator, PDF invoice maker, online invoice tool, billing software, open source invoice",
       "siteName": "EasyInvoicePDF.com | Free Invoice Generator"
     }
   },
   "FAQ": {
     "title": "Frequently Asked Questions",
-    "description": "Find answers to common questions about EasyInvoicePDF",
+    "description": "Answers about pricing, privacy, PDF download, using the app without an account, and sharing invoices with clients.",
     "items": {
       "whatIs": {
         "question": "What is EasyInvoicePDF?",
-        "answer": "EasyInvoicePDF is a free, open-source tool that helps you create professional invoices instantly. It features a live preview, customizable templates, and supports multiple languages and currencies."
+        "answer": "EasyInvoicePDF is a free, open-source invoice maker that helps you create professional PDF invoices fast. It includes a live PDF preview, customizable templates, and support for multiple languages and currencies."
       },
       "isFree": {
         "question": "Is it really free?",
@@ -90,19 +92,19 @@
       },
       "accountNeeded": {
         "question": "Do I need to create an account?",
-        "answer": "No, you don't need to create an account or sign up. You can start creating invoices immediately without any registration process."
+        "answer": "No account or sign-up is required. You can start building invoices and use one-click PDF download immediately, with no registration."
       },
       "customization": {
         "question": "Can I customize the invoice template?",
-        "answer": "Yes, you can customize various aspects of your invoice including company details, currency, and language. More customization options are being added regularly."
+        "answer": "Yes. You can customize company details, currency, language, taxes, and layout options in the editor. More template controls are added regularly."
       },
       "dataSecurity": {
         "question": "Is my data secure?",
-        "answer": "Your privacy is important to us. All invoice data is processed entirely in your browser - we don't store any of your information on our servers."
+        "answer": "Invoice data is processed client-side in your browser for PDF generation and preview. We do not store your invoice content on our servers."
       },
       "sharing": {
         "question": "Can I share invoices with others?",
-        "answer": "Yes, you can generate shareable links for your invoices that others can view and download. These links are secure and only accessible to people you share them with."
+        "answer": "Yes. You can create a shareable link so clients can view the invoice and download the PDF. Only people with the link can open it."
       }
     }
   }

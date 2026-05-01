@@ -1,8 +1,4 @@
-export function ProjectLogoDescription({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function ProjectLogoDescription({ text }: { text: string }) {
   return (
     <div className="flex flex-col -space-y-0.5">
       <h1 className="text-balance text-xl font-bold text-slate-800 lg:text-2xl">
@@ -15,7 +11,7 @@ export function ProjectLogoDescription({
         </a>
       </h1>
       <h2 className="text-balance text-[12px] text-slate-700 sm:text-[13px]">
-        {children || "Free Invoice Generator with Live PDF Preview"}
+        {text}
       </h2>
     </div>
   );

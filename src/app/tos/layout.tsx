@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     title: "Terms of Service | EasyInvoicePDF",
     description:
       "Terms of Service for EasyInvoicePDF.com. Browser-based invoice PDF tool.",
-    siteName: "EasyInvoicePDF.com | Free Invoice Generator",
+    siteName: "EasyInvoicePDF.com | Free Invoice PDF Generator",
     type: "website",
     locale: "en_US",
     url: "https://easyinvoicepdf.com/tos",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
         type: "image/png",
         width: 1200,
         height: 630,
-        alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
+        alt: "EasyInvoicePDF.com - Free Invoice PDF Generator",
       },
     ],
   },
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
         type: "image/png",
         width: 1200,
         height: 630,
-        alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
+        alt: "EasyInvoicePDF.com - Free Invoice PDF Generator",
       },
     ],
   },
@@ -79,11 +79,13 @@ export default function TosLayout({ children }: TosLayoutProps) {
         locale={"en"}
         translations={{
           navLinks: {
+            home: "Product",
             features: "Features",
             faq: "FAQ",
             github: "GitHub",
             githubUrl: GITHUB_URL,
             githubCTA: "Star on GitHub",
+            tagline: "Free & Open-Source Invoice Generator",
           },
           switchLanguageText: "Switch Language",
           goToAppText: "Open app",
@@ -115,7 +117,7 @@ export default function TosLayout({ children }: TosLayoutProps) {
             </>
           ),
           footerCreatedBy: "Made by",
-          product: "Product",
+          resources: "Resources",
         }}
         links={
           <ul className="space-y-2">

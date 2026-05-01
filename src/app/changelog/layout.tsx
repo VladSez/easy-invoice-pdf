@@ -40,10 +40,10 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Changelog | EasyInvoicePDF - Free & Open-Source Invoice Generator",
+    title: "Changelog | EasyInvoicePDF - Free Invoice PDF Generator",
     description:
       "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
-    siteName: "EasyInvoicePDF.com | Free Invoice Generator",
+    siteName: "EasyInvoicePDF.com | Free Invoice PDF Generator",
     type: "website",
     locale: "en_US",
     images: [
@@ -52,13 +52,13 @@ export const metadata: Metadata = {
         type: "image/png",
         width: 1200,
         height: 630,
-        alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
+        alt: "EasyInvoicePDF.com - Free Invoice PDF Generator",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Changelog | Free Invoice Generator – Live Preview, No Sign-Up",
+    title: "Changelog | Free Invoice PDF Generator",
     description:
       "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.com",
     creator: "@vlad_sazon",
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
         type: "image/png",
         width: 1200,
         height: 630,
-        alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
+        alt: "EasyInvoicePDF.com - Free Invoice PDF Generator",
       },
     ],
   },
@@ -86,11 +86,13 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
         locale={"en"}
         translations={{
           navLinks: {
+            home: "Product",
             features: "Features",
             faq: "FAQ",
             github: "GitHub",
             githubUrl: GITHUB_URL,
             githubCTA: "Star on GitHub",
+            tagline: "Free & Open-Source Invoice Generator",
           },
           switchLanguageText: "Switch Language",
           goToAppText: "Open app",
@@ -122,7 +124,7 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
             </>
           ),
           footerCreatedBy: "Made by",
-          product: "Product",
+          resources: "Resources",
         }}
         links={
           <ul className="space-y-2">

@@ -60,9 +60,7 @@ export function InvoicePageHeader({
           <div className="flex items-center">
             <ProjectLogo className="h-8 w-8" />
 
-            <ProjectLogoDescription>
-              Free Invoice Generator with Live PDF Preview
-            </ProjectLogoDescription>
+            <ProjectLogoDescription text="Free & Open-Source Invoice Generator" />
           </div>
         </div>
         {/* desktop only section (hidden on mobile) */}

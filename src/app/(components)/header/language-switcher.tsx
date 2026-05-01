@@ -41,6 +41,15 @@ interface LanguageSwitcherProps {
   onSelect?: () => void;
 }
 
+/**
+ * Language switcher dropdown component that allows users to change the UI language.
+ * Renders a globe icon button that opens a dropdown menu with available language options.
+ * Handles locale switching via Next.js router with loading state during transition.
+ *
+ * @param locale - Current language locale
+ * @param buttonText - Accessible label text for the language switcher button
+ * @param onSelect - Optional callback fired when a language is selected
+ */
 export function LanguageSwitcher({
   locale,
   buttonText,
@@ -59,7 +68,7 @@ export function LanguageSwitcher({
               <Button
                 size="icon"
                 variant="ghost"
-                className="rounded-full shadow-none"
+                className="rounded-full shadow-none hover:bg-slate-200/80"
                 aria-label={buttonText}
                 disabled={isPending}
               >

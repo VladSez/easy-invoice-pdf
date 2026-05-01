@@ -5,6 +5,7 @@ import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import type EnMessages from "../../../../messages/en.json";
 import { APP_URL, STATIC_ASSETS_URL } from "@/config";
+import { AboutJsonLd } from "./about-json-ld";
 
 // Add metadata to make sure search engines can index the page
 export async function generateMetadata({
@@ -52,7 +53,7 @@ export async function generateMetadata({
             width: 1200,
             height: 630,
             type: "image/png",
-            alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
+            alt: "EasyInvoicePDF.com - Free Invoice PDF Generator",
           },
         ],
       },
@@ -67,7 +68,7 @@ export async function generateMetadata({
             width: 1200,
             height: 630,
             type: "image/png",
-            alt: "EasyInvoicePDF.com - Free Invoice Generator with Live PDF Preview",
+            alt: "EasyInvoicePDF.com - Free Invoice PDF Generator",
           },
         ],
       },
@@ -104,5 +105,11 @@ export default async function AboutLocaleLayout({
   // Enables static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
   setRequestLocale(locale);
 
-  return children;
+  return (
+    <>
+      {/** render the JSON-LD script tag (for SEO) for the about page */}
+      <AboutJsonLd locale={locale} />
+      {children}
+    </>
+  );
 }

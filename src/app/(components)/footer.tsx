@@ -7,7 +7,7 @@ interface FooterProps {
   translations: {
     footerDescription: React.ReactNode;
     footerCreatedBy: string;
-    product: string;
+    resources: string;
   };
 }
 export function Footer({ links, translations }: FooterProps) {
@@ -74,7 +74,7 @@ export function Footer({ links, translations }: FooterProps) {
             <div className="space-y-3"></div>
             <div className="space-y-3" data-testid="footer-social-links">
               <h3 className="text-sm font-medium text-slate-900">
-                {translations.product}
+                {translations.resources}
               </h3>
               {links}
             </div>
