@@ -22,7 +22,7 @@ interface MobileMenuPanelProps extends MobileMenuSharedProps {
 }
 
 const mobileNavLinkClass =
-  "flex items-center rounded-lg px-4 py-4 text-lg font-medium hover:bg-slate-100/90 hover:text-black active:scale-[0.98] transition-all duration-300 md:px-5 md:py-5";
+  "flex items-center rounded-lg px-4 py-4 text-lg font-medium hover:bg-slate-100/90 hover:text-black active:scale-[0.98] transition-all duration-300 md:px-5";
 
 const activeMobileNavLinkClass =
   "bg-slate-200/70 text-black hover:bg-slate-200/80";

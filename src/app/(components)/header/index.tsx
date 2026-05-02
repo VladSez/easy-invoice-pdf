@@ -7,7 +7,6 @@ import { GITHUB_URL } from "@/config";
 import { cn } from "@/lib/utils";
 import { type Locale } from "next-intl";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { LanguageSwitcher } from "./language-switcher";
 import { Logo } from "./logo";
@@ -36,10 +35,7 @@ export interface HeaderProps {
 }
 
 const desktopNavLinkClass =
-  "rounded-md px-3 py-1.5 text-sm font-medium hover:bg-slate-100 hover:text-black active:scale-[0.97] transition-all duration-300";
-
-const activeDesktopNavLinkClass =
-  "bg-slate-200/70 text-black hover:bg-slate-200/80";
+  "rounded-md text-slate-800 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 hover:text-black active:scale-[0.97] transition-all duration-300";
 
 export function Header({
   locale,
@@ -47,12 +43,6 @@ export function Header({
   hideLanguageSwitcher = false,
 }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const pathname = usePathname();
-
-  const isChangelogActive = pathname === "/changelog";
-  const isTosActive = pathname === "/tos";
-  const isHomeActive = pathname === `/${locale}/about`;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
@@ -80,50 +70,19 @@ export function Header({
                   {translations.navLinks.github}
                 </Link>
                 {/* a href this is only reliable way to scroll to a section on route navigation*/}
-                {/* <a
-                  href={`/${locale}/about#features`}
-                  className={cn(desktopNavLinkClass, "text-slate-800")}
-                >
-                  {translations.navLinks.features}
-                </a> */}
-                {/* a href this is only reliable way to scroll to a section on route navigation*/}
-                {/* <a
-                  href={`/${locale}/about#faq`}
-                  className={cn(desktopNavLinkClass, "text-slate-800")}
-                >
-                  {translations.navLinks.faq}
-                </a> */}
-
                 <a
                   href={`/${locale}/about`}
-                  className={cn(
-                    desktopNavLinkClass,
-                    isHomeActive ? activeDesktopNavLinkClass : "text-slate-800",
-                  )}
+                  className={cn(desktopNavLinkClass)}
                 >
                   {translations.navLinks.home}
                 </a>
 
                 {/*  eslint-disable-next-line @next/next/no-html-link-for-pages */}
-                <a
-                  href="/changelog"
-                  className={cn(
-                    desktopNavLinkClass,
-                    isChangelogActive
-                      ? activeDesktopNavLinkClass
-                      : "text-slate-800",
-                  )}
-                >
+                <a href="/changelog" className={cn(desktopNavLinkClass)}>
                   {translations.changelogLinkText}
                 </a>
                 {/*  eslint-disable-next-line @next/next/no-html-link-for-pages */}
-                <a
-                  href="/tos"
-                  className={cn(
-                    desktopNavLinkClass,
-                    isTosActive ? activeDesktopNavLinkClass : "text-slate-800",
-                  )}
-                >
+                <a href="/tos" className={cn(desktopNavLinkClass)}>
                   {translations.termsOfServiceLinkText}
                 </a>
               </nav>
