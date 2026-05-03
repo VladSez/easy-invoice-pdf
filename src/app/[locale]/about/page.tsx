@@ -206,8 +206,8 @@ function HeroSection() {
                       span: (chunks) => {
                         const colors = [
                           "bg-yellow-300 dark:bg-yellow-600 text-slate-900 dark:text-slate-900",
-                          "bg-blue-500 dark:bg-blue-500 text-white dark:text-white",
                           "bg-purple-500 dark:bg-purple-500 text-white dark:text-white",
+                          "bg-blue-500 dark:bg-blue-500 text-white dark:text-white",
                         ] as const;
 
                         // Get the current color from the array using modulo to cycle through colors
