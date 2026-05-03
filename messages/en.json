@@ -80,31 +80,31 @@
   },
   "FAQ": {
     "title": "Frequently Asked Questions",
-    "description": "Answers about using the tool for free, privacy, PDF download, working without an account, and sharing invoices with clients.",
+    "description": "Answers about our free PDF invoice generator: pricing, privacy, customizing templates, working without an account, and sharing invoices with clients.",
     "items": {
       "whatIs": {
         "question": "What is EasyInvoicePDF?",
-        "answer": "EasyInvoicePDF is a free, open-source invoice maker that helps you create professional PDF invoices fast. It includes a live PDF preview, customizable templates, and support for multiple languages and currencies."
+        "answer": "EasyInvoicePDF is a free online PDF invoice generator and open-source invoice maker. You build professional invoices in the browser with a live PDF preview, flexible tax and currency settings, and printed labels in multiple languages. It suits freelancers, consultants, and small businesses that want fast invoicing without installing paid software."
       },
       "isFree": {
-        "question": "Is it really free?",
-        "answer": "Yes, EasyInvoicePDF is completely free to use. The entire project is open-source and available on GitHub."
+        "question": "Is EasyInvoicePDF free to use?",
+        "answer": "Yes. Core invoicing, live preview, and PDF download are free with no paid subscription. The project is open source on GitHub, so you can inspect the code or self-host if you prefer."
       },
       "accountNeeded": {
-        "question": "Do I need to create an account?",
-        "answer": "No account or sign-up is required. You can start building invoices and use one-click PDF download immediately, with no registration."
+        "question": "Do I need an account to create or download a PDF invoice?",
+        "answer": "No sign-up or login is required. Open the editor, enter your details, and download a PDF in one click. Your draft stays in your browser until you leave the page or clear it."
       },
       "customization": {
-        "question": "Can I customize the invoice template?",
-        "answer": "Yes. You can customize company details, currency, language, taxes, and layout options in the editor. More template controls are added regularly."
+        "question": "Can I customize the PDF invoice template and fields?",
+        "answer": "Yes. You can set seller and buyer details, line items, currency, tax labels and amounts, language for dates and labels, and layout options that change how the PDF looks. New template controls are added over time."
       },
       "dataSecurity": {
-        "question": "Is my data secure?",
-        "answer": "Invoice data is processed client-side in your browser for PDF generation and preview. We do not store your invoice content on our servers."
+        "question": "Is my invoice data secure and private?",
+        "answer": "Preview and PDF generation run in your browser from the data you enter there. We do not store your invoice content on our servers for normal editing and download. Shareable links keep a compressed copy of the invoice inside the URL, not in a user account on our servers."
       },
       "sharing": {
-        "question": "Can I share invoices with others?",
-        "answer": "Yes. You can create a shareable link so clients can view the invoice and download the PDF. Only people with the link can open it."
+        "question": "How do I share an invoice with a client?",
+        "answer": "Use the share action in the editor to copy a link. The link carries your invoice data so recipients can open it in their browser, review the invoice, and download the PDF without signing up. Anyone with the full link can open it, so only send it to people you trust."
       }
     }
   }
