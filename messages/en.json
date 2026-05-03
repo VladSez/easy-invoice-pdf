@@ -80,7 +80,7 @@
   },
   "FAQ": {
     "title": "Frequently Asked Questions",
-    "description": "Answers about pricing, privacy, PDF download, using the app without an account, and sharing invoices with clients.",
+    "description": "Answers about using the tool for free, privacy, PDF download, working without an account, and sharing invoices with clients.",
     "items": {
       "whatIs": {
         "question": "What is EasyInvoicePDF?",

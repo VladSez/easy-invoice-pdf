@@ -10,7 +10,7 @@ import Script from "next/script";
 
 import { Toaster } from "sonner";
 
-import { STATIC_ASSETS_URL } from "@/config";
+import { PERSONAL_WEBSITE_URL, STATIC_ASSETS_URL } from "@/config";
 import {
   BREADCRUMB_JSONLD,
   SITE_NAVIGATION_JSONLD,
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     "invoice maker pdf",
     "professional invoice generator",
   ],
-  authors: [{ name: "Uladzislau Sazonau" }],
+  authors: [{ name: "Uladzislau Sazonau", url: PERSONAL_WEBSITE_URL }],
   creator: "Uladzislau Sazonau",
   publisher: "Uladzislau Sazonau",
   icons: {

@@ -34,6 +34,9 @@ export default function ContactPage() {
             <p className="mt-3 text-center text-xl text-slate-600 md:text-2xl">
               Product Engineer & Design Enthusiast
             </p>
+            <p className="mt-2 text-center text-base text-slate-500 md:text-lg">
+              Founder of EasyInvoicePDF
+            </p>
           </AnimatedDiv>
 
           <AnimatedDiv

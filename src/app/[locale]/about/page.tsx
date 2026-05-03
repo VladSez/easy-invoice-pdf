@@ -20,6 +20,7 @@ import { ChevronDown } from "lucide-react";
 import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
+import { ABOUT_FAQ_ITEM_KEYS } from "@/app/[locale]/about/about-faq-item-keys";
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
 import { Header, type HeaderProps } from "@/app/(components)/header";
 
@@ -183,7 +184,7 @@ function HeroSection() {
     >
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-indigo-50/50 blur-3xl" />
+        <div className="pointer-events-none absolute -right-40 -top-40 h-80 w-80 rounded-full bg-indigo-50/50 blur-3xl" />
         <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-emerald-50/40 blur-3xl" />
       </div>
 
@@ -385,29 +386,6 @@ function FeaturesSection() {
 function FaqSection() {
   const t = useTranslations("FAQ");
 
-  const FAQ_ITEMS = [
-    {
-      translationKey: "whatIs",
-    },
-    {
-      translationKey: "isFree",
-    },
-    {
-      translationKey: "accountNeeded",
-    },
-    {
-      translationKey: "customization",
-    },
-    {
-      translationKey: "dataSecurity",
-    },
-    {
-      translationKey: "sharing",
-    },
-  ] as const satisfies {
-    translationKey: string;
-  }[];
-
   return (
     <section
       id="faq"
@@ -426,19 +404,19 @@ function FaqSection() {
         </div>
         <div className="mx-auto mt-14 max-w-3xl">
           <div className="space-y-2">
-            {FAQ_ITEMS.map((item) => {
-              const question = t(`items.${item.translationKey}.question`);
-              const answer = t(`items.${item.translationKey}.answer`);
+            {ABOUT_FAQ_ITEM_KEYS.map((translationKey) => {
+              const question = t(`items.${translationKey}.question`);
+              const answer = t(`items.${translationKey}.answer`);
 
               return (
                 <details
-                  key={item.translationKey}
+                  key={translationKey}
                   className="group cursor-pointer border-b border-slate-200 bg-white transition-all duration-200 hover:border-slate-200"
                 >
                   <summary className="flex select-none items-center justify-between gap-2 py-3 text-left">
-                    <span className="text-base font-medium text-slate-900">
+                    <h3 className="text-base font-medium text-slate-900">
                       {question}
-                    </span>
+                    </h3>
                     <ChevronDown
                       className="ml-auto size-6 shrink-0 rounded-full p-1 text-slate-600 transition-all duration-200 hover:bg-gray-200 hover:text-slate-900 group-open:rotate-180"
                       aria-hidden="true"

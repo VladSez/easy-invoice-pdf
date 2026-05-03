@@ -1,27 +1,40 @@
 import { Footer } from "@/app/(components)/footer";
 import { Header } from "@/app/(components)/header";
-import { GITHUB_URL, STATIC_ASSETS_URL } from "@/config";
+import {
+  GITHUB_URL,
+  PERSONAL_WEBSITE_URL,
+  STATIC_ASSETS_URL,
+  TWITTER_CREATOR,
+} from "@/config";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 export const dynamic = "force-static";
 
+const FOUNDER_PAGE_URL = `https://easyinvoicepdf.com/founder`;
+
+const FOUNDER_PAGE_TITLE = "Vlad Sazonau | Founder of EasyInvoicePDF";
+
+const FOUNDER_PAGE_DESCRIPTION =
+  "Meet Vlad Sazonau, founder of EasyInvoicePDF, the free open-source invoice PDF generator with live preview. Product engineer and design enthusiast with 8+ years building digital products.";
+
+const ogImageAlt = "Vlad Sazonau, founder of EasyInvoicePDF — product engineer";
+
 export const metadata: Metadata = {
-  title: "Vlad Sazonau | Founder of EasyInvoicePDF",
-  description:
-    "Meet Vlad Sazonau, the founder of EasyInvoicePDF. Pragmatic engineer and builder.",
+  title: FOUNDER_PAGE_TITLE,
+  description: FOUNDER_PAGE_DESCRIPTION,
   keywords: [
     "Vlad Sazonau",
-    "EasyInvoicePDF founder",
+    "EasyInvoicePDF",
+    "founder",
     "product engineer",
-    "indie developer",
-    "easyinvoicepdf",
+    "invoice PDF generator",
   ],
-  authors: [{ name: "Uladzislau Sazonau" }],
+  authors: [{ name: "Uladzislau Sazonau", url: PERSONAL_WEBSITE_URL }],
   creator: "Uladzislau Sazonau",
   publisher: "Uladzislau Sazonau",
   alternates: {
-    canonical: "https://easyinvoicepdf.com/founder",
+    canonical: FOUNDER_PAGE_URL,
   },
   robots: {
     index: true,
@@ -35,36 +48,34 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Vlad Sazonau | Founder of EasyInvoicePDF",
-    description:
-      "Meet Vlad Sazonau, the founder of EasyInvoicePDF. Pragmatic engineer and builder.",
+    title: FOUNDER_PAGE_TITLE,
+    description: FOUNDER_PAGE_DESCRIPTION,
     siteName: "EasyInvoicePDF.com | Free Invoice PDF Generator",
     type: "profile",
     locale: "en_US",
-    url: "https://easyinvoicepdf.com/founder",
+    url: FOUNDER_PAGE_URL,
     images: [
       {
         url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
         type: "image/png",
         width: 1200,
         height: 630,
-        alt: "EasyInvoicePDF.com - Free Invoice PDF Generator",
+        alt: ogImageAlt,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Vlad Sazonau | Founder of EasyInvoicePDF",
-    description:
-      "Meet Vlad Sazonau, the founder of EasyInvoicePDF. Pragmatic engineer and builder.",
-    creator: "@vlad_sazon",
+    title: FOUNDER_PAGE_TITLE,
+    description: FOUNDER_PAGE_DESCRIPTION,
+    creator: TWITTER_CREATOR,
     images: [
       {
         url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
         type: "image/png",
         width: 1200,
         height: 630,
-        alt: "EasyInvoicePDF.com - Free Invoice PDF Generator",
+        alt: ogImageAlt,
       },
     ],
   },
