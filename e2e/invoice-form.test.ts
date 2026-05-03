@@ -58,13 +58,13 @@ test.describe("Invoice Generator Page", () => {
     // Check other meta tags for Stripe template
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
       "content",
-      "Create Invoice — EasyInvoicePDF",
+      "Free Invoice PDF Generator | EasyInvoicePDF",
     );
     await expect(
       page.locator('meta[property="og:description"]'),
     ).toHaveAttribute(
       "content",
-      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
+      "Create invoices online for free with our PDF invoice generator. Customize templates, download instantly, no signup required.",
     );
     await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
       "content",
@@ -80,7 +80,7 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveAttribute("content", "630");
     await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
       "content",
-      "EasyInvoicePDF.com - Free Invoice PDF Generator",
+      "Default Invoice Template - EasyInvoicePDF.com",
     );
   });
 
@@ -89,7 +89,9 @@ test.describe("Invoice Generator Page", () => {
     await expect(page).toHaveURL("/?template=default");
 
     // Check title and branding
-    await expect(page).toHaveTitle("Create Invoice — EasyInvoicePDF");
+    await expect(page).toHaveTitle(
+      "Free Invoice PDF Generator | EasyInvoicePDF",
+    );
 
     const header = page.getByTestId("header");
     await expect(header).toBeVisible();
