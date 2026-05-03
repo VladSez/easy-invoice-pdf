@@ -47,13 +47,13 @@ test.describe("Stripe Invoice Template", () => {
     // Check other meta tags for Stripe template
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
       "content",
-      "Stripe Template — Create Invoice | EasyInvoicePDF",
+      "Stripe Template - Create Invoice | EasyInvoicePDF",
     );
     await expect(
       page.locator('meta[property="og:description"]'),
     ).toHaveAttribute(
       "content",
-      "Create and download professional invoices instantly with EasyInvoicePDF.com. Free and open-source. No signup required.",
+      "Create invoices online for free with our PDF invoice generator. Customize templates, download instantly, no signup required.",
     );
     await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
       "content",
@@ -69,7 +69,7 @@ test.describe("Stripe Invoice Template", () => {
     ).toHaveAttribute("content", "630");
     await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
       "content",
-      "Stripe Invoice Template",
+      "Stripe Invoice Template - EasyInvoicePDF.com",
     );
   });
 

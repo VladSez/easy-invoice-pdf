@@ -1,4 +1,9 @@
-import { APP_URL, STATIC_ASSETS_URL } from "@/config";
+import {
+  APP_URL,
+  PERSONAL_WEBSITE_URL,
+  STATIC_ASSETS_URL,
+  TWITTER_CREATOR,
+} from "@/config";
 import {
   formatChangelogDate,
   getChangelogEntry,
@@ -47,7 +52,7 @@ export async function generateMetadata({
         "Changelog | EasyInvoicePDF - Free & Open-Source Invoice Generator",
       description:
         "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
-      authors: [{ name: "Vlad Sazonau", url: "https://x.com/vlad_sazon" }],
+      authors: [{ name: "Uladzislau Sazonau", url: PERSONAL_WEBSITE_URL }],
       alternates: {
         canonical: `https://easyinvoicepdf.com/changelog/${slug}`,
       },
@@ -63,7 +68,7 @@ export async function generateMetadata({
         title: "Changelog | Free Invoice PDF Generator",
         description:
           "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
-        creator: "@vlad_sazon",
+        creator: TWITTER_CREATOR,
       },
     };
   }
@@ -73,7 +78,7 @@ export async function generateMetadata({
   return {
     title: `${entry.metadata.title || `Update ${formattedDate}`}`,
     description: entry.metadata.description,
-    authors: [{ name: "Vlad Sazonau", url: "https://x.com/vlad_sazon" }],
+    authors: [{ name: "Uladzislau Sazonau", url: PERSONAL_WEBSITE_URL }],
     alternates: {
       canonical: `https://easyinvoicepdf.com/changelog/${slug}`,
     },

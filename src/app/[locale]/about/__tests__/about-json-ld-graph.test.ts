@@ -23,6 +23,7 @@ describe("buildAboutJsonLdGraph", () => {
       url: "https://easyinvoicepdf.com/pl/about",
       name: plMessages.Metadata.about.title,
       description: plMessages.Metadata.about.description,
+      mainEntity: { "@id": "https://easyinvoicepdf.com/pl/about" },
     });
 
     expect(faqPage).toMatchObject({
@@ -55,6 +56,7 @@ describe("buildAboutJsonLdGraph", () => {
       url: "https://easyinvoicepdf.com/en/about",
       name: enMessages.Metadata.about.title,
       description: enMessages.Metadata.about.description,
+      mainEntity: { "@id": "https://easyinvoicepdf.com/en/about" },
     });
 
     expect(faqPage).toMatchObject({

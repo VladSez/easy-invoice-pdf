@@ -35,6 +35,9 @@ export const LINKEDIN_URL =
   "https://www.linkedin.com/in/vlad-sazonau-22a9a9126/";
 
 export const TWITTER_URL = "https://x.com/vladsazonau";
+export const TWITTER_CREATOR = "@vlad_sazonau";
+
+export const PERSONAL_WEBSITE_URL = "https://vladsazon.com";
 
 export const BUG_REPORT_URL =
   "https://pdfinvoicegenerator.userjot.com/board/bugs";

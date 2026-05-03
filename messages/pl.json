@@ -80,7 +80,7 @@
   },
   "FAQ": {
     "title": "Często Zadawane Pytania",
-    "description": "Odpowiedzi o cenach (za darmo), prywatności, pobieraniu PDF, korzystaniu bez konta i udostępnianiu faktur klientom.",
+    "description": "Odpowiedzi o darmowym korzystaniu, prywatności, pobieraniu PDF, użytkowaniu bez konta i udostępnianiu faktur klientom.",
     "items": {
       "whatIs": {
         "question": "Czym jest EasyInvoicePDF?",

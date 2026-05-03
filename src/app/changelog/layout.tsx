@@ -1,6 +1,11 @@
 import { Header } from "@/app/(components)/header";
 import { Footer } from "@/app/(components)/footer";
-import { GITHUB_URL, STATIC_ASSETS_URL } from "@/config";
+import {
+  GITHUB_URL,
+  PERSONAL_WEBSITE_URL,
+  STATIC_ASSETS_URL,
+  TWITTER_CREATOR,
+} from "@/config";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -21,7 +26,7 @@ export const metadata: Metadata = {
     "easyinvoicepdf",
     "easy invoice pdf changelog",
   ],
-  authors: [{ name: "Uladzislau Sazonau" }],
+  authors: [{ name: "Uladzislau Sazonau", url: PERSONAL_WEBSITE_URL }],
   creator: "Uladzislau Sazonau",
   publisher: "Uladzislau Sazonau",
   alternates: {
@@ -61,7 +66,7 @@ export const metadata: Metadata = {
     title: "Changelog | Free Invoice PDF Generator",
     description:
       "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.com",
-    creator: "@vlad_sazon",
+    creator: TWITTER_CREATOR,
     images: [
       {
         url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,

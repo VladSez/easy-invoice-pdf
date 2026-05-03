@@ -53,7 +53,7 @@ jobs:
           NEXT_PUBLIC_SENTRY_ENABLED: false
         continue-on-error: true
         # https://playwright.dev/docs/test-reporters#line-reporter
-        run: pnpm exec playwright test --reporter=html,dot
+        run: pnpm exec playwright test --reporter=html,list
 
       - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         name: 🎲 Upload Playwright report
@@ -77,8 +77,8 @@ jobs:
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
       - name: 📧 Send email
-        ## send email only if the workflow is not cancelled (success or failure)
-        if: always() && !cancelled()
+        ## always notify; subject/body reflect cancellation vs pass/fail
+        if: always()
         # https://github.com/dawidd6/action-send-mail
         uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
         with:
@@ -88,17 +88,17 @@ jobs:
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: ${{ steps.playwright.outcome == 'success' && '✅ E2E Tests Passed' || '❌ E2E Tests Failed' }} for ${{ github.repository }}
+          subject: ${{ job.status == 'cancelled' && '⚠️ E2E Tests Cancelled' || (steps.playwright.outcome == 'success' && '✅ E2E Tests Passed' || '❌ E2E Tests Failed') }} for ${{ github.repository }}
           body: |
             E2E tests for ${{ github.repository }} have completed.
 
-            Result: ${{ steps.playwright.outcome == 'success' && '✅ Passed' || '❌ Failed' }}
+            Result: ${{ job.status == 'cancelled' && '⚠️ Cancelled' || (steps.playwright.outcome == 'success' && '✅ Passed' || '❌ Failed') }}
 
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
             - Vercel deployment: ${{ github.event.deployment_status.environment_url }}
-          attachments: playwright-output/report/index.html
+          attachments: ${{ job.status != 'cancelled' && 'playwright-output/report/index.html' || '' }}
 
       - name: ❌ Mark workflow failed on E2E Tests failure
         if: steps.playwright.outcome == 'failure'

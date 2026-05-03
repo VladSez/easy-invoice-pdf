@@ -4,8 +4,21 @@ import { routing } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import type EnMessages from "../../../../messages/en.json";
-import { APP_URL, STATIC_ASSETS_URL } from "@/config";
+import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
 import { AboutJsonLd } from "./about-json-ld";
+
+const OPEN_GRAPH_LOCALE_BY_LOCALE = {
+  en: "en_US",
+  pl: "pl_PL",
+  de: "de_DE",
+  es: "es_ES",
+  pt: "pt_PT",
+  ru: "ru_RU",
+  uk: "uk_UA",
+  fr: "fr_FR",
+  it: "it_IT",
+  nl: "nl_NL",
+} as const satisfies Record<Locale, string>;
 
 // Add metadata to make sure search engines can index the page
 export async function generateMetadata({
@@ -44,7 +57,8 @@ export async function generateMetadata({
         title: messages.Metadata.about.title,
         description: messages.Metadata.about.description,
         siteName: messages.Metadata.about.siteName,
-        locale: params.locale,
+        locale: OPEN_GRAPH_LOCALE_BY_LOCALE[params.locale],
+        alternateLocale: Object.values(OPEN_GRAPH_LOCALE_BY_LOCALE),
         type: "website",
         url: `${APP_URL}/${params.locale}/about`,
         images: [
@@ -61,7 +75,7 @@ export async function generateMetadata({
         card: "summary_large_image",
         title: messages.Metadata.about.title,
         description: messages.Metadata.about.description,
-        creator: "@vlad_sazon",
+        creator: TWITTER_CREATOR,
         images: [
           {
             url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,

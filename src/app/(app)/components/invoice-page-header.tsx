@@ -53,8 +53,14 @@ export function InvoicePageHeader({
   isMobile: boolean;
   isSharedInvoice: boolean;
 }) {
+  const srOnlyHeading =
+    invoiceDataState.template === "stripe"
+      ? "Stripe Template - Create Invoice | EasyInvoicePDF"
+      : "Create Invoice - EasyInvoicePDF";
+
   return (
     <div data-testid="header">
+      <h1 className="sr-only">{srOnlyHeading}</h1>
       <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
         <div className="relative bottom-2 mt-2 flex w-full flex-col justify-center sm:bottom-4 sm:mt-0">
           <div className="flex items-center">

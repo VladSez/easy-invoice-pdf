@@ -44,6 +44,12 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     expect(dataParam).toBeTruthy();
     expect(dataParam).not.toBe("");
 
+    // Verify that the shared URL is not indexed by search engines (to prevent sensitive data from being indexed)
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+      "content",
+      "noindex, nofollow",
+    );
+
     // ------------------------------------------------------------
     // Open URL in new tab
     // ------------------------------------------------------------
@@ -59,6 +65,12 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     const newDataParam = newUrlObj.searchParams.get("data");
     expect(newDataParam).toBeTruthy();
     expect(newDataParam).not.toBe("");
+
+    // Verify that the shared URL is not indexed by search engines (to prevent sensitive data from being indexed)
+    await expect(newPage.locator('meta[name="robots"]')).toHaveAttribute(
+      "content",
+      "noindex, nofollow",
+    );
 
     // Verify stripe template UI elements are visible
     const newPageGeneralInfoSection = newPage.getByTestId(

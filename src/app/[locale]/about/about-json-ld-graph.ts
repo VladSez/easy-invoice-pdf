@@ -3,16 +3,7 @@ import type { Locale } from "next-intl";
 import type Messages from "../../../../messages/en.json";
 import type { Graph } from "schema-dts";
 
-const FAQ_ITEM_KEYS = [
-  "whatIs",
-  "isFree",
-  "accountNeeded",
-  "customization",
-  "dataSecurity",
-  "sharing",
-] as const;
-
-type FaqItemKey = (typeof FAQ_ITEM_KEYS)[number];
+import { ABOUT_FAQ_ITEM_KEYS } from "./about-faq-item-keys";
 
 /**
  * Builds a JSON-LD graph for the about page with schema.org structured data.
@@ -31,7 +22,7 @@ export function buildAboutJsonLdGraph(
   const pageUrl = `${baseUrl}/${locale}/about`;
   const faqUrl = `${pageUrl}#faq`;
 
-  const faqEntities = FAQ_ITEM_KEYS.map((key: FaqItemKey) => {
+  const faqEntities = ABOUT_FAQ_ITEM_KEYS.map((key) => {
     const item = messages.FAQ.items[key];
 
     if (!item) {

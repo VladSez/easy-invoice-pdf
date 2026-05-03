@@ -144,7 +144,9 @@ test.describe("About page", () => {
     ).toBeVisible();
 
     await expect(faqSection.getByText("What is EasyInvoicePDF?")).toBeVisible();
-    await expect(faqSection.getByText("Is it really free?")).toBeVisible();
+    await expect(
+      faqSection.getByText("Is EasyInvoicePDF free to use?"),
+    ).toBeVisible();
 
     // Check footer
     const footer = page.getByRole("contentinfo");
