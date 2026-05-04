@@ -263,16 +263,16 @@ function SeoComparisonTable({ table }: { table: ComparisonTable }) {
 
   return (
     <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
-      <table className="w-full min-w-[320px] text-left text-sm text-slate-800">
+      <table className="w-full min-w-[390px] text-left text-sm text-slate-800">
         <thead className="border-b border-slate-200 bg-slate-50">
           <tr>
-            <th scope="col" className="px-4 py-3 font-semibold">
+            <th scope="col" className="px-3 py-2 font-semibold md:px-4 md:py-3">
               {colA}
             </th>
-            <th scope="col" className="px-4 py-3 font-semibold">
+            <th scope="col" className="px-3 py-2 font-semibold md:px-4 md:py-3">
               {colB}
             </th>
-            <th scope="col" className="px-4 py-3 font-semibold">
+            <th scope="col" className="px-3 py-2 font-semibold md:px-4 md:py-3">
               {colC}
             </th>
           </tr>
@@ -283,11 +283,18 @@ function SeoComparisonTable({ table }: { table: ComparisonTable }) {
               key={row.feature}
               className="border-b border-slate-100 last:border-0"
             >
-              <th scope="row" className="px-4 py-3 font-medium text-slate-900">
+              <th
+                scope="row"
+                className="px-3 py-2 font-medium text-slate-900 md:px-4 md:py-3"
+              >
                 {row.feature}
               </th>
-              <td className="px-4 py-3 text-slate-700">{row.thisTool}</td>
-              <td className="px-4 py-3 text-slate-700">{row.other}</td>
+              <td className="px-3 py-2 text-slate-700 md:px-4 md:py-3">
+                {row.thisTool}
+              </td>
+              <td className="px-3 py-2 text-slate-700 md:px-4 md:py-3">
+                {row.other}
+              </td>
             </tr>
           ))}
         </tbody>

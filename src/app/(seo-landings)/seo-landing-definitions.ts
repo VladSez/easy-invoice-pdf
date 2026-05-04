@@ -310,9 +310,9 @@ export const SEO_LANDING_DEFINITIONS = {
       columnLabels: ["Feature", "EasyInvoicePDF.com", "Stripe"],
       rows: [
         { feature: "No login", thisTool: "✅ Yes", other: "❌ No" },
-        { feature: "Instant PDF", thisTool: "✅ Yes", other: "Varies" },
+        { feature: "Instant PDF", thisTool: "✅ Yes", other: "⚠️ Varies" },
         { feature: "Open-source", thisTool: "✅ Yes", other: "❌ No" },
-        { feature: "Free forever", thisTool: "✅ Yes", other: "Paid plans" },
+        { feature: "Free forever", thisTool: "✅ Yes", other: "⚠️ Paid plans" },
       ],
     },
     faq: [
