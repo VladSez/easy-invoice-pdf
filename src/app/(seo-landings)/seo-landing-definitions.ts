@@ -169,7 +169,7 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Start Generating Invoices",
       ctaHref: DEFAULT_INVOICE_TEMPLATE_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/stripe-template-v1.png`,
+      heroImage: `${STATIC_ASSETS_URL}/seo-content/str-tmp-v2.png`,
     },
     sections: [
       {
@@ -364,7 +364,8 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Generate Invoice PDF",
       ctaHref: DEFAULT_INVOICE_TEMPLATE_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
+      heroImage: `${STATIC_ASSETS_URL}/seo-content/
+def-tmp-v2.png`,
     },
     sections: [
       {

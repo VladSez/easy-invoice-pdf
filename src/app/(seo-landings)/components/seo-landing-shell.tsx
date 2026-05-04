@@ -43,7 +43,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
         <Header locale="en" translations={HEADER_TRANSLATIONS} />
         <main className="flex flex-1 flex-col md:pb-12">
           <div className="border-b border-slate-200 bg-white">
-            <div className="container mx-auto max-w-4xl px-4 py-12 md:px-6 md:py-16">
+            <div className="container mx-auto max-w-4xl px-4 pb-6 pt-12 md:px-6 md:py-16 md:pb-8">
               <h1 className="text-balance text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
                 {definition.hero.h1}
               </h1>

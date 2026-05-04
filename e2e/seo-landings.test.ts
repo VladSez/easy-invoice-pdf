@@ -39,6 +39,18 @@ test.describe("SEO landing pages", () => {
         page.getByRole("heading", { level: 2, name: subheading }),
       ).toBeVisible();
 
+      /** Check that hero image exists and loads  */
+      const imageRes = await fetch(heroImageSrc);
+
+      const imageOk = imageRes.ok;
+      expect(imageOk).toBe(true);
+
+      const imageStatus = imageRes.status;
+      expect(imageStatus).toBe(200);
+
+      const imageHeaders = imageRes.headers;
+      expect(imageHeaders.get("content-type")).toContain("image/png");
+
       const img = page.getByRole("img", { name: h1 });
       await expect(img).toBeVisible();
       await expect(img).toHaveAttribute("src", heroImageSrc);
