@@ -5,10 +5,10 @@ import type { SeoLandingDefinition } from "./seo-landing-definitions";
 
 export function buildSeoLandingJsonLd(
   definition: SeoLandingDefinition,
-  baseUrl: string = APP_URL,
+  baseUrl = APP_URL,
 ): Graph {
-  const pageUrl = `${baseUrl}/${definition.slug}`;
-  const faqUrl = `${pageUrl}#faq`;
+  const pageUrl = `${baseUrl}/${definition.slug}` as const;
+  const faqUrl = `${pageUrl}#faq` as const;
 
   const faqEntities = definition.faq.map((item) => ({
     "@type": "Question" as const,
