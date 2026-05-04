@@ -28,7 +28,7 @@
 - 📺 **Live PDF Preview**: See changes in real-time as you type
 - ⭐ **No Sign-Up Required**: Start creating invoices immediately without any registration
 - 📄 **Instant PDF**: One-click download ready for printing or sending
-- 🎨 **Custom Logo Upload**: Add your company branding with easy logo upload
+- ✏️ **Custom Logo Upload**: Add your company branding with easy logo upload
 - 🔗 **Shareable Links**: Send invoices directly to clients without attachments
 - 🎨 **Multiple Templates**: Including modern **Stripe-style design**
 - 🌍 **Multi-Language & Currency**: Support for 10+ languages and 120+ currencies
@@ -227,9 +227,4 @@ For the full app experience, you’ll need to obtain and set values from the fol
 
 ## License
 
-This project is dual-licensed:
-
-- **AGPL-3.0** (for open-source or compliant use): [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.html)
-- **Commercial license** (for proprietary use): contact [vlad@mail.easyinvoicepdf.com](mailto:vlad@mail.easyinvoicepdf.com)
-
-By using this software, you agree to the terms of the applicable license.
+This project is licensed under the [GNU AGPL v3](https://opensource.org/license/AGPL-3.0).

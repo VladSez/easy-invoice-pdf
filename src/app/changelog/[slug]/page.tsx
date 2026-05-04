@@ -19,7 +19,7 @@ import { Suspense } from "react";
 import { ChangelogAuthorByline } from "../components/changelog-author-byline";
 import { ChangelogVersionBadgeLink } from "../components/changelog-version-badge-link";
 import { DateTime } from "../components/date-time";
-import { BlackGoToAppButton } from "@/app/(components)/header/go-to-app-button-cta";
+
 import * as Sentry from "@sentry/nextjs";
 
 interface ChangelogPageProps {
@@ -291,16 +291,6 @@ export default async function ChangelogEntryPage({
             </Suspense>
           </div>
         </article>
-
-        {/* CTA Button */}
-        <div
-          className="mt-16 flex justify-center"
-          data-testid="go-to-app-button-container"
-        >
-          <BlackGoToAppButton className="w-full py-6 text-lg">
-            Start Invoicing
-          </BlackGoToAppButton>
-        </div>
 
         {/* Previous and Next post navigation */}
         {(previousEntry || nextEntry) && (

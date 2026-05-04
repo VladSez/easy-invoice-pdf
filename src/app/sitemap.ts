@@ -1,4 +1,5 @@
 import { APP_URL } from "@/config";
+import { SEO_LANDING_SLUGS } from "@/app/(seo-landings)/seo-landing-definitions";
 import { type MetadataRoute } from "next";
 import { SUPPORTED_LANGUAGES } from "./schema";
 import { getChangelogEntries } from "./changelog/utils";
@@ -66,6 +67,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.5,
     },
+    // Programmatic SEO landing pages
+    ...SEO_LANDING_SLUGS.map((slug) => ({
+      url: `${APP_URL}/${slug}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })),
   ];
 
   return sitemapEntries;

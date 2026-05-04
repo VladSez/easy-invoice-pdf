@@ -21,6 +21,11 @@ export default function robots(): MetadataRoute.Robots {
           "/tos",
           // Allow founder page
           "/founder",
+          // SEO landing pages
+          "/invoice-generator-no-login",
+          "/open-source-invoice-generator",
+          "/stripe-invoice-alternative",
+          "/invoice-template-pdf",
         ],
         disallow: [
           // Disallow shared invoice URLs, like /?data=*

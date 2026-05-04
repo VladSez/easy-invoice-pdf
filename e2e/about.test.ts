@@ -127,7 +127,7 @@ test.describe("About page", () => {
 
     await expect(
       featuresSection.getByText(
-        "Create professional invoices in minutes with a simple, powerful tool.",
+        "Create professional invoices with live preview, instant PDF downloads, multi-language support, flexible tax systems and more.",
       ),
     ).toBeVisible();
 

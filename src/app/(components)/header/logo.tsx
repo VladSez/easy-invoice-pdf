@@ -14,7 +14,7 @@ export function Logo({ text }: { text: string }) {
 
         {/* show only app name on mobile (to save space) */}
         <div className="block sm:hidden">
-          <p className="text-balance text-center text-xl font-bold text-zinc-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
+          <p className="text-balance text-center text-base font-bold text-zinc-800 min-[375px]:text-xl sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
             <a
               href="https://easyinvoicepdf.com"
               target="_blank"

@@ -1,3 +1,4 @@
+import { SEO_FOOTER_SOLUTION_LINKS } from "@/app/(seo-landings)/seo-landing-footer-links";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { GITHUB_URL, TWITTER_URL } from "@/config";
 import Link from "next/link";
@@ -70,8 +71,22 @@ export function Footer({ links, translations }: FooterProps) {
               </Link>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:gap-10 md:flex-1 md:grid-cols-2">
-            <div className="space-y-3"></div>
+          <div className="grid grid-cols-1 sm:gap-10 md:ml-20 md:flex-1 md:grid-cols-2">
+            <div className="space-y-3" data-testid="footer-solutions-links">
+              <h3 className="text-sm font-medium text-slate-900">Solutions</h3>
+              <ul className="space-y-2">
+                {SEO_FOOTER_SOLUTION_LINKS.map(({ slug, label }) => (
+                  <li key={slug}>
+                    <Link
+                      href={`/${slug}`}
+                      className="text-sm text-slate-500 hover:text-slate-900"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <div className="space-y-3" data-testid="footer-social-links">
               <h3 className="text-sm font-medium text-slate-900">
                 {translations.resources}
