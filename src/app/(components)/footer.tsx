@@ -71,7 +71,7 @@ export function Footer({ links, translations }: FooterProps) {
               </Link>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:gap-10 md:ml-20 md:flex-1 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-10 md:ml-20 md:flex-1 md:grid-cols-2">
             <div className="space-y-3" data-testid="footer-solutions-links">
               <h3 className="text-sm font-medium text-slate-900">Solutions</h3>
               <ul className="space-y-2">
