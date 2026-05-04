@@ -79,7 +79,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
             </div>
           </div>
 
-          <div className="container mx-auto max-w-4xl flex-1 px-4 pt-10 md:px-6">
+          <div className="container mx-auto max-w-4xl flex-1 px-4 pt-6 md:px-6 md:pt-10">
             {definition.sections.map((section, id) => (
               <div key={section.title}>
                 <div className="my-2">
@@ -87,7 +87,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                 </div>
                 {definition.comparisonTable &&
                 section.title === "When to use this instead" ? (
-                  <div className="py-8">
+                  <div className="py-6 md:py-8">
                     <h2 className="w-fit bg-rose-500 text-2xl font-semibold tracking-tight text-white dark:bg-cyan-600 dark:text-white md:text-3xl">
                       Feature comparison
                     </h2>
@@ -142,7 +142,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
               </div>
             </section>
 
-            <div className="flex justify-center py-10 md:py-12">
+            <div className="flex justify-center py-6 md:py-12">
               <BlackGoToAppButton className="h-12 w-full px-8 text-base">
                 {definition.hero.ctaLabel}
               </BlackGoToAppButton>
@@ -230,7 +230,7 @@ function SeoSectionBlock({ section, id }: { section: SeoSection; id: number }) {
   const color = colors[id % colors.length];
 
   return (
-    <section className="border-b border-slate-100 py-8 last:border-b-0">
+    <section className="border-b border-slate-100 py-6 last:border-b-0 md:py-8">
       <h2 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
         <span className={`${color} px-0.5 font-bold`}>{section.title}</span>
       </h2>
