@@ -6,7 +6,7 @@
   <h1>EasyInvoicePDF</h1>
   <h3>Free & Open-Source Invoice Generator</h3>
   <p>Create professional invoices instantly in your browser with <strong>Live Preview</strong>, <strong>Multiple Templates</strong> (including a Stripe-style design). <strong>No Sign-Up Required</strong>.</p>
-  <p style="font-size:14.75px;"><a href="https://easyinvoicepdf.com/?template=stripe&ref=github"><strong>Start Invoicing</strong></a></p>
+  <p style="font-size:15px;"><a href="https://easyinvoicepdf.com/?template=stripe&ref=github"><strong>Start Invoicing</strong></a></p>
   <p>
       <a href="https://easyinvoicepdf.com/en/about?ref=github">About</a>
       ·
@@ -19,7 +19,7 @@
       <img
         alt="Star EasyInvoicePDF on GitHub - free & open-source invoice generator"
         src="https://shieldcn.dev/github/VladSez/easy-invoice-pdf/stars.svg?mode=light"
-        height="30"
+        height="34"
       />
     </a>
 </div>
