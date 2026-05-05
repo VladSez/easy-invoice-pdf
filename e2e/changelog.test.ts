@@ -99,12 +99,18 @@ test.describe("Changelog page", () => {
 
     // Check CTA button
     const goToAppButtonContainer = page.getByTestId(
-      "go-to-app-button-container",
+      "ready-to-start-invoicing-cta",
     );
+    await expect(goToAppButtonContainer).toBeVisible();
 
-    const ctaButton = goToAppButtonContainer.getByRole("link");
+    const ctaButton = goToAppButtonContainer.getByRole("link", {
+      name: "Start Invoicing",
+    });
     await expect(ctaButton).toBeVisible();
-    await expect(ctaButton).toHaveText("Start Invoicing");
+    await expect(ctaButton).toHaveAttribute(
+      "href",
+      "https://easyinvoicepdf.com?ref=changelog",
+    );
   });
 
   test("should navigate back to changelog from individual entry", async ({

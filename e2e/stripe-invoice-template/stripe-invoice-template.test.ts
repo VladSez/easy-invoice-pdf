@@ -47,7 +47,7 @@ test.describe("Stripe Invoice Template", () => {
     // Check other meta tags for Stripe template
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
       "content",
-      "Stripe Template - Create Invoice | EasyInvoicePDF",
+      "Stripe Invoice Template - Create Free PDF Invoice",
     );
     await expect(
       page.locator('meta[property="og:description"]'),

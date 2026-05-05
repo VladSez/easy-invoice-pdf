@@ -1,7 +1,7 @@
-export function ProjectLogoDescription({ text }: { text: string }) {
+export function ProjectLogoDescription({ text = "" }: { text: string }) {
   return (
     <div className="flex flex-col -space-y-0.5">
-      <h1 className="text-balance text-xl font-bold text-slate-800 lg:text-2xl">
+      <p className="text-balance text-xl font-bold text-slate-800 lg:text-2xl">
         <a
           href="https://easyinvoicepdf.com"
           target="_blank"
@@ -9,10 +9,10 @@ export function ProjectLogoDescription({ text }: { text: string }) {
         >
           EasyInvoicePDF
         </a>
-      </h1>
-      <h2 className="text-balance text-[12px] text-slate-700 sm:text-[13px]">
+      </p>
+      <h1 className="text-balance text-[12px] text-slate-700 sm:text-[13px]">
         {text}
-      </h2>
+      </h1>
     </div>
   );
 }

@@ -6,9 +6,11 @@ import Link from "next/link";
 export function GoToAppButton({
   className,
   children,
+  href = "/?template=default",
 }: {
   className?: string;
   children?: React.ReactNode;
+  href?: string;
 }) {
   return (
     <Button
@@ -20,7 +22,7 @@ export function GoToAppButton({
       )}
       asChild
     >
-      <Link href="/?template=default" scroll={false}>
+      <Link href={href} scroll={false}>
         <ArrowRight className="mr-2 size-6 transition-transform group-hover:scale-110" />
         {children}
       </Link>
@@ -31,9 +33,11 @@ export function GoToAppButton({
 export function BlackGoToAppButton({
   className,
   children,
+  href = "/?template=default",
 }: {
   className?: string;
   children?: React.ReactNode;
+  href?: string;
 }) {
   return (
     <GoToAppButton
@@ -41,6 +45,7 @@ export function BlackGoToAppButton({
         "relative overflow-hidden bg-zinc-900 text-white transition-all duration-300 hover:scale-[1.02] hover:bg-zinc-800 hover:text-white active:scale-[0.98]",
         className,
       )}
+      href={href}
     >
       {children}
     </GoToAppButton>

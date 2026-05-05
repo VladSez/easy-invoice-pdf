@@ -8,7 +8,7 @@ const APP_PAGE_DESCRIPTION =
   "Create invoices online for free with our PDF invoice generator. Customize templates, download instantly, no signup required.";
 
 const DEFAULT_TEMPLATE_META = {
-  title: "Free Invoice PDF Generator | EasyInvoicePDF",
+  title: "Free Invoice Generator - Download PDF Invoices Instantly",
   canonical: `${APP_URL}/`, // we use root URL as canonical for SEO purposes
   images: [
     {
@@ -26,7 +26,7 @@ const DEFAULT_TEMPLATE_META = {
 };
 
 const STRIPE_TEMPLATE_META = {
-  title: "Stripe Template - Create Invoice | EasyInvoicePDF",
+  title: "Stripe Invoice Template - Create Free PDF Invoice",
   canonical: `${APP_URL}/`, // we use root URL as canonical for SEO purposes
   images: [
     {
