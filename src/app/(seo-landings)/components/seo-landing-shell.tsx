@@ -12,6 +12,8 @@ import {
 } from "../seo-landing-definitions";
 import { ChevronDownIcon } from "lucide-react";
 import { StickySeoCta } from "@/app/(seo-landings)/components/sticky-seo-cta";
+import { Button } from "@/components/ui/button";
+import { GithubIcon } from "@/components/etc/github-logo";
 
 const HEADER_TRANSLATIONS = {
   navLinks: {
@@ -34,11 +36,20 @@ interface SeoLandingShellProps {
   definition: SeoLandingDefinition;
 }
 
+/**
+ * Renders a complete SEO landing page shell with hero section, CTA buttons, and layout structure.
+ *
+ * @param {SeoLandingShellProps} props - Component props
+ * @param {SeoLandingDefinition} props.definition - SEO landing page definition
+ */
 export function SeoLandingShell({ definition }: SeoLandingShellProps) {
   return (
     <>
+      {/** Sticky CTA component displayed at bottom of SEO landing pages. */}
       <StickySeoCta href={definition.hero.ctaHref} />
+      {/** Renders JSON-LD structured data for SEO landing pages. */}
       <SeoLandingJsonLd definition={definition} />
+
       <div className="flex min-h-screen flex-col bg-slate-50">
         <Header locale="en" translations={HEADER_TRANSLATIONS} />
         <main className="flex flex-1 flex-col md:pb-12">
@@ -50,13 +61,28 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
               <h2 className="mt-4 max-w-3xl text-xl leading-relaxed text-slate-600 md:text-2xl">
                 {definition.hero.subheading}
               </h2>
-              <div className="mt-8">
+              <div className="mt-8 flex flex-col gap-4 md:flex-row">
                 <BlackGoToAppButton
-                  className="h-12 w-full px-8 text-base md:h-14 md:w-auto md:text-lg"
+                  className="w-full px-8 py-6 text-base lg:w-[325px] lg:px-10"
                   href={definition.hero.ctaHref}
                 >
-                  {definition.hero.ctaLabel}
+                  <span className="truncate">{definition.hero.ctaLabel}</span>
                 </BlackGoToAppButton>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="group relative w-full overflow-hidden border-slate-200 px-8 py-6 text-base shadow-sm transition-all duration-300 hover:scale-[1.02] hover:border-slate-300 hover:shadow-md lg:w-[325px] lg:px-10"
+                  asChild
+                >
+                  <Link
+                    href={GITHUB_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <GithubIcon className="mr-2 size-6 transition-all duration-300 group-hover:scale-105" />
+                    <span className="text-clip">View on GitHub</span>
+                  </Link>
+                </Button>
               </div>
               {definition.hero.heroImage ? (
                 <div className="mt-8">

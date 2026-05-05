@@ -370,13 +370,12 @@ def-tmp-v2.png`,
     sections: [
       {
         title: "Why use a PDF invoice template",
-        lead: "PDF invoices are:",
+        lead: "No formatting issues, no surprises.",
         bullets: [
           "Universally accepted by clients and accounting teams",
           "Easy to share without layout shifts",
           "Consistent across devices and printers",
         ],
-        paragraphs: ["No formatting issues, no surprises."],
       },
       {
         title: "What is included",

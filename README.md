@@ -6,12 +6,18 @@
   <h1>EasyInvoicePDF</h1>
   <h3>Free & Open-Source Invoice Generator</h3>
   <p>Create professional invoices instantly in your browser with <strong>Live Preview</strong>, <strong>Multiple Templates</strong> (including a Stripe-style design). <strong>No Sign-Up Required</strong>.</p>
-  <p><a href="https://easyinvoicepdf.com/?template=stripe&ref=github"><strong>Start Invoicing</strong></a></p>
+  <p style="font-size:14.75px;"><a href="https://easyinvoicepdf.com/?template=stripe&ref=github"><strong>Start Invoicing</strong></a></p>
   <p>
       <a href="https://easyinvoicepdf.com/en/about?ref=github">About</a>
       ·
       <a href="https://github.com/VladSez/easy-invoice-pdf/releases">Releases</a>
     </p>
+
+  <p style="display: flex; justify-content: center; align-items: center;" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">
+    <strong>Star us&nbsp;❤️&nbsp;→</strong>&nbsp;<a href="https://github.com/VladSez/easy-invoice-pdf" >
+      <img alt="Star EasyInvoicePDF on GitHub - free & open-source invoice generator" src="https://shieldcn.dev/github/VladSez/easy-invoice-pdf/stars.svg?size=large&mode=light" height="36" width="120">
+    </a>
+  </p>
 
   <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">
     <!-- source:  .github/screenshots/stripe-template.png -->
