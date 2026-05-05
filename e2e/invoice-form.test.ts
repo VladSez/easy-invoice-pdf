@@ -58,7 +58,7 @@ test.describe("Invoice Generator Page", () => {
     // Check other meta tags for Stripe template
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
       "content",
-      "Free Invoice Generator - Download PDF Invoices Instantly",
+      "Free Invoice Generator - Create PDF Invoices Instantly",
     );
     await expect(
       page.locator('meta[property="og:description"]'),
@@ -90,7 +90,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Check title and branding
     await expect(page).toHaveTitle(
-      "Free Invoice Generator - Download PDF Invoices Instantly",
+      "Free Invoice Generator - Create PDF Invoices Instantly",
     );
 
     const header = page.getByTestId("header");

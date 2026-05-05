@@ -1,4 +1,12 @@
 {
+  "Metadata": {
+    "about": {
+      "title": "Gratis PDF-factuurgenerator - Over EasyInvoicePDF",
+      "description": "EasyInvoicePDF in het kort: gratis PDF-facturen, live preview, verwerking in de browser, sjablonen en deelbare links. Open source, geen registratie.",
+      "keywords": "gratis factuurgenerator, PDF-factuur online, facturatieprogramma, billingsoftware, open source factuur",
+      "siteName": "EasyInvoicePDF.com | Gratis Factuur Generator"
+    }
+  },
   "About": {
     "tagline": "Gratis factuurgenerator",
     "hero": {
@@ -68,14 +76,6 @@
       "shareFeedback": "Feedback delen",
       "app": "App",
       "startInvoicing": "Begin met factureren"
-    }
-  },
-  "Metadata": {
-    "about": {
-      "title": "Gratis PDF-factuurgenerator - Over EasyInvoicePDF",
-      "description": "EasyInvoicePDF in het kort: gratis PDF-facturen, live preview, verwerking in de browser, sjablonen en deelbare links. Open source, geen registratie. Open de generator.",
-      "keywords": "gratis factuurgenerator, PDF-factuur online, facturatieprogramma, billingsoftware, open source factuur",
-      "siteName": "EasyInvoicePDF.com | Gratis Factuur Generator"
     }
   },
   "FAQ": {

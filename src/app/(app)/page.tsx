@@ -8,7 +8,7 @@ const APP_PAGE_DESCRIPTION =
   "Create invoices online for free with our PDF invoice generator. Customize templates, download instantly, no signup required.";
 
 const DEFAULT_TEMPLATE_META = {
-  title: "Free Invoice Generator - Download PDF Invoices Instantly",
+  title: "Free Invoice Generator - Create PDF Invoices Instantly",
   canonical: `${APP_URL}/`, // we use root URL as canonical for SEO purposes
   images: [
     {

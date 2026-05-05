@@ -13,7 +13,8 @@ export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "Terms of Service | EasyInvoicePDF",
-  description: "Terms of Service for EasyInvoicePDF.com",
+  description:
+    "Terms of Service for EasyInvoicePDF.com. Browser-based invoice PDF tool.",
   keywords: [
     "terms of service",
     "easyinvoicepdf",
