@@ -20,7 +20,6 @@
         alt="Star EasyInvoicePDF on GitHub - free & open-source invoice generator"
         src="https://shieldcn.dev/github/VladSez/easy-invoice-pdf/stars.svg?mode=light&size=lg"
         height="38"
-        style="margin-top: 6px;"
       />
     </a>
 </div>
