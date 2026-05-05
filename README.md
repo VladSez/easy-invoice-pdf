@@ -13,16 +13,16 @@
       <a href="https://github.com/VladSez/easy-invoice-pdf/releases">Releases</a>
     </p>
 
-<p align="center" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">
-  <strong>Star us ❤️ →</strong>
-  <a href="https://github.com/VladSez/easy-invoice-pdf" style="vertical-align: middle;">
-    <img
-      alt="Star EasyInvoicePDF on GitHub - free & open-source invoice generator"
-      src="https://shieldcn.dev/github/VladSez/easy-invoice-pdf/stars.svg?mode=light"
-      height="30"
-    />
-  </a>
-</p>
+  <div align="center" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">
+    <strong>Star us on GitHub ❤️</strong><br/>
+    <a href="https://github.com/VladSez/easy-invoice-pdf">
+      <img
+        alt="Star EasyInvoicePDF on GitHub - free & open-source invoice generator"
+        src="https://shieldcn.dev/github/VladSez/easy-invoice-pdf/stars.svg?mode=light"
+        height="30"
+      />
+    </a>
+</div>
 
   <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">
     <!-- source:  .github/screenshots/stripe-template.png -->
