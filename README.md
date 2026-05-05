@@ -11,6 +11,8 @@
       <a href="https://easyinvoicepdf.com/en/about?ref=github">About</a>
       ·
       <a href="https://github.com/VladSez/easy-invoice-pdf/releases">Releases</a>
+      ·
+      <a href="#self-host">Self-host</a>
     </p>
 
   <div align="center" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">
@@ -223,7 +225,9 @@ Your support helps keep this project free and open-source 🙏
 - [typescript-plugin-directives](https://www.npmjs.com/package/typescript-plugin-directives)
 - [Create Mockups with shots.so](https://shots.so/)
 
-## Quick Start
+<h2 id="self-host">Quick Start</h2>
+
+EasyInvoicePDF is [AGPL v3](#license); self-host your own instance locally or on your infrastructure with the steps below.
 
 - Run `pnpm i`
 - Copy `.env.example to .env.local` (`cp .env.example .env.local`)
