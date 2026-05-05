@@ -15,12 +15,11 @@
 
 <p align="center" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">
   <strong>Star us ❤️ →</strong>
-  <a href="https://github.com/VladSez/easy-invoice-pdf">
+  <a href="https://github.com/VladSez/easy-invoice-pdf" style="vertical-align: middle;">
     <img
       alt="Star EasyInvoicePDF on GitHub - free & open-source invoice generator"
       src="https://shieldcn.dev/github/VladSez/easy-invoice-pdf/stars.svg?mode=light"
       height="30"
-      style="vertical-align: middle;"
     />
   </a>
 </p>
