@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export function StickySeoCta({
@@ -30,7 +29,6 @@ export function StickySeoCta({
         >
           <Link href={href} scroll={false} data-testid="seo-sticky-cta">
             Open app
-            <ArrowRight className="ml-1 size-4" aria-hidden />
           </Link>
         </Button>
       </div>

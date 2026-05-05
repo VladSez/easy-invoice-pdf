@@ -71,7 +71,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
               ) : null}
               {definition.hero.bullets.length ? (
                 <div className="mt-4 text-pretty">
-                  <p className="text-base text-stone-700">
+                  <p className="text-sm text-stone-700 md:text-base">
                     {definition.hero.bullets.join(", ")}
                   </p>
                 </div>
