@@ -4,6 +4,14 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
+/**
+ * Sticky CTA component displayed at bottom of SEO landing pages.
+ * Shows a fixed banner with call-to-action to open the app.
+ *
+ * @param {Object} props - Component props
+ * @param {string} props.href - URL to navigate to when CTA is clicked
+ * @param {string} [props.className] - Optional additional CSS classes
+ */
 export function StickySeoCta({
   href,
   className,

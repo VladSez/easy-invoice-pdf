@@ -11,7 +11,7 @@ export function buildSeoLandingMetadata(slug: SeoLandingSlug): Metadata {
 
   if (!definition) {
     throw new Error(
-      `🚨🚨🚨 [buildSeoLandingMetadata] SEO landing definition not found for slug: ${slug} 🚨🚨🚨`,
+      `\n\n🚨🚨🚨 [buildSeoLandingMetadata] SEO landing definition not found for slug: ____${slug}____ 🚨🚨🚨\n\n`,
     );
   }
 
@@ -71,6 +71,12 @@ export function buildSeoLandingMetadata(slug: SeoLandingSlug): Metadata {
 
 export function SeoLandingRoutePage({ slug }: { slug: SeoLandingSlug }) {
   const definition = SEO_LANDING_DEFINITIONS[slug];
+
+  if (!definition) {
+    throw new Error(
+      `\n\n🚨🚨🚨 [SeoLandingRoutePage] SEO landing definition not found for slug: ____${slug}____ 🚨🚨🚨\n\n`,
+    );
+  }
 
   return <SeoLandingShell definition={definition} />;
 }

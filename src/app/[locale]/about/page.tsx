@@ -228,7 +228,7 @@ function HeroSection() {
               </div>
             </div>
 
-            {/* CTA Buttons (Go to app and View on GitHub) */}
+            {/* CTA Buttons (Go to app and GitHub) */}
             <div className="flex w-full flex-col justify-center gap-3 sm:flex-row sm:flex-wrap xl:justify-start">
               <BlackGoToAppButton className="w-full px-10 py-6 text-lg lg:w-[270px] lg:max-w-[270px]">
                 <span className="text-clip">{t("buttons.startInvoicing")}</span>
@@ -237,7 +237,7 @@ function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="group relative w-full overflow-hidden border-slate-200 px-10 py-6 text-lg shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md lg:w-[270px] lg:max-w-[270px]"
+                className="group relative w-full overflow-hidden border-slate-200 px-10 py-6 text-lg shadow-sm transition-all duration-300 hover:scale-[1.02] hover:border-slate-300 hover:shadow-md lg:w-[270px] lg:max-w-[270px]"
                 asChild
               >
                 <Link
@@ -245,7 +245,7 @@ function HeroSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <GithubIcon className="mr-2 h-6 w-6 transition-transform group-hover:scale-110" />
+                  <GithubIcon className="mr-2 size-6 transition-all duration-300 group-hover:scale-105" />
                   <span className="text-clip">{t("buttons.viewOnGithub")}</span>
                 </Link>
               </Button>
