@@ -13,6 +13,7 @@ import { MobileMenuPanel } from "./mobile-menu";
 import { MorphingMenuIcon } from "./morphing-menu-icon";
 import { StarIcon } from "lucide-react";
 import type { HeaderProps } from "@/app/(components)/header";
+import { githubStarCountFormatter } from "@/utils/number-formatter";
 
 const desktopNavLinkClass =
   "rounded-md text-slate-800 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 hover:text-black active:scale-[0.97] transition-all duration-300";
@@ -31,6 +32,10 @@ export function HeaderClient({
   githubStarsCount,
 }: HeaderProps & { githubStarsCount: number }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const gitHubStarCountFormatted = githubStarCountFormatter
+    .format(githubStarsCount)
+    .toLowerCase();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
@@ -57,21 +62,18 @@ export function HeaderClient({
                 >
                   <GithubIcon className="size-4 fill-slate-800 transition-all duration-300 group-hover:fill-current" />
                   {translations.navLinks.github}
-                  <div
-                    className={cn(
-                      "mx-0.5 h-4 w-[1px] bg-slate-300",
-                      githubStarsCount > 0 ? "block" : "hidden",
-                    )}
-                  />
-                  <StarIcon className="size-4 fill-yellow-400 text-yellow-600 transition-all duration-300 group-hover:fill-yellow-300 group-hover:text-yellow-600/80" />
-                  <span
-                    className={cn(
-                      "text-sm font-semibold tabular-nums text-slate-800",
-                      githubStarsCount > 0 ? "block" : "hidden",
-                    )}
-                  >
-                    {githubStarsCount}
-                  </span>
+
+                  {githubStarsCount > 0 ? (
+                    <>
+                      <div className="mx-0.5 h-4 w-[1px] bg-slate-300" />
+                      <StarIcon className="size-4 fill-yellow-400 text-yellow-600 transition-all duration-300 group-hover:fill-yellow-300 group-hover:text-yellow-600/80" />
+                      <span className="text-sm font-semibold tabular-nums text-slate-800">
+                        {gitHubStarCountFormatted}
+                      </span>
+                    </>
+                  ) : (
+                    <StarIcon className="size-4 fill-yellow-400 text-yellow-600 transition-all duration-300 group-hover:fill-yellow-300 group-hover:text-yellow-600/80" />
+                  )}
                 </Link>
                 {/* a href this is only reliable way to scroll to a section on route navigation*/}
                 <a

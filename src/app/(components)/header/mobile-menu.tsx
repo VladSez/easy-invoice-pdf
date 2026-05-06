@@ -11,6 +11,7 @@ import { useEffect, useId, useRef } from "react";
 import { LanguageSwitcher } from "./language-switcher";
 import { GITHUB_URL } from "@/config";
 import type { HeaderProps } from "@/app/(components)/header";
+import { githubStarCountFormatter } from "@/utils/number-formatter";
 
 interface MobileMenuSharedProps {
   locale: Locale;
@@ -48,6 +49,10 @@ export function MobileMenuPanel({
   const pathname = usePathname();
   const titleId = useId();
   const descriptionId = useId();
+
+  const gitHubStarCountFormatted = githubStarCountFormatter
+    .format(githubStarsCount)
+    .toLowerCase();
 
   const isChangelogActive = pathname === "/changelog";
   const isTosActive = pathname === "/tos";
@@ -134,21 +139,18 @@ export function MobileMenuPanel({
           >
             <GithubIcon className="size-5 transition-all duration-300 group-hover:fill-current" />
             {translations.navLinks.githubCTA}
-            <div
-              className={cn(
-                "mx-0.5 h-4 w-[1px] bg-slate-400",
-                githubStarsCount > 0 ? "block" : "hidden", // show separator if there are stars
-              )}
-            />
-            <StarIcon className="size-5 fill-yellow-400 text-yellow-600 transition-all duration-300 group-hover:fill-yellow-300 group-hover:text-yellow-500" />
-            <span
-              className={cn(
-                "text-sm font-semibold tabular-nums text-slate-800",
-                githubStarsCount > 0 ? "block" : "hidden", // show stars count if there are stars
-              )}
-            >
-              {githubStarsCount}
-            </span>
+
+            {githubStarsCount > 0 ? (
+              <>
+                <div className="mx-0.5 h-4 w-[1px] bg-slate-300" />
+                <StarIcon className="size-5 fill-yellow-400 text-yellow-600 transition-all duration-300 group-hover:fill-yellow-300 group-hover:text-yellow-500" />
+                <span className="text-sm font-semibold tabular-nums text-slate-800">
+                  {gitHubStarCountFormatted}
+                </span>
+              </>
+            ) : (
+              <StarIcon className="size-5 fill-yellow-400 text-yellow-600 transition-all duration-300 group-hover:fill-yellow-300 group-hover:text-yellow-500" />
+            )}
           </a>
 
           <div className="w-full pt-4">
