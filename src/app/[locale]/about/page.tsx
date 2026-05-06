@@ -22,7 +22,7 @@ import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { ABOUT_FAQ_ITEM_KEYS } from "@/app/[locale]/about/about-faq-item-keys";
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
-import { Header, type HeaderProps } from "@/app/(components)/header";
+import { type HeaderProps, Header } from "@/app/(components)/header";
 
 // statically generate the pages for all locales
 export function generateStaticParams() {
@@ -42,7 +42,6 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
     features: t("footer.links.features"),
     faq: "FAQ",
     github: t("footer.links.github"),
-    githubUrl: GITHUB_URL,
     githubCTA: t("buttons.viewOnGithub"),
     tagline: t("tagline"),
   } as const satisfies HeaderProps["translations"]["navLinks"];
@@ -70,6 +69,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
             termsOfServiceLinkText,
           }}
         />
+
         <main>
           <HeroSection />
           <FeaturesSection />
@@ -174,6 +174,16 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
   );
 }
 
+/**
+ * HeroSection component
+ *
+ * Renders the hero section of the About page with:
+ * - CTA buttons to start invoicing and view on GitHub
+ * - Video demo of the app
+ * - Localized title and description with colored text spans
+ * - Responsive layout (single column on mobile, two columns on XL screens)
+ *
+ */
 function HeroSection() {
   const t = useTranslations("About");
 

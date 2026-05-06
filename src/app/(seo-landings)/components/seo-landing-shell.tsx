@@ -1,5 +1,4 @@
 import { Footer } from "@/app/(components)/footer";
-import { Header, type HeaderProps } from "@/app/(components)/header";
 import { BlackGoToAppButton } from "@/app/(components)/header/go-to-app-button-cta";
 import { GITHUB_URL } from "@/config";
 import Link from "next/link";
@@ -14,23 +13,7 @@ import { ChevronDownIcon } from "lucide-react";
 import { StickySeoCta } from "@/app/(seo-landings)/components/sticky-seo-cta";
 import { Button } from "@/components/ui/button";
 import { GithubIcon } from "@/components/etc/github-logo";
-
-const HEADER_TRANSLATIONS = {
-  navLinks: {
-    home: "Product",
-    features: "Features",
-    faq: "FAQ",
-    github: "GitHub",
-    githubUrl: GITHUB_URL,
-    githubCTA: "Star on GitHub",
-    tagline: "Free & Open-Source Invoice Generator",
-  },
-  switchLanguageText: "Switch language",
-  goToAppText: "Open app",
-  startInvoicingButtonText: "Start Invoicing",
-  changelogLinkText: "Changelog",
-  termsOfServiceLinkText: "Terms of Service",
-} as const satisfies HeaderProps["translations"];
+import { Header } from "@/app/(components)/header";
 
 interface SeoLandingShellProps {
   definition: SeoLandingDefinition;
@@ -51,7 +34,24 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
       <SeoLandingJsonLd definition={definition} />
 
       <div className="flex min-h-screen flex-col bg-slate-50">
-        <Header locale="en" translations={HEADER_TRANSLATIONS} />
+        <Header
+          locale="en"
+          translations={{
+            navLinks: {
+              home: "Product",
+              features: "Features",
+              faq: "FAQ",
+              github: "GitHub",
+              githubCTA: "Star on GitHub",
+              tagline: "Free & Open-Source Invoice Generator",
+            },
+            switchLanguageText: "Switch language",
+            goToAppText: "Open app",
+            startInvoicingButtonText: "Start Invoicing",
+            changelogLinkText: "Changelog",
+            termsOfServiceLinkText: "Terms of Service",
+          }}
+        />
         <main className="flex flex-1 flex-col md:pb-12">
           <div className="border-b border-slate-200 bg-white">
             <div className="container mx-auto max-w-4xl px-4 pb-6 pt-12 md:px-6 md:py-16 md:pb-8">

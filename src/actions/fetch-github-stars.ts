@@ -20,7 +20,7 @@ export const fetchGithubStars = cache(async (): Promise<number> => {
         headers: {
           Authorization: `Bearer ${env.GITHUB_TOKEN}`,
         },
-        next: { revalidate: 60 }, // 1 minute in seconds
+        next: { revalidate: 60 }, // revalidate every 1 minute (60 seconds)
       },
     );
 

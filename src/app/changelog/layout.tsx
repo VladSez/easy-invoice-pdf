@@ -95,7 +95,6 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
             features: "Features",
             faq: "FAQ",
             github: "GitHub",
-            githubUrl: GITHUB_URL,
             githubCTA: "Star on GitHub",
             tagline: "Free & Open-Source Invoice Generator",
           },
