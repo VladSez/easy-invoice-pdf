@@ -16,7 +16,7 @@
     </p>
 
   <div align="center" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">
-    <strong>Star us on GitHub ❤️</strong><br/>
+    <p><strong>⭐ Star us on GitHub</strong></p>
     <a href="https://github.com/VladSez/easy-invoice-pdf">
       <img
         alt="Star EasyInvoicePDF on GitHub - free & open-source invoice generator"
@@ -24,7 +24,7 @@
         height="38"
       />
     </a>
-</div>
+  </div>
 
   <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">
     <!-- source:  .github/screenshots/stripe-template.png -->
