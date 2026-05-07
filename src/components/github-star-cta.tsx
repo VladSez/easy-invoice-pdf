@@ -16,7 +16,7 @@ export function GitHubStarCTA({
     umamiTrackEvent("github_star_cta_clicked");
   };
 
-  const gitHubStartFormattedCount = githubStarCountFormatter
+  const gitHubStarCountFormatted = githubStarCountFormatter
     .format(githubStarsCount)
     .toLowerCase();
 
@@ -43,7 +43,7 @@ export function GitHubStarCTA({
             {githubStarsCount > 0 ? (
               <>
                 <span className="min-w-[27px] text-center text-sm font-medium tabular-nums text-slate-50">
-                  {gitHubStartFormattedCount}
+                  {gitHubStarCountFormatted}
                 </span>
               </>
             ) : (
