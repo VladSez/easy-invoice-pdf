@@ -4,8 +4,8 @@ import { GITHUB_URL } from "@/config";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { Star } from "lucide-react";
 import { GithubIcon } from "./etc/github-logo";
-import { CountUpNumber } from "./ui/count-up-number";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { githubStarCountFormatter } from "@/utils/number-formatter";
 
 export function GitHubStarCTA({
   githubStarsCount,
@@ -15,6 +15,10 @@ export function GitHubStarCTA({
   const handleStarClick = () => {
     umamiTrackEvent("github_star_cta_clicked");
   };
+
+  const gitHubStarCountFormatted = githubStarCountFormatter
+    .format(githubStarsCount)
+    .toLowerCase();
 
   return (
     <Tooltip>
@@ -38,7 +42,9 @@ export function GitHubStarCTA({
             </span>
             {githubStarsCount > 0 ? (
               <>
-                <CountUpNumber number={githubStarsCount} />
+                <span className="min-w-[27px] text-center text-sm font-medium tabular-nums text-slate-50">
+                  {gitHubStarCountFormatted}
+                </span>
               </>
             ) : (
               <span>Star on GitHub</span>

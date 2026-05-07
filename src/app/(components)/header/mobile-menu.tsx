@@ -3,18 +3,21 @@
 import { GithubIcon } from "@/components/etc/github-logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, StarIcon } from "lucide-react";
 import type { Locale } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef } from "react";
-import type { HeaderProps } from ".";
 import { LanguageSwitcher } from "./language-switcher";
+import { GITHUB_URL } from "@/config";
+import type { HeaderProps } from "@/app/(components)/header";
+import { githubStarCountFormatter } from "@/utils/number-formatter";
 
 interface MobileMenuSharedProps {
   locale: Locale;
   translations: HeaderProps["translations"];
   hideLanguageSwitcher?: boolean;
+  githubStarsCount: number;
 }
 
 interface MobileMenuPanelProps extends MobileMenuSharedProps {
@@ -41,10 +44,15 @@ export function MobileMenuPanel({
   locale,
   translations,
   hideLanguageSwitcher,
+  githubStarsCount,
 }: MobileMenuPanelProps) {
   const pathname = usePathname();
   const titleId = useId();
   const descriptionId = useId();
+
+  const gitHubStarCountFormatted = githubStarCountFormatter
+    .format(githubStarsCount)
+    .toLowerCase();
 
   const isChangelogActive = pathname === "/changelog";
   const isTosActive = pathname === "/tos";
@@ -118,19 +126,31 @@ export function MobileMenuPanel({
           >
             {translations.termsOfServiceLinkText}
           </a>
+
           <a
-            href={translations.navLinks.githubUrl}
+            href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
               mobileNavLinkClass,
-              "flex items-center gap-3 text-slate-700",
+              "group flex items-center gap-1.5 text-slate-800",
             )}
             aria-label={translations.navLinks.githubCTA}
-            onClick={close}
           >
-            <GithubIcon className="size-5" />
+            <GithubIcon className="size-5 transition-all duration-300 group-hover:fill-current" />
             {translations.navLinks.githubCTA}
+
+            {githubStarsCount > 0 ? (
+              <>
+                <div className="mx-0.5 h-4 w-[1px] bg-slate-300" />
+                <StarIcon className="size-5 fill-yellow-400 text-yellow-600 transition-all duration-300 group-hover:fill-yellow-300 group-hover:text-yellow-500" />
+                <span className="text-sm font-semibold tabular-nums text-slate-800">
+                  {gitHubStarCountFormatted}
+                </span>
+              </>
+            ) : (
+              <StarIcon className="size-5 fill-yellow-400 text-yellow-600 transition-all duration-300 group-hover:fill-yellow-300 group-hover:text-yellow-500" />
+            )}
           </a>
 
           <div className="w-full pt-4">

@@ -96,7 +96,6 @@ export default function FounderLayout({ children }: FounderLayoutProps) {
             features: "Features",
             faq: "FAQ",
             github: "GitHub",
-            githubUrl: GITHUB_URL,
             githubCTA: "Star on GitHub",
             tagline: "Free & Open-Source Invoice Generator",
           },

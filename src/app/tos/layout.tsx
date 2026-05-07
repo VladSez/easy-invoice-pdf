@@ -89,7 +89,6 @@ export default function TosLayout({ children }: TosLayoutProps) {
             features: "Features",
             faq: "FAQ",
             github: "GitHub",
-            githubUrl: GITHUB_URL,
             githubCTA: "Star on GitHub",
             tagline: "Free & Open-Source Invoice Generator",
           },
