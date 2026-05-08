@@ -92,7 +92,7 @@ export default function FounderLayout({ children }: FounderLayoutProps) {
         locale={"en"}
         translations={{
           navLinks: {
-            home: "Product",
+            home: "Home",
             features: "Features",
             faq: "FAQ",
             github: "GitHub",
@@ -146,7 +146,7 @@ export default function FounderLayout({ children }: FounderLayoutProps) {
                 href="/en/about"
                 className="text-sm text-slate-500 hover:text-slate-900"
               >
-                About
+                Home
               </Link>
             </li>
 

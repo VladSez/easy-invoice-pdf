@@ -91,7 +91,7 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
         locale={"en"}
         translations={{
           navLinks: {
-            home: "Product",
+            home: "Home",
             features: "Features",
             faq: "FAQ",
             github: "GitHub",
@@ -145,7 +145,7 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
                 href="/en/about"
                 className="text-sm text-slate-500 hover:text-slate-900"
               >
-                About
+                Home
               </Link>
             </li>
 
