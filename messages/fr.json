@@ -48,7 +48,6 @@
     },
     "footer": {
       "description": "Un outil gratuit et open-source pour créer des factures PDF professionnelles avec aperçu en temps réel.<br></br><br></br>Pas un logiciel de comptabilité. Aucune garantie de conformité. En utilisant cet outil, vous acceptez les <tosLink>Conditions d'utilisation</tosLink>.",
-      "product": "Produit",
       "links": {
         "features": "Fonctionnalités",
         "github": "GitHub",
@@ -61,7 +60,7 @@
     },
     "buttons": {
       "goToApp": "Ouvrir",
-      "home": "Produit",
+      "home": "Accueil",
       "viewOnGithub": "Voir sur GitHub",
       "starOnGithub": "Mettre une étoile sur GitHub",
       "switchLanguage": "Changer de langue",

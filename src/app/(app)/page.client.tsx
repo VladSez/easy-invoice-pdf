@@ -759,7 +759,7 @@ export function AppPageClient({
                 href="/en/about"
                 className="text-sm text-slate-500 hover:text-slate-900"
               >
-                About
+                Home
               </Link>
             </li>
             <li>

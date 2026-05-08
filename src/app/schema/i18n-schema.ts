@@ -60,7 +60,6 @@ const aboutSchema = z
     footer: z
       .object({
         description: z.string(),
-        product: z.string(),
         links: z
           .object({
             features: z.string(),

@@ -56,7 +56,6 @@
     },
     "footer": {
       "description": "Create professional invoices in seconds with our free & open-source invoice maker. 100% in-browser, no sign-up required. Includes live PDF preview and a Stripe-style template - perfect for freelancers, startups, and small businesses.<br></br><br></br>Not accounting software. No compliance guarantees. By using this tool, you agree to the <tosLink>Terms of Service</tosLink>.",
-      "product": "Product",
       "links": {
         "features": "Features",
         "github": "GitHub",
@@ -69,7 +68,7 @@
     },
     "buttons": {
       "goToApp": "Open app",
-      "home": "Product",
+      "home": "Home",
       "viewOnGithub": "Star on GitHub",
       "starOnGithub": "Star on GitHub",
       "switchLanguage": "Switch language",

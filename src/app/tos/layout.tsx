@@ -85,7 +85,7 @@ export default function TosLayout({ children }: TosLayoutProps) {
         locale={"en"}
         translations={{
           navLinks: {
-            home: "Product",
+            home: "Home",
             features: "Features",
             faq: "FAQ",
             github: "GitHub",
@@ -139,7 +139,7 @@ export default function TosLayout({ children }: TosLayoutProps) {
                 href="/en/about"
                 className="text-sm text-slate-500 hover:text-slate-900"
               >
-                About
+                Home
               </Link>
             </li>
 

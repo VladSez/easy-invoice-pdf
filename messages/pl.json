@@ -56,7 +56,6 @@
     },
     "footer": {
       "description": "Darmowe narzędzie open-source do tworzenia profesjonalnych faktur PDF z podglądem w czasie rzeczywistym.<br></br><br></br>Nie jest oprogramowaniem księgowym. Brak gwarancji zgodności. Korzystając z tego narzędzia, akceptujesz <tosLink>Regulamin</tosLink>.",
-      "product": "Produkt",
       "links": {
         "features": "Funkcje",
         "github": "GitHub",
@@ -69,7 +68,7 @@
     },
     "buttons": {
       "goToApp": "Otwórz",
-      "home": "Produkt",
+      "home": "Strona",
       "viewOnGithub": "Zobacz na GitHub",
       "starOnGithub": "Oznacz gwiazdką na GitHub",
       "switchLanguage": "Zmień język",

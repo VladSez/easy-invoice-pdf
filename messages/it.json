@@ -56,7 +56,6 @@
     },
     "footer": {
       "description": "Uno strumento gratuito e open-source per creare fatture PDF professionali con anteprima in tempo reale.<br></br><br></br>Non è un software di contabilità. Nessuna garanzia di conformità. Utilizzando questo strumento, accetti i <tosLink>Termini di servizio</tosLink>.",
-      "product": "Prodotto",
       "links": {
         "features": "Funzionalità",
         "github": "GitHub",
@@ -69,7 +68,7 @@
     },
     "buttons": {
       "goToApp": "Apri",
-      "home": "Prodotto",
+      "home": "Home",
       "viewOnGithub": "Visualizza su GitHub",
       "starOnGithub": "Metti una stella su GitHub",
       "switchLanguage": "Cambia lingua",

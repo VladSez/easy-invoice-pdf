@@ -56,7 +56,6 @@
     },
     "footer": {
       "description": "Ein kostenloses Open-Source-Tool zur Erstellung professioneller PDF-Rechnungen mit Live-Vorschau.<br></br><br></br>Keine Buchhaltungssoftware. Keine Compliance-Garantien. Durch die Nutzung dieses Tools stimmen Sie den <tosLink>Nutzungsbedingungen</tosLink> zu.",
-      "product": "Produkt",
       "links": {
         "features": "Funktionen",
         "github": "GitHub",
@@ -69,7 +68,7 @@
     },
     "buttons": {
       "goToApp": "Öffnen",
-      "home": "Produkt",
+      "home": "Startseite",
       "viewOnGithub": "Auf GitHub ansehen",
       "starOnGithub": "Auf GitHub bewerten",
       "switchLanguage": "Sprache wechseln",
