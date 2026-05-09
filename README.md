@@ -15,15 +15,14 @@
       <a href="#self-host">Self-host</a>
     </p>
 
-  <div align="center" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">
-    <p><strong>⭐ Star us on GitHub</strong></p>
-    <a href="https://github.com/VladSez/easy-invoice-pdf">
-      <img
-        alt="Star EasyInvoicePDF on GitHub - free & open-source invoice generator"
-        src="https://shieldcn.dev/github/VladSez/easy-invoice-pdf/stars.svg?mode=light&size=lg"
-        height="38"
-      />
-    </a>
+  <a href="https://github.com/VladSez/easy-invoice-pdf" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">
+    <strong>⭐ Star us on GitHub</strong>
+  </a>
+
+  <p>
+    <a href="https://vladsazon.com">Built by <strong>Vlad Sazonau</strong></a>
+  </p>
+
   </div>
 
   <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">
