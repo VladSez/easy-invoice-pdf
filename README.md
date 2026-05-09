@@ -20,7 +20,7 @@
   </a>
 
   <p>
-    <a href="https://vladsazon.com">Built by <strong>Vlad Sazonau</strong></a>
+    Built by <a href="https://vladsazon.com?ref=github"><strong>Vlad Sazonau</strong></a>
   </p>
 
   </div>
