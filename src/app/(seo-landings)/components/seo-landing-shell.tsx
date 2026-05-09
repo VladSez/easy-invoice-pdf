@@ -169,7 +169,10 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
             </section>
 
             <div className="flex justify-center py-6 md:py-12">
-              <BlackGoToAppButton className="h-12 w-full px-8 text-base">
+              <BlackGoToAppButton
+                className="h-12 w-full px-8 text-base"
+                href={definition.hero.ctaHref}
+              >
                 {definition.hero.ctaLabel}
               </BlackGoToAppButton>
             </div>
