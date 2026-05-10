@@ -16,7 +16,7 @@
     </p>
 
   <a href="https://github.com/VladSez/easy-invoice-pdf" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">
-    <strong>⭐ Star us on GitHub</strong>
+    <strong>⭐ Like the project? Star it on GitHub</strong>
   </a>
 
   <p>
