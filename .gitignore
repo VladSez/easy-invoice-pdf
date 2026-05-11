@@ -54,3 +54,5 @@ node_modules/
 messages/en.d.json.ts
 
 .pnpm-store/
+
+.github/workflows/.secrets

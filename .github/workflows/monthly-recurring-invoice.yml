@@ -13,7 +13,6 @@ on:
     # - if the 10th is Sunday -> run on Monday 11th
     - cron: "0 15 10-12 * *"
       timezone: Europe/Warsaw
-  workflow_dispatch:
 
 jobs:
   recurring-invoice:
@@ -27,44 +26,65 @@ jobs:
         id: date-check
         run: |
           output=$(node <<'EOF'
-          // Current date in UTC.
-          // GitHub cron schedules always use UTC.
+          // Use local time (Europe/Warsaw) for date calculations.
+          // This ensures consistency with the job's TZ env and Telegram timestamps.
+          const formatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'Europe/Warsaw',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            weekday: 'long'
+          })
+          // Get current date/time in Warsaw timezone
           const now = new Date()
+          // Parse the formatted date into individual components
+          const parts = formatter.formatToParts(now)
+          // Helper to extract specific date component by type
+          const getPart = (type) => parts.find(p => p.type === type)?.value
 
-          // Extract current year/month.
-          // Month is zero-based in JavaScript.
-          const year = now.getUTCFullYear()
-          const month = now.getUTCMonth()
+          // Extract year, month (convert to 0-based), day, and weekday index
+          const year = parseInt(getPart('year'))
+          const month = parseInt(getPart('month')) - 1 // zero-based for Date constructor
 
-          // Create a Date object for the 10th day
-          // of the current month.
-          const tenth = new Date(Date.UTC(year, month, 10))
+          const today = parseInt(getPart('day'))
 
-          // Weekday numbers:
-          // 0 = Sunday
-          // 6 = Saturday
-          const weekday = tenth.getUTCDay()
+          // Map weekday name to numeric index (0 = Sunday, 6 = Saturday)
+          const todayWeekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(getPart('weekday'))
+
+          // Create a Date object for the 10th day of the current month.
+          // Using Intl to get the 10th in Warsaw timezone.
+          const tenthFormatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'Europe/Warsaw',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            weekday: 'long'
+          })
+          const tenthDate = new Date(year, month, 10)
+
+          // Format the 10th day in Warsaw timezone to extract its weekday
+          const tenthParts = tenthFormatter.formatToParts(tenthDate)
+
+          // Helper function to get specific part from formatted date (e.g., 'weekday', 'day')
+          const tenthGetPart = (type) => tenthParts.find(p => p.type === type)?.value
+
+          // Convert weekday name (e.g., 'Saturday') to numeric index (0-6, where 0=Sunday, 6=Saturday)
+          const weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(tenthGetPart('weekday'))
 
           // Default execution date is the 10th.
           let targetDay = 10
 
-          // If the 10th falls on Saturday,
-          // move execution to Monday the 12th.
+          // If the 10th falls on Saturday, move execution to Monday the 12th.
           if (weekday === 6) {
             targetDay = 12
           }
 
-          // If the 10th falls on Sunday,
-          // move execution to Monday the 11th.
+          // If the 10th falls on Sunday, move execution to Monday the 11th.
           if (weekday === 0) {
             targetDay = 11
           }
 
-          // Current day of the month in UTC.
-          const today = now.getUTCDate()
-
-          // Final decision:
-          // run only if today matches computed target day.
+          // Final decision: run only if today matches computed target day.
           const shouldRun = today === targetDay
 
           // Expose values to later GitHub Action steps.
@@ -72,7 +92,8 @@ jobs:
             `should_run=${shouldRun}\n` +
             `weekday=${weekday}\n` +
             `target_day=${targetDay}\n` +
-            `today=${today}\n`
+            `today=${today}\n` +
+            `today_weekday=${todayWeekday}\n`
           )
           EOF
           )
@@ -82,24 +103,31 @@ jobs:
         run: |
           WEEKDAY=${{ steps.date-check.outputs.weekday }}
           TARGET_DAY=${{ steps.date-check.outputs.target_day }}
-          TODAY=${{ steps.date-check.outputs.today }}
           SHOULD_RUN=${{ steps.date-check.outputs.should_run }}
           WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
-          if [ "$SHOULD_RUN" == "true" ]; then
-            STATUS="✅ Proceeding with invoice generation"
-          else
-            STATUS="⏭️ Skipped (weekend)"
-          fi
+          NOW="$(date '+%d.%m.%Y %H:%M:%S %Z')"
+          BILLING_PERIOD="$(date '+%B %Y')"
 
           WEEKDAY_NAMES=("Sunday" "Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday")
           WEEKDAY_NAME="${WEEKDAY_NAMES[$WEEKDAY]}"
 
+          # Build weekend explanation if 10th fell on Saturday or Sunday
+          WEEKEND_LINE=""
+          if [ "$WEEKDAY" == "0" ] || [ "$WEEKDAY" == "6" ]; then
+            WEEKEND_LINE="10th was a weekend ($WEEKDAY_NAME), so execution moved to Monday ($TARGET_DAY).%0A%0A"
+          fi
+
+          if [ "$SHOULD_RUN" == "true" ]; then
+            STATUS="✅ Status: Proceeding with invoice generation"
+          else
+            STATUS="⏭️ Status: Skipped (awaiting correct date)"
+          fi
+
           MESSAGE="📅 Monthly Invoice Workflow%0A%0A"
-          MESSAGE+="10th weekday: $WEEKDAY_NAME ($WEEKDAY)%0A"
-          MESSAGE+="Target execution day: $TARGET_DAY%0A"
-          MESSAGE+="Today: $TODAY%0A"
-          MESSAGE+="Status: $STATUS%0A%0A"
+          MESSAGE+="🕒 $NOW%0A%0A"
+          MESSAGE+="<b>Billing period:</b> $BILLING_PERIOD%0A%0A"
+          MESSAGE+="$WEEKEND_LINE"
+          MESSAGE+="$STATUS%0A%0A"
           MESSAGE+="🔗 <a href=\"$WORKFLOW_URL\">View Workflow</a>"
 
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
@@ -124,9 +152,11 @@ jobs:
         if: steps.date-check.outputs.should_run == 'true' && success()
         run: |
           WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          NOW="$(date '+%d.%m.%Y %H:%M:%S %Z')"
 
           MESSAGE="📅 Monthly Invoice Workflow%0A%0A"
-          MESSAGE+="Status: ✅ Invoice generated successfully%0A%0A"
+          MESSAGE+="🕒 $NOW%0A%0A"
+          MESSAGE+="✅ Status: Invoice generated successfully%0A%0A"
           MESSAGE+="🔗 <a href=\"$WORKFLOW_URL\">View Workflow</a>"
 
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
@@ -138,10 +168,12 @@ jobs:
         if: failure()
         run: |
           WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          NOW="$(date '+%d.%m.%Y %H:%M:%S %Z')"
 
-          MESSAGE="📅 Monthly Invoice Workflow - ERROR%0A%0A"
-          MESSAGE+="Status: 🚨 Invoice generation failed%0A"
-          MESSAGE+="Please check the workflow for details.%0A%0A"
+          MESSAGE="📅 Monthly Invoice Workflow%0A%0A"
+          MESSAGE+="🕒 $NOW%0A%0A"
+          MESSAGE+="🚨 Status: Invoice generation failed%0A"
+          MESSAGE+="Please check the workflow for details%0A%0A"
           MESSAGE+="🔗 <a href=\"$WORKFLOW_URL\">View Workflow</a>"
 
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \

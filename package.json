@@ -33,7 +33,8 @@
     "cloudflared:tunnel": "pnpm dlx cloudflared tunnel run easy-invoice-pdf-local-dev",
     "corepack:enable": "corepack enable",
     "corepack:prepare": "corepack prepare pnpm@latest",
-    "update-github-actions": "pnpm dlx actions-up --min-age=7"
+    "update-github-actions": "pnpm dlx actions-up --min-age=7",
+    "test-gh-action-locally:monthly-recurring-invoice": "act schedule -j recurring-invoice --secret-file .github/workflows/.secrets"
   },
   "dependencies": {
     "@hookform/resolvers": "3.9.0",
