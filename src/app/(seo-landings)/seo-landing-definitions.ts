@@ -18,6 +18,8 @@ export interface SeoSection {
   title: string;
   /** Short lead before body content */
   lead?: string;
+  /** Show comparison table */
+  showComparisonTable?: boolean;
   paragraphs?: string[];
   bullets?: string[];
 }
@@ -291,6 +293,7 @@ export const SEO_LANDING_DEFINITIONS = {
         ],
       },
       {
+        showComparisonTable: true,
         title: "👉 When to use this instead",
         lead: "Use this tool if:",
         bullets: [

@@ -1,5 +1,9 @@
 name: 📅 Monthly Recurring Invoice
 
+concurrency:
+  group: monthly-recurring-invoice
+  cancel-in-progress: false
+
 on:
   schedule:
     # Run every day from the 10th to the 12th.
@@ -8,11 +12,14 @@ on:
     # - if the 10th is Saturday -> run on Monday 12th
     # - if the 10th is Sunday -> run on Monday 11th
     - timezone: Europe/Warsaw
-      cron: "0 17 10-12 * *"
+      cron: "0 15 10-12 * *"
 
 jobs:
   check-and-run:
     runs-on: ubuntu-latest
+    timeout-minutes: 10 # we set a timeout to 5 minutes to avoid the workflow running indefinitely
+    env:
+      TZ: Europe/Warsaw # we use Europe/Warsaw timezone for consistent date handling across local machines and CI
 
     steps:
       - name: Determine whether workflow should run today
@@ -95,21 +102,25 @@ jobs:
           MESSAGE+="Target execution day: $TARGET_DAY%0A"
           MESSAGE+="Today: $TODAY%0A"
           MESSAGE+="Status: $STATUS%0A%0A"
-          MESSAGE+="🔗 %5BView Workflow%5D($WORKFLOW_URL)"
+          MESSAGE+="🔗 <a href=\"$WORKFLOW_URL\">View Workflow</a>"
 
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
             -d chat_id="${{ secrets.TELEGRAM_GITHUB_ACTIONS_CHAT_ID }}" \
             -d text="$MESSAGE" \
-            -d parse_mode="Markdown" > /dev/null
+            -d parse_mode="HTML" > /dev/null
 
       - name: Generate monthly recurring invoice
         # Execute only if date-check step decided
         # that today is the correct execution day.
         if: steps.date-check.outputs.should_run == 'true'
         run: |
-          curl -X POST https://easyinvoicepdf.com/api/generate-invoice \
+          curl --fail-with-body \
+            --silent \
+            --show-error \
+            -X GET \
+            --max-time 60 \
             -H "Authorization: Bearer ${{ secrets.INVOICE_AUTH_TOKEN }}" \
-            -H "Content-Type: application/json"
+            https://easyinvoicepdf.com/api/generate-invoice
 
       - name: Send success notification to Telegram
         if: steps.date-check.outputs.should_run == 'true' && success()
@@ -118,12 +129,12 @@ jobs:
 
           MESSAGE="📅 Monthly Invoice Workflow%0A%0A"
           MESSAGE+="Status: ✅ Invoice generated successfully%0A%0A"
-          MESSAGE+="🔗 %5BView Workflow%5D($WORKFLOW_URL)"
+          MESSAGE+="🔗 <a href=\"$WORKFLOW_URL\">View Workflow</a>"
 
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
             -d chat_id="${{ secrets.TELEGRAM_GITHUB_ACTIONS_CHAT_ID }}" \
             -d text="$MESSAGE" \
-            -d parse_mode="Markdown" > /dev/null
+            -d parse_mode="HTML" > /dev/null
 
       - name: Send failure notification to Telegram
         if: failure()
@@ -133,9 +144,9 @@ jobs:
           MESSAGE="📅 Monthly Invoice Workflow - ERROR%0A%0A"
           MESSAGE+="Status: 🚨 Invoice generation failed%0A"
           MESSAGE+="Please check the workflow for details.%0A%0A"
-          MESSAGE+="🔗 %5BView Workflow%5D($WORKFLOW_URL)"
+          MESSAGE+="🔗 <a href=\"$WORKFLOW_URL\">View Workflow</a>"
 
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
             -d chat_id="${{ secrets.TELEGRAM_GITHUB_ACTIONS_CHAT_ID }}" \
             -d text="$MESSAGE" \
-            -d parse_mode="Markdown" > /dev/null
+            -d parse_mode="HTML" > /dev/null
