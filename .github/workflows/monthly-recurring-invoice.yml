@@ -1,7 +1,7 @@
 name: 📅 Monthly Recurring Invoice
 
 concurrency:
-  group: monthly-recurring-invoice
+  group: recurring-invoice
   cancel-in-progress: false
 
 on:
@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-and-run:
+  recurring-invoice:
     runs-on: ubuntu-latest
     timeout-minutes: 10 # we set a timeout to 5 minutes to avoid the workflow running indefinitely
     env:
@@ -26,7 +26,7 @@ jobs:
       - name: Determine whether workflow should run today
         id: date-check
         run: |
-          node <<'EOF'
+          output=$(node <<'EOF'
           // Current date in UTC.
           // GitHub cron schedules always use UTC.
           const now = new Date()
@@ -67,11 +67,6 @@ jobs:
           // run only if today matches computed target day.
           const shouldRun = today === targetDay
 
-          console.log(`10th weekday: ${weekday}`)
-          console.log(`Target execution day: ${targetDay}`)
-          console.log(`Today's date: ${today}`)
-          console.log(`Should run: ${shouldRun}`)
-
           // Expose values to later GitHub Action steps.
           process.stdout.write(
             `should_run=${shouldRun}\n` +
@@ -79,7 +74,9 @@ jobs:
             `target_day=${targetDay}\n` +
             `today=${today}\n`
           )
-          EOF >> $GITHUB_OUTPUT
+          EOF
+          )
+          echo "$output" >> $GITHUB_OUTPUT
 
       - name: Send date-check notification to Telegram
         run: |
