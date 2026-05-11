@@ -1,0 +1,141 @@
+name: 📅 Monthly Recurring Invoice
+
+on:
+  schedule:
+    # Run every day from the 10th to the 12th.
+    # We need this range because:
+    # - if the 10th is a weekday -> run on 10th
+    # - if the 10th is Saturday -> run on Monday 12th
+    # - if the 10th is Sunday -> run on Monday 11th
+    - timezone: Europe/Warsaw
+      cron: "0 17 10-12 * *"
+
+jobs:
+  check-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Determine whether workflow should run today
+        id: date-check
+        run: |
+          node <<'EOF'
+          // Current date in UTC.
+          // GitHub cron schedules always use UTC.
+          const now = new Date()
+
+          // Extract current year/month.
+          // Month is zero-based in JavaScript.
+          const year = now.getUTCFullYear()
+          const month = now.getUTCMonth()
+
+          // Create a Date object for the 10th day
+          // of the current month.
+          const tenth = new Date(Date.UTC(year, month, 10))
+
+          // Weekday numbers:
+          // 0 = Sunday
+          // 6 = Saturday
+          const weekday = tenth.getUTCDay()
+
+          // Default execution date is the 10th.
+          let targetDay = 10
+
+          // If the 10th falls on Saturday,
+          // move execution to Monday the 12th.
+          if (weekday === 6) {
+            targetDay = 12
+          }
+
+          // If the 10th falls on Sunday,
+          // move execution to Monday the 11th.
+          if (weekday === 0) {
+            targetDay = 11
+          }
+
+          // Current day of the month in UTC.
+          const today = now.getUTCDate()
+
+          // Final decision:
+          // run only if today matches computed target day.
+          const shouldRun = today === targetDay
+
+          console.log(`10th weekday: ${weekday}`)
+          console.log(`Target execution day: ${targetDay}`)
+          console.log(`Today's date: ${today}`)
+          console.log(`Should run: ${shouldRun}`)
+
+          // Expose values to later GitHub Action steps.
+          process.stdout.write(
+            `should_run=${shouldRun}\n` +
+            `weekday=${weekday}\n` +
+            `target_day=${targetDay}\n` +
+            `today=${today}\n`
+          )
+          EOF >> $GITHUB_OUTPUT
+
+      - name: Send date-check notification to Telegram
+        run: |
+          WEEKDAY=${{ steps.date-check.outputs.weekday }}
+          TARGET_DAY=${{ steps.date-check.outputs.target_day }}
+          TODAY=${{ steps.date-check.outputs.today }}
+          SHOULD_RUN=${{ steps.date-check.outputs.should_run }}
+          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          if [ "$SHOULD_RUN" == "true" ]; then
+            STATUS="✅ Proceeding with invoice generation"
+          else
+            STATUS="⏭️ Skipped (weekend)"
+          fi
+
+          WEEKDAY_NAMES=("Sunday" "Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday")
+          WEEKDAY_NAME="${WEEKDAY_NAMES[$WEEKDAY]}"
+
+          MESSAGE="📅 Monthly Invoice Workflow%0A%0A"
+          MESSAGE+="10th weekday: $WEEKDAY_NAME ($WEEKDAY)%0A"
+          MESSAGE+="Target execution day: $TARGET_DAY%0A"
+          MESSAGE+="Today: $TODAY%0A"
+          MESSAGE+="Status: $STATUS%0A%0A"
+          MESSAGE+="🔗 %5BView Workflow%5D($WORKFLOW_URL)"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_GITHUB_ACTIONS_CHAT_ID }}" \
+            -d text="$MESSAGE" \
+            -d parse_mode="Markdown" > /dev/null
+
+      - name: Generate monthly recurring invoice
+        # Execute only if date-check step decided
+        # that today is the correct execution day.
+        if: steps.date-check.outputs.should_run == 'true'
+        run: |
+          curl -X POST https://easyinvoicepdf.com/api/generate-invoice \
+            -H "Authorization: Bearer ${{ secrets.INVOICE_AUTH_TOKEN }}" \
+            -H "Content-Type: application/json"
+
+      - name: Send success notification to Telegram
+        if: steps.date-check.outputs.should_run == 'true' && success()
+        run: |
+          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          MESSAGE="📅 Monthly Invoice Workflow%0A%0A"
+          MESSAGE+="Status: ✅ Invoice generated successfully%0A%0A"
+          MESSAGE+="🔗 %5BView Workflow%5D($WORKFLOW_URL)"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_GITHUB_ACTIONS_CHAT_ID }}" \
+            -d text="$MESSAGE" \
+            -d parse_mode="Markdown" > /dev/null
+
+      - name: Send failure notification to Telegram
+        if: failure()
+        run: |
+          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          MESSAGE="📅 Monthly Invoice Workflow - ERROR%0A%0A"
+          MESSAGE+="Status: 🚨 Invoice generation failed%0A"
+          MESSAGE+="Please check the workflow for details.%0A%0A"
+          MESSAGE+="🔗 %5BView Workflow%5D($WORKFLOW_URL)"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_GITHUB_ACTIONS_CHAT_ID }}" \
+            -d text="$MESSAGE" \
+            -d parse_mode="Markdown" > /dev/null

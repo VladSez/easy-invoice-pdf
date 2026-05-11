@@ -26,7 +26,7 @@ export function StickySeoCta({
         className,
       )}
     >
-      <div className="pointer-events-auto w-full max-w-lg rounded-xl border bg-slate-900 p-3 shadow-lg ring-2 ring-slate-700 sm:flex sm:items-center sm:justify-between sm:gap-3 sm:p-4">
+      <div className="pointer-events-auto w-full max-w-lg rounded-xl border bg-slate-900 p-3 shadow sm:flex sm:items-center sm:justify-between sm:gap-3 sm:p-4">
         <p className="text-center text-sm font-medium text-slate-100 sm:text-left">
           Generate invoice in 10 seconds - no signup required
         </p>

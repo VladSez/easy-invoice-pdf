@@ -90,7 +90,10 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                     <img
                       src={definition.hero.heroImage}
                       alt={definition.hero.h1}
-                      className="h-auto w-full rounded-lg shadow-sm"
+                      className="h-auto w-full rounded-lg bg-slate-100/80 shadow-sm"
+                      loading="lazy"
+                      width={1920}
+                      height={1536}
                     />
                   </a>
                 </div>
