@@ -13,6 +13,7 @@ on:
     # - if the 10th is Sunday -> run on Monday 11th
     - timezone: Europe/Warsaw
       cron: "0 15 10-12 * *"
+  workflow_dispatch:
 
 jobs:
   check-and-run:
