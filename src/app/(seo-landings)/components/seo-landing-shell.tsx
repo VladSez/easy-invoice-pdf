@@ -111,7 +111,8 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
 
           <div className="container mx-auto max-w-4xl flex-1 px-4 pt-6 md:px-6 md:pt-10">
             {definition.sections.map((section, id) => {
-              const isComparisonTable = section?.showComparisonTable ?? false;
+              const canShowComparisonTable =
+                section?.showComparisonTable ?? false;
               const comparisonTable = definition?.comparisonTable;
 
               return (
@@ -119,7 +120,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                   <div className="my-2">
                     <SeoSectionBlock section={section} id={id} />
                   </div>
-                  {isComparisonTable ? (
+                  {canShowComparisonTable && comparisonTable ? (
                     <div className="py-6 md:py-8">
                       <h2 className="w-fit bg-rose-500 text-2xl font-semibold tracking-tight text-white dark:bg-cyan-600 dark:text-white md:text-3xl">
                         👉 Feature comparison
@@ -295,7 +296,7 @@ function SeoSectionBlock({ section, id }: { section: SeoSection; id: number }) {
   );
 }
 
-function SeoComparisonTable({ table }: { table: ComparisonTable | undefined }) {
+function SeoComparisonTable({ table }: { table: ComparisonTable }) {
   if (!table) {
     return null;
   }
