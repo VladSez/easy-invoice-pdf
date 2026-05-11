@@ -115,14 +115,16 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    await sendTelegramMessage({
-      message: `✅ Invoices generated and sent successfully!`,
-    });
-
-    return new NextResponse(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new NextResponse(
+      JSON.stringify({
+        ok: true,
+        message: "[telegram-webhook] Invoices generated and sent successfully!",
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   } catch (error) {
     console.error("[telegram-webhook] Error in webhook:", error);
 
