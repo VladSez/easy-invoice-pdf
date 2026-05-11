@@ -229,7 +229,9 @@ The generated invoices are included in the attachments. Please check them carefu
 [View invoice online](${invoiceUrl})
 [View in Google Drive](${folderToUploadInvoices.webViewLink}) path: *${googleDriveFolderPath}*
 
-*Don't forget to* [send email to company](${companyEmailLink})
+*☝️ Important - Don't forget to:*
+- [Send email to company](${companyEmailLink})
+- [Submit to KSEF](https://ap.ksef.mf.gov.pl/web/)
 
 Have a nice day!
 
@@ -263,7 +265,9 @@ EasyInvoicePDF.com`,
     <br/>
     <br/>
 
-    <b>Important:</b> <a href="${companyEmailLink}"><b>Send these invoices via email to the company</b></a> for processing and payment
+    <b>☝️ Important - Don't forget to:</b><br/>
+    - <a href="${companyEmailLink}"><b>Send these invoices via email to the company</b></a> for processing and payment<br/>
+    - <a href="https://ap.ksef.mf.gov.pl/web/"><b>Submit to KSEF</b></a>
     <br/>
     <br/>
 

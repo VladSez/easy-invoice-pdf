@@ -90,7 +90,11 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                     <img
                       src={definition.hero.heroImage}
                       alt={definition.hero.h1}
-                      className="h-auto w-full rounded-lg shadow-sm"
+                      className="h-auto w-full rounded-lg bg-slate-100/80 shadow-sm"
+                      loading="eager"
+                      fetchPriority="high"
+                      width={1920}
+                      height={1536}
                     />
                   </a>
                 </div>
@@ -106,29 +110,34 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
           </div>
 
           <div className="container mx-auto max-w-4xl flex-1 px-4 pt-6 md:px-6 md:pt-10">
-            {definition.sections.map((section, id) => (
-              <div key={section.title}>
-                <div className="my-2">
-                  <SeoSectionBlock section={section} id={id} />
-                </div>
-                {definition.comparisonTable &&
-                section.title === "When to use this instead" ? (
-                  <div className="py-6 md:py-8">
-                    <h2 className="w-fit bg-rose-500 text-2xl font-semibold tracking-tight text-white dark:bg-cyan-600 dark:text-white md:text-3xl">
-                      Feature comparison
-                    </h2>
-                    {definition.comparisonTable.intro ? (
-                      <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600">
-                        {definition.comparisonTable.intro}
-                      </p>
-                    ) : null}
-                    <div className="mt-6">
-                      <SeoComparisonTable table={definition.comparisonTable} />
-                    </div>
+            {definition.sections.map((section, id) => {
+              const canShowComparisonTable =
+                section?.showComparisonTable ?? false;
+              const comparisonTable = definition?.comparisonTable;
+
+              return (
+                <div key={section.title}>
+                  <div className="my-2">
+                    <SeoSectionBlock section={section} id={id} />
                   </div>
-                ) : null}
-              </div>
-            ))}
+                  {canShowComparisonTable && comparisonTable ? (
+                    <div className="py-6 md:py-8">
+                      <h2 className="w-fit bg-rose-500 text-2xl font-semibold tracking-tight text-white dark:bg-cyan-600 dark:text-white md:text-3xl">
+                        👉 Feature comparison
+                      </h2>
+                      {comparisonTable?.intro ? (
+                        <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600">
+                          {comparisonTable.intro}
+                        </p>
+                      ) : null}
+                      <div className="mt-6">
+                        <SeoComparisonTable table={comparisonTable} />
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
 
             <section
               id="faq"
@@ -288,6 +297,10 @@ function SeoSectionBlock({ section, id }: { section: SeoSection; id: number }) {
 }
 
 function SeoComparisonTable({ table }: { table: ComparisonTable }) {
+  if (!table) {
+    return null;
+  }
+
   const [colA, colB, colC] = table.columnLabels;
 
   return (

@@ -18,6 +18,8 @@ export interface SeoSection {
   title: string;
   /** Short lead before body content */
   lead?: string;
+  /** Show comparison table */
+  showComparisonTable?: boolean;
   paragraphs?: string[];
   bullets?: string[];
 }
@@ -67,9 +69,9 @@ export const SEO_LANDING_DEFINITIONS = {
         "Generate professional PDFs in seconds. No account, no signup, no tracking. Start creating now.",
       bullets: [
         "Create invoices in 60 seconds",
-        "No login. No email. No tracking.",
         "Download PDF instantly",
         "Free and open-source forever",
+        "No login. No email. No tracking.",
       ],
       ctaLabel: "Create Invoice Now",
       ctaHref: DEFAULT_INVOICE_TEMPLATE_HREF,
@@ -77,7 +79,7 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     sections: [
       {
-        title: "Why no-login matters",
+        title: "👉 Why no-login matters",
         lead: "Most tools force you to create an account before you can even download an invoice. That slows you down and adds unnecessary friction.",
         paragraphs: ["This tool skips all of that:"],
         bullets: [
@@ -88,7 +90,7 @@ export const SEO_LANDING_DEFINITIONS = {
         ],
       },
       {
-        title: "Who is this for",
+        title: "👉 Who is this for",
         bullets: [
           "Freelancers who need a quick invoice",
           "Developers generating invoices on the fly",
@@ -97,7 +99,7 @@ export const SEO_LANDING_DEFINITIONS = {
         ],
       },
       {
-        title: "Features",
+        title: "👉 Features",
         bullets: [
           "Generate professional PDFs in seconds",
           "Templates designed to impress clients",
@@ -106,7 +108,7 @@ export const SEO_LANDING_DEFINITIONS = {
         ],
       },
       {
-        title: "Compare to other tools",
+        title: "👉 Compare to other tools",
         lead: "Unlike tools like QuickBooks or Zoho:",
         bullets: [
           "No onboarding",
@@ -173,7 +175,7 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     sections: [
       {
-        title: "Why open-source matters",
+        title: "👉 Why open-source matters",
         lead: "Most invoicing tools lock you into their ecosystem.",
         paragraphs: ["This one does not:"],
         bullets: [
@@ -184,7 +186,7 @@ export const SEO_LANDING_DEFINITIONS = {
         ],
       },
       {
-        title: "What you can do",
+        title: "👉 What you can do",
         bullets: [
           "Generate invoices instantly",
           "Customize templates and fields before export",
@@ -193,7 +195,7 @@ export const SEO_LANDING_DEFINITIONS = {
         ],
       },
       {
-        title: "Built for developers",
+        title: "👉 Built for developers",
         lead: "Unlike traditional tools like Stripe or QuickBooks, this is designed with developers in mind:",
         bullets: [
           "Simple architecture you can read quickly",
@@ -203,7 +205,7 @@ export const SEO_LANDING_DEFINITIONS = {
         ],
       },
       {
-        title: "Self-hosting option",
+        title: "👉 Self-hosting option",
         lead: "Want full control?",
         paragraphs: ["You can run your own version:"],
         bullets: [
@@ -213,7 +215,7 @@ export const SEO_LANDING_DEFINITIONS = {
         ],
       },
       {
-        title: "Use cases",
+        title: "👉 Use cases",
         bullets: [
           "Indie hackers",
           "SaaS builders",
@@ -274,7 +276,7 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     sections: [
       {
-        title: "Why not use Stripe?",
+        title: "👉 Why not use Stripe?",
         lead: "Stripe is powerful - but often overkill if you just need a simple invoice.",
         paragraphs: ["Common issues:"],
         bullets: [
@@ -284,14 +286,15 @@ export const SEO_LANDING_DEFINITIONS = {
         ],
       },
       {
-        title: "A simpler approach",
+        title: "👉 A simpler approach",
         paragraphs: [
           "This tool focuses on one thing: generating clean, professional invoices fast.",
           "No account setup, no product configuration, and no integrations required.",
         ],
       },
       {
-        title: "When to use this instead",
+        showComparisonTable: true,
+        title: "👉 When to use this instead",
         lead: "Use this tool if:",
         bullets: [
           "You do not need online payments",
@@ -300,7 +303,7 @@ export const SEO_LANDING_DEFINITIONS = {
         ],
       },
       {
-        title: "Who this is for",
+        title: "👉 Who this is for",
         bullets: ["Freelancers", "Consultants", "Developers", "Side projects"],
       },
     ],
@@ -364,12 +367,11 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Generate Invoice PDF",
       ctaHref: DEFAULT_INVOICE_TEMPLATE_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/
-def-tmp-v2.png`,
+      heroImage: `${STATIC_ASSETS_URL}/seo-content/def-tmp-v2.png`,
     },
     sections: [
       {
-        title: "Why use a PDF invoice template",
+        title: "👉 Why use a PDF invoice template",
         lead: "No formatting issues, no surprises.",
         bullets: [
           "Universally accepted by clients and accounting teams",
@@ -378,7 +380,7 @@ def-tmp-v2.png`,
         ],
       },
       {
-        title: "What is included",
+        title: "👉 What is included",
         bullets: [
           "Pre-designed invoice layout ready to fill in",
           "Automatic totals calculation as you edit line items",
@@ -387,11 +389,11 @@ def-tmp-v2.png`,
         ],
       },
       {
-        title: "Who it is for",
+        title: "👉 Who it is for",
         bullets: ["Freelancers", "Contractors", "Agencies", "Small businesses"],
       },
       {
-        title: "Skip manual templates",
+        title: "👉 Skip manual templates",
         lead: "Instead of editing Word or Excel templates:",
         bullets: [
           "No formatting headaches",
@@ -400,7 +402,7 @@ def-tmp-v2.png`,
         ],
       },
       {
-        title: "Better than traditional tools",
+        title: "👉 Better than traditional tools",
         lead: "Compared to tools like QuickBooks or Wave:",
         bullets: [
           "Generate PDFs faster for one-off invoices",

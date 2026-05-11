@@ -1,0 +1,182 @@
+name: 📅 Monthly Recurring Invoice
+
+concurrency:
+  group: recurring-invoice
+  cancel-in-progress: false
+
+on:
+  schedule:
+    # Run every day from the 10th to the 12th.
+    # We need this range because:
+    # - if the 10th is a weekday -> run on 10th
+    # - if the 10th is Saturday -> run on Monday 12th
+    # - if the 10th is Sunday -> run on Monday 11th
+    - cron: "0 15 10-12 * *"
+      timezone: Europe/Warsaw
+
+jobs:
+  recurring-invoice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10 # we set a timeout to 5 minutes to avoid the workflow running indefinitely
+    env:
+      TZ: Europe/Warsaw # we use Europe/Warsaw timezone for consistent date handling across local machines and CI
+
+    steps:
+      - name: Determine whether workflow should run today
+        id: date-check
+        run: |
+          output=$(node <<'EOF'
+          // Use local time (Europe/Warsaw) for date calculations.
+          // This ensures consistency with the job's TZ env and Telegram timestamps.
+          const formatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'Europe/Warsaw',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            weekday: 'long'
+          })
+          // Get current date/time in Warsaw timezone
+          const now = new Date()
+          // Parse the formatted date into individual components
+          const parts = formatter.formatToParts(now)
+          // Helper to extract specific date component by type
+          const getPart = (type) => parts.find(p => p.type === type)?.value
+
+          // Extract year, month (convert to 0-based), day, and weekday index
+          const year = parseInt(getPart('year'))
+          const month = parseInt(getPart('month')) - 1 // zero-based for Date constructor
+
+          const today = parseInt(getPart('day'))
+
+          // Map weekday name to numeric index (0 = Sunday, 6 = Saturday)
+          const todayWeekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(getPart('weekday'))
+
+          // Create a Date object for the 10th day of the current month.
+          // Using Intl to get the 10th in Warsaw timezone.
+          const tenthFormatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'Europe/Warsaw',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            weekday: 'long'
+          })
+          const tenthDate = new Date(year, month, 10)
+
+          // Format the 10th day in Warsaw timezone to extract its weekday
+          const tenthParts = tenthFormatter.formatToParts(tenthDate)
+
+          // Helper function to get specific part from formatted date (e.g., 'weekday', 'day')
+          const tenthGetPart = (type) => tenthParts.find(p => p.type === type)?.value
+
+          // Convert weekday name (e.g., 'Saturday') to numeric index (0-6, where 0=Sunday, 6=Saturday)
+          const weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(tenthGetPart('weekday'))
+
+          // Default execution date is the 10th.
+          let targetDay = 10
+
+          // If the 10th falls on Saturday, move execution to Monday the 12th.
+          if (weekday === 6) {
+            targetDay = 12
+          }
+
+          // If the 10th falls on Sunday, move execution to Monday the 11th.
+          if (weekday === 0) {
+            targetDay = 11
+          }
+
+          // Final decision: run only if today matches computed target day.
+          const shouldRun = today === targetDay
+
+          // Expose values to later GitHub Action steps.
+          process.stdout.write(
+            `should_run=${shouldRun}\n` +
+            `weekday=${weekday}\n` +
+            `target_day=${targetDay}\n` +
+            `today=${today}\n` +
+            `today_weekday=${todayWeekday}\n`
+          )
+          EOF
+          )
+          echo "$output" >> $GITHUB_OUTPUT
+
+      - name: Send date-check notification to Telegram
+        run: |
+          WEEKDAY=${{ steps.date-check.outputs.weekday }}
+          TARGET_DAY=${{ steps.date-check.outputs.target_day }}
+          SHOULD_RUN=${{ steps.date-check.outputs.should_run }}
+          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          NOW="$(date '+%d.%m.%Y %H:%M:%S %Z')"
+          BILLING_PERIOD="$(date '+%B %Y')"
+
+          WEEKDAY_NAMES=("Sunday" "Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday")
+          WEEKDAY_NAME="${WEEKDAY_NAMES[$WEEKDAY]}"
+
+          # Build weekend explanation if 10th fell on Saturday or Sunday
+          WEEKEND_LINE=""
+          if [ "$WEEKDAY" == "0" ] || [ "$WEEKDAY" == "6" ]; then
+            WEEKEND_LINE="10th was a weekend ($WEEKDAY_NAME), so execution moved to Monday ($TARGET_DAY).%0A%0A"
+          fi
+
+          if [ "$SHOULD_RUN" == "true" ]; then
+            STATUS="✅ Status: Proceeding with invoice generation"
+          else
+            STATUS="⏭️ Status: Skipped (awaiting correct date)"
+          fi
+
+          MESSAGE="📅 Monthly Invoice Workflow%0A%0A"
+          MESSAGE+="🕒 $NOW%0A%0A"
+          MESSAGE+="<b>Billing period:</b> $BILLING_PERIOD%0A%0A"
+          MESSAGE+="$WEEKEND_LINE"
+          MESSAGE+="$STATUS%0A%0A"
+          MESSAGE+="🔗 <a href=\"$WORKFLOW_URL\">View Workflow</a>"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_GITHUB_ACTIONS_CHAT_ID }}" \
+            -d text="$MESSAGE" \
+            -d parse_mode="HTML" > /dev/null
+
+      - name: Generate monthly recurring invoice
+        # Execute only if date-check step decided
+        # that today is the correct execution day.
+        if: steps.date-check.outputs.should_run == 'true'
+        run: |
+          curl --fail-with-body \
+            --silent \
+            --show-error \
+            -X GET \
+            --max-time 60 \
+            -H "Authorization: Bearer ${{ secrets.INVOICE_AUTH_TOKEN }}" \
+            https://easyinvoicepdf.com/api/generate-invoice
+
+      - name: Send success notification to Telegram
+        if: steps.date-check.outputs.should_run == 'true' && success()
+        run: |
+          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          NOW="$(date '+%d.%m.%Y %H:%M:%S %Z')"
+
+          MESSAGE="📅 Monthly Invoice Workflow%0A%0A"
+          MESSAGE+="🕒 $NOW%0A%0A"
+          MESSAGE+="✅ Status: Invoice generated successfully%0A%0A"
+          MESSAGE+="🔗 <a href=\"$WORKFLOW_URL\">View Workflow</a>"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_GITHUB_ACTIONS_CHAT_ID }}" \
+            -d text="$MESSAGE" \
+            -d parse_mode="HTML" > /dev/null
+
+      - name: Send failure notification to Telegram
+        if: failure()
+        run: |
+          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          NOW="$(date '+%d.%m.%Y %H:%M:%S %Z')"
+
+          MESSAGE="📅 Monthly Invoice Workflow%0A%0A"
+          MESSAGE+="🕒 $NOW%0A%0A"
+          MESSAGE+="🚨 Status: Invoice generation failed%0A"
+          MESSAGE+="Please check the workflow for details%0A%0A"
+          MESSAGE+="🔗 <a href=\"$WORKFLOW_URL\">View Workflow</a>"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_GITHUB_ACTIONS_CHAT_ID }}" \
+            -d text="$MESSAGE" \
+            -d parse_mode="HTML" > /dev/null
