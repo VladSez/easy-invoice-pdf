@@ -5,14 +5,14 @@ concurrency:
   cancel-in-progress: false
 
 on:
-  schedule:
-    # Run every day from the 10th to the 12th.
-    # We need this range because:
-    # - if the 10th is a weekday -> run on 10th
-    # - if the 10th is Saturday -> run on Monday 12th
-    # - if the 10th is Sunday -> run on Monday 11th
-    - timezone: Europe/Warsaw
-      cron: "0 15 10-12 * *"
+  #   schedule:
+  #     # Run every day from the 10th to the 12th.
+  #     # We need this range because:
+  #     # - if the 10th is a weekday -> run on 10th
+  #     # - if the 10th is Saturday -> run on Monday 12th
+  #     # - if the 10th is Sunday -> run on Monday 11th
+  #     - timezone: Europe/Warsaw
+  #       cron: "0 15 10-12 * *"
   workflow_dispatch:
 
 jobs:
