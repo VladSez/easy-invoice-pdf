@@ -19,6 +19,7 @@ const telegramMessageSchema = z
     date: z.number().int().nonnegative(),
     text: z
       .string()
+      .min(1, "Text cannot be empty")
       .refine((val) => val === "/generate", {
         message: "Only '/generate' command is supported",
       })
@@ -40,6 +41,6 @@ const telegramMessageSchema = z
 export const telegramUpdateSchema = z
   .object({
     update_id: z.number().int(),
-    message: telegramMessageSchema.optional(),
+    message: telegramMessageSchema,
   })
   .strict();

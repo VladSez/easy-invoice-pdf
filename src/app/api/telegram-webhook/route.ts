@@ -35,14 +35,6 @@ export async function POST(req: NextRequest) {
 
     const update = parseResult.data;
 
-    // Guard: ignore updates without message (schema validates text is "/generate" if present)
-    if (!update?.message) {
-      return new NextResponse(JSON.stringify({ ok: true }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
     const senderChatId = update.message.from.id;
     const allowedChatId = parseInt(env.TELEGRAM_CHAT_ID, 10);
 

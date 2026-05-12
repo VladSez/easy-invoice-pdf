@@ -23,22 +23,12 @@ describe("Telegram Schema Validation", () => {
       } as const;
 
       const result = telegramUpdateSchema.safeParse(validUpdate);
+
       expect(result.success).toBe(true);
+
       if (result.success) {
         expect(result.data.update_id).toBe(123456789);
         expect(result.data.message?.text).toBe("/generate");
-      }
-    });
-
-    it("should validate update without message", () => {
-      const updateWithoutMessage = {
-        update_id: 123456789,
-      } as const;
-
-      const result = telegramUpdateSchema.safeParse(updateWithoutMessage);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.message).toBeUndefined();
       }
     });
 
@@ -62,7 +52,9 @@ describe("Telegram Schema Validation", () => {
       } as const;
 
       const result = telegramUpdateSchema.safeParse(updateWithoutEntities);
+
       expect(result.success).toBe(true);
+
       if (result.success) {
         expect(result.data.message?.entities).toBeUndefined();
       }
@@ -87,6 +79,17 @@ describe("Telegram Schema Validation", () => {
       } as const;
 
       const result = telegramUpdateSchema.safeParse(invalidUpdate);
+
+      expect(result.success).toBe(false);
+    });
+
+    it("should reject update with missing message", () => {
+      const updateWithoutMessage = {
+        update_id: 123456789,
+      } as const;
+
+      const result = telegramUpdateSchema.safeParse(updateWithoutMessage);
+
       expect(result.success).toBe(false);
     });
 
@@ -164,7 +167,9 @@ describe("Telegram Schema Validation", () => {
       } as const;
 
       const result = telegramUpdateSchema.safeParse(updateWithEntities);
+
       expect(result.success).toBe(true);
+
       if (result.success) {
         expect(result.data.message?.entities).toHaveLength(1);
         expect(result.data.message?.entities?.[0].type).toBe("bot_command");
@@ -194,6 +199,29 @@ describe("Telegram Schema Validation", () => {
       expect(result.success).toBe(false);
     });
 
+    it("should reject message with empty text", () => {
+      const updateWithEmptyText = {
+        update_id: 123456789,
+        message: {
+          message_id: 1,
+          from: {
+            id: 987654321,
+            is_bot: false,
+            first_name: "John",
+          },
+          chat: {
+            id: 987654321,
+            type: "private",
+          },
+          date: 1234567890,
+          text: "",
+        },
+      } as const;
+
+      const result = telegramUpdateSchema.safeParse(updateWithEmptyText);
+      expect(result.success).toBe(false);
+    });
+
     it("should accept message with exactly '/generate' text", () => {
       const updateWithGenerateCommand = {
         update_id: 123456789,
@@ -214,7 +242,9 @@ describe("Telegram Schema Validation", () => {
       } as const;
 
       const result = telegramUpdateSchema.safeParse(updateWithGenerateCommand);
+
       expect(result.success).toBe(true);
+
       if (result.success) {
         expect(result.data.message?.text).toBe("/generate");
       }
