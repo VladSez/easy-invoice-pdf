@@ -1,31 +1,13 @@
+import { telegramUpdateSchema } from "@/app/api/telegram-webhook/schema/telegram-schema";
 import { env } from "@/env";
 import { sendTelegramMessage } from "@/lib/telegram";
+
 import { NextResponse, type NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-interface TelegramUpdate {
-  update_id: number;
-  message?: {
-    message_id: number;
-    from: {
-      id: number;
-      is_bot: boolean;
-      first_name: string;
-    };
-    chat: {
-      id: number;
-      type: string;
-    };
-    date: number;
-    text?: string;
-    entities?: Array<{
-      offset: number;
-      length: number;
-      type: string;
-    }>;
-  };
-}
+// serverless function can run for max 30 seconds
+export const maxDuration = 30; // Set to 30 seconds
 
 /**
  * Handles incoming Telegram webhook updates.
@@ -38,24 +20,20 @@ export async function POST(req: NextRequest) {
     const body = await req.text();
 
     // Parse and validate incoming Telegram update
-    const update = JSON.parse(body) as TelegramUpdate;
+    const parseResult = telegramUpdateSchema.safeParse(JSON.parse(body));
 
-    // Guard: ignore updates without message text
-    if (!update.message?.text) {
+    if (!parseResult.success) {
+      console.error(
+        "[telegram-webhook] Invalid webhook payload:",
+        parseResult.error.errors,
+      );
       return new NextResponse(JSON.stringify({ ok: true }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    const isGenerateInvoiceCommand = update.message.text === "/generate";
-
-    if (!isGenerateInvoiceCommand) {
-      return new NextResponse(JSON.stringify({ ok: true }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+    const update = parseResult.data;
 
     const senderChatId = update.message.from.id;
     const allowedChatId = parseInt(env.TELEGRAM_CHAT_ID, 10);
