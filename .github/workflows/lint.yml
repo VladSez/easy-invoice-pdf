@@ -26,7 +26,6 @@ jobs:
         name: 📚 Setup Node.js
         with:
           node-version: lts/*
-          cache: "pnpm"
 
       - name: 🚚 Install dependencies
         run: pnpm install
