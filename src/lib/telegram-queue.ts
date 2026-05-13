@@ -1,5 +1,3 @@
-"use server";
-
 import { Redis } from "@upstash/redis";
 import { env } from "@/env";
 
@@ -16,19 +14,17 @@ const redis = new Redis({
  * @returns Promise<boolean> - true if job was successfully queued, false if already queued
  */
 export async function queueInvoiceGeneration(chatId: number): Promise<boolean> {
-  const key = `telegram:job:${chatId}`;
+  const key = `telegram:job:${chatId}` as const;
 
-  // Check if already queued
-  const exists = await redis.exists(key);
-  if (exists) return false;
-
-  // Mark as queued with 10-minutes TTL
-  await redis.set(
+  // Atomically set key only if it doesn't exist, with 10-minutes TTL
+  // Returns "OK" on success, null if key already existed (preventing race conditions)
+  const result = await redis.set(
     key,
     JSON.stringify({ createdAt: new Date().toISOString() }),
-    { ex: 600 },
+    { nx: true, ex: 600 }, // nx: only set if key doesn't exist, ex: 10 minutes TTL
   );
-  return true;
+
+  return result === "OK";
 }
 
 /**

@@ -130,6 +130,7 @@ async function handleInvoiceGenerate({ chatId }: { chatId: number }) {
         Expires: "0",
       },
       cache: "no-store",
+      signal: AbortSignal.timeout(25_000), // abort after 25 seconds if the request takes too long
     });
 
     if (!response.ok) {
