@@ -3,19 +3,15 @@ import { z } from "zod";
 const telegramMessageSchema = z
   .object({
     message_id: z.number().int(),
-    from: z
-      .object({
-        id: z.number().int(),
-        is_bot: z.boolean(),
-        first_name: z.string(),
-      })
-      .strict(),
-    chat: z
-      .object({
-        id: z.number().int(),
-        type: z.string(),
-      })
-      .strict(),
+    from: z.object({
+      id: z.number().int(),
+      is_bot: z.boolean(),
+      first_name: z.string(),
+    }),
+    chat: z.object({
+      id: z.number().int(),
+      type: z.string(),
+    }),
     date: z.number().int().nonnegative(),
     text: z
       .string()
@@ -26,13 +22,11 @@ const telegramMessageSchema = z
       .optional(),
     entities: z
       .array(
-        z
-          .object({
-            offset: z.number().int().nonnegative(),
-            length: z.number().int().positive(),
-            type: z.string(),
-          })
-          .strict(),
+        z.object({
+          offset: z.number().int().nonnegative(),
+          length: z.number().int().positive(),
+          type: z.string(),
+        }),
       )
       .optional(),
   })

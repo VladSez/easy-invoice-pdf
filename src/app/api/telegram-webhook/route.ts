@@ -1,6 +1,7 @@
 import { telegramUpdateSchema } from "@/app/api/telegram-webhook/schema/telegram-schema";
 import { env } from "@/env";
 import { sendTelegramMessage } from "@/lib/telegram";
+import { queueInvoiceGeneration, clearQueuedJob } from "@/lib/telegram-queue";
 
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -27,6 +28,11 @@ export async function POST(req: NextRequest) {
         "[telegram-webhook] Invalid webhook payload:",
         parseResult.error.errors,
       );
+
+      await sendTelegramMessage({
+        message: "❌ Invalid webhook payload.",
+      });
+
       return new NextResponse(JSON.stringify({ ok: true }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
@@ -51,40 +57,17 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    console.error(
-      "[telegram-webhook] Authorized user triggered /generate command",
-    );
+    const chatId = update.message.chat.id;
 
-    await sendTelegramMessage({
-      message: "⏳ Generating invoices... Please wait.",
-    });
-
-    const BASE_URL =
-      `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` ||
-      "http://localhost:3000";
-
-    const API_URL = `${BASE_URL}/api/generate-invoice`;
-
-    const response = await fetch(API_URL, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${env.AUTH_TOKEN}`,
-        "Content-Type": "application/json",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
+    // Check if already processing - prevents duplicate invoices from Telegram retries
+    const queued = await queueInvoiceGeneration(chatId);
+    if (!queued) {
       console.error(
-        `[telegram-webhook] Failed to generate invoice: ${response.status} ${errorText}`,
+        `[telegram-webhook] Job already queued for chat ${chatId}, ignoring retry`,
       );
 
       await sendTelegramMessage({
-        message: `❌ Failed to generate invoices.\n\nStatus: ${response.status}\nError: ${errorText}`,
+        message: "⏳ Job already queued for this chat, ignoring retry",
       });
 
       return new NextResponse(JSON.stringify({ ok: true }), {
@@ -93,16 +76,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return new NextResponse(
-      JSON.stringify({
-        ok: true,
-        message: "[telegram-webhook] Invoices generated and sent successfully!",
-      }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    // Fire-and-forget invoice generation: don't await the background work
+    void handleInvoiceGenerate({ chatId });
+
+    return new NextResponse(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("[telegram-webhook] Error in webhook:", error);
 
@@ -121,5 +101,58 @@ export async function POST(req: NextRequest) {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
+  }
+}
+
+/**
+ * Handles the invoice generation request triggered via Telegram.
+ * Sends status updates to the user and manages the generation queue.
+ *
+ * @param chatId - The Telegram chat ID to send status messages to
+ */
+async function handleInvoiceGenerate({ chatId }: { chatId: number }) {
+  try {
+    await sendTelegramMessage({
+      message: "⏳ Generating invoices... Please wait.",
+    });
+
+    const BASE_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : "http://localhost:3000";
+
+    const response = await fetch(`${BASE_URL}/api/generate-invoice`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${env.AUTH_TOKEN}`,
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        `[telegram-webhook] Failed to generate invoice: ${response.status} ${errorText}`,
+      );
+
+      await sendTelegramMessage({
+        message: `❌ Failed to generate invoices.\n\nStatus: ${response.status}`,
+      });
+      return;
+    }
+  } catch (error) {
+    console.error("[telegram-webhook] handleInvoiceGenerate error:", error);
+    try {
+      await sendTelegramMessage({
+        message: `🚨 Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+      });
+    } catch (e) {
+      console.error("[telegram-webhook] Failed to send error message:", e);
+    }
+  } finally {
+    await clearQueuedJob(chatId);
   }
 }

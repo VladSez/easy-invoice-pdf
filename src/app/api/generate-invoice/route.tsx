@@ -4,6 +4,7 @@ import {
   createOrFindInvoiceFolder,
   initializeGoogleDrive,
   uploadFile,
+  type GoogleDriveFile,
 } from "@/lib/google-drive";
 import { resend } from "@/lib/resend";
 import { sendTelegramMessage } from "@/lib/telegram";
@@ -58,9 +59,21 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // only send email if the query parameter "sendEmail" is not "false" (for backwards compatibility), we want to send email by default, but allow to disable it for testing purposes
+    /**
+     * Determines if email notifications should be sent.
+     * Defaults to true for backwards compatibility.
+     * Can be disabled by passing ?sendEmail=false query parameter for testing.
+     */
     const shouldSendEmail =
       req.nextUrl.searchParams.get("sendEmail") !== "false";
+
+    /**
+     * Determines if invoices should be saved to Google Drive.
+     * Defaults to true for backwards compatibility.
+     * Can be disabled by passing ?saveToGoogleDrive=false query parameter for testing.
+     */
+    const shouldSaveToGoogleDrive =
+      req.nextUrl.searchParams.get("saveToGoogleDrive") !== "false";
 
     const GENERATED_ENGLISH_INVOICE_PDF_DOCUMENT = renderToBuffer(
       <InvoicePdfTemplateToRenderOnBackend
@@ -159,49 +172,57 @@ export async function GET(req: NextRequest) {
 
     // *___________UPLOAD INVOICES TO GOOGLE DRIVE___________*
 
-    // Initialize Google Drive
-    const googleDrive = await initializeGoogleDrive();
+    let folderToUploadInvoices: GoogleDriveFile | null = null;
+    let googleDriveFolderPath = "";
 
-    const currentMonth = dayjs().format("MM");
-    const currentYear = dayjs().format("YYYY");
+    if (shouldSaveToGoogleDrive) {
+      // Initialize Google Drive
+      const googleDrive = await initializeGoogleDrive();
 
-    // Create the month folder (this will automatically create/find the year folder)
-    const result = await createOrFindInvoiceFolder({
-      googleDrive,
-      parentFolderId: env.GOOGLE_DRIVE_PARENT_FOLDER_ID,
-      month: currentMonth,
-      year: currentYear,
-    });
+      const currentMonth = dayjs().format("MM");
+      const currentYear = dayjs().format("YYYY");
 
-    const { folderToUploadInvoices, googleDriveFolderPath } = result;
-
-    // Upload each invoice to Google Drive
-    const uploadPromises = ATTACHMENTS.map((attachment) =>
-      uploadFile({
+      // Create the month folder (this will automatically create/find the year folder)
+      const result = await createOrFindInvoiceFolder({
         googleDrive,
-        fileName: attachment.filename,
-        fileContent: Buffer.from(attachment.content),
-        folderId: folderToUploadInvoices.id,
-      }),
-    );
+        parentFolderId: env.GOOGLE_DRIVE_PARENT_FOLDER_ID,
+        month: currentMonth,
+        year: currentYear,
+      });
 
-    const uploadResults = await Promise.allSettled(uploadPromises);
-    const failedUploads = uploadResults.filter(
-      (result): result is PromiseRejectedResult => result.status === "rejected",
-    );
+      folderToUploadInvoices = result.folderToUploadInvoices;
+      googleDriveFolderPath = result.googleDriveFolderPath;
 
-    if (failedUploads.length > 0) {
-      console.error(
-        "[generate-invoice] Some files failed to upload to Google Drive:",
-        failedUploads,
+      // Upload each invoice to Google Drive
+      const uploadPromises = ATTACHMENTS.map((attachment) =>
+        uploadFile({
+          googleDrive,
+          fileName: attachment.filename,
+          fileContent: Buffer.from(attachment.content),
+          folderId: folderToUploadInvoices!.id,
+        }),
       );
 
-      return NextResponse.json(
-        {
-          error: "[generate-invoice] Failed to upload invoices to Google Drive",
-        },
-        { status: 500 },
+      const uploadResults = await Promise.allSettled(uploadPromises);
+      const failedUploads = uploadResults.filter(
+        (result): result is PromiseRejectedResult =>
+          result.status === "rejected",
       );
+
+      if (failedUploads.length > 0) {
+        console.error(
+          "[generate-invoice] Some files failed to upload to Google Drive:",
+          failedUploads,
+        );
+
+        return NextResponse.json(
+          {
+            error:
+              "[generate-invoice] Failed to upload invoices to Google Drive",
+          },
+          { status: 500 },
+        );
+      }
     }
 
     const companyEmailLink =
@@ -226,8 +247,11 @@ Date: *${dayjs().format("MMMM D, YYYY")}*
 
 The generated invoices are included in the attachments. Please check them carefully.
 
-[View invoice online](${invoiceUrl})
-[View in Google Drive](${folderToUploadInvoices.webViewLink}) path: *${googleDriveFolderPath}*
+[View invoice online](${invoiceUrl})${
+          folderToUploadInvoices
+            ? `\n[View in Google Drive](${folderToUploadInvoices.webViewLink}) path: *${googleDriveFolderPath}*`
+            : ""
+        }
 
 *☝️ Important - Don't forget to:*
 - [Send email to company](${companyEmailLink})
@@ -260,8 +284,11 @@ EasyInvoicePDF.com`,
     <br/>
     <br/>
 
-    <a href="${invoiceUrl}">View invoice online</a><br/>
-    <a href="${folderToUploadInvoices.webViewLink}">View in Google Drive</a> path: <b>${googleDriveFolderPath}</b>
+    <a href="${invoiceUrl}">View invoice online</a>${
+      folderToUploadInvoices
+        ? `<br/>\n    <a href="${folderToUploadInvoices.webViewLink}">View in Google Drive</a> path: <b>${googleDriveFolderPath}</b>`
+        : ""
+    }<br/>
     <br/>
     <br/>
 
