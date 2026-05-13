@@ -20,8 +20,6 @@ test.describe("Stripe Invoice Template", () => {
   test.beforeEach(async ({ page }) => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
-
-    await page.goto("/?template=default");
   });
 
   test("displays correct OG meta tags for Stripe template", async ({
@@ -102,8 +100,6 @@ test.describe("Stripe Invoice Template", () => {
       .selectOption("stripe");
 
     // Wait for URL to be updated
-    await page.waitForURL("/?template=stripe");
-
     await expect(page).toHaveURL("/?template=stripe");
 
     // Logo section should still be visible on Stripe template
@@ -158,6 +154,8 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
+    await expect(page).toHaveURL("/?template=stripe");
+
     // Create a mock file input event with invalid file type
     await page.evaluate(() => {
       const fileInput = document.querySelector(
@@ -188,6 +186,8 @@ test.describe("Stripe Invoice Template", () => {
     await page
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
+
+    await expect(page).toHaveURL("/?template=stripe");
 
     // Create a mock file input event with large file
     await page.evaluate(() => {
@@ -223,6 +223,8 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
+    await expect(page).toHaveURL("/?template=stripe");
+
     const generalInfoSection = page.getByTestId("general-information-section");
 
     // Upload a valid small image
@@ -257,6 +259,8 @@ test.describe("Stripe Invoice Template", () => {
     await page
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
+
+    await expect(page).toHaveURL("/?template=stripe");
 
     // Upload a valid small image
     await uploadLogoFile(page);
@@ -301,6 +305,8 @@ test.describe("Stripe Invoice Template", () => {
     await page
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
+
+    await expect(page).toHaveURL("/?template=stripe");
 
     const generalInfoSection = page.getByTestId("general-information-section");
     const paymentUrlInput = generalInfoSection.getByRole("textbox", {
@@ -397,7 +403,6 @@ test.describe("Stripe Invoice Template", () => {
   test("Signature fields only appears for default template", async ({
     page,
   }) => {
-    // Verify default template is selected by default
     await expect(page).toHaveURL("/?template=default");
 
     const finalSection = page.getByTestId("final-section");

@@ -1066,8 +1066,6 @@ test.describe("Buyer management", () => {
       localStorage.setItem("EASY_INVOICE_PDF_BUYERS", JSON.stringify(buyers));
     });
 
-    await page.goto("/?template=default");
-
     await page.getByRole("button", { name: "New Buyer" }).click();
 
     const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");

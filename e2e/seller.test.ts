@@ -1130,8 +1130,6 @@ test.describe("Seller management", () => {
       localStorage.setItem("EASY_INVOICE_PDF_SELLERS", JSON.stringify(sellers));
     });
 
-    await page.goto("/?template=default");
-
     await page.getByRole("button", { name: "New Seller" }).click();
 
     const manageSellerDialog = page.getByTestId("manage-seller-dialog");
