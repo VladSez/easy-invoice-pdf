@@ -722,249 +722,237 @@ export const APP_VERSION = "1.0.0";
  */
 export const SCHEMA_VERSION = "1.0.0";
 
-export const invoiceItemSchema = z
-  .object({
-    // Show/hide Number column on PDF
-    invoiceItemNumberIsVisible: z.boolean().default(true),
+export const invoiceItemSchema = z.object({
+  // Show/hide Number column on PDF
+  invoiceItemNumberIsVisible: z.boolean().default(true),
 
-    name: z
-      .string()
-      .max(500, "Item name must not exceed 500 characters")
-      .trim()
-      .optional(),
-    nameFieldIsVisible: z.boolean().default(true),
+  name: z
+    .string()
+    .max(500, "Item name must not exceed 500 characters")
+    .trim()
+    .optional(),
+  nameFieldIsVisible: z.boolean().default(true),
 
-    typeOfGTU: z
-      .string()
-      .max(50, "Type of GTU must not exceed 50 characters")
-      .trim()
-      .optional()
-      .default(""),
-    typeOfGTUFieldIsVisible: z.boolean().default(true),
+  typeOfGTU: z
+    .string()
+    .max(50, "Type of GTU must not exceed 50 characters")
+    .trim()
+    .optional()
+    .default(""),
+  typeOfGTUFieldIsVisible: z.boolean().default(true),
 
-    amount: z
-      .any()
-      .refine((val) => val !== "", {
-        message: "Amount is required",
-      })
-      .transform(Number)
-      .refine((val) => val > 0, {
-        message: "Amount must be positive",
-      })
-      .refine((val) => val <= 9_999_999_999.99, {
-        message: "Amount must not exceed 9 999 999 999.99",
-      }),
-    amountFieldIsVisible: z.boolean().default(true),
+  amount: z
+    .any()
+    .refine((val) => val !== "", {
+      message: "Amount is required",
+    })
+    .transform(Number)
+    .refine((val) => val > 0, {
+      message: "Amount must be positive",
+    })
+    .refine((val) => val <= 9_999_999_999.99, {
+      message: "Amount must not exceed 9 999 999 999.99",
+    }),
+  amountFieldIsVisible: z.boolean().default(true),
 
-    unit: z.string().trim().optional(),
-    unitFieldIsVisible: z.boolean().default(true),
+  unit: z.string().trim().optional(),
+  unitFieldIsVisible: z.boolean().default(true),
 
-    netPrice: z
-      .any()
-      .refine((val) => val !== "", {
-        message: "Net price is required",
-      })
-      .transform(Number)
-      .refine((val) => val >= 0, {
-        message: "Net price must be >= 0",
-      })
-      .refine((val) => val <= 100_000_000_000, {
-        message: "Net price must not exceed 100 billion",
-      }),
-    netPriceFieldIsVisible: z.boolean().default(true),
+  netPrice: z
+    .any()
+    .refine((val) => val !== "", {
+      message: "Net price is required",
+    })
+    .transform(Number)
+    .refine((val) => val >= 0, {
+      message: "Net price must be >= 0",
+    })
+    .refine((val) => val <= 100_000_000_000, {
+      message: "Net price must not exceed 100 billion",
+    }),
+  netPriceFieldIsVisible: z.boolean().default(true),
 
-    // Tax rate. Accepts numbers 0-100 or any text string (i.e. NP, OO, etc)
-    // Valid inputs and their outputs:
-    // - "23" -> 23 (number)
-    // - "100" -> 100 (number)
-    // - "NP" -> "NP" (string)
-    vat: z
-      .preprocess(
-        // z.preprocess runs before Zod does any validation, parsing, or type checking on the schema it wraps.
-        (raw) => {
-          // Handle null/undefined by returning empty string for validation
-          if (raw == null) return "";
+  // Tax rate. Accepts numbers 0-100 or any text string (i.e. NP, OO, etc)
+  // Valid inputs and their outputs:
+  // - "23" -> 23 (number)
+  // - "100" -> 100 (number)
+  // - "NP" -> "NP" (string)
+  vat: z
+    .preprocess(
+      // z.preprocess runs before Zod does any validation, parsing, or type checking on the schema it wraps.
+      (raw) => {
+        // Handle null/undefined by returning empty string for validation
+        if (raw == null) return "";
 
-          // Trim whitespace from string inputs, pass through other types as-is
-          const val = typeof raw === "string" ? raw.trim() : raw;
+        // Trim whitespace from string inputs, pass through other types as-is
+        const val = typeof raw === "string" ? raw.trim() : raw;
 
-          // Empty strings should fail the required validation
-          if (val === "") return "";
+        // Empty strings should fail the required validation
+        if (val === "") return "";
 
-          // Attempt to convert to number
-          const num = Number(val);
+        // Attempt to convert to number
+        const num = Number(val);
 
-          // If conversion succeeds, return as number (for 0-100 validation)
-          // Otherwise, return as string (for text values like "NP", "OO", etc)
-          return Number.isNaN(num) ? val : num;
+        // If conversion succeeds, return as number (for 0-100 validation)
+        // Otherwise, return as string (for text values like "NP", "OO", etc)
+        return Number.isNaN(num) ? val : num;
+      },
+      z.union(
+        [
+          z
+            .number()
+            .min(
+              0,
+              `Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
+            )
+            .max(
+              100,
+              `Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
+            ),
+          z
+            .string()
+            .min(
+              1,
+              `Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).`,
+            ),
+        ],
+        {
+          errorMap: () => ({
+            message:
+              "Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).",
+          }),
         },
-        z.union(
-          [
-            z
-              .number()
-              .min(
-                0,
-                `Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
-              )
-              .max(
-                100,
-                `Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
-              ),
-            z
-              .string()
-              .min(
-                1,
-                `Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).`,
-              ),
-          ],
-          {
-            errorMap: () => ({
-              message:
-                "Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).",
-            }),
-          },
-        ),
-      )
-      .describe(
-        "Tax rate. Accepts numbers 0-100 or any text (i.e. NP, OO, etc).",
       ),
+    )
+    .describe(
+      "Tax rate. Accepts numbers 0-100 or any text (i.e. NP, OO, etc).",
+    ),
 
-    vatFieldIsVisible: z.boolean().default(true),
+  vatFieldIsVisible: z.boolean().default(true),
 
-    netAmount: z.coerce.number().nonnegative("Net amount must be non-negative"),
-    netAmountFieldIsVisible: z.boolean().default(true),
+  netAmount: z.coerce.number().nonnegative("Net amount must be non-negative"),
+  netAmountFieldIsVisible: z.boolean().default(true),
 
-    vatAmount: z.coerce.number().nonnegative("VAT amount must be non-negative"),
-    vatAmountFieldIsVisible: z.boolean().default(true),
+  vatAmount: z.coerce.number().nonnegative("VAT amount must be non-negative"),
+  vatAmountFieldIsVisible: z.boolean().default(true),
 
-    preTaxAmount: z.coerce
-      .number()
-      .nonnegative("Pre-tax amount must be non-negative"),
-    preTaxAmountFieldIsVisible: z.boolean().default(true),
-  })
-  .strict();
+  preTaxAmount: z.coerce
+    .number()
+    .nonnegative("Pre-tax amount must be non-negative"),
+  preTaxAmountFieldIsVisible: z.boolean().default(true),
+});
 
 export type InvoiceItemData = z.infer<typeof invoiceItemSchema>;
 
-export const sellerSchema = z
-  .object({
-    id: z.string().optional(),
+export const sellerSchema = z.object({
+  id: z.string().optional(),
 
-    name: z
-      .string()
-      .min(1, "Seller name is required")
-      .max(500, "Seller name must not exceed 500 characters")
-      .trim(),
-    address: z
-      .string()
-      .min(1, "Seller address is required")
-      .max(500, "Seller address must not exceed 500 characters")
-      .trim(),
+  name: z
+    .string()
+    .min(1, "Seller name is required")
+    .max(500, "Seller name must not exceed 500 characters")
+    .trim(),
+  address: z
+    .string()
+    .min(1, "Seller address is required")
+    .max(500, "Seller address must not exceed 500 characters")
+    .trim(),
 
-    vatNo: z
-      .string()
-      .max(200, "VAT number must not exceed 200 characters")
-      .trim()
-      .optional(),
-    // not really only a vatNo anymore, it's a more general tax number (but we keep the name for simplicity, for now)
-    vatNoLabelText: z
-      .string()
-      .min(1, "Tax number label is required")
-      .max(50, "Tax number label must not exceed 50 characters")
-      .trim()
-      .default("VAT no")
-      .describe(
-        "Customizable tax number label. Defaults to ‘VAT no’, but you can change it to any text (e.g. Tax no, VAT no, etc.)",
-      ),
-    vatNoFieldIsVisible: z.boolean().default(true),
+  vatNo: z
+    .string()
+    .max(200, "VAT number must not exceed 200 characters")
+    .trim()
+    .optional(),
+  // not really only a vatNo anymore, it's a more general tax number (but we keep the name for simplicity, for now)
+  vatNoLabelText: z
+    .string()
+    .min(1, "Tax number label is required")
+    .max(50, "Tax number label must not exceed 50 characters")
+    .trim()
+    .default("VAT no")
+    .describe(
+      "Customizable tax number label. Defaults to ‘VAT no’, but you can change it to any text (e.g. Tax no, VAT no, etc.)",
+    ),
+  vatNoFieldIsVisible: z.boolean().default(true),
 
-    email: z
-      .string()
-      .trim()
-      .refine(
-        (val) => val === "" || z.string().email().safeParse(val).success,
-        {
-          message: "Invalid email address",
-        },
-      )
-      .optional(),
-    emailFieldIsVisible: z.boolean().default(true),
+  email: z
+    .string()
+    .trim()
+    .refine((val) => val === "" || z.string().email().safeParse(val).success, {
+      message: "Invalid email address",
+    })
+    .optional(),
+  emailFieldIsVisible: z.boolean().default(true),
 
-    accountNumber: z
-      .string()
-      .max(200, "Account number must not exceed 200 characters")
-      .trim()
-      .optional(),
-    accountNumberFieldIsVisible: z.boolean().default(true),
+  accountNumber: z
+    .string()
+    .max(200, "Account number must not exceed 200 characters")
+    .trim()
+    .optional(),
+  accountNumberFieldIsVisible: z.boolean().default(true),
 
-    swiftBic: z
-      .string()
-      .max(200, "SWIFT/BIC must not exceed 200 characters")
-      .trim()
-      .optional(),
-    swiftBicFieldIsVisible: z.boolean().default(true),
+  swiftBic: z
+    .string()
+    .max(200, "SWIFT/BIC must not exceed 200 characters")
+    .trim()
+    .optional(),
+  swiftBicFieldIsVisible: z.boolean().default(true),
 
-    notes: z
-      .string()
-      .max(750, "Notes must not exceed 750 characters")
-      .trim()
-      .optional(),
-    notesFieldIsVisible: z.boolean().default(true),
-  })
-  .strict();
+  notes: z
+    .string()
+    .max(750, "Notes must not exceed 750 characters")
+    .trim()
+    .optional(),
+  notesFieldIsVisible: z.boolean().default(true),
+});
 
 export type SellerData = z.infer<typeof sellerSchema>;
 
-export const buyerSchema = z
-  .object({
-    id: z.string().optional(),
+export const buyerSchema = z.object({
+  id: z.string().optional(),
 
-    name: z
-      .string()
-      .min(1, "Buyer name is required")
-      .max(500, "Buyer name must not exceed 500 characters")
-      .trim(),
-    address: z
-      .string()
-      .min(1, "Buyer address is required")
-      .max(500, "Buyer address must not exceed 500 characters")
-      .trim(),
-    vatNo: z
-      .string()
-      .max(200, "VAT number must not exceed 200 characters")
-      .trim()
-      .optional(),
-    vatNoLabelText: z
-      .string()
-      .min(1, "Tax number label is required")
-      .max(50, "Tax number label must not exceed 50 characters")
-      .trim()
-      .default("VAT no")
-      .describe(
-        "Customizable tax number label. Defaults to ‘VAT no’, but you can change it to any text (e.g. Tax no, VAT no, etc.)",
-      ),
-    vatNoFieldIsVisible: z.boolean().default(true),
+  name: z
+    .string()
+    .min(1, "Buyer name is required")
+    .max(500, "Buyer name must not exceed 500 characters")
+    .trim(),
+  address: z
+    .string()
+    .min(1, "Buyer address is required")
+    .max(500, "Buyer address must not exceed 500 characters")
+    .trim(),
+  vatNo: z
+    .string()
+    .max(200, "VAT number must not exceed 200 characters")
+    .trim()
+    .optional(),
+  vatNoLabelText: z
+    .string()
+    .min(1, "Tax number label is required")
+    .max(50, "Tax number label must not exceed 50 characters")
+    .trim()
+    .default("VAT no")
+    .describe(
+      "Customizable tax number label. Defaults to ‘VAT no’, but you can change it to any text (e.g. Tax no, VAT no, etc.)",
+    ),
+  vatNoFieldIsVisible: z.boolean().default(true),
 
-    email: z
-      .string()
-      .trim()
-      .refine(
-        (val) => val === "" || z.string().email().safeParse(val).success,
-        {
-          message: "Invalid email address",
-        },
-      )
-      .optional(),
-    emailFieldIsVisible: z.boolean().default(true),
+  email: z
+    .string()
+    .trim()
+    .refine((val) => val === "" || z.string().email().safeParse(val).success, {
+      message: "Invalid email address",
+    })
+    .optional(),
+  emailFieldIsVisible: z.boolean().default(true),
 
-    notes: z
-      .string()
-      .max(750, "Notes must not exceed 750 characters")
-      .trim()
-      .optional(),
-    notesFieldIsVisible: z.boolean().default(true),
-  })
-  .strict();
+  notes: z
+    .string()
+    .max(750, "Notes must not exceed 750 characters")
+    .trim()
+    .optional(),
+  notesFieldIsVisible: z.boolean().default(true),
+});
 
 export type BuyerData = z.infer<typeof buyerSchema>;
 
