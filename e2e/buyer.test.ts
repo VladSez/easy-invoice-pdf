@@ -4,7 +4,8 @@ import { expect, test } from "@playwright/test";
 
 test.describe("Buyer management", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
   });
 
   test("create/edit buyer", async ({ page }) => {
@@ -1067,6 +1068,7 @@ test.describe("Buyer management", () => {
     });
 
     await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
 
     await page.getByRole("button", { name: "New Buyer" }).click();
 

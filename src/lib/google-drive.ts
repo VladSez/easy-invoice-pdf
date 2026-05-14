@@ -3,7 +3,7 @@ import { z } from "zod";
 import { Readable } from "node:stream";
 import { env } from "@/env";
 
-interface GoogleDriveFile {
+export interface GoogleDriveFile {
   id: string;
   name: string;
   mimeType: string;

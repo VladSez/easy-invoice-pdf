@@ -4,7 +4,7 @@ import { expect, test } from "@playwright/test";
 
 test.describe("Seller management", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?template=default");
 
     await expect(page).toHaveURL("/?template=default");
   });
@@ -1131,6 +1131,7 @@ test.describe("Seller management", () => {
     });
 
     await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
 
     await page.getByRole("button", { name: "New Seller" }).click();
 

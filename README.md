@@ -15,9 +15,7 @@
       <a href="#self-host">Self-host</a>
     </p>
 
-  <a href="https://github.com/VladSez/easy-invoice-pdf" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">
-    <strong>⭐ Like the project? Star it on GitHub</strong>
-  </a>
+<strong>⭐ Like the project? <a href="https://github.com/VladSez/easy-invoice-pdf" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">Star it on GitHub</a></strong>
 
   <p>
     Built by <a href="https://vladsazon.com?ref=github"><strong>Vlad Sazonau</strong></a>

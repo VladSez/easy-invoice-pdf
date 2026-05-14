@@ -80,6 +80,9 @@ importers:
       '@upstash/redis':
         specifier: 1.34.6
         version: 1.34.6
+      '@vercel/functions':
+        specifier: 3.5.1
+        version: 3.5.1
       '@vercel/speed-insights':
         specifier: 1.2.0
         version: 1.2.0(next@14.2.15(@babel/core@7.28.3)(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
@@ -2786,6 +2789,19 @@ packages:
 
   '@upstash/redis@1.34.6':
     resolution: {integrity: sha512-/ic+NszsXyIl2P8aExL7xETxgmzyhn6txG4senGDgd524bypGEJs1TMzLDeOV+PFVuacc10wZVJLIj6aRZZNaw==}
+
+  '@vercel/functions@3.5.1':
+    resolution: {integrity: sha512-ndh5v+uhWqGA8033oD0i0KHvqUHcLlLCOaLOw5L+xx5zVsWUSQcZPKEYk2nm51aisnKhcnTylxnOmhx+w4UCRA==}
+    engines: {node: '>= 20'}
+    peerDependencies:
+      '@aws-sdk/credential-provider-web-identity': '*'
+    peerDependenciesMeta:
+      '@aws-sdk/credential-provider-web-identity':
+        optional: true
+
+  '@vercel/oidc@3.4.1':
+    resolution: {integrity: sha512-H6B+/ig/GoahccL3WZjiHayHw1H5KhvTJNceqYulwfK9kkz5iul2hTmYzcJ7tTCQzyd0dutuL9xYFZCyLUqsog==}
+    engines: {node: '>= 20'}
 
   '@vercel/speed-insights@1.2.0':
     resolution: {integrity: sha512-y9GVzrUJ2xmgtQlzFP2KhVRoCglwfRQgjyfY607aU0hh0Un6d0OUyrJkjuAlsV18qR4zfoFPs/BiIj9YDS6Wzw==}
@@ -9511,6 +9527,12 @@ snapshots:
   '@upstash/redis@1.34.6':
     dependencies:
       crypto-js: 4.2.0
+
+  '@vercel/functions@3.5.1':
+    dependencies:
+      '@vercel/oidc': 3.4.1
+
+  '@vercel/oidc@3.4.1': {}
 
   '@vercel/speed-insights@1.2.0(next@14.2.15(@babel/core@7.28.3)(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
     optionalDependencies:

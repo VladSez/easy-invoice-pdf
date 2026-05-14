@@ -22,7 +22,8 @@ import {
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
   });
 
   test("returns permanent redirect from /:locale/app to /", async ({
