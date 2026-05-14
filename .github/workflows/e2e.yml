@@ -49,7 +49,7 @@ jobs:
           node-version: lts/*
 
       - name: 🚚 Install dependencies
-        run: sfw pnpm install
+        run: sfw pnpm install # firewall to block malicious packages from being installed https://docs.socket.dev/docs/socket-firewall-overview
 
       - name: 📦 Install Playwright browser binaries & OS dependencies
         run: pnpm exec playwright install chromium webkit --with-deps

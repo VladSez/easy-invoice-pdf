@@ -35,7 +35,7 @@ jobs:
           node-version: lts/*
 
       - name: 🚚 Install dependencies
-        run: sfw pnpm install
+        run: sfw pnpm install # firewall to block malicious packages from being installed https://docs.socket.dev/docs/socket-firewall-overview
 
       - name: 🧪 Run Vitest tests
         id: vitest

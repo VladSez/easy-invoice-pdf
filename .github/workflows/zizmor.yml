@@ -3,17 +3,19 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: ["**"]
 
-permissions:
-  contents: read
-  pull-requests: read
+permissions: {}
 
 jobs:
   zizmor:
-    name: Run zizmor static analysis tool for GitHub Actions # https://docs.zizmor.sh/
+    name: Run zizmor static analysis tool for GitHub Actions
     timeout-minutes: 5
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write # Required for upload-sarif to upload SARIF files.
+      contents: read
+      actions: read # Needed for upload-sarif to read workflow run info.
     steps:
       # we use pinned versions because there are safer to use: https://x.com/paulmillr/status/1900948425325031448
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -21,15 +23,13 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
-        name: 📦 Setup uv
-
       - name: 🔎 Run zizmor
         id: zizmor
         continue-on-error: true
+        # https://github.com/zizmorcore/zizmor-action
+        uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e # v0.5.3
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: zizmor --format=github .
 
       - name: 🔍 Get PR URL
         if: steps.zizmor.outcome == 'failure'
