@@ -22,7 +22,8 @@ import {
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
   });
 
   test("returns permanent redirect from /:locale/app to /", async ({
@@ -1404,6 +1405,7 @@ test.describe("Invoice Generator Page", () => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-01T00:00:00Z"));
 
+    await page.goto("/?template=default");
     await expect(page).toHaveURL("/?template=default");
 
     const generalInfoSection = page.getByRole("region", {
