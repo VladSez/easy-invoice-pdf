@@ -1,8 +1,9 @@
 import { telegramUpdateSchema } from "@/app/api/telegram-webhook/schema/telegram-schema";
 import { env } from "@/env";
 import { sendTelegramMessage } from "@/lib/telegram";
-import { queueInvoiceGeneration, clearQueuedJob } from "@/lib/telegram-queue";
+import { clearQueuedJob, queueInvoiceGeneration } from "@/lib/telegram-queue";
 
+import { waitUntil } from "@vercel/functions";
 import { NextResponse, type NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -77,7 +78,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Fire-and-forget invoice generation: don't await the background work
-    void handleInvoiceGenerate({ chatId });
+    // https://vercel.com/docs/functions/functions-api-reference/vercel-functions-package#waituntil
+    waitUntil(handleInvoiceGenerate({ chatId }));
 
     return new NextResponse(JSON.stringify({ ok: true }), {
       status: 200,
