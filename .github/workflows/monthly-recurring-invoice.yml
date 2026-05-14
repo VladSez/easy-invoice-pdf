@@ -17,6 +17,7 @@ on:
 jobs:
   recurring-invoice:
     runs-on: ubuntu-latest
+    permissions: {}
     timeout-minutes: 10 # we set a timeout to 5 minutes to avoid the workflow running indefinitely
     env:
       TZ: Europe/Warsaw # we use Europe/Warsaw timezone for consistent date handling across local machines and CI
@@ -100,10 +101,11 @@ jobs:
           echo "$output" >> $GITHUB_OUTPUT
 
       - name: Send date-check notification to Telegram
+        env:
+          WEEKDAY: ${{ steps.date-check.outputs.weekday }}
+          TARGET_DAY: ${{ steps.date-check.outputs.target_day }}
+          SHOULD_RUN: ${{ steps.date-check.outputs.should_run }}
         run: |
-          WEEKDAY=${{ steps.date-check.outputs.weekday }}
-          TARGET_DAY=${{ steps.date-check.outputs.target_day }}
-          SHOULD_RUN=${{ steps.date-check.outputs.should_run }}
           WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           NOW="$(date '+%d.%m.%Y %H:%M:%S %Z')"
           BILLING_PERIOD="$(date '+%B %Y')"

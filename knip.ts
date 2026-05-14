@@ -30,7 +30,7 @@ const config: KnipConfig = {
   // ignore tags
   // https://knip.dev/reference/configuration#tags
   tags: ["-@lintignore"],
-  ignoreBinaries: ["act"],
+  ignoreBinaries: ["act", "zizmor"],
 };
 
 export default config;

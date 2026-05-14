@@ -199,7 +199,7 @@ Built by [Vlad Sazonau](https://x.com/vladsazonau)
 If you find EasyInvoicePDF useful, please consider:
 
 - ⭐ **Star this repository** on GitHub to show your support
-- ☕ [Buy me a coffee](https://buymeacoffee.com/vladsazon) to support the [creator](https://vladsazon.com)
+- ☕ [Buy me a coffee](https://buymeacoffee.com/vladsazon) to support the [creator of the project](https://vladsazon.com)
 
 Your support helps keep this project free and open-source 🙏
 
@@ -221,6 +221,7 @@ Your support helps keep this project free and open-source 🙏
 - Analytics: https://umami.is/
 - [typescript-plugin-directives](https://www.npmjs.com/package/typescript-plugin-directives)
 - [Create Mockups with shots.so](https://shots.so/)
+- zizmor (static analysis tool for GitHub Actions): https://docs.zizmor.sh/
 
 <h2 id="self-host">Quick Start</h2>
 

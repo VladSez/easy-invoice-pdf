@@ -1,4 +1,4 @@
-name: 📝 TypeScript Type Check
+name: 🔒 zizmor static analysis tool for GitHub Actions # https://docs.zizmor.sh/
 on:
   push:
     branches: [main]
@@ -10,8 +10,8 @@ permissions:
   pull-requests: read
 
 jobs:
-  type-check:
-    name: Run type check
+  zizmor:
+    name: Run zizmor static analysis tool for GitHub Actions # https://docs.zizmor.sh/
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
@@ -21,29 +21,18 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: SocketDev/action@ba6de6cc0565af1f42295590380973573297e31f # v1.3.2
-        name: 🔒 Setup Socket Firewall
-        with:
-          mode: firewall-free
+      - uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
+        name: 📦 Setup uv
 
-      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
-        name: 📦 Setup pnpm
-
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        name: 📚 Setup Node.js
-        with:
-          node-version: lts/*
-
-      - name: 🚚 Install dependencies
-        run: sfw pnpm install
-
-      - name: 🔍 Run type check
-        id: type-check
+      - name: 🔎 Run zizmor
+        id: zizmor
         continue-on-error: true
-        run: pnpm type-check:go
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: zizmor --format=github .
 
       - name: 🔍 Get PR URL
-        if: steps.type-check.outcome == 'failure'
+        if: steps.zizmor.outcome == 'failure'
         id: pr-url
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,7 +48,7 @@ jobs:
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
       - name: 📧 Send email
-        if: steps.type-check.outcome == 'failure'
+        if: steps.zizmor.outcome == 'failure'
         # https://github.com/dawidd6/action-send-mail
         uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
         with:
@@ -69,14 +58,14 @@ jobs:
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: ❌ Type Check Failed for ${{ github.repository }}
+          subject: ❌ zizmor Failed for ${{ github.repository }}
           body: |
-            Type check for ${{ github.repository }} has failed.
+            zizmor security analysis for ${{ github.repository }} has failed.
 
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
 
-      - name: ❌ Mark workflow failed on Type Check failure
-        if: steps.type-check.outcome == 'failure'
+      - name: ❌ Mark workflow failed on zizmor failure
+        if: steps.zizmor.outcome == 'failure'
         run: exit 1
