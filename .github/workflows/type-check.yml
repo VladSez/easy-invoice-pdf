@@ -19,6 +19,11 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         name: 🛎️ Checkout repository
 
+      - uses: SocketDev/action@ba6de6cc0565af1f42295590380973573297e31f # v1.3.2
+        name: 🔒 Setup Socket Firewall
+        with:
+          mode: firewall-free
+
       - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
         name: 📦 Setup pnpm
 
@@ -28,7 +33,7 @@ jobs:
           node-version: lts/*
 
       - name: 🚚 Install dependencies
-        run: pnpm install
+        run: sfw pnpm install
 
       - name: 🔍 Run type check
         id: type-check
