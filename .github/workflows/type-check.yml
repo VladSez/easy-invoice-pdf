@@ -18,6 +18,13 @@ jobs:
       # we use pinned versions because there are safer to use: https://x.com/paulmillr/status/1900948425325031448
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         name: 🛎️ Checkout repository
+        with:
+          persist-credentials: false
+
+      - uses: SocketDev/action@ba6de6cc0565af1f42295590380973573297e31f # v1.3.2
+        name: 🔒 Setup Socket Firewall
+        with:
+          mode: firewall-free
 
       - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
         name: 📦 Setup pnpm
@@ -28,7 +35,7 @@ jobs:
           node-version: lts/*
 
       - name: 🚚 Install dependencies
-        run: pnpm install
+        run: sfw pnpm install # firewall to block malicious packages from being installed https://docs.socket.dev/docs/socket-firewall-overview
 
       - name: 🔍 Run type check
         id: type-check
@@ -40,11 +47,14 @@ jobs:
         id: pr-url
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPOSITORY: ${{ github.repository }}
+          GH_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GH_REF_NAME: ${{ github.ref_name }}
         run: |
           PR_URL=$(curl -s \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository_owner }}:${{ github.ref_name }}" \
+            "https://api.github.com/repos/$GH_REPOSITORY/pulls?head=$GH_REPOSITORY_OWNER:$GH_REF_NAME" \
             | jq -r '.[0].html_url // empty')
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 

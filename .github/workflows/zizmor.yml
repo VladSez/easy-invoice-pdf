@@ -1,19 +1,21 @@
-name: 🔍 Knip
+name: 🔒 zizmor static analysis tool for GitHub Actions # https://docs.zizmor.sh/
 on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: ["**"]
 
-permissions:
-  contents: read
-  pull-requests: read
+permissions: {}
 
 jobs:
-  knip:
-    name: Run Knip
+  zizmor:
+    name: Run zizmor static analysis tool for GitHub Actions
     timeout-minutes: 5
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write # Required for upload-sarif to upload SARIF files.
+      contents: read
+      actions: read # Needed for upload-sarif to read workflow run info.
     steps:
       # we use pinned versions because there are safer to use: https://x.com/paulmillr/status/1900948425325031448
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -21,29 +23,16 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: SocketDev/action@ba6de6cc0565af1f42295590380973573297e31f # v1.3.2
-        name: 🔒 Setup Socket Firewall
-        with:
-          mode: firewall-free
-
-      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
-        name: 📦 Setup pnpm
-
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        name: 📚 Setup Node.js
-        with:
-          node-version: lts/*
-
-      - name: 🚚 Install dependencies
-        run: sfw pnpm install # firewall to block malicious packages from being installed https://docs.socket.dev/docs/socket-firewall-overview
-
-      - name: 🔎 Run Knip
-        id: knip
+      - name: 🔎 Run zizmor
+        id: zizmor
         continue-on-error: true
-        run: pnpm knip
+        # https://github.com/zizmorcore/zizmor-action
+        uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e # v0.5.3
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🔍 Get PR URL
-        if: steps.knip.outcome == 'failure'
+        if: steps.zizmor.outcome == 'failure'
         id: pr-url
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,7 +48,7 @@ jobs:
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
       - name: 📧 Send email
-        if: steps.knip.outcome == 'failure'
+        if: steps.zizmor.outcome == 'failure'
         # https://github.com/dawidd6/action-send-mail
         uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
         with:
@@ -69,14 +58,14 @@ jobs:
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: ❌ Knip Failed for ${{ github.repository }}
+          subject: ❌ zizmor Failed for ${{ github.repository }}
           body: |
-            Knip for ${{ github.repository }} has failed.
+            zizmor security analysis for ${{ github.repository }} has failed.
 
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
 
-      - name: ❌ Mark workflow failed on Knip failure
-        if: steps.knip.outcome == 'failure'
+      - name: ❌ Mark workflow failed on zizmor failure
+        if: steps.zizmor.outcome == 'failure'
         run: exit 1
