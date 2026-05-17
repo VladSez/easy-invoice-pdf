@@ -16,7 +16,7 @@ import {
 } from "@/config";
 import { routing } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
@@ -203,9 +203,9 @@ function HeroSection() {
           {/* Left column start (text and CTA buttons) */}
           <div className="flex flex-col justify-center space-y-5 md:space-y-6">
             <div className="space-y-3 md:space-y-4">
-              <h1 className="text-balance text-center text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl md:text-6xl xl:text-left">
+              <h2 className="text-balance text-center text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl md:text-6xl xl:text-left">
                 {t("hero.title")}
-              </h1>
+              </h2>
 
               <div className="flex justify-center xl:justify-start">
                 <p className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
@@ -421,20 +421,20 @@ function FaqSection() {
               return (
                 <details
                   key={translationKey}
-                  className="group cursor-pointer border-b border-slate-200 bg-white transition-all duration-200 hover:border-slate-200"
+                  className="group cursor-pointer border-b border-dashed border-stone-300 bg-white transition-all duration-200 last:border-b-0"
                 >
                   <summary className="flex select-none items-center justify-between gap-2 py-3 text-left">
-                    <h3 className="text-base font-medium text-slate-900">
+                    <h3 className="text-base font-medium text-stone-900">
                       {question}
                     </h3>
-                    <ChevronDown
-                      className="ml-auto size-6 shrink-0 rounded-full p-1 text-slate-600 transition-all duration-200 hover:bg-gray-200 hover:text-slate-900 group-open:rotate-180"
+                    <PlusIcon
+                      className="ml-auto size-6 shrink-0 rounded-full p-1 text-stone-400 transition-all duration-200 hover:bg-stone-200/50 group-open:rotate-45 group-hover:text-stone-900"
                       aria-hidden="true"
                     />
                   </summary>
                   <div className="overflow-hidden">
                     <div className="pb-4 pr-4">
-                      <p className="cursor-default text-pretty text-sm leading-relaxed text-slate-600">
+                      <p className="cursor-default text-pretty text-sm leading-relaxed text-stone-600">
                         {answer}
                       </p>
                     </div>
