@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -35,7 +36,14 @@ export function StickySeoCta({
           size="sm"
           className="mt-2 w-full shrink-0 bg-slate-100 text-sm text-slate-900 hover:bg-slate-100/95 sm:mt-0 sm:w-auto"
         >
-          <Link href={href} scroll={false} data-testid="seo-sticky-cta">
+          <Link
+            href={href}
+            scroll={false}
+            data-testid="seo-sticky-cta"
+            onClick={() => {
+              umamiTrackEvent("seo_sticky_cta_clicked");
+            }}
+          >
             Open app
           </Link>
         </Button>

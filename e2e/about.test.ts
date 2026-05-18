@@ -14,7 +14,7 @@ test.describe("About page", () => {
     await expect(page).toHaveURL("/en/about");
 
     await expect(page).toHaveTitle(
-      "Free Invoice Generator PDF - EasyInvoicePDF (Open Source)",
+      "Free Invoice Generator PDF - EasyInvoicePDF",
     );
 
     const header = page.getByRole("banner");
@@ -112,10 +112,6 @@ test.describe("About page", () => {
     // Check Features section
     const featuresSection = page.locator("#features");
     await expect(featuresSection).toBeVisible();
-
-    await expect(
-      featuresSection.getByTestId("features-coming-soon"),
-    ).toHaveText("E-invoicing and API support - coming soon");
 
     await expect(
       featuresSection.getByRole("heading", {

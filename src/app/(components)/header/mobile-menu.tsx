@@ -79,7 +79,7 @@ export function MobileMenuPanel({
       aria-labelledby={titleId}
       aria-describedby={descriptionId}
       className={cn(
-        "fixed inset-x-0 top-16 z-[60] flex max-h-[calc(100dvh-4rem)] flex-col overflow-y-auto border-b border-t bg-white shadow-lg",
+        "fixed inset-x-0 top-[84px] z-[60] mx-2 flex max-h-[calc(100dvh-4rem)] flex-col overflow-y-auto rounded-3xl border-b border-t bg-white shadow-lg md:mx-6",
         "duration-200 animate-in fade-in slide-in-from-top-2",
       )}
     >

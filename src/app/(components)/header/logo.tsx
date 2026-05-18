@@ -1,7 +1,14 @@
 import { FinalProjectLogo } from "@/components/etc/final-project-logo";
 import { ProjectLogoDescription } from "@/app/(components)/project-logo-description";
+import { cn } from "@/lib/utils";
 
-export function Logo({ text }: { text: string }) {
+export function Logo({
+  text,
+  className,
+}: {
+  text: string;
+  className?: string;
+}) {
   return (
     <div>
       <div className="flex items-center gap-1.5 md:gap-2">
@@ -14,7 +21,12 @@ export function Logo({ text }: { text: string }) {
 
         {/* show only app name on mobile (to save space) */}
         <div className="block sm:hidden">
-          <p className="text-balance text-center text-base font-bold text-zinc-800 min-[375px]:text-xl sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
+          <p
+            className={cn(
+              "text-balance text-center text-base font-bold text-zinc-800 min-[375px]:text-xl sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left",
+              className,
+            )}
+          >
             <a
               href="https://easyinvoicepdf.com"
               target="_blank"

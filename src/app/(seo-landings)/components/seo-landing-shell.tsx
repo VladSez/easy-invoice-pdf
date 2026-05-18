@@ -9,7 +9,7 @@ import {
   type SeoLandingDefinition,
   type SeoSection,
 } from "../seo-landing-definitions";
-import { ChevronDownIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { StickySeoCta } from "@/app/(seo-landings)/components/sticky-seo-cta";
 import { Button } from "@/components/ui/button";
 import { GithubIcon } from "@/components/etc/github-logo";
@@ -154,20 +154,20 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                 {definition.faq.map((item) => (
                   <details
                     key={item.question}
-                    className="group cursor-pointer border-b border-dashed border-slate-400"
+                    className="group cursor-pointer border-b border-dashed border-stone-300 transition-all duration-200 last:border-b-0"
                   >
                     <summary className="flex select-none items-center justify-between gap-2 py-3 text-left">
-                      <h3 className="text-base font-medium text-slate-900">
+                      <h3 className="text-base font-medium text-stone-900">
                         {item.question}
                       </h3>
-                      <ChevronDownIcon
-                        className="ml-auto size-6 shrink-0 rounded-full p-1 text-slate-600 transition-all duration-200 hover:bg-gray-200 hover:text-slate-900 group-open:rotate-180"
+                      <PlusIcon
+                        className="ml-auto size-6 shrink-0 rounded-full p-1 text-stone-400 transition-all duration-200 hover:bg-stone-200/50 group-open:rotate-45 group-hover:text-stone-900"
                         aria-hidden="true"
                       />
                     </summary>
                     <div className="overflow-hidden">
                       <div className="pb-4 pr-4">
-                        <p className="cursor-default text-pretty text-sm leading-relaxed text-slate-600">
+                        <p className="cursor-default text-pretty text-sm leading-relaxed text-stone-600">
                           {item.answer}
                         </p>
                       </div>
@@ -268,19 +268,22 @@ function SeoSectionBlock({ section, id }: { section: SeoSection; id: number }) {
   const color = colors[id % colors.length];
 
   return (
-    <section className="border-b border-slate-100 py-6 last:border-b-0 md:py-8">
+    <section
+      className="border-b border-slate-100 py-6 last:border-b-0 md:py-8"
+      data-testid={`seo-landing-section-${section.title}`}
+    >
       <h2 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
         <span className={`${color} px-0.5 font-bold`}>{section.title}</span>
       </h2>
       {section.lead ? (
-        <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600">
+        <p className="mt-4 max-w-3xl text-balance text-xl leading-relaxed text-slate-800">
           {section.lead}
         </p>
       ) : null}
       {section.paragraphs?.map((paragraph, index) => (
         <p
           key={`${section.title}-p-${index}`}
-          className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600"
+          className="mt-4 max-w-3xl text-pretty text-xl leading-relaxed text-slate-800"
         >
           {paragraph}
         </p>
@@ -288,7 +291,9 @@ function SeoSectionBlock({ section, id }: { section: SeoSection; id: number }) {
       {section.bullets?.length ? (
         <ul className="mt-4 max-w-3xl list-disc space-y-2 pl-6 text-lg text-slate-700">
           {section.bullets.map((item) => (
-            <li key={item}>{item}</li>
+            <li key={item} className="text-pretty">
+              {item}
+            </li>
           ))}
         </ul>
       ) : null}
