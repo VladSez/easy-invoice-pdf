@@ -205,9 +205,9 @@ function HeroSection() {
           {/* Left column start (text and CTA buttons) */}
           <div className="flex flex-col justify-center space-y-5 md:space-y-6">
             <div className="space-y-3 md:space-y-4">
-              <h2 className="text-balance text-center text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl md:text-6xl xl:text-left">
+              <h1 className="text-balance text-center text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl md:text-6xl xl:text-left">
                 {t("hero.title")}
-              </h2>
+              </h1>
 
               <div className="flex justify-center xl:justify-start">
                 <p className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">

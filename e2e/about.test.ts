@@ -88,7 +88,7 @@ test.describe("About page", () => {
 
     await expect(
       heroSection.getByRole("heading", {
-        level: 2,
+        level: 1,
         name: "Create professional invoices in seconds",
         exact: true,
       }),
@@ -271,7 +271,7 @@ test.describe("About page", () => {
 
     await expect(
       heroSection.getByRole("heading", {
-        level: 2,
+        level: 1,
         name: "Créez des factures professionnelles en quelques secondes",
         exact: true,
       }),
@@ -357,7 +357,7 @@ test.describe("About page", () => {
 
     await expect(
       heroSection.getByRole("heading", {
-        level: 2,
+        level: 1,
         name: "Erstellen Sie professionelle Rechnungen in Sekunden",
         exact: true,
       }),
