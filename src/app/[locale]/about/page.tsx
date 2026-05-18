@@ -15,7 +15,6 @@ import {
   VIDEO_DEMO_URL,
 } from "@/config";
 import { routing } from "@/i18n/routing";
-import { cn } from "@/lib/utils";
 import { PlusIcon } from "lucide-react";
 import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
@@ -190,13 +189,16 @@ function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative flex w-full items-center justify-center overflow-hidden bg-gradient-to-b from-white to-slate-50 py-10 md:py-16 xl:py-24"
+      className="flex w-full items-center justify-center overflow-hidden bg-gradient-to-b from-white to-slate-50 py-10 md:py-16 xl:py-24"
     >
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="pointer-events-none absolute -right-40 -top-40 h-80 w-80 rounded-full bg-indigo-50/50 blur-3xl" />
         <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-emerald-50/40 blur-3xl" />
       </div>
+
+      {/* Blur transition overlay between header and hero */}
+      <div className="z-5 pointer-events-none absolute left-0 right-0 top-[60px] h-32 bg-gradient-to-b from-slate-100 to-slate-50 blur-2xl" />
 
       <div className="container relative z-10 px-4 md:px-6">
         <div className="grid gap-6 md:gap-8 lg:gap-12 xl:grid-cols-2 xl:gap-6">
@@ -323,24 +325,20 @@ function FeaturesSection() {
         </div>
 
         {/* Features cards */}
-        <div className="flex flex-row flex-wrap items-center justify-center gap-6 pt-10 md:gap-10">
-          {MARKETING_FEATURES_CARDS.map((feature, index) => {
+        <div className="grid grid-cols-1 gap-6 pt-10 md:gap-10 lg:grid-cols-2">
+          {MARKETING_FEATURES_CARDS.map((feature) => {
             const title = t(`features.items.${feature.translationKey}.title`);
             const description = t(
               `features.items.${feature.translationKey}.description`,
             );
-            const isEven = index % 2 === 0;
 
             return (
               <div
                 key={feature.translationKey}
-                className={cn(
-                  `flex h-full w-full flex-col items-start gap-6 rounded-xl border-[0.5px] border-slate-200 bg-white shadow-sm md:items-center md:rounded-2xl`,
-                  isEven ? "xl:flex-row" : "xl:flex-row-reverse", // swap the video and text content for even index
-                )}
+                className="flex h-full w-full flex-col items-start gap-2 rounded-xl bg-white shadow-sm ring-1 ring-slate-200 md:items-center md:rounded-2xl"
               >
                 {/* text content */}
-                <div className="mb-[-5px] max-w-[700px] flex-1 px-8 pt-6 md:pt-7 xl:mb-0 xl:py-4">
+                <div className="max-w-[700px] flex-1 px-8 py-4 pt-6">
                   <h3 className="text-balance pb-4 text-xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-2xl">
                     {title}
                   </h3>
@@ -352,7 +350,7 @@ function FeaturesSection() {
                 {/* video container */}
                 <div className="relative w-full max-w-[800px] px-2 pb-3 lg:px-0 lg:pb-4 xl:mx-0 xl:pb-0">
                   {/* Mac OS Frame around the video */}
-                  <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
+                  <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl xl:border-b-0 xl:border-l-0 xl:border-r-0">
                     {/* Browser chrome bar */}
                     <div className="h-8 w-full rounded-t-xl bg-gradient-to-b from-[#F3F3F3] to-[#E9E9E9] px-4 shadow-sm md:h-12 md:rounded-t-2xl">
                       <div className="flex h-full items-center">

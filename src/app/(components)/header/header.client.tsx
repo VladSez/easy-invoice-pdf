@@ -38,12 +38,15 @@ export function HeaderClient({
     .toLowerCase();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
+    <header className="sticky top-4 z-50 w-full px-2 md:px-6">
       <div className="flex items-center justify-center">
-        <div className="container h-16 px-4 md:px-6">
+        <div className="container h-16 rounded-3xl border bg-gradient-to-r from-stone-50/80 to-white px-4 shadow-sm backdrop-blur-md md:px-6">
           <div className="flex h-full items-center justify-between gap-4">
             {/* App logo  */}
-            <Logo text={translations.navLinks.tagline} />
+            <Logo
+              text={translations.navLinks.tagline}
+              className="text-sm min-[375px]:text-base"
+            />
 
             {/* Right side actions */}
             <div className="flex items-center gap-1">
@@ -55,7 +58,7 @@ export function HeaderClient({
                   rel="noopener noreferrer"
                   className={cn(
                     desktopNavLinkClass,
-                    "group flex items-center gap-1.5 bg-stone-200/50 text-slate-800 hover:bg-stone-200/80",
+                    "group flex items-center gap-1.5 bg-stone-200/80 text-slate-800 hover:bg-stone-200/90",
                   )}
                   aria-label={translations.navLinks.github}
                   title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator"

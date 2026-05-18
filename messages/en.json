@@ -17,7 +17,7 @@
       "badge": "Features",
       "title": "Everything you need for professional invoicing",
       "description": "Create professional invoices with live preview, instant PDF downloads, multi-language support, flexible tax systems and more.",
-      "comingSoon": "E-invoicing and API support - coming soon",
+      "comingSoon": "API support and recurring invoices - coming soon",
       "items": {
         "livePreview": {
           "title": "Live Preview",

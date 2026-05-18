@@ -114,10 +114,6 @@ test.describe("About page", () => {
     await expect(featuresSection).toBeVisible();
 
     await expect(
-      featuresSection.getByTestId("features-coming-soon"),
-    ).toHaveText("E-invoicing and API support - coming soon");
-
-    await expect(
       featuresSection.getByRole("heading", {
         level: 2,
         name: "Everything you need for professional invoicing",
