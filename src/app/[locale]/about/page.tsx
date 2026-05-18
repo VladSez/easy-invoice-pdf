@@ -198,7 +198,7 @@ function HeroSection() {
       </div>
 
       {/* Blur transition overlay between header and hero */}
-      <div className="z-5 pointer-events-none absolute left-0 right-0 top-[60px] h-32 bg-gradient-to-b from-slate-100 to-slate-50 blur-2xl" />
+      <div className="z-5 pointer-events-none absolute left-0 right-0 top-[25px] h-32 bg-gradient-to-b from-slate-100 to-slate-50 blur-2xl" />
 
       <div className="container relative z-10 px-4 md:px-6">
         <div className="grid gap-6 md:gap-8 lg:gap-12 xl:grid-cols-2 xl:gap-6">

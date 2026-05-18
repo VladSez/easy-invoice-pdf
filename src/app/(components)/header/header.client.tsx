@@ -40,7 +40,7 @@ export function HeaderClient({
   return (
     <header className="sticky top-4 z-50 w-full px-2 md:px-6">
       <div className="flex items-center justify-center">
-        <div className="container h-16 rounded-3xl border bg-gradient-to-r from-stone-50/80 to-white px-4 shadow-sm backdrop-blur-md md:px-6">
+        <div className="container h-16 rounded-3xl bg-gradient-to-r from-stone-50/80 to-white px-4 shadow-sm ring-1 ring-stone-200 backdrop-blur-md md:px-6">
           <div className="flex h-full items-center justify-between gap-4">
             {/* App logo  */}
             <Logo
