@@ -1,7 +1,12 @@
 export default function TermsOfServicePage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
-      <div className="container mx-auto max-w-3xl px-4 py-12 md:px-6 md:py-16">
+      {/* Blur transition overlay between header and hero */}
+      <div
+        data-info="blur-transition-overlay"
+        className="pointer-events-none absolute left-0 right-0 top-[25px] h-24 bg-gradient-to-b from-slate-100 to-slate-50 blur-2xl"
+      />
+      <div className="container relative mx-auto max-w-3xl px-4 py-12 md:px-6 md:py-16">
         <article className="prose prose-gray max-w-none dark:prose-invert prose-headings:scroll-mt-20 prose-headings:font-semibold prose-headings:text-gray-900 prose-h1:text-3xl prose-h2:text-xl prose-p:leading-relaxed prose-p:text-gray-600 prose-strong:text-gray-900 prose-li:text-gray-600 prose-hr:border-gray-200 dark:prose-headings:text-gray-100 dark:prose-p:text-gray-300 dark:prose-strong:text-gray-100 dark:prose-li:text-gray-300 dark:prose-hr:border-gray-700">
           <h1>Terms of Service</h1>
           <p>

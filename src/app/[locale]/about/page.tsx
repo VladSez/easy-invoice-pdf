@@ -192,13 +192,19 @@ function HeroSection() {
       className="flex w-full items-center justify-center overflow-hidden bg-gradient-to-b from-white to-slate-50 py-10 md:py-16 xl:py-24"
     >
       {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="pointer-events-none absolute -right-40 -top-40 h-80 w-80 rounded-full bg-indigo-50/50 blur-3xl" />
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+        data-info="background-decorative-elements"
+      >
+        <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-indigo-50/50 blur-3xl" />
         <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-emerald-50/40 blur-3xl" />
       </div>
 
       {/* Blur transition overlay between header and hero */}
-      <div className="z-5 pointer-events-none absolute left-0 right-0 top-[25px] h-32 bg-gradient-to-b from-slate-100 to-slate-50 blur-2xl" />
+      <div
+        data-info="blur-transition-overlay"
+        className="pointer-events-none absolute left-0 right-0 top-[25px] h-32 bg-gradient-to-b from-slate-100 to-slate-50 blur-2xl"
+      />
 
       <div className="container relative z-10 px-4 md:px-6">
         <div className="grid gap-6 md:gap-8 lg:gap-12 xl:grid-cols-2 xl:gap-6">
@@ -348,9 +354,9 @@ function FeaturesSection() {
                 </div>
 
                 {/* video container */}
-                <div className="relative w-full max-w-[800px] px-2 pb-3 lg:px-0 lg:pb-4 xl:mx-0 xl:pb-0">
+                <div className="relative w-full max-w-[800px]">
                   {/* Mac OS Frame around the video */}
-                  <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl xl:border-b-0 xl:border-l-0 xl:border-r-0">
+                  <div className="relative overflow-hidden rounded-xl border border-b-0 border-l-0 border-r-0 border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
                     {/* Browser chrome bar */}
                     <div className="h-8 w-full rounded-t-xl bg-gradient-to-b from-[#F3F3F3] to-[#E9E9E9] px-4 shadow-sm md:h-12 md:rounded-t-2xl">
                       <div className="flex h-full items-center">

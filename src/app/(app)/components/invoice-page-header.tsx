@@ -11,25 +11,22 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import Link from "next/link";
 
-import { GithubIcon } from "@/components/etc/github-logo";
+import { InvoicePDFDownloadLink } from "@/app/(app)/components/invoice-pdf-download-link";
 import { ProjectLogoDescription } from "@/app/(components)/project-logo-description";
+import { GithubIcon } from "@/components/etc/github-logo";
 import { GITHUB_URL, VIDEO_DEMO_YOUTUBE_URL } from "@/config";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
-import { AlertCircleIcon, HeartIcon, LinkIcon } from "lucide-react";
+import { AlertCircleIcon, LinkIcon } from "lucide-react";
 import { useState } from "react";
-import { InvoicePDFDownloadLink } from "@/app/(app)/components/invoice-pdf-download-link";
 
 /**
  * Header component for the invoice page.
- * 
+ *
  * Displays the project logo, description, and action buttons including:
  * - Share invoice button (with conditional rendering based on shareability)
  * - Download PDF button with error handling
- * - Support project button
-
  * @returns The rendered invoice page header with logo, description, and action buttons
  */
 export function InvoicePageHeader({
@@ -82,34 +79,6 @@ export function InvoicePageHeader({
               content={"Viewing shared invoice"}
             />
           ) : null}
-          {/* Support project button (hidden on mobile) */}
-          <Button
-            asChild
-            variant="outline"
-            className="group mx-2 w-full border-pink-200 bg-pink-50 text-pink-700 shadow-md transition-all duration-200 hover:border-pink-300 hover:bg-pink-100 hover:text-pink-800 hover:no-underline hover:shadow-lg focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 lg:mx-0 lg:inline-flex lg:w-auto"
-            onClick={() => {
-              // analytics track event
-              umamiTrackEvent("donate_to_project_button_clicked_header");
-            }}
-          >
-            <Link
-              href="https://dub.sh/easyinvoice-donate"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2"
-            >
-              Support Project
-              <div className="relative select-none">
-                <HeartIcon className="size-3 scale-110 fill-pink-500 text-pink-500 transition-all duration-200 group-hover:fill-pink-600 group-hover:text-pink-600" />
-                <HeartIcon
-                  className={cn(
-                    "size-3 animate-ping fill-pink-500 text-pink-500 duration-1000 group-hover:fill-pink-600",
-                    "absolute inset-0 flex",
-                  )}
-                />
-              </div>
-            </Link>
-          </Button>
 
           {/* On mobile version, we show it in different place (bottom of the page)*/}
           {isDesktop ? (

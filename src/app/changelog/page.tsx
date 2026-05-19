@@ -31,6 +31,11 @@ export default async function ChangelogPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
+      {/* Blur transition overlay between header and hero */}
+      <div
+        data-info="blur-transition-overlay"
+        className="pointer-events-none absolute left-0 right-0 top-[25px] h-24 bg-gradient-to-b from-slate-100 to-slate-50 blur-2xl"
+      />
       <div className="relative z-0">
         <div className="relative mb-8 pt-16 text-center sm:mb-16">
           <div className="absolute bottom-0 h-full w-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] sm:bottom-auto"></div>
