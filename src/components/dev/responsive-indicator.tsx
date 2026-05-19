@@ -8,11 +8,10 @@ import { useEffect, useState } from "react";
  * (XS, SM, MD, LG, XL, 2XL) and exact pixel width. Useful for testing responsive designs.
  *
  * Only renders on client side after hydration to avoid width mismatch errors.
- *
- * @returns {React.ReactNode | null} The responsive indicator component, or null during hydration
  */
 export function ResponsiveIndicator() {
   const [width, setWidth] = useState(0);
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     const update = () => setWidth(window.innerWidth);
@@ -21,7 +20,7 @@ export function ResponsiveIndicator() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  if (width === 0) return null;
+  if (width === 0 || hidden) return null;
 
   const breakpoint =
     width >= 1536
@@ -37,7 +36,12 @@ export function ResponsiveIndicator() {
               : "XS";
 
   return (
-    <div className="fixed left-2 top-2 z-[9999] flex items-center gap-1 rounded-md bg-blue-600/90 px-2 py-1 font-mono text-xs text-white shadow-lg duration-300 animate-in fade-in slide-in-from-left-2">
+    <div
+      onClick={() => setHidden(true)}
+      className="fixed left-2 top-2 z-[9999] flex cursor-pointer items-center gap-1 rounded-md bg-blue-600/90 px-2 py-1 font-mono text-xs text-white shadow-lg duration-300 animate-in fade-in slide-in-from-left-2"
+      data-info="responsive-indicator"
+      title="Click to hide"
+    >
       <span className="font-bold">{breakpoint}</span>
       <span className="text-blue-200">|</span>
       <span>{width}px</span>
