@@ -26,16 +26,16 @@ jobs:
         with:
           mode: firewall-free
 
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        name: 📚 Setup Node.js
+        with:
+          node-version: lts/*
+
       - name: 📦 Enable Corepack
         run: corepack enable
 
       - name: 📦 Install pinned package manager
         run: corepack install
-
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        name: 📚 Setup Node.js
-        with:
-          node-version: lts/*
 
       - name: 🚚 Install dependencies
         run: sfw pnpm install --frozen-lockfile # firewall to block malicious packages from being installed https://docs.socket.dev/docs/socket-firewall-overview
