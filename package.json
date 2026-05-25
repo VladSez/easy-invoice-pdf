@@ -113,7 +113,7 @@
     "husky": "9.1.7",
     "knip": "5.85.0",
     "lint-staged": "15.5.0",
-    "postcss": "^8",
+    "postcss": "8.5.3",
     "prettier": "3.5.3",
     "prettier-plugin-tailwindcss": "0.6.11",
     "react-email": "4.0.4",
