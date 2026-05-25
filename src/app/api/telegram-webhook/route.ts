@@ -1,7 +1,10 @@
+import {
+  clearQueuedJob,
+  queueInvoiceGeneration,
+} from "@/app/api/telegram-webhook/lib/telegram-queue";
 import { telegramUpdateSchema } from "@/app/api/telegram-webhook/schema/telegram-schema";
 import { env } from "@/env";
 import { sendTelegramMessage } from "@/lib/telegram";
-import { clearQueuedJob, queueInvoiceGeneration } from "@/lib/telegram-queue";
 
 import { waitUntil } from "@vercel/functions";
 import { NextResponse, type NextRequest } from "next/server";

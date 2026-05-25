@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { showRandomCTAToast } from "../components/cta-toasts";
 import { useCTAToast } from "../contexts/cta-toast-context";
 
@@ -39,18 +38,22 @@ export function useShowRandomCTAToastOnIdle() {
 
   // Idle detection — resets on every form update (interactionCount change)
   useEffect(() => {
+    // Skip if CTA already triggered this session or toast already shown
     if (hasTriggeredCTAAction || triggeredRef.current) return;
+    // Skip if user hasn't engaged enough with the form yet
     if (interactionCount < MIN_INTERACTIONS) return;
 
+    // Start idle timer — triggers toast after IDLE_TIME of inactivity
     const idleTimer = setTimeout(() => {
+      // Verify both conditions still met: minimum time elapsed AND not already triggered
       if (!hasMinTimeElapsedRef.current || triggeredRef.current) return;
 
+      // Mark as triggered to prevent duplicate toasts
       triggeredRef.current = true;
 
+      // Show the toast and mark action as triggered
       showRandomCTAToast();
       markCTAActionTriggered();
-
-      umamiTrackEvent("cta_toast_shown_idle");
     }, IDLE_TIME);
 
     return () => clearTimeout(idleTimer);

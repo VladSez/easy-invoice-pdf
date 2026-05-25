@@ -59,9 +59,9 @@ export const SEO_LANDING_DEFINITIONS = {
     metadata: {
       title: "Create Free Invoices Online - No Login Required",
       description:
-        "Generate professional invoices in seconds with EasyInvoicePDF. No account, no signup, no tracking. Free, open-source, browser-based. Start creating your PDF.",
+        "Generate professional invoices in seconds with EasyInvoicePDF. No account, no signup, no tracking, no ads. Free, open-source, browser-based. Start creating your PDF.",
       keywords:
-        "free invoice generator no login, easy invoice, create invoice PDF, generate PDF invoice, invoice PDF without account, no signup invoice maker, instant invoice PDF, browser invoice generator",
+        "free invoice generator no login, easy invoice, create invoice PDF, generate PDF invoice, invoice PDF without account, no signup invoice maker, instant invoice PDF, browser invoice generator, no ads invoice generator, ad-free invoice PDF",
     },
     hero: {
       h1: "Create Free Invoices Online - No Login Required",
@@ -70,8 +70,8 @@ export const SEO_LANDING_DEFINITIONS = {
       bullets: [
         "Create invoices in 60 seconds",
         "Download PDF instantly",
-        "Free and open-source forever",
-        "No login. No email. No tracking.",
+        "Free and open-source",
+        "No login. No email. No ads.",
       ],
       ctaLabel: "Create Invoice Now",
       ctaHref: DEFAULT_INVOICE_TEMPLATE_HREF,
@@ -116,6 +116,16 @@ export const SEO_LANDING_DEFINITIONS = {
           "No unnecessary features",
         ],
       },
+      {
+        title: "👉 Ad-free and fast",
+        lead: "No ads means a faster, cleaner experience:",
+        bullets: [
+          "No tracking pixels or third-party scripts",
+          "Faster page load times",
+          "Focus on your invoice, not on ads",
+          "Your data stays private and isn't monetized",
+        ],
+      },
     ],
     faq: [
       {
@@ -148,6 +158,11 @@ export const SEO_LANDING_DEFINITIONS = {
         answer:
           "Yes. Edit fields, tax labels, currency, notes, and template options before you generate the PDF.",
       },
+      {
+        question: "Does it have ads?",
+        answer:
+          "No. EasyInvoicePDF is completely ad-free. No ads, no tracking pixels, no third-party scripts. We generate revenue through sponsorships, not by tracking or monetizing your data.",
+      },
     ],
   },
   "open-source-invoice-generator": {
@@ -155,9 +170,9 @@ export const SEO_LANDING_DEFINITIONS = {
     metadata: {
       title: "Free Open-Source Invoice Generator - Easy to Use",
       description:
-        "Generate PDF invoices instantly in your browser. Fully open-source, customizable code, self-hostable. Free forever, no vendor lock-in. Open the app and try it.",
+        "Generate PDF invoices instantly in your browser. Fully open-source, customizable code, self-hostable. Free forever, no vendor lock-in, no ads. Open the app and try it.",
       keywords:
-        "open source invoice generator, self-hosted invoice PDF, easy invoice PDF, free invoice software github, customizable invoice template, AGPL invoice tool",
+        "open source invoice generator, self-hosted invoice PDF, easy invoice PDF, free invoice software github, customizable invoice template, AGPL invoice tool, no ads invoice, ad-free open source",
     },
     hero: {
       h1: "Free Open-Source Invoice Generator - Easy to Use & Customize",
@@ -168,6 +183,7 @@ export const SEO_LANDING_DEFINITIONS = {
         "Fully open-source code",
         "Self-host or use online",
         "No vendor lock-in",
+        "Completely ad-free",
       ],
       ctaLabel: "Start Generating Invoices",
       ctaHref: DEFAULT_INVOICE_TEMPLATE_HREF,
@@ -223,6 +239,15 @@ export const SEO_LANDING_DEFINITIONS = {
           "Privacy-focused users",
         ],
       },
+      {
+        title: "👉 Ad-free and fast",
+        lead: "No ads means a transparent, distraction-free experience:",
+        bullets: [
+          "No tracking pixels or ad networks",
+          "Faster page load times",
+          "No hidden data monetization",
+        ],
+      },
     ],
     faq: [
       {
@@ -249,6 +274,11 @@ export const SEO_LANDING_DEFINITIONS = {
         answer:
           "Yes. Adjust fields, tax labels, currency, notes, and template options in the UI before generating the PDF.",
       },
+      {
+        question: "Does it have ads?",
+        answer:
+          "No. EasyInvoicePDF is completely ad-free, with no ads, no tracking pixels, and no third-party ad networks. This commitment to privacy and transparency is core to the open-source philosophy.",
+      },
     ],
   },
   "stripe-invoice-alternative": {
@@ -256,9 +286,9 @@ export const SEO_LANDING_DEFINITIONS = {
     metadata: {
       title: "Free Stripe Invoice Alternative - Generate PDFs",
       description:
-        "Create invoices without Stripe setup. Instant PDF generation, no account required. Fast, free alternative to Stripe invoicing. Try it free. No signup needed.",
+        "Create invoices without Stripe setup. Instant PDF generation, no account required. Fast, free, ad-free alternative to Stripe invoicing. Try it free. No signup needed.",
       keywords:
-        "stripe invoice alternative, invoice without stripe, create invoice without stripe, simple PDF invoice, no stripe dashboard, free stripe invoice alternative",
+        "stripe invoice alternative, invoice without stripe, create invoice without stripe, simple PDF invoice, no stripe dashboard, free stripe invoice alternative, no ads invoice, ad-free invoicing",
     },
     hero: {
       h1: "Create Invoices Without Stripe - Fast & Free Alternative",
@@ -269,6 +299,7 @@ export const SEO_LANDING_DEFINITIONS = {
         "Instant PDF generation",
         "No account setup required",
         "Free forever",
+        "Completely ad-free",
       ],
       ctaLabel: "Create Invoice Without Stripe",
       ctaHref: "/?template=stripe",
@@ -305,6 +336,16 @@ export const SEO_LANDING_DEFINITIONS = {
       {
         title: "👉 Who this is for",
         bullets: ["Freelancers", "Consultants", "Developers", "Side projects"],
+      },
+      {
+        title: "👉 Ad-free and fast",
+        lead: "Unlike Stripe and other tools, we keep it ad-free:",
+        bullets: [
+          "No tracking or analytics for monetization",
+          "Faster, cleaner interface",
+          "No distractions while you work",
+          "Your data is not sold or monetized",
+        ],
       },
     ],
     comparisonTable: {
@@ -344,6 +385,11 @@ export const SEO_LANDING_DEFINITIONS = {
         answer:
           "Yes. It runs in your browser with no installer. Works on desktop and mobile browsers that support modern JavaScript.",
       },
+      {
+        question: "Does it have ads?",
+        answer:
+          "No. EasyInvoicePDF is ad-free with no tracking pixels or third-party scripts. Use it clean and fast without distractions or data monetization.",
+      },
     ],
   },
   "invoice-template-pdf": {
@@ -351,9 +397,9 @@ export const SEO_LANDING_DEFINITIONS = {
     metadata: {
       title: "Free Invoice Template - PDF Download Instantly",
       description:
-        "Generate professional invoice PDFs in seconds. No design skills needed, instant download, free forever. No signup required. Easy invoice PDF in your browser.",
+        "Generate professional invoice PDFs in seconds. No design skills needed, instant download, free forever, no ads. No signup required. Easy invoice PDF in your browser.",
       keywords:
-        "free invoice template PDF, professional invoice PDF, printable invoice template, easy invoice PDF, invoice PDF download, invoice layout generator, PDF billing template",
+        "free invoice template PDF, professional invoice PDF, printable invoice template, easy invoice PDF, invoice PDF download, invoice layout generator, PDF billing template, no ads invoice, ad-free invoice generator",
     },
     hero: {
       h1: "Free Invoice Template PDF - Easy to Create & Download",
@@ -364,6 +410,7 @@ export const SEO_LANDING_DEFINITIONS = {
         "Generate PDF in seconds",
         "No design skills needed",
         "Download instantly, always free",
+        "Completely ad-free",
       ],
       ctaLabel: "Generate Invoice PDF",
       ctaHref: DEFAULT_INVOICE_TEMPLATE_HREF,
@@ -410,6 +457,16 @@ export const SEO_LANDING_DEFINITIONS = {
           "No login required to get started",
         ],
       },
+      {
+        title: "👉 Ad-free and fast",
+        lead: "Stay focused on what matters:",
+        bullets: [
+          "No ads cluttering the interface",
+          "No tracking or data monetization",
+          "Faster loading times",
+          "Clean, distraction-free invoice creation",
+        ],
+      },
     ],
     faq: [
       {
@@ -441,6 +498,11 @@ export const SEO_LANDING_DEFINITIONS = {
         question: "Is there a free invoice generator that is truly free?",
         answer:
           "EasyInvoicePDF stays free to use with no forced account wall. You get PDF export and editing without a subscription.",
+      },
+      {
+        question: "Does it have ads?",
+        answer:
+          "No. EasyInvoicePDF is completely ad-free with no tracking pixels, third-party scripts, or data monetization. Create invoices in a clean, distraction-free environment.",
       },
     ],
   },

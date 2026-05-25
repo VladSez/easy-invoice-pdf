@@ -227,7 +227,8 @@ Your support helps keep this project free and open-source 🙏
 
 EasyInvoicePDF is [AGPL v3](#license); self-host your own instance locally or on your infrastructure with the steps below.
 
-- Run `pnpm i`
+- Run `corepack enable`
+- Run `corepack install`
 - Copy `.env.example to .env.local` (`cp .env.example .env.local`)
 - Run `pnpm run dev`
 
