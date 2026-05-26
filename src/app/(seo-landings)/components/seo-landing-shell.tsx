@@ -100,8 +100,8 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                 </div>
               ) : null}
               {definition.hero.bullets.length ? (
-                <div className="mt-4 text-pretty">
-                  <p className="text-sm text-stone-700 md:text-base">
+                <div className="mt-3 text-pretty">
+                  <p className="text-sm text-stone-900">
                     {definition.hero.bullets.join(", ")}
                   </p>
                 </div>
@@ -122,7 +122,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                   </div>
                   {canShowComparisonTable && comparisonTable ? (
                     <div className="py-6 md:py-8">
-                      <h2 className="w-fit bg-rose-500 text-2xl font-semibold tracking-tight text-white dark:bg-cyan-600 dark:text-white md:text-3xl">
+                      <h2 className="w-fit bg-rose-500 text-2xl font-semibold italic tracking-tight text-white dark:bg-cyan-600 dark:text-white md:text-3xl">
                         👉 Feature comparison
                       </h2>
                       {comparisonTable?.intro ? (
@@ -141,7 +141,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
 
             <section
               id="faq"
-              className="pb-4 pt-10 md:pt-12"
+              className="pb-4 pt-10"
               aria-labelledby="seo-landing-faq-heading"
             >
               <h2
@@ -256,40 +256,42 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
 
 function SeoSectionBlock({ section, id }: { section: SeoSection; id: number }) {
   const colors = [
-    "bg-yellow-300 dark:bg-yellow-600 text-slate-900 dark:text-slate-900",
-    "bg-purple-500 dark:bg-purple-500 text-white dark:text-white",
-    "bg-green-500 dark:bg-green-500 text-white dark:text-white",
-    "bg-blue-500 dark:bg-blue-500 text-white dark:text-white",
-    "bg-orange-500 dark:bg-orange-500 text-white dark:text-white",
-    "bg-teal-500 dark:bg-teal-500 text-white dark:text-white",
-    "bg-red-500 dark:bg-red-500 text-white dark:text-white",
+    "bg-yellow-300/90 text-black dark:bg-yellow-600 dark:text-black",
+    "bg-purple-500/90 dark:bg-purple-500 text-white dark:text-white",
+    "bg-green-500/90 dark:bg-green-500 text-white dark:text-white",
+    "bg-blue-500/90 dark:bg-blue-500 text-white dark:text-white",
+    "bg-orange-500/90 dark:bg-orange-500 text-white dark:text-white",
+    "bg-teal-500/90 dark:bg-teal-500 text-white dark:text-white",
+    "bg-red-500/90 dark:bg-red-500 text-white dark:text-white",
   ] as const;
 
   const color = colors[id % colors.length];
 
   return (
     <section
-      className="border-b border-slate-100 py-6 last:border-b-0 md:py-8"
+      className="border-b border-slate-100 py-6 last:border-b-0"
       data-testid={`seo-landing-section-${section.title}`}
     >
       <h2 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
-        <span className={`${color} px-0.5 font-bold`}>{section.title}</span>
+        <span className={`${color} px-0.5 font-bold italic`}>
+          {section.title}
+        </span>
       </h2>
       {section.lead ? (
-        <p className="mt-4 max-w-3xl text-balance text-xl leading-relaxed text-slate-800">
+        <p className="mt-4 max-w-3xl text-balance text-lg leading-relaxed text-slate-800">
           {section.lead}
         </p>
       ) : null}
       {section.paragraphs?.map((paragraph, index) => (
         <p
           key={`${section.title}-p-${index}`}
-          className="mt-4 max-w-3xl text-pretty text-xl leading-relaxed text-slate-800"
+          className="mt-4 max-w-3xl text-pretty text-lg leading-relaxed text-slate-800"
         >
           {paragraph}
         </p>
       ))}
       {section.bullets?.length ? (
-        <ul className="mt-4 max-w-3xl list-disc space-y-2 pl-6 text-lg text-slate-700">
+        <ul className="mt-4 max-w-3xl list-disc space-y-2 pl-6 text-base text-slate-800">
           {section.bullets.map((item) => (
             <li key={item} className="text-pretty">
               {item}

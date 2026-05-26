@@ -20,8 +20,6 @@ import { ChangelogAuthorByline } from "../components/changelog-author-byline";
 import { ChangelogVersionBadgeLink } from "../components/changelog-version-badge-link";
 import { DateTime } from "../components/date-time";
 
-import * as Sentry from "@sentry/nextjs";
-
 interface ChangelogPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -42,10 +40,9 @@ export async function generateMetadata({
   const entry = await getChangelogEntry(slug);
 
   if (!entry) {
-    Sentry.captureEvent({
-      message: `Changelog entry not found for slug: ${slug}`,
-      level: "error",
-    });
+    console.error(
+      `\n\n_____Changelog entry not found for slug: ${slug}_____\n\n`,
+    );
 
     return {
       title:
@@ -133,10 +130,9 @@ export default async function ChangelogEntryPage({
   const entry = await getChangelogEntry(slug);
 
   if (!entry) {
-    Sentry.captureEvent({
-      message: `Changelog entry not found for slug: ${slug}`,
-      level: "error",
-    });
+    console.error(
+      `\n\n_____Changelog entry not found for slug: ${slug}_____\n\n`,
+    );
 
     notFound();
   }

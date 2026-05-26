@@ -41,6 +41,49 @@
 - Mobile-friendly design: responsive layout and touch-optimized UX for phones and tablets.
 - Open-source codebase with a clear AGPL-3.0 plus commercial licensing path.
 
+## Solution pages
+
+Dedicated pages for specific invoicing workflows. Each page links to the app editor; use the default template or Stripe-style template as noted.
+
+### [Free Invoice Generator - No Login Required](https://easyinvoicepdf.com/invoice-generator-no-login)
+
+Generate professional invoices in seconds with no account, no signup and no ads. Data stays in your browser.
+
+- Create invoices in about 60 seconds; download PDF instantly
+- No registration, hidden paywalls, or data upload for normal editing
+- For freelancers, developers, small businesses, and anyone who needs a PDF invoice now
+- [Start with default template](https://easyinvoicepdf.com/?template=default)
+
+### [Open-Source Invoice Generator - Free & Customizable](https://easyinvoicepdf.com/open-source-invoice-generator)
+
+Fully open-source, self-hostable invoice PDF generator with transparent codebase and no vendor lock-in.
+
+- Generate PDFs instantly; fork and modify the code for your workflow
+- Self-host for full control over branding and data privacy
+- For indie hackers, SaaS builders, agencies, and privacy-focused users
+- Licensed under AGPL-3.0; commercial license available for proprietary use
+- [Start with default template](https://easyinvoicepdf.com/?template=default)
+
+### [Stripe Invoice Alternative - Easier & Faster](https://easyinvoicepdf.com/stripe-invoice-alternative)
+
+Create invoices without Stripe setup. Fast, free, ad-free PDF workflow when you do not need payment processing.
+
+- No Stripe account, dashboard, or product configuration required
+- Does not accept payments; use for one-off PDF invoices and document billing elsewhere
+- EasyInvoicePDF focuses on fast invoice PDFs; Stripe covers payments, subscriptions, and full billing
+- For freelancers, consultants, developers, and side projects
+- [Start with Stripe-style template](https://easyinvoicepdf.com/?template=stripe)
+
+### [Free PDF Invoice Templates - Professional & Downloadable](https://easyinvoicepdf.com/invoice-template-pdf)
+
+Pre-designed invoice layout with automatic totals, tax labels, and currency support. No design skills or desktop software required.
+
+- Universally accepted PDF format; consistent across devices and printers
+- Skip Word or Excel formatting headaches and manual calculations
+- Faster than heavyweight tools when you only need a document
+- For freelancers, contractors, agencies, and small businesses
+- [Generate invoice PDF](https://easyinvoicepdf.com/?template=default)
+
 ## Links
 
 - [Home](https://easyinvoicepdf.com)
@@ -55,6 +98,8 @@
 - [EasyInvoicePDF on X](https://x.com/EasyInvoicePDF)
 - [Vlad Sazonau on X](https://x.com/vladsazonau)
 - [Demo video (YouTube)](https://www.youtube.com/watch?v=iAROeCIcZ40)
-- [Share feedback](https://dub.sh/easy-invoice-pdf-feedback)
 - [Bug reports / feature board](https://pdfinvoicegenerator.userjot.com/board/bugs)
-- [Buy Me a Coffee](https://buymeacoffee.com/vladsazon)
+- [Free Invoice Generator - No Login Required](https://easyinvoicepdf.com/invoice-generator-no-login)
+- [Open-Source Invoice Generator - Free & Customizable](https://easyinvoicepdf.com/open-source-invoice-generator)
+- [Stripe Invoice Alternative - Easier & Faster](https://easyinvoicepdf.com/stripe-invoice-alternative)
+- [Free PDF Invoice Templates - Professional & Downloadable](https://easyinvoicepdf.com/invoice-template-pdf)
