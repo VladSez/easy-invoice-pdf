@@ -92,6 +92,16 @@ export function Footer({ links, translations }: FooterProps) {
                 {translations.resources}
               </h3>
               {links}
+              <ul className="!mt-2 space-y-2">
+                <li>
+                  <Link
+                    href="/llms.txt"
+                    className="text-sm text-slate-500 hover:text-slate-900"
+                  >
+                    llms.txt
+                  </Link>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

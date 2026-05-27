@@ -18,23 +18,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     // About pages in all languages
-    {
-      url: `${APP_URL}/en/about`,
+    ...SUPPORTED_LANGUAGES.map((locale) => ({
+      url: `${APP_URL}/${locale}/about`,
       lastModified,
       changeFrequency: "weekly" as const,
       priority: 1,
-      alternates: {
-        languages: {
-          "x-default": `${APP_URL}/en/about`,
-          ...Object.fromEntries(
-            SUPPORTED_LANGUAGES.map((lang) => [
-              lang,
-              `${APP_URL}/${lang}/about`,
-            ]),
-          ),
-        },
-      },
-    },
+    })),
     // Changelog page
     {
       url: `${APP_URL}/changelog`,
@@ -72,8 +61,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${APP_URL}/${slug}`,
       lastModified,
       changeFrequency: "weekly" as const,
-      priority: 0.8,
+      priority: 1,
     })),
+    // llms.txt
+    {
+      url: `${APP_URL}/llms.txt`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 1,
+    },
   ];
 
   return sitemapEntries;

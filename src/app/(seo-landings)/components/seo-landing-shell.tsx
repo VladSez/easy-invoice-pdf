@@ -273,7 +273,7 @@ function SeoSectionBlock({ section, id }: { section: SeoSection; id: number }) {
       data-testid={`seo-landing-section-${section.title}`}
     >
       <h2 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
-        <span className={`${color} px-0.5 font-bold italic`}>
+        <span className={`${color} px-3 font-bold italic`}>
           {section.title}
         </span>
       </h2>
