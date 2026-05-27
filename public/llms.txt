@@ -15,7 +15,7 @@
 - **No sign-up**: Open the app and generate invoices immediately.
 - **Instant PDF download**: Client-side PDF generation for quick export.
 - **Custom logo upload**: Add your company branding by uploading a logo image.
-- **No ads*: Enjoy a completely ad-free experience.
+- **No ads**: Enjoy a completely ad-free experience.
 - **Shareable links**: Encode invoice data in the URL for easy sharing (sharing is disabled when certain assets, such as a logo on the default template, make the payload unsuitable for links).
 - **Templates**: Default layout plus a Stripe-style template; logo support on the default template.
 - **Languages**: Ten UI locales: English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, and Dutch.
