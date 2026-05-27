@@ -28,13 +28,41 @@ jobs:
       - name: 📦 Enable Corepack
         run: corepack enable
 
-      - name: 📦 Install pinned package manager from package.json
+      - name: 📦 Install pinned package manager # from package.json
         run: corepack install
 
       - name: Verify pnpm supply-chain config
+        shell: bash
         run: |
           set -euo pipefail
-          [[ "$(pnpm config get minimum-release-age)" = "7200" ]] || { echo "❌ minimum-release-age mismatch"; exit 1; }
-          [[ "$(pnpm config get block-exotic-subdeps)" = "true" ]] || { echo "❌ block-exotic-subdeps mismatch"; exit 1; }
-          [[ "$(pnpm config get trust-policy)" = "no-downgrade" ]] || { echo "❌ trust-policy mismatch"; exit 1; }
-          echo "✅ pnpm config values are correct"
+
+          required_pnpm_version="10.16.0"
+          actual_pnpm_version="$(pnpm --version)"
+
+          if ! printf '%s\n%s\n' "$required_pnpm_version" "$actual_pnpm_version" | sort -CV; then
+            echo "❌ pnpm version must be >= $required_pnpm_version (got $actual_pnpm_version)"
+            exit 1
+          fi
+
+          echo "✅ pnpm version=$actual_pnpm_version (>= $required_pnpm_version)"
+
+          verify_config() {
+            local key="$1"
+            local expected="$2"
+
+            local actual
+            actual="$(pnpm config get "$key" --location project 2>/dev/null || true)"
+            actual="${actual%\"}"
+            actual="${actual#\"}"
+
+            if [[ "$actual" != "$expected" ]]; then
+              echo "❌ $key mismatch: expected '$expected', got '${actual:-<empty>}'"
+              exit 1
+            fi
+
+            echo "✅ $key=$actual"
+          }
+
+          verify_config minimum-release-age 7200
+          verify_config block-exotic-subdeps true
+          verify_config trust-policy no-downgrade

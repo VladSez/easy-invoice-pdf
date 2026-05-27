@@ -24,7 +24,11 @@ interface ChangelogPageProps {
   params: Promise<{ slug: string }>;
 }
 
-// Generate static params for all changelog entries
+// generateStaticParams() runs at build time by Next.js for dynamic route ([slug]) with static generation
+// Purpose: pre-generate all possible changelog/[slug] pages
+// 1. getChangelogEntries fetches all changelog entry objects (each has slug)
+// 2. map each entry to { slug } param object, used for static route generation
+// Next.js builds all these routes statically for SEO, fast load, etc.
 export async function generateStaticParams() {
   const entries = await getChangelogEntries();
   return entries.map((entry) => ({
@@ -40,34 +44,7 @@ export async function generateMetadata({
   const entry = await getChangelogEntry(slug);
 
   if (!entry) {
-    console.error(
-      `\n\n_____Changelog entry not found for slug: ${slug}_____\n\n`,
-    );
-
-    return {
-      title:
-        "Changelog | EasyInvoicePDF - Free & Open-Source Invoice Generator",
-      description:
-        "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
-      authors: [{ name: "Uladzislau Sazonau", url: PERSONAL_WEBSITE_URL }],
-      alternates: {
-        canonical: `https://easyinvoicepdf.com/changelog/${slug}`,
-      },
-      openGraph: {
-        title: "Changelog | EasyInvoicePDF - Free Invoice PDF Generator",
-        description:
-          "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
-        type: "website",
-        locale: "en_US",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: "Changelog | Free Invoice PDF Generator",
-        description:
-          "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
-        creator: TWITTER_CREATOR,
-      },
-    };
+    throw new Error(`Changelog entry not found for slug: ${slug}`);
   }
 
   const formattedDate = formatChangelogDate(entry.metadata.date);
@@ -75,7 +52,7 @@ export async function generateMetadata({
   return {
     title: `${entry.metadata.title || `Update ${formattedDate}`}`,
     description: entry.metadata.description,
-    authors: [{ name: "Uladzislau Sazonau", url: PERSONAL_WEBSITE_URL }],
+    authors: [{ name: "Vlad Sazonau", url: PERSONAL_WEBSITE_URL }],
     alternates: {
       canonical: `https://easyinvoicepdf.com/changelog/${slug}`,
     },
@@ -110,6 +87,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: `${entry.metadata.title || `Update ${formattedDate}`} | Changelog`,
       description: entry.metadata.description,
+      creator: TWITTER_CREATOR,
       images: [
         {
           url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,

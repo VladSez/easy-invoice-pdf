@@ -13,8 +13,7 @@
 ## Licensing and availability
 
 - **Web app**: Free to use at [easyinvoicepdf.com](https://easyinvoicepdf.com).
-- **Open source**: Source code is licensed under [GNU AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html) for open-source or compliant use.
-- **Commercial use**: A separate commercial license is available for proprietary deployments. Contact [vlad@mail.easyinvoicepdf.com](mailto:vlad@mail.easyinvoicepdf.com) for details.
+- **Open source**: Source code is licensed under [GNU AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html).
 
 ## Key features
 
@@ -22,6 +21,7 @@
 - **No sign-up**: Open the app and generate invoices immediately.
 - **Instant PDF download**: Client-side PDF generation for quick export.
 - **Custom logo upload**: Add your company branding by uploading a logo image.
+- **No ads*: Enjoy a completely ad-free experience.
 - **Shareable links**: Encode invoice data in the URL for easy sharing (sharing is disabled when certain assets, such as a logo on the default template, make the payload unsuitable for links).
 - **Templates**: Default layout plus a Stripe-style template; logo support on the default template.
 - **Languages**: Ten UI locales: English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, and Dutch.
@@ -82,7 +82,7 @@ Pre-designed invoice layout with automatic totals, tax labels, and currency supp
 - Skip Word or Excel formatting headaches and manual calculations
 - Faster than heavyweight tools when you only need a document
 - For freelancers, contractors, agencies, and small businesses
-- [Generate invoice PDF](https://easyinvoicepdf.com/?template=default)
+- [Generate invoice PDF](https://easyinvoicepdf.com)
 
 ## Links
 
