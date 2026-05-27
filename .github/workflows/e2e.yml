@@ -48,7 +48,7 @@ jobs:
       - name: 📦 Enable Corepack
         run: corepack enable
 
-      - name: 📦 Install pinned package manager from package.json
+      - name: 📦 Install pinned package manager # from package.json
         run: corepack install
 
       - name: 🚚 Install dependencies

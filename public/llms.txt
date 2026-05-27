@@ -1,6 +1,6 @@
 # EasyInvoicePDF
 
-[EasyInvoicePDF](https://easyinvoicepdf.com) is a free, open-source web app for creating professional invoices with a live PDF preview, instant download, and shareable links that encode invoice state in the URL. It ships multiple templates (including a Stripe-inspired layout), supports customizable tax labels (VAT, GST, sales tax, and similar), QR codes on invoices, and multi-page PDFs. The UI is built with React, TypeScript, Next.js, Tailwind CSS, shadcn/ui, Origin UI, and [@react-pdf/renderer](https://github.com/diegomura/react-pdf). You can start without signing up. The project is maintained by [Vlad Sazonau](https://vladsazon.com).
+[EasyInvoicePDF](https://easyinvoicepdf.com) is a free, open-source web app for creating professional invoices with a live PDF preview, instant download, and shareable links that encode invoice state in the URL. It ships multiple templates (including a Stripe-inspired layout), supports customizable tax labels (VAT, GST, sales tax, and similar), QR codes on invoices, and multi-page PDFs. The UI is built with React, TypeScript, Next.js, Tailwind CSS, shadcn/ui, Origin UI, and [@react-pdf/renderer](https://github.com/diegomura/react-pdf). You can start without signing up. The project is founded and maintained by [Vlad Sazonau](https://vladsazon.com).
 
 ## Who it is for
 
@@ -8,13 +8,6 @@
 - Small businesses that want a fast, template-based PDF workflow
 - Teams that share invoices via a link instead of email attachments
 - Users who need European-style VAT handling and flexible tax labeling
-- Developers and organizations evaluating AGPL-3.0 source code or a commercial license for proprietary use
-
-## Licensing and availability
-
-- **Web app**: Free to use at [easyinvoicepdf.com](https://easyinvoicepdf.com).
-- **Open source**: Source code is licensed under [GNU AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html) for open-source or compliant use.
-- **Commercial use**: A separate commercial license is available for proprietary deployments. Contact [vlad@mail.easyinvoicepdf.com](mailto:vlad@mail.easyinvoicepdf.com) for details.
 
 ## Key features
 
@@ -22,6 +15,7 @@
 - **No sign-up**: Open the app and generate invoices immediately.
 - **Instant PDF download**: Client-side PDF generation for quick export.
 - **Custom logo upload**: Add your company branding by uploading a logo image.
+- **No ads*: Enjoy a completely ad-free experience.
 - **Shareable links**: Encode invoice data in the URL for easy sharing (sharing is disabled when certain assets, such as a logo on the default template, make the payload unsuitable for links).
 - **Templates**: Default layout plus a Stripe-style template; logo support on the default template.
 - **Languages**: Ten UI locales: English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, and Dutch.
@@ -37,9 +31,17 @@
 - No account wall: editing and preview stay lightweight for occasional use.
 - Shareable URL model for collaboration and review.
 - Strong internationalization (10 languages) and broad currency coverage out of the box.
+- No ads, 100% ad-free experience.
 - Dual template story (classic plus Stripe-inspired) for different brand aesthetics.
 - Mobile-friendly design: responsive layout and touch-optimized UX for phones and tablets.
 - Open-source codebase with a clear AGPL-3.0 plus commercial licensing path.
+
+
+## Licensing and availability
+
+- **Web app**: Free to use at [easyinvoicepdf.com](https://easyinvoicepdf.com).
+- **Open source**: Source code is licensed under [GNU AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html).
+
 
 ## Solution pages
 
@@ -82,13 +84,43 @@ Pre-designed invoice layout with automatic totals, tax labels, and currency supp
 - Skip Word or Excel formatting headaches and manual calculations
 - Faster than heavyweight tools when you only need a document
 - For freelancers, contractors, agencies, and small businesses
-- [Generate invoice PDF](https://easyinvoicepdf.com/?template=default)
+- [Generate invoice PDF](https://easyinvoicepdf.com)
+
+
+## Changelog & Releases
+
+The changelog documents product releases, new invoice features, UX improvements, fixes, and infrastructure work for EasyInvoicePDF.
+
+### [EasyInvoicePDF v1.0.3 - Seller and Buyer Improvements](https://easyinvoicepdf.com/changelog/seller-buyer-improvements)
+
+Adds seller and buyer email visibility toggles, reworked seller/buyer form sections with clearer locked states, a confirm dialog for unsaved changes, mobile auto-scroll when switching tabs, and an out-of-date dates helper.
+
+### [EasyInvoicePDF v1.0.2 - QR Codes and Invoice Improvements](https://easyinvoicepdf.com/changelog/qr-codes-and-improvements)
+
+Adds QR code generation for invoices, logo upload for the default template, a searchable currency combobox, improved multi-page PDF support, better error handling, and Sentry tracking for selected flows.
+
+### [EasyInvoicePDF v1.0.1 - Customizable Tax and VAT Labels](https://easyinvoicepdf.com/changelog/stripe-pdf-template)
+
+Adds customizable tax and tax number labels, per-language tax label behavior, stronger VAT validation, localization updates, PDF rendering improvements, and broader end-to-end test coverage.
+
+### [EasyInvoicePDF v1.0.0 - Initial Launch](https://easyinvoicepdf.com/changelog/easy-invoice-pdf-launch)
+
+Launches EasyInvoicePDF with live invoice preview, instant PDF download, shareable links, default and Stripe-inspired templates, 10 languages, broad currency support, European VAT support, and privacy-focused browser-side editing.
 
 ## Links
 
 - [Home](https://easyinvoicepdf.com)
 - [GitHub repository](https://github.com/VladSez/easy-invoice-pdf)
 - [About / marketing](https://easyinvoicepdf.com/en/about)
+- [Polish home / marketing](https://easyinvoicepdf.com/pl/about)
+- [German home / marketing](https://easyinvoicepdf.com/de/about)
+- [Spanish home / marketing](https://easyinvoicepdf.com/es/about)
+- [Portuguese home / marketing](https://easyinvoicepdf.com/pt/about)
+- [Russian home / marketing](https://easyinvoicepdf.com/ru/about)
+- [Ukrainian home / marketing](https://easyinvoicepdf.com/uk/about)
+- [French home / marketing](https://easyinvoicepdf.com/fr/about)
+- [Italian home / marketing](https://easyinvoicepdf.com/it/about)
+- [Dutch home / marketing](https://easyinvoicepdf.com/nl/about)
 - [Features (on About)](https://easyinvoicepdf.com/en/about#features)
 - [FAQ (on About)](https://easyinvoicepdf.com/en/about#faq)
 - [Changelog](https://easyinvoicepdf.com/changelog)

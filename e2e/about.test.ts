@@ -244,6 +244,14 @@ test.describe("About page", () => {
     await expect(githubLink).toHaveAttribute("href", GITHUB_URL);
     await expect(githubLink).toHaveAttribute("target", "_blank");
 
+    const llmsTxtLink = footerLinks.getByRole("link", {
+      name: "llms.txt",
+      exact: true,
+    });
+
+    await expect(llmsTxtLink).toBeVisible();
+    await expect(llmsTxtLink).toHaveAttribute("href", "/llms.txt");
+
     await expect(footer.getByText("Made by Vlad Sazonau")).toBeVisible();
   });
 

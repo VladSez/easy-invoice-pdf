@@ -9,7 +9,7 @@ permissions: {}
 
 jobs:
   zizmor:
-    name: Run zizmor static analysis tool for GitHub Actions
+    name: Run zizmor
     timeout-minutes: 5
     runs-on: ubuntu-latest
     permissions:

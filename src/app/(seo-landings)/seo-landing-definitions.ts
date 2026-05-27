@@ -161,7 +161,7 @@ export const SEO_LANDING_DEFINITIONS = {
       {
         question: "Does it have ads?",
         answer:
-          "No. EasyInvoicePDF is completely ad-free. No ads, no tracking pixels, no third-party scripts. We generate revenue through sponsorships, not by tracking or monetizing your data.",
+          "No. EasyInvoicePDF is completely ad-free. No ads, no tracking pixels.",
       },
     ],
   },
