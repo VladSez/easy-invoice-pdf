@@ -272,9 +272,19 @@ export function InvoiceClientPage({
               {invoiceLastUpdatedAtFormatted}
             </div>
           )}
+
+          <div
+            className="mt-5 flex flex-wrap justify-center gap-1 text-xs text-zinc-900"
+            data-testid="mobile-terms-of-service-link"
+          >
+            By using this tool, you agree to the{" "}
+            <Link href="/tos" className="underline hover:text-black">
+              Terms of Service
+            </Link>
+          </div>
           {/* Founders info section (Mobile version) */}
-          <div className="mt-3 flex w-full justify-center">
-            <div className="flex items-center gap-1.5 text-xs text-zinc-900 duration-500 animate-in fade-in slide-in-from-bottom-2">
+          <div className="mt-5 flex w-full justify-center">
+            <div className="flex items-center gap-1.5 text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
               <a href={"/founder"}>
                 <img
                   src="https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459"
@@ -293,15 +303,6 @@ export function InvoiceClientPage({
                 </a>
               </span>
             </div>
-          </div>
-          <div
-            className="mt-3 flex flex-wrap justify-center gap-1 text-xs text-zinc-900"
-            data-testid="mobile-terms-of-service-link"
-          >
-            By using this tool, you agree to the{" "}
-            <Link href="/tos" className="underline hover:text-black">
-              Terms of Service
-            </Link>
           </div>
         </div>
       ) : (
