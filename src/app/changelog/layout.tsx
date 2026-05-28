@@ -1,13 +1,11 @@
 import { Header } from "@/app/(components)/header";
 import { Footer } from "@/app/(components)/footer";
 import {
-  GITHUB_URL,
   PERSONAL_WEBSITE_URL,
   STATIC_ASSETS_URL,
   TWITTER_CREATOR,
 } from "@/config";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 // Enable static generation for changelog layout
 export const dynamic = "force-static";
@@ -107,88 +105,7 @@ export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
         hideLanguageSwitcher={true}
       />
       {children}
-      <Footer
-        translations={{
-          footerDescription: (
-            <>
-              Create professional invoices in seconds with our free &
-              open-source invoice maker. 100% in-browser, no sign-up required.
-              Includes live PDF preview and a Stripe-style template - perfect
-              for freelancers, startups, and small businesses.
-              <br /> <br />
-              Not accounting software. No compliance guarantees. By using this
-              tool, you agree to the{" "}
-              <Link
-                href="/tos"
-                className="text-slate-700 underline hover:text-slate-900"
-              >
-                Terms of Service
-              </Link>
-              .
-            </>
-          ),
-          footerCreatedBy: "Made by",
-          resources: "Resources",
-        }}
-        links={
-          <ul className="space-y-2">
-            <li>
-              <Link
-                href="/?template=default"
-                className="text-sm text-slate-500 hover:text-slate-900"
-              >
-                App
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/en/about"
-                className="text-sm text-slate-500 hover:text-slate-900"
-              >
-                Home
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                href={GITHUB_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-slate-500 hover:text-slate-900"
-              >
-                GitHub
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                href="/tos"
-                className="text-sm text-slate-500 hover:text-slate-900"
-              >
-                Terms of Service
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-slate-500 hover:text-slate-900"
-              >
-                Share feedback
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/founder"
-                className="text-sm text-slate-500 hover:text-slate-900"
-              >
-                Founder
-              </Link>
-            </li>
-          </ul>
-        }
-      />
+      <Footer />
     </>
   );
 }

@@ -4,14 +4,22 @@ import { GITHUB_URL, TWITTER_URL } from "@/config";
 import Link from "next/link";
 
 interface FooterProps {
-  links: React.ReactNode;
-  translations: {
+  links?: React.ReactNode;
+  translations?: {
     footerDescription: React.ReactNode;
     footerCreatedBy: string;
     resources: string;
   };
 }
+
 export function Footer({ links, translations }: FooterProps) {
+  const footerLinks = links ?? <DefaultFooterLinks />;
+  const footerDescription =
+    translations?.footerDescription ?? DEFAULT_FOOTER_DESCRIPTION;
+
+  const footerCreatedBy = translations?.footerCreatedBy ?? "Made by";
+  const resources = translations?.resources ?? "Resources";
+
   return (
     <footer className="w-full border-t border-slate-200 bg-white py-12 md:py-16">
       <div className="container mx-auto px-4 md:px-6">
@@ -29,9 +37,7 @@ export function Footer({ links, translations }: FooterProps) {
                 </a>
               </p>
             </div>
-            <p className="text-sm text-slate-700">
-              {translations.footerDescription}
-            </p>
+            <p className="text-sm text-slate-700">{footerDescription}</p>
             <div className="flex gap-4" data-testid="footer-logos-social-links">
               <Link
                 href={GITHUB_URL}
@@ -89,19 +95,9 @@ export function Footer({ links, translations }: FooterProps) {
             </div>
             <div className="space-y-3" data-testid="footer-social-links">
               <h3 className="text-sm font-medium text-slate-900">
-                {translations.resources}
+                {resources}
               </h3>
-              {links}
-              <ul className="!mt-2 space-y-2">
-                <li>
-                  <Link
-                    href="/llms.txt"
-                    className="text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    llms.txt
-                  </Link>
-                </li>
-              </ul>
+              {footerLinks}
             </div>
           </div>
         </div>
@@ -127,7 +123,7 @@ export function Footer({ links, translations }: FooterProps) {
             © {new Date().getFullYear()} EasyInvoicePDF.com
           </p>
           <p className="text-sm text-slate-700">
-            {translations.footerCreatedBy}{" "}
+            {footerCreatedBy}{" "}
             <Link
               href={TWITTER_URL}
               target="_blank"
@@ -140,5 +136,90 @@ export function Footer({ links, translations }: FooterProps) {
         </div>
       </div>
     </footer>
+  );
+}
+
+const DEFAULT_FOOTER_DESCRIPTION = (
+  <>
+    Create professional PDF invoices in seconds with our free, open-source
+    invoice generator. 100% in-browser, no sign-up required, and no ads. Your
+    data stays on your device. Includes live PDF preview, instant PDF download,
+    and customizable templates, including a Stripe-style layout - ideal for
+    freelancers, startups, and small businesses.
+    <br /> <br />
+    Not accounting software. No compliance guarantees. By using this tool, you
+    agree to the{" "}
+    <Link href="/tos" className="text-slate-700 underline hover:text-slate-900">
+      Terms of Service
+    </Link>
+  </>
+);
+
+function DefaultFooterLinks() {
+  return (
+    <ul className="space-y-2">
+      <li>
+        <Link
+          href="/?template=default"
+          className="text-sm text-slate-500 hover:text-slate-900"
+        >
+          Invoice Generator
+        </Link>
+      </li>
+      <li>
+        <Link
+          href="/en/about"
+          className="text-sm text-slate-500 hover:text-slate-900"
+        >
+          Home
+        </Link>
+      </li>
+
+      <li>
+        <Link
+          href={GITHUB_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-slate-500 hover:text-slate-900"
+        >
+          GitHub
+        </Link>
+      </li>
+
+      <li>
+        <Link
+          href="/tos"
+          className="text-sm text-slate-500 hover:text-slate-900"
+        >
+          Terms of Service
+        </Link>
+      </li>
+      <li>
+        <Link
+          href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-slate-500 hover:text-slate-900"
+        >
+          Share feedback
+        </Link>
+      </li>
+      <li>
+        <Link
+          href="/founder"
+          className="text-sm text-slate-500 hover:text-slate-900"
+        >
+          Founder
+        </Link>
+      </li>
+      <li>
+        <Link
+          href="/llms.txt"
+          className="text-sm text-slate-500 hover:text-slate-900"
+        >
+          llms.txt
+        </Link>
+      </li>
+    </ul>
   );
 }

@@ -57,6 +57,7 @@
     "footer": {
       "description": "Uno strumento gratuito e open-source per creare fatture PDF professionali con anteprima in tempo reale.<br></br><br></br>Non è un software di contabilità. Nessuna garanzia di conformità. Utilizzando questo strumento, accetti i <tosLink>Termini di servizio</tosLink>.",
       "links": {
+        "invoiceGenerator": "Generatore di fatture",
         "features": "Funzionalità",
         "github": "GitHub",
         "changelog": "Novità",
