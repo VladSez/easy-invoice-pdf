@@ -101,7 +101,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
                   href="/?template=default"
                   className="text-sm text-slate-500 hover:text-slate-900"
                 >
-                  {t("buttons.app")}
+                  {t("footer.links.invoiceGenerator")}
                 </Link>
               </li>
               <li>
@@ -163,6 +163,14 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
                   className="text-sm text-slate-500 hover:text-slate-900"
                 >
                   {t("footer.links.founder")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/llms.txt"
+                  className="text-sm text-slate-500 hover:text-slate-900"
+                >
+                  llms.txt
                 </Link>
               </li>
             </ul>

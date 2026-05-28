@@ -10,9 +10,9 @@ import {
 } from "@/app/schema";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useDeviceContext } from "@/contexts/device-context";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { InvoicePageHeader } from "@/app/(app)/components/invoice-page-header";
 import {
   DEFAULT_METADATA,
   getAppMetadata,
@@ -20,7 +20,8 @@ import {
 } from "@/app/(app)/utils/get-app-metadata";
 import { Footer } from "@/app/(components)/footer";
 import { GitHubStarCTA } from "@/components/github-star-cta";
-import { GITHUB_URL } from "@/config";
+import { Button } from "@/components/ui/button";
+import { haptic } from "@/lib/haptic";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import {
   compressInvoiceData,
@@ -41,9 +42,6 @@ import { useCTAToast } from "./contexts/cta-toast-context";
 import { useShowRandomCTAToastOnIdle } from "./hooks/use-show-random-cta-toast";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
-import { InvoicePageHeader } from "@/app/(app)/components/invoice-page-header";
-import { Button } from "@/components/ui/button";
-import { haptic } from "@/lib/haptic";
 
 // TODO: enable later when PRO version is released, this is PRO FEATURE =)
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
@@ -730,85 +728,7 @@ export function AppPageClient({
           </div>
         </div>
       </div>
-      <Footer
-        translations={{
-          footerDescription: (
-            <>
-              Create professional invoices in seconds with our free &
-              open-source invoice maker. 100% in-browser, no sign-up required.
-              Includes live PDF preview and a Stripe-style template - perfect
-              for freelancers, startups, and small businesses.
-              <br /> <br />
-              Not accounting software. No compliance guarantees. By using this
-              tool, you agree to the{" "}
-              <Link
-                href="/tos"
-                className="text-slate-700 underline hover:text-slate-900"
-              >
-                Terms of Service
-              </Link>
-            </>
-          ),
-          footerCreatedBy: "Made by",
-          resources: "Resources",
-        }}
-        links={
-          <ul className="space-y-2">
-            <li>
-              <Link
-                href="/en/about"
-                className="text-sm text-slate-500 hover:text-slate-900"
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                href={GITHUB_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-slate-500 hover:text-slate-900"
-              >
-                GitHub
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/changelog"
-                className="text-sm text-slate-500 hover:text-slate-900"
-              >
-                Changelog
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/tos"
-                className="text-sm text-slate-500 hover:text-slate-900"
-              >
-                Terms of Service
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-slate-500 hover:text-slate-900"
-              >
-                Share feedback
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/founder"
-                className="text-sm text-slate-500 hover:text-slate-900"
-              >
-                Founder
-              </Link>
-            </li>
-          </ul>
-        }
-      />
+      <Footer />
       <div className="fixed right-1.5 top-1.5 z-50 duration-500 animate-in fade-in slide-in-from-top-4">
         <GitHubStarCTA githubStarsCount={githubStarsCount} />
       </div>

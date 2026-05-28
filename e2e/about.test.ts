@@ -172,7 +172,10 @@ test.describe("About page", () => {
     // now check all the rest of the footer links
     const footerLinks = footer.getByTestId("footer-social-links");
 
-    const appLink = footerLinks.getByRole("link", { name: "App" });
+    const appLink = footerLinks.getByRole("link", {
+      name: "Invoice Generator",
+      exact: true,
+    });
 
     await expect(appLink).toBeVisible();
     await expect(appLink).toHaveAttribute("href", "/?template=default");
@@ -314,7 +317,7 @@ test.describe("About page", () => {
     const footerLinks = footer.getByTestId("footer-social-links");
 
     const appLink = footerLinks.getByRole("link", {
-      name: "Application",
+      name: "Générateur de factures",
       exact: true,
     });
 

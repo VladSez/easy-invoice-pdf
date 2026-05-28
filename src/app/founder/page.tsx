@@ -32,7 +32,7 @@ export default function ContactPage() {
               Vlad Sazonau
             </h1>
             <p className="mt-3 text-center text-xl text-slate-600 md:text-2xl">
-              Product Engineer & Design Enthusiast
+              Software Engineer & Design Enthusiast
             </p>
             <p className="mt-2 text-center text-base text-slate-500 md:text-lg">
               Founder of EasyInvoicePDF
@@ -40,9 +40,15 @@ export default function ContactPage() {
           </AnimatedDiv>
 
           <AnimatedDiv
-            className="mt-8 w-full max-w-xl"
+            className="mt-8 w-full max-w-xl space-y-4"
             transition={blockEnterSpring(0.1)}
           >
+            <p className="mx-auto text-center text-lg leading-relaxed text-slate-700">
+              I built EasyInvoicePDF for myself because I was tired of paying
+              for bloated software just to create and send invoices to clients
+              and my accountant.
+            </p>
+
             <p className="mx-auto text-center text-lg leading-relaxed text-slate-700">
               I&apos;m a product-minded generalist with 8+ years of experience
               building beautiful, functional products. I enjoy solving complex

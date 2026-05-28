@@ -57,6 +57,7 @@
     "footer": {
       "description": "Una herramienta gratuita de código abierto para crear facturas PDF profesionales con vista previa en tiempo real.<br></br><br></br>No es software de contabilidad. Sin garantías de cumplimiento. Al usar esta herramienta, aceptas los <tosLink>Términos del servicio</tosLink>.",
       "links": {
+        "invoiceGenerator": "Generador de facturas",
         "features": "Características",
         "github": "GitHub",
         "changelog": "Novedades",

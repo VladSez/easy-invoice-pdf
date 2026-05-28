@@ -188,67 +188,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
           </div>
         </main>
 
-        <Footer
-          translations={{
-            footerDescription: (
-              <>
-                Create professional invoices in seconds with our free and
-                open-source invoice maker. 100% in-browser, no sign-up required.
-                <br />
-                <br />
-                Not accounting software. No compliance guarantees. By using this
-                tool, you agree to the{" "}
-                <Link
-                  href="/tos"
-                  className="text-slate-700 underline hover:text-slate-900"
-                >
-                  Terms of Service
-                </Link>
-                .
-              </>
-            ),
-            footerCreatedBy: "Made by",
-            resources: "Resources",
-          }}
-          links={
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/?template=default"
-                  className="text-sm text-slate-500 hover:text-slate-900"
-                >
-                  App
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href={GITHUB_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-slate-500 hover:text-slate-900"
-                >
-                  GitHub
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/en/about"
-                  className="text-sm text-slate-500 hover:text-slate-900"
-                >
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/changelog"
-                  className="text-sm text-slate-500 hover:text-slate-900"
-                >
-                  Changelog
-                </Link>
-              </li>
-            </ul>
-          }
-        />
+        <Footer />
       </div>
     </>
   );

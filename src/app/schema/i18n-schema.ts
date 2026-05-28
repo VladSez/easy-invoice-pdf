@@ -62,6 +62,7 @@ const aboutSchema = z
         description: z.string(),
         links: z
           .object({
+            invoiceGenerator: z.string(),
             features: z.string(),
             github: z.string(),
             changelog: z.string(),

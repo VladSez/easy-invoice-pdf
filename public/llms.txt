@@ -1,29 +1,48 @@
-# EasyInvoicePDF
+# EasyInvoicePDF — free, open-source invoice generator
 
-[EasyInvoicePDF](https://easyinvoicepdf.com) is a free, open-source web app for creating professional invoices with a live PDF preview, instant download, and shareable links that encode invoice state in the URL. It ships multiple templates (including a Stripe-inspired layout), supports customizable tax labels (VAT, GST, sales tax, and similar), QR codes on invoices, and multi-page PDFs. The UI is built with React, TypeScript, Next.js, Tailwind CSS, shadcn/ui, Origin UI, and [@react-pdf/renderer](https://github.com/diegomura/react-pdf). You can start without signing up. The project is founded and maintained by [Vlad Sazonau](https://vladsazon.com).
+[EasyInvoicePDF](https://easyinvoicepdf.com)
 
-## Who it is for
+## Summary
 
-- Freelancers and agencies invoicing clients in different countries
-- Small businesses that want a fast, template-based PDF workflow
-- Teams that share invoices via a link instead of email attachments
-- Users who need European-style VAT handling and flexible tax labeling
+Free, open-source invoice generator for creating professional PDF invoices in the browser. No sign-up required, no ads, fully client-side.
+
+## Core capabilities
+
+* Create invoices directly in the browser (no backend required)
+* Live PDF preview with real-time updates
+* Instant PDF download (client-side generation)
+* Shareable invoice links with full state encoded in the URL
+* Multiple invoice templates, including a Stripe-inspired layout
 
 ## Key features
 
-- **Live PDF preview**: Invoice updates as you edit fields.
-- **No sign-up**: Open the app and generate invoices immediately.
-- **Instant PDF download**: Client-side PDF generation for quick export.
-- **Custom logo upload**: Add your company branding by uploading a logo image.
-- **No ads**: Enjoy a completely ad-free experience.
-- **Shareable links**: Encode invoice data in the URL for easy sharing (sharing is disabled when certain assets, such as a logo on the default template, make the payload unsuitable for links).
-- **Templates**: Default layout plus a Stripe-style template; logo support on the default template.
-- **Languages**: Ten UI locales: English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, and Dutch.
-- **Currencies**: 120+ currencies with a searchable selector.
-- **Tax and dates**: Customizable tax labels per language, multiple date formats, and validation helpers for VAT-style values.
-- **QR codes**: Optional QR blocks for payment links, UPI, contact data, or custom payloads.
-- **Multi-page PDFs**: Automatic pagination and page breaks for long invoices.
-- **Mobile-friendly**: Responsive layout and mobile-oriented UX patterns.
+* Custom logo upload for invoice branding
+* 120+ currencies with searchable selector
+* Multilingual UI (10 locales: EN, PL, DE, ES, PT, RU, UK, FR, IT, NL)
+* VAT-friendly invoicing with customizable tax labels (VAT, GST, sales tax, custom labels)
+* Flexible date formats and validation helpers
+* QR codes for payment links, UPI, contact details, or custom payloads
+* Multi-page PDF generation with automatic pagination
+* Mobile-first responsive UI
+
+## Constraints
+
+* No sign-up required
+* No ads
+* Fully client-side execution (no backend)
+
+## Use cases
+
+* Freelancers invoicing international clients
+* Agencies generating branded PDF invoices quickly
+* Small businesses needing fast template-based invoice workflows
+* Teams sharing invoices via links instead of email attachments
+* EU users requiring VAT-compliant invoice structure and flexible tax labeling
+
+## Maintainer
+
+[Vlad Sazonau](https://vladsazon.com)
+
 
 ## Key differentiators
 
@@ -34,13 +53,7 @@
 - No ads, 100% ad-free experience.
 - Dual template story (classic plus Stripe-inspired) for different brand aesthetics.
 - Mobile-friendly design: responsive layout and touch-optimized UX for phones and tablets.
-- Open-source codebase with a clear AGPL-3.0 plus commercial licensing path.
-
-
-## Licensing and availability
-
-- **Web app**: Free to use at [easyinvoicepdf.com](https://easyinvoicepdf.com).
-- **Open source**: Source code is licensed under [GNU AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html).
+- Open-source codebase with a clear AGPL-3.0
 
 
 ## Solution pages
@@ -106,6 +119,10 @@ Adds customizable tax and tax number labels, per-language tax label behavior, st
 ### [EasyInvoicePDF v1.0.0 - Initial Launch](https://easyinvoicepdf.com/changelog/easy-invoice-pdf-launch)
 
 Launches EasyInvoicePDF with live invoice preview, instant PDF download, shareable links, default and Stripe-inspired templates, 10 languages, broad currency support, European VAT support, and privacy-focused browser-side editing.
+
+## Licensing and availability
+
+- **Open source**: Source code is licensed under [GNU AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html).
 
 ## Links
 
