@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 import { SEO_FOOTER_SOLUTION_LINKS } from "@/app/(seo-landings)/seo-landing-footer-links";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { GITHUB_URL, TWITTER_URL } from "@/config";
@@ -122,17 +123,25 @@ export function Footer({ links, translations }: FooterProps) {
           <p className="text-sm text-slate-700">
             © {new Date().getFullYear()} EasyInvoicePDF.com
           </p>
-          <p className="text-sm text-slate-700">
-            {footerCreatedBy}{" "}
-            <Link
-              href={TWITTER_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-black"
-            >
-              Vlad Sazonau
-            </Link>
-          </p>
+          <div className="flex items-center gap-1.5 text-sm text-slate-700">
+            <a href="/founder">
+              <img
+                src="https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459"
+                alt="Vlad Sazonau"
+                className="size-6 rounded-full"
+                height="24"
+                width="24"
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
+            <span>
+              {footerCreatedBy}{" "}
+              <a href="/founder" className="underline hover:text-black">
+                Vlad Sazonau
+              </a>
+            </span>
+          </div>
         </div>
       </div>
     </footer>

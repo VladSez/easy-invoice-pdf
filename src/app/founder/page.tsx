@@ -50,9 +50,8 @@ export default function ContactPage() {
             </p>
 
             <p className="mx-auto text-center text-lg leading-relaxed text-slate-700">
-              I&apos;m a product-minded generalist with 8+ years of experience
-              building beautiful, functional products. I enjoy solving complex
-              problems at the intersection of engineering and design.
+              I enjoy solving complex problems at the intersection of
+              engineering and design.
             </p>
           </AnimatedDiv>
 
