@@ -21,7 +21,6 @@ const config: KnipConfig = {
     "global.ts",
     "src/i18n/**/*",
     "src/app/schema/**/*",
-    "src/**/dev/**/*",
     "src/app/changelog/content/**/*",
     "src/app/(app)/pdf-i18n-translations/pdf-translations.ts",
   ],
