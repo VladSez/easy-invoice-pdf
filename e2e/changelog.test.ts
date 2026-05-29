@@ -7,6 +7,18 @@ test.describe("Changelog page", () => {
     // Verify the page is loaded
     await expect(page).toHaveURL("/changelog");
 
+    // Check header visibility
+    const header = page.locator("header");
+    await expect(header).toBeVisible();
+
+    const goToAppButton = header.getByRole("link", {
+      name: "Open app",
+      exact: true,
+    });
+
+    await expect(goToAppButton).toBeVisible();
+    await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
+
     // Check main heading
     await expect(
       page.getByRole("heading", {
@@ -28,11 +40,31 @@ test.describe("Changelog page", () => {
 
     // At least one entry should be visible
     await expect(entryCards.first()).toBeVisible();
+
+    // Check footer visibility
+    const footer = page.locator("footer");
+    await expect(footer).toBeVisible();
+
+    const appLink = footer.getByRole("link", {
+      name: "Invoice Generator",
+      exact: true,
+    });
+
+    await expect(appLink).toBeVisible();
+    await expect(appLink).toHaveAttribute("href", "/");
+    await expect(appLink).not.toHaveAttribute("target", "_blank");
+
+    await expect(
+      footer.locator('[data-testid="footer-logos-social-links"]'),
+    ).toBeVisible();
   });
 
   test("should navigate to individual changelog entry", async ({ page }) => {
     await page.goto("/changelog");
     await expect(page).toHaveURL("/changelog");
+
+    // Check header visibility
+    await expect(page.locator("header")).toBeVisible();
 
     // Find and click on the first changelog entry title link
     // Find first changelog entry link and get its href
@@ -48,10 +80,24 @@ test.describe("Changelog page", () => {
     // Verify we navigated to the individual entry page
     await expect(page).toHaveURL(href!);
 
+    // Check header visibility
+    const header = page.locator("header");
+    await expect(header).toBeVisible();
+
+    const goToAppButton = header.getByRole("link", {
+      name: "Open app",
+      exact: true,
+    });
+    await expect(goToAppButton).toBeVisible();
+    await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
+
     // Check that we're on an individual entry page by looking for "Back to All Posts" link
     await expect(
       page.getByRole("link", { name: "Back to All Posts" }),
     ).toBeVisible();
+
+    // Check footer visibility
+    await expect(page.locator("footer")).toBeVisible();
   });
 
   test("should display individual changelog entry content", async ({
@@ -60,6 +106,9 @@ test.describe("Changelog page", () => {
     // Navigate to changelog and then to first entry
     await page.goto("/changelog");
     await expect(page).toHaveURL("/changelog");
+
+    // Check header visibility
+    await expect(page.locator("header")).toBeVisible();
 
     // Find and click on the first changelog entry title link
     // Find first changelog entry link and get its href
@@ -111,6 +160,9 @@ test.describe("Changelog page", () => {
       "href",
       "https://easyinvoicepdf.com?ref=changelog",
     );
+
+    // Check footer visibility
+    await expect(page.locator("footer")).toBeVisible();
   });
 
   test("should navigate back to changelog from individual entry", async ({
@@ -119,6 +171,9 @@ test.describe("Changelog page", () => {
     // Navigate to an individual entry
     await page.goto("/changelog");
     await expect(page).toHaveURL("/changelog");
+
+    // Check header visibility
+    await expect(page.locator("header")).toBeVisible();
 
     const firstEntryLink = page
       .getByRole("link")
@@ -141,6 +196,9 @@ test.describe("Changelog page", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Changelog" }),
     ).toBeVisible();
+
+    // Check footer visibility
+    await expect(page.locator("footer")).toBeVisible();
   });
 
   test("should handle direct navigation to changelog entry", async ({
@@ -150,6 +208,9 @@ test.describe("Changelog page", () => {
     // First get the slug from the main page
     await page.goto("/changelog");
     await expect(page).toHaveURL("/changelog");
+
+    // Check header visibility
+    await expect(page.locator("header")).toBeVisible();
 
     const firstEntryLink = page.locator('a[href^="/changelog/"]').first();
     const href = await firstEntryLink.getAttribute("href");
@@ -166,5 +227,8 @@ test.describe("Changelog page", () => {
     // Verify we can still navigate back
     await page.getByRole("link", { name: "Back to All Posts" }).click();
     await expect(page).toHaveURL("/changelog");
+
+    // Check footer visibility
+    await expect(page.locator("footer")).toBeVisible();
   });
 });

@@ -168,10 +168,7 @@ function DefaultFooterLinks() {
   return (
     <ul className="space-y-2">
       <li>
-        <Link
-          href="/?template=default"
-          className="text-sm text-slate-500 hover:text-slate-900"
-        >
+        <Link href="/" className="text-sm text-slate-500 hover:text-slate-900">
           Invoice Generator
         </Link>
       </li>

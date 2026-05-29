@@ -31,6 +31,18 @@ test.describe("SEO landing pages", () => {
 
       await expect(page).toHaveURL(path);
 
+      // Check header visibility
+      const header = page.locator("header");
+      await expect(header).toBeVisible();
+
+      const goToAppButton = header.getByRole("link", {
+        name: "Open app",
+        exact: true,
+      });
+
+      await expect(goToAppButton).toBeVisible();
+      await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
+
       await expect(
         page.getByRole("heading", { level: 1, name: h1 }),
       ).toBeVisible();
@@ -67,6 +79,23 @@ test.describe("SEO landing pages", () => {
         "href",
         ctaHref,
       );
+
+      // Check footer visibility
+      const footer = page.locator("footer");
+      await expect(footer).toBeVisible();
+
+      const appLink = footer.getByRole("link", {
+        name: "Invoice Generator",
+        exact: true,
+      });
+
+      await expect(appLink).toBeVisible();
+      await expect(appLink).toHaveAttribute("href", "/");
+      await expect(appLink).not.toHaveAttribute("target", "_blank");
+
+      await expect(
+        footer.locator('[data-testid="footer-logos-social-links"]'),
+      ).toBeVisible();
     });
   }
 
