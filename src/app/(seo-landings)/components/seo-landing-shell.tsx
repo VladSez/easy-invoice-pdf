@@ -9,9 +9,9 @@ import {
   type SeoLandingDefinition,
   type SeoSection,
 } from "../seo-landing-definitions";
-import { PlusIcon } from "lucide-react";
 import { StickySeoCta } from "@/app/(seo-landings)/components/sticky-seo-cta";
 import { Button } from "@/components/ui/button";
+import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { Header } from "@/app/(components)/header";
 
@@ -34,24 +34,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
       <SeoLandingJsonLd definition={definition} />
 
       <div className="flex min-h-screen flex-col bg-slate-50">
-        <Header
-          locale="en"
-          translations={{
-            navLinks: {
-              home: "Home",
-              features: "Features",
-              faq: "FAQ",
-              github: "GitHub",
-              githubCTA: "Star on GitHub",
-              tagline: "Free & Open-Source Invoice Generator",
-            },
-            switchLanguageText: "Switch language",
-            goToAppText: "Open app",
-            startInvoicingButtonText: "Start Invoicing",
-            changelogLinkText: "Changelog",
-            termsOfServiceLinkText: "Terms of Service",
-          }}
-        />
+        <Header />
         <main className="flex flex-1 flex-col md:pb-12">
           <div className="border-b border-slate-200 bg-white">
             <div className="container mx-auto max-w-4xl px-4 pb-6 pt-12 md:px-6 md:py-16 md:pb-8">
@@ -150,31 +133,16 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
               >
                 FAQ
               </h2>
-              <div className="space-y-2">
+              <FaqAccordion>
                 {definition.faq.map((item) => (
-                  <details
+                  <FaqAccordionItem
                     key={item.question}
-                    className="group cursor-pointer border-b border-dashed border-stone-300 transition-all duration-200 last:border-b-0"
+                    question={item.question}
                   >
-                    <summary className="flex select-none items-center justify-between gap-2 py-3 text-left">
-                      <h3 className="text-base font-medium text-stone-900">
-                        {item.question}
-                      </h3>
-                      <PlusIcon
-                        className="ml-auto size-6 shrink-0 rounded-full p-1 text-stone-400 transition-all duration-200 hover:bg-stone-200/50 group-open:rotate-45 group-hover:text-stone-900"
-                        aria-hidden="true"
-                      />
-                    </summary>
-                    <div className="overflow-hidden">
-                      <div className="pb-4 pr-4">
-                        <p className="cursor-default text-pretty text-sm leading-relaxed text-stone-600">
-                          {item.answer}
-                        </p>
-                      </div>
-                    </div>
-                  </details>
+                    {item.answer}
+                  </FaqAccordionItem>
                 ))}
-              </div>
+              </FaqAccordion>
             </section>
 
             <div className="flex justify-center py-6 md:py-12">

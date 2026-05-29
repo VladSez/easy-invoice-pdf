@@ -26,11 +26,16 @@ const desktopNavLinkClass =
  * @param githubStarsCount - Number of GitHub stars to display
  */
 export function HeaderClient({
-  locale,
-  translations,
-  hideLanguageSwitcher = false,
+  locale = "en",
+  translations = defaultTranslations,
+  hideLanguageSwitcher = true,
   githubStarsCount,
-}: HeaderProps & { githubStarsCount: number }) {
+}: Omit<HeaderProps, "translations" | "locale" | "hideLanguageSwitcher"> & {
+  locale?: HeaderProps["locale"];
+  translations?: HeaderProps["translations"];
+  hideLanguageSwitcher?: HeaderProps["hideLanguageSwitcher"];
+  githubStarsCount: number;
+}) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const gitHubStarCountFormatted = githubStarCountFormatter
@@ -149,3 +154,19 @@ export function HeaderClient({
     </header>
   );
 }
+
+const defaultTranslations = {
+  navLinks: {
+    home: "Home",
+    features: "Features",
+    faq: "FAQ",
+    github: "GitHub",
+    githubCTA: "Star on GitHub",
+    tagline: "Free & Open-Source Invoice Generator",
+  },
+  switchLanguageText: "Switch Language",
+  goToAppText: "Open app",
+  startInvoicingButtonText: "Start Invoicing",
+  changelogLinkText: "Changelog",
+  termsOfServiceLinkText: "Terms of Service",
+} as const satisfies HeaderProps["translations"];

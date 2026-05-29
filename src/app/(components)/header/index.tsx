@@ -30,7 +30,16 @@ export interface HeaderProps {
  * @param props.hideLanguageSwitcher - Optional flag to hide language switcher
  * @returns Rendered header with GitHub stars count
  */
-export async function Header(props: HeaderProps) {
+export async function Header(
+  props: Omit<
+    HeaderProps,
+    "translations" | "locale" | "hideLanguageSwitcher"
+  > & {
+    translations?: HeaderProps["translations"];
+    locale?: HeaderProps["locale"];
+    hideLanguageSwitcher?: HeaderProps["hideLanguageSwitcher"];
+  },
+) {
   const githubStarsCount = await fetchGithubStars();
 
   return <HeaderClient {...props} githubStarsCount={githubStarsCount} />;
