@@ -13,7 +13,6 @@ const config: KnipConfig = {
     "@types/file-saver",
     "eslint-config-next",
     "@ianvs/prettier-plugin-sort-imports",
-    "react-scan",
     "pdfjs-dist",
   ],
   ignore: [
@@ -30,7 +29,7 @@ const config: KnipConfig = {
   // ignore tags
   // https://knip.dev/reference/configuration#tags
   tags: ["-@lintignore"],
-  ignoreBinaries: ["act", "zizmor", "printf"],
+  ignoreBinaries: ["act", "zizmor", "printf", "cloudflared"],
 };
 
 export default config;
