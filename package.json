@@ -2,7 +2,7 @@
   "name": "easy-invoice-pdf",
   "version": "1.0.3",
   "private": true,
-  "packageManager": "pnpm@10.30.1+sha512.3590e550d5384caa39bd5c7c739f72270234b2f6059e13018f975c313b1eb9fefcc09714048765d4d9efe961382c312e624572c0420762bdc5d5940cdf9be73a",
+  "packageManager": "pnpm@11.5.0+sha512.dbfcc4f81cf48597afd4bc391ffdf12c11f1a9fb83a395bfa6b0a2d9cc2fd8ffebafdb1ccbd529632153f793904c2615b7f09fe1a345473fd1c35845172a8eb1",
   "pnpm": {
     "minimumReleaseAge": 7200,
     "trustPolicy": "no-downgrade",
