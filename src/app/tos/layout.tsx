@@ -79,25 +79,7 @@ interface TosLayoutProps {
 export default function TosLayout({ children }: TosLayoutProps) {
   return (
     <>
-      <Header
-        locale={"en"}
-        translations={{
-          navLinks: {
-            home: "Home",
-            features: "Features",
-            faq: "FAQ",
-            github: "GitHub",
-            githubCTA: "Star on GitHub",
-            tagline: "Free & Open-Source Invoice Generator",
-          },
-          switchLanguageText: "Switch Language",
-          goToAppText: "Open app",
-          startInvoicingButtonText: "Start Invoicing",
-          changelogLinkText: "Changelog",
-          termsOfServiceLinkText: "Terms of Service",
-        }}
-        hideLanguageSwitcher={true}
-      />
+      <Header />
       {children}
       <Footer />
     </>

@@ -13,7 +13,6 @@ const config: KnipConfig = {
     "@types/file-saver",
     "eslint-config-next",
     "@ianvs/prettier-plugin-sort-imports",
-    "react-scan",
     "pdfjs-dist",
   ],
   ignore: [
@@ -22,7 +21,6 @@ const config: KnipConfig = {
     "global.ts",
     "src/i18n/**/*",
     "src/app/schema/**/*",
-    "src/**/dev/**/*",
     "src/app/changelog/content/**/*",
     "src/app/(app)/pdf-i18n-translations/pdf-translations.ts",
   ],
@@ -30,7 +28,7 @@ const config: KnipConfig = {
   // ignore tags
   // https://knip.dev/reference/configuration#tags
   tags: ["-@lintignore"],
-  ignoreBinaries: ["act", "zizmor", "printf"],
+  ignoreBinaries: ["act", "zizmor", "printf", "cloudflared"],
 };
 
 export default config;

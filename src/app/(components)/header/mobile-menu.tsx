@@ -44,7 +44,7 @@ export function MobileMenuPanel({
   locale,
   translations,
   hideLanguageSwitcher,
-  githubStarsCount,
+  githubStarsCount = 0,
 }: MobileMenuPanelProps) {
   const pathname = usePathname();
   const titleId = useId();
@@ -153,7 +153,7 @@ export function MobileMenuPanel({
             )}
           </a>
 
-          <div className="w-full pt-4">
+          <div className="w-full pb-2 pt-4">
             <Button
               size="lg"
               variant="outline"
@@ -180,7 +180,7 @@ export function MobileMenuPanel({
       {!hideLanguageSwitcher ? (
         <div className="border-t border-slate-200 px-6 pb-6 pt-5 sm:px-8 md:px-12 md:pb-8 md:pt-6">
           <div className="flex items-center gap-2 px-2">
-            <span className="text-sm text-slate-700">
+            <span className="text-sm text-slate-800">
               {translations.switchLanguageText}
             </span>
             <LanguageSwitcher

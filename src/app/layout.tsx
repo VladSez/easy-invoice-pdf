@@ -1,7 +1,6 @@
 import { DeviceContextProvider } from "@/contexts/device-context";
 import { checkDeviceUserAgent } from "@/lib/check-device.server";
 import { NextIntlClientProvider } from "next-intl";
-// import { ReactScan } from "@/components/dev/react-scan";
 import { ResponsiveIndicator } from "@/components/dev/responsive-indicator";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -85,8 +84,6 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      {/* Performance monitoring only in development */}
-      {/* {process.env.NODE_ENV !== "development" ? null : <ReactScan />} */}
       <body>
         <DeviceContextProvider
           isDesktop={isDesktopServer}

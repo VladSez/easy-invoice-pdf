@@ -2,12 +2,10 @@
   "name": "easy-invoice-pdf",
   "version": "1.0.3",
   "private": true,
-  "packageManager": "pnpm@10.30.1+sha512.3590e550d5384caa39bd5c7c739f72270234b2f6059e13018f975c313b1eb9fefcc09714048765d4d9efe961382c312e624572c0420762bdc5d5940cdf9be73a",
-  "pnpm": {
-    "minimumReleaseAge": 7200,
-    "trustPolicy": "no-downgrade",
-    "blockExoticSubdeps": true
-  },
+  "packageManager": "pnpm@10.33.4+sha512.1c67b3b359b2d408119ba1ed289f34b8fc3c6873412bec6fd264fbdc82489e510fcbecb9ce9d22dae7f3b76269d8441046014bdca53b9979cd7a561ad631b800",
+  "author": "Vlad Sazonau (https://vladsazon.com)",
+  "homepage": "https://easyinvoicepdf.com",
+  "description": "Free and open-source invoice generator.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -26,15 +24,15 @@
     "e2e:not-flaky": "pnpm e2e --workers=2",
     "e2e:update-snapshots": "pnpm e2e --update-snapshots",
     "dedupe": "pnpm dedupe",
-    "lint-stage": "pnpm dlx lint-staged --verbose",
+    "lint-stage": "pnpm lint-staged --verbose",
     "check-meta": "pnpx check-site-meta",
     "dev:email": "email dev --dir src/emails",
     "prepare": "husky",
-    "expose-to-internet": "pnpm dlx cloudflared tunnel --url http://localhost:3000",
-    "cloudflared:tunnel": "pnpm dlx cloudflared tunnel run easy-invoice-pdf-local-dev",
+    "expose-to-internet": "cloudflared tunnel --url http://localhost:3000",
+    "cloudflared:tunnel": "cloudflared tunnel run easy-invoice-pdf-local-dev",
     "corepack:enable": "corepack enable",
     "corepack:prepare": "corepack prepare pnpm@latest",
-    "update-github-actions": "pnpm dlx actions-up --min-age=7",
+    "update-github-actions": "pnpm actions-up --min-age=7",
     "test-gh-action-locally:monthly-recurring-invoice": "act schedule -j recurring-invoice --secret-file .github/workflows/.secrets"
   },
   "dependencies": {
@@ -97,13 +95,13 @@
   "devDependencies": {
     "@eslint/eslintrc": "3.3.1",
     "@next/eslint-plugin-next": "15.2.3",
-    "@playwright/test": "1.56.1",
+    "@playwright/test": "1.60.0",
     "@types/file-saver": "2.0.7",
     "@types/node": "22.8.1",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "@typescript/native-preview": "7.0.0-dev.20260217.1",
-    "actions-up": "1.12.0",
+    "actions-up": "1.14.2",
     "autoprefixer": "10.4.21",
     "dotenv": "17.2.3",
     "eslint": "9.33.0",
@@ -117,12 +115,23 @@
     "prettier": "3.5.3",
     "prettier-plugin-tailwindcss": "0.6.11",
     "react-email": "4.0.4",
-    "react-scan": "0.3.4",
     "schema-dts": "1.1.5",
     "shadcn": "3.2.1",
     "tailwindcss": "3.4.14",
     "typescript": "5.9.3",
     "typescript-eslint": "8.56.0",
     "vitest": "3.2.4"
-  }
+  },
+  "keywords": [
+    "invoice",
+    "pdf",
+    "invoice generator",
+    "open source",
+    "free",
+    "invoice pdf",
+    "professional invoice",
+    "online invoice",
+    "pdf invoice template",
+    "easyinvoicepdf"
+  ]
 }

@@ -5,6 +5,7 @@ import {
   GoToAppButton,
 } from "@/app/(components)/header/go-to-app-button-cta";
 import { Button } from "@/components/ui/button";
+import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AutoPlayVideo, ManualPlayVideo } from "@/components/video";
@@ -15,7 +16,6 @@ import {
   VIDEO_DEMO_URL,
 } from "@/config";
 import { routing } from "@/i18n/routing";
-import { PlusIcon } from "lucide-react";
 import { useTranslations, type Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
@@ -41,7 +41,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
     features: t("footer.links.features"),
     faq: "FAQ",
     github: t("footer.links.github"),
-    githubCTA: t("buttons.viewOnGithub"),
+    githubCTA: t("buttons.starOnGithub"),
     tagline: t("tagline"),
   } as const satisfies HeaderProps["translations"]["navLinks"];
 
@@ -67,6 +67,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
             changelogLinkText,
             termsOfServiceLinkText,
           }}
+          hideLanguageSwitcher={false}
         />
 
         <main>
@@ -425,36 +426,17 @@ function FaqSection() {
           </div>
         </div>
         <div className="mx-auto mt-14 max-w-3xl">
-          <div className="space-y-2">
-            {ABOUT_FAQ_ITEM_KEYS.map((translationKey) => {
-              const question = t(`items.${translationKey}.question`);
-              const answer = t(`items.${translationKey}.answer`);
-
-              return (
-                <details
-                  key={translationKey}
-                  className="group cursor-pointer border-b border-dashed border-stone-300 bg-white transition-all duration-200 last:border-b-0"
-                >
-                  <summary className="flex select-none items-center justify-between gap-2 py-3 text-left">
-                    <h3 className="text-base font-medium text-stone-900">
-                      {question}
-                    </h3>
-                    <PlusIcon
-                      className="ml-auto size-6 shrink-0 rounded-full p-1 text-stone-400 transition-all duration-200 hover:bg-stone-200/50 group-open:rotate-45 group-hover:text-stone-900"
-                      aria-hidden="true"
-                    />
-                  </summary>
-                  <div className="overflow-hidden">
-                    <div className="pb-4 pr-4">
-                      <p className="cursor-default text-pretty text-sm leading-relaxed text-stone-600">
-                        {answer}
-                      </p>
-                    </div>
-                  </div>
-                </details>
-              );
-            })}
-          </div>
+          <FaqAccordion>
+            {ABOUT_FAQ_ITEM_KEYS.map((translationKey) => (
+              <FaqAccordionItem
+                key={translationKey}
+                question={t(`items.${translationKey}.question`)}
+                className="border-stone-300 bg-white"
+              >
+                {t(`items.${translationKey}.answer`)}
+              </FaqAccordionItem>
+            ))}
+          </FaqAccordion>
         </div>
       </div>
     </section>
