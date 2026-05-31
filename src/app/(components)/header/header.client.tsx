@@ -157,7 +157,7 @@ export function HeaderClient({
 
 const defaultTranslations = {
   navLinks: {
-    home: "Home",
+    home: "About Us",
     features: "Features",
     faq: "FAQ",
     github: "GitHub",

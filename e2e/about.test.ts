@@ -32,7 +32,7 @@ test.describe("About page", () => {
       ).toBeHidden();
 
       await expect(
-        header.getByRole("link", { name: "Home", exact: true }),
+        header.getByRole("link", { name: "About Us", exact: true }),
       ).toBeHidden();
     } else {
       // Desktop: nav links and language switcher visible inline, burger button hidden
@@ -41,7 +41,7 @@ test.describe("About page", () => {
       ).toBeVisible();
 
       const productLink = header.getByRole("link", {
-        name: "Home",
+        name: "About Us",
         exact: true,
       });
 
@@ -474,7 +474,7 @@ test.describe("About page", () => {
     const header = page.getByRole("banner");
 
     const productLink = header.getByRole("link", {
-      name: "Home",
+      name: "About Us",
       exact: true,
     });
 
@@ -546,7 +546,7 @@ test.describe("About page", () => {
     await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
 
     await expect(
-      header.getByRole("link", { name: "Home", exact: true }),
+      header.getByRole("link", { name: "About Us", exact: true }),
     ).toBeHidden();
 
     await expect(
@@ -559,7 +559,7 @@ test.describe("About page", () => {
     const sheet = page.getByRole("dialog", { name: "Mobile Menu" });
 
     const productLink = sheet.getByRole("link", {
-      name: "Home",
+      name: "About Us",
       exact: true,
     });
     await expect(productLink).toBeVisible();
