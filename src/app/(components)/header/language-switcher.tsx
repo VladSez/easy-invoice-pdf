@@ -68,7 +68,7 @@ export function LanguageSwitcher({
               <Button
                 size="icon"
                 variant="ghost"
-                className="rounded-full shadow-none hover:bg-slate-200/80"
+                className="rounded-full shadow-none hover:bg-slate-100"
                 aria-label={buttonText}
                 disabled={isPending}
               >
