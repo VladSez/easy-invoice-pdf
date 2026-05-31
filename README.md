@@ -5,14 +5,12 @@
   </a>
   <h1>EasyInvoicePDF</h1>
   <h3>Free & Open-Source Invoice Generator</h3>
-  <p>Create professional invoices instantly in your browser with <strong>Live Preview</strong>, <strong>Multiple Templates</strong> (including a Stripe-style design). <strong>No Sign-Up Required</strong>.</p>
+  <p>Create professional invoices instantly in your browser with <strong>Live Preview</strong>, <strong>Instant PDF Export</strong>, <strong>Multiple Customizable Templates</strong> (including a Stripe-style design). <strong>No Ads</strong>. <strong>No Sign-Up Required</strong>.</p>
   <p><a href="https://easyinvoicepdf.com/?template=stripe&ref=github"><strong>Start Invoicing</strong></a></p>
   <p>
-      <a href="https://easyinvoicepdf.com/en/about?ref=github">About</a>
+      <a href="https://easyinvoicepdf.com/en/about?ref=github">About us</a>
       ·
       <a href="https://github.com/VladSez/easy-invoice-pdf/releases">Releases</a>
-      ·
-      <a href="#self-host">Self-host</a>
     </p>
 
 <strong>⭐ Like the project? <a href="https://github.com/VladSez/easy-invoice-pdf" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">Star it on GitHub</a></strong>
