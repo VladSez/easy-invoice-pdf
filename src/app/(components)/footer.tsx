@@ -103,7 +103,19 @@ export function Footer({ links, translations }: FooterProps) {
           </div>
         </div>
         {/* Badge for featured on Startup Fame */}
-        <div className="my-5 flex flex-wrap items-center gap-2">
+        <div className="my-5 flex flex-wrap items-center gap-3">
+          <a
+            href="https://startupfa.me/s/easyinvoicepdf?utm_source=easyinvoicepdf.com"
+            target="_blank"
+          >
+            <img
+              src="https://startupfa.me/badges/featured/light-rounded.webp"
+              alt="EasyInvoicePDF - Featured on Startup Fame"
+              width="171"
+              height="54"
+            />
+          </a>
+
           <a
             href="https://launchpanda.dev/launches"
             target="_blank"
@@ -114,18 +126,6 @@ export function Footer({ links, translations }: FooterProps) {
               alt="Launched on LaunchPanda"
               width="260"
               height="64"
-            />
-          </a>
-
-          <a
-            href="https://startupfa.me/s/easyinvoicepdf?utm_source=easyinvoicepdf.com"
-            target="_blank"
-          >
-            <img
-              src="https://startupfa.me/badges/featured-badge-small.webp"
-              alt="Featured on Startup Fame"
-              width="224"
-              height="36"
             />
           </a>
         </div>
