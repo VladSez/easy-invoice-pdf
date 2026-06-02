@@ -114,8 +114,6 @@ export function Footer({ links, translations }: FooterProps) {
               alt="Launched on LaunchPanda"
               width="260"
               height="64"
-              loading="lazy"
-              decoding="async"
             />
           </a>
 
@@ -128,8 +126,6 @@ export function Footer({ links, translations }: FooterProps) {
               alt="Featured on Startup Fame"
               width="224"
               height="36"
-              loading="lazy"
-              decoding="async"
             />
           </a>
         </div>
