@@ -16,7 +16,7 @@
     "lint:fix": "pnpm eslint . --fix",
     "prettify": "prettier --write --cache '**/*.{ts?(x),json,js,mjs,yml,yaml,md}'",
     "knip": "knip",
-    "update-deps": "pnpm upgrade --interactive --latest -rLi --config.minimum-release-age=4320",
+    "update-deps": "pnpm upgrade --interactive --latest -rLi --config.minimum-release-age=7200",
     "vitest": "vitest --reporter=verbose",
     "vitest:ui": "vitest --ui",
     "e2e": "pnpm exec playwright test --reporter=line",

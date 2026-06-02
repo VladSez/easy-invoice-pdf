@@ -10,6 +10,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+textarea {
+  field-sizing: content;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
