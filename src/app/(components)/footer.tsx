@@ -112,8 +112,8 @@ export function Footer({ links, translations }: FooterProps) {
             <img
               src="https://launchpanda.dev/images/badges/launchpanda-badge.svg"
               alt="Launched on LaunchPanda"
-              width="224"
-              height="36"
+              width="260"
+              height="64"
               loading="lazy"
               decoding="async"
             />
