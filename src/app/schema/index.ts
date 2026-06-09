@@ -1066,7 +1066,7 @@ export const invoiceObjectSchema = z.object({
       "Invoice date of service. Default is the last day of the current month",
     ),
 
-  servicePeriodFieldIsVisible: z.boolean().default(true),
+  servicePeriodFieldIsVisible: z.boolean().default(false),
 
   /**
    * Renamed from "Invoice Type" to "Header Notes" on UI to better reflect its purpose
