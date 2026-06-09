@@ -307,10 +307,28 @@ test.describe("Invoice Generator Page", () => {
       generalInfoSection.getByRole("textbox", { name: "Date of Issue" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.dateOfIssue);
 
-    // Date of Service
+    // Service period
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+
+    await expect(servicePeriodFieldset).toBeVisible();
+
     await expect(
-      generalInfoSection.getByRole("textbox", { name: "Date of Service" }),
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period start",
+      }),
+    ).toHaveValue(INITIAL_INVOICE_DATA.dateOfServiceStart);
+
+    await expect(
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period end",
+      }),
     ).toHaveValue(INITIAL_INVOICE_DATA.dateOfService);
+
+    await expect(
+      servicePeriodFieldset.getByTestId("servicePeriodFieldIsVisible"),
+    ).not.toBeChecked();
 
     // Invoice Type
     await expect(
@@ -1178,48 +1196,49 @@ test.describe("Invoice Generator Page", () => {
     // Test invalid values
     await amountInput.fill("-1");
     await expect(
-      invoiceItemsSection.getByText("Amount must be positive"),
+      invoiceItemsSection.getByText("Amount must be >= 0"),
+    ).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page.getByLabel("Notifications alt+T").getByText("Amount must be >= 0"),
+    ).toBeVisible();
+
+    await amountInput.fill("1000000"); // Exceeds max of 999 999.99
+    await expect(
+      invoiceItemsSection.getByText("Amount must not exceed 999 999.99"),
     ).toBeVisible();
 
     // Check that notification is also visible
     await expect(
       page
         .getByLabel("Notifications alt+T")
-        .getByText("Amount must be positive"),
-    ).toBeVisible();
-
-    await amountInput.fill("0");
-    await expect(
-      invoiceItemsSection.getByText("Amount must be positive"),
-    ).toBeVisible();
-
-    await amountInput.fill("1000000000000"); // 1 trillion
-    await expect(
-      invoiceItemsSection.getByText("Amount must not exceed 9 999 999 999.99"),
-    ).toBeVisible();
-
-    // Check that notification is also visible
-    await expect(
-      page
-        .getByLabel("Notifications alt+T")
-        .getByText("Amount must not exceed 9 999 999 999.99"),
+        .getByText("Amount must not exceed 999 999.99"),
     ).toBeVisible();
 
     // Test valid values
-    await amountInput.fill("1");
+    await amountInput.fill("0");
     await expect(
-      invoiceItemsSection.getByText("Amount must be positive"),
+      invoiceItemsSection.getByText("Amount must be >= 0"),
     ).toBeHidden();
     await expect(
-      invoiceItemsSection.getByText("Amount must not exceed 9 999 999 999.99"),
+      invoiceItemsSection.getByText("Amount must not exceed 999 999.99"),
     ).toBeHidden();
 
-    await amountInput.fill("9999999999.99"); // Maximum valid value
+    await amountInput.fill("1");
     await expect(
-      invoiceItemsSection.getByText("Amount must be positive"),
+      invoiceItemsSection.getByText("Amount must be >= 0"),
     ).toBeHidden();
     await expect(
-      invoiceItemsSection.getByText("Amount must not exceed 9 999 999 999.99"),
+      invoiceItemsSection.getByText("Amount must not exceed 999 999.99"),
+    ).toBeHidden();
+
+    await amountInput.fill("999999.99"); // Maximum valid value
+    await expect(
+      invoiceItemsSection.getByText("Amount must be >= 0"),
+    ).toBeHidden();
+    await expect(
+      invoiceItemsSection.getByText("Amount must not exceed 999 999.99"),
     ).toBeHidden();
 
     // **NET PRICE FIELD**
@@ -1244,14 +1263,14 @@ test.describe("Invoice Generator Page", () => {
     // Test exceeding maximum value
     await netPriceInput.fill("1000000000000"); // 1 trillion
     await expect(
-      invoiceItemsSection.getByText("Net price must not exceed 100 billion"),
+      invoiceItemsSection.getByText("Net price must not exceed 1 billion"),
     ).toBeVisible();
 
     // Check that notification is also visible
     await expect(
       page
         .getByLabel("Notifications alt+T")
-        .getByText("Net price must not exceed 100 billion"),
+        .getByText("Net price must not exceed 1 billion"),
     ).toBeVisible();
 
     // Test zero value
@@ -1266,7 +1285,15 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByText("Net price must be >= 0"),
     ).toBeHidden();
     await expect(
-      invoiceItemsSection.getByText("Net price must not exceed 100 billion"),
+      invoiceItemsSection.getByText("Net price must not exceed 1 billion"),
+    ).toBeHidden();
+
+    await netPriceInput.fill("1000000000"); // Maximum valid value
+    await expect(
+      invoiceItemsSection.getByText("Net price must be >= 0"),
+    ).toBeHidden();
+    await expect(
+      invoiceItemsSection.getByText("Net price must not exceed 1 billion"),
     ).toBeHidden();
 
     // **VAT FIELD**
@@ -1340,6 +1367,12 @@ test.describe("Invoice Generator Page", () => {
         amount: "3",
         netPrice: "100",
         expected: { net: "300.00", vatAmount: "0.00", total: "300.00" },
+      },
+      {
+        vat: "23",
+        amount: "0",
+        netPrice: "100",
+        expected: { net: "0.00", vatAmount: "0.00", total: "0.00" },
       },
     ] as const satisfies {
       vat: string;
@@ -1419,14 +1452,19 @@ test.describe("Invoice Generator Page", () => {
       generalInfoSection.getByText("Date of issue is not today"),
     ).toBeVisible();
 
-    // Set date of service to a date that's not the last day of current month
-    const dateOfServiceInput = generalInfoSection.getByLabel("Date of Service");
+    // Set service period end to a date that's not the last day of current month
+    const dateOfServiceStartInput = generalInfoSection.getByLabel(
+      "Service period start",
+    );
+    const dateOfServiceInput =
+      generalInfoSection.getByLabel("Service period end");
+    await dateOfServiceStartInput.fill("2025-06-14");
     await dateOfServiceInput.fill("2024-01-20");
 
-    // Verify per-field "Date of service is not the last day of the current month" inline helper message
+    // Verify per-field service period end helper message
     await expect(
       generalInfoSection.getByText(
-        "Date of service is not the last day of the current month",
+        "Service period end is not the last day of the current month",
       ),
     ).toBeVisible();
 
@@ -1465,7 +1503,7 @@ test.describe("Invoice Generator Page", () => {
       outOfDateHelper.getByText("Date of issue", { exact: true }),
     ).toBeVisible();
     await expect(
-      outOfDateHelper.getByText("Date of service", { exact: true }),
+      outOfDateHelper.getByText("Service period end", { exact: true }),
     ).toBeVisible();
     await expect(
       outOfDateHelper.getByText("Invoice number", { exact: true }),
@@ -1511,14 +1549,58 @@ test.describe("Invoice Generator Page", () => {
     ).toBeHidden();
     await expect(
       generalInfoSection.getByText(
-        "Date of service is not the last day of the current month",
+        "Service period end is not the last day of the current month",
       ),
     ).toBeHidden();
 
     // Verify all fields were updated to correct values
     await expect(dateOfIssueInput).toHaveValue("2025-12-01");
+    await expect(dateOfServiceStartInput).toHaveValue("2025-06-14");
     await expect(dateOfServiceInput).toHaveValue("2025-12-31");
     await expect(invoiceNumberInput).toHaveValue("1/12-2025");
     await expect(paymentDueInput).toHaveValue("2025-12-15");
+  });
+
+  test("allows setting a partial service period", async ({ page }) => {
+    await page.clock.setSystemTime(new Date("2025-06-15T12:00:00Z"));
+
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
+
+    const generalInfoSection = page.getByRole("region", {
+      name: "General Information",
+    });
+
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+
+    const servicePeriodSwitch = servicePeriodFieldset.getByTestId(
+      "servicePeriodFieldIsVisible",
+    );
+
+    await servicePeriodFieldset
+      .getByLabel("Service period start")
+      .fill("2025-06-14");
+    await servicePeriodFieldset
+      .getByLabel("Service period end")
+      .fill("2025-06-20");
+
+    await expect(
+      servicePeriodFieldset.getByLabel("Service period start"),
+    ).toHaveValue("2025-06-14");
+    await expect(
+      servicePeriodFieldset.getByLabel("Service period end"),
+    ).toHaveValue("2025-06-20");
+
+    await expect(servicePeriodSwitch).toBeChecked();
+
+    await servicePeriodSwitch.click();
+    await expect(servicePeriodSwitch).not.toBeChecked();
+
+    await servicePeriodFieldset
+      .getByLabel("Service period start")
+      .fill("2025-06-15");
+    await expect(servicePeriodSwitch).toBeChecked();
   });
 });

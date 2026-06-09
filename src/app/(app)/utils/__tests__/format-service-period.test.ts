@@ -1,0 +1,183 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+  formatDateOfServiceEnd,
+  formatServicePeriodRange,
+  getServicePeriod,
+  isCurrentFullMonthServicePeriod,
+  isServicePeriodStartFirstDayOfCurrentMonth,
+  shouldShowServicePeriodInDefaultPdf,
+  shouldShowServicePeriodLine,
+} from "@/app/(app)/utils/format-service-period";
+import type { InvoiceData } from "@/app/schema";
+
+const baseInvoiceData = {
+  dateFormat: "YYYY-MM-DD",
+} as Pick<InvoiceData, "dateFormat">;
+
+describe("format-service-period", () => {
+  describe("getServicePeriod", () => {
+    it("should derive start from end month when start is missing", () => {
+      const { start, end } = getServicePeriod({
+        dateOfService: "2025-06-20",
+      });
+
+      expect(start.format("YYYY-MM-DD")).toBe("2025-06-01");
+      expect(end.format("YYYY-MM-DD")).toBe("2025-06-20");
+    });
+
+    it("should use explicit start when provided", () => {
+      const { start, end } = getServicePeriod({
+        dateOfServiceStart: "2025-06-14",
+        dateOfService: "2025-06-20",
+      });
+
+      expect(start.format("YYYY-MM-DD")).toBe("2025-06-14");
+      expect(end.format("YYYY-MM-DD")).toBe("2025-06-20");
+    });
+  });
+
+  describe("formatDateOfServiceEnd", () => {
+    it("should always return the formatted end date", () => {
+      const result = formatDateOfServiceEnd({
+        ...baseInvoiceData,
+        dateOfServiceStart: "2025-06-14",
+        dateOfService: "2025-06-20",
+      } as InvoiceData);
+
+      expect(result).toBe("2025-06-20");
+    });
+  });
+
+  describe("isServicePeriodStartFirstDayOfCurrentMonth", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2025-06-15T12:00:00Z"));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("should return true when start is the first day of the current month", () => {
+      expect(isServicePeriodStartFirstDayOfCurrentMonth("2025-06-01")).toBe(
+        true,
+      );
+    });
+
+    it("should return false when start is not the first day of the current month", () => {
+      expect(isServicePeriodStartFirstDayOfCurrentMonth("2025-06-14")).toBe(
+        false,
+      );
+    });
+
+    it("should return false when start is the first day of a different month", () => {
+      expect(isServicePeriodStartFirstDayOfCurrentMonth("2025-05-01")).toBe(
+        false,
+      );
+    });
+  });
+
+  describe("shouldShowServicePeriodLine", () => {
+    it("should return false when start is the first day of the month", () => {
+      expect(
+        shouldShowServicePeriodLine({
+          ...baseInvoiceData,
+          dateOfServiceStart: "2026-05-01",
+          dateOfService: "2026-05-31",
+        } as InvoiceData),
+      ).toBe(false);
+    });
+
+    it("should return true when start is not the first day of the month", () => {
+      expect(
+        shouldShowServicePeriodLine({
+          ...baseInvoiceData,
+          dateOfServiceStart: "2026-05-11",
+          dateOfService: "2026-05-31",
+        } as InvoiceData),
+      ).toBe(true);
+    });
+  });
+
+  describe("shouldShowServicePeriodInDefaultPdf", () => {
+    it("should return false for full month when switch is off", () => {
+      expect(
+        shouldShowServicePeriodInDefaultPdf({
+          ...baseInvoiceData,
+          dateOfServiceStart: "2026-05-01",
+          dateOfService: "2026-05-31",
+          servicePeriodFieldIsVisible: false,
+        } as InvoiceData),
+      ).toBe(false);
+    });
+
+    it("should return true for full month when switch is on", () => {
+      expect(
+        shouldShowServicePeriodInDefaultPdf({
+          ...baseInvoiceData,
+          dateOfServiceStart: "2026-05-01",
+          dateOfService: "2026-05-31",
+          servicePeriodFieldIsVisible: true,
+        } as InvoiceData),
+      ).toBe(true);
+    });
+
+    it("should return false for partial period when switch is off", () => {
+      expect(
+        shouldShowServicePeriodInDefaultPdf({
+          ...baseInvoiceData,
+          dateOfServiceStart: "2026-05-11",
+          dateOfService: "2026-05-31",
+          servicePeriodFieldIsVisible: false,
+        } as InvoiceData),
+      ).toBe(false);
+    });
+
+    it("should return true for partial period when switch is on", () => {
+      expect(
+        shouldShowServicePeriodInDefaultPdf({
+          ...baseInvoiceData,
+          dateOfServiceStart: "2026-05-11",
+          dateOfService: "2026-05-31",
+          servicePeriodFieldIsVisible: true,
+        } as InvoiceData),
+      ).toBe(true);
+    });
+  });
+
+  describe("formatServicePeriodRange", () => {
+    it("should always show start and end separated by an en dash", () => {
+      const result = formatServicePeriodRange({
+        ...baseInvoiceData,
+        dateOfServiceStart: "2025-06-14",
+        dateOfService: "2025-06-20",
+      } as InvoiceData);
+
+      expect(result).toBe("2025-06-14 – 2025-06-20");
+    });
+  });
+
+  describe("isCurrentFullMonthServicePeriod", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2025-06-15T12:00:00Z"));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("should return true for the current full month", () => {
+      expect(isCurrentFullMonthServicePeriod("2025-06-01", "2025-06-30")).toBe(
+        true,
+      );
+    });
+
+    it("should return false for partial periods in the current month", () => {
+      expect(isCurrentFullMonthServicePeriod("2025-06-14", "2025-06-20")).toBe(
+        false,
+      );
+    });
+  });
+});

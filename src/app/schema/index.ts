@@ -747,11 +747,11 @@ export const invoiceItemSchema = z.object({
       message: "Amount is required",
     })
     .transform(Number)
-    .refine((val) => val > 0, {
-      message: "Amount must be positive",
+    .refine((val) => val >= 0, {
+      message: "Amount must be >= 0",
     })
-    .refine((val) => val <= 9_999_999_999.99, {
-      message: "Amount must not exceed 9 999 999 999.99",
+    .refine((val) => val <= 999_999.99, {
+      message: "Amount must not exceed 999 999.99",
     }),
   amountFieldIsVisible: z.boolean().default(true),
 
@@ -767,8 +767,8 @@ export const invoiceItemSchema = z.object({
     .refine((val) => val >= 0, {
       message: "Net price must be >= 0",
     })
-    .refine((val) => val <= 100_000_000_000, {
-      message: "Net price must not exceed 100 billion",
+    .refine((val) => val <= 1_000_000_000, {
+      message: "Net price must not exceed 1 billion",
     }),
   netPriceFieldIsVisible: z.boolean().default(true),
 
@@ -957,11 +957,11 @@ export const buyerSchema = z.object({
 export type BuyerData = z.infer<typeof buyerSchema>;
 
 /**
- * Invoice schema
+ * Invoice object schema (without cross-field transforms)
  *
- * This schema is used to validate the invoice data
+ * Exported for tests that need access to `.shape` (e.g. URL compression key map).
  */
-export const invoiceSchema = z.object({
+export const invoiceObjectSchema = z.object({
   language: z.enum(SUPPORTED_LANGUAGES).default("en"),
   dateFormat: z.enum(SUPPORTED_DATE_FORMATS).default("YYYY-MM-DD"),
   currency: z.enum(SUPPORTED_CURRENCIES).default("EUR"),
@@ -1043,6 +1043,15 @@ export const invoiceSchema = z.object({
     })
     .describe("Invoice date of issue. Default is today's date"),
 
+  dateOfServiceStart: z
+    .string()
+    .trim()
+    .optional()
+    .describe(
+      "Service period start date. Defaults to the first day of the month containing dateOfService",
+    ),
+
+  // date of service end (name in zod schema for backwards compatibility)
   dateOfService: z
     .string()
     .trim()
@@ -1056,6 +1065,8 @@ export const invoiceSchema = z.object({
     .describe(
       "Invoice date of service. Default is the last day of the current month",
     ),
+
+  servicePeriodFieldIsVisible: z.boolean().default(true),
 
   /**
    * Renamed from "Invoice Type" to "Header Notes" on UI to better reflect its purpose
@@ -1174,6 +1185,30 @@ export const invoiceSchema = z.object({
     .default(""),
   personAuthorizedToIssueFieldIsVisible: z.boolean().default(true),
 });
+
+/**
+ * Invoice schema
+ *
+ * This schema is used to validate the invoice data
+ */
+export const invoiceSchema = invoiceObjectSchema
+  .transform((data) => ({
+    ...data,
+    dateOfServiceStart:
+      data.dateOfServiceStart?.trim() ||
+      dayjs(data.dateOfService).startOf("month").format("YYYY-MM-DD"),
+  }))
+  .superRefine((data, ctx) => {
+    if (
+      dayjs(data.dateOfServiceStart).isAfter(dayjs(data.dateOfService), "day")
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Service period start must be on or before the end date",
+        path: ["dateOfServiceStart"],
+      });
+    }
+  });
 
 export type InvoiceData = z.infer<typeof invoiceSchema>;
 

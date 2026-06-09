@@ -1933,4 +1933,157 @@ test.describe("Default Invoice Template", () => {
       "email-visible-in-pdf-default-template.png",
     );
   });
+
+  test("displays service period in PDF when enabled and hides it when toggled off", async ({
+    page,
+    browserName,
+    downloadDir,
+  }, testInfo) => {
+    const SERVICE_PERIOD_TEST_DATA = {
+      start: "2025-12-14",
+      end: "2025-12-20",
+    } as const;
+
+    await expect(page).toHaveURL("/?template=default");
+
+    const generalInfoSection = page.getByTestId("general-information-section");
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+    await expect(servicePeriodFieldset).toBeVisible();
+
+    const servicePeriodSwitch = servicePeriodFieldset.getByTestId(
+      "servicePeriodFieldIsVisible",
+    );
+
+    await servicePeriodFieldset
+      .getByLabel("Service period start")
+      .fill(SERVICE_PERIOD_TEST_DATA.start);
+    await servicePeriodFieldset
+      .getByLabel("Service period end")
+      .fill(SERVICE_PERIOD_TEST_DATA.end);
+
+    await expect(
+      servicePeriodFieldset.getByLabel("Service period start"),
+    ).toHaveValue(SERVICE_PERIOD_TEST_DATA.start);
+    await expect(
+      servicePeriodFieldset.getByLabel("Service period end"),
+    ).toHaveValue(SERVICE_PERIOD_TEST_DATA.end);
+    await expect(servicePeriodSwitch).toBeChecked();
+
+    const finalSection = page.getByTestId("final-section");
+    await finalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(`Test: ${testInfo.title} (${testInfo.project.name})`);
+
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const downloadPdfEnglishButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadPdfEnglishButton).toBeVisible();
+    await expect(downloadPdfEnglishButton).toBeEnabled();
+
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfEnglishButton.click(),
+    ]);
+
+    const pdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-${download.suggestedFilename()}`,
+    );
+
+    await download.saveAs(pdfFilePath);
+
+    const absolutePath = path.resolve(pdfFilePath);
+    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
+
+    const pdfBytes = fs.readFileSync(absolutePath);
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, pdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "displays-service-period-in-pdf-default-template.png",
+    );
+
+    await page.goto("/");
+    await expect(page).toHaveURL("/?template=default");
+
+    const newGeneralInfoSection = page.getByTestId(
+      "general-information-section",
+    );
+    const newServicePeriodFieldset = newGeneralInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+    await expect(newServicePeriodFieldset).toBeVisible();
+
+    const newServicePeriodSwitch = newServicePeriodFieldset.getByTestId(
+      "servicePeriodFieldIsVisible",
+    );
+
+    await expect(newServicePeriodSwitch).toBeChecked();
+
+    await newServicePeriodSwitch.click();
+    await expect(newServicePeriodSwitch).not.toBeChecked();
+
+    await expect(
+      newServicePeriodFieldset.getByLabel("Service period start"),
+    ).toHaveValue(SERVICE_PERIOD_TEST_DATA.start);
+    await expect(
+      newServicePeriodFieldset.getByLabel("Service period end"),
+    ).toHaveValue(SERVICE_PERIOD_TEST_DATA.end);
+
+    const newFinalSection = page.getByTestId("final-section");
+    await newFinalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: ${testInfo.title} - service period hidden in PDF (${testInfo.project.name})`,
+      );
+
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const newDownloadPdfEnglishButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    const [downloadWithoutServicePeriod] = await Promise.all([
+      page.waitForEvent("download"),
+      newDownloadPdfEnglishButton.click(),
+    ]);
+
+    const pdfFilePath2 = path.join(
+      downloadDir,
+      `${browserName}-${downloadWithoutServicePeriod.suggestedFilename()}`,
+    );
+
+    await downloadWithoutServicePeriod.saveAs(pdfFilePath2);
+
+    const pdfBytesWithoutServicePeriod = fs.readFileSync(pdfFilePath2);
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, pdfBytesWithoutServicePeriod);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "service-period-hidden-in-pdf-default-template.png",
+    );
+  });
 });

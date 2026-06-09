@@ -3,6 +3,7 @@ import { InvoiceBody } from "@/app/(app)/components/invoice-templates/invoice-pd
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import {
   INVOICE_DEFAULT_NUMBER_VALUE,
+  FIRST_DAY_OF_MONTH,
   LAST_DAY_OF_MONTH,
   PAYMENT_DUE,
   TODAY,
@@ -85,7 +86,9 @@ export const ENGLISH_INVOICE_REAL_DATA = {
   },
 
   dateOfIssue: TODAY,
+  dateOfServiceStart: FIRST_DAY_OF_MONTH,
   dateOfService: LAST_DAY_OF_MONTH,
+  servicePeriodFieldIsVisible: false,
   paymentDue: PAYMENT_DUE,
 
   invoiceType: "Reverse Charge",

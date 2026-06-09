@@ -3,6 +3,7 @@ import {
   ErrorMessage,
 } from "@/app/(app)/components/invoice-form/common";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { isServicePeriodStartFirstDayOfCurrentMonth } from "@/app/(app)/utils/format-service-period";
 import {
   DEFAULT_DATE_FORMAT,
   type InvoiceData,
@@ -76,7 +77,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
   const isDateOfIssueNotToday = !dayjs(dateOfIssue).isSame(dayjs(), "day");
 
-  const isDateOfServiceEqualsEndOfCurrentMonth = dayjs(dateOfService).isSame(
+  const isDateOfServiceEndOfMonth = dayjs(dateOfService).isSame(
     dayjs().endOf("month"),
     "day",
   );
@@ -152,7 +153,7 @@ export const GeneralInformation = memo(function GeneralInformation({
     !dayjs(paymentDue).isSame(dayjs(dateOfIssue).add(14, "days"), "day");
 
   const canShowOutOfDateDatesHelper =
-    !isDateOfServiceEqualsEndOfCurrentMonth ||
+    !isDateOfServiceEndOfMonth ||
     !isInvoiceNumberInCurrentMonth ||
     isDateOfIssueNotToday ||
     isPaymentDueNotMatchingIssueDate;
@@ -186,6 +187,9 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                     // Set unit field to be HIDDEN by default for Stripe template (matches stripe template behaviour)
                     setValue("items.0.unitFieldIsVisible", false);
+
+                    // Set service period field to be VISIBLE for Stripe template (for backwards compatibility)
+                    setValue("servicePeriodFieldIsVisible", true);
                   } else {
                     // DEFAULT TEMPLATE
 
@@ -480,31 +484,104 @@ export const GeneralInformation = memo(function GeneralInformation({
           ) : null}
         </div>
 
-        {/* Date of Service */}
-        <div>
-          <Label htmlFor={`dateOfService`} className="mb-1">
-            Date of Service
-          </Label>
-          <Controller
-            name="dateOfService"
-            control={control}
-            render={({ field }) => (
-              <Input {...field} type="date" id={`dateOfService`} className="" />
-            )}
-          />
-          {errors.dateOfService && (
-            <ErrorMessage>{errors.dateOfService.message}</ErrorMessage>
-          )}
+        <fieldset className="rounded-md border p-4">
+          <legend className="px-1 text-lg font-semibold text-gray-900">
+            Service period
+          </legend>
 
-          {!isDateOfServiceEqualsEndOfCurrentMonth && !errors.dateOfService ? (
-            <InputHelperMessage>
-              <span className="flex items-center text-amber-800">
-                <AlertIcon />
-                Date of service is not the last day of the current month
-              </span>
-            </InputHelperMessage>
-          ) : null}
-        </div>
+          <div className="mb-3 flex justify-end">
+            <div className="inline-flex items-center gap-2">
+              <Controller
+                name="servicePeriodFieldIsVisible"
+                control={control}
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Switch
+                    {...field}
+                    id="servicePeriodFieldIsVisible"
+                    data-testid="servicePeriodFieldIsVisible"
+                    checked={value}
+                    onCheckedChange={onChange}
+                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    aria-label='Show the "Service period" field in the PDF'
+                  />
+                )}
+              />
+              <CustomTooltip
+                trigger={
+                  <Label htmlFor="servicePeriodFieldIsVisible">
+                    Show in PDF
+                  </Label>
+                }
+                content='Show the "Service period" field in the PDF'
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="dateOfServiceStart" className="mb-1">
+                Service period start
+              </Label>
+              <Controller
+                name="dateOfServiceStart"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="date"
+                    id="dateOfServiceStart"
+                    className=""
+                    onChange={(e) => {
+                      field.onChange(e);
+
+                      const newStart = e.target.value;
+
+                      if (
+                        newStart &&
+                        !isServicePeriodStartFirstDayOfCurrentMonth(newStart)
+                      ) {
+                        setValue("servicePeriodFieldIsVisible", true);
+                      }
+                    }}
+                  />
+                )}
+              />
+              {errors.dateOfServiceStart ? (
+                <ErrorMessage>{errors.dateOfServiceStart.message}</ErrorMessage>
+              ) : null}
+            </div>
+
+            <div>
+              <Label htmlFor="dateOfService" className="mb-1">
+                Service period end
+              </Label>
+              <Controller
+                name="dateOfService"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="date"
+                    id="dateOfService"
+                    className=""
+                  />
+                )}
+              />
+              {errors.dateOfService ? (
+                <ErrorMessage>{errors.dateOfService.message}</ErrorMessage>
+              ) : null}
+
+              {!isDateOfServiceEndOfMonth && !errors.dateOfService ? (
+                <InputHelperMessage>
+                  <span className="flex items-center text-amber-800">
+                    <AlertIcon />
+                    Service period end is not the last day of the current month
+                  </span>
+                </InputHelperMessage>
+              ) : null}
+            </div>
+          </div>
+        </fieldset>
 
         {/* Out of Date Dates Helper */}
         {canShowOutOfDateDatesHelper ? (
@@ -747,7 +824,7 @@ function OutOfDateDatesHelper({
       hint: "today",
     },
     isDateOfServiceStale && {
-      label: "Date of service",
+      label: "Service period end",
       oldValue: formatDate(dateOfService),
       newValue: targetEndOfMonth,
       hint: "end of current month",

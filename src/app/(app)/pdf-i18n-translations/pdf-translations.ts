@@ -172,6 +172,7 @@ export const translationSchema = z
     invoiceNumber: z.string(),
     dateOfIssue: z.string(),
     dateOfService: z.string(),
+    servicePeriod: z.string(),
     invoiceType: z.string(),
     seller: sellerTranslationSchema,
     buyer: buyerTranslationSchema,
@@ -215,6 +216,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     invoiceNumber: "Invoice No. of",
     dateOfIssue: "Date of issue",
     dateOfService: "Date of sales/of executing the service",
+    servicePeriod: "Service period",
     invoiceType: "Invoice Type",
     seller: {
       name: "Seller",
@@ -337,6 +339,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     invoiceNumber: "Faktura nr",
     dateOfIssue: "Data wystawienia",
     dateOfService: "Data sprzedaży / wykonania usługi",
+    servicePeriod: "Okres realizacji",
     invoiceType: "Typ faktury",
     seller: {
       name: "Sprzedawca",
@@ -424,6 +427,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     invoiceNumber: "Rechnungsnummer",
     dateOfIssue: "Ausstellungsdatum",
     dateOfService: "Verkaufsdatum/Leistungsdatum",
+    servicePeriod: "Leistungszeitraum",
     invoiceType: "Rechnungstyp",
     seller: {
       name: "Verkäufer",
@@ -511,6 +515,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     invoiceNumber: "Factura N°",
     dateOfIssue: "Fecha de emisión",
     dateOfService: "Fecha de venta/prestación del servicio",
+    servicePeriod: "Periodo de servicio",
     invoiceType: "Tipo de factura",
     seller: {
       name: "Vendedor",
@@ -598,6 +603,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     invoiceNumber: "Fatura N°",
     dateOfIssue: "Data de emissão",
     dateOfService: "Data de venda/prestação do serviço",
+    servicePeriod: "Período de serviço",
     invoiceType: "Tipo de fatura",
     seller: {
       name: "Vendedor",
@@ -685,6 +691,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     invoiceNumber: "Инвойс №",
     dateOfIssue: "Дата выставления",
     dateOfService: "Дата продажи/оказания услуги",
+    servicePeriod: "Период оказания услуг",
     invoiceType: "Тип счёта",
     seller: {
       name: "Продавец",
@@ -772,6 +779,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     invoiceNumber: "Рахунок-фактура №",
     dateOfIssue: "Дата виставлення",
     dateOfService: "Дата продажу/надання послуги",
+    servicePeriod: "Період надання послуги",
     invoiceType: "Тип рахунку",
     seller: {
       name: "Продавець",
@@ -859,6 +867,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     invoiceNumber: "Facture N°",
     dateOfIssue: "Date d'émission",
     dateOfService: "Date de vente/prestation de service",
+    servicePeriod: "Période de service",
     invoiceType: "Type de facture",
     seller: {
       name: "Vendeur",
@@ -946,6 +955,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     invoiceNumber: "Fattura N°",
     dateOfIssue: "Data di emissione",
     dateOfService: "Data di vendita/prestazione del servizio",
+    servicePeriod: "Periodo di servizio",
     invoiceType: "Tipo di fattura",
     seller: {
       name: "Venditore",
@@ -1033,6 +1043,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     invoiceNumber: "Factuurnummer",
     dateOfIssue: "Uitgiftedatum",
     dateOfService: "Datum van verkoop/dienstverlening",
+    servicePeriod: "Dienstverleningperiode",
     invoiceType: "Factuurtype",
     seller: {
       name: "Verkoper",

@@ -9,7 +9,7 @@ import {
   type InvoiceItemData,
   type SellerData,
   type BuyerData,
-  invoiceSchema,
+  invoiceObjectSchema,
   sellerSchema,
   buyerSchema,
   invoiceItemSchema,
@@ -28,7 +28,9 @@ describe("URL Compression Utilities", () => {
       expect(result).toHaveProperty("d", "default"); // template
       expect(result).toHaveProperty("e", MOCK_INVOICE_DATA.logo); // logo
       expect(result).toHaveProperty("g", "2024-01-15"); // dateOfIssue
+      expect(result).toHaveProperty("9", "2024-01-01"); // dateOfServiceStart
       expect(result).toHaveProperty("h", "2024-01-31"); // dateOfService
+      expect(result).toHaveProperty("!", false); // servicePeriodFieldIsVisible
       expect(result).toHaveProperty("i", "Standard Invoice"); // invoiceType
       expect(result).toHaveProperty("j", true); // invoiceTypeFieldIsVisible
       expect(result).toHaveProperty("n", 247.23); // total
@@ -204,7 +206,9 @@ describe("URL Compression Utilities", () => {
       expect(result).toHaveProperty("template", "default");
       expect(result).toHaveProperty("logo", MOCK_INVOICE_DATA.logo);
       expect(result).toHaveProperty("dateOfIssue", "2024-01-15");
+      expect(result).toHaveProperty("dateOfServiceStart", "2024-01-01");
       expect(result).toHaveProperty("dateOfService", "2024-01-31");
+      expect(result).toHaveProperty("servicePeriodFieldIsVisible", false);
       expect(result).toHaveProperty("invoiceType", "Standard Invoice");
       expect(result).toHaveProperty("invoiceTypeFieldIsVisible", true);
       expect(result).toHaveProperty("total", 247.23);
@@ -528,8 +532,8 @@ describe("URL Compression Utilities", () => {
         // We'll do this by creating a comprehensive mock object and checking each key exists in INVOICE_KEY_COMPRESSION_MAP
 
         const invoiceRootKeys = Object.keys(
-          invoiceSchema.shape,
-        ) as (keyof typeof invoiceSchema.shape)[];
+          invoiceObjectSchema.shape,
+        ) as (keyof typeof invoiceObjectSchema.shape)[];
 
         const sellerKeys = Object.keys(
           sellerSchema.shape,

@@ -11,6 +11,7 @@ import { INVOICE_PDF_TRANSLATIONS } from "../(app)/pdf-i18n-translations/pdf-tra
 import dayjs from "dayjs";
 
 export const TODAY = dayjs().format("YYYY-MM-DD");
+export const FIRST_DAY_OF_MONTH = dayjs().startOf("month").format("YYYY-MM-DD");
 export const LAST_DAY_OF_MONTH = dayjs().endOf("month").format("YYYY-MM-DD");
 export const PAYMENT_DUE = dayjs(TODAY).add(14, "days").format("YYYY-MM-DD");
 const INVOICE_CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
@@ -88,7 +89,9 @@ export const INITIAL_INVOICE_DATA = {
   },
 
   dateOfIssue: TODAY,
+  dateOfServiceStart: FIRST_DAY_OF_MONTH,
   dateOfService: LAST_DAY_OF_MONTH,
+  servicePeriodFieldIsVisible: false,
   dateFormat: DEFAULT_DATE_FORMAT,
 
   invoiceType: "",

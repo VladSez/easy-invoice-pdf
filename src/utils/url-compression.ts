@@ -48,6 +48,8 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   invoiceNumberObject: "f",
   dateOfIssue: "g",
   dateOfService: "h",
+  dateOfServiceStart: "9",
+  servicePeriodFieldIsVisible: "!",
   invoiceType: "i",
   invoiceTypeFieldIsVisible: "j",
   seller: "k",

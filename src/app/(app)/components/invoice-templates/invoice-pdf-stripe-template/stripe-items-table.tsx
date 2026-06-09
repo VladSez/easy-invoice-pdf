@@ -1,4 +1,5 @@
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { formatServicePeriodRange } from "@/app/(app)/utils/format-service-period";
 import { formatCurrency } from "@/app/(app)/utils/format-currency";
 import type { InvoiceData } from "@/app/schema";
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
@@ -32,13 +33,7 @@ export function StripeItemsTable({
   dayjs.locale(language);
 
   // Calculate service period (example: Jan 01 2025 - Jan 31 2025)
-  const servicePeriodStart = dayjs(invoiceData.dateOfService)
-    .startOf("month")
-    .format(invoiceData.dateFormat);
-
-  const servicePeriodEnd = dayjs(invoiceData.dateOfService).format(
-    invoiceData.dateFormat,
-  );
+  const servicePeriod = formatServicePeriodRange(invoiceData);
 
   const unitFieldIsVisible = invoiceData.items[0].unitFieldIsVisible;
   const vatAmountFieldIsVisible = invoiceData.items[0].vatFieldIsVisible;
@@ -109,10 +104,11 @@ export function StripeItemsTable({
           >
             <View style={styles.colDescription}>
               <Text style={[styles.fontSize10]}>{item.name}</Text>
-              {/* Add service period if available */}
-              <Text style={[styles.fontSize9, styles.mt4]}>
-                {servicePeriodStart} – {servicePeriodEnd}
-              </Text>
+              {invoiceData.servicePeriodFieldIsVisible ? (
+                <Text style={[styles.fontSize9, styles.mt4]}>
+                  {servicePeriod}
+                </Text>
+              ) : null}
             </View>
             <View style={styles.colQty}>
               <Text style={[styles.fontSize11, styles.textDark]}>
