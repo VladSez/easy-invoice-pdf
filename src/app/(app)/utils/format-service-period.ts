@@ -47,6 +47,17 @@ export function isServicePeriodStartFirstDayOfCurrentMonth(
 }
 
 /**
+ * Check if given dateOfServiceStart is in the current calendar month.
+ * @param dateOfServiceStart - ISO date string.
+ * @returns True if date is in the current month and year.
+ */
+export function isServicePeriodStartInCurrentMonth(
+  dateOfServiceStart: string,
+): boolean {
+  return dayjs(dateOfServiceStart).isSame(dayjs(), "month");
+}
+
+/**
  * Determine if service period should be shown (not first day of month).
  * @param invoiceData - Invoice containing service period fields.
  * @returns True if start is not first day of its month.

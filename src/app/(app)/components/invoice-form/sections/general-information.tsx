@@ -3,7 +3,10 @@ import {
   ErrorMessage,
 } from "@/app/(app)/components/invoice-form/common";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-import { isServicePeriodStartFirstDayOfCurrentMonth } from "@/app/(app)/utils/format-service-period";
+import {
+  isServicePeriodStartFirstDayOfCurrentMonth,
+  isServicePeriodStartInCurrentMonth,
+} from "@/app/(app)/utils/format-service-period";
 import {
   DEFAULT_DATE_FORMAT,
   type InvoiceData,
@@ -66,6 +69,7 @@ export const GeneralInformation = memo(function GeneralInformation({
   });
 
   const dateOfService = useWatch({ control, name: "dateOfService" });
+  const dateOfServiceStart = useWatch({ control, name: "dateOfServiceStart" });
   const language = useWatch({ control, name: "language" });
   const template = useWatch({ control, name: "template" });
   const logo = useWatch({ control, name: "logo" });
@@ -81,6 +85,10 @@ export const GeneralInformation = memo(function GeneralInformation({
     dayjs().endOf("month"),
     "day",
   );
+
+  const isServicePeriodStartOutsideCurrentMonth =
+    !!dateOfServiceStart &&
+    !isServicePeriodStartInCurrentMonth(dateOfServiceStart);
 
   const isDefaultInvoiceNumberLabel =
     invoiceNumberLabel === defaultInvoiceNumber;
@@ -152,8 +160,15 @@ export const GeneralInformation = memo(function GeneralInformation({
     !paymentDue ||
     !dayjs(paymentDue).isSame(dayjs(dateOfIssue).add(14, "days"), "day");
 
-  const canShowOutOfDateDatesHelper =
+  /**
+   * Whether to show Stale Dates Banner.
+   * Banner appears when any invoice date/number is out of sync with current month.
+   * Triggers: service end not end of current month, service start not in current month,
+   * invoice number not for current month, issue date not today, payment due not 14 days after issue.
+   */
+  const canShowStaleDatesBanner =
     !isDateOfServiceEndOfMonth ||
+    isServicePeriodStartOutsideCurrentMonth ||
     !isInvoiceNumberInCurrentMonth ||
     isDateOfIssueNotToday ||
     isPaymentDueNotMatchingIssueDate;
@@ -536,6 +551,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                       const newStart = e.target.value;
 
+                      // auto-show "Service period" in PDF when start date not first day of current month
                       if (
                         newStart &&
                         !isServicePeriodStartFirstDayOfCurrentMonth(newStart)
@@ -548,6 +564,16 @@ export const GeneralInformation = memo(function GeneralInformation({
               />
               {errors.dateOfServiceStart ? (
                 <ErrorMessage>{errors.dateOfServiceStart.message}</ErrorMessage>
+              ) : null}
+
+              {isServicePeriodStartOutsideCurrentMonth &&
+              !errors.dateOfServiceStart ? (
+                <InputHelperMessage>
+                  <span className="flex items-center text-amber-800">
+                    <AlertIcon />
+                    Service period start is not in the current month
+                  </span>
+                </InputHelperMessage>
               ) : null}
             </div>
 
@@ -584,10 +610,11 @@ export const GeneralInformation = memo(function GeneralInformation({
         </fieldset>
 
         {/* Out of Date Dates Helper */}
-        {canShowOutOfDateDatesHelper ? (
-          <OutOfDateDatesHelper
+        {canShowStaleDatesBanner ? (
+          <StaleDatesBanner
             dateOfIssue={dateOfIssue}
             dateOfService={dateOfService}
+            dateOfServiceStart={dateOfServiceStart ?? ""}
             invoiceNumberValue={invoiceNumberValue ?? ""}
             paymentDue={paymentDue ?? ""}
             selectedDateFormat={selectedDateFormat ?? DEFAULT_DATE_FORMAT}
@@ -745,6 +772,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 interface OutOfDateDatesHelperProps {
   dateOfIssue: string;
   dateOfService: string;
+  dateOfServiceStart: string;
   invoiceNumberValue: string;
   paymentDue: string;
   selectedDateFormat: string;
@@ -753,15 +781,16 @@ interface OutOfDateDatesHelperProps {
 }
 
 /**
- * Displays a helper component that detects and allows updating stale invoice dates.
+ * Displays a helper (banner) component that detects and allows updating stale invoice dates.
  *
- * This component checks if the invoice dates (date of issue, date of service, payment due)
- * and invoice number are outdated compared to the current date. If any are stale, it displays
- * a table showing the old vs new values and provides a button to update all dates at once.
+ * This component checks if the invoice dates (date of issue, service period start/end,
+ * payment due) and invoice number are outdated compared to the current date. If any are stale,
+ * it displays a banner with a table showing the old vs new values and provides a button to update all dates at once.
  */
-function OutOfDateDatesHelper({
+function StaleDatesBanner({
   dateOfIssue,
   dateOfService,
+  dateOfServiceStart,
   invoiceNumberValue,
   paymentDue,
   selectedDateFormat,
@@ -776,6 +805,9 @@ function OutOfDateDatesHelper({
     dayjs().endOf("month"),
     "day",
   );
+  const isDateOfServiceStartStale =
+    !!dateOfServiceStart &&
+    !isServicePeriodStartInCurrentMonth(dateOfServiceStart);
   const extractedMonthYear = /(\d{2}-\d{4})/.exec(invoiceNumberValue)?.[1];
   const isInvoiceNumberStale = extractedMonthYear !== CURRENT_MONTH_AND_YEAR;
 
@@ -793,6 +825,10 @@ function OutOfDateDatesHelper({
   const targetEndOfMonth = dayjs()
     .locale("en")
     .endOf("month")
+    .format(selectedDateFormat);
+  const targetStartOfMonth = dayjs()
+    .locale("en")
+    .startOf("month")
     .format(selectedDateFormat);
   const targetPaymentDue = dayjs()
     .locale("en")
@@ -828,6 +864,12 @@ function OutOfDateDatesHelper({
       oldValue: formatDate(dateOfService),
       newValue: targetEndOfMonth,
       hint: "end of current month",
+    },
+    isDateOfServiceStartStale && {
+      label: "Service period start",
+      oldValue: formatDate(dateOfServiceStart),
+      newValue: targetStartOfMonth,
+      hint: "start of current month",
     },
     isInvoiceNumberStale && {
       label: "Invoice number",
@@ -911,10 +953,14 @@ function OutOfDateDatesHelper({
         onClick={() => {
           const today = dayjs().format("YYYY-MM-DD");
 
+          const firstDayOfCurrentMonth = dayjs()
+            .startOf("month")
+            .format("YYYY-MM-DD");
           const lastDayOfCurrentMonth = dayjs()
             .endOf("month")
             .format("YYYY-MM-DD");
 
+          setValue("dateOfServiceStart", firstDayOfCurrentMonth);
           setValue("dateOfService", lastDayOfCurrentMonth);
           setValue("dateOfIssue", today);
           setValue("invoiceNumberObject.value", targetInvoiceNumber);

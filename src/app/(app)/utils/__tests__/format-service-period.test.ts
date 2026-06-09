@@ -6,6 +6,7 @@ import {
   getServicePeriod,
   isCurrentFullMonthServicePeriod,
   isServicePeriodStartFirstDayOfCurrentMonth,
+  isServicePeriodStartInCurrentMonth,
   shouldShowServicePeriodInDefaultPdf,
   shouldShowServicePeriodLine,
 } from "@/app/(app)/utils/format-service-period";
@@ -75,6 +76,33 @@ describe("format-service-period", () => {
       expect(isServicePeriodStartFirstDayOfCurrentMonth("2025-05-01")).toBe(
         false,
       );
+    });
+  });
+
+  describe("isServicePeriodStartInCurrentMonth", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2025-06-15T12:00:00Z"));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("should return true when start is the first day of the current month", () => {
+      expect(isServicePeriodStartInCurrentMonth("2025-06-01")).toBe(true);
+    });
+
+    it("should return true when start is mid-month in the current month", () => {
+      expect(isServicePeriodStartInCurrentMonth("2025-06-14")).toBe(true);
+    });
+
+    it("should return false when start is in a different month of the same year", () => {
+      expect(isServicePeriodStartInCurrentMonth("2025-05-01")).toBe(false);
+    });
+
+    it("should return false when start is in the same month of a different year", () => {
+      expect(isServicePeriodStartInCurrentMonth("2024-06-01")).toBe(false);
     });
   });
 

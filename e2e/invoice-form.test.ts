@@ -1461,6 +1461,13 @@ test.describe("Invoice Generator Page", () => {
     await dateOfServiceStartInput.fill("2025-06-14");
     await dateOfServiceInput.fill("2024-01-20");
 
+    // Verify per-field service period start helper message
+    await expect(
+      generalInfoSection.getByText(
+        "Service period start is not in the current month",
+      ),
+    ).toBeVisible();
+
     // Verify per-field service period end helper message
     await expect(
       generalInfoSection.getByText(
@@ -1495,12 +1502,15 @@ test.describe("Invoice Generator Page", () => {
 
     // Verify the header shows the correct count of stale fields
     await expect(
-      outOfDateHelper.getByText("4 fields are out of date"),
+      outOfDateHelper.getByText("5 fields are out of date"),
     ).toBeVisible();
 
     // Verify each stale field appears as a row in the table
     await expect(
       outOfDateHelper.getByText("Date of issue", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      outOfDateHelper.getByText("Service period start", { exact: true }),
     ).toBeVisible();
     await expect(
       outOfDateHelper.getByText("Service period end", { exact: true }),
@@ -1512,19 +1522,38 @@ test.describe("Invoice Generator Page", () => {
       outOfDateHelper.getByText("Payment due", { exact: true }),
     ).toBeVisible();
 
-    // Verify the table shows old → new values for date fields
-    await expect(outOfDateHelper.getByText("2024-01-15")).toBeVisible();
-    await expect(outOfDateHelper.getByText("2024-01-20")).toBeVisible();
-    await expect(outOfDateHelper.getByText("2025-12-01")).toBeVisible();
-    await expect(outOfDateHelper.getByText("2025-12-31")).toBeVisible();
+    // Verify the table shows old → new values per row (avoids strict mode when targets match)
+    const dateOfIssueRow = outOfDateHelper
+      .getByRole("row")
+      .filter({ hasText: "Date of issue" });
 
-    // Verify old and new invoice number values in the table
-    await expect(outOfDateHelper.getByText("1/01-2024")).toBeVisible();
-    await expect(outOfDateHelper.getByText("1/12-2025")).toBeVisible();
+    await expect(dateOfIssueRow.getByText("2024-01-15")).toBeVisible();
+    await expect(dateOfIssueRow.getByText("2025-12-01")).toBeVisible();
 
-    // Verify old and new payment due values in the table
-    await expect(outOfDateHelper.getByText("2024-01-16")).toBeVisible();
-    await expect(outOfDateHelper.getByText("2025-12-15")).toBeVisible();
+    const servicePeriodStartRow = outOfDateHelper
+      .getByRole("row")
+      .filter({ hasText: "Service period start" });
+
+    await expect(servicePeriodStartRow.getByText("2025-06-14")).toBeVisible();
+    await expect(servicePeriodStartRow.getByText("2025-12-01")).toBeVisible();
+
+    const servicePeriodEndRow = outOfDateHelper
+      .getByRole("row")
+      .filter({ hasText: "Service period end" });
+    await expect(servicePeriodEndRow.getByText("2024-01-20")).toBeVisible();
+    await expect(servicePeriodEndRow.getByText("2025-12-31")).toBeVisible();
+
+    const invoiceNumberRow = outOfDateHelper
+      .getByRole("row")
+      .filter({ hasText: "Invoice number" });
+    await expect(invoiceNumberRow.getByText("1/01-2024")).toBeVisible();
+    await expect(invoiceNumberRow.getByText("1/12-2025")).toBeVisible();
+
+    const paymentDueRow = outOfDateHelper
+      .getByRole("row")
+      .filter({ hasText: "Payment due" });
+    await expect(paymentDueRow.getByText("2024-01-16")).toBeVisible();
+    await expect(paymentDueRow.getByText("2025-12-15")).toBeVisible();
 
     // Verify the "Update All Dates" button is visible
     const updateAllDatesButton = outOfDateHelper.getByRole("button", {
@@ -1552,10 +1581,15 @@ test.describe("Invoice Generator Page", () => {
         "Service period end is not the last day of the current month",
       ),
     ).toBeHidden();
+    await expect(
+      generalInfoSection.getByText(
+        "Service period start is not in the current month",
+      ),
+    ).toBeHidden();
 
     // Verify all fields were updated to correct values
     await expect(dateOfIssueInput).toHaveValue("2025-12-01");
-    await expect(dateOfServiceStartInput).toHaveValue("2025-06-14");
+    await expect(dateOfServiceStartInput).toHaveValue("2025-12-01");
     await expect(dateOfServiceInput).toHaveValue("2025-12-31");
     await expect(invoiceNumberInput).toHaveValue("1/12-2025");
     await expect(paymentDueInput).toHaveValue("2025-12-15");
