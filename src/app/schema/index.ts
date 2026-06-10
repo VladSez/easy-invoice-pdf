@@ -1051,7 +1051,10 @@ export const invoiceObjectSchema = z.object({
       "Service period start date. Defaults to the first day of the month containing dateOfService",
     ),
 
-  // date of service end (name in zod schema for backwards compatibility)
+  /**
+   * Date of service end. (date of sales/of executing the service)
+   * Name retained as "dateOfService" in schema for backwards compatibility.
+   */
   dateOfService: z
     .string()
     .trim()
@@ -1065,7 +1068,14 @@ export const invoiceObjectSchema = z.object({
     .describe(
       "Invoice date of service. Default is the last day of the current month",
     ),
+  /**
+   * Show/hide the "Date of sales/of executing the service" field in the PDF
+   */
+  dateOfServiceFieldIsVisible: z.boolean().default(true),
 
+  /**
+   * Show/hide the "Service period" (service period start and end date) field in the PDF
+   */
   servicePeriodFieldIsVisible: z.boolean().default(false),
 
   /**

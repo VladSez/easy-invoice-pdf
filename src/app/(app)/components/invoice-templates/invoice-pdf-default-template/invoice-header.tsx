@@ -6,7 +6,6 @@ import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-
 import {
   formatDateOfServiceEnd,
   formatServicePeriodRange,
-  shouldShowServicePeriodInDefaultPdf,
 } from "@/app/(app)/utils/format-service-period";
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
@@ -23,8 +22,11 @@ function HeaderDates({
     invoiceData.dateFormat,
   );
   const dateOfServiceEnd = formatDateOfServiceEnd(invoiceData);
-  const showServicePeriod = shouldShowServicePeriodInDefaultPdf(invoiceData);
   const servicePeriodRange = formatServicePeriodRange(invoiceData);
+
+  const showServicePeriod = invoiceData?.servicePeriodFieldIsVisible;
+
+  const showDateOfService = invoiceData?.dateOfServiceFieldIsVisible;
 
   return (
     <View
@@ -46,12 +48,14 @@ function HeaderDates({
           </Text>
         </Text>
       ) : null}
-      <Text style={styles.fontSize7}>
-        {t.dateOfService}:{" "}
-        <Text style={[styles.fontBold, styles.fontSize8]}>
-          {dateOfServiceEnd}
+      {showDateOfService ? (
+        <Text style={styles.fontSize7}>
+          {t.dateOfService}:{" "}
+          <Text style={[styles.fontBold, styles.fontSize8]}>
+            {dateOfServiceEnd}
+          </Text>
         </Text>
-      </Text>
+      ) : null}
     </View>
   );
 }

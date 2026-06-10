@@ -504,7 +504,7 @@ export const GeneralInformation = memo(function GeneralInformation({
             Service period
           </legend>
 
-          <div className="mb-3 flex justify-end">
+          <div className="mb-5 flex flex-col items-end gap-2 sm:flex-row sm:justify-end sm:gap-4">
             <div className="inline-flex items-center gap-2">
               <Controller
                 name="servicePeriodFieldIsVisible"
@@ -524,12 +524,42 @@ export const GeneralInformation = memo(function GeneralInformation({
               <CustomTooltip
                 trigger={
                   <Label htmlFor="servicePeriodFieldIsVisible">
-                    Show in PDF
+                    Service period
                   </Label>
                 }
                 content='Show the "Service period" field in the PDF'
               />
             </div>
+            {template === "default" ? (
+              <div className="inline-flex items-center gap-2">
+                <Controller
+                  name="dateOfServiceFieldIsVisible"
+                  control={control}
+                  render={({ field: { value, onChange, ...field } }) => (
+                    <Switch
+                      {...field}
+                      id="dateOfServiceFieldIsVisible"
+                      data-testid="dateOfServiceFieldIsVisible"
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      aria-label='Show the "Date of sales" field in the PDF'
+                    />
+                  )}
+                />
+                <CustomTooltip
+                  trigger={
+                    <Label
+                      htmlFor="dateOfServiceFieldIsVisible"
+                      className="min-w-[77px]"
+                    >
+                      Date of sales
+                    </Label>
+                  }
+                  content='Show the "Date of sales" field in the PDF'
+                />
+              </div>
+            ) : null}
           </div>
 
           <div className="space-y-4">

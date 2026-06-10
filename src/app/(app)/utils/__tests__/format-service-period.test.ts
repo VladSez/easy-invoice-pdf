@@ -7,7 +7,6 @@ import {
   isCurrentFullMonthServicePeriod,
   isServicePeriodStartFirstDayOfCurrentMonth,
   isServicePeriodStartInCurrentMonth,
-  shouldShowServicePeriodInDefaultPdf,
   shouldShowServicePeriodLine,
 } from "@/app/(app)/utils/format-service-period";
 import type { InvoiceData } from "@/app/schema";
@@ -123,52 +122,6 @@ describe("format-service-period", () => {
           ...baseInvoiceData,
           dateOfServiceStart: "2026-05-11",
           dateOfService: "2026-05-31",
-        } as InvoiceData),
-      ).toBe(true);
-    });
-  });
-
-  describe("shouldShowServicePeriodInDefaultPdf", () => {
-    it("should return false for full month when switch is off", () => {
-      expect(
-        shouldShowServicePeriodInDefaultPdf({
-          ...baseInvoiceData,
-          dateOfServiceStart: "2026-05-01",
-          dateOfService: "2026-05-31",
-          servicePeriodFieldIsVisible: false,
-        } as InvoiceData),
-      ).toBe(false);
-    });
-
-    it("should return true for full month when switch is on", () => {
-      expect(
-        shouldShowServicePeriodInDefaultPdf({
-          ...baseInvoiceData,
-          dateOfServiceStart: "2026-05-01",
-          dateOfService: "2026-05-31",
-          servicePeriodFieldIsVisible: true,
-        } as InvoiceData),
-      ).toBe(true);
-    });
-
-    it("should return false for partial period when switch is off", () => {
-      expect(
-        shouldShowServicePeriodInDefaultPdf({
-          ...baseInvoiceData,
-          dateOfServiceStart: "2026-05-11",
-          dateOfService: "2026-05-31",
-          servicePeriodFieldIsVisible: false,
-        } as InvoiceData),
-      ).toBe(false);
-    });
-
-    it("should return true for partial period when switch is on", () => {
-      expect(
-        shouldShowServicePeriodInDefaultPdf({
-          ...baseInvoiceData,
-          dateOfServiceStart: "2026-05-11",
-          dateOfService: "2026-05-31",
-          servicePeriodFieldIsVisible: true,
         } as InvoiceData),
       ).toBe(true);
     });

@@ -92,6 +92,7 @@ export const INITIAL_INVOICE_DATA = {
   dateOfServiceStart: FIRST_DAY_OF_MONTH,
   dateOfService: LAST_DAY_OF_MONTH,
   servicePeriodFieldIsVisible: false,
+  dateOfServiceFieldIsVisible: true,
   dateFormat: DEFAULT_DATE_FORMAT,
 
   invoiceType: "",

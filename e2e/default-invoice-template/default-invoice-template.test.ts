@@ -2086,4 +2086,131 @@ test.describe("Default Invoice Template", () => {
       "service-period-hidden-in-pdf-default-template.png",
     );
   });
+
+  test("displays date of sales in PDF when enabled and hides it when toggled off", async ({
+    page,
+    browserName,
+    downloadDir,
+  }, testInfo) => {
+    await expect(page).toHaveURL("/?template=default");
+
+    const generalInfoSection = page.getByTestId("general-information-section");
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+    await expect(servicePeriodFieldset).toBeVisible();
+
+    const dateOfServiceSwitch = servicePeriodFieldset.getByTestId(
+      "dateOfServiceFieldIsVisible",
+    );
+    await expect(dateOfServiceSwitch).toBeChecked();
+
+    const finalSection = page.getByTestId("final-section");
+    await finalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(`Test: ${testInfo.title} (${testInfo.project.name})`);
+
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const downloadPdfEnglishButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    await expect(downloadPdfEnglishButton).toBeVisible();
+    await expect(downloadPdfEnglishButton).toBeEnabled();
+
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      downloadPdfEnglishButton.click(),
+    ]);
+
+    const pdfFilePath = path.join(
+      downloadDir,
+      `${browserName}-${download.suggestedFilename()}`,
+    );
+
+    await download.saveAs(pdfFilePath);
+
+    const absolutePath = path.resolve(pdfFilePath);
+    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
+
+    const pdfBytes = fs.readFileSync(absolutePath);
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, pdfBytes);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "date-of-sales-visible-in-pdf-default-template.png",
+    );
+
+    await page.goto("/");
+    await expect(page).toHaveURL("/?template=default");
+
+    const newGeneralInfoSection = page.getByTestId(
+      "general-information-section",
+    );
+    const newServicePeriodFieldset = newGeneralInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+    await expect(newServicePeriodFieldset).toBeVisible();
+
+    const newDateOfServiceSwitch = newServicePeriodFieldset.getByTestId(
+      "dateOfServiceFieldIsVisible",
+    );
+
+    await expect(newDateOfServiceSwitch).toBeChecked();
+
+    await newDateOfServiceSwitch.click();
+    await expect(newDateOfServiceSwitch).not.toBeChecked();
+
+    const newFinalSection = page.getByTestId("final-section");
+    await newFinalSection
+      .getByRole("textbox", { name: "Notes", exact: true })
+      .fill(
+        `Test: ${testInfo.title} - date of sales hidden in PDF (${testInfo.project.name})`,
+      );
+
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(700);
+
+    const newDownloadPdfEnglishButton = page.getByRole("link", {
+      name: "Download PDF in English",
+    });
+
+    const [downloadWithoutDateOfSales] = await Promise.all([
+      page.waitForEvent("download"),
+      newDownloadPdfEnglishButton.click(),
+    ]);
+
+    const pdfFilePath2 = path.join(
+      downloadDir,
+      `${browserName}-${downloadWithoutDateOfSales.suggestedFilename()}`,
+    );
+
+    await downloadWithoutDateOfSales.saveAs(pdfFilePath2);
+
+    const pdfBytesWithoutDateOfSales = fs.readFileSync(pdfFilePath2);
+
+    await page.goto("about:blank");
+
+    await renderPdfOnCanvas(page, pdfBytesWithoutDateOfSales);
+
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __PDF_RENDERED__: boolean })
+          .__PDF_RENDERED__ === true,
+    );
+
+    await expect(page.locator("canvas")).toHaveScreenshot(
+      "date-of-sales-hidden-in-pdf-default-template.png",
+    );
+  });
 });

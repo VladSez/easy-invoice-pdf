@@ -31,6 +31,7 @@ describe("URL Compression Utilities", () => {
       expect(result).toHaveProperty("9", "2024-01-01"); // dateOfServiceStart
       expect(result).toHaveProperty("h", "2024-01-31"); // dateOfService
       expect(result).toHaveProperty("!", false); // servicePeriodFieldIsVisible
+      expect(result).toHaveProperty("@", true); // dateOfServiceFieldIsVisible
       expect(result).toHaveProperty("i", "Standard Invoice"); // invoiceType
       expect(result).toHaveProperty("j", true); // invoiceTypeFieldIsVisible
       expect(result).toHaveProperty("n", 247.23); // total
@@ -209,6 +210,7 @@ describe("URL Compression Utilities", () => {
       expect(result).toHaveProperty("dateOfServiceStart", "2024-01-01");
       expect(result).toHaveProperty("dateOfService", "2024-01-31");
       expect(result).toHaveProperty("servicePeriodFieldIsVisible", false);
+      expect(result).toHaveProperty("dateOfServiceFieldIsVisible", true);
       expect(result).toHaveProperty("invoiceType", "Standard Invoice");
       expect(result).toHaveProperty("invoiceTypeFieldIsVisible", true);
       expect(result).toHaveProperty("total", 247.23);

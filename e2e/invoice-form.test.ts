@@ -330,6 +330,19 @@ test.describe("Invoice Generator Page", () => {
       servicePeriodFieldset.getByTestId("servicePeriodFieldIsVisible"),
     ).not.toBeChecked();
 
+    // Date of service (date of sales/of executing the service)
+    const dateOfServiceSwitch = servicePeriodFieldset.getByTestId(
+      "dateOfServiceFieldIsVisible",
+    );
+
+    await expect(dateOfServiceSwitch).toBeChecked();
+    await dateOfServiceSwitch.click();
+    await expect(dateOfServiceSwitch).not.toBeChecked();
+
+    await expect(
+      servicePeriodFieldset.getByLabel("Service period end"),
+    ).toBeEditable();
+
     // Invoice Type
     await expect(
       generalInfoSection.getByRole("textbox", { name: "Header Notes" }),

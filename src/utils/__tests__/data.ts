@@ -72,6 +72,7 @@ export const MOCK_INVOICE_DATA = {
   dateOfServiceStart: "2024-01-01",
   dateOfService: "2024-01-31",
   servicePeriodFieldIsVisible: false,
+  dateOfServiceFieldIsVisible: true,
   invoiceType: "Standard Invoice",
   invoiceTypeFieldIsVisible: true,
   seller: MOCK_SELLER_DATA,

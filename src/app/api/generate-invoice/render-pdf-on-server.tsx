@@ -89,6 +89,7 @@ export const ENGLISH_INVOICE_REAL_DATA = {
   dateOfServiceStart: FIRST_DAY_OF_MONTH,
   dateOfService: LAST_DAY_OF_MONTH,
   servicePeriodFieldIsVisible: false,
+  dateOfServiceFieldIsVisible: true,
   paymentDue: PAYMENT_DUE,
 
   invoiceType: "Reverse Charge",

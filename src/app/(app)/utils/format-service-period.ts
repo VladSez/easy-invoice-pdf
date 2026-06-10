@@ -69,17 +69,6 @@ export function shouldShowServicePeriodLine(invoiceData: InvoiceData): boolean {
 }
 
 /**
- * Check if service period field should show in default PDF.
- * @param invoiceData - Invoice containing servicePeriodFieldIsVisible field.
- * @returns True if service period field is visible.
- */
-export function shouldShowServicePeriodInDefaultPdf(
-  invoiceData: InvoiceData,
-): boolean {
-  return invoiceData.servicePeriodFieldIsVisible;
-}
-
-/**
  * Format start and end of service period as range using invoice's date format.
  * @param invoiceData - Invoice containing dateFormat and service period dates.
  * @returns Range string: 'start – end', formatted.
