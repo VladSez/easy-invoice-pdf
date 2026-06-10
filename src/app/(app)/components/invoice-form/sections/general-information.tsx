@@ -28,7 +28,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import dayjs from "dayjs";
-import { AlertTriangle, RefreshCw, Upload, X } from "lucide-react";
+import { AlertTriangle, InfoIcon, RefreshCw, Upload, X } from "lucide-react";
 import { memo, useCallback, useRef } from "react";
 import {
   type Control,
@@ -504,7 +504,7 @@ export const GeneralInformation = memo(function GeneralInformation({
             Service period
           </legend>
 
-          <div className="mb-5 flex flex-col items-end gap-2 sm:flex-row sm:justify-end sm:gap-4">
+          <div className="mb-5 flex flex-col items-start gap-2 sm:justify-end sm:gap-4">
             <div className="inline-flex items-center gap-2">
               <Controller
                 name="servicePeriodFieldIsVisible"
@@ -517,17 +517,17 @@ export const GeneralInformation = memo(function GeneralInformation({
                     checked={value}
                     onCheckedChange={onChange}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    aria-label='Show the "Service period" field in the PDF'
+                    aria-label='Show the "Service period" (Service period start and end) field in the PDF'
                   />
                 )}
               />
               <CustomTooltip
                 trigger={
                   <Label htmlFor="servicePeriodFieldIsVisible">
-                    Service period
+                    Show &quot;Service period&quot; in PDF
                   </Label>
                 }
-                content='Show the "Service period" field in the PDF'
+                content='Show the "Service period" (Service period start and end) field in the PDF'
               />
             </div>
             {template === "default" ? (
@@ -543,20 +543,17 @@ export const GeneralInformation = memo(function GeneralInformation({
                       checked={value}
                       onCheckedChange={onChange}
                       className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                      aria-label='Show the "Date of sales" field in the PDF'
+                      aria-label='Show the "Date of sales/of executing the service" (Service period end) field in the PDF'
                     />
                   )}
                 />
                 <CustomTooltip
                   trigger={
-                    <Label
-                      htmlFor="dateOfServiceFieldIsVisible"
-                      className="min-w-[77px]"
-                    >
-                      Date of sales
+                    <Label htmlFor="dateOfServiceFieldIsVisible">
+                      Show &quot;Date of sales&quot; in PDF (Service period end)
                     </Label>
                   }
-                  content='Show the "Date of sales" field in the PDF'
+                  content='Show the "Date of sales/of executing the service" (Service period end) field in the PDF'
                 />
               </div>
             ) : null}
@@ -608,9 +605,23 @@ export const GeneralInformation = memo(function GeneralInformation({
             </div>
 
             <div>
-              <Label htmlFor="dateOfService" className="mb-1">
-                Service period end
-              </Label>
+              <div className="mb-1 flex items-center">
+                <Label htmlFor="dateOfService">Service period end</Label>
+                <CustomTooltip
+                  content='Shown on PDF as "Date of sales/of executing the service"'
+                  side="top"
+                  trigger={
+                    <button
+                      type="button"
+                      className="ml-1 inline-flex cursor-pointer items-center align-middle"
+                      aria-label='Shown on PDF as "Date of sales/of executing the service"'
+                    >
+                      <InfoIcon className="size-3" aria-hidden />
+                    </button>
+                  }
+                />
+              </div>
+
               <Controller
                 name="dateOfService"
                 control={control}
@@ -864,7 +875,10 @@ function StaleDatesBanner({
     .locale("en")
     .add(14, "days")
     .format(selectedDateFormat);
+
   const targetInvoiceNumber = `1/${CURRENT_MONTH_AND_YEAR}`;
+
+  const fallbackValue = "(not set)";
 
   /**
    * Array of items to check for staleness.
@@ -885,31 +899,33 @@ function StaleDatesBanner({
   )[] = [
     isDateOfIssueStale && {
       label: "Date of issue",
-      oldValue: formatDate(dateOfIssue),
+      oldValue: dateOfIssue ? formatDate(dateOfIssue) : fallbackValue,
       newValue: targetToday,
       hint: "today",
     },
     isDateOfServiceStale && {
       label: "Service period end",
-      oldValue: formatDate(dateOfService),
+      oldValue: dateOfService ? formatDate(dateOfService) : fallbackValue,
       newValue: targetEndOfMonth,
       hint: "end of current month",
     },
     isDateOfServiceStartStale && {
       label: "Service period start",
-      oldValue: formatDate(dateOfServiceStart),
+      oldValue: dateOfServiceStart
+        ? formatDate(dateOfServiceStart)
+        : fallbackValue,
       newValue: targetStartOfMonth,
       hint: "start of current month",
     },
     isInvoiceNumberStale && {
       label: "Invoice number",
-      oldValue: invoiceNumberValue || "—",
+      oldValue: invoiceNumberValue ? invoiceNumberValue : fallbackValue,
       newValue: targetInvoiceNumber,
       hint: "current month",
     },
     isPaymentDueStale && {
       label: "Payment due",
-      oldValue: paymentDue ? formatDate(paymentDue) : "—",
+      oldValue: paymentDue ? formatDate(paymentDue) : fallbackValue,
       newValue: targetPaymentDue,
       hint: "date of issue + 14 days",
     },

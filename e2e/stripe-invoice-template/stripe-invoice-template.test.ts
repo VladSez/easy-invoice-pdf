@@ -1216,22 +1216,26 @@ test.describe("Stripe Invoice Template", () => {
     });
     await expect(servicePeriodFieldset).toBeVisible();
 
-    const servicePeriodSwitch = servicePeriodFieldset.getByTestId(
-      "servicePeriodFieldIsVisible",
-    );
+    const servicePeriodSwitch = servicePeriodFieldset.getByRole("switch", {
+      name: 'Show the "Service period" (Service period start and end) field in the PDF',
+    });
 
     await servicePeriodFieldset
-      .getByLabel("Service period start")
+      .getByRole("textbox", { name: "Service period start" })
       .fill(SERVICE_PERIOD_TEST_DATA.start);
     await servicePeriodFieldset
-      .getByLabel("Service period end")
+      .getByRole("textbox", { name: "Service period end" })
       .fill(SERVICE_PERIOD_TEST_DATA.end);
 
     await expect(
-      servicePeriodFieldset.getByLabel("Service period start"),
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period start",
+      }),
     ).toHaveValue(SERVICE_PERIOD_TEST_DATA.start);
     await expect(
-      servicePeriodFieldset.getByLabel("Service period end"),
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period end",
+      }),
     ).toHaveValue(SERVICE_PERIOD_TEST_DATA.end);
     await expect(servicePeriodSwitch).toBeChecked();
 
@@ -1292,8 +1296,11 @@ test.describe("Stripe Invoice Template", () => {
     });
     await expect(newServicePeriodFieldset).toBeVisible();
 
-    const newServicePeriodSwitch = newServicePeriodFieldset.getByTestId(
-      "servicePeriodFieldIsVisible",
+    const newServicePeriodSwitch = newServicePeriodFieldset.getByRole(
+      "switch",
+      {
+        name: 'Show the "Service period" (Service period start and end) field in the PDF',
+      },
     );
 
     await expect(newServicePeriodSwitch).toBeChecked();
@@ -1302,10 +1309,14 @@ test.describe("Stripe Invoice Template", () => {
     await expect(newServicePeriodSwitch).not.toBeChecked();
 
     await expect(
-      newServicePeriodFieldset.getByLabel("Service period start"),
+      newServicePeriodFieldset.getByRole("textbox", {
+        name: "Service period start",
+      }),
     ).toHaveValue(SERVICE_PERIOD_TEST_DATA.start);
     await expect(
-      newServicePeriodFieldset.getByLabel("Service period end"),
+      newServicePeriodFieldset.getByRole("textbox", {
+        name: "Service period end",
+      }),
     ).toHaveValue(SERVICE_PERIOD_TEST_DATA.end);
 
     const newFinalSection = page.getByTestId("final-section");

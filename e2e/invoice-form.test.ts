@@ -327,21 +327,31 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue(INITIAL_INVOICE_DATA.dateOfService);
 
     await expect(
-      servicePeriodFieldset.getByTestId("servicePeriodFieldIsVisible"),
+      servicePeriodFieldset.getByRole("switch", {
+        name: 'Show the "Service period" (Service period start and end) field in the PDF',
+      }),
     ).not.toBeChecked();
 
-    // Date of service (date of sales/of executing the service)
-    const dateOfServiceSwitch = servicePeriodFieldset.getByTestId(
-      "dateOfServiceFieldIsVisible",
-    );
+    // by default, date of sales is visible in PDF
+    const dateOfServiceSwitch = servicePeriodFieldset.getByRole("switch", {
+      name: 'Show the "Date of sales/of executing the service" (Service period end) field in the PDF',
+    });
 
     await expect(dateOfServiceSwitch).toBeChecked();
     await dateOfServiceSwitch.click();
     await expect(dateOfServiceSwitch).not.toBeChecked();
 
     await expect(
-      servicePeriodFieldset.getByLabel("Service period end"),
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period end",
+      }),
     ).toBeEditable();
+
+    await expect(
+      servicePeriodFieldset.getByRole("button", {
+        name: 'Shown on PDF as "Date of sales/of executing the service"',
+      }),
+    ).toBeVisible();
 
     // Invoice Type
     await expect(
@@ -1466,11 +1476,12 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     // Set service period end to a date that's not the last day of current month
-    const dateOfServiceStartInput = generalInfoSection.getByLabel(
-      "Service period start",
-    );
-    const dateOfServiceInput =
-      generalInfoSection.getByLabel("Service period end");
+    const dateOfServiceStartInput = generalInfoSection.getByRole("textbox", {
+      name: "Service period start",
+    });
+    const dateOfServiceInput = generalInfoSection.getByRole("textbox", {
+      name: "Service period end",
+    });
     await dateOfServiceStartInput.fill("2025-06-14");
     await dateOfServiceInput.fill("2024-01-20");
 
@@ -1622,22 +1633,26 @@ test.describe("Invoice Generator Page", () => {
       name: "Service period",
     });
 
-    const servicePeriodSwitch = servicePeriodFieldset.getByTestId(
-      "servicePeriodFieldIsVisible",
-    );
+    const servicePeriodSwitch = servicePeriodFieldset.getByRole("switch", {
+      name: 'Show the "Service period" (Service period start and end) field in the PDF',
+    });
 
     await servicePeriodFieldset
-      .getByLabel("Service period start")
+      .getByRole("textbox", { name: "Service period start" })
       .fill("2025-06-14");
     await servicePeriodFieldset
-      .getByLabel("Service period end")
+      .getByRole("textbox", { name: "Service period end" })
       .fill("2025-06-20");
 
     await expect(
-      servicePeriodFieldset.getByLabel("Service period start"),
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period start",
+      }),
     ).toHaveValue("2025-06-14");
     await expect(
-      servicePeriodFieldset.getByLabel("Service period end"),
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period end",
+      }),
     ).toHaveValue("2025-06-20");
 
     await expect(servicePeriodSwitch).toBeChecked();
@@ -1646,7 +1661,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(servicePeriodSwitch).not.toBeChecked();
 
     await servicePeriodFieldset
-      .getByLabel("Service period start")
+      .getByRole("textbox", { name: "Service period start" })
       .fill("2025-06-15");
     await expect(servicePeriodSwitch).toBeChecked();
   });
