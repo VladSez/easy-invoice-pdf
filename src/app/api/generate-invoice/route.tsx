@@ -75,6 +75,25 @@ export async function GET(req: NextRequest) {
     const shouldSaveToGoogleDrive =
       req.nextUrl.searchParams.get("saveToGoogleDrive") !== "false";
 
+    const testModeWarnings: string[] = [];
+
+    if (!shouldSendEmail) {
+      testModeWarnings.push("👉 Email sending *disabled* (`sendEmail=false`)");
+    }
+
+    if (!shouldSaveToGoogleDrive) {
+      testModeWarnings.push(
+        "👉 Google Drive upload *disabled* (`saveToGoogleDrive=false`)",
+      );
+    }
+
+    const testModeWarningBlock =
+      testModeWarnings.length > 0
+        ? `\n\n⚠️⚠️⚠️ *Test mode warning:* ⚠️⚠️⚠️\n\n${testModeWarnings
+            .map((w) => `- ${w}`)
+            .join("\n")}\n\n------------------------------------\n`
+        : "";
+
     const GENERATED_ENGLISH_INVOICE_PDF_DOCUMENT = renderToBuffer(
       <InvoicePdfTemplateToRenderOnBackend
         invoiceData={ENGLISH_INVOICE_REAL_DATA}
@@ -240,7 +259,7 @@ export async function GET(req: NextRequest) {
     // Send notifications in parallel
     const notifications: Promise<unknown>[] = [
       sendTelegramMessage({
-        message: `📝 *Invoices for ${monthAndYear}*
+        message: `${testModeWarningBlock}📝 *Invoices for ${monthAndYear}*
 
 Invoice No. of: *${invoiceNumberValue}*
 Date: *${dayjs().format("MMMM D, YYYY")}*

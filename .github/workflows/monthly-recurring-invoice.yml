@@ -5,14 +5,14 @@ concurrency:
   cancel-in-progress: false
 
 on:
+  workflow_dispatch:
   schedule:
     # Run every day from the 10th to the 12th.
     # We need this range because:
     # - if the 10th is a weekday -> run on 10th
     # - if the 10th is Saturday -> run on Monday 12th
     # - if the 10th is Sunday -> run on Monday 11th
-    - cron: "0 15 10-12 * *"
-      timezone: Europe/Warsaw
+    - cron: "5 14 10-12 * *"
 
 jobs:
   recurring-invoice:
@@ -94,7 +94,8 @@ jobs:
             `weekday=${weekday}\n` +
             `target_day=${targetDay}\n` +
             `today=${today}\n` +
-            `today_weekday=${todayWeekday}\n`
+            `today_weekday=${todayWeekday}\n` +
+            `today_weekday_name=${getPart('weekday')}\n`
           )
           EOF
           )
@@ -105,6 +106,9 @@ jobs:
           WEEKDAY: ${{ steps.date-check.outputs.weekday }}
           TARGET_DAY: ${{ steps.date-check.outputs.target_day }}
           SHOULD_RUN: ${{ steps.date-check.outputs.should_run }}
+          TODAY_WEEKDAY_NAME: ${{ steps.date-check.outputs.today_weekday_name }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_GITHUB_ACTIONS_CHAT_ID }}
         run: |
           WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           NOW="$(date '+%d.%m.%Y %H:%M:%S %Z')"
@@ -113,10 +117,9 @@ jobs:
           WEEKDAY_NAMES=("Sunday" "Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday")
           WEEKDAY_NAME="${WEEKDAY_NAMES[$WEEKDAY]}"
 
-          # Build weekend explanation if 10th fell on Saturday or Sunday
           WEEKEND_LINE=""
           if [ "$WEEKDAY" == "0" ] || [ "$WEEKDAY" == "6" ]; then
-            WEEKEND_LINE="10th was a weekend ($WEEKDAY_NAME), so execution moved to Monday ($TARGET_DAY).%0A%0A"
+            WEEKEND_LINE=$'10th was a weekend ('"$WEEKDAY_NAME"$'), so execution moved to Monday ('"$TARGET_DAY"$').\n\n'
           fi
 
           if [ "$SHOULD_RUN" == "true" ]; then
@@ -125,60 +128,53 @@ jobs:
             STATUS="⏭️ Status: Skipped (awaiting correct date)"
           fi
 
-          MESSAGE="📅 Monthly Invoice Workflow%0A%0A"
-          MESSAGE+="🕒 $NOW%0A%0A"
-          MESSAGE+="<b>Billing period:</b> $BILLING_PERIOD%0A%0A"
-          MESSAGE+="$WEEKEND_LINE"
-          MESSAGE+="$STATUS%0A%0A"
-          MESSAGE+="🔗 <a href=\"$WORKFLOW_URL\">View Workflow</a>"
+          export TEXT=$'📅 Monthly Invoice Workflow\n\n'"🕒 ${NOW} (${TODAY_WEEKDAY_NAME})"$'\n\n<b>Billing period:</b> '"${BILLING_PERIOD}"$'\n\n'"${WEEKEND_LINE}${STATUS}"$'\n\n🔗 <a href="'"${WORKFLOW_URL}"$'">View Workflow</a>'
 
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
-            -d chat_id="${{ secrets.TELEGRAM_GITHUB_ACTIONS_CHAT_ID }}" \
-            -d text="$MESSAGE" \
-            -d parse_mode="HTML" > /dev/null
+          node <<'EOF'
+          ;(async () => {
+            const text = process.env.TEXT
+            const payload = {
+              chat_id: process.env.TELEGRAM_CHAT_ID,
+              text,
+              parse_mode: "HTML",
+              disable_web_page_preview: true,
+            }
+
+            const response = await fetch(
+              `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              },
+            )
+            const body = await response.text()
+            if (!response.ok) {
+              console.error("Telegram API error:", body)
+              process.exit(1)
+            }
+            console.log("Telegram notification sent:", body)
+          })().catch((error) => {
+            console.error(error)
+            process.exit(1)
+          })
+          EOF
 
       - name: Generate monthly recurring invoice
+        id: generate-invoice
         # Execute only if date-check step decided
         # that today is the correct execution day.
         if: steps.date-check.outputs.should_run == 'true'
         run: |
+          INVOICE_API_URL='https://easyinvoicepdf.com/api/generate-invoice'
+
+          echo "✅ [monthly-recurring-invoice github actions workflow] Generating monthly recurring invoice at $(date '+%Y-%m-%d %H:%M:%S %Z')"
+          echo "👉 [monthly-recurring-invoice github actions workflow] GET ${INVOICE_API_URL}"
+
           curl --fail-with-body \
             --silent \
             --show-error \
             -X GET \
             --max-time 60 \
             -H "Authorization: Bearer ${{ secrets.INVOICE_AUTH_TOKEN }}" \
-            https://easyinvoicepdf.com/api/generate-invoice
-
-      - name: Send success notification to Telegram
-        if: steps.date-check.outputs.should_run == 'true' && success()
-        run: |
-          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          NOW="$(date '+%d.%m.%Y %H:%M:%S %Z')"
-
-          MESSAGE="📅 Monthly Invoice Workflow%0A%0A"
-          MESSAGE+="🕒 $NOW%0A%0A"
-          MESSAGE+="✅ Status: Invoice generated successfully%0A%0A"
-          MESSAGE+="🔗 <a href=\"$WORKFLOW_URL\">View Workflow</a>"
-
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
-            -d chat_id="${{ secrets.TELEGRAM_GITHUB_ACTIONS_CHAT_ID }}" \
-            -d text="$MESSAGE" \
-            -d parse_mode="HTML" > /dev/null
-
-      - name: Send failure notification to Telegram
-        if: failure()
-        run: |
-          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          NOW="$(date '+%d.%m.%Y %H:%M:%S %Z')"
-
-          MESSAGE="📅 Monthly Invoice Workflow%0A%0A"
-          MESSAGE+="🕒 $NOW%0A%0A"
-          MESSAGE+="🚨 Status: Invoice generation failed%0A"
-          MESSAGE+="Please check the workflow for details%0A%0A"
-          MESSAGE+="🔗 <a href=\"$WORKFLOW_URL\">View Workflow</a>"
-
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_GITHUB_ACTIONS_BOT_TOKEN }}/sendMessage" \
-            -d chat_id="${{ secrets.TELEGRAM_GITHUB_ACTIONS_CHAT_ID }}" \
-            -d text="$MESSAGE" \
-            -d parse_mode="HTML" > /dev/null
+            "${INVOICE_API_URL}"
