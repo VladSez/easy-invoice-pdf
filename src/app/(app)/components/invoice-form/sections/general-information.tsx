@@ -68,6 +68,16 @@ export const GeneralInformation = memo(function GeneralInformation({
     name: "invoiceNumberObject.value",
   });
 
+  const servicePeriodLabelText = useWatch({
+    control,
+    name: "servicePeriodLabelText",
+  });
+
+  const dateOfServiceLabelText = useWatch({
+    control,
+    name: "dateOfServiceLabelText",
+  });
+
   const dateOfService = useWatch({ control, name: "dateOfService" });
   const dateOfServiceStart = useWatch({ control, name: "dateOfServiceStart" });
   const language = useWatch({ control, name: "language" });
@@ -78,6 +88,14 @@ export const GeneralInformation = memo(function GeneralInformation({
 
   const t = INVOICE_PDF_TRANSLATIONS[language];
   const defaultInvoiceNumber = `${t.invoiceNumber}:`;
+  const defaultServicePeriodLabel = t.servicePeriod;
+  const defaultDateOfServiceLabel = t.dateOfService;
+
+  const isDefaultServicePeriodLabel =
+    servicePeriodLabelText === defaultServicePeriodLabel;
+
+  const isDefaultDateOfServiceLabel =
+    dateOfServiceLabelText === defaultDateOfServiceLabel;
 
   const isDateOfIssueNotToday = !dayjs(dateOfIssue).isSame(dayjs(), "day");
 
@@ -293,6 +311,15 @@ export const GeneralInformation = memo(function GeneralInformation({
                   // This ensures the tax column header in the invoice items table
                   // displays the correct translation for the selected language
                   setValue("taxLabelText", newTranslation);
+
+                  setValue(
+                    "servicePeriodLabelText",
+                    INVOICE_PDF_TRANSLATIONS[newLanguage].servicePeriod,
+                  );
+                  setValue(
+                    "dateOfServiceLabelText",
+                    INVOICE_PDF_TRANSLATIONS[newLanguage].dateOfService,
+                  );
                 }}
               >
                 {SUPPORTED_LANGUAGES.map((lang) => {
@@ -495,6 +522,22 @@ export const GeneralInformation = memo(function GeneralInformation({
                 <AlertIcon />
                 Date of issue is not today
               </span>
+              <ButtonHelper
+                onClick={() => {
+                  const today = dayjs().format("YYYY-MM-DD");
+
+                  setValue("dateOfIssue", today);
+                  setValue(
+                    "paymentDue",
+                    dayjs(today).add(14, "days").format("YYYY-MM-DD"),
+                  );
+                }}
+              >
+                <span className="text-pretty">
+                  Set date of issue to today (
+                  {dayjs().format(selectedDateFormat)})
+                </span>
+              </ButtonHelper>
             </InputHelperMessage>
           ) : null}
         </div>
@@ -531,33 +574,6 @@ export const GeneralInformation = memo(function GeneralInformation({
                 content='Show the "Service period" (Service period start and end) field in the PDF'
               />
             </div>
-            {template === "default" ? (
-              <div className="inline-flex items-center gap-2">
-                <Controller
-                  name="dateOfServiceFieldIsVisible"
-                  control={control}
-                  render={({ field: { value, onChange, ...field } }) => (
-                    <Switch
-                      {...field}
-                      id="dateOfServiceFieldIsVisible"
-                      data-testid="dateOfServiceFieldIsVisible"
-                      checked={value}
-                      onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                      aria-label='Show the "Date of sales/of executing the service" (Service period end) field in the PDF'
-                    />
-                  )}
-                />
-                <CustomTooltip
-                  trigger={
-                    <Label htmlFor="dateOfServiceFieldIsVisible">
-                      Show &quot;Date of sales&quot; in PDF (Service period end)
-                    </Label>
-                  }
-                  content='Show the "Date of sales/of executing the service" (Service period end) field in the PDF'
-                />
-              </div>
-            ) : null}
           </div>
 
           {/** Service period start and end inputs */}
@@ -610,13 +626,13 @@ export const GeneralInformation = memo(function GeneralInformation({
               <div className="mb-1 flex items-center">
                 <Label htmlFor="dateOfService">Service period end</Label>
                 <CustomTooltip
-                  content='Shown on PDF as "Date of sales/of executing the service"'
+                  content='Shown on PDF as part of "Service period" and as "Date of sales/of executing the service"'
                   side="top"
                   trigger={
                     <button
                       type="button"
                       className="ml-1 inline-flex cursor-pointer items-center align-middle"
-                      aria-label='Shown on PDF as "Date of sales/of executing the service"'
+                      aria-label='Shown on PDF as part of "Service period" and as "Date of sales/of executing the service"'
                     >
                       <InfoIcon className="size-3" aria-hidden />
                     </button>
@@ -650,6 +666,118 @@ export const GeneralInformation = memo(function GeneralInformation({
               ) : null}
             </div>
           </div>
+
+          {/** Service period PDF label customization - default template only */}
+          {template === "default" ? (
+            <div className="mt-5 space-y-5">
+              <div>
+                <Label htmlFor="servicePeriodLabelText">
+                  Service period PDF label
+                </Label>
+                <Controller
+                  name="servicePeriodLabelText"
+                  control={control}
+                  render={({ field }) => (
+                    <Textarea
+                      {...field}
+                      id="servicePeriodLabelText"
+                      rows={2}
+                      placeholder="Enter service period PDF label"
+                      className="mt-1 block w-full"
+                    />
+                  )}
+                />
+                {errors.servicePeriodLabelText ? (
+                  <ErrorMessage>
+                    {errors.servicePeriodLabelText.message}
+                  </ErrorMessage>
+                ) : null}
+                {!isDefaultServicePeriodLabel &&
+                !errors.servicePeriodLabelText ? (
+                  <InputHelperMessage>
+                    <ButtonHelper
+                      onClick={() => {
+                        setValue(
+                          "servicePeriodLabelText",
+                          defaultServicePeriodLabel,
+                        );
+                      }}
+                    >
+                      Switch to default label (&quot;{defaultServicePeriodLabel}
+                      &quot;)
+                    </ButtonHelper>
+                  </InputHelperMessage>
+                ) : null}
+              </div>
+
+              <div>
+                <div className="relative mb-2 flex items-center justify-between">
+                  <Label htmlFor="dateOfServiceLabelText">
+                    Date of sales PDF label
+                  </Label>
+                  <div className="inline-flex items-center gap-2">
+                    <Controller
+                      name="dateOfServiceFieldIsVisible"
+                      control={control}
+                      render={({ field: { value, onChange, ...field } }) => (
+                        <Switch
+                          {...field}
+                          id="dateOfServiceFieldIsVisible"
+                          data-testid="dateOfServiceFieldIsVisible"
+                          checked={value}
+                          onCheckedChange={onChange}
+                          className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                          aria-label='Show the "Date of sales/of executing the service" field in the PDF'
+                        />
+                      )}
+                    />
+                    <CustomTooltip
+                      trigger={
+                        <Label htmlFor="dateOfServiceFieldIsVisible">
+                          Show in PDF
+                        </Label>
+                      }
+                      content='Show the "Date of sales/of executing the service" field in the PDF'
+                    />
+                  </div>
+                </div>
+                <Controller
+                  name="dateOfServiceLabelText"
+                  control={control}
+                  render={({ field }) => (
+                    <Textarea
+                      {...field}
+                      id="dateOfServiceLabelText"
+                      rows={2}
+                      placeholder="Enter date of sales (Service period end) PDF label"
+                      className="block w-full"
+                    />
+                  )}
+                />
+                {errors.dateOfServiceLabelText ? (
+                  <ErrorMessage>
+                    {errors.dateOfServiceLabelText.message}
+                  </ErrorMessage>
+                ) : null}
+                {!isDefaultDateOfServiceLabel &&
+                !errors.dateOfServiceLabelText ? (
+                  <InputHelperMessage>
+                    <ButtonHelper
+                      onClick={() => {
+                        setValue(
+                          "dateOfServiceLabelText",
+                          defaultDateOfServiceLabel,
+                        );
+                      }}
+                    >
+                      Switch to default label (&quot;{defaultDateOfServiceLabel}
+                      &quot;)
+                    </ButtonHelper>
+                  </InputHelperMessage>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
         </fieldset>
 
         {/* Out of Date Dates Helper */}

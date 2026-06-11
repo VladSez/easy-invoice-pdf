@@ -4,7 +4,7 @@ import path from "node:path";
 import { test as base } from "@playwright/test";
 
 /**
- * Extended Playwright test fixture with additional capabilities beyond the default `test` from `@playwright/test`.
+ * **Extended Playwright test fixture** with additional capabilities beyond the default `test` from `@playwright/test`.
  *
  * Provides a temporary download directory for each test:
  * 1. Creates a unique temp directory in the OS temp folder before the test runs

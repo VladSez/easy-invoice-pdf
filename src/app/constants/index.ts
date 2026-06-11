@@ -93,6 +93,8 @@ export const INITIAL_INVOICE_DATA = {
   dateOfService: LAST_DAY_OF_MONTH,
   servicePeriodFieldIsVisible: false,
   dateOfServiceFieldIsVisible: true,
+  servicePeriodLabelText: INVOICE_PDF_TRANSLATIONS[EN].servicePeriod,
+  dateOfServiceLabelText: INVOICE_PDF_TRANSLATIONS[EN].dateOfService,
   dateFormat: DEFAULT_DATE_FORMAT,
 
   invoiceType: "",

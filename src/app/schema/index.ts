@@ -1079,6 +1079,32 @@ export const invoiceObjectSchema = z.object({
   servicePeriodFieldIsVisible: z.boolean().default(false),
 
   /**
+   * Customizable "Service period" label shown in the PDF header
+   */
+  servicePeriodLabelText: z
+    .string()
+    .min(1, "Service period label is required")
+    .max(250, "Service period label must not exceed 250 characters")
+    .trim()
+    .default("Service period")
+    .describe(
+      "Customizable service period label. Defaults to the translated 'Service period' text for the selected language.",
+    ),
+
+  /**
+   * Customizable "Date of sales/of executing the service" label shown in the PDF header
+   */
+  dateOfServiceLabelText: z
+    .string()
+    .min(1, "Date of sales label is required")
+    .max(250, "Date of sales label must not exceed 250 characters")
+    .trim()
+    .default("Date of sales/of executing the service")
+    .describe(
+      "Customizable date of sales label. Defaults to the translated text for the selected language.",
+    ),
+
+  /**
    * Renamed from "Invoice Type" to "Header Notes" on UI to better reflect its purpose
    */
   invoiceType: z

@@ -13,6 +13,7 @@ import {
 } from "@/app/schema";
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
 import {
   GITHUB_URL,
@@ -316,6 +317,18 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(
       servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period PDF label",
+      }),
+    ).toHaveValue(INITIAL_INVOICE_DATA.servicePeriodLabelText);
+
+    await expect(
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Date of sales PDF label",
+      }),
+    ).toHaveValue(INITIAL_INVOICE_DATA.dateOfServiceLabelText);
+
+    await expect(
+      servicePeriodFieldset.getByRole("textbox", {
         name: "Service period start",
       }),
     ).toHaveValue(INITIAL_INVOICE_DATA.dateOfServiceStart);
@@ -334,7 +347,7 @@ test.describe("Invoice Generator Page", () => {
 
     // by default, date of sales is visible in PDF
     const dateOfServiceSwitch = servicePeriodFieldset.getByRole("switch", {
-      name: 'Show the "Date of sales/of executing the service" (Service period end) field in the PDF',
+      name: 'Show the "Date of sales/of executing the service" field in the PDF',
     });
 
     await expect(dateOfServiceSwitch).toBeChecked();
@@ -349,7 +362,7 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(
       servicePeriodFieldset.getByRole("button", {
-        name: 'Shown on PDF as "Date of sales/of executing the service"',
+        name: 'Shown on PDF as part of "Service period" and as "Date of sales/of executing the service"',
       }),
     ).toBeVisible();
 
@@ -622,6 +635,54 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       invoiceItemsSection.getByRole("button", { name: "Add invoice item" }),
     ).toBeVisible();
+  });
+
+  test("updates service period PDF labels on language change and allows customization", async ({
+    page,
+  }) => {
+    const generalInfoSection = page.getByTestId("general-information-section");
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+
+    const servicePeriodLabelInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Service period PDF label",
+    });
+    const dateOfServiceLabelInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Date of sales PDF label",
+    });
+
+    await servicePeriodLabelInput.fill("Custom service period label");
+    await dateOfServiceLabelInput.fill("Custom date of sales label");
+
+    const languageSelect = generalInfoSection.getByRole("combobox", {
+      name: "Invoice PDF Language",
+    });
+    await languageSelect.selectOption("pl");
+
+    await expect(servicePeriodLabelInput).toHaveValue(
+      INVOICE_PDF_TRANSLATIONS.pl.servicePeriod,
+    );
+    await expect(dateOfServiceLabelInput).toHaveValue(
+      INVOICE_PDF_TRANSLATIONS.pl.dateOfService,
+    );
+
+    await servicePeriodLabelInput.fill("My custom period");
+    await expect(
+      servicePeriodFieldset.getByRole("button", {
+        name: `Switch to default label ("${INVOICE_PDF_TRANSLATIONS.pl.servicePeriod}")`,
+      }),
+    ).toBeVisible();
+
+    await servicePeriodFieldset
+      .getByRole("button", {
+        name: `Switch to default label ("${INVOICE_PDF_TRANSLATIONS.pl.servicePeriod}")`,
+      })
+      .click();
+
+    await expect(servicePeriodLabelInput).toHaveValue(
+      INVOICE_PDF_TRANSLATIONS.pl.servicePeriod,
+    );
   });
 
   test("can add and remove invoice items and recalculates totals correctly", async ({
@@ -1617,6 +1678,90 @@ test.describe("Invoice Generator Page", () => {
     await expect(dateOfServiceInput).toHaveValue("2025-12-31");
     await expect(invoiceNumberInput).toHaveValue("1/12-2025");
     await expect(paymentDueInput).toHaveValue("2025-12-15");
+  });
+
+  test("allows setting date of issue to today from inline helper", async ({
+    page,
+  }) => {
+    await page.clock.setSystemTime(new Date("2025-12-01T00:00:00Z"));
+
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
+
+    const generalInfoSection = page.getByRole("region", {
+      name: "General Information",
+    });
+    const dateOfIssueInput = generalInfoSection.getByLabel("Date of Issue");
+
+    await dateOfIssueInput.fill("2024-01-15");
+
+    await expect(
+      generalInfoSection.getByText("Date of issue is not today"),
+    ).toBeVisible();
+
+    await generalInfoSection
+      .getByRole("button", { name: /Set date of issue to today/ })
+      .click();
+
+    await expect(dateOfIssueInput).toHaveValue("2025-12-01");
+    await expect(
+      generalInfoSection.getByText("Date of issue is not today"),
+    ).toBeHidden();
+    await expect(page.getByLabel("Payment Due")).toHaveValue("2025-12-15");
+  });
+
+  test("allows switching service period PDF label to default from inline helper", async ({
+    page,
+  }) => {
+    const generalInfoSection = page.getByRole("region", {
+      name: "General Information",
+    });
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+    const servicePeriodLabelInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Service period PDF label",
+    });
+    const defaultLabel = INVOICE_PDF_TRANSLATIONS.en.servicePeriod;
+    const switchToDefaultButton = servicePeriodFieldset.getByRole("button", {
+      name: `Switch to default label ("${defaultLabel}")`,
+    });
+
+    await servicePeriodLabelInput.fill("Custom service period label");
+
+    await expect(switchToDefaultButton).toBeVisible();
+
+    await switchToDefaultButton.click();
+
+    await expect(servicePeriodLabelInput).toHaveValue(defaultLabel);
+    await expect(switchToDefaultButton).toBeHidden();
+  });
+
+  test("allows switching date of sales PDF label to default from inline helper", async ({
+    page,
+  }) => {
+    const generalInfoSection = page.getByRole("region", {
+      name: "General Information",
+    });
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+    const dateOfServiceLabelInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Date of sales PDF label",
+    });
+    const defaultLabel = INVOICE_PDF_TRANSLATIONS.en.dateOfService;
+    const switchToDefaultButton = servicePeriodFieldset.getByRole("button", {
+      name: `Switch to default label ("${defaultLabel}")`,
+    });
+
+    await dateOfServiceLabelInput.fill("Custom date of sales label");
+
+    await expect(switchToDefaultButton).toBeVisible();
+
+    await switchToDefaultButton.click();
+
+    await expect(dateOfServiceLabelInput).toHaveValue(defaultLabel);
+    await expect(switchToDefaultButton).toBeHidden();
   });
 
   test("allows setting a partial service period", async ({ page }) => {

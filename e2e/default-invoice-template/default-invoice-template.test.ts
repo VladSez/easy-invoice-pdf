@@ -1944,6 +1944,8 @@ test.describe("Default Invoice Template", () => {
       end: "2025-12-20",
     } as const;
 
+    const CUSTOM_SERVICE_PERIOD_LABEL = "Billing period";
+
     await expect(page).toHaveURL("/?template=default");
 
     const generalInfoSection = page.getByTestId("general-information-section");
@@ -1952,16 +1954,39 @@ test.describe("Default Invoice Template", () => {
     });
     await expect(servicePeriodFieldset).toBeVisible();
 
+    const servicePeriodLabelInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Service period PDF label",
+    });
+    await expect(servicePeriodLabelInput).toHaveValue(
+      INVOICE_PDF_TRANSLATIONS.en.servicePeriod,
+    );
+
     const servicePeriodSwitch = servicePeriodFieldset.getByRole("switch", {
       name: 'Show the "Service period" (Service period start and end) field in the PDF',
     });
 
+    // Service period start and end dates
     await servicePeriodFieldset
       .getByRole("textbox", { name: "Service period start" })
       .fill(SERVICE_PERIOD_TEST_DATA.start);
+
     await servicePeriodFieldset
       .getByRole("textbox", { name: "Service period end" })
       .fill(SERVICE_PERIOD_TEST_DATA.end);
+
+    // Custom service period label
+    await servicePeriodLabelInput.fill(CUSTOM_SERVICE_PERIOD_LABEL);
+
+    await expect(servicePeriodLabelInput).toHaveValue(
+      CUSTOM_SERVICE_PERIOD_LABEL,
+    );
+
+    // Check that "Switch to default label ("Service period")" text is displayed
+    await expect(
+      servicePeriodFieldset.getByRole("button", {
+        name: 'Switch to default label ("Service period")',
+      }),
+    ).toBeVisible();
 
     await expect(
       servicePeriodFieldset.getByRole("textbox", {
@@ -2041,6 +2066,12 @@ test.describe("Default Invoice Template", () => {
 
     await expect(newServicePeriodSwitch).toBeChecked();
 
+    await expect(
+      newServicePeriodFieldset.getByRole("textbox", {
+        name: "Service period PDF label",
+      }),
+    ).toHaveValue(CUSTOM_SERVICE_PERIOD_LABEL);
+
     await newServicePeriodSwitch.click();
     await expect(newServicePeriodSwitch).not.toBeChecked();
 
@@ -2054,6 +2085,11 @@ test.describe("Default Invoice Template", () => {
         name: "Service period end",
       }),
     ).toHaveValue(SERVICE_PERIOD_TEST_DATA.end);
+    await expect(
+      newServicePeriodFieldset.getByRole("textbox", {
+        name: "Service period PDF label",
+      }),
+    ).toHaveValue(CUSTOM_SERVICE_PERIOD_LABEL);
 
     const newFinalSection = page.getByTestId("final-section");
     await newFinalSection
@@ -2103,6 +2139,8 @@ test.describe("Default Invoice Template", () => {
     browserName,
     downloadDir,
   }, testInfo) => {
+    const CUSTOM_DATE_OF_SALES_LABEL = "Sale date";
+
     await expect(page).toHaveURL("/?template=default");
 
     const generalInfoSection = page.getByTestId("general-information-section");
@@ -2111,9 +2149,32 @@ test.describe("Default Invoice Template", () => {
     });
     await expect(servicePeriodFieldset).toBeVisible();
 
-    const dateOfServiceSwitch = servicePeriodFieldset.getByRole("switch", {
-      name: 'Show the "Date of sales/of executing the service" (Service period end) field in the PDF',
+    const dateOfServiceLabelInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Date of sales PDF label",
     });
+
+    await expect(dateOfServiceLabelInput).toHaveValue(
+      INVOICE_PDF_TRANSLATIONS.en.dateOfService,
+    );
+
+    // Custom date of sales label
+    await dateOfServiceLabelInput.fill(CUSTOM_DATE_OF_SALES_LABEL);
+
+    await expect(dateOfServiceLabelInput).toHaveValue(
+      CUSTOM_DATE_OF_SALES_LABEL,
+    );
+
+    // Check that "Switch to default label ("Date of sales")" text is displayed
+    await expect(
+      servicePeriodFieldset.getByRole("button", {
+        name: 'Switch to default label ("Date of sales/of executing the service")',
+      }),
+    ).toBeVisible();
+
+    const dateOfServiceSwitch = servicePeriodFieldset.getByRole("switch", {
+      name: 'Show the "Date of sales/of executing the service" field in the PDF',
+    });
+
     await expect(dateOfServiceSwitch).toBeChecked();
 
     const finalSection = page.getByTestId("final-section");
@@ -2173,10 +2234,20 @@ test.describe("Default Invoice Template", () => {
     });
     await expect(newServicePeriodFieldset).toBeVisible();
 
+    const newDateOfServiceLabelInput = newServicePeriodFieldset.getByRole(
+      "textbox",
+      {
+        name: "Date of sales PDF label",
+      },
+    );
+    await expect(newDateOfServiceLabelInput).toHaveValue(
+      CUSTOM_DATE_OF_SALES_LABEL,
+    );
+
     const newDateOfServiceSwitch = newServicePeriodFieldset.getByRole(
       "switch",
       {
-        name: 'Show the "Date of sales/of executing the service" (Service period end) field in the PDF',
+        name: 'Show the "Date of sales/of executing the service" field in the PDF',
       },
     );
 
@@ -2184,6 +2255,10 @@ test.describe("Default Invoice Template", () => {
 
     await newDateOfServiceSwitch.click();
     await expect(newDateOfServiceSwitch).not.toBeChecked();
+
+    await expect(newDateOfServiceLabelInput).toHaveValue(
+      CUSTOM_DATE_OF_SALES_LABEL,
+    );
 
     const newFinalSection = page.getByTestId("final-section");
     await newFinalSection

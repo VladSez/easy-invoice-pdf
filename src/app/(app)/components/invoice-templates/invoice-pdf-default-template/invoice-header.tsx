@@ -28,6 +28,11 @@ function HeaderDates({
 
   const showDateOfService = invoiceData?.dateOfServiceFieldIsVisible;
 
+  const servicePeriodLabel =
+    invoiceData.servicePeriodLabelText ?? t.servicePeriod;
+  const dateOfServiceLabel =
+    invoiceData.dateOfServiceLabelText ?? t.dateOfService;
+
   return (
     <View
       style={{
@@ -42,7 +47,7 @@ function HeaderDates({
       </Text>
       {showServicePeriod ? (
         <Text style={styles.fontSize7}>
-          {t.servicePeriod}:{" "}
+          {servicePeriodLabel}:{" "}
           <Text style={[styles.fontBold, styles.fontSize8]}>
             {servicePeriodRange}
           </Text>
@@ -50,7 +55,7 @@ function HeaderDates({
       ) : null}
       {showDateOfService ? (
         <Text style={styles.fontSize7}>
-          {t.dateOfService}:{" "}
+          {dateOfServiceLabel}:{" "}
           <Text style={[styles.fontBold, styles.fontSize8]}>
             {dateOfServiceEnd}
           </Text>

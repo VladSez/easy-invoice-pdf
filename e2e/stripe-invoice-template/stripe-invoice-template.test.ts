@@ -1216,6 +1216,19 @@ test.describe("Stripe Invoice Template", () => {
     });
     await expect(servicePeriodFieldset).toBeVisible();
 
+    // these fields are hidden by default for the STRIPE template (we don't show them on stripe pdf template)
+    await expect(
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period PDF label",
+      }),
+    ).toBeHidden();
+
+    await expect(
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Date of sales PDF label",
+      }),
+    ).toBeHidden();
+
     const servicePeriodSwitch = servicePeriodFieldset.getByRole("switch", {
       name: 'Show the "Service period" (Service period start and end) field in the PDF',
     });
@@ -1223,6 +1236,7 @@ test.describe("Stripe Invoice Template", () => {
     await servicePeriodFieldset
       .getByRole("textbox", { name: "Service period start" })
       .fill(SERVICE_PERIOD_TEST_DATA.start);
+
     await servicePeriodFieldset
       .getByRole("textbox", { name: "Service period end" })
       .fill(SERVICE_PERIOD_TEST_DATA.end);
