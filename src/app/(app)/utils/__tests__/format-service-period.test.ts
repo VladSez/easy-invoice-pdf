@@ -4,10 +4,8 @@ import {
   formatDateOfServiceEnd,
   formatServicePeriodRange,
   getServicePeriod,
-  isCurrentFullMonthServicePeriod,
-  isServicePeriodStartFirstDayOfCurrentMonth,
+  isFirstDayOfMonth,
   isServicePeriodStartInCurrentMonth,
-  shouldShowServicePeriodLine,
 } from "@/app/(app)/utils/format-service-period";
 import type { InvoiceData } from "@/app/schema";
 
@@ -49,32 +47,15 @@ describe("format-service-period", () => {
     });
   });
 
-  describe("isServicePeriodStartFirstDayOfCurrentMonth", () => {
-    beforeEach(() => {
-      vi.useFakeTimers();
-      vi.setSystemTime(new Date("2025-06-15T12:00:00Z"));
+  describe("isFirstDayOfMonth", () => {
+    it("should return true for the first day of any month", () => {
+      expect(isFirstDayOfMonth("2026-05-01")).toBe(true);
+      expect(isFirstDayOfMonth("2025-12-01")).toBe(true);
     });
 
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
-    it("should return true when start is the first day of the current month", () => {
-      expect(isServicePeriodStartFirstDayOfCurrentMonth("2025-06-01")).toBe(
-        true,
-      );
-    });
-
-    it("should return false when start is not the first day of the current month", () => {
-      expect(isServicePeriodStartFirstDayOfCurrentMonth("2025-06-14")).toBe(
-        false,
-      );
-    });
-
-    it("should return false when start is the first day of a different month", () => {
-      expect(isServicePeriodStartFirstDayOfCurrentMonth("2025-05-01")).toBe(
-        false,
-      );
+    it("should return false for non-first days regardless of current month", () => {
+      expect(isFirstDayOfMonth("2026-05-11")).toBe(false);
+      expect(isFirstDayOfMonth("2025-06-14")).toBe(false);
     });
   });
 
@@ -105,28 +86,6 @@ describe("format-service-period", () => {
     });
   });
 
-  describe("shouldShowServicePeriodLine", () => {
-    it("should return false when start is the first day of the month", () => {
-      expect(
-        shouldShowServicePeriodLine({
-          ...baseInvoiceData,
-          dateOfServiceStart: "2026-05-01",
-          dateOfService: "2026-05-31",
-        } as InvoiceData),
-      ).toBe(false);
-    });
-
-    it("should return true when start is not the first day of the month", () => {
-      expect(
-        shouldShowServicePeriodLine({
-          ...baseInvoiceData,
-          dateOfServiceStart: "2026-05-11",
-          dateOfService: "2026-05-31",
-        } as InvoiceData),
-      ).toBe(true);
-    });
-  });
-
   describe("formatServicePeriodRange", () => {
     it("should always show start and end separated by an en dash", () => {
       const result = formatServicePeriodRange({
@@ -136,29 +95,6 @@ describe("format-service-period", () => {
       } as InvoiceData);
 
       expect(result).toBe("2025-06-14 – 2025-06-20");
-    });
-  });
-
-  describe("isCurrentFullMonthServicePeriod", () => {
-    beforeEach(() => {
-      vi.useFakeTimers();
-      vi.setSystemTime(new Date("2025-06-15T12:00:00Z"));
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
-    it("should return true for the current full month", () => {
-      expect(isCurrentFullMonthServicePeriod("2025-06-01", "2025-06-30")).toBe(
-        true,
-      );
-    });
-
-    it("should return false for partial periods in the current month", () => {
-      expect(isCurrentFullMonthServicePeriod("2025-06-14", "2025-06-20")).toBe(
-        false,
-      );
     });
   });
 });

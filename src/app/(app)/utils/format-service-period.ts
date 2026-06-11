@@ -36,14 +36,14 @@ export function formatDateOfServiceEnd(invoiceData: InvoiceData): string {
 }
 
 /**
- * Check if given dateOfServiceStart is first day of current month.
- * @param dateOfServiceStart - ISO date string.
- * @returns True if is first day of current month.
+ * Check if given date is the first day of its own month.
+ * @param date - ISO date string.
+ * @returns True if date is the first day of its month.
  */
-export function isServicePeriodStartFirstDayOfCurrentMonth(
-  dateOfServiceStart: string,
-): boolean {
-  return dayjs(dateOfServiceStart).isSame(dayjs().startOf("month"), "day");
+export function isFirstDayOfMonth(date: string): boolean {
+  const parsed = dayjs(date);
+
+  return parsed.isSame(parsed.startOf("month"), "day");
 }
 
 /**
@@ -58,17 +58,6 @@ export function isServicePeriodStartInCurrentMonth(
 }
 
 /**
- * Determine if service period should be shown (not first day of month).
- * @param invoiceData - Invoice containing service period fields.
- * @returns True if start is not first day of its month.
- */
-export function shouldShowServicePeriodLine(invoiceData: InvoiceData): boolean {
-  const { start } = getServicePeriod(invoiceData);
-
-  return !start.isSame(start.startOf("month"), "day");
-}
-
-/**
  * Format start and end of service period as range using invoice's date format.
  * @param invoiceData - Invoice containing dateFormat and service period dates.
  * @returns Range string: 'start – end', formatted.
@@ -79,22 +68,4 @@ export function formatServicePeriodRange(
   const { start, end } = getServicePeriod(invoiceData);
 
   return `${start.format(invoiceData.dateFormat)} – ${end.format(invoiceData.dateFormat)}`;
-}
-
-/**
- * Check if given start/end span full current month.
- * @param dateOfServiceStart - ISO start date string.
- * @param dateOfService - ISO end date string.
- * @returns True if range is entire current month.
- */
-export function isCurrentFullMonthServicePeriod(
-  dateOfServiceStart: string,
-  dateOfService: string,
-): boolean {
-  const now = dayjs();
-
-  return (
-    dayjs(dateOfServiceStart).isSame(now.startOf("month"), "day") &&
-    dayjs(dateOfService).isSame(now.endOf("month"), "day")
-  );
 }

@@ -4,7 +4,7 @@ import {
 } from "@/app/(app)/components/invoice-form/common";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import {
-  isServicePeriodStartFirstDayOfCurrentMonth,
+  isFirstDayOfMonth,
   isServicePeriodStartInCurrentMonth,
 } from "@/app/(app)/utils/format-service-period";
 import {
@@ -504,6 +504,7 @@ export const GeneralInformation = memo(function GeneralInformation({
             Service period
           </legend>
 
+          {/** Service period PDF visibility toggle */}
           <div className="mb-5 flex flex-col items-start gap-2 sm:justify-end sm:gap-4">
             <div className="inline-flex items-center gap-2">
               <Controller
@@ -559,6 +560,7 @@ export const GeneralInformation = memo(function GeneralInformation({
             ) : null}
           </div>
 
+          {/** Service period start and end inputs */}
           <div className="space-y-4">
             <div>
               <Label htmlFor="dateOfServiceStart" className="mb-1">
@@ -576,12 +578,12 @@ export const GeneralInformation = memo(function GeneralInformation({
                     onChange={(e) => {
                       field.onChange(e);
 
-                      const newStart = e.target.value;
+                      const newServicePeriodStartDate = e.target.value;
 
-                      // auto-show "Service period" in PDF when start date not first day of current month
+                      // auto-show "Service period" in PDF when start date is not first day of its month
                       if (
-                        newStart &&
-                        !isServicePeriodStartFirstDayOfCurrentMonth(newStart)
+                        newServicePeriodStartDate &&
+                        !isFirstDayOfMonth(newServicePeriodStartDate)
                       ) {
                         setValue("servicePeriodFieldIsVisible", true);
                       }

@@ -1665,4 +1665,43 @@ test.describe("Invoice Generator Page", () => {
       .fill("2025-06-15");
     await expect(servicePeriodSwitch).toBeChecked();
   });
+
+  test("does not auto-enable service period PDF field when start is the first day of its month", async ({
+    page,
+  }) => {
+    await page.clock.setSystemTime(new Date("2025-06-15T12:00:00Z"));
+
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
+
+    const generalInfoSection = page.getByRole("region", {
+      name: "General Information",
+    });
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+    const servicePeriodStartInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Service period start",
+    });
+    const servicePeriodSwitch = servicePeriodFieldset.getByRole("switch", {
+      name: 'Show the "Service period" (Service period start and end) field in the PDF',
+    });
+
+    await expect(servicePeriodSwitch).not.toBeChecked();
+
+    // First day of the current month should not auto-enable the PDF field.
+    await servicePeriodStartInput.fill("2025-06-01");
+    await expect(servicePeriodStartInput).toHaveValue("2025-06-01");
+    await expect(servicePeriodSwitch).not.toBeChecked();
+
+    // First day of a different month should also stay off (regression for current-month check).
+    await servicePeriodStartInput.fill("2025-05-01");
+    await expect(servicePeriodStartInput).toHaveValue("2025-05-01");
+    await expect(servicePeriodSwitch).not.toBeChecked();
+
+    // Partial month start should still auto-enable the PDF field.
+    await servicePeriodStartInput.fill("2025-05-11");
+    await expect(servicePeriodStartInput).toHaveValue("2025-05-11");
+    await expect(servicePeriodSwitch).toBeChecked();
+  });
 });
