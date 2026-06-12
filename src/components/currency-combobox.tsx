@@ -35,10 +35,12 @@ export function CurrencyCombobox({
   id = "",
   value,
   onChange,
+  hasError = false,
 }: {
   id: string;
   value: string;
   onChange: (value: string) => void;
+  hasError?: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -113,7 +115,10 @@ export function CurrencyCombobox({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full !scale-100 justify-between rounded-md border border-gray-300 bg-white pl-3 pr-2 text-sm font-normal text-slate-950 shadow-sm shadow-black/5 !outline-none transition-all hover:bg-slate-100/80 focus-visible:!border-2 focus-visible:!border-indigo-600 focus-visible:!ring-2 focus-visible:!ring-indigo-200 focus-visible:!ring-opacity-50 focus-visible:!ring-offset-1"
+            className={cn(
+              "w-full !scale-100 justify-between rounded-md border border-gray-300 bg-white pl-3 pr-2 text-sm font-normal text-slate-950 shadow-sm shadow-black/5 !outline-none transition-all hover:bg-slate-100/80 focus-visible:!border-2 focus-visible:!border-indigo-600 focus-visible:!ring-2 focus-visible:!ring-indigo-200 focus-visible:!ring-opacity-50 focus-visible:!ring-offset-1",
+              hasError && "border-red-500",
+            )}
           >
             {value ? (
               <span className="flex min-w-0 items-center gap-2">

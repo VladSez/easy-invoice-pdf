@@ -3,6 +3,12 @@
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import * as React from "react";
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useIsDesktop } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 
 const TooltipProvider = React.memo(TooltipPrimitive.Provider);
@@ -51,7 +57,10 @@ interface CustomTooltipProps {
   align?: "start" | "center" | "end";
   delayDuration?: number;
   showArrow?: boolean;
+  popoverOnMobile?: boolean;
 }
+
+const contentClassName = "max-w-[280px] px-2 py-1 text-xs";
 
 const CustomTooltip = React.memo(
   ({
@@ -62,10 +71,31 @@ const CustomTooltip = React.memo(
     align = "center",
     delayDuration = 300,
     showArrow = false,
+    popoverOnMobile = false,
   }: CustomTooltipProps) => {
+    const isDesktop = useIsDesktop();
+    const usePopover = popoverOnMobile && !isDesktop;
+
     // Memoize both trigger and content
     const memoizedTrigger = React.useMemo(() => trigger, [trigger]);
     const memoizedContent = React.useMemo(() => content, [content]);
+
+    if (usePopover) {
+      return (
+        <Popover>
+          <PopoverTrigger asChild>{memoizedTrigger}</PopoverTrigger>
+          {memoizedContent ? (
+            <PopoverContent
+              side={side}
+              align={align}
+              className={cn(contentClassName, className)}
+            >
+              {memoizedContent}
+            </PopoverContent>
+          ) : null}
+        </Popover>
+      );
+    }
 
     return (
       <Tooltip delayDuration={delayDuration}>
@@ -74,7 +104,7 @@ const CustomTooltip = React.memo(
           <TooltipContent
             side={side}
             align={align}
-            className={cn("px-2 py-1 text-xs", className)}
+            className={cn(contentClassName, className)}
             showArrow={showArrow}
           >
             {memoizedContent}

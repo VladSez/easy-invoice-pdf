@@ -1,4 +1,6 @@
+import { inputErrorClassName } from "@/app/(app)/components/invoice-form/common";
 import { SellerManagement } from "@/app/(app)/components/invoice-form/sections/components/seller/seller-management";
+import { cn } from "@/lib/utils";
 import { type InvoiceData, type SellerData } from "@/app/schema";
 import { AccordionContent } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
@@ -90,7 +92,12 @@ export const SellerInformation = memo(function SellerInformation({
               name="seller.name"
               control={control}
               render={({ field }) => (
-                <Textarea {...field} id="sellerName" rows={3} />
+                <Textarea
+                  {...field}
+                  id="sellerName"
+                  rows={3}
+                  className={inputErrorClassName(!!errors.seller?.name)}
+                />
               )}
             />
             {errors.seller?.name && (
@@ -106,7 +113,12 @@ export const SellerInformation = memo(function SellerInformation({
               name="seller.address"
               control={control}
               render={({ field }) => (
-                <Textarea {...field} id="sellerAddress" rows={3} />
+                <Textarea
+                  {...field}
+                  id="sellerAddress"
+                  rows={3}
+                  className={inputErrorClassName(!!errors.seller?.address)}
+                />
               )}
             />
             {errors.seller?.address && (
@@ -164,7 +176,10 @@ export const SellerInformation = memo(function SellerInformation({
                         type="text"
                         id="sellerVatNoLabel"
                         placeholder="Enter Tax number label"
-                        className="mt-1 block w-full"
+                        className={cn(
+                          "mt-1 block w-full",
+                          inputErrorClassName(!!errors.seller?.vatNoLabelText),
+                        )}
                       />
                     )}
                   />
@@ -191,7 +206,10 @@ export const SellerInformation = memo(function SellerInformation({
                         id="sellerVatNo"
                         type="text"
                         placeholder="Enter Tax number value"
-                        className="mt-1 block w-full"
+                        className={cn(
+                          "mt-1 block w-full",
+                          inputErrorClassName(!!errors.seller?.vatNo),
+                        )}
                       />
                     )}
                   />
@@ -242,7 +260,12 @@ export const SellerInformation = memo(function SellerInformation({
               name="seller.email"
               control={control}
               render={({ field }) => (
-                <Input {...field} id="sellerEmail" type="email" />
+                <Input
+                  {...field}
+                  id="sellerEmail"
+                  type="email"
+                  className={inputErrorClassName(!!errors.seller?.email)}
+                />
               )}
             />
             {errors.seller?.email && (
@@ -289,7 +312,14 @@ export const SellerInformation = memo(function SellerInformation({
               name="seller.accountNumber"
               control={control}
               render={({ field }) => (
-                <Textarea {...field} id="sellerAccountNumber" rows={3} />
+                <Textarea
+                  {...field}
+                  id="sellerAccountNumber"
+                  rows={3}
+                  className={inputErrorClassName(
+                    !!errors.seller?.accountNumber,
+                  )}
+                />
               )}
             />
             {errors.seller?.accountNumber && (
@@ -337,7 +367,12 @@ export const SellerInformation = memo(function SellerInformation({
               name="seller.swiftBic"
               control={control}
               render={({ field }) => (
-                <Textarea {...field} id="sellerSwiftBic" rows={3} />
+                <Textarea
+                  {...field}
+                  id="sellerSwiftBic"
+                  rows={3}
+                  className={inputErrorClassName(!!errors.seller?.swiftBic)}
+                />
               )}
             />
             {errors.seller?.swiftBic && (
@@ -384,7 +419,12 @@ export const SellerInformation = memo(function SellerInformation({
               name="seller.notes"
               control={control}
               render={({ field }) => (
-                <Textarea {...field} id="sellerNotes" rows={3} />
+                <Textarea
+                  {...field}
+                  id="sellerNotes"
+                  rows={3}
+                  className={inputErrorClassName(!!errors.seller?.notes)}
+                />
               )}
             />
             {errors.seller?.notes && (

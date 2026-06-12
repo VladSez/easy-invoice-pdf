@@ -339,6 +339,11 @@ test.describe("Invoice Generator Page", () => {
       }),
     ).toHaveValue(INITIAL_INVOICE_DATA.dateOfService);
 
+    // Check that info icon is visible
+    await expect(
+      servicePeriodFieldset.getByTestId("service-period-end-info-icon"),
+    ).toBeVisible();
+
     await expect(
       servicePeriodFieldset.getByRole("switch", {
         name: 'Show the "Service period" (Service period start and end) field in the PDF',

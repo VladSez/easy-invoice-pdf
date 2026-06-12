@@ -1,6 +1,8 @@
 "use client";
 
+import { inputErrorClassName } from "@/app/(app)/components/invoice-form/common";
 import { type BuyerData, type InvoiceData } from "@/app/schema";
+import { cn } from "@/lib/utils";
 import { BuyerManagement } from "@/app/(app)/components/invoice-form/sections/components/buyer/buyer-management";
 import { AccordionContent } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
@@ -88,7 +90,12 @@ export const BuyerInformation = memo(function BuyerInformation({
               name="buyer.name"
               control={control}
               render={({ field }) => (
-                <Textarea {...field} id="buyerName" rows={3} />
+                <Textarea
+                  {...field}
+                  id="buyerName"
+                  rows={3}
+                  className={inputErrorClassName(!!errors.buyer?.name)}
+                />
               )}
             />
             {errors.buyer?.name && (
@@ -104,7 +111,12 @@ export const BuyerInformation = memo(function BuyerInformation({
               name="buyer.address"
               control={control}
               render={({ field }) => (
-                <Textarea {...field} id="buyerAddress" rows={3} />
+                <Textarea
+                  {...field}
+                  id="buyerAddress"
+                  rows={3}
+                  className={inputErrorClassName(!!errors.buyer?.address)}
+                />
               )}
             />
             {errors.buyer?.address && (
@@ -162,7 +174,10 @@ export const BuyerInformation = memo(function BuyerInformation({
                         type="text"
                         id="buyerVatNoLabel"
                         placeholder="Enter Tax number label"
-                        className="mt-1 block w-full"
+                        className={cn(
+                          "mt-1 block w-full",
+                          inputErrorClassName(!!errors.buyer?.vatNoLabelText),
+                        )}
                       />
                     )}
                   />
@@ -189,7 +204,10 @@ export const BuyerInformation = memo(function BuyerInformation({
                         id="buyerVatNo"
                         type="text"
                         placeholder="Enter Tax number value"
-                        className="mt-1 block w-full"
+                        className={cn(
+                          "mt-1 block w-full",
+                          inputErrorClassName(!!errors.buyer?.vatNo),
+                        )}
                       />
                     )}
                   />
@@ -238,7 +256,12 @@ export const BuyerInformation = memo(function BuyerInformation({
               name="buyer.email"
               control={control}
               render={({ field }) => (
-                <Input {...field} id="buyerEmail" type="email" />
+                <Input
+                  {...field}
+                  id="buyerEmail"
+                  type="email"
+                  className={inputErrorClassName(!!errors.buyer?.email)}
+                />
               )}
             />
             {errors.buyer?.email && (
@@ -284,7 +307,12 @@ export const BuyerInformation = memo(function BuyerInformation({
               name="buyer.notes"
               control={control}
               render={({ field }) => (
-                <Textarea {...field} id="buyerNotes" rows={3} />
+                <Textarea
+                  {...field}
+                  id="buyerNotes"
+                  rows={3}
+                  className={inputErrorClassName(!!errors.buyer?.notes)}
+                />
               )}
             />
             {errors.buyer?.notes && (

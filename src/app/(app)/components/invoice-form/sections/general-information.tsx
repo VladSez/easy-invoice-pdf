@@ -1,6 +1,7 @@
 import {
   AlertIcon,
   ErrorMessage,
+  inputErrorClassName,
 } from "@/app/(app)/components/invoice-form/common";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import {
@@ -27,6 +28,7 @@ import { SelectNative } from "@/components/ui/select-native";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import { AlertTriangle, InfoIcon, RefreshCw, Upload, X } from "lucide-react";
 import { memo, useCallback, useRef } from "react";
@@ -206,7 +208,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               <SelectNative
                 {...field}
                 id={`template`}
-                className="block"
+                className={cn("block", inputErrorClassName(!!errors.template))}
                 onChange={(e) => {
                   field.onChange(e);
 
@@ -272,7 +274,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               <SelectNative
                 {...field}
                 id={`language`}
-                className="block"
+                className={cn("block", inputErrorClassName(!!errors.language))}
                 onChange={(e) => {
                   field.onChange(e);
 
@@ -360,6 +362,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                 id={`currency`}
                 value={field.value}
                 onChange={field.onChange}
+                hasError={!!errors.currency}
               />
             )}
           />
@@ -381,7 +384,11 @@ export const GeneralInformation = memo(function GeneralInformation({
             name="dateFormat"
             control={control}
             render={({ field }) => (
-              <SelectNative {...field} id={`dateFormat`} className="block">
+              <SelectNative
+                {...field}
+                id={`dateFormat`}
+                className={cn("block", inputErrorClassName(!!errors.dateFormat))}
+              >
                 {SUPPORTED_DATE_FORMATS.map((format) => {
                   const preview = dayjs().locale(language).format(format);
                   const isDefault = format === DEFAULT_DATE_FORMAT;
@@ -422,7 +429,10 @@ export const GeneralInformation = memo(function GeneralInformation({
                     type="text"
                     id="invoiceNumberLabel"
                     placeholder="Enter invoice number label"
-                    className="mt-1 block w-full"
+                    className={cn(
+                      "mt-1 block w-full",
+                      inputErrorClassName(!!errors.invoiceNumberObject?.label),
+                    )}
                   />
                 )}
               />
@@ -460,7 +470,10 @@ export const GeneralInformation = memo(function GeneralInformation({
                     type="text"
                     id="invoiceNumberValue"
                     placeholder="Enter invoice number value"
-                    className="mt-1 block w-full"
+                    className={cn(
+                      "mt-1 block w-full",
+                      inputErrorClassName(!!errors.invoiceNumberObject?.value),
+                    )}
                   />
                 )}
               />
@@ -496,7 +509,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                 {...field}
                 type="date"
                 id={`dateOfIssue`}
-                className=""
+                className={inputErrorClassName(!!errors.dateOfIssue)}
                 onChange={(e) => {
                   field.onChange(e);
 
@@ -590,7 +603,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                     {...field}
                     type="date"
                     id="dateOfServiceStart"
-                    className=""
+                    className={inputErrorClassName(!!errors.dateOfServiceStart)}
                     onChange={(e) => {
                       field.onChange(e);
 
@@ -628,13 +641,18 @@ export const GeneralInformation = memo(function GeneralInformation({
                 <CustomTooltip
                   content='Shown on PDF as part of "Service period" and as "Date of sales/of executing the service"'
                   side="top"
+                  popoverOnMobile
                   trigger={
                     <button
                       type="button"
                       className="ml-1 inline-flex cursor-pointer items-center align-middle"
                       aria-label='Shown on PDF as part of "Service period" and as "Date of sales/of executing the service"'
                     >
-                      <InfoIcon className="size-3" aria-hidden />
+                      <InfoIcon
+                        className="size-3"
+                        aria-hidden
+                        data-testid="service-period-end-info-icon"
+                      />
                     </button>
                   }
                 />
@@ -648,7 +666,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                     {...field}
                     type="date"
                     id="dateOfService"
-                    className=""
+                    className={inputErrorClassName(!!errors.dateOfService)}
                   />
                 )}
               />
@@ -683,7 +701,10 @@ export const GeneralInformation = memo(function GeneralInformation({
                       id="servicePeriodLabelText"
                       rows={2}
                       placeholder="Enter service period PDF label"
-                      className="mt-1 block w-full"
+                      className={cn(
+                        "mt-1 block w-full",
+                        inputErrorClassName(!!errors.servicePeriodLabelText),
+                      )}
                     />
                   )}
                 />
@@ -692,8 +713,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                     {errors.servicePeriodLabelText.message}
                   </ErrorMessage>
                 ) : null}
-                {!isDefaultServicePeriodLabel &&
-                !errors.servicePeriodLabelText ? (
+                {!isDefaultServicePeriodLabel ? (
                   <InputHelperMessage>
                     <ButtonHelper
                       onClick={() => {
@@ -750,7 +770,10 @@ export const GeneralInformation = memo(function GeneralInformation({
                       id="dateOfServiceLabelText"
                       rows={2}
                       placeholder="Enter date of sales (Service period end) PDF label"
-                      className="block w-full"
+                      className={cn(
+                        "block w-full",
+                        inputErrorClassName(!!errors.dateOfServiceLabelText),
+                      )}
                     />
                   )}
                 />
@@ -759,8 +782,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                     {errors.dateOfServiceLabelText.message}
                   </ErrorMessage>
                 ) : null}
-                {!isDefaultDateOfServiceLabel &&
-                !errors.dateOfServiceLabelText ? (
+                {!isDefaultDateOfServiceLabel ? (
                   <InputHelperMessage>
                     <ButtonHelper
                       onClick={() => {
@@ -836,7 +858,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                 {...field}
                 id={`invoiceType`}
                 rows={2}
-                className=""
+                className={inputErrorClassName(!!errors.invoiceType)}
                 placeholder="Enter header notes"
               />
             )}
@@ -855,7 +877,6 @@ export const GeneralInformation = memo(function GeneralInformation({
             <div className="space-y-2">
               {/* Logo preview */}
               <div className="relative inline-block">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={logo}
                   alt="Company logo preview"
@@ -921,7 +942,10 @@ export const GeneralInformation = memo(function GeneralInformation({
                   {...field}
                   id={`stripePayOnlineUrl`}
                   type="url"
-                  className="mt-1"
+                  className={cn(
+                    "mt-1",
+                    inputErrorClassName(!!errors.stripePayOnlineUrl),
+                  )}
                 />
               )}
             />
