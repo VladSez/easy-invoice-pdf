@@ -63,6 +63,7 @@ export default tseslint.config(
         },
       ],
       "@next/next/no-img-element": "off",
+      "react/jsx-no-leaked-render": "warn",
     },
   },
   {

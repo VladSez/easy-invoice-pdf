@@ -1,8 +1,13 @@
 import {
   AlertIcon,
   ErrorMessage,
+  inputErrorClassName,
 } from "@/app/(app)/components/invoice-form/common";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import {
+  isFirstDayOfMonth,
+  isServicePeriodStartInCurrentMonth,
+} from "@/app/(app)/utils/format-service-period";
 import {
   DEFAULT_DATE_FORMAT,
   type InvoiceData,
@@ -23,8 +28,9 @@ import { SelectNative } from "@/components/ui/select-native";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { AlertTriangle, RefreshCw, Upload, X } from "lucide-react";
+import { AlertTriangle, InfoIcon, RefreshCw, Upload, X } from "lucide-react";
 import { memo, useCallback, useRef } from "react";
 import {
   type Control,
@@ -64,7 +70,18 @@ export const GeneralInformation = memo(function GeneralInformation({
     name: "invoiceNumberObject.value",
   });
 
+  const servicePeriodLabelText = useWatch({
+    control,
+    name: "servicePeriodLabelText",
+  });
+
+  const dateOfServiceLabelText = useWatch({
+    control,
+    name: "dateOfServiceLabelText",
+  });
+
   const dateOfService = useWatch({ control, name: "dateOfService" });
+  const dateOfServiceStart = useWatch({ control, name: "dateOfServiceStart" });
   const language = useWatch({ control, name: "language" });
   const template = useWatch({ control, name: "template" });
   const logo = useWatch({ control, name: "logo" });
@@ -73,13 +90,25 @@ export const GeneralInformation = memo(function GeneralInformation({
 
   const t = INVOICE_PDF_TRANSLATIONS[language];
   const defaultInvoiceNumber = `${t.invoiceNumber}:`;
+  const defaultServicePeriodLabel = t.servicePeriod;
+  const defaultDateOfServiceLabel = t.dateOfService;
+
+  const isDefaultServicePeriodLabel =
+    servicePeriodLabelText === defaultServicePeriodLabel;
+
+  const isDefaultDateOfServiceLabel =
+    dateOfServiceLabelText === defaultDateOfServiceLabel;
 
   const isDateOfIssueNotToday = !dayjs(dateOfIssue).isSame(dayjs(), "day");
 
-  const isDateOfServiceEqualsEndOfCurrentMonth = dayjs(dateOfService).isSame(
+  const isDateOfServiceEndOfMonth = dayjs(dateOfService).isSame(
     dayjs().endOf("month"),
     "day",
   );
+
+  const isServicePeriodStartOutsideCurrentMonth =
+    !!dateOfServiceStart &&
+    !isServicePeriodStartInCurrentMonth(dateOfServiceStart);
 
   const isDefaultInvoiceNumberLabel =
     invoiceNumberLabel === defaultInvoiceNumber;
@@ -151,8 +180,15 @@ export const GeneralInformation = memo(function GeneralInformation({
     !paymentDue ||
     !dayjs(paymentDue).isSame(dayjs(dateOfIssue).add(14, "days"), "day");
 
-  const canShowOutOfDateDatesHelper =
-    !isDateOfServiceEqualsEndOfCurrentMonth ||
+  /**
+   * Whether to show Stale Dates Banner.
+   * Banner appears when any invoice date/number is out of sync with current month.
+   * Triggers: service end not end of current month, service start not in current month,
+   * invoice number not for current month, issue date not today, payment due not 14 days after issue.
+   */
+  const canShowStaleDatesBanner =
+    !isDateOfServiceEndOfMonth ||
+    isServicePeriodStartOutsideCurrentMonth ||
     !isInvoiceNumberInCurrentMonth ||
     isDateOfIssueNotToday ||
     isPaymentDueNotMatchingIssueDate;
@@ -172,7 +208,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               <SelectNative
                 {...field}
                 id={`template`}
-                className="block"
+                className={cn("block", inputErrorClassName(!!errors.template))}
                 onChange={(e) => {
                   field.onChange(e);
 
@@ -186,6 +222,9 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                     // Set unit field to be HIDDEN by default for Stripe template (matches stripe template behaviour)
                     setValue("items.0.unitFieldIsVisible", false);
+
+                    // Set service period field to be VISIBLE for Stripe template (for backwards compatibility)
+                    setValue("servicePeriodFieldIsVisible", true);
                   } else {
                     // DEFAULT TEMPLATE
 
@@ -235,7 +274,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               <SelectNative
                 {...field}
                 id={`language`}
-                className="block"
+                className={cn("block", inputErrorClassName(!!errors.language))}
                 onChange={(e) => {
                   field.onChange(e);
 
@@ -274,6 +313,15 @@ export const GeneralInformation = memo(function GeneralInformation({
                   // This ensures the tax column header in the invoice items table
                   // displays the correct translation for the selected language
                   setValue("taxLabelText", newTranslation);
+
+                  setValue(
+                    "servicePeriodLabelText",
+                    INVOICE_PDF_TRANSLATIONS[newLanguage].servicePeriod,
+                  );
+                  setValue(
+                    "dateOfServiceLabelText",
+                    INVOICE_PDF_TRANSLATIONS[newLanguage].dateOfService,
+                  );
                 }}
               >
                 {SUPPORTED_LANGUAGES.map((lang) => {
@@ -314,6 +362,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                 id={`currency`}
                 value={field.value}
                 onChange={field.onChange}
+                hasError={!!errors.currency}
               />
             )}
           />
@@ -335,7 +384,11 @@ export const GeneralInformation = memo(function GeneralInformation({
             name="dateFormat"
             control={control}
             render={({ field }) => (
-              <SelectNative {...field} id={`dateFormat`} className="block">
+              <SelectNative
+                {...field}
+                id={`dateFormat`}
+                className={cn("block", inputErrorClassName(!!errors.dateFormat))}
+              >
                 {SUPPORTED_DATE_FORMATS.map((format) => {
                   const preview = dayjs().locale(language).format(format);
                   const isDefault = format === DEFAULT_DATE_FORMAT;
@@ -376,7 +429,10 @@ export const GeneralInformation = memo(function GeneralInformation({
                     type="text"
                     id="invoiceNumberLabel"
                     placeholder="Enter invoice number label"
-                    className="mt-1 block w-full"
+                    className={cn(
+                      "mt-1 block w-full",
+                      inputErrorClassName(!!errors.invoiceNumberObject?.label),
+                    )}
                   />
                 )}
               />
@@ -414,7 +470,10 @@ export const GeneralInformation = memo(function GeneralInformation({
                     type="text"
                     id="invoiceNumberValue"
                     placeholder="Enter invoice number value"
-                    className="mt-1 block w-full"
+                    className={cn(
+                      "mt-1 block w-full",
+                      inputErrorClassName(!!errors.invoiceNumberObject?.value),
+                    )}
                   />
                 )}
               />
@@ -450,7 +509,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                 {...field}
                 type="date"
                 id={`dateOfIssue`}
-                className=""
+                className={inputErrorClassName(!!errors.dateOfIssue)}
                 onChange={(e) => {
                   field.onChange(e);
 
@@ -476,41 +535,279 @@ export const GeneralInformation = memo(function GeneralInformation({
                 <AlertIcon />
                 Date of issue is not today
               </span>
+              <ButtonHelper
+                onClick={() => {
+                  const today = dayjs().format("YYYY-MM-DD");
+
+                  setValue("dateOfIssue", today);
+                  setValue(
+                    "paymentDue",
+                    dayjs(today).add(14, "days").format("YYYY-MM-DD"),
+                  );
+                }}
+              >
+                <span className="text-pretty">
+                  Set date of issue to today (
+                  {dayjs().format(selectedDateFormat)})
+                </span>
+              </ButtonHelper>
             </InputHelperMessage>
           ) : null}
         </div>
 
-        {/* Date of Service */}
-        <div>
-          <Label htmlFor={`dateOfService`} className="mb-1">
-            Date of Service
-          </Label>
-          <Controller
-            name="dateOfService"
-            control={control}
-            render={({ field }) => (
-              <Input {...field} type="date" id={`dateOfService`} className="" />
-            )}
-          />
-          {errors.dateOfService && (
-            <ErrorMessage>{errors.dateOfService.message}</ErrorMessage>
-          )}
+        <fieldset className="rounded-md border p-4">
+          <legend className="px-1 text-lg font-semibold text-gray-900">
+            Service period
+          </legend>
 
-          {!isDateOfServiceEqualsEndOfCurrentMonth && !errors.dateOfService ? (
-            <InputHelperMessage>
-              <span className="flex items-center text-amber-800">
-                <AlertIcon />
-                Date of service is not the last day of the current month
-              </span>
-            </InputHelperMessage>
+          {/** Service period PDF visibility toggle */}
+          <div className="mb-5 flex flex-col items-start gap-2 sm:justify-end sm:gap-4">
+            <div className="inline-flex items-center gap-2">
+              <Controller
+                name="servicePeriodFieldIsVisible"
+                control={control}
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Switch
+                    {...field}
+                    id="servicePeriodFieldIsVisible"
+                    data-testid="servicePeriodFieldIsVisible"
+                    checked={value}
+                    onCheckedChange={onChange}
+                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    aria-label='Show the "Service period" (Service period start and end) field in the PDF'
+                  />
+                )}
+              />
+              <CustomTooltip
+                trigger={
+                  <Label htmlFor="servicePeriodFieldIsVisible">
+                    Show &quot;Service period&quot; in PDF
+                  </Label>
+                }
+                content='Show the "Service period" (Service period start and end) field in the PDF'
+              />
+            </div>
+          </div>
+
+          {/** Service period start and end inputs */}
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="dateOfServiceStart" className="mb-1">
+                Service period start
+              </Label>
+              <Controller
+                name="dateOfServiceStart"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="date"
+                    id="dateOfServiceStart"
+                    className={inputErrorClassName(!!errors.dateOfServiceStart)}
+                    onChange={(e) => {
+                      field.onChange(e);
+
+                      const newServicePeriodStartDate = e.target.value;
+
+                      // auto-show "Service period" in PDF when start date is not first day of its month
+                      if (
+                        newServicePeriodStartDate &&
+                        !isFirstDayOfMonth(newServicePeriodStartDate)
+                      ) {
+                        setValue("servicePeriodFieldIsVisible", true);
+                      }
+                    }}
+                  />
+                )}
+              />
+              {errors.dateOfServiceStart ? (
+                <ErrorMessage>{errors.dateOfServiceStart.message}</ErrorMessage>
+              ) : null}
+
+              {isServicePeriodStartOutsideCurrentMonth &&
+              !errors.dateOfServiceStart ? (
+                <InputHelperMessage>
+                  <span className="flex items-center text-amber-800">
+                    <AlertIcon />
+                    Service period start is not in the current month
+                  </span>
+                </InputHelperMessage>
+              ) : null}
+            </div>
+
+            <div>
+              <div className="mb-1 flex items-center">
+                <Label htmlFor="dateOfService">Service period end</Label>
+                <CustomTooltip
+                  content='Shown on PDF as part of "Service period" and as "Date of sales/of executing the service"'
+                  side="top"
+                  popoverOnMobile
+                  trigger={
+                    <button
+                      type="button"
+                      className="ml-1 inline-flex cursor-pointer items-center align-middle"
+                      aria-label='Shown on PDF as part of "Service period" and as "Date of sales/of executing the service"'
+                    >
+                      <InfoIcon
+                        className="size-3"
+                        aria-hidden
+                        data-testid="service-period-end-info-icon"
+                      />
+                    </button>
+                  }
+                />
+              </div>
+
+              <Controller
+                name="dateOfService"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="date"
+                    id="dateOfService"
+                    className={inputErrorClassName(!!errors.dateOfService)}
+                  />
+                )}
+              />
+              {errors.dateOfService ? (
+                <ErrorMessage>{errors.dateOfService.message}</ErrorMessage>
+              ) : null}
+
+              {!isDateOfServiceEndOfMonth && !errors.dateOfService ? (
+                <InputHelperMessage>
+                  <span className="flex items-center text-amber-800">
+                    <AlertIcon />
+                    Service period end is not the last day of the current month
+                  </span>
+                </InputHelperMessage>
+              ) : null}
+            </div>
+          </div>
+
+          {/** Service period PDF label customization - default template only */}
+          {template === "default" ? (
+            <div className="mt-5 space-y-5">
+              <div>
+                <Label htmlFor="servicePeriodLabelText">
+                  Service period PDF label
+                </Label>
+                <Controller
+                  name="servicePeriodLabelText"
+                  control={control}
+                  render={({ field }) => (
+                    <Textarea
+                      {...field}
+                      id="servicePeriodLabelText"
+                      rows={2}
+                      placeholder="Enter service period PDF label"
+                      className={cn(
+                        "mt-1 block w-full",
+                        inputErrorClassName(!!errors.servicePeriodLabelText),
+                      )}
+                    />
+                  )}
+                />
+                {errors.servicePeriodLabelText ? (
+                  <ErrorMessage>
+                    {errors.servicePeriodLabelText.message}
+                  </ErrorMessage>
+                ) : null}
+                {!isDefaultServicePeriodLabel ? (
+                  <InputHelperMessage>
+                    <ButtonHelper
+                      onClick={() => {
+                        setValue(
+                          "servicePeriodLabelText",
+                          defaultServicePeriodLabel,
+                        );
+                      }}
+                    >
+                      Switch to default label (&quot;{defaultServicePeriodLabel}
+                      &quot;)
+                    </ButtonHelper>
+                  </InputHelperMessage>
+                ) : null}
+              </div>
+
+              <div>
+                <div className="relative mb-2 flex items-center justify-between">
+                  <Label htmlFor="dateOfServiceLabelText">
+                    Date of sales PDF label
+                  </Label>
+                  <div className="inline-flex items-center gap-2">
+                    <Controller
+                      name="dateOfServiceFieldIsVisible"
+                      control={control}
+                      render={({ field: { value, onChange, ...field } }) => (
+                        <Switch
+                          {...field}
+                          id="dateOfServiceFieldIsVisible"
+                          data-testid="dateOfServiceFieldIsVisible"
+                          checked={value}
+                          onCheckedChange={onChange}
+                          className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                          aria-label='Show the "Date of sales/of executing the service" field in the PDF'
+                        />
+                      )}
+                    />
+                    <CustomTooltip
+                      trigger={
+                        <Label htmlFor="dateOfServiceFieldIsVisible">
+                          Show in PDF
+                        </Label>
+                      }
+                      content='Show the "Date of sales/of executing the service" field in the PDF'
+                    />
+                  </div>
+                </div>
+                <Controller
+                  name="dateOfServiceLabelText"
+                  control={control}
+                  render={({ field }) => (
+                    <Textarea
+                      {...field}
+                      id="dateOfServiceLabelText"
+                      rows={2}
+                      placeholder="Enter date of sales (Service period end) PDF label"
+                      className={cn(
+                        "block w-full",
+                        inputErrorClassName(!!errors.dateOfServiceLabelText),
+                      )}
+                    />
+                  )}
+                />
+                {errors.dateOfServiceLabelText ? (
+                  <ErrorMessage>
+                    {errors.dateOfServiceLabelText.message}
+                  </ErrorMessage>
+                ) : null}
+                {!isDefaultDateOfServiceLabel ? (
+                  <InputHelperMessage>
+                    <ButtonHelper
+                      onClick={() => {
+                        setValue(
+                          "dateOfServiceLabelText",
+                          defaultDateOfServiceLabel,
+                        );
+                      }}
+                    >
+                      Switch to default label (&quot;{defaultDateOfServiceLabel}
+                      &quot;)
+                    </ButtonHelper>
+                  </InputHelperMessage>
+                ) : null}
+              </div>
+            </div>
           ) : null}
-        </div>
+        </fieldset>
 
         {/* Out of Date Dates Helper */}
-        {canShowOutOfDateDatesHelper ? (
-          <OutOfDateDatesHelper
+        {canShowStaleDatesBanner ? (
+          <StaleDatesBanner
             dateOfIssue={dateOfIssue}
             dateOfService={dateOfService}
+            dateOfServiceStart={dateOfServiceStart ?? ""}
             invoiceNumberValue={invoiceNumberValue ?? ""}
             paymentDue={paymentDue ?? ""}
             selectedDateFormat={selectedDateFormat ?? DEFAULT_DATE_FORMAT}
@@ -561,7 +858,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                 {...field}
                 id={`invoiceType`}
                 rows={2}
-                className=""
+                className={inputErrorClassName(!!errors.invoiceType)}
                 placeholder="Enter header notes"
               />
             )}
@@ -580,7 +877,6 @@ export const GeneralInformation = memo(function GeneralInformation({
             <div className="space-y-2">
               {/* Logo preview */}
               <div className="relative inline-block">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={logo}
                   alt="Company logo preview"
@@ -646,7 +942,10 @@ export const GeneralInformation = memo(function GeneralInformation({
                   {...field}
                   id={`stripePayOnlineUrl`}
                   type="url"
-                  className="mt-1"
+                  className={cn(
+                    "mt-1",
+                    inputErrorClassName(!!errors.stripePayOnlineUrl),
+                  )}
                 />
               )}
             />
@@ -668,6 +967,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 interface OutOfDateDatesHelperProps {
   dateOfIssue: string;
   dateOfService: string;
+  dateOfServiceStart: string;
   invoiceNumberValue: string;
   paymentDue: string;
   selectedDateFormat: string;
@@ -676,15 +976,16 @@ interface OutOfDateDatesHelperProps {
 }
 
 /**
- * Displays a helper component that detects and allows updating stale invoice dates.
+ * Displays a helper (banner) component that detects and allows updating stale invoice dates.
  *
- * This component checks if the invoice dates (date of issue, date of service, payment due)
- * and invoice number are outdated compared to the current date. If any are stale, it displays
- * a table showing the old vs new values and provides a button to update all dates at once.
+ * This component checks if the invoice dates (date of issue, service period start/end,
+ * payment due) and invoice number are outdated compared to the current date. If any are stale,
+ * it displays a banner with a table showing the old vs new values and provides a button to update all dates at once.
  */
-function OutOfDateDatesHelper({
+function StaleDatesBanner({
   dateOfIssue,
   dateOfService,
+  dateOfServiceStart,
   invoiceNumberValue,
   paymentDue,
   selectedDateFormat,
@@ -699,6 +1000,9 @@ function OutOfDateDatesHelper({
     dayjs().endOf("month"),
     "day",
   );
+  const isDateOfServiceStartStale =
+    !!dateOfServiceStart &&
+    !isServicePeriodStartInCurrentMonth(dateOfServiceStart);
   const extractedMonthYear = /(\d{2}-\d{4})/.exec(invoiceNumberValue)?.[1];
   const isInvoiceNumberStale = extractedMonthYear !== CURRENT_MONTH_AND_YEAR;
 
@@ -717,11 +1021,18 @@ function OutOfDateDatesHelper({
     .locale("en")
     .endOf("month")
     .format(selectedDateFormat);
+  const targetStartOfMonth = dayjs()
+    .locale("en")
+    .startOf("month")
+    .format(selectedDateFormat);
   const targetPaymentDue = dayjs()
     .locale("en")
     .add(14, "days")
     .format(selectedDateFormat);
+
   const targetInvoiceNumber = `1/${CURRENT_MONTH_AND_YEAR}`;
+
+  const fallbackValue = "(not set)";
 
   /**
    * Array of items to check for staleness.
@@ -742,25 +1053,33 @@ function OutOfDateDatesHelper({
   )[] = [
     isDateOfIssueStale && {
       label: "Date of issue",
-      oldValue: formatDate(dateOfIssue),
+      oldValue: dateOfIssue ? formatDate(dateOfIssue) : fallbackValue,
       newValue: targetToday,
       hint: "today",
     },
     isDateOfServiceStale && {
-      label: "Date of service",
-      oldValue: formatDate(dateOfService),
+      label: "Service period end",
+      oldValue: dateOfService ? formatDate(dateOfService) : fallbackValue,
       newValue: targetEndOfMonth,
       hint: "end of current month",
     },
+    isDateOfServiceStartStale && {
+      label: "Service period start",
+      oldValue: dateOfServiceStart
+        ? formatDate(dateOfServiceStart)
+        : fallbackValue,
+      newValue: targetStartOfMonth,
+      hint: "start of current month",
+    },
     isInvoiceNumberStale && {
       label: "Invoice number",
-      oldValue: invoiceNumberValue || "—",
+      oldValue: invoiceNumberValue ? invoiceNumberValue : fallbackValue,
       newValue: targetInvoiceNumber,
       hint: "current month",
     },
     isPaymentDueStale && {
       label: "Payment due",
-      oldValue: paymentDue ? formatDate(paymentDue) : "—",
+      oldValue: paymentDue ? formatDate(paymentDue) : fallbackValue,
       newValue: targetPaymentDue,
       hint: "date of issue + 14 days",
     },
@@ -834,10 +1153,14 @@ function OutOfDateDatesHelper({
         onClick={() => {
           const today = dayjs().format("YYYY-MM-DD");
 
+          const firstDayOfCurrentMonth = dayjs()
+            .startOf("month")
+            .format("YYYY-MM-DD");
           const lastDayOfCurrentMonth = dayjs()
             .endOf("month")
             .format("YYYY-MM-DD");
 
+          setValue("dateOfServiceStart", firstDayOfCurrentMonth);
           setValue("dateOfService", lastDayOfCurrentMonth);
           setValue("dateOfIssue", today);
           setValue("invoiceNumberObject.value", targetInvoiceNumber);

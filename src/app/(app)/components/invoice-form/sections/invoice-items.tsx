@@ -1,8 +1,10 @@
+import { inputErrorClassName } from "@/app/(app)/components/invoice-form/common";
 import {
   type InvoiceData,
   type SupportedCurrencies,
   type SupportedLanguages,
 } from "@/app/schema";
+import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { memo, useState } from "react";
@@ -148,7 +150,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                       {...field}
                       rows={4}
                       id={`itemName${index}`}
-                      className=""
+                      className={inputErrorClassName(
+                        !!errors.items?.[index]?.name,
+                      )}
                     />
                   )}
                 />
@@ -208,7 +212,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <Input
                         {...field}
                         id={`itemTypeOfGTU${index}`}
-                        className=""
+                        className={inputErrorClassName(
+                          !!errors.items?.[index]?.typeOfGTU,
+                        )}
                         type="text"
                       />
                     )}
@@ -277,7 +283,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                           type="number"
                           step="0.01"
                           min="0"
-                          className=""
+                          className={inputErrorClassName(
+                            !!errors.items?.[index]?.amount,
+                          )}
                         />
                         {!errors.items?.[index]?.amount && (
                           <InputHelperMessage>
@@ -336,7 +344,14 @@ export const InvoiceItems = memo(function InvoiceItems({
                   name={`items.${index}.unit`}
                   control={control}
                   render={({ field }) => (
-                    <Input {...field} id={`itemUnit${index}`} type="text" />
+                    <Input
+                      {...field}
+                      id={`itemUnit${index}`}
+                      type="text"
+                      className={inputErrorClassName(
+                        !!errors.items?.[index]?.unit,
+                      )}
+                    />
                   )}
                 />
                 {errors.items?.[index]?.unit && (
@@ -415,7 +430,12 @@ export const InvoiceItems = memo(function InvoiceItems({
                             type="number"
                             step="0.01"
                             min="0"
-                            className="w-full"
+                            className={cn(
+                              "w-full",
+                              inputErrorClassName(
+                                !!errors.items?.[index]?.netPrice,
+                              ),
+                            )}
                             dataTestId={`itemNetPrice${index}`}
                           />
                           {!errors.items?.[index]?.netPrice && (
@@ -483,7 +503,10 @@ export const InvoiceItems = memo(function InvoiceItems({
                         type="text"
                         id="taxLabelText"
                         placeholder="Enter tax label (e.g., VAT, Tax, GST, Sales Tax)"
-                        className="mt-1 block w-full"
+                        className={cn(
+                          "mt-1 block w-full",
+                          inputErrorClassName(!!errors.taxLabelText),
+                        )}
                       />
                     )}
                   />
@@ -514,7 +537,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                         {...field}
                         id={`itemVat${index}`}
                         type="text"
-                        className=""
+                        className={inputErrorClassName(
+                          !!errors.items?.[index]?.vat,
+                        )}
                       />
                     )}
                   />
@@ -583,6 +608,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
+                        className={inputErrorClassName(
+                          !!errors.items?.[index]?.netAmount,
+                        )}
                         dataTestId={`itemNetAmount${index}`}
                       />
                     );
@@ -652,6 +680,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
+                        className={inputErrorClassName(
+                          !!errors.items?.[index]?.vatAmount,
+                        )}
                         data-testid="vat-amount"
                       />
                     );
@@ -722,6 +753,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
+                        className={inputErrorClassName(
+                          !!errors.items?.[index]?.preTaxAmount,
+                        )}
                       />
                     );
                   }}

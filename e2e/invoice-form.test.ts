@@ -13,6 +13,7 @@ import {
 } from "@/app/schema";
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
 import {
   GITHUB_URL,
@@ -307,10 +308,68 @@ test.describe("Invoice Generator Page", () => {
       generalInfoSection.getByRole("textbox", { name: "Date of Issue" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.dateOfIssue);
 
-    // Date of Service
+    // Service period
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+
+    await expect(servicePeriodFieldset).toBeVisible();
+
     await expect(
-      generalInfoSection.getByRole("textbox", { name: "Date of Service" }),
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period PDF label",
+      }),
+    ).toHaveValue(INITIAL_INVOICE_DATA.servicePeriodLabelText);
+
+    await expect(
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Date of sales PDF label",
+      }),
+    ).toHaveValue(INITIAL_INVOICE_DATA.dateOfServiceLabelText);
+
+    await expect(
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period start",
+      }),
+    ).toHaveValue(INITIAL_INVOICE_DATA.dateOfServiceStart);
+
+    await expect(
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period end",
+      }),
     ).toHaveValue(INITIAL_INVOICE_DATA.dateOfService);
+
+    // Check that info icon is visible
+    await expect(
+      servicePeriodFieldset.getByTestId("service-period-end-info-icon"),
+    ).toBeVisible();
+
+    await expect(
+      servicePeriodFieldset.getByRole("switch", {
+        name: 'Show the "Service period" (Service period start and end) field in the PDF',
+      }),
+    ).not.toBeChecked();
+
+    // by default, date of sales is visible in PDF
+    const dateOfServiceSwitch = servicePeriodFieldset.getByRole("switch", {
+      name: 'Show the "Date of sales/of executing the service" field in the PDF',
+    });
+
+    await expect(dateOfServiceSwitch).toBeChecked();
+    await dateOfServiceSwitch.click();
+    await expect(dateOfServiceSwitch).not.toBeChecked();
+
+    await expect(
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period end",
+      }),
+    ).toBeEditable();
+
+    await expect(
+      servicePeriodFieldset.getByRole("button", {
+        name: 'Shown on PDF as part of "Service period" and as "Date of sales/of executing the service"',
+      }),
+    ).toBeVisible();
 
     // Invoice Type
     await expect(
@@ -581,6 +640,54 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       invoiceItemsSection.getByRole("button", { name: "Add invoice item" }),
     ).toBeVisible();
+  });
+
+  test("updates service period PDF labels on language change and allows customization", async ({
+    page,
+  }) => {
+    const generalInfoSection = page.getByTestId("general-information-section");
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+
+    const servicePeriodLabelInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Service period PDF label",
+    });
+    const dateOfServiceLabelInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Date of sales PDF label",
+    });
+
+    await servicePeriodLabelInput.fill("Custom service period label");
+    await dateOfServiceLabelInput.fill("Custom date of sales label");
+
+    const languageSelect = generalInfoSection.getByRole("combobox", {
+      name: "Invoice PDF Language",
+    });
+    await languageSelect.selectOption("pl");
+
+    await expect(servicePeriodLabelInput).toHaveValue(
+      INVOICE_PDF_TRANSLATIONS.pl.servicePeriod,
+    );
+    await expect(dateOfServiceLabelInput).toHaveValue(
+      INVOICE_PDF_TRANSLATIONS.pl.dateOfService,
+    );
+
+    await servicePeriodLabelInput.fill("My custom period");
+    await expect(
+      servicePeriodFieldset.getByRole("button", {
+        name: `Switch to default label ("${INVOICE_PDF_TRANSLATIONS.pl.servicePeriod}")`,
+      }),
+    ).toBeVisible();
+
+    await servicePeriodFieldset
+      .getByRole("button", {
+        name: `Switch to default label ("${INVOICE_PDF_TRANSLATIONS.pl.servicePeriod}")`,
+      })
+      .click();
+
+    await expect(servicePeriodLabelInput).toHaveValue(
+      INVOICE_PDF_TRANSLATIONS.pl.servicePeriod,
+    );
   });
 
   test("can add and remove invoice items and recalculates totals correctly", async ({
@@ -1178,48 +1285,49 @@ test.describe("Invoice Generator Page", () => {
     // Test invalid values
     await amountInput.fill("-1");
     await expect(
-      invoiceItemsSection.getByText("Amount must be positive"),
+      invoiceItemsSection.getByText("Amount must be >= 0"),
+    ).toBeVisible();
+
+    // Check that notification is also visible
+    await expect(
+      page.getByLabel("Notifications alt+T").getByText("Amount must be >= 0"),
+    ).toBeVisible();
+
+    await amountInput.fill("1000000"); // Exceeds max of 999 999.99
+    await expect(
+      invoiceItemsSection.getByText("Amount must not exceed 999 999.99"),
     ).toBeVisible();
 
     // Check that notification is also visible
     await expect(
       page
         .getByLabel("Notifications alt+T")
-        .getByText("Amount must be positive"),
-    ).toBeVisible();
-
-    await amountInput.fill("0");
-    await expect(
-      invoiceItemsSection.getByText("Amount must be positive"),
-    ).toBeVisible();
-
-    await amountInput.fill("1000000000000"); // 1 trillion
-    await expect(
-      invoiceItemsSection.getByText("Amount must not exceed 9 999 999 999.99"),
-    ).toBeVisible();
-
-    // Check that notification is also visible
-    await expect(
-      page
-        .getByLabel("Notifications alt+T")
-        .getByText("Amount must not exceed 9 999 999 999.99"),
+        .getByText("Amount must not exceed 999 999.99"),
     ).toBeVisible();
 
     // Test valid values
-    await amountInput.fill("1");
+    await amountInput.fill("0");
     await expect(
-      invoiceItemsSection.getByText("Amount must be positive"),
+      invoiceItemsSection.getByText("Amount must be >= 0"),
     ).toBeHidden();
     await expect(
-      invoiceItemsSection.getByText("Amount must not exceed 9 999 999 999.99"),
+      invoiceItemsSection.getByText("Amount must not exceed 999 999.99"),
     ).toBeHidden();
 
-    await amountInput.fill("9999999999.99"); // Maximum valid value
+    await amountInput.fill("1");
     await expect(
-      invoiceItemsSection.getByText("Amount must be positive"),
+      invoiceItemsSection.getByText("Amount must be >= 0"),
     ).toBeHidden();
     await expect(
-      invoiceItemsSection.getByText("Amount must not exceed 9 999 999 999.99"),
+      invoiceItemsSection.getByText("Amount must not exceed 999 999.99"),
+    ).toBeHidden();
+
+    await amountInput.fill("999999.99"); // Maximum valid value
+    await expect(
+      invoiceItemsSection.getByText("Amount must be >= 0"),
+    ).toBeHidden();
+    await expect(
+      invoiceItemsSection.getByText("Amount must not exceed 999 999.99"),
     ).toBeHidden();
 
     // **NET PRICE FIELD**
@@ -1244,14 +1352,14 @@ test.describe("Invoice Generator Page", () => {
     // Test exceeding maximum value
     await netPriceInput.fill("1000000000000"); // 1 trillion
     await expect(
-      invoiceItemsSection.getByText("Net price must not exceed 100 billion"),
+      invoiceItemsSection.getByText("Net price must not exceed 1 billion"),
     ).toBeVisible();
 
     // Check that notification is also visible
     await expect(
       page
         .getByLabel("Notifications alt+T")
-        .getByText("Net price must not exceed 100 billion"),
+        .getByText("Net price must not exceed 1 billion"),
     ).toBeVisible();
 
     // Test zero value
@@ -1266,7 +1374,15 @@ test.describe("Invoice Generator Page", () => {
       invoiceItemsSection.getByText("Net price must be >= 0"),
     ).toBeHidden();
     await expect(
-      invoiceItemsSection.getByText("Net price must not exceed 100 billion"),
+      invoiceItemsSection.getByText("Net price must not exceed 1 billion"),
+    ).toBeHidden();
+
+    await netPriceInput.fill("1000000000"); // Maximum valid value
+    await expect(
+      invoiceItemsSection.getByText("Net price must be >= 0"),
+    ).toBeHidden();
+    await expect(
+      invoiceItemsSection.getByText("Net price must not exceed 1 billion"),
     ).toBeHidden();
 
     // **VAT FIELD**
@@ -1340,6 +1456,12 @@ test.describe("Invoice Generator Page", () => {
         amount: "3",
         netPrice: "100",
         expected: { net: "300.00", vatAmount: "0.00", total: "300.00" },
+      },
+      {
+        vat: "23",
+        amount: "0",
+        netPrice: "100",
+        expected: { net: "0.00", vatAmount: "0.00", total: "0.00" },
       },
     ] as const satisfies {
       vat: string;
@@ -1419,14 +1541,27 @@ test.describe("Invoice Generator Page", () => {
       generalInfoSection.getByText("Date of issue is not today"),
     ).toBeVisible();
 
-    // Set date of service to a date that's not the last day of current month
-    const dateOfServiceInput = generalInfoSection.getByLabel("Date of Service");
+    // Set service period end to a date that's not the last day of current month
+    const dateOfServiceStartInput = generalInfoSection.getByRole("textbox", {
+      name: "Service period start",
+    });
+    const dateOfServiceInput = generalInfoSection.getByRole("textbox", {
+      name: "Service period end",
+    });
+    await dateOfServiceStartInput.fill("2025-06-14");
     await dateOfServiceInput.fill("2024-01-20");
 
-    // Verify per-field "Date of service is not the last day of the current month" inline helper message
+    // Verify per-field service period start helper message
     await expect(
       generalInfoSection.getByText(
-        "Date of service is not the last day of the current month",
+        "Service period start is not in the current month",
+      ),
+    ).toBeVisible();
+
+    // Verify per-field service period end helper message
+    await expect(
+      generalInfoSection.getByText(
+        "Service period end is not the last day of the current month",
       ),
     ).toBeVisible();
 
@@ -1457,7 +1592,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Verify the header shows the correct count of stale fields
     await expect(
-      outOfDateHelper.getByText("4 fields are out of date"),
+      outOfDateHelper.getByText("5 fields are out of date"),
     ).toBeVisible();
 
     // Verify each stale field appears as a row in the table
@@ -1465,7 +1600,10 @@ test.describe("Invoice Generator Page", () => {
       outOfDateHelper.getByText("Date of issue", { exact: true }),
     ).toBeVisible();
     await expect(
-      outOfDateHelper.getByText("Date of service", { exact: true }),
+      outOfDateHelper.getByText("Service period start", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      outOfDateHelper.getByText("Service period end", { exact: true }),
     ).toBeVisible();
     await expect(
       outOfDateHelper.getByText("Invoice number", { exact: true }),
@@ -1474,19 +1612,38 @@ test.describe("Invoice Generator Page", () => {
       outOfDateHelper.getByText("Payment due", { exact: true }),
     ).toBeVisible();
 
-    // Verify the table shows old → new values for date fields
-    await expect(outOfDateHelper.getByText("2024-01-15")).toBeVisible();
-    await expect(outOfDateHelper.getByText("2024-01-20")).toBeVisible();
-    await expect(outOfDateHelper.getByText("2025-12-01")).toBeVisible();
-    await expect(outOfDateHelper.getByText("2025-12-31")).toBeVisible();
+    // Verify the table shows old → new values per row (avoids strict mode when targets match)
+    const dateOfIssueRow = outOfDateHelper
+      .getByRole("row")
+      .filter({ hasText: "Date of issue" });
 
-    // Verify old and new invoice number values in the table
-    await expect(outOfDateHelper.getByText("1/01-2024")).toBeVisible();
-    await expect(outOfDateHelper.getByText("1/12-2025")).toBeVisible();
+    await expect(dateOfIssueRow.getByText("2024-01-15")).toBeVisible();
+    await expect(dateOfIssueRow.getByText("2025-12-01")).toBeVisible();
 
-    // Verify old and new payment due values in the table
-    await expect(outOfDateHelper.getByText("2024-01-16")).toBeVisible();
-    await expect(outOfDateHelper.getByText("2025-12-15")).toBeVisible();
+    const servicePeriodStartRow = outOfDateHelper
+      .getByRole("row")
+      .filter({ hasText: "Service period start" });
+
+    await expect(servicePeriodStartRow.getByText("2025-06-14")).toBeVisible();
+    await expect(servicePeriodStartRow.getByText("2025-12-01")).toBeVisible();
+
+    const servicePeriodEndRow = outOfDateHelper
+      .getByRole("row")
+      .filter({ hasText: "Service period end" });
+    await expect(servicePeriodEndRow.getByText("2024-01-20")).toBeVisible();
+    await expect(servicePeriodEndRow.getByText("2025-12-31")).toBeVisible();
+
+    const invoiceNumberRow = outOfDateHelper
+      .getByRole("row")
+      .filter({ hasText: "Invoice number" });
+    await expect(invoiceNumberRow.getByText("1/01-2024")).toBeVisible();
+    await expect(invoiceNumberRow.getByText("1/12-2025")).toBeVisible();
+
+    const paymentDueRow = outOfDateHelper
+      .getByRole("row")
+      .filter({ hasText: "Payment due" });
+    await expect(paymentDueRow.getByText("2024-01-16")).toBeVisible();
+    await expect(paymentDueRow.getByText("2025-12-15")).toBeVisible();
 
     // Verify the "Update All Dates" button is visible
     const updateAllDatesButton = outOfDateHelper.getByRole("button", {
@@ -1511,14 +1668,190 @@ test.describe("Invoice Generator Page", () => {
     ).toBeHidden();
     await expect(
       generalInfoSection.getByText(
-        "Date of service is not the last day of the current month",
+        "Service period end is not the last day of the current month",
+      ),
+    ).toBeHidden();
+    await expect(
+      generalInfoSection.getByText(
+        "Service period start is not in the current month",
       ),
     ).toBeHidden();
 
     // Verify all fields were updated to correct values
     await expect(dateOfIssueInput).toHaveValue("2025-12-01");
+    await expect(dateOfServiceStartInput).toHaveValue("2025-12-01");
     await expect(dateOfServiceInput).toHaveValue("2025-12-31");
     await expect(invoiceNumberInput).toHaveValue("1/12-2025");
     await expect(paymentDueInput).toHaveValue("2025-12-15");
+  });
+
+  test("allows setting date of issue to today from inline helper", async ({
+    page,
+  }) => {
+    await page.clock.setSystemTime(new Date("2025-12-01T00:00:00Z"));
+
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
+
+    const generalInfoSection = page.getByRole("region", {
+      name: "General Information",
+    });
+    const dateOfIssueInput = generalInfoSection.getByLabel("Date of Issue");
+
+    await dateOfIssueInput.fill("2024-01-15");
+
+    await expect(
+      generalInfoSection.getByText("Date of issue is not today"),
+    ).toBeVisible();
+
+    await generalInfoSection
+      .getByRole("button", { name: /Set date of issue to today/ })
+      .click();
+
+    await expect(dateOfIssueInput).toHaveValue("2025-12-01");
+    await expect(
+      generalInfoSection.getByText("Date of issue is not today"),
+    ).toBeHidden();
+    await expect(page.getByLabel("Payment Due")).toHaveValue("2025-12-15");
+  });
+
+  test("allows switching service period PDF label to default from inline helper", async ({
+    page,
+  }) => {
+    const generalInfoSection = page.getByRole("region", {
+      name: "General Information",
+    });
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+    const servicePeriodLabelInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Service period PDF label",
+    });
+    const defaultLabel = INVOICE_PDF_TRANSLATIONS.en.servicePeriod;
+    const switchToDefaultButton = servicePeriodFieldset.getByRole("button", {
+      name: `Switch to default label ("${defaultLabel}")`,
+    });
+
+    await servicePeriodLabelInput.fill("Custom service period label");
+
+    await expect(switchToDefaultButton).toBeVisible();
+
+    await switchToDefaultButton.click();
+
+    await expect(servicePeriodLabelInput).toHaveValue(defaultLabel);
+    await expect(switchToDefaultButton).toBeHidden();
+  });
+
+  test("allows switching date of sales PDF label to default from inline helper", async ({
+    page,
+  }) => {
+    const generalInfoSection = page.getByRole("region", {
+      name: "General Information",
+    });
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+    const dateOfServiceLabelInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Date of sales PDF label",
+    });
+    const defaultLabel = INVOICE_PDF_TRANSLATIONS.en.dateOfService;
+    const switchToDefaultButton = servicePeriodFieldset.getByRole("button", {
+      name: `Switch to default label ("${defaultLabel}")`,
+    });
+
+    await dateOfServiceLabelInput.fill("Custom date of sales label");
+
+    await expect(switchToDefaultButton).toBeVisible();
+
+    await switchToDefaultButton.click();
+
+    await expect(dateOfServiceLabelInput).toHaveValue(defaultLabel);
+    await expect(switchToDefaultButton).toBeHidden();
+  });
+
+  test("allows setting a partial service period", async ({ page }) => {
+    await page.clock.setSystemTime(new Date("2025-06-15T12:00:00Z"));
+
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
+
+    const generalInfoSection = page.getByRole("region", {
+      name: "General Information",
+    });
+
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+
+    const servicePeriodSwitch = servicePeriodFieldset.getByRole("switch", {
+      name: 'Show the "Service period" (Service period start and end) field in the PDF',
+    });
+
+    await servicePeriodFieldset
+      .getByRole("textbox", { name: "Service period start" })
+      .fill("2025-06-14");
+    await servicePeriodFieldset
+      .getByRole("textbox", { name: "Service period end" })
+      .fill("2025-06-20");
+
+    await expect(
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period start",
+      }),
+    ).toHaveValue("2025-06-14");
+    await expect(
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period end",
+      }),
+    ).toHaveValue("2025-06-20");
+
+    await expect(servicePeriodSwitch).toBeChecked();
+
+    await servicePeriodSwitch.click();
+    await expect(servicePeriodSwitch).not.toBeChecked();
+
+    await servicePeriodFieldset
+      .getByRole("textbox", { name: "Service period start" })
+      .fill("2025-06-15");
+    await expect(servicePeriodSwitch).toBeChecked();
+  });
+
+  test("does not auto-enable service period PDF field when start is the first day of its month", async ({
+    page,
+  }) => {
+    await page.clock.setSystemTime(new Date("2025-06-15T12:00:00Z"));
+
+    await page.goto("/?template=default");
+    await expect(page).toHaveURL("/?template=default");
+
+    const generalInfoSection = page.getByRole("region", {
+      name: "General Information",
+    });
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+    const servicePeriodStartInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Service period start",
+    });
+    const servicePeriodSwitch = servicePeriodFieldset.getByRole("switch", {
+      name: 'Show the "Service period" (Service period start and end) field in the PDF',
+    });
+
+    await expect(servicePeriodSwitch).not.toBeChecked();
+
+    // First day of the current month should not auto-enable the PDF field.
+    await servicePeriodStartInput.fill("2025-06-01");
+    await expect(servicePeriodStartInput).toHaveValue("2025-06-01");
+    await expect(servicePeriodSwitch).not.toBeChecked();
+
+    // First day of a different month should also stay off (regression for current-month check).
+    await servicePeriodStartInput.fill("2025-05-01");
+    await expect(servicePeriodStartInput).toHaveValue("2025-05-01");
+    await expect(servicePeriodSwitch).not.toBeChecked();
+
+    // Partial month start should still auto-enable the PDF field.
+    await servicePeriodStartInput.fill("2025-05-11");
+    await expect(servicePeriodStartInput).toHaveValue("2025-05-11");
+    await expect(servicePeriodSwitch).toBeChecked();
   });
 });
