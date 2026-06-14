@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 import { SEO_FOOTER_SOLUTION_LINKS } from "@/app/(seo-landings)/seo-landing-footer-links";
 import { ProjectLogo } from "@/components/etc/project-logo";
-import { GITHUB_URL, TWITTER_URL } from "@/config";
+import { DISCORD_COMMUNITY_URL, GITHUB_URL, TWITTER_URL } from "@/config";
 import Link from "next/link";
 
 interface FooterProps {
@@ -213,7 +213,15 @@ function DefaultFooterLinks() {
       </li>
       <li>
         <Link
-          href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
+          href="/changelog"
+          className="text-sm text-slate-500 hover:text-slate-900"
+        >
+          Changelog
+        </Link>
+      </li>
+      <li>
+        <Link
+          href={DISCORD_COMMUNITY_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm text-slate-500 hover:text-slate-900"

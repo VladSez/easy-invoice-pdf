@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AppPageClient } from "./page.client";
 import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
+import { getLatestChangelogSummary } from "@/app/changelog/utils";
 import { CTAToastProvider } from "./contexts/cta-toast-context";
 
 const APP_PAGE_DESCRIPTION =
@@ -155,11 +156,17 @@ export async function generateMetadata({
 }
 
 export default async function AppPage() {
-  const githubStarsCount = await fetchGithubStars();
+  const [githubStarsCount, latestChangelog] = await Promise.all([
+    fetchGithubStars(),
+    getLatestChangelogSummary(),
+  ]);
 
   return (
     <CTAToastProvider>
-      <AppPageClient githubStarsCount={githubStarsCount} />
+      <AppPageClient
+        githubStarsCount={githubStarsCount}
+        latestChangelog={latestChangelog}
+      />
     </CTAToastProvider>
   );
 }

@@ -1,3 +1,12 @@
+---
+type: Reference
+title: EasyInvoicePDF
+description: Free, open-source invoice generator for creating professional PDF invoices in the browser.
+resource: https://easyinvoicepdf.com
+tags: [invoice-generator, pdf, open-source, invoicing, client-side, multilingual, vat]
+timestamp: 2026-06-14T00:00:00Z
+---
+
 # EasyInvoicePDF — free, open-source invoice generator
 
 [EasyInvoicePDF](https://easyinvoicepdf.com)

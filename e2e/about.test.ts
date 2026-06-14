@@ -1,6 +1,11 @@
 /* eslint-disable playwright/no-conditional-expect */
 /* eslint-disable playwright/no-conditional-in-test */
-import { GITHUB_URL, TWITTER_URL, VIDEO_DEMO_FALLBACK_IMG } from "@/config";
+import {
+  DISCORD_COMMUNITY_URL,
+  GITHUB_URL,
+  TWITTER_URL,
+  VIDEO_DEMO_FALLBACK_IMG,
+} from "@/config";
 import { expect, test } from "@playwright/test";
 
 test.describe("About page", () => {
@@ -234,7 +239,7 @@ test.describe("About page", () => {
     await expect(shareFeedbackLink).toBeVisible();
     await expect(shareFeedbackLink).toHaveAttribute(
       "href",
-      "https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10",
+      DISCORD_COMMUNITY_URL,
     );
     await expect(shareFeedbackLink).toHaveAttribute("target", "_blank");
 

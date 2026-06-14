@@ -25,7 +25,14 @@ export const VIDEO_DEMO_FALLBACK_IMG = `${STATIC_ASSETS_URL}/demo-videos/easy-in
 export const VIDEO_DEMO_YOUTUBE_URL =
   "https://www.youtube.com/embed/iAROeCIcZ40?si=EyJKCsUr43Z8zY1f";
 
-// const DONATION_URL = "https://dub.sh/easyinvoice-donate";
+export const YOUTUBE_VIDEO_HOW_TO_ADD_SELLER =
+  "https://youtu.be/xfSF35c0vfU?si=upjUB8FV5m1eJTmM";
+
+export const YOUTUBE_VIDEO_HOW_TO_ADD_BUYER =
+  "https://youtu.be/XxAY0YGgXIk?si=l9SY-1-zFT83DejJ";
+
+export const YOUTUBE_VIDEO_HOW_TO_ADD_INVOICE_FOR_ONE_WEEK =
+  "https://youtu.be/6KzDBBiAJmg?si=RHqmB6RDiRFks2NM";
 
 export const PROD_WEBSITE_URL = "https://easyinvoicepdf.com";
 
@@ -36,6 +43,9 @@ export const LINKEDIN_URL =
 
 export const TWITTER_URL = "https://x.com/vladsazonau";
 export const TWITTER_CREATOR = "@vlad_sazonau";
+
+export const REDDIT_COMMUNITY_URL = "https://www.reddit.com/r/EasyInvoicePDF/";
+export const DISCORD_COMMUNITY_URL = "https://discord.gg/gAr3HteWta";
 
 export const PERSONAL_WEBSITE_URL = "https://vladsazon.com";
 

@@ -1230,11 +1230,14 @@ export const invoiceObjectSchema = z.object({
 export const invoiceSchema = invoiceObjectSchema
   .transform((data) => ({
     ...data,
+    // Ensure dateOfServiceStart is trimmed and defaults to first day of
+    // month containing dateOfService if not set
     dateOfServiceStart:
       data.dateOfServiceStart?.trim() ||
       dayjs(data.dateOfService).startOf("month").format("YYYY-MM-DD"),
   }))
   .superRefine((data, ctx) => {
+    // Custom validation: dateOfServiceStart must not be after dateOfService
     if (
       dayjs(data.dateOfServiceStart).isAfter(dayjs(data.dateOfService), "day")
     ) {
