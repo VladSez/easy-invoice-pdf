@@ -60,11 +60,19 @@ const aboutSchema = z
     footer: z
       .object({
         description: z.string(),
+        headings: z
+          .object({
+            product: z.string(),
+            company: z.string(),
+            community: z.string(),
+          })
+          .strict(),
         links: z
           .object({
             invoiceGenerator: z.string(),
             features: z.string(),
             github: z.string(),
+            howItWorks: z.string(),
             changelog: z.string(),
             founder: z.string(),
             resources: z.string(),
