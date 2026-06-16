@@ -1,10 +1,14 @@
 import { HowItWorksVideos } from "@/app/(app)/components/how-it-works-videos";
 import { HOW_IT_WORKS_VIDEOS } from "@/config";
+import { cn } from "@/lib/utils";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 
 export const dynamic = "force-static";
+
+const linkClassName =
+  "font-medium text-slate-950 underline decoration-slate-400 underline-offset-2 transition-colors hover:text-slate-950/90 hover:decoration-slate-500";
 
 function VideoPlayerSkeleton() {
   return (
@@ -37,10 +41,7 @@ export default function HowItWorksPage() {
             invoices online with EasyInvoicePDF. Watch step-by-step tutorial
             videos to learn invoice creation, branding, and customization tips.
             Start generating invoices instantly in our{" "}
-            <Link
-              href="/"
-              className="font-medium text-slate-800 underline decoration-slate-300 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-500"
-            >
+            <Link href="/" className={cn(linkClassName)}>
               free online invoice generator
             </Link>
             .
@@ -72,7 +73,7 @@ export default function HowItWorksPage() {
                   <p className="mt-3">
                     <Link
                       href={`/how-it-works?video=${video.id}`}
-                      className="font-medium text-slate-800 underline decoration-slate-300 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-500"
+                      className={cn(linkClassName)}
                     >
                       Watch tutorial
                     </Link>
@@ -81,7 +82,7 @@ export default function HowItWorksPage() {
                       href={video.watchUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-medium text-slate-800 underline decoration-slate-300 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-500"
+                      className={cn(linkClassName)}
                     >
                       Watch on YouTube
                     </a>

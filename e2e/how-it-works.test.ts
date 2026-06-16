@@ -67,9 +67,12 @@ test.describe("How it works page", () => {
       page.getByRole("heading", { level: 2, name: "All tutorials" }),
     ).toBeVisible();
 
-    const cta = page.getByTestId("how-it-works-cta");
-    await expect(cta).toBeVisible();
-    await expect(cta).toHaveAttribute("href", "/");
+    const buttonCta = page.getByRole("link", {
+      name: "Start Invoicing",
+      exact: true,
+    });
+    await expect(buttonCta).toBeVisible();
+    await expect(buttonCta).toHaveAttribute("href", "/");
 
     const footer = page.locator("footer");
     await expect(footer).toBeVisible();

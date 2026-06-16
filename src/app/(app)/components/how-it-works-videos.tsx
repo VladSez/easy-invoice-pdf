@@ -153,7 +153,7 @@ export function HowItWorksVideos({
           href={DISCORD_COMMUNITY_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-medium text-slate-800 underline decoration-slate-300 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-500"
+          className="font-semibold text-slate-800 underline decoration-slate-400 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-500"
           data-testid="how-it-works-discord"
           onClick={() => umamiTrackEvent("how-it-works-discord-click")}
         >
@@ -164,7 +164,7 @@ export function HowItWorksVideos({
           href={REDDIT_COMMUNITY_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-medium text-slate-800 underline decoration-slate-300 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-500"
+          className="font-semibold text-slate-800 underline decoration-slate-400 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-500"
           data-testid="how-it-works-reddit"
           onClick={() => umamiTrackEvent("how-it-works-reddit-click")}
         >
