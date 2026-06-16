@@ -129,6 +129,15 @@ Adds customizable tax and tax number labels, per-language tax label behavior, st
 
 Launches EasyInvoicePDF with live invoice preview, instant PDF download, shareable links, default and Stripe-inspired templates, 10 languages, broad currency support, European VAT support, and privacy-focused browser-side editing.
 
+## How it works (video tutorials)
+
+Step-by-step video guides for using EasyInvoicePDF. Page: [How EasyInvoicePDF Works](https://easyinvoicepdf.com/how-it-works)
+
+- **Overview**: Create and customize professional PDF invoices with live preview
+- **Add seller**: Save seller details and reuse them on future invoices
+- **Add buyer**: Save buyer details and reuse them on future invoices
+- **Weekly invoices**: Generate invoices for a week of work
+
 ## Licensing and availability
 
 - **Open source**: Source code is licensed under [GNU AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html).
@@ -150,6 +159,7 @@ Launches EasyInvoicePDF with live invoice preview, instant PDF download, shareab
 - [Features (on About)](https://easyinvoicepdf.com/en/about#features)
 - [FAQ (on About)](https://easyinvoicepdf.com/en/about#faq)
 - [Changelog](https://easyinvoicepdf.com/changelog)
+- [How it works (video tutorials)](https://easyinvoicepdf.com/how-it-works)
 - [Founder](https://easyinvoicepdf.com/founder)
 - [Terms of Service](https://easyinvoicepdf.com/tos)
 - [GitHub releases](https://github.com/VladSez/easy-invoice-pdf/releases)

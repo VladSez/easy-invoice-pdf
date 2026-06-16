@@ -116,6 +116,13 @@ export const SITE_NAVIGATION_JSONLD = {
       description: "Latest updates and improvements to the application",
       url: "https://easyinvoicepdf.com/changelog",
     },
+    {
+      "@type": "SiteNavigationElement",
+      name: "How it works",
+      description:
+        "Video tutorials for creating invoices, saving seller and buyer details, and weekly invoicing",
+      url: "https://easyinvoicepdf.com/how-it-works",
+    },
   ],
 } as const satisfies WithContext<SiteNavigationElement>;
 

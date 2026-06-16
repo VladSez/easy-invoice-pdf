@@ -1,8 +1,8 @@
 "use client";
 
 import type { ChangelogSummary } from "@/app/changelog/utils";
-import { shouldShowChangelogPopup } from "@/lib/changelog-seen-storage";
-import { hasSeenWelcomePopup } from "@/lib/welcome-popup-seen-storage";
+import { shouldShowChangelogPopup } from "@/app/(app)/utils/changelog-seen-storage";
+import { hasSeenWelcomePopup } from "@/app/(app)/utils/welcome-popup-seen-storage";
 import { useCallback, useEffect, useState } from "react";
 
 /** Wait before showing so the page can settle first */
@@ -30,10 +30,7 @@ function resolvePopupVariant(
     return "welcome";
   }
 
-  if (
-    latestChangelog &&
-    shouldShowChangelogPopup(latestChangelog.slug)
-  ) {
+  if (latestChangelog && shouldShowChangelogPopup(latestChangelog.slug)) {
     return "changelog";
   }
 
@@ -61,6 +58,7 @@ export function useChangelogUpdatePopup({
   }, []);
 
   useEffect(() => {
+    // Never show popup in CI or on mobile, unmount if these become true
     if (process.env.CI || isMobile) {
       setIsMounted(false);
       setIsOpen(false);
@@ -68,12 +66,15 @@ export function useChangelogUpdatePopup({
       return;
     }
 
+    // Never show popup if viewing a shared invoice
     if (isViewingSharedInvoice) {
       return;
     }
 
+    // Determine which popup (welcome/changelog) to show, if any
     const nextVariant = resolvePopupVariant(latestChangelog);
 
+    // If no popup needed, reset state and exit
     if (!nextVariant) {
       setIsMounted(false);
       setIsOpen(false);
@@ -81,12 +82,14 @@ export function useChangelogUpdatePopup({
       return;
     }
 
+    // Delay showing the popup for a nicer UX
     const timer = window.setTimeout(() => {
       setVariant(nextVariant);
       setIsMounted(true);
       setIsOpen(true);
     }, SHOW_DELAY_MS);
 
+    // Cleanup timeout if dependencies change/unmount
     return () => {
       window.clearTimeout(timer);
     };
@@ -96,7 +99,6 @@ export function useChangelogUpdatePopup({
     isOpen: isOpen && isMounted,
     dismiss,
     variant,
-    latestChangelog:
-      variant === "changelog" ? latestChangelog : null,
+    latestChangelog: variant === "changelog" ? latestChangelog : null,
   };
 }

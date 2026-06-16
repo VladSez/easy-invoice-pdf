@@ -2,7 +2,7 @@
 
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 
-export const WELCOME_POPUP_SEEN_STORAGE_KEY = "EASY_INVOICE_WELCOME_POPUP_SEEN";
+const WELCOME_POPUP_SEEN_STORAGE_KEY = "EASY_INVOICE_WELCOME_POPUP_SEEN";
 
 const WELCOME_POPUP_SEEN_VALUE = "v1";
 

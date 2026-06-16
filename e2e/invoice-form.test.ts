@@ -16,9 +16,12 @@ import dayjs from "dayjs";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
 import {
+  DISCORD_COMMUNITY_URL,
   GITHUB_URL,
+  REDDIT_COMMUNITY_URL,
   STATIC_ASSETS_URL,
   VIDEO_DEMO_YOUTUBE_URL,
+  YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
 } from "@/config";
 
 test.describe("Invoice Generator Page", () => {
@@ -114,9 +117,16 @@ test.describe("Invoice Generator Page", () => {
       page.getByRole("link", { name: "Download PDF in English" }),
     ).toBeVisible();
 
-    await expect(
-      header.getByRole("link", { name: "Share your feedback" }),
-    ).toBeVisible();
+    const shareFeedbackLink = header.getByRole("link", {
+      name: "Share your feedback",
+    });
+    await expect(shareFeedbackLink).toBeVisible();
+
+    await expect(shareFeedbackLink).toHaveAttribute(
+      "href",
+      DISCORD_COMMUNITY_URL,
+    );
+    await expect(shareFeedbackLink).toHaveAttribute("target", "_blank");
 
     const howItWorksButton = header.getByRole("button", {
       name: "How it works",
@@ -132,9 +142,7 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     await expect(
-      page.getByText(
-        "Watch this quick demo to learn how to create and customize your invoices.",
-      ),
+      page.getByText("Learn how to create and customize your invoices."),
     ).toBeVisible();
 
     // Check that demo embed is displayed in dialog
@@ -147,6 +155,19 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(embed).toHaveAttribute("src", VIDEO_DEMO_YOUTUBE_URL);
     await expect(embed).toHaveAttribute("title", "EasyInvoicePDF Demo Video");
+
+    await dialog.getByTestId("how-it-works-tab-add-seller").click();
+    await expect(embed).toHaveAttribute("src", YOUTUBE_VIDEO_HOW_TO_ADD_SELLER);
+    await expect(
+      page.getByRole("heading", { name: "How to add a seller" }),
+    ).toBeVisible();
+
+    const discordLink = dialog.getByTestId("how-it-works-discord");
+    const redditLink = dialog.getByTestId("how-it-works-reddit");
+    await expect(discordLink).toBeVisible();
+    await expect(discordLink).toHaveAttribute("href", DISCORD_COMMUNITY_URL);
+    await expect(redditLink).toBeVisible();
+    await expect(redditLink).toHaveAttribute("href", REDDIT_COMMUNITY_URL);
 
     await dialog.getByRole("button", { name: "Close" }).click();
     await expect(dialog).toBeHidden();

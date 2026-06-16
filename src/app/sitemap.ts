@@ -31,6 +31,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 0.7,
     },
+    // How it works page
+    {
+      url: `${APP_URL}/how-it-works`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // Changelog entries
     ...changelogEntries.map((entry) => {
       const lastModified = new Date(entry.metadata.date);

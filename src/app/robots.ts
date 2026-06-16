@@ -17,6 +17,8 @@ export default function robots(): MetadataRoute.Robots {
           // Allow changelog pages
           "/changelog",
           "/changelog/*",
+          // Allow how it works page
+          "/how-it-works",
           // Allow terms of service page
           "/tos",
           // Allow founder page

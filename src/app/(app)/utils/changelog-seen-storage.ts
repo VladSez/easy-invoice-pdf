@@ -2,10 +2,9 @@
 
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 
-export const CHANGELOG_SEEN_STORAGE_KEY =
-  "EASY_INVOICE_LAST_SEEN_CHANGELOG_SLUG";
+const CHANGELOG_SEEN_STORAGE_KEY = "EASY_INVOICE_LAST_SEEN_CHANGELOG_SLUG";
 
-export function getLastSeenChangelogSlug(): string | null {
+function getLastSeenChangelogSlug(): string | null {
   if (!isLocalStorageAvailable) {
     return null;
   }

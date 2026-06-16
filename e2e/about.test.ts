@@ -213,6 +213,15 @@ test.describe("About page", () => {
     await expect(changelogLink).toHaveAttribute("href", "/changelog");
     await expect(changelogLink).not.toHaveAttribute("target", "_blank");
 
+    const howItWorksLink = footerLinks.getByRole("link", {
+      name: "How it works",
+      exact: true,
+    });
+
+    await expect(howItWorksLink).toBeVisible();
+    await expect(howItWorksLink).toHaveAttribute("href", "/how-it-works");
+    await expect(howItWorksLink).not.toHaveAttribute("target", "_blank");
+
     const founderLink = footerLinks.getByRole("link", {
       name: "Founder",
       exact: true,
