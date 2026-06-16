@@ -28,7 +28,7 @@ export const VIDEO_DEMO_YOUTUBE_URL =
 export const YOUTUBE_VIDEO_HOW_TO_ADD_SELLER =
   "https://www.youtube.com/embed/xfSF35c0vfU";
 
-const YOUTUBE_VIDEO_HOW_TO_ADD_BUYER =
+export const YOUTUBE_VIDEO_HOW_TO_ADD_BUYER =
   "https://www.youtube.com/embed/XxAY0YGgXIk";
 
 const YOUTUBE_VIDEO_HOW_TO_ADD_INVOICE_FOR_ONE_WEEK =

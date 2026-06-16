@@ -2,6 +2,7 @@ import {
   DISCORD_COMMUNITY_URL,
   REDDIT_COMMUNITY_URL,
   VIDEO_DEMO_YOUTUBE_URL,
+  YOUTUBE_VIDEO_HOW_TO_ADD_BUYER,
   YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
 } from "@/config";
 import { expect, test } from "@playwright/test";
@@ -34,26 +35,28 @@ test.describe("How it works page", () => {
 
     await expect(
       page.getByText(
-        "Learn how to create and customize professional PDF invoices.",
+        "Discover how to create, customize, and send professional PDF invoices online with EasyInvoicePDF. Watch step-by-step tutorial videos to learn invoice creation, branding, and customization tips. Start generating invoices instantly in our free online invoice generator.",
       ),
     ).toBeVisible();
 
     const embed = page.getByTestId("how-it-works-video");
+
     await expect(embed).toBeVisible();
     await expect(embed).toHaveAttribute("src", VIDEO_DEMO_YOUTUBE_URL);
     await expect(embed).toHaveAttribute("title", "EasyInvoicePDF Demo Video");
 
-    await page.getByTestId("how-it-works-tab-add-seller").click();
+    const sellerTab = page.getByTestId("how-it-works-tab-add-seller");
+
+    await sellerTab.click();
     await expect(embed).toHaveAttribute("src", YOUTUBE_VIDEO_HOW_TO_ADD_SELLER);
-    await expect(
-      page.getByRole("heading", {
-        level: 2,
-        name: "How to add a seller",
-      }),
-    ).toBeVisible();
+
+    await expect(sellerTab).toBeVisible();
+    await expect(sellerTab).toHaveAttribute("role", "tab");
+    await expect(sellerTab).toHaveAttribute("aria-selected", "true");
 
     const discordLink = page.getByTestId("how-it-works-discord");
     const redditLink = page.getByTestId("how-it-works-reddit");
+
     await expect(discordLink).toBeVisible();
     await expect(discordLink).toHaveAttribute("href", DISCORD_COMMUNITY_URL);
     await expect(redditLink).toBeVisible();
@@ -85,15 +88,14 @@ test.describe("How it works page", () => {
     await expect(page).toHaveURL("/how-it-works?video=add-buyer");
 
     const embed = page.getByTestId("how-it-works-video");
-    await expect(embed).toHaveAttribute(
-      "src",
-      "https://www.youtube.com/embed/XxAY0YGgXIk",
-    );
-    await expect(
-      page.getByRole("heading", {
-        level: 2,
-        name: "How to add a buyer",
-      }),
-    ).toBeVisible();
+
+    await expect(embed).toHaveAttribute("src", YOUTUBE_VIDEO_HOW_TO_ADD_BUYER);
+
+    const buyerTab = page.getByTestId("how-it-works-tab-add-buyer");
+    await expect(buyerTab).toBeVisible();
+
+    await expect(buyerTab).toHaveAttribute("role", "tab");
+
+    await expect(buyerTab).toHaveAttribute("aria-selected", "true");
   });
 });

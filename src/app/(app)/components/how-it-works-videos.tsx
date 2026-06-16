@@ -54,6 +54,8 @@ export function HowItWorksVideos({
   const [activeVideoId, setActiveVideoId] =
     useState<HowItWorksVideoId>(resolvedInitialId);
 
+  // Reset activeVideoId when resetKey changes, e.g. after dialog open/close.
+  // If initialVideoId provided, use it, otherwise fallback to default.
   // eslint-disable-next-line react-you-might-not-need-an-effect/you-might-not-need-an-effect
   useEffect(() => {
     if (resetKey !== undefined) {
@@ -61,7 +63,8 @@ export function HowItWorksVideos({
     }
   }, [resetKey, initialVideoId]);
 
-  // eslint-disable-next-line react-you-might-not-need-an-effect/you-might-not-need-an-effect
+  // Sync active tab with ?video query param in URL.
+  // If videoParam is valid, update activeVideoId state.
   useEffect(() => {
     if (isValidVideoId(videoParam)) {
       setActiveVideoId(videoParam);
@@ -80,7 +83,10 @@ export function HowItWorksVideos({
   }
 
   return (
-    <div className={cn("flex flex-col", className)}>
+    <div
+      className={cn("flex flex-col", className)}
+      data-testid="how-it-works-videos-dialog-content"
+    >
       <div className="shrink-0 px-4 pb-3 pt-4 text-center sm:p-6 sm:pb-4 sm:text-left">
         <h2
           className={cn(

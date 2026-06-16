@@ -27,6 +27,8 @@ export function HowItWorksVideoDialog({
 }: HowItWorksVideoDialogProps) {
   const [resetKey, setResetKey] = useState(0);
 
+  // Reset video iframe when dialog opens by incrementing a key.
+  // This forces the HowItWorksVideos component to re-mount and reload video.
   // eslint-disable-next-line react-you-might-not-need-an-effect/you-might-not-need-an-effect
   useEffect(() => {
     if (open) {

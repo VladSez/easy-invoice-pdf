@@ -137,19 +137,29 @@ test.describe("Invoice Generator Page", () => {
     // open How it works dialog
     await howItWorksButton.click();
 
-    await expect(
-      page.getByRole("heading", { name: "How EasyInvoicePDF Works" }),
-    ).toBeVisible();
-
-    await expect(
-      page.getByText("Learn how to create and customize your invoices."),
-    ).toBeVisible();
-
     // Check that demo embed is displayed in dialog
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
 
-    const embed = dialog.getByTestId("how-it-works-video");
+    const dialogContent = dialog.getByTestId(
+      "how-it-works-videos-dialog-content",
+    );
+    await expect(dialogContent).toBeVisible();
+
+    await expect(
+      dialogContent.getByRole("heading", {
+        name: "How EasyInvoicePDF Works",
+        level: 2,
+      }),
+    ).toBeVisible();
+
+    await expect(
+      dialogContent.getByText(
+        "Learn how to create and customize your invoices.",
+      ),
+    ).toBeVisible();
+
+    const embed = dialogContent.getByTestId("how-it-works-video");
 
     await expect(embed).toBeVisible();
 
@@ -158,8 +168,9 @@ test.describe("Invoice Generator Page", () => {
 
     await dialog.getByTestId("how-it-works-tab-add-seller").click();
     await expect(embed).toHaveAttribute("src", YOUTUBE_VIDEO_HOW_TO_ADD_SELLER);
+
     await expect(
-      page.getByRole("heading", { name: "How to add a seller" }),
+      dialog.getByRole("heading", { name: "How to add a seller" }),
     ).toBeVisible();
 
     const discordLink = dialog.getByTestId("how-it-works-discord");
