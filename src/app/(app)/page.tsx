@@ -4,6 +4,7 @@ import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { getLatestChangelogSummary } from "@/app/changelog/utils";
 import { CTAToastProvider } from "./contexts/cta-toast-context";
+import * as Sentry from "@sentry/nextjs";
 
 const APP_PAGE_DESCRIPTION =
   "Create invoices online for free with our PDF invoice generator. Customize templates, download instantly, no signup required.";
@@ -158,7 +159,18 @@ export async function generateMetadata({
 export default async function AppPage() {
   const [githubStarsCount, latestChangelog] = await Promise.all([
     fetchGithubStars(),
-    getLatestChangelogSummary(),
+    getLatestChangelogSummary().catch((error) => {
+      // don't fail the page if we can't load the latest changelog summary
+      console.error("[AppPage] Failed to load latest changelog summary", error);
+
+      Sentry.captureException(
+        new Error(
+          `[AppPage] Failed to load latest changelog summary: ${error}`,
+        ),
+      );
+
+      return null;
+    }),
   ]);
 
   return (

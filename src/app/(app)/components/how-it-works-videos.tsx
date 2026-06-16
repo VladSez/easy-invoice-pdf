@@ -26,6 +26,10 @@ interface HowItWorksVideosProps {
   resetKey?: string | number;
   showIframe?: boolean;
   className?: string;
+  /** Overrides the active video title in the heading. */
+  title?: string;
+  /** Overrides the active video description in the heading. */
+  description?: string;
   titleClassName?: string;
   descriptionClassName?: string;
   onVideoChange?: (videoId: HowItWorksVideoId) => void;
@@ -40,6 +44,8 @@ export function HowItWorksVideos({
   resetKey,
   showIframe = true,
   className,
+  title,
+  description,
   titleClassName,
   descriptionClassName,
   onVideoChange,
@@ -90,11 +96,11 @@ export function HowItWorksVideos({
       <div className="shrink-0 px-4 pb-3 pt-4 text-center sm:p-6 sm:pb-4 sm:text-left">
         <h2
           className={cn(
-            "pr-6 text-center text-lg font-semibold tracking-tight",
+            "pr-6 text-center text-xl font-semibold tracking-tight sm:text-2xl",
             titleClassName,
           )}
         >
-          {activeVideo.title}
+          {title ?? activeVideo.title}
         </h2>
         <p
           className={cn(
@@ -102,7 +108,7 @@ export function HowItWorksVideos({
             descriptionClassName,
           )}
         >
-          {activeVideo.description}
+          {description ?? activeVideo.description}
         </p>
       </div>
 

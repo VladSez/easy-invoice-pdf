@@ -1,5 +1,6 @@
 import { HowItWorksVideos } from "@/app/(app)/components/how-it-works-videos";
 import { HOW_IT_WORKS_VIDEOS } from "@/config";
+import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -46,9 +47,9 @@ export default function HowItWorksPage() {
           </p>
         </div>
 
-        <div className="mx-auto max-w-3xl overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="mx-auto max-w-3xl overflow-hidden border-b border-t border-slate-200 bg-white px-3 sm:rounded-lg sm:border sm:px-0 sm:shadow-sm">
           <Suspense fallback={<VideoPlayerSkeleton />}>
-            <HowItWorksVideos />
+            <HowItWorksVideos title="Tutorial videos" />
           </Suspense>
         </div>
 
@@ -92,16 +93,19 @@ export default function HowItWorksPage() {
         </section>
 
         <div className="border-t border-slate-200 bg-slate-50 py-14 text-center">
-          <p className="text-wrap-balance text-lg font-medium text-gray-700">
+          <p className="text-balance text-lg font-medium text-gray-800">
             Ready to create your first invoice?
           </p>
-          <Link
-            href="/"
-            className="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-base text-white shadow transition-colors will-change-transform hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/70 focus-visible:ring-offset-2 active:scale-95"
-            data-testid="how-it-works-cta"
-          >
-            <span aria-hidden="true">Open invoice generator</span>
-          </Link>
+
+          <div className="mx-auto mt-6 w-full max-w-xl px-3 sm:px-0">
+            <Link
+              href="/"
+              className="group inline-flex h-12 w-full items-center justify-center rounded-lg bg-slate-900 px-8 text-lg font-medium transition-all hover:bg-slate-900/95 active:scale-[0.98]"
+            >
+              <ArrowRightIcon className="mr-2 size-5 animate-pulse-arrow text-white transition-transform group-hover:scale-110" />
+              <span className="text-white">Start Invoicing</span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
