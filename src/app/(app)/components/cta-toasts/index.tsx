@@ -10,10 +10,8 @@ import {
 } from "lucide-react";
 
 import { GithubIcon } from "@/components/etc/github-logo";
-import { GITHUB_URL } from "@/config";
+import { DISCORD_FEEDBACK_URL, GITHUB_URL } from "@/config";
 import { toast as sonnerToast } from "sonner";
-
-const FEEDBACK_URL = "https://pdfinvoicegenerator.userjot.com/";
 
 interface ToastProps {
   id: string | number;
@@ -149,7 +147,7 @@ function PremiumToastFeedbackButton(
       data-testid="toast-cta-btn"
     >
       <a
-        href={FEEDBACK_URL}
+        href={DISCORD_FEEDBACK_URL}
         target="_blank"
         rel="noopener noreferrer"
         {...props}
@@ -228,7 +226,7 @@ function DefaultToastFeedbackButton(
       data-testid="toast-cta-btn"
     >
       <a
-        href={FEEDBACK_URL}
+        href={DISCORD_FEEDBACK_URL}
         target="_blank"
         rel="noopener noreferrer"
         {...props}
