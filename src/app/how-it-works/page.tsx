@@ -30,22 +30,24 @@ export default function HowItWorksPage() {
       <div className="relative z-0">
         <div className="relative mb-8 pt-16 text-center sm:mb-12">
           <div className="absolute bottom-0 h-full w-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] sm:bottom-auto" />
-          <h1
-            className="relative z-10 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl"
-            data-testid="how-it-works-page-title"
-          >
-            How EasyInvoicePDF Works
-          </h1>
-          <p className="relative z-10 mx-auto mt-4 max-w-2xl text-balance px-4 text-sm text-gray-600 sm:px-0 md:text-lg">
-            Discover how to create, customize, and send professional PDF
-            invoices online with EasyInvoicePDF. Watch step-by-step tutorial
-            videos to learn invoice creation, branding, and customization tips.
-            Start generating invoices instantly in our{" "}
-            <Link href="/" className={cn(linkClassName)}>
-              free online invoice generator
-            </Link>
-            .
-          </p>
+          <div className="mx-4 sm:mx-0">
+            <h1
+              className="relative z-10 text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl"
+              data-testid="how-it-works-page-title"
+            >
+              How EasyInvoicePDF Works
+            </h1>
+            <p className="relative z-10 mx-auto mt-6 max-w-2xl text-pretty text-sm text-gray-600 md:text-lg">
+              Discover how to create, customize, and send professional PDF
+              invoices online with EasyInvoicePDF. Watch step-by-step tutorial
+              videos to learn invoice creation, branding, and customization
+              tips. Start generating invoices instantly in our{" "}
+              <Link href="/" className={cn(linkClassName)}>
+                free online invoice generator
+              </Link>
+              .
+            </p>
+          </div>
         </div>
 
         <div className="mx-auto max-w-3xl overflow-hidden border-b border-t border-slate-200 bg-white px-3 sm:rounded-lg sm:border sm:px-0 sm:shadow-sm">
@@ -93,7 +95,7 @@ export default function HowItWorksPage() {
           </ul>
         </section>
 
-        <div className="border-t border-slate-200 bg-slate-50 py-14 text-center">
+        <div className="border-t border-slate-200 bg-slate-50 px-4 py-14 text-center">
           <p className="text-balance text-lg font-medium text-gray-800">
             Ready to create your first invoice?
           </p>
