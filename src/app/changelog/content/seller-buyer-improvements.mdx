@@ -10,8 +10,8 @@ export const metadata = {
 
 ## ✨ Highlights
 
-- **Seller & Buyer Email visibility toggle** — control whether the email address appears in the generated PDF
-- **`ConfirmDiscardDialog`** component to warn users about unsaved changes when closing the buyer/seller dialogs
+- **Seller & Buyer Email visibility toggle** - control whether the email address appears in the generated PDF
+- **ConfirmDiscardDialog** component warns before discarding unsaved changes in buyer/seller dialogs
 - **Reworked seller and buyer information form sections** with improved layout, locked-state banners, and cleaner field grouping
 - **Auto-scroll the invoice form on mobile** when switching between tabs (UX improvement)
 - **Out-of-Date dates helper** shows outdated fields and provides a button to update all dates at once
@@ -44,14 +44,12 @@ export const metadata = {
 <div className="rounded-lg border-2 border-blue-200 bg-blue-50 px-8 py-4 dark:border-blue-900 dark:bg-blue-950" data-testid="ready-to-start-invoicing-cta">
 <h2 className="!mt-4">Ready to start invoicing?</h2>
 
-Create professional invoices instantly with our free, open-source PDF
-generator. Add QR codes, custom logos, and accept payments in multiple
-currencies - no sign-up required. Start creating your first invoice now.
+Make invoices fast with EasyInvoicePDF, free open-source PDF tool. No sign-up needed. Create your invoice now.
 
 <div className="mt-6">
   <a
     href="https://easyinvoicepdf.com?ref=changelog"
-    className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-slate-900 px-8 text-lg font-medium no-underline transition-colors hover:bg-slate-800"
+    className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-slate-900 px-8 text-lg font-medium no-underline transition-all hover:bg-slate-800 active:scale-[0.98]"
   >
     <span className="text-white">Start Invoicing</span>
   </a>

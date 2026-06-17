@@ -37,9 +37,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { InvoiceClientPage } from "./components";
+import { ChangelogUpdatePopup } from "./components/changelog-update-popup";
+import { HowItWorksVideoDialog } from "./components/how-it-works-video-dialog";
 import { showRandomCTAToast } from "./components/cta-toasts";
 import { useCTAToast } from "./contexts/cta-toast-context";
+import { useChangelogUpdatePopup } from "./hooks/use-changelog-update-popup";
 import { useShowRandomCTAToastOnIdle } from "./hooks/use-show-random-cta-toast";
+import type { ChangelogSummary } from "@/app/changelog/utils";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
 
@@ -63,8 +67,10 @@ import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaki
  */
 export function AppPageClient({
   githubStarsCount,
+  latestChangelog,
 }: {
   githubStarsCount: number;
+  latestChangelog: ChangelogSummary | null;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -107,6 +113,19 @@ export function AppPageClient({
 
   const isViewingSharedInvoice =
     searchParams.get("data") !== null && !isInvoiceUrlCorrupted;
+
+  const {
+    isOpen: isChangelogPopupOpen,
+    dismiss: dismissChangelogPopup,
+    variant: changelogPopupVariant,
+    latestChangelog: changelogForPopup,
+  } = useChangelogUpdatePopup({
+    latestChangelog,
+    isViewingSharedInvoice,
+    isMobile,
+  });
+
+  const [isHowItWorksDialogOpen, setIsHowItWorksDialogOpen] = useState(false);
 
   const [invoiceFormHasErrors, setInvoiceFormHasErrors] = useState(false);
 
@@ -729,6 +748,19 @@ export function AppPageClient({
         </div>
       </div>
       <Footer />
+      {changelogPopupVariant ? (
+        <ChangelogUpdatePopup
+          variant={changelogPopupVariant}
+          latestChangelog={changelogForPopup}
+          isOpen={isChangelogPopupOpen}
+          onDismiss={dismissChangelogPopup}
+          onHowItWorksClick={() => setIsHowItWorksDialogOpen(true)}
+        />
+      ) : null}
+      <HowItWorksVideoDialog
+        open={isHowItWorksDialogOpen}
+        onOpenChange={setIsHowItWorksDialogOpen}
+      />
       <div className="fixed right-1.5 top-1.5 z-50 duration-500 animate-in fade-in slide-in-from-top-4">
         <GitHubStarCTA githubStarsCount={githubStarsCount} />
       </div>

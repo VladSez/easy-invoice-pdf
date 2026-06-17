@@ -1,5 +1,5 @@
 import { GithubIcon } from "@/components/etc/github-logo";
-import { Footer } from "@/app/(components)/footer";
+import { Footer, FooterLinkGroup } from "@/app/(components)/footer";
 import {
   BlackGoToAppButton,
   GoToAppButton,
@@ -10,8 +10,11 @@ import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AutoPlayVideo, ManualPlayVideo } from "@/components/video";
 import {
+  DISCORD_COMMUNITY_URL,
   GITHUB_URL,
   MARKETING_FEATURES_CARDS,
+  PRODUCT_TWITTER_URL,
+  REDDIT_COMMUNITY_URL,
   VIDEO_DEMO_FALLBACK_IMG,
   VIDEO_DEMO_URL,
 } from "@/config";
@@ -96,85 +99,66 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
             resources: t("footer.links.resources"),
           }}
           links={
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/?template=default"
-                  className="text-sm text-slate-500 hover:text-slate-900"
-                >
-                  {t("footer.links.invoiceGenerator")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href={GITHUB_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-slate-500 hover:text-slate-900"
-                >
-                  {t("footer.links.github")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#features"
-                  className="text-sm text-slate-500 hover:text-slate-900"
-                >
-                  {t("footer.links.features")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#faq"
-                  className="text-sm text-slate-500 hover:text-slate-900"
-                >
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/changelog"
-                  className="text-sm text-slate-500 hover:text-slate-900"
-                >
-                  {t("footer.links.changelog")}
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/tos"
-                  className="text-sm text-slate-500 hover:text-slate-900"
-                >
-                  {t("footer.links.termsOfService")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-slate-500 hover:text-slate-900"
-                >
-                  {t("buttons.shareFeedback")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/founder"
-                  className="text-sm text-slate-500 hover:text-slate-900"
-                >
-                  {t("footer.links.founder")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/llms.txt"
-                  className="text-sm text-slate-500 hover:text-slate-900"
-                >
-                  llms.txt
-                </Link>
-              </li>
-            </ul>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <FooterLinkGroup
+                heading={t("footer.headings.product")}
+                links={[
+                  {
+                    href: "/?template=default",
+                    label: t("footer.links.invoiceGenerator"),
+                  },
+                  {
+                    href: GITHUB_URL,
+                    label: t("footer.links.github"),
+                    external: true,
+                  },
+                  { href: "#features", label: t("footer.links.features") },
+                  { href: "#faq", label: "FAQ" },
+                  {
+                    href: "/how-it-works",
+                    label: t("footer.links.howItWorks"),
+                  },
+                  { href: "/changelog", label: t("footer.links.changelog") },
+                  { href: "/llms.txt", label: "llms.txt" },
+                ]}
+              />
+              <FooterLinkGroup
+                heading={t("footer.headings.company")}
+                links={[
+                  {
+                    href: `/${locale}/about`,
+                    label: t("buttons.home"),
+                  },
+                  { href: "/founder", label: t("footer.links.founder") },
+                  { href: "/tos", label: t("footer.links.termsOfService") },
+                ]}
+              />
+              <FooterLinkGroup
+                heading={t("footer.headings.community")}
+                links={[
+                  {
+                    href: DISCORD_COMMUNITY_URL,
+                    label: t("buttons.shareFeedback"),
+                    external: true,
+                  },
+                  {
+                    href: DISCORD_COMMUNITY_URL,
+                    label: "Discord",
+                    external: true,
+                  },
+                  {
+                    href: REDDIT_COMMUNITY_URL,
+                    label: "Reddit",
+                    external: true,
+                  },
+                  {
+                    href: PRODUCT_TWITTER_URL,
+                    label: "X (Twitter)",
+                    external: true,
+                  },
+                ]}
+              />
+            </div>
           }
         />
       </div>

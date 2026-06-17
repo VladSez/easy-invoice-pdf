@@ -56,10 +56,16 @@
     },
     "footer": {
       "description": "Darmowe narzędzie open-source do tworzenia profesjonalnych faktur PDF z podglądem w czasie rzeczywistym.<br></br><br></br>Nie jest oprogramowaniem księgowym. Brak gwarancji zgodności. Korzystając z tego narzędzia, akceptujesz <tosLink>Regulamin</tosLink>.",
+      "headings": {
+        "product": "Produkt",
+        "company": "Firma",
+        "community": "Społeczność"
+      },
       "links": {
         "invoiceGenerator": "Generator faktur",
         "features": "Funkcje",
         "github": "GitHub",
+        "howItWorks": "Jak to działa",
         "changelog": "Dziennik zmian",
         "founder": "Założyciel",
         "resources": "Zasoby",

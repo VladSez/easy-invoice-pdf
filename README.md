@@ -16,7 +16,8 @@
 <strong>⭐ Like the project? <a href="https://github.com/VladSez/easy-invoice-pdf" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">Star it on GitHub</a></strong>
 
   <p>
-    Built by <a href="https://vladsazon.com?ref=github"><strong>Vlad Sazonau</strong></a>
+    <img src="https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459" alt="Vlad Sazonau Avatar" width="28" height="28" style="border-radius:50%; vertical-align:middle; margin-right:8px;">
+    Made by <a href="https://vladsazon.com"><strong>Vlad Sazonau</strong></a>
   </p>
 
   </div>

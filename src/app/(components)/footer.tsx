@@ -1,7 +1,13 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 import { SEO_FOOTER_SOLUTION_LINKS } from "@/app/(seo-landings)/seo-landing-footer-links";
 import { ProjectLogo } from "@/components/etc/project-logo";
-import { GITHUB_URL, TWITTER_URL } from "@/config";
+import {
+  DISCORD_COMMUNITY_URL,
+  GITHUB_URL,
+  PRODUCT_TWITTER_URL,
+  REDDIT_COMMUNITY_URL,
+  TWITTER_URL,
+} from "@/config";
 import Link from "next/link";
 
 interface FooterProps {
@@ -79,8 +85,10 @@ export function Footer({ links, translations }: FooterProps) {
             </div>
           </div>
           <div className="grid grid-cols-1 gap-10 md:ml-20 md:flex-1 md:grid-cols-2">
-            <div className="space-y-3" data-testid="footer-solutions-links">
-              <h3 className="text-sm font-medium text-slate-900">Solutions</h3>
+            <div className="space-y-5" data-testid="footer-solutions-links">
+              <h3 className="text-base font-semibold text-slate-800">
+                Solutions
+              </h3>
               <ul className="space-y-2">
                 {SEO_FOOTER_SOLUTION_LINKS.map(({ slug, label }) => (
                   <li key={slug}>
@@ -94,8 +102,8 @@ export function Footer({ links, translations }: FooterProps) {
                 ))}
               </ul>
             </div>
-            <div className="space-y-3" data-testid="footer-social-links">
-              <h3 className="text-sm font-medium text-slate-900">
+            <div className="space-y-5" data-testid="footer-social-links">
+              <h3 className="text-base font-semibold text-slate-800">
                 {resources}
               </h3>
               {footerLinks}
@@ -175,68 +183,79 @@ const DEFAULT_FOOTER_DESCRIPTION = (
   </>
 );
 
+const FOOTER_LINK_CLASSNAME = "text-sm text-slate-500 hover:text-slate-900";
+
+interface FooterLinkItem {
+  href: string;
+  label: string;
+  external?: boolean;
+}
+
+export function FooterLinkGroup({
+  heading,
+  links,
+}: {
+  heading: string;
+  links: FooterLinkItem[];
+}) {
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-light uppercase tracking-wide text-slate-900">
+        {heading}
+      </p>
+      <ul className="space-y-2">
+        {links.map((link) => (
+          <li key={`${heading}-${link.label}`}>
+            <Link
+              href={link.href}
+              className={FOOTER_LINK_CLASSNAME}
+              {...(link.external
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function DefaultFooterLinks() {
   return (
-    <ul className="space-y-2">
-      <li>
-        <Link href="/" className="text-sm text-slate-500 hover:text-slate-900">
-          Invoice Generator
-        </Link>
-      </li>
-      <li>
-        <Link
-          href="/en/about"
-          className="text-sm text-slate-500 hover:text-slate-900"
-        >
-          About Us
-        </Link>
-      </li>
-
-      <li>
-        <Link
-          href={GITHUB_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-slate-500 hover:text-slate-900"
-        >
-          GitHub
-        </Link>
-      </li>
-
-      <li>
-        <Link
-          href="/tos"
-          className="text-sm text-slate-500 hover:text-slate-900"
-        >
-          Terms of Service
-        </Link>
-      </li>
-      <li>
-        <Link
-          href="https://pdfinvoicegenerator.userjot.com/?cursor=1&order=top&limit=10"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-slate-500 hover:text-slate-900"
-        >
-          Share feedback
-        </Link>
-      </li>
-      <li>
-        <Link
-          href="/founder"
-          className="text-sm text-slate-500 hover:text-slate-900"
-        >
-          Founder
-        </Link>
-      </li>
-      <li>
-        <Link
-          href="/llms.txt"
-          className="text-sm text-slate-500 hover:text-slate-900"
-        >
-          llms.txt
-        </Link>
-      </li>
-    </ul>
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <FooterLinkGroup
+        heading="Product"
+        links={[
+          { href: "/", label: "Invoice Generator" },
+          { href: GITHUB_URL, label: "GitHub", external: true },
+          { href: "/how-it-works", label: "How it works" },
+          { href: "/changelog", label: "Changelog" },
+          { href: "/llms.txt", label: "llms.txt" },
+        ]}
+      />
+      <FooterLinkGroup
+        heading="Company"
+        links={[
+          { href: "/en/about", label: "About Us" },
+          { href: "/founder", label: "Founder" },
+          { href: "/tos", label: "Terms of Service" },
+        ]}
+      />
+      <FooterLinkGroup
+        heading="Community"
+        links={[
+          {
+            href: DISCORD_COMMUNITY_URL,
+            label: "Share feedback",
+            external: true,
+          },
+          { href: DISCORD_COMMUNITY_URL, label: "Discord", external: true },
+          { href: REDDIT_COMMUNITY_URL, label: "Reddit", external: true },
+          { href: PRODUCT_TWITTER_URL, label: "X (Twitter)", external: true },
+        ]}
+      />
+    </div>
   );
 }

@@ -3,19 +3,13 @@
 import { type InvoiceData } from "@/app/schema";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { HowItWorksVideoDialog } from "@/app/(app)/components/how-it-works-video-dialog";
 import { CustomTooltip } from "@/components/ui/tooltip";
 
 import { InvoicePDFDownloadLink } from "@/app/(app)/components/invoice-pdf-download-link";
 import { ProjectLogoDescription } from "@/app/(components)/project-logo-description";
 import { GithubIcon } from "@/components/etc/github-logo";
-import { GITHUB_URL, VIDEO_DEMO_YOUTUBE_URL } from "@/config";
+import { DISCORD_COMMUNITY_URL, GITHUB_URL } from "@/config";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
 import { AlertCircleIcon, LinkIcon } from "lucide-react";
@@ -192,9 +186,10 @@ function ProjectInfoLinks() {
         </button>
         <span className="h-3 w-px bg-slate-500" aria-hidden="true" />
         <a
-          href="https://dub.sh/easy-invoice-pdf-feedback"
-          className="inline-flex items-center transition duration-200 hover:text-blue-600 hover:underline active:scale-[0.96]"
+          href={DISCORD_COMMUNITY_URL}
           target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center transition duration-200 hover:text-blue-600 hover:underline active:scale-[0.96]"
         >
           Share your feedback
         </a>
@@ -218,28 +213,10 @@ function ProjectInfoLinks() {
         </div>
       </div>
 
-      <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
-        <DialogContent className="max-h-[calc(100vh-2rem)] gap-0 overflow-hidden p-0 sm:max-w-[800px]">
-          <DialogHeader className="p-6 pb-4">
-            <DialogTitle>How EasyInvoicePDF Works</DialogTitle>
-            <DialogDescription>
-              Watch this quick demo to learn how to create and customize your
-              invoices.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="aspect-video w-full overflow-hidden">
-            <iframe
-              src={VIDEO_DEMO_YOUTUBE_URL}
-              title="EasyInvoicePDF Demo Video"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-              className="h-full w-full border-0"
-              data-testid="how-it-works-video"
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
+      <HowItWorksVideoDialog
+        open={isVideoDialogOpen}
+        onOpenChange={setIsVideoDialogOpen}
+      />
     </>
   );
 }

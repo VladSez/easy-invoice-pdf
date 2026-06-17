@@ -3,6 +3,14 @@ import { readdir } from "fs/promises";
 import { join } from "path";
 import { z } from "zod";
 
+export interface ChangelogSummary {
+  slug: string;
+  title: string;
+  description: string;
+  version?: string;
+  date: string;
+}
+
 /** Maps metadata `version` (e.g. "1.0.1") to the GitHub release tag name. */
 const changelogVersionToReleaseTag: Record<string, string> = {
   "1.0.0": "EasyInvoicePDF-v1.0.0",
@@ -47,6 +55,27 @@ const changelogEntryMetadataSchema = z.object({
   version: z.string().optional(),
   type: z.enum(["major", "minor", "patch"]).optional(),
 });
+
+/**
+ * Returns the newest changelog entry metadata without the MDX component.
+ */
+export async function getLatestChangelogSummary(): Promise<ChangelogSummary | null> {
+  const [latest] = await getChangelogEntries();
+
+  if (!latest) {
+    return null;
+  }
+
+  const { slug, metadata } = latest;
+
+  return {
+    slug,
+    title: metadata.title,
+    description: metadata.description,
+    version: metadata.version,
+    date: metadata.date,
+  };
+}
 
 /**
  * Gets all MDX files from the content/changelog directory

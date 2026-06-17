@@ -1,19 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import {
-  GiftIcon,
-  Heart,
-  MessageSquare,
-  Sparkles,
-  Star,
-  XIcon,
-} from "lucide-react";
+import { GiftIcon, Heart, Star, XIcon } from "lucide-react";
 
 import { GithubIcon } from "@/components/etc/github-logo";
-import { GITHUB_URL } from "@/config";
+import { DISCORD_FEEDBACK_URL, GITHUB_URL } from "@/config";
 import { toast as sonnerToast } from "sonner";
-
-const FEEDBACK_URL = "https://pdfinvoicegenerator.userjot.com/";
 
 interface ToastProps {
   id: string | number;
@@ -68,14 +59,14 @@ const SonnerCloseButton = (
 ) => {
   return (
     <button
-      className="absolute flex h-5 w-5 border border-gray-300 bg-white"
+      className="absolute flex size-5 border border-gray-300 bg-white"
       aria-label="Close toast"
       type="button"
       data-disabled="false"
       data-close-button="true"
       {...props}
     >
-      <XIcon className="h-3.5 w-3.5" />
+      <XIcon className="size-3.5" />
     </button>
   );
 };
@@ -103,12 +94,12 @@ function PremiumDonationToast(props: ToastProps) {
         <p className="mb-4 text-xs leading-relaxed text-gray-700">
           {description}
         </p>
-        <div className="flex items-end justify-end gap-2">
+        <div className="flex flex-wrap items-end justify-end gap-2">
           <Button
             size="sm"
             variant="default"
             asChild
-            className="h-8 max-w-[150px] flex-1 border-gray-300 text-xs transition-all duration-200 hover:scale-105"
+            className="h-8 w-[150px] flex-1 border-gray-300 text-xs transition-all duration-200"
           >
             <a
               href={GITHUB_URL}
@@ -124,40 +115,31 @@ function PremiumDonationToast(props: ToastProps) {
               Star on GitHub
             </a>
           </Button>
-          <PremiumToastFeedbackButton
-            onClick={() => {
-              umamiTrackEvent("feedback_btn_click_download_pdf_toast_premium");
+          <Button
+            size="sm"
+            className="h-8 w-[150px] flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
+            variant="secondary"
+            asChild
+            data-testid="toast-cta-btn"
+          >
+            <a
+              href={DISCORD_FEEDBACK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                umamiTrackEvent(
+                  "feedback_btn_click_download_pdf_toast_premium",
+                );
 
-              sonnerToast.dismiss(id);
-            }}
-          />
+                sonnerToast.dismiss(id);
+              }}
+            >
+              Share Feedback
+            </a>
+          </Button>
         </div>
       </div>
     </div>
-  );
-}
-
-function PremiumToastFeedbackButton(
-  props: React.AnchorHTMLAttributes<HTMLAnchorElement>,
-) {
-  return (
-    <Button
-      size="sm"
-      className="h-8 max-w-[150px] flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
-      variant="secondary"
-      asChild
-      data-testid="toast-cta-btn"
-    >
-      <a
-        href={FEEDBACK_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        {...props}
-      >
-        <MessageSquare className="mr-1 h-3 w-3" />
-        Share Feedback
-      </a>
-    </Button>
   );
 }
 
@@ -177,7 +159,6 @@ function DefaultDonationToast(props: ToastProps) {
       </div>
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-yellow-500" />
           <p className="text-sm font-semibold text-gray-900">{title}</p>
         </div>
         <p className="mb-3 text-xs leading-relaxed text-gray-600">
@@ -186,7 +167,7 @@ function DefaultDonationToast(props: ToastProps) {
         <div className="flex items-end justify-end gap-2">
           <Button
             size="sm"
-            className="group h-8 max-w-[150px] bg-gray-900 px-3 text-xs font-medium text-white transition-all duration-200 hover:scale-105 hover:bg-gray-800"
+            className="group h-8 max-w-[150px] bg-gray-900 px-3 text-xs font-medium text-white transition-all duration-200 hover:bg-gray-800"
             asChild
           >
             <a
@@ -203,40 +184,31 @@ function DefaultDonationToast(props: ToastProps) {
               Star on GitHub
             </a>
           </Button>
-          <DefaultToastFeedbackButton
-            onClick={() => {
-              umamiTrackEvent("feedback_btn_click_download_pdf_toast_default");
+          <Button
+            size="sm"
+            className="h-8 max-w-[150px] flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
+            variant="secondary"
+            asChild
+            data-testid="toast-cta-btn"
+          >
+            <a
+              href={DISCORD_FEEDBACK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                umamiTrackEvent(
+                  "feedback_btn_click_download_pdf_toast_default",
+                );
 
-              sonnerToast.dismiss(id);
-            }}
-          />
+                sonnerToast.dismiss(id);
+              }}
+            >
+              Share Feedback
+            </a>
+          </Button>
         </div>
       </div>
     </div>
-  );
-}
-
-function DefaultToastFeedbackButton(
-  props: React.AnchorHTMLAttributes<HTMLAnchorElement>,
-) {
-  return (
-    <Button
-      size="sm"
-      className="h-8 max-w-[150px] flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
-      variant="secondary"
-      asChild
-      data-testid="toast-cta-btn"
-    >
-      <a
-        href={FEEDBACK_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        {...props}
-      >
-        <MessageSquare className="mr-1 h-3 w-3" />
-        Share Feedback
-      </a>
-    </Button>
   );
 }
 

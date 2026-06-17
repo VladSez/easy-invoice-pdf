@@ -56,10 +56,16 @@
     },
     "footer": {
       "description": "Ein kostenloses Open-Source-Tool zur Erstellung professioneller PDF-Rechnungen mit Live-Vorschau.<br></br><br></br>Keine Buchhaltungssoftware. Keine Compliance-Garantien. Durch die Nutzung dieses Tools stimmen Sie den <tosLink>Nutzungsbedingungen</tosLink> zu.",
+      "headings": {
+        "product": "Produkt",
+        "company": "Unternehmen",
+        "community": "Community"
+      },
       "links": {
         "invoiceGenerator": "Rechnungsgenerator",
         "features": "Funktionen",
         "github": "GitHub",
+        "howItWorks": "So funktioniert es",
         "changelog": "Änderungen",
         "founder": "Gründer",
         "resources": "Ressourcen",

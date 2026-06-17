@@ -56,10 +56,16 @@
     },
     "footer": {
       "description": "Een gratis, open-source tool voor het maken van professionele PDF-facturen met realtime voorbeeld.<br></br><br></br>Geen boekhoudsoftware. Geen nalevingsgaranties. Door deze tool te gebruiken, gaat u akkoord met de <tosLink>Servicevoorwaarden</tosLink>.",
+      "headings": {
+        "product": "Product",
+        "company": "Bedrijf",
+        "community": "Community"
+      },
       "links": {
         "invoiceGenerator": "Factuurgenerator",
         "features": "Functies",
         "github": "GitHub",
+        "howItWorks": "Hoe het werkt",
         "changelog": "Nieuw",
         "founder": "Oprichter",
         "resources": "Bronnen",
