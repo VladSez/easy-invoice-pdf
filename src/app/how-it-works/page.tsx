@@ -50,7 +50,7 @@ export default function HowItWorksPage() {
           </div>
         </div>
 
-        <div className="mx-auto max-w-3xl overflow-hidden border-b border-t border-slate-200 bg-white px-3 sm:rounded-lg sm:border sm:px-0 sm:shadow-sm">
+        <div className="mx-auto max-w-3xl overflow-hidden border-b border-t border-slate-200 bg-white sm:rounded-lg sm:border sm:shadow-sm">
           <Suspense fallback={<VideoPlayerSkeleton />}>
             <HowItWorksVideos title="Tutorial videos" />
           </Suspense>
