@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { GiftIcon, Heart, Sparkles, Star, XIcon } from "lucide-react";
+import { GiftIcon, Heart, Star, XIcon } from "lucide-react";
 
 import { GithubIcon } from "@/components/etc/github-logo";
 import { DISCORD_FEEDBACK_URL, GITHUB_URL } from "@/config";
@@ -115,39 +115,31 @@ function PremiumDonationToast(props: ToastProps) {
               Star on GitHub
             </a>
           </Button>
-          <PremiumToastFeedbackButton
-            onClick={() => {
-              umamiTrackEvent("feedback_btn_click_download_pdf_toast_premium");
+          <Button
+            size="sm"
+            className="h-8 w-[150px] flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
+            variant="secondary"
+            asChild
+            data-testid="toast-cta-btn"
+          >
+            <a
+              href={DISCORD_FEEDBACK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                umamiTrackEvent(
+                  "feedback_btn_click_download_pdf_toast_premium",
+                );
 
-              sonnerToast.dismiss(id);
-            }}
-          />
+                sonnerToast.dismiss(id);
+              }}
+            >
+              Share Feedback
+            </a>
+          </Button>
         </div>
       </div>
     </div>
-  );
-}
-
-function PremiumToastFeedbackButton(
-  props: React.AnchorHTMLAttributes<HTMLAnchorElement>,
-) {
-  return (
-    <Button
-      size="sm"
-      className="h-8 w-[150px] flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
-      variant="secondary"
-      asChild
-      data-testid="toast-cta-btn"
-    >
-      <a
-        href={DISCORD_FEEDBACK_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        {...props}
-      >
-        Share Feedback
-      </a>
-    </Button>
   );
 }
 
@@ -167,7 +159,6 @@ function DefaultDonationToast(props: ToastProps) {
       </div>
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-yellow-500" />
           <p className="text-sm font-semibold text-gray-900">{title}</p>
         </div>
         <p className="mb-3 text-xs leading-relaxed text-gray-600">
@@ -193,39 +184,31 @@ function DefaultDonationToast(props: ToastProps) {
               Star on GitHub
             </a>
           </Button>
-          <DefaultToastFeedbackButton
-            onClick={() => {
-              umamiTrackEvent("feedback_btn_click_download_pdf_toast_default");
+          <Button
+            size="sm"
+            className="h-8 max-w-[150px] flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
+            variant="secondary"
+            asChild
+            data-testid="toast-cta-btn"
+          >
+            <a
+              href={DISCORD_FEEDBACK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                umamiTrackEvent(
+                  "feedback_btn_click_download_pdf_toast_default",
+                );
 
-              sonnerToast.dismiss(id);
-            }}
-          />
+                sonnerToast.dismiss(id);
+              }}
+            >
+              Share Feedback
+            </a>
+          </Button>
         </div>
       </div>
     </div>
-  );
-}
-
-function DefaultToastFeedbackButton(
-  props: React.AnchorHTMLAttributes<HTMLAnchorElement>,
-) {
-  return (
-    <Button
-      size="sm"
-      className="h-8 max-w-[150px] flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
-      variant="secondary"
-      asChild
-      data-testid="toast-cta-btn"
-    >
-      <a
-        href={DISCORD_FEEDBACK_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        {...props}
-      >
-        Share Feedback
-      </a>
-    </Button>
   );
 }
 
