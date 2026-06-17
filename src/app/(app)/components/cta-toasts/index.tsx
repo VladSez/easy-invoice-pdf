@@ -1,13 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import {
-  GiftIcon,
-  Heart,
-  MessageSquare,
-  Sparkles,
-  Star,
-  XIcon,
-} from "lucide-react";
+import { GiftIcon, Heart, Sparkles, Star, XIcon } from "lucide-react";
 
 import { GithubIcon } from "@/components/etc/github-logo";
 import { DISCORD_FEEDBACK_URL, GITHUB_URL } from "@/config";
@@ -66,14 +59,14 @@ const SonnerCloseButton = (
 ) => {
   return (
     <button
-      className="absolute flex h-5 w-5 border border-gray-300 bg-white"
+      className="absolute flex size-5 border border-gray-300 bg-white"
       aria-label="Close toast"
       type="button"
       data-disabled="false"
       data-close-button="true"
       {...props}
     >
-      <XIcon className="h-3.5 w-3.5" />
+      <XIcon className="size-3.5" />
     </button>
   );
 };
@@ -101,12 +94,12 @@ function PremiumDonationToast(props: ToastProps) {
         <p className="mb-4 text-xs leading-relaxed text-gray-700">
           {description}
         </p>
-        <div className="flex items-end justify-end gap-2">
+        <div className="flex flex-wrap items-end justify-end gap-2">
           <Button
             size="sm"
             variant="default"
             asChild
-            className="h-8 max-w-[150px] flex-1 border-gray-300 text-xs transition-all duration-200 hover:scale-105"
+            className="h-8 w-[150px] flex-1 border-gray-300 text-xs transition-all duration-200"
           >
             <a
               href={GITHUB_URL}
@@ -141,7 +134,7 @@ function PremiumToastFeedbackButton(
   return (
     <Button
       size="sm"
-      className="h-8 max-w-[150px] flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
+      className="h-8 w-[150px] flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
       variant="secondary"
       asChild
       data-testid="toast-cta-btn"
@@ -152,7 +145,6 @@ function PremiumToastFeedbackButton(
         rel="noopener noreferrer"
         {...props}
       >
-        <MessageSquare className="mr-1 h-3 w-3" />
         Share Feedback
       </a>
     </Button>
@@ -184,7 +176,7 @@ function DefaultDonationToast(props: ToastProps) {
         <div className="flex items-end justify-end gap-2">
           <Button
             size="sm"
-            className="group h-8 max-w-[150px] bg-gray-900 px-3 text-xs font-medium text-white transition-all duration-200 hover:scale-105 hover:bg-gray-800"
+            className="group h-8 max-w-[150px] bg-gray-900 px-3 text-xs font-medium text-white transition-all duration-200 hover:bg-gray-800"
             asChild
           >
             <a
@@ -231,7 +223,6 @@ function DefaultToastFeedbackButton(
         rel="noopener noreferrer"
         {...props}
       >
-        <MessageSquare className="mr-1 h-3 w-3" />
         Share Feedback
       </a>
     </Button>
