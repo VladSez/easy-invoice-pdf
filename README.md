@@ -15,10 +15,13 @@
 
 <strong>⭐ Like the project? <a href="https://github.com/VladSez/easy-invoice-pdf" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">Star it on GitHub</a></strong>
 
-  <p>
-    <img src="https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459" alt="Vlad Sazonau Avatar" width="28" height="28" style="border-radius:50%; vertical-align:middle; margin-right:8px;">
-    Made by <a href="https://vladsazon.com"><strong>Vlad Sazonau</strong></a>
-  </p>
+<p align="center">
+  <a href="https://vladsazon.com">
+    <img src="https://github.com/user-attachments/assets/b3506dec-4b50-48c3-8938-94203f5a2d37" width="60" height="60" alt="Software Engineer and founder of EasyInvoicePDF" title="Vlad Sazonau - Software Engineer and founder of EasyInvoicePDF"/>
+  </a>
+  <br />
+  Made by <a href="https://vladsazon.com" title="Software Engineer and founder of EasyInvoicePDF"><strong>Vlad Sazonau</strong></a>
+</p>
 
   </div>
 
