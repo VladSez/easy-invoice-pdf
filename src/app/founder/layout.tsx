@@ -6,6 +6,7 @@ import {
   TWITTER_CREATOR,
 } from "@/config";
 import type { Metadata } from "next";
+import { FounderJsonLd } from "./founder-json-ld";
 
 export const dynamic = "force-static";
 
@@ -86,6 +87,7 @@ interface FounderLayoutProps {
 export default function FounderLayout({ children }: FounderLayoutProps) {
   return (
     <>
+      <FounderJsonLd />
       <Header />
       {children}
       <Footer />

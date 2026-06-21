@@ -1,8 +1,20 @@
-import { APP_URL, HOW_IT_WORKS_VIDEOS } from "@/config";
+import { PROD_WEBSITE_URL, HOW_IT_WORKS_VIDEOS } from "@/config";
 import type { Graph } from "schema-dts";
 
-export function buildHowItWorksJsonLd(baseUrl = APP_URL): Graph {
-  const pageUrl = `${baseUrl}/how-it-works` as const;
+import { buildBreadcrumbList } from "@/lib/seo/breadcrumb";
+import {
+  JSON_LD_IDS,
+  pageBreadcrumbId,
+  pageWebPageId,
+} from "@/lib/seo/json-ld-ids";
+
+const PAGE_TITLE = "How EasyInvoicePDF Works | Video Tutorials";
+
+const PAGE_DESCRIPTION =
+  "Watch step-by-step video tutorials on creating invoices, saving seller and buyer details, and generating weekly invoices with EasyInvoicePDF.";
+
+export function buildHowItWorksJsonLd(baseUrl = PROD_WEBSITE_URL): Graph {
+  const pageUrl = `${baseUrl}/how-it-works`;
 
   const videoItems = HOW_IT_WORKS_VIDEOS.map((video, index) => ({
     "@type": "ListItem" as const,
@@ -27,11 +39,17 @@ export function buildHowItWorksJsonLd(baseUrl = APP_URL): Graph {
     "@graph": [
       {
         "@type": "WebPage",
-        "@id": pageUrl,
+        "@id": pageWebPageId(pageUrl),
         url: pageUrl,
-        name: "How EasyInvoicePDF Works | Video Tutorials",
-        description:
-          "Watch step-by-step video tutorials on creating invoices, saving seller and buyer details, and generating weekly invoices with EasyInvoicePDF.",
+        name: PAGE_TITLE,
+        description: PAGE_DESCRIPTION,
+        inLanguage: "en",
+        isPartOf: {
+          "@id": JSON_LD_IDS.website,
+        },
+        breadcrumb: {
+          "@id": pageBreadcrumbId(pageUrl),
+        },
         mainEntity: {
           "@type": "ItemList",
           "@id": `${pageUrl}#tutorials`,
@@ -39,6 +57,10 @@ export function buildHowItWorksJsonLd(baseUrl = APP_URL): Graph {
           itemListElement: videoItems,
         },
       },
+      buildBreadcrumbList(pageUrl, [
+        { name: "Home", item: `${baseUrl}/` },
+        { name: "How it works" },
+      ]),
     ],
   };
 }

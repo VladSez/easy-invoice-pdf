@@ -1,6 +1,7 @@
 import type Messages from "../../../../messages/en.json";
 import type { Locale } from "next-intl";
 import { buildAboutJsonLdGraph } from "./about-json-ld-graph";
+import { JsonLdScript } from "@/lib/seo/render-json-ld";
 
 /**
  * Renders a JSON-LD script tag for the about page with structured schema.org data.
@@ -16,11 +17,5 @@ export async function AboutJsonLd({ locale }: { locale: Locale }) {
 
   const graph = buildAboutJsonLdGraph(messages, locale);
 
-  return (
-    <script
-      id="json-ld-about"
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
-    />
-  );
+  return <JsonLdScript id="json-ld-about" data={graph} />;
 }

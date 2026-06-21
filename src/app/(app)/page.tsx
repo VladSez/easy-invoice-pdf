@@ -4,6 +4,7 @@ import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { getLatestChangelogSummary } from "@/app/changelog/utils";
 import { CTAToastProvider } from "./contexts/cta-toast-context";
+import { HomeJsonLd } from "./home-json-ld";
 import * as Sentry from "@sentry/nextjs";
 
 const APP_PAGE_DESCRIPTION =
@@ -156,7 +157,19 @@ export async function generateMetadata({
   };
 }
 
-export default async function AppPage() {
+export default async function AppPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const hasShareableData = Boolean(searchParams?.data);
+  const isProd =
+    process.env.VERCEL_ENV === "production" &&
+    `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` ===
+      "https://easyinvoicepdf.com";
+
+  const shouldIndex = isProd && !hasShareableData;
+
   const [githubStarsCount, latestChangelog] = await Promise.all([
     fetchGithubStars(),
     getLatestChangelogSummary().catch((error) => {
@@ -175,6 +188,7 @@ export default async function AppPage() {
 
   return (
     <CTAToastProvider>
+      {shouldIndex ? <HomeJsonLd /> : null}
       <AppPageClient
         githubStarsCount={githubStarsCount}
         latestChangelog={latestChangelog}

@@ -10,12 +10,8 @@ import Script from "next/script";
 import { Toaster } from "sonner";
 
 import { PERSONAL_WEBSITE_URL, STATIC_ASSETS_URL } from "@/config";
-import {
-  BREADCRUMB_JSONLD,
-  SITE_NAVIGATION_JSONLD,
-  SOFTWARE_APPLICATION_JSONLD,
-  WEBSITE_JSONLD,
-} from "./constants/seo";
+import { JsonLdScript } from "@/lib/seo/render-json-ld";
+import { buildSiteWideJsonLdGraph } from "@/lib/seo/site-entities";
 
 import "./globals.css";
 
@@ -82,6 +78,8 @@ export default async function RootLayout({
     inAppInfo,
   } = await checkDeviceUserAgent();
 
+  const siteWideJsonLd = buildSiteWideJsonLdGraph();
+
   return (
     <html lang="en">
       <body>
@@ -115,34 +113,7 @@ export default async function RootLayout({
                 />
               </>
             )}
-            <script
-              id="website-json-ld"
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{
-                __html: JSON.stringify(WEBSITE_JSONLD),
-              }}
-            />
-            <script
-              id="breadcrumb-json-ld"
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{
-                __html: JSON.stringify(BREADCRUMB_JSONLD),
-              }}
-            />
-            <script
-              id="site-navigation-json-ld"
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{
-                __html: JSON.stringify(SITE_NAVIGATION_JSONLD),
-              }}
-            />
-            <script
-              id="software-application-json-ld"
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{
-                __html: JSON.stringify(SOFTWARE_APPLICATION_JSONLD),
-              }}
-            />
+            <JsonLdScript id="site-wide-json-ld" data={siteWideJsonLd} />
           </NextIntlClientProvider>
         </DeviceContextProvider>
       </body>
