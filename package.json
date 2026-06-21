@@ -32,6 +32,7 @@
     "corepack:enable": "corepack enable",
     "corepack:prepare": "corepack prepare pnpm@latest",
     "update-github-actions": "pnpm actions-up --min-age=7",
+    "check-github-actions-security": "zizmor .",
     "test-gh-action-locally:monthly-recurring-invoice": "act schedule -j recurring-invoice --secret-file .github/workflows/.secrets"
   },
   "dependencies": {
