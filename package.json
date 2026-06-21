@@ -11,7 +11,7 @@
     "build": "next build",
     "start": "next start",
     "type-check": "tsc --noEmit --diagnostics",
-    "type-check:go": "npx tsgo --diagnostics",
+    "type-check:go": "tsgo --diagnostics",
     "lint": "pnpm eslint . --cache",
     "lint:fix": "pnpm eslint . --fix",
     "prettify": "prettier --write --cache '**/*.{ts?(x),json,js,mjs,yml,yaml,md}'",
@@ -25,7 +25,6 @@
     "e2e:update-snapshots": "pnpm e2e --update-snapshots",
     "dedupe": "pnpm dedupe",
     "lint-stage": "pnpm lint-staged --verbose",
-    "check-meta": "pnpx check-site-meta",
     "dev:email": "email dev --dir src/emails",
     "prepare": "husky",
     "expose-to-internet": "cloudflared tunnel --url http://localhost:3000",
@@ -33,6 +32,7 @@
     "corepack:enable": "corepack enable",
     "corepack:prepare": "corepack prepare pnpm@latest",
     "update-github-actions": "pnpm actions-up --min-age=7",
+    "check-github-actions-security": "zizmor .",
     "test-gh-action-locally:monthly-recurring-invoice": "act schedule -j recurring-invoice --secret-file .github/workflows/.secrets"
   },
   "dependencies": {

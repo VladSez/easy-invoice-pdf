@@ -194,7 +194,7 @@ https://github.com/user-attachments/assets/d46c6e4e-b78a-4aa1-ab44-d20d6485b682
 Built by [Vlad Sazonau](https://x.com/vladsazonau)
 
 - 🐦 Twitter: [@vladsazonau](https://twitter.com/vladsazonau)
-- 💼 LinkedIn: [Vlad Sazonau](https://www.linkedin.com/in/vlad-sazonau-22a9a9126/)
+- 💼 LinkedIn: [Vlad Sazonau](https://www.linkedin.com/in/vlad-sazonau/)
 - 🌐 Website: [vladsazon.com](https://vladsazon.com)
 
 ## ❤️ Support the Project

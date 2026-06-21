@@ -93,8 +93,7 @@ export const PROD_WEBSITE_URL = "https://easyinvoicepdf.com";
 
 export const GITHUB_URL = "https://github.com/VladSez/easy-invoice-pdf";
 
-export const LINKEDIN_URL =
-  "https://www.linkedin.com/in/vlad-sazonau-22a9a9126/";
+export const LINKEDIN_URL = "https://www.linkedin.com/in/vlad-sazonau/";
 
 export const TWITTER_URL = "https://x.com/vladsazonau";
 export const TWITTER_CREATOR = "@vlad_sazonau";
