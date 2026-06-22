@@ -13,22 +13,7 @@ import {
 
 import { ABOUT_FAQ_ITEM_KEYS } from "./about-faq-item-keys";
 
-const OPEN_GRAPH_LOCALE_BY_LOCALE = {
-  en: "en_US",
-  pl: "pl_PL",
-  de: "de_DE",
-  es: "es_ES",
-  pt: "pt_PT",
-  ru: "ru_RU",
-  uk: "uk_UA",
-  fr: "fr_FR",
-  it: "it_IT",
-  nl: "nl_NL",
-} as const satisfies Record<Locale, string>;
-
-function toSchemaLanguage(locale: Locale) {
-  return OPEN_GRAPH_LOCALE_BY_LOCALE[locale].replace("_", "-");
-}
+import { toSchemaLanguage } from "@/lib/seo/locale-utils";
 
 /**
  * Builds a JSON-LD graph for the about page with schema.org structured data.

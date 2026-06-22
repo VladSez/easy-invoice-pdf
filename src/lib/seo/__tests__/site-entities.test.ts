@@ -10,7 +10,7 @@ import {
 } from "../site-entities";
 
 describe("site-entities", () => {
-  it("buildSlimWebSite uses stable website @id", () => {
+  it("should use stable website @id for buildSlimWebSite", () => {
     expect(buildSlimWebSite()).toMatchObject({
       "@type": "WebSite",
       "@id": JSON_LD_IDS.website,
@@ -18,21 +18,21 @@ describe("site-entities", () => {
     });
   });
 
-  it("buildFullWebSite links publisher to person", () => {
+  it("should link publisher to person in buildFullWebSite", () => {
     expect(buildFullWebSite()).toMatchObject({
       "@id": JSON_LD_IDS.website,
       publisher: { "@id": JSON_LD_IDS.person },
     });
   });
 
-  it("buildPerson uses real name without role suffix", () => {
+  it("should use real name without role suffix for buildPerson", () => {
     const person = buildPerson();
     expect(person.name).toBe("Uladzislau Sazonau");
     expect(person.name).not.toContain("Founder");
-    expect(person.sameAs.length).toBeGreaterThan(0);
+    expect(person.sameAs).toHaveLength(4);
   });
 
-  it("buildWebApplication includes offers.price 0 and no aggregateRating", () => {
+  it("should include offers.price 0 and no aggregateRating in buildWebApplication", () => {
     const app = buildWebApplication();
     expect(app.offers).toMatchObject({
       price: "0",
@@ -44,7 +44,7 @@ describe("site-entities", () => {
 });
 
 describe("buildBreadcrumbList", () => {
-  it("builds ordered crumbs with optional last item URL", () => {
+  it("should build ordered crumbs with optional last item URL", () => {
     const breadcrumb = buildBreadcrumbList("https://easyinvoicepdf.com/foo", [
       { name: "Home", item: "https://easyinvoicepdf.com/" },
       { name: "Foo" },

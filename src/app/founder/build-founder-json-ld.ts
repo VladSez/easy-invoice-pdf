@@ -7,12 +7,11 @@ import {
   pageBreadcrumbId,
   pageWebPageId,
 } from "@/lib/seo/json-ld-ids";
-import { FOUNDER_PAGE_URL } from "@/lib/seo/site-entities";
-
-const FOUNDER_PAGE_TITLE = "Vlad Sazonau | Founder of EasyInvoicePDF";
-
-const FOUNDER_PAGE_DESCRIPTION =
-  "Meet Vlad Sazonau, founder of EasyInvoicePDF, the free open-source invoice PDF generator with live preview. Product engineer and design enthusiast with 8+ years building digital products.";
+import {
+  FOUNDER_PAGE_DESCRIPTION,
+  FOUNDER_PAGE_TITLE,
+  FOUNDER_PAGE_URL,
+} from "@/lib/seo/site-entities";
 
 export function buildFounderJsonLdGraph(): Graph {
   const pageUrl = FOUNDER_PAGE_URL;

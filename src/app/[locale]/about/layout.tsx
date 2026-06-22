@@ -7,18 +7,7 @@ import type EnMessages from "../../../../messages/en.json";
 import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
 import { AboutJsonLd } from "./about-json-ld";
 
-const OPEN_GRAPH_LOCALE_BY_LOCALE = {
-  en: "en_US",
-  pl: "pl_PL",
-  de: "de_DE",
-  es: "es_ES",
-  pt: "pt_PT",
-  ru: "ru_RU",
-  uk: "uk_UA",
-  fr: "fr_FR",
-  it: "it_IT",
-  nl: "nl_NL",
-} as const satisfies Record<Locale, string>;
+import { OPEN_GRAPH_LOCALE_BY_LOCALE } from "@/lib/seo/locale-utils";
 
 // Add metadata to make sure search engines can index the page
 export async function generateMetadata({

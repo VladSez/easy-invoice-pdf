@@ -9,7 +9,7 @@ import {
 } from "@/lib/seo/json-ld-ids";
 import { OG_IMAGE_URL } from "@/lib/seo/site-entities";
 
-import type { ChangelogEntry } from "./utils";
+import { formatChangelogDate, type ChangelogEntry } from "./utils";
 
 const CHANGELOG_INDEX_URL = `${PROD_WEBSITE_URL}/changelog`;
 
@@ -69,7 +69,9 @@ export function buildChangelogIndexJsonLdGraph(
 
 export function buildChangelogPostJsonLdGraph(entry: ChangelogEntry): Graph {
   const pageUrl = `${PROD_WEBSITE_URL}/changelog/${entry.slug}`;
-  const title = entry.metadata.title;
+  const title =
+    entry.metadata.title ||
+    `Update ${formatChangelogDate(entry.metadata.date)}`;
 
   return {
     "@context": "https://schema.org",

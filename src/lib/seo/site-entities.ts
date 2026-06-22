@@ -8,6 +8,7 @@
  */
 
 import {
+  FOUNDER_AVATAR_URL,
   GITHUB_URL,
   LINKEDIN_URL,
   PERSONAL_WEBSITE_URL,
@@ -27,10 +28,12 @@ const SITE_DESCRIPTION =
 export const HOME_PAGE_DESCRIPTION =
   "Create invoices online for free with our PDF invoice generator. Customize templates, download instantly, no signup required.";
 
-const FOUNDER_AVATAR_URL =
-  "https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459";
-
 export const FOUNDER_PAGE_URL = `${PROD_WEBSITE_URL}/founder`;
+
+export const FOUNDER_PAGE_TITLE = "Vlad Sazonau | Founder of EasyInvoicePDF";
+
+export const FOUNDER_PAGE_DESCRIPTION =
+  "Meet Vlad Sazonau, founder of EasyInvoicePDF, the free open-source invoice PDF generator with live preview. Product engineer and design enthusiast with 8+ years building digital products.";
 
 export const OG_IMAGE_URL = `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`;
 

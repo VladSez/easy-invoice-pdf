@@ -33,6 +33,20 @@ describe("buildChangelogIndexJsonLdGraph", () => {
       "@id": "https://easyinvoicepdf.com/changelog#breadcrumb",
     });
   });
+
+  it("should omit dateModified when latestDateModified is null", () => {
+    const graph = buildChangelogIndexJsonLdGraph(null);
+    const parsed = JSON.parse(JSON.stringify(graph)) as {
+      "@graph": Array<Record<string, unknown>>;
+    };
+    const blog = parsed["@graph"][1];
+
+    expect(blog).toMatchObject({
+      "@type": "Blog",
+      "@id": JSON_LD_IDS.blog,
+    });
+    expect(blog).not.toHaveProperty("dateModified");
+  });
 });
 
 describe("buildChangelogPostJsonLdGraph", () => {
@@ -64,5 +78,37 @@ describe("buildChangelogPostJsonLdGraph", () => {
     });
 
     expect(blogPosting).not.toHaveProperty("aggregateRating");
+  });
+
+  it("should fall back to a date-based title when metadata title is blank", () => {
+    const graph = buildChangelogPostJsonLdGraph({
+      slug: "untitled-release",
+      metadata: {
+        title: "",
+        description: "A test changelog entry.",
+        date: "2026-02-01",
+        version: "1.0.0",
+      },
+      Component: () => null,
+    });
+
+    const parsed = JSON.parse(JSON.stringify(graph)) as {
+      "@graph": Array<Record<string, unknown>>;
+    };
+    const webPage = parsed["@graph"][0];
+    const blogPosting = parsed["@graph"][1];
+    const breadcrumb = parsed["@graph"][2] as {
+      itemListElement: Array<{ name: string }>;
+    };
+
+    expect(webPage).toMatchObject({
+      "@type": "WebPage",
+      name: "Update February 1, 2026",
+    });
+    expect(blogPosting).toMatchObject({
+      "@type": "BlogPosting",
+      headline: "Update February 1, 2026",
+    });
+    expect(breadcrumb.itemListElement[2]?.name).toBe("Update February 1, 2026");
   });
 });

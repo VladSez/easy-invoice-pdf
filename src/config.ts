@@ -91,6 +91,9 @@ export const HOW_IT_WORKS_VIDEOS = [
 
 export const PROD_WEBSITE_URL = "https://easyinvoicepdf.com";
 
+export const FOUNDER_AVATAR_URL =
+  "https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459";
+
 export const GITHUB_URL = "https://github.com/VladSez/easy-invoice-pdf";
 
 export const LINKEDIN_URL = "https://www.linkedin.com/in/vlad-sazonau/";

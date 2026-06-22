@@ -5,6 +5,7 @@ import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { getLatestChangelogSummary } from "@/app/changelog/utils";
 import { CTAToastProvider } from "./contexts/cta-toast-context";
 import { HomeJsonLd } from "./home-json-ld";
+import { computeIndexingFlags } from "@/lib/seo/indexing-utils";
 import * as Sentry from "@sentry/nextjs";
 
 const APP_PAGE_DESCRIPTION =
@@ -132,18 +133,8 @@ export async function generateMetadata({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }): Promise<Metadata> {
-  const hasShareableData = Boolean(searchParams?.data);
+  const { shouldIndex } = computeIndexingFlags(searchParams);
   const isStripeTemplate = Boolean(searchParams?.template === "stripe");
-
-  const isProd =
-    process.env.VERCEL_ENV === "production" &&
-    `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` ===
-      "https://easyinvoicepdf.com";
-
-  /**
-   * Only allow indexing on production and when there's no shareable data
-   */
-  const shouldIndex = isProd && !hasShareableData;
 
   const templateMetadata = buildTemplateMetadata(
     isStripeTemplate ? STRIPE_TEMPLATE_META : DEFAULT_TEMPLATE_META,
@@ -162,13 +153,7 @@ export default async function AppPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const hasShareableData = Boolean(searchParams?.data);
-  const isProd =
-    process.env.VERCEL_ENV === "production" &&
-    `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` ===
-      "https://easyinvoicepdf.com";
-
-  const shouldIndex = isProd && !hasShareableData;
+  const { shouldIndex } = computeIndexingFlags(searchParams);
 
   const [githubStarsCount, latestChangelog] = await Promise.all([
     fetchGithubStars(),
