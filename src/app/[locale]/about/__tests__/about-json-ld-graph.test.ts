@@ -16,19 +16,28 @@ describe("buildAboutJsonLdGraph", () => {
 
     const webPage = parsed["@graph"][0];
     const faqPage = parsed["@graph"][1];
+    const breadcrumb = parsed["@graph"][2];
 
     expect(webPage).toMatchObject({
       "@type": "WebPage",
-      "@id": "https://easyinvoicepdf.com/pl/about",
+      "@id": "https://easyinvoicepdf.com/pl/about#webpage",
       url: "https://easyinvoicepdf.com/pl/about",
       name: plMessages.Metadata.about.title,
       description: plMessages.Metadata.about.description,
-      mainEntity: { "@id": "https://easyinvoicepdf.com/pl/about" },
+      inLanguage: "pl-PL",
+      isPartOf: { "@id": "https://easyinvoicepdf.com/#website" },
+      breadcrumb: { "@id": "https://easyinvoicepdf.com/pl/about#breadcrumb" },
+      mainEntity: { "@id": "https://easyinvoicepdf.com/pl/about#faq" },
     });
 
     expect(faqPage).toMatchObject({
       "@type": "FAQPage",
       "@id": "https://easyinvoicepdf.com/pl/about#faq",
+    });
+
+    expect(breadcrumb).toMatchObject({
+      "@type": "BreadcrumbList",
+      "@id": "https://easyinvoicepdf.com/pl/about#breadcrumb",
     });
 
     const mainEntity = faqPage.mainEntity as { name: string }[];
@@ -52,11 +61,12 @@ describe("buildAboutJsonLdGraph", () => {
 
     expect(webPage).toMatchObject({
       "@type": "WebPage",
-      "@id": "https://easyinvoicepdf.com/en/about",
+      "@id": "https://easyinvoicepdf.com/en/about#webpage",
       url: "https://easyinvoicepdf.com/en/about",
       name: enMessages.Metadata.about.title,
       description: enMessages.Metadata.about.description,
-      mainEntity: { "@id": "https://easyinvoicepdf.com/en/about" },
+      inLanguage: "en-US",
+      mainEntity: { "@id": "https://easyinvoicepdf.com/en/about#faq" },
     });
 
     expect(faqPage).toMatchObject({

@@ -6,7 +6,7 @@
   <h1>EasyInvoicePDF</h1>
   <h3>Free & Open-Source Invoice Generator</h3>
   <p>Create professional invoices instantly in your browser with <strong>Live Preview</strong>, <strong>Instant PDF Export</strong>, <strong>Multiple Customizable Templates</strong> (including a Stripe-style design). <strong>No Ads</strong>. <strong>No Sign-Up Required</strong>.</p>
-  <p><a href="https://easyinvoicepdf.com/?template=stripe&ref=github"><strong>Start Invoicing</strong></a></p>
+  <p><a href="https://easyinvoicepdf.com"><strong>Start Invoicing</strong></a></p>
   <p>
       <a href="https://easyinvoicepdf.com/en/about?ref=github">About us</a>
       ·
@@ -25,7 +25,7 @@
 
   </div>
 
-  <a href="https://easyinvoicepdf.com/?template=stripe&ref=github">
+  <a href="https://easyinvoicepdf.com/?template=stripe">
     <!-- source:  .github/screenshots/stripe-template.png -->
     <img width="1920" height="1536" alt="EasyInvoicePDF Product Screenshot" src="https://github.com/user-attachments/assets/6f0e2156-24e0-4f8b-b8f1-1d2bf5ac157a" />
   </a>
@@ -37,19 +37,16 @@
 
 ## ✨ Key Features of EasyInvoicePDF:
 
-- 📺 **Live PDF Preview**: See changes in real-time as you type
-- ⭐ **No Sign-Up Required**: Start creating invoices immediately without any registration
-- 📄 **Instant PDF**: One-click download ready for printing or sending
-- ✏️ **Custom Logo Upload**: Add your company branding by uploading a logo image that appears on the invoice
-- ❌ **No Ads**: Enjoy a completely ad-free experience
-- 🔗 **Shareable Links**: Send invoices directly to clients without attachments
-- 🎨 **Multiple Templates**: Including modern **Stripe-style design**
-- 🌍 **Multi-Language & Currency**: Support for 10+ languages and 120+ currencies
-- 🖥️ **Browser Only**: No server uploads, your data stays private
-- 💰 **Flexible Tax Support**: VAT, GST, Sales Tax, and custom tax formats with automatic calculations
-- 📱 **Mobile-Friendly**: Create invoices on the go from any device
-- 🏞️ **QR Code Support**: Add payment QR codes with any invoice-related information (payment links, UPI, contact details, custom data)
-- 📑 **Multi-Page PDFs**: Seamless multi-page support with automatic pagination and page breaks
+- 📺 **Instant PDF generation** with live preview
+- 🚀 **No sign-up required** - start immediately
+- 🎉 **Ad-free experience**
+- 👤 **Saved profiles** - reuse seller & buyer details
+- 🎨 **Multiple fully customizable templates** including modern Stripe-style design
+- 🧾 **Smart invoicing tools** - VAT, GST, sales tax & custom tax support with automatic calculations
+- 🏷️ **Logo support** for custom branding
+- 📱 **Mobile-friendly** - works on any device
+- 🌍 **Multi-language & multi-currency** (10+ languages, 120+ currencies)
+- 🔒 **Privacy-first** - browser-only, no server uploads
 
 <h4>Learn more about <a href="https://easyinvoicepdf.com/en/about#features">features</a>.</h4>
 
@@ -187,6 +184,8 @@ https://github.com/user-attachments/assets/23bb5448-c9fb-4ff2-98f3-0b80d75b7683
 
 Watch a quick demo of EasyInvoicePDF in action to see how easy it is to create professional invoices in seconds. The video demonstrates key features like **Live Preview**, **Instant PDF Download**, and **Customization Options**.
 
+More demo videos on [YouTube](https://www.youtube.com/@vladsazon).
+
 https://github.com/user-attachments/assets/d46c6e4e-b78a-4aa1-ab44-d20d6485b682
 
 ## 👨‍💻 Made By
@@ -195,6 +194,7 @@ Built by [Vlad Sazonau](https://x.com/vladsazonau)
 
 - 🐦 Twitter: [@vladsazonau](https://twitter.com/vladsazonau)
 - 💼 LinkedIn: [Vlad Sazonau](https://www.linkedin.com/in/vlad-sazonau/)
+- ▶️ YouTube: [@vladsazon](https://www.youtube.com/@vladsazon) (demo videos)
 - 🌐 Website: [vladsazon.com](https://vladsazon.com)
 
 ## ❤️ Support the Project

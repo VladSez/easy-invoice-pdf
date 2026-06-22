@@ -6,6 +6,7 @@ import {
   TWITTER_CREATOR,
 } from "@/config";
 import type { Metadata } from "next";
+import { ChangelogIndexJsonLd } from "./changelog-index-json-ld";
 
 // Enable static generation for changelog layout
 export const dynamic = "force-static";
@@ -85,6 +86,7 @@ interface ChangelogLayoutProps {
 export default function ChangelogLayout({ children }: ChangelogLayoutProps) {
   return (
     <>
+      <ChangelogIndexJsonLd />
       <Header />
       {children}
       <Footer />

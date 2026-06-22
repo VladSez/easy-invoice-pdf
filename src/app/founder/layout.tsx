@@ -5,16 +5,15 @@ import {
   STATIC_ASSETS_URL,
   TWITTER_CREATOR,
 } from "@/config";
+import {
+  FOUNDER_PAGE_DESCRIPTION,
+  FOUNDER_PAGE_TITLE,
+  FOUNDER_PAGE_URL,
+} from "@/lib/seo/site-entities";
 import type { Metadata } from "next";
+import { FounderJsonLd } from "./founder-json-ld";
 
 export const dynamic = "force-static";
-
-const FOUNDER_PAGE_URL = `https://easyinvoicepdf.com/founder`;
-
-const FOUNDER_PAGE_TITLE = "Vlad Sazonau | Founder of EasyInvoicePDF";
-
-const FOUNDER_PAGE_DESCRIPTION =
-  "Meet Vlad Sazonau, founder of EasyInvoicePDF, the free open-source invoice PDF generator with live preview. Product engineer and design enthusiast with 8+ years building digital products.";
 
 const ogImageAlt = "Vlad Sazonau, founder of EasyInvoicePDF — product engineer";
 
@@ -86,6 +85,7 @@ interface FounderLayoutProps {
 export default function FounderLayout({ children }: FounderLayoutProps) {
   return (
     <>
+      <FounderJsonLd />
       <Header />
       {children}
       <Footer />

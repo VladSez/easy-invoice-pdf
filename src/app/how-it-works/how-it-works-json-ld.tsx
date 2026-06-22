@@ -1,13 +1,8 @@
 import { buildHowItWorksJsonLd } from "./build-how-it-works-json-ld";
+import { JsonLdScript } from "@/lib/seo/render-json-ld";
 
 export function HowItWorksJsonLd() {
-  const graph = buildHowItWorksJsonLd();
-
   return (
-    <script
-      id="json-ld-how-it-works"
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
-    />
+    <JsonLdScript id="json-ld-how-it-works" data={buildHowItWorksJsonLd()} />
   );
 }
