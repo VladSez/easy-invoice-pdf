@@ -19,9 +19,9 @@ export const metadata: Metadata = {
     "invoice generator",
     "legal",
   ],
-  authors: [{ name: "Uladzislau Sazonau", url: PERSONAL_WEBSITE_URL }],
-  creator: "Uladzislau Sazonau",
-  publisher: "Uladzislau Sazonau",
+  authors: [{ name: "Vlad Sazonau", url: PERSONAL_WEBSITE_URL }],
+  creator: "Vlad Sazonau",
+  publisher: "Vlad Sazonau",
   alternates: {
     canonical: "https://easyinvoicepdf.com/tos",
   },

@@ -27,9 +27,9 @@ export const metadata: Metadata = {
     "product engineer",
     "invoice PDF generator",
   ],
-  authors: [{ name: "Uladzislau Sazonau", url: PERSONAL_WEBSITE_URL }],
-  creator: "Uladzislau Sazonau",
-  publisher: "Uladzislau Sazonau",
+  authors: [{ name: "Vlad Sazonau", url: PERSONAL_WEBSITE_URL }],
+  creator: "Vlad Sazonau",
+  publisher: "Vlad Sazonau",
   alternates: {
     canonical: FOUNDER_PAGE_URL,
   },

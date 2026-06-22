@@ -86,7 +86,7 @@ export function buildPerson() {
     "@type": "Person" as const,
     "@id": JSON_LD_IDS.person,
     url: FOUNDER_PAGE_URL,
-    name: "Uladzislau Sazonau",
+    name: "Vlad Sazonau",
     givenName: "Uladzislau",
     familyName: "Sazonau",
     description:
@@ -95,7 +95,7 @@ export function buildPerson() {
       "@type": "ImageObject" as const,
       "@id": JSON_LD_IDS.personImage,
       url: FOUNDER_AVATAR_URL,
-      caption: "Uladzislau Sazonau",
+      caption: "Vlad Sazonau",
     },
     sameAs: [PERSONAL_WEBSITE_URL, GITHUB_URL, LINKEDIN_URL, TWITTER_URL],
   };

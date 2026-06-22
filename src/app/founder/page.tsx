@@ -43,13 +43,13 @@ export default function ContactPage() {
             className="mt-8 w-full max-w-xl space-y-4"
             transition={blockEnterSpring(0.1)}
           >
-            <p className="mx-auto text-center text-lg leading-relaxed text-slate-700">
+            <p className="mx-auto text-center text-sm leading-relaxed text-slate-700 sm:text-base">
               I built EasyInvoicePDF for myself because I was tired of paying
               for bloated software just to create and send invoices to clients
               and my accountant.
             </p>
 
-            <p className="mx-auto text-center text-lg leading-relaxed text-slate-700">
+            <p className="mx-auto text-center text-sm leading-relaxed text-slate-700 sm:text-base">
               I enjoy solving complex problems at the intersection of
               engineering and design.
             </p>
