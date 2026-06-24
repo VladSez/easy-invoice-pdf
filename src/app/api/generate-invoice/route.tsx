@@ -1,368 +1,66 @@
-import { INVOICE_DEFAULT_NUMBER_VALUE } from "@/app/constants";
-import { invoiceSchema } from "@/app/schema";
-import {
-  createOrFindInvoiceFolder,
-  initializeGoogleDrive,
-  uploadFile,
-  type GoogleDriveFile,
-} from "@/lib/google-drive";
-import { resend } from "@/lib/resend";
-import { sendTelegramMessage } from "@/lib/telegram";
-
-// eslint-disable-next-line no-restricted-imports
-import { renderToBuffer } from "@react-pdf/renderer";
-import dayjs from "dayjs";
-import { compressToEncodedURIComponent } from "lz-string";
 import { NextResponse, type NextRequest } from "next/server";
-import type { Attachment } from "resend";
-
-import {
-  ENGLISH_INVOICE_REAL_DATA,
-  InvoicePdfTemplateToRenderOnBackend,
-  POLISH_INVOICE_REAL_DATA,
-} from "./render-pdf-on-server";
 
 import { env } from "@/env";
 import { ipLimiter } from "@/lib/rate-limit";
-import { compressInvoiceData } from "@/utils/url-compression";
+import { runProductionGenerateMonthlyInvoice } from "./run-production-generate-invoice";
 
 export const dynamic = "force-dynamic";
 
-// serverless function can run for max 30 seconds
-export const maxDuration = 30; // Set to 30 seconds
+// maxTimeout for the serverless function on vercel (30 seconds), max timeout is 300 seconds (5 minutes) atm per their docs
+// https://vercel.com/docs/functions/configuring-functions/duration
+export const maxDuration = 30;
 
 export async function GET(req: NextRequest) {
   try {
-    // Check if the request is authorized
     if (req.headers.get("Authorization") !== `Bearer ${env.AUTH_TOKEN}`) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Rate limiting
-    const ip = req.headers.get("x-forwarded-for") || "127.0.0.1";
-
+    const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
     const rateLimitResult = await ipLimiter.limit(ip);
 
     if (!rateLimitResult.success) {
-      console.log(`Rate limit exceeded for IP: ${ip}`);
-
-      return new NextResponse(
-        JSON.stringify({
-          error: "Too many requests.",
-        }),
-        {
-          status: 429,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      console.error(`Rate limit exceeded for IP: ${ip}`);
+      return new NextResponse(JSON.stringify({ error: "Too many requests." }), {
+        status: 429,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    /**
-     * Determines if email notifications should be sent.
-     * Defaults to true for backwards compatibility.
-     * Can be disabled by passing ?sendEmail=false query parameter for testing.
-     */
+    // Parse query parameters to control invoice generation behavior
+    // Both default to true (enabled) unless explicitly set to "false"
+    // This allows the endpoint to be used for testing without side effects
     const shouldSendEmail =
       req.nextUrl.searchParams.get("sendEmail") !== "false";
 
-    /**
-     * Determines if invoices should be saved to Google Drive.
-     * Defaults to true for backwards compatibility.
-     * Can be disabled by passing ?saveToGoogleDrive=false query parameter for testing.
-     */
-    const shouldSaveToGoogleDrive =
-      req.nextUrl.searchParams.get("saveToGoogleDrive") !== "false";
+    const shouldUploadToGoogleDrive =
+      req.nextUrl.searchParams.get("uploadToGoogleDrive") !== "false";
 
-    const testModeWarnings: string[] = [];
-
-    if (!shouldSendEmail) {
-      testModeWarnings.push("👉 Email sending *disabled* (`sendEmail=false`)");
-    }
-
-    if (!shouldSaveToGoogleDrive) {
-      testModeWarnings.push(
-        "👉 Google Drive upload *disabled* (`saveToGoogleDrive=false`)",
-      );
-    }
-
-    const testModeWarningBlock =
-      testModeWarnings.length > 0
-        ? `\n\n⚠️⚠️⚠️ *Test mode warning:* ⚠️⚠️⚠️\n\n${testModeWarnings
-            .map((w) => `- ${w}`)
-            .join("\n")}\n\n------------------------------------\n`
-        : "";
-
-    const GENERATED_ENGLISH_INVOICE_PDF_DOCUMENT = renderToBuffer(
-      <InvoicePdfTemplateToRenderOnBackend
-        invoiceData={ENGLISH_INVOICE_REAL_DATA}
-      />,
-    ).catch((err) => {
-      console.error(
-        "\n\n_________________________[generate-invoice] Error during `renderToBuffer` for ENGLISH invoice:",
-        err,
-      );
-
-      throw err;
+    const result = await runProductionGenerateMonthlyInvoice({
+      shouldSendEmail,
+      shouldUploadToGoogleDrive,
     });
 
-    const GENERATED_POLISH_INVOICE_PDF_DOCUMENT = renderToBuffer(
-      <InvoicePdfTemplateToRenderOnBackend
-        invoiceData={POLISH_INVOICE_REAL_DATA}
-      />,
-    ).catch((err) => {
-      console.error(
-        "\n\n_________________________[generate-invoice] Error during `renderToBuffer` for POLISH invoice:",
-        err,
-      );
+    // eslint-disable-next-line no-console
+    console.log("[generate-invoice] Report:", result.report);
 
-      throw err;
-    });
-
-    const GENERATED_INVOICES =
-      (await Promise.allSettled([
-        GENERATED_ENGLISH_INVOICE_PDF_DOCUMENT.then((buf) => ({
-          language: "en",
-          document: buf,
-        })),
-        GENERATED_POLISH_INVOICE_PDF_DOCUMENT.then((buf) => ({
-          language: "pl",
-          document: buf,
-        })),
-      ]).catch((err) => {
-        console.error(
-          "\n\n_________________________Error during `Promise.allSettled`:",
-          err,
-        );
-      })) || [];
-
-    const fulfilledInvoices = [];
-
-    for (const invoice of GENERATED_INVOICES) {
-      if (invoice.status === "fulfilled") {
-        fulfilledInvoices.push({
-          language: invoice.value.language,
-          document: invoice.value.document,
-        });
-      } else if (invoice.status === "rejected") {
-        console.error(
-          "\n\n_________________________Error in generate-invoice route:",
-          invoice?.reason || "Unknown error",
-        );
-      }
-    }
-
-    // // Replace all slashes with dashes (e.g. 01/2025 -> 01-2025)
-    const formattedInvoiceNumber = INVOICE_DEFAULT_NUMBER_VALUE
-      ? INVOICE_DEFAULT_NUMBER_VALUE?.replace(/\//g, "-")
-      : dayjs().format("MM-YYYY"); // Fallback to current month and year if no invoice number
-
-    const ATTACHMENTS = fulfilledInvoices.map((document) => {
-      const fileName = `invoice-${document.language.toUpperCase()}-${formattedInvoiceNumber}.pdf`;
-
-      return {
-        filename: fileName,
-        content: document.document,
-        contentType: "application/pdf",
-      } satisfies Attachment;
-    });
-
-    if (!ATTACHMENTS.length) {
+    if (!result.ok) {
+      const status = result.kind === "no_attachments" ? 400 : 500;
       return NextResponse.json(
-        { error: "[generate-invoice] No attachments found" },
-        { status: 400 },
+        { error: result.error, report: result.report },
+        { status },
       );
-    }
-
-    const newInvoiceDataValidated = invoiceSchema.parse(
-      ENGLISH_INVOICE_REAL_DATA,
-    );
-
-    // Compress JSON keys before stringifying to reduce URL size
-    const compressedKeys = compressInvoiceData(newInvoiceDataValidated);
-    const compressedJson = JSON.stringify(compressedKeys);
-
-    const compressedData = compressToEncodedURIComponent(compressedJson);
-
-    const invoiceUrl = `https://easyinvoicepdf.com/?template=${newInvoiceDataValidated.template}&data=${compressedData}`;
-
-    const monthAndYear = dayjs().format("MMMM YYYY");
-
-    // *___________UPLOAD INVOICES TO GOOGLE DRIVE___________*
-
-    let folderToUploadInvoices: GoogleDriveFile | null = null;
-    let googleDriveFolderPath = "";
-
-    if (shouldSaveToGoogleDrive) {
-      // Initialize Google Drive
-      const googleDrive = await initializeGoogleDrive();
-
-      const currentMonth = dayjs().format("MM");
-      const currentYear = dayjs().format("YYYY");
-
-      // Create the month folder (this will automatically create/find the year folder)
-      const result = await createOrFindInvoiceFolder({
-        googleDrive,
-        parentFolderId: env.GOOGLE_DRIVE_PARENT_FOLDER_ID,
-        month: currentMonth,
-        year: currentYear,
-      });
-
-      folderToUploadInvoices = result.folderToUploadInvoices;
-      googleDriveFolderPath = result.googleDriveFolderPath;
-
-      // Upload each invoice to Google Drive
-      const uploadPromises = ATTACHMENTS.map((attachment) =>
-        uploadFile({
-          googleDrive,
-          fileName: attachment.filename,
-          fileContent: Buffer.from(attachment.content),
-          folderId: folderToUploadInvoices!.id,
-        }),
-      );
-
-      const uploadResults = await Promise.allSettled(uploadPromises);
-      const failedUploads = uploadResults.filter(
-        (result): result is PromiseRejectedResult =>
-          result.status === "rejected",
-      );
-
-      if (failedUploads.length > 0) {
-        console.error(
-          "[generate-invoice] Some files failed to upload to Google Drive:",
-          failedUploads,
-        );
-
-        return NextResponse.json(
-          {
-            error:
-              "[generate-invoice] Failed to upload invoices to Google Drive",
-          },
-          { status: 500 },
-        );
-      }
-    }
-
-    const companyEmailLink =
-      `https://outlook.office.com/mail/deeplink/compose` +
-      `?to=${encodeURIComponent(env.INVOICE_EMAIL_COMPANY_TO)}` +
-      `&subject=${encodeURIComponent(`Invoice for ${monthAndYear}`)}` +
-      `&body=${encodeURIComponent(`Hello,\nThe invoice for ${monthAndYear} is in the attachment.\n\nHave a nice day.`)}`;
-
-    // we only need the value of the invoice number e.g. 1/05.2025
-    const invoiceNumberValue =
-      ENGLISH_INVOICE_REAL_DATA?.invoiceNumberObject?.value;
-
-    // *___________SEND NOTIFICATIONS___________*
-
-    // Send notifications in parallel
-    const notifications: Promise<unknown>[] = [
-      sendTelegramMessage({
-        message: `${testModeWarningBlock}📝 *Invoices for ${monthAndYear}*
-
-Invoice No. of: *${invoiceNumberValue}*
-Date: *${dayjs().format("MMMM D, YYYY")}*
-
-The generated invoices are included in the attachments. Please check them carefully.
-
-[View invoice online](${invoiceUrl})${
-          folderToUploadInvoices
-            ? `\n[View in Google Drive](${folderToUploadInvoices.webViewLink}) path: *${googleDriveFolderPath}*`
-            : ""
-        }
-
-*☝️ Important - Don't forget to:*
-- [Send email to company](${companyEmailLink})
-- [Submit to KSEF](https://ap.ksef.mf.gov.pl/web/)
-
-Have a nice day!
-
-Best regards,
-EasyInvoicePDF.com`,
-        files: ATTACHMENTS.map((attachment) => ({
-          filename: attachment.filename,
-          buffer: Buffer.from(attachment.content),
-        })),
-      }),
-    ];
-
-    if (shouldSendEmail) {
-      notifications.push(
-        resend.emails.send({
-          from: "Vlad from EasyInvoicePDF.com <vlad@updates.easyinvoicepdf.com>",
-          to: env.INVOICE_EMAIL_RECIPIENT,
-          subject: `📝 Invoices for ${monthAndYear}`,
-          html: `<p>Hello,</p>
-    <span>Invoice No. of: <b>${invoiceNumberValue}</b><br/>
-    Date: <b>${dayjs().format("MMMM D, YYYY")}</b>
-    <br/>
-    <br/>
-
-    The generated invoices are included in the attachments. Please check them carefully.
-    <br/>
-    <br/>
-
-    <a href="${invoiceUrl}">View invoice online</a>${
-      folderToUploadInvoices
-        ? `<br/>\n    <a href="${folderToUploadInvoices.webViewLink}">View in Google Drive</a> path: <b>${googleDriveFolderPath}</b>`
-        : ""
-    }<br/>
-    <br/>
-    <br/>
-
-    <b>☝️ Important - Don't forget to:</b><br/>
-    - <a href="${companyEmailLink}"><b>Send these invoices via email to the company</b></a> for processing and payment<br/>
-    - <a href="https://ap.ksef.mf.gov.pl/web/"><b>Submit to KSEF</b></a>
-    <br/>
-    <br/>
-
-    Have a nice day!<br/><br/>
-    Best regards,<br/>EasyInvoicePDF.com</span>`,
-          attachments: ATTACHMENTS,
-        }),
-      );
-    }
-
-    const notificationResults = await Promise.allSettled(notifications);
-
-    const failedNotifications = notificationResults.filter(
-      (result): result is PromiseRejectedResult => result.status === "rejected",
-    );
-
-    if (failedNotifications.length > 0) {
-      const errorMessage = `Some notifications failed to send:\n${JSON.stringify(
-        failedNotifications,
-        null,
-        2,
-      )}`;
-
-      console.error("[generate-invoice] Error in route:", errorMessage);
-
-      // Send error to Telegram
-      try {
-        await sendTelegramMessage({
-          message: `🚨 Error in generate-invoice API route\n\n${errorMessage}`,
-        });
-      } catch (telegramError) {
-        console.error(
-          "Failed to send error notification to Telegram:",
-          telegramError,
-        );
-      }
-
-      throw new Error("[generate-invoice] Failed to send notifications", {
-        cause: errorMessage,
-      });
     }
 
     return NextResponse.json(
-      { message: "Invoice sent successfully" },
+      {
+        message: "Invoice generated and sent successfully",
+        report: result.report,
+      },
       { status: 200 },
     );
   } catch (error) {
     console.error("[generate-invoice] Error in route:", error);
-
     return NextResponse.json(
       { error: "[generate-invoice] Failed to generate and send invoice" },
       { status: 500 },

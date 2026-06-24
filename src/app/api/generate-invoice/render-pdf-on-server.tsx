@@ -1,20 +1,15 @@
 import { PDF_DEFAULT_TEMPLATE_STYLES } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
 import { InvoiceBody } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template/invoice-body";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-import {
-  INVOICE_DEFAULT_NUMBER_VALUE,
-  FIRST_DAY_OF_MONTH,
-  LAST_DAY_OF_MONTH,
-  PAYMENT_DUE,
-  TODAY,
-} from "@/app/constants";
+import { INVOICE_DEFAULT_NUMBER_VALUE } from "@/app/constants";
 import { type InvoiceData, type SupportedLanguages } from "@/app/schema";
 import { INVOICE_PDF_FONTS } from "@/config";
 import { env } from "@/env";
+import dayjs from "dayjs";
 
-// IMPORTANT: we use @react-pdf/renderer directly here, because we need to render the PDF on the server, not the client
+// IMPORTANT: it's fine to use on server directly
 // eslint-disable-next-line no-restricted-imports
-import { Document, Font, Page } from "@react-pdf/renderer";
+import { Document, Font, Page, renderToBuffer } from "@react-pdf/renderer";
 
 // Open sans seems to be working fine with EN and PL
 const fontFamily = "Open Sans";
@@ -38,7 +33,7 @@ Font.register({
  *
  * It is used to generate the PDF file for the invoice and is DUPLICATED from the frontend component (/invoice-pdf-template/index.tsx), due to technical limitations.
  */
-export const InvoicePdfTemplateToRenderOnBackend = ({
+const InvoicePdfTemplateToRenderOnBackend = ({
   invoiceData,
 }: {
   invoiceData: InvoiceData;
@@ -63,6 +58,35 @@ export const InvoicePdfTemplateToRenderOnBackend = ({
   );
 };
 
+/**
+ * Renders invoice data to a PDF buffer for server-side (backend) usage.
+ *
+ * @param invoiceData - Data for invoice to be rendered.
+ */
+export function renderInvoicePdfBuffer({
+  invoiceData,
+}: {
+  invoiceData: InvoiceData;
+}) {
+  return renderToBuffer(
+    <InvoicePdfTemplateToRenderOnBackend invoiceData={invoiceData} />,
+  );
+}
+
+/**
+ * Returns translated invoice number label based on language.
+ *
+ * Example:
+ * ```typescript
+ * const invoiceNumberLabel = translateInvoiceNumberLabel({ language: "en" });
+ * // Returns: "Invoice Number:"
+ *
+ * const invoiceNumberLabel = translateInvoiceNumberLabel({ language: "pl" });
+ * // Returns: "Numer faktury:"
+ * ```
+ *
+ * @param language - Supported language key.
+ */
 const translateInvoiceNumberLabel = ({
   language,
 }: {
@@ -75,7 +99,25 @@ const translateInvoiceNumberLabel = ({
 
 const INVOICE_NET_PRICE = Number(env.INVOICE_NET_PRICE) || 0;
 
-export const ENGLISH_INVOICE_REAL_DATA = {
+/** Recomputed each call so warm servers do not reuse module-load dates. (to avoid outdated dates in the PDF) */
+function getInvoiceDefaultDates(): Pick<
+  InvoiceData,
+  "dateOfIssue" | "dateOfService" | "paymentDue" | "dateOfServiceStart"
+> {
+  const now = dayjs();
+  const lastDayOfMonth = now.endOf("month").format("YYYY-MM-DD");
+  const firstDayOfMonth = now.startOf("month").format("YYYY-MM-DD");
+
+  return {
+    dateOfIssue: now.format("YYYY-MM-DD"),
+    dateOfServiceStart: firstDayOfMonth,
+    dateOfService: lastDayOfMonth,
+    // Same as date of service: last day of the month as the default payment due date
+    paymentDue: lastDayOfMonth,
+  };
+}
+
+const ENGLISH_INVOICE_REAL_DATA_BASE = {
   language: "en",
   dateFormat: "YYYY-MM-DD",
   currency: "EUR",
@@ -85,14 +127,10 @@ export const ENGLISH_INVOICE_REAL_DATA = {
     value: INVOICE_DEFAULT_NUMBER_VALUE,
   },
 
-  dateOfIssue: TODAY,
-  dateOfServiceStart: FIRST_DAY_OF_MONTH,
-  dateOfService: LAST_DAY_OF_MONTH,
   servicePeriodFieldIsVisible: false,
   dateOfServiceFieldIsVisible: true,
   servicePeriodLabelText: "Service period",
   dateOfServiceLabelText: "Date of sales/of executing the service",
-  paymentDue: PAYMENT_DUE,
 
   invoiceType: "Reverse Charge",
   invoiceTypeFieldIsVisible: true,
@@ -168,21 +206,56 @@ export const ENGLISH_INVOICE_REAL_DATA = {
 
   template: "default",
   taxLabelText: "VAT",
-} as const satisfies InvoiceData;
+} satisfies Omit<
+  InvoiceData,
+  "dateOfIssue" | "dateOfService" | "paymentDue" | "dateOfServiceStart"
+>;
 
-export const POLISH_INVOICE_REAL_DATA = {
-  ...ENGLISH_INVOICE_REAL_DATA,
-  language: "pl",
-  invoiceNumberObject: {
-    label: translateInvoiceNumberLabel({ language: "pl" }),
-    value: INVOICE_DEFAULT_NUMBER_VALUE,
-  },
-  buyer: {
-    ...ENGLISH_INVOICE_REAL_DATA.buyer,
-    vatNoLabelText: "NIP", // on polish invoices, we use "NIP" instead of "VAT"
-  },
-  seller: {
-    ...ENGLISH_INVOICE_REAL_DATA.seller,
-    vatNoLabelText: "NIP", // on polish invoices, we use "NIP" instead of "VAT"
-  },
-} as const satisfies InvoiceData;
+/**
+ * Get English invoice data with current default dates.
+ *
+ * Spreads ENGLISH_INVOICE_REAL_DATA_BASE and injects freshly computed date fields
+ * using getInvoiceDefaultDates() on each call, ensuring no stale data due to
+ * serverless warm starts.
+ *
+ * @returns {InvoiceData} Invoice data object, ready for English invoice rendering.
+ */
+export function getEnglishInvoiceRealData(): InvoiceData {
+  return {
+    ...ENGLISH_INVOICE_REAL_DATA_BASE,
+    ...getInvoiceDefaultDates(), // IMPORTANT: recomputed each call so warm servers do not reuse module-load dates (to avoid outdated dates in the PDF)
+  };
+}
+
+/**
+ * Get Polish invoice data with current default dates.
+ *
+ * Spreads English invoice data and injects freshly computed date fields
+ * using getInvoiceDefaultDates() on each call, ensuring no stale data due to
+ * serverless warm starts.
+ *
+ * @param englishInvoiceData - English invoice data to spread.
+ * @returns {InvoiceData} Invoice data object, ready for Polish invoice rendering.
+ */
+export function getPolishInvoiceRealData(
+  englishInvoiceData: InvoiceData,
+): InvoiceData {
+  return {
+    ...englishInvoiceData,
+    language: "pl",
+    invoiceNumberObject: {
+      label: translateInvoiceNumberLabel({ language: "pl" }),
+      value:
+        englishInvoiceData.invoiceNumberObject?.value ??
+        INVOICE_DEFAULT_NUMBER_VALUE,
+    },
+    buyer: {
+      ...englishInvoiceData.buyer,
+      vatNoLabelText: "NIP",
+    },
+    seller: {
+      ...englishInvoiceData.seller,
+      vatNoLabelText: "NIP",
+    },
+  };
+}

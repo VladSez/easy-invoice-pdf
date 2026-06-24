@@ -10,16 +10,46 @@ import {
 import { INVOICE_PDF_TRANSLATIONS } from "../(app)/pdf-i18n-translations/pdf-translations";
 import dayjs from "dayjs";
 
-export const TODAY = dayjs().format("YYYY-MM-DD");
-export const FIRST_DAY_OF_MONTH = dayjs().startOf("month").format("YYYY-MM-DD");
-export const LAST_DAY_OF_MONTH = dayjs().endOf("month").format("YYYY-MM-DD");
-export const PAYMENT_DUE = dayjs(TODAY).add(14, "days").format("YYYY-MM-DD");
-const INVOICE_CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
+/**
+ * Current date in YYYY-MM-DD format
+ *
+ * Used as default **date of issue**
+ */
+const TODAY = dayjs().format("YYYY-MM-DD");
+
+/**
+ * First day of current month in YYYY-MM-DD format
+ *
+ * Used as default date of **service period start**
+ */
+const FIRST_DAY_OF_MONTH = dayjs().startOf("month").format("YYYY-MM-DD");
+
+/**
+ * Last day of current month in YYYY-MM-DD format
+ *
+ * Used as default date of **service period end** and **date of service**
+ */
+const LAST_DAY_OF_MONTH = dayjs().endOf("month").format("YYYY-MM-DD");
+
+/**
+ * Payment due date (14 days from today) in YYYY-MM-DD format
+ *
+ * Used as default **payment due date**
+ */
+const PAYMENT_DUE = dayjs(TODAY).add(14, "days").format("YYYY-MM-DD");
 
 const EUR = SUPPORTED_CURRENCIES[0];
 const EN = SUPPORTED_LANGUAGES[0];
 const DEFAULT_TEMPLATE = SUPPORTED_TEMPLATES[0];
 
+const INVOICE_CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
+
+/**
+ * Default invoice number value
+ * Format: 1/MM-YYYY (e.g., 1/03-2024)
+ *
+ * Used as default **invoice number** when creating a new invoice
+ */
 export const INVOICE_DEFAULT_NUMBER_VALUE = `1/${INVOICE_CURRENT_MONTH_AND_YEAR}`;
 
 /**

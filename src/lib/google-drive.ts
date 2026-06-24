@@ -1,9 +1,10 @@
-import { google } from "googleapis";
-import { z } from "zod";
-import { Readable } from "node:stream";
 import { env } from "@/env";
+import type { drive_v3 } from "googleapis";
+import { google } from "googleapis";
+import { Readable } from "node:stream";
+import { z } from "zod";
 
-export interface GoogleDriveFile {
+interface GoogleDriveFile {
   id: string;
   name: string;
   mimeType: string;
@@ -28,7 +29,7 @@ const FolderInputSchema = z.object({
 
 type FolderInput = z.infer<typeof FolderInputSchema>;
 
-let cachedDrive: ReturnType<typeof google.drive> | undefined;
+let cachedDrive: drive_v3.Drive | undefined;
 
 export async function initializeGoogleDrive() {
   if (cachedDrive) {
@@ -51,7 +52,7 @@ export async function initializeGoogleDrive() {
 }
 
 async function createFolder(
-  drive: ReturnType<typeof google.drive>,
+  drive: drive_v3.Drive,
   folderName: string,
   parentFolderId?: string,
 ): Promise<GoogleDriveFile> {
@@ -86,7 +87,7 @@ export async function uploadFile({
   fileContent,
   folderId,
 }: {
-  googleDrive: ReturnType<typeof google.drive>;
+  googleDrive: drive_v3.Drive;
   fileName: string;
   fileContent: Buffer;
   folderId: string;
@@ -118,7 +119,7 @@ export async function createOrFindInvoiceFolder({
   googleDrive,
   ...input
 }: {
-  googleDrive: ReturnType<typeof google.drive>;
+  googleDrive: drive_v3.Drive;
 } & FolderInput): Promise<CreateOrFindInvoiceFolderResult> {
   // Validate input
   const validatedInput = FolderInputSchema.parse(input);
