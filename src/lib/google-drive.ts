@@ -4,20 +4,36 @@ import { google } from "googleapis";
 import { Readable } from "node:stream";
 import { z } from "zod";
 
-interface GoogleDriveFile {
+type GoogleDriveFile = drive_v3.Schema$File;
+
+export interface DriveFolderRef {
   id: string;
-  name: string;
-  mimeType: string;
-  webViewLink?: string;
+  webViewLink: string;
 }
 
-interface Success {
-  status: "success";
-  folderToUploadInvoices: GoogleDriveFile;
+export interface InvoiceFolderResult {
+  folderToUploadInvoices: DriveFolderRef;
   googleDriveFolderPath: string;
 }
 
-type CreateOrFindInvoiceFolderResult = Success;
+/**
+ * Convert Google Drive File object to DriveFolderRef.
+ * Throws if file missing required fields.
+ *
+ * @param file - Google Drive file (should be a folder)
+ * @returns DriveFolderRef with id and webViewLink
+ */
+function toDriveFolderRef(file: GoogleDriveFile): DriveFolderRef {
+  if (!file.id) {
+    throw new Error("Google Drive folder is missing id");
+  }
+
+  if (!file.webViewLink) {
+    throw new Error("Google Drive folder is missing webViewLink");
+  }
+
+  return { id: file.id, webViewLink: file.webViewLink };
+}
 
 const FolderInputSchema = z.object({
   parentFolderId: z.string().min(1),
@@ -71,7 +87,7 @@ async function createFolder(
     throw new Error("Failed to create folder");
   }
 
-  return response.data as GoogleDriveFile;
+  return response.data;
 }
 
 /**
@@ -112,7 +128,7 @@ export async function uploadFile({
     throw new Error("Failed to upload file");
   }
 
-  return response.data as GoogleDriveFile;
+  return response.data;
 }
 
 export async function createOrFindInvoiceFolder({
@@ -120,7 +136,7 @@ export async function createOrFindInvoiceFolder({
   ...input
 }: {
   googleDrive: drive_v3.Drive;
-} & FolderInput): Promise<CreateOrFindInvoiceFolderResult> {
+} & FolderInput): Promise<InvoiceFolderResult> {
   // Validate input
   const validatedInput = FolderInputSchema.parse(input);
 
@@ -140,7 +156,7 @@ export async function createOrFindInvoiceFolder({
 
   if (yearFolderResponse.data.files?.length) {
     // if the year folder already exists, use it
-    yearFolder = yearFolderResponse.data.files[0] as GoogleDriveFile;
+    yearFolder = yearFolderResponse.data.files[0];
   } else {
     // if the year folder does not exist, create it
     yearFolder = await createFolder(
@@ -166,7 +182,7 @@ export async function createOrFindInvoiceFolder({
 
   if (monthFolderResponse.data.files?.length) {
     // if the month folder already exists, use it
-    monthFolder = monthFolderResponse.data.files[0] as GoogleDriveFile;
+    monthFolder = monthFolderResponse.data.files[0];
 
     // eslint-disable-next-line no-console
     console.log(
@@ -180,7 +196,7 @@ export async function createOrFindInvoiceFolder({
     monthFolder = await createFolder(
       googleDrive,
       monthFolderName,
-      yearFolder.id,
+      yearFolder?.id ?? "",
     );
   }
 
@@ -198,14 +214,13 @@ export async function createOrFindInvoiceFolder({
 
   if (invoicesFolderResponse.data.files?.length) {
     // if the invoices folder already exists, use it
-    folderToUploadInvoices = invoicesFolderResponse.data
-      .files[0] as GoogleDriveFile;
+    folderToUploadInvoices = invoicesFolderResponse.data.files[0];
   } else {
     // if the invoices folder does not exist, create it
     folderToUploadInvoices = await createFolder(
       googleDrive,
       "invoices",
-      monthFolder.id,
+      monthFolder?.id ?? "",
     );
   }
 
@@ -218,9 +233,10 @@ export async function createOrFindInvoiceFolder({
     "\n\n",
   );
 
+  const folderToUploadInvoicesRef = toDriveFolderRef(folderToUploadInvoices);
+
   return {
-    status: "success",
-    folderToUploadInvoices,
+    folderToUploadInvoices: folderToUploadInvoicesRef,
     googleDriveFolderPath,
   };
 }

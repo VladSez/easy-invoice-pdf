@@ -30,9 +30,8 @@ function buildGenerateInvoiceDeps(
       renderInvoicePdfBuffer({ invoiceData: polishInvoiceData }),
     initializeGoogleDrive,
 
-    createOrFindInvoiceFolder:
-      createOrFindInvoiceFolder as GenerateInvoiceDeps["createOrFindInvoiceFolder"],
-    uploadFile: uploadFile as GenerateInvoiceDeps["uploadFile"],
+    createOrFindInvoiceFolder,
+    uploadFile,
     sendTelegramMessage,
     sendEmail: (args) => resend.emails.send(args),
   };

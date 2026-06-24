@@ -1,10 +1,11 @@
 import { INVOICE_DEFAULT_NUMBER_VALUE } from "@/app/constants";
 import { invoiceSchema, type InvoiceData } from "@/app/schema";
+import type { InvoiceFolderResult } from "@/lib/google-drive";
 import { compressInvoiceData } from "@/utils/url-compression";
 import dayjs from "dayjs";
 import type { drive_v3 } from "googleapis";
 import { compressToEncodedURIComponent } from "lz-string";
-import type { Attachment } from "resend";
+import type { Attachment, CreateEmailResponse } from "resend";
 
 /**
  * Formats milliseconds into a human-readable duration string.
@@ -63,22 +64,6 @@ export type GenerateInvoiceResult =
       report: GenerateInvoiceReport;
     };
 
-/** Minimal representation of a Google Drive folder returned after creation/lookup. */
-interface GoogleDriveFolder {
-  /** Drive file ID used for uploading children. */
-  id: string;
-  /** Browser-accessible URL shown in notifications. */
-  webViewLink: string;
-}
-
-/** Shape returned by `createOrFindInvoiceFolder`. */
-interface InvoiceFolderResult {
-  /** The folder where invoice PDFs will be uploaded. */
-  folderToUploadInvoices: GoogleDriveFolder;
-  /** Human-readable path string used in notification messages (e.g. "2026 / 03-March"). */
-  googleDriveFolderPath: string;
-}
-
 /**
  * External side-effects injected into `generateInvoice`.
  * Keeping them as explicit dependencies makes the function fully unit-testable
@@ -107,7 +92,7 @@ export interface GenerateInvoiceDeps {
     fileName: string;
     fileContent: Buffer;
     folderId: string;
-  }) => Promise<unknown>;
+  }) => Promise<drive_v3.Schema$File>;
   /**
    * Sends a Telegram message, optionally attaching PDF files.
    * Used both for the happy-path summary and for error alerts.
@@ -115,7 +100,7 @@ export interface GenerateInvoiceDeps {
   sendTelegramMessage: (args: {
     message: string;
     files?: Array<{ filename: string; buffer: Buffer }>;
-  }) => Promise<unknown>;
+  }) => Promise<{ success: boolean }>;
   /** Sends a Resend email with the invoice PDFs as attachments. */
   sendEmail: (args: {
     from: string;
@@ -123,7 +108,7 @@ export interface GenerateInvoiceDeps {
     subject: string;
     html: string;
     attachments: Attachment[];
-  }) => Promise<unknown>;
+  }) => Promise<CreateEmailResponse>;
 }
 
 /**
