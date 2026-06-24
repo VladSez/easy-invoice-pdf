@@ -1,3 +1,4 @@
+import { runProductionGenerateMonthlyInvoice } from "@/app/api/generate-invoice/run-production-generate-invoice";
 import {
   clearQueuedJob,
   queueInvoiceGeneration,
@@ -121,33 +122,28 @@ async function handleInvoiceGenerate({ chatId }: { chatId: number }) {
       message: "⏳ Generating invoices... Please wait.",
     });
 
-    const BASE_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : "http://localhost:3000";
+    // IMPORTANT: for local development, we *DON'T* want to send emails and upload to Google Drive
+    const isProduction = process.env.VERCEL_ENV === "production";
 
-    const response = await fetch(`${BASE_URL}/api/generate-invoice`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${env.AUTH_TOKEN}`,
-        "Content-Type": "application/json",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-      cache: "no-store",
-      signal: AbortSignal.timeout(25_000), // abort after 25 seconds if the request takes too long
+    const result = await runProductionGenerateMonthlyInvoice({
+      shouldSendEmail: isProduction,
+      shouldUploadToGoogleDrive: isProduction,
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
+    // eslint-disable-next-line no-console
+    console.log("[telegram-webhook] Report:", result.report);
+
+    if (!result.ok) {
       console.error(
-        `[telegram-webhook] Failed to generate invoice: ${response.status} ${errorText}`,
+        `[telegram-webhook] Failed to generate invoice (${result.kind}):`,
+        result.error,
       );
 
-      await sendTelegramMessage({
-        message: `❌ Failed to generate invoices.\n\nStatus: ${response.status}`,
-      });
-      return;
+      if (result.kind !== "notification_failed") {
+        await sendTelegramMessage({
+          message: `❌ Failed to generate invoices.\n\n${result.error}`,
+        });
+      }
     }
   } catch (error) {
     console.error("[telegram-webhook] handleInvoiceGenerate error:", error);

@@ -27,11 +27,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import type { NonReadonly, Prettify } from "@/types";
+import { calculateItemTotals } from "./utils/calculate-item-totals";
+import { hasAnyItemTotalsChanged } from "./utils/has-item-totals-changed";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
-import React, {
+import {
   memo,
   useCallback,
   useEffect,
@@ -50,12 +52,12 @@ import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
 
+import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 import { AlertIcon, ErrorMessage } from "./common";
 import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
-import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 
 export const LOADING_BUTTON_TIMEOUT = 400;
 export const LOADING_BUTTON_TEXT = "Generating Document...";
@@ -159,16 +161,8 @@ export const InvoiceForm = memo(function InvoiceForm({
     // Skip rest of calculations if no items
     if (!invoiceItems?.length) return;
 
-    // Check if any relevant values have changed
-    const hasChanges = invoiceItems.some((item) => {
-      const calculated = calculateItemTotals(item);
-      return (
-        calculated?.netAmount !== item.netAmount ||
-        calculated?.vatAmount !== item.vatAmount ||
-        calculated?.preTaxAmount !== item.preTaxAmount
-      );
-    });
-    if (!hasChanges) return;
+    // if no item totals changed (netAmount, vatAmount, preTaxAmount), skip the rest of the calculations
+    if (!hasAnyItemTotalsChanged(invoiceItems)) return;
 
     // Only update if there are actual changes
     const updatedItems = invoiceItems
@@ -884,40 +878,6 @@ export const InvoiceForm = memo(function InvoiceForm({
     </form>
   );
 });
-
-const calculateItemTotals = (item: InvoiceItemData | null) => {
-  if (!item) return null;
-
-  const amount = Number(item.amount) || 0;
-  const netPrice = Number(item.netPrice) || 0;
-  const calculatedNetAmount = amount * netPrice;
-  const formattedNetAmount = Number(calculatedNetAmount.toFixed(2));
-
-  let vatAmount = 0;
-
-  // item.vat always come as a string, so we need to convert it to a number ("23" -> 23) to calculate the VAT amount
-  // it also can be not a number (e.g. "NP", "OO", etc), in this case we don't calculate the VAT amount and set it to 0
-  if (item?.vat) {
-    const vatValue = Number(item.vat);
-    const isVatValueANumber = !Number.isNaN(vatValue);
-
-    if (isVatValueANumber) {
-      vatAmount = (formattedNetAmount * vatValue) / 100;
-    }
-  }
-
-  const formattedVatAmount = Number(vatAmount.toFixed(2));
-  const formattedPreTaxAmount = Number(
-    (formattedNetAmount + formattedVatAmount).toFixed(2),
-  );
-
-  return {
-    ...item,
-    netAmount: formattedNetAmount,
-    vatAmount: formattedVatAmount,
-    preTaxAmount: formattedPreTaxAmount,
-  };
-};
 
 const formErrorsToToast = ({
   errors,
