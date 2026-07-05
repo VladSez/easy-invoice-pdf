@@ -1886,4 +1886,50 @@ test.describe("Invoice Generator Page", () => {
     await expect(servicePeriodStartInput).toHaveValue("2025-05-11");
     await expect(servicePeriodSwitch).toBeChecked();
   });
+
+  test("validates service period start is on or before end date", async ({
+    page,
+  }) => {
+    const generalInfoSection = page.getByRole("region", {
+      name: "General Information",
+    });
+    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      name: "Service period",
+    });
+    const servicePeriodStartInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Service period start",
+    });
+    const servicePeriodEndInput = servicePeriodFieldset.getByRole("textbox", {
+      name: "Service period end",
+    });
+
+    const errorMessage =
+      "Service period start must be on or before the end date";
+    const notifications = page.getByLabel("Notifications alt+T");
+
+    await servicePeriodEndInput.fill("2025-06-15");
+    await servicePeriodStartInput.fill("2025-06-20");
+
+    await expect(
+      servicePeriodFieldset.getByText(errorMessage, { exact: true }),
+    ).toBeVisible();
+
+    await expect(
+      notifications.getByText("Please fix the following errors:"),
+    ).toBeVisible();
+
+    await expect(notifications.getByText(errorMessage)).toBeVisible();
+
+    await servicePeriodStartInput.fill("2025-06-15");
+
+    await expect(
+      servicePeriodFieldset.getByText(errorMessage, { exact: true }),
+    ).toBeHidden();
+
+    await expect(
+      notifications.getByText("Please fix the following errors:"),
+    ).toBeHidden();
+
+    await expect(notifications.getByText(errorMessage)).toBeHidden();
+  });
 });
