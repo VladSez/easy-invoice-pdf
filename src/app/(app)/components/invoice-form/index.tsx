@@ -28,6 +28,7 @@ import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import type { NonReadonly, Prettify } from "@/types";
 import { calculateItemTotals } from "./utils/calculate-item-totals";
+import { formErrorsToToast } from "./utils/form-errors-to-toast";
 import { hasAnyItemTotalsChanged } from "./utils/has-item-totals-changed";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,13 +42,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
-import {
-  Controller,
-  useFieldArray,
-  useForm,
-  useWatch,
-  type FieldErrors,
-} from "react-hook-form";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
@@ -878,68 +873,3 @@ export const InvoiceForm = memo(function InvoiceForm({
     </form>
   );
 });
-
-const formErrorsToToast = ({
-  errors,
-  isMobile,
-}: {
-  errors: FieldErrors<InvoiceData>;
-  isMobile: boolean;
-}) => {
-  // Return early if there are no errors
-  if (!errors || Object.keys(errors).length === 0) {
-    return;
-  }
-  toast.error(
-    <div>
-      <p className="font-semibold">Please fix the following errors:</p>
-      <ul className="mt-1 list-inside list-disc">
-        {Object.entries(errors)
-          .map(([key, error]) => {
-            // Handle nested errors (e.g., seller.name, items[0].name)
-            if (error && typeof error === "object" && "message" in error) {
-              return (
-                <li key={key} className="text-sm">
-                  {error?.message || "Unknown error"}
-                </li>
-              );
-            }
-
-            // Handle array errors (e.g., items array)
-            if (Array.isArray(error)) {
-              return error.map((item, index) =>
-                Object.entries(
-                  item as { [key: string]: { message?: string } },
-                ).map(([fieldName, fieldError]) => (
-                  <li key={`${key}.${index}.${fieldName}`} className="text-sm">
-                    {fieldError?.message || "Unknown error"}
-                  </li>
-                )),
-              );
-            }
-
-            // Handle nested object errors
-            if (error && typeof error === "object") {
-              return Object.entries(
-                error as { [key: string]: { message?: string } },
-              ).map(([nestedKey, nestedError]) => {
-                return (
-                  <li key={`${key}.${nestedKey}`} className="text-sm">
-                    {nestedError?.message || "Unknown error"}
-                  </li>
-                );
-              });
-            }
-
-            return null;
-          })
-          .flat(Infinity)}
-      </ul>
-    </div>,
-    {
-      id: "form-errors-error-toast",
-      duration: 15_000,
-      position: isMobile ? "top-center" : "bottom-right",
-    },
-  );
-};
