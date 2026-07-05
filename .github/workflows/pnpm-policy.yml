@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   pnpm-policy:
@@ -32,6 +33,8 @@ jobs:
         run: corepack install
 
       - name: Verify pnpm supply-chain config
+        id: pnpm-policy
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -66,3 +69,42 @@ jobs:
           verify_config minimum-release-age 7200
           verify_config block-exotic-subdeps true
           verify_config trust-policy no-downgrade
+
+      - name: 🔍 Get PR URL
+        if: steps.pnpm-policy.outcome == 'failure'
+        id: pr-url
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPOSITORY: ${{ github.repository }}
+          GH_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GH_REF_NAME: ${{ github.ref_name }}
+        run: |
+          PR_URL=$(curl -s \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GH_REPOSITORY/pulls?head=$GH_REPOSITORY_OWNER:$GH_REF_NAME" \
+            | jq -r '.[0].html_url // empty')
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+
+      - name: 📧 Send email
+        if: steps.pnpm-policy.outcome == 'failure'
+        # https://github.com/dawidd6/action-send-mail
+        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          from: "GitHub Actions (no-reply) <${{ secrets.EMAIL_USERNAME }}>"
+          to: ${{ secrets.EMAIL_USERNAME }}
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: ❌ pnpm Supply-Chain Policy Failed for ${{ github.repository }}
+          body: |
+            pnpm supply-chain policy verification for ${{ github.repository }} has failed.
+
+            For more details, please check:
+            - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
+
+      - name: ❌ Mark workflow failed on pnpm policy failure
+        if: steps.pnpm-policy.outcome == 'failure'
+        run: exit 1

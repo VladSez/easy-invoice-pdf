@@ -8,6 +8,7 @@ export default defineConfig({
   test: {
     dir: "./src",
     exclude: ["**/e2e/**"],
+    silent: true, // suppress console.log output in test output
   },
   resolve: {
     alias: {
