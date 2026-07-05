@@ -139,6 +139,9 @@ async function handleInvoiceGenerate({ chatId }: { chatId: number }) {
         result.error,
       );
 
+      // Only send failure notification if notification itself did not fail.
+      // If result.kind is "notification_failed", previous notification (email or Telegram) already failed,
+      // so suppress further Telegram failure message to avoid recursion or spam.
       if (result.kind !== "notification_failed") {
         await sendTelegramMessage({
           message: `❌ Failed to generate invoices.\n\n${result.error}`,
