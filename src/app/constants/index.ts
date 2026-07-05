@@ -42,15 +42,15 @@ const EUR = SUPPORTED_CURRENCIES[0];
 const EN = SUPPORTED_LANGUAGES[0];
 const DEFAULT_TEMPLATE = SUPPORTED_TEMPLATES[0];
 
-const INVOICE_CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
-
 /**
- * Default invoice number value
+ * Default invoice number value computed at call time.
  * Format: 1/MM-YYYY (e.g., 1/03-2024)
  *
  * Used as default **invoice number** when creating a new invoice
  */
-export const INVOICE_DEFAULT_NUMBER_VALUE = `1/${INVOICE_CURRENT_MONTH_AND_YEAR}`;
+export function getInvoiceDefaultNumberValue() {
+  return `1/${dayjs().format("MM-YYYY")}` as const;
+}
 
 /**
  * Default seller data
@@ -115,7 +115,7 @@ export const INITIAL_INVOICE_DATA = {
 
   invoiceNumberObject: {
     label: `${INVOICE_PDF_TRANSLATIONS[EN].invoiceNumber}:`,
-    value: INVOICE_DEFAULT_NUMBER_VALUE,
+    value: getInvoiceDefaultNumberValue(),
   },
 
   dateOfIssue: TODAY,
@@ -187,3 +187,17 @@ export const INITIAL_INVOICE_DATA = {
 
   taxLabelText: "VAT",
 } as const satisfies InvoiceData;
+
+/**
+ * Returns initial invoice data with a freshly computed default invoice number.
+ * Use when resetting form state at runtime (avoids stale month on long-lived tabs).
+ */
+export function getInitialInvoiceData() {
+  return {
+    ...INITIAL_INVOICE_DATA,
+    invoiceNumberObject: {
+      ...INITIAL_INVOICE_DATA.invoiceNumberObject,
+      value: getInvoiceDefaultNumberValue(),
+    },
+  } satisfies InvoiceData;
+}

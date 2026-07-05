@@ -1,13 +1,13 @@
 import { PDF_DEFAULT_TEMPLATE_STYLES } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
 import { InvoiceBody } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template/invoice-body";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-import { INVOICE_DEFAULT_NUMBER_VALUE } from "@/app/constants";
+import { getInvoiceDefaultNumberValue } from "@/app/constants";
 import { type InvoiceData, type SupportedLanguages } from "@/app/schema";
 import { INVOICE_PDF_FONTS } from "@/config";
 import { env } from "@/env";
 import dayjs from "dayjs";
 
-// IMPORTANT: it's fine to use on server directly
+// IMPORTANT: it's fine to use this import directly on server side
 // eslint-disable-next-line no-restricted-imports
 import { Document, Font, Page, renderToBuffer } from "@react-pdf/renderer";
 
@@ -117,15 +117,10 @@ function getInvoiceDefaultDates(): Pick<
   };
 }
 
-const ENGLISH_INVOICE_REAL_DATA_BASE = {
+const ENGLISH_INVOICE_PROD_DATA_BASE = {
   language: "en",
   dateFormat: "YYYY-MM-DD",
   currency: "EUR",
-
-  invoiceNumberObject: {
-    label: "Invoice No. of:",
-    value: INVOICE_DEFAULT_NUMBER_VALUE,
-  },
 
   servicePeriodFieldIsVisible: false,
   dateOfServiceFieldIsVisible: true,
@@ -208,38 +203,41 @@ const ENGLISH_INVOICE_REAL_DATA_BASE = {
   taxLabelText: "VAT",
 } satisfies Omit<
   InvoiceData,
-  "dateOfIssue" | "dateOfService" | "paymentDue" | "dateOfServiceStart"
+  | "dateOfIssue"
+  | "dateOfService"
+  | "paymentDue"
+  | "dateOfServiceStart"
+  | "invoiceNumberObject"
 >;
 
 /**
- * Get English invoice data with current default dates.
+ * Returns **English invoice data** with current default dates.
  *
- * Spreads ENGLISH_INVOICE_REAL_DATA_BASE and injects freshly computed date fields
+ * Spreads ENGLISH_INVOICE_PROD_DATA_BASE and injects freshly computed date fields
  * using getInvoiceDefaultDates() on each call, ensuring no stale data due to
  * serverless warm starts.
- *
- * @returns {InvoiceData} Invoice data object, ready for English invoice rendering.
  */
-export function getEnglishInvoiceRealData(): InvoiceData {
+export function getEnglishInvoiceRealData() {
   return {
-    ...ENGLISH_INVOICE_REAL_DATA_BASE,
+    ...ENGLISH_INVOICE_PROD_DATA_BASE,
     ...getInvoiceDefaultDates(), // IMPORTANT: recomputed each call so warm servers do not reuse module-load dates (to avoid outdated dates in the PDF)
-  };
+    invoiceNumberObject: {
+      label: "Invoice No. of:",
+      value: getInvoiceDefaultNumberValue(),
+    },
+  } as const satisfies InvoiceData;
 }
 
 /**
- * Get Polish invoice data with current default dates.
+ * Returns **Polish invoice data** with current default dates.
  *
  * Spreads English invoice data and injects freshly computed date fields
  * using getInvoiceDefaultDates() on each call, ensuring no stale data due to
  * serverless warm starts.
  *
  * @param englishInvoiceData - English invoice data to spread.
- * @returns {InvoiceData} Invoice data object, ready for Polish invoice rendering.
  */
-export function getPolishInvoiceRealData(
-  englishInvoiceData: InvoiceData,
-): InvoiceData {
+export function getPolishInvoiceRealData(englishInvoiceData: InvoiceData) {
   return {
     ...englishInvoiceData,
     language: "pl",
@@ -247,7 +245,7 @@ export function getPolishInvoiceRealData(
       label: translateInvoiceNumberLabel({ language: "pl" }),
       value:
         englishInvoiceData.invoiceNumberObject?.value ??
-        INVOICE_DEFAULT_NUMBER_VALUE,
+        getInvoiceDefaultNumberValue(),
     },
     buyer: {
       ...englishInvoiceData.buyer,
@@ -257,5 +255,5 @@ export function getPolishInvoiceRealData(
       ...englishInvoiceData.seller,
       vatNoLabelText: "NIP",
     },
-  };
+  } as const satisfies InvoiceData;
 }

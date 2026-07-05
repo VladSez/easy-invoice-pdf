@@ -193,10 +193,16 @@ export async function createOrFindInvoiceFolder({
     );
   } else {
     // if the month folder does not exist (new month), create it
+    if (!yearFolder?.id) {
+      throw new Error(
+        "[createOrFindInvoiceFolder] Google Drive year folder is missing id",
+      );
+    }
+
     monthFolder = await createFolder(
       googleDrive,
       monthFolderName,
-      yearFolder?.id ?? "",
+      yearFolder.id,
     );
   }
 
@@ -217,10 +223,16 @@ export async function createOrFindInvoiceFolder({
     folderToUploadInvoices = invoicesFolderResponse.data.files[0];
   } else {
     // if the invoices folder does not exist, create it
+    if (!monthFolder?.id) {
+      throw new Error(
+        "[createOrFindInvoiceFolder] Google Drive month folder is missing id",
+      );
+    }
+
     folderToUploadInvoices = await createFolder(
       googleDrive,
       "invoices",
-      monthFolder?.id ?? "",
+      monthFolder.id,
     );
   }
 

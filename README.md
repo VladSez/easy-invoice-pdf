@@ -35,12 +35,12 @@
   <img src="https://github.com/user-attachments/assets/450fcdc8-32fc-4f41-bc4b-54d6ac96e03c" width="1440" alt="EasyInvoicePDF demo">
 </div>
 
-## ✨ Key Features of EasyInvoicePDF:
+## ✨ Feature Highlights
 
 - 📺 **Instant PDF generation** with live preview
 - 🚀 **No sign-up required** - start immediately
 - 🎉 **Ad-free experience**
-- 👤 **Saved profiles** - reuse seller & buyer details
+- 👤 **Save Seller & Buyer Profiles** - reuse seller & buyer details for future invoices
 - 🎨 **Multiple fully customizable templates** including modern Stripe-style design
 - 🧾 **Smart invoicing tools** - VAT, GST, sales tax & custom tax support with automatic calculations
 - 🏷️ **Logo support** for custom branding

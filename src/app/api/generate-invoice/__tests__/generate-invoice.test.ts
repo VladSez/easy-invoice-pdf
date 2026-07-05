@@ -177,11 +177,11 @@ describe("generateInvoice", () => {
       const deps = buildDeps();
       await generateInvoice(deps, MOCK_INPUT);
 
-      const uploadOrder = vi.mocked(deps.uploadFile).mock
-        .invocationCallOrder[0];
+      const uploadCalls = vi.mocked(deps.uploadFile).mock.invocationCallOrder;
+      const lastUploadOrder = uploadCalls[uploadCalls.length - 1];
       const telegramOrder = vi.mocked(deps.sendTelegramMessage).mock
         .invocationCallOrder[0];
-      expect(uploadOrder).toBeLessThan(telegramOrder);
+      expect(lastUploadOrder).toBeLessThan(telegramOrder);
     });
   });
 
@@ -385,10 +385,55 @@ describe("generateInvoice", () => {
       await generateInvoice(deps, MOCK_INPUT);
 
       expect(deps.uploadFile).not.toHaveBeenCalled();
+      expect(deps.sendTelegramMessage).not.toHaveBeenCalled();
+      expect(deps.sendEmail).not.toHaveBeenCalled();
     });
   });
 
   describe("upload failure", () => {
+    it("should return upload_failed when Google Drive initialization fails", async () => {
+      const deps = buildDeps({
+        initializeGoogleDrive: vi
+          .fn()
+          .mockRejectedValueOnce(new Error("Auth failed")),
+      });
+      const result = await generateInvoice(deps, MOCK_INPUT);
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          ok: false,
+          kind: "upload_failed",
+          error: expect.stringContaining(
+            "Failed to initialize Google Drive",
+          ) as string,
+        }),
+      );
+      expect(deps.uploadFile).not.toHaveBeenCalled();
+      expect(deps.sendTelegramMessage).not.toHaveBeenCalled();
+      expect(deps.sendEmail).not.toHaveBeenCalled();
+    });
+
+    it("should return upload_failed when folder creation fails", async () => {
+      const deps = buildDeps({
+        createOrFindInvoiceFolder: vi
+          .fn()
+          .mockRejectedValueOnce(new Error("Folder creation failed")),
+      });
+      const result = await generateInvoice(deps, MOCK_INPUT);
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          ok: false,
+          kind: "upload_failed",
+          error: expect.stringContaining(
+            "Failed to initialize Google Drive",
+          ) as string,
+        }),
+      );
+      expect(deps.uploadFile).not.toHaveBeenCalled();
+      expect(deps.sendTelegramMessage).not.toHaveBeenCalled();
+      expect(deps.sendEmail).not.toHaveBeenCalled();
+    });
     it("should return upload_failed when one upload fails", async () => {
       const deps = buildDeps({
         uploadFile: vi
@@ -587,12 +632,34 @@ describe("generateInvoice", () => {
   });
 
   describe("invoice filename format", () => {
-    it("should replace slashes in invoice number with dashes in filename", async () => {
+    it("should use englishInvoiceData invoice number in filename", async () => {
       const deps = buildDeps();
-      // INVOICE_DEFAULT_NUMBER_VALUE is e.g. "1/03-2026" — slash becomes dash in filename
       await generateInvoice(deps, MOCK_INPUT);
 
+      const formattedNumber =
+        MOCK_INVOICE_DATA.invoiceNumberObject.value.replace(/\//g, "-");
+
       for (const call of vi.mocked(deps.uploadFile).mock.calls) {
+        expect(call[0].fileName).toContain(formattedNumber);
+        expect(call[0].fileName).not.toContain("/");
+      }
+    });
+
+    it("should replace slashes in invoice number with dashes in filename", async () => {
+      const deps = buildDeps();
+      await generateInvoice(deps, {
+        ...MOCK_INPUT,
+        englishInvoiceData: {
+          ...MOCK_INVOICE_DATA,
+          invoiceNumberObject: {
+            ...MOCK_INVOICE_DATA.invoiceNumberObject,
+            value: "1/07-2026",
+          },
+        },
+      });
+
+      for (const call of vi.mocked(deps.uploadFile).mock.calls) {
+        expect(call[0].fileName).toMatch(/invoice-(EN|PL)-1-07-2026\.pdf$/);
         expect(call[0].fileName).not.toContain("/");
       }
     });

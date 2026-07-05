@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { INITIAL_INVOICE_DATA } from "../constants";
+import { getInitialInvoiceData } from "../constants";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
 import { ErrorMessage } from "@/components/etc/error-message";
@@ -97,7 +97,7 @@ export default function Error({
                   try {
                     localStorage.setItem(
                       PDF_DATA_LOCAL_STORAGE_KEY,
-                      JSON.stringify(INITIAL_INVOICE_DATA),
+                      JSON.stringify(getInitialInvoiceData()),
                     );
 
                     localStorage.setItem(

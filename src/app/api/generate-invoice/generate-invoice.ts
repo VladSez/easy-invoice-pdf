@@ -1,4 +1,3 @@
-import { INVOICE_DEFAULT_NUMBER_VALUE } from "@/app/constants";
 import { invoiceSchema, type InvoiceData } from "@/app/schema";
 import type { InvoiceFolderResult } from "@/lib/google-drive";
 import { compressInvoiceData } from "@/utils/url-compression";
@@ -226,9 +225,11 @@ export async function generateInvoice(
 
   // ─── Step 2: Build email/Telegram attachments ─────────────────────────────
   // Derive a filesystem-safe invoice number (replace "/" with "-").
-  // Falls back to "MM-YYYY" if no default number is configured.
-  const formattedInvoiceNumber = INVOICE_DEFAULT_NUMBER_VALUE
-    ? INVOICE_DEFAULT_NUMBER_VALUE.replace(/\//g, "-")
+  // Falls back to "MM-YYYY" if invoice number is not provided in input data.
+  const invoiceNumber =
+    englishInvoiceData?.invoiceNumberObject?.value?.trim() || "";
+  const formattedInvoiceNumber = invoiceNumber
+    ? invoiceNumber.replace(/\//g, "-")
     : dayjs().format("MM-YYYY");
 
   const attachments = fulfilledInvoices.map((doc) => {
@@ -274,57 +275,80 @@ export async function generateInvoice(
   let savedToGoogleDrive = false;
 
   if (shouldUploadToGoogleDrive) {
-    // Authenticate, then resolve (or create) the month/year folder in Drive.
-    const googleDrive = await initializeGoogleDrive();
-    const currentMonth = dayjs().format("MM");
-    const currentYear = dayjs().format("YYYY");
+    try {
+      // Authenticate, then resolve (or create) the month/year folder in Drive.
+      const googleDrive = await initializeGoogleDrive();
 
-    const folderResult = await createOrFindInvoiceFolder({
-      googleDrive,
-      parentFolderId,
-      month: currentMonth,
-      year: currentYear,
-    });
+      const currentMonth = dayjs().format("MM");
+      const currentYear = dayjs().format("YYYY");
 
-    const { folderToUploadInvoices, googleDriveFolderPath: folderPath } =
-      folderResult;
+      const folderResult = await createOrFindInvoiceFolder({
+        googleDrive,
+        parentFolderId,
+        month: currentMonth,
+        year: currentYear,
+      });
 
-    driveWebViewLink = folderToUploadInvoices.webViewLink;
-    googleDriveFolderPath = folderPath;
+      const { folderToUploadInvoices, googleDriveFolderPath: folderPath } =
+        folderResult;
 
-    // Upload all attachments in parallel; treat any failure as a hard error
-    // since missing files in Drive would break the audit trail.
-    const uploadStartTime = performance.now();
+      driveWebViewLink = folderToUploadInvoices.webViewLink;
+      googleDriveFolderPath = folderPath;
 
-    const uploadResults = await Promise.allSettled(
-      attachments.map((attachment) =>
-        uploadFile({
-          googleDrive,
-          fileName: attachment.filename,
-          fileContent: Buffer.from(attachment.content),
-          folderId: folderToUploadInvoices.id,
-        }),
-      ),
-    );
+      // Upload all attachments in parallel; treat any failure as a hard error
+      // since missing files in Drive would break the audit trail.
+      const uploadStartTime = performance.now();
 
-    console.log(
-      "[generate-invoice] PDF uploading to Google Drive completed in",
-      formatDuration(performance.now() - uploadStartTime),
-    );
-
-    const failedUploads = uploadResults.filter(
-      (r): r is PromiseRejectedResult => r.status === "rejected",
-    );
-
-    if (failedUploads.length > 0) {
-      console.error(
-        "[generate-invoice] Some files failed to upload to Google Drive:",
-        failedUploads,
+      const uploadResults = await Promise.allSettled(
+        attachments.map((attachment) =>
+          uploadFile({
+            googleDrive,
+            fileName: attachment.filename,
+            fileContent: Buffer.from(attachment.content),
+            folderId: folderToUploadInvoices.id,
+          }),
+        ),
       );
+
+      console.log(
+        "[generate-invoice] PDF uploading to Google Drive completed in",
+        formatDuration(performance.now() - uploadStartTime),
+      );
+
+      const failedUploads = uploadResults.filter(
+        (r): r is PromiseRejectedResult => r.status === "rejected",
+      );
+
+      if (failedUploads.length > 0) {
+        console.error(
+          "[generate-invoice] Some files failed to upload to Google Drive:",
+          failedUploads,
+        );
+        return {
+          ok: false,
+          kind: "upload_failed",
+          error: "[generate-invoice] Failed to upload invoices to Google Drive",
+          report: {
+            invoiceENgeneratedSuccessfully,
+            invoicePLgeneratedSuccessfully,
+            savedToGoogleDrive: false,
+            notifiedByTelegram: false,
+            notifiedByEmail: false,
+            totalTimeTook: formatDuration(performance.now() - startTime),
+          },
+        };
+      }
+
+      savedToGoogleDrive = true;
+    } catch (err) {
+      console.error("[generate-invoice] Google Drive setup failed:", err);
+
       return {
         ok: false,
         kind: "upload_failed",
-        error: "[generate-invoice] Failed to upload invoices to Google Drive",
+        error: `[generate-invoice] Failed to initialize Google Drive: ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`,
         report: {
           invoiceENgeneratedSuccessfully,
           invoicePLgeneratedSuccessfully,
@@ -335,8 +359,6 @@ export async function generateInvoice(
         },
       };
     }
-
-    savedToGoogleDrive = true;
   }
 
   // ─── Step 4: Dispatch notifications ──────────────────────────────────────

@@ -1,6 +1,6 @@
 "use client";
 
-import { INITIAL_INVOICE_DATA } from "@/app/constants";
+import { getInitialInvoiceData } from "@/app/constants";
 import {
   invoiceSchema,
   METADATA_LOCAL_STORAGE_KEY,
@@ -210,19 +210,19 @@ export function AppPageClient({
         if (templateValidation.success) {
           // if no data in local storage and template is in url, set initial data with template from url
           setInvoiceDataState({
-            ...INITIAL_INVOICE_DATA,
+            ...getInitialInvoiceData(),
             template: templateValidation.data,
           });
         } else {
           // if no data in local storage, set initial data
-          setInvoiceDataState(INITIAL_INVOICE_DATA);
+          setInvoiceDataState(getInitialInvoiceData());
         }
       }
     } catch (error) {
       console.error("Failed to load saved invoice data:", error);
 
       // fallback to initial data on error
-      setInvoiceDataState(INITIAL_INVOICE_DATA);
+      setInvoiceDataState(getInitialInvoiceData());
 
       toast.error(
         "Unable to load your saved invoice data. For your convenience, we've reset the form to default values. Please try creating a new invoice.",

@@ -26,14 +26,14 @@ const MOCK_ENV = {
   UPSTASH_REDIS_REST_TOKEN: "redis-token",
 } as const;
 
-const mockGenerateInvoice = vi.fn();
+const mockRunProduction = vi.fn();
 const mockIpLimiterLimit = vi.fn();
 
 vi.mock("@/env", () => ({ env: { ...MOCK_ENV } }));
 
-vi.mock("../generate-invoice", () => ({
-  generateInvoice: (...args: unknown[]) =>
-    mockGenerateInvoice(...args) as unknown as Promise<GenerateInvoiceResult>,
+vi.mock("../run-production-generate-invoice", () => ({
+  runProductionGenerateMonthlyInvoice: (...args: unknown[]) =>
+    mockRunProduction(...args) as unknown as Promise<GenerateInvoiceResult>,
 }));
 
 vi.mock("@/lib/rate-limit", () => ({
@@ -41,34 +41,6 @@ vi.mock("@/lib/rate-limit", () => ({
     limit: (...args: unknown[]) =>
       mockIpLimiterLimit(...args) as unknown as Promise<{ success: boolean }>,
   },
-}));
-
-// Stub modules that route.tsx imports to build deps — not exercised when generateInvoice is mocked
-vi.mock("@react-pdf/renderer", () => ({
-  renderToBuffer: vi.fn(),
-  Document: vi.fn(),
-  Page: vi.fn(),
-  Font: { register: vi.fn() },
-}));
-
-vi.mock("../render-pdf-on-server", () => ({
-  InvoicePdfTemplateToRenderOnBackend: vi.fn(),
-  getEnglishInvoiceRealData: () => ({}),
-  getPolishInvoiceRealData: () => ({}),
-}));
-
-vi.mock("@/lib/google-drive", () => ({
-  initializeGoogleDrive: vi.fn(),
-  createOrFindInvoiceFolder: vi.fn(),
-  uploadFile: vi.fn(),
-}));
-
-vi.mock("@/lib/resend", () => ({
-  resend: { emails: { send: vi.fn() } },
-}));
-
-vi.mock("@/lib/telegram", () => ({
-  sendTelegramMessage: vi.fn(),
 }));
 
 function createRequest({
@@ -114,11 +86,11 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
       expect(await response.text()).toBe("Unauthorized");
     });
 
-    it("should not call generateInvoice when unauthorized", async () => {
+    it("should not call runProductionGenerateMonthlyInvoice when unauthorized", async () => {
       const { GET } = await import("../route");
       await GET(createRequest());
 
-      expect(mockGenerateInvoice).not.toHaveBeenCalled();
+      expect(mockRunProduction).not.toHaveBeenCalled();
     });
   });
 
@@ -159,13 +131,13 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
       expect(mockIpLimiterLimit).toHaveBeenCalledWith("127.0.0.1");
     });
 
-    it("should not call generateInvoice when rate limited", async () => {
+    it("should not call runProductionGenerateMonthlyInvoice when rate limited", async () => {
       mockIpLimiterLimit.mockResolvedValue({ success: false });
 
       const { GET } = await import("../route");
       await GET(createRequest({ authToken: TEST_AUTH_TOKEN }));
 
-      expect(mockGenerateInvoice).not.toHaveBeenCalled();
+      expect(mockRunProduction).not.toHaveBeenCalled();
     });
   });
 
@@ -174,8 +146,8 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
       mockIpLimiterLimit.mockResolvedValue({ success: true });
     });
 
-    it("should return 200 when generateInvoice succeeds", async () => {
-      mockGenerateInvoice.mockResolvedValue({ ok: true, report: MOCK_REPORT });
+    it("should return 200 when runProductionGenerateMonthlyInvoice succeeds", async () => {
+      mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
 
       const { GET } = await import("../route");
       const response = await GET(createRequest({ authToken: TEST_AUTH_TOKEN }));
@@ -187,8 +159,8 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
       expect(body.message).toBe("Invoice generated and sent successfully");
     });
 
-    it("should return 400 when generateInvoice returns no_attachments", async () => {
-      mockGenerateInvoice.mockResolvedValue({
+    it("should return 400 when runProductionGenerateMonthlyInvoice returns no_attachments", async () => {
+      mockRunProduction.mockResolvedValue({
         ok: false,
         kind: "no_attachments",
         error: "[generate-invoice] No attachments found",
@@ -203,8 +175,8 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
       expect(body.error).toContain("No attachments found");
     });
 
-    it("should return 500 when generateInvoice returns upload_failed", async () => {
-      mockGenerateInvoice.mockResolvedValue({
+    it("should return 500 when runProductionGenerateMonthlyInvoice returns upload_failed", async () => {
+      mockRunProduction.mockResolvedValue({
         ok: false,
         kind: "upload_failed",
         error: "[generate-invoice] Failed to upload invoices to Google Drive",
@@ -219,8 +191,8 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
       expect(body.error).toContain("Failed to upload invoices to Google Drive");
     });
 
-    it("should return 500 when generateInvoice returns notification_failed", async () => {
-      mockGenerateInvoice.mockResolvedValue({
+    it("should return 500 when runProductionGenerateMonthlyInvoice returns notification_failed", async () => {
+      mockRunProduction.mockResolvedValue({
         ok: false,
         kind: "notification_failed",
         error: "[generate-invoice] Failed to generate and send invoice",
@@ -235,8 +207,8 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
       expect(body.error).toContain("Failed to generate and send invoice");
     });
 
-    it("should return 500 when generateInvoice throws unexpectedly", async () => {
-      mockGenerateInvoice.mockRejectedValueOnce(new Error("Unexpected crash"));
+    it("should return 500 when runProductionGenerateMonthlyInvoice throws unexpectedly", async () => {
+      mockRunProduction.mockRejectedValueOnce(new Error("Unexpected crash"));
 
       const { GET } = await import("../route");
       const response = await GET(createRequest({ authToken: TEST_AUTH_TOKEN }));
@@ -247,7 +219,7 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
     });
 
     it("should pass shouldSendEmail=false when query param is set", async () => {
-      mockGenerateInvoice.mockResolvedValue({ ok: true, report: MOCK_REPORT });
+      mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
 
       const { GET } = await import("../route");
       await GET(
@@ -257,26 +229,26 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
         }),
       );
 
-      const callInput = mockGenerateInvoice.mock.calls[0][1] as unknown as {
+      const callOptions = mockRunProduction.mock.calls[0][0] as unknown as {
         shouldSendEmail: boolean;
       };
-      expect(callInput.shouldSendEmail).toBe(false);
+      expect(callOptions.shouldSendEmail).toBe(false);
     });
 
     it("should pass shouldSendEmail=true by default", async () => {
-      mockGenerateInvoice.mockResolvedValue({ ok: true, report: MOCK_REPORT });
+      mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
 
       const { GET } = await import("../route");
       await GET(createRequest({ authToken: TEST_AUTH_TOKEN }));
 
-      const callInput = mockGenerateInvoice.mock.calls[0][1] as unknown as {
+      const callOptions = mockRunProduction.mock.calls[0][0] as unknown as {
         shouldSendEmail: boolean;
       };
-      expect(callInput.shouldSendEmail).toBe(true);
+      expect(callOptions.shouldSendEmail).toBe(true);
     });
 
     it("should pass shouldUploadToGoogleDrive=false when query param is set", async () => {
-      mockGenerateInvoice.mockResolvedValue({ ok: true, report: MOCK_REPORT });
+      mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
 
       const { GET } = await import("../route");
       await GET(
@@ -286,22 +258,22 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
         }),
       );
 
-      const callInput = mockGenerateInvoice.mock.calls[0][1] as unknown as {
+      const callOptions = mockRunProduction.mock.calls[0][0] as {
         shouldUploadToGoogleDrive: boolean;
       };
-      expect(callInput.shouldUploadToGoogleDrive).toBe(false);
+      expect(callOptions.shouldUploadToGoogleDrive).toBe(false);
     });
 
     it("should pass shouldUploadToGoogleDrive=true by default", async () => {
-      mockGenerateInvoice.mockResolvedValue({ ok: true, report: MOCK_REPORT });
+      mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
 
       const { GET } = await import("../route");
       await GET(createRequest({ authToken: TEST_AUTH_TOKEN }));
 
-      const callInput = mockGenerateInvoice.mock.calls[0][1] as unknown as {
+      const callOptions = mockRunProduction.mock.calls[0][0] as {
         shouldUploadToGoogleDrive: boolean;
       };
-      expect(callInput.shouldUploadToGoogleDrive).toBe(true);
+      expect(callOptions.shouldUploadToGoogleDrive).toBe(true);
     });
   });
 });
