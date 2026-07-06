@@ -444,7 +444,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       {/* Final section */}
       <div className="space-y-4" data-testid={`final-section`}>
         <div className="">
-          {/* Total field (with currency) */}
+          {/* Total field (with currency) (calculated automatically - read only field in the UI) */}
           <div className="mt-5" />
           <Label htmlFor={`total`} className="mb-1">
             Total

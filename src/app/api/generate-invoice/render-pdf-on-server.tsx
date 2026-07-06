@@ -211,6 +211,8 @@ const ENGLISH_INVOICE_PROD_DATA_BASE = {
 >;
 
 /**
+ * **NOTE: Used only on server side**
+ *
  * Returns **English invoice data** with current default dates.
  *
  * Spreads ENGLISH_INVOICE_PROD_DATA_BASE and injects freshly computed date fields
@@ -229,9 +231,11 @@ export function getEnglishInvoiceRealData() {
 }
 
 /**
+ * **NOTE: Used only on server side**
+ *
  * Returns **Polish invoice data** with current default dates.
  *
- * Spreads English invoice data and injects freshly computed date fields
+ * Spreads English invoice data and injects freshly computed **date fields**
  * using getInvoiceDefaultDates() on each call, ensuring no stale data due to
  * serverless warm starts.
  *
@@ -241,6 +245,8 @@ export function getPolishInvoiceRealData(englishInvoiceData: InvoiceData) {
   return {
     ...englishInvoiceData,
     language: "pl",
+    // INFO: below we override some field translations for the Polish invoice data
+    invoiceType: "Odwrotne obciążenie",
     invoiceNumberObject: {
       label: translateInvoiceNumberLabel({ language: "pl" }),
       value:

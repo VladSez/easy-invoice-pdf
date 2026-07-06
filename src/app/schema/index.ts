@@ -830,12 +830,21 @@ export const invoiceItemSchema = z.object({
 
   vatFieldIsVisible: z.boolean().default(true),
 
+  /**
+   * Net Amount (**calculated automatically** - read only field in the UI)
+   */
   netAmount: z.coerce.number().nonnegative("Net amount must be non-negative"),
   netAmountFieldIsVisible: z.boolean().default(true),
 
+  /**
+   * VAT Amount (**calculated automatically** - read only field in the UI)
+   */
   vatAmount: z.coerce.number().nonnegative("VAT amount must be non-negative"),
   vatAmountFieldIsVisible: z.boolean().default(true),
 
+  /**
+   * Pre-tax Amount (**calculated automatically** - read only field in the UI)
+   */
   preTaxAmount: z.coerce
     .number()
     .nonnegative("Pre-tax amount must be non-negative"),
@@ -1105,7 +1114,7 @@ export const invoiceObjectSchema = z.object({
     ),
 
   /**
-   * Renamed from "Invoice Type" to "Header Notes" on UI to better reflect its purpose
+   * Field "Invoice Type" renamed to "Header Notes" in **UI** for clarity; stores invoice header notes.
    */
   invoiceType: z
     .string()
@@ -1113,7 +1122,7 @@ export const invoiceObjectSchema = z.object({
     .trim()
     .optional(),
   /**
-   * Renamed to "Header Notes" on UI to better reflect its purpose
+   * Field "Invoice Type" renamed to "Header Notes" in **UI** for clarity; toggles visibility of the field in the PDF.
    */
   invoiceTypeFieldIsVisible: z.boolean().default(true),
 
@@ -1121,6 +1130,10 @@ export const invoiceObjectSchema = z.object({
   buyer: buyerSchema,
 
   items: z.array(invoiceItemSchema).min(1, "At least one item is required"),
+
+  /**
+   * Total (**calculated automatically** - read only field in the UI)
+   */
   total: z.coerce.number().nonnegative("Total must be non-negative"),
 
   // Show/hide VAT Table Summary on PDF

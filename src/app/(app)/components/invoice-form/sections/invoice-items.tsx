@@ -594,7 +594,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                   ) : null}
                 </div>
 
-                {/* Invoice Item Net Amount (calculated automatically) */}
+                {/* Invoice Item Net Amount (calculated automatically - read only) */}
                 <Controller
                   name={`items.${index}.netAmount`}
                   control={control}
@@ -628,7 +628,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                 )}
               </div>
 
-              {/* Invoice Item Tax Amount (calculated automatically) */}
+              {/* Invoice Item Tax Amount (calculated automatically - read only) */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemVatAmount${index}`} className="">
@@ -701,7 +701,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                 )}
               </div>
 
-              {/* Pre-tax Amount field */}
+              {/* Pre-tax Amount field (calculated automatically - read only) */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemPreTaxAmount${index}`} className="">
