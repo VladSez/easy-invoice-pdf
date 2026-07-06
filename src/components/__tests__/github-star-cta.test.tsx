@@ -55,6 +55,42 @@ describe("GitHubStarCTA", () => {
     expect(within(link).queryByText("Star on GitHub")).not.toBeInTheDocument();
   });
 
+  it("should show two-decimal compact star count for values like 2350", () => {
+    const githubStarsCount = 2350;
+
+    renderGitHubStarCTA(githubStarsCount);
+
+    const link = screen.getByTestId("github-star-cta-button");
+
+    expect(within(link).getByText("2.35k")).toBeInTheDocument();
+
+    expect(within(link).queryByText("Star on GitHub")).not.toBeInTheDocument();
+  });
+
+  it("should show unabbreviated star count for three-digit values", () => {
+    const githubStarsCount = 969;
+
+    renderGitHubStarCTA(githubStarsCount);
+
+    const link = screen.getByTestId("github-star-cta-button");
+
+    expect(within(link).getByText("969")).toBeInTheDocument();
+
+    expect(within(link).queryByText("Star on GitHub")).not.toBeInTheDocument();
+  });
+
+  it("should show lowercase formatted star count when count is over 10k", () => {
+    const githubStarsCount = 15000;
+
+    renderGitHubStarCTA(githubStarsCount);
+
+    const link = screen.getByTestId("github-star-cta-button");
+
+    expect(within(link).getByText("15k")).toBeInTheDocument();
+
+    expect(within(link).queryByText("Star on GitHub")).not.toBeInTheDocument();
+  });
+
   it("should show Star on GitHub label in button when count is 0", () => {
     renderGitHubStarCTA(0);
 
