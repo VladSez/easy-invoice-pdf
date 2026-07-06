@@ -99,10 +99,12 @@ describe("POST /api/telegram-webhook — HTTP layer", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     waitUntilPromises.length = 0;
+
     mockSendTelegramMessage.mockResolvedValue(undefined);
     mockQueueInvoiceGeneration.mockResolvedValue(true);
     mockClearQueuedJob.mockResolvedValue(undefined);
     mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
+
     delete process.env.VERCEL_ENV;
   });
 
@@ -210,7 +212,7 @@ describe("POST /api/telegram-webhook — HTTP layer", () => {
       expect(mockClearQueuedJob).toHaveBeenCalledWith(CHAT_ID);
     });
 
-    it("should enable email and drive upload in production", async () => {
+    it("should complete production background generation without failure notification", async () => {
       process.env.VERCEL_ENV = "production";
 
       const { POST } = await import("../route");
@@ -221,6 +223,11 @@ describe("POST /api/telegram-webhook — HTTP layer", () => {
         shouldSendEmail: true,
         shouldUploadToGoogleDrive: true,
       });
+      expect(mockSendTelegramMessage).toHaveBeenCalledTimes(1);
+      expect(mockSendTelegramMessage).toHaveBeenCalledWith({
+        message: "⏳ Generating invoices... Please wait.",
+      });
+      expect(mockClearQueuedJob).toHaveBeenCalledWith(CHAT_ID);
     });
 
     it("should notify on generation failure when kind is not notification_failed", async () => {

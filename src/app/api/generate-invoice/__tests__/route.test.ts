@@ -146,7 +146,7 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
       mockIpLimiterLimit.mockResolvedValue({ success: true });
     });
 
-    it("should return 200 when runProductionGenerateMonthlyInvoice succeeds", async () => {
+    it("should return 200 with success message and full report when runProductionGenerateMonthlyInvoice succeeds", async () => {
       mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
 
       const { GET } = await import("../route");
@@ -154,9 +154,13 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
 
       expect(response.status).toBe(200);
 
-      const body = (await response.json()) as unknown as { message: string };
+      const body = (await response.json()) as {
+        message: string;
+        report: GenerateInvoiceReport;
+      };
 
       expect(body.message).toBe("Invoice generated and sent successfully");
+      expect(body.report).toEqual(MOCK_REPORT);
     });
 
     it("should return 400 when runProductionGenerateMonthlyInvoice returns no_attachments", async () => {

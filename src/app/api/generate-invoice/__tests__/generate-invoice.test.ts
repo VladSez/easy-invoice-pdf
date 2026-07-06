@@ -177,11 +177,20 @@ describe("generateInvoice", () => {
       const deps = buildDeps();
       await generateInvoice(deps, MOCK_INPUT);
 
+      // Get call order numbers for each uploadFile invocation
       const uploadCalls = vi.mocked(deps.uploadFile).mock.invocationCallOrder;
+
+      // Last uploadFile() invocation (want to ensure all uploads precede notifications)
       const lastUploadOrder = uploadCalls[uploadCalls.length - 1];
+
+      // Get call order numbers for the first sendTelegramMessage and sendEmail calls
       const telegramOrder = vi.mocked(deps.sendTelegramMessage).mock
         .invocationCallOrder[0];
+      const emailOrder = vi.mocked(deps.sendEmail).mock.invocationCallOrder[0];
+
+      // Assert each notification happens after all PDF uploads
       expect(lastUploadOrder).toBeLessThan(telegramOrder);
+      expect(lastUploadOrder).toBeLessThan(emailOrder);
     });
   });
 
