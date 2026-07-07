@@ -17,7 +17,8 @@ export const SERVER_PDF_MOCK_INVOICE_DATA = {
   ...MOCK_INVOICE_DATA,
   logo: "",
   invoiceType: "Reverse Charge",
-  notes: "Reverse Charge",
+  notes:
+    "Test PDF for server-side rendering using <InvoicePdfTemplateToRenderOnBackend/> in src/app/api/generate-invoice/render-pdf-on-server.tsx. Used to validate server PDF generation.",
   items: MOCK_INVOICE_DATA.items.map((item) => ({
     ...item,
     typeOfGTUFieldIsVisible: false,

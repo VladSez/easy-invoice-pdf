@@ -6,10 +6,14 @@ import path from "node:path";
 import { test, expect } from "@playwright/test";
 import { renderPdfOnCanvas } from "../utils/render-pdf-on-canvas";
 
+// IMPORTANT - we use spawnServerPdfRender() to generate server-side PDF files for visual regression testing
 /**
  * Spawn child process to render invoice PDF on server, for a given language.
+ *
  * Uses Vitest to run export-server-pdf.test.ts, which writes PDF to temp file.
+ *
  * Returns Buffer of generated PDF. Deletes temp file after reading.
+ *
  * Throws error if process fails or PDF not created.
  */
 function spawnServerPdfRender(language: "en" | "pl"): Buffer {

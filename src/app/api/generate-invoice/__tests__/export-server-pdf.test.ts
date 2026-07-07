@@ -6,6 +6,11 @@ import { describe, expect, it, vi } from "vitest";
 
 import { SERVER_PDF_MOCK_INVOICE_DATA } from "./pdf-test-utils";
 
+import {
+  getPolishInvoiceRealData,
+  renderInvoicePdfBuffer,
+} from "../render-pdf-on-server";
+
 vi.mock("@/env", () => ({
   env: {
     AUTH_TOKEN: "test-auth-token",
@@ -35,15 +40,19 @@ vi.mock("@/env", () => ({
   },
 }));
 
-import {
-  getPolishInvoiceRealData,
-  renderInvoicePdfBuffer,
-} from "../render-pdf-on-server";
-
 const exportPath = process.env.PDF_EXPORT_PATH;
 const exportLanguage = process.env.PDF_EXPORT_LANG === "pl" ? "pl" : "en";
 
-// we run this test only on e2e (e2e/server-render-pdf.test.ts)
+// IMPORTANT: we use this test to write out PDF buffer to disk for visual regression testing that is used in e2e/server-render-pdf.test.ts
+/**
+ * Export server PDF test needed for end-to-end visual regression.
+ *
+ * e2e/server-render-pdf.test.ts spawns this test (in a child process)
+ * to generate actual server-side PDF files, enabling snapshot comparison
+ * of rendered invoices in Playwright. Not run during normal CI test suite.
+ *
+ * **ONLY PURPOSE**: write out PDF buffer to disk as e2e artifact.
+ */
 describe.skipIf(!exportPath)("export server PDF for e2e", () => {
   it("writes PDF buffer to disk", async () => {
     const invoiceData =
