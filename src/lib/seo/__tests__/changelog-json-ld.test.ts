@@ -7,7 +7,7 @@ import {
 import { JSON_LD_IDS } from "../json-ld-ids";
 
 describe("buildChangelogIndexJsonLdGraph", () => {
-  it("includes CollectionPage, Blog, and BreadcrumbList", () => {
+  it("includes CollectionPage, Blog, Organization, and BreadcrumbList", () => {
     const graph = buildChangelogIndexJsonLdGraph("2026-01-15");
     const parsed = JSON.parse(JSON.stringify(graph)) as {
       "@graph": Array<Record<string, unknown>>;
@@ -18,17 +18,22 @@ describe("buildChangelogIndexJsonLdGraph", () => {
       "@type": "CollectionPage",
       "@id": "https://easyinvoicepdf.com/changelog#webpage",
       isPartOf: { "@id": JSON_LD_IDS.website },
-      about: { "@id": JSON_LD_IDS.person },
+      about: { "@id": JSON_LD_IDS.organization },
     });
 
     expect(nodes[1]).toMatchObject({
       "@type": "Blog",
       "@id": JSON_LD_IDS.blog,
       dateModified: "2026-01-15",
-      publisher: { "@id": JSON_LD_IDS.person },
+      publisher: { "@id": JSON_LD_IDS.organization },
     });
 
     expect(nodes[2]).toMatchObject({
+      "@type": "Organization",
+      "@id": JSON_LD_IDS.organization,
+    });
+
+    expect(nodes[3]).toMatchObject({
       "@type": "BreadcrumbList",
       "@id": "https://easyinvoicepdf.com/changelog#breadcrumb",
     });
@@ -50,7 +55,7 @@ describe("buildChangelogIndexJsonLdGraph", () => {
 });
 
 describe("buildChangelogPostJsonLdGraph", () => {
-  it("links BlogPosting to blog and person", () => {
+  it("links BlogPosting to blog and organization", () => {
     const graph = buildChangelogPostJsonLdGraph({
       slug: "test-release",
       metadata: {
@@ -72,8 +77,8 @@ describe("buildChangelogPostJsonLdGraph", () => {
       "@id": "https://easyinvoicepdf.com/changelog/test-release#blogposting",
       headline: "Test Release",
       datePublished: "2026-02-01",
-      author: { "@id": JSON_LD_IDS.person },
-      publisher: { "@id": JSON_LD_IDS.person },
+      author: { "@id": JSON_LD_IDS.organization },
+      publisher: { "@id": JSON_LD_IDS.organization },
       isPartOf: { "@id": JSON_LD_IDS.blog },
     });
 
@@ -97,7 +102,7 @@ describe("buildChangelogPostJsonLdGraph", () => {
     };
     const webPage = parsed["@graph"][0];
     const blogPosting = parsed["@graph"][1];
-    const breadcrumb = parsed["@graph"][2] as {
+    const breadcrumb = parsed["@graph"][3] as {
       itemListElement: Array<{ name: string }>;
     };
 

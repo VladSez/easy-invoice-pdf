@@ -19,7 +19,7 @@ test.describe("About page", () => {
     await expect(page).toHaveURL("/en/about");
 
     await expect(page).toHaveTitle(
-      "Free Invoice Generator PDF - EasyInvoicePDF",
+      "About EasyInvoicePDF - Free, Open-Source Invoice Generator",
     );
 
     const header = page.getByRole("banner");

@@ -57,9 +57,9 @@ export const SEO_LANDING_DEFINITIONS = {
   "invoice-generator-no-login": {
     slug: "invoice-generator-no-login",
     metadata: {
-      title: "Create Free Invoices Online - No Login Required",
+      title: "Invoice Generator With No Login or Signup Required",
       description:
-        "Generate professional invoices in seconds with EasyInvoicePDF. No account, no signup, no tracking, no ads. Free, open-source, browser-based. Start creating your PDF.",
+        "Skip the account creation. Generate and download a PDF invoice in seconds - no login, no email, no credit card required.",
       keywords:
         "free invoice generator no login, easy invoice, create invoice PDF, generate PDF invoice, invoice PDF without account, no signup invoice maker, instant invoice PDF, browser invoice generator, no ads invoice generator, ad-free invoice PDF",
     },
@@ -129,19 +129,19 @@ export const SEO_LANDING_DEFINITIONS = {
     ],
     faq: [
       {
-        question: "Do I need an account to create invoices?",
+        question: "Do I need to create an account?",
         answer:
-          "No. Open the app and start generating invoices immediately. No email, no password required. Save invoices as PDF files or share via links when supported.",
+          "No. Open the app and start generating invoices immediately. No email, no password, and no signup required. Save invoices as PDF files or share via links when supported.",
+      },
+      {
+        question: "Is it really free?",
+        answer:
+          "Yes. EasyInvoicePDF is free to use with no paywalls, no premium tiers, and no credit card required. The project is open-source on GitHub.",
       },
       {
         question: "Is my data stored?",
         answer:
           "No. Everything runs locally in your browser. Your invoice data is not uploaded to a server for normal editing and PDF generation.",
-      },
-      {
-        question: "Is it really free?",
-        answer:
-          "Yes. EasyInvoicePDF is free to use with no paywalls, no premium tiers, and no signup gate. The project is open-source on GitHub.",
       },
       {
         question: "How do I create a free invoice?",
@@ -168,9 +168,9 @@ export const SEO_LANDING_DEFINITIONS = {
   "open-source-invoice-generator": {
     slug: "open-source-invoice-generator",
     metadata: {
-      title: "Free Open-Source Invoice Generator - Easy to Use",
+      title: "Open Source Invoice Generator (Free, No Signup) | EasyInvoicePDF",
       description:
-        "Generate PDF invoices instantly in your browser. Fully open-source, customizable code, self-hostable. Free forever, no vendor lock-in, no ads. Open the app and try it.",
+        "Create professional PDF invoices with a free, open-source generator. No account, no signup, no watermark. Try it instantly in your browser.",
       keywords:
         "open source invoice generator, self-hosted invoice PDF, easy invoice PDF, free invoice software github, customizable invoice template, AGPL invoice tool, no ads invoice, ad-free open source",
     },

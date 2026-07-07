@@ -1,5 +1,5 @@
 /**
- * Site-wide JSON-LD entities (WebSite, Person, WebApplication).
+ * Site-wide JSON-LD entities (WebSite, Organization, Person, WebApplication).
  *
  * Content-accuracy rules:
  * - Never add JSON-LD for content not rendered on the page.
@@ -37,6 +37,8 @@ export const FOUNDER_PAGE_DESCRIPTION =
 
 export const OG_IMAGE_URL = `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`;
 
+const START_INVOICING_URL = `${JSON_LD_BASE}/?template=default`;
+
 const WEB_APPLICATION_FEATURES = [
   "Live preview as you type",
   "No sign-up needed",
@@ -70,7 +72,7 @@ export function buildFullWebSite() {
     description: SITE_DESCRIPTION,
     inLanguage: "en",
     publisher: {
-      "@id": JSON_LD_IDS.person,
+      "@id": JSON_LD_IDS.organization,
     },
     image: {
       "@type": "ImageObject" as const,
@@ -78,6 +80,16 @@ export function buildFullWebSite() {
       url: OG_IMAGE_URL,
       caption: "EasyInvoicePDF",
     },
+  };
+}
+
+export function buildOrganization() {
+  return {
+    "@type": "Organization" as const,
+    "@id": JSON_LD_IDS.organization,
+    name: "EasyInvoicePDF",
+    url: `${JSON_LD_BASE}/`,
+    sameAs: [GITHUB_URL],
   };
 }
 
@@ -112,7 +124,7 @@ export function buildWebApplication() {
     applicationCategory: "BusinessApplication",
     featureList: [...WEB_APPLICATION_FEATURES],
     creator: {
-      "@id": JSON_LD_IDS.person,
+      "@id": JSON_LD_IDS.organization,
     },
     sameAs: [GITHUB_URL],
     offers: {
@@ -120,12 +132,51 @@ export function buildWebApplication() {
       price: "0",
       priceCurrency: "EUR",
     },
+    potentialAction: {
+      "@type": "UseAction" as const,
+      name: "Start Invoicing",
+      target: START_INVOICING_URL,
+    },
+  };
+}
+
+export function buildSiteNavigationList() {
+  return {
+    "@type": "ItemList" as const,
+    "@id": JSON_LD_IDS.siteNavigation,
+    name: "Site navigation",
+    itemListElement: [
+      {
+        "@type": "ListItem" as const,
+        position: 1,
+        name: "Start Invoicing",
+        item: START_INVOICING_URL,
+      },
+      {
+        "@type": "ListItem" as const,
+        position: 2,
+        name: "About",
+        item: `${JSON_LD_BASE}/en/about`,
+      },
+      {
+        "@type": "ListItem" as const,
+        position: 3,
+        name: "Changelog",
+        item: `${JSON_LD_BASE}/changelog`,
+      },
+      {
+        "@type": "ListItem" as const,
+        position: 4,
+        name: "Terms of Service",
+        item: `${JSON_LD_BASE}/tos`,
+      },
+    ],
   };
 }
 
 export function buildSiteWideJsonLdGraph() {
   return {
     "@context": "https://schema.org" as const,
-    "@graph": [buildSlimWebSite(), buildPerson()],
+    "@graph": [buildSlimWebSite()],
   };
 }

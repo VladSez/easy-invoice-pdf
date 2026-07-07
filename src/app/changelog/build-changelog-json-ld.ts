@@ -7,17 +7,17 @@ import {
   pageBreadcrumbId,
   pageWebPageId,
 } from "@/lib/seo/json-ld-ids";
-import { OG_IMAGE_URL } from "@/lib/seo/site-entities";
+import { buildOrganization, OG_IMAGE_URL } from "@/lib/seo/site-entities";
 
 import { formatChangelogDate, type ChangelogEntry } from "./utils";
 
 const CHANGELOG_INDEX_URL = `${PROD_WEBSITE_URL}/changelog`;
 
-const CHANGELOG_INDEX_TITLE =
-  "Changelog | EasyInvoicePDF - Free Invoice PDF Generator";
+export const CHANGELOG_INDEX_TITLE =
+  "EasyInvoicePDF Changelog - Latest Features & Updates";
 
-const CHANGELOG_INDEX_DESCRIPTION =
-  "Explore the latest updates, new features, and improvements to EasyInvoicePDF.com - the free, open-source invoice generator.";
+export const CHANGELOG_INDEX_DESCRIPTION =
+  "See what's new in EasyInvoicePDF: Stripe templates, QR codes, and ongoing improvements to our free invoice generator.";
 
 export function buildChangelogIndexJsonLdGraph(
   latestDateModified: string | null,
@@ -39,7 +39,7 @@ export function buildChangelogIndexJsonLdGraph(
           "@id": pageBreadcrumbId(CHANGELOG_INDEX_URL),
         },
         about: {
-          "@id": JSON_LD_IDS.person,
+          "@id": JSON_LD_IDS.organization,
         },
       },
       {
@@ -56,9 +56,10 @@ export function buildChangelogIndexJsonLdGraph(
         inLanguage: "en",
         ...(latestDateModified ? { dateModified: latestDateModified } : {}),
         publisher: {
-          "@id": JSON_LD_IDS.person,
+          "@id": JSON_LD_IDS.organization,
         },
       },
+      buildOrganization(),
       buildBreadcrumbList(CHANGELOG_INDEX_URL, [
         { name: "Home", item: `${PROD_WEBSITE_URL}/` },
         { name: "Changelog" },
@@ -105,16 +106,17 @@ export function buildChangelogPostJsonLdGraph(entry: ChangelogEntry): Graph {
           "@id": JSON_LD_IDS.blog,
         },
         author: {
-          "@id": JSON_LD_IDS.person,
+          "@id": JSON_LD_IDS.organization,
         },
         publisher: {
-          "@id": JSON_LD_IDS.person,
+          "@id": JSON_LD_IDS.organization,
         },
         image: {
           "@type": "ImageObject",
           url: OG_IMAGE_URL,
         },
       },
+      buildOrganization(),
       buildBreadcrumbList(pageUrl, [
         { name: "Home", item: `${PROD_WEBSITE_URL}/` },
         { name: "Changelog", item: CHANGELOG_INDEX_URL },

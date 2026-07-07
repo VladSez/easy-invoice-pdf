@@ -7,14 +7,17 @@ import {
 } from "@/config";
 import type { Metadata } from "next";
 import { ChangelogIndexJsonLd } from "./changelog-index-json-ld";
+import {
+  CHANGELOG_INDEX_DESCRIPTION,
+  CHANGELOG_INDEX_TITLE,
+} from "./build-changelog-json-ld";
 
 // Enable static generation for changelog layout
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
-  title: "Changelog  | EasyInvoicePDF - Free & Open-Source Invoice Generator",
-  description:
-    "Explore the latest updates, new features, and improvements to EasyInvoicePDF.com - the free, open-source invoice generator. Track our development progress and upcoming features.",
+  title: CHANGELOG_INDEX_TITLE,
+  description: CHANGELOG_INDEX_DESCRIPTION,
   keywords: [
     "changelog",
     "updates",
@@ -44,9 +47,8 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Changelog | EasyInvoicePDF - Free Invoice PDF Generator",
-    description:
-      "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.",
+    title: CHANGELOG_INDEX_TITLE,
+    description: CHANGELOG_INDEX_DESCRIPTION,
     siteName: "EasyInvoicePDF.com | Free Invoice PDF Generator",
     type: "website",
     locale: "en_US",
@@ -62,9 +64,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Changelog | Free Invoice PDF Generator",
-    description:
-      "Stay up to date with the latest features, improvements, and bug fixes in EasyInvoicePDF.com",
+    title: CHANGELOG_INDEX_TITLE,
+    description: CHANGELOG_INDEX_DESCRIPTION,
     creator: TWITTER_CREATOR,
     images: [
       {

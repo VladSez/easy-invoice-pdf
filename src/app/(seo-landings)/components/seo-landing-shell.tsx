@@ -3,12 +3,12 @@ import { BlackGoToAppButton } from "@/app/(components)/header/go-to-app-button-c
 import { GITHUB_URL } from "@/config";
 import Link from "next/link";
 
-import { SeoLandingJsonLd } from "./seo-landing-json-ld";
 import {
   type ComparisonTable,
   type SeoLandingDefinition,
   type SeoSection,
 } from "../seo-landing-definitions";
+import { SeoLandingJsonLd } from "./seo-landing-json-ld";
 import { StickySeoCta } from "@/app/(seo-landings)/components/sticky-seo-cta";
 import { Button } from "@/components/ui/button";
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
@@ -30,7 +30,6 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
     <>
       {/** Sticky CTA component displayed at bottom of SEO landing pages. */}
       <StickySeoCta href={definition.hero.ctaHref} />
-      {/** Renders JSON-LD structured data for SEO landing pages. */}
       <SeoLandingJsonLd definition={definition} />
 
       <div className="flex min-h-screen flex-col bg-slate-50">

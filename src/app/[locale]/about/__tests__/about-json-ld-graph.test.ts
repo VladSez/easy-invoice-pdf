@@ -38,6 +38,19 @@ describe("buildAboutJsonLdGraph", () => {
     expect(breadcrumb).toMatchObject({
       "@type": "BreadcrumbList",
       "@id": "https://easyinvoicepdf.com/pl/about#breadcrumb",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://easyinvoicepdf.com/",
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: plMessages.About.buttons.home,
+        },
+      ],
     });
 
     const mainEntity = faqPage.mainEntity as { name: string }[];

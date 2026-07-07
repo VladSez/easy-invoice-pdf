@@ -8,6 +8,7 @@ import {
   pageWebPageId,
 } from "@/lib/seo/json-ld-ids";
 import {
+  buildPerson,
   FOUNDER_PAGE_DESCRIPTION,
   FOUNDER_PAGE_TITLE,
   FOUNDER_PAGE_URL,
@@ -19,6 +20,7 @@ export function buildFounderJsonLdGraph(): Graph {
   return {
     "@context": "https://schema.org",
     "@graph": [
+      buildPerson(),
       {
         "@type": "ProfilePage",
         "@id": pageWebPageId(pageUrl),

@@ -5,6 +5,8 @@ import { JsonLdScript } from "@/lib/seo/render-json-ld";
 import { JSON_LD_IDS } from "@/lib/seo/json-ld-ids";
 import {
   buildFullWebSite,
+  buildOrganization,
+  buildSiteNavigationList,
   buildWebApplication,
   HOME_PAGE_DESCRIPTION,
   SITE_NAME,
@@ -17,7 +19,9 @@ export function buildHomeJsonLdGraph(): Graph {
     "@context": "https://schema.org",
     "@graph": [
       buildFullWebSite(),
+      buildOrganization(),
       buildWebApplication(),
+      buildSiteNavigationList(),
       {
         "@type": "WebPage",
         "@id": `${pageUrl}#webpage`,
@@ -30,6 +34,9 @@ export function buildHomeJsonLdGraph(): Graph {
         },
         mainEntity: {
           "@id": JSON_LD_IDS.app,
+        },
+        hasPart: {
+          "@id": JSON_LD_IDS.siteNavigation,
         },
       },
     ],
