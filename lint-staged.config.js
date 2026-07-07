@@ -6,7 +6,7 @@ module.exports = {
     `pnpm run lint`,
     `pnpm run check-github-actions-security`, // zizmor is used to check the security of the GitHub Actions workflows https://docs.zizmor.sh/
     `pnpm run knip`,
-    `pnpm run vitest --reporter=verbose`,
+    `pnpm run vitest --run --reporter=verbose`,
     `pnpm run prettify --write`,
   ],
 };

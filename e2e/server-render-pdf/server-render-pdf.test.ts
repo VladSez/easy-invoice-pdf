@@ -12,7 +12,7 @@ import { renderPdfOnCanvas } from "../utils/render-pdf-on-canvas";
  *
  * Uses Vitest to run export-server-pdf.test.ts, which writes PDF to temp file.
  *
- * Returns Buffer of generated PDF. Deletes temp file after reading.
+ * Returns Buffer of generated PDF. Always deletes temp file before returning or throwing.
  *
  * Throws error if process fails or PDF not created.
  */
@@ -23,40 +23,39 @@ function spawnServerPdfRender(language: "en" | "pl"): Buffer {
     `server-pdf-${language}-${process.pid}-${Date.now()}.pdf`,
   );
 
-  // Run vitest test that generates PDF, passing env vars for output and language
-  const result = spawnSync(
-    "pnpm",
-    [
-      "vitest",
-      "run",
-      "src/app/api/generate-invoice/__tests__/export-server-pdf.test.ts",
-    ],
-    {
-      cwd: process.cwd(),
-      env: {
-        ...process.env,
-        PDF_EXPORT_PATH: tmpFile, // test will write PDF here
-        PDF_EXPORT_LANG: language, // test will use this language
-      },
-      stdio: "pipe",
-      encoding: "utf-8",
-    },
-  );
-
-  // If test failed, throw error with stdout/stderr for debugging
-  if (result.status !== 0) {
-    throw new Error(
-      `Server PDF render failed (${language}):\n${result.stdout}\n${result.stderr}`,
-    );
-  }
-
-  // Check that temp PDF file was created
-  if (!fs.existsSync(tmpFile)) {
-    throw new Error(`Server PDF file was not created: ${tmpFile}`);
-  }
-
-  // Read and return PDF buffer, ensure temp file is deleted afterwards
   try {
+    // Run vitest test that generates PDF, passing env vars for output and language
+    const result = spawnSync(
+      "pnpm",
+      [
+        "vitest",
+        "run",
+        "src/app/api/generate-invoice/__tests__/export-server-pdf.test.ts",
+      ],
+      {
+        cwd: process.cwd(),
+        env: {
+          ...process.env,
+          PDF_EXPORT_PATH: tmpFile, // test will write PDF here
+          PDF_EXPORT_LANG: language, // test will use this language
+        },
+        stdio: "pipe",
+        encoding: "utf-8",
+      },
+    );
+
+    // If test failed, throw error with stdout/stderr for debugging
+    if (result.status !== 0) {
+      throw new Error(
+        `Server PDF render failed (${language}):\n${result.stdout}\n${result.stderr}`,
+      );
+    }
+
+    // Check that temp PDF file was created
+    if (!fs.existsSync(tmpFile)) {
+      throw new Error(`Server PDF file was not created: ${tmpFile}`);
+    }
+
     return fs.readFileSync(tmpFile);
   } finally {
     fs.rmSync(tmpFile, { force: true });
