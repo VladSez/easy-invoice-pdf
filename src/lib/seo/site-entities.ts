@@ -26,7 +26,7 @@ const SITE_DESCRIPTION =
   "Create and download professional invoices instantly with EasyInvoicePDF. Free and open-source. No signup required.";
 
 export const HOME_PAGE_DESCRIPTION =
-  "Create invoices online for free with our PDF invoice generator. Customize templates, download instantly, no signup required.";
+  "Create professional PDF invoices online for free. Customize invoice templates, add your logo, download instantly, and send invoices without signup.";
 
 export const FOUNDER_PAGE_URL = `${PROD_WEBSITE_URL}/founder`;
 

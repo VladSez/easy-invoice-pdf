@@ -42,7 +42,7 @@ describe("buildAboutJsonLdGraph", () => {
         {
           "@type": "ListItem",
           position: 1,
-          name: "Home",
+          name: "Start Invoicing",
           item: "https://easyinvoicepdf.com/",
         },
         {

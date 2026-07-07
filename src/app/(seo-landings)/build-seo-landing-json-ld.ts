@@ -79,7 +79,7 @@ export function buildSeoLandingJsonLd(
   };
 
   const breadcrumb = buildBreadcrumbList(pageUrl, [
-    { name: "Home", item: `${baseUrl}/` },
+    { name: "Start Invoicing", item: `${baseUrl}/` },
     { name: definition.metadata.title },
   ]);
 

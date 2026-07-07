@@ -39,7 +39,7 @@ export function buildFounderJsonLdGraph(): Graph {
         },
       },
       buildBreadcrumbList(pageUrl, [
-        { name: "Home", item: `${PROD_WEBSITE_URL}/` },
+        { name: "Start Invoicing", item: `${PROD_WEBSITE_URL}/` },
         { name: "Founder" },
       ]),
     ],

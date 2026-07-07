@@ -53,7 +53,7 @@ test.describe("Stripe Invoice Template", () => {
       page.locator('meta[property="og:description"]'),
     ).toHaveAttribute(
       "content",
-      "Create invoices online for free with our PDF invoice generator. Customize templates, download instantly, no signup required.",
+      "Create professional PDF invoices online for free. Customize invoice templates, add your logo, download instantly, and send invoices without signup.",
     );
     await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
       "content",

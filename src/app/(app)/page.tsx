@@ -9,10 +9,10 @@ import { computeIndexingFlags } from "@/lib/seo/indexing-utils";
 import * as Sentry from "@sentry/nextjs";
 
 const APP_PAGE_DESCRIPTION =
-  "Create invoices online for free with our PDF invoice generator. Customize templates, download instantly, no signup required.";
+  "Create professional PDF invoices online for free. Customize invoice templates, add your logo, download instantly, and send invoices without signup.";
 
 const DEFAULT_TEMPLATE_META = {
-  title: "Free Invoice Generator - Create PDF Invoices Instantly",
+  title: "Free Invoice Generator - Create PDF Invoices Online",
   canonical: `${APP_URL}/`, // we use root URL as canonical for SEO purposes
   images: [
     {

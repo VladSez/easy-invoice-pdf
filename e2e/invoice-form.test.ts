@@ -63,13 +63,13 @@ test.describe("Invoice Generator Page", () => {
     // Check other meta tags for Stripe template
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
       "content",
-      "Free Invoice Generator - Create PDF Invoices Instantly",
+      "Free Invoice Generator - Create PDF Invoices Online",
     );
     await expect(
       page.locator('meta[property="og:description"]'),
     ).toHaveAttribute(
       "content",
-      "Create invoices online for free with our PDF invoice generator. Customize templates, download instantly, no signup required.",
+      "Create professional PDF invoices online for free. Customize invoice templates, add your logo, download instantly, and send invoices without signup.",
     );
     await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
       "content",
@@ -95,7 +95,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Check title and branding
     await expect(page).toHaveTitle(
-      "Free Invoice Generator - Create PDF Invoices Instantly",
+      "Free Invoice Generator - Create PDF Invoices Online",
     );
 
     const header = page.getByTestId("header");

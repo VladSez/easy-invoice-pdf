@@ -86,7 +86,7 @@ describe("site-entities", () => {
 describe("buildBreadcrumbList", () => {
   it("should build ordered crumbs with optional last item URL", () => {
     const breadcrumb = buildBreadcrumbList("https://easyinvoicepdf.com/foo", [
-      { name: "Home", item: "https://easyinvoicepdf.com/" },
+      { name: "Start Invoicing", item: "https://easyinvoicepdf.com/" },
       { name: "Foo" },
     ]);
 
@@ -97,7 +97,7 @@ describe("buildBreadcrumbList", () => {
         {
           "@type": "ListItem",
           position: 1,
-          name: "Home",
+          name: "Start Invoicing",
           item: "https://easyinvoicepdf.com/",
         },
         {

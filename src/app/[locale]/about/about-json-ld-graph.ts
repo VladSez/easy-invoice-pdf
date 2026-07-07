@@ -26,7 +26,7 @@ export function buildAboutJsonLdGraph(
 ): Graph {
   const pageUrl = `${baseUrl}/${locale}/about`;
   const faqUrl = pageFaqId(pageUrl);
-  const homeLabel = "Home";
+  const homeLabel = "Start Invoicing";
   const aboutLabel = messages.About.buttons.home;
 
   const faqEntities = ABOUT_FAQ_ITEM_KEYS.map((key) => {

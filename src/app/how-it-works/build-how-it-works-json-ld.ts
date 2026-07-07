@@ -58,7 +58,7 @@ export function buildHowItWorksJsonLd(baseUrl = PROD_WEBSITE_URL): Graph {
         },
       },
       buildBreadcrumbList(pageUrl, [
-        { name: "Home", item: `${baseUrl}/` },
+        { name: "Start Invoicing", item: `${baseUrl}/` },
         { name: "How it works" },
       ]),
     ],
