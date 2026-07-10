@@ -12,9 +12,9 @@ on:
     # - if the 10th is a weekday -> run on 10th
     # - if the 10th is Saturday -> run on Monday 12th
     # - if the 10th is Sunday -> run on Monday 11th
-    # GitHub Actions cron is UTC-only; 11:35 UTC = 12:35 in Warsaw (CET, UTC+1).
-    # During Warsaw summer time (CEST, UTC+2) this will run at 13:35 local instead.
-    - cron: "35 11 10-12 * *"
+    # GitHub Actions cron is UTC-only; 10:35 UTC = 12:35 in Warsaw summer time (CEST, UTC+2).
+    # During Warsaw winter time (CET, UTC+1) this will run at 11:35 local instead.
+    - cron: "35 10 10-12 * *"
 
 jobs:
   recurring-invoice:
