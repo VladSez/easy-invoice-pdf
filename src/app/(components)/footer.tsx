@@ -92,15 +92,9 @@ export function Footer({ links, translations }: FooterProps) {
             </div>
           </div>
           <div className="grid grid-cols-1 gap-10 md:ml-20 md:flex-1 md:grid-cols-2">
-            <div className="space-y-5" data-testid="footer-social-links">
-              <h3 className="text-base font-semibold text-slate-800">
-                {resources}
-              </h3>
-              {footerLinks}
-            </div>
-            <div className="space-y-10">
+            <div className="order-2 space-y-10 md:order-1">
               <div className="space-y-5" data-testid="footer-about-links">
-                <h3 className="text-base font-semibold text-slate-800">
+                <h3 className="text-lg font-semibold text-slate-800">
                   About EasyInvoicePDF
                 </h3>
                 <ul className="grid grid-cols-2 gap-x-6 gap-y-2">
@@ -117,7 +111,7 @@ export function Footer({ links, translations }: FooterProps) {
                 </ul>
               </div>
               <div className="space-y-5" data-testid="footer-solutions-links">
-                <h3 className="text-base font-semibold text-slate-800">
+                <h3 className="text-lg font-semibold text-slate-800">
                   Solutions
                 </h3>
                 <ul className="space-y-2">
@@ -133,6 +127,15 @@ export function Footer({ links, translations }: FooterProps) {
                   ))}
                 </ul>
               </div>
+            </div>
+            <div
+              className="order-1 space-y-5 md:order-2"
+              data-testid="footer-social-links"
+            >
+              <h3 className="text-lg font-semibold text-slate-800">
+                {resources}
+              </h3>
+              {footerLinks}
             </div>
           </div>
         </div>
@@ -203,7 +206,7 @@ export function FooterLinkGroup({
 }) {
   return (
     <div className="space-y-2">
-      <p className="text-sm font-semibold uppercase tracking-wide text-slate-800">
+      <p className="text-sm font-semibold uppercase tracking-wide text-slate-700">
         {heading}
       </p>
       <ul className="space-y-2">
