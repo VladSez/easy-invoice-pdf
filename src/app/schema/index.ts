@@ -685,6 +685,24 @@ export const LANGUAGE_TO_LABEL = {
   nl: "Dutch",
 } as const satisfies Record<SupportedLanguages, string>;
 
+/**
+ * Mapping from language code to its native language label.
+ * Used for language selectors, footer, and UI where displaying the language in its native form is preferred.
+ * Example: { en: "English", pl: "Polski" }
+ */
+export const LANGUAGE_TO_NATIVE_LABEL = {
+  en: "English",
+  pl: "Polski",
+  de: "Deutsch",
+  es: "Español",
+  pt: "Português",
+  ru: "Русский",
+  uk: "Українська",
+  fr: "Français",
+  it: "Italiano",
+  nl: "Nederlands",
+} as const satisfies Record<SupportedLanguages, string>;
+
 export const SUPPORTED_DATE_FORMATS = [
   "YYYY-MM-DD", // 2024-03-20 (default template date format)
   "DD/MM/YYYY", // 20/03/2024

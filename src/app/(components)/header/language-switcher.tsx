@@ -1,5 +1,6 @@
 "use client";
 
+import { LANGUAGE_TO_NATIVE_LABEL } from "@/app/schema";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { GlobeIcon } from "lucide-react";
 import type { Locale } from "next-intl";
@@ -19,18 +20,10 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
-const MAP_LOCALE_TO_LANGUAGE = {
-  en: "English",
-  pl: "Polski",
-  de: "Deutsch",
-  es: "Español",
-  pt: "Português",
-  ru: "Русский",
-  uk: "Українська",
-  fr: "Français",
-  it: "Italiano",
-  nl: "Nederlands",
-} as const satisfies Record<Locale, string>;
+const MAP_LOCALE_TO_LANGUAGE = LANGUAGE_TO_NATIVE_LABEL satisfies Record<
+  Locale,
+  string
+>;
 
 type SupportedLocale = keyof typeof MAP_LOCALE_TO_LANGUAGE;
 type LanguageLabel = (typeof MAP_LOCALE_TO_LANGUAGE)[SupportedLocale];

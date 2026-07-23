@@ -3,10 +3,10 @@ import { ProjectLogoDescription } from "@/app/(components)/project-logo-descript
 import { cn } from "@/lib/utils";
 
 export function Logo({
-  text,
+  description,
   className,
 }: {
-  text: string;
+  description: React.ReactNode;
   className?: string;
 }) {
   return (
@@ -16,7 +16,14 @@ export function Logo({
 
         {/* show app logo and description on desktop */}
         <div className="hidden sm:block">
-          <ProjectLogoDescription text={text} />
+          <ProjectLogoDescription
+            title={
+              <p className="text-balance text-xl font-bold text-slate-800 lg:text-2xl">
+                EasyInvoicePDF
+              </p>
+            }
+            description={description}
+          />
         </div>
 
         {/* show only app name on mobile (to save space) */}

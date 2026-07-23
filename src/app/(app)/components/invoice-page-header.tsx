@@ -54,7 +54,18 @@ export function InvoicePageHeader({
         <div className="relative bottom-2 mt-2 flex w-full flex-col justify-center sm:bottom-4 sm:mt-0">
           <div className="flex items-center">
             <ProjectLogo className="h-8 w-8" />
-            <ProjectLogoDescription text="Free & Open-Source Invoice Generator" />
+            <ProjectLogoDescription
+              title={
+                <h1 className="text-balance text-xl font-bold text-slate-800 lg:text-2xl">
+                  EasyInvoicePDF
+                </h1>
+              }
+              description={
+                <h2 className="text-balance text-[12px] text-slate-700 sm:text-[13px]">
+                  Free & Open-Source Invoice Generator
+                </h2>
+              }
+            />
           </div>
         </div>
         {/* desktop only section (hidden on mobile) */}

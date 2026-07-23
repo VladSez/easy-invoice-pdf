@@ -49,7 +49,11 @@ export function HeaderClient({
           <div className="flex h-full items-center justify-between gap-4">
             {/* App logo  */}
             <Logo
-              text={translations.navLinks.tagline}
+              description={
+                <p className="text-balance text-[12px] text-slate-700 sm:text-[13px]">
+                  {translations.navLinks.tagline}
+                </p>
+              }
               className="text-sm min-[375px]:text-base"
             />
 
