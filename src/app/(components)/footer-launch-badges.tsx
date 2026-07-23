@@ -87,6 +87,20 @@ export function FooterLaunchBadges() {
         />
       </a>
 
+      {/* Badge for Featured on EasyDoFollow */}
+      <a
+        href="https://easydofollow.dev/finance/easyinvoicepdf"
+        target="_blank"
+        rel="noopener"
+      >
+        <img
+          src="https://easydofollow.dev/badge/easydofollow-badge-light.svg"
+          alt="Featured on EasyDoFollow"
+          width="188"
+          height="56"
+        />
+      </a>
+
       {/* Badge for Launched on Tiny Startups */}
       <a
         href="https://www.tinystartups.com/startup/easyinvoicepdf"
