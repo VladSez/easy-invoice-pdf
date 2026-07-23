@@ -73,6 +73,20 @@ export function FooterLaunchBadges() {
         />
       </a>
 
+      {/* Badge for Featured on EasyLaunch */}
+      <a
+        href="https://easylaunch.dev/finance/easyinvoicepdf"
+        target="_blank"
+        rel="noopener"
+      >
+        <img
+          src="https://easylaunch.dev/badge/easylaunch-badge-light.svg"
+          alt="Featured on EasyLaunch"
+          width="188"
+          height="56"
+        />
+      </a>
+
       {/* Badge for Launched on Tiny Startups */}
       <a
         href="https://www.tinystartups.com/startup/easyinvoicepdf"
