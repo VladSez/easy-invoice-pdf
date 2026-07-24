@@ -57,6 +57,8 @@
     "footer": {
       "description": "Een gratis, open-source tool voor het maken van professionele PDF-facturen met realtime voorbeeld.<br></br><br></br>Geen boekhoudsoftware. Geen nalevingsgaranties. Door deze tool te gebruiken, gaat u akkoord met de <tosLink>Servicevoorwaarden</tosLink>.",
       "headings": {
+        "about": "Over EasyInvoicePDF",
+        "solutions": "Oplossingen",
         "product": "Product",
         "company": "Bedrijf",
         "community": "Community"

@@ -62,6 +62,8 @@ const aboutSchema = z
         description: z.string(),
         headings: z
           .object({
+            about: z.string(),
+            solutions: z.string(),
             product: z.string(),
             company: z.string(),
             community: z.string(),

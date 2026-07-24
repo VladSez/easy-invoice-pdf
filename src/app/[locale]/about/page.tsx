@@ -84,6 +84,9 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
         </main>
         <Footer
           translations={{
+            tagline: t("tagline"),
+            aboutHeading: t("footer.headings.about"),
+            solutionsHeading: t("footer.headings.solutions"),
             footerDescription: t.rich("footer.description", {
               br: () => <br />,
               tosLink: (chunks) => (

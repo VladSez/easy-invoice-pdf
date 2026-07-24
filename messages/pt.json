@@ -57,6 +57,8 @@
     "footer": {
       "description": "Uma ferramenta gratuita de código aberto para criar faturas PDF profissionais com pré-visualização em tempo real.<br></br><br></br>Não é um software de contabilidade. Sem garantias de conformidade. Ao usar esta ferramenta, você concorda com os <tosLink>Termos de serviço</tosLink>.",
       "headings": {
+        "about": "Sobre o EasyInvoicePDF",
+        "solutions": "Soluções",
         "product": "Produto",
         "company": "Empresa",
         "community": "Comunidade"

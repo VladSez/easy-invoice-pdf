@@ -15,6 +15,9 @@ import Link from "next/link";
 interface FooterProps {
   links?: React.ReactNode;
   translations?: {
+    tagline: string;
+    aboutHeading: string;
+    solutionsHeading: string;
     footerDescription: React.ReactNode;
     footerCreatedBy: string;
     resources: string;
@@ -26,6 +29,10 @@ export function Footer({ links, translations }: FooterProps) {
   const footerDescription =
     translations?.footerDescription ?? DEFAULT_FOOTER_DESCRIPTION;
 
+  const tagline =
+    translations?.tagline ?? "Free & Open-Source Invoice Generator";
+  const aboutHeading = translations?.aboutHeading ?? "About EasyInvoicePDF";
+  const solutionsHeading = translations?.solutionsHeading ?? "Solutions";
   const footerCreatedBy = translations?.footerCreatedBy ?? "Made by";
   const resources = translations?.resources ?? "Resources";
 
@@ -47,7 +54,7 @@ export function Footer({ links, translations }: FooterProps) {
                   </a>
                 </p>
                 <p className="text-balance text-[12px] text-slate-700 sm:text-[13px]">
-                  Free & Open-Source Invoice Generator
+                  {tagline}
                 </p>
               </div>
             </div>
@@ -95,7 +102,7 @@ export function Footer({ links, translations }: FooterProps) {
             <div className="order-2 space-y-10 md:order-1">
               <div className="space-y-5" data-testid="footer-about-links">
                 <h3 className="text-lg font-semibold text-slate-800">
-                  About EasyInvoicePDF
+                  {aboutHeading}
                 </h3>
                 <ul className="grid grid-cols-2 gap-x-6 gap-y-2">
                   {SUPPORTED_LANGUAGES.map((lang) => (
@@ -112,7 +119,7 @@ export function Footer({ links, translations }: FooterProps) {
               </div>
               <div className="space-y-5" data-testid="footer-solutions-links">
                 <h3 className="text-lg font-semibold text-slate-800">
-                  Solutions
+                  {solutionsHeading}
                 </h3>
                 <ul className="space-y-2">
                   {SEO_FOOTER_SOLUTION_LINKS.map(({ slug, label }) => (
