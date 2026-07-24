@@ -57,6 +57,8 @@
     "footer": {
       "description": "Ein kostenloses Open-Source-Tool zur Erstellung professioneller PDF-Rechnungen mit Live-Vorschau.<br></br><br></br>Keine Buchhaltungssoftware. Keine Compliance-Garantien. Durch die Nutzung dieses Tools stimmen Sie den <tosLink>Nutzungsbedingungen</tosLink> zu.",
       "headings": {
+        "about": "Über EasyInvoicePDF",
+        "solutions": "Lösungen",
         "product": "Produkt",
         "company": "Unternehmen",
         "community": "Community"

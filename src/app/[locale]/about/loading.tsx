@@ -1,4 +1,4 @@
-import { FooterSkeleton } from "@/app/(components)/footer-skeleton";
+import { Footer } from "@/app/(components)/footer";
 import { HeaderSkeleton } from "@/app/(components)/header/header-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -57,11 +57,11 @@ export default function AboutLoading() {
           </div>
         </section>
 
-        {/* Newsletter Section */}
+        {/* FAQ Section */}
         <section className="flex w-full items-center justify-center bg-white py-12 md:py-24">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
+              <div className="w-full space-y-2">
                 <Skeleton className="mx-auto h-10 w-[60%]" />
                 <Skeleton className="mx-auto h-16 w-[80%]" />
               </div>
@@ -75,24 +75,20 @@ export default function AboutLoading() {
         {/* CTA Section */}
         <section className="flex w-full items-center justify-center bg-slate-900 py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <Skeleton className="mx-auto h-10 w-[60%]" />
-                <Skeleton className="mx-auto h-16 w-[80%]" />
-              </div>
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <Skeleton className="h-4 w-[200px]" />
               <div className="flex w-full flex-col items-center justify-center gap-6">
-                <div className="flex w-full flex-col justify-center gap-2 md:flex-row">
+                <div className="flex gap-2">
                   <Skeleton className="h-11 w-[160px]" />
                   <Skeleton className="h-11 w-[160px]" />
                 </div>
               </div>
-              <Skeleton className="h-4 w-[200px]" />
             </div>
           </div>
         </section>
       </main>
 
-      <FooterSkeleton />
+      <Footer />
     </div>
   );
 }

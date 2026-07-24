@@ -57,6 +57,8 @@
     "footer": {
       "description": "Darmowe narzędzie open-source do tworzenia profesjonalnych faktur PDF z podglądem w czasie rzeczywistym.<br></br><br></br>Nie jest oprogramowaniem księgowym. Brak gwarancji zgodności. Korzystając z tego narzędzia, akceptujesz <tosLink>Regulamin</tosLink>.",
       "headings": {
+        "about": "O EasyInvoicePDF",
+        "solutions": "Rozwiązania",
         "product": "Produkt",
         "company": "Firma",
         "community": "Społeczność"

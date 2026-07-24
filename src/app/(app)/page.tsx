@@ -31,7 +31,7 @@ const DEFAULT_TEMPLATE_META = {
 
 const STRIPE_TEMPLATE_META = {
   title: "Stripe Invoice Template - Create Free PDF Invoice",
-  canonical: `${APP_URL}/`, // we use root URL as canonical for SEO purposes
+  canonical: `${APP_URL}/?template=stripe`, // self-referencing canonical so the Stripe template is indexed as its own page
   images: [
     {
       url: `${STATIC_ASSETS_URL}/stripe-og.png?v=1755773921680`,
@@ -90,13 +90,10 @@ function buildTemplateMetadata(
  * Resolves `robots` metadata for the main invoice app URL (`/`).
  *
  * Indexing is allowed only when `shouldIndex` is true (production deploy,
- * no shareable `?data=` payload). Otherwise behavior depends on template:
- * Stripe template URLs use `noindex` but `follow` so crawlers may discover links
- * without indexing a duplicate variant; all other non-indexable cases use strict
+ * no shareable `?data=` payload). All non-indexable cases use strict
  * `noindex,nofollow` (including preview builds and share links).
  *
- * @param shouldIndex - Whether this response should be treated as the canonical indexable homepage.
- * @param isStripeTemplate - Whether `template=stripe` is active (affects fallback when not indexable).
+ * @param shouldIndex - Whether this response should be indexable.
  * @returns Next.js `Metadata.robots` object for this page.
  */
 function resolveAppPageRobots(

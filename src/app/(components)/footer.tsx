@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 import { FooterLaunchBadges } from "@/app/(components)/footer-launch-badges";
 import { SEO_FOOTER_SOLUTION_LINKS } from "@/app/(seo-landings)/seo-landing-footer-links";
+import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_LANGUAGES } from "@/app/schema";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import {
   DISCORD_COMMUNITY_URL,
@@ -14,6 +15,9 @@ import Link from "next/link";
 interface FooterProps {
   links?: React.ReactNode;
   translations?: {
+    tagline: string;
+    aboutHeading: string;
+    solutionsHeading: string;
     footerDescription: React.ReactNode;
     footerCreatedBy: string;
     resources: string;
@@ -25,6 +29,10 @@ export function Footer({ links, translations }: FooterProps) {
   const footerDescription =
     translations?.footerDescription ?? DEFAULT_FOOTER_DESCRIPTION;
 
+  const tagline =
+    translations?.tagline ?? "Free & Open-Source Invoice Generator";
+  const aboutHeading = translations?.aboutHeading ?? "About EasyInvoicePDF";
+  const solutionsHeading = translations?.solutionsHeading ?? "Solutions";
   const footerCreatedBy = translations?.footerCreatedBy ?? "Made by";
   const resources = translations?.resources ?? "Resources";
 
@@ -35,15 +43,20 @@ export function Footer({ links, translations }: FooterProps) {
           <div className="space-y-4 md:w-1/3">
             <div className="flex items-center">
               <ProjectLogo className="size-8" />
-              <p className="text-balance text-center text-xl font-bold text-slate-800 sm:mt-0 sm:text-2xl lg:mr-5 lg:text-left">
-                <a
-                  href="https://easyinvoicepdf.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  EasyInvoicePDF
-                </a>
-              </p>
+              <div className="flex flex-col -space-y-0.5">
+                <p className="text-balance text-xl font-bold text-slate-800 lg:text-2xl">
+                  <a
+                    href="https://easyinvoicepdf.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    EasyInvoicePDF
+                  </a>
+                </p>
+                <p className="text-balance text-[12px] text-slate-700 sm:text-[13px]">
+                  {tagline}
+                </p>
+              </div>
             </div>
             <p className="text-sm text-slate-700">{footerDescription}</p>
             <div className="flex gap-4" data-testid="footer-logos-social-links">
@@ -86,25 +99,47 @@ export function Footer({ links, translations }: FooterProps) {
             </div>
           </div>
           <div className="grid grid-cols-1 gap-10 md:ml-20 md:flex-1 md:grid-cols-2">
-            <div className="space-y-5" data-testid="footer-solutions-links">
-              <h3 className="text-base font-semibold text-slate-800">
-                Solutions
-              </h3>
-              <ul className="space-y-2">
-                {SEO_FOOTER_SOLUTION_LINKS.map(({ slug, label }) => (
-                  <li key={slug}>
-                    <Link
-                      href={`/${slug}`}
-                      className="text-sm text-slate-500 hover:text-slate-900"
-                    >
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+            <div className="order-2 space-y-10 md:order-1">
+              <div className="space-y-5" data-testid="footer-about-links">
+                <h3 className="text-lg font-semibold text-slate-800">
+                  {aboutHeading}
+                </h3>
+                <ul className="grid grid-cols-2 gap-x-6 gap-y-2">
+                  {SUPPORTED_LANGUAGES.map((lang) => (
+                    <li key={lang}>
+                      <Link
+                        href={`/${lang}/about`}
+                        className="text-sm text-slate-500 hover:text-slate-900"
+                      >
+                        {LANGUAGE_TO_NATIVE_LABEL[lang]}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="space-y-5" data-testid="footer-solutions-links">
+                <h3 className="text-lg font-semibold text-slate-800">
+                  {solutionsHeading}
+                </h3>
+                <ul className="space-y-2">
+                  {SEO_FOOTER_SOLUTION_LINKS.map(({ slug, label }) => (
+                    <li key={slug}>
+                      <Link
+                        href={`/${slug}`}
+                        className="text-sm text-slate-500 hover:text-slate-900"
+                      >
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-            <div className="space-y-5" data-testid="footer-social-links">
-              <h3 className="text-base font-semibold text-slate-800">
+            <div
+              className="order-1 space-y-5 md:order-2"
+              data-testid="footer-social-links"
+            >
+              <h3 className="text-lg font-semibold text-slate-800">
                 {resources}
               </h3>
               {footerLinks}
@@ -112,7 +147,7 @@ export function Footer({ links, translations }: FooterProps) {
           </div>
         </div>
         {/* LAUNCH Badges */}
-        <div className="mb-7 mt-10 flex flex-wrap items-center gap-3">
+        <div className="mb-7 mt-10 flex flex-wrap items-center gap-3 md:mt-20">
           <FooterLaunchBadges />
         </div>
 
@@ -178,7 +213,7 @@ export function FooterLinkGroup({
 }) {
   return (
     <div className="space-y-2">
-      <p className="text-sm font-light uppercase tracking-wide text-slate-900">
+      <p className="text-sm font-semibold uppercase tracking-wide text-slate-700">
         {heading}
       </p>
       <ul className="space-y-2">

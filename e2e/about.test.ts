@@ -6,6 +6,10 @@ import {
   TWITTER_URL,
   VIDEO_DEMO_FALLBACK_IMG,
 } from "@/config";
+import {
+  LANGUAGE_TO_NATIVE_LABEL,
+  SUPPORTED_LANGUAGES,
+} from "@/app/schema";
 import { expect, test } from "@playwright/test";
 
 test.describe("About page", () => {
@@ -441,7 +445,7 @@ test.describe("About page", () => {
     await page
       .getByRole("button", { name: "Switch language", exact: true })
       .click();
-    await page.getByText("Français").click();
+    await page.getByRole("menuitem", { name: "Français" }).click();
 
     await expect(page).toHaveURL("/fr/about");
 
@@ -449,6 +453,55 @@ test.describe("About page", () => {
 
     await expect(
       header.getByRole("link", {
+        name: "Ouvrir",
+        exact: true,
+      }),
+    ).toBeVisible();
+  });
+
+  test("should display footer about language links", async ({ page }) => {
+    await page.goto("/en/about");
+
+    const footer = page.getByRole("contentinfo");
+    const footerAboutLinks = footer.getByTestId("footer-about-links");
+
+    await expect(
+      footerAboutLinks.getByRole("heading", {
+        level: 3,
+        name: "About EasyInvoicePDF",
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    for (const lang of SUPPORTED_LANGUAGES) {
+      const link = footerAboutLinks.getByRole("link", {
+        name: LANGUAGE_TO_NATIVE_LABEL[lang],
+        exact: true,
+      });
+
+      await expect(link).toBeVisible();
+      await expect(link).toHaveAttribute("href", `/${lang}/about`);
+      await expect(link).not.toHaveAttribute("target", "_blank");
+    }
+  });
+
+  test("should navigate to localized about page from footer language link", async ({
+    page,
+  }) => {
+    await page.goto("/en/about");
+
+    const footerAboutLinks = page
+      .getByRole("contentinfo")
+      .getByTestId("footer-about-links");
+
+    await footerAboutLinks
+      .getByRole("link", { name: "Français", exact: true })
+      .click();
+
+    await expect(page).toHaveURL("/fr/about");
+
+    await expect(
+      page.getByRole("banner").getByRole("link", {
         name: "Ouvrir",
         exact: true,
       }),

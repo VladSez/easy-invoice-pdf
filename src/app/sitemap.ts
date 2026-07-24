@@ -17,6 +17,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 1,
     },
+    // Stripe invoice template variant of the main app page
+    {
+      url: `${APP_URL}/?template=stripe`,
+      lastModified,
+      changeFrequency: "daily",
+      priority: 1,
+    },
     // About pages in all languages
     ...SUPPORTED_LANGUAGES.map((locale) => ({
       url: `${APP_URL}/${locale}/about`,

@@ -84,6 +84,9 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
         </main>
         <Footer
           translations={{
+            tagline: t("tagline"),
+            aboutHeading: t("footer.headings.about"),
+            solutionsHeading: t("footer.headings.solutions"),
             footerDescription: t.rich("footer.description", {
               br: () => <br />,
               tosLink: (chunks) => (
@@ -209,7 +212,7 @@ function HeroSection() {
               </h1>
 
               <div className="flex justify-center xl:justify-start">
-                <p className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
+                <h2 className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
                   {(() => {
                     let colorIndex = 0;
 
@@ -235,7 +238,7 @@ function HeroSection() {
                       },
                     });
                   })()}
-                </p>
+                </h2>
               </div>
             </div>
 

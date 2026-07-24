@@ -49,6 +49,8 @@
     "footer": {
       "description": "Un outil gratuit et open-source pour créer des factures PDF professionnelles avec aperçu en temps réel.<br></br><br></br>Pas un logiciel de comptabilité. Aucune garantie de conformité. En utilisant cet outil, vous acceptez les <tosLink>Conditions d'utilisation</tosLink>.",
       "headings": {
+        "about": "À propos d'EasyInvoicePDF",
+        "solutions": "Solutions",
         "product": "Produit",
         "company": "Entreprise",
         "community": "Communauté"
