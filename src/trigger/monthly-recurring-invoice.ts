@@ -6,7 +6,6 @@ import {
   WARSAW_TIME_ZONE,
 } from "./warsaw-time";
 import { APP_URL } from "@/config";
-import { env } from "@/env";
 
 const INVOICE_API_URL = `${APP_URL}/api/generate-invoice` as const;
 
@@ -59,11 +58,15 @@ export const monthlyRecurringInvoice = schedules.task({
 });
 
 async function generateInvoice() {
+  if (!process.env.AUTH_TOKEN) {
+    throw new Error("AUTH_TOKEN is not set");
+  }
+
   logger.log(`Generating monthly recurring invoice: GET ${INVOICE_API_URL}`);
 
   const response = await fetch(INVOICE_API_URL, {
     headers: {
-      Authorization: `Bearer ${env.AUTH_TOKEN}`,
+      Authorization: `Bearer ${process.env.AUTH_TOKEN}`,
     },
     signal: AbortSignal.timeout(60_000),
   });

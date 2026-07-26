@@ -11,10 +11,6 @@ interface ScheduledTaskPayload {
   upcoming: Date[];
 }
 
-const MOCK_ENV = {
-  AUTH_TOKEN: TEST_AUTH_TOKEN,
-} as const;
-
 const mockLoggerLog = vi.fn();
 const mockWaitUntil = vi.fn();
 
@@ -27,8 +23,6 @@ type TaskConfig = {
 
 let runMonthlyRecurringInvoice: TaskRun | undefined;
 let monthlyRecurringInvoiceRetry: TaskConfig["retry"];
-
-vi.mock("@/env", () => ({ env: { ...MOCK_ENV } }));
 
 vi.mock("@trigger.dev/sdk", () => ({
   logger: {
@@ -81,6 +75,7 @@ function mockFetchResponse({
 describe("monthlyRecurringInvoice", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
+    process.env.AUTH_TOKEN = TEST_AUTH_TOKEN;
     mockWaitUntil.mockResolvedValue(undefined);
     vi.stubGlobal(
       "fetch",
@@ -92,6 +87,7 @@ describe("monthlyRecurringInvoice", () => {
   });
 
   afterEach(() => {
+    delete process.env.AUTH_TOKEN;
     vi.unstubAllGlobals();
   });
 
