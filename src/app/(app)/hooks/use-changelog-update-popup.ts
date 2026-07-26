@@ -3,7 +3,7 @@
 import type { ChangelogSummary } from "@/app/changelog/utils";
 import { shouldShowChangelogPopup } from "@/app/(app)/utils/changelog-seen-storage";
 import { hasSeenWelcomePopup } from "@/app/(app)/utils/welcome-popup-seen-storage";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /** Wait before showing so the page can settle first */
 const SHOW_DELAY_MS = 1_500;
@@ -25,9 +25,14 @@ interface UseChangelogUpdatePopupResult {
 
 function resolvePopupVariant(
   latestChangelog: ChangelogSummary | null,
+  skipChangelogThisSession: boolean,
 ): AppUpdatePopupVariant | null {
   if (!hasSeenWelcomePopup()) {
     return "welcome";
+  }
+
+  if (skipChangelogThisSession) {
+    return null;
   }
 
   if (latestChangelog && shouldShowChangelogPopup(latestChangelog.slug)) {
@@ -52,6 +57,8 @@ export function useChangelogUpdatePopup({
   const [isOpen, setIsOpen] = useState(false);
   const [variant, setVariant] = useState<AppUpdatePopupVariant | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  /** Blocks changelog popup in same session after welcome was shown */
+  const skipChangelogThisSessionRef = useRef(false);
 
   const dismiss = useCallback(() => {
     setIsOpen(false);
@@ -72,7 +79,10 @@ export function useChangelogUpdatePopup({
     }
 
     // Determine which popup (welcome/changelog) to show, if any
-    const nextVariant = resolvePopupVariant(latestChangelog);
+    const nextVariant = resolvePopupVariant(
+      latestChangelog,
+      skipChangelogThisSessionRef.current,
+    );
 
     // If no popup needed, reset state and exit
     if (!nextVariant) {
@@ -84,6 +94,10 @@ export function useChangelogUpdatePopup({
 
     // Delay showing the popup for a nicer UX
     const timer = window.setTimeout(() => {
+      if (nextVariant === "welcome") {
+        skipChangelogThisSessionRef.current = true;
+      }
+
       setVariant(nextVariant);
       setIsMounted(true);
       setIsOpen(true);
