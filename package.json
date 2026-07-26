@@ -34,8 +34,8 @@
     "update-github-actions": "pnpm actions-up --min-age=7",
     "check-github-actions-security": "zizmor .",
     "test-gh-actions-locally": "act --secret-file .github/workflows/.secrets",
-    "trigger:dev": "pnpm dlx trigger.dev@4.5.6 dev",
-    "trigger:deploy": "pnpm dlx trigger.dev@4.5.6 deploy"
+    "trigger:dev": "pnpm dlx trigger.dev dev",
+    "trigger:deploy": "pnpm dlx trigger.dev deploy"
   },
   "dependencies": {
     "@hookform/resolvers": "3.9.0",
