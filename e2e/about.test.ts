@@ -6,10 +6,7 @@ import {
   TWITTER_URL,
   VIDEO_DEMO_FALLBACK_IMG,
 } from "@/config";
-import {
-  LANGUAGE_TO_NATIVE_LABEL,
-  SUPPORTED_LANGUAGES,
-} from "@/app/schema";
+import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_LANGUAGES } from "@/app/schema";
 import { expect, test } from "@playwright/test";
 
 test.describe("About page", () => {

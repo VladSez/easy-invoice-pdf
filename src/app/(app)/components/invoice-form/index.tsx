@@ -523,9 +523,9 @@ export const InvoiceForm = memo(function InvoiceForm({
                 />
               )}
             />
-            {errors.paymentMethod && (
+            {errors.paymentMethod ? (
               <ErrorMessage>{errors.paymentMethod.message}</ErrorMessage>
-            )}
+            ) : null}
           </div>
         )}
 
@@ -542,9 +542,9 @@ export const InvoiceForm = memo(function InvoiceForm({
                 <Input {...field} id={`paymentDue`} type="date" className="" />
               )}
             />
-            {errors.paymentDue && (
+            {errors.paymentDue ? (
               <ErrorMessage>{errors.paymentDue.message}</ErrorMessage>
-            )}
+            ) : null}
             {!errors.paymentDue &&
             isPaymentDueBeforeDateOfIssue &&
             dateOfIssue ? (
@@ -645,9 +645,9 @@ export const InvoiceForm = memo(function InvoiceForm({
               />
             )}
           />
-          {errors?.notes && (
+          {errors?.notes ? (
             <ErrorMessage>{errors?.notes?.message}</ErrorMessage>
-          )}
+          ) : null}
         </div>
 
         {/* QR Code */}
@@ -703,9 +703,9 @@ export const InvoiceForm = memo(function InvoiceForm({
                 Enter any text or URL to generate a QR code. The QR code will
                 appear in the bottom section of the invoice PDF.
               </InputHelperMessage>
-              {errors.qrCodeData && (
+              {errors.qrCodeData ? (
                 <ErrorMessage>{errors.qrCodeData.message}</ErrorMessage>
-              )}
+              ) : null}
             </div>
 
             {/* QR Code Description */}
@@ -730,9 +730,9 @@ export const InvoiceForm = memo(function InvoiceForm({
                 Optional text that will be displayed below the QR code in the
                 PDF.
               </InputHelperMessage>
-              {errors.qrCodeDescription && (
+              {errors.qrCodeDescription ? (
                 <ErrorMessage>{errors.qrCodeDescription.message}</ErrorMessage>
-              )}
+              ) : null}
             </div>
           </div>
         </fieldset>
@@ -797,11 +797,11 @@ export const InvoiceForm = memo(function InvoiceForm({
                 <InputHelperMessage>
                   Name displayed above the signature line in the PDF.
                 </InputHelperMessage>
-                {errors.personAuthorizedToReceiveName && (
+                {errors.personAuthorizedToReceiveName ? (
                   <ErrorMessage>
                     {errors.personAuthorizedToReceiveName.message}
                   </ErrorMessage>
-                )}
+                ) : null}
               </div>
             </fieldset>
 
@@ -860,11 +860,11 @@ export const InvoiceForm = memo(function InvoiceForm({
                 <InputHelperMessage>
                   Name displayed above the signature line in the PDF.
                 </InputHelperMessage>
-                {errors.personAuthorizedToIssueName && (
+                {errors.personAuthorizedToIssueName ? (
                   <ErrorMessage>
                     {errors.personAuthorizedToIssueName.message}
                   </ErrorMessage>
-                )}
+                ) : null}
               </div>
             </fieldset>
           </>
