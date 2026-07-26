@@ -2,6 +2,8 @@ import type { KnipConfig } from "knip";
 
 // https://knip.dev/reference/configuration#_top
 const config: KnipConfig = {
+  // Trigger.dev entry points (https://trigger.dev/docs/config/config-file)
+  entry: ["trigger.config.ts", "src/trigger/monthly-recurring-invoice.ts"],
   ignoreDependencies: [
     "shadcn",
     "@radix-ui/react-separator",

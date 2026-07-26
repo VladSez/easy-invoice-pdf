@@ -1,12 +1,16 @@
 {
   "mcpServers": {
-    "shadcn": {
-      "command": "npx",
-      "args": ["shadcn@latest", "mcp"]
-    },
     "playwright": {
-      "command": "npx",
-      "args": ["@playwright/mcp@latest"]
+      "args": ["@playwright/mcp@latest"],
+      "command": "npx"
+    },
+    "shadcn": {
+      "args": ["shadcn@latest", "mcp"],
+      "command": "npx"
+    },
+    "trigger": {
+      "args": ["trigger.dev@4.5.6", "mcp", "--dev-only"],
+      "command": "npx"
     }
   }
 }

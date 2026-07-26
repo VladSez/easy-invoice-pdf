@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
 import type {
   GenerateInvoiceResult,
@@ -67,6 +67,11 @@ function createRequest({
 describe("GET /api/generate-invoice — HTTP layer", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    delete process.env.VERCEL_ENV;
+  });
+
+  afterEach(() => {
+    delete process.env.VERCEL_ENV;
   });
 
   describe("authentication", () => {
@@ -239,11 +244,41 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
       expect(callOptions.shouldSendEmail).toBe(false);
     });
 
-    it("should pass shouldSendEmail=true by default", async () => {
+    it("should default shouldSendEmail to false in non-production", async () => {
       mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
 
       const { GET } = await import("../route");
       await GET(createRequest({ authToken: TEST_AUTH_TOKEN }));
+
+      const callOptions = mockRunProduction.mock.calls[0][0] as unknown as {
+        shouldSendEmail: boolean;
+      };
+      expect(callOptions.shouldSendEmail).toBe(false);
+    });
+
+    it("should default shouldSendEmail to true in production", async () => {
+      process.env.VERCEL_ENV = "production";
+      mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
+
+      const { GET } = await import("../route");
+      await GET(createRequest({ authToken: TEST_AUTH_TOKEN }));
+
+      const callOptions = mockRunProduction.mock.calls[0][0] as unknown as {
+        shouldSendEmail: boolean;
+      };
+      expect(callOptions.shouldSendEmail).toBe(true);
+    });
+
+    it("should pass shouldSendEmail=true when query param overrides non-production default", async () => {
+      mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
+
+      const { GET } = await import("../route");
+      await GET(
+        createRequest({
+          authToken: TEST_AUTH_TOKEN,
+          searchParams: { sendEmail: "true" },
+        }),
+      );
 
       const callOptions = mockRunProduction.mock.calls[0][0] as unknown as {
         shouldSendEmail: boolean;
@@ -268,11 +303,41 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
       expect(callOptions.shouldUploadToGoogleDrive).toBe(false);
     });
 
-    it("should pass shouldUploadToGoogleDrive=true by default", async () => {
+    it("should default shouldUploadToGoogleDrive to false in non-production", async () => {
       mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
 
       const { GET } = await import("../route");
       await GET(createRequest({ authToken: TEST_AUTH_TOKEN }));
+
+      const callOptions = mockRunProduction.mock.calls[0][0] as {
+        shouldUploadToGoogleDrive: boolean;
+      };
+      expect(callOptions.shouldUploadToGoogleDrive).toBe(false);
+    });
+
+    it("should default shouldUploadToGoogleDrive to true in production", async () => {
+      process.env.VERCEL_ENV = "production";
+      mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
+
+      const { GET } = await import("../route");
+      await GET(createRequest({ authToken: TEST_AUTH_TOKEN }));
+
+      const callOptions = mockRunProduction.mock.calls[0][0] as {
+        shouldUploadToGoogleDrive: boolean;
+      };
+      expect(callOptions.shouldUploadToGoogleDrive).toBe(true);
+    });
+
+    it("should pass shouldUploadToGoogleDrive=true when query param overrides non-production default", async () => {
+      mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
+
+      const { GET } = await import("../route");
+      await GET(
+        createRequest({
+          authToken: TEST_AUTH_TOKEN,
+          searchParams: { uploadToGoogleDrive: "true" },
+        }),
+      );
 
       const callOptions = mockRunProduction.mock.calls[0][0] as {
         shouldUploadToGoogleDrive: boolean;

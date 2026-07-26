@@ -27,14 +27,23 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Parse query parameters to control invoice generation behavior
-    // Both default to true (enabled) unless explicitly set to "false"
-    // This allows the endpoint to be used for testing without side effects
-    const shouldSendEmail =
-      req.nextUrl.searchParams.get("sendEmail") !== "false";
+    // Locally default off; production defaults on. Query params override either way.
+    const isProduction = process.env.VERCEL_ENV === "production";
 
+    const sendEmailParam = req.nextUrl.searchParams.get("sendEmail");
+    const uploadToGoogleDriveParam = req.nextUrl.searchParams.get(
+      "uploadToGoogleDrive",
+    );
+
+    // If the query param is not set, use the production default.
+    const shouldSendEmail =
+      sendEmailParam === null ? isProduction : sendEmailParam !== "false";
+
+    // If the query param is not set, use the production default.
     const shouldUploadToGoogleDrive =
-      req.nextUrl.searchParams.get("uploadToGoogleDrive") !== "false";
+      uploadToGoogleDriveParam === null
+        ? isProduction
+        : uploadToGoogleDriveParam !== "false";
 
     const result = await runProductionGenerateMonthlyInvoice({
       shouldSendEmail,

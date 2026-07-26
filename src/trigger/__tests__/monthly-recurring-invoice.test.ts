@@ -1,0 +1,187 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
+const TEST_AUTH_TOKEN = "test-auth-token";
+
+interface ScheduledTaskPayload {
+  timestamp: Date;
+  lastTimestamp?: Date;
+  timezone: string;
+  scheduleId: string;
+  externalId?: string;
+  upcoming: Date[];
+}
+
+const MOCK_ENV = {
+  AUTH_TOKEN: TEST_AUTH_TOKEN,
+} as const;
+
+const mockLoggerLog = vi.fn();
+const mockWaitUntil = vi.fn();
+
+type TaskRun = (payload: ScheduledTaskPayload) => Promise<unknown>;
+
+type TaskConfig = {
+  run: TaskRun;
+  retry?: { maxAttempts: number };
+};
+
+let runMonthlyRecurringInvoice: TaskRun | undefined;
+let monthlyRecurringInvoiceRetry: TaskConfig["retry"];
+
+vi.mock("@/env", () => ({ env: { ...MOCK_ENV } }));
+
+vi.mock("@trigger.dev/sdk", () => ({
+  logger: {
+    log: (...args: unknown[]) => mockLoggerLog(...args) as void,
+  },
+  wait: {
+    until: (...args: unknown[]) => mockWaitUntil(...args) as void,
+  },
+  schedules: {
+    task: (config: TaskConfig) => {
+      runMonthlyRecurringInvoice = config.run;
+      monthlyRecurringInvoiceRetry = config.retry;
+      return { id: "monthly-recurring-invoice" };
+    },
+  },
+}));
+
+// 13:00 on the 10th, Warsaw wall time (same instants as warsaw-time.test.ts).
+const SATURDAY_JAN_10_2026 = new Date("2026-01-10T12:00:00Z");
+const SUNDAY_MAY_10_2026 = new Date("2026-05-10T11:00:00Z");
+const FRIDAY_JUL_10_2026 = new Date("2026-07-10T11:00:00Z");
+
+function createPayload(timestamp: Date): ScheduledTaskPayload {
+  return {
+    timestamp,
+    lastTimestamp: undefined,
+    timezone: "Europe/Warsaw",
+    scheduleId: "sched_test",
+    externalId: undefined,
+    upcoming: [],
+  };
+}
+
+function mockFetchResponse({
+  ok,
+  status,
+  body,
+}: {
+  ok: boolean;
+  status: number;
+  body: string;
+}) {
+  return vi.fn().mockResolvedValue({
+    ok,
+    status,
+    text: () => Promise.resolve(body),
+  });
+}
+
+describe("monthlyRecurringInvoice", () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockWaitUntil.mockResolvedValue(undefined);
+    vi.stubGlobal(
+      "fetch",
+      mockFetchResponse({ ok: true, status: 200, body: "{}" }),
+    );
+
+    vi.resetModules();
+    await import("../monthly-recurring-invoice");
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("does not inherit default retries because invoice generation is not idempotent", () => {
+    expect(monthlyRecurringInvoiceRetry).toEqual({ maxAttempts: 1 });
+  });
+
+  it("generates the invoice immediately on a weekday without waiting", async () => {
+    const invoiceResult = { invoiceId: "inv-123" };
+    vi.stubGlobal(
+      "fetch",
+      mockFetchResponse({
+        ok: true,
+        status: 200,
+        body: JSON.stringify(invoiceResult),
+      }),
+    );
+
+    const result = await runMonthlyRecurringInvoice!(
+      createPayload(FRIDAY_JUL_10_2026),
+    );
+
+    expect(mockWaitUntil).not.toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledWith(
+      "http://localhost:3000/api/generate-invoice",
+      expect.objectContaining({
+        headers: {
+          Authorization: `Bearer ${TEST_AUTH_TOKEN}`,
+        },
+      }),
+    );
+    expect(result).toEqual(invoiceResult);
+  });
+
+  it("waits until Monday when the 10th falls on a Saturday", async () => {
+    await runMonthlyRecurringInvoice!(createPayload(SATURDAY_JAN_10_2026));
+
+    expect(mockWaitUntil).toHaveBeenCalledWith({
+      date: new Date("2026-01-12T12:00:00.000Z"),
+    });
+    expect(mockLoggerLog).toHaveBeenCalledWith(
+      "The 10th falls on a weekend, waiting until Monday to generate the invoice",
+      {
+        scheduledAt: SATURDAY_JAN_10_2026,
+        resumeAt: new Date("2026-01-12T12:00:00.000Z"),
+      },
+    );
+    expect(fetch).toHaveBeenCalledOnce();
+  });
+
+  it("waits until Monday when the 10th falls on a Sunday", async () => {
+    await runMonthlyRecurringInvoice!(createPayload(SUNDAY_MAY_10_2026));
+
+    expect(mockWaitUntil).toHaveBeenCalledWith({
+      date: new Date("2026-05-11T11:00:00.000Z"),
+    });
+    expect(fetch).toHaveBeenCalledOnce();
+  });
+
+  it("throws when invoice generation fails so the run is marked as failed", async () => {
+    vi.stubGlobal(
+      "fetch",
+      mockFetchResponse({
+        ok: false,
+        status: 502,
+        body: "Bad gateway from upstream",
+      }),
+    );
+
+    await expect(
+      runMonthlyRecurringInvoice!(createPayload(FRIDAY_JUL_10_2026)),
+    ).rejects.toThrow(
+      "Invoice generation failed (502): Bad gateway from upstream",
+    );
+  });
+
+  it("returns the raw response body when it is not valid JSON", async () => {
+    vi.stubGlobal(
+      "fetch",
+      mockFetchResponse({
+        ok: true,
+        status: 200,
+        body: "ok",
+      }),
+    );
+
+    const result = await runMonthlyRecurringInvoice!(
+      createPayload(FRIDAY_JUL_10_2026),
+    );
+
+    expect(result).toBe("ok");
+  });
+});

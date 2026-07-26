@@ -33,7 +33,9 @@
     "corepack:prepare": "corepack prepare pnpm@latest",
     "update-github-actions": "pnpm actions-up --min-age=7",
     "check-github-actions-security": "zizmor .",
-    "test-gh-action-locally:monthly-recurring-invoice": "act schedule -j recurring-invoice --secret-file .github/workflows/.secrets"
+    "test-gh-actions-locally": "act --secret-file .github/workflows/.secrets",
+    "trigger:dev": "pnpm dlx trigger.dev dev",
+    "trigger:deploy": "pnpm dlx trigger.dev deploy"
   },
   "dependencies": {
     "@hookform/resolvers": "3.9.0",
@@ -55,6 +57,7 @@
     "@sentry/nextjs": "9.3.0",
     "@t3-oss/env-nextjs": "0.13.4",
     "@tailwindcss/typography": "0.5.16",
+    "@trigger.dev/sdk": "4.5.6",
     "@types/mdx": "2.0.13",
     "@types/qrcode": "1.5.6",
     "@types/ua-parser-js": "0.7.39",

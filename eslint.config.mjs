@@ -10,7 +10,7 @@ const compat = new FlatCompat({
 
 export default tseslint.config(
   {
-    ignores: [".next", "playwright-output"],
+    ignores: [".next", "playwright-output", ".trigger"],
   },
   // next config
   ...compat.extends("next/core-web-vitals"),

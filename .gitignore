@@ -56,3 +56,4 @@ messages/en.d.json.ts
 .pnpm-store/
 
 .github/workflows/.secrets
+.trigger
