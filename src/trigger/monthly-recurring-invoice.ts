@@ -5,8 +5,10 @@ import {
   getWarsawWeekday,
   WARSAW_TIME_ZONE,
 } from "./warsaw-time";
+import { APP_URL } from "@/config";
+import { env } from "@/env";
 
-const INVOICE_API_URL = "https://easyinvoicepdf.com/api/generate-invoice";
+const INVOICE_API_URL = `${APP_URL}/api/generate-invoice` as const;
 
 // Hour of the day (Warsaw wall time) at which the invoice is generated.
 const INVOICE_GENERATION_HOUR = 13;
@@ -24,7 +26,7 @@ export const monthlyRecurringInvoice = schedules.task({
   id: "monthly-recurring-invoice",
   cron: {
     // 13:00 on the 10th of every month, Warsaw wall time (DST-adjusted automatically)
-    pattern: `0 ${INVOICE_GENERATION_HOUR} 10 * *`,
+    pattern: `0 ${INVOICE_GENERATION_HOUR} 27 * *`, // IMPORTANT: we use the 27th only for TESTING. RETURN BACK TO 10TH AFTER TESTING!!!
     timezone: WARSAW_TIME_ZONE,
     environments: ["PRODUCTION"],
   },
@@ -52,17 +54,11 @@ export const monthlyRecurringInvoice = schedules.task({
 });
 
 async function generateInvoice() {
-  const authToken = process.env.INVOICE_AUTH_TOKEN;
-
-  if (!authToken) {
-    throw new Error("INVOICE_AUTH_TOKEN environment variable is not set");
-  }
-
   logger.log(`Generating monthly recurring invoice: GET ${INVOICE_API_URL}`);
 
   const response = await fetch(INVOICE_API_URL, {
     headers: {
-      Authorization: `Bearer ${authToken}`,
+      Authorization: `Bearer ${env.AUTH_TOKEN}`,
     },
     signal: AbortSignal.timeout(60_000),
   });
@@ -71,10 +67,14 @@ async function generateInvoice() {
 
   // Throw on failure so the run is marked as failed and Trigger.dev alerts fire.
   if (!response.ok) {
-    throw new Error(`Invoice generation failed (${response.status}): ${body}`);
+    throw new Error(
+      `Invoice generation failed (${response.status}): ${body.slice(0, 200)}`,
+    );
   }
 
-  logger.log("Invoice generated successfully", { body });
+  logger.log("Invoice generated successfully", {
+    body: JSON.stringify(body, null, 2),
+  });
 
   try {
     return JSON.parse(body) as unknown;
