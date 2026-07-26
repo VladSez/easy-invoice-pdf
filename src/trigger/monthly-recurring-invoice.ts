@@ -24,6 +24,11 @@ const INVOICE_GENERATION_HOUR = 13;
  */
 export const monthlyRecurringInvoice = schedules.task({
   id: "monthly-recurring-invoice",
+  // Invoice generation sends email/Drive side effects without idempotency guards.
+  // Do not inherit trigger.config default retries until that flow is safe to repeat.
+  retry: {
+    maxAttempts: 1,
+  },
   cron: {
     // 13:00 on the 10th of every month, Warsaw wall time (DST-adjusted automatically)
     pattern: `0 ${INVOICE_GENERATION_HOUR} 27 * *`, // IMPORTANT: we use the 27th only for TESTING. RETURN BACK TO 10TH AFTER TESTING!!!

@@ -14,6 +14,7 @@ export default defineConfig({
   maxDuration: 300, // 300 seconds or 5 minutes
   retries: {
     enabledInDev: true,
+    // Non-idempotent tasks must override with retry.maxAttempts: 1 (see monthly-recurring-invoice).
     default: {
       maxAttempts: 3,
       minTimeoutInMs: 1000,

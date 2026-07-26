@@ -29,7 +29,7 @@ The fastest path is the CLI's own wizard, which performs every mechanical step b
 and also offers to install the MCP server and these agent skills:
 
 ```bash
-npx trigger.dev@latest init
+npx trigger.dev init
 ```
 
 Prefer `init` when you can. Do the manual steps further down when `init` does not fit
@@ -40,7 +40,7 @@ Prefer `init` when you can. Do the manual steps further down when `init` does no
 Most of setup is automatable, but two steps require a person and cannot be done
 headlessly. When you reach them, stop and ask the user to do them, then continue:
 
-1. **Authenticating the CLI.** `npx trigger.dev@latest login` opens a browser for the
+1. **Authenticating the CLI.** `npx trigger.dev login` opens a browser for the
    user to sign in. If they have no account, point them to https://cloud.trigger.dev
    (or a self-hosted instance) first. You cannot complete this for them.
 2. **The secret key and project ref.** `TRIGGER_SECRET_KEY` and the project ref
@@ -55,9 +55,9 @@ Treat these as handoffs: state exactly what you need, wait for the user, then re
 ### 1. Authenticate (human step)
 
 ```bash
-npx trigger.dev@latest login
+npx trigger.dev login
 # self-hosted:
-npx trigger.dev@latest login --api-url https://your-trigger-instance.com
+npx trigger.dev login --api-url https://your-trigger-instance.com
 ```
 
 ### 2. Install the packages
@@ -145,7 +145,7 @@ TRIGGER_SECRET_KEY=tr_dev_xxxxxxxx
 ### 7. Run the dev server
 
 ```bash
-npx trigger.dev@latest dev
+npx trigger.dev dev
 ```
 
 Leave it running. Tasks register with the dashboard, where the user can fire a test run
@@ -187,7 +187,7 @@ See the manual setup docs for full Turborepo examples before scaffolding either.
 2. **Mismatched CLI and SDK versions.** A `trigger.dev` CLI on a different major than
    `@trigger.dev/sdk` breaks dev/deploy.
 
-   - Wrong: `npx trigger.dev@latest dev` against an old pinned SDK.
+   - Wrong: `npx trigger.dev dev` against an old pinned SDK.
    - Correct: keep `trigger.dev`, `@trigger.dev/sdk`, and `@trigger.dev/build` on the same version.
 
 3. **Importing from `@trigger.dev/sdk/v3` or using `client.defineJob()`.** Both are old.
