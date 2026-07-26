@@ -46,8 +46,8 @@ function resolvePopupVariant(
  * Hook to manage showing welcome or changelog update popup to user.
  *
  * Shows welcome popup on first visit, then changelog popup when a new
- * changelog version is unseen. Never shows in CI, on mobile, or when
- * viewing a shared invoice.
+ * changelog version is unseen. Never shows on mobile or when viewing a
+ * shared invoice.
  */
 export function useChangelogUpdatePopup({
   latestChangelog,
@@ -65,8 +65,8 @@ export function useChangelogUpdatePopup({
   }, []);
 
   useEffect(() => {
-    // Never show popup in CI or on mobile, unmount if these become true
-    if (process.env.CI || isMobile) {
+    // Never show popup on mobile
+    if (isMobile) {
       setIsMounted(false);
       setIsOpen(false);
       setVariant(null);
