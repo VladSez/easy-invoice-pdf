@@ -270,7 +270,7 @@ export default async function ChangelogEntryPage({
           </article>
 
           {/* Previous and Next post navigation */}
-          {(previousEntry || nextEntry) && (
+          {previousEntry || nextEntry ? (
             <div className="mt-16 border-t border-gray-200 pt-8 dark:border-gray-700">
               <div className="flex flex-row gap-8 sm:justify-between">
                 {/* Previous post link */}
@@ -315,7 +315,7 @@ export default async function ChangelogEntryPage({
                 )}
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </>

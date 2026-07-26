@@ -156,11 +156,11 @@ export const InvoiceItems = memo(function InvoiceItems({
                     />
                   )}
                 />
-                {errors.items?.[index]?.name && (
+                {errors.items?.[index]?.name ? (
                   <ErrorMessage>
                     {errors.items[index]?.name?.message}
                   </ErrorMessage>
-                )}
+                ) : null}
               </div>
 
               {/* Invoice Item Type of GTU - Only show for default template */}
@@ -219,11 +219,11 @@ export const InvoiceItems = memo(function InvoiceItems({
                       />
                     )}
                   />
-                  {errors.items?.[index]?.typeOfGTU && (
+                  {errors.items?.[index]?.typeOfGTU ? (
                     <ErrorMessage>
                       {errors.items[index]?.typeOfGTU?.message}
                     </ErrorMessage>
-                  )}
+                  ) : null}
                 </div>
               )}
 
@@ -296,11 +296,11 @@ export const InvoiceItems = memo(function InvoiceItems({
                     );
                   }}
                 />
-                {errors.items?.[index]?.amount && (
+                {errors.items?.[index]?.amount ? (
                   <ErrorMessage>
                     {errors.items[index].amount.message}
                   </ErrorMessage>
-                )}
+                ) : null}
               </div>
 
               {/* Invoice Item Unit */}
@@ -354,11 +354,11 @@ export const InvoiceItems = memo(function InvoiceItems({
                     />
                   )}
                 />
-                {errors.items?.[index]?.unit && (
+                {errors.items?.[index]?.unit ? (
                   <ErrorMessage>
                     {errors.items[index].unit.message}
                   </ErrorMessage>
-                )}
+                ) : null}
               </div>
 
               {/* Invoice Item Net Price */}
@@ -451,11 +451,11 @@ export const InvoiceItems = memo(function InvoiceItems({
                   />
                 </div>
 
-                {errors.items?.[index]?.netPrice && (
+                {errors.items?.[index]?.netPrice ? (
                   <ErrorMessage>
                     {errors.items[index].netPrice.message}
                   </ErrorMessage>
-                )}
+                ) : null}
               </div>
 
               {/* Invoice Item Tax Settings */}
@@ -510,9 +510,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                       />
                     )}
                   />
-                  {errors.taxLabelText && (
+                  {errors.taxLabelText ? (
                     <ErrorMessage>{errors.taxLabelText.message}</ErrorMessage>
-                  )}
+                  ) : null}
                   {!errors.taxLabelText && (
                     <InputHelperMessage>
                       Customize the tax label on your invoice (e.g., VAT, Sales

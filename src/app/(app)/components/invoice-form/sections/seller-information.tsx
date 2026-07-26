@@ -100,9 +100,9 @@ export const SellerInformation = memo(function SellerInformation({
                 />
               )}
             />
-            {errors.seller?.name && (
+            {errors.seller?.name ? (
               <ErrorMessage>{errors.seller.name.message}</ErrorMessage>
-            )}
+            ) : null}
           </div>
 
           <div>
@@ -121,9 +121,9 @@ export const SellerInformation = memo(function SellerInformation({
                 />
               )}
             />
-            {errors.seller?.address && (
+            {errors.seller?.address ? (
               <ErrorMessage>{errors.seller.address.message}</ErrorMessage>
-            )}
+            ) : null}
           </div>
 
           <div>
@@ -183,11 +183,11 @@ export const SellerInformation = memo(function SellerInformation({
                       />
                     )}
                   />
-                  {errors.seller?.vatNoLabelText && (
+                  {errors.seller?.vatNoLabelText ? (
                     <ErrorMessage>
                       {errors.seller.vatNoLabelText.message}
                     </ErrorMessage>
-                  )}
+                  ) : null}
                   {!errors.seller?.vatNoLabelText && (
                     <InputHelperMessage>
                       Set a custom label (e.g. VAT no, Tax no, etc.)
@@ -213,9 +213,9 @@ export const SellerInformation = memo(function SellerInformation({
                       />
                     )}
                   />
-                  {errors.seller?.vatNo && (
+                  {errors.seller?.vatNo ? (
                     <ErrorMessage>{errors.seller.vatNo.message}</ErrorMessage>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </fieldset>
@@ -268,9 +268,9 @@ export const SellerInformation = memo(function SellerInformation({
                 />
               )}
             />
-            {errors.seller?.email && (
+            {errors.seller?.email ? (
               <ErrorMessage>{errors.seller.email.message}</ErrorMessage>
-            )}
+            ) : null}
           </div>
 
           {/* Account Number */}
@@ -322,9 +322,9 @@ export const SellerInformation = memo(function SellerInformation({
                 />
               )}
             />
-            {errors.seller?.accountNumber && (
+            {errors.seller?.accountNumber ? (
               <ErrorMessage>{errors.seller.accountNumber.message}</ErrorMessage>
-            )}
+            ) : null}
           </div>
 
           {/* SWIFT/BIC */}
@@ -375,9 +375,9 @@ export const SellerInformation = memo(function SellerInformation({
                 />
               )}
             />
-            {errors.seller?.swiftBic && (
+            {errors.seller?.swiftBic ? (
               <ErrorMessage>{errors.seller.swiftBic.message}</ErrorMessage>
-            )}
+            ) : null}
           </div>
 
           {/* Notes */}
@@ -427,9 +427,9 @@ export const SellerInformation = memo(function SellerInformation({
                 />
               )}
             />
-            {errors.seller?.notes && (
+            {errors.seller?.notes ? (
               <ErrorMessage>{errors.seller.notes.message}</ErrorMessage>
-            )}
+            ) : null}
           </div>
         </fieldset>
       </AccordionContent>

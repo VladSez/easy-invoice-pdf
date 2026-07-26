@@ -40,9 +40,9 @@ const TooltipContent = React.memo(
         {...props}
       >
         {props.children}
-        {showArrow && (
+        {showArrow ? (
           <TooltipPrimitive.Arrow className="my-px border-slate-200 fill-white drop-shadow-[0_1px_0_hsl(var(--border))]" />
-        )}
+        ) : null}
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   )),

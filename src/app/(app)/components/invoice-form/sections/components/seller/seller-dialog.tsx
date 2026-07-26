@@ -422,11 +422,11 @@ export function SellerDialog({
                               placeholder="Enter Tax number label"
                             />
                           </FormControl>
-                          {form.formState.errors.vatNoLabelText && (
+                          {form.formState.errors.vatNoLabelText ? (
                             <FormMessage>
                               {form.formState.errors.vatNoLabelText.message}
                             </FormMessage>
-                          )}
+                          ) : null}
 
                           {!form.formState.errors.vatNoLabelText && (
                             <InputHelperMessage>

@@ -418,11 +418,11 @@ export function BuyerDialog({
                             />
                           </FormControl>
 
-                          {form.formState.errors.vatNoLabelText && (
+                          {form.formState.errors.vatNoLabelText ? (
                             <FormMessage>
                               {form.formState.errors.vatNoLabelText.message}
                             </FormMessage>
-                          )}
+                          ) : null}
 
                           {!form.formState.errors.vatNoLabelText && (
                             <InputHelperMessage>

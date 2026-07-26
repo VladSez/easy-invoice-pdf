@@ -439,11 +439,11 @@ export const GeneralInformation = memo(function GeneralInformation({
                   />
                 )}
               />
-              {errors.invoiceNumberObject?.label && (
+              {errors.invoiceNumberObject?.label ? (
                 <ErrorMessage>
                   {errors.invoiceNumberObject.label.message}
                 </ErrorMessage>
-              )}
+              ) : null}
               {!isDefaultInvoiceNumberLabel &&
                 !errors.invoiceNumberObject?.label && (
                   <InputHelperMessage>
@@ -480,11 +480,11 @@ export const GeneralInformation = memo(function GeneralInformation({
                   />
                 )}
               />
-              {errors.invoiceNumberObject?.value && (
+              {errors.invoiceNumberObject?.value ? (
                 <ErrorMessage>
                   {errors.invoiceNumberObject.value.message}
                 </ErrorMessage>
-              )}
+              ) : null}
 
               {!isInvoiceNumberInCurrentMonth &&
                 !errors.invoiceNumberObject?.value && (
@@ -529,9 +529,9 @@ export const GeneralInformation = memo(function GeneralInformation({
               />
             )}
           />
-          {errors.dateOfIssue && (
+          {errors.dateOfIssue ? (
             <ErrorMessage>{errors.dateOfIssue.message}</ErrorMessage>
-          )}
+          ) : null}
           {isDateOfIssueNotToday && !errors.dateOfIssue ? (
             <InputHelperMessage>
               <span className="flex items-center text-amber-800">
@@ -866,9 +866,9 @@ export const GeneralInformation = memo(function GeneralInformation({
               />
             )}
           />
-          {errors.invoiceType && (
+          {errors.invoiceType ? (
             <ErrorMessage>{errors.invoiceType.message}</ErrorMessage>
-          )}
+          ) : null}
         </div>
         {/* Logo Upload */}
         <div className="">

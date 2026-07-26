@@ -98,9 +98,9 @@ export const BuyerInformation = memo(function BuyerInformation({
                 />
               )}
             />
-            {errors.buyer?.name && (
+            {errors.buyer?.name ? (
               <ErrorMessage>{errors.buyer.name.message}</ErrorMessage>
-            )}
+            ) : null}
           </div>
 
           <div>
@@ -119,9 +119,9 @@ export const BuyerInformation = memo(function BuyerInformation({
                 />
               )}
             />
-            {errors.buyer?.address && (
+            {errors.buyer?.address ? (
               <ErrorMessage>{errors.buyer.address.message}</ErrorMessage>
-            )}
+            ) : null}
           </div>
 
           <div>
@@ -181,11 +181,11 @@ export const BuyerInformation = memo(function BuyerInformation({
                       />
                     )}
                   />
-                  {errors.buyer?.vatNoLabelText && (
+                  {errors.buyer?.vatNoLabelText ? (
                     <ErrorMessage>
                       {errors.buyer.vatNoLabelText.message}
                     </ErrorMessage>
-                  )}
+                  ) : null}
                   {!errors.buyer?.vatNoLabelText && (
                     <InputHelperMessage>
                       Set a custom label (e.g. VAT no, Tax no, etc.)
@@ -211,9 +211,9 @@ export const BuyerInformation = memo(function BuyerInformation({
                       />
                     )}
                   />
-                  {errors.buyer?.vatNo && (
+                  {errors.buyer?.vatNo ? (
                     <ErrorMessage>{errors.buyer.vatNo.message}</ErrorMessage>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </fieldset>
@@ -264,9 +264,9 @@ export const BuyerInformation = memo(function BuyerInformation({
                 />
               )}
             />
-            {errors.buyer?.email && (
+            {errors.buyer?.email ? (
               <ErrorMessage>{errors.buyer.email.message}</ErrorMessage>
-            )}
+            ) : null}
           </div>
 
           {/* Notes */}
@@ -315,9 +315,9 @@ export const BuyerInformation = memo(function BuyerInformation({
                 />
               )}
             />
-            {errors.buyer?.notes && (
+            {errors.buyer?.notes ? (
               <ErrorMessage>{errors.buyer.notes.message}</ErrorMessage>
-            )}
+            ) : null}
           </div>
         </fieldset>
       </AccordionContent>
