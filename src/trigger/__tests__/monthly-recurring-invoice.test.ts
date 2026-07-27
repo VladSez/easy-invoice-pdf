@@ -40,10 +40,14 @@ vi.mock("@trigger.dev/sdk", () => ({
   },
 }));
 
-// 13:00 on the 10th, Warsaw wall time (same instants as warsaw-time.test.ts).
+// Saturday/Sunday on the 10th, Warsaw wall time (weekday checks only; hour matches warsaw-time.test.ts payloads).
 const SATURDAY_JAN_10_2026 = new Date("2026-01-10T12:00:00Z");
 const SUNDAY_MAY_10_2026 = new Date("2026-05-10T11:00:00Z");
 const FRIDAY_JUL_10_2026 = new Date("2026-07-10T11:00:00Z");
+
+// Resume-at instants: 15:00 Warsaw on the following Monday (matches INVOICE_GENERATION_HOUR).
+const MONDAY_JAN_12_2026_15_WARSAW = new Date("2026-01-12T14:00:00.000Z");
+const MONDAY_MAY_11_2026_15_WARSAW = new Date("2026-05-11T13:00:00.000Z");
 
 function createPayload(timestamp: Date): ScheduledTaskPayload {
   return {
@@ -126,13 +130,13 @@ describe("monthlyRecurringInvoice", () => {
     await runMonthlyRecurringInvoice!(createPayload(SATURDAY_JAN_10_2026));
 
     expect(mockWaitUntil).toHaveBeenCalledWith({
-      date: new Date("2026-01-12T12:00:00.000Z"),
+      date: MONDAY_JAN_12_2026_15_WARSAW,
     });
     expect(mockLoggerLog).toHaveBeenCalledWith(
       "The 10th falls on a weekend, waiting until Monday to generate the invoice",
       {
         scheduledAt: SATURDAY_JAN_10_2026,
-        resumeAt: new Date("2026-01-12T12:00:00.000Z"),
+        resumeAt: MONDAY_JAN_12_2026_15_WARSAW,
       },
     );
     expect(fetch).toHaveBeenCalledOnce();
@@ -142,7 +146,7 @@ describe("monthlyRecurringInvoice", () => {
     await runMonthlyRecurringInvoice!(createPayload(SUNDAY_MAY_10_2026));
 
     expect(mockWaitUntil).toHaveBeenCalledWith({
-      date: new Date("2026-05-11T11:00:00.000Z"),
+      date: MONDAY_MAY_11_2026_15_WARSAW,
     });
     expect(fetch).toHaveBeenCalledOnce();
   });
