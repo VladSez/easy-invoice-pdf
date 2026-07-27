@@ -5,7 +5,8 @@ import {
   getWarsawWeekday,
   WARSAW_TIME_ZONE,
 } from "./warsaw-time";
-import { APP_URL } from "@/config";
+
+const APP_URL = process.env.APP_URL ?? `http://localhost:3000`;
 
 const INVOICE_API_URL = `${APP_URL}/api/generate-invoice` as const;
 
