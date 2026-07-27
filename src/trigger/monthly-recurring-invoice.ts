@@ -11,7 +11,7 @@ const APP_URL = process.env.APP_URL ?? `http://localhost:3000`;
 const INVOICE_API_URL = `${APP_URL}/api/generate-invoice` as const;
 
 // Hour of the day (Warsaw wall time) at which the invoice is generated.
-const INVOICE_GENERATION_HOUR = 15;
+const INVOICE_GENERATION_HOUR = 13;
 
 /**
  * Generates the monthly recurring invoice on the 10th of every month
@@ -31,7 +31,7 @@ export const monthlyRecurringInvoice = schedules.task({
   },
   cron: {
     // 15:00 on the 10th of every month, Warsaw wall time (DST-adjusted automatically)
-    pattern: `0 ${INVOICE_GENERATION_HOUR} 27 * *`, // IMPORTANT: we use the 27th only for TESTING. RETURN BACK TO 10TH AFTER TESTING!!!
+    pattern: `0 ${INVOICE_GENERATION_HOUR} 10 * *`,
     timezone: WARSAW_TIME_ZONE,
     environments: ["PRODUCTION"],
   },
