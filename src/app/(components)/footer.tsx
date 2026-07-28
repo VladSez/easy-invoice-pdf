@@ -147,7 +147,7 @@ export function Footer({ links, translations }: FooterProps) {
           </div>
         </div>
         {/* LAUNCH Badges */}
-        <div className="mb-7 mt-10 flex flex-wrap items-center gap-3 md:mt-20">
+        <div className="mb-7 mt-10 flex flex-wrap items-center justify-center gap-3 md:mt-20">
           <FooterLaunchBadges />
         </div>
 
