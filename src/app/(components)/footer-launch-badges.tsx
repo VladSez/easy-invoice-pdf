@@ -169,6 +169,16 @@ export function FooterLaunchBadges() {
         />
       </a>
 
+      {/* Badge for Featured on Better Launch */}
+      <a href="https://www.betterlaunch.co/product/easyinvoicepdf">
+        <img
+          src="https://www.betterlaunch.co/badge-launching-gradient.svg"
+          alt="Featured on Better Launch"
+          width="200"
+          height="56"
+        />
+      </a>
+
       {/* Badge for Launched on Tiny Startups */}
       <a
         href="https://www.tinystartups.com/startup/easyinvoicepdf"
