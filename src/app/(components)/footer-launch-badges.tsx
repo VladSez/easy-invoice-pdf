@@ -189,20 +189,6 @@ export function FooterLaunchBadges() {
         />
       </a>
 
-      {/* Badge for Featured on Super Launch */}
-      <a
-        href="https://www.superlaun.ch/products/2998"
-        target="_blank"
-        rel="noopener"
-      >
-        <img
-          src="https://www.superlaun.ch/badge.png"
-          alt="Featured on Super Launch"
-          width="200"
-          height="200"
-        />
-      </a>
-
       {/* Badge for Launched on Tiny Startups */}
       <a
         href="https://www.tinystartups.com/startup/easyinvoicepdf"
