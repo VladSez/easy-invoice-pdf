@@ -179,6 +179,16 @@ export function FooterLaunchBadges() {
         />
       </a>
 
+      {/* Badge for Featured on DodoDirectory */}
+      <a href="https://dododirectory.com" target="_blank" rel="dofollow">
+        <img
+          src="https://dododirectory.com/badge-light.png"
+          alt="Featured on DodoDirectory"
+          width="200"
+          height="54"
+        />
+      </a>
+
       {/* Badge for Launched on Tiny Startups */}
       <a
         href="https://www.tinystartups.com/startup/easyinvoicepdf"
