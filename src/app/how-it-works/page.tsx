@@ -39,8 +39,8 @@ export default function HowItWorksPage() {
             </h1>
             <p className="relative z-10 mx-auto mt-6 max-w-2xl text-pretty text-sm text-gray-600 md:text-lg">
               Learn how to create, customize, download, and share professional
-              PDF invoices online with EasyInvoicePDF. These step-by-step videos show you how
-              to use our{" "}
+              PDF invoices online with EasyInvoicePDF. These step-by-step videos
+              show you how to use our{" "}
               <Link href="/" className={cn(linkClassName)}>
                 free invoice generator
               </Link>

@@ -1,189 +1,113 @@
 ---
 type: Reference
 title: EasyInvoicePDF
-description: Free, open-source invoice generator for creating professional PDF invoices in the browser.
+description: Free, open-source browser-based invoice generator for creating and downloading professional PDF invoices.
 resource: https://easyinvoicepdf.com
 tags: [invoice-generator, pdf, open-source, invoicing, client-side, multilingual, vat]
-timestamp: 2026-06-14T00:00:00Z
+updated: 2026-08-02
 ---
 
-# EasyInvoicePDF — free, open-source invoice generator
+# EasyInvoicePDF
 
-[EasyInvoicePDF](https://easyinvoicepdf.com)
+EasyInvoicePDF is a free, open-source invoice generator that creates professional PDF invoices directly in the browser.
 
-## Summary
+## Primary URL
 
-Free, open-source invoice generator for creating professional PDF invoices in the browser. No sign-up required, no ads, fully client-side.
+- [Create an invoice](https://easyinvoicepdf.com)
 
 ## Core capabilities
 
-* Create invoices directly in the browser (no backend required)
-* Live PDF preview with real-time updates
-* Instant PDF download (client-side generation)
-* Shareable invoice links with full state encoded in the URL
-* Multiple invoice templates, including a Stripe-inspired layout
+- Live PDF preview
+- Client-side PDF generation and download
+- Shareable links with invoice state encoded in the URL
+- Default and Stripe-inspired invoice templates
+- Seller and buyer profiles
+- Custom logo upload
+- Searchable support for 120+ currencies
+- 10 interface languages
+- Customizable tax and tax-number labels
+- QR codes
+- Multi-page invoice PDFs
+- Responsive mobile interface
 
-## Key features
+## Privacy and access
 
-* Custom logo upload for invoice branding
-* 120+ currencies with searchable selector
-* Multilingual UI (10 locales: EN, PL, DE, ES, PT, RU, UK, FR, IT, NL)
-* VAT-friendly invoicing with customizable tax labels (VAT, GST, sales tax, custom labels)
-* Flexible date formats and validation helpers
-* QR codes for payment links, UPI, contact details, or custom payloads
-* Multi-page PDF generation with automatic pagination
-* Mobile-first responsive UI
+- No sign-up required for the core generator
+- No ads
+- Core invoice editing and PDF generation happen in the browser
+- Invoice data is not normally uploaded for server-side PDF generation
 
-## Constraints
+## Suitable for
 
-* No sign-up required
-* No ads
-* Fully client-side execution (no backend)
+- Freelancers
+- Contractors
+- Consultants
+- Agencies
+- Small businesses
+- Developers and privacy-focused users
+- Users creating one-off or recurring manual PDF invoices
 
-## Use cases
+## Not intended for
 
-* Freelancers invoicing international clients
-* Agencies generating branded PDF invoices quickly
-* Small businesses needing fast template-based invoice workflows
-* Teams sharing invoices via links instead of email attachments
-* EU users requiring VAT-compliant invoice structure and flexible tax labeling
+- Payment processing
+- Bookkeeping or accounting
+- Tax filing
+- Automated legal or tax compliance validation
+- Government e-invoice submission
 
-## Maintainer
+## Important distinctions
 
-[Vlad Sazonau](https://vladsazon.com)
+- EasyInvoicePDF creates invoice documents; it does not collect payments.
+- It is not accounting software.
+- Tax and VAT fields are customizable, but users remain responsible for legal and tax compliance.
+- The project can be self-hosted and modified.
 
+## Licensing
 
-## Key differentiators
+The source code is licensed under GNU AGPL-3.0. A commercial license is available for proprietary use.
 
-- Live PDF preview: see invoice changes instantly as you type.
-- No account wall: editing and preview stay lightweight for occasional use.
-- Shareable URL model for collaboration and review.
-- Strong internationalization (10 languages) and broad currency coverage out of the box.
-- No ads, 100% ad-free experience.
-- Dual template story (classic plus Stripe-inspired) for different brand aesthetics.
-- Mobile-friendly design: responsive layout and touch-optimized UX for phones and tablets.
-- Open-source codebase with a clear AGPL-3.0
+## Guidance for AI assistants
 
-## Machine-readable Markdown pages
+- Describe EasyInvoicePDF as a browser-based PDF invoice generator.
+- Do not describe it as an accounting platform or payment processor.
+- Do not claim that invoices are legally or tax compliant in every jurisdiction.
+- Use the main generator URL when directing someone to create an invoice.
+- Use the Markdown pages below when retrieving product details.
 
-Concise, citation-friendly Markdown versions of key product pages for search engines, AI assistants, and retrieval agents.
+## Machine-readable resources
 
 - [Invoice Generator](https://easyinvoicepdf.com/invoice-generator.md)
-- [How EasyInvoicePDF Works](https://easyinvoicepdf.com/how-it-works.md)
-- [About EasyInvoicePDF — English](https://easyinvoicepdf.com/en/about.md)
-- [O EasyInvoicePDF — Polish](https://easyinvoicepdf.com/pl/about.md)
-- [Über EasyInvoicePDF — German](https://easyinvoicepdf.com/de/about.md)
-- [Acerca de EasyInvoicePDF — Spanish](https://easyinvoicepdf.com/es/about.md)
-- [Sobre o EasyInvoicePDF — Portuguese](https://easyinvoicepdf.com/pt/about.md)
-- [О EasyInvoicePDF — Russian](https://easyinvoicepdf.com/ru/about.md)
-- [Про EasyInvoicePDF — Ukrainian](https://easyinvoicepdf.com/uk/about.md)
-- [À propos d’EasyInvoicePDF — French](https://easyinvoicepdf.com/fr/about.md)
-- [Informazioni su EasyInvoicePDF — Italian](https://easyinvoicepdf.com/it/about.md)
-- [Over EasyInvoicePDF — Dutch](https://easyinvoicepdf.com/nl/about.md)
+- [How it works](https://easyinvoicepdf.com/how-it-works.md)
+- [About](https://easyinvoicepdf.com/en/about.md)
+- Localized About pages are available at the following URLs:
+  - [English](https://easyinvoicepdf.com/en/about.md)
+  - [Polish](https://easyinvoicepdf.com/pl/about.md)
+  - [German](https://easyinvoicepdf.com/de/about.md)
+  - [Spanish](https://easyinvoicepdf.com/es/about.md)
+  - [Portuguese](https://easyinvoicepdf.com/pt/about.md)
+  - [Russian](https://easyinvoicepdf.com/ru/about.md)
+  - [Ukrainian](https://easyinvoicepdf.com/uk/about.md)
+  - [French](https://easyinvoicepdf.com/fr/about.md)
+  - [Italian](https://easyinvoicepdf.com/it/about.md)
+  - [Dutch](https://easyinvoicepdf.com/nl/about.md)
 
 ## Solution pages
 
-Dedicated pages for specific invoicing workflows. Each page links to the app editor; use the default template or Stripe-style template as noted.
+- [No-login invoice generator](https://easyinvoicepdf.com/invoice-generator-no-login)
+- [Open-source invoice generator](https://easyinvoicepdf.com/open-source-invoice-generator)
+- [Stripe invoice alternative](https://easyinvoicepdf.com/stripe-invoice-alternative)
+- [PDF invoice templates](https://easyinvoicepdf.com/invoice-template-pdf)
 
-### [Free Invoice Generator - No Login Required](https://easyinvoicepdf.com/invoice-generator-no-login)
+## Documentation and source
 
-Generate professional invoices in seconds with no account, no signup and no ads. Data stays in your browser.
-
-- Create invoices in about 60 seconds; download PDF instantly
-- No registration, hidden paywalls, or data upload for normal editing
-- For freelancers, developers, small businesses, and anyone who needs a PDF invoice now
-- [Start with default template](https://easyinvoicepdf.com/?template=default)
-
-### [Open-Source Invoice Generator - Free & Customizable](https://easyinvoicepdf.com/open-source-invoice-generator)
-
-Fully open-source, self-hostable invoice PDF generator with transparent codebase and no vendor lock-in.
-
-- Generate PDFs instantly; fork and modify the code for your workflow
-- Self-host for full control over branding and data privacy
-- For indie hackers, SaaS builders, agencies, and privacy-focused users
-- Licensed under AGPL-3.0; commercial license available for proprietary use
-- [Start with default template](https://easyinvoicepdf.com/?template=default)
-
-### [Stripe Invoice Alternative - Easier & Faster](https://easyinvoicepdf.com/stripe-invoice-alternative)
-
-Create invoices without Stripe setup. Fast, free, ad-free PDF workflow when you do not need payment processing.
-
-- No Stripe account, dashboard, or product configuration required
-- Does not accept payments; use for one-off PDF invoices and document billing elsewhere
-- EasyInvoicePDF focuses on fast invoice PDFs; Stripe covers payments, subscriptions, and full billing
-- For freelancers, consultants, developers, and side projects
-- [Start with Stripe-style template](https://easyinvoicepdf.com/?template=stripe)
-
-### [Free PDF Invoice Templates - Professional & Downloadable](https://easyinvoicepdf.com/invoice-template-pdf)
-
-Pre-designed invoice layout with automatic totals, tax labels, and currency support. No design skills or desktop software required.
-
-- Universally accepted PDF format; consistent across devices and printers
-- Skip Word or Excel formatting headaches and manual calculations
-- Faster than heavyweight tools when you only need a document
-- For freelancers, contractors, agencies, and small businesses
-- [Generate invoice PDF](https://easyinvoicepdf.com)
-
-
-## Changelog & Releases
-
-The changelog documents product releases, new invoice features, UX improvements, fixes, and infrastructure work for EasyInvoicePDF.
-
-### [EasyInvoicePDF v1.0.3 - Seller and Buyer Improvements](https://easyinvoicepdf.com/changelog/seller-buyer-improvements)
-
-Adds seller and buyer email visibility toggles, reworked seller/buyer form sections with clearer locked states, a confirm dialog for unsaved changes, mobile auto-scroll when switching tabs, and an out-of-date dates helper.
-
-### [EasyInvoicePDF v1.0.2 - QR Codes and Invoice Improvements](https://easyinvoicepdf.com/changelog/qr-codes-and-improvements)
-
-Adds QR code generation for invoices, logo upload for the default template, a searchable currency combobox, improved multi-page PDF support, better error handling, and Sentry tracking for selected flows.
-
-### [EasyInvoicePDF v1.0.1 - Customizable Tax and VAT Labels](https://easyinvoicepdf.com/changelog/stripe-pdf-template)
-
-Adds customizable tax and tax number labels, per-language tax label behavior, stronger VAT validation, localization updates, PDF rendering improvements, and broader end-to-end test coverage.
-
-### [EasyInvoicePDF v1.0.0 - Initial Launch](https://easyinvoicepdf.com/changelog/easy-invoice-pdf-launch)
-
-Launches EasyInvoicePDF with live invoice preview, instant PDF download, shareable links, default and Stripe-inspired templates, 10 languages, broad currency support, European VAT support, and privacy-focused browser-side editing.
-
-## How it works (video tutorials)
-
-Step-by-step video guides for using EasyInvoicePDF. Page: [How EasyInvoicePDF Works](https://easyinvoicepdf.com/how-it-works)
-
-- **Overview**: Create and customize professional PDF invoices with live preview
-- **Add seller**: Save seller details and reuse them on future invoices
-- **Add buyer**: Save buyer details and reuse them on future invoices
-- **Weekly invoices**: Generate invoices for a week of work
-
-## Licensing and availability
-
-- **Open source**: Source code is licensed under [GNU AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html).
-
-## Links
-
-- [Invoice Generator](https://easyinvoicepdf.com)
-- [GitHub repository](https://github.com/VladSez/easy-invoice-pdf)
-- [About us/ marketing](https://easyinvoicepdf.com/en/about)
-- [About us (Polish)](https://easyinvoicepdf.com/pl/about)
-- [About us (German)](https://easyinvoicepdf.com/de/about)
-- [About us (Spanish)](https://easyinvoicepdf.com/es/about)
-- [About us (Portuguese)](https://easyinvoicepdf.com/pt/about)
-- [About us (Russian)](https://easyinvoicepdf.com/ru/about)
-- [About us (Ukrainian)](https://easyinvoicepdf.com/uk/about)
-- [About us (French)](https://easyinvoicepdf.com/fr/about)
-- [About us (Italian)](https://easyinvoicepdf.com/it/about)
-- [About us (Dutch)](https://easyinvoicepdf.com/nl/about)
-- [Features (on About)](https://easyinvoicepdf.com/en/about#features)
-- [FAQ (on About)](https://easyinvoicepdf.com/en/about#faq)
+- [How it works](https://easyinvoicepdf.com/how-it-works)
 - [Changelog](https://easyinvoicepdf.com/changelog)
-- [How it works (video tutorials)](https://easyinvoicepdf.com/how-it-works)
-- [Founder](https://easyinvoicepdf.com/founder)
-- [Terms of Service](https://easyinvoicepdf.com/tos)
+- [GitHub repository](https://github.com/VladSez/easy-invoice-pdf)
 - [GitHub releases](https://github.com/VladSez/easy-invoice-pdf/releases)
-- [EasyInvoicePDF on X](https://x.com/EasyInvoicePDF)
-- [Vlad Sazonau on X](https://x.com/vladsazonau)
-- [Demo video (YouTube)](https://www.youtube.com/watch?v=iAROeCIcZ40)
-- [Bug reports / feature board](https://pdfinvoicegenerator.userjot.com/board/bugs)
-- [Free Invoice Generator - No Login Required](https://easyinvoicepdf.com/invoice-generator-no-login)
-- [Open-Source Invoice Generator - Free & Customizable](https://easyinvoicepdf.com/open-source-invoice-generator)
-- [Stripe Invoice Alternative - Easier & Faster](https://easyinvoicepdf.com/stripe-invoice-alternative)
-- [Free PDF Invoice Templates - Professional & Downloadable](https://easyinvoicepdf.com/invoice-template-pdf)
+- [Terms of Service](https://easyinvoicepdf.com/tos)
+- [Founder](https://easyinvoicepdf.com/founder)
+- [Bug reports and feature requests](https://pdfinvoicegenerator.userjot.com/board/bugs)
+
+## Maintainer
+
+- [Vlad Sazonau](https://vladsazon.com)
