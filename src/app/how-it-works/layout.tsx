@@ -35,6 +35,9 @@ export const metadata: Metadata = {
   publisher: "Vlad Sazonau",
   alternates: {
     canonical: HOW_IT_WORKS_PAGE_URL,
+    types: {
+      "text/markdown": "https://easyinvoicepdf.com/how-it-works.md",
+    },
   },
   robots: {
     index: true,

@@ -38,14 +38,16 @@ export default function HowItWorksPage() {
               How EasyInvoicePDF Works
             </h1>
             <p className="relative z-10 mx-auto mt-6 max-w-2xl text-pretty text-sm text-gray-600 md:text-lg">
-              Discover how to create, customize, and send professional PDF
-              invoices online with EasyInvoicePDF. Watch step-by-step tutorial
-              videos to learn invoice creation, branding, and customization
-              tips. Start generating invoices instantly in our{" "}
+              Learn how to create, customize, download, and share professional
+              PDF invoices online with EasyInvoicePDF. These step-by-step videos show you how
+              to use our{" "}
               <Link href="/" className={cn(linkClassName)}>
-                free online invoice generator
+                free invoice generator
               </Link>
-              .
+              , save seller and buyer details, add branding, and prepare weekly
+              invoices. Whether you need an invoice maker for a one-off bill or
+              a small business invoice template you can reuse, you can start in
+              seconds.
             </p>
           </div>
         </div>

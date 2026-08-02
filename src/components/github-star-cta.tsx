@@ -6,9 +6,10 @@ import { Star } from "lucide-react";
 import { GithubIcon } from "./etc/github-logo";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { githubStarCountFormatter } from "@/utils/number-formatter";
+import { cn } from "@/lib/utils";
 
 export function GitHubStarCTA({
-  githubStarsCount,
+  githubStarsCount = 0,
 }: {
   githubStarsCount: number;
 }) {
@@ -19,6 +20,9 @@ export function GitHubStarCTA({
   const gitHubStarCountFormatted = githubStarCountFormatter
     .format(githubStarsCount)
     .toLowerCase();
+
+  const isTwoCharacterStarCount =
+    githubStarsCount > 0 && gitHubStarCountFormatted.length === 2;
 
   return (
     <Tooltip>
@@ -42,7 +46,12 @@ export function GitHubStarCTA({
             </span>
             {githubStarsCount > 0 ? (
               <>
-                <span className="min-w-[27px] text-center text-sm font-medium tabular-nums text-slate-50">
+                <span
+                  className={cn(
+                    isTwoCharacterStarCount ? "min-w-5" : "min-w-[27px]",
+                    "text-center text-sm font-medium tabular-nums text-slate-50",
+                  )}
+                >
                   {gitHubStarCountFormatted}
                 </span>
               </>

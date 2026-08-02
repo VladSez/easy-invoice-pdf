@@ -23,6 +23,8 @@ export function buildHowItWorksJsonLd(baseUrl = PROD_WEBSITE_URL): Graph {
       "@type": "VideoObject" as const,
       name: video.title,
       description: video.description,
+      uploadDate: video.uploadDate,
+      thumbnailUrl: video.thumbnailUrl,
       embedUrl: video.embedUrl,
       contentUrl: video.watchUrl,
       url: `${pageUrl}#${video.id}`,

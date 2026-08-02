@@ -27,6 +27,9 @@ export async function generateMetadata({
       keywords: messages.Metadata.about.keywords,
       alternates: {
         canonical: `${APP_URL}/${params.locale}/about`,
+        types: {
+          "text/markdown": `${APP_URL}/${params.locale}/about.md`,
+        },
         languages: {
           // @ts-expect-error - x-default is not a valid locale
           "x-default": `${APP_URL}/en/about`,

@@ -64,6 +64,22 @@ Free, open-source invoice generator for creating professional PDF invoices in th
 - Mobile-friendly design: responsive layout and touch-optimized UX for phones and tablets.
 - Open-source codebase with a clear AGPL-3.0
 
+## Machine-readable Markdown pages
+
+Concise, citation-friendly Markdown versions of key product pages for search engines, AI assistants, and retrieval agents.
+
+- [Invoice Generator](https://easyinvoicepdf.com/invoice-generator.md)
+- [How EasyInvoicePDF Works](https://easyinvoicepdf.com/how-it-works.md)
+- [About EasyInvoicePDF — English](https://easyinvoicepdf.com/en/about.md)
+- [O EasyInvoicePDF — Polish](https://easyinvoicepdf.com/pl/about.md)
+- [Über EasyInvoicePDF — German](https://easyinvoicepdf.com/de/about.md)
+- [Acerca de EasyInvoicePDF — Spanish](https://easyinvoicepdf.com/es/about.md)
+- [Sobre o EasyInvoicePDF — Portuguese](https://easyinvoicepdf.com/pt/about.md)
+- [О EasyInvoicePDF — Russian](https://easyinvoicepdf.com/ru/about.md)
+- [Про EasyInvoicePDF — Ukrainian](https://easyinvoicepdf.com/uk/about.md)
+- [À propos d’EasyInvoicePDF — French](https://easyinvoicepdf.com/fr/about.md)
+- [Informazioni su EasyInvoicePDF — Italian](https://easyinvoicepdf.com/it/about.md)
+- [Over EasyInvoicePDF — Dutch](https://easyinvoicepdf.com/nl/about.md)
 
 ## Solution pages
 
