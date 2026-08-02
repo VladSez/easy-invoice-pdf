@@ -21,9 +21,6 @@ export function GitHubStarCTA({
     .format(githubStarsCount)
     .toLowerCase();
 
-  const isTwoCharacterStarCount =
-    githubStarsCount > 0 && gitHubStarCountFormatted.length === 2;
-
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -48,7 +45,6 @@ export function GitHubStarCTA({
               <>
                 <span
                   className={cn(
-                    isTwoCharacterStarCount ? "min-w-5" : "min-w-[27px]",
                     "text-center text-sm font-medium tabular-nums text-slate-50",
                   )}
                 >

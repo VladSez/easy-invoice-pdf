@@ -74,24 +74,6 @@ describe("GitHubStarCTA", () => {
     },
   );
 
-  it("should use a narrower minimum width only for two-character star counts", () => {
-    const { rerender } = renderGitHubStarCTA(1012);
-
-    expect(
-      within(screen.getByTestId("github-star-cta-button")).getByText("1k"),
-    ).toHaveClass("min-w-5");
-
-    rerender(
-      <TooltipProvider delayDuration={0}>
-        <GitHubStarCTA githubStarsCount={1050} />
-      </TooltipProvider>,
-    );
-
-    expect(
-      within(screen.getByTestId("github-star-cta-button")).getByText("1.1k"),
-    ).toHaveClass("min-w-[27px]");
-  });
-
   it("should show unabbreviated star count for three-digit values", () => {
     const githubStarsCount = 969;
 
