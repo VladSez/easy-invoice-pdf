@@ -66,6 +66,9 @@ function buildTemplateMetadata(
     description: APP_PAGE_DESCRIPTION,
     alternates: {
       canonical,
+      types: {
+        "text/markdown": `${APP_URL}/invoice-generator.md`,
+      },
     },
     openGraph: {
       title,
