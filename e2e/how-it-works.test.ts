@@ -35,7 +35,7 @@ test.describe("How it works page", () => {
 
     await expect(
       page.getByText(
-        "Learn how to create, customize, and send professional PDF invoices online with EasyInvoicePDF. These step-by-step videos show you how to use our free invoice generator, save seller and buyer details, add branding, and prepare weekly invoices. Whether you need an invoice maker for a one-off bill or a small business invoice template you can reuse, you can start in seconds.",
+        "Learn how to create, customize, download, and share professional PDF invoices online with EasyInvoicePDF. These step-by-step videos show you how to use our free invoice generator, save seller and buyer details, add branding, and prepare weekly invoices. Whether you need an invoice maker for a one-off bill or a small business invoice template you can reuse, you can start in seconds.",
       ),
     ).toBeVisible();
 
