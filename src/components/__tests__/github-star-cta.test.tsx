@@ -55,16 +55,41 @@ describe("GitHubStarCTA", () => {
     expect(within(link).queryByText("Star on GitHub")).not.toBeInTheDocument();
   });
 
-  it("should show two-decimal compact star count for values like 2350", () => {
-    const githubStarsCount = 2350;
+  it.each([
+    { githubStarsCount: 1012, expected: "1k" },
+    { githubStarsCount: 1050, expected: "1.1k" },
+    { githubStarsCount: 2350, expected: "2.4k" },
+  ])(
+    "should show $expected for $githubStarsCount stars",
+    ({ githubStarsCount, expected }) => {
+      renderGitHubStarCTA(githubStarsCount);
 
-    renderGitHubStarCTA(githubStarsCount);
+      const link = screen.getByTestId("github-star-cta-button");
 
-    const link = screen.getByTestId("github-star-cta-button");
+      expect(within(link).getByText(expected)).toBeInTheDocument();
 
-    expect(within(link).getByText("2.35k")).toBeInTheDocument();
+      expect(
+        within(link).queryByText("Star on GitHub"),
+      ).not.toBeInTheDocument();
+    },
+  );
 
-    expect(within(link).queryByText("Star on GitHub")).not.toBeInTheDocument();
+  it("should use a narrower minimum width only for two-character star counts", () => {
+    const { rerender } = renderGitHubStarCTA(1012);
+
+    expect(
+      within(screen.getByTestId("github-star-cta-button")).getByText("1k"),
+    ).toHaveClass("min-w-5");
+
+    rerender(
+      <TooltipProvider delayDuration={0}>
+        <GitHubStarCTA githubStarsCount={1050} />
+      </TooltipProvider>,
+    );
+
+    expect(
+      within(screen.getByTestId("github-star-cta-button")).getByText("1.1k"),
+    ).toHaveClass("min-w-[27px]");
   });
 
   it("should show unabbreviated star count for three-digit values", () => {

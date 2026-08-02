@@ -1,5 +1,6 @@
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { GITHUB_URL } from "@/config";
+import { githubStarCountFormatter } from "@/utils/number-formatter";
 
 /**
  * Server component that renders a GitHub star CTA button for the marketing/about page.
@@ -10,13 +11,17 @@ import { GITHUB_URL } from "@/config";
 export async function GithubStarCtaMarketingPageBody() {
   const githubStarsCount = await fetchGithubStars();
 
+  const gitHubStarCountFormatted = githubStarCountFormatter
+    .format(githubStarsCount)
+    .toLowerCase();
+
   return (
     <div className="">
       <a
         href={GITHUB_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="group relative inline-flex h-12 items-center justify-center gap-2 overflow-hidden rounded-full border border-slate-800 bg-slate-900 px-6 font-medium text-white transition-all duration-300 hover:border-slate-700 hover:bg-slate-800 active:scale-95"
+        className="group relative inline-flex h-12 items-center justify-center gap-1 overflow-hidden rounded-full border border-slate-800 bg-slate-900 px-6 font-medium text-white transition-all duration-300 hover:border-slate-700 hover:bg-slate-800 active:scale-95"
         aria-label="Star project on GitHub"
         data-testid="github-star-cta-about-page-button"
       >
@@ -40,7 +45,9 @@ export async function GithubStarCtaMarketingPageBody() {
         </div>
         <div className="mx-2 h-4 w-[1px] bg-slate-300" />
         <div className="flex items-center gap-1 text-slate-50 transition-colors group-hover:text-white">
-          <span className="font-medium tabular-nums">{githubStarsCount}</span>
+          <span className="font-medium tabular-nums">
+            {gitHubStarCountFormatted}
+          </span>
         </div>
       </a>
     </div>
