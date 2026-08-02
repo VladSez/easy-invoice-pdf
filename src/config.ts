@@ -46,6 +46,8 @@ export const HOW_IT_WORKS_VIDEOS = [
     description: "Learn how to create and customize your invoices.",
     embedUrl: VIDEO_DEMO_YOUTUBE_URL,
     watchUrl: "https://www.youtube.com/watch?v=iAROeCIcZ40",
+    uploadDate: "2026-04-16T15:49:53-07:00",
+    thumbnailUrl: "https://i.ytimg.com/vi/iAROeCIcZ40/maxresdefault.jpg",
     iframeTitle: "EasyInvoicePDF Demo Video",
   },
   {
@@ -56,6 +58,8 @@ export const HOW_IT_WORKS_VIDEOS = [
     description: "Save seller details and reuse them on future invoices.",
     embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
     watchUrl: "https://www.youtube.com/watch?v=xfSF35c0vfU",
+    uploadDate: "2026-06-13T13:06:34-07:00",
+    thumbnailUrl: "https://i.ytimg.com/vi/xfSF35c0vfU/maxresdefault.jpg",
     iframeTitle: "How to add a seller - EasyInvoicePDF",
   },
   {
@@ -66,6 +70,8 @@ export const HOW_IT_WORKS_VIDEOS = [
     description: "Save buyer details and reuse them on future invoices.",
     embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_BUYER,
     watchUrl: "https://www.youtube.com/watch?v=XxAY0YGgXIk",
+    uploadDate: "2026-06-13T13:17:28-07:00",
+    thumbnailUrl: "https://i.ytimg.com/vi/XxAY0YGgXIk/maxresdefault.jpg",
     iframeTitle: "How to add a buyer - EasyInvoicePDF",
   },
   {
@@ -76,6 +82,8 @@ export const HOW_IT_WORKS_VIDEOS = [
     description: "Learn how to generate invoices for a week of work.",
     embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_INVOICE_FOR_ONE_WEEK,
     watchUrl: "https://www.youtube.com/watch?v=6KzDBBiAJmg",
+    uploadDate: "2026-06-13T13:23:38-07:00",
+    thumbnailUrl: "https://i.ytimg.com/vi/6KzDBBiAJmg/maxresdefault.jpg",
     iframeTitle: "How to create weekly invoices - EasyInvoicePDF",
   },
 ] as const satisfies {
@@ -86,6 +94,8 @@ export const HOW_IT_WORKS_VIDEOS = [
   description: string;
   embedUrl: string;
   watchUrl: string;
+  uploadDate: string;
+  thumbnailUrl: string;
   iframeTitle: string;
 }[];
 
