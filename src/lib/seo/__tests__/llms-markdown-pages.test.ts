@@ -27,15 +27,24 @@ describe("LLM-facing Markdown pages", () => {
 
     expect(content).toMatch(/^# EasyInvoicePDF|^# .*EasyInvoicePDF/m);
     expect(content).toContain("https://easyinvoicepdf.com/");
-    expect(content).toContain("2026-08-02");
+
+    const updatedAtMatch = /\b(\d{4}-\d{2}-\d{2})\b/.exec(content);
+    expect(updatedAtMatch, "expected a YYYY-MM-DD update date").not.toBeNull();
+
+    const updatedAt = new Date(`${updatedAtMatch?.[1]}T00:00:00Z`);
+    expect(updatedAt.getTime()).not.toBeNaN();
+    expect(updatedAt.getTime()).toBeLessThanOrEqual(Date.now());
+
     expect(content.length).toBeGreaterThan(1_000);
   });
 
   it("lists every Markdown page in llms.txt", () => {
     const llmsTxt = readPublicFile("llms.txt");
 
-    for (const path of MARKDOWN_PATHS) {
-      expect(llmsTxt).toContain(`https://easyinvoicepdf.com/${path}`);
-    }
+    const linkedPaths = [
+      ...llmsTxt.matchAll(/https:\/\/easyinvoicepdf\.com\/(\S+?\.md)/g),
+    ].map((match) => match[1]);
+
+    expect(new Set(linkedPaths)).toEqual(new Set(MARKDOWN_PATHS));
   });
 });

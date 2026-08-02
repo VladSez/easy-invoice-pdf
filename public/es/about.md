@@ -15,7 +15,7 @@ EasyInvoicePDF es un generador de facturas PDF gratuito y de código abierto par
 - Permite personalizar vendedor, cliente, artículos, moneda, fechas, impuestos, idioma y diseño.
 - Compatible con 10 idiomas y más de 120 monedas.
 - Admite IVA, GST, impuesto sobre ventas y etiquetas fiscales personalizadas.
-- Incluye plantillas clásica e inspirada en Stripe, logotipo personalizado, códigos QR y PDF de varias páginas.
+- Incluye una plantilla clásica y otra inspirada en Stripe, logotipo personalizado, códigos QR y PDF de varias páginas.
 - Los enlaces compartidos guardan una copia comprimida de los datos de la factura en la URL. Cualquier persona con el enlace completo puede abrirlo.
 - El código fuente usa la licencia GNU AGPL-3.0 y se puede alojar en un servidor propio.
 
@@ -41,7 +41,7 @@ La edición normal, la vista previa y la creación del PDF ocurren en el navegad
 
 ### ¿Puedo personalizar la factura?
 
-Sí. Puede cambiar empresas, artículos, precios, moneda, fechas, impuestos, idioma, logotipo, código QR y diseño.
+Sí. Puede editar los datos del vendedor y del cliente, así como artículos, precios, moneda, fechas, impuestos, idioma, logotipo, código QR y diseño.
 
 ## Enlaces oficiales
 

@@ -23,7 +23,7 @@ EasyInvoicePDF é um gerador gratuito e de código aberto para criar, personaliz
 
 Use o EasyInvoicePDF quando precisar rapidamente de uma fatura PDF profissional, sem instalar software de contabilidade nem criar uma conta. É útil para faturas pontuais, dados reutilizáveis de empresas e clientes, moedas internacionais, etiquetas localizadas e documentos com a sua marca.
 
-O EasyInvoicePDF é um gerador de documentos, não software de contabilidade, aconselhamento fiscal, processador de pagamentos ou garantia de conformidade legal ou tributária. O utilizador deve confirmar os requisitos locais.
+O EasyInvoicePDF é um gerador de documentos; não é um software de contabilidade, um serviço de aconselhamento fiscal, um processador de pagamentos nem uma garantia de conformidade legal ou tributária. O utilizador deve confirmar os requisitos locais.
 
 ## Perguntas frequentes
 
