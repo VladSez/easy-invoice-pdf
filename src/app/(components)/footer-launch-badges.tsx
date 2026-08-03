@@ -122,7 +122,7 @@ export function FooterLaunchBadges() {
             rx="12"
             fill="#FFFDF7"
             stroke="#78A7A2"
-            stroke-width="3"
+            strokeWidth="3"
           />
           <g transform="translate(13 9) scale(.104)">
             <path
@@ -134,10 +134,10 @@ export function FooterLaunchBadges() {
             x="64"
             y="24"
             fill="#FFA100"
-            font-size="13"
-            font-family="Avenir Next, Inter, ui-sans-serif, system-ui, sans-serif"
-            font-weight="700"
-            letter-spacing=".08em"
+            fontSize="13"
+            fontFamily="Avenir Next, Inter, ui-sans-serif, system-ui, sans-serif"
+            fontWeight="700"
+            letterSpacing=".08em"
           >
             TRENDING ON
           </text>
@@ -145,10 +145,10 @@ export function FooterLaunchBadges() {
             x="64"
             y="43"
             fill="#053F43"
-            font-size="22"
-            font-family="Avenir Next, Inter, ui-sans-serif, system-ui, sans-serif"
-            font-weight="800"
-            letter-spacing=".06em"
+            fontSize="22"
+            fontFamily="Avenir Next, Inter, ui-sans-serif, system-ui, sans-serif"
+            fontWeight="800"
+            letterSpacing=".06em"
           >
             BuildHop
           </text>
