@@ -415,14 +415,14 @@ export const InvoiceForm = memo(function InvoiceForm({
           </div>
         </AccordionItem>
 
-        {/* Invoice Items */}
+        {/* Items and pricing */}
         <AccordionItem
           value={ACCORDION_ITEMS}
           className="rounded-lg border shadow"
           data-testid={`invoice-items-section`}
         >
           <AccordionTrigger className="px-4 py-3">
-            <Legend>Invoice Items</Legend>
+            <Legend>Items and pricing</Legend>
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
             <InvoiceItems
@@ -470,8 +470,8 @@ export const InvoiceForm = memo(function InvoiceForm({
             <ErrorMessage>{errors.total.message}</ErrorMessage>
           ) : (
             <InputHelperMessage>
-              Calculated automatically based on (Net Amount + VAT Amount) *
-              Number of invoice items
+              Calculated automatically as the sum of each line item&apos;s
+              pre-tax amount (Net Amount + VAT Amount)
             </InputHelperMessage>
           )}
         </div>

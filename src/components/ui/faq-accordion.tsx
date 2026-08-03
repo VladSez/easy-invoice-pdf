@@ -31,7 +31,7 @@ function FaqAccordionItem({
       )}
     >
       <summary className="flex cursor-pointer select-none list-none appearance-none items-center justify-between gap-2 py-3 text-left [&::-webkit-details-marker]:hidden">
-        <h3 className="text-base font-medium text-stone-900">{question}</h3>
+        <h3 className="text-base font-medium text-stone-950">{question}</h3>
         <PlusIcon
           className="size-5 shrink-0 text-stone-400 transition-all duration-200 will-change-transform group-open:rotate-45 group-hover:text-stone-900"
           aria-hidden="true"
@@ -39,7 +39,7 @@ function FaqAccordionItem({
       </summary>
       <div className="overflow-hidden">
         <div className="pb-4 pr-4">
-          <p className="cursor-default text-pretty text-sm leading-relaxed text-stone-600">
+          <p className="cursor-default text-pretty text-sm leading-relaxed text-stone-700">
             {children}
           </p>
         </div>

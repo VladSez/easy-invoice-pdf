@@ -113,6 +113,18 @@
       "sharing": {
         "question": "How do I share an invoice with a client?",
         "answer": "Use the share action in the editor to copy a link. The link carries your invoice data so recipients can open it in their browser, review the invoice, and download the PDF without signing up. Anyone with the full link can open it, so only send it to people you trust."
+      },
+      "howItWorks": {
+        "question": "How does EasyInvoicePDF work?",
+        "answer": "Enter your invoice details, preview the PDF instantly, then download or share your invoice."
+      },
+      "whoItIsFor": {
+        "question": "Who is EasyInvoicePDF for?",
+        "answer": "EasyInvoicePDF is built for freelancers, consultants, agencies, contractors, and small businesses that need a fast invoice without complicated accounting software."
+      },
+      "whyEasyInvoicePdf": {
+        "question": "Why choose EasyInvoicePDF?",
+        "answer": "Unlike traditional invoicing platforms, EasyInvoicePDF requires no account and processes your invoice entirely inside your browser."
       }
     }
   }

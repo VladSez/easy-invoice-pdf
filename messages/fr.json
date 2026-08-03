@@ -113,6 +113,18 @@
       "sharing": {
         "question": "Puis-je partager des factures avec d'autres personnes ?",
         "answer": "Oui. Vous créez un lien partageable pour que les clients consultent la facture et téléchargent le PDF. Seules les personnes disposant du lien peuvent l'ouvrir."
+      },
+      "howItWorks": {
+        "question": "Comment fonctionne EasyInvoicePDF ?",
+        "answer": "Saisissez les informations de votre facture, prévisualisez instantanément le PDF, puis téléchargez ou partagez votre facture."
+      },
+      "whoItIsFor": {
+        "question": "À qui s'adresse EasyInvoicePDF ?",
+        "answer": "EasyInvoicePDF est conçu pour les freelances, les consultants, les agences, les prestataires et les petites entreprises qui souhaitent créer rapidement une facture sans logiciel de comptabilité complexe."
+      },
+      "whyEasyInvoicePdf": {
+        "question": "Pourquoi choisir EasyInvoicePDF ?",
+        "answer": "Contrairement aux plateformes de facturation traditionnelles, EasyInvoicePDF ne nécessite aucun compte et traite votre facture entièrement dans votre navigateur."
       }
     }
   }

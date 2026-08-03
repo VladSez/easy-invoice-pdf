@@ -521,7 +521,7 @@ test.describe("Invoice Generator Page", () => {
     // **Check INVOICE ITEMS section**
     const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
     await expect(
-      invoiceItemsSection.getByText("Invoice Items", { exact: true }),
+      invoiceItemsSection.getByText("Items and pricing", { exact: true }),
     ).toBeVisible();
 
     // Check visibility toggles in settings
@@ -1160,7 +1160,7 @@ test.describe("Invoice Generator Page", () => {
       { id: "general-information-section", label: "General Information" },
       { id: "seller-information-section", label: "Seller Information" },
       { id: "buyer-information-section", label: "Buyer Information" },
-      { id: "invoice-items-section", label: "Invoice Items" },
+      { id: "invoice-items-section", label: "Items and pricing" },
     ] as const;
 
     // Verify all sections are initially visible and expanded
@@ -1180,7 +1180,7 @@ test.describe("Invoice Generator Page", () => {
 
     await page
       .getByTestId("invoice-items-section")
-      .getByRole("button", { name: "Invoice Items" })
+      .getByRole("button", { name: "Items and pricing", exact: true })
       .click();
 
     // Verify mixed state: general and buyer expanded, seller and items collapsed
@@ -1205,7 +1205,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       page
         .getByTestId("invoice-items-section")
-        .getByRole("region", { name: "Invoice Items" }),
+        .getByRole("region", { name: "Items and pricing", exact: true }),
     ).toBeHidden();
 
     // Verify the state is saved in localStorage
@@ -1249,7 +1249,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       page
         .getByTestId("invoice-items-section")
-        .getByRole("region", { name: "Invoice Items" }),
+        .getByRole("region", { name: "Items and pricing", exact: true }),
     ).toBeHidden();
 
     // Toggle states after reload
@@ -1285,7 +1285,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       page
         .getByTestId("invoice-items-section")
-        .getByRole("region", { name: "Invoice Items" }),
+        .getByRole("region", { name: "Items and pricing", exact: true }),
     ).toBeHidden();
 
     // Verify updated state is saved in localStorage

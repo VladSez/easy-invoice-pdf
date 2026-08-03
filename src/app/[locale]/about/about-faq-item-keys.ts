@@ -9,4 +9,7 @@ export const ABOUT_FAQ_ITEM_KEYS = [
   "customization",
   "dataSecurity",
   "sharing",
+  "howItWorks",
+  "whoItIsFor",
+  "whyEasyInvoicePdf",
 ] as const;

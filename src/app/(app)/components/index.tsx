@@ -120,6 +120,24 @@ const PdfViewer = ({
 const TAB_INVOICE_FORM = MOBILE_TABS_VALUES[0];
 const TAB_INVOICE_PREVIEW = MOBILE_TABS_VALUES[1];
 
+function LocalStorageNotice() {
+  return (
+    <CustomTooltip
+      trigger={
+        <button
+          type="button"
+          className="cursor-default text-zinc-700 transition-colors hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+        >
+          Saved locally in your browser
+        </button>
+      }
+      content="No data is uploaded to the server"
+      side="bottom"
+      popoverOnMobile
+    />
+  );
+}
+
 export function InvoiceClientPage({
   invoiceDataState,
   handleInvoiceDataChange,
@@ -266,12 +284,21 @@ export function InvoiceClientPage({
             />
           </div>
           {/** Mobile version */}
-          {invoiceLastUpdatedAtFormatted ? (
-            <div className="relative mt-2 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
-              <span className="font-semibold">Invoice last updated:</span>{" "}
-              {invoiceLastUpdatedAtFormatted}
-            </div>
-          ) : null}
+          <div className="relative mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
+            <LocalStorageNotice />
+            {invoiceLastUpdatedAtFormatted ? (
+              <>
+                <span
+                  className="hidden h-3 w-px bg-zinc-400 sm:block"
+                  aria-hidden="true"
+                />
+                <span>
+                  <span className="font-semibold">Invoice last updated:</span>{" "}
+                  {invoiceLastUpdatedAtFormatted}
+                </span>
+              </>
+            ) : null}
+          </div>
 
           <div
             className="mt-5 flex flex-wrap justify-center gap-1 text-xs text-zinc-900"
@@ -341,14 +368,25 @@ export function InvoiceClientPage({
           </div>
           {/* Invoice preview section i.e. right column (Desktop version) */}
           <div className="relative col-span-8 h-[620px] w-full max-w-full 2xl:h-[700px]">
-            {invoiceLastUpdatedAtFormatted ? (
-              <div className="relative">
-                <div className="absolute -top-5 right-0 z-10 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2 md:-mb-5 lg:text-right">
-                  <span className="font-semibold">Invoice last updated:</span>{" "}
-                  {invoiceLastUpdatedAtFormatted}
-                </div>
+            <div className="relative">
+              <div className="absolute -top-5 right-0 z-10 flex items-center gap-x-2 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2 md:-mb-5 lg:text-right">
+                <LocalStorageNotice />
+                {invoiceLastUpdatedAtFormatted ? (
+                  <>
+                    <span
+                      className="hidden h-3 w-px bg-zinc-400 sm:block"
+                      aria-hidden="true"
+                    />
+                    <span>
+                      <span className="font-semibold">
+                        Invoice last updated:
+                      </span>{" "}
+                      {invoiceLastUpdatedAtFormatted}
+                    </span>
+                  </>
+                ) : null}
               </div>
-            ) : null}
+            </div>
             <PdfViewer
               invoiceData={invoiceDataState}
               errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
