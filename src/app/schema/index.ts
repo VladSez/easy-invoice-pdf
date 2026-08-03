@@ -709,6 +709,7 @@ export const SUPPORTED_DATE_FORMATS = [
   "MM/DD/YYYY", // 03/20/2024
   "D MMMM YYYY", // 20 March 2024
   "MMMM D, YYYY", // March 20, 2024 (Stripe template default date format)
+  "MMM D, YYYY", // Mar 20, 2024
   "DD.MM.YYYY", // 20.03.2024
   "DD-MM-YYYY", // 20-03-2024
   "YYYY.MM.DD", // 2024.03.20

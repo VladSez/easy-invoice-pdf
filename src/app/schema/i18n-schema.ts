@@ -129,6 +129,18 @@ const faqSchema = z
           question: z.string(),
           answer: z.string(),
         }),
+        howItWorks: z.object({
+          question: z.string(),
+          answer: z.string(),
+        }),
+        whoItIsFor: z.object({
+          question: z.string(),
+          answer: z.string(),
+        }),
+        whyEasyInvoicePdf: z.object({
+          question: z.string(),
+          answer: z.string(),
+        }),
       })
       .strict(),
   })
