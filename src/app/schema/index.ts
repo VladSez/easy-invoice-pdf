@@ -705,14 +705,19 @@ export const LANGUAGE_TO_NATIVE_LABEL = {
 
 export const SUPPORTED_DATE_FORMATS = [
   "YYYY-MM-DD", // 2024-03-20 (default template date format)
-  "DD/MM/YYYY", // 20/03/2024
+  "YYYY/MM/DD", // 2024/03/20
+  "YYYY.MM.DD", // 2024.03.20
   "MM/DD/YYYY", // 03/20/2024
+  "MM-DD-YYYY", // 03-20-2024
+  "M/D/YYYY", // 3/20/2024
   "D MMMM YYYY", // 20 March 2024
+  "D MMM YYYY", // 20 Mar 2024
   "MMMM D, YYYY", // March 20, 2024 (Stripe template default date format)
   "MMM D, YYYY", // Mar 20, 2024
-  "DD.MM.YYYY", // 20.03.2024
   "DD-MM-YYYY", // 20-03-2024
-  "YYYY.MM.DD", // 2024.03.20
+  "DD/MM/YYYY", // 20/03/2024
+  "DD.MM.YYYY", // 20.03.2024
+  "D/M/YYYY", // 20/3/2024
 ] as const;
 
 export const DEFAULT_DATE_FORMAT = "YYYY-MM-DD";
