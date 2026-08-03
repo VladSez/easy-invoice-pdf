@@ -29,7 +29,7 @@ const AccordionTrigger = React.forwardRef<
     <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        "flex flex-1 items-center justify-between py-4 font-medium transition-all [&[data-state=open]>svg]:rotate-180",
+        "group flex flex-1 items-center justify-between py-4 font-medium transition-all",
         className,
       )}
       {...props}
@@ -37,7 +37,7 @@ const AccordionTrigger = React.forwardRef<
       {children}
       <CustomTooltip
         trigger={
-          <ChevronDown className="size-6 shrink-0 rounded-full bg-gray-200/70 p-1 transition-all duration-200 hover:bg-gray-200" />
+          <ChevronDown className="size-6 shrink-0 rounded-full bg-gray-200/70 p-1 transition-all duration-200 group-hover:bg-gray-200 group-data-[state=open]:rotate-180" />
         }
         content="Expand/Collapse Section"
       />

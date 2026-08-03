@@ -470,8 +470,8 @@ export const InvoiceForm = memo(function InvoiceForm({
             <ErrorMessage>{errors.total.message}</ErrorMessage>
           ) : (
             <InputHelperMessage>
-              Calculated automatically based on (Net Amount + VAT Amount) *
-              Number of items
+              Calculated automatically as the sum of each line item&apos;s
+              pre-tax amount (Net Amount + VAT Amount)
             </InputHelperMessage>
           )}
         </div>
