@@ -259,11 +259,6 @@ function DefaultFooterLinks() {
       <FooterLinkGroup
         heading="Community"
         links={[
-          {
-            href: DISCORD_COMMUNITY_URL,
-            label: "Share feedback",
-            external: true,
-          },
           { href: DISCORD_COMMUNITY_URL, label: "Discord", external: true },
           { href: REDDIT_COMMUNITY_URL, label: "Reddit", external: true },
           { href: PRODUCT_TWITTER_URL, label: "X (Twitter)", external: true },

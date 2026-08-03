@@ -113,6 +113,18 @@
       "sharing": {
         "question": "Czy mogę udostępniać faktury innym?",
         "answer": "Tak. Tworzysz link do udostępnienia, aby klienci zobaczyli fakturę i pobrali PDF. Dostęp mają tylko osoby z linkiem."
+      },
+      "howItWorks": {
+        "question": "Jak działa EasyInvoicePDF?",
+        "answer": "Wprowadź dane faktury, od razu zobacz podgląd pliku PDF, a następnie pobierz lub udostępnij fakturę."
+      },
+      "whoItIsFor": {
+        "question": "Dla kogo jest EasyInvoicePDF?",
+        "answer": "EasyInvoicePDF powstał z myślą o freelancerach, konsultantach, agencjach, wykonawcach i małych firmach, które potrzebują szybko wystawić fakturę bez skomplikowanego oprogramowania księgowego."
+      },
+      "whyEasyInvoicePdf": {
+        "question": "Dlaczego warto wybrać EasyInvoicePDF?",
+        "answer": "W przeciwieństwie do tradycyjnych platform do fakturowania EasyInvoicePDF nie wymaga konta i przetwarza fakturę w całości w Twojej przeglądarce."
       }
     }
   }

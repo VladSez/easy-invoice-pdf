@@ -55,7 +55,7 @@ describe("buildAboutJsonLdGraph", () => {
 
     const mainEntity = faqPage.mainEntity as { name: string }[];
     expect(Array.isArray(mainEntity)).toBe(true);
-    expect(mainEntity.length).toBe(6);
+    expect(mainEntity.length).toBe(9);
     expect(mainEntity[0].name).toBe(plMessages.FAQ.items.whatIs.question);
   });
 
@@ -89,6 +89,6 @@ describe("buildAboutJsonLdGraph", () => {
 
     const mainEntity = faqPage.mainEntity as { name: string }[];
     expect(Array.isArray(mainEntity)).toBe(true);
-    expect(mainEntity.length).toBe(6);
+    expect(mainEntity.length).toBe(9);
   });
 });

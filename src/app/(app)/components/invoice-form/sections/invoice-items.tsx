@@ -826,7 +826,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               htmlFor={`itemInvoiceItemNumberIsVisible0`}
               className="text-balance font-medium"
             >
-              Show &quot;Number&quot; Column in the Invoice Items Table
+              Show &quot;Number&quot; Column in the Items and pricing table
             </Label>
 
             <Controller

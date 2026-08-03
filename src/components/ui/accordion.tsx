@@ -37,7 +37,7 @@ const AccordionTrigger = React.forwardRef<
       {children}
       <CustomTooltip
         trigger={
-          <ChevronDown className="h-6 w-6 shrink-0 rounded-full p-1 transition-all duration-200 hover:bg-gray-200" />
+          <ChevronDown className="size-6 shrink-0 rounded-full bg-gray-200/70 p-1 transition-all duration-200 hover:bg-gray-200" />
         }
         content="Expand/Collapse Section"
       />

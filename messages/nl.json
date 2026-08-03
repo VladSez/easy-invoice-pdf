@@ -113,6 +113,18 @@
       "sharing": {
         "question": "Kan ik facturen delen met anderen?",
         "answer": "Ja. Je maakt een deelbare link zodat klanten de factuur zien en de PDF downloaden. Alleen mensen met de link kunnen deze openen."
+      },
+      "howItWorks": {
+        "question": "Hoe werkt EasyInvoicePDF?",
+        "answer": "Vul je factuurgegevens in, bekijk direct een voorbeeld van de PDF en download of deel daarna je factuur."
+      },
+      "whoItIsFor": {
+        "question": "Voor wie is EasyInvoicePDF bedoeld?",
+        "answer": "EasyInvoicePDF is gemaakt voor freelancers, consultants, bureaus, zzp'ers en kleine bedrijven die snel een factuur nodig hebben zonder ingewikkelde boekhoudsoftware."
+      },
+      "whyEasyInvoicePdf": {
+        "question": "Waarom kiezen voor EasyInvoicePDF?",
+        "answer": "In tegenstelling tot traditionele facturatieplatforms heb je voor EasyInvoicePDF geen account nodig en wordt je factuur volledig in je browser verwerkt."
       }
     }
   }

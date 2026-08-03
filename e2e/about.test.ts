@@ -1,11 +1,6 @@
 /* eslint-disable playwright/no-conditional-expect */
 /* eslint-disable playwright/no-conditional-in-test */
-import {
-  DISCORD_COMMUNITY_URL,
-  GITHUB_URL,
-  TWITTER_URL,
-  VIDEO_DEMO_FALLBACK_IMG,
-} from "@/config";
+import { GITHUB_URL, TWITTER_URL, VIDEO_DEMO_FALLBACK_IMG } from "@/config";
 import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_LANGUAGES } from "@/app/schema";
 import { expect, test } from "@playwright/test";
 
@@ -240,18 +235,6 @@ test.describe("About page", () => {
     await expect(termsOfServiceLink).toBeVisible();
     await expect(termsOfServiceLink).toHaveAttribute("href", "/tos");
     await expect(termsOfServiceLink).not.toHaveAttribute("target", "_blank");
-
-    const shareFeedbackLink = footerLinks.getByRole("link", {
-      name: "Share feedback",
-      exact: true,
-    });
-
-    await expect(shareFeedbackLink).toBeVisible();
-    await expect(shareFeedbackLink).toHaveAttribute(
-      "href",
-      DISCORD_COMMUNITY_URL,
-    );
-    await expect(shareFeedbackLink).toHaveAttribute("target", "_blank");
 
     const githubLink = footerLinks.getByRole("link", {
       name: "GitHub",

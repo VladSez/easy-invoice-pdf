@@ -113,6 +113,18 @@
       "sharing": {
         "question": "Kann ich Rechnungen mit anderen teilen?",
         "answer": "Ja. Sie erstellen einen teilbaren Link, damit Kunden die Rechnung sehen und das PDF herunterladen können. Nur Personen mit dem Link haben Zugriff."
+      },
+      "howItWorks": {
+        "question": "Wie funktioniert EasyInvoicePDF?",
+        "answer": "Geben Sie Ihre Rechnungsdaten ein, sehen Sie sich sofort eine Vorschau des PDFs an und laden Sie Ihre Rechnung anschließend herunter oder teilen Sie sie."
+      },
+      "whoItIsFor": {
+        "question": "Für wen ist EasyInvoicePDF gedacht?",
+        "answer": "EasyInvoicePDF wurde für Freiberufler, Berater, Agenturen, Auftragnehmer und kleine Unternehmen entwickelt, die schnell eine Rechnung ohne komplizierte Buchhaltungssoftware benötigen."
+      },
+      "whyEasyInvoicePdf": {
+        "question": "Warum EasyInvoicePDF wählen?",
+        "answer": "Anders als herkömmliche Rechnungsplattformen erfordert EasyInvoicePDF kein Konto und verarbeitet Ihre Rechnung vollständig in Ihrem Browser."
       }
     }
   }

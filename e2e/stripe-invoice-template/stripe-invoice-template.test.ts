@@ -470,7 +470,7 @@ test.describe("Stripe Invoice Template", () => {
     await expect(newPersonAuthorizedToIssueFieldset).toBeHidden();
   });
 
-  test("Invoice items fields and switches only appear for default template (except for Tax Settings field)", async ({
+  test("Items and pricing fields and switches only appear for default template (except for Tax Settings field)", async ({
     page,
   }) => {
     // Verify default template is selected by default
@@ -482,7 +482,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // 1. Show Number Column switch
     const showNumberColumnSwitch = invoiceItemsSection.getByRole("switch", {
-      name: 'Show "Number" Column in the Invoice Items Table',
+      name: 'Show "Number" Column in the Items and pricing table',
     });
 
     await expect(showNumberColumnSwitch).toBeVisible();
