@@ -99,23 +99,15 @@ function MobileEditorLoading() {
 function DesktopEditorLoading() {
   return (
     <>
-      <div className="col-span-4 -mt-0.5 mr-[27px] hidden lg:block">
+      <div className="col-span-4 -mt-0.5 mb-7 mr-[27px] hidden lg:block">
         <div className="rounded-t-lg border shadow">
           <div className="h-[618px] overflow-hidden px-4 pb-4 pt-0 2xl:h-[700px]">
             <FormLoadingContent />
           </div>
         </div>
-        <div className="mt-1 flex h-6 items-center gap-1.5">
-          <Skeleton className="size-6 rounded-full" />
-          <Skeleton className="h-3 w-[112px]" />
-        </div>
       </div>
 
       <div className="relative col-span-8 hidden h-[620px] w-full max-w-full lg:block 2xl:h-[700px]">
-        <div className="absolute -top-5 right-0 flex h-4 items-center gap-2">
-          <Skeleton className="h-3 w-[156px]" />
-          <Skeleton className="h-3 w-[228px]" />
-        </div>
         <div className="flex h-full items-center justify-center overflow-hidden rounded-sm border border-slate-200 bg-slate-100">
           <div className="h-[92%] w-[68%] rounded-sm bg-white shadow-sm">
             <div className="space-y-4 p-8">
