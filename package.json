@@ -69,6 +69,8 @@
     "clsx": "2.1.1",
     "cmdk": "1.0.0",
     "dayjs": "1.11.13",
+    "embla-carousel-auto-scroll": "8.6.0",
+    "embla-carousel-react": "8.6.0",
     "eslint-plugin-react-hooks": "5.2.0",
     "file-saver": "2.0.5",
     "googleapis": "148.0.0",
