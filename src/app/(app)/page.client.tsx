@@ -46,6 +46,7 @@ import { useShowRandomCTAToastOnIdle } from "./hooks/use-show-random-cta-toast";
 import type { ChangelogSummary } from "@/app/changelog/utils";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
+import { InvoicePageLoadingSkeleton } from "@/app/(app)/loading";
 
 // TODO: enable later when PRO version is released, this is PRO FEATURE =)
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
@@ -710,7 +711,7 @@ export function AppPageClient({
 
   // we only want to render the page on client side
   if (!invoiceDataState) {
-    return null;
+    return <InvoicePageLoadingSkeleton />;
   }
 
   return (

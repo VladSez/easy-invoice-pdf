@@ -134,6 +134,7 @@ function LocalStorageNotice() {
       content="No data is uploaded to the server"
       side="bottom"
       popoverOnMobile
+      className="w-fit"
     />
   );
 }
