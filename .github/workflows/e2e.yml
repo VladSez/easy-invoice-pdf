@@ -78,6 +78,7 @@ jobs:
 
       - name: 🔍 Get PR URL
         id: pr-url
+        if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPOSITORY: ${{ github.repository }}
