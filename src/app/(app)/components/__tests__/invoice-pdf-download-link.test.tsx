@@ -3,7 +3,6 @@
 import { getInitialInvoiceData } from "@/app/constants";
 import { CTAToastProvider } from "@/app/(app)/contexts/cta-toast-context";
 import { CTA_TOAST_TIMEOUT } from "@/app/(app)/components/cta-toasts";
-import { LOADING_BUTTON_TEXT } from "@/app/(app)/components/invoice-form";
 import { DeviceContextProvider } from "@/contexts/device-context";
 import type { InvoiceData } from "@/app/schema";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -91,7 +90,10 @@ vi.mock("sonner", () => ({
   }),
 }));
 
-import { InvoicePDFDownloadLink } from "../invoice-pdf-download-link";
+import {
+  InvoicePDFDownloadLink,
+  LOADING_BUTTON_TEXT,
+} from "../invoice-pdf-download-link";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";

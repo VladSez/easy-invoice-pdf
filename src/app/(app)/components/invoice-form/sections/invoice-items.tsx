@@ -40,6 +40,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { MAX_INVOICE_ITEMS } from "@/app/schema";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
@@ -71,6 +72,7 @@ export const InvoiceItems = memo(function InvoiceItems({
   invoiceData,
 }: InvoiceItemsSettingsProps) {
   const [deleteItemIndex, setDeleteItemIndex] = useState<number | null>(null);
+  const hasReachedItemLimit = fields.length >= MAX_INVOICE_ITEMS;
 
   return (
     <>
@@ -806,13 +808,18 @@ export const InvoiceItems = memo(function InvoiceItems({
               umamiTrackEvent("add_invoice_item");
             }}
             variant="default"
+            disabled={hasReachedItemLimit}
             className="w-full gap-2"
           >
             <Plus className="size-4" />
             Add invoice item
           </Button>
         }
-        content="Add a new line item with name, quantity, price and tax details"
+        content={
+          hasReachedItemLimit
+            ? `Invoices support at most ${MAX_INVOICE_ITEMS} line items`
+            : "Add a new line item with name, quantity, price and tax details"
+        }
         side="bottom"
         showArrow
       />

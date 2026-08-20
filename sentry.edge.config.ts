@@ -5,6 +5,11 @@
 
 import * as Sentry from "@sentry/nextjs";
 
+import {
+  scrubSensitiveUrlParamsBeforeBreadcrumb,
+  scrubSensitiveUrlParamsFromEvent,
+} from "@/lib/sentry/scrub-sensitive-url-params";
+
 const isCI = process.env.CI === "true";
 
 const isSentryEnabled = process.env.SENTRY_ENABLED === "true" && !isCI;
@@ -19,6 +24,12 @@ if (isSentryEnabled) {
 
     // Recommended production settings
     debug: false,
+
+    // Privacy: the invoice data lives in the `?data=` query param, redact it in
+    // every URL we report (request url, referrer, breadcrumbs, spans)
+    beforeSend: scrubSensitiveUrlParamsFromEvent,
+    beforeSendTransaction: scrubSensitiveUrlParamsFromEvent,
+    beforeBreadcrumb: scrubSensitiveUrlParamsBeforeBreadcrumb,
 
     // Performance settings
     replaysSessionSampleRate: 0.1, // Sample 10% of sessions

@@ -3,7 +3,6 @@
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   accordionSchema,
-  invoiceItemSchema,
   invoiceSchema,
   PDF_DATA_LOCAL_STORAGE_KEY,
   type AccordionState,
@@ -27,9 +26,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import type { NonReadonly, Prettify } from "@/types";
+import { calculateInvoiceTotal } from "./utils/calculate-invoice-total";
 import { calculateItemTotals } from "./utils/calculate-item-totals";
 import { formErrorsToToast } from "./utils/form-errors-to-toast";
 import { hasAnyItemTotalsChanged } from "./utils/has-item-totals-changed";
+import { parseValidatedInvoiceItems } from "./utils/validated-invoice-items";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
@@ -45,7 +46,6 @@ import {
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
-import { z } from "zod";
 
 import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 import { AlertIcon, ErrorMessage } from "./common";
@@ -54,8 +54,6 @@ import { GeneralInformation } from "./sections/general-information";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
 
-export const LOADING_BUTTON_TIMEOUT = 400;
-export const LOADING_BUTTON_TEXT = "Generating Document...";
 const DEBOUNCE_TIMEOUT = 500;
 
 const DEFAULT_ACCORDION_VALUES = [
@@ -124,28 +122,29 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   // calculate totals and other values when invoice items change
   useEffect(() => {
-    // run validations before calculations because user can input invalid data
-    const validatedItems = z.array(invoiceItemSchema).safeParse(invoiceItems);
+    // Bail out while the user is mid-edit with input the schema rejects, so we
+    // never turn half-typed values into totals and write them back. Clearing the
+    // amount field to retype it would otherwise zero out the item's totals, and
+    // a VAT of 500 would persist a bogus tax amount.
+    // `zodResolver` does not do this for us: it populates `errors`, but form
+    // state (and so `useWatch`) still holds the raw, unvalidated input.
+    const validatedItemsResult = parseValidatedInvoiceItems(invoiceItems);
 
-    if (!validatedItems.success) {
-      console.error("Invalid items:", validatedItems.error);
+    if (!validatedItemsResult.success) {
+      console.error("Invalid items:", validatedItemsResult.error);
+
+      Sentry.captureException(validatedItemsResult.error);
+
       return;
     }
 
-    // Always calculate total, even when no items
-    const total = invoiceItems?.length
-      ? Number(
-          invoiceItems
-            .reduce((sum, item) => sum + (item?.preTaxAmount || 0), 0)
-            .toFixed(2),
-        )
-      : 0;
+    const total = calculateInvoiceTotal(invoiceItems);
 
     console.log(
       "[useEffect] recalculating totals because invoice items changed",
       {
         invoiceItems,
-        validatedItems,
+        validatedItemsResult,
         total,
       },
     );

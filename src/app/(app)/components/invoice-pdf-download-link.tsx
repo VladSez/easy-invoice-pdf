@@ -14,7 +14,6 @@ import dayjs from "dayjs";
 import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { LOADING_BUTTON_TEXT, LOADING_BUTTON_TIMEOUT } from "./invoice-form";
 
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { useDeviceContext } from "@/contexts/device-context";
@@ -23,6 +22,9 @@ import { updateAppMetadata } from "../utils/get-app-metadata";
 import { useCTAToast } from "../contexts/cta-toast-context";
 import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./cta-toasts";
 import { haptic } from "@/lib/haptic";
+
+const LOADING_BUTTON_TIMEOUT = 400;
+export const LOADING_BUTTON_TEXT = "Generating Document...";
 
 // Separate button states into a memoized component
 const ButtonContent = ({
