@@ -7,7 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { AlertCircleIcon, FileTextIcon, PencilIcon } from "lucide-react";
+import {
+  AlertCircleIcon,
+  FileTextIcon,
+  LinkIcon,
+  PencilIcon,
+} from "lucide-react";
 import dynamic from "next/dynamic";
 
 import Link from "next/link";
@@ -237,7 +242,8 @@ export function InvoiceClientPage({
                   variant="outline"
                   className={cn("mx-2 w-full")}
                 >
-                  Generate invoice link
+                  <LinkIcon className="mr-1.5 size-4" />
+                  Get link
                 </Button>
               }
               content={
@@ -285,12 +291,12 @@ export function InvoiceClientPage({
             />
           </div>
           {/** Mobile version */}
-          <div className="relative mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
+          <div className="relative mx-2 mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
             <LocalStorageNotice />
             {invoiceLastUpdatedAtFormatted ? (
               <>
                 <span
-                  className="hidden h-3 w-px bg-zinc-400 sm:block"
+                  className="hidden h-3 w-px bg-zinc-400 min-[453px]:block"
                   aria-hidden="true"
                 />
                 <span>

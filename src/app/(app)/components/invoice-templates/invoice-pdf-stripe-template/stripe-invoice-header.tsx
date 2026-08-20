@@ -14,6 +14,9 @@ export function StripeInvoiceHeader({
   const t = INVOICE_PDF_TRANSLATIONS[language];
   const hasLogo = invoiceData.logo && invoiceData.logo.length > 0;
 
+  const invoiceNumberLabel =
+    invoiceData.invoiceNumberObject?.label ?? t.stripe.invoice;
+
   return (
     <View style={[hasLogo ? {} : { marginBottom: 16 }]}>
       {hasLogo ? (
@@ -29,7 +32,7 @@ export function StripeInvoiceHeader({
         >
           <View style={{ flex: 1, alignItems: "flex-start" }}>
             <Text style={[styles.fontSize18, styles.fontBold, styles.textDark]}>
-              {t.stripe.invoice}
+              {invoiceNumberLabel}
             </Text>
           </View>
           <View style={{ flex: 1, alignItems: "flex-end" }}>
@@ -47,7 +50,7 @@ export function StripeInvoiceHeader({
       ) : (
         // Header with title only
         <Text style={[styles.fontSize18, styles.fontBold, styles.textDark]}>
-          {t.stripe.invoice}
+          {invoiceNumberLabel}
         </Text>
       )}
     </View>

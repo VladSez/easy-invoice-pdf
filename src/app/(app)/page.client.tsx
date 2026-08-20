@@ -7,7 +7,9 @@ import {
   PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_TEMPLATES,
   type InvoiceData,
+  type SupportedTemplates,
 } from "@/app/schema";
+import { getDefaultInvoiceNumberLabel } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useDeviceContext } from "@/contexts/device-context";
 import { useRouter } from "next/navigation";
@@ -50,6 +52,42 @@ import { InvoicePageLoadingSkeleton } from "@/app/(app)/loading";
 
 // TODO: enable later when PRO version is released, this is PRO FEATURE =)
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
+
+/**
+ * Selects the invoice template and updates the invoice data accordingly.
+ *
+ * If the invoice number object label matches a known default label for any supported template,
+ * updates the label to match the default for the newly selected template and the invoice's language.
+ * Preserves custom labels.
+ */
+function selectInvoiceTemplate(
+  invoiceData: InvoiceData,
+  template: SupportedTemplates,
+) {
+  const invoiceNumberObject = invoiceData.invoiceNumberObject;
+
+  // Older Stripe drafts stored the default-template label because Stripe used
+  // to ignore this field. Treat either template's translated value as a default
+  // so those drafts receive the correct heading without changing custom text.
+  const hasKnownDefaultInvoiceNumberLabel = SUPPORTED_TEMPLATES.some(
+    (supportedTemplate) =>
+      invoiceNumberObject?.label ===
+      getDefaultInvoiceNumberLabel(invoiceData.language, supportedTemplate),
+  );
+
+  if (!invoiceNumberObject || !hasKnownDefaultInvoiceNumberLabel) {
+    return { ...invoiceData, template } satisfies InvoiceData;
+  }
+
+  return {
+    ...invoiceData,
+    template,
+    invoiceNumberObject: {
+      ...invoiceNumberObject,
+      label: getDefaultInvoiceNumberLabel(invoiceData.language, template),
+    },
+  } satisfies InvoiceData;
+}
 
 /**
  * Main client component for the invoice application page.
@@ -201,19 +239,15 @@ export function AppPageClient({
 
         const parsedData = invoiceSchema.parse(updatedJson);
 
-        // if template is in url, use it
-        if (templateValidation.success) {
-          parsedData.template = templateValidation.data;
-        }
+        const selectedInvoiceData = templateValidation.success
+          ? selectInvoiceTemplate(parsedData, templateValidation.data)
+          : parsedData;
 
-        setInvoiceDataState(parsedData);
+        setInvoiceDataState(selectedInvoiceData);
       } else {
         if (templateValidation.success) {
           // if no data in local storage and template is in url, set initial data with template from url
-          setInvoiceDataState({
-            ...getInitialInvoiceData(),
-            template: templateValidation.data,
-          });
+          setInvoiceDataState(getInitialInvoiceData(templateValidation.data));
         } else {
           // if no data in local storage, set initial data
           setInvoiceDataState(getInitialInvoiceData());
@@ -223,7 +257,11 @@ export function AppPageClient({
       console.error("Failed to load saved invoice data:", error);
 
       // fallback to initial data on error
-      setInvoiceDataState(getInitialInvoiceData());
+      setInvoiceDataState(
+        getInitialInvoiceData(
+          templateValidation.success ? templateValidation.data : undefined,
+        ),
+      );
 
       toast.error(
         "Unable to load your saved invoice data. For your convenience, we've reset the form to default values. Please try creating a new invoice.",
@@ -285,14 +323,14 @@ export function AppPageClient({
         // The ?template parameter provides a cleaner URL and better user experience
         // while ?data contains the actual invoice data including the template
         // ?template=" " has higher priority than ?data=" " =)
-        if (templateValidation.success) {
-          validatedDataFromURL.template = templateValidation.data;
-        }
+        const selectedInvoiceData = templateValidation.success
+          ? selectInvoiceTemplate(validatedDataFromURL, templateValidation.data)
+          : validatedDataFromURL;
 
-        setInvoiceDataState(validatedDataFromURL);
+        setInvoiceDataState(selectedInvoiceData);
 
         // Store the original URL invoice data for change detection
-        originalUrlInvoiceDataRef.current = validatedDataFromURL;
+        originalUrlInvoiceDataRef.current = selectedInvoiceData;
 
         const appMetadata = getAppMetadata();
 
@@ -417,7 +455,7 @@ export function AppPageClient({
             <p className="text-muted-foreground text-pretty leading-relaxed">
               Click{" "}
               <span className="font-semibold text-foreground">
-                &apos;Generate invoice link&apos;
+                &apos;Get link&apos;
               </span>{" "}
               to create an updated shareable link.
             </p>
@@ -476,7 +514,7 @@ export function AppPageClient({
           <p className="text-muted-foreground text-pretty leading-relaxed">
             Click{" "}
             <span className="font-semibold text-foreground">
-              &apos;Generate invoice link&apos;
+              &apos;Get link&apos;
             </span>{" "}
             to create a new shareable link.
           </p>

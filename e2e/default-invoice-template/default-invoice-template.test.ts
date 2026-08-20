@@ -26,7 +26,7 @@ test.describe("Default Invoice Template", () => {
     downloadDir,
   }) => {
     const downloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
     // Wait for download button to be visible and enabled
     await expect(downloadPdfEnglishButton).toBeVisible();
@@ -93,7 +93,7 @@ test.describe("Default Invoice Template", () => {
 
     // Wait for the download button to be visible and enabled for Stripe template
     const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfStripeButton).toBeVisible();
@@ -153,7 +153,7 @@ test.describe("Default Invoice Template", () => {
 
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
     const downloadPdfPolishButton = page.getByRole("link", {
-      name: "Download PDF in Polish",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfPolishButton).toBeVisible();
@@ -335,7 +335,7 @@ test.describe("Default Invoice Template", () => {
 
     // Wait for the download button to be visible and enabled for Stripe template
     const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in Polish",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfStripeButton).toBeVisible();
@@ -521,7 +521,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const downloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfEnglishButton).toBeVisible();
@@ -574,7 +574,7 @@ test.describe("Default Invoice Template", () => {
 
     // Wait for the download button to be ready after navigation
     const newDownloadPdfButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
     await expect(newDownloadPdfButton).toBeVisible();
     await expect(newDownloadPdfButton).toBeEnabled();
@@ -606,7 +606,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfStripeButton).toBeVisible();
@@ -663,7 +663,7 @@ test.describe("Default Invoice Template", () => {
 
     // Download button in English is visible and enabled
     const downloadPdfButtonEnglish = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
     // Wait for download button to be visible
     await expect(downloadPdfButtonEnglish).toBeVisible();
@@ -699,7 +699,9 @@ test.describe("Default Invoice Template", () => {
       name: "Value",
     });
 
-    await invoiceNumberLabelInput.fill("MOBILE-TEST-001:");
+    const INVOICE_NUMBER_LABEL = "INVOICE NUMBER MOBILE TEST:";
+
+    await invoiceNumberLabelInput.fill(INVOICE_NUMBER_LABEL);
     await invoiceNumberValueInput.fill("2/05-2024");
 
     const finalSection = page.getByTestId("final-section");
@@ -745,7 +747,7 @@ test.describe("Default Invoice Template", () => {
 
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
     const downloadPdfFrenchBtn = page.getByRole("link", {
-      name: "Download PDF in French",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
     // Wait for download button to be visible and enabled
     await expect(downloadPdfFrenchBtn).toBeVisible();
@@ -834,7 +836,7 @@ test.describe("Default Invoice Template", () => {
     ).toBeHidden();
 
     // Verify form data persists
-    await expect(invoiceNumberLabelInput).toHaveValue("MOBILE-TEST-001:");
+    await expect(invoiceNumberLabelInput).toHaveValue(INVOICE_NUMBER_LABEL);
     await expect(invoiceNumberValueInput).toHaveValue("2/05-2024");
 
     await expect(
@@ -907,6 +909,9 @@ test.describe("Default Invoice Template", () => {
       name: "Invoice Template",
     });
     await expect(templateSelect).toHaveValue("stripe");
+    await expect(invoiceNumberLabelInput).toHaveValue(
+      INVOICE_PDF_TRANSLATIONS.fr.stripe.invoice,
+    );
 
     const newFinalSection = page.getByTestId(`final-section`);
 
@@ -922,7 +927,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in French",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfStripeButton).toBeVisible();
@@ -1012,20 +1017,20 @@ test.describe("Default Invoice Template", () => {
     await invoiceNumberLabelInput.fill("Faktura TEST:");
 
     // check that warning message appears
-    const switchToDefaultFormatButton = page.getByRole("button", {
-      name: `Switch to default label ("Faktura nr:")`,
+    const resetToDefaultFormatButton = page.getByRole("button", {
+      name: `Reset to default ("Faktura nr:")`,
     });
 
-    await expect(switchToDefaultFormatButton).toBeVisible();
+    await expect(resetToDefaultFormatButton).toBeVisible();
 
-    // switch to default format
-    await switchToDefaultFormatButton.click();
+    // reset to default format
+    await resetToDefaultFormatButton.click();
 
     // check that the invoice number is updated to the default format
     await expect(invoiceNumberLabelInput).toHaveValue(`Faktura nr:`);
 
-    // check that the switch to default format button is hidden
-    await expect(switchToDefaultFormatButton).toBeHidden();
+    // check that the reset to default format button is hidden
+    await expect(resetToDefaultFormatButton).toBeHidden();
 
     // fill once again the invoice number
     await invoiceNumberLabelInput.fill("Faktura TEST:");
@@ -1056,7 +1061,7 @@ test.describe("Default Invoice Template", () => {
 
     // Verify that the download PDF button is visible after page reload
     const downloadPdfPlButton = page.getByRole("link", {
-      name: "Download PDF in Polish",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfPlButton).toBeVisible();
@@ -1089,7 +1094,7 @@ test.describe("Default Invoice Template", () => {
 
     await expect(
       page.getByRole("button", {
-        name: `Switch to default label ("Fatura N°:")`,
+        name: `Reset to default ("Fatura N°:")`,
       }),
     ).toBeVisible();
 
@@ -1109,7 +1114,7 @@ test.describe("Default Invoice Template", () => {
 
     // we wait until this button is visible and enabled, that means that the PDF preview has been regenerated
     const downloadPdfPtButton = page.getByRole("link", {
-      name: "Download PDF in Portuguese",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfPtButton).toBeVisible();
@@ -1175,6 +1180,22 @@ test.describe("Default Invoice Template", () => {
     });
     await expect(templateSelect).toHaveValue("stripe");
 
+    // Switching templates replaces a custom label with the new template's
+    // localized default.
+    await expect(newInvoiceNumberLabelInput).toHaveValue(
+      INVOICE_PDF_TRANSLATIONS.pt.stripe.invoice,
+    );
+
+    // Language changes use the Stripe heading instead of the default
+    // template's invoice-number label.
+    await newLanguageSelect.selectOption("en");
+    await expect(newInvoiceNumberLabelInput).toHaveValue("Invoice");
+
+    await newLanguageSelect.selectOption("pt");
+    await expect(newInvoiceNumberLabelInput).toHaveValue("Fatura");
+
+    await newInvoiceNumberLabelInput.fill("Fatura CUSTOM LABEL N°:");
+
     // Currency should be CHF after navigating back to the previous page
     const currencyCombobox3 = page.getByRole("combobox", { name: "Currency" });
     await expect(currencyCombobox3).toContainText("CHF");
@@ -1196,7 +1217,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const downloadPdfStripeButton = page.getByRole("link", {
-      name: "Download PDF in Portuguese",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfStripeButton).toBeVisible();
@@ -1294,7 +1315,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const downloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfEnglishButton).toBeVisible();
@@ -1404,7 +1425,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const newDownloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     // Download the PDF again
@@ -1520,7 +1541,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const downloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfEnglishButton).toBeVisible();
@@ -1596,7 +1617,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(800);
 
     const downloadPDFButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPDFButton).toBeVisible();
@@ -1673,7 +1694,7 @@ test.describe("Default Invoice Template", () => {
 
     // Download PDF with Stripe template + logo
     const stripeDownloadPDFButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(stripeDownloadPDFButton).toBeVisible();
@@ -1780,7 +1801,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const downloadPdfButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
     await expect(downloadPdfButton).toBeVisible();
     await expect(downloadPdfButton).toBeEnabled();
@@ -1900,7 +1921,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const newDownloadPdfButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
     await expect(newDownloadPdfButton).toBeVisible();
     await expect(newDownloadPdfButton).toBeEnabled();
@@ -1981,10 +2002,10 @@ test.describe("Default Invoice Template", () => {
       CUSTOM_SERVICE_PERIOD_LABEL,
     );
 
-    // Check that "Switch to default label ("Service period")" text is displayed
+    // Check that the reset helper is displayed
     await expect(
       servicePeriodFieldset.getByRole("button", {
-        name: 'Switch to default label ("Service period")',
+        name: 'Reset to default ("Service period")',
       }),
     ).toBeVisible();
 
@@ -2009,7 +2030,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const downloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfEnglishButton).toBeVisible();
@@ -2102,7 +2123,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const newDownloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     const [downloadWithoutServicePeriod] = await Promise.all([
@@ -2164,10 +2185,10 @@ test.describe("Default Invoice Template", () => {
       CUSTOM_DATE_OF_SALES_LABEL,
     );
 
-    // Check that "Switch to default label ("Date of sales")" text is displayed
+    // Check that the reset helper is displayed
     await expect(
       servicePeriodFieldset.getByRole("button", {
-        name: 'Switch to default label ("Date of sales/of executing the service")',
+        name: 'Reset to default ("Date of sales/of executing the service")',
       }),
     ).toBeVisible();
 
@@ -2186,7 +2207,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const downloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfEnglishButton).toBeVisible();
@@ -2271,7 +2292,7 @@ test.describe("Default Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const newDownloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     const [downloadWithoutDateOfSales] = await Promise.all([

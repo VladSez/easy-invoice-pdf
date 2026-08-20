@@ -4,10 +4,14 @@ import {
   SUPPORTED_TEMPLATES,
   DEFAULT_DATE_FORMAT,
   type InvoiceData,
+  type SupportedTemplates,
   type SellerData,
   type BuyerData,
 } from "../schema";
-import { INVOICE_PDF_TRANSLATIONS } from "../(app)/pdf-i18n-translations/pdf-translations";
+import {
+  getDefaultInvoiceNumberLabel,
+  INVOICE_PDF_TRANSLATIONS,
+} from "../(app)/pdf-i18n-translations/pdf-translations";
 import dayjs from "dayjs";
 
 /**
@@ -192,11 +196,18 @@ export const INITIAL_INVOICE_DATA = {
  * Returns initial invoice data with a freshly computed default invoice number.
  * Use when resetting form state at runtime (avoids stale month on long-lived tabs).
  */
-export function getInitialInvoiceData() {
+export function getInitialInvoiceData(
+  template: SupportedTemplates = DEFAULT_TEMPLATE,
+) {
   return {
     ...INITIAL_INVOICE_DATA,
+    template,
     invoiceNumberObject: {
       ...INITIAL_INVOICE_DATA.invoiceNumberObject,
+      label: getDefaultInvoiceNumberLabel(
+        INITIAL_INVOICE_DATA.language,
+        template,
+      ),
       value: getInvoiceDefaultNumberValue(),
     },
   } satisfies InvoiceData;

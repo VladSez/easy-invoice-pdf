@@ -145,7 +145,7 @@ function renderInvoicePDFDownloadLink({
 }
 
 function getDownloadLink() {
-  return screen.getByRole("link", { name: /Download PDF in/i });
+  return screen.getByRole("link", { name: /Download PDF/i });
 }
 
 describe("InvoicePDFDownloadLink", () => {
@@ -160,10 +160,17 @@ describe("InvoicePDFDownloadLink", () => {
     vi.useRealTimers();
   });
 
-  it("should render download link with language label when PDF is ready", () => {
+  it("should render a language-specific desktop download link when PDF is ready", () => {
     renderInvoicePDFDownloadLink();
 
     expect(getDownloadLink()).toHaveTextContent("Download PDF in English");
+  });
+
+  it("should render a concise mobile download link", () => {
+    renderInvoicePDFDownloadLink({ isMobile: true });
+
+    expect(getDownloadLink()).toHaveTextContent("Download PDF");
+    expect(getDownloadLink()).not.toHaveTextContent("Download PDF in English");
   });
 
   it("should call updatePdfInstance when document mounts", () => {

@@ -97,7 +97,8 @@ export function InvoicePageHeader({
                     variant="outline"
                     className={cn("mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto")}
                   >
-                    Generate invoice link
+                    <LinkIcon className="mr-1.5 size-4" />
+                    Get link
                   </Button>
                 }
                 content={
