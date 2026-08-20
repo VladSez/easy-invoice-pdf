@@ -7,9 +7,7 @@ import {
   PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_TEMPLATES,
   type InvoiceData,
-  type SupportedTemplates,
 } from "@/app/schema";
-import { getDefaultInvoiceNumberLabel } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useDeviceContext } from "@/contexts/device-context";
 import { useRouter } from "next/navigation";
@@ -48,46 +46,11 @@ import { useShowRandomCTAToastOnIdle } from "./hooks/use-show-random-cta-toast";
 import type { ChangelogSummary } from "@/app/changelog/utils";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
+import { selectInvoiceTemplate } from "./utils/select-invoice-template";
 import { InvoicePageLoadingSkeleton } from "@/app/(app)/loading";
 
 // TODO: enable later when PRO version is released, this is PRO FEATURE =)
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
-
-/**
- * Selects the invoice template and updates the invoice data accordingly.
- *
- * If the invoice number object label matches a known default label for any supported template,
- * updates the label to match the default for the newly selected template and the invoice's language.
- * Preserves custom labels.
- */
-function selectInvoiceTemplate(
-  invoiceData: InvoiceData,
-  template: SupportedTemplates,
-) {
-  const invoiceNumberObject = invoiceData.invoiceNumberObject;
-
-  // Older Stripe drafts stored the default-template label because Stripe used
-  // to ignore this field. Treat either template's translated value as a default
-  // so those drafts receive the correct heading without changing custom text.
-  const hasKnownDefaultInvoiceNumberLabel = SUPPORTED_TEMPLATES.some(
-    (supportedTemplate) =>
-      invoiceNumberObject?.label ===
-      getDefaultInvoiceNumberLabel(invoiceData.language, supportedTemplate),
-  );
-
-  if (!invoiceNumberObject || !hasKnownDefaultInvoiceNumberLabel) {
-    return { ...invoiceData, template } satisfies InvoiceData;
-  }
-
-  return {
-    ...invoiceData,
-    template,
-    invoiceNumberObject: {
-      ...invoiceNumberObject,
-      label: getDefaultInvoiceNumberLabel(invoiceData.language, template),
-    },
-  } satisfies InvoiceData;
-}
 
 /**
  * Main client component for the invoice application page.

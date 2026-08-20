@@ -1146,5 +1146,5 @@ export function getDefaultInvoiceNumberLabel(
     return translation.stripe.invoice;
   }
 
-  return `${translation.invoiceNumber}:`;
+  return `${translation.invoiceNumber}:` as const;
 }

@@ -157,11 +157,8 @@ export function scrubSensitiveUrlParamsFromEvent<T extends Event>(event: T): T {
     const headers = request.headers;
 
     if (headers) {
-      // The browser SDK sends `Referer`, servers/proxies may lowercase it
-      for (const key of ["Referer", "referer", "Referrer", "referrer"]) {
-        const value = headers[key];
-
-        if (typeof value === "string") {
+      for (const [key, value] of Object.entries(headers)) {
+        if (key.toLowerCase() === "referer" && typeof value === "string") {
           headers[key] = scrubUrl(value);
         }
       }

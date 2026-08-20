@@ -132,6 +132,28 @@ describe("scrubSensitiveUrlParamsFromEvent (errors)", () => {
     });
   });
 
+  it("scrubs referer headers regardless of key casing", () => {
+    const event = {
+      request: {
+        headers: {
+          REFERER: "https://easyinvoicepdf.com/?data=N4IgtghgLg",
+          ReFeReR: "https://easyinvoicepdf.com/?data=N4IgtghgLg&locale=pl",
+          "User-Agent": "Mozilla/5.0",
+        },
+      },
+    } as unknown as ErrorEvent;
+
+    const scrubbed = scrubSensitiveUrlParamsFromEvent(event);
+
+    expect(scrubbed.request?.headers?.REFERER).toBe(
+      "https://easyinvoicepdf.com/?data=[Filtered]",
+    );
+    expect(scrubbed.request?.headers?.ReFeReR).toBe(
+      "https://easyinvoicepdf.com/?data=[Filtered]&locale=pl",
+    );
+    expect(scrubbed.request?.headers?.["User-Agent"]).toBe("Mozilla/5.0");
+  });
+
   it("returns events without request data unchanged", () => {
     const event = { message: "boom" } as unknown as ErrorEvent;
 

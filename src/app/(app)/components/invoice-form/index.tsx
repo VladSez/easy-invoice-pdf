@@ -140,7 +140,8 @@ export const InvoiceForm = memo(function InvoiceForm({
 
     const total = calculateInvoiceTotal(invoiceItems);
 
-    console.log(
+    // eslint-disable-next-line no-console
+    console.info(
       "[useEffect] recalculating totals because invoice items changed",
       {
         invoiceItems,
