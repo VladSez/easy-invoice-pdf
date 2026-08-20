@@ -494,6 +494,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
       name: "Invoice Number",
     });
 
+    // Old URLs load without ?template=, so the stored default-template label is kept.
     await expect(
       invoiceNumberFieldset.getByRole("textbox", { name: "Label" }),
     ).toHaveValue("Faktura nr:");
@@ -555,9 +556,10 @@ test.describe("Generate Invoice Link (Get link)", () => {
       name: "Invoice Number",
     });
 
+    // Compressed URLs include ?template=stripe, so the label migrates to the Stripe default.
     await expect(
       newInvoiceNumberFieldset.getByRole("textbox", { name: "Label" }),
-    ).toHaveValue("Faktura nr:");
+    ).toHaveValue("Faktura");
 
     await expect(
       newInvoiceNumberFieldset.getByRole("textbox", { name: "Value" }),
