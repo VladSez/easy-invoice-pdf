@@ -4,6 +4,7 @@ import {
   STRIPE_DEFAULT_DATE_FORMAT,
   type InvoiceData,
 } from "@/app/schema";
+import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import fs from "node:fs";
 import path from "node:path";
 import { uploadLogoFile } from "./utils";
@@ -22,6 +23,51 @@ test.describe("Stripe Invoice Template", () => {
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
 
     await page.goto("/?template=default");
+  });
+
+  test("uses template-specific default invoice number labels", async ({
+    page,
+  }) => {
+    // Older Stripe drafts stored the default-template label even though the
+    // Stripe PDF ignored it. Verify that loading one migrates only the default.
+    await page.evaluate(
+      ({ invoiceData, storageKey }) => {
+        localStorage.setItem(storageKey, JSON.stringify(invoiceData));
+      },
+      {
+        storageKey: PDF_DATA_LOCAL_STORAGE_KEY,
+        invoiceData: {
+          ...INITIAL_INVOICE_DATA,
+          template: "stripe",
+        },
+      },
+    );
+
+    await page.goto("/?template=stripe");
+
+    const generalInfoSection = page.getByTestId("general-information-section");
+    const invoiceNumberFieldset = generalInfoSection.getByRole("group", {
+      name: "Invoice Number",
+    });
+    const invoiceNumberLabelInput = invoiceNumberFieldset.getByRole("textbox", {
+      name: "Label",
+    });
+
+    await expect(invoiceNumberLabelInput).toHaveValue("Invoice");
+
+    await page
+      .getByRole("combobox", { name: "Invoice PDF Language" })
+      .selectOption("pl");
+
+    await expect(invoiceNumberLabelInput).toHaveValue("Faktura");
+
+    await invoiceNumberLabelInput.fill("Custom invoice label");
+
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("default");
+
+    await expect(invoiceNumberLabelInput).toHaveValue("Faktura nr:");
   });
 
   test("displays correct OG meta tags for Stripe template", async ({
@@ -787,7 +833,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Generate PDF to verify Tax column is visible
     const downloadPDFButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPDFButton).toBeVisible();
@@ -930,7 +976,7 @@ test.describe("Stripe Invoice Template", () => {
     expect(parsedData.logo).toBeTruthy();
 
     const downloadPDFButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPDFButton).toBeVisible();
@@ -1043,7 +1089,7 @@ test.describe("Stripe Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const downloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfEnglishButton).toBeVisible();
@@ -1152,7 +1198,7 @@ test.describe("Stripe Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const newDownloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     // Download the PDF again
@@ -1262,7 +1308,7 @@ test.describe("Stripe Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const downloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfEnglishButton).toBeVisible();
@@ -1344,7 +1390,7 @@ test.describe("Stripe Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const newDownloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     const [downloadWithoutServicePeriod] = await Promise.all([
@@ -1451,7 +1497,7 @@ test.describe("Stripe Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const downloadPdfEnglishButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
 
     await expect(downloadPdfEnglishButton).toBeVisible();
@@ -1574,7 +1620,7 @@ test.describe("Stripe Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const downloadPdfButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
     await expect(downloadPdfButton).toBeVisible();
     await expect(downloadPdfButton).toBeEnabled();
@@ -1695,7 +1741,7 @@ test.describe("Stripe Invoice Template", () => {
     await page.waitForTimeout(700);
 
     const newDownloadPdfButton = page.getByRole("link", {
-      name: "Download PDF in English",
+      name: /^(Download PDF|Download PDF in .+)$/,
     });
     await expect(newDownloadPdfButton).toBeVisible();
     await expect(newDownloadPdfButton).toBeEnabled();

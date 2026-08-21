@@ -3,7 +3,10 @@ import {
   ErrorMessage,
   inputErrorClassName,
 } from "@/app/(app)/components/invoice-form/common";
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import {
+  getDefaultInvoiceNumberLabel,
+  INVOICE_PDF_TRANSLATIONS,
+} from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import {
   isFirstDayOfMonth,
   isServicePeriodStartInCurrentMonth,
@@ -89,7 +92,10 @@ export const GeneralInformation = memo(function GeneralInformation({
   const paymentDue = useWatch({ control, name: "paymentDue" });
 
   const t = INVOICE_PDF_TRANSLATIONS[language];
-  const defaultInvoiceNumber = `${t.invoiceNumber}:`;
+  const defaultInvoiceNumberLabel = getDefaultInvoiceNumberLabel(
+    language,
+    template,
+  );
   const defaultServicePeriodLabel = t.servicePeriod;
   const defaultDateOfServiceLabel = t.dateOfService;
 
@@ -111,7 +117,7 @@ export const GeneralInformation = memo(function GeneralInformation({
     !isServicePeriodStartInCurrentMonth(dateOfServiceStart);
 
   const isDefaultInvoiceNumberLabel =
-    invoiceNumberLabel === defaultInvoiceNumber;
+    invoiceNumberLabel === defaultInvoiceNumberLabel;
 
   // extract the month and year from the invoice number (i.e. 1/04-2025 -> 04-2025)
   const extractInvoiceMonthAndYear = /(\d{2}-\d{4})/.exec(
@@ -210,9 +216,17 @@ export const GeneralInformation = memo(function GeneralInformation({
                 id={`template`}
                 className={cn("block", inputErrorClassName(!!errors.template))}
                 onChange={(e) => {
+                  const newTemplate =
+                    e.target.value === "stripe" ? "stripe" : "default";
+
                   field.onChange(e);
 
-                  const newTemplate = e.target.value;
+                  // When the user changes the invoice template, automatically update the invoice number label
+                  // so it matches the default convention for the selected template and current language.
+                  setValue(
+                    "invoiceNumberObject.label",
+                    getDefaultInvoiceNumberLabel(language, newTemplate),
+                  );
 
                   // Handles template-specific form updates for better UX
 
@@ -284,13 +298,10 @@ export const GeneralInformation = memo(function GeneralInformation({
                   const newLanguage = e.target
                     .value as keyof typeof INVOICE_PDF_TRANSLATIONS;
 
-                  const newInvoiceNumberLabel =
-                    INVOICE_PDF_TRANSLATIONS[newLanguage].invoiceNumber;
-
                   // we need to keep the invoice number suffix (e.g. 1/MM-YYYY) for better user experience, when switching language
                   setValue(
                     "invoiceNumberObject.label",
-                    `${newInvoiceNumberLabel}:`,
+                    getDefaultInvoiceNumberLabel(newLanguage, template),
                   );
                   setValue("invoiceNumberObject.value", invoiceNumberValue);
 
@@ -451,12 +462,11 @@ export const GeneralInformation = memo(function GeneralInformation({
                       onClick={() => {
                         setValue(
                           "invoiceNumberObject.label",
-                          defaultInvoiceNumber,
+                          defaultInvoiceNumberLabel,
                         );
                       }}
                     >
-                      Switch to default label (&quot;{defaultInvoiceNumber}
-                      &quot;)
+                      Reset to default (&quot;{defaultInvoiceNumberLabel}&quot;)
                     </ButtonHelper>
                   </InputHelperMessage>
                 )}
@@ -726,8 +736,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                         );
                       }}
                     >
-                      Switch to default label (&quot;{defaultServicePeriodLabel}
-                      &quot;)
+                      Reset to default (&quot;{defaultServicePeriodLabel}&quot;)
                     </ButtonHelper>
                   </InputHelperMessage>
                 ) : null}
@@ -795,8 +804,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                         );
                       }}
                     >
-                      Switch to default label (&quot;{defaultDateOfServiceLabel}
-                      &quot;)
+                      Reset to default (&quot;{defaultDateOfServiceLabel}&quot;)
                     </ButtonHelper>
                   </InputHelperMessage>
                 ) : null}

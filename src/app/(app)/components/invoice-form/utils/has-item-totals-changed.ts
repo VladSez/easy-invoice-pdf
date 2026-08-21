@@ -26,6 +26,8 @@ export function hasItemTotalsChanged(item: InvoiceItemData): boolean {
  * @param items Array of InvoiceItemData
  * @returns true if any item has changed totals, false otherwise
  */
-export function hasAnyItemTotalsChanged(items: InvoiceItemData[]): boolean {
+export function hasAnyItemTotalsChanged(
+  items: ReadonlyArray<InvoiceItemData>,
+): boolean {
   return items.some(hasItemTotalsChanged);
 }

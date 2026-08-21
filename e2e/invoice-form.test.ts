@@ -110,11 +110,11 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     // Check main action buttons
+    await expect(page.getByRole("button", { name: "Get link" })).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Generate invoice link" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Download PDF in English" }),
+      page.getByRole("link", {
+        name: /^(Download PDF|Download PDF in .+)$/,
+      }),
     ).toBeVisible();
 
     const shareFeedbackLink = header.getByRole("link", {
@@ -198,11 +198,11 @@ test.describe("Invoice Generator Page", () => {
     await expect(githubStarCtaButton).toHaveAttribute("target", "_blank");
 
     // Verify buttons are enabled
+    await expect(page.getByRole("button", { name: "Get link" })).toBeEnabled();
     await expect(
-      page.getByRole("button", { name: "Generate invoice link" }),
-    ).toBeEnabled();
-    await expect(
-      page.getByRole("link", { name: "Download PDF in English" }),
+      page.getByRole("link", {
+        name: /^(Download PDF|Download PDF in .+)$/,
+      }),
     ).toBeEnabled();
   });
 
@@ -707,13 +707,13 @@ test.describe("Invoice Generator Page", () => {
     await servicePeriodLabelInput.fill("My custom period");
     await expect(
       servicePeriodFieldset.getByRole("button", {
-        name: `Switch to default label ("${INVOICE_PDF_TRANSLATIONS.pl.servicePeriod}")`,
+        name: `Reset to default ("${INVOICE_PDF_TRANSLATIONS.pl.servicePeriod}")`,
       }),
     ).toBeVisible();
 
     await servicePeriodFieldset
       .getByRole("button", {
-        name: `Switch to default label ("${INVOICE_PDF_TRANSLATIONS.pl.servicePeriod}")`,
+        name: `Reset to default ("${INVOICE_PDF_TRANSLATIONS.pl.servicePeriod}")`,
       })
       .click();
 
@@ -1747,7 +1747,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(page.getByLabel("Payment Due")).toHaveValue("2025-12-15");
   });
 
-  test("allows switching service period PDF label to default from inline helper", async ({
+  test("allows resetting service period PDF label from the inline helper", async ({
     page,
   }) => {
     const generalInfoSection = page.getByRole("region", {
@@ -1760,21 +1760,21 @@ test.describe("Invoice Generator Page", () => {
       name: "Service period PDF label",
     });
     const defaultLabel = INVOICE_PDF_TRANSLATIONS.en.servicePeriod;
-    const switchToDefaultButton = servicePeriodFieldset.getByRole("button", {
-      name: `Switch to default label ("${defaultLabel}")`,
+    const resetToDefaultButton = servicePeriodFieldset.getByRole("button", {
+      name: `Reset to default ("${defaultLabel}")`,
     });
 
     await servicePeriodLabelInput.fill("Custom service period label");
 
-    await expect(switchToDefaultButton).toBeVisible();
+    await expect(resetToDefaultButton).toBeVisible();
 
-    await switchToDefaultButton.click();
+    await resetToDefaultButton.click();
 
     await expect(servicePeriodLabelInput).toHaveValue(defaultLabel);
-    await expect(switchToDefaultButton).toBeHidden();
+    await expect(resetToDefaultButton).toBeHidden();
   });
 
-  test("allows switching date of sales PDF label to default from inline helper", async ({
+  test("allows resetting date of sales PDF label from the inline helper", async ({
     page,
   }) => {
     const generalInfoSection = page.getByRole("region", {
@@ -1787,18 +1787,18 @@ test.describe("Invoice Generator Page", () => {
       name: "Date of sales PDF label",
     });
     const defaultLabel = INVOICE_PDF_TRANSLATIONS.en.dateOfService;
-    const switchToDefaultButton = servicePeriodFieldset.getByRole("button", {
-      name: `Switch to default label ("${defaultLabel}")`,
+    const resetToDefaultButton = servicePeriodFieldset.getByRole("button", {
+      name: `Reset to default ("${defaultLabel}")`,
     });
 
     await dateOfServiceLabelInput.fill("Custom date of sales label");
 
-    await expect(switchToDefaultButton).toBeVisible();
+    await expect(resetToDefaultButton).toBeVisible();
 
-    await switchToDefaultButton.click();
+    await resetToDefaultButton.click();
 
     await expect(dateOfServiceLabelInput).toHaveValue(defaultLabel);
-    await expect(switchToDefaultButton).toBeHidden();
+    await expect(resetToDefaultButton).toBeHidden();
   });
 
   test("allows setting a partial service period", async ({ page }) => {

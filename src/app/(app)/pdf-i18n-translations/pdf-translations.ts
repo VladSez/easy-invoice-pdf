@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   SUPPORTED_LANGUAGES,
   type SupportedLanguages,
+  type SupportedTemplates,
 } from "../../schema/index";
 
 // Schema for seller translations
@@ -1128,3 +1129,22 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
   },
 } as const satisfies Record<SupportedLanguages, TranslationSchema>;
+
+/**
+ * Returns the editable invoice label used by the selected PDF template.
+ *
+ * The default template prints a label next to the invoice number, while the
+ * Stripe template uses the same field as its document heading.
+ */
+export function getDefaultInvoiceNumberLabel(
+  language: SupportedLanguages,
+  template: SupportedTemplates,
+) {
+  const translation = INVOICE_PDF_TRANSLATIONS[language];
+
+  if (template === "stripe") {
+    return translation.stripe.invoice;
+  }
+
+  return `${translation.invoiceNumber}:` as const;
+}

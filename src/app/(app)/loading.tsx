@@ -52,8 +52,10 @@ function LoadingHeader() {
 
         {/* Desktop Buttons skeleton Share Invoice and Download PDF */}
         <div className="mb-1 hidden w-full flex-nowrap justify-end gap-3 lg:flex">
-          <Skeleton className="h-9 w-[163px]" />
-          <Skeleton className="h-9 w-[210px]" />
+          {/* Share Invoice (Get link) */}
+          <Skeleton className="h-9 w-[106px]" />
+          {/* Download PDF */}
+          <Skeleton className="h-9 w-[230px]" />
         </div>
       </div>
 

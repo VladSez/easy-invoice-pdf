@@ -37,7 +37,7 @@ const TEST_BUYER_DATA = {
   notes: "This is a BUYER test note",
 } as const satisfies BuyerData;
 
-test.describe("Generate Invoice Link", () => {
+test.describe("Generate Invoice Link (Get link)", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
 
@@ -175,7 +175,7 @@ test.describe("Generate Invoice Link", () => {
     await page.waitForTimeout(700);
 
     // Generate share link
-    await page.getByRole("button", { name: "Generate invoice link" }).click();
+    await page.getByRole("button", { name: "Get link" }).click();
 
     // Wait for URL to update with share data
     await page.waitForURL((url) => url.searchParams.has("data"));
@@ -330,7 +330,9 @@ test.describe("Generate Invoice Link", () => {
 
     // ensure page is loaded
     await expect(
-      page.getByRole("link", { name: "Download PDF in English" }),
+      page.getByRole("link", {
+        name: /^(Download PDF|Download PDF in .+)$/,
+      }),
     ).toBeVisible();
 
     // Verify error toast appears
@@ -374,7 +376,9 @@ test.describe("Generate Invoice Link", () => {
 
     // ensure page content is displayed
     await expect(
-      page.getByRole("link", { name: "Download PDF in English" }),
+      page.getByRole("link", {
+        name: /^(Download PDF|Download PDF in .+)$/,
+      }),
     ).toBeVisible();
   });
 
@@ -389,7 +393,9 @@ test.describe("Generate Invoice Link", () => {
     /* Ensure page content is displayed */
 
     await expect(
-      page.getByRole("link", { name: "Download PDF in English" }),
+      page.getByRole("link", {
+        name: /^(Download PDF|Download PDF in .+)$/,
+      }),
     ).toBeVisible();
 
     /* VERIFY ERROR TOAST IS SHOWN */
@@ -438,9 +444,7 @@ test.describe("Generate Invoice Link", () => {
     ).toBeVisible();
 
     await expect(
-      page.getByText(
-        "Click 'Generate invoice link' to create a new shareable link.",
-      ),
+      page.getByText("Click 'Get link' to create a new shareable link."),
     ).toBeVisible();
 
     // Wait for URL to be cleared and verify
@@ -449,7 +453,9 @@ test.describe("Generate Invoice Link", () => {
     /* Ensure page content is displayed */
 
     await expect(
-      page.getByRole("link", { name: "Download PDF in English" }),
+      page.getByRole("link", {
+        name: /^(Download PDF|Download PDF in .+)$/,
+      }),
     ).toBeVisible();
   });
 
@@ -488,6 +494,7 @@ test.describe("Generate Invoice Link", () => {
       name: "Invoice Number",
     });
 
+    // Old URLs load without ?template=, so the stored default-template label is kept.
     await expect(
       invoiceNumberFieldset.getByRole("textbox", { name: "Label" }),
     ).toHaveValue("Faktura nr:");
@@ -549,9 +556,10 @@ test.describe("Generate Invoice Link", () => {
       name: "Invoice Number",
     });
 
+    // Compressed URLs include ?template=stripe, so the label migrates to the Stripe default.
     await expect(
       newInvoiceNumberFieldset.getByRole("textbox", { name: "Label" }),
-    ).toHaveValue("Faktura nr:");
+    ).toHaveValue("Faktura");
 
     await expect(
       newInvoiceNumberFieldset.getByRole("textbox", { name: "Value" }),
@@ -644,7 +652,7 @@ test.describe("Generate Invoice Link", () => {
     await page.waitForTimeout(700);
 
     // Generate share link
-    await page.getByRole("button", { name: "Generate invoice link" }).click();
+    await page.getByRole("button", { name: "Get link" }).click();
 
     // Verify the share invoice link description toast appears after generating the link
     const toast = page.getByTestId("share-invoice-link-description-toast");
@@ -936,7 +944,7 @@ test.describe("Generate Invoice Link", () => {
     await page.waitForTimeout(700);
 
     // Try to generate share link - should fail with error toast
-    await page.getByRole("button", { name: "Generate invoice link" }).click();
+    await page.getByRole("button", { name: "Get link" }).click();
 
     // Verify error toast appears with correct text
     await expect(

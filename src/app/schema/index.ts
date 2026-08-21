@@ -672,6 +672,8 @@ export const SUPPORTED_LANGUAGES = [
 ] as const;
 export type SupportedLanguages = (typeof SUPPORTED_LANGUAGES)[number];
 
+export const MAX_INVOICE_ITEMS = 100;
+
 export const LANGUAGE_TO_LABEL = {
   en: "English",
   pl: "Polish",
@@ -1153,7 +1155,13 @@ export const invoiceObjectSchema = z.object({
   seller: sellerSchema,
   buyer: buyerSchema,
 
-  items: z.array(invoiceItemSchema).min(1, "At least one item is required"),
+  items: z
+    .array(invoiceItemSchema)
+    .min(1, "At least one item is required")
+    .max(
+      MAX_INVOICE_ITEMS,
+      `Invoices support at most ${MAX_INVOICE_ITEMS} line items`,
+    ),
 
   /**
    * Total (**calculated automatically** - read only field in the UI)

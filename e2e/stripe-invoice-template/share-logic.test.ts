@@ -25,7 +25,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Verify share button is still enabled (no logo uploaded)
     const shareButton = page.getByRole("button", {
-      name: "Generate invoice link",
+      name: "Get link",
     });
     await expect(shareButton).toBeVisible();
     await expect(shareButton).toBeEnabled();
@@ -131,7 +131,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Verify share button is disabled
     const shareButton = page.getByRole("button", {
-      name: "Generate invoice link",
+      name: "Get link",
     });
     await expect(shareButton).toHaveAttribute("data-disabled", "true");
 
@@ -173,7 +173,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Verify share button is disabled
     const shareButton = page.getByRole("button", {
-      name: "Generate invoice link",
+      name: "Get link",
     });
     await expect(shareButton).toHaveAttribute("data-disabled", "true");
 
@@ -225,7 +225,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Start with default template and verify share button is enabled
     const shareButton = page.getByRole("button", {
-      name: "Generate invoice link",
+      name: "Get link",
     });
     await expect(shareButton).toBeEnabled();
 
@@ -280,7 +280,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     ).toBeVisible();
 
     const shareButton = page.getByRole("button", {
-      name: "Generate invoice link",
+      name: "Get link",
     });
 
     // Verify share button is disabled
@@ -329,7 +329,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Verify share button is visible and enabled in mobile
     const shareButton = page.getByRole("button", {
-      name: "Generate invoice link",
+      name: "Get link",
     });
     await expect(shareButton).toBeVisible();
     await expect(shareButton).toBeEnabled();
@@ -396,7 +396,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Click share button — should show error toast because form has validation errors
     const shareButton = page.getByRole("button", {
-      name: "Generate invoice link",
+      name: "Get link",
     });
     await shareButton.click();
 
