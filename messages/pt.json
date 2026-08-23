@@ -33,7 +33,7 @@
         },
         "multiLanguage": {
           "title": "Múltiplos Idiomas e Moedas",
-          "description": "Crie faturas em dez idiomas (inglês, polonês, alemão, espanhol, português, russo, ucraniano, francês, italiano, holandês) com suporte para todas as principais moedas e formatação automática."
+          "description": "Crie faturas em dez idiomas com suporte para todas as principais moedas e formatação automática."
         },
         "taxSupport": {
           "title": "Sistema Fiscal Flexível",
@@ -83,7 +83,9 @@
       "switchLanguage": "Mudar idioma",
       "shareFeedback": "Compartilhar feedback",
       "app": "App",
-      "startInvoicing": "Começar a faturar"
+      "startInvoicing": "Começar a faturar",
+      "previousFeature": "Recurso anterior",
+      "nextFeature": "Próximo recurso"
     }
   },
   "FAQ": {

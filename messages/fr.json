@@ -25,7 +25,7 @@
         },
         "multiLanguage": {
           "title": "Langues et Devises Multiples",
-          "description": "Créez des factures en dix langues (anglais, polonais, allemand, espagnol, portugais, russe, ukrainien, français, italien, néerlandais) avec prise en charge de toutes les principales devises et formatage automatique."
+          "description": "Créez des factures en dix langues avec prise en charge de toutes les principales devises et formatage automatique."
         },
         "taxSupport": {
           "title": "Système Fiscal Flexible",
@@ -75,7 +75,9 @@
       "switchLanguage": "Changer de langue",
       "shareFeedback": "Partager un avis",
       "app": "Application",
-      "startInvoicing": "Commencer la facturation"
+      "startInvoicing": "Commencer la facturation",
+      "previousFeature": "Fonctionnalité précédente",
+      "nextFeature": "Fonctionnalité suivante"
     }
   },
   "Metadata": {

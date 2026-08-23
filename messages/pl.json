@@ -33,7 +33,7 @@
         },
         "multiLanguage": {
           "title": "Wiele języków i walut",
-          "description": "Twórz faktury w dziesięciu językach (angielski, polski, niemiecki, hiszpański, portugalski, rosyjski, ukraiński, francuski, włoski, holenderski) z obsługą wszystkich głównych walut i automatycznym formatowaniem."
+          "description": "Twórz faktury w dziesięciu językach z obsługą wszystkich głównych walut i automatycznym formatowaniem."
         },
         "taxSupport": {
           "title": "Elastyczny System Podatkowy",
@@ -83,7 +83,9 @@
       "switchLanguage": "Zmień język",
       "shareFeedback": "Podziel się opinią",
       "app": "Aplikacja",
-      "startInvoicing": "Rozpocznij fakturowanie"
+      "startInvoicing": "Rozpocznij fakturowanie",
+      "previousFeature": "Poprzednia funkcja",
+      "nextFeature": "Następna funkcja"
     }
   },
   "FAQ": {

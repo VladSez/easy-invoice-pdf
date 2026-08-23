@@ -33,7 +33,7 @@
         },
         "multiLanguage": {
           "title": "Múltiples Idiomas y Monedas",
-          "description": "Cree facturas en diez idiomas (inglés, polaco, alemán, español, portugués, ruso, ucraniano, francés, italiano, holandés) con soporte para todas las principales monedas y formato automático."
+          "description": "Cree facturas en diez idiomas con soporte para todas las principales monedas y formato automático."
         },
         "taxSupport": {
           "title": "Sistema Fiscal Flexible",
@@ -83,7 +83,9 @@
       "switchLanguage": "Cambiar idioma",
       "shareFeedback": "Compartir comentarios",
       "app": "Aplicación",
-      "startInvoicing": "Comenzar a facturar"
+      "startInvoicing": "Comenzar a facturar",
+      "previousFeature": "Característica anterior",
+      "nextFeature": "Característica siguiente"
     }
   },
   "FAQ": {

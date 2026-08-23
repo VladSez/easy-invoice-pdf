@@ -94,6 +94,8 @@ const aboutSchema = z
         app: z.string(),
         startInvoicing: z.string(),
         home: z.string(),
+        previousFeature: z.string(),
+        nextFeature: z.string(),
       })
       .strict(),
   })

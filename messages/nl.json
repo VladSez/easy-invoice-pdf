@@ -33,7 +33,7 @@
         },
         "multiLanguage": {
           "title": "Meerdere Talen & Valuta's",
-          "description": "Maak facturen in tien talen (Engels, Pools, Duits, Spaans, Portugees, Russisch, Oekraïens, Frans, Italiaans, Nederlands) met ondersteuning voor alle belangrijke valuta's en automatische opmaak."
+          "description": "Maak facturen in tien talen met ondersteuning voor alle belangrijke valuta's en automatische opmaak."
         },
         "taxSupport": {
           "title": "Flexibel Belastingsysteem",
@@ -83,7 +83,9 @@
       "switchLanguage": "Verander taal",
       "shareFeedback": "Feedback delen",
       "app": "App",
-      "startInvoicing": "Begin met factureren"
+      "startInvoicing": "Begin met factureren",
+      "previousFeature": "Vorige functie",
+      "nextFeature": "Volgende functie"
     }
   },
   "FAQ": {
