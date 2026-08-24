@@ -33,7 +33,7 @@
         },
         "multiLanguage": {
           "title": "Lingue e Valute Multiple",
-          "description": "Crea fatture in dieci lingue (inglese, polacco, tedesco, spagnolo, portoghese, russo, ucraino, francese, italiano, olandese) con supporto per tutte le principali valute e formattazione automatica."
+          "description": "Crea fatture in dieci lingue con supporto per tutte le principali valute e formattazione automatica."
         },
         "taxSupport": {
           "title": "Sistema Fiscale Flessibile",
@@ -83,7 +83,9 @@
       "switchLanguage": "Cambia lingua",
       "shareFeedback": "Condividi feedback",
       "app": "App",
-      "startInvoicing": "Inizia fatturazione"
+      "startInvoicing": "Inizia fatturazione",
+      "previousFeature": "Funzionalità precedente",
+      "nextFeature": "Funzionalità successiva"
     }
   },
   "FAQ": {

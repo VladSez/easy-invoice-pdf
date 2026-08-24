@@ -33,7 +33,7 @@
         },
         "multiLanguage": {
           "title": "Mehrere Sprachen & Währungen",
-          "description": "Erstellen Sie Rechnungen in zehn Sprachen (Englisch, Polnisch, Deutsch, Spanisch, Portugiesisch, Russisch, Ukrainisch, Französisch, Italienisch, Niederländisch) mit Unterstützung für alle wichtigen Währungen und automatischer Formatierung."
+          "description": "Erstellen Sie Rechnungen in zehn Sprachen mit Unterstützung für alle wichtigen Währungen und automatischer Formatierung."
         },
         "taxSupport": {
           "title": "Flexibles Steuersystem",
@@ -83,7 +83,9 @@
       "switchLanguage": "Sprache wechseln",
       "shareFeedback": "Feedback teilen",
       "app": "App",
-      "startInvoicing": "Zur App gehen"
+      "startInvoicing": "Zur App gehen",
+      "previousFeature": "Vorherige Funktion",
+      "nextFeature": "Nächste Funktion"
     }
   },
   "FAQ": {

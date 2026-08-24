@@ -33,7 +33,7 @@
         },
         "multiLanguage": {
           "title": "Multiple Languages & Currencies",
-          "description": "Create invoices in ten languages (English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, Dutch) with support for all major currencies and automatic formatting."
+          "description": "Create invoices in ten languages with support for all major currencies and automatic formatting."
         },
         "taxSupport": {
           "title": "Flexible Tax System Support",
@@ -83,7 +83,9 @@
       "switchLanguage": "Switch language",
       "shareFeedback": "Share feedback",
       "app": "App",
-      "startInvoicing": "Start Invoicing"
+      "startInvoicing": "Start Invoicing",
+      "previousFeature": "Previous feature",
+      "nextFeature": "Next feature"
     }
   },
   "FAQ": {

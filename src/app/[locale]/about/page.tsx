@@ -1,5 +1,4 @@
 import { GithubIcon } from "@/components/etc/github-logo";
-import { Footer, FooterLinkGroup } from "@/app/(components)/footer";
 import {
   BlackGoToAppButton,
   GoToAppButton,
@@ -8,13 +7,10 @@ import { Button } from "@/components/ui/button";
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AutoPlayVideo, ManualPlayVideo } from "@/components/video";
+import { AutoPlayVideo } from "@/components/video";
 import {
-  DISCORD_COMMUNITY_URL,
   GITHUB_URL,
   MARKETING_FEATURES_CARDS,
-  PRODUCT_TWITTER_URL,
-  REDDIT_COMMUNITY_URL,
   VIDEO_DEMO_FALLBACK_IMG,
   VIDEO_DEMO_URL,
 } from "@/config";
@@ -24,6 +20,8 @@ import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { ABOUT_FAQ_ITEM_KEYS } from "@/app/[locale]/about/about-faq-item-keys";
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
+import { FeaturesCarousel } from "@/app/[locale]/about/components/features-carousel";
+import { AboutFooter } from "@/app/[locale]/about/components/about-footer";
 import { type HeaderProps, Header } from "@/app/(components)/header";
 
 // statically generate the pages for all locales
@@ -82,88 +80,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
           <FaqSection />
           <CtaSection />
         </main>
-        <Footer
-          translations={{
-            tagline: t("tagline"),
-            aboutHeading: t("footer.headings.about"),
-            solutionsHeading: t("footer.headings.solutions"),
-            footerDescription: t.rich("footer.description", {
-              br: () => <br />,
-              tosLink: (chunks) => (
-                <Link
-                  href="/tos"
-                  className="text-slate-700 underline hover:text-slate-900"
-                >
-                  {chunks}
-                </Link>
-              ),
-            }),
-            footerCreatedBy: t("footer.createdBy"),
-            resources: t("footer.links.resources"),
-          }}
-          links={
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <FooterLinkGroup
-                heading={t("footer.headings.product")}
-                links={[
-                  {
-                    href: "/?template=default",
-                    label: t("footer.links.invoiceGenerator"),
-                  },
-                  {
-                    href: GITHUB_URL,
-                    label: t("footer.links.github"),
-                    external: true,
-                  },
-                  { href: "#features", label: t("footer.links.features") },
-                  { href: "#faq", label: "FAQ" },
-                  {
-                    href: "/how-it-works",
-                    label: t("footer.links.howItWorks"),
-                  },
-                  { href: "/changelog", label: t("footer.links.changelog") },
-                  { href: "/llms.txt", label: "llms.txt" },
-                ]}
-              />
-              <FooterLinkGroup
-                heading={t("footer.headings.company")}
-                links={[
-                  {
-                    href: `/${locale}/about`,
-                    label: t("buttons.home"),
-                  },
-                  { href: "/founder", label: t("footer.links.founder") },
-                  { href: "/tos", label: t("footer.links.termsOfService") },
-                ]}
-              />
-              <FooterLinkGroup
-                heading={t("footer.headings.community")}
-                links={[
-                  {
-                    href: DISCORD_COMMUNITY_URL,
-                    label: t("buttons.shareFeedback"),
-                    external: true,
-                  },
-                  {
-                    href: DISCORD_COMMUNITY_URL,
-                    label: "Discord",
-                    external: true,
-                  },
-                  {
-                    href: REDDIT_COMMUNITY_URL,
-                    label: "Reddit",
-                    external: true,
-                  },
-                  {
-                    href: PRODUCT_TWITTER_URL,
-                    label: "X (Twitter)",
-                    external: true,
-                  },
-                ]}
-              />
-            </div>
-          }
-        />
+        <AboutFooter />
       </div>
     </TooltipProvider>
   );
@@ -302,6 +219,15 @@ function HeroSection() {
 function FeaturesSection() {
   const t = useTranslations("About");
 
+  const features = MARKETING_FEATURES_CARDS.map((feature) => ({
+    translationKey: feature.translationKey,
+    videoSrc: feature.videoSrc,
+    videoFallbackImg: feature.videoFallbackImg,
+    videoDescription: feature.videoDescription,
+    title: t(`features.items.${feature.translationKey}.title`),
+    description: t(`features.items.${feature.translationKey}.description`),
+  }));
+
   return (
     <section
       id="features"
@@ -327,67 +253,14 @@ function FeaturesSection() {
         </div>
 
         {/* Features cards */}
-        <div className="grid grid-cols-1 gap-6 pt-10 md:gap-10 lg:grid-cols-2">
-          {MARKETING_FEATURES_CARDS.map((feature) => {
-            const title = t(`features.items.${feature.translationKey}.title`);
-            const description = t(
-              `features.items.${feature.translationKey}.description`,
-            );
-
-            return (
-              <div
-                key={feature.translationKey}
-                className="flex h-full w-full flex-col items-start gap-2 rounded-xl bg-white shadow-sm ring-1 ring-slate-200 md:items-center md:rounded-2xl"
-              >
-                {/* text content */}
-                <div className="max-w-[700px] flex-1 px-8 py-4 pt-6">
-                  <h3 className="text-balance pb-4 text-xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-2xl">
-                    {title}
-                  </h3>
-                  <p className="text-pretty text-base leading-relaxed text-slate-600 sm:text-lg sm:leading-7">
-                    {description}
-                  </p>
-                </div>
-
-                {/* video container */}
-                <div className="relative w-full max-w-[800px]">
-                  {/* Mac OS Frame around the video */}
-                  <div className="relative overflow-hidden rounded-xl border border-b-0 border-l-0 border-r-0 border-slate-200 bg-white shadow-lg md:rounded-2xl md:shadow-xl">
-                    {/* Browser chrome bar */}
-                    <div className="h-8 w-full rounded-t-xl bg-gradient-to-b from-[#F3F3F3] to-[#E9E9E9] px-4 shadow-sm md:h-12 md:rounded-t-2xl">
-                      <div className="flex h-full items-center">
-                        <div className="flex space-x-2">
-                          <div className="h-2.5 w-2.5 rounded-full bg-[#FF5F57] md:h-3 md:w-3"></div>
-                          <div className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E] md:h-3 md:w-3"></div>
-                          <div className="h-2.5 w-2.5 rounded-full bg-[#28C840] md:h-3 md:w-3"></div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Video container */}
-                    <div className="relative aspect-[16.6/8.9] h-full w-full lg:aspect-[16.99/9.1]">
-                      {/* Auto play video for desktop */}
-                      <AutoPlayVideo
-                        className="hidden xl:block"
-                        src={feature.videoSrc}
-                        posterImg={feature.videoFallbackImg}
-                        description={feature.videoDescription}
-                        testId={`${feature.translationKey}-demo-video`}
-                      />
-                      {/* Manual play video for mobile for better UX */}
-                      <ManualPlayVideo
-                        className="xl:hidden"
-                        src={feature.videoSrc}
-                        posterImg={feature.videoFallbackImg}
-                        description={feature.videoDescription}
-                        testId={`${feature.translationKey}-demo-video`}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <FeaturesCarousel
+          features={features}
+          translations={{
+            label: t("features.title"),
+            previousFeature: t("buttons.previousFeature"),
+            nextFeature: t("buttons.nextFeature"),
+          }}
+        />
       </div>
     </section>
   );
