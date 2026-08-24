@@ -62,20 +62,23 @@ export function FeaturesCarousel({
       className="pt-10 sm:px-4 lg:px-0"
       data-testid="features-carousel"
     >
-      {/* The negative margins cancel the `p-2` of the carousel viewport so the cards
-          run edge to edge on mobile, and from `sm` up they open the gutter between slides.
+      {/* The negative margins cancel the `p-2` of the carousel viewport plus each slide's
+          own gutter, so the cards run edge to edge on mobile, and from `sm` up they open
+          the gutter between slides. On mobile `-ml-6` = 8px (viewport padding) + 16px
+          (the slide's `pl-4`), which parks the gutter off-screen: a card still fills the
+          full width at rest, and the 16px only becomes visible mid-swipe, between cards.
           Cards stretch to the tallest one at every breakpoint, so swiping never changes
           the height of the carousel. */}
-      <CarouselContent className="-ml-2 -mr-2 items-stretch sm:-ml-4 sm:mr-0 lg:-ml-6 xl:-ml-10">
+      <CarouselContent className="-ml-6 -mr-2 items-stretch sm:-ml-4 sm:mr-0 lg:-ml-6 xl:-ml-10">
         {features.map((feature) => (
           <CarouselItem
             key={feature.translationKey}
             // one card per view on mobile, two from `lg` up. Mobile takes the full
             // width so the demo video is as large as it can be; the arrows and dots
             // below carry the "there is more" affordance that the peeking card did.
-            // `pl-0` drops the `pl-4` that `CarouselItem` hardcodes, so mobile cards
-            // have no side padding at all
-            className="basis-full pl-0 sm:basis-[70%] sm:pl-4 md:basis-[55%] lg:basis-1/2 lg:pl-6 xl:pl-10"
+            // The `pl-4` that `CarouselItem` hardcodes is the gutter between cards; the
+            // track's `-ml-6` pulls it off-screen so it only shows while scrolling
+            className="basis-full sm:basis-[70%] md:basis-[55%] lg:basis-1/2 lg:pl-6 xl:pl-10"
           >
             <FeatureCard {...feature} />
           </CarouselItem>
