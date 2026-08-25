@@ -15,9 +15,11 @@ import {
   VIDEO_DEMO_URL,
 } from "@/config";
 import { routing } from "@/i18n/routing";
-import { useTranslations, type Locale } from "next-intl";
+import { use } from "react";
+import { hasLocale, useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { ABOUT_FAQ_ITEM_KEYS } from "@/app/[locale]/about/about-faq-item-keys";
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
 import { FeaturesCarousel } from "@/app/[locale]/about/components/features-carousel";
@@ -29,8 +31,17 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export default function AboutPage({ params }: { params: { locale: Locale } }) {
-  const { locale } = params;
+export default function AboutPage({
+  params,
+}: {
+  // Next.js types dynamic segments as `string`, so we narrow to `Locale` below
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = use(params);
+
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
 
   // Enables static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
   setRequestLocale(locale);

@@ -77,6 +77,9 @@ export function InvoiceItemsTable({
           {isTypeOfGTUFieldVisible ? (
             <View style={[styles.tableCol, styles.colGTU, styles.center]}>
               <Text style={styles.tableCellBold}>
+                {/* .split("") is used for long text like "Type of Goods/Service" to wrap it in a new line
+                https://github.com/diegomura/react-pdf/issues/2243#issuecomment-1778554041
+                */}
                 {t.invoiceItemsTable.typeOfGTU.split("")}
               </Text>
             </View>
@@ -86,7 +89,6 @@ export function InvoiceItemsTable({
           {isAmountFieldVisible ? (
             <View style={[styles.tableCol, styles.colAmount, styles.center]}>
               <Text style={[styles.tableCellBold]}>
-                {/* https://github.com/diegomura/react-pdf/issues/2243#issuecomment-1778554041 */}
                 {t.invoiceItemsTable.amount.split("")}
               </Text>
             </View>
@@ -340,25 +342,20 @@ export function InvoiceItemsTable({
           START: Table footer
         */}
         <View style={styles.tableRow} wrap={false} minPresenceAhead={60}>
-          {/* Empty cells */}
-          <View style={[styles.tableCol, { borderRight: 0 }]}></View>
+          {/* This section renders the table footer row that displays the total/sum for the invoice,
+          with the first nine columns as empty.
+          View components serving as placeholders to align the sum to the final column. */}
+          <View style={[styles.tableCol, { borderRightWidth: 0 }]}></View>
+          <View style={[styles.tableCol, { borderRightWidth: 0 }]}></View>
+          <View style={[styles.tableCol, { borderRightWidth: 0 }]}></View>
+          <View style={[styles.tableCol, { borderRightWidth: 0 }]}></View>
+          <View style={[styles.tableCol, { borderRightWidth: 0 }]}></View>
+          <View style={[styles.tableCol, { borderRightWidth: 0 }]}></View>
+          <View style={[styles.tableCol, { borderRightWidth: 0 }]}></View>
+          <View style={[styles.tableCol, { borderRightWidth: 0 }]}></View>
+          <View style={[styles.tableCol, { borderRightWidth: 0 }]}></View>
 
-          <View style={[styles.tableCol, { borderRight: 0 }]}></View>
-
-          <View style={[styles.tableCol, { borderRight: 0 }]}></View>
-
-          <View style={[styles.tableCol, { borderRight: 0 }]}></View>
-
-          <View style={[styles.tableCol, { borderRight: 0 }]}></View>
-
-          <View style={[styles.tableCol, { borderRight: 0 }]}></View>
-
-          <View style={[styles.tableCol, { borderRight: 0 }]}></View>
-
-          <View style={[styles.tableCol, { borderRight: 0 }]}></View>
-
-          <View style={[styles.tableCol, { borderRight: 0 }]}></View>
-
+          {/* The last cell spans the remaining width and contains the sum label and value */}
           <View style={[styles.tableCol, { width: "100%" }]}>
             <Text
               style={[
@@ -371,6 +368,7 @@ export function InvoiceItemsTable({
                 },
               ]}
             >
+              {/* Renders the sum label (e.g., "Total:") followed by the formatted total */}
               {t.invoiceItemsTable.sum}:{" "}
               <Text style={[styles.boldText, styles.fontSize8]}>
                 {formattedInvoiceTotal}
@@ -379,7 +377,7 @@ export function InvoiceItemsTable({
           </View>
         </View>
         {/* 
-          END: Table footer
+          END: Table footer row
         */}
       </View>
     </View>

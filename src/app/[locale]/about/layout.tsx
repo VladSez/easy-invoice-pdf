@@ -13,22 +13,29 @@ import { OPEN_GRAPH_LOCALE_BY_LOCALE } from "@/lib/seo/locale-utils";
 export async function generateMetadata({
   params,
 }: {
-  params: { locale: Locale };
+  // Next.js types dynamic segments as `string`, so we narrow to `Locale` below
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
+  const { locale } = await params;
+
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+
   try {
     // Load the messages for the requested locale
-    const messages = await import(
-      `../../../../messages/${params.locale}.json`
-    ).then((module: { default: typeof EnMessages }) => module.default);
+    const messages = await import(`../../../../messages/${locale}.json`).then(
+      (module: { default: typeof EnMessages }) => module.default,
+    );
 
     return {
       title: messages.Metadata.about.title,
       description: messages.Metadata.about.description,
       keywords: messages.Metadata.about.keywords,
       alternates: {
-        canonical: `${APP_URL}/${params.locale}/about`,
+        canonical: `${APP_URL}/${locale}/about`,
         types: {
-          "text/markdown": `${APP_URL}/${params.locale}/about.md`,
+          "text/markdown": `${APP_URL}/${locale}/about.md`,
         },
         languages: {
           // @ts-expect-error - x-default is not a valid locale
@@ -49,10 +56,10 @@ export async function generateMetadata({
         title: messages.Metadata.about.title,
         description: messages.Metadata.about.description,
         siteName: messages.Metadata.about.siteName,
-        locale: OPEN_GRAPH_LOCALE_BY_LOCALE[params.locale],
+        locale: OPEN_GRAPH_LOCALE_BY_LOCALE[locale],
         alternateLocale: Object.values(OPEN_GRAPH_LOCALE_BY_LOCALE),
         type: "website",
-        url: `${APP_URL}/${params.locale}/about`,
+        url: `${APP_URL}/${locale}/about`,
         images: [
           {
             url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
@@ -99,10 +106,11 @@ export default async function AboutLocaleLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { locale: Locale };
+  // Next.js types dynamic segments as `string`, so we narrow to `Locale` below
+  params: Promise<{ locale: string }>;
 }) {
   // Ensure that the incoming `locale` is valid
-  const { locale } = params;
+  const { locale } = await params;
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();

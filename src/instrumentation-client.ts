@@ -1,6 +1,7 @@
 // This file configures the initialization of Sentry on the client.
-// The config you add here will be used whenever a users loads a page in their browser.
+// The config you add here will be used whenever a user loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
+// https://nextjs.org/docs/app/api-reference/file-conventions/instrumentation-client
 
 import * as Sentry from "@sentry/nextjs";
 
@@ -44,3 +45,7 @@ if (isSentryEnabled) {
     replaysOnErrorSampleRate: 1.0, // But capture all sessions with errors
   });
 }
+
+// Required by Sentry to instrument client-side router navigations (App Router).
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/#step-3-capture-react-render-errors
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

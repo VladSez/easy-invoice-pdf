@@ -15,7 +15,9 @@ const config: KnipConfig = {
     "@types/file-saver",
     "eslint-config-next",
     "@ianvs/prettier-plugin-sort-imports",
-    "pdfjs-dist",
+    // Sentry resolves these directly when instrumenting Next.js in development.
+    "import-in-the-middle",
+    "require-in-the-middle",
   ],
   ignore: [
     "src/app/**/invoice-pdf-download-multiple-languages.tsx",

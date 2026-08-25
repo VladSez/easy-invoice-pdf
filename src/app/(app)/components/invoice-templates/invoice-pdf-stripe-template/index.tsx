@@ -11,7 +11,9 @@ import {
   type Styles,
 } from "@react-pdf/renderer/lib/react-pdf.browser";
 
-import { memo } from "react";
+import { InvoiceQRCode } from "@/app/(app)/components/invoice-templates/common/invoice-qr-code";
+import { formatCurrency } from "@/app/(app)/utils/format-currency";
+import { INVOICE_PDF_FONTS } from "@/config";
 import { StripeDueAmount } from "./stripe-due-amount";
 import { StripeFooter } from "./stripe-footer";
 import { StripeInvoiceHeader } from "./stripe-invoice-header";
@@ -19,21 +21,19 @@ import { StripeInvoiceInfo } from "./stripe-invoice-info";
 import { StripeItemsTable } from "./stripe-items-table";
 import { StripeSellerBuyerInfo } from "./stripe-seller-buyer-info";
 import { StripeVatSummaryTableTotals } from "./stripe-totals";
-import { formatCurrency } from "@/app/(app)/utils/format-currency";
-import { INVOICE_PDF_FONTS } from "@/config";
 
-import "dayjs/locale/en";
-import "dayjs/locale/pl";
+import dayjs from "dayjs";
+
 import "dayjs/locale/de";
+import "dayjs/locale/en";
 import "dayjs/locale/es";
-import "dayjs/locale/pt";
-import "dayjs/locale/ru";
-import "dayjs/locale/uk";
 import "dayjs/locale/fr";
 import "dayjs/locale/it";
 import "dayjs/locale/nl";
-import dayjs from "dayjs";
-import { InvoiceQRCode } from "@/app/(app)/components/invoice-templates/common/invoice-qr-code";
+import "dayjs/locale/pl";
+import "dayjs/locale/pt";
+import "dayjs/locale/ru";
+import "dayjs/locale/uk";
 
 const fontFamily = "Inter";
 
@@ -215,7 +215,7 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
   },
 } as const satisfies Styles);
 
-export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
+export function StripeInvoicePdfTemplate({
   invoiceData,
   qrCodeDataUrl,
 }: {
@@ -229,7 +229,9 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
 
   const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
   const invoiceNumber = `${invoiceNumberValue}`;
-  const invoiceDocTitle = `Invoice ${invoiceNumber} | Created with https://easyinvoicepdf.com`;
+
+  const invoiceDocTitle =
+    `Invoice ${invoiceNumber} | Created with https://easyinvoicepdf.com` as const;
 
   const formattedInvoiceTotal = formatCurrency({
     amount: invoiceData?.total,
@@ -326,4 +328,4 @@ export const StripeInvoicePdfTemplate = memo(function StripeInvoicePdfTemplate({
       </Page>
     </Document>
   );
-});
+}

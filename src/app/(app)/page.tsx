@@ -131,10 +131,12 @@ function resolveAppPageRobots(
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }): Promise<Metadata> {
-  const { shouldIndex } = computeIndexingFlags(searchParams);
-  const isStripeTemplate = Boolean(searchParams?.template === "stripe");
+  const resolvedSearchParams = await searchParams;
+
+  const { shouldIndex } = computeIndexingFlags(resolvedSearchParams);
+  const isStripeTemplate = Boolean(resolvedSearchParams?.template === "stripe");
 
   const templateMetadata = buildTemplateMetadata(
     isStripeTemplate ? STRIPE_TEMPLATE_META : DEFAULT_TEMPLATE_META,
@@ -151,9 +153,9 @@ export async function generateMetadata({
 export default async function AppPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { shouldIndex } = computeIndexingFlags(searchParams);
+  const { shouldIndex } = computeIndexingFlags(await searchParams);
 
   const [githubStarsCount, latestChangelog] = await Promise.all([
     fetchGithubStars(),

@@ -8,7 +8,7 @@ export interface InAppInfo {
   name: string | null;
 }
 
-type HeadersList = ReturnType<typeof headers>;
+type HeadersList = Awaited<ReturnType<typeof headers>>;
 
 /**
  * Simplified in-app browser detection with detailed app identification
@@ -191,7 +191,7 @@ export const checkDeviceUserAgent = async () => {
     );
   }
 
-  const headersList = headers();
+  const headersList = await headers();
   const ua = headersList.get("user-agent");
 
   const parser = new UAParser(ua || "");

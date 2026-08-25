@@ -64,6 +64,27 @@ const MobileInvoicePDFViewer = dynamic(
   },
 );
 
+// Render the appropriate template based on the selected template
+const renderTemplate = (invoiceData: InvoiceData, qrCodeDataUrl: string) => {
+  switch (invoiceData.template) {
+    case "stripe":
+      return (
+        <StripeInvoicePdfTemplate
+          invoiceData={invoiceData}
+          qrCodeDataUrl={qrCodeDataUrl}
+        />
+      );
+    case "default":
+    default:
+      return (
+        <InvoicePdfTemplate
+          invoiceData={invoiceData}
+          qrCodeDataUrl={qrCodeDataUrl}
+        />
+      );
+  }
+};
+
 const PdfViewer = ({
   invoiceData,
   errorWhileGeneratingPdfIsShown,
@@ -75,27 +96,6 @@ const PdfViewer = ({
   isMobile: boolean;
   qrCodeDataUrl: string;
 }) => {
-  // Render the appropriate template based on the selected template
-  const renderTemplate = () => {
-    switch (invoiceData.template) {
-      case "stripe":
-        return (
-          <StripeInvoicePdfTemplate
-            invoiceData={invoiceData}
-            qrCodeDataUrl={qrCodeDataUrl}
-          />
-        );
-      case "default":
-      default:
-        return (
-          <InvoicePdfTemplate
-            invoiceData={invoiceData}
-            qrCodeDataUrl={qrCodeDataUrl}
-          />
-        );
-    }
-  };
-
   // Use Mobile PDF viewer for:
   // 1. Mobile devices
   // 2. Any in-app browser/WebView environment (new logic for platforms like X.com, LinkedIn, etc.)
@@ -110,7 +110,7 @@ const PdfViewer = ({
     );
   }
 
-  const template = renderTemplate();
+  const template = renderTemplate(invoiceData, qrCodeDataUrl);
 
   // Normal version for standard desktop browsers
   return (

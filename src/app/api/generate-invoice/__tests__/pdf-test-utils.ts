@@ -3,13 +3,18 @@ import { pathToFileURL } from "node:url";
 
 import type { InvoiceData } from "@/app/schema";
 import { MOCK_INVOICE_DATA } from "@/utils/__tests__/data";
-import { pdfjs } from "react-pdf";
 import { expect } from "vitest";
+
+// Use PDF.js' legacy build in Node. PDF.js uses this build in its official
+// Node examples and currently lists Node.js support under the legacy build.
+
+// https://github.com/mozilla/pdf.js/wiki/Frequently-Asked-Questions#which-browsersenvironments-are-supported
+import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 
 const require = createRequire(import.meta.url);
 
 pdfjs.GlobalWorkerOptions.workerSrc = pathToFileURL(
-  require.resolve("pdfjs-dist/build/pdf.worker.mjs"),
+  require.resolve("pdfjs-dist/legacy/build/pdf.worker.mjs"),
 ).href;
 
 /** Invoice fixture for render-pdf-on-server.test.tsx — no logo. */

@@ -4,7 +4,6 @@ import { withSentryConfig } from "@sentry/nextjs";
 import createNextIntlPlugin from "next-intl/plugin";
 import createMDX from "@next/mdx";
 import { createJiti } from "jiti";
-import remarkGfm from "remark-gfm";
 
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -122,7 +121,9 @@ const withMDX = createMDX({
   // Add markdown plugins here, as desired
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [remarkGfm],
+    // Plugins must be referenced by name (not imported) so Turbopack can
+    // serialize the loader options and resolve them itself.
+    remarkPlugins: [["remark-gfm"]],
     rehypePlugins: [],
   },
 });
@@ -186,9 +187,16 @@ export default withSentryConfig(withNextIntl(withMDX(nextConfig)), {
   // Upload a larger set of source maps for prettier stack traces (increases build time)
   widenClientFileUpload: true,
 
-  // Automatically annotate React components to show their full name in breadcrumbs and session replay
-  reactComponentAnnotation: {
-    enabled: true,
+  webpack: {
+    // Automatically annotate React components to show their full name in breadcrumbs and session replay
+    reactComponentAnnotation: {
+      enabled: true,
+    },
+
+    treeshake: {
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      removeDebugLogging: true,
+    },
   },
 
   // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
@@ -196,7 +204,4 @@ export default withSentryConfig(withNextIntl(withMDX(nextConfig)), {
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
   // side errors will fail.
   // tunnelRoute: "/monitoring",
-
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
 });

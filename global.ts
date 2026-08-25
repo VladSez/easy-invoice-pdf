@@ -13,3 +13,7 @@ declare module "next-intl" {
     Formats: Formats;
   }
 }
+
+declare module "mdx/types.js" {
+  export import JSX = React.JSX;
+}

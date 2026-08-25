@@ -5,8 +5,8 @@ import {
   Font,
   Page,
   StyleSheet,
+  type Styles,
 } from "@react-pdf/renderer/lib/react-pdf.browser";
-import { memo } from "react";
 import { InvoiceBody } from "./invoice-body";
 
 // Open sans seems to be working fine with EN and PL
@@ -187,10 +187,10 @@ export const PDF_DEFAULT_TEMPLATE_STYLES = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-} as const);
+} as const satisfies Styles);
 
 // Memoize the PDF Document component
-export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
+export function InvoicePdfTemplate({
   invoiceData,
   qrCodeDataUrl,
 }: {
@@ -202,7 +202,8 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
   const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
 
   const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`;
-  const invoiceDocTitle = `${invoiceNumber} | Created with https://easyinvoicepdf.com`;
+  const invoiceDocTitle =
+    `${invoiceNumber} | Created with https://easyinvoicepdf.com` as const;
 
   return (
     <Document title={invoiceDocTitle}>
@@ -215,4 +216,4 @@ export const InvoicePdfTemplate = memo(function InvoicePdfTemplate({
       </Page>
     </Document>
   );
-});
+}
