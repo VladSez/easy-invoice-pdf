@@ -49,6 +49,7 @@ export async function renderPdfOnCanvas(page: Page, pdfBytes: Uint8Array) {
 
                 await page.render({ canvasContext: ctx, viewport }).promise
 
+                window.__PDF_PAGE_COUNT__ = pdf.numPages
                 window.__PDF_RENDERED__ = true
             </script>
         </body>
@@ -132,6 +133,7 @@ export async function renderMultiPagePdfOnCanvas(
                     currentX += viewport.width + pageGap
                 }
 
+                window.__PDF_PAGE_COUNT__ = numPages
                 window.__PDF_RENDERED__ = true
             </script>
         </body>

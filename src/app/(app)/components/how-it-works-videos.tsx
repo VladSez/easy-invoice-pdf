@@ -62,7 +62,6 @@ export function HowItWorksVideos({
 
   // Reset activeVideoId when resetKey changes, e.g. after dialog open/close.
   // If initialVideoId provided, use it, otherwise fallback to default.
-  // eslint-disable-next-line react-you-might-not-need-an-effect/you-might-not-need-an-effect
   useEffect(() => {
     if (resetKey !== undefined) {
       setActiveVideoId(initialVideoId ?? DEFAULT_VIDEO_ID);

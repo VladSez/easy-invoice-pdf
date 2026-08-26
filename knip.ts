@@ -8,12 +8,9 @@ const config: KnipConfig = {
     "shadcn",
     "@radix-ui/react-separator",
     "@types/ua-parser-js",
-    "eslint-plugin-react-hooks",
     "file-saver",
     "jszip",
-    "@next/eslint-plugin-next",
     "@types/file-saver",
-    "eslint-config-next",
     "@ianvs/prettier-plugin-sort-imports",
     // Sentry resolves these directly when instrumenting Next.js in development.
     "import-in-the-middle",

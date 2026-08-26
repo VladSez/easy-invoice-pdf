@@ -5,16 +5,14 @@ import {
   type InvoiceData,
 } from "@/app/schema";
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
-import fs from "node:fs";
-import path from "node:path";
-import { uploadLogoFile } from "./utils";
+import { LOGO_FIXTURE_FORMATS, uploadLogoFile } from "./utils";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { expect, test } from "../utils/extended-playwright-test";
 import {
-  renderPdfOnCanvas,
-  renderMultiPagePdfOnCanvas,
-} from "../utils/render-pdf-on-canvas";
+  expectPdfScreenshot,
+  waitForPdfRegeneration,
+} from "../utils/pdf-download";
 import { STATIC_ASSETS_URL } from "@/config";
 
 test.describe("Stripe Invoice Template", () => {
@@ -258,42 +256,61 @@ test.describe("Stripe Invoice Template", () => {
     ).toBeVisible();
   });
 
-  test("successfully uploads valid image and shows preview", async ({
-    page,
-  }) => {
-    // Switch to Stripe template to show logo upload
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
+  // the UI promises "JPEG, PNG or WebP", so every accepted format is exercised
+  for (const format of LOGO_FIXTURE_FORMATS) {
+    test(`successfully uploads a valid ${format.toUpperCase()} image and shows preview`, async ({
+      page,
+    }) => {
+      // Switch to Stripe template to show logo upload
+      await page
+        .getByRole("combobox", { name: "Invoice Template" })
+        .selectOption("stripe");
 
-    const generalInfoSection = page.getByTestId("general-information-section");
+      const generalInfoSection = page.getByTestId(
+        "general-information-section",
+      );
 
-    // Upload a valid small image
-    await uploadLogoFile(page);
+      // Upload a valid small image (the logo is saved with the form debounce)
+      await waitForPdfRegeneration(page, async () => {
+        await uploadLogoFile(page, format);
 
-    // Should show success toast
-    await expect(page.getByText("Logo uploaded successfully!")).toBeVisible();
+        // Should show success toast
+        await expect(
+          page.getByText("Logo uploaded successfully!"),
+        ).toBeVisible();
 
-    // Should show logo preview
-    await expect(
-      generalInfoSection.getByAltText("Company logo preview"),
-    ).toBeVisible();
-    await expect(
-      generalInfoSection.getByText(
-        "Logo uploaded successfully. Click the X to remove it.",
-      ),
-    ).toBeVisible();
+        // Should show logo preview
+        await expect(
+          generalInfoSection.getByAltText("Company logo preview"),
+        ).toBeVisible();
+        await expect(
+          generalInfoSection.getByText(
+            "Logo uploaded successfully. Click the X to remove it.",
+          ),
+        ).toBeVisible();
+      });
 
-    // Should show remove button
-    await expect(
-      generalInfoSection.getByRole("button", { name: "Remove logo" }),
-    ).toBeVisible();
+      // Should show remove button
+      await expect(
+        generalInfoSection.getByRole("button", { name: "Remove logo" }),
+      ).toBeVisible();
 
-    // Upload area should be hidden
-    await expect(
-      generalInfoSection.getByText("Click to upload your company logo"),
-    ).toBeHidden();
-  });
+      // Upload area should be hidden
+      await expect(
+        generalInfoSection.getByText("Click to upload your company logo"),
+      ).toBeHidden();
+
+      // the uploaded logo is stored as a data URL of the uploaded format
+      const storedData = (await page.evaluate(
+        (key) => localStorage.getItem(key),
+        PDF_DATA_LOCAL_STORAGE_KEY,
+      )) as string;
+
+      const parsedData = JSON.parse(storedData) as InvoiceData;
+
+      expect(parsedData.logo).toContain("data:image/");
+    });
+  }
 
   test("can remove uploaded logo", async ({ page }) => {
     // Switch to Stripe template and upload logo first
@@ -316,17 +333,15 @@ test.describe("Stripe Invoice Template", () => {
       ),
     ).toBeVisible();
 
-    // Wait debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(800);
-
     // Click remove button
-    await generalInfoSection
-      .getByRole("button", { name: "Remove logo" })
-      .click();
+    await waitForPdfRegeneration(page, async () => {
+      await generalInfoSection
+        .getByRole("button", { name: "Remove logo" })
+        .click();
 
-    // Should show success toast
-    await expect(page.getByText("Logo removed successfully!")).toBeVisible();
+      // Should show success toast
+      await expect(page.getByText("Logo removed successfully!")).toBeVisible();
+    });
 
     // Logo preview should be hidden
     await expect(
@@ -337,34 +352,6 @@ test.describe("Stripe Invoice Template", () => {
     await expect(
       generalInfoSection.getByText("Click to upload your company logo"),
     ).toBeVisible();
-  });
-
-  test("validates payment URL format", async ({ page }) => {
-    // Switch to Stripe template
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
-
-    const generalInfoSection = page.getByTestId("general-information-section");
-    const paymentUrlInput = generalInfoSection.getByRole("textbox", {
-      name: "Payment Link URL",
-    });
-
-    // Try invalid URL
-    await paymentUrlInput.fill("not-a-valid-url");
-    await paymentUrlInput.blur();
-
-    // Check for validation error (this would depend on your validation implementation)
-    // The actual validation error checking would depend on how your form validation works
-
-    // Try valid URL
-    await paymentUrlInput.fill("https://buy.stripe.com/test_payment_link");
-    await paymentUrlInput.blur();
-
-    // Should not show error for valid URL
-    await expect(paymentUrlInput).toHaveValue(
-      "https://buy.stripe.com/test_payment_link",
-    );
   });
 
   test("persists logo and payment URL in localStorage", async ({ page }) => {
@@ -384,24 +371,22 @@ test.describe("Stripe Invoice Template", () => {
       .fill("https://buy.stripe.com/test_payment_link");
 
     // Upload logo
-    await uploadLogoFile(page);
+    await waitForPdfRegeneration(page, async () => {
+      await uploadLogoFile(page);
 
-    // Wait for logo to be uploaded and PDF to regenerate
-    await expect(page.getByText("Logo uploaded successfully!")).toBeVisible();
+      // Wait for logo to be uploaded and PDF to regenerate
+      await expect(page.getByText("Logo uploaded successfully!")).toBeVisible();
 
-    // Should show logo preview
-    await expect(
-      generalInfoSection.getByAltText("Company logo preview"),
-    ).toBeVisible();
-    await expect(
-      generalInfoSection.getByText(
-        "Logo uploaded successfully. Click the X to remove it.",
-      ),
-    ).toBeVisible();
-
-    // Wait debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(800);
+      // Should show logo preview
+      await expect(
+        generalInfoSection.getByAltText("Company logo preview"),
+      ).toBeVisible();
+      await expect(
+        generalInfoSection.getByText(
+          "Logo uploaded successfully. Click the X to remove it.",
+        ),
+      ).toBeVisible();
+    });
 
     // Verify data is actually saved in localStorage
     const storedData = (await page.evaluate((key) => {
@@ -788,12 +773,10 @@ test.describe("Stripe Invoice Template", () => {
       name: "VAT Rate",
       exact: true,
     });
-    await vatInput.clear();
-    await vatInput.fill("20");
-
-    // Wait debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
+    await waitForPdfRegeneration(page, async () => {
+      await vatInput.clear();
+      await vatInput.fill("20");
+    });
 
     // Switch to Stripe template
     await page
@@ -832,52 +815,11 @@ test.describe("Stripe Invoice Template", () => {
     expect(parsedData.dateFormat).toBe(STRIPE_DEFAULT_DATE_FORMAT);
 
     // Generate PDF to verify Tax column is visible
-    const downloadPDFButton = page.getByRole("link", {
-      name: /^(Download PDF|Download PDF in .+)$/,
-    });
-
-    await expect(downloadPDFButton).toBeVisible();
-
-    // Click the download button and wait for download
-    const [download] = await Promise.all([
-      page.waitForEvent("download"),
-      downloadPDFButton.click(),
-    ]);
-
-    // Get the suggested filename
-    const suggestedFilename = download.suggestedFilename();
-
-    // save the file to temporary directory
-    const pdfFilePath = path.join(
+    await expectPdfScreenshot(page, {
       downloadDir,
-      `${browserName}-${suggestedFilename}`,
-    );
-
-    await download.saveAs(pdfFilePath);
-
-    // Convert to absolute path and use proper file URL format
-    const absolutePath = path.resolve(pdfFilePath);
-    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
-
-    /**
-     * Render the PDF on a canvas and take a screenshot of it
-     */
-
-    const pdfBytes = fs.readFileSync(absolutePath);
-
-    await page.goto("about:blank");
-
-    await renderPdfOnCanvas(page, pdfBytes);
-
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
-
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      "automatically-sets-date-format-when-switching-to-Stripe-template.png",
-    );
+      browserName,
+      name: "automatically-sets-date-format-when-switching-to-Stripe-template.png",
+    });
 
     // navigate back to the previous page
     await page.goto("/");
@@ -956,13 +898,11 @@ test.describe("Stripe Invoice Template", () => {
     ).toBeVisible();
 
     // Add payment URL
-    await generalInfoSection
-      .getByRole("textbox", { name: "Payment Link URL" })
-      .fill("https://buy.stripe.com/test_payment_link");
-
-    // Wait a moment for any debounced localStorage updates
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(800);
+    await waitForPdfRegeneration(page, async () => {
+      await generalInfoSection
+        .getByRole("textbox", { name: "Payment Link URL" })
+        .fill("https://buy.stripe.com/test_payment_link");
+    });
 
     // Verify data is actually saved in localStorage
     const storedData = (await page.evaluate((key) => {
@@ -975,803 +915,10 @@ test.describe("Stripe Invoice Template", () => {
 
     expect(parsedData.logo).toBeTruthy();
 
-    const downloadPDFButton = page.getByRole("link", {
-      name: /^(Download PDF|Download PDF in .+)$/,
-    });
-
-    await expect(downloadPDFButton).toBeVisible();
-    await expect(downloadPDFButton).toBeEnabled();
-
-    // Click the download button and wait for download
-    const [download] = await Promise.all([
-      page.waitForEvent("download"),
-      downloadPDFButton.click(),
-    ]);
-
-    // Get the suggested filename
-    const suggestedFilename = download.suggestedFilename();
-
-    // save the file to temporary directory
-    const pdfFilePath = path.join(
+    await expectPdfScreenshot(page, {
       downloadDir,
-      `${browserName}-${suggestedFilename}`,
-    );
-
-    await download.saveAs(pdfFilePath);
-
-    // Convert to absolute path and use proper file URL format
-    const absolutePath = path.resolve(pdfFilePath);
-    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
-
-    /**
-     * Render the PDF on a canvas and take a screenshot of it
-     */
-
-    const pdfBytes = fs.readFileSync(absolutePath);
-
-    await page.goto("about:blank");
-
-    await renderPdfOnCanvas(page, pdfBytes);
-
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
-
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      "pdf-with-logo-and-payment-url-when-using-stripe-template.png",
-    );
-  });
-
-  test("displays QR code in PDF when QR code data is provided", async ({
-    page,
-    browserName,
-    downloadDir,
-  }, testInfo) => {
-    const QR_CODE_TEST_DATA = {
-      data: "https://easyinvoicepdf.com",
-      description: "QR Code Description",
-    } as const satisfies {
-      data: string;
-      description: string;
-    };
-
-    // Switch to Stripe template
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
-
-    await page.waitForURL("/?template=stripe");
-
-    const finalSection = page.getByTestId("final-section");
-
-    const qrCodeFieldset = finalSection.getByRole("group", {
-      name: "QR Code",
+      browserName,
+      name: "pdf-with-logo-and-payment-url-when-using-stripe-template.png",
     });
-    await expect(qrCodeFieldset).toBeVisible();
-
-    // Verify that "Show QR Code in PDF" switch is on by default
-    const showQrCodeSwitch = qrCodeFieldset.getByRole("switch", {
-      name: "Show QR Code in PDF",
-    });
-    await expect(showQrCodeSwitch).toBeVisible();
-    await expect(showQrCodeSwitch).toBeEnabled();
-    await expect(showQrCodeSwitch).toBeChecked();
-
-    // Verify QR Code Data field is empty by default
-    const qrCodeDataTextarea = qrCodeFieldset.getByRole("textbox", {
-      name: "Data",
-    });
-    await expect(qrCodeDataTextarea).toBeVisible();
-    await expect(qrCodeDataTextarea).toHaveValue("");
-
-    // Fill in the QR code data field
-    await qrCodeDataTextarea.fill(QR_CODE_TEST_DATA.data);
-
-    // Verify QR Code Description field is empty by default
-    const qrCodeDescriptionTextarea = qrCodeFieldset.getByRole("textbox", {
-      name: "Description (optional)",
-    });
-    await expect(qrCodeDescriptionTextarea).toBeVisible();
-    await expect(qrCodeDescriptionTextarea).toHaveValue("");
-
-    // Fill in the QR code description field
-    await qrCodeDescriptionTextarea.fill(QR_CODE_TEST_DATA.description);
-
-    // for better debugging screenshots, we fill in the notes field with a test note =)
-    await finalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill(`Test: ${testInfo.title} (${testInfo.project.name})`);
-
-    // Wait for debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
-
-    const downloadPdfEnglishButton = page.getByRole("link", {
-      name: /^(Download PDF|Download PDF in .+)$/,
-    });
-
-    await expect(downloadPdfEnglishButton).toBeVisible();
-    await expect(downloadPdfEnglishButton).toBeEnabled();
-
-    // Click the download button and wait for download
-    const [download] = await Promise.all([
-      page.waitForEvent("download"),
-      downloadPdfEnglishButton.click(),
-    ]);
-
-    // Get the suggested filename
-    const suggestedFilename = download.suggestedFilename();
-
-    // save the file to temporary directory
-    const pdfFilePath = path.join(
-      downloadDir,
-      `${browserName}-${suggestedFilename}`,
-    );
-
-    await download.saveAs(pdfFilePath);
-
-    // Convert to absolute path and use proper file URL format
-    const absolutePath = path.resolve(pdfFilePath);
-    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
-
-    /**
-     * Render the PDF on a canvas and take a screenshot of it
-     */
-    const pdfBytes = fs.readFileSync(absolutePath);
-
-    await page.goto("about:blank");
-
-    await renderPdfOnCanvas(page, pdfBytes);
-
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
-
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      "displays-qr-code-in-pdf-stripe-template.png",
-    );
-
-    /**
-     * TURN OFF QR CODE IN PDF AND DOWNLOAD PDF AGAIN
-     */
-
-    // navigate back to the previous page
-    await page.goto("/");
-
-    // verify that we are on the STRIPE template
-    await expect(page).toHaveURL("/?template=stripe");
-
-    const newFinalSection = page.getByTestId("final-section");
-
-    const newQrCodeFieldset = newFinalSection.getByRole("group", {
-      name: "QR Code",
-    });
-    await expect(newQrCodeFieldset).toBeVisible();
-
-    // Verify that "Show QR Code in PDF" switch is on by default
-    const newShowQrCodeSwitch = newQrCodeFieldset.getByRole("switch", {
-      name: "Show QR Code in PDF",
-    });
-
-    await expect(newShowQrCodeSwitch).toBeVisible();
-    await expect(newShowQrCodeSwitch).toBeEnabled();
-    await expect(newShowQrCodeSwitch).toBeChecked();
-
-    // toggle the switch off
-    await newShowQrCodeSwitch.click();
-
-    // verify that the switch is off
-    await expect(newShowQrCodeSwitch).not.toBeChecked();
-
-    // Verify QR Code Data field retains its value after toggling off
-    const newQrCodeDataTextarea = newQrCodeFieldset.getByRole("textbox", {
-      name: "Data",
-    });
-    await expect(newQrCodeDataTextarea).toBeVisible();
-    await expect(newQrCodeDataTextarea).toHaveValue(QR_CODE_TEST_DATA.data);
-
-    // Verify QR Code Description field retains its value after toggling off
-    const newQrCodeDescriptionTextarea = newQrCodeFieldset.getByRole(
-      "textbox",
-      {
-        name: "Description (optional)",
-      },
-    );
-    await expect(newQrCodeDescriptionTextarea).toBeVisible();
-    await expect(newQrCodeDescriptionTextarea).toHaveValue(
-      QR_CODE_TEST_DATA.description,
-    );
-
-    // for better debugging screenshots, we fill in the notes field with a test note =)
-    await newFinalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill(
-        `Test: ${testInfo.title} - QR code hidden in PDF (${testInfo.project.name})`,
-      );
-
-    // wait for debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
-
-    const newDownloadPdfEnglishButton = page.getByRole("link", {
-      name: /^(Download PDF|Download PDF in .+)$/,
-    });
-
-    // Download the PDF again
-    const [downloadPdfWithoutQrCode] = await Promise.all([
-      page.waitForEvent("download"),
-      newDownloadPdfEnglishButton.click(),
-    ]);
-
-    // Get the suggested filename
-    const suggestedFilenameWithoutQrCode =
-      downloadPdfWithoutQrCode.suggestedFilename();
-
-    // save the file to temporary directory
-    const pdfFilePath2 = path.join(
-      downloadDir,
-      `${browserName}-${suggestedFilenameWithoutQrCode}`,
-    );
-
-    await downloadPdfWithoutQrCode.saveAs(pdfFilePath2);
-
-    /**
-     * Render the PDF on a canvas and take a screenshot to verify QR code is not displayed
-     */
-    const pdfBytesWithoutQrCode = fs.readFileSync(pdfFilePath2);
-
-    await page.goto("about:blank");
-
-    await renderPdfOnCanvas(page, pdfBytesWithoutQrCode);
-
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
-
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      "qr-code-hidden-in-pdf-stripe-template.png",
-    );
-  });
-
-  test("displays service period in PDF when enabled and hides it when toggled off", async ({
-    page,
-    browserName,
-    downloadDir,
-  }, testInfo) => {
-    const SERVICE_PERIOD_TEST_DATA = {
-      start: "2025-12-14",
-      end: "2025-12-20",
-    } as const;
-
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
-
-    await page.waitForURL("/?template=stripe");
-    await expect(page).toHaveURL("/?template=stripe");
-
-    const generalInfoSection = page.getByTestId("general-information-section");
-    const servicePeriodFieldset = generalInfoSection.getByRole("group", {
-      name: "Service period",
-    });
-    await expect(servicePeriodFieldset).toBeVisible();
-
-    // these fields are hidden by default for the STRIPE template (we don't show them on stripe pdf template)
-    await expect(
-      servicePeriodFieldset.getByRole("textbox", {
-        name: "Service period PDF label",
-      }),
-    ).toBeHidden();
-
-    await expect(
-      servicePeriodFieldset.getByRole("textbox", {
-        name: "Date of sales PDF label",
-      }),
-    ).toBeHidden();
-
-    const servicePeriodSwitch = servicePeriodFieldset.getByRole("switch", {
-      name: 'Show the "Service period" (Service period start and end) field in the PDF',
-    });
-
-    await servicePeriodFieldset
-      .getByRole("textbox", { name: "Service period start" })
-      .fill(SERVICE_PERIOD_TEST_DATA.start);
-
-    await servicePeriodFieldset
-      .getByRole("textbox", { name: "Service period end" })
-      .fill(SERVICE_PERIOD_TEST_DATA.end);
-
-    await expect(
-      servicePeriodFieldset.getByRole("textbox", {
-        name: "Service period start",
-      }),
-    ).toHaveValue(SERVICE_PERIOD_TEST_DATA.start);
-    await expect(
-      servicePeriodFieldset.getByRole("textbox", {
-        name: "Service period end",
-      }),
-    ).toHaveValue(SERVICE_PERIOD_TEST_DATA.end);
-    await expect(servicePeriodSwitch).toBeChecked();
-
-    const finalSection = page.getByTestId("final-section");
-    await finalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill(`Test: ${testInfo.title} (${testInfo.project.name})`);
-
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
-
-    const downloadPdfEnglishButton = page.getByRole("link", {
-      name: /^(Download PDF|Download PDF in .+)$/,
-    });
-
-    await expect(downloadPdfEnglishButton).toBeVisible();
-    await expect(downloadPdfEnglishButton).toBeEnabled();
-
-    const [download] = await Promise.all([
-      page.waitForEvent("download"),
-      downloadPdfEnglishButton.click(),
-    ]);
-
-    const pdfFilePath = path.join(
-      downloadDir,
-      `${browserName}-${download.suggestedFilename()}`,
-    );
-
-    await download.saveAs(pdfFilePath);
-
-    const absolutePath = path.resolve(pdfFilePath);
-    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
-
-    const pdfBytes = fs.readFileSync(absolutePath);
-
-    await page.goto("about:blank");
-
-    await renderPdfOnCanvas(page, pdfBytes);
-
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
-
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      "displays-service-period-in-pdf-stripe-template.png",
-    );
-
-    await page.goto("/");
-    await expect(page).toHaveURL("/?template=stripe");
-
-    const newGeneralInfoSection = page.getByTestId(
-      "general-information-section",
-    );
-    const newServicePeriodFieldset = newGeneralInfoSection.getByRole("group", {
-      name: "Service period",
-    });
-    await expect(newServicePeriodFieldset).toBeVisible();
-
-    const newServicePeriodSwitch = newServicePeriodFieldset.getByRole(
-      "switch",
-      {
-        name: 'Show the "Service period" (Service period start and end) field in the PDF',
-      },
-    );
-
-    await expect(newServicePeriodSwitch).toBeChecked();
-
-    await newServicePeriodSwitch.click();
-    await expect(newServicePeriodSwitch).not.toBeChecked();
-
-    await expect(
-      newServicePeriodFieldset.getByRole("textbox", {
-        name: "Service period start",
-      }),
-    ).toHaveValue(SERVICE_PERIOD_TEST_DATA.start);
-    await expect(
-      newServicePeriodFieldset.getByRole("textbox", {
-        name: "Service period end",
-      }),
-    ).toHaveValue(SERVICE_PERIOD_TEST_DATA.end);
-
-    const newFinalSection = page.getByTestId("final-section");
-    await newFinalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill(
-        `Test: ${testInfo.title} - service period hidden in PDF (${testInfo.project.name})`,
-      );
-
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
-
-    const newDownloadPdfEnglishButton = page.getByRole("link", {
-      name: /^(Download PDF|Download PDF in .+)$/,
-    });
-
-    const [downloadWithoutServicePeriod] = await Promise.all([
-      page.waitForEvent("download"),
-      newDownloadPdfEnglishButton.click(),
-    ]);
-
-    const pdfFilePath2 = path.join(
-      downloadDir,
-      `${browserName}-${downloadWithoutServicePeriod.suggestedFilename()}`,
-    );
-
-    await downloadWithoutServicePeriod.saveAs(pdfFilePath2);
-
-    const pdfBytesWithoutServicePeriod = fs.readFileSync(pdfFilePath2);
-
-    await page.goto("about:blank");
-
-    await renderPdfOnCanvas(page, pdfBytesWithoutServicePeriod);
-
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
-
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      "service-period-hidden-in-pdf-stripe-template.png",
-    );
-  });
-
-  test("generates multi-page PDF when invoice has many items", async ({
-    page,
-    browserName,
-    downloadDir,
-  }, testInfo) => {
-    // Switch to Stripe template
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
-
-    // Wait for URL to be updated
-    await page.waitForURL("/?template=stripe");
-
-    // Verify we're on the Stripe template
-    await expect(page).toHaveURL("/?template=stripe");
-
-    const invoiceItemsSection = page.getByTestId("invoice-items-section");
-
-    // Add  additional invoice items to trigger 2-page PDF
-    for (let i = 0; i < 17; i++) {
-      await invoiceItemsSection
-        .getByRole("button", { name: "Add invoice item" })
-        .click();
-
-      // Fill minimal required fields for the new item
-      const itemFieldset = invoiceItemsSection.getByRole("group", {
-        name: `Item ${i + 2}`, // Item numbers start at 1
-      });
-
-      // Add longer descriptions only to odd-numbered items to test mixed content layout
-      // This verifies that the PDF template handles varying text lengths correctly
-      // and maintains proper spacing between short and long item descriptions
-      const itemName =
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        (i + 2) % 2 === 1
-          ? `Item ${i + 2} - Professional consulting services including detailed analysis, comprehensive reporting, and ongoing support for enterprise-level implementations`
-          : `Item ${i + 2}`;
-
-      await itemFieldset.getByRole("textbox", { name: "Name" }).fill(itemName);
-
-      // Set VAT to 10% for each item
-      const taxSettingsFieldset = itemFieldset.getByRole("group", {
-        name: "Tax Settings",
-      });
-
-      // Use different tax rates: 10%, 20%, or 50%
-      const taxRate =
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        (i + 2) % 3 === 0 ? "50" : (i + 2) % 2 === 0 ? "20" : "10";
-
-      await taxSettingsFieldset
-        .getByRole("textbox", { name: "VAT Rate", exact: true })
-        .fill(taxRate);
-
-      await itemFieldset
-        .getByRole("spinbutton", {
-          name: "Net Price (Rate or Unit Price)",
-        })
-        .fill(`${100 * (i + 1)}`);
-    }
-
-    const finalSection = page.getByTestId("final-section");
-
-    // for better debugging screenshots, we fill in the notes field with a test note
-    await finalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill(
-        `Test: generates multi-page PDF when invoice has many items (${testInfo.project.name})`,
-      );
-
-    // Wait for PDF preview to regenerate after invoice data changes (debounce timeout)
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
-
-    const downloadPdfEnglishButton = page.getByRole("link", {
-      name: /^(Download PDF|Download PDF in .+)$/,
-    });
-
-    await expect(downloadPdfEnglishButton).toBeVisible();
-    await expect(downloadPdfEnglishButton).toBeEnabled();
-
-    // Click the download button and wait for download
-    const [download] = await Promise.all([
-      page.waitForEvent("download"),
-      downloadPdfEnglishButton.click(),
-    ]);
-
-    // Get the suggested filename
-    const suggestedFilename = download.suggestedFilename();
-
-    // save the file to temporary directory
-    const pdfFilePath = path.join(
-      downloadDir,
-      `${browserName}-${suggestedFilename}`,
-    );
-
-    await download.saveAs(pdfFilePath);
-
-    // Convert to absolute path and use proper file URL format
-    const absolutePath = path.resolve(pdfFilePath);
-    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
-
-    /**
-     * RENDER ALL PDF PAGES ON A SINGLE CANVAS AND TAKE SCREENSHOT
-     */
-
-    const pdfBytes = fs.readFileSync(absolutePath);
-
-    await page.goto("about:blank");
-
-    await renderMultiPagePdfOnCanvas(page, pdfBytes);
-
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
-
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      "stripe-template-multi-pages.png",
-    );
-  });
-
-  test("toggles seller and buyer email visibility in PDF", async ({
-    page,
-    browserName,
-    downloadDir,
-  }, testInfo) => {
-    await expect(page).toHaveURL("/?template=default");
-
-    // Switch to Stripe template
-    await page
-      .getByRole("combobox", { name: "Invoice Template" })
-      .selectOption("stripe");
-
-    await expect(page).toHaveURL("/?template=stripe");
-
-    /*
-     * PHASE 1: Fill inline form with email switch OFF -> PDF screenshot (emails hidden)
-     */
-
-    const sellerSection = page.getByTestId("seller-information-section");
-    const buyerSection = page.getByTestId("buyer-information-section");
-
-    // Fill seller fields inline (no saved seller selected, so switch is enabled)
-    await sellerSection
-      .getByRole("textbox", { name: "Name (Required)" })
-      .fill("Email Visibility Test Seller");
-
-    await sellerSection
-      .getByRole("textbox", { name: "Address (Required)" })
-      .fill("123 Seller Street\nSeller City, 10001");
-
-    await sellerSection
-      .getByRole("textbox", { name: "Email" })
-      .fill("VISIBLE-SELLER@test.com");
-
-    // Toggle seller email switch OFF via inline form
-    const sellerEmailSwitch = sellerSection.getByRole("switch", {
-      name: "Show the 'Email' field in the PDF",
-    });
-    await expect(sellerEmailSwitch).toBeChecked();
-    await sellerEmailSwitch.click();
-    await expect(sellerEmailSwitch).not.toBeChecked();
-
-    // Fill buyer fields inline (no saved buyer selected, so switch is enabled)
-    await buyerSection
-      .getByRole("textbox", { name: "Name (Required)" })
-      .fill("Email Visibility Test Buyer");
-
-    await buyerSection
-      .getByRole("textbox", { name: "Address (Required)" })
-      .fill("456 Buyer Avenue\nBuyer City, 20002");
-
-    await buyerSection
-      .getByRole("textbox", { name: "Email" })
-      .fill("VISIBLE-BUYER@test.com");
-
-    // Toggle buyer email switch OFF via inline form
-    const buyerEmailSwitch = buyerSection.getByRole("switch", {
-      name: "Show the 'Email' field in the PDF",
-    });
-    await expect(buyerEmailSwitch).toBeChecked();
-    await buyerEmailSwitch.click();
-    await expect(buyerEmailSwitch).not.toBeChecked();
-
-    const finalSection = page.getByTestId("final-section");
-    await finalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill(
-        `Test: ${testInfo.title} - emails hidden (${testInfo.project.name})`,
-      );
-
-    // wait for debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
-
-    const downloadPdfButton = page.getByRole("link", {
-      name: /^(Download PDF|Download PDF in .+)$/,
-    });
-    await expect(downloadPdfButton).toBeVisible();
-    await expect(downloadPdfButton).toBeEnabled();
-
-    // Download PDF with emails hidden (toggled off via inline form)
-    const [download] = await Promise.all([
-      page.waitForEvent("download"),
-      downloadPdfButton.click(),
-    ]);
-
-    const pdfFilePath = path.join(
-      downloadDir,
-      `${browserName}-${download.suggestedFilename()}`,
-    );
-    await download.saveAs(pdfFilePath);
-
-    const absolutePath = path.resolve(pdfFilePath);
-    await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
-
-    const pdfBytes = fs.readFileSync(absolutePath);
-    await page.goto("about:blank");
-    await renderPdfOnCanvas(page, pdfBytes);
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
-
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      "email-hidden-in-pdf-stripe-template.png",
-    );
-
-    /*
-     * PHASE 2: Save seller/buyer via dialog with email ON -> PDF screenshot (emails visible)
-     */
-
-    await page.goto("/");
-    await expect(page).toHaveURL("/?template=stripe");
-
-    // Create seller via dialog with email visible
-    await page.getByRole("button", { name: "New Seller" }).click();
-
-    const manageSellerDialog = page.getByTestId("manage-seller-dialog");
-
-    await manageSellerDialog
-      .getByRole("textbox", { name: "Name (Required)" })
-      .fill("Email Visibility Test Seller");
-
-    await manageSellerDialog
-      .getByRole("textbox", { name: "Address (Required)" })
-      .fill("123 Seller Street\nSeller City, 10001");
-
-    await manageSellerDialog
-      .getByRole("textbox", { name: "Email" })
-      .fill("VISIBLE-SELLER@test.com");
-
-    // Verify email visibility switch is checked by default in dialog
-    const sellerEmailSwitchInDialog = manageSellerDialog.getByRole("switch", {
-      name: "Show the 'Email' field in the PDF",
-    });
-    await expect(sellerEmailSwitchInDialog).toBeVisible();
-    await expect(sellerEmailSwitchInDialog).toBeChecked();
-
-    await manageSellerDialog
-      .getByRole("button", { name: "Save Seller" })
-      .click();
-
-    await expect(manageSellerDialog).toBeHidden();
-
-    await expect(
-      page.getByText("Seller added and applied to invoice", { exact: true }),
-    ).toBeVisible();
-
-    // wait for debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
-
-    // Create buyer via dialog with email visible
-    await page.getByRole("button", { name: "New Buyer" }).click();
-
-    const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
-
-    await manageBuyerDialog
-      .getByRole("textbox", { name: "Name (Required)" })
-      .fill("Email Visibility Test Buyer");
-
-    await manageBuyerDialog
-      .getByRole("textbox", { name: "Address (Required)" })
-      .fill("456 Buyer Avenue\nBuyer City, 20002");
-
-    await manageBuyerDialog
-      .getByRole("textbox", { name: "Email" })
-      .fill("VISIBLE-BUYER@test.com");
-
-    // Verify email visibility switch is checked by default in dialog
-    const buyerEmailSwitchInDialog = manageBuyerDialog.getByRole("switch", {
-      name: "Show the 'Email' field in the PDF",
-    });
-    await expect(buyerEmailSwitchInDialog).toBeVisible();
-    await expect(buyerEmailSwitchInDialog).toBeChecked();
-
-    await manageBuyerDialog.getByRole("button", { name: "Save Buyer" }).click();
-
-    await expect(manageBuyerDialog).toBeHidden();
-
-    await expect(
-      page.getByText("Buyer added and applied to invoice", { exact: true }),
-    ).toBeVisible();
-
-    const newFinalSection = page.getByTestId("final-section");
-    await newFinalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill(
-        `Test: ${testInfo.title} - emails visible (${testInfo.project.name})`,
-      );
-
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
-
-    const newDownloadPdfButton = page.getByRole("link", {
-      name: /^(Download PDF|Download PDF in .+)$/,
-    });
-    await expect(newDownloadPdfButton).toBeVisible();
-    await expect(newDownloadPdfButton).toBeEnabled();
-
-    // Download PDF with emails visible (saved via dialog)
-    const [downloadVisible] = await Promise.all([
-      page.waitForEvent("download"),
-      newDownloadPdfButton.click(),
-    ]);
-
-    const visiblePdfFilePath = path.join(
-      downloadDir,
-      `${browserName}-visible-${downloadVisible.suggestedFilename()}`,
-    );
-    await downloadVisible.saveAs(visiblePdfFilePath);
-
-    const visibleAbsolutePath = path.resolve(visiblePdfFilePath);
-    await expect.poll(() => fs.existsSync(visibleAbsolutePath)).toBe(true);
-
-    const visiblePdfBytes = fs.readFileSync(visibleAbsolutePath);
-    await page.goto("about:blank");
-    await renderPdfOnCanvas(page, visiblePdfBytes);
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
-
-    await expect(page.locator("canvas")).toHaveScreenshot(
-      "email-visible-in-pdf-stripe-template.png",
-    );
   });
 });

@@ -419,9 +419,7 @@ describe("URL Compression Utilities", () => {
         notes: undefined,
       };
 
-      const compressedData = compressInvoiceData(
-        dataWithUndefined as unknown as InvoiceData,
-      );
+      const compressedData = compressInvoiceData(dataWithUndefined);
       const decompressedData = decompressInvoiceData(compressedData);
 
       expect(decompressedData.invoiceNumberObject).toBeUndefined();
@@ -467,9 +465,7 @@ describe("URL Compression Utilities", () => {
         ],
       };
 
-      const compressedData = compressInvoiceData(
-        complexData as unknown as InvoiceData,
-      );
+      const compressedData = compressInvoiceData(complexData);
       const decompressedData = decompressInvoiceData(compressedData);
 
       expect(decompressedData).toEqual(complexData);

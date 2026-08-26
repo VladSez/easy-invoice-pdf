@@ -159,10 +159,7 @@ export async function getChangelogEntries(): Promise<ChangelogEntry[]> {
     }
 
     const { slug, module } = imported;
-    const { metadata, default: Component } = module as {
-      metadata: ChangelogMetadata;
-      default: React.ComponentType;
-    };
+    const { metadata, default: Component } = module;
 
     entries.push({
       slug,
@@ -200,10 +197,7 @@ export async function getChangelogEntry(
   }
 
   const { module } = imported;
-  const { metadata, default: Component } = module as {
-    metadata: ChangelogMetadata;
-    default: React.ComponentType;
-  };
+  const { metadata, default: Component } = module;
 
   return {
     slug,
