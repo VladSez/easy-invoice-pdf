@@ -13,6 +13,7 @@ import { useDeviceContext } from "@/contexts/device-context";
 import { useRouter } from "next/navigation";
 
 import { InvoicePageHeader } from "@/app/(app)/components/invoice-page-header";
+import { InvoicePdfInstanceProvider } from "@/app/(app)/contexts/invoice-pdf-instance-context";
 import {
   DEFAULT_METADATA,
   getAppMetadata,
@@ -134,6 +135,10 @@ export function AppPageClient({
   // Refs to track original URL invoice data
   const originalUrlInvoiceDataRef = useRef<InvoiceData | null>(null);
 
+  // Tracks whether the invoice data has already been initialized (from URL or localStorage).
+  // Initialization must happen exactly once per page load, see the effect below for details.
+  const hasInitializedInvoiceDataRef = useRef(false);
+
   // Generate QR code data URL when qrCodeData changes
   useEffect(() => {
     // Flag to detect if the component is still mounted and effect is active
@@ -247,6 +252,21 @@ export function AppPageClient({
 
   // Initialize data from URL (via shared invoice link) or localStorage on page load
   useEffect(() => {
+    // Run only once per page load.
+    //
+    // This effect depends on `searchParams`, and the app rewrites the URL with
+    // `router.replace` on its own (e.g. to keep ?template= in sync, or to add ?data=
+    // when a share link is generated). Without this guard, every one of those rewrites
+    // re-ran the initialization, re-read localStorage and called `setInvoiceDataState`
+    // with a brand new (but identical) object. That extra state update makes react-pdf
+    // regenerate the very same PDF a second time, which shows up as a visible flicker /
+    // double render in the preview when the user switches the invoice template.
+    if (hasInitializedInvoiceDataRef.current) {
+      return;
+    }
+
+    hasInitializedInvoiceDataRef.current = true;
+
     const compressedInvoiceDataInUrl = searchParams.get("data");
     const urlTemplateSearchParam = searchParams.get("template");
 
@@ -593,6 +613,12 @@ export function AppPageClient({
 
         router.replace(`?${currentParams.toString()}`, { scroll: false });
 
+        // Remember the invoice that was just shared, so later edits are detected and the
+        // "Invoice Updated" toast is shown. Previously this ref was (re)populated as a
+        // side effect of the initialization effect re-running on the ?data= URL change,
+        // which no longer happens now that initialization runs once per page load.
+        originalUrlInvoiceDataRef.current = newInvoiceDataValidated;
+
         // Construct full URL with locale and compressed data
         const newGeneratedLinkFullUrl = `${window.location.origin}/?${currentParams.toString()}`;
 
@@ -717,38 +743,42 @@ export function AppPageClient({
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
-        <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 min-[1400px]:max-w-7xl 2xl:max-w-[1480px]">
-          <InvoicePageHeader
-            canShareInvoice={canShareInvoice}
-            handleShareInvoice={handleShareInvoice}
-            isDesktop={isDesktop}
-            invoiceDataState={invoiceDataState}
-            errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
-            setErrorWhileGeneratingPdfIsShown={
-              setErrorWhileGeneratingPdfIsShown
-            }
-            qrCodeDataUrl={qrCodeDataUrl}
-            isMobile={isMobile}
-            isSharedInvoice={isViewingSharedInvoice}
-          />
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-            <InvoiceClientPage
-              invoiceDataState={invoiceDataState}
-              handleInvoiceDataChange={handleInvoiceDataChange}
+      {/* Generates the invoice PDF once and shares it with the preview and the download button */}
+      <InvoicePdfInstanceProvider
+        invoiceData={invoiceDataState}
+        qrCodeDataUrl={qrCodeDataUrl}
+      >
+        <div className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
+          <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 min-[1400px]:max-w-7xl 2xl:max-w-[1480px]">
+            <InvoicePageHeader
+              canShareInvoice={canShareInvoice}
               handleShareInvoice={handleShareInvoice}
-              isMobile={isMobile}
+              isDesktop={isDesktop}
+              invoiceDataState={invoiceDataState}
               errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
               setErrorWhileGeneratingPdfIsShown={
                 setErrorWhileGeneratingPdfIsShown
               }
-              canShareInvoice={canShareInvoice}
-              qrCodeDataUrl={qrCodeDataUrl}
-              setInvoiceFormHasErrors={setInvoiceFormHasErrors}
+              isMobile={isMobile}
+              isSharedInvoice={isViewingSharedInvoice}
             />
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+              <InvoiceClientPage
+                invoiceDataState={invoiceDataState}
+                handleInvoiceDataChange={handleInvoiceDataChange}
+                handleShareInvoice={handleShareInvoice}
+                isMobile={isMobile}
+                errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
+                setErrorWhileGeneratingPdfIsShown={
+                  setErrorWhileGeneratingPdfIsShown
+                }
+                canShareInvoice={canShareInvoice}
+                setInvoiceFormHasErrors={setInvoiceFormHasErrors}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </InvoicePdfInstanceProvider>
       <Footer />
       {changelogPopupVariant ? (
         <ChangelogUpdatePopup

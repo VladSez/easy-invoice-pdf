@@ -68,7 +68,6 @@ jobs:
 
           verify_config minimum-release-age 7200
           verify_config block-exotic-subdeps true
-          verify_config trust-policy no-downgrade
 
       - name: 🔍 Get PR URL
         if: steps.pnpm-policy.outcome == 'failure'

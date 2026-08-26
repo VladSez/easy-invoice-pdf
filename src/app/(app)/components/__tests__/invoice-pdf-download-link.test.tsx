@@ -94,6 +94,7 @@ import {
   InvoicePDFDownloadLink,
   LOADING_BUTTON_TEXT,
 } from "../invoice-pdf-download-link";
+import { InvoicePdfInstanceProvider } from "@/app/(app)/contexts/invoice-pdf-instance-context";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
@@ -129,15 +130,20 @@ function renderInvoicePDFDownloadLink({
         inAppInfo={inAppInfo}
       >
         <CTAToastProvider>
-          <InvoicePDFDownloadLink
+          {/* The download link reads the PDF from the shared instance, so it needs the provider */}
+          <InvoicePdfInstanceProvider
             invoiceData={invoiceData}
-            errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
-            setErrorWhileGeneratingPdfIsShown={
-              setErrorWhileGeneratingPdfIsShown
-            }
             qrCodeDataUrl={qrCodeDataUrl}
-            isMobile={isMobile}
-          />
+          >
+            <InvoicePDFDownloadLink
+              invoiceData={invoiceData}
+              errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
+              setErrorWhileGeneratingPdfIsShown={
+                setErrorWhileGeneratingPdfIsShown
+              }
+              isMobile={isMobile}
+            />
+          </InvoicePdfInstanceProvider>
         </CTAToastProvider>
       </DeviceContextProvider>
     </TooltipProvider>,

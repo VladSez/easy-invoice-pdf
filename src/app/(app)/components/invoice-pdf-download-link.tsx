@@ -1,5 +1,4 @@
-import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
-import { StripeInvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
+import { useInvoicePdfInstance } from "@/app/(app)/contexts/invoice-pdf-instance-context";
 import {
   LANGUAGE_TO_LABEL,
   type InvoiceData,
@@ -8,7 +7,6 @@ import {
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
-import { usePDF } from "@react-pdf/renderer/lib/react-pdf.browser";
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
 import { DownloadIcon, Loader2 } from "lucide-react";
@@ -59,19 +57,18 @@ export function InvoicePDFDownloadLink({
   invoiceData,
   errorWhileGeneratingPdfIsShown,
   setErrorWhileGeneratingPdfIsShown,
-  qrCodeDataUrl,
   isMobile,
 }: {
   invoiceData: InvoiceData;
   errorWhileGeneratingPdfIsShown: boolean;
   setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
-  qrCodeDataUrl: string;
   isMobile: boolean;
 }) {
   const { inAppInfo } = useDeviceContext();
   const { markCTAActionTriggered } = useCTAToast();
 
-  const [{ loading: pdfLoading, url, error }, updatePdfInstance] = usePDF();
+  // The very same PDF the preview shows, generated once by `InvoicePdfInstanceProvider`
+  const { loading: pdfLoading, url, error } = useInvoicePdfInstance();
   const [isLoading, setIsLoading] = useState(false);
 
   const [inAppBrowserToastShown, setInAppBrowserToastShown] = useState(false);
@@ -173,31 +170,6 @@ export function InvoicePDFDownloadLink({
 
     return name;
   }, [invoiceData?.language, invoiceData?.invoiceNumberObject]);
-
-  const PdfDocument = useMemo(() => {
-    switch (invoiceData.template) {
-      case "stripe":
-        return (
-          <StripeInvoicePdfTemplate
-            invoiceData={invoiceData}
-            qrCodeDataUrl={qrCodeDataUrl}
-          />
-        );
-      case "default":
-      default:
-        return (
-          <InvoicePdfTemplate
-            invoiceData={invoiceData}
-            qrCodeDataUrl={qrCodeDataUrl}
-          />
-        );
-    }
-  }, [invoiceData, qrCodeDataUrl]);
-
-  // Handle PDF updates
-  useEffect(() => {
-    updatePdfInstance(PdfDocument);
-  }, [PdfDocument, updatePdfInstance]);
 
   // Handle loading state (for better UX)
   useEffect(() => {
