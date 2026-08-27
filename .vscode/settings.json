@@ -1,5 +1,11 @@
 {
   "css.validate": false,
+  // oxfmt via the Oxc extension (`oxc.oxc-vscode`). The extension shells out to
+  // the local `oxfmt` binary, so it picks up .oxfmtrc.json automatically.
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSave": true,
+  "[json]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
+  "[jsonc]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
   "editor.inlayHints.enabled": "on",
   "typescript.inlayHints.parameterNames.enabled": "all",
   "typescript.preferences.importModuleSpecifier": "non-relative",

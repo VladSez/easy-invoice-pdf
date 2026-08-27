@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+
 import { telegramUpdateSchema } from "./telegram-schema";
 
 describe("Telegram Schema Validation", () => {
@@ -22,14 +23,12 @@ describe("Telegram Schema Validation", () => {
         },
       } as const;
 
-      const result = telegramUpdateSchema.safeParse(validUpdate);
+      // `parse` throws on an invalid update, so the test still fails loudly
+      // without an `if (result.success)` guard around the assertions.
+      const parsed = telegramUpdateSchema.parse(validUpdate);
 
-      expect(result.success).toBe(true);
-
-      if (result.success) {
-        expect(result.data.update_id).toBe(123456789);
-        expect(result.data.message?.text).toBe("/generate");
-      }
+      expect(parsed.update_id).toBe(123456789);
+      expect(parsed.message?.text).toBe("/generate");
     });
 
     it("should validate message without entities", () => {
@@ -51,13 +50,9 @@ describe("Telegram Schema Validation", () => {
         },
       } as const;
 
-      const result = telegramUpdateSchema.safeParse(updateWithoutEntities);
+      const parsed = telegramUpdateSchema.parse(updateWithoutEntities);
 
-      expect(result.success).toBe(true);
-
-      if (result.success) {
-        expect(result.data.message?.entities).toBeUndefined();
-      }
+      expect(parsed.message?.entities).toBeUndefined();
     });
 
     it("should reject update with missing update_id", () => {
@@ -166,14 +161,10 @@ describe("Telegram Schema Validation", () => {
         },
       } as const;
 
-      const result = telegramUpdateSchema.safeParse(updateWithEntities);
+      const parsed = telegramUpdateSchema.parse(updateWithEntities);
 
-      expect(result.success).toBe(true);
-
-      if (result.success) {
-        expect(result.data.message?.entities).toHaveLength(1);
-        expect(result.data.message?.entities?.[0].type).toBe("bot_command");
-      }
+      expect(parsed.message?.entities).toHaveLength(1);
+      expect(parsed.message?.entities?.[0].type).toBe("bot_command");
     });
 
     it("should reject message with text other than '/generate'", () => {
@@ -241,13 +232,9 @@ describe("Telegram Schema Validation", () => {
         },
       } as const;
 
-      const result = telegramUpdateSchema.safeParse(updateWithGenerateCommand);
+      const parsed = telegramUpdateSchema.parse(updateWithGenerateCommand);
 
-      expect(result.success).toBe(true);
-
-      if (result.success) {
-        expect(result.data.message?.text).toBe("/generate");
-      }
+      expect(parsed.message?.text).toBe("/generate");
     });
   });
 });

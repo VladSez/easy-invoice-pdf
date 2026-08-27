@@ -1,17 +1,19 @@
 "use client";
 
-import { GithubIcon } from "@/components/etc/github-logo";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { ArrowRightIcon, StarIcon } from "lucide-react";
 import type { Locale } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef } from "react";
-import { LanguageSwitcher } from "./language-switcher";
-import { GITHUB_URL } from "@/config";
+
 import type { HeaderProps } from "@/app/(components)/header";
+import { GithubIcon } from "@/components/etc/github-logo";
+import { Button } from "@/components/ui/button";
+import { GITHUB_URL } from "@/config";
+import { cn } from "@/lib/utils";
 import { githubStarCountFormatter } from "@/utils/number-formatter";
+
+import { LanguageSwitcher } from "./language-switcher";
 
 interface MobileMenuSharedProps {
   locale: Locale;
@@ -67,10 +69,14 @@ export function MobileMenuPanel({
       if (e.key === "Escape") onOpenChangeRef.current(false);
     }
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () => {
+      return window.removeEventListener("keydown", onKeyDown);
+    };
   }, []);
 
-  const close = () => onOpenChange(false);
+  const close = () => {
+    return onOpenChange(false);
+  };
 
   return (
     <div

@@ -1,12 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { handleInvoiceNumberBreakingChange } from "../invoice-number-breaking-change";
-import { SUPPORTED_LANGUAGES, type InvoiceData } from "@/app/schema";
+
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { SUPPORTED_LANGUAGES, type InvoiceData } from "@/app/schema";
+
+import { handleInvoiceNumberBreakingChange } from "../invoice-number-breaking-change";
 
 // Mock the umami tracking function
-vi.mock("@/lib/umami-analytics-track-event", () => ({
-  umamiTrackEvent: vi.fn(),
-}));
+vi.mock("@/lib/umami-analytics-track-event", () => {
+  return {
+    umamiTrackEvent: vi.fn(),
+  };
+});
 
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 
@@ -163,7 +167,10 @@ describe("handleInvoiceNumberBreakingChange", () => {
         },
       });
 
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Invalid invoice language:",
+        expect.any(Object),
+      );
       expect(umamiTrackEvent).toHaveBeenCalledWith("breaking_change_detected");
 
       consoleSpy.mockRestore();
@@ -230,14 +237,14 @@ describe("handleInvoiceNumberBreakingChange", () => {
     it("should return unchanged when input is null", () => {
       const result = handleInvoiceNumberBreakingChange(null);
 
-      expect(result).toBe(null);
+      expect(result).toBeNull();
       expect(umamiTrackEvent).not.toHaveBeenCalled();
     });
 
     it("should return unchanged when input is undefined", () => {
       const result = handleInvoiceNumberBreakingChange(undefined);
 
-      expect(result).toBe(undefined);
+      expect(result).toBeUndefined();
       expect(umamiTrackEvent).not.toHaveBeenCalled();
     });
 
@@ -353,20 +360,19 @@ describe("handleInvoiceNumberBreakingChange", () => {
       const result = handleInvoiceNumberBreakingChange(input);
 
       expect(typeof result).toBe("object");
-      expect(result).not.toBe(null);
+      expect(result).not.toBeNull();
 
-      if (typeof result === "object" && result !== null) {
-        expect("invoiceNumberObject" in result).toBe(true);
-        expect("invoiceNumber" in result).toBe(false);
+      // `handleInvoiceNumberBreakingChange` takes and returns `unknown`, so the
+      // shape has to be asserted rather than narrowed with an `if`.
+      const resultObject = result as Record<string, unknown>;
 
-        if ("invoiceNumberObject" in result) {
-          const invoiceNumberObject = (result as unknown as InvoiceData)
-            .invoiceNumberObject;
+      expect("invoiceNumberObject" in resultObject).toBe(true);
+      expect("invoiceNumber" in resultObject).toBe(false);
 
-          expect(typeof invoiceNumberObject?.label).toBe("string");
-          expect(typeof invoiceNumberObject?.value).toBe("string");
-        }
-      }
+      const { invoiceNumberObject } = result as InvoiceData;
+
+      expect(typeof invoiceNumberObject?.label).toBe("string");
+      expect(typeof invoiceNumberObject?.value).toBe("string");
     });
   });
 });

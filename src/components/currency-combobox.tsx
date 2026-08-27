@@ -1,5 +1,8 @@
 "use client";
 
+import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+
 import {
   CURRENCY_COMBOBOX_GROUPS,
   CURRENCY_SYMBOLS,
@@ -21,8 +24,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Currency Combobox component
@@ -115,6 +116,7 @@ export function CurrencyCombobox({
             variant="outline"
             role="combobox"
             aria-expanded={open}
+            aria-controls={`${id}-listbox`}
             className={cn(
               "w-full !scale-100 justify-between rounded-md border border-gray-300 bg-white pl-3 pr-2 text-sm font-normal text-slate-950 shadow-sm shadow-black/5 !outline-none transition-all hover:bg-slate-100/80 focus-visible:!border-2 focus-visible:!border-indigo-600 focus-visible:!ring-2 focus-visible:!ring-indigo-200 focus-visible:!ring-opacity-50 focus-visible:!ring-offset-1",
               hasError && "border-red-500",
@@ -139,6 +141,7 @@ export function CurrencyCombobox({
           </Button>
         </PopoverTrigger>
         <PopoverContent
+          id={`${id}-listbox`}
           className="w-full min-w-[var(--radix-popper-anchor-width)] border border-slate-300 p-0"
           align="start"
         >

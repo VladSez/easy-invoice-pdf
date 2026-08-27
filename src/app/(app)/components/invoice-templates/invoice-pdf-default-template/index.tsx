@@ -1,5 +1,3 @@
-import { type InvoiceData } from "@/app/schema";
-import { INVOICE_PDF_FONTS } from "@/config";
 import {
   Document,
   Font,
@@ -7,6 +5,10 @@ import {
   StyleSheet,
   type Styles,
 } from "@react-pdf/renderer/lib/react-pdf.browser";
+
+import { type InvoiceData } from "@/app/schema";
+import { INVOICE_PDF_FONTS } from "@/config";
+
 import { InvoiceBody } from "./invoice-body";
 
 // Open sans seems to be working fine with EN and PL

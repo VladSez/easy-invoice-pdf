@@ -1,5 +1,21 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as Sentry from "@sentry/nextjs";
+import dayjs from "dayjs";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
+import { useDebouncedCallback } from "use-debounce";
+
+import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   accordionSchema,
@@ -26,33 +42,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import type { NonReadonly, Prettify } from "@/types";
-import { calculateInvoiceTotal } from "./utils/calculate-invoice-total";
-import { calculateItemTotals } from "./utils/calculate-item-totals";
-import { formErrorsToToast } from "./utils/form-errors-to-toast";
-import { hasAnyItemTotalsChanged } from "./utils/has-item-totals-changed";
-import { parseValidatedInvoiceItems } from "./utils/validated-invoice-items";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as Sentry from "@sentry/nextjs";
-import dayjs from "dayjs";
-import {
-  memo,
-  useCallback,
-  useEffect,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
-import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
-import { toast } from "sonner";
-import { useDebouncedCallback } from "use-debounce";
-
-import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 import { AlertIcon, ErrorMessage } from "./common";
 import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
+import { calculateInvoiceTotal } from "./utils/calculate-invoice-total";
+import { calculateItemTotals } from "./utils/calculate-item-totals";
+import { formErrorsToToast } from "./utils/form-errors-to-toast";
+import { hasAnyItemTotalsChanged } from "./utils/has-item-totals-changed";
+import { parseValidatedInvoiceItems } from "./utils/validated-invoice-items";
 
 const DEBOUNCE_TIMEOUT = 500;
 
@@ -140,7 +140,6 @@ export const InvoiceForm = memo(function InvoiceForm({
 
     const total = calculateInvoiceTotal(invoiceItems);
 
-    // eslint-disable-next-line no-console
     console.info(
       "[useEffect] recalculating totals because invoice items changed",
       {
@@ -161,7 +160,9 @@ export const InvoiceForm = memo(function InvoiceForm({
 
     // Only update if there are actual changes
     const updatedItems = invoiceItems
-      .map(calculateItemTotals)
+      .map((item) => {
+        return calculateItemTotals(item);
+      })
       .filter(Boolean) as InvoiceItemData[];
 
     // Batch updates
@@ -174,7 +175,9 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   // top level of component
   const debouncedShowFormErrorsToast = useDebouncedCallback(
-    () => formErrorsToToast({ errors, isMobile }),
+    () => {
+      return formErrorsToToast({ errors, isMobile });
+    },
     isMobile ? 3000 : 1000,
   );
 
@@ -230,7 +233,9 @@ export const InvoiceForm = memo(function InvoiceForm({
       void debouncedRegeneratePdfOnFormChange(value as unknown as InvoiceData);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      return subscription.unsubscribe();
+    };
   }, [debouncedRegeneratePdfOnFormChange, watch]);
 
   const template = useWatch({ control, name: "template" });
@@ -245,7 +250,9 @@ export const InvoiceForm = memo(function InvoiceForm({
     (index: number) => {
       setValue(
         "items",
-        invoiceItems.filter((_, i) => i !== index),
+        invoiceItems.filter((_, i) => {
+          return i !== index;
+        }),
         {
           shouldValidate: true,
           shouldTouch: true,
@@ -301,8 +308,12 @@ export const InvoiceForm = memo(function InvoiceForm({
 
         if (validatedState.success) {
           const arrayOfOpenSections = Object.entries(validatedState.data)
-            .filter(([_, isOpen]) => isOpen)
-            .map(([section]) => section) as Prettify<AccordionKeys>;
+            .filter(([_, isOpen]) => {
+              return isOpen;
+            })
+            .map(([section]) => {
+              return section;
+            }) as Prettify<AccordionKeys>;
 
           return arrayOfOpenSections;
         }
@@ -453,17 +464,19 @@ export const InvoiceForm = memo(function InvoiceForm({
             <Controller
               name="total"
               control={control}
-              render={({ field }) => (
-                <ReadOnlyMoneyInput
-                  {...field}
-                  id={`total`}
-                  currency={currency}
-                  value={field.value.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                />
-              )}
+              render={({ field }) => {
+                return (
+                  <ReadOnlyMoneyInput
+                    {...field}
+                    id={`total`}
+                    currency={currency}
+                    value={field.value.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  />
+                );
+              }}
             />
           </div>
           {errors.total ? (
@@ -477,7 +490,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         </div>
 
         {/* Payment Method (Only show for default template) */}
-        {template === "default" && (
+        {template === "default" ? (
           <div>
             <div className="relative mb-2 mt-6 flex items-center justify-between">
               <Label htmlFor={`paymentMethod`} className="">
@@ -489,16 +502,18 @@ export const InvoiceForm = memo(function InvoiceForm({
                 <Controller
                   name={`paymentMethodFieldIsVisible`}
                   control={control}
-                  render={({ field: { value, onChange, ...field } }) => (
-                    <Switch
-                      {...field}
-                      id={`paymentMethodFieldIsVisible`}
-                      checked={value}
-                      onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                      data-testid="paymentMethodFieldIsVisible"
-                    />
-                  )}
+                  render={({ field: { value, onChange, ...field } }) => {
+                    return (
+                      <Switch
+                        {...field}
+                        id={`paymentMethodFieldIsVisible`}
+                        checked={value}
+                        onCheckedChange={onChange}
+                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        data-testid="paymentMethodFieldIsVisible"
+                      />
+                    );
+                  }}
                 />
                 <CustomTooltip
                   trigger={
@@ -514,20 +529,22 @@ export const InvoiceForm = memo(function InvoiceForm({
             <Controller
               name="paymentMethod"
               control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  id={`paymentMethod`}
-                  type="text"
-                  className="mt-1"
-                />
-              )}
+              render={({ field }) => {
+                return (
+                  <Input
+                    {...field}
+                    id={`paymentMethod`}
+                    type="text"
+                    className="mt-1"
+                  />
+                );
+              }}
             />
             {errors.paymentMethod ? (
               <ErrorMessage>{errors.paymentMethod.message}</ErrorMessage>
             ) : null}
           </div>
-        )}
+        ) : null}
 
         {/* Payment Due */}
         <div>
@@ -538,9 +555,16 @@ export const InvoiceForm = memo(function InvoiceForm({
             <Controller
               name="paymentDue"
               control={control}
-              render={({ field }) => (
-                <Input {...field} id={`paymentDue`} type="date" className="" />
-              )}
+              render={({ field }) => {
+                return (
+                  <Input
+                    {...field}
+                    id={`paymentDue`}
+                    type="date"
+                    className=""
+                  />
+                );
+              }}
             />
             {errors.paymentDue ? (
               <ErrorMessage>{errors.paymentDue.message}</ErrorMessage>
@@ -614,15 +638,17 @@ export const InvoiceForm = memo(function InvoiceForm({
               <Controller
                 name={`notesFieldIsVisible`}
                 control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`notesFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                  />
-                )}
+                render={({ field: { value, onChange, ...field } }) => {
+                  return (
+                    <Switch
+                      {...field}
+                      id={`notesFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    />
+                  );
+                }}
               />
               <CustomTooltip
                 trigger={
@@ -635,15 +661,17 @@ export const InvoiceForm = memo(function InvoiceForm({
           <Controller
             name="notes"
             control={control}
-            render={({ field }) => (
-              <Textarea
-                {...field}
-                id={`notes`}
-                rows={3}
-                className=""
-                data-testid="notes"
-              />
-            )}
+            render={({ field }) => {
+              return (
+                <Textarea
+                  {...field}
+                  id={`notes`}
+                  rows={3}
+                  className=""
+                  data-testid="notes"
+                />
+              );
+            }}
           />
           {errors?.notes ? (
             <ErrorMessage>{errors?.notes?.message}</ErrorMessage>
@@ -662,16 +690,18 @@ export const InvoiceForm = memo(function InvoiceForm({
               <Controller
                 name={`qrCodeIsVisible`}
                 control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`qrCodeIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    aria-label="Show QR Code in PDF"
-                  />
-                )}
+                render={({ field: { value, onChange, ...field } }) => {
+                  return (
+                    <Switch
+                      {...field}
+                      id={`qrCodeIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      aria-label="Show QR Code in PDF"
+                    />
+                  );
+                }}
               />
               <CustomTooltip
                 trigger={<Label htmlFor={`qrCodeIsVisible`}>Show in PDF</Label>}
@@ -689,15 +719,17 @@ export const InvoiceForm = memo(function InvoiceForm({
               <Controller
                 name="qrCodeData"
                 control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    id={`qrCodeData`}
-                    type="text"
-                    placeholder="Enter URL or text to encode"
-                    data-testid="qrCodeData"
-                  />
-                )}
+                render={({ field }) => {
+                  return (
+                    <Input
+                      {...field}
+                      id={`qrCodeData`}
+                      type="text"
+                      placeholder="Enter URL or text to encode"
+                      data-testid="qrCodeData"
+                    />
+                  );
+                }}
               />
               <InputHelperMessage>
                 Enter any text or URL to generate a QR code. The QR code will
@@ -716,15 +748,17 @@ export const InvoiceForm = memo(function InvoiceForm({
               <Controller
                 name="qrCodeDescription"
                 control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    id={`qrCodeDescription`}
-                    type="text"
-                    placeholder="Enter a description for the QR code"
-                    data-testid="qrCodeDescription"
-                  />
-                )}
+                render={({ field }) => {
+                  return (
+                    <Input
+                      {...field}
+                      id={`qrCodeDescription`}
+                      type="text"
+                      placeholder="Enter a description for the QR code"
+                      data-testid="qrCodeDescription"
+                    />
+                  );
+                }}
               />
               <InputHelperMessage>
                 Optional text that will be displayed below the QR code in the
@@ -740,7 +774,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         {/*
             Stripe template doesn't have these fields
         */}
-        {invoiceData.template === "default" && (
+        {invoiceData.template === "default" ? (
           <>
             <fieldset className="rounded-md border px-4 pb-4">
               <legend className="text-base font-semibold lg:text-lg">
@@ -752,16 +786,18 @@ export const InvoiceForm = memo(function InvoiceForm({
                   <Controller
                     name="personAuthorizedToReceiveFieldIsVisible"
                     control={control}
-                    render={({ field: { value, onChange, ...field } }) => (
-                      <Switch
-                        {...field}
-                        id="personAuthorizedToReceiveFieldIsVisible"
-                        checked={value}
-                        onCheckedChange={onChange}
-                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                        aria-label="Show Person Authorized to Receive in PDF"
-                      />
-                    )}
+                    render={({ field: { value, onChange, ...field } }) => {
+                      return (
+                        <Switch
+                          {...field}
+                          id="personAuthorizedToReceiveFieldIsVisible"
+                          checked={value}
+                          onCheckedChange={onChange}
+                          className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                          aria-label="Show Person Authorized to Receive in PDF"
+                        />
+                      );
+                    }}
                   />
                   <CustomTooltip
                     trigger={
@@ -784,15 +820,17 @@ export const InvoiceForm = memo(function InvoiceForm({
                 <Controller
                   name="personAuthorizedToReceiveName"
                   control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id="personAuthorizedToReceiveName"
-                      type="text"
-                      placeholder="Enter name of person authorized to receive"
-                      data-testid="personAuthorizedToReceiveName"
-                    />
-                  )}
+                  render={({ field }) => {
+                    return (
+                      <Input
+                        {...field}
+                        id="personAuthorizedToReceiveName"
+                        type="text"
+                        placeholder="Enter name of person authorized to receive"
+                        data-testid="personAuthorizedToReceiveName"
+                      />
+                    );
+                  }}
                 />
                 <InputHelperMessage>
                   Name displayed above the signature line in the PDF.
@@ -815,16 +853,18 @@ export const InvoiceForm = memo(function InvoiceForm({
                   <Controller
                     name="personAuthorizedToIssueFieldIsVisible"
                     control={control}
-                    render={({ field: { value, onChange, ...field } }) => (
-                      <Switch
-                        {...field}
-                        id="personAuthorizedToIssueFieldIsVisible"
-                        checked={value}
-                        onCheckedChange={onChange}
-                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                        aria-label="Show Person Authorized to Issue in PDF"
-                      />
-                    )}
+                    render={({ field: { value, onChange, ...field } }) => {
+                      return (
+                        <Switch
+                          {...field}
+                          id="personAuthorizedToIssueFieldIsVisible"
+                          checked={value}
+                          onCheckedChange={onChange}
+                          className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                          aria-label="Show Person Authorized to Issue in PDF"
+                        />
+                      );
+                    }}
                   />
                   <CustomTooltip
                     trigger={
@@ -847,15 +887,17 @@ export const InvoiceForm = memo(function InvoiceForm({
                 <Controller
                   name="personAuthorizedToIssueName"
                   control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id="personAuthorizedToIssueName"
-                      type="text"
-                      placeholder="Enter name of person authorized to issue"
-                      data-testid="personAuthorizedToIssueName"
-                    />
-                  )}
+                  render={({ field }) => {
+                    return (
+                      <Input
+                        {...field}
+                        id="personAuthorizedToIssueName"
+                        type="text"
+                        placeholder="Enter name of person authorized to issue"
+                        data-testid="personAuthorizedToIssueName"
+                      />
+                    );
+                  }}
                 />
                 <InputHelperMessage>
                   Name displayed above the signature line in the PDF.
@@ -868,7 +910,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               </div>
             </fieldset>
           </>
-        )}
+        ) : null}
       </div>
     </form>
   );

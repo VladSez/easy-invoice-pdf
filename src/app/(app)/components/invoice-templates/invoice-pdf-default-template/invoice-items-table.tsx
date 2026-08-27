@@ -1,6 +1,8 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
-import type { InvoiceData } from "@/app/schema";
+
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import type { InvoiceData } from "@/app/schema";
+
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
 export function InvoiceItemsTable({
@@ -53,7 +55,7 @@ export function InvoiceItemsTable({
   return (
     <View style={{ marginBottom: 5, marginTop: 14 }}>
       <View style={styles.table}>
-        {/* 
+        {/*
           START: Table header row with columns
         */}
         <View style={[styles.tableRow, { borderTopWidth: 1 }]} fixed>
@@ -142,11 +144,11 @@ export function InvoiceItemsTable({
             </View>
           ) : null}
         </View>
-        {/* 
+        {/*
             END: Table header columns
         */}
 
-        {/* 
+        {/*
           START: Table body rows
         */}
         {invoiceData?.items.map((item, index) => {
@@ -334,11 +336,11 @@ export function InvoiceItemsTable({
             </View>
           );
         })}
-        {/* 
+        {/*
           END: Table body rows
         */}
 
-        {/* 
+        {/*
           START: Table footer
         */}
         <View style={styles.tableRow} wrap={false} minPresenceAhead={60}>
@@ -376,7 +378,7 @@ export function InvoiceItemsTable({
             </Text>
           </View>
         </View>
-        {/* 
+        {/*
           END: Table footer row
         */}
       </View>

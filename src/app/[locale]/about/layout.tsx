@@ -1,21 +1,20 @@
-import { hasLocale, type Locale } from "next-intl";
-import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
-import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
-import type EnMessages from "../../../../messages/en.json";
-import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
-import { AboutJsonLd } from "./about-json-ld";
+import { hasLocale, type Locale } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
+import { notFound } from "next/navigation";
 
+import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
+import { routing } from "@/i18n/routing";
 import { OPEN_GRAPH_LOCALE_BY_LOCALE } from "@/lib/seo/locale-utils";
 
+import type EnMessages from "../../../../messages/en.json";
+import { AboutJsonLd } from "./about-json-ld";
+
 // Add metadata to make sure search engines can index the page
+// Next.js types dynamic segments as `string`, so we narrow to `Locale` below
 export async function generateMetadata({
   params,
-}: {
-  // Next.js types dynamic segments as `string`, so we narrow to `Locale` below
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
+}: Pick<LayoutProps<"/[locale]/about">, "params">): Promise<Metadata> {
   const { locale } = await params;
 
   if (!hasLocale(routing.locales, locale)) {
@@ -25,7 +24,9 @@ export async function generateMetadata({
   try {
     // Load the messages for the requested locale
     const messages = await import(`../../../../messages/${locale}.json`).then(
-      (module: { default: typeof EnMessages }) => module.default,
+      (module: { default: typeof EnMessages }) => {
+        return module.default;
+      },
     );
 
     return {
@@ -101,14 +102,11 @@ export async function generateMetadata({
   }
 }
 
+// Next.js types dynamic segments as `string`, so we narrow to `Locale` below
 export default async function AboutLocaleLayout({
   children,
   params,
-}: {
-  children: React.ReactNode;
-  // Next.js types dynamic segments as `string`, so we narrow to `Locale` below
-  params: Promise<{ locale: string }>;
-}) {
+}: LayoutProps<"/[locale]/about">) {
   // Ensure that the incoming `locale` is valid
   const { locale } = await params;
 

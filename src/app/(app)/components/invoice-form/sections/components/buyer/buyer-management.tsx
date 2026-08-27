@@ -1,9 +1,11 @@
+import * as Sentry from "@sentry/nextjs";
 import { Plus, Trash2, Pencil, AlertCircleIcon } from "lucide-react";
 import { useId, useState, useEffect } from "react";
-import { CustomTooltip } from "@/components/ui/tooltip";
-import { SelectNative } from "@/components/ui/select-native";
-import { Button } from "@/components/ui/button";
-import { BuyerDialog } from "./buyer-dialog";
+import type { UseFormSetValue } from "react-hook-form";
+import { toast } from "sonner";
+
+import { DEFAULT_BUYER_DATA } from "@/app/constants";
+import { buyerSchema, type InvoiceData, type BuyerData } from "@/app/schema";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,15 +16,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import type { UseFormSetValue } from "react-hook-form";
-import { buyerSchema, type InvoiceData, type BuyerData } from "@/app/schema";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { SelectNative } from "@/components/ui/select-native";
+import { CustomTooltip } from "@/components/ui/tooltip";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import * as Sentry from "@sentry/nextjs";
-import { DEFAULT_BUYER_DATA } from "@/app/constants";
+import { cn } from "@/lib/utils";
+
+import { BuyerDialog } from "./buyer-dialog";
 
 export const BUYERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_BUYERS";
 
@@ -127,6 +129,7 @@ export function BuyerManagement({
         return buyer?.id === invoiceData?.buyer?.id;
       });
 
+      // oxlint-disable-next-line react/set-state-in-effect react-you-might-not-need-an-effect/no-adjust-state-on-prop-change
       setBuyersSelectOptions(validBuyers);
       setSelectedBuyerId(selectedBuyer?.id ?? "");
     } catch (error) {
@@ -192,9 +195,9 @@ export function BuyerManagement({
   // Update buyers when edited
   const handleBuyerEdit = (editedBuyer: BuyerData) => {
     try {
-      const updatedBuyers = buyersSelectOptions.map((buyer) =>
-        buyer.id === editedBuyer.id ? editedBuyer : buyer,
-      );
+      const updatedBuyers = buyersSelectOptions.map((buyer) => {
+        return buyer.id === editedBuyer.id ? editedBuyer : buyer;
+      });
 
       localStorage.setItem(
         BUYERS_LOCAL_STORAGE_KEY,
@@ -234,9 +237,9 @@ export function BuyerManagement({
 
     if (id) {
       setSelectedBuyerId(id);
-      const selectedBuyer = buyersSelectOptions.find(
-        (buyer) => buyer.id === id,
-      );
+      const selectedBuyer = buyersSelectOptions.find((buyer) => {
+        return buyer.id === id;
+      });
 
       if (selectedBuyer) {
         setValue("buyer", selectedBuyer);
@@ -265,9 +268,9 @@ export function BuyerManagement({
   const handleDeleteBuyer = () => {
     try {
       setBuyersSelectOptions((prevBuyers) => {
-        const updatedBuyers = prevBuyers.filter(
-          (buyer) => buyer.id !== selectedBuyerId,
-        );
+        const updatedBuyers = prevBuyers.filter((buyer) => {
+          return buyer.id !== selectedBuyerId;
+        });
 
         localStorage.setItem(
           BUYERS_LOCAL_STORAGE_KEY,
@@ -305,9 +308,9 @@ export function BuyerManagement({
     }
   };
 
-  const activeBuyer = buyersSelectOptions.find(
-    (buyer) => buyer.id === selectedBuyerId,
-  );
+  const activeBuyer = buyersSelectOptions.find((buyer) => {
+    return buyer.id === selectedBuyerId;
+  });
 
   const hasBuyers = buyersSelectOptions.length > 0;
 
@@ -340,11 +343,13 @@ export function BuyerManagement({
                 title={activeBuyer?.name}
               >
                 <option value="">No buyer selected (default)</option>
-                {buyersSelectOptions.map((buyer) => (
-                  <option key={buyer.id} value={buyer.id}>
-                    {buyer.name}
-                  </option>
-                ))}
+                {buyersSelectOptions.map((buyer) => {
+                  return (
+                    <option key={buyer.id} value={buyer.id}>
+                      {buyer.name}
+                    </option>
+                  );
+                })}
               </SelectNative>
 
               {selectedBuyerId ? (

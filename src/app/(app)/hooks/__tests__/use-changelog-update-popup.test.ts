@@ -1,19 +1,25 @@
 // @vitest-environment happy-dom
 
-import type { ChangelogSummary } from "@/app/changelog/utils";
-import { shouldShowChangelogPopup } from "@/app/(app)/utils/changelog-seen-storage";
-import { hasSeenWelcomePopup } from "@/app/(app)/utils/welcome-popup-seen-storage";
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { shouldShowChangelogPopup } from "@/app/(app)/utils/changelog-seen-storage";
+import { hasSeenWelcomePopup } from "@/app/(app)/utils/welcome-popup-seen-storage";
+import type { ChangelogSummary } from "@/app/changelog/utils";
+
 import { useChangelogUpdatePopup } from "../use-changelog-update-popup";
 
-vi.mock("@/app/(app)/utils/welcome-popup-seen-storage", () => ({
-  hasSeenWelcomePopup: vi.fn(),
-}));
+vi.mock("@/app/(app)/utils/welcome-popup-seen-storage", () => {
+  return {
+    hasSeenWelcomePopup: vi.fn(),
+  };
+});
 
-vi.mock("@/app/(app)/utils/changelog-seen-storage", () => ({
-  shouldShowChangelogPopup: vi.fn(),
-}));
+vi.mock("@/app/(app)/utils/changelog-seen-storage", () => {
+  return {
+    shouldShowChangelogPopup: vi.fn(),
+  };
+});
 
 const latestChangelog: ChangelogSummary = {
   slug: "v1-0-3",
@@ -30,14 +36,14 @@ function renderChangelogPopupHook(
     isMobile: boolean;
   }> = {},
 ) {
-  return renderHook(() =>
-    useChangelogUpdatePopup({
+  return renderHook(() => {
+    return useChangelogUpdatePopup({
       latestChangelog: null,
       isViewingSharedInvoice: false,
       isMobile: false,
       ...overrides,
-    }),
-  );
+    });
+  });
 }
 
 describe("useChangelogUpdatePopup", () => {
@@ -56,7 +62,7 @@ describe("useChangelogUpdatePopup", () => {
     const { result } = renderChangelogPopupHook();
 
     expect(result.current.isOpen).toBe(false);
-    expect(result.current.variant).toBe(null);
+    expect(result.current.variant).toBeNull();
 
     act(() => {
       vi.advanceTimersByTime(1_500);
@@ -64,17 +70,18 @@ describe("useChangelogUpdatePopup", () => {
 
     expect(result.current.isOpen).toBe(true);
     expect(result.current.variant).toBe("welcome");
-    expect(result.current.latestChangelog).toBe(null);
+    expect(result.current.latestChangelog).toBeNull();
   });
 
   it("should not show changelog in same session after welcome was shown", () => {
     const { result, rerender } = renderHook(
-      ({ latest }) =>
-        useChangelogUpdatePopup({
+      ({ latest }) => {
+        return useChangelogUpdatePopup({
           latestChangelog: latest,
           isViewingSharedInvoice: false,
           isMobile: false,
-        }),
+        });
+      },
       { initialProps: { latest: null as ChangelogSummary | null } },
     );
 
@@ -97,7 +104,7 @@ describe("useChangelogUpdatePopup", () => {
     });
 
     expect(result.current.isOpen).toBe(false);
-    expect(result.current.variant).toBe(null);
+    expect(result.current.variant).toBeNull();
   });
 
   it("should show changelog popup on a return visit", () => {
@@ -131,17 +138,18 @@ describe("useChangelogUpdatePopup", () => {
       version: "1.0.4",
     };
 
-    vi.mocked(shouldShowChangelogPopup).mockImplementation(
-      (slug) => slug === newChangelog.slug,
-    );
+    vi.mocked(shouldShowChangelogPopup).mockImplementation((slug) => {
+      return slug === newChangelog.slug;
+    });
 
     const { result, rerender } = renderHook(
-      ({ latest }) =>
-        useChangelogUpdatePopup({
+      ({ latest }) => {
+        return useChangelogUpdatePopup({
           latestChangelog: latest,
           isViewingSharedInvoice: false,
           isMobile: false,
-        }),
+        });
+      },
       { initialProps: { latest: previousChangelog } },
     );
 
@@ -150,7 +158,7 @@ describe("useChangelogUpdatePopup", () => {
     });
 
     expect(result.current.isOpen).toBe(false);
-    expect(result.current.variant).toBe(null);
+    expect(result.current.variant).toBeNull();
 
     rerender({ latest: newChangelog });
 
@@ -174,7 +182,7 @@ describe("useChangelogUpdatePopup", () => {
     });
 
     expect(result.current.isOpen).toBe(false);
-    expect(result.current.variant).toBe(null);
+    expect(result.current.variant).toBeNull();
   });
 
   it("should not show popup on mobile", () => {
@@ -185,7 +193,7 @@ describe("useChangelogUpdatePopup", () => {
     });
 
     expect(result.current.isOpen).toBe(false);
-    expect(result.current.variant).toBe(null);
+    expect(result.current.variant).toBeNull();
   });
 
   it("should not show popup when viewing a shared invoice", () => {
@@ -199,7 +207,7 @@ describe("useChangelogUpdatePopup", () => {
     });
 
     expect(result.current.isOpen).toBe(false);
-    expect(result.current.variant).toBe(null);
+    expect(result.current.variant).toBeNull();
   });
 
   it("should close popup when dismissed", () => {

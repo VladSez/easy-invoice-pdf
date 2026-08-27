@@ -1,6 +1,8 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
-import type { InvoiceData } from "@/app/schema";
+
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import type { InvoiceData } from "@/app/schema";
+
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
 export function InvoiceVATSummaryTable({
@@ -35,10 +37,13 @@ export function InvoiceVATSummaryTable({
     const isAString = isNaN(Number(a.vat));
     const isBString = isNaN(Number(b.vat));
 
-    if (isAString && isBString) {
-      if (typeof a.vat === "string" && typeof b.vat === "string") {
-        return a.vat.localeCompare(b.vat);
-      }
+    if (
+      isAString &&
+      isBString &&
+      typeof a.vat === "string" &&
+      typeof b.vat === "string"
+    ) {
+      return a.vat.localeCompare(b.vat);
     }
 
     if (isAString) return 1; // Strings go last
@@ -48,10 +53,9 @@ export function InvoiceVATSummaryTable({
     return Number(b.vat) - Number(a.vat);
   });
 
-  const totalNetAmount = sortedItems.reduce(
-    (acc, item) => acc + item.netAmount,
-    0,
-  );
+  const totalNetAmount = sortedItems.reduce((acc, item) => {
+    return acc + item.netAmount;
+  }, 0);
   const formattedTotalNetAmount = totalNetAmount
     .toLocaleString("en-US", {
       minimumFractionDigits: 2,
@@ -59,10 +63,9 @@ export function InvoiceVATSummaryTable({
     })
     .replaceAll(",", " ");
 
-  const totalVATAmount = sortedItems.reduce(
-    (acc, item) => acc + item.vatAmount,
-    0,
-  );
+  const totalVATAmount = sortedItems.reduce((acc, item) => {
+    return acc + item.vatAmount;
+  }, 0);
   const formattedTotalVATAmount = totalVATAmount
     .toLocaleString("en-US", {
       minimumFractionDigits: 2,
@@ -72,7 +75,7 @@ export function InvoiceVATSummaryTable({
 
   return (
     <View style={[styles.table, { width: "100%" }]}>
-      {/* 
+      {/*
       START: Table header row (top of the VAT summary table)
       */}
       <View style={[styles.tableRow, { borderTopWidth: 1 }]} fixed>
@@ -89,11 +92,11 @@ export function InvoiceVATSummaryTable({
           <Text style={styles.tableCellBold}>{preTaxColumnLabel}</Text>
         </View>
       </View>
-      {/* 
+      {/*
       END: Table header row
       */}
 
-      {/* 
+      {/*
       START: Table body rows
       */}
       {sortedItems?.map((item, index) => {
@@ -182,11 +185,11 @@ export function InvoiceVATSummaryTable({
           </View>
         );
       })}
-      {/* 
+      {/*
       END: Table body rows
       */}
 
-      {/* 
+      {/*
       START: Total row (bottom of the VAT summary table)
       */}
       <View style={styles.tableRow}>
@@ -222,7 +225,7 @@ export function InvoiceVATSummaryTable({
           </Text>
         </View>
       </View>
-      {/* 
+      {/*
       END: Total row
       */}
     </View>

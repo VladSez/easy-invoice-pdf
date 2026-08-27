@@ -1,5 +1,25 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
+import {
+  compressToEncodedURIComponent,
+  decompressFromEncodedURIComponent,
+} from "lz-string";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
+
+import { InvoicePageHeader } from "@/app/(app)/components/invoice-page-header";
+import { InvoicePdfInstanceProvider } from "@/app/(app)/contexts/invoice-pdf-instance-context";
+import { InvoicePageLoadingSkeleton } from "@/app/(app)/loading";
+import {
+  DEFAULT_METADATA,
+  getAppMetadata,
+  updateAppMetadata,
+} from "@/app/(app)/utils/get-app-metadata";
+import { Footer } from "@/app/(components)/footer";
+import type { ChangelogSummary } from "@/app/changelog/utils";
 import { getInitialInvoiceData } from "@/app/constants";
 import {
   invoiceSchema,
@@ -8,47 +28,27 @@ import {
   SUPPORTED_TEMPLATES,
   type InvoiceData,
 } from "@/app/schema";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { useDeviceContext } from "@/contexts/device-context";
-import { useRouter } from "next/navigation";
-
-import { InvoicePageHeader } from "@/app/(app)/components/invoice-page-header";
-import { InvoicePdfInstanceProvider } from "@/app/(app)/contexts/invoice-pdf-instance-context";
-import {
-  DEFAULT_METADATA,
-  getAppMetadata,
-  updateAppMetadata,
-} from "@/app/(app)/utils/get-app-metadata";
-import { Footer } from "@/app/(components)/footer";
 import { GitHubStarCTA } from "@/components/github-star-cta";
 import { Button } from "@/components/ui/button";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { useDeviceContext } from "@/contexts/device-context";
 import { haptic } from "@/lib/haptic";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import {
   compressInvoiceData,
   decompressInvoiceData,
 } from "@/utils/url-compression";
-import * as Sentry from "@sentry/nextjs";
-import {
-  compressToEncodedURIComponent,
-  decompressFromEncodedURIComponent,
-} from "lz-string";
-import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
-import { z } from "zod";
+
 import { InvoiceClientPage } from "./components";
 import { ChangelogUpdatePopup } from "./components/changelog-update-popup";
-import { HowItWorksVideoDialog } from "./components/how-it-works-video-dialog";
 import { showRandomCTAToast } from "./components/cta-toasts";
+import { HowItWorksVideoDialog } from "./components/how-it-works-video-dialog";
 import { useCTAToast } from "./contexts/cta-toast-context";
 import { useChangelogUpdatePopup } from "./hooks/use-changelog-update-popup";
 import { useShowRandomCTAToastOnIdle } from "./hooks/use-show-random-cta-toast";
-import type { ChangelogSummary } from "@/app/changelog/utils";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
 import { selectInvoiceTemplate } from "./utils/select-invoice-template";
-import { InvoicePageLoadingSkeleton } from "@/app/(app)/loading";
 
 // TODO: enable later when PRO version is released, this is PRO FEATURE =)
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
@@ -212,14 +212,12 @@ export function AppPageClient({
           : parsedData;
 
         setInvoiceDataState(selectedInvoiceData);
+      } else if (templateValidation.success) {
+        // if no data in local storage and template is in url, set initial data with template from url
+        setInvoiceDataState(getInitialInvoiceData(templateValidation.data));
       } else {
-        if (templateValidation.success) {
-          // if no data in local storage and template is in url, set initial data with template from url
-          setInvoiceDataState(getInitialInvoiceData(templateValidation.data));
-        } else {
-          // if no data in local storage, set initial data
-          setInvoiceDataState(getInitialInvoiceData());
-        }
+        // if no data in local storage, set initial data
+        setInvoiceDataState(getInitialInvoiceData());
       }
     } catch (error) {
       console.error("Failed to load saved invoice data:", error);
@@ -278,7 +276,7 @@ export function AppPageClient({
 
     // first try to load from url i.e. if user has shared invoice link
     if (compressedInvoiceDataInUrl) {
-      console.log("[useEffect] [initialize invoice data from ** URL **]");
+      console.warn("[useEffect] [initialize invoice data from ** URL **]");
 
       try {
         const decompressedData = decompressFromEncodedURIComponent(
@@ -297,7 +295,7 @@ export function AppPageClient({
 
         const validatedDataFromURL = invoiceSchema.parse(updatedJson);
 
-        console.log(
+        console.warn(
           "[useEffect] [initialize invoice data from ** URL **] validatedDataFromURL",
           validatedDataFromURL,
         );
@@ -367,7 +365,7 @@ export function AppPageClient({
         Sentry.captureException(error);
       }
     } else {
-      console.log(
+      console.warn(
         "[useEffect] [initialize invoice data from ** LOCAL STORAGE **]",
       );
 
@@ -386,7 +384,7 @@ export function AppPageClient({
       return;
     }
 
-    console.log("[useEffect] [add missing template to URL]", {
+    console.warn("[useEffect] [add missing template to URL]", {
       template: invoiceDataState.template,
     });
 
@@ -406,7 +404,7 @@ export function AppPageClient({
    */
   const checkForInvoiceChanges = useCallback(
     (currentData: InvoiceData) => {
-      console.log("[checkForInvoiceChanges]", currentData.template, {
+      console.warn("[checkForInvoiceChanges]", currentData.template, {
         originalUrlInvoiceDataRef: originalUrlInvoiceDataRef.current,
       });
 
@@ -415,7 +413,7 @@ export function AppPageClient({
 
       // Skip if no original URL data or no data in url
       if (!originalUrlInvoiceDataRef.current || !urlData) {
-        console.log("[checkForInvoiceChanges] skipping");
+        console.warn("[checkForInvoiceChanges] skipping");
 
         return;
       }
@@ -426,7 +424,7 @@ export function AppPageClient({
         JSON.stringify(currentData);
 
       if (invoiceHasChanged) {
-        console.log("[checkForInvoiceChanges] invoice has changed");
+        console.warn("[checkForInvoiceChanges] invoice has changed");
 
         toast.info(
           <div className="space-y-2">
@@ -473,10 +471,10 @@ export function AppPageClient({
    *
    */
   const handleInvoiceDataChange = (updatedData: InvoiceData) => {
-    console.log("[handleInvoiceDataChange]");
+    console.warn("[handleInvoiceDataChange]");
 
     if (isInvoiceUrlCorrupted) {
-      console.log("[handleInvoiceDataChange] clearing url due to corruption");
+      console.warn("[handleInvoiceDataChange] clearing url due to corruption");
 
       /** CLEAR URL IN CASE OF CORRUPTED INVOICE URL (i.e. "/?data=") for better UX and consistency */
 
@@ -524,14 +522,14 @@ export function AppPageClient({
 
     // update the url with the new template
     if (currentTemplate !== updatedData.template) {
-      console.log("[handleInvoiceDataChange] update url with new template", {
+      console.warn("[handleInvoiceDataChange] update url with new template", {
         currentTemplate,
         updatedDataTemplate: updatedData.template,
       });
 
       router.replace(`/?template=${updatedData.template}`, { scroll: false });
     } else {
-      console.log("[handleInvoiceDataChange] invoice template did not change");
+      console.warn("[handleInvoiceDataChange] invoice template did not change");
     }
   };
 
@@ -645,10 +643,12 @@ export function AppPageClient({
               .then(() => {
                 umamiTrackEvent("share_invoice_link_mobile");
 
-                updateAppMetadata((current) => ({
-                  ...current,
-                  invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
-                }));
+                updateAppMetadata((current) => {
+                  return {
+                    ...current,
+                    invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
+                  };
+                });
 
                 // dismiss other toasts when navigator.share is successful (for better UX)
                 setTimeout(() => {
@@ -709,10 +709,12 @@ export function AppPageClient({
 
               umamiTrackEvent("share_invoice_link");
 
-              updateAppMetadata((current) => ({
-                ...current,
-                invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
-              }));
+              updateAppMetadata((current) => {
+                return {
+                  ...current,
+                  invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
+                };
+              });
 
               // show CTA toast after x seconds (after invoice link notification is shown)
               setTimeout(() => {
@@ -786,7 +788,9 @@ export function AppPageClient({
           latestChangelog={changelogForPopup}
           isOpen={isChangelogPopupOpen}
           onDismiss={dismissChangelogPopup}
-          onHowItWorksClick={() => setIsHowItWorksDialogOpen(true)}
+          onHowItWorksClick={() => {
+            return setIsHowItWorksDialogOpen(true);
+          }}
         />
       ) : null}
       <HowItWorksVideoDialog

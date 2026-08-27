@@ -1,6 +1,7 @@
+import { describe, expect, it } from "vitest";
+
 import enMessages from "../../../../../messages/en.json";
 import plMessages from "../../../../../messages/pl.json";
-import { describe, expect, it } from "vitest";
 import { buildAboutJsonLdGraph } from "../about-json-ld-graph";
 
 describe("buildAboutJsonLdGraph", () => {
@@ -55,7 +56,7 @@ describe("buildAboutJsonLdGraph", () => {
 
     const mainEntity = faqPage.mainEntity as { name: string }[];
     expect(Array.isArray(mainEntity)).toBe(true);
-    expect(mainEntity.length).toBe(9);
+    expect(mainEntity).toHaveLength(9);
     expect(mainEntity[0].name).toBe(plMessages.FAQ.items.whatIs.question);
   });
 
@@ -89,6 +90,6 @@ describe("buildAboutJsonLdGraph", () => {
 
     const mainEntity = faqPage.mainEntity as { name: string }[];
     expect(Array.isArray(mainEntity)).toBe(true);
-    expect(mainEntity.length).toBe(9);
+    expect(mainEntity).toHaveLength(9);
   });
 });

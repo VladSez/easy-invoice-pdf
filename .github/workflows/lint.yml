@@ -1,4 +1,4 @@
-name: 🧹 ESLint
+name: 🧹 Oxlint
 on:
   push:
     branches: [main]
@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   lint:
-    name: Run linting
+    name: Run linting and format check
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
@@ -43,10 +43,17 @@ jobs:
       - name: 🔎 Run linting
         id: lint
         continue-on-error: true
-        run: pnpm eslint .
+        # `--format=github` turns findings into inline PR annotations.
+        # Type-aware rules run too (see `options.typeAware` in .oxlintrc.json).
+        run: pnpm lint --format=github
+
+      - name: 💅 Check formatting
+        id: format
+        continue-on-error: true
+        run: pnpm format:check
 
       - name: 🔍 Get PR URL
-        if: steps.lint.outcome == 'failure'
+        if: steps.lint.outcome == 'failure' || steps.format.outcome == 'failure'
         id: pr-url
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -62,7 +69,7 @@ jobs:
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
       - name: 📧 Send email
-        if: steps.lint.outcome == 'failure'
+        if: steps.lint.outcome == 'failure' || steps.format.outcome == 'failure'
         # https://github.com/dawidd6/action-send-mail
         uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
         with:
@@ -72,14 +79,14 @@ jobs:
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: ❌ Linting Failed for ${{ github.repository }}
+          subject: ❌ Linting or formatting failed for ${{ github.repository }}
           body: |
-            Linting for ${{ github.repository }} has failed.
+            Linting or formatting for ${{ github.repository }} has failed.
 
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
 
-      - name: ❌ Mark workflow failed on Linting failure
-        if: steps.lint.outcome == 'failure'
+      - name: ❌ Mark workflow failed on linting or formatting failure
+        if: steps.lint.outcome == 'failure' || steps.format.outcome == 'failure'
         run: exit 1

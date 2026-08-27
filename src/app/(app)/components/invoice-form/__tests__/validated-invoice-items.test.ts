@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { assert, describe, expect, it } from "vitest";
+
 import type { InvoiceItemData } from "@/app/schema";
 import { MOCK_INVOICE_ITEM_DATA } from "@/utils/__tests__/data";
+
 import { parseValidatedInvoiceItems } from "../utils/validated-invoice-items";
 
 function createItem(overrides: Partial<InvoiceItemData> = {}): InvoiceItemData {
@@ -14,11 +16,9 @@ describe("parseValidatedInvoiceItems", () => {
   it("accepts items that pass invoiceItemSchema", () => {
     const result = parseValidatedInvoiceItems([createItem()]);
 
-    expect(result.success).toBe(true);
-
-    if (!result.success) {
-      return;
-    }
+    // `assert` both fails the test and narrows the safeParse union, so the
+    // assertions below need no `if (!result.success) return` guard.
+    assert(result.success);
 
     expect(result.data[0].preTaxAmount).toBe(
       MOCK_INVOICE_ITEM_DATA.preTaxAmount,
@@ -30,11 +30,7 @@ describe("parseValidatedInvoiceItems", () => {
       createItem({ preTaxAmount: "247.23" as unknown as number }),
     ]);
 
-    expect(result.success).toBe(true);
-
-    if (!result.success) {
-      return;
-    }
+    assert(result.success);
 
     expect(result.data[0].preTaxAmount).toBe(247.23);
   });

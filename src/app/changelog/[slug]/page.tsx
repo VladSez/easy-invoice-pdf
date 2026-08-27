@@ -1,9 +1,9 @@
-import {
-  APP_URL,
-  PERSONAL_WEBSITE_URL,
-  STATIC_ASSETS_URL,
-  TWITTER_CREATOR,
-} from "@/config";
+import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+
 import {
   formatChangelogDate,
   getChangelogEntry,
@@ -11,19 +11,19 @@ import {
   getNextChangelogEntry,
   getPreviousChangelogEntry,
 } from "@/app/changelog/utils";
-import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
-import type { Metadata } from "next";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { Suspense } from "react";
-import { ChangelogAuthorByline } from "../components/changelog-author-byline";
+import {
+  APP_URL,
+  PERSONAL_WEBSITE_URL,
+  STATIC_ASSETS_URL,
+  TWITTER_CREATOR,
+} from "@/config";
+
 import { ChangelogPostJsonLd } from "../changelog-post-json-ld";
+import { ChangelogAuthorByline } from "../components/changelog-author-byline";
 import { ChangelogVersionBadgeLink } from "../components/changelog-version-badge-link";
 import { DateTime } from "../components/date-time";
 
-interface ChangelogPageProps {
-  params: Promise<{ slug: string }>;
-}
+type ChangelogPageProps = PageProps<"/changelog/[slug]">;
 
 // generateStaticParams() runs at build time by Next.js for dynamic route ([slug]) with static generation
 // Purpose: pre-generate all possible changelog/[slug] pages
@@ -32,9 +32,11 @@ interface ChangelogPageProps {
 // Next.js builds all these routes statically for SEO, fast load, etc.
 export async function generateStaticParams() {
   const entries = await getChangelogEntries();
-  return entries.map((entry) => ({
-    slug: entry.slug,
-  }));
+  return entries.map((entry) => {
+    return {
+      slug: entry.slug,
+    };
+  });
 }
 
 // Generate metadata for each changelog entry
@@ -51,7 +53,7 @@ export async function generateMetadata({
   const formattedDate = formatChangelogDate(entry.metadata.date);
 
   return {
-    title: `${entry.metadata.title || `Update ${formattedDate}`}`,
+    title: entry.metadata.title || `Update ${formattedDate}`,
     description: entry.metadata.description,
     authors: [{ name: "Vlad Sazonau", url: PERSONAL_WEBSITE_URL }],
     alternates: {
@@ -68,7 +70,7 @@ export async function generateMetadata({
       "easy invoice pdf changelog",
     ],
     openGraph: {
-      title: `${entry.metadata.title || `Update ${formattedDate}`}`,
+      title: entry.metadata.title || `Update ${formattedDate}`,
       description: entry.metadata.description,
       type: "article",
       publishedTime: entry.metadata.date,
@@ -167,6 +169,7 @@ export default async function ChangelogEntryPage({
                 {/* Twitter/X share */}
                 <a
                   target="_blank"
+                  aria-label="Share this update on X"
                   rel="noopener noreferrer"
                   className="transition-all hover:scale-110"
                   href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
@@ -190,6 +193,7 @@ export default async function ChangelogEntryPage({
                 {/* LinkedIn share */}
                 <a
                   target="_blank"
+                  aria-label="Share this update on LinkedIn"
                   rel="noopener noreferrer"
                   className="transition-all hover:scale-110"
                   href={`http://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
@@ -212,6 +216,7 @@ export default async function ChangelogEntryPage({
                 {/* Facebook share */}
                 <a
                   target="_blank"
+                  aria-label="Share this update on Facebook"
                   rel="noopener noreferrer"
                   className="transition-all hover:scale-110"
                   href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
@@ -235,6 +240,7 @@ export default async function ChangelogEntryPage({
                 {/* Hacker News share */}
                 <a
                   target="_blank"
+                  aria-label="Share this update on Hacker News"
                   rel="noopener noreferrer"
                   className="transition-all hover:scale-110"
                   href={`https://news.ycombinator.com/submitlink?u=${encodeURIComponent(

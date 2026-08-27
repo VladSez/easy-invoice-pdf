@@ -1,9 +1,10 @@
 "use client";
 
+import { Play } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
+
 import { cn } from "@/lib/utils";
-import { Play } from "lucide-react";
 
 interface SharedVideoProps extends React.ComponentPropsWithRef<"div"> {
   src: string;
@@ -103,7 +104,9 @@ export function AutoPlayVideo({
     }
 
     video.addEventListener("click", handleClick);
-    return () => video.removeEventListener("click", handleClick);
+    return () => {
+      return video.removeEventListener("click", handleClick);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -211,7 +214,9 @@ export function ManualPlayVideo({
     window.addEventListener("video-play", handler);
 
     // Cleanup: remove listener when component unmounts
-    return () => window.removeEventListener("video-play", handler);
+    return () => {
+      return window.removeEventListener("video-play", handler);
+    };
   }, [videoId]);
 
   // Handler: Called when user clicks the play button
@@ -257,7 +262,7 @@ export function ManualPlayVideo({
           >
             <source src={src} type="video/mp4" />
           </video>
-          {/* 
+          {/*
             Play button overlay - only shown when video is not playing
           */}
           {!isPlaying ? (

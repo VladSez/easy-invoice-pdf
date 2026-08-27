@@ -1,16 +1,5 @@
 "use client";
 
-import { inputErrorClassName } from "@/app/(app)/components/invoice-form/common";
-import { type BuyerData, type InvoiceData } from "@/app/schema";
-import { cn } from "@/lib/utils";
-import { BuyerManagement } from "@/app/(app)/components/invoice-form/sections/components/buyer/buyer-management";
-import { AccordionContent } from "@/components/ui/accordion";
-import { Input } from "@/components/ui/input";
-import { InputHelperMessage } from "@/components/ui/input-helper-message";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { CustomTooltip } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
 import { memo, useState } from "react";
 import {
@@ -19,6 +8,18 @@ import {
   type FieldErrors,
   type UseFormSetValue,
 } from "react-hook-form";
+
+import { inputErrorClassName } from "@/app/(app)/components/invoice-form/common";
+import { BuyerManagement } from "@/app/(app)/components/invoice-form/sections/components/buyer/buyer-management";
+import { type BuyerData, type InvoiceData } from "@/app/schema";
+import { AccordionContent } from "@/components/ui/accordion";
+import { Input } from "@/components/ui/input";
+import { InputHelperMessage } from "@/components/ui/input-helper-message";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { CustomTooltip } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
@@ -89,14 +90,16 @@ export const BuyerInformation = memo(function BuyerInformation({
             <Controller
               name="buyer.name"
               control={control}
-              render={({ field }) => (
-                <Textarea
-                  {...field}
-                  id="buyerName"
-                  rows={3}
-                  className={inputErrorClassName(!!errors.buyer?.name)}
-                />
-              )}
+              render={({ field }) => {
+                return (
+                  <Textarea
+                    {...field}
+                    id="buyerName"
+                    rows={3}
+                    className={inputErrorClassName(!!errors.buyer?.name)}
+                  />
+                );
+              }}
             />
             {errors.buyer?.name ? (
               <ErrorMessage>{errors.buyer.name.message}</ErrorMessage>
@@ -110,14 +113,16 @@ export const BuyerInformation = memo(function BuyerInformation({
             <Controller
               name="buyer.address"
               control={control}
-              render={({ field }) => (
-                <Textarea
-                  {...field}
-                  id="buyerAddress"
-                  rows={3}
-                  className={inputErrorClassName(!!errors.buyer?.address)}
-                />
-              )}
+              render={({ field }) => {
+                return (
+                  <Textarea
+                    {...field}
+                    id="buyerAddress"
+                    rows={3}
+                    className={inputErrorClassName(!!errors.buyer?.address)}
+                  />
+                );
+              }}
             />
             {errors.buyer?.address ? (
               <ErrorMessage>{errors.buyer.address.message}</ErrorMessage>
@@ -135,17 +140,19 @@ export const BuyerInformation = memo(function BuyerInformation({
                   <Controller
                     name="buyer.vatNoFieldIsVisible"
                     control={control}
-                    render={({ field: { value, onChange, ...field } }) => (
-                      <Switch
-                        {...field}
-                        id="buyerVatNoFieldIsVisible"
-                        checked={value}
-                        onCheckedChange={onChange}
-                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                        data-testid="buyerVatNoFieldIsVisible"
-                        aria-label="Show the 'Buyer Tax Number' Field in the PDF"
-                      />
-                    )}
+                    render={({ field: { value, onChange, ...field } }) => {
+                      return (
+                        <Switch
+                          {...field}
+                          id="buyerVatNoFieldIsVisible"
+                          checked={value}
+                          onCheckedChange={onChange}
+                          className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                          data-testid="buyerVatNoFieldIsVisible"
+                          aria-label="Show the 'Buyer Tax Number' Field in the PDF"
+                        />
+                      );
+                    }}
                   />
                   <CustomTooltip
                     trigger={
@@ -168,29 +175,31 @@ export const BuyerInformation = memo(function BuyerInformation({
                   <Controller
                     name="buyer.vatNoLabelText"
                     control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        type="text"
-                        id="buyerVatNoLabel"
-                        placeholder="Enter Tax number label"
-                        className={cn(
-                          "mt-1 block w-full",
-                          inputErrorClassName(!!errors.buyer?.vatNoLabelText),
-                        )}
-                      />
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <Input
+                          {...field}
+                          type="text"
+                          id="buyerVatNoLabel"
+                          placeholder="Enter Tax number label"
+                          className={cn(
+                            "mt-1 block w-full",
+                            inputErrorClassName(!!errors.buyer?.vatNoLabelText),
+                          )}
+                        />
+                      );
+                    }}
                   />
                   {errors.buyer?.vatNoLabelText ? (
                     <ErrorMessage>
                       {errors.buyer.vatNoLabelText.message}
                     </ErrorMessage>
                   ) : null}
-                  {!errors.buyer?.vatNoLabelText && (
+                  {!errors.buyer?.vatNoLabelText ? (
                     <InputHelperMessage>
                       Set a custom label (e.g. VAT no, Tax no, etc.)
                     </InputHelperMessage>
-                  )}
+                  ) : null}
                 </div>
 
                 <div>
@@ -198,18 +207,20 @@ export const BuyerInformation = memo(function BuyerInformation({
                   <Controller
                     name="buyer.vatNo"
                     control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        id="buyerVatNo"
-                        type="text"
-                        placeholder="Enter Tax number value"
-                        className={cn(
-                          "mt-1 block w-full",
-                          inputErrorClassName(!!errors.buyer?.vatNo),
-                        )}
-                      />
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <Input
+                          {...field}
+                          id="buyerVatNo"
+                          type="text"
+                          placeholder="Enter Tax number value"
+                          className={cn(
+                            "mt-1 block w-full",
+                            inputErrorClassName(!!errors.buyer?.vatNo),
+                          )}
+                        />
+                      );
+                    }}
                   />
                   {errors.buyer?.vatNo ? (
                     <ErrorMessage>{errors.buyer.vatNo.message}</ErrorMessage>
@@ -228,17 +239,19 @@ export const BuyerInformation = memo(function BuyerInformation({
                 <Controller
                   name="buyer.emailFieldIsVisible"
                   control={control}
-                  render={({ field: { value, onChange, ...field } }) => (
-                    <Switch
-                      {...field}
-                      id="buyerEmailFieldIsVisible"
-                      checked={value}
-                      onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                      data-testid="buyerEmailFieldIsVisible"
-                      aria-label="Show the 'Email' field in the PDF"
-                    />
-                  )}
+                  render={({ field: { value, onChange, ...field } }) => {
+                    return (
+                      <Switch
+                        {...field}
+                        id="buyerEmailFieldIsVisible"
+                        checked={value}
+                        onCheckedChange={onChange}
+                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        data-testid="buyerEmailFieldIsVisible"
+                        aria-label="Show the 'Email' field in the PDF"
+                      />
+                    );
+                  }}
                 />
                 <CustomTooltip
                   trigger={
@@ -255,14 +268,16 @@ export const BuyerInformation = memo(function BuyerInformation({
             <Controller
               name="buyer.email"
               control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  id="buyerEmail"
-                  type="email"
-                  className={inputErrorClassName(!!errors.buyer?.email)}
-                />
-              )}
+              render={({ field }) => {
+                return (
+                  <Input
+                    {...field}
+                    id="buyerEmail"
+                    type="email"
+                    className={inputErrorClassName(!!errors.buyer?.email)}
+                  />
+                );
+              }}
             />
             {errors.buyer?.email ? (
               <ErrorMessage>{errors.buyer.email.message}</ErrorMessage>
@@ -278,17 +293,19 @@ export const BuyerInformation = memo(function BuyerInformation({
                 <Controller
                   name="buyer.notesFieldIsVisible"
                   control={control}
-                  render={({ field: { value, onChange, ...field } }) => (
-                    <Switch
-                      {...field}
-                      id="buyerNotesFieldIsVisible"
-                      checked={value}
-                      onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                      data-testid="buyerNotesInvoiceFormFieldVisibilitySwitch"
-                      aria-label="Show the 'Notes' field in the PDF"
-                    />
-                  )}
+                  render={({ field: { value, onChange, ...field } }) => {
+                    return (
+                      <Switch
+                        {...field}
+                        id="buyerNotesFieldIsVisible"
+                        checked={value}
+                        onCheckedChange={onChange}
+                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        data-testid="buyerNotesInvoiceFormFieldVisibilitySwitch"
+                        aria-label="Show the 'Notes' field in the PDF"
+                      />
+                    );
+                  }}
                 />
                 <CustomTooltip
                   trigger={
@@ -306,14 +323,16 @@ export const BuyerInformation = memo(function BuyerInformation({
             <Controller
               name="buyer.notes"
               control={control}
-              render={({ field }) => (
-                <Textarea
-                  {...field}
-                  id="buyerNotes"
-                  rows={3}
-                  className={inputErrorClassName(!!errors.buyer?.notes)}
-                />
-              )}
+              render={({ field }) => {
+                return (
+                  <Textarea
+                    {...field}
+                    id="buyerNotes"
+                    rows={3}
+                    className={inputErrorClassName(!!errors.buyer?.notes)}
+                  />
+                );
+              }}
             />
             {errors.buyer?.notes ? (
               <ErrorMessage>{errors.buyer.notes.message}</ErrorMessage>

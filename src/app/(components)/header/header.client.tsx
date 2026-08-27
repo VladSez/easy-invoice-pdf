@@ -1,19 +1,21 @@
 "use client";
 
+import { StarIcon } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+
+import type { HeaderProps } from "@/app/(components)/header";
 import { BlackAnimatedGoToAppBtn } from "@/app/(components)/header/animated-go-to-app-btn";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { Button } from "@/components/ui/button";
 import { GITHUB_URL } from "@/config";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { useState } from "react";
+import { githubStarCountFormatter } from "@/utils/number-formatter";
+
 import { LanguageSwitcher } from "./language-switcher";
 import { Logo } from "./logo";
 import { MobileMenuPanel } from "./mobile-menu";
 import { MorphingMenuIcon } from "./morphing-menu-icon";
-import { StarIcon } from "lucide-react";
-import type { HeaderProps } from "@/app/(components)/header";
-import { githubStarCountFormatter } from "@/utils/number-formatter";
 
 const desktopNavLinkClass =
   "rounded-md text-slate-800 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 hover:text-black active:scale-[0.97] transition-all duration-300";
@@ -107,12 +109,12 @@ export function HeaderClient({
 
               {/* Language switcher -- desktop only */}
               <div className="hidden min-w-[36px] lg:block">
-                {!hideLanguageSwitcher && (
+                {!hideLanguageSwitcher ? (
                   <LanguageSwitcher
                     locale={locale}
                     buttonText={translations.switchLanguageText}
                   />
-                )}
+                ) : null}
               </div>
 
               {/* CTA button  */}
@@ -132,7 +134,9 @@ export function HeaderClient({
                   {...(!isMobileMenuOpen
                     ? { "aria-haspopup": "dialog" as const }
                     : {})}
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  onClick={() => {
+                    return setIsMobileMenuOpen(!isMobileMenuOpen);
+                  }}
                 >
                   <MorphingMenuIcon
                     isOpen={isMobileMenuOpen}

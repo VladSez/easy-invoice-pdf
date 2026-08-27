@@ -43,7 +43,7 @@ jobs:
       - name: 🔍 Run type check
         id: type-check
         continue-on-error: true
-        run: pnpm type-check:go
+        run: pnpm type-check
 
       - name: 🔍 Get PR URL
         if: steps.type-check.outcome == 'failure'

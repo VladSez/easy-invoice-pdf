@@ -1,18 +1,13 @@
 // src/components/multi-select.tsx
 
-import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { CheckIcon, XCircle, ChevronDown } from "lucide-react";
+import * as React from "react";
 
-import { cn } from "@/lib/utils";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
+import { LANGUAGE_TO_LABEL } from "@/app/schema";
+import type { SupportedLanguages } from "@/app/schema";
 import { Badge } from "@/components/ui/badge";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -22,8 +17,14 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { LANGUAGE_TO_LABEL } from "@/app/schema";
-import type { SupportedLanguages } from "@/app/schema";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+
 import { CustomTooltip } from "./tooltip";
 
 /**
@@ -31,16 +32,16 @@ import { CustomTooltip } from "./tooltip";
  * Uses class-variance-authority (cva) to define different styles based on "variant" prop.
  */
 const multiSelectVariants = cva(
-  "m-1 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300",
+  "m-1 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110",
   {
     variants: {
       variant: {
         default:
-          "border-foreground/10 text-foreground bg-card hover:bg-card/80",
+          "border-foreground/10 bg-card hover:bg-card/80 text-foreground",
         secondary:
           "border-foreground/10 bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/80 border-transparent",
         inverted: "inverted",
       },
     },
@@ -54,7 +55,8 @@ const multiSelectVariants = cva(
  * Props for MultiSelect component
  */
 interface MultiSelectProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof multiSelectVariants> {
   /**
    * An array of option objects to be displayed in the multi-select component.
@@ -172,7 +174,9 @@ export const MultiSelect = React.forwardRef<
 
     const toggleOption = (option: SupportedLanguages) => {
       const newSelectedValues = selectedLanguages.includes(option)
-        ? selectedLanguages.filter((value) => value !== option)
+        ? selectedLanguages.filter((value) => {
+            return value !== option;
+          })
         : [...selectedLanguages, option];
       setSelectedLanguages(newSelectedValues);
       onValueChange(newSelectedValues);
@@ -184,7 +188,9 @@ export const MultiSelect = React.forwardRef<
     };
 
     const handleTogglePopover = () => {
-      setIsPopoverOpen((prev) => !prev);
+      setIsPopoverOpen((prev) => {
+        return !prev;
+      });
     };
 
     const clearExtraOptions = () => {
@@ -245,7 +251,7 @@ export const MultiSelect = React.forwardRef<
                             </React.Fragment>
                           );
                         })}
-                      {selectedLanguages.length > maxCount && (
+                      {selectedLanguages.length > maxCount ? (
                         <Badge
                           className={cn(
                             "border-foreground/1 bg-transparent text-foreground hover:bg-transparent",
@@ -261,7 +267,7 @@ export const MultiSelect = React.forwardRef<
                             }}
                           />
                         </Badge>
-                      )}
+                      ) : null}
                     </div>
                   </div>
                 </Button>
@@ -288,7 +294,9 @@ export const MultiSelect = React.forwardRef<
         <PopoverContent
           className="w-auto p-0"
           align="start"
-          onEscapeKeyDown={() => setIsPopoverOpen(false)}
+          onEscapeKeyDown={() => {
+            return setIsPopoverOpen(false);
+          }}
         >
           <Command>
             <CommandInput
@@ -305,9 +313,9 @@ export const MultiSelect = React.forwardRef<
                   return (
                     <CommandItem
                       key={option.value}
-                      onSelect={() =>
-                        toggleOption(option.value as SupportedLanguages)
-                      }
+                      onSelect={() => {
+                        return toggleOption(option.value as SupportedLanguages);
+                      }}
                       className="cursor-pointer"
                     >
                       <div
@@ -331,7 +339,7 @@ export const MultiSelect = React.forwardRef<
               <CommandSeparator />
               <CommandGroup>
                 <div className="flex items-center justify-between gap-1">
-                  {selectedLanguages.length > 0 && (
+                  {selectedLanguages.length > 0 ? (
                     <>
                       <CommandItem
                         onSelect={handleClear}
@@ -353,15 +361,17 @@ export const MultiSelect = React.forwardRef<
                         Download
                       </CommandItem>
                     </>
-                  )}
-                  {selectedLanguages.length === 0 && (
+                  ) : null}
+                  {selectedLanguages.length === 0 ? (
                     <CommandItem
-                      onSelect={() => setIsPopoverOpen(false)}
+                      onSelect={() => {
+                        return setIsPopoverOpen(false);
+                      }}
                       className="max-w-full flex-1 cursor-pointer justify-center"
                     >
                       Close
                     </CommandItem>
-                  )}
+                  ) : null}
                 </div>
               </CommandGroup>
             </CommandList>

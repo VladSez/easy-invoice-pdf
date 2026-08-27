@@ -11,7 +11,10 @@ const config: KnipConfig = {
     "file-saver",
     "jszip",
     "@types/file-saver",
-    "@ianvs/prettier-plugin-sort-imports",
+    // loaded by oxlint through `jsPlugins` in .oxlintrc.json, never imported
+    "eslint-plugin-playwright",
+    "eslint-plugin-react",
+    "eslint-plugin-react-you-might-not-need-an-effect",
     // Sentry resolves these directly when instrumenting Next.js in development.
     "import-in-the-middle",
     "require-in-the-middle",

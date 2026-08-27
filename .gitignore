@@ -47,8 +47,8 @@ node_modules/
 /playwright-output/
 /playwright-test-downloads/
 
-# eslint
-.eslintcache
+# oxlint / oxfmt
+.oxlintcache
 
 # i18n
 messages/en.d.json.ts
