@@ -1,3 +1,7 @@
+import { expect, test } from "@playwright/test";
+import dayjs from "dayjs";
+
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   CURRENCY_SYMBOLS,
@@ -11,10 +15,6 @@ import {
   type AccordionState,
   type InvoiceData,
 } from "@/app/schema";
-import { expect, test } from "@playwright/test";
-import dayjs from "dayjs";
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-import { INITIAL_INVOICE_DATA } from "../src/app/constants";
 import {
   DISCORD_COMMUNITY_URL,
   GITHUB_URL,
@@ -23,6 +23,8 @@ import {
   VIDEO_DEMO_YOUTUBE_URL,
   YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
 } from "@/config";
+
+import { INITIAL_INVOICE_DATA } from "../src/app/constants";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -788,7 +790,9 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     await expect(
-      page.getByText('Are you sure you want to delete the invoice item "#2"?'),
+      page.getByText(
+        'Are you sure you want to delete the invoice item "TEST INVOICE ITEM"?',
+      ),
     ).toBeVisible();
 
     // --- Test cancel flow first ---
@@ -802,7 +806,9 @@ test.describe("Invoice Generator Page", () => {
     ).toBeHidden();
 
     await expect(
-      page.getByText('Are you sure you want to delete the invoice item "#2"?'),
+      page.getByText(
+        'Are you sure you want to delete the invoice item "TEST INVOICE ITEM"?',
+      ),
     ).toBeHidden();
 
     // Item should still be present
