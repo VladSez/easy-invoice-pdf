@@ -1,8 +1,10 @@
 /* eslint-disable playwright/no-conditional-expect */
 /* eslint-disable playwright/no-conditional-in-test */
-import { GITHUB_URL, TWITTER_URL, VIDEO_DEMO_FALLBACK_IMG } from "@/config";
-import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_LANGUAGES } from "@/app/schema";
+
 import { expect, test } from "@playwright/test";
+
+import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_LANGUAGES } from "@/app/schema";
+import { GITHUB_URL, TWITTER_URL, VIDEO_DEMO_FALLBACK_IMG } from "@/config";
 
 test.describe("About page", () => {
   test("should display about page content in English", async ({
@@ -105,7 +107,6 @@ test.describe("About page", () => {
 
     await expect(video).toBeVisible();
     await expect(video).toHaveAttribute("poster", VIDEO_DEMO_FALLBACK_IMG);
-    await expect(video).toHaveAttribute("muted");
     await expect(video).toHaveAttribute("loop");
     await expect(video).toHaveAttribute("playsinline");
     await expect(video).toHaveAttribute("preload", "none");

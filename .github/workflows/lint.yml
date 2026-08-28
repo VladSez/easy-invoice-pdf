@@ -45,6 +45,10 @@ jobs:
         continue-on-error: true
         # `--format=github` turns findings into inline PR annotations.
         # Type-aware rules run too (see `options.typeAware` in .oxlintrc.json).
+        env:
+          # `next typegen` loads next.config.mjs, which validates src/env.ts.
+          # Runtime secrets are not needed (and not available) for linting.
+          SKIP_ENV_VALIDATION: "true"
         run: pnpm lint --format=github
 
       - name: 💅 Check formatting

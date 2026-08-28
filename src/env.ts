@@ -74,5 +74,9 @@ export const env = createEnv({
 
     GITHUB_TOKEN: process.env.GITHUB_TOKEN,
   },
+  // `next typegen` (used by `pnpm type-check` and `pnpm lint`) loads next.config.mjs,
+  // which imports this file. CI runs those jobs without runtime secrets, so they set
+  // SKIP_ENV_VALIDATION=true. Never set it for `next build` / `next dev`.
+  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   // emptyStringAsUndefined: true,
 });

@@ -1,3 +1,9 @@
+import type { Page } from "@playwright/test";
+
+import {
+  getDefaultInvoiceNumberLabel,
+  INVOICE_PDF_TRANSLATIONS,
+} from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import {
   CURRENCY_SYMBOLS,
   CURRENCY_TO_LABEL,
@@ -7,11 +13,6 @@ import {
   type SupportedLanguages,
   type SupportedTemplates,
 } from "@/app/schema";
-import {
-  getDefaultInvoiceNumberLabel,
-  INVOICE_PDF_TRANSLATIONS,
-} from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-import type { Page } from "@playwright/test";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { expect, test } from "../utils/extended-playwright-test";
@@ -43,10 +44,12 @@ const LANGUAGE_TO_CURRENCY = {
 } as const satisfies Record<SupportedLanguages, SupportedCurrencies>;
 
 const PDF_LANGUAGE_CASES = [
-  ...SUPPORTED_LANGUAGES.map((language) => ({
-    language,
-    currency: LANGUAGE_TO_CURRENCY[language],
-  })),
+  ...SUPPORTED_LANGUAGES.map((language) => {
+    return {
+      language,
+      currency: LANGUAGE_TO_CURRENCY[language],
+    };
+  }),
   // JPY is a zero-decimal currency, so it formats amounts (and converts them to
   // words) differently from every currency above
   { language: "en", currency: "JPY" },
@@ -101,7 +104,13 @@ async function expectTranslatedInvoiceNumberLabel(
  * download the generated PDF, render it on a canvas and take a screenshot of it.
  */
 test.describe("Invoice Template PDF languages", () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page }, testInfo) => {
+    // eslint-disable-next-line playwright/no-skipped-test -- PDF language snapshots are Desktop Chrome only
+    test.skip(
+      testInfo.project.name !== "Desktop Chrome",
+      "PDF language snapshots are Desktop Chrome only",
+    );
+
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
 
@@ -205,6 +214,14 @@ test.describe("Invoice Template PDF languages", () => {
  * broken translation lookup does not silently make every assertion pass.
  */
 test.describe("PDF language test data", () => {
+  test.beforeEach(({}, testInfo) => {
+    // eslint-disable-next-line playwright/no-skipped-test -- PDF language test data is Desktop Chrome only
+    test.skip(
+      testInfo.project.name !== "Desktop Chrome",
+      "PDF language test data is Desktop Chrome only",
+    );
+  });
+
   test("default invoice number labels come from the language translations", () => {
     for (const language of SUPPORTED_LANGUAGES) {
       expect(getDefaultInvoiceNumberLabel(language, "default")).toBe(
