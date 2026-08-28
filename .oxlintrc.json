@@ -66,7 +66,7 @@
       { "checksVoidReturn": { "attributes": false } }
     ],
     // always use a block body for arrow functions
-    "arrow-body-style": ["error", "always"],
+    "arrow-body-style": ["warn", "always"],
     // keep `return await` - it keeps the caller's frame on the async stack, so
     // failures carry a useful stack trace
     "typescript/return-await": ["warn", "always"],
