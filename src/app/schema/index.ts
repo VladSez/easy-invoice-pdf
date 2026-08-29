@@ -1,5 +1,5 @@
-import { z } from "zod";
 import dayjs from "dayjs";
+import { z } from "zod";
 
 export const SUPPORTED_CURRENCIES = [
   // Top currencies (pinned)
@@ -638,13 +638,17 @@ export interface CurrencyComboboxGroup {
   items: CurrencyComboboxItem[];
 }
 
-export const CURRENCY_COMBOBOX_GROUPS = CURRENCY_GROUPS.map((group) => ({
-  value: group.label,
-  items: group.currencies.map((code) => ({
-    code,
-    searchLabel: `${code} ${CURRENCY_SYMBOLS[code]} ${CURRENCY_TO_LABEL[code]}`,
-  })),
-})) satisfies CurrencyComboboxGroup[];
+export const CURRENCY_COMBOBOX_GROUPS = CURRENCY_GROUPS.map((group) => {
+  return {
+    value: group.label,
+    items: group.currencies.map((code) => {
+      return {
+        code,
+        searchLabel: `${code} ${CURRENCY_SYMBOLS[code]} ${CURRENCY_TO_LABEL[code]}`,
+      };
+    }),
+  };
+}) satisfies CurrencyComboboxGroup[];
 
 export const SUPPORTED_TEMPLATES = ["default", "stripe"] as const;
 
@@ -769,16 +773,31 @@ export const invoiceItemSchema = z.object({
 
   amount: z
     .any()
-    .refine((val) => val !== "", {
-      message: "Amount is required",
-    })
+    .refine(
+      (val) => {
+        return val !== "";
+      },
+      {
+        message: "Amount is required",
+      },
+    )
     .transform(Number)
-    .refine((val) => val >= 0, {
-      message: "Amount must be >= 0",
-    })
-    .refine((val) => val <= 999_999.99, {
-      message: "Amount must not exceed 999 999.99",
-    }),
+    .refine(
+      (val) => {
+        return val >= 0;
+      },
+      {
+        message: "Amount must be >= 0",
+      },
+    )
+    .refine(
+      (val) => {
+        return val <= 999_999.99;
+      },
+      {
+        message: "Amount must not exceed 999 999.99",
+      },
+    ),
   amountFieldIsVisible: z.boolean().default(true),
 
   unit: z.string().trim().optional(),
@@ -786,16 +805,31 @@ export const invoiceItemSchema = z.object({
 
   netPrice: z
     .any()
-    .refine((val) => val !== "", {
-      message: "Net price is required",
-    })
+    .refine(
+      (val) => {
+        return val !== "";
+      },
+      {
+        message: "Net price is required",
+      },
+    )
     .transform(Number)
-    .refine((val) => val >= 0, {
-      message: "Net price must be >= 0",
-    })
-    .refine((val) => val <= 1_000_000_000, {
-      message: "Net price must not exceed 1 billion",
-    }),
+    .refine(
+      (val) => {
+        return val >= 0;
+      },
+      {
+        message: "Net price must be >= 0",
+      },
+    )
+    .refine(
+      (val) => {
+        return val <= 1_000_000_000;
+      },
+      {
+        message: "Net price must not exceed 1 billion",
+      },
+    ),
   netPriceFieldIsVisible: z.boolean().default(true),
 
   // Tax rate. Accepts numbers 0-100 or any text string (i.e. NP, OO, etc)
@@ -808,7 +842,7 @@ export const invoiceItemSchema = z.object({
       // z.preprocess runs before Zod does any validation, parsing, or type checking on the schema it wraps.
       (raw) => {
         // Handle null/undefined by returning empty string for validation
-        if (raw == null) return "";
+        if (raw === null || raw === undefined) return "";
 
         // Trim whitespace from string inputs, pass through other types as-is
         const val = typeof raw === "string" ? raw.trim() : raw;
@@ -843,10 +877,12 @@ export const invoiceItemSchema = z.object({
             ),
         ],
         {
-          errorMap: () => ({
-            message:
-              "Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).",
-          }),
+          errorMap: () => {
+            return {
+              message:
+                "Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).",
+            };
+          },
         },
       ),
     )
@@ -913,9 +949,14 @@ export const sellerSchema = z.object({
   email: z
     .string()
     .trim()
-    .refine((val) => val === "" || z.string().email().safeParse(val).success, {
-      message: "Invalid email address",
-    })
+    .refine(
+      (val) => {
+        return val === "" || z.string().email().safeParse(val).success;
+      },
+      {
+        message: "Invalid email address",
+      },
+    )
     .optional(),
   emailFieldIsVisible: z.boolean().default(true),
 
@@ -975,9 +1016,14 @@ export const buyerSchema = z.object({
   email: z
     .string()
     .trim()
-    .refine((val) => val === "" || z.string().email().safeParse(val).success, {
-      message: "Invalid email address",
-    })
+    .refine(
+      (val) => {
+        return val === "" || z.string().email().safeParse(val).success;
+      },
+      {
+        message: "Invalid email address",
+      },
+    )
     .optional(),
   emailFieldIsVisible: z.boolean().default(true),
 
@@ -1202,17 +1248,18 @@ export const invoiceObjectSchema = z.object({
   stripePayOnlineUrl: z
     .string()
     .trim() // Remove whitespace
-    .transform((val) => val) // Pass through value
+    .transform((val) => {
+      return val;
+    }) // Pass through value
     .pipe(
       z.union([
         z.literal(""), // Allow empty string
         z
           .string()
           .url("Please enter a valid URL or leave empty")
-          .refine(
-            (url) => url.startsWith("https://"),
-            "URL must start with https://",
-          ), // Validate HTTPS URL format
+          .refine((url) => {
+            return url.startsWith("https://");
+          }, "URL must start with https://"), // Validate HTTPS URL format
       ]),
     )
     .optional()
@@ -1273,14 +1320,16 @@ export const invoiceObjectSchema = z.object({
  * This schema is used to validate the invoice data
  */
 export const invoiceSchema = invoiceObjectSchema
-  .transform((data) => ({
-    ...data,
-    // Ensure dateOfServiceStart is trimmed and defaults to first day of
-    // month containing dateOfService if not set
-    dateOfServiceStart:
-      data.dateOfServiceStart?.trim() ||
-      dayjs(data.dateOfService).startOf("month").format("YYYY-MM-DD"),
-  }))
+  .transform((data) => {
+    return {
+      ...data,
+      // Ensure dateOfServiceStart is trimmed and defaults to first day of
+      // month containing dateOfService if not set
+      dateOfServiceStart:
+        data.dateOfServiceStart?.trim() ||
+        dayjs(data.dateOfService).startOf("month").format("YYYY-MM-DD"),
+    };
+  })
   .superRefine((data, ctx) => {
     // Custom validation: dateOfServiceStart must not be after dateOfService
     if (
@@ -1337,7 +1386,9 @@ export const metadataSchema = z.object({
   invoiceCreatedAt: z
     .string()
     .datetime()
-    .default(() => dayjs().toISOString()),
+    .default(() => {
+      return dayjs().toISOString();
+    }),
   /** when the invoice was last updated (i.e. invoice is regenerated) */
   invoiceLastUpdatedAt: z.string().datetime().optional(),
 
@@ -1364,9 +1415,9 @@ export const METADATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_METADATA";
 const uniqueCurrencies = new Set(SUPPORTED_CURRENCIES);
 
 if (uniqueCurrencies.size !== SUPPORTED_CURRENCIES.length) {
-  const duplicates = SUPPORTED_CURRENCIES.filter(
-    (currency, index) => SUPPORTED_CURRENCIES.indexOf(currency) !== index,
-  );
+  const duplicates = SUPPORTED_CURRENCIES.filter((currency, index) => {
+    return SUPPORTED_CURRENCIES.indexOf(currency) !== index;
+  });
 
   const currencyFullNames = duplicates.map((currency) => {
     const currencyFullName = CURRENCY_TO_LABEL[currency];
@@ -1380,23 +1431,25 @@ if (uniqueCurrencies.size !== SUPPORTED_CURRENCIES.length) {
 }
 
 // Validate that all supported currencies are in exactly one group
-const currenciesInGroups = CURRENCY_GROUPS.flatMap((g) => g.currencies);
+const currenciesInGroups = CURRENCY_GROUPS.flatMap((g) => {
+  return g.currencies;
+});
 const currenciesInGroupsSet = new Set(currenciesInGroups);
 
 // Check for duplicates within groups
 if (currenciesInGroupsSet.size !== currenciesInGroups.length) {
-  const duplicates = currenciesInGroups.filter(
-    (currency, index) => currenciesInGroups.indexOf(currency) !== index,
-  );
+  const duplicates = currenciesInGroups.filter((currency, index) => {
+    return currenciesInGroups.indexOf(currency) !== index;
+  });
   throw new Error(
     `CURRENCY_GROUPS contains duplicate entries: ${duplicates.join(", ")}`,
   );
 }
 
 // Check for missing currencies
-const missingCurrencies = SUPPORTED_CURRENCIES.filter(
-  (c) => !currenciesInGroupsSet.has(c),
-);
+const missingCurrencies = SUPPORTED_CURRENCIES.filter((c) => {
+  return !currenciesInGroupsSet.has(c);
+});
 if (missingCurrencies.length > 0) {
   throw new Error(
     `CURRENCY_GROUPS is missing currencies: ${missingCurrencies.join(", ")}`,

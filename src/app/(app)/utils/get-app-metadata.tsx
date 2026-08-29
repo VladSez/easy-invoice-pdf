@@ -1,5 +1,8 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
+import dayjs from "dayjs";
+
 import {
   METADATA_LOCAL_STORAGE_KEY,
   metadataSchema,
@@ -8,8 +11,6 @@ import {
   type Metadata,
   DEFAULT_MOBILE_TAB,
 } from "@/app/schema";
-import * as Sentry from "@sentry/nextjs";
-import dayjs from "dayjs";
 
 export const DEFAULT_METADATA = {
   appVersion: APP_VERSION,

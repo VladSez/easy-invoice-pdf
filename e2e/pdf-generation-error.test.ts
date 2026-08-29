@@ -1,5 +1,7 @@
-import { BUG_REPORT_URL, CONTACT_SUPPORT_EMAIL } from "@/config";
 import { expect, test } from "@playwright/test";
+
+import { BUG_REPORT_URL, CONTACT_SUPPORT_EMAIL } from "@/config";
+
 import { getDownloadPdfLink } from "./utils/pdf-download";
 
 /**
@@ -18,7 +20,9 @@ test.describe("PDF generation errors", () => {
    * (e.g., a CDN outage or being offline), forcing the PDF generation to fail.
    */
   test.beforeEach(async ({ page }) => {
-    await page.route("**/*.ttf", (route) => route.abort());
+    await page.route("**/*.ttf", (route) => {
+      return route.abort();
+    });
   });
 
   test("shows the error toast with recovery steps when the PDF cannot be generated", async ({

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+
 import { expect, type Locator, type Page } from "@playwright/test";
 
 import {
@@ -95,7 +96,11 @@ async function downloadPdf(
   await download.saveAs(pdfFilePath);
 
   const absolutePath = path.resolve(pdfFilePath);
-  await expect.poll(() => fs.existsSync(absolutePath)).toBe(true);
+  await expect
+    .poll(() => {
+      return fs.existsSync(absolutePath);
+    })
+    .toBe(true);
 
   return {
     suggestedFilename,
@@ -164,18 +169,17 @@ export async function expectPdfScreenshot(
     await renderPdfOnCanvas(page, pdfBytes);
   }
 
-  await page.waitForFunction(
-    () =>
-      (window as unknown as { __PDF_RENDERED__: boolean }).__PDF_RENDERED__ ===
-      true,
-  );
+  await page.waitForFunction(() => {
+    return (window as unknown as { __PDF_RENDERED__: boolean })
+      .__PDF_RENDERED__;
+  });
 
   await expect(page.locator("canvas")).toHaveScreenshot(name);
 
-  const numPages = await page.evaluate(
-    () =>
-      (window as unknown as { __PDF_PAGE_COUNT__: number }).__PDF_PAGE_COUNT__,
-  );
+  const numPages = await page.evaluate(() => {
+    return (window as unknown as { __PDF_PAGE_COUNT__: number })
+      .__PDF_PAGE_COUNT__;
+  });
 
   return { suggestedFilename, numPages };
 }

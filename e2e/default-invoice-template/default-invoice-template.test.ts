@@ -1,7 +1,7 @@
-import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-import { uploadLogoFile } from "../stripe-invoice-template/utils";
+import { INITIAL_INVOICE_DATA } from "@/app/constants";
 
+import { uploadLogoFile } from "../stripe-invoice-template/utils";
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { test, expect } from "../utils/extended-playwright-test";
 import {

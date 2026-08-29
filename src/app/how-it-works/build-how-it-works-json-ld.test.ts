@@ -10,9 +10,9 @@ describe("buildHowItWorksJsonLd", () => {
       "@graph": Array<Record<string, unknown>>;
     };
 
-    const webPage = graph["@graph"].find(
-      (node) => node["@type"] === "WebPage",
-    ) as {
+    const webPage = graph["@graph"].find((node) => {
+      return node["@type"] === "WebPage";
+    }) as {
       mainEntity: {
         itemListElement: Array<{
           item: {

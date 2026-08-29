@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+
 import { showRandomCTAToast } from "../components/cta-toasts";
 import { useCTAToast } from "../contexts/cta-toast-context";
 
@@ -33,7 +34,9 @@ export function useShowRandomCTAToastOnIdle() {
       hasMinTimeElapsedRef.current = true;
     }, MIN_TIME_ON_PAGE);
 
-    return () => clearTimeout(timer);
+    return () => {
+      return clearTimeout(timer);
+    };
   }, [hasTriggeredCTAAction]);
 
   // Idle detection — resets on every form update (interactionCount change)
@@ -56,6 +59,8 @@ export function useShowRandomCTAToastOnIdle() {
       markCTAActionTriggered();
     }, IDLE_TIME);
 
-    return () => clearTimeout(idleTimer);
+    return () => {
+      return clearTimeout(idleTimer);
+    };
   }, [interactionCount, hasTriggeredCTAAction, markCTAActionTriggered]);
 }

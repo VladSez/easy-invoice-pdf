@@ -12,21 +12,21 @@ describe("buildHomeJsonLdGraph", () => {
 
     expect(parsed["@graph"]).toHaveLength(5);
 
-    const webSite = parsed["@graph"].find(
-      (node) => node["@type"] === "WebSite",
-    );
-    const organization = parsed["@graph"].find(
-      (node) => node["@type"] === "Organization",
-    );
-    const webApplication = parsed["@graph"].find(
-      (node) => node["@type"] === "WebApplication",
-    );
-    const siteNavigation = parsed["@graph"].find(
-      (node) => node["@type"] === "ItemList",
-    );
-    const webPage = parsed["@graph"].find(
-      (node) => node["@type"] === "WebPage",
-    );
+    const webSite = parsed["@graph"].find((node) => {
+      return node["@type"] === "WebSite";
+    });
+    const organization = parsed["@graph"].find((node) => {
+      return node["@type"] === "Organization";
+    });
+    const webApplication = parsed["@graph"].find((node) => {
+      return node["@type"] === "WebApplication";
+    });
+    const siteNavigation = parsed["@graph"].find((node) => {
+      return node["@type"] === "ItemList";
+    });
+    const webPage = parsed["@graph"].find((node) => {
+      return node["@type"] === "WebPage";
+    });
 
     expect(webSite).toMatchObject({
       "@id": JSON_LD_IDS.website,

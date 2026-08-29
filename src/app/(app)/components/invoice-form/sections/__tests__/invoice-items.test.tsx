@@ -1,9 +1,5 @@
 // @vitest-environment happy-dom
 
-import { getInitialInvoiceData } from "@/app/constants";
-import type { InvoiceData } from "@/app/schema";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { MOCK_INVOICE_ITEM_DATA } from "@/utils/__tests__/data";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useMemo } from "react";
@@ -14,14 +10,22 @@ import {
   useForm,
 } from "react-hook-form";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { getInitialInvoiceData } from "@/app/constants";
+import type * as InvoiceSchema from "@/app/schema";
+import type { InvoiceData } from "@/app/schema";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { MOCK_INVOICE_ITEM_DATA } from "@/utils/__tests__/data";
 import "@testing-library/jest-dom/vitest";
 
-const { MOCK_MAX_INVOICE_ITEMS } = vi.hoisted(() => ({
-  MOCK_MAX_INVOICE_ITEMS: 3,
-}));
+const { MOCK_MAX_INVOICE_ITEMS } = vi.hoisted(() => {
+  return {
+    MOCK_MAX_INVOICE_ITEMS: 3,
+  };
+});
 
 vi.mock("@/app/schema", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/app/schema")>();
+  const actual = await importOriginal<typeof InvoiceSchema>();
 
   return {
     ...actual,
@@ -29,15 +33,22 @@ vi.mock("@/app/schema", async (importOriginal) => {
   };
 });
 
-vi.mock("@/lib/umami-analytics-track-event", () => ({
-  umamiTrackEvent: vi.fn(),
-}));
+vi.mock("@/lib/umami-analytics-track-event", () => {
+  return {
+    umamiTrackEvent: vi.fn(),
+  };
+});
 
-vi.mock("@/hooks/use-media-query", () => ({
-  useIsDesktop: () => true,
-}));
+vi.mock("@/hooks/use-media-query", () => {
+  return {
+    useIsDesktop: () => {
+      return true;
+    },
+  };
+});
 
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+
 import { InvoiceItems } from "../invoice-items";
 
 interface InvoiceItemsTestHarnessProps {
@@ -51,23 +62,26 @@ function InvoiceItemsTestHarness({
   append = vi.fn(),
   onRemove = vi.fn(),
 }: InvoiceItemsTestHarnessProps) {
-  const invoiceData = useMemo(
-    () => ({
+  const invoiceData = useMemo(() => {
+    return {
       ...getInitialInvoiceData(),
-      items: Array.from({ length: itemCount }, () => ({
-        ...MOCK_INVOICE_ITEM_DATA,
-      })),
-    }),
-    [itemCount],
-  );
+      items: Array.from({ length: itemCount }, () => {
+        return {
+          ...MOCK_INVOICE_ITEM_DATA,
+        };
+      }),
+    };
+  }, [itemCount]);
 
   const { control } = useForm<InvoiceData>({
     defaultValues: invoiceData,
   });
 
-  const fields = Array.from({ length: itemCount }, (_, index) => ({
-    id: `item-${index}`,
-  })) as FieldArrayWithId<InvoiceData, "items", "id">[];
+  const fields = Array.from({ length: itemCount }, (_, index) => {
+    return {
+      id: `item-${index}`,
+    };
+  }) as FieldArrayWithId<InvoiceData, "items">[];
 
   return (
     <TooltipProvider delayDuration={0}>

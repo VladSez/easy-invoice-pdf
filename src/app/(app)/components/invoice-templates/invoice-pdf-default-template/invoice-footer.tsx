@@ -1,10 +1,12 @@
-import { type InvoiceData } from "@/app/schema";
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-import { PROD_WEBSITE_URL } from "@/config";
 import { Link, Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import dayjs from "dayjs";
-import { formatCurrency } from "../../../utils/format-currency";
+
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { type InvoiceData } from "@/app/schema";
+import { PROD_WEBSITE_URL } from "@/config";
+
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
+import { formatCurrency } from "../../../utils/format-currency";
 
 export function InvoiceFooter({
   invoiceData,
@@ -56,9 +58,9 @@ export function InvoiceFooter({
         </View>
         <Text
           style={[styles.fontSize8]}
-          render={({ pageNumber, totalPages }) =>
-            `${t.stripe.page} ${pageNumber} ${t.stripe.of} ${totalPages}`
-          }
+          render={({ pageNumber, totalPages }) => {
+            return `${t.stripe.page} ${pageNumber} ${t.stripe.of} ${totalPages}`;
+          }}
         />
       </View>
     </View>

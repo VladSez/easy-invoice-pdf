@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 
 import { test, expect } from "@playwright/test";
+
 import { renderPdfOnCanvas } from "../utils/render-pdf-on-canvas";
 
 // IMPORTANT - we use spawnServerPdfRender() to generate server-side PDF files for visual regression testing
@@ -79,11 +80,10 @@ test.describe("Server-side PDF rendering", () => {
     await page.goto("about:blank");
     await renderPdfOnCanvas(page, new Uint8Array(buffer));
 
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
+    await page.waitForFunction(() => {
+      return (window as unknown as { __PDF_RENDERED__: boolean })
+        .__PDF_RENDERED__;
+    });
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       "server-en-invoice.png",
@@ -96,11 +96,10 @@ test.describe("Server-side PDF rendering", () => {
     await page.goto("about:blank");
     await renderPdfOnCanvas(page, new Uint8Array(buffer));
 
-    await page.waitForFunction(
-      () =>
-        (window as unknown as { __PDF_RENDERED__: boolean })
-          .__PDF_RENDERED__ === true,
-    );
+    await page.waitForFunction(() => {
+      return (window as unknown as { __PDF_RENDERED__: boolean })
+        .__PDF_RENDERED__;
+    });
 
     await expect(page.locator("canvas")).toHaveScreenshot(
       "server-pl-invoice.png",

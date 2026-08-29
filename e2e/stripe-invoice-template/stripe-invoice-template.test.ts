@@ -1,11 +1,11 @@
+import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import {
   DEFAULT_DATE_FORMAT,
   PDF_DATA_LOCAL_STORAGE_KEY,
   STRIPE_DEFAULT_DATE_FORMAT,
   type InvoiceData,
 } from "@/app/schema";
-import { INITIAL_INVOICE_DATA } from "@/app/constants";
-import { LOGO_FIXTURE_FORMATS, uploadLogoFile } from "./utils";
+import { STATIC_ASSETS_URL } from "@/config";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { expect, test } from "../utils/extended-playwright-test";
@@ -13,7 +13,7 @@ import {
   expectPdfScreenshot,
   waitForPdfRegeneration,
 } from "../utils/pdf-download";
-import { STATIC_ASSETS_URL } from "@/config";
+import { LOGO_FIXTURE_FORMATS, uploadLogoFile } from "./utils";
 
 test.describe("Stripe Invoice Template", () => {
   test.beforeEach(async ({ page }) => {
@@ -237,7 +237,7 @@ test.describe("Stripe Invoice Template", () => {
       ) as HTMLInputElement;
       if (fileInput) {
         // Create a mock file that's too large (4MB)
-        const largeContent = new Array(4 * 1024 * 1024).fill("a").join("");
+        const largeContent = "a".repeat(4 * 1024 * 1024);
         const file = new File([largeContent], "large-image.png", {
           type: "image/png",
         });
@@ -301,10 +301,9 @@ test.describe("Stripe Invoice Template", () => {
       ).toBeHidden();
 
       // the uploaded logo is stored as a data URL of the uploaded format
-      const storedData = (await page.evaluate(
-        (key) => localStorage.getItem(key),
-        PDF_DATA_LOCAL_STORAGE_KEY,
-      )) as string;
+      const storedData = (await page.evaluate((key) => {
+        return localStorage.getItem(key);
+      }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
 
       const parsedData = JSON.parse(storedData) as InvoiceData;
 

@@ -28,65 +28,79 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     },
 
     // Enhanced code block styling
-    pre: ({ children, ...props }) => (
-      <pre
-        {...props}
-        className="overflow-x-auto rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm dark:border-gray-700 dark:bg-gray-800"
-      >
-        {children}
-      </pre>
-    ),
+    pre: ({ children, ...props }) => {
+      return (
+        <pre
+          {...props}
+          className="overflow-x-auto rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm dark:border-gray-700 dark:bg-gray-800"
+        >
+          {children}
+        </pre>
+      );
+    },
 
     // Enhanced inline code styling
-    code: ({ children, ...props }) => (
-      <code
-        {...props}
-        className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-sm text-gray-800 dark:bg-gray-800 dark:text-gray-200"
-      >
-        {children}
-      </code>
-    ),
+    code: ({ children, ...props }) => {
+      return (
+        <code
+          {...props}
+          className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-sm text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+        >
+          {children}
+        </code>
+      );
+    },
 
     // Custom blockquote with accent color
-    blockquote: ({ children, ...props }) => (
-      <blockquote
-        {...props}
-        className="border-l-4 border-blue-500 bg-blue-50 py-2 pl-6 italic dark:bg-blue-950/20"
-      >
-        {children}
-      </blockquote>
-    ),
+    blockquote: ({ children, ...props }) => {
+      return (
+        <blockquote
+          {...props}
+          className="border-l-4 border-blue-500 bg-blue-50 py-2 pl-6 italic dark:bg-blue-950/20"
+        >
+          {children}
+        </blockquote>
+      );
+    },
 
     // Enhanced image styling with responsive design
-    img: ({ alt, src, ...props }) => (
-      <img
-        {...props}
-        src={src}
-        alt={alt}
-        height={450}
-        width={840}
-        className="aspect-auto rounded-lg border border-gray-200 bg-slate-300 shadow-sm dark:border-gray-700"
-        style={{ maxWidth: "100%", height: "auto" }}
-      />
-    ),
+    img: ({ alt, src, ...props }) => {
+      return (
+        <img
+          {...props}
+          src={src}
+          alt={alt}
+          height={450}
+          width={840}
+          className="aspect-auto rounded-lg border border-gray-200 bg-slate-300 shadow-sm dark:border-gray-700"
+          style={{ maxWidth: "100%", height: "auto" }}
+        />
+      );
+    },
 
-    table: ({ children, ...props }) => (
-      <table {...props} className="w-full border-collapse border">
-        {children}
-      </table>
-    ),
+    table: ({ children, ...props }) => {
+      return (
+        <table {...props} className="w-full border-collapse border">
+          {children}
+        </table>
+      );
+    },
 
-    th: ({ children, ...props }) => (
-      <th {...props} className="border p-2 text-center">
-        {children}
-      </th>
-    ),
+    th: ({ children, ...props }) => {
+      return (
+        <th {...props} className="border p-2 text-center">
+          {children}
+        </th>
+      );
+    },
 
-    td: ({ children, ...props }) => (
-      <td {...props} className="border p-2">
-        {children}
-      </td>
-    ),
+    td: ({ children, ...props }) => {
+      return (
+        <td {...props} className="border p-2">
+          {children}
+        </td>
+      );
+    },
 
     // Override any default components as needed
     ...components,

@@ -57,6 +57,10 @@
       }
     ],
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    // one import statement per module - `preferInline` folds a separate
+    // `import type { X }` back into the value import as `{ type X }`, which is
+    // the style `typescript/consistent-type-imports` below already enforces
+    "import/no-duplicates": ["error", { "preferInline": true }],
     "no-var": "error",
     "prefer-const": "error",
     "typescript/no-explicit-any": "error",
@@ -65,15 +69,15 @@
       "error",
       { "checksVoidReturn": { "attributes": false } }
     ],
+    "typescript/consistent-type-imports": [
+      "error",
+      { "prefer": "type-imports", "fixStyle": "inline-type-imports" }
+    ],
     // always use a block body for arrow functions
     "arrow-body-style": ["warn", "always"],
     // keep `return await` - it keeps the caller's frame on the async stack, so
     // failures carry a useful stack trace
     "typescript/return-await": ["warn", "always"],
-    "typescript/consistent-type-imports": [
-      "warn",
-      { "prefer": "type-imports", "fixStyle": "inline-type-imports" }
-    ],
 
     // --- rules the eslint config had that live outside the categories above ---
     "jsx-a11y/alt-text": ["warn", { "elements": ["img"], "img": ["Image"] }],

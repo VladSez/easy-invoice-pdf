@@ -1,18 +1,18 @@
 // @ts-check
 
-import { withSentryConfig } from "@sentry/nextjs";
-import createNextIntlPlugin from "next-intl/plugin";
-import createMDX from "@next/mdx";
-import { createJiti } from "jiti";
-
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import fs from "node:fs";
+import path from "node:path";
 
-const loadTsFileViaJiti = createJiti(fileURLToPath(import.meta.url));
+import createMDX from "@next/mdx";
+import { withSentryConfig } from "@sentry/nextjs";
+import { createJiti } from "jiti";
+import createNextIntlPlugin from "next-intl/plugin";
 
-// Import ENV file here to validate during build. Using jiti@^1 we can import .ts files :)
-loadTsFileViaJiti("./src/env");
+const loadTsFileViaJiti = createJiti(import.meta.filename);
+
+// Import ENV file here to validate during build. jiti lets us import .ts files :)
+// (jiti v2 deprecated the callable form in favour of `.import()`)
+await loadTsFileViaJiti.import("./src/env");
 
 // Validate all i18n files, that are used to translate the /about page
 async function validatei18nAndInvoicePDFTranslationFiles() {
@@ -47,9 +47,9 @@ async function validatei18nAndInvoicePDFTranslationFiles() {
   );
 
   // Validate messages
-  const is18nJSONMessageFiles = fs
-    .readdirSync(messagesDir)
-    .filter((file) => file.endsWith(".json"));
+  const is18nJSONMessageFiles = fs.readdirSync(messagesDir).filter((file) => {
+    return file.endsWith(".json");
+  });
 
   const validationPromises = is18nJSONMessageFiles.map(async (file) => {
     try {
@@ -82,11 +82,12 @@ async function validatei18nAndInvoicePDFTranslationFiles() {
 
   const results = await Promise.allSettled(validationPromises);
 
-  const hasErrors = results.some(
-    (result) =>
+  const hasErrors = results.some((result) => {
+    return (
       result.status === "rejected" ||
-      (result.status === "fulfilled" && !result.value.success),
-  );
+      (result.status === "fulfilled" && !result.value.success)
+    );
+  });
 
   if (hasErrors) {
     results.forEach((result) => {
@@ -105,7 +106,9 @@ async function validatei18nAndInvoicePDFTranslationFiles() {
   }
 }
 
-// Since the function is now async, we need to handle it properly
+// Deliberately not awaited at the top level: validation runs alongside the rest of
+// the config evaluation instead of blocking it, and failures exit the process below.
+// oxlint-disable-next-line unicorn/prefer-top-level-await
 validatei18nAndInvoicePDFTranslationFiles().catch((error) => {
   console.error("❌ Fatal error during validation:", error);
   process.exit(1);

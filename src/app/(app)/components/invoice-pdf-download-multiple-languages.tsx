@@ -1,20 +1,20 @@
 "use client";
 
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { pdf } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
+import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
 import {
   LANGUAGE_TO_LABEL,
   SUPPORTED_LANGUAGES,
   type InvoiceData,
   type SupportedLanguages,
 } from "@/app/schema";
-import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
-
 import { MultiSelect } from "@/components/ui/multi-select";
-import { useEffect, useState } from "react";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 
 const SUPPORTED_LANGUAGES_OPTIONS = SUPPORTED_LANGUAGES.map((language) => {
   return {
@@ -116,9 +116,13 @@ export function InvoicePDFDownloadMultipleLanguages({
         placeholder="Download PDF"
         variant="inverted"
         maxCount={3}
-        handleDownload={() =>
-          generateAndZipPDFs(selectedLanguages.map((lang) => lang))
-        }
+        handleDownload={() => {
+          return generateAndZipPDFs(
+            selectedLanguages.map((lang) => {
+              return lang;
+            }),
+          );
+        }}
       />
     </>
   );

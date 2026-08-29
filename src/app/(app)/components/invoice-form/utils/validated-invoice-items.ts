@@ -1,5 +1,6 @@
-import { invoiceItemSchema } from "@/app/schema";
 import { z } from "zod";
+
+import { invoiceItemSchema } from "@/app/schema";
 
 const invoiceItemsSchema = z.array(invoiceItemSchema);
 

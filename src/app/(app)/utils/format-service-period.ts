@@ -1,5 +1,6 @@
-import type { InvoiceData } from "@/app/schema";
 import dayjs from "dayjs";
+
+import type { InvoiceData } from "@/app/schema";
 
 interface ServicePeriod {
   start: dayjs.Dayjs;

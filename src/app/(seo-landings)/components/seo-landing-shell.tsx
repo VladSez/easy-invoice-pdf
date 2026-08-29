@@ -1,7 +1,13 @@
-import { Footer } from "@/app/(components)/footer";
-import { BlackGoToAppButton } from "@/app/(components)/header/go-to-app-button-cta";
-import { GITHUB_URL } from "@/config";
 import Link from "next/link";
+
+import { Footer } from "@/app/(components)/footer";
+import { Header } from "@/app/(components)/header";
+import { BlackGoToAppButton } from "@/app/(components)/header/go-to-app-button-cta";
+import { StickySeoCta } from "@/app/(seo-landings)/components/sticky-seo-cta";
+import { GithubIcon } from "@/components/etc/github-logo";
+import { Button } from "@/components/ui/button";
+import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
+import { GITHUB_URL } from "@/config";
 
 import {
   type ComparisonTable,
@@ -9,11 +15,6 @@ import {
   type SeoSection,
 } from "../seo-landing-definitions";
 import { SeoLandingJsonLd } from "./seo-landing-json-ld";
-import { StickySeoCta } from "@/app/(seo-landings)/components/sticky-seo-cta";
-import { Button } from "@/components/ui/button";
-import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
-import { GithubIcon } from "@/components/etc/github-logo";
-import { Header } from "@/app/(components)/header";
 
 interface SeoLandingShellProps {
   definition: SeoLandingDefinition;
@@ -81,7 +82,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                   </a>
                 </div>
               ) : null}
-              {definition.hero.bullets.length ? (
+              {definition.hero.bullets.length > 0 ? (
                 <div className="mt-3 text-pretty">
                   <p className="text-sm text-stone-900">
                     {definition.hero.bullets.join(", ")}
@@ -133,14 +134,16 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                 FAQ
               </h2>
               <FaqAccordion>
-                {definition.faq.map((item) => (
-                  <FaqAccordionItem
-                    key={item.question}
-                    question={item.question}
-                  >
-                    {item.answer}
-                  </FaqAccordionItem>
-                ))}
+                {definition.faq.map((item) => {
+                  return (
+                    <FaqAccordionItem
+                      key={item.question}
+                      question={item.question}
+                    >
+                      {item.answer}
+                    </FaqAccordionItem>
+                  );
+                })}
               </FaqAccordion>
             </section>
 
@@ -189,21 +192,25 @@ function SeoSectionBlock({ section, id }: { section: SeoSection; id: number }) {
           {section.lead}
         </p>
       ) : null}
-      {section.paragraphs?.map((paragraph, index) => (
-        <p
-          key={`${section.title}-p-${index}`}
-          className="mt-4 max-w-3xl text-pretty text-lg leading-relaxed text-slate-800"
-        >
-          {paragraph}
-        </p>
-      ))}
+      {section.paragraphs?.map((paragraph, index) => {
+        return (
+          <p
+            key={`${section.title}-p-${index}`}
+            className="mt-4 max-w-3xl text-pretty text-lg leading-relaxed text-slate-800"
+          >
+            {paragraph}
+          </p>
+        );
+      })}
       {section.bullets?.length ? (
         <ul className="mt-4 max-w-3xl list-disc space-y-2 pl-6 text-base text-slate-800">
-          {section.bullets.map((item) => (
-            <li key={item} className="text-pretty">
-              {item}
-            </li>
-          ))}
+          {section.bullets.map((item) => {
+            return (
+              <li key={item} className="text-pretty">
+                {item}
+              </li>
+            );
+          })}
         </ul>
       ) : null}
     </section>
@@ -234,25 +241,27 @@ function SeoComparisonTable({ table }: { table: ComparisonTable }) {
           </tr>
         </thead>
         <tbody>
-          {table.rows.map((row) => (
-            <tr
-              key={row.feature}
-              className="border-b border-slate-100 last:border-0"
-            >
-              <th
-                scope="row"
-                className="px-3 py-2 font-medium text-slate-900 md:px-4 md:py-3"
+          {table.rows.map((row) => {
+            return (
+              <tr
+                key={row.feature}
+                className="border-b border-slate-100 last:border-0"
               >
-                {row.feature}
-              </th>
-              <td className="px-3 py-2 text-slate-700 md:px-4 md:py-3">
-                {row.thisTool}
-              </td>
-              <td className="px-3 py-2 text-slate-700 md:px-4 md:py-3">
-                {row.other}
-              </td>
-            </tr>
-          ))}
+                <th
+                  scope="row"
+                  className="px-3 py-2 font-medium text-slate-900 md:px-4 md:py-3"
+                >
+                  {row.feature}
+                </th>
+                <td className="px-3 py-2 text-slate-700 md:px-4 md:py-3">
+                  {row.thisTool}
+                </td>
+                <td className="px-3 py-2 text-slate-700 md:px-4 md:py-3">
+                  {row.other}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

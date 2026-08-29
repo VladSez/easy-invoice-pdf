@@ -1,7 +1,9 @@
-import { PDF_DATA_LOCAL_STORAGE_KEY, type InvoiceData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
-import { uploadLogoFile } from "./utils";
+
+import { PDF_DATA_LOCAL_STORAGE_KEY, type InvoiceData } from "@/app/schema";
+
 import { waitForPdfRegeneration } from "../utils/pdf-download";
+import { uploadLogoFile } from "./utils";
 
 test.describe("Stripe Invoice Sharing Logic", () => {
   test.beforeEach(async ({ page }) => {
@@ -35,7 +37,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await shareButton.click();
 
     // Verify URL contains shared data
-    await page.waitForURL((url) => url.searchParams.has("data"));
+    await page.waitForURL((url) => {
+      return url.searchParams.has("data");
+    });
     const url = page.url();
     expect(url).toContain(`?template=stripe&data=`);
 
@@ -204,7 +208,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     ).toBeVisible();
 
     // verify URL contains data parameter
-    await page.waitForURL((url) => url.searchParams.has("data"));
+    await page.waitForURL((url) => {
+      return url.searchParams.has("data");
+    });
 
     const url = page.url();
     expect(url).toContain(`?template=stripe&data=`);
@@ -288,10 +294,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // Verify the logo is actually saved in localStorage (it is written with a debounce)
     await expect
       .poll(async () => {
-        const storedData = await page.evaluate(
-          (key) => localStorage.getItem(key),
-          PDF_DATA_LOCAL_STORAGE_KEY,
-        );
+        const storedData = await page.evaluate((key) => {
+          return localStorage.getItem(key);
+        }, PDF_DATA_LOCAL_STORAGE_KEY);
 
         return storedData
           ? Boolean((JSON.parse(storedData) as InvoiceData).logo)
@@ -428,7 +433,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     ).toBeVisible();
 
     // Verify link was generated: URL should contain data param
-    await page.waitForURL((url) => url.searchParams.has("data"));
+    await page.waitForURL((url) => {
+      return url.searchParams.has("data");
+    });
     const url = page.url();
     expect(url).toContain("?template=stripe&data=");
 

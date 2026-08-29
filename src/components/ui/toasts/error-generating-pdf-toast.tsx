@@ -1,6 +1,11 @@
-import { BUG_REPORT_URL, CONTACT_SUPPORT_EMAIL } from "@/config";
 import { toast } from "sonner";
 
+import { BUG_REPORT_URL, CONTACT_SUPPORT_EMAIL } from "@/config";
+
+/**
+ * Displays a toast notification indicating an error occurred while generating a PDF document.
+ * Provides troubleshooting steps and contact options for support/bug report.
+ */
 export function ErrorGeneratingPdfToast() {
   return toast.error(
     <span>

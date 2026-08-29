@@ -1,8 +1,10 @@
-import { APP_URL } from "@/config";
-import { SEO_LANDING_SLUGS } from "@/app/(seo-landings)/seo-landing-definitions";
 import { type MetadataRoute } from "next";
-import { SUPPORTED_LANGUAGES } from "./schema";
+
+import { SEO_LANDING_SLUGS } from "@/app/(seo-landings)/seo-landing-definitions";
+import { APP_URL } from "@/config";
+
 import { getChangelogEntries } from "./changelog/utils";
+import { SUPPORTED_LANGUAGES } from "./schema";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
@@ -25,12 +27,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     // About pages in all languages
-    ...SUPPORTED_LANGUAGES.map((locale) => ({
-      url: `${APP_URL}/${locale}/about`,
-      lastModified,
-      changeFrequency: "weekly" as const,
-      priority: 1,
-    })),
+    ...SUPPORTED_LANGUAGES.map((locale) => {
+      return {
+        url: `${APP_URL}/${locale}/about`,
+        lastModified,
+        changeFrequency: "weekly" as const,
+        priority: 1,
+      };
+    }),
     // Changelog page
     {
       url: `${APP_URL}/changelog`,
@@ -71,12 +75,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
     },
     // Programmatic SEO landing pages
-    ...SEO_LANDING_SLUGS.map((slug) => ({
-      url: `${APP_URL}/${slug}`,
-      lastModified,
-      changeFrequency: "weekly" as const,
-      priority: 1,
-    })),
+    ...SEO_LANDING_SLUGS.map((slug) => {
+      return {
+        url: `${APP_URL}/${slug}`,
+        lastModified,
+        changeFrequency: "weekly" as const,
+        priority: 1,
+      };
+    }),
     // llms.txt
     {
       url: `${APP_URL}/llms.txt`,

@@ -1,8 +1,9 @@
 "use client";
 
+import { createContext, useContext, useEffect, useState } from "react";
+
 import { useIsDesktop } from "@/hooks/use-media-query";
 import type { InAppInfo } from "@/lib/check-device.server";
-import { createContext, useContext, useEffect, useState } from "react";
 
 interface DeviceContextType {
   isDesktop: boolean;

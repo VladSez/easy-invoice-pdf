@@ -1,10 +1,10 @@
 "use client";
 
-import { LANGUAGE_TO_NATIVE_LABEL } from "@/app/schema";
-import { usePathname, useRouter } from "@/i18n/navigation";
 import { GlobeIcon } from "lucide-react";
 import type { Locale } from "next-intl";
 import { useTransition } from "react";
+
+import { LANGUAGE_TO_NATIVE_LABEL } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,6 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 const MAP_LOCALE_TO_LANGUAGE = LANGUAGE_TO_NATIVE_LABEL satisfies Record<

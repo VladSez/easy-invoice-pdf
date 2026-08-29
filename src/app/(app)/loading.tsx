@@ -134,13 +134,15 @@ function FormLoadingContent() {
         <Skeleton className="h-6 w-[190px]" />
         <Skeleton className="size-6 shrink-0 rounded-full" />
       </div>
-      {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="space-y-2">
-          <Skeleton className="h-3 w-28" />
-          <Skeleton className="h-9 w-full bg-slate-100" />
-          <Skeleton className="h-2.5 w-4/5" />
-        </div>
-      ))}
+      {Array.from({ length: 4 }).map((_, index) => {
+        return (
+          <div key={index} className="space-y-2">
+            <Skeleton className="h-3 w-28" />
+            <Skeleton className="h-9 w-full bg-slate-100" />
+            <Skeleton className="h-2.5 w-4/5" />
+          </div>
+        );
+      })}
       <div className="rounded-md border border-slate-200 p-4">
         <Skeleton className="mb-4 h-5 w-36" />
         <div className="space-y-3">

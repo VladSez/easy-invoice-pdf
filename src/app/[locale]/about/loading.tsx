@@ -1,5 +1,5 @@
-import { AboutFooter } from "@/app/[locale]/about/components/about-footer";
 import { HeaderSkeleton } from "@/app/(components)/header/header-skeleton";
+import { AboutFooter } from "@/app/[locale]/about/components/about-footer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -175,14 +175,16 @@ function FeaturesSectionSkeleton() {
         <div className="pt-10 sm:px-4 lg:px-0">
           <div className="overflow-hidden p-2">
             <div className="-ml-6 -mr-2 flex items-stretch sm:-ml-4 sm:mr-0 lg:-ml-6 xl:-ml-10">
-              {Array.from({ length: 2 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="min-w-0 shrink-0 grow-0 basis-full pl-4 sm:basis-[70%] md:basis-[55%] lg:basis-1/2 lg:pl-6 xl:pl-10"
-                >
-                  <FeatureCardSkeleton />
-                </div>
-              ))}
+              {Array.from({ length: 2 }).map((_, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="min-w-0 shrink-0 grow-0 basis-full pl-4 sm:basis-[70%] md:basis-[55%] lg:basis-1/2 lg:pl-6 xl:pl-10"
+                  >
+                    <FeatureCardSkeleton />
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -190,11 +192,13 @@ function FeaturesSectionSkeleton() {
           <div className="flex items-center justify-center gap-2 pt-6 lg:gap-4">
             <Skeleton className="size-10 shrink-0 rounded-full" />
             <div className="flex items-center gap-2">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="p-1.5">
-                  <Skeleton className="size-2 rounded-full" />
-                </div>
-              ))}
+              {Array.from({ length: 6 }).map((_, index) => {
+                return (
+                  <div key={index} className="p-1.5">
+                    <Skeleton className="size-2 rounded-full" />
+                  </div>
+                );
+              })}
             </div>
             <Skeleton className="size-10 shrink-0 rounded-full" />
           </div>
@@ -311,31 +315,35 @@ function FaqSectionSkeleton() {
 
         <div className="mx-auto mt-14 max-w-3xl">
           <div className="space-y-2">
-            {FAQ_QUESTION_RUNS.map((runs, index) => (
-              <div
-                key={index}
-                className="border-b border-dashed border-stone-300 last:border-b-0"
-              >
-                <div className="flex items-center justify-between gap-2 py-3">
-                  {/* Question: one `text-base` line box per run that fits */}
-                  <div className="flex flex-wrap gap-x-1">
-                    {runs.map((width) => (
-                      <div
-                        key={width}
-                        className={cn(
-                          "flex h-6 max-w-full shrink-0 items-center",
-                          width,
-                        )}
-                      >
-                        <Skeleton className="h-3.5 w-full" />
-                      </div>
-                    ))}
+            {FAQ_QUESTION_RUNS.map((runs, index) => {
+              return (
+                <div
+                  key={index}
+                  className="border-b border-dashed border-stone-300 last:border-b-0"
+                >
+                  <div className="flex items-center justify-between gap-2 py-3">
+                    {/* Question: one `text-base` line box per run that fits */}
+                    <div className="flex flex-wrap gap-x-1">
+                      {runs.map((width) => {
+                        return (
+                          <div
+                            key={width}
+                            className={cn(
+                              "flex h-6 max-w-full shrink-0 items-center",
+                              width,
+                            )}
+                          >
+                            <Skeleton className="h-3.5 w-full" />
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* The plus icon that expands the answer */}
+                    <Skeleton className="size-5 shrink-0 rounded-md" />
                   </div>
-                  {/* The plus icon that expands the answer */}
-                  <Skeleton className="size-5 shrink-0 rounded-md" />
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

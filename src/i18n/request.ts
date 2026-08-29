@@ -1,7 +1,8 @@
-import { getRequestConfig } from "next-intl/server";
 import { hasLocale } from "next-intl";
-import { routing } from "./routing";
+import { getRequestConfig } from "next-intl/server";
+
 import type EnMessages from "../../messages/en.json";
+import { routing } from "./routing";
 
 export default getRequestConfig(async ({ requestLocale }) => {
   try {
@@ -13,7 +14,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
       : routing.defaultLocale;
 
     const messages = await import(`../../messages/${locale}.json`).then(
-      (module: { default: typeof EnMessages }) => module.default,
+      (module: { default: typeof EnMessages }) => {
+        return module.default;
+      },
     );
 
     return {

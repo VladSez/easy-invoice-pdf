@@ -1,7 +1,6 @@
 import { Readable } from "node:stream";
 
-import type { drive_v3 } from "googleapis";
-import { google } from "googleapis";
+import { type drive_v3, google } from "googleapis";
 import { z } from "zod";
 
 import { env } from "@/env";

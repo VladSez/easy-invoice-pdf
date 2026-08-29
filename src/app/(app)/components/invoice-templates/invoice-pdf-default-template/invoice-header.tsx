@@ -1,5 +1,4 @@
 import { Image, Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
-import { type InvoiceData } from "@/app/schema";
 import dayjs from "dayjs";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
@@ -7,6 +6,8 @@ import {
   formatDateOfServiceEnd,
   formatServicePeriodRange,
 } from "@/app/(app)/utils/format-service-period";
+import { type InvoiceData } from "@/app/schema";
+
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
 function HeaderDates({

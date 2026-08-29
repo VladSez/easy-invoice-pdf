@@ -14,10 +14,14 @@ export function ResponsiveIndicator() {
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
-    const update = () => setWidth(window.innerWidth);
+    const update = () => {
+      return setWidth(window.innerWidth);
+    };
     update();
     window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    return () => {
+      return window.removeEventListener("resize", update);
+    };
   }, []);
 
   if (width === 0 || hidden) return null;
@@ -36,8 +40,11 @@ export function ResponsiveIndicator() {
               : "XS";
 
   return (
-    <div
-      onClick={() => setHidden(true)}
+    <button
+      type="button"
+      onClick={() => {
+        return setHidden(true);
+      }}
       className="fixed left-2 top-2 z-[9999] flex cursor-pointer items-center gap-1 rounded-md bg-blue-600/90 px-2 py-1 font-mono text-xs text-white shadow-lg duration-300 animate-in fade-in slide-in-from-left-2"
       data-info="responsive-indicator"
       title="Click to hide"
@@ -45,6 +52,6 @@ export function ResponsiveIndicator() {
       <span className="font-bold">{breakpoint}</span>
       <span className="text-blue-200">|</span>
       <span>{width}px</span>
-    </div>
+    </button>
   );
 }

@@ -1,12 +1,14 @@
+import * as Sentry from "@sentry/nextjs";
 import type { Metadata } from "next";
-import { AppPageClient } from "./page.client";
-import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
+
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { getLatestChangelogSummary } from "@/app/changelog/utils";
+import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
+import { computeIndexingFlags } from "@/lib/seo/indexing-utils";
+
 import { CTAToastProvider } from "./contexts/cta-toast-context";
 import { HomeJsonLd } from "./home-json-ld";
-import { computeIndexingFlags } from "@/lib/seo/indexing-utils";
-import * as Sentry from "@sentry/nextjs";
+import { AppPageClient } from "./page.client";
 
 const APP_PAGE_DESCRIPTION =
   "Create professional PDF invoices online for free. Customize invoice templates, add your logo, download instantly, and send invoices without signup.";
@@ -136,7 +138,7 @@ export async function generateMetadata({
   const resolvedSearchParams = await searchParams;
 
   const { shouldIndex } = computeIndexingFlags(resolvedSearchParams);
-  const isStripeTemplate = Boolean(resolvedSearchParams?.template === "stripe");
+  const isStripeTemplate = resolvedSearchParams?.template === "stripe";
 
   const templateMetadata = buildTemplateMetadata(
     isStripeTemplate ? STRIPE_TEMPLATE_META : DEFAULT_TEMPLATE_META,

@@ -14,8 +14,8 @@ import {
   type InvoiceData,
   type SupportedCurrencies,
   type SupportedLanguages,
+  MAX_INVOICE_ITEMS,
 } from "@/app/schema";
-import { MAX_INVOICE_ITEMS } from "@/app/schema";
 import { Legend } from "@/components/legend";
 import {
   AlertDialog,

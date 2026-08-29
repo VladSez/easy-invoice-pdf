@@ -1,25 +1,24 @@
+import dayjs from "dayjs";
+import { DownloadIcon, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+
 import { useInvoicePdfInstance } from "@/app/(app)/contexts/invoice-pdf-instance-context";
 import {
   LANGUAGE_TO_LABEL,
   type InvoiceData,
   type SupportedLanguages,
 } from "@/app/schema";
-import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { cn } from "@/lib/utils";
-import * as Sentry from "@sentry/nextjs";
-import dayjs from "dayjs";
-import { DownloadIcon, Loader2 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
-
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { useDeviceContext } from "@/contexts/device-context";
-import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
-import { updateAppMetadata } from "../utils/get-app-metadata";
-import { useCTAToast } from "../contexts/cta-toast-context";
-import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./cta-toasts";
 import { haptic } from "@/lib/haptic";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { cn } from "@/lib/utils";
+import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
+
+import { useCTAToast } from "../contexts/cta-toast-context";
+import { updateAppMetadata } from "../utils/get-app-metadata";
+import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./cta-toasts";
 
 const LOADING_BUTTON_TIMEOUT = 400;
 export const LOADING_BUTTON_TEXT = "Generating Document...";
@@ -55,13 +54,9 @@ const ButtonContent = ({
 
 export function InvoicePDFDownloadLink({
   invoiceData,
-  errorWhileGeneratingPdfIsShown,
-  setErrorWhileGeneratingPdfIsShown,
   isMobile,
 }: {
   invoiceData: InvoiceData;
-  errorWhileGeneratingPdfIsShown: boolean;
-  setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
   isMobile: boolean;
 }) {
   const { inAppInfo } = useDeviceContext();
@@ -70,8 +65,6 @@ export function InvoicePDFDownloadLink({
   // The very same PDF the preview shows, generated once by `InvoicePdfInstanceProvider`
   const { loading: pdfLoading, url, error } = useInvoicePdfInstance();
   const [isLoading, setIsLoading] = useState(false);
-
-  const [inAppBrowserToastShown, setInAppBrowserToastShown] = useState(false);
 
   const isTelegramPreviewBrowser = isTelegramInAppBrowser();
 
@@ -129,10 +122,12 @@ export function InvoicePDFDownloadLink({
           },
         });
 
-        updateAppMetadata((current) => ({
-          ...current,
-          invoiceDownloadCount: (current?.invoiceDownloadCount ?? 0) + 1,
-        }));
+        updateAppMetadata((current) => {
+          return {
+            ...current,
+            invoiceDownloadCount: (current?.invoiceDownloadCount ?? 0) + 1,
+          };
+        });
 
         // close all other toasts (if any)
         toast.dismiss();
@@ -157,74 +152,33 @@ export function InvoicePDFDownloadLink({
     ],
   );
 
-  // Memoize static values
-  const filename = useMemo(() => {
-    const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
+  const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
 
-    // Replace all slashes with dashes (e.g. 01/2025 -> 01-2025)
-    const formattedInvoiceNumber = invoiceNumberValue
-      ? invoiceNumberValue?.replace(/\//g, "-")
-      : dayjs().format("MM-YYYY"); // Fallback to current month and year if no invoice number
+  // Replace all slashes with dashes (e.g. 01/2025 -> 01-2025)
+  const formattedInvoiceNumber = invoiceNumberValue
+    ? invoiceNumberValue?.replaceAll("/", "-")
+    : dayjs().format("MM-YYYY"); // Fallback to current month and year if no invoice number
 
-    const name = `invoice-${invoiceData?.language?.toUpperCase()}-${formattedInvoiceNumber}.pdf`;
-
-    return name;
-  }, [invoiceData?.language, invoiceData?.invoiceNumberObject]);
+  const filename = `invoice-${invoiceData?.language?.toUpperCase()}-${formattedInvoiceNumber}.pdf`;
 
   // Handle loading state (for better UX)
   useEffect(() => {
     if (!pdfLoading) {
-      const timer = setTimeout(
-        () => setIsLoading(false),
-        LOADING_BUTTON_TIMEOUT,
-      );
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => {
+        return setIsLoading(false);
+      }, LOADING_BUTTON_TIMEOUT);
+
+      return () => {
+        return clearTimeout(timer);
+      };
     }
+    // oxlint-disable-next-line react/set-state-in-effect -- `pdfLoading` comes from the shared PDF instance, and the button holds its loading state for `LOADING_BUTTON_TIMEOUT` after it clears; there is no event here to derive this from
     setIsLoading(true);
+
+    // it's ok to return here
+    // oxlint-disable-next-line no-useless-return
+    return;
   }, [pdfLoading]);
-
-  // Handle errors
-  useEffect(() => {
-    if (error && !errorWhileGeneratingPdfIsShown) {
-      ErrorGeneratingPdfToast();
-      setErrorWhileGeneratingPdfIsShown(true);
-
-      umamiTrackEvent("error_generating_document_link", { data: { error } });
-      Sentry.captureException(error);
-    }
-  }, [
-    error,
-    errorWhileGeneratingPdfIsShown,
-    setErrorWhileGeneratingPdfIsShown,
-  ]);
-
-  // Show a toast if the user is in an in-app browser
-  useEffect(() => {
-    if (
-      (inAppInfo?.isInApp || isTelegramPreviewBrowser) &&
-      !inAppBrowserToastShown
-    ) {
-      toast.info("In-App Browser Detected", {
-        description: (
-          <p>
-            For the best experience, please open this page in{" "}
-            <span className="font-bold">Chrome</span> or{" "}
-            <span className="font-bold">Safari</span> browser.
-          </p>
-        ),
-        id: "in-app-browser-toast", // To prevent duplicate toasts
-        duration: Infinity,
-        icon: "⚠️",
-        position: isMobile ? "top-center" : "bottom-right",
-      });
-      setInAppBrowserToastShown(true);
-    }
-  }, [
-    inAppInfo?.isInApp,
-    inAppBrowserToastShown,
-    isTelegramPreviewBrowser,
-    isMobile,
-  ]);
 
   return (
     <CustomTooltip

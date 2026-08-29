@@ -48,9 +48,9 @@ function scrubQueryString(queryString: string) {
 
   const params = new URLSearchParams(rawQuery);
 
-  const hasSensitiveParam = SENSITIVE_QUERY_PARAMS.some((param) =>
-    params.has(param),
-  );
+  const hasSensitiveParam = SENSITIVE_QUERY_PARAMS.some((param) => {
+    return params.has(param);
+  });
 
   if (!hasSensitiveParam) {
     return queryString;

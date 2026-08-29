@@ -10,6 +10,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
+
 import { FeatureCard, type FeatureCardProps } from "./feature-card";
 
 interface FeaturesCarouselProps {
@@ -52,7 +53,12 @@ export function FeaturesCarousel({
     };
   }, [api]);
 
-  const scrollTo = useCallback((index: number) => api?.scrollTo(index), [api]);
+  const scrollTo = useCallback(
+    (index: number) => {
+      return api?.scrollTo(index);
+    },
+    [api],
+  );
 
   return (
     <Carousel
@@ -70,19 +76,21 @@ export function FeaturesCarousel({
           Cards stretch to the tallest one at every breakpoint, so swiping never changes
           the height of the carousel. */}
       <CarouselContent className="-ml-6 -mr-2 items-stretch sm:-ml-4 sm:mr-0 lg:-ml-6 xl:-ml-10">
-        {features.map((feature) => (
-          <CarouselItem
-            key={feature.translationKey}
-            // one card per view on mobile, two from `lg` up. Mobile takes the full
-            // width so the demo video is as large as it can be; the arrows and dots
-            // below carry the "there is more" affordance that the peeking card did.
-            // The `pl-4` that `CarouselItem` hardcodes is the gutter between cards; the
-            // track's `-ml-6` pulls it off-screen so it only shows while scrolling
-            className="basis-full sm:basis-[70%] md:basis-[55%] lg:basis-1/2 lg:pl-6 xl:pl-10"
-          >
-            <FeatureCard {...feature} />
-          </CarouselItem>
-        ))}
+        {features.map((feature) => {
+          return (
+            <CarouselItem
+              key={feature.translationKey}
+              // one card per view on mobile, two from `lg` up. Mobile takes the full
+              // width so the demo video is as large as it can be; the arrows and dots
+              // below carry the "there is more" affordance that the peeking card did.
+              // The `pl-4` that `CarouselItem` hardcodes is the gutter between cards; the
+              // track's `-ml-6` pulls it off-screen so it only shows while scrolling
+              className="basis-full sm:basis-[70%] md:basis-[55%] lg:basis-1/2 lg:pl-6 xl:pl-10"
+            >
+              <FeatureCard {...feature} />
+            </CarouselItem>
+          );
+        })}
       </CarouselContent>
 
       {/* Controls: previous/next arrows and one dot per feature */}
@@ -90,38 +98,46 @@ export function FeaturesCarousel({
         <button
           type="button"
           aria-label={translations.previousFeature}
-          onClick={() => api?.scrollPrev()}
+          onClick={() => {
+            return api?.scrollPrev();
+          }}
           className={arrowButtonClassName}
         >
           <ChevronLeft className="size-5" aria-hidden="true" />
         </button>
 
         <div role="group" className="flex items-center gap-2">
-          {features.map((feature, index) => (
-            <button
-              key={feature.translationKey}
-              type="button"
-              // the feature title keeps the label localized, unlike a hardcoded "Go to slide N"
-              aria-label={feature.title}
-              aria-current={index === selectedIndex}
-              onClick={() => scrollTo(index)}
-              className="rounded-full p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
-            >
-              <span
-                aria-hidden="true"
-                className={cn(
-                  "block size-2 rounded-full bg-slate-300 transition-colors",
-                  index === selectedIndex && "bg-slate-900",
-                )}
-              />
-            </button>
-          ))}
+          {features.map((feature, index) => {
+            return (
+              <button
+                key={feature.translationKey}
+                type="button"
+                // the feature title keeps the label localized, unlike a hardcoded "Go to slide N"
+                aria-label={feature.title}
+                aria-current={index === selectedIndex}
+                onClick={() => {
+                  return scrollTo(index);
+                }}
+                className="rounded-full p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "block size-2 rounded-full bg-slate-300 transition-colors",
+                    index === selectedIndex && "bg-slate-900",
+                  )}
+                />
+              </button>
+            );
+          })}
         </div>
 
         <button
           type="button"
           aria-label={translations.nextFeature}
-          onClick={() => api?.scrollNext()}
+          onClick={() => {
+            return api?.scrollNext();
+          }}
           className={arrowButtonClassName}
         >
           <ChevronRight className="size-5" aria-hidden="true" />

@@ -1,3 +1,8 @@
+// IMPORTANT: it's fine to use this import directly on server side
+// eslint-disable-next-line no-restricted-imports
+import { Document, Font, Page, renderToBuffer } from "@react-pdf/renderer";
+import dayjs from "dayjs";
+
 import { PDF_DEFAULT_TEMPLATE_STYLES } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
 import { InvoiceBody } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template/invoice-body";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
@@ -5,11 +10,6 @@ import { getInvoiceDefaultNumberValue } from "@/app/constants";
 import { type InvoiceData, type SupportedLanguages } from "@/app/schema";
 import { INVOICE_PDF_FONTS } from "@/config";
 import { env } from "@/env";
-import dayjs from "dayjs";
-
-// IMPORTANT: it's fine to use this import directly on server side
-// eslint-disable-next-line no-restricted-imports
-import { Document, Font, Page, renderToBuffer } from "@react-pdf/renderer";
 
 // Open sans seems to be working fine with EN and PL
 const fontFamily = "Open Sans";

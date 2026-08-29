@@ -129,7 +129,7 @@ export function BuyerManagement({
         return buyer?.id === invoiceData?.buyer?.id;
       });
 
-      // oxlint-disable-next-line react/set-state-in-effect react-you-might-not-need-an-effect/no-adjust-state-on-prop-change
+      // oxlint-disable-next-line react/set-state-in-effect react-you-might-not-need-an-effect/no-adjust-state-on-prop-change -- localStorage is an external system: the saved buyers cannot be derived during render, they have to be read after mount
       setBuyersSelectOptions(validBuyers);
       setSelectedBuyerId(selectedBuyer?.id ?? "");
     } catch (error) {

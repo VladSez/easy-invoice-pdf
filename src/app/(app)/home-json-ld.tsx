@@ -1,8 +1,8 @@
-import { PROD_WEBSITE_URL } from "@/config";
 import type { Graph } from "schema-dts";
 
-import { JsonLdScript } from "@/lib/seo/render-json-ld";
+import { PROD_WEBSITE_URL } from "@/config";
 import { JSON_LD_IDS } from "@/lib/seo/json-ld-ids";
+import { JsonLdScript } from "@/lib/seo/render-json-ld";
 import {
   buildFullWebSite,
   buildOrganization,

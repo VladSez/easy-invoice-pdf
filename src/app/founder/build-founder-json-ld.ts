@@ -1,6 +1,6 @@
-import { PROD_WEBSITE_URL } from "@/config";
 import type { Graph } from "schema-dts";
 
+import { PROD_WEBSITE_URL } from "@/config";
 import { buildBreadcrumbList } from "@/lib/seo/breadcrumb";
 import {
   JSON_LD_IDS,

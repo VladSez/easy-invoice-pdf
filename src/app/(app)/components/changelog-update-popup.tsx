@@ -1,16 +1,17 @@
 "use client";
 
-import type { ChangelogSummary } from "@/app/changelog/utils";
-import { Button } from "@/components/ui/button";
-import type { AppUpdatePopupVariant } from "@/app/(app)/hooks/use-changelog-update-popup";
-import { DISCORD_COMMUNITY_URL, REDDIT_COMMUNITY_URL } from "@/config";
-import { markChangelogAsSeen } from "@/app/(app)/utils/changelog-seen-storage";
-import { markWelcomePopupSeen } from "@/app/(app)/utils/welcome-popup-seen-storage";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { cn } from "@/lib/utils";
 import { XIcon } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect } from "react";
+
+import type { AppUpdatePopupVariant } from "@/app/(app)/hooks/use-changelog-update-popup";
+import { markChangelogAsSeen } from "@/app/(app)/utils/changelog-seen-storage";
+import { markWelcomePopupSeen } from "@/app/(app)/utils/welcome-popup-seen-storage";
+import type { ChangelogSummary } from "@/app/changelog/utils";
+import { Button } from "@/components/ui/button";
+import { DISCORD_COMMUNITY_URL, REDDIT_COMMUNITY_URL } from "@/config";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { cn } from "@/lib/utils";
 
 interface ChangelogUpdatePopupProps {
   variant: AppUpdatePopupVariant;

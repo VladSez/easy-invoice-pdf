@@ -1,7 +1,9 @@
-import { GITHUB_URL } from "@/config";
 import { readdir } from "fs/promises";
 import { join } from "path";
+
 import { z } from "zod";
+
+import { GITHUB_URL } from "@/config";
 
 export interface ChangelogSummary {
   slug: string;
@@ -90,7 +92,9 @@ async function getChangelogFiles(): Promise<string[]> {
       "content",
     );
     const files = await readdir(changelogDir);
-    return files.filter((file) => file.endsWith(".mdx"));
+    return files.filter((file) => {
+      return file.endsWith(".mdx");
+    });
   } catch (error) {
     console.error("Failed to read changelog directory:", error);
     return [];
@@ -172,10 +176,11 @@ export async function getChangelogEntries(): Promise<ChangelogEntry[]> {
   }
 
   // Sort by date (newest first)
-  return entries.sort(
-    (a, b) =>
-      new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime(),
-  );
+  return entries.sort((a, b) => {
+    return (
+      new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime()
+    );
+  });
 }
 
 /**
@@ -185,7 +190,9 @@ export async function getChangelogEntry(
   slug: string,
 ): Promise<ChangelogEntry | null> {
   const files = await getChangelogFiles();
-  const filename = files.find((file) => filenameToSlug(file) === slug);
+  const filename = files.find((file) => {
+    return filenameToSlug(file) === slug;
+  });
 
   if (!filename) {
     return null;
@@ -227,9 +234,9 @@ export async function getNextChangelogEntry(
   currentSlug: string,
 ): Promise<ChangelogEntry | null> {
   const allEntries = await getChangelogEntries();
-  const currentIndex = allEntries.findIndex(
-    (entry) => entry.slug === currentSlug,
-  );
+  const currentIndex = allEntries.findIndex((entry) => {
+    return entry.slug === currentSlug;
+  });
 
   // If current entry is not found or is the first one (newest), return null
   if (currentIndex === -1 || currentIndex === 0) {
@@ -247,9 +254,9 @@ export async function getPreviousChangelogEntry(
   currentSlug: string,
 ): Promise<ChangelogEntry | null> {
   const allEntries = await getChangelogEntries();
-  const currentIndex = allEntries.findIndex(
-    (entry) => entry.slug === currentSlug,
-  );
+  const currentIndex = allEntries.findIndex((entry) => {
+    return entry.slug === currentSlug;
+  });
 
   // If current entry is not found or is the last one (oldest), return null
   if (currentIndex === -1 || currentIndex === allEntries.length - 1) {

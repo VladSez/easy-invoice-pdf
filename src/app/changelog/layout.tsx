@@ -1,16 +1,18 @@
-import { Header } from "@/app/(components)/header";
+import type { Metadata } from "next";
+
 import { Footer } from "@/app/(components)/footer";
+import { Header } from "@/app/(components)/header";
 import {
   PERSONAL_WEBSITE_URL,
   STATIC_ASSETS_URL,
   TWITTER_CREATOR,
 } from "@/config";
-import type { Metadata } from "next";
-import { ChangelogIndexJsonLd } from "./changelog-index-json-ld";
+
 import {
   CHANGELOG_INDEX_DESCRIPTION,
   CHANGELOG_INDEX_TITLE,
 } from "./build-changelog-json-ld";
+import { ChangelogIndexJsonLd } from "./changelog-index-json-ld";
 
 // Enable static generation for changelog layout
 export const dynamic = "force-static";

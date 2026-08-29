@@ -1,11 +1,12 @@
 import { View, Text } from "@react-pdf/renderer/lib/react-pdf.browser";
-import type { InvoiceData } from "@/app/schema";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import type { InvoiceData } from "@/app/schema";
 import {
   getAmountInWords,
   getNumberFractionalPart,
 } from "@/utils/invoice.utils";
+
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 
 /**

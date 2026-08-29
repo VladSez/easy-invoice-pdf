@@ -1,6 +1,7 @@
-import { getLatestChangelogSummary } from "./utils";
-import { buildChangelogIndexJsonLdGraph } from "./build-changelog-json-ld";
 import { JsonLdScript } from "@/lib/seo/render-json-ld";
+
+import { buildChangelogIndexJsonLdGraph } from "./build-changelog-json-ld";
+import { getLatestChangelogSummary } from "./utils";
 
 export async function ChangelogIndexJsonLd() {
   const latest = await getLatestChangelogSummary().catch((error) => {

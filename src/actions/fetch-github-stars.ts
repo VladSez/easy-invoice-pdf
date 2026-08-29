@@ -1,9 +1,9 @@
 "use server";
 
-import { env } from "@/env";
-
-import { cache } from "react";
 import * as Sentry from "@sentry/nextjs";
+import { cache } from "react";
+
+import { env } from "@/env";
 
 /**
  * Fetches the current star count for the GitHub repository.

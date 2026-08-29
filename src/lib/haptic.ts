@@ -44,13 +44,13 @@ export function haptic(pattern: number | number[] = 50) {
     const input = document.createElement("input");
     input.type = "checkbox";
     input.setAttribute("switch", "");
-    label.appendChild(input);
+    label.append(input);
 
     try {
-      document.head.appendChild(label);
+      document.head.append(label);
       label.click();
     } finally {
-      document.head.removeChild(label);
+      label.remove();
     }
   } catch {}
 }

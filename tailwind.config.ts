@@ -107,7 +107,8 @@ const config: Config = {
       },
     },
   },
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  // tailwind v3 resolves plugins through CJS `require`
+  // oxlint-disable-next-line typescript/no-require-imports
   plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 };
 export default config;

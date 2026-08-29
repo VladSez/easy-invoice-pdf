@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 /**
  * Sticky CTA component displayed at bottom of SEO landing pages.

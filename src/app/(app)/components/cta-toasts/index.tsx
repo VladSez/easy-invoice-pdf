@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { GiftIcon, Heart, Star, XIcon } from "lucide-react";
+import { toast as sonnerToast } from "sonner";
 
 import { GithubIcon } from "@/components/etc/github-logo";
+import { Button } from "@/components/ui/button";
 import { DISCORD_FEEDBACK_URL, GITHUB_URL } from "@/config";
-import { toast as sonnerToast } from "sonner";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 
 interface ToastProps {
   id: string | number;
@@ -20,13 +20,15 @@ function customPremiumToast(toast: ToastProps) {
   sonnerToast.dismiss();
 
   return sonnerToast.custom(
-    (id) => (
-      <PremiumDonationToast
-        id={id}
-        title={toast.title}
-        description={toast.description}
-      />
-    ),
+    (id) => {
+      return (
+        <PremiumDonationToast
+          id={id}
+          title={toast.title}
+          description={toast.description}
+        />
+      );
+    },
     {
       duration: Infinity,
     },
@@ -41,13 +43,15 @@ function customDefaultToast(toast: ToastProps) {
   sonnerToast.dismiss();
 
   return sonnerToast.custom(
-    (id) => (
-      <DefaultDonationToast
-        id={id}
-        title={toast.title}
-        description={toast.description}
-      />
-    ),
+    (id) => {
+      return (
+        <DefaultDonationToast
+          id={id}
+          title={toast.title}
+          description={toast.description}
+        />
+      );
+    },
     {
       duration: Infinity,
     },
@@ -80,7 +84,11 @@ function PremiumDonationToast(props: ToastProps) {
       data-testid="download-pdf-toast"
     >
       {/* Close button - styled like default Sonner toast */}
-      <SonnerCloseButton onClick={() => sonnerToast.dismiss(id)} />
+      <SonnerCloseButton
+        onClick={() => {
+          return sonnerToast.dismiss(id);
+        }}
+      />
 
       <div className="relative">
         <div className="mb-2 flex items-center gap-2">
@@ -152,7 +160,11 @@ function DefaultDonationToast(props: ToastProps) {
       data-testid="download-pdf-toast"
     >
       {/* Close button - styled like default Sonner toast */}
-      <SonnerCloseButton onClick={() => sonnerToast.dismiss(id)} />
+      <SonnerCloseButton
+        onClick={() => {
+          return sonnerToast.dismiss(id);
+        }}
+      />
 
       <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-600">
         <Heart className="h-5 w-5 fill-current text-white" />

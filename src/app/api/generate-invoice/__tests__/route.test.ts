@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
 import type {
   GenerateInvoiceResult,
   GenerateInvoiceReport,
@@ -29,19 +30,31 @@ const MOCK_ENV = {
 const mockRunProduction = vi.fn();
 const mockIpLimiterLimit = vi.fn();
 
-vi.mock("@/env", () => ({ env: { ...MOCK_ENV } }));
+vi.mock("@/env", () => {
+  return { env: { ...MOCK_ENV } };
+});
 
-vi.mock("../run-production-generate-invoice", () => ({
-  runProductionGenerateMonthlyInvoice: (...args: unknown[]) =>
-    mockRunProduction(...args) as unknown as Promise<GenerateInvoiceResult>,
-}));
+vi.mock("../run-production-generate-invoice", () => {
+  return {
+    runProductionGenerateMonthlyInvoice: (...args: unknown[]) => {
+      return mockRunProduction(
+        ...args,
+      ) as unknown as Promise<GenerateInvoiceResult>;
+    },
+  };
+});
 
-vi.mock("@/lib/rate-limit", () => ({
-  ipLimiter: {
-    limit: (...args: unknown[]) =>
-      mockIpLimiterLimit(...args) as unknown as Promise<{ success: boolean }>,
-  },
-}));
+vi.mock("@/lib/rate-limit", () => {
+  return {
+    ipLimiter: {
+      limit: (...args: unknown[]) => {
+        return mockIpLimiterLimit(...args) as unknown as Promise<{
+          success: boolean;
+        }>;
+      },
+    },
+  };
+});
 
 function createRequest({
   authToken,

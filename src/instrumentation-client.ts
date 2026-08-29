@@ -48,4 +48,7 @@ if (isSentryEnabled) {
 
 // Required by Sentry to instrument client-side router navigations (App Router).
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/#step-3-capture-react-render-errors
+// @sentry/nextjs ships separate client/server entrypoints and the import resolver
+// reads the server one; this export only exists in the browser build.
+// oxlint-disable-next-line import/namespace
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

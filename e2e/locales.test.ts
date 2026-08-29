@@ -1,7 +1,9 @@
-import { SUPPORTED_LANGUAGES } from "@/app/schema";
-import { expect, test } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
+
+import { expect, test } from "@playwright/test";
+
+import { SUPPORTED_LANGUAGES } from "@/app/schema";
 
 /**
  * The app ships a translation file per supported language (`messages/<locale>.json`)

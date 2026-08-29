@@ -1,5 +1,7 @@
-import { APP_URL } from "@/config";
 import { type MetadataRoute } from "next";
+
+import { APP_URL } from "@/config";
+
 import { SUPPORTED_LANGUAGES } from "./schema";
 
 export default function robots(): MetadataRoute.Robots {
@@ -11,7 +13,9 @@ export default function robots(): MetadataRoute.Robots {
           // Allow main app page (now at /)
           "/",
           // Allow about pages in all languages
-          ...SUPPORTED_LANGUAGES.map((locale) => `/${locale}/about`),
+          ...SUPPORTED_LANGUAGES.map((locale) => {
+            return `/${locale}/about`;
+          }),
           // Allow template parameter URLs
           "/?template=*",
           // Allow changelog pages

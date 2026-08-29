@@ -1,6 +1,15 @@
 "use client"; // Error boundaries must be Client Components
 
-import { Button } from "@/components/ui/button";
+import * as Sentry from "@sentry/nextjs";
+import { useEffect } from "react";
+import { toast } from "sonner";
+
+import { DEFAULT_METADATA } from "@/app/(app)/utils/get-app-metadata";
+import {
+  METADATA_LOCAL_STORAGE_KEY,
+  PDF_DATA_LOCAL_STORAGE_KEY,
+} from "@/app/schema";
+import { ErrorMessage } from "@/components/etc/error-message";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,18 +21,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useEffect } from "react";
-import { toast } from "sonner";
-import { getInitialInvoiceData } from "../constants";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import * as Sentry from "@sentry/nextjs";
-import { ErrorMessage } from "@/components/etc/error-message";
-import {
-  METADATA_LOCAL_STORAGE_KEY,
-  PDF_DATA_LOCAL_STORAGE_KEY,
-} from "@/app/schema";
+import { Button } from "@/components/ui/button";
 import { BUG_REPORT_URL } from "@/config";
-import { DEFAULT_METADATA } from "@/app/(app)/utils/get-app-metadata";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+
+import { getInitialInvoiceData } from "../constants";
 
 export default function Error({
   error,

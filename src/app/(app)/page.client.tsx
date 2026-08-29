@@ -45,6 +45,7 @@ import { showRandomCTAToast } from "./components/cta-toasts";
 import { HowItWorksVideoDialog } from "./components/how-it-works-video-dialog";
 import { useCTAToast } from "./contexts/cta-toast-context";
 import { useChangelogUpdatePopup } from "./hooks/use-changelog-update-popup";
+import { useInAppBrowserNotice } from "./hooks/use-in-app-browser-notice";
 import { useShowRandomCTAToastOnIdle } from "./hooks/use-show-random-cta-toast";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
@@ -91,6 +92,9 @@ export function AppPageClient({
   const { isDesktop, isUADesktop } = useDeviceContext();
   const isMobile = !isDesktop;
 
+  // Warns the user when they are inside an in-app browser, where downloads are blocked
+  useInAppBrowserNotice();
+
   /**
    * State for storing the current invoice data.
    *
@@ -104,9 +108,6 @@ export function AppPageClient({
   const [invoiceDataState, setInvoiceDataState] = useState<InvoiceData | null>(
     null,
   );
-
-  const [errorWhileGeneratingPdfIsShown, setErrorWhileGeneratingPdfIsShown] =
-    useState(false);
 
   const canShareInvoice = !invoiceDataState?.logo;
 
@@ -757,10 +758,6 @@ export function AppPageClient({
               handleShareInvoice={handleShareInvoice}
               isDesktop={isDesktop}
               invoiceDataState={invoiceDataState}
-              errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
-              setErrorWhileGeneratingPdfIsShown={
-                setErrorWhileGeneratingPdfIsShown
-              }
               isMobile={isMobile}
               isSharedInvoice={isViewingSharedInvoice}
             />
@@ -770,10 +767,6 @@ export function AppPageClient({
                 handleInvoiceDataChange={handleInvoiceDataChange}
                 handleShareInvoice={handleShareInvoice}
                 isMobile={isMobile}
-                errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
-                setErrorWhileGeneratingPdfIsShown={
-                  setErrorWhileGeneratingPdfIsShown
-                }
                 canShareInvoice={canShareInvoice}
                 setInvoiceFormHasErrors={setInvoiceFormHasErrors}
               />

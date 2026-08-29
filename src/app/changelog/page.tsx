@@ -1,11 +1,13 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+
 import {
   formatChangelogDate,
   getChangelogEntries,
   type ChangelogEntry,
 } from "@/app/changelog/utils";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { Suspense } from "react";
+
 import { ChangelogAuthorByline } from "./components/changelog-author-byline";
 import { ChangelogVersionBadgeLink } from "./components/changelog-version-badge-link";
 import { DateTime } from "./components/date-time";
@@ -50,9 +52,9 @@ export default async function ChangelogPage() {
         {/* Timeline Grid */}
         <div className="border-slate-200 sm:border-t">
           <div className="mx-auto max-w-6xl border-slate-200 px-4 dark:border-gray-700 sm:px-12 xl:border-x">
-            {entries.map((entry) => (
-              <ChangelogEntryCard key={entry.slug} entry={entry} />
-            ))}
+            {entries.map((entry) => {
+              return <ChangelogEntryCard key={entry.slug} entry={entry} />;
+            })}
           </div>
         </div>
       </div>

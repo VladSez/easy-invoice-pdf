@@ -1,9 +1,10 @@
 import { Text, View, Link } from "@react-pdf/renderer/lib/react-pdf.browser";
-import { type InvoiceData } from "@/app/schema";
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-import type { STRIPE_TEMPLATE_STYLES } from ".";
-
 import dayjs from "dayjs";
+
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { type InvoiceData } from "@/app/schema";
+
+import type { STRIPE_TEMPLATE_STYLES } from ".";
 import "dayjs/locale/en";
 import "dayjs/locale/pl";
 import "dayjs/locale/de";

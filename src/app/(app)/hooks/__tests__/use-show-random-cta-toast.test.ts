@@ -2,17 +2,22 @@
 
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { showRandomCTAToast } from "../../components/cta-toasts";
 import { useCTAToast } from "../../contexts/cta-toast-context";
 import { useShowRandomCTAToastOnIdle } from "../use-show-random-cta-toast";
 
-vi.mock("../../components/cta-toasts", () => ({
-  showRandomCTAToast: vi.fn(),
-}));
+vi.mock("../../components/cta-toasts", () => {
+  return {
+    showRandomCTAToast: vi.fn(),
+  };
+});
 
-vi.mock("../../contexts/cta-toast-context", () => ({
-  useCTAToast: vi.fn(),
-}));
+vi.mock("../../contexts/cta-toast-context", () => {
+  return {
+    useCTAToast: vi.fn(),
+  };
+});
 
 const MIN_TIME_ON_PAGE = 7_000;
 const IDLE_TIME = 5_000;
@@ -30,14 +35,18 @@ function renderIdleToastHook(initialState: Partial<CTAToastState> = {}) {
     ...initialState,
   };
 
-  vi.mocked(useCTAToast).mockImplementation(() => ({
-    hasTriggeredCTAAction: state.hasTriggeredCTAAction,
-    markCTAActionTriggered,
-    interactionCount: state.interactionCount,
-    incrementInteractionCount: vi.fn(),
-  }));
+  vi.mocked(useCTAToast).mockImplementation(() => {
+    return {
+      hasTriggeredCTAAction: state.hasTriggeredCTAAction,
+      markCTAActionTriggered,
+      interactionCount: state.interactionCount,
+      incrementInteractionCount: vi.fn(),
+    };
+  });
 
-  const hook = renderHook(() => useShowRandomCTAToastOnIdle());
+  const hook = renderHook(() => {
+    return useShowRandomCTAToastOnIdle();
+  });
 
   return {
     ...hook,

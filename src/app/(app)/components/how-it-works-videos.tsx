@@ -1,5 +1,8 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DISCORD_COMMUNITY_URL,
@@ -8,14 +11,16 @@ import {
 } from "@/config";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 
 type HowItWorksVideoId = (typeof HOW_IT_WORKS_VIDEOS)[number]["id"];
 
 const DEFAULT_VIDEO_ID = HOW_IT_WORKS_VIDEOS[0].id;
 
-const VALID_VIDEO_IDS = new Set(HOW_IT_WORKS_VIDEOS.map((video) => video.id));
+const VALID_VIDEO_IDS = new Set(
+  HOW_IT_WORKS_VIDEOS.map((video) => {
+    return video.id;
+  }),
+);
 
 function isValidVideoId(value: string | null): value is HowItWorksVideoId {
   return value !== null && VALID_VIDEO_IDS.has(value as HowItWorksVideoId);
@@ -23,7 +28,6 @@ function isValidVideoId(value: string | null): value is HowItWorksVideoId {
 
 interface HowItWorksVideosProps {
   initialVideoId?: HowItWorksVideoId;
-  resetKey?: string | number;
   showIframe?: boolean;
   className?: string;
   /** Overrides the active video title in the heading. */
@@ -41,7 +45,6 @@ interface HowItWorksVideosProps {
  */
 export function HowItWorksVideos({
   initialVideoId,
-  resetKey,
   showIframe = true,
   className,
   title,
@@ -53,36 +56,37 @@ export function HowItWorksVideos({
   const searchParams = useSearchParams();
   const videoParam = searchParams.get("video");
 
-  const resolvedInitialId = isValidVideoId(videoParam)
-    ? videoParam
-    : (initialVideoId ?? DEFAULT_VIDEO_ID);
+  const paramVideoId = isValidVideoId(videoParam) ? videoParam : null;
 
-  const [activeVideoId, setActiveVideoId] =
-    useState<HowItWorksVideoId>(resolvedInitialId);
+  // The tab the user picked, if any. Everything else about the active video is
+  // derived, so there is nothing to keep in sync with an effect.
+  const [selectedVideoId, setSelectedVideoId] =
+    useState<HowItWorksVideoId | null>(null);
 
-  // Reset activeVideoId when resetKey changes, e.g. after dialog open/close.
-  // If initialVideoId provided, use it, otherwise fallback to default.
-  useEffect(() => {
-    if (resetKey !== undefined) {
-      setActiveVideoId(initialVideoId ?? DEFAULT_VIDEO_ID);
-    }
-  }, [resetKey, initialVideoId]);
+  // A ?video= deep link wins over an earlier tab click: the "Watch tutorial"
+  // links on /how-it-works navigate without remounting this component.
+  const [lastParamVideoId, setLastParamVideoId] = useState(paramVideoId);
 
-  // Sync active tab with ?video query param in URL.
-  // If videoParam is valid, update activeVideoId state.
-  useEffect(() => {
-    if (isValidVideoId(videoParam)) {
-      setActiveVideoId(videoParam);
-    }
-  }, [videoParam]);
+  // This block checks if the `video` query parameter in the URL (`paramVideoId`)
+  // has changed compared to what we last saw (`lastParamVideoId`). If it has changed,
+  // we update `lastParamVideoId` to the new value, and reset `selectedVideoId` to null.
+  // This means that the tab selection should now follow the new value from the URL.
+  if (paramVideoId !== lastParamVideoId) {
+    setLastParamVideoId(paramVideoId);
+    setSelectedVideoId(null);
+  }
+
+  const activeVideoId =
+    selectedVideoId ?? paramVideoId ?? initialVideoId ?? DEFAULT_VIDEO_ID;
 
   const activeVideo =
-    HOW_IT_WORKS_VIDEOS.find((video) => video.id === activeVideoId) ??
-    HOW_IT_WORKS_VIDEOS[0];
+    HOW_IT_WORKS_VIDEOS.find((video) => {
+      return video.id === activeVideoId;
+    }) ?? HOW_IT_WORKS_VIDEOS[0];
 
   function handleTabChange(value: string) {
     const videoId = value as HowItWorksVideoId;
-    setActiveVideoId(videoId);
+    setSelectedVideoId(videoId);
     umamiTrackEvent(`how-it-works-video-tab-${value}`);
     onVideoChange?.(videoId);
   }
@@ -115,17 +119,19 @@ export function HowItWorksVideos({
         <div className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
           <Tabs value={activeVideoId} onValueChange={handleTabChange}>
             <TabsList className="inline-flex h-auto w-max min-w-full justify-center gap-0.5 sm:min-w-0 sm:gap-1">
-              {HOW_IT_WORKS_VIDEOS.map((video) => (
-                <TabsTrigger
-                  key={video.id}
-                  value={video.id}
-                  className="shrink-0 whitespace-nowrap px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm"
-                  data-testid={`how-it-works-tab-${video.id}`}
-                >
-                  <span className="sm:hidden">{video.tabLabelShort}</span>
-                  <span className="hidden sm:inline">{video.tabLabel}</span>
-                </TabsTrigger>
-              ))}
+              {HOW_IT_WORKS_VIDEOS.map((video) => {
+                return (
+                  <TabsTrigger
+                    key={video.id}
+                    value={video.id}
+                    className="shrink-0 whitespace-nowrap px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm"
+                    data-testid={`how-it-works-tab-${video.id}`}
+                  >
+                    <span className="sm:hidden">{video.tabLabelShort}</span>
+                    <span className="hidden sm:inline">{video.tabLabel}</span>
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
           </Tabs>
         </div>
@@ -154,7 +160,9 @@ export function HowItWorksVideos({
           rel="noopener noreferrer"
           className="font-semibold text-slate-800 underline decoration-slate-400 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-500"
           data-testid="how-it-works-discord"
-          onClick={() => umamiTrackEvent("how-it-works-discord-click")}
+          onClick={() => {
+            return umamiTrackEvent("how-it-works-discord-click");
+          }}
         >
           Discord
         </a>{" "}
@@ -165,7 +173,9 @@ export function HowItWorksVideos({
           rel="noopener noreferrer"
           className="font-semibold text-slate-800 underline decoration-slate-400 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-500"
           data-testid="how-it-works-reddit"
-          onClick={() => umamiTrackEvent("how-it-works-reddit-click")}
+          onClick={() => {
+            return umamiTrackEvent("how-it-works-reddit-click");
+          }}
         >
           Reddit
         </a>{" "}

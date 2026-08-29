@@ -1,5 +1,6 @@
-import { LINKEDIN_URL, TWITTER_URL } from "@/config";
 import { expect, test } from "@playwright/test";
+
+import { LINKEDIN_URL, TWITTER_URL } from "@/config";
 
 test.describe("Founder page", () => {
   test("renders the founder page and its links", async ({ page }) => {

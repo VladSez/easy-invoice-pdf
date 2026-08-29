@@ -1,6 +1,7 @@
+import { expect, test, type Locator, type Page } from "@playwright/test";
+
 import { DEFAULT_BUYER_DATA, DEFAULT_SELLER_DATA } from "@/app/constants";
 import type { BuyerData, SellerData } from "@/app/schema";
-import { expect, test, type Locator, type Page } from "@playwright/test";
 
 /**
  * Sellers and buyers are managed through the same UI: a "New <party>" dialog, a
@@ -107,10 +108,9 @@ async function savePartyDialog(page: Page, party: Party) {
  * asserts that data exists, and parses the JSON into an array of SellerData or BuyerData objects.
  */
 async function readStoredParties(page: Page, party: Party) {
-  const storedData = (await page.evaluate(
-    (key) => localStorage.getItem(key),
-    PARTY_CONFIG[party].storageKey,
-  )) as string;
+  const storedData = (await page.evaluate((key) => {
+    return localStorage.getItem(key);
+  }, PARTY_CONFIG[party].storageKey)) as string;
 
   expect(storedData).toBeTruthy();
 

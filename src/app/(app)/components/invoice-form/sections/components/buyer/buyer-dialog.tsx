@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -34,6 +34,20 @@ import { ConfirmDiscardDialog } from "../confirm-discard-dialog";
 import { BUYERS_LOCAL_STORAGE_KEY } from "./buyer-management";
 
 const BUYER_FORM_ID = "buyer-form";
+
+/** The buyer form with nothing filled in yet */
+const EMPTY_BUYER_FORM_VALUES = {
+  id: "",
+  name: "",
+  address: "",
+  vatNo: "",
+  vatNoLabelText: "VAT no",
+  email: "",
+  emailFieldIsVisible: true,
+  vatNoFieldIsVisible: true,
+  notes: "",
+  notesFieldIsVisible: true,
+} as const satisfies BuyerData;
 
 interface BuyerDialogProps {
   isOpen: boolean;
@@ -111,69 +125,73 @@ export function BuyerDialog({
   >(null);
 
   /**
-   * Synchronizes form values based on the "Use current invoice data" switch state.
+   * Resets the dialog form to the buyer it was opened with, or to an empty
+   * form when adding a new one.
    *
-   * When creating a new buyer (not in edit mode):
-   * - If switch is ON: Populates the form with current invoice buyer data (formValues)
-   *   to allow users to save the current invoice's buyer information as a new saved buyer.
-   * - If switch is OFF: Resets the form to empty/default values or initialData
-   *   to allow users to enter completely new buyer information from scratch.
-   *
-   * This effect does not run in edit mode to prevent overwriting the buyer being edited.
+   * `form.reset()` with no arguments cannot be used for this: react-hook-form treats
+   * the values of the last `reset(values)` call as the new defaults, so after a
+   * pre-fill it would restore the pre-filled values instead of clearing them.
    */
-  useEffect(() => {
-    // Switch is ON: Pre-fill form with current invoice buyer data
-    if (shouldApplyInlineFormValues && formValues && !isEditMode) {
-      form.reset({
-        ...form.getValues(),
-        ...formValues,
-      });
+  function resetFormToInitialValues() {
+    form.reset(initialData ?? EMPTY_BUYER_FORM_VALUES);
+  }
+
+  /**
+   * Applies the "Use current invoice data" switch to the dialog form.
+   *
+   * Switch ON: fills the form with the current invoice buyer data, so the invoice's
+   * buyer can be saved as a new buyer.
+   * Switch OFF: clears the form back to the initial (or empty) buyer.
+   *
+   * Leaves the form alone in edit mode, so the buyer being edited is never overwritten.
+   */
+  function applyPrefillSwitch(newValue: boolean) {
+    setShouldApplyInlineFormValues(newValue);
+
+    if (isEditMode) {
+      return;
     }
 
-    // Switch is OFF: Reset form to empty state or initial data
-    else if (!shouldApplyInlineFormValues && !isEditMode) {
-      form.reset(
-        initialData ?? {
-          id: "",
-          name: "",
-          address: "",
-          vatNo: "",
-          vatNoLabelText: "VAT no",
-          email: "",
-          emailFieldIsVisible: true,
-          vatNoFieldIsVisible: true,
-          notes: "",
-          notesFieldIsVisible: true,
-        },
-      );
+    // Switch is ON: pre-fill the form with the current invoice buyer data
+    if (newValue) {
+      if (formValues) {
+        form.reset({
+          ...form.getValues(),
+          ...formValues,
+        });
+      }
+      return;
     }
-  }, [shouldApplyInlineFormValues, formValues, initialData, isEditMode, form]);
+
+    // Switch is OFF: reset the form to the initial data, or to an empty form
+    resetFormToInitialValues();
+  }
 
   /**
    * Guards the pre-fill switch toggle against dirty form state.
    *
    * When the form has unsaved changes, opens the ConfirmDiscardDialog before
-   * applying the switch change. Only updates shouldApplyFormValues (and thus
-   * triggers form.reset via the effect above) after the user confirms discard.
+   * applying the switch change. Only applies the switch after the user confirms
+   * discard.
    */
   function handlePrefillSwitchToggle(newValue: boolean) {
     if (isDirty) {
       setPendingDiscardAction(() => {
         return () => {
-          return setShouldApplyInlineFormValues(newValue);
+          return applyPrefillSwitch(newValue);
         };
       });
       setIsConfirmDiscardDialogOpen(true);
       return;
     }
-    setShouldApplyInlineFormValues(newValue);
+    applyPrefillSwitch(newValue);
   }
 
   /**
    * Closes the buyer dialog and resets the form to its default state.
    */
   function closeDialog() {
-    form.reset();
+    resetFormToInitialValues();
 
     // by default, we don't want to apply the inline form values to the dialog form
     setShouldApplyInlineFormValues(false);

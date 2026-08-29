@@ -1,5 +1,6 @@
-import type { SupportedCurrencies, SupportedLanguages } from "@/app/schema";
 import * as Sentry from "@sentry/nextjs";
+
+import type { SupportedCurrencies, SupportedLanguages } from "@/app/schema";
 
 export function formatCurrency({
   amount,

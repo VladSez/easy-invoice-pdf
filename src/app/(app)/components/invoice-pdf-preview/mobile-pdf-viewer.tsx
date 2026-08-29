@@ -1,10 +1,9 @@
+import * as Sentry from "@sentry/nextjs";
+import { useState } from "react";
 import { Document, Page } from "react-pdf";
 
 import { useInvoicePdfInstance } from "@/app/(app)/contexts/invoice-pdf-instance-context";
-
 import { BUG_REPORT_URL } from "@/config";
-import * as Sentry from "@sentry/nextjs";
-import { useState } from "react";
 
 // This import registers the PDF.js worker globally so that react-pdf can render PDFs in the browser.
 // https://github.com/wojtekmaj/react-pdf/issues/1824#issuecomment-2266150831
@@ -96,7 +95,9 @@ export const MobileInvoicePDFViewer = () => {
         console.error(error);
 
         // Force a re-render of the PDF viewer to try to recover from error
-        setKey((prev) => prev + 1);
+        setKey((prev) => {
+          return prev + 1;
+        });
       }}
       error={
         <div className="flex h-[520px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
@@ -118,30 +119,32 @@ export const MobileInvoicePDFViewer = () => {
         </div>
       }
     >
-      {Array.from({ length: numPages }, (_, index) => (
-        <Page
-          key={`page-${index + 1}`}
-          // we add some space between pages to make it easier to see the page break
-          className={
-            index < numPages - 1 ? "border-b-[15px] border-gray-200" : ""
-          }
-          pageNumber={index + 1}
-          error={"Something went wrong"}
-          loading={
-            <div className="flex h-[520px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-              <div className="text-center">
-                <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-                <p className="text-gray-600">Loading PDF viewer...</p>
+      {Array.from({ length: numPages }, (_, index) => {
+        return (
+          <Page
+            key={`page-${index + 1}`}
+            // we add some space between pages to make it easier to see the page break
+            className={
+              index < numPages - 1 ? "border-b-[15px] border-gray-200" : ""
+            }
+            pageNumber={index + 1}
+            error={"Something went wrong"}
+            loading={
+              <div className="flex h-[520px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+                <div className="text-center">
+                  <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+                  <p className="text-gray-600">Loading PDF viewer...</p>
+                </div>
               </div>
-            </div>
-          }
-          onLoadError={(error) => {
-            Sentry.captureException(error);
-          }}
-          height={450}
-          width={650}
-        />
-      ))}
+            }
+            onLoadError={(error) => {
+              Sentry.captureException(error);
+            }}
+            height={450}
+            width={650}
+          />
+        );
+      })}
     </Document>
   );
 };

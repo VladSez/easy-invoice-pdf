@@ -1,6 +1,5 @@
 "use client";
 
-import { type InvoiceData } from "@/app/schema";
 import {
   Document,
   Font,
@@ -10,10 +9,13 @@ import {
   View,
   type Styles,
 } from "@react-pdf/renderer/lib/react-pdf.browser";
+import dayjs from "dayjs";
 
 import { InvoiceQRCode } from "@/app/(app)/components/invoice-templates/common/invoice-qr-code";
 import { formatCurrency } from "@/app/(app)/utils/format-currency";
+import { type InvoiceData } from "@/app/schema";
 import { INVOICE_PDF_FONTS } from "@/config";
+
 import { StripeDueAmount } from "./stripe-due-amount";
 import { StripeFooter } from "./stripe-footer";
 import { StripeInvoiceHeader } from "./stripe-invoice-header";
@@ -21,8 +23,6 @@ import { StripeInvoiceInfo } from "./stripe-invoice-info";
 import { StripeItemsTable } from "./stripe-items-table";
 import { StripeSellerBuyerInfo } from "./stripe-seller-buyer-info";
 import { StripeVatSummaryTableTotals } from "./stripe-totals";
-
-import dayjs from "dayjs";
 
 import "dayjs/locale/de";
 import "dayjs/locale/en";

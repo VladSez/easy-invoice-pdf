@@ -13,6 +13,7 @@
     "jsx": "preserve",
     "incremental": true,
     "allowArbitraryExtensions": true,
+    "noImplicitReturns": true,
     "plugins": [
       {
         "name": "next"

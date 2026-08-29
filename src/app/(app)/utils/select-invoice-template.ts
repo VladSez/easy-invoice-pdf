@@ -22,9 +22,12 @@ export function selectInvoiceTemplate(
   // to ignore this field. Treat either template's translated value as a default
   // so those drafts receive the correct heading without changing custom text.
   const hasKnownDefaultInvoiceNumberLabel = SUPPORTED_TEMPLATES.some(
-    (supportedTemplate) =>
-      invoiceNumberObject?.label ===
-      getDefaultInvoiceNumberLabel(invoiceData.language, supportedTemplate),
+    (supportedTemplate) => {
+      return (
+        invoiceNumberObject?.label ===
+        getDefaultInvoiceNumberLabel(invoiceData.language, supportedTemplate)
+      );
+    },
   );
 
   if (!invoiceNumberObject || !hasKnownDefaultInvoiceNumberLabel) {

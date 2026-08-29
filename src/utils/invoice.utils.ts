@@ -1,9 +1,10 @@
-import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "@/app/schema";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
 import n2words from "n2words";
 import { toast } from "sonner";
 import { z } from "zod";
+
+import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "@/app/schema";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 
 /**
  * Get the amount in words (e.g. 123.45 -> "one hundred twenty-three and 45/100 dollars")

@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import {
   SUPPORTED_LANGUAGES,
   type SupportedLanguages,
@@ -199,7 +200,9 @@ export const translationSchema = z
     }
  */
 const languageToSchemaMap = Object.fromEntries(
-  SUPPORTED_LANGUAGES.map((lang) => [lang, translationSchema]),
+  SUPPORTED_LANGUAGES.map((lang) => {
+    return [lang, translationSchema];
+  }),
 );
 /**
  *Schema for all translations

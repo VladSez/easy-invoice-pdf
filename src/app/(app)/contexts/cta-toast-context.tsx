@@ -39,9 +39,9 @@ const CTAToastContext = createContext<CTAToastContextValue | undefined>(
 );
 
 export function CTAToastProvider({ children }: { children: React.ReactNode }) {
-  const [hasTriggeredCTAAction, setHasTriggeredCTAAction] = useState(() =>
-    isCTAToastInCooldown(),
-  );
+  const [hasTriggeredCTAAction, setHasTriggeredCTAAction] = useState(() => {
+    return isCTAToastInCooldown();
+  });
   const [interactionCount, setInteractionCount] = useState(0);
 
   const markCTAActionTriggered = useCallback(() => {
@@ -50,7 +50,9 @@ export function CTAToastProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const incrementInteractionCount = useCallback(() => {
-    setInteractionCount((prevCount) => prevCount + 1);
+    setInteractionCount((prevCount) => {
+      return prevCount + 1;
+    });
   }, []);
 
   return (

@@ -1,5 +1,6 @@
-import { type routing } from "@/i18n/routing";
 import type formats from "@/i18n/request";
+import { type routing } from "@/i18n/routing";
+
 import type EnMessages from "./messages/en.json";
 
 type Locale = (typeof routing.locales)[number];

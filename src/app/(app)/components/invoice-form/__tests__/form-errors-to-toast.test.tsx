@@ -1,19 +1,23 @@
 // @vitest-environment happy-dom
 
-import type { InvoiceData } from "@/app/schema";
-import type { FieldErrors } from "react-hook-form";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
+import type { FieldErrors } from "react-hook-form";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { InvoiceData } from "@/app/schema";
 import "@testing-library/jest-dom/vitest";
 
-vi.mock("sonner", () => ({
-  toast: Object.assign(vi.fn(), {
-    error: vi.fn(),
-  }),
-}));
+vi.mock("sonner", () => {
+  return {
+    toast: Object.assign(vi.fn(), {
+      error: vi.fn(),
+    }),
+  };
+});
 
 import { toast } from "sonner";
+
 import { formErrorsToToast } from "../utils/form-errors-to-toast";
 
 function renderToastContent(content: unknown) {

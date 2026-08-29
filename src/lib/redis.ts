@@ -1,5 +1,6 @@
-import { env } from "@/env";
 import { Redis } from "@upstash/redis";
+
+import { env } from "@/env";
 
 /**
  * Redis client instance for Upstash Redis.

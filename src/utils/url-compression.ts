@@ -120,10 +120,9 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
  * Reverse mapping for decompression
  */
 const REVERSE_KEY_MAP = Object.fromEntries(
-  Object.entries(INVOICE_KEY_COMPRESSION_MAP).map(([key, value]) => [
-    value,
-    key,
-  ]),
+  Object.entries(INVOICE_KEY_COMPRESSION_MAP).map(([key, value]) => {
+    return [value, key];
+  }),
 ) as Record<string, keyof typeof INVOICE_KEY_COMPRESSION_MAP>;
 
 /**
@@ -152,7 +151,9 @@ function remapKeys<T>(
   }
 
   if (Array.isArray(obj)) {
-    return obj.map(remapKeys) as T extends Record<string, unknown>
+    return obj.map((item: unknown) => {
+      return remapKeys(item);
+    }) as T extends Record<string, unknown>
       ? Record<string, unknown>
       : T extends unknown[]
         ? unknown[]
@@ -202,7 +203,9 @@ function restoreKeys<T>(
   }
 
   if (Array.isArray(obj)) {
-    return obj.map(restoreKeys) as T extends Record<string, unknown>
+    return obj.map((item: unknown) => {
+      return restoreKeys(item);
+    }) as T extends Record<string, unknown>
       ? Record<string, unknown>
       : T extends unknown[]
         ? unknown[]

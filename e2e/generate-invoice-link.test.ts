@@ -1,5 +1,6 @@
-import type { BuyerData, SellerData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
+
+import type { BuyerData, SellerData } from "@/app/schema";
 
 const TEST_SELLER_DATA = {
   name: "TEST SELLER COMPANY",
@@ -178,7 +179,9 @@ test.describe("Generate Invoice Link (Get link)", () => {
     await page.getByRole("button", { name: "Get link" }).click();
 
     // Wait for URL to update with share data
-    await page.waitForURL((url) => url.searchParams.has("data"));
+    await page.waitForURL((url) => {
+      return url.searchParams.has("data");
+    });
 
     // Get the current URL which should now contain the share data
     const sharedUrl = page.url();
@@ -665,7 +668,9 @@ test.describe("Generate Invoice Link (Get link)", () => {
     ).toBeVisible();
 
     // Wait for URL to update with share data
-    await page.waitForURL((url) => url.searchParams.has("data"));
+    await page.waitForURL((url) => {
+      return url.searchParams.has("data");
+    });
 
     // Get the current URL which should now contain the share data
     const sharedUrl = page.url();

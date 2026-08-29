@@ -229,6 +229,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   // TODO: rewrite to subscribe()? https://react-hook-form.com/docs/useform/subscribe
   // subscribe to form changes to regenerate pdf on every input change
   useEffect(() => {
+    // oxlint-disable-next-line react/incompatible-library
     const subscription = watch((value) => {
       void debouncedRegeneratePdfOnFormChange(value as unknown as InvoiceData);
     });

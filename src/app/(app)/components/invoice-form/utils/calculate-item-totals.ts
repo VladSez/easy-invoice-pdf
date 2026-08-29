@@ -15,7 +15,9 @@ export function calculateItemTotals(
 ): InvoiceItemData | null {
   if (!item) return null;
 
+  // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- form inputs and shared URLs can hand these over as strings, the schema type says number
   const amount = Number(item.amount) || 0;
+  // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- same as above
   const netPrice = Number(item.netPrice) || 0;
   const calculatedNetAmount = amount * netPrice;
   const formattedNetAmount = Number(calculatedNetAmount.toFixed(2));

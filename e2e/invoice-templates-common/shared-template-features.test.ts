@@ -1,6 +1,7 @@
+import type { Locator, Page } from "@playwright/test";
+
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import type { SupportedTemplates } from "@/app/schema";
-import type { Locator, Page } from "@playwright/test";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { expect, test } from "../utils/extended-playwright-test";
@@ -142,9 +143,12 @@ const MULTI_PAGE_ITEMS = {
   default: {
     taxLabel: "Sales Tax",
     taxRateFieldName: "Sales Tax Rate",
-    itemName: (itemNumber: number) =>
-      `Item ${itemNumber}. Some long item name that should be wrapped to the next line. Some long item name that should be wrapped to the next line. Some long item name that should be wrapped to the next line.`,
-    netPrice: (itemNumber: number) => `${1000 * (itemNumber - 1)}`,
+    itemName: (itemNumber: number) => {
+      return `Item ${itemNumber}. Some long item name that should be wrapped to the next line. Some long item name that should be wrapped to the next line. Some long item name that should be wrapped to the next line.`;
+    },
+    netPrice: (itemNumber: number) => {
+      return `${1000 * (itemNumber - 1)}`;
+    },
   },
   stripe: {
     taxLabel: null,
@@ -152,11 +156,14 @@ const MULTI_PAGE_ITEMS = {
     // Add longer descriptions only to odd-numbered items to test mixed content layout
     // This verifies that the PDF template handles varying text lengths correctly
     // and maintains proper spacing between short and long item descriptions
-    itemName: (itemNumber: number) =>
-      itemNumber % 2 === 1
+    itemName: (itemNumber: number) => {
+      return itemNumber % 2 === 1
         ? `Item ${itemNumber} - Professional consulting services including detailed analysis, comprehensive reporting, and ongoing support for enterprise-level implementations`
-        : `Item ${itemNumber}`,
-    netPrice: (itemNumber: number) => `${100 * (itemNumber - 1)}`,
+        : `Item ${itemNumber}`;
+    },
+    netPrice: (itemNumber: number) => {
+      return `${100 * (itemNumber - 1)}`;
+    },
   },
 } as const satisfies Record<Template, unknown>;
 

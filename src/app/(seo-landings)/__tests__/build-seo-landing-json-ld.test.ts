@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 
+import { JSON_LD_IDS } from "@/lib/seo/json-ld-ids";
+
 import { buildSeoLandingJsonLd } from "../build-seo-landing-json-ld";
 import { SEO_LANDING_DEFINITIONS } from "../seo-landing-definitions";
-import { JSON_LD_IDS } from "@/lib/seo/json-ld-ids";
 
 describe("buildSeoLandingJsonLd", () => {
   it("links no-login page mainEntity to FAQPage with account and pricing questions first", () => {

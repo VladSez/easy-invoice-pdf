@@ -1,4 +1,5 @@
 import { Ratelimit } from "@upstash/ratelimit";
+
 import { redis } from "./redis";
 
 /**
@@ -15,7 +16,9 @@ export const ipLimiter =
   process.env.NODE_ENV === "development"
     ? {
         // in development mode, we don't want to rate limit
-        limit: async () => ({ success: true }),
+        limit: async () => {
+          return { success: true };
+        },
       }
     : new Ratelimit({
         redis,

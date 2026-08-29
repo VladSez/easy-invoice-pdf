@@ -5,8 +5,9 @@ import {
 
 export const dynamic = "force-static";
 
-export const generateMetadata = () =>
-  buildSeoLandingMetadata("invoice-template-pdf");
+export const generateMetadata = () => {
+  return buildSeoLandingMetadata("invoice-template-pdf");
+};
 
 export default function InvoiceTemplatePdfPage() {
   return <SeoLandingRoutePage slug="invoice-template-pdf" />;

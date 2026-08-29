@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { Footer } from "@/app/(components)/footer";
 import { Header } from "@/app/(components)/header";
 import {
@@ -10,7 +12,7 @@ import {
   FOUNDER_PAGE_TITLE,
   FOUNDER_PAGE_URL,
 } from "@/lib/seo/site-entities";
-import type { Metadata } from "next";
+
 import { FounderJsonLd } from "./founder-json-ld";
 
 export const dynamic = "force-static";

@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+
 import { getNextMondayInWarsaw, getWarsawWeekday } from "../warsaw-time";
 
 // The instants below are the actual moments the schedule fires:

@@ -1,6 +1,7 @@
-import type { ChangelogEntry } from "./utils";
-import { buildChangelogPostJsonLdGraph } from "./build-changelog-json-ld";
 import { JsonLdScript } from "@/lib/seo/render-json-ld";
+
+import { buildChangelogPostJsonLdGraph } from "./build-changelog-json-ld";
+import type { ChangelogEntry } from "./utils";
 
 interface ChangelogPostJsonLdProps {
   entry: ChangelogEntry;

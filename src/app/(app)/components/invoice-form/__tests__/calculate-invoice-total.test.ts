@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
+
 import type { InvoiceItemData } from "@/app/schema";
 import { MOCK_INVOICE_ITEM_DATA } from "@/utils/__tests__/data";
+
 import {
   calculateInvoiceTotal,
   getSafeNumber,
@@ -150,13 +152,15 @@ describe("calculateInvoiceTotal", () => {
 
     // Without coercion, `0 + "10"` becomes `"010"`, then string concat continues
     // and `.toFixed` throws: TypeError: f.reduce(...).toFixed is not a function
-    expect(() =>
-      Number(
+    expect(() => {
+      return Number(
         rawFormItems
-          .reduce((sum, item) => sum + item.preTaxAmount, 0)
+          .reduce((sum, item) => {
+            return sum + item.preTaxAmount;
+          }, 0)
           .toFixed(2),
-      ),
-    ).toThrow(TypeError);
+      );
+    }).toThrow(TypeError);
 
     expect(calculateInvoiceTotal(rawFormItems)).toBe(30);
   });

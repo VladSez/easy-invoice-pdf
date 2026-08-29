@@ -3,14 +3,10 @@
 import { useInvoicePdfInstance } from "@/app/(app)/contexts/invoice-pdf-instance-context";
 import { BUG_REPORT_URL } from "@/config";
 
-export function DesktopInvoicePDFViewer({
-  errorWhileGeneratingPdfIsShown,
-}: {
-  errorWhileGeneratingPdfIsShown: boolean;
-}) {
-  const { url } = useInvoicePdfInstance();
+export function DesktopInvoicePDFViewer() {
+  const { url, error } = useInvoicePdfInstance();
 
-  if (errorWhileGeneratingPdfIsShown) {
+  if (error) {
     return (
       <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
         <div className="text-center">

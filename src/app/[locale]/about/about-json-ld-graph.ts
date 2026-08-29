@@ -1,8 +1,7 @@
-import { PROD_WEBSITE_URL } from "@/config";
 import type { Locale } from "next-intl";
-import type Messages from "../../../../messages/en.json";
 import type { Graph } from "schema-dts";
 
+import { PROD_WEBSITE_URL } from "@/config";
 import { buildBreadcrumbList } from "@/lib/seo/breadcrumb";
 import {
   JSON_LD_IDS,
@@ -10,10 +9,10 @@ import {
   pageFaqId,
   pageWebPageId,
 } from "@/lib/seo/json-ld-ids";
-
-import { ABOUT_FAQ_ITEM_KEYS } from "./about-faq-item-keys";
-
 import { toSchemaLanguage } from "@/lib/seo/locale-utils";
+
+import type Messages from "../../../../messages/en.json";
+import { ABOUT_FAQ_ITEM_KEYS } from "./about-faq-item-keys";
 
 /**
  * Builds a JSON-LD graph for the about page with schema.org structured data.

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 /* eslint-disable @next/next/no-html-link-for-pages */
 import { FooterLaunchBadges } from "@/app/(components)/footer-launch-badges";
 import { SEO_FOOTER_SOLUTION_LINKS } from "@/app/(seo-landings)/seo-landing-footer-links";
@@ -10,7 +12,6 @@ import {
   REDDIT_COMMUNITY_URL,
   TWITTER_URL,
 } from "@/config";
-import Link from "next/link";
 
 interface FooterProps {
   links?: React.ReactNode;
@@ -105,16 +106,18 @@ export function Footer({ links, translations }: FooterProps) {
                   {aboutHeading}
                 </h3>
                 <ul className="grid grid-cols-2 gap-x-6 gap-y-2">
-                  {SUPPORTED_LANGUAGES.map((lang) => (
-                    <li key={lang}>
-                      <Link
-                        href={`/${lang}/about`}
-                        className="text-sm text-slate-500 hover:text-slate-900"
-                      >
-                        {LANGUAGE_TO_NATIVE_LABEL[lang]}
-                      </Link>
-                    </li>
-                  ))}
+                  {SUPPORTED_LANGUAGES.map((lang) => {
+                    return (
+                      <li key={lang}>
+                        <Link
+                          href={`/${lang}/about`}
+                          className="text-sm text-slate-500 hover:text-slate-900"
+                        >
+                          {LANGUAGE_TO_NATIVE_LABEL[lang]}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
               <div className="space-y-5" data-testid="footer-solutions-links">
@@ -122,16 +125,18 @@ export function Footer({ links, translations }: FooterProps) {
                   {solutionsHeading}
                 </h3>
                 <ul className="space-y-2">
-                  {SEO_FOOTER_SOLUTION_LINKS.map(({ slug, label }) => (
-                    <li key={slug}>
-                      <Link
-                        href={`/${slug}`}
-                        className="text-sm text-slate-500 hover:text-slate-900"
-                      >
-                        {label}
-                      </Link>
-                    </li>
-                  ))}
+                  {SEO_FOOTER_SOLUTION_LINKS.map(({ slug, label }) => {
+                    return (
+                      <li key={slug}>
+                        <Link
+                          href={`/${slug}`}
+                          className="text-sm text-slate-500 hover:text-slate-900"
+                        >
+                          {label}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>
@@ -217,19 +222,21 @@ export function FooterLinkGroup({
         {heading}
       </p>
       <ul className="space-y-2">
-        {links.map((link) => (
-          <li key={`${heading}-${link.label}`}>
-            <Link
-              href={link.href}
-              className={FOOTER_LINK_CLASSNAME}
-              {...(link.external
-                ? { target: "_blank", rel: "noopener noreferrer" }
-                : {})}
-            >
-              {link.label}
-            </Link>
-          </li>
-        ))}
+        {links.map((link) => {
+          return (
+            <li key={`${heading}-${link.label}`}>
+              <Link
+                href={link.href}
+                className={FOOTER_LINK_CLASSNAME}
+                {...(link.external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
+              >
+                {link.label}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

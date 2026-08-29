@@ -61,6 +61,7 @@ export function CurrencyCombobox({
    * Dependencies: Runs on changes to `open` or `value`.
    */
   useEffect(() => {
+    // oxlint-disable-next-line react-you-might-not-need-an-effect/no-event-handler
     if (!open || !value) return;
 
     requestAnimationFrame(() => {

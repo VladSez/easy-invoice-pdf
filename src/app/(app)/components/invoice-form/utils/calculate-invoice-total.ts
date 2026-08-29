@@ -31,7 +31,9 @@ export function calculateInvoiceTotal(
 ) {
   return Number(
     items
-      .reduce((sum, item) => sum + getSafeNumber(item.preTaxAmount), 0)
+      .reduce((sum, item) => {
+        return sum + getSafeNumber(item.preTaxAmount);
+      }, 0)
       .toFixed(2),
   );
 }

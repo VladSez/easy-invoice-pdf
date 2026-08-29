@@ -18,7 +18,7 @@ function storageAvailable(type: "localStorage" | "sessionStorage") {
       e.name === "QuotaExceededError" &&
       // acknowledge QuotaExceededError only if there's something already stored
       storage &&
-      storage.length !== 0
+      storage.length > 0
     );
   }
 }

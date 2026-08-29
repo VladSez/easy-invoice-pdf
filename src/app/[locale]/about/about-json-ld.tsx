@@ -1,7 +1,9 @@
-import type Messages from "../../../../messages/en.json";
 import type { Locale } from "next-intl";
-import { buildAboutJsonLdGraph } from "./about-json-ld-graph";
+
 import { JsonLdScript } from "@/lib/seo/render-json-ld";
+
+import type Messages from "../../../../messages/en.json";
+import { buildAboutJsonLdGraph } from "./about-json-ld-graph";
 
 /**
  * Renders a JSON-LD script tag for the about page with structured schema.org data.
@@ -12,7 +14,9 @@ import { JsonLdScript } from "@/lib/seo/render-json-ld";
  */
 export async function AboutJsonLd({ locale }: { locale: Locale }) {
   const messages = await import(`../../../../messages/${locale}.json`).then(
-    (module: { default: typeof Messages }) => module.default,
+    (module: { default: typeof Messages }) => {
+      return module.default;
+    },
   );
 
   const graph = buildAboutJsonLdGraph(messages, locale);

@@ -1,7 +1,7 @@
 "use client";
 
-import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";
+import { z } from "zod";
 
 interface UmamiEventData {
   [key: string]: string | number | boolean | undefined;

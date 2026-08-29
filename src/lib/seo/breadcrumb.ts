@@ -15,11 +15,13 @@ export function buildBreadcrumbList(
   return {
     "@type": "BreadcrumbList",
     "@id": pageBreadcrumbId(pageUrl),
-    itemListElement: items.map((crumb, index) => ({
-      "@type": "ListItem" as const,
-      position: index + 1,
-      name: crumb.name,
-      ...(crumb.item ? { item: crumb.item } : {}),
-    })),
+    itemListElement: items.map((crumb, index) => {
+      return {
+        "@type": "ListItem" as const,
+        position: index + 1,
+        name: crumb.name,
+        ...(crumb.item ? { item: crumb.item } : {}),
+      };
+    }),
   };
 }

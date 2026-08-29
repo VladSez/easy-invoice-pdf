@@ -1,9 +1,10 @@
 "use client";
 
-import type { ChangelogSummary } from "@/app/changelog/utils";
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import { shouldShowChangelogPopup } from "@/app/(app)/utils/changelog-seen-storage";
 import { hasSeenWelcomePopup } from "@/app/(app)/utils/welcome-popup-seen-storage";
-import { useCallback, useEffect, useRef, useState } from "react";
+import type { ChangelogSummary } from "@/app/changelog/utils";
 
 /** Wait before showing so the page can settle first */
 const SHOW_DELAY_MS = 1_500;
@@ -54,53 +55,37 @@ export function useChangelogUpdatePopup({
   isViewingSharedInvoice,
   isMobile,
 }: UseChangelogUpdatePopupOptions): UseChangelogUpdatePopupResult {
-  const [isOpen, setIsOpen] = useState(false);
-  const [variant, setVariant] = useState<AppUpdatePopupVariant | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
+  /** The popup the timer below decided to show, if any */
+  const [shownVariant, setShownVariant] =
+    useState<AppUpdatePopupVariant | null>(null);
+  const [isDismissed, setIsDismissed] = useState(false);
   /** Blocks changelog popup in same session after welcome was shown */
   const skipChangelogThisSessionRef = useRef(false);
 
   const dismiss = useCallback(() => {
-    setIsOpen(false);
+    setIsDismissed(true);
   }, []);
 
   useEffect(() => {
-    // Never show popup on mobile
-    if (isMobile) {
-      setIsMounted(false);
-      setIsOpen(false);
-      setVariant(null);
+    // Never show popup on mobile or when viewing a shared invoice
+    if (isMobile || isViewingSharedInvoice) {
       return;
     }
 
-    // Never show popup if viewing a shared invoice
-    if (isViewingSharedInvoice) {
-      return;
-    }
-
-    // Determine which popup (welcome/changelog) to show, if any
-    const nextVariant = resolvePopupVariant(
-      latestChangelog,
-      skipChangelogThisSessionRef.current,
-    );
-
-    // If no popup needed, reset state and exit
-    if (!nextVariant) {
-      setIsMounted(false);
-      setIsOpen(false);
-      setVariant(null);
-      return;
-    }
-
-    // Delay showing the popup for a nicer UX
+    // Delay showing the popup for a nicer UX. Which popup (welcome/changelog) to
+    // show is decided when the timer fires, so the decision reflects what the user
+    // has seen by then - and resolving to `null` clears a decision that has gone stale.
     const timer = window.setTimeout(() => {
+      const nextVariant = resolvePopupVariant(
+        latestChangelog,
+        skipChangelogThisSessionRef.current,
+      );
+
       if (nextVariant === "welcome") {
         skipChangelogThisSessionRef.current = true;
       }
 
-      setVariant(nextVariant);
-      setIsMounted(true);
-      setIsOpen(true);
+      setShownVariant(nextVariant);
     }, SHOW_DELAY_MS);
 
     // Cleanup timeout if dependencies change/unmount
@@ -109,8 +94,12 @@ export function useChangelogUpdatePopup({
     };
   }, [isMobile, isViewingSharedInvoice, latestChangelog]);
 
+  // Switching to a mobile viewport hides an already shown popup, so this is
+  // derived rather than stored
+  const variant = isMobile ? null : shownVariant;
+
   return {
-    isOpen: isOpen && isMounted,
+    isOpen: variant !== null && !isDismissed,
     dismiss,
     variant,
     latestChangelog: variant === "changelog" ? latestChangelog : null,

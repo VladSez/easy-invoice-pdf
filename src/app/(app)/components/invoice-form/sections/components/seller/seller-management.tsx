@@ -1,5 +1,5 @@
+import * as Sentry from "@sentry/nextjs";
 import { Plus, Trash2, Pencil, AlertCircleIcon } from "lucide-react";
-
 import {
   useId,
   useState,
@@ -7,9 +7,12 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
-import { CustomTooltip } from "@/components/ui/tooltip";
-import { SelectNative } from "@/components/ui/select-native";
-import { Button } from "@/components/ui/button";
+import type { UseFormSetValue } from "react-hook-form";
+import { toast } from "sonner";
+
+import { SellerDialog } from "@/app/(app)/components/invoice-form/sections/components/seller/seller-dialog";
+import { DEFAULT_SELLER_DATA } from "@/app/constants";
+import { sellerSchema, type InvoiceData, type SellerData } from "@/app/schema";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,16 +23,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import type { UseFormSetValue } from "react-hook-form";
-import { sellerSchema, type InvoiceData, type SellerData } from "@/app/schema";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { SelectNative } from "@/components/ui/select-native";
+import { CustomTooltip } from "@/components/ui/tooltip";
 import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import * as Sentry from "@sentry/nextjs";
-import { DEFAULT_SELLER_DATA } from "@/app/constants";
-import { SellerDialog } from "@/app/(app)/components/invoice-form/sections/components/seller/seller-dialog";
+import { cn } from "@/lib/utils";
 
 export const SELLERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_SELLERS";
 
@@ -136,6 +136,7 @@ export function SellerManagement({
         return seller?.id === invoiceData?.seller?.id;
       });
 
+      // oxlint-disable-next-line react/set-state-in-effect react-you-might-not-need-an-effect/no-adjust-state-on-prop-change -- localStorage is an external system: the saved sellers cannot be derived during render, they have to be read after mount
       setSellersSelectOptions(validSellers);
       setSelectedSellerId(selectedSeller?.id ?? "");
     } catch (error) {
@@ -206,9 +207,9 @@ export function SellerManagement({
   // Update sellers when edited
   const handleSellerEdit = (editedSeller: SellerData) => {
     try {
-      const updatedSellers = sellersSelectOptions.map((seller) =>
-        seller.id === editedSeller.id ? editedSeller : seller,
-      );
+      const updatedSellers = sellersSelectOptions.map((seller) => {
+        return seller.id === editedSeller.id ? editedSeller : seller;
+      });
 
       localStorage.setItem(
         SELLERS_LOCAL_STORAGE_KEY,
@@ -248,9 +249,9 @@ export function SellerManagement({
 
     if (id) {
       setSelectedSellerId(id);
-      const selectedSeller = sellersSelectOptions.find(
-        (seller) => seller.id === id,
-      );
+      const selectedSeller = sellersSelectOptions.find((seller) => {
+        return seller.id === id;
+      });
 
       if (selectedSeller) {
         setValue("seller", selectedSeller);
@@ -279,9 +280,9 @@ export function SellerManagement({
   const handleDeleteSeller = () => {
     try {
       setSellersSelectOptions((prevSellers) => {
-        const updatedSellers = prevSellers.filter(
-          (seller) => seller.id !== selectedSellerId,
-        );
+        const updatedSellers = prevSellers.filter((seller) => {
+          return seller.id !== selectedSellerId;
+        });
 
         localStorage.setItem(
           SELLERS_LOCAL_STORAGE_KEY,
@@ -319,9 +320,9 @@ export function SellerManagement({
     }
   };
 
-  const activeSeller = sellersSelectOptions.find(
-    (seller) => seller.id === selectedSellerId,
-  );
+  const activeSeller = sellersSelectOptions.find((seller) => {
+    return seller.id === selectedSellerId;
+  });
 
   const hasSellers = sellersSelectOptions.length > 0;
 
@@ -354,11 +355,13 @@ export function SellerManagement({
                 title={activeSeller?.name}
               >
                 <option value="">No seller selected (default)</option>
-                {sellersSelectOptions.map((seller) => (
-                  <option key={seller.id} value={seller.id}>
-                    {seller.name}
-                  </option>
-                ))}
+                {sellersSelectOptions.map((seller) => {
+                  return (
+                    <option key={seller.id} value={seller.id}>
+                      {seller.name}
+                    </option>
+                  );
+                })}
               </SelectNative>
 
               {selectedSellerId ? (

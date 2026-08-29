@@ -1,8 +1,9 @@
+import { expect, test } from "@playwright/test";
+
 import {
   SEO_LANDING_DEFINITIONS,
   type SeoLandingSlug,
 } from "@/app/(seo-landings)/seo-landing-definitions";
-import { expect, test } from "@playwright/test";
 
 const SLUGS = Object.keys(SEO_LANDING_DEFINITIONS) as SeoLandingSlug[];
 

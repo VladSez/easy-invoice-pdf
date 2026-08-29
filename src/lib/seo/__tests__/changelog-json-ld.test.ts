@@ -64,7 +64,9 @@ describe("buildChangelogPostJsonLdGraph", () => {
         date: "2026-02-01",
         version: "1.0.0",
       },
-      Component: () => null,
+      Component: () => {
+        return null;
+      },
     });
 
     const parsed = JSON.parse(JSON.stringify(graph)) as {
@@ -94,7 +96,9 @@ describe("buildChangelogPostJsonLdGraph", () => {
         date: "2026-02-01",
         version: "1.0.0",
       },
-      Component: () => null,
+      Component: () => {
+        return null;
+      },
     });
 
     const parsed = JSON.parse(JSON.stringify(graph)) as {
