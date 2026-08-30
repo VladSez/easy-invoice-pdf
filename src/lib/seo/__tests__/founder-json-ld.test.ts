@@ -6,7 +6,8 @@ import { JSON_LD_IDS } from "../json-ld-ids";
 describe("buildFounderJsonLdGraph", () => {
   it("includes Person entity and ProfilePage with mainEntity pointing to person", () => {
     const graph = buildFounderJsonLdGraph();
-    const parsed = JSON.parse(JSON.stringify(graph)) as {
+    const serializedGraph = JSON.stringify(graph);
+    const parsed = JSON.parse(serializedGraph) as {
       "@graph": Array<Record<string, unknown>>;
     };
 

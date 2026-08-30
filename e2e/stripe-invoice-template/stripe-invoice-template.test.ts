@@ -199,21 +199,11 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    // Create a mock file input event with invalid file type
-    await page.evaluate(() => {
-      const fileInput = document.querySelector(
-        "#logoUpload",
-      ) as HTMLInputElement;
-      if (fileInput) {
-        // Create a mock file with invalid type
-        const file = new File(["test"], "test.txt", { type: "text/plain" });
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        fileInput.files = dataTransfer.files;
-
-        // Trigger change event
-        fileInput.dispatchEvent(new Event("change", { bubbles: true }));
-      }
+    // Upload a file that is not an image
+    await page.locator("#logoUpload").setInputFiles({
+      name: "test.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from("test"),
     });
 
     // Should show error toast
@@ -230,24 +220,11 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    // Create a mock file input event with large file
-    await page.evaluate(() => {
-      const fileInput = document.querySelector(
-        "#logoUpload",
-      ) as HTMLInputElement;
-      if (fileInput) {
-        // Create a mock file that's too large (4MB)
-        const largeContent = "a".repeat(4 * 1024 * 1024);
-        const file = new File([largeContent], "large-image.png", {
-          type: "image/png",
-        });
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        fileInput.files = dataTransfer.files;
-
-        // Trigger change event
-        fileInput.dispatchEvent(new Event("change", { bubbles: true }));
-      }
+    // Upload an image that is over the 3MB limit
+    await page.locator("#logoUpload").setInputFiles({
+      name: "large-image.png",
+      mimeType: "image/png",
+      buffer: Buffer.alloc(4 * 1024 * 1024, "a"),
     });
 
     // Should show error toast
@@ -351,6 +328,51 @@ test.describe("Stripe Invoice Template", () => {
     await expect(
       generalInfoSection.getByText("Click to upload your company logo"),
     ).toBeVisible();
+  });
+
+  test("validates the payment link URL", async ({ page }) => {
+    // Switch to Stripe template
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await expect(page).toHaveURL("/?template=stripe");
+
+    const generalInfoSection = page.getByTestId("general-information-section");
+    const paymentUrlInput = generalInfoSection.getByRole("textbox", {
+      name: "Payment Link URL",
+    });
+
+    // Something that is not a URL at all
+    await paymentUrlInput.fill("not-a-valid-url");
+
+    await expect(
+      generalInfoSection.getByText("Please enter a valid URL or leave empty"),
+    ).toBeVisible();
+
+    // A valid URL, but not an https one
+    await paymentUrlInput.fill("http://buy.stripe.com/test_payment_link");
+
+    await expect(
+      generalInfoSection.getByText("URL must start with https://"),
+    ).toBeVisible();
+
+    // A valid https URL clears the error
+    await paymentUrlInput.fill("https://buy.stripe.com/test_payment_link");
+
+    await expect(
+      generalInfoSection.getByText("URL must start with https://"),
+    ).toBeHidden();
+    await expect(
+      generalInfoSection.getByText("Please enter a valid URL or leave empty"),
+    ).toBeHidden();
+
+    // the field is optional, so an empty value is valid as well
+    await paymentUrlInput.fill("");
+
+    await expect(
+      generalInfoSection.getByText("Please enter a valid URL or leave empty"),
+    ).toBeHidden();
   });
 
   test("persists logo and payment URL in localStorage", async ({ page }) => {
@@ -913,6 +935,9 @@ test.describe("Stripe Invoice Template", () => {
     const parsedData = JSON.parse(storedData) as InvoiceData;
 
     expect(parsedData.logo).toBeTruthy();
+    expect(parsedData.stripePayOnlineUrl).toBe(
+      "https://buy.stripe.com/test_payment_link",
+    );
 
     await expectPdfScreenshot(page, {
       downloadDir,

@@ -6,19 +6,19 @@ describe("Telegram Schema Validation", () => {
   describe("telegramUpdateSchema", () => {
     it("should validate a valid Telegram update", () => {
       const validUpdate = {
-        update_id: 123456789,
+        update_id: 123_456_789,
         message: {
           message_id: 1,
           from: {
-            id: 987654321,
+            id: 987_654_321,
             is_bot: false,
             first_name: "John",
           },
           chat: {
-            id: 987654321,
+            id: 987_654_321,
             type: "private",
           },
-          date: 1234567890,
+          date: 1_234_567_890,
           text: "/generate",
         },
       } as const;
@@ -27,25 +27,25 @@ describe("Telegram Schema Validation", () => {
       // without an `if (result.success)` guard around the assertions.
       const parsed = telegramUpdateSchema.parse(validUpdate);
 
-      expect(parsed.update_id).toBe(123456789);
+      expect(parsed.update_id).toBe(123_456_789);
       expect(parsed.message?.text).toBe("/generate");
     });
 
     it("should validate message without entities", () => {
       const updateWithoutEntities = {
-        update_id: 123456789,
+        update_id: 123_456_789,
         message: {
           message_id: 1,
           from: {
-            id: 987654321,
+            id: 987_654_321,
             is_bot: false,
             first_name: "John",
           },
           chat: {
-            id: 987654321,
+            id: 987_654_321,
             type: "private",
           },
-          date: 1234567890,
+          date: 1_234_567_890,
           text: "/generate",
         },
       } as const;
@@ -60,15 +60,15 @@ describe("Telegram Schema Validation", () => {
         message: {
           message_id: 1,
           from: {
-            id: 987654321,
+            id: 987_654_321,
             is_bot: false,
             first_name: "John",
           },
           chat: {
-            id: 987654321,
+            id: 987_654_321,
             type: "private",
           },
-          date: 1234567890,
+          date: 1_234_567_890,
           text: "/generate",
         },
       } as const;
@@ -80,7 +80,7 @@ describe("Telegram Schema Validation", () => {
 
     it("should reject update with missing message", () => {
       const updateWithoutMessage = {
-        update_id: 123456789,
+        update_id: 123_456_789,
       } as const;
 
       const result = telegramUpdateSchema.safeParse(updateWithoutMessage);
@@ -90,7 +90,7 @@ describe("Telegram Schema Validation", () => {
 
     it("should reject update with invalid from object", () => {
       const invalidUpdate = {
-        update_id: 123456789,
+        update_id: 123_456_789,
         message: {
           message_id: 1,
           from: {
@@ -99,10 +99,10 @@ describe("Telegram Schema Validation", () => {
             first_name: "John",
           },
           chat: {
-            id: 987654321,
+            id: 987_654_321,
             type: "private",
           },
-          date: 1234567890,
+          date: 1_234_567_890,
           text: "/generate",
         },
       } as const;
@@ -113,19 +113,19 @@ describe("Telegram Schema Validation", () => {
 
     it("should reject update with extra unknown fields", () => {
       const updateWithExtra = {
-        update_id: 123456789,
+        update_id: 123_456_789,
         message: {
           message_id: 1,
           from: {
-            id: 987654321,
+            id: 987_654_321,
             is_bot: false,
             first_name: "John",
           },
           chat: {
-            id: 987654321,
+            id: 987_654_321,
             type: "private",
           },
-          date: 1234567890,
+          date: 1_234_567_890,
           text: "/generate",
         },
         extra_field: "should fail",
@@ -137,19 +137,19 @@ describe("Telegram Schema Validation", () => {
 
     it("should validate update with entities", () => {
       const updateWithEntities = {
-        update_id: 123456789,
+        update_id: 123_456_789,
         message: {
           message_id: 1,
           from: {
-            id: 987654321,
+            id: 987_654_321,
             is_bot: false,
             first_name: "John",
           },
           chat: {
-            id: 987654321,
+            id: 987_654_321,
             type: "private",
           },
-          date: 1234567890,
+          date: 1_234_567_890,
           text: "/generate",
           entities: [
             {
@@ -169,19 +169,19 @@ describe("Telegram Schema Validation", () => {
 
     it("should reject message with text other than '/generate'", () => {
       const updateWithInvalidCommand = {
-        update_id: 123456789,
+        update_id: 123_456_789,
         message: {
           message_id: 1,
           from: {
-            id: 987654321,
+            id: 987_654_321,
             is_bot: false,
             first_name: "John",
           },
           chat: {
-            id: 987654321,
+            id: 987_654_321,
             type: "private",
           },
-          date: 1234567890,
+          date: 1_234_567_890,
           text: "/start",
         },
       } as const;
@@ -192,19 +192,19 @@ describe("Telegram Schema Validation", () => {
 
     it("should reject message with empty text", () => {
       const updateWithEmptyText = {
-        update_id: 123456789,
+        update_id: 123_456_789,
         message: {
           message_id: 1,
           from: {
-            id: 987654321,
+            id: 987_654_321,
             is_bot: false,
             first_name: "John",
           },
           chat: {
-            id: 987654321,
+            id: 987_654_321,
             type: "private",
           },
-          date: 1234567890,
+          date: 1_234_567_890,
           text: "",
         },
       } as const;
@@ -215,19 +215,19 @@ describe("Telegram Schema Validation", () => {
 
     it("should accept message with exactly '/generate' text", () => {
       const updateWithGenerateCommand = {
-        update_id: 123456789,
+        update_id: 123_456_789,
         message: {
           message_id: 1,
           from: {
-            id: 987654321,
+            id: 987_654_321,
             is_bot: false,
             first_name: "John",
           },
           chat: {
-            id: 987654321,
+            id: 987_654_321,
             type: "private",
           },
-          date: 1234567890,
+          date: 1_234_567_890,
           text: "/generate",
         },
       } as const;

@@ -1034,69 +1034,79 @@ test.describe("Invoice Generator Page", () => {
     await expect(page.getByLabel("Notifications alt+T")).toBeHidden();
   });
 
-  test("persists data in local storage", async ({ page }) => {
-    // Fill in some data
-    const invoiceNumberFieldset = page.getByRole("group", {
-      name: "Invoice Number",
-    });
+  test(
+    "persists data in local storage",
+    {
+      // form state -> localStorage -> rehydrate on reload, verified on Gecko too
+      tag: "@firefox-smoke",
+    },
+    async ({ page }) => {
+      // Fill in some data
+      const invoiceNumberFieldset = page.getByRole("group", {
+        name: "Invoice Number",
+      });
 
-    const invoiceNumberValueField = invoiceNumberFieldset.getByRole("textbox", {
-      name: "Value",
-    });
+      const invoiceNumberValueField = invoiceNumberFieldset.getByRole(
+        "textbox",
+        {
+          name: "Value",
+        },
+      );
 
-    await invoiceNumberValueField.fill("TEST/2024");
+      await invoiceNumberValueField.fill("TEST/2024");
 
-    const finalSection = page.getByTestId(`final-section`);
+      const finalSection = page.getByTestId(`final-section`);
 
-    await finalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill("Test note");
+      await finalSection
+        .getByRole("textbox", { name: "Notes", exact: true })
+        .fill("Test note");
 
-    // Check that "Invoice last updated:" text is displayed after filling in the data
-    await expect(
-      page.getByText("Invoice last updated:", { exact: false }),
-    ).toBeVisible();
+      // Check that "Invoice last updated:" text is displayed after filling in the data
+      await expect(
+        page.getByText("Invoice last updated:", { exact: false }),
+      ).toBeVisible();
 
-    // Wait a moment for any debounced localStorage updates
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(500);
+      // Wait a moment for any debounced localStorage updates
+      // eslint-disable-next-line playwright/no-wait-for-timeout
+      await page.waitForTimeout(500);
 
-    // Verify data is actually saved in localStorage
-    const storedData = (await page.evaluate((key) => {
-      return localStorage.getItem(key);
-    }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
+      // Verify data is actually saved in localStorage
+      const storedData = (await page.evaluate((key) => {
+        return localStorage.getItem(key);
+      }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
 
-    expect(storedData).toBeTruthy();
+      expect(storedData).toBeTruthy();
 
-    const parsedData = JSON.parse(storedData) as InvoiceData;
-    expect(parsedData).toMatchObject({
-      invoiceNumberObject: {
-        label: "Invoice No. of:",
-        value: "TEST/2024",
-      },
-      notes: "Test note",
-    } satisfies Pick<InvoiceData, "notes" | "invoiceNumberObject">);
+      const parsedData = JSON.parse(storedData) as InvoiceData;
+      expect(parsedData).toMatchObject({
+        invoiceNumberObject: {
+          label: "Invoice No. of:",
+          value: "TEST/2024",
+        },
+        notes: "Test note",
+      } satisfies Pick<InvoiceData, "notes" | "invoiceNumberObject">);
 
-    // Reload page
-    await page.reload();
+      // Reload page
+      await page.reload();
 
-    // Check if data persists in UI
-    const invoiceNumberFieldset2 = page.getByRole("group", {
-      name: "Invoice Number",
-    });
+      // Check if data persists in UI
+      const invoiceNumberFieldset2 = page.getByRole("group", {
+        name: "Invoice Number",
+      });
 
-    const invoiceNumberValueField2 = invoiceNumberFieldset2.getByRole(
-      "textbox",
-      {
-        name: "Value",
-      },
-    );
-    await expect(invoiceNumberValueField2).toHaveValue("TEST/2024");
+      const invoiceNumberValueField2 = invoiceNumberFieldset2.getByRole(
+        "textbox",
+        {
+          name: "Value",
+        },
+      );
+      await expect(invoiceNumberValueField2).toHaveValue("TEST/2024");
 
-    await expect(
-      finalSection.getByRole("textbox", { name: "Notes", exact: true }),
-    ).toHaveValue("Test note");
-  });
+      await expect(
+        finalSection.getByRole("textbox", { name: "Notes", exact: true }),
+      ).toHaveValue("Test note");
+    },
+  );
 
   test("handles currency switching", async ({ page }) => {
     const invoiceItemsSection = page.getByTestId(`invoice-items-section`);

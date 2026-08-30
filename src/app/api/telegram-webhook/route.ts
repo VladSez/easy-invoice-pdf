@@ -153,8 +153,8 @@ async function handleInvoiceGenerate({ chatId }: { chatId: number }) {
       await sendTelegramMessage({
         message: `🚨 Error: ${error instanceof Error ? error.message : "Unknown error"}`,
       });
-    } catch (e) {
-      console.error("[telegram-webhook] Failed to send error message:", e);
+    } catch (error) {
+      console.error("[telegram-webhook] Failed to send error message:", error);
     }
   } finally {
     await clearQueuedJob(chatId);

@@ -68,7 +68,7 @@ function extractUpdateDate(content: string, path: string) {
   const locale = pathLocale in UPDATE_DATE_LABELS ? pathLocale : "en";
   const label = UPDATE_DATE_LABELS[locale as keyof typeof UPDATE_DATE_LABELS];
 
-  const escapedLabel = label.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escapedLabel = label.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 
   const match = new RegExp(
     `^>\\s*${escapedLabel}\\s*:\\s*(\\S+)\\s*$`,
@@ -99,7 +99,7 @@ describe("LLM-facing Markdown pages", () => {
 
     expect(updatedAt.data.getTime()).toBeLessThanOrEqual(Date.now());
 
-    expect(content.length).toBeGreaterThan(1_000);
+    expect(content.length).toBeGreaterThan(1000);
   });
 
   it("rejects content without the localized update date field", () => {

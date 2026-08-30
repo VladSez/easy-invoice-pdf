@@ -21,7 +21,7 @@ type Messages = { About: { tagline: string } };
 function readMessages(locale: string): Messages {
   const messagesPath = path.join(__dirname, `../messages/${locale}.json`);
 
-  return JSON.parse(fs.readFileSync(messagesPath, "utf-8")) as Messages;
+  return JSON.parse(fs.readFileSync(messagesPath, "utf8")) as Messages;
 }
 
 test.describe("Localized about page", () => {

@@ -7,7 +7,7 @@ import { hasSeenWelcomePopup } from "@/app/(app)/utils/welcome-popup-seen-storag
 import type { ChangelogSummary } from "@/app/changelog/utils";
 
 /** Wait before showing so the page can settle first */
-const SHOW_DELAY_MS = 1_500;
+const SHOW_DELAY_MS = 1500;
 
 export type AppUpdatePopupVariant = "welcome" | "changelog";
 

@@ -4,7 +4,7 @@ import { ArrowRightIcon, StarIcon } from "lucide-react";
 import type { Locale } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId } from "react";
 
 import type { HeaderProps } from "@/app/(components)/header";
 import { GithubIcon } from "@/components/etc/github-logo";
@@ -60,19 +60,16 @@ export function MobileMenuPanel({
   const isTosActive = pathname === "/tos";
   const isHomeActive = pathname === `/${locale}/about`;
 
-  const onOpenChangeRef = useRef(onOpenChange);
-  onOpenChangeRef.current = onOpenChange;
-
   // close mobile menu when escape key is pressed
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onOpenChangeRef.current(false);
+      if (e.key === "Escape") onOpenChange(false);
     }
     window.addEventListener("keydown", onKeyDown);
     return () => {
       return window.removeEventListener("keydown", onKeyDown);
     };
-  }, []);
+  }, [onOpenChange]);
 
   const close = () => {
     return onOpenChange(false);

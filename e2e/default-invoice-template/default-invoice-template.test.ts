@@ -20,20 +20,27 @@ test.describe("Default Invoice Template", () => {
     await expect(page).toHaveURL("/?template=default");
   });
 
-  test("downloads PDF in English and verifies content", async ({
-    page,
-    browserName,
-    downloadDir,
-  }) => {
-    const { suggestedFilename } = await expectPdfScreenshot(page, {
-      downloadDir,
-      browserName,
-      name: "downloads-PDF-in-English.png",
-    });
+  test(
+    "downloads PDF in English and verifies content",
+    {
+      // client side PDF generation + download is the most engine sensitive path
+      // we have, so it is part of the Gecko smoke run
+      tag: "@firefox-smoke",
+    },
+    async ({ page, browserName, downloadDir }) => {
+      const { suggestedFilename, numPages } = await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        name: "downloads-PDF-in-English.png",
+      });
 
-    // the file name contains the PDF language and the invoice number
-    expect(suggestedFilename).toBe("invoice-EN-1-12-2025.pdf");
-  });
+      // the file name contains the PDF language and the invoice number
+      expect(suggestedFilename).toBe("invoice-EN-1-12-2025.pdf");
+
+      // the default invoice fits on a single page
+      expect(numPages).toBe(1);
+    },
+  );
 
   test("downloads PDF in Polish and verifies content", async ({
     page,
@@ -41,9 +48,19 @@ test.describe("Default Invoice Template", () => {
     downloadDir,
   }, testInfo) => {
     // Switch to Polish
-    await page
-      .getByRole("combobox", { name: "Invoice PDF Language" })
-      .selectOption("pl");
+    const languageSelect = page.getByRole("combobox", {
+      name: "Invoice PDF Language",
+    });
+
+    await languageSelect.selectOption("pl");
+    await expect(languageSelect).toHaveValue("pl");
+
+    // the invoice number label follows the selected language
+    await expect(
+      page
+        .getByRole("group", { name: "Invoice Number" })
+        .getByRole("textbox", { name: "Label" }),
+    ).toHaveValue(`${INVOICE_PDF_TRANSLATIONS.pl.invoiceNumber}:`);
 
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
@@ -166,9 +183,12 @@ test.describe("Default Invoice Template", () => {
     await expect(page.locator('input[name="currency"]')).toHaveValue("GBP");
 
     // Switch to another date format
-    await page
-      .getByRole("combobox", { name: "Date format" })
-      .selectOption(DATE_FORMAT);
+    const dateFormatSelect = page.getByRole("combobox", {
+      name: "Date format",
+    });
+
+    await dateFormatSelect.selectOption(DATE_FORMAT);
+    await expect(dateFormatSelect).toHaveValue(DATE_FORMAT);
 
     await page
       .getByRole("textbox", { name: "Header Notes" })
@@ -183,33 +203,32 @@ test.describe("Default Invoice Template", () => {
       .getByRole("textbox", { name: "Name" })
       .fill("PLAYWRIGHT SELLER TEST");
 
-    // Toggle VAT Number visibility off
-    await sellerSection
-      .getByRole("switch", {
+    // Toggle VAT Number, Account Number and SWIFT/BIC visibility off, so they are
+    // left out of the generated PDF
+    const sellerHiddenFieldSwitches = [
+      sellerSection.getByRole("switch", {
         name: `Show the 'Seller Tax Number' Field in the PDF`,
-      })
-      .click();
-
-    // Toggle Account Number visibility off
-    await sellerSection
-      .getByRole("switch", {
+      }),
+      sellerSection.getByRole("switch", {
         name: `Show the 'Account Number' Field in the PDF`,
-      })
-      .click();
-
-    // Toggle SWIFT visibility off
-    await sellerSection
-      .getByRole("switch", {
+      }),
+      sellerSection.getByRole("switch", {
         name: `Show the 'SWIFT/BIC' Field in the PDF`,
-      })
-      .click();
+      }),
+    ];
+
+    for (const fieldSwitch of sellerHiddenFieldSwitches) {
+      await expect(fieldSwitch).toBeChecked();
+      await fieldSwitch.click();
+      await expect(fieldSwitch).not.toBeChecked();
+    }
 
     // update notes
     await sellerSection
       .getByRole("textbox", { name: "Notes" })
       .fill("PLAYWRIGHT SELLER NOTES TEST");
 
-    // Toggle notes visibility on
+    // seller notes are shown in the PDF by default
     const sellerNotesSwitch = sellerSection.getByTestId(
       `sellerNotesInvoiceFormFieldVisibilitySwitch`,
     );
@@ -241,7 +260,7 @@ test.describe("Default Invoice Template", () => {
       .getByRole("textbox", { name: "Notes" })
       .fill("PLAYWRIGHT BUYER NOTES TEST");
 
-    // Toggle notes visibility on
+    // buyer notes are shown in the PDF by default
     const buyerNotesSwitch = buyerSection.getByTestId(
       `buyerNotesInvoiceFormFieldVisibilitySwitch`,
     );
@@ -264,9 +283,13 @@ test.describe("Default Invoice Template", () => {
       .fill("1000");
 
     // Toggle VAT Table Summary visibility off
-    await page
-      .getByRole("switch", { name: `Show "VAT Table Summary" in the PDF` })
-      .click();
+    const vatTableSummarySwitch = page.getByRole("switch", {
+      name: `Show "VAT Table Summary" in the PDF`,
+    });
+
+    await expect(vatTableSummarySwitch).toBeChecked();
+    await vatTableSummarySwitch.click();
+    await expect(vatTableSummarySwitch).not.toBeChecked();
 
     await expectPdfScreenshot(page, {
       downloadDir,
@@ -280,32 +303,29 @@ test.describe("Default Invoice Template", () => {
     page,
     browserName,
     downloadDir,
+    isMobile,
   }, testInfo) => {
-    // this flow is about the mobile UI (tabs), so we only run it on a real mobile
-    // project instead of re-running the very same flow on every project
-    // eslint-disable-next-line playwright/no-skipped-test -- mobile UI flow, Mobile Chrome only
-    test.skip(
-      testInfo.project.name !== "Mobile Chrome",
-      "mobile only flow, runs on the Mobile Chrome project",
-    );
+    // this flow is about the mobile UI (tabs), so it runs on the mobile projects
+    // (Mobile Chrome and Mobile Safari) instead of on the desktop one
+    // eslint-disable-next-line playwright/no-skipped-test -- mobile UI flow, mobile projects only
+    test.skip(!isMobile, "mobile only flow, runs on the mobile projects");
 
     // Verify tabs are visible in mobile view
     await expect(page.getByRole("tab", { name: "Edit Invoice" })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Preview PDF" })).toBeVisible();
 
     // Download button in English is visible and enabled
-    const downloadPdfButtonEnglish = page.getByRole("link", {
-      name: /^(Download PDF|Download PDF in .+)$/,
-    });
-    // Wait for download button to be visible
-    await expect(downloadPdfButtonEnglish).toBeVisible();
-    // Wait for download button to be enabled
-    await expect(downloadPdfButtonEnglish).toBeEnabled();
+    const downloadPdfButton = getDownloadPdfLink(page);
+    await expect(downloadPdfButton).toBeVisible();
+    await expect(downloadPdfButton).toBeEnabled();
 
     // Switch to French
-    await page
-      .getByRole("combobox", { name: "Invoice PDF Language" })
-      .selectOption("fr");
+    const languageSelect = page.getByRole("combobox", {
+      name: "Invoice PDF Language",
+    });
+
+    await languageSelect.selectOption("fr");
+    await expect(languageSelect).toHaveValue("fr");
 
     // Switch currency to GBP via combobox
     const mobileCurrencyCombobox = page.getByRole("combobox", {
@@ -336,8 +356,6 @@ test.describe("Default Invoice Template", () => {
     await invoiceNumberLabelInput.fill(INVOICE_NUMBER_LABEL);
     await invoiceNumberValueInput.fill("2/05-2024");
 
-    const finalSection = page.getByTestId("final-section");
-
     // Fill in seller information
     const sellerSection = page.getByTestId("seller-information-section");
     await sellerSection
@@ -362,6 +380,8 @@ test.describe("Default Invoice Template", () => {
       name: "Tax Settings",
     });
 
+    // the VAT field is labelled "TVA" in French, so finding it proves the form
+    // switched language
     await taxSettingsFieldset
       .getByRole("textbox", { name: "TVA Rate", exact: true })
       .fill("23");
@@ -373,20 +393,26 @@ test.describe("Default Invoice Template", () => {
     await fillDebugNotes(page, MOBILE_FLOW_NOTES);
 
     // Switch to preview tab
-    await page.getByRole("tab", { name: "Preview PDF" }).click();
+    const previewTab = page.getByRole("tab", { name: "Preview PDF" });
+    const editInvoiceTab = page.getByRole("tab", { name: "Edit Invoice" });
 
-    // Verify preview tab is selected
+    await previewTab.click();
+
+    // Verify preview tab is selected. We assert on the tabs (which are always
+    // rendered) instead of the inactive tab panel, which is unmounted while the
+    // other tab is open
+    await expect(previewTab).toHaveAttribute("aria-selected", "true");
+    await expect(editInvoiceTab).toHaveAttribute("aria-selected", "false");
     await expect(
       page.getByRole("tabpanel", { name: "Preview PDF" }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("tabpanel", { name: "Edit Invoice" }),
-    ).toBeHidden();
 
-    await expectPdfScreenshot(page, {
+    const { suggestedFilename } = await expectPdfScreenshot(page, {
       downloadDir,
       browserName,
       name: "completes-full-invoice-flow-on-mobile.png",
+      // this test only runs on the mobile projects, so both of them keep a baseline
+      snapshotProject: ["Mobile Chrome", "Mobile Safari"],
       afterDownload: async () => {
         const downloadPdfToast = page.getByTestId("download-pdf-toast");
 
@@ -403,27 +429,36 @@ test.describe("Default Invoice Template", () => {
       },
     });
 
+    // the file name carries the selected PDF language and the invoice number we
+    // typed above (slashes become dashes)
+    expect(suggestedFilename).toBe("invoice-FR-2-05-2024.pdf");
+
     // Navigate back to the previous page
     await page.goto("/");
     await expect(page).toHaveURL("/?template=default");
 
     // Switch back to form tab
-    await page.getByRole("tab", { name: "Edit Invoice" }).click();
+    await editInvoiceTab.click();
 
     // Verify form tab is selected and data persists
+    await expect(editInvoiceTab).toHaveAttribute("aria-selected", "true");
+    await expect(previewTab).toHaveAttribute("aria-selected", "false");
     await expect(
       page.getByRole("tabpanel", { name: "Edit Invoice" }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("tabpanel", { name: "Preview PDF" }),
-    ).toBeHidden();
 
     // Verify form data persists
     await expect(invoiceNumberLabelInput).toHaveValue(INVOICE_NUMBER_LABEL);
     await expect(invoiceNumberValueInput).toHaveValue("2/05-2024");
 
+    // the PDF language and the currency are part of that data too
+    await expect(languageSelect).toHaveValue("fr");
+    await expect(page.locator('input[name="currency"]')).toHaveValue("GBP");
+
     await expect(
-      finalSection.getByRole("textbox", { name: "Notes", exact: true }),
+      page
+        .getByTestId("final-section")
+        .getByRole("textbox", { name: "Notes", exact: true }),
     ).toHaveValue(MOBILE_FLOW_NOTES);
 
     // Verify seller information persists
@@ -446,12 +481,8 @@ test.describe("Default Invoice Template", () => {
       }),
     ).toHaveValue("50");
 
-    const newTaxSettingsFieldset = invoiceItemsSection.getByRole("group", {
-      name: "Tax Settings",
-    });
-
     await expect(
-      newTaxSettingsFieldset.getByRole("textbox", {
+      taxSettingsFieldset.getByRole("textbox", {
         name: "TVA Rate",
         exact: true,
       }),
@@ -665,11 +696,13 @@ test.describe("Default Invoice Template", () => {
       ).toBeVisible();
     });
 
-    await expectPdfScreenshot(page, {
+    const { suggestedFilename } = await expectPdfScreenshot(page, {
       downloadDir,
       browserName,
       name: "pdf-with-logo-default-template.png",
     });
+
+    expect(suggestedFilename).toBe("invoice-EN-1-12-2025.pdf");
 
     /**
      * VERIFY LOGO PERSISTS AFTER NAVIGATING BACK TO DEFAULT TEMPLATE

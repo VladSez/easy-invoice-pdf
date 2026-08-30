@@ -6,8 +6,8 @@ import type {
   GenerateInvoiceReport,
 } from "@/app/api/generate-invoice/generate-invoice";
 
-const ALLOWED_CHAT_ID = 12345;
-const CHAT_ID = 67890;
+const ALLOWED_CHAT_ID = 12_345;
+const CHAT_ID = 67_890;
 
 const MOCK_REPORT = {
   invoiceENgeneratedSuccessfully: true,
@@ -172,7 +172,7 @@ describe("POST /api/telegram-webhook — HTTP layer", () => {
     it("should return 200 and notify when sender is unauthorized", async () => {
       const { POST } = await import("../route");
       const response = await POST(
-        createRequest(createValidUpdate({ senderId: 99999 })),
+        createRequest(createValidUpdate({ senderId: 99_999 })),
       );
 
       expect(response.status).toBe(200);

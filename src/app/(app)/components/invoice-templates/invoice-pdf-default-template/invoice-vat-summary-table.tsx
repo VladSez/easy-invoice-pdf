@@ -34,8 +34,8 @@ export function InvoiceVATSummaryTable({
 
   const sortedItems = [...(invoiceData?.items ?? [])].sort((a, b) => {
     // Handle cases where either value is a string (NP or OO)
-    const isAString = isNaN(Number(a.vat));
-    const isBString = isNaN(Number(b.vat));
+    const isAString = Number.isNaN(Number(a.vat));
+    const isBString = Number.isNaN(Number(b.vat));
 
     if (
       isAString &&
@@ -146,7 +146,7 @@ export function InvoiceVATSummaryTable({
                   { textAlign: "right", marginRight: 2 },
                 ]}
               >
-                {isNaN(Number(item.vat)) ? item.vat : `${item.vat}%`}
+                {Number.isNaN(Number(item.vat)) ? item.vat : `${item.vat}%`}
               </Text>
             </View>
             {/* Net */}

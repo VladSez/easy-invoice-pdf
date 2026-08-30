@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { expect, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 import {
   renderMultiPagePdfOnCanvas,
@@ -109,6 +109,53 @@ async function downloadPdf(
 }
 
 /**
+ * The project the PDF **screenshots** are compared on.
+ *
+ * The screenshot is a canvas that pdf.js rasterizes at a fixed size, so running it
+ * on every project compared the same PDF re-rendered by a different rasterizer
+ * (WebKit vs Chromium), not our app. The parts that *are* browser and device
+ * specific — generating the PDF and downloading it — still run on every project,
+ * see {@link expectValidPdfFile}.
+ */
+const DEFAULT_SNAPSHOT_PROJECT = "Desktop Chrome";
+
+/**
+ * Asserts the downloaded file is a complete PDF document.
+ *
+ * This runs on **every** project: it is what verifies that PDF generation and the
+ * download itself work in that browser/device, without depending on how the
+ * browser rasterizes the result.
+ */
+function expectValidPdfFile(pdfBytes: Buffer) {
+  // PDF magic bytes
+  expect(pdfBytes.subarray(0, 5).toString("latin1")).toBe("%PDF-");
+
+  // the end-of-file marker means we got the whole document, not a truncated download
+  expect(pdfBytes.subarray(-1024).toString("latin1")).toContain("%%EOF");
+
+  // a generated invoice is tens of kilobytes, an empty document would not be
+  expect(pdfBytes.byteLength).toBeGreaterThan(1000);
+}
+
+/**
+ * Reads the number of pages from the PDF page tree (`/Count N`), which react-pdf
+ * writes uncompressed. Lets us assert the page count on every project, without
+ * rendering the document.
+ */
+function getPdfPageCount(pdfBytes: Buffer) {
+  const counts = [
+    ...pdfBytes.toString("latin1").matchAll(/\/Count (\d+)/g),
+  ].map((match) => {
+    return Number(match[1]);
+  });
+
+  expect(counts.length).toBeGreaterThan(0);
+
+  // nested page tree nodes each carry a count, the root holds the total
+  return Math.max(...counts);
+}
+
+/**
  * Downloads the currently previewed PDF, renders it on a canvas and compares it
  * against the stored screenshot.
  *
@@ -119,6 +166,11 @@ async function downloadPdf(
  *   screenshots) and waits until the PDF is regenerated with it.
  * - `allPages` stacks **every** page of the PDF on a single canvas instead of
  *   screenshotting only the first one.
+ * - `snapshotProject` overrides which project(s) compare the screenshot, for tests
+ *   that only run on the mobile projects.
+ *
+ * Every project downloads the PDF and asserts it is a complete document; only
+ * {@link DEFAULT_SNAPSHOT_PROJECT} compares the rendered screenshot.
  *
  * Returns the suggested filename of the download and the number of pages of the
  * generated PDF, so that tests can assert on them.
@@ -133,6 +185,7 @@ export async function expectPdfScreenshot(
     filePrefix,
     allPages = false,
     afterDownload,
+    snapshotProject = DEFAULT_SNAPSHOT_PROJECT,
   }: {
     downloadDir: string;
     browserName: string;
@@ -143,6 +196,7 @@ export async function expectPdfScreenshot(
     allPages?: boolean;
     /** Runs right after the download finished, while the app is still open */
     afterDownload?: () => Promise<void>;
+    snapshotProject?: string | string[];
   },
 ) {
   if (notes) {
@@ -156,6 +210,22 @@ export async function expectPdfScreenshot(
   });
 
   await afterDownload?.();
+
+  /**
+   * EVERY PROJECT: verify the browser generated a complete PDF and downloaded it
+   */
+  expectValidPdfFile(pdfBytes);
+
+  const numPages = getPdfPageCount(pdfBytes);
+
+  // the visual comparison only runs on the snapshot project(s), see DEFAULT_SNAPSHOT_PROJECT
+  const snapshotProjects = Array.isArray(snapshotProject)
+    ? snapshotProject
+    : [snapshotProject];
+
+  if (!snapshotProjects.includes(test.info().project.name)) {
+    return { suggestedFilename, numPages };
+  }
 
   /**
    * RENDER PDF ON CANVAS AND TAKE SCREENSHOT OF IT
@@ -176,10 +246,13 @@ export async function expectPdfScreenshot(
 
   await expect(page.locator("canvas")).toHaveScreenshot(name);
 
-  const numPages = await page.evaluate(() => {
+  // cross check the page count we read from the raw PDF against what pdf.js parsed
+  const renderedPageCount = await page.evaluate(() => {
     return (window as unknown as { __PDF_PAGE_COUNT__: number })
       .__PDF_PAGE_COUNT__;
   });
+
+  expect(renderedPageCount).toBe(numPages);
 
   return { suggestedFilename, numPages };
 }

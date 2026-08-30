@@ -6,7 +6,8 @@ import { buildHowItWorksJsonLd } from "./build-how-it-works-json-ld";
 
 describe("buildHowItWorksJsonLd", () => {
   it("includes Google's required video rich-result fields for every tutorial", () => {
-    const graph = JSON.parse(JSON.stringify(buildHowItWorksJsonLd())) as {
+    const serializedGraph = JSON.stringify(buildHowItWorksJsonLd());
+    const graph = JSON.parse(serializedGraph) as {
       "@graph": Array<Record<string, unknown>>;
     };
 

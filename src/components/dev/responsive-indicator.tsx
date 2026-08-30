@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
+
+const RESIZE_DEBOUNCE_MS = 100;
 
 /**
  * **Development-only** utility component that displays the current viewport width and Tailwind breakpoint.
@@ -10,19 +13,28 @@ import { useEffect, useState } from "react";
  * Only renders on client side after hydration to avoid width mismatch errors.
  */
 export function ResponsiveIndicator() {
+  // there is no viewport on the server, so the width stays 0 through the server
+  // and hydration renders - the indicator is unrendered until the effect below
+  // reads the real width on the client, which is what avoids the mismatch
   const [width, setWidth] = useState(0);
   const [hidden, setHidden] = useState(false);
 
+  // resize fires on every frame of a drag - debouncing keeps React from
+  // re-rendering the indicator dozens of times per second
+  const handleResize = useDebouncedCallback(() => {
+    return setWidth(window.innerWidth);
+  }, RESIZE_DEBOUNCE_MS);
+
   useEffect(() => {
-    const update = () => {
-      return setWidth(window.innerWidth);
-    };
-    update();
-    window.addEventListener("resize", update);
+    // oxlint-disable-next-line react/set-state-in-effect -- the viewport is an external system: there is no width to derive during render, it has to be read after mount
+    setWidth(window.innerWidth);
+
+    window.addEventListener("resize", handleResize);
     return () => {
-      return window.removeEventListener("resize", update);
+      handleResize.cancel();
+      return window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [handleResize]);
 
   if (width === 0 || hidden) return null;
 

@@ -19,8 +19,8 @@ vi.mock("../../contexts/cta-toast-context", () => {
   };
 });
 
-const MIN_TIME_ON_PAGE = 7_000;
-const IDLE_TIME = 5_000;
+const MIN_TIME_ON_PAGE = 7000;
+const IDLE_TIME = 5000;
 
 interface CTAToastState {
   hasTriggeredCTAAction: boolean;
@@ -173,19 +173,19 @@ describe("useShowRandomCTAToastOnIdle", () => {
     setInteractionCount(3);
 
     act(() => {
-      vi.advanceTimersByTime(IDLE_TIME - 1_000);
+      vi.advanceTimersByTime(IDLE_TIME - 1000);
     });
 
     setInteractionCount(4);
 
     act(() => {
-      vi.advanceTimersByTime(IDLE_TIME - 1_000);
+      vi.advanceTimersByTime(IDLE_TIME - 1000);
     });
 
     expect(showRandomCTAToast).not.toHaveBeenCalled();
 
     act(() => {
-      vi.advanceTimersByTime(1_000);
+      vi.advanceTimersByTime(1000);
     });
 
     expect(showRandomCTAToast).toHaveBeenCalledTimes(1);

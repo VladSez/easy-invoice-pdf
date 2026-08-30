@@ -90,7 +90,7 @@ describe("GitHubStarCTA", () => {
   });
 
   it("should show lowercase formatted star count when count is over 10k", () => {
-    const githubStarsCount = 15000;
+    const githubStarsCount = 15_000;
 
     renderGitHubStarCTA(githubStarsCount);
 

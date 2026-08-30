@@ -359,7 +359,7 @@ export function AppPageClient({
               </Button>
             </div>
           ),
-          duration: 20000,
+          duration: 20_000,
           closeButton: true,
         });
 
@@ -380,7 +380,14 @@ export function AppPageClient({
    * If missing, adds it based on the current invoice data state.
    */
   useEffect(() => {
-    // Only run if we have invoice data and no template in URL
+    // Only run if we have invoice data and no template in URL.
+    //
+    // `no-event-handler` wants this written where the invoice data is set, but `router.replace`
+    // is dropped when it is called from the initialization effect while the App Router is still
+    // mounting -- under load the shared-link e2e tests then sit on a URL that never grows its
+    // `?template=`. Reacting to `invoiceDataState` defers the call by one render, which is what
+    // makes it land.
+    // oxlint-disable-next-line react-you-might-not-need-an-effect/no-event-handler
     if (!invoiceDataState || searchParams.get("template")) {
       return;
     }
@@ -654,32 +661,32 @@ export function AppPageClient({
                 // dismiss other toasts when navigator.share is successful (for better UX)
                 setTimeout(() => {
                   toast.dismiss();
-                }, 1_500);
+                }, 1500);
 
                 // show CTA toast after x seconds
                 setTimeout(() => {
                   showRandomCTAToast();
-                }, 2_500);
+                }, 2500);
               })
-              .catch((err) => {
+              .catch((error) => {
                 console.error(
                   "[handleShareInvoice] failed to share invoice:",
-                  err,
+                  error,
                 );
 
                 // dismiss all other toasts for better UX
                 toast.dismiss();
 
                 // Only show error if it's not an abort error (user cancelled the share)
-                if (err instanceof Error && err?.name !== "AbortError") {
+                if (error instanceof Error && error?.name !== "AbortError") {
                   toast.error("Failed to share invoice", {
                     id: "failed-to-share-invoice-error-toast",
                     description: `Please try again or copy the link manually from the address bar`,
                     position: isMobile ? "top-center" : "bottom-right",
-                    duration: 5_000,
+                    duration: 5000,
                   });
 
-                  Sentry.captureException(err);
+                  Sentry.captureException(error);
                 }
               });
           } catch (shareError) {
@@ -705,7 +712,7 @@ export function AppPageClient({
                   </p>
                 ),
                 position: isMobile ? "top-center" : "bottom-right",
-                duration: 5_000,
+                duration: 5000,
               });
 
               umamiTrackEvent("share_invoice_link");
@@ -720,10 +727,10 @@ export function AppPageClient({
               // show CTA toast after x seconds (after invoice link notification is shown)
               setTimeout(() => {
                 showRandomCTAToast();
-              }, 5_500);
+              }, 5500);
             })
-            .catch((err) => {
-              Sentry.captureException(err);
+            .catch((error) => {
+              Sentry.captureException(error);
             });
         }
 

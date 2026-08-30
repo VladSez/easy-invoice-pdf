@@ -259,4 +259,4 @@ export const showRandomCTAToast = () => {
 /**
  * Slight delay to prevent the toast from appearing too quickly
  */
-export const CTA_TOAST_TIMEOUT = 2_500; // in ms
+export const CTA_TOAST_TIMEOUT = 2500; // in ms

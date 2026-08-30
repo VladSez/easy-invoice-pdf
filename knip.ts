@@ -3,7 +3,12 @@ import type { KnipConfig } from "knip";
 // https://knip.dev/reference/configuration#_top
 const config: KnipConfig = {
   // Trigger.dev entry points (https://trigger.dev/docs/config/config-file)
-  entry: ["trigger.config.ts", "src/trigger/monthly-recurring-invoice.ts"],
+  entry: [
+    "trigger.config.ts",
+    "src/trigger/monthly-recurring-invoice.ts",
+    // spawned as a child process by e2e/server-render-pdf/server-render-pdf.test.ts
+    "e2e/server-render-pdf/render-server-pdf.mjs",
+  ],
   ignoreDependencies: [
     "shadcn",
     "@radix-ui/react-separator",

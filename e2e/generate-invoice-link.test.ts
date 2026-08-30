@@ -45,283 +45,305 @@ test.describe("Generate Invoice Link (Get link)", () => {
     await expect(page).toHaveURL("/?template=default");
   });
 
-  test("can share invoice and data is persisted in new tab", async ({
-    page,
-    context,
-  }) => {
-    // Verify shared invoice badge is NOT visible before sharing
-    await expect(page.getByTestId("shared-invoice-badge")).toBeHidden();
+  test(
+    "can share invoice and data is persisted in new tab",
+    {
+      // the URL encoded/compressed invoice state round trip, a likely place for a
+      // Gecko vs Chromium divergence to hide
+      tag: "@firefox-smoke",
+    },
+    async ({ page, context }) => {
+      // Verify shared invoice badge is NOT visible before sharing
+      await expect(page.getByTestId("shared-invoice-badge")).toBeHidden();
 
-    // Fill in some test data
-    const invoiceNumberFieldset = page.getByRole("group", {
-      name: "Invoice Number",
-    });
+      // Fill in some test data
+      const invoiceNumberFieldset = page.getByRole("group", {
+        name: "Invoice Number",
+      });
 
-    const invoiceNumberValueField = invoiceNumberFieldset.getByRole("textbox", {
-      name: "Value",
-    });
+      const invoiceNumberValueField = invoiceNumberFieldset.getByRole(
+        "textbox",
+        {
+          name: "Value",
+        },
+      );
 
-    await invoiceNumberValueField.fill("SHARE-TEST-001");
+      await invoiceNumberValueField.fill("SHARE-TEST-001");
 
-    const finalSection = page.getByTestId(`final-section`);
+      const finalSection = page.getByTestId(`final-section`);
 
-    await finalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill("Test note for sharing");
+      await finalSection
+        .getByRole("textbox", { name: "Notes", exact: true })
+        .fill("Test note for sharing");
 
-    // Fill in seller information
-    const sellerSection = page.getByTestId("seller-information-section");
-    await sellerSection
-      .getByRole("textbox", { name: "Name" })
-      .fill(TEST_SELLER_DATA.name);
-    await sellerSection
-      .getByRole("textbox", { name: "Address" })
-      .fill(TEST_SELLER_DATA.address);
-    await sellerSection
-      .getByRole("textbox", { name: "Email" })
-      .fill(TEST_SELLER_DATA.email);
+      // Fill in seller information
+      const sellerSection = page.getByTestId("seller-information-section");
+      await sellerSection
+        .getByRole("textbox", { name: "Name" })
+        .fill(TEST_SELLER_DATA.name);
+      await sellerSection
+        .getByRole("textbox", { name: "Address" })
+        .fill(TEST_SELLER_DATA.address);
+      await sellerSection
+        .getByRole("textbox", { name: "Email" })
+        .fill(TEST_SELLER_DATA.email);
 
-    // fill in seller tax number
-    const sellerVatNumberFieldset = sellerSection.getByRole("group", {
-      name: "Seller Tax Number",
-    });
+      // fill in seller tax number
+      const sellerVatNumberFieldset = sellerSection.getByRole("group", {
+        name: "Seller Tax Number",
+      });
 
-    await sellerVatNumberFieldset
-      .getByRole("textbox", { name: "Label" })
-      .fill(TEST_SELLER_DATA.vatNoLabelText);
+      await sellerVatNumberFieldset
+        .getByRole("textbox", { name: "Label" })
+        .fill(TEST_SELLER_DATA.vatNoLabelText);
 
-    await sellerVatNumberFieldset
-      .getByRole("textbox", { name: "Value" })
-      .fill(TEST_SELLER_DATA.vatNo);
+      await sellerVatNumberFieldset
+        .getByRole("textbox", { name: "Value" })
+        .fill(TEST_SELLER_DATA.vatNo);
 
-    // Fill in buyer information
-    const buyerSection = page.getByTestId("buyer-information-section");
-    await buyerSection
-      .getByRole("textbox", { name: "Name" })
-      .fill(TEST_BUYER_DATA.name);
-    await buyerSection
-      .getByRole("textbox", { name: "Address" })
-      .fill(TEST_BUYER_DATA.address);
-    await buyerSection
-      .getByRole("textbox", { name: "Email" })
-      .fill(TEST_BUYER_DATA.email);
+      // Fill in buyer information
+      const buyerSection = page.getByTestId("buyer-information-section");
+      await buyerSection
+        .getByRole("textbox", { name: "Name" })
+        .fill(TEST_BUYER_DATA.name);
+      await buyerSection
+        .getByRole("textbox", { name: "Address" })
+        .fill(TEST_BUYER_DATA.address);
+      await buyerSection
+        .getByRole("textbox", { name: "Email" })
+        .fill(TEST_BUYER_DATA.email);
 
-    // fill in buyer tax number
-    const buyerVatNumberFieldset = buyerSection.getByRole("group", {
-      name: "Buyer Tax Number",
-    });
+      // fill in buyer tax number
+      const buyerVatNumberFieldset = buyerSection.getByRole("group", {
+        name: "Buyer Tax Number",
+      });
 
-    await buyerVatNumberFieldset
-      .getByRole("textbox", { name: "Label" })
-      .fill(TEST_BUYER_DATA.vatNoLabelText);
+      await buyerVatNumberFieldset
+        .getByRole("textbox", { name: "Label" })
+        .fill(TEST_BUYER_DATA.vatNoLabelText);
 
-    await buyerVatNumberFieldset
-      .getByRole("textbox", { name: "Value" })
-      .fill(TEST_BUYER_DATA.vatNo);
+      await buyerVatNumberFieldset
+        .getByRole("textbox", { name: "Value" })
+        .fill(TEST_BUYER_DATA.vatNo);
 
-    // Fill in an invoice item
-    const invoiceItemsSection = page.getByTestId("invoice-items-section");
+      // Fill in an invoice item
+      const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
-    await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)" })
-      .fill("5");
+      await invoiceItemsSection
+        .getByRole("spinbutton", { name: "Amount (Quantity)" })
+        .fill("5");
 
-    await invoiceItemsSection
-      .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
-      })
-      .fill("100");
+      await invoiceItemsSection
+        .getByRole("spinbutton", {
+          name: "Net Price (Rate or Unit Price)",
+        })
+        .fill("100");
 
-    const taxSettingsFieldset = invoiceItemsSection.getByRole("group", {
-      name: "Tax Settings",
-    });
+      const taxSettingsFieldset = invoiceItemsSection.getByRole("group", {
+        name: "Tax Settings",
+      });
 
-    // Update the Tax Settings "Tax Label" field to a new value (e.g., "Custom VAT")
-    await taxSettingsFieldset
-      .getByRole("textbox", { name: "Tax Label" })
-      .fill("Custom VAT");
+      // Update the Tax Settings "Tax Label" field to a new value (e.g., "Custom VAT")
+      await taxSettingsFieldset
+        .getByRole("textbox", { name: "Tax Label" })
+        .fill("Custom VAT");
 
-    await taxSettingsFieldset
-      .getByRole("textbox", { name: "VAT Rate" })
-      .fill("23");
+      await taxSettingsFieldset
+        .getByRole("textbox", { name: "VAT Rate" })
+        .fill("23");
 
-    // check total
-    const totalField = finalSection.getByRole("textbox", {
-      name: "Total",
-      exact: true,
-    });
-    await expect(totalField).toHaveValue("615.00");
-
-    // check QR code data field
-    const qrCodeFieldset = finalSection.getByRole("group", {
-      name: "QR Code",
-    });
-
-    // check QR code data field
-    const qrCodeDataField = qrCodeFieldset.getByRole("textbox", {
-      name: "Data",
-    });
-
-    await qrCodeDataField.fill("https://easyinvoicepdf.com");
-
-    // check QR code description field
-    const qrCodeDescriptionField = qrCodeFieldset.getByRole("textbox", {
-      name: "Description (optional)",
-    });
-
-    await qrCodeDescriptionField.fill("QR Code TEST Description");
-
-    // wait for debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
-
-    // Generate share link
-    await page.getByRole("button", { name: "Get link" }).click();
-
-    // Wait for URL to update with share data
-    await page.waitForURL((url) => {
-      return url.searchParams.has("data");
-    });
-
-    // Get the current URL which should now contain the share data
-    const sharedUrl = page.url();
-    expect(sharedUrl).toContain("?template=default&data=");
-
-    // Open URL in new tab
-    const newPage = await context.newPage();
-    await newPage.goto(sharedUrl);
-
-    // Verify the URL contains the shared invoice data
-    await expect(newPage).toHaveURL(/\?template=default&data=/);
-
-    // Get elements from the new page context
-    const newInvoiceNumberFieldset = newPage.getByRole("group", {
-      name: "Invoice Number",
-    });
-
-    /* VERIFY DATA IS LOADED IN NEW TAB */
-
-    await expect(
-      newInvoiceNumberFieldset.getByRole("textbox", { name: "Value" }),
-    ).toHaveValue("SHARE-TEST-001");
-
-    const newPageFinalSection = newPage.getByTestId(`final-section`);
-
-    await expect(
-      newPageFinalSection.getByRole("textbox", { name: "Notes", exact: true }),
-    ).toHaveValue("Test note for sharing");
-
-    // Verify seller information
-    const newSellerSection = newPage.getByTestId("seller-information-section");
-
-    await expect(
-      newSellerSection.getByRole("textbox", { name: "Name" }),
-    ).toHaveValue(TEST_SELLER_DATA.name);
-
-    await expect(
-      newSellerSection.getByRole("textbox", { name: "Address" }),
-    ).toHaveValue(TEST_SELLER_DATA.address);
-
-    await expect(
-      newSellerSection.getByRole("textbox", { name: "Email" }),
-    ).toHaveValue(TEST_SELLER_DATA.email);
-
-    // Verify seller tax number
-    const newSellerVatNumberFieldset = newSellerSection.getByRole("group", {
-      name: "Seller Tax Number",
-    });
-
-    await expect(
-      newSellerVatNumberFieldset.getByRole("textbox", { name: "Label" }),
-    ).toHaveValue(TEST_SELLER_DATA.vatNoLabelText);
-
-    await expect(
-      newSellerVatNumberFieldset.getByRole("textbox", { name: "Value" }),
-    ).toHaveValue(TEST_SELLER_DATA.vatNo);
-
-    // Verify buyer information
-    const newBuyerSection = newPage.getByTestId("buyer-information-section");
-
-    await expect(
-      newBuyerSection.getByRole("textbox", { name: "Name" }),
-    ).toHaveValue(TEST_BUYER_DATA.name);
-
-    await expect(
-      newBuyerSection.getByRole("textbox", { name: "Address" }),
-    ).toHaveValue(TEST_BUYER_DATA.address);
-
-    await expect(
-      newBuyerSection.getByRole("textbox", { name: "Email" }),
-    ).toHaveValue(TEST_BUYER_DATA.email);
-
-    // Verify buyer tax number
-    const newBuyerVatNumberFieldset = newBuyerSection.getByRole("group", {
-      name: "Buyer Tax Number",
-    });
-
-    await expect(
-      newBuyerVatNumberFieldset.getByRole("textbox", { name: "Label" }),
-    ).toHaveValue(TEST_BUYER_DATA.vatNoLabelText);
-
-    await expect(
-      newBuyerVatNumberFieldset.getByRole("textbox", { name: "Value" }),
-    ).toHaveValue(TEST_BUYER_DATA.vatNo);
-
-    // Verify invoice item
-    const newInvoiceItemsSection = newPage.getByTestId("invoice-items-section");
-
-    await expect(
-      newInvoiceItemsSection.getByRole("spinbutton", {
-        name: "Amount (Quantity)",
-      }),
-    ).toHaveValue("5");
-    await expect(
-      newInvoiceItemsSection.getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
-      }),
-    ).toHaveValue("100");
-
-    const newTaxSettingsFieldset = newInvoiceItemsSection.getByRole("group", {
-      name: "Tax Settings",
-    });
-    await expect(
-      newTaxSettingsFieldset.getByRole("textbox", { name: "Tax Label" }),
-    ).toHaveValue("Custom VAT");
-
-    await expect(
-      newTaxSettingsFieldset.getByRole("textbox", { name: "Custom VAT Rate" }),
-    ).toHaveValue("23");
-
-    const newFinalSection = newPage.getByTestId(`final-section`);
-
-    await expect(
-      newFinalSection.getByRole("textbox", {
+      // check total
+      const totalField = finalSection.getByRole("textbox", {
         name: "Total",
         exact: true,
-      }),
-    ).toHaveValue("615.00");
+      });
+      await expect(totalField).toHaveValue("615.00");
 
-    // Verify QR code data field
-    const newQrCodeDataField = newPageFinalSection.getByRole("textbox", {
-      name: "Data",
-    });
-    await expect(newQrCodeDataField).toHaveValue("https://easyinvoicepdf.com");
+      // check QR code data field
+      const qrCodeFieldset = finalSection.getByRole("group", {
+        name: "QR Code",
+      });
 
-    // Verify QR code description field
-    const newQrCodeDescriptionField = newPageFinalSection.getByRole("textbox", {
-      name: "Description (optional)",
-    });
+      // check QR code data field
+      const qrCodeDataField = qrCodeFieldset.getByRole("textbox", {
+        name: "Data",
+      });
 
-    await expect(newQrCodeDescriptionField).toHaveValue(
-      "QR Code TEST Description",
-    );
+      await qrCodeDataField.fill("https://easyinvoicepdf.com");
 
-    // Verify shared invoice badge is visible on the new page
-    const sharedInvoiceBadge = newPage.getByTestId("shared-invoice-badge");
+      // check QR code description field
+      const qrCodeDescriptionField = qrCodeFieldset.getByRole("textbox", {
+        name: "Description (optional)",
+      });
 
-    await expect(sharedInvoiceBadge).toBeVisible();
-    await expect(sharedInvoiceBadge).toHaveText("Shared invoice");
-  });
+      await qrCodeDescriptionField.fill("QR Code TEST Description");
+
+      // wait for debounce timeout
+      // eslint-disable-next-line playwright/no-wait-for-timeout
+      await page.waitForTimeout(700);
+
+      // Generate share link
+      await page.getByRole("button", { name: "Get link" }).click();
+
+      // Wait for URL to update with share data
+      await page.waitForURL((url) => {
+        return url.searchParams.has("data");
+      });
+
+      // Get the current URL which should now contain the share data
+      const sharedUrl = page.url();
+      expect(sharedUrl).toContain("?template=default&data=");
+
+      // Open URL in new tab
+      const newPage = await context.newPage();
+      await newPage.goto(sharedUrl);
+
+      // Verify the URL contains the shared invoice data
+      await expect(newPage).toHaveURL(/\?template=default&data=/);
+
+      // Get elements from the new page context
+      const newInvoiceNumberFieldset = newPage.getByRole("group", {
+        name: "Invoice Number",
+      });
+
+      /* VERIFY DATA IS LOADED IN NEW TAB */
+
+      await expect(
+        newInvoiceNumberFieldset.getByRole("textbox", { name: "Value" }),
+      ).toHaveValue("SHARE-TEST-001");
+
+      const newPageFinalSection = newPage.getByTestId(`final-section`);
+
+      await expect(
+        newPageFinalSection.getByRole("textbox", {
+          name: "Notes",
+          exact: true,
+        }),
+      ).toHaveValue("Test note for sharing");
+
+      // Verify seller information
+      const newSellerSection = newPage.getByTestId(
+        "seller-information-section",
+      );
+
+      await expect(
+        newSellerSection.getByRole("textbox", { name: "Name" }),
+      ).toHaveValue(TEST_SELLER_DATA.name);
+
+      await expect(
+        newSellerSection.getByRole("textbox", { name: "Address" }),
+      ).toHaveValue(TEST_SELLER_DATA.address);
+
+      await expect(
+        newSellerSection.getByRole("textbox", { name: "Email" }),
+      ).toHaveValue(TEST_SELLER_DATA.email);
+
+      // Verify seller tax number
+      const newSellerVatNumberFieldset = newSellerSection.getByRole("group", {
+        name: "Seller Tax Number",
+      });
+
+      await expect(
+        newSellerVatNumberFieldset.getByRole("textbox", { name: "Label" }),
+      ).toHaveValue(TEST_SELLER_DATA.vatNoLabelText);
+
+      await expect(
+        newSellerVatNumberFieldset.getByRole("textbox", { name: "Value" }),
+      ).toHaveValue(TEST_SELLER_DATA.vatNo);
+
+      // Verify buyer information
+      const newBuyerSection = newPage.getByTestId("buyer-information-section");
+
+      await expect(
+        newBuyerSection.getByRole("textbox", { name: "Name" }),
+      ).toHaveValue(TEST_BUYER_DATA.name);
+
+      await expect(
+        newBuyerSection.getByRole("textbox", { name: "Address" }),
+      ).toHaveValue(TEST_BUYER_DATA.address);
+
+      await expect(
+        newBuyerSection.getByRole("textbox", { name: "Email" }),
+      ).toHaveValue(TEST_BUYER_DATA.email);
+
+      // Verify buyer tax number
+      const newBuyerVatNumberFieldset = newBuyerSection.getByRole("group", {
+        name: "Buyer Tax Number",
+      });
+
+      await expect(
+        newBuyerVatNumberFieldset.getByRole("textbox", { name: "Label" }),
+      ).toHaveValue(TEST_BUYER_DATA.vatNoLabelText);
+
+      await expect(
+        newBuyerVatNumberFieldset.getByRole("textbox", { name: "Value" }),
+      ).toHaveValue(TEST_BUYER_DATA.vatNo);
+
+      // Verify invoice item
+      const newInvoiceItemsSection = newPage.getByTestId(
+        "invoice-items-section",
+      );
+
+      await expect(
+        newInvoiceItemsSection.getByRole("spinbutton", {
+          name: "Amount (Quantity)",
+        }),
+      ).toHaveValue("5");
+      await expect(
+        newInvoiceItemsSection.getByRole("spinbutton", {
+          name: "Net Price (Rate or Unit Price)",
+        }),
+      ).toHaveValue("100");
+
+      const newTaxSettingsFieldset = newInvoiceItemsSection.getByRole("group", {
+        name: "Tax Settings",
+      });
+      await expect(
+        newTaxSettingsFieldset.getByRole("textbox", { name: "Tax Label" }),
+      ).toHaveValue("Custom VAT");
+
+      await expect(
+        newTaxSettingsFieldset.getByRole("textbox", {
+          name: "Custom VAT Rate",
+        }),
+      ).toHaveValue("23");
+
+      const newFinalSection = newPage.getByTestId(`final-section`);
+
+      await expect(
+        newFinalSection.getByRole("textbox", {
+          name: "Total",
+          exact: true,
+        }),
+      ).toHaveValue("615.00");
+
+      // Verify QR code data field
+      const newQrCodeDataField = newPageFinalSection.getByRole("textbox", {
+        name: "Data",
+      });
+      await expect(newQrCodeDataField).toHaveValue(
+        "https://easyinvoicepdf.com",
+      );
+
+      // Verify QR code description field
+      const newQrCodeDescriptionField = newPageFinalSection.getByRole(
+        "textbox",
+        {
+          name: "Description (optional)",
+        },
+      );
+
+      await expect(newQrCodeDescriptionField).toHaveValue(
+        "QR Code TEST Description",
+      );
+
+      // Verify shared invoice badge is visible on the new page
+      const sharedInvoiceBadge = newPage.getByTestId("shared-invoice-badge");
+
+      await expect(sharedInvoiceBadge).toBeVisible();
+      await expect(sharedInvoiceBadge).toHaveText("Shared invoice");
+    },
+  );
 
   test("shows error notification when invoice link is broken", async ({
     page,

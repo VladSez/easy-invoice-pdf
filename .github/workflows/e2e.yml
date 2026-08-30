@@ -55,7 +55,7 @@ jobs:
         run: sfw pnpm install --frozen-lockfile # firewall to block malicious packages from being installed https://docs.socket.dev/docs/socket-firewall-overview
 
       - name: 📦 Install Playwright browser binaries & OS dependencies
-        run: pnpm exec playwright install chromium webkit --with-deps
+        run: pnpm exec playwright install chromium webkit firefox --with-deps
 
       - name: 🎭 Run Playwright tests
         id: playwright
@@ -63,6 +63,10 @@ jobs:
           BASE_URL: ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}
           SENTRY_ENABLED: false
           NEXT_PUBLIC_SENTRY_ENABLED: false
+          # Needed by the /api/generate-invoice/preview e2e snapshots. Must match the
+          # AUTH_TOKEN of the deployment under test. The preview tests fail when it is
+          # unset so CI cannot pass without exercising the authenticated endpoint.
+          AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
         continue-on-error: true
         # https://playwright.dev/docs/test-reporters#line-reporter
         run: pnpm exec playwright test --reporter=html,list

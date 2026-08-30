@@ -327,7 +327,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
       const result = handleInvoiceNumberBreakingChange(input);
 
       expect((result as InvoiceData).invoiceNumberObject?.value).toBe(
-        "INV/2024\\001-#@!",
+        String.raw`INV/2024\001-#@!`,
       );
     });
 

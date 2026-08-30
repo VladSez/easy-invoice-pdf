@@ -65,7 +65,7 @@ describe("useChangelogUpdatePopup", () => {
     expect(result.current.variant).toBeNull();
 
     act(() => {
-      vi.advanceTimersByTime(1_500);
+      vi.advanceTimersByTime(1500);
     });
 
     expect(result.current.isOpen).toBe(true);
@@ -86,7 +86,7 @@ describe("useChangelogUpdatePopup", () => {
     );
 
     act(() => {
-      vi.advanceTimersByTime(1_500);
+      vi.advanceTimersByTime(1500);
     });
 
     expect(result.current.variant).toBe("welcome");
@@ -100,7 +100,7 @@ describe("useChangelogUpdatePopup", () => {
     rerender({ latest: latestChangelog });
 
     act(() => {
-      vi.advanceTimersByTime(1_500);
+      vi.advanceTimersByTime(1500);
     });
 
     expect(result.current.isOpen).toBe(false);
@@ -113,7 +113,7 @@ describe("useChangelogUpdatePopup", () => {
     const { result } = renderChangelogPopupHook({ latestChangelog });
 
     act(() => {
-      vi.advanceTimersByTime(1_500);
+      vi.advanceTimersByTime(1500);
     });
 
     expect(result.current.isOpen).toBe(true);
@@ -154,7 +154,7 @@ describe("useChangelogUpdatePopup", () => {
     );
 
     act(() => {
-      vi.advanceTimersByTime(1_500);
+      vi.advanceTimersByTime(1500);
     });
 
     expect(result.current.isOpen).toBe(false);
@@ -163,7 +163,7 @@ describe("useChangelogUpdatePopup", () => {
     rerender({ latest: newChangelog });
 
     act(() => {
-      vi.advanceTimersByTime(1_500);
+      vi.advanceTimersByTime(1500);
     });
 
     expect(result.current.isOpen).toBe(true);
@@ -178,7 +178,7 @@ describe("useChangelogUpdatePopup", () => {
     const { result } = renderChangelogPopupHook({ latestChangelog });
 
     act(() => {
-      vi.advanceTimersByTime(1_500);
+      vi.advanceTimersByTime(1500);
     });
 
     expect(result.current.isOpen).toBe(false);
@@ -189,7 +189,7 @@ describe("useChangelogUpdatePopup", () => {
     const { result } = renderChangelogPopupHook({ isMobile: true });
 
     act(() => {
-      vi.advanceTimersByTime(1_500);
+      vi.advanceTimersByTime(1500);
     });
 
     expect(result.current.isOpen).toBe(false);
@@ -203,7 +203,7 @@ describe("useChangelogUpdatePopup", () => {
     });
 
     act(() => {
-      vi.advanceTimersByTime(1_500);
+      vi.advanceTimersByTime(1500);
     });
 
     expect(result.current.isOpen).toBe(false);
@@ -214,7 +214,7 @@ describe("useChangelogUpdatePopup", () => {
     const { result } = renderChangelogPopupHook();
 
     act(() => {
-      vi.advanceTimersByTime(1_500);
+      vi.advanceTimersByTime(1500);
     });
 
     expect(result.current.isOpen).toBe(true);

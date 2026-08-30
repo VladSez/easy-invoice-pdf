@@ -93,10 +93,45 @@ export default defineConfig({
         },
       },
     },
-    // {
-    //   name: "webkit",
-    //   use: { ...devices["Desktop Safari"] },
-    // },
+    /**
+     * Gecko smoke coverage.
+     *
+     * `Mobile Safari` already covers WebKit, so Firefox is the only engine we
+     * would otherwise never run. It is scoped with `grep` to the handful of
+     * tests tagged `@firefox-smoke` (the riskiest engine-sensitive paths:
+     * client side PDF generation + download, localStorage persistence and the
+     * shared invoice URL round trip) instead of the full suite.
+     *
+     * NOTE: no `channel` and no `launchOptions.args` here - those are Chromium
+     * only. Clipboard permissions are omitted too, Firefox rejects
+     * `clipboard-read`/`clipboard-write`.
+     *
+     * Visual snapshots are never compared on this project, see
+     * DEFAULT_SNAPSHOT_PROJECT in `e2e/utils/pdf-download.ts`, so it needs no
+     * screenshot baselines of its own.
+     */
+    {
+      name: "Desktop Firefox",
+      grep: /@firefox-smoke/,
+      use: {
+        ...devices["Desktop Firefox"],
+        // Set localStorage to disable umami analytics
+        storageState: {
+          cookies: [],
+          origins: [
+            {
+              origin: BASE_URL,
+              localStorage: [
+                {
+                  name: "umami.disabled",
+                  value: "1",
+                },
+              ],
+            },
+          ],
+        },
+      },
+    },
 
     // /* Test against mobile viewports. */
     {

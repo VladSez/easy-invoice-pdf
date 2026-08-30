@@ -19,8 +19,7 @@ function attachMediaListener(
     return () => {
       return query.removeEventListener("change", callback);
     };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (e: unknown) {
+  } catch {
     // deprecated on purpose: this is the fallback path for Safari <= Catalina,
     // which has no `addEventListener` on MediaQueryList (see the note above)
     // oxlint-disable-next-line typescript/no-deprecated

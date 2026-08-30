@@ -138,6 +138,43 @@ describe("generateInvoice", () => {
       );
     });
 
+    it("should use Warsaw time for date-based output", async () => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(new Date("2026-08-31T22:30:00.000Z"));
+
+      try {
+        const deps = buildDeps();
+        await generateInvoice(deps, {
+          ...MOCK_INPUT,
+          englishInvoiceData: {
+            ...MOCK_INPUT.englishInvoiceData,
+            invoiceNumberObject: {
+              label: "Invoice Number",
+              value: "",
+            },
+          },
+        });
+
+        expect(deps.createOrFindInvoiceFolder).toHaveBeenCalledWith(
+          expect.objectContaining({ month: "09", year: "2026" }),
+        );
+        expect(deps.uploadFile).toHaveBeenCalledWith(
+          expect.objectContaining({ fileName: "invoice-EN-09-2026.pdf" }),
+        );
+
+        const telegramCall = vi.mocked(deps.sendTelegramMessage).mock
+          .calls[0][0];
+        expect(telegramCall.message).toContain("Invoices for September 2026");
+        expect(telegramCall.message).toContain("Date: *September 1, 2026*");
+
+        const emailCall = vi.mocked(deps.sendEmail).mock.calls[0][0];
+        expect(emailCall.subject).toBe("📝 Invoices for September 2026");
+        expect(emailCall.html).toContain("Date: <b>September 1, 2026</b>");
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
     it("should send Telegram notification with 2 file attachments", async () => {
       const deps = buildDeps();
       await generateInvoice(deps, MOCK_INPUT);

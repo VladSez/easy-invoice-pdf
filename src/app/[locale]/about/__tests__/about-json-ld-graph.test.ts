@@ -11,7 +11,8 @@ describe("buildAboutJsonLdGraph", () => {
       "pl",
       "https://easyinvoicepdf.com",
     );
-    const parsed = JSON.parse(JSON.stringify(graph)) as {
+    const serializedGraph = JSON.stringify(graph);
+    const parsed = JSON.parse(serializedGraph) as {
       "@graph": Array<Record<string, unknown>>;
     };
 
@@ -66,7 +67,8 @@ describe("buildAboutJsonLdGraph", () => {
       "en",
       "https://easyinvoicepdf.com",
     );
-    const parsed = JSON.parse(JSON.stringify(graph)) as {
+    const serializedGraph = JSON.stringify(graph);
+    const parsed = JSON.parse(serializedGraph) as {
       "@graph": Array<Record<string, unknown>>;
     };
 

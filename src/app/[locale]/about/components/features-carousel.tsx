@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState, useSyncExternalStore } from "react";
 
 import {
   Carousel,
@@ -23,6 +23,11 @@ interface FeaturesCarouselProps {
   };
 }
 
+/** Used while embla has no api yet: there is nothing to unsubscribe from */
+const noop = () => {
+  return undefined;
+};
+
 /**
  * Carousel with the marketing feature demos: one card per view on mobile,
  * two per view from `lg` up (same as the grid it replaced).
@@ -34,24 +39,38 @@ export function FeaturesCarousel({
   translations,
 }: FeaturesCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
-  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  useEffect(() => {
-    if (!api) return;
+  // The embla instance owns the selected slide, so read it straight from the
+  // carousel rather than mirroring it into state. `setApi` re-renders once the
+  // instance exists, which is when the snapshot below starts returning it.
+  const subscribeToSelectedIndex = useCallback(
+    (onStoreChange: () => void) => {
+      // there is nothing to subscribe to until embla hands over its api
+      if (!api) {
+        return noop;
+      }
 
-    function syncSelectedIndex(carouselApi: CarouselApi) {
-      if (carouselApi) setSelectedIndex(carouselApi.selectedScrollSnap());
-    }
+      api.on("select", onStoreChange);
+      api.on("reInit", onStoreChange);
 
-    syncSelectedIndex(api);
-    api.on("select", syncSelectedIndex);
-    api.on("reInit", syncSelectedIndex);
+      return () => {
+        api.off("select", onStoreChange);
+        api.off("reInit", onStoreChange);
+      };
+    },
+    [api],
+  );
 
-    return () => {
-      api.off("select", syncSelectedIndex);
-      api.off("reInit", syncSelectedIndex);
-    };
-  }, [api]);
+  const selectedIndex = useSyncExternalStore(
+    subscribeToSelectedIndex,
+    () => {
+      return api?.selectedScrollSnap() ?? 0;
+    },
+    // the carousel only exists on the client, so the first slide is always selected on the server
+    () => {
+      return 0;
+    },
+  );
 
   const scrollTo = useCallback(
     (index: number) => {

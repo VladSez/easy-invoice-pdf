@@ -9,7 +9,8 @@ describe("buildSeoLandingJsonLd", () => {
   it("links no-login page mainEntity to FAQPage with account and pricing questions first", () => {
     const definition = SEO_LANDING_DEFINITIONS["invoice-generator-no-login"];
     const graph = buildSeoLandingJsonLd(definition);
-    const parsed = JSON.parse(JSON.stringify(graph)) as {
+    const serializedGraph = JSON.stringify(graph);
+    const parsed = JSON.parse(serializedGraph) as {
       "@graph": Array<Record<string, unknown>>;
     };
     const webPage = parsed["@graph"][0];
@@ -37,7 +38,8 @@ describe("buildSeoLandingJsonLd", () => {
   it("adds SoftwareApplication mainEntity for open-source landing", () => {
     const definition = SEO_LANDING_DEFINITIONS["open-source-invoice-generator"];
     const graph = buildSeoLandingJsonLd(definition);
-    const parsed = JSON.parse(JSON.stringify(graph)) as {
+    const serializedGraph = JSON.stringify(graph);
+    const parsed = JSON.parse(serializedGraph) as {
       "@graph": Array<Record<string, unknown>>;
     };
     const webPage = parsed["@graph"][0];
