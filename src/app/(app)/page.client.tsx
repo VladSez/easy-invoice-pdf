@@ -122,7 +122,6 @@ export function AppPageClient({
     isOpen: isChangelogPopupOpen,
     dismiss: dismissChangelogPopup,
     variant: changelogPopupVariant,
-    latestChangelog: changelogForPopup,
   } = useChangelogUpdatePopup({
     latestChangelog,
     isViewingSharedInvoice,
@@ -785,7 +784,6 @@ export function AppPageClient({
       {changelogPopupVariant ? (
         <ChangelogUpdatePopup
           variant={changelogPopupVariant}
-          latestChangelog={changelogForPopup}
           isOpen={isChangelogPopupOpen}
           onDismiss={dismissChangelogPopup}
           onHowItWorksClick={() => {

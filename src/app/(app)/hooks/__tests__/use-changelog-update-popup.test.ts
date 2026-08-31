@@ -3,8 +3,14 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { shouldShowChangelogPopup } from "@/app/(app)/utils/changelog-seen-storage";
-import { hasSeenWelcomePopup } from "@/app/(app)/utils/welcome-popup-seen-storage";
+import {
+  markChangelogAsSeen,
+  shouldShowChangelogPopup,
+} from "@/app/(app)/utils/changelog-seen-storage";
+import {
+  hasSeenWelcomePopup,
+  markWelcomePopupSeen,
+} from "@/app/(app)/utils/welcome-popup-seen-storage";
 import type { ChangelogSummary } from "@/app/changelog/utils";
 
 import { useChangelogUpdatePopup } from "../use-changelog-update-popup";
@@ -12,12 +18,14 @@ import { useChangelogUpdatePopup } from "../use-changelog-update-popup";
 vi.mock("@/app/(app)/utils/welcome-popup-seen-storage", () => {
   return {
     hasSeenWelcomePopup: vi.fn(),
+    markWelcomePopupSeen: vi.fn(),
   };
 });
 
 vi.mock("@/app/(app)/utils/changelog-seen-storage", () => {
   return {
     shouldShowChangelogPopup: vi.fn(),
+    markChangelogAsSeen: vi.fn(),
   };
 });
 
@@ -70,7 +78,7 @@ describe("useChangelogUpdatePopup", () => {
 
     expect(result.current.isOpen).toBe(true);
     expect(result.current.variant).toBe("welcome");
-    expect(result.current.latestChangelog).toBeNull();
+    expect(markWelcomePopupSeen).toHaveBeenCalledTimes(1);
   });
 
   it("should not show changelog in same session after welcome was shown", () => {
@@ -104,7 +112,38 @@ describe("useChangelogUpdatePopup", () => {
     });
 
     expect(result.current.isOpen).toBe(false);
-    expect(result.current.variant).toBeNull();
+    expect(markChangelogAsSeen).not.toHaveBeenCalled();
+  });
+
+  it("should keep the welcome popup shown when props change while it is open", () => {
+    const { result, rerender } = renderHook(
+      ({ latest }) => {
+        return useChangelogUpdatePopup({
+          latestChangelog: latest,
+          isViewingSharedInvoice: false,
+          isMobile: false,
+        });
+      },
+      { initialProps: { latest: null as ChangelogSummary | null } },
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+
+    expect(result.current.variant).toBe("welcome");
+
+    // Welcome was marked as seen on show, so a re-resolve would wrongly hide it
+    vi.mocked(hasSeenWelcomePopup).mockReturnValue(true);
+
+    rerender({ latest: latestChangelog });
+
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.variant).toBe("welcome");
   });
 
   it("should show changelog popup on a return visit", () => {
@@ -118,7 +157,7 @@ describe("useChangelogUpdatePopup", () => {
 
     expect(result.current.isOpen).toBe(true);
     expect(result.current.variant).toBe("changelog");
-    expect(result.current.latestChangelog).toEqual(latestChangelog);
+    expect(markChangelogAsSeen).toHaveBeenCalledWith(latestChangelog.slug);
   });
 
   it("should show changelog popup when latest changelog slug changes", () => {
@@ -168,7 +207,21 @@ describe("useChangelogUpdatePopup", () => {
 
     expect(result.current.isOpen).toBe(true);
     expect(result.current.variant).toBe("changelog");
-    expect(result.current.latestChangelog).toEqual(newChangelog);
+    expect(markChangelogAsSeen).toHaveBeenCalledWith(newChangelog.slug);
+  });
+
+  it("should mark popup as seen even when it is never interacted with", () => {
+    vi.mocked(hasSeenWelcomePopup).mockReturnValue(true);
+
+    const { unmount } = renderChangelogPopupHook({ latestChangelog });
+
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+
+    unmount();
+
+    expect(markChangelogAsSeen).toHaveBeenCalledWith(latestChangelog.slug);
   });
 
   it("should not show popup when changelog was already seen", () => {

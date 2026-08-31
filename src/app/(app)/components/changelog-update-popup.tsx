@@ -2,12 +2,9 @@
 
 import { XIcon } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 
 import type { AppUpdatePopupVariant } from "@/app/(app)/hooks/use-changelog-update-popup";
-import { markChangelogAsSeen } from "@/app/(app)/utils/changelog-seen-storage";
-import { markWelcomePopupSeen } from "@/app/(app)/utils/welcome-popup-seen-storage";
-import type { ChangelogSummary } from "@/app/changelog/utils";
 import { Button } from "@/components/ui/button";
 import { DISCORD_COMMUNITY_URL, REDDIT_COMMUNITY_URL } from "@/config";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
@@ -15,7 +12,6 @@ import { cn } from "@/lib/utils";
 
 interface ChangelogUpdatePopupProps {
   variant: AppUpdatePopupVariant;
-  latestChangelog: ChangelogSummary | null;
   isOpen: boolean;
   onDismiss: () => void;
   onHowItWorksClick?: () => void;
@@ -79,21 +75,10 @@ const POPUP_CONTENT = {
 
 export function ChangelogUpdatePopup({
   variant,
-  latestChangelog,
   isOpen,
   onDismiss,
   onHowItWorksClick,
 }: ChangelogUpdatePopupProps) {
-  const markSeenAndDismiss = useCallback(() => {
-    if (variant === "welcome") {
-      markWelcomePopupSeen();
-    } else if (latestChangelog) {
-      markChangelogAsSeen(latestChangelog.slug);
-    }
-
-    onDismiss();
-  }, [latestChangelog, onDismiss, variant]);
-
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -101,7 +86,7 @@ export function ChangelogUpdatePopup({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        markSeenAndDismiss();
+        onDismiss();
       }
     };
 
@@ -110,7 +95,7 @@ export function ChangelogUpdatePopup({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, markSeenAndDismiss]);
+  }, [isOpen, onDismiss]);
 
   if (!isOpen) {
     return null;
@@ -139,7 +124,7 @@ export function ChangelogUpdatePopup({
           data-testid="changelog-update-close"
           onClick={() => {
             umamiTrackEvent(`${analyticsPrefix}-dismissed`);
-            markSeenAndDismiss();
+            onDismiss();
           }}
           variant="ghost"
           size="icon"
@@ -164,7 +149,7 @@ export function ChangelogUpdatePopup({
               data-testid={content.continueTestId}
               onClick={() => {
                 umamiTrackEvent(`${analyticsPrefix}-continue`);
-                markSeenAndDismiss();
+                onDismiss();
               }}
             >
               Continue
@@ -178,7 +163,7 @@ export function ChangelogUpdatePopup({
                 data-testid={content.secondaryTestId}
                 onClick={() => {
                   umamiTrackEvent(`${analyticsPrefix}-how-it-works`);
-                  markSeenAndDismiss();
+                  onDismiss();
                   onHowItWorksClick?.();
                 }}
               >
@@ -196,7 +181,7 @@ export function ChangelogUpdatePopup({
                   href="/changelog"
                   onClick={() => {
                     umamiTrackEvent(`${analyticsPrefix}-link`);
-                    markSeenAndDismiss();
+                    onDismiss();
                   }}
                 >
                   New features
