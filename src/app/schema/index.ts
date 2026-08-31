@@ -877,11 +877,10 @@ export const invoiceItemSchema = z.object({
             ),
         ],
         {
-          errorMap: () => {
-            return {
-              message:
-                "Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).",
-            };
+          // zod v4 replaced `errorMap` with `error`, which returns the message
+          // string directly instead of a `{ message }` object.
+          error: () => {
+            return "Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).";
           },
         },
       ),
@@ -951,7 +950,7 @@ export const sellerSchema = z.object({
     .trim()
     .refine(
       (val) => {
-        return val === "" || z.string().email().safeParse(val).success;
+        return val === "" || z.email().safeParse(val).success;
       },
       {
         message: "Invalid email address",
@@ -1018,7 +1017,7 @@ export const buyerSchema = z.object({
     .trim()
     .refine(
       (val) => {
-        return val === "" || z.string().email().safeParse(val).success;
+        return val === "" || z.email().safeParse(val).success;
       },
       {
         message: "Invalid email address",
@@ -1254,12 +1253,9 @@ export const invoiceObjectSchema = z.object({
     .pipe(
       z.union([
         z.literal(""), // Allow empty string
-        z
-          .string()
-          .url("Please enter a valid URL or leave empty")
-          .refine((url) => {
-            return url.startsWith("https://");
-          }, "URL must start with https://"), // Validate HTTPS URL format
+        z.url("Please enter a valid URL or leave empty").refine((url) => {
+          return url.startsWith("https://");
+        }, "URL must start with https://"), // Validate HTTPS URL format
       ]),
     )
     .optional()
@@ -1336,7 +1332,7 @@ export const invoiceSchema = invoiceObjectSchema
       dayjs(data.dateOfServiceStart).isAfter(dayjs(data.dateOfService), "day")
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Service period start must be on or before the end date",
         path: ["dateOfServiceStart"],
       });
@@ -1383,14 +1379,11 @@ export const metadataSchema = z.object({
   /** the schema (zod) version of the app's data model */
   schemaVersion: z.string().default(SCHEMA_VERSION),
   /** when the invoice was created (i.e. invoice is first created) */
-  invoiceCreatedAt: z
-    .string()
-    .datetime()
-    .default(() => {
-      return dayjs().toISOString();
-    }),
+  invoiceCreatedAt: z.iso.datetime().default(() => {
+    return dayjs().toISOString();
+  }),
   /** when the invoice was last updated (i.e. invoice is regenerated) */
-  invoiceLastUpdatedAt: z.string().datetime().optional(),
+  invoiceLastUpdatedAt: z.iso.datetime().optional(),
 
   /** the last visited mobile tab (for better UX) */
   lastVisitedMobileTab: z

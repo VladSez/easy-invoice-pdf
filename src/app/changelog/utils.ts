@@ -53,7 +53,7 @@ export interface ChangelogEntry {
 const changelogEntryMetadataSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  date: z.string().date(),
+  date: z.iso.date(),
   version: z.string().optional(),
   type: z.enum(["major", "minor", "patch"]).optional(),
 });
@@ -126,7 +126,7 @@ async function importChangelogFile(filename: string) {
       if (error instanceof z.ZodError) {
         console.error(
           `Invalid metadata in changelog file ${filename}:`,
-          error.errors,
+          error.issues,
         );
         return null;
       }

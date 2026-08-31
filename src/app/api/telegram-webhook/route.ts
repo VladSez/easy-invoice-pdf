@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     if (!parseResult.success) {
       console.error(
         "[telegram-webhook] Invalid webhook payload:",
-        parseResult.error.errors,
+        parseResult.error.issues,
       );
 
       await sendTelegramMessage({

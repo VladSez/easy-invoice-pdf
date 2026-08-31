@@ -40,7 +40,7 @@ export const umamiTrackEvent = (
     Sentry.captureException(error);
 
     if (error instanceof z.ZodError) {
-      console.error("Invalid event name:", error.errors[0].message);
+      console.error("Invalid event name:", error.issues[0].message);
       return;
     }
   }

@@ -31,7 +31,7 @@ const config: KnipConfig = {
     "src/i18n/**/*",
     "src/app/schema/**/*",
     "src/app/changelog/content/**/*",
-    "src/app/(app)/pdf-i18n-translations/pdf-translations.ts",
+    "src/app/(app)/pdf-i18n-translations/pdf-translations-schema.ts",
   ],
   includeEntryExports: true,
   // ignore tags

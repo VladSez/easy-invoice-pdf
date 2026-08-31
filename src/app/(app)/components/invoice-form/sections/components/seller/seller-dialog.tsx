@@ -1,4 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -28,6 +27,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
+import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
 
 import { InputHelperMessage } from "../../../../../../../components/ui/input-helper-message";
 import { ConfirmDiscardDialog } from "../confirm-discard-dialog";
@@ -94,7 +94,7 @@ export function SellerDialog({
   formValues,
 }: SellerDialogProps) {
   const form = useForm<SellerData>({
-    resolver: zodResolver(sellerSchema),
+    resolver: zodResolverForOutput(sellerSchema),
     defaultValues: {
       id: initialData?.id ?? "",
       name: initialData?.name ?? "",

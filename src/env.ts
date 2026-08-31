@@ -16,21 +16,21 @@ export const env = createEnv({
     SELLER_NAME: z.string(),
     SELLER_ADDRESS: z.string(),
     SELLER_VAT_NO: z.string(),
-    SELLER_EMAIL: z.string().email(),
+    SELLER_EMAIL: z.email(),
     SELLER_ACCOUNT_NUMBER: z.string(),
     SELLER_SWIFT_BIC: z.string(),
 
     BUYER_NAME: z.string(),
     BUYER_ADDRESS: z.string(),
     BUYER_VAT_NO: z.string(),
-    BUYER_EMAIL: z.string().email(),
+    BUYER_EMAIL: z.email(),
 
     INVOICE_NET_PRICE: z.string(),
-    INVOICE_EMAIL_RECIPIENT: z.string().email(),
-    INVOICE_EMAIL_COMPANY_TO: z.string().email(),
+    INVOICE_EMAIL_RECIPIENT: z.email(),
+    INVOICE_EMAIL_COMPANY_TO: z.email(),
 
     GOOGLE_DRIVE_PARENT_FOLDER_ID: z.string(),
-    GOOGLE_DRIVE_CLIENT_EMAIL: z.string().email(),
+    GOOGLE_DRIVE_CLIENT_EMAIL: z.email(),
     GOOGLE_DRIVE_PRIVATE_KEY: z.string(),
 
     GITHUB_TOKEN: z.string(),

@@ -18,23 +18,26 @@ await loadTsFileViaJiti.import("./src/env");
 async function validatei18nAndInvoicePDFTranslationFiles() {
   // Validates our custom translations object against the schema, that is used to translate PDF fields, invoice items table, etc.
   try {
-    // Import the translations schema using jiti
+    // Import the translations schema and catalog using jiti
     // @ts-ignore
-    const { invoicePDFtranslationsSchema, INVOICE_PDF_TRANSLATIONS } =
-      await loadTsFileViaJiti.import(
-        "./src/app/(app)/pdf-i18n-translations/pdf-translations.ts",
-      );
+    const { invoicePDFTranslationsSchema } = await loadTsFileViaJiti.import(
+      "./src/app/(app)/pdf-i18n-translations/pdf-translations-schema.ts",
+    );
+    // @ts-ignore
+    const { INVOICE_PDF_TRANSLATIONS } = await loadTsFileViaJiti.import(
+      "./src/app/(app)/pdf-i18n-translations/pdf-translations.ts",
+    );
 
-    const result = invoicePDFtranslationsSchema.safeParse(
+    const result = invoicePDFTranslationsSchema.safeParse(
       INVOICE_PDF_TRANSLATIONS,
     );
 
     if (!result.success) {
-      console.error("❌ Invalid translations:", result.error.message);
+      console.error("❌ Invalid PDF translations:", result.error.message);
       process.exit(1);
     }
   } catch (error) {
-    console.error("❌ Error validating translations:", error);
+    console.error("❌ Error validating PDF translations:", error);
     process.exit(1);
   }
 
@@ -135,12 +138,6 @@ const withMDX = createMDX({
 const nextConfig = {
   // Configure the file extensions that Next.js should handle
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   compiler: {
     removeConsole: process.env.VERCEL_ENV === "production",
   },

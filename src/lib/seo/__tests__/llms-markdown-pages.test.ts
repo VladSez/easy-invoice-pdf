@@ -32,12 +32,9 @@ const UPDATE_DATE_LABELS = {
   nl: "Laatst bijgewerkt",
 } as const;
 
-const UPDATE_DATE_SCHEMA = z
-  .string()
-  .date()
-  .transform((value) => {
-    return new Date(`${value}T00:00:00.000Z`);
-  });
+const UPDATE_DATE_SCHEMA = z.iso.date().transform((value) => {
+  return new Date(`${value}T00:00:00.000Z`);
+});
 
 function readPublicFile(path: string) {
   return readFileSync(resolve(process.cwd(), "public", path), "utf8");

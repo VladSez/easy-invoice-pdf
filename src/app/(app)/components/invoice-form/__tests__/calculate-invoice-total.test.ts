@@ -115,29 +115,34 @@ describe("calculateInvoiceTotal", () => {
     ).toBe(75.5);
   });
 
-  // `z.coerce.number().nonnegative()` accepts Infinity, so these reach
-  // `calculateInvoiceTotal` through the real parse path and are the cases that
-  // `getSafeNumber` actually exists to handle.
-  it("treats a non-finite preTaxAmount that passed validation as 0", () => {
+  // As of zod v4 `z.coerce.number()` rejects non-finite values, so the parse
+  // path no longer lets `Infinity` through.
+  it("rejects a non-finite preTaxAmount at the parse step", () => {
     expect(
-      calculateInvoiceTotal(
-        createValidatedItems([
-          createItem({ preTaxAmount: 100 }),
-          createItem({ preTaxAmount: Number.POSITIVE_INFINITY }),
-        ]),
-      ),
-    ).toBe(100);
+      parseValidatedInvoiceItems([
+        createItem({ preTaxAmount: Number.POSITIVE_INFINITY }),
+      ]).success,
+    ).toBe(false);
+
+    // an overflowing numeric string coerces to Infinity, so it is rejected too
+    expect(
+      parseValidatedInvoiceItems([
+        createItem({ preTaxAmount: "1e999" as unknown as number }),
+      ]).success,
+    ).toBe(false);
   });
 
-  it("treats an overflowing numeric string as 0", () => {
-    const validatedItems = createValidatedItems([
-      createItem({ preTaxAmount: 100 }),
-      createItem({ preTaxAmount: "1e999" as unknown as number }),
-    ]);
+  // The totals effect passes raw, unvalidated `useWatch` items straight in, so
+  // a non-finite amount still reaches the sum without ever being parsed. That
+  // is what `getSafeNumber`'s finiteness guard exists for.
+  it("treats a non-finite preTaxAmount in raw form values as 0", () => {
+    const rawFormItems = [
+      { preTaxAmount: 100 },
+      { preTaxAmount: Number.POSITIVE_INFINITY },
+      { preTaxAmount: "1e999" },
+    ] as unknown as ReadonlyArray<Pick<InvoiceItemData, "preTaxAmount">>;
 
-    // the string overflows to Infinity during coercion, not to a parse error
-    expect(validatedItems[1].preTaxAmount).toBe(Number.POSITIVE_INFINITY);
-    expect(calculateInvoiceTotal(validatedItems)).toBe(100);
+    expect(calculateInvoiceTotal(rawFormItems)).toBe(100);
   });
 
   it("coerces string preTaxAmount when raw form values reach it", () => {

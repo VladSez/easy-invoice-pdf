@@ -10,10 +10,11 @@ import type { InvoiceItemData } from "@/app/schema";
  *   but never writes coerced values back into it, so a `useWatch` result can
  *   still hold `"10"`. Summing that concatenates (`0 + "10"` -> `"010"`) and
  *   then throws on `.toFixed`.
- * - `z.coerce.number().nonnegative()` accepts `Infinity`, so a literal
- *   `Infinity` or an overflowing numeric string like `"1e999"` survives
- *   validation. Summing those renders the invoice total as "Infinity"; a
- *   non-finite amount contributes 0 instead so the form stays usable.
+ * - A literal `Infinity`, or an overflowing numeric string like `"1e999"`, can
+ *   sit in form state. Zod rejects non-finite values, but this runs on raw
+ *   `useWatch` items that were never parsed, so nothing has filtered them out.
+ *   Summing those renders the invoice total as "Infinity"; a non-finite amount
+ *   contributes 0 instead so the form stays usable.
  */
 export function getSafeNumber(value: unknown) {
   const number = Number(value ?? 0);

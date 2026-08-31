@@ -1,6 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
 import {
@@ -41,6 +40,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
 import type { NonReadonly, Prettify } from "@/types";
 
 import { AlertIcon, ErrorMessage } from "./common";
@@ -84,7 +84,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   setInvoiceFormHasErrors,
 }: InvoiceFormProps) {
   const form = useForm<InvoiceData>({
-    resolver: zodResolver(invoiceSchema),
+    resolver: zodResolverForOutput(invoiceSchema),
     defaultValues: invoiceData,
     mode: "onChange",
   });
