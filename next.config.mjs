@@ -138,13 +138,6 @@ const withMDX = createMDX({
 const nextConfig = {
   // Configure the file extensions that Next.js should handle
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
-  // pdfkit (a @react-pdf/renderer dependency) loads its 14 built-in fonts through
-  // a Node subpath imports map in its own package.json: `require('#standard-fonts/Helvetica')`.
-  // `#` specifiers resolve relative to the *package's* package.json, so once pdfkit
-  // is inlined into a server chunk that file is gone and the require throws
-  // MODULE_NOT_FOUND at runtime — only in a built deployment, never in `next dev`.
-  // Keeping pdfkit external leaves it in node_modules, where the map resolves.
-  serverExternalPackages: ["pdfkit"],
   compiler: {
     removeConsole: process.env.VERCEL_ENV === "production",
   },

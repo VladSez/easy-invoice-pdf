@@ -17,3 +17,41 @@
 # Full write-up, including how to reproduce and verify: patches/README.md
 patchedDependencies:
   fontkit@2.0.4: patches/fontkit@2.0.4.patch
+
+# @react-pdf/renderer is held at 4.6.1, and its whole sub-tree is pinned here.
+# This block is not arbitrary — do not loosen it to carets, and do not let a
+# dependency update touch @react-pdf/* without re-reading this comment.
+#
+# Two independent reasons:
+#
+# 1. The 4.9.x line depends on the UNSCOPED `pdfkit`, which loads its 14 built-in
+#    fonts through a Node subpath imports map declared in its own package.json
+#    (`require('#standard-fonts/Helvetica')`). Vercel's runtime resolver does not
+#    honour `imports` maps, so every server-side render dies with
+#    MODULE_NOT_FOUND on the deployment while working fine in `next dev`.
+#    4.6.1 uses `@react-pdf/pdfkit` instead, which has no such map.
+#
+# 2. 4.6.1 declares its own sub-packages with caret ranges, so a fresh install
+#    resolves them from the 4.9.x line. @react-pdf/font@4.1.x switched to the
+#    unscoped pdfkit and stopped calling registerStdFonts(), so every render dies
+#    with `Standard font "Helvetica" is not registered`. The versions below are
+#    the exact tree 4.6.1 shipped with (resolved at its publish date).
+#
+# 4.6.1 is also the newest release still on the old layout stack (layout@4.7.1 +
+# textkit@6.4.1); 4.7.0 moves to layout@5.x. Downgrading below 4.3.2 is not an
+# option: those releases predate @react-pdf/reconciler@2.0.0 and cannot run on
+# React 19.2.
+overrides:
+  "@react-pdf/fns": "3.1.3"
+  "@react-pdf/font": "4.0.10"
+  "@react-pdf/image": "3.1.1"
+  "@react-pdf/layout": "4.7.1"
+  "@react-pdf/pdfkit": "6.0.1"
+  "@react-pdf/primitives": "4.3.0"
+  "@react-pdf/reconciler": "2.0.0"
+  "@react-pdf/render": "4.6.1"
+  "@react-pdf/renderer": "4.6.1"
+  "@react-pdf/stylesheet": "6.2.3"
+  "@react-pdf/svg": "1.1.0"
+  "@react-pdf/textkit": "6.4.1"
+  "@react-pdf/types": "2.11.3"
