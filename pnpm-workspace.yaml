@@ -1,0 +1,19 @@
+# fontkit 2.0.4 drops characters from generated PDFs. Rendering an accented
+# letter (ã ç é ó) poisons a cache inside the font object, and because
+# @react-pdf shares that object across every render in a page session, later
+# PDFs come out with the first character of labels missing ("Cobrar de" renders
+# as "obrar de") until the page is reloaded.
+#
+# Upstream issue (open since 2018, not fixed):
+#   https://github.com/foliojs/fontkit/issues/154
+# The approach we use - evicting the cache entry rather than repairing it:
+#   https://github.com/foliojs/fontkit/issues/154#issuecomment-4187174366
+#
+# The patch is the fix. Do NOT remove it, and do not bump fontkit without
+# re-making it - the version is pinned into the patch name, so an upgrade
+# silently drops the fix and the bug comes back. Drop it only once the upstream
+# issue is released.
+#
+# Full write-up, including how to reproduce and verify: patches/README.md
+patchedDependencies:
+  fontkit@2.0.4: patches/fontkit@2.0.4.patch
