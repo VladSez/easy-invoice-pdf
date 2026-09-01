@@ -8,13 +8,13 @@ cause reported from the `getGlyph(gid)` side.
 **Symptom.** Switching the invoice template and then the PDF language in quick
 succession produced PDFs with the first one or two characters of labels missing:
 
-| expected            | rendered           |
-| ------------------- | ------------------ |
-| `Fatura`            | `atura`            |
-| `Data de emissão`   | `ata de emissão`   |
-| `agosto 25, 2026`   | `osto 25, 2026`    |
-| `Cobrar de`         | `obrar de`         |
-| `Valor vencido`     | `alor vencido`     |
+| expected          | rendered         |
+| ----------------- | ---------------- |
+| `Fatura`          | `atura`          |
+| `Data de emissão` | `ata de emissão` |
+| `agosto 25, 2026` | `osto 25, 2026`  |
+| `Cobrar de`       | `obrar de`       |
+| `Valor vencido`   | `alor vencido`   |
 
 It hit Portuguese and Spanish far more than English, was intermittent, and a
 page reload always cleared it. It affected both the preview **and** the
@@ -63,7 +63,11 @@ just less likely to hit the triggering render order.
 that does know them — rebuilds it:
 
 ```js
-if (characters.length > 0 && this._glyphs[glyph] && this._glyphs[glyph].codePoints.length === 0) {
+if (
+  characters.length > 0 &&
+  this._glyphs[glyph] &&
+  this._glyphs[glyph].codePoints.length === 0
+) {
   this._glyphs[glyph] = null;
 }
 ```
@@ -81,11 +85,11 @@ patched-in-place mark glyph keeps `isMark: false` — and `isMark` drives GPOS m
 attachment, i.e. where the accent gets positioned. Measured on Inter after
 decomposing `ç ã é ó`:
 
-| | U+0303 tilde | U+0327 cedilla | U+0308 diaeresis (not a component — control) |
-| --- | --- | --- | --- |
-| unpatched | `isMark=false cp=[]` | `isMark=false cp=[]` | `isMark=true cp=[776]` |
-| repair in place | `isMark=false cp=[771]` | `isMark=false cp=[807]` | `isMark=true cp=[776]` |
-| **evict (this patch)** | `isMark=true cp=[771]` | `isMark=true cp=[807]` | `isMark=true cp=[776]` |
+|                        | U+0303 tilde            | U+0327 cedilla          | U+0308 diaeresis (not a component — control) |
+| ---------------------- | ----------------------- | ----------------------- | -------------------------------------------- |
+| unpatched              | `isMark=false cp=[]`    | `isMark=false cp=[]`    | `isMark=true cp=[776]`                       |
+| repair in place        | `isMark=false cp=[771]` | `isMark=false cp=[807]` | `isMark=true cp=[776]`                       |
+| **evict (this patch)** | `isMark=true cp=[771]`  | `isMark=true cp=[807]`  | `isMark=true cp=[776]`                       |
 
 Approach suggested by @mauricedoepke in
 https://github.com/foliojs/fontkit/issues/154#issuecomment-4187174366.
@@ -97,7 +101,7 @@ fails if the patch stops being applied. It resolves the exact fontkit instance
 `@react-pdf/renderer` renders with, and reproduces the poisoning against a real
 TTF that ships with `pdfjs-dist` (no committed asset, no network).
 
-It asserts the patch's *contents*, not its path, because pnpm can recreate the
+It asserts the patch's _contents_, not its path, because pnpm can recreate the
 `fontkit@2.0.4_patch_hash=…` directory with unpatched files. That assertion also
 pins the eviction approach. The `isMark` regression above is **not** covered
 behaviourally: it needs a font with combining marks and none ship with our
@@ -106,11 +110,14 @@ dependencies (the Liberation family in `pdfjs-dist` has none).
 ## Reproducing / verifying
 
 ```js
-import fk from 'fontkit';
-const font = fk.create(fs.readFileSync('Inter-Medium.ttf'));
-for (const ch of ['ã', 'ç', 'é', 'ó']) font.glyphForCodePoint(ch.codePointAt(0)).path;
+import fk from "fontkit";
+const font = fk.create(fs.readFileSync("Inter-Medium.ttf"));
+for (const ch of ["ã", "ç", "é", "ó"])
+  font.glyphForCodePoint(ch.codePointAt(0)).path;
 // unpatched: a c e o now all have codePoints: []
-['a', 'c', 'e', 'o'].map((ch) => font._glyphs[font.glyphForCodePoint(ch.codePointAt(0)).id].codePoints);
+["a", "c", "e", "o"].map(
+  (ch) => font._glyphs[font.glyphForCodePoint(ch.codePointAt(0)).id].codePoints,
+);
 ```
 
 End to end: render a PDF, poison the cache as above, render again and extract
@@ -128,7 +135,7 @@ the text with pdf.js. Unpatched the second render yields `4g "tur"` for
   dependency versions after running it.
 - If you hand-delete anything under `node_modules/.pnpm`, pnpm can recreate the
   `fontkit@2.0.4_patch_hash=…` directory **without** the patch content. The
-  directory name is not proof. Check the copy that is actually *resolved*, not a
+  directory name is not proof. Check the copy that is actually _resolved_, not a
   glob — re-patching also leaves
   stale `patch_hash` directories behind, so a glob can match copies nothing uses:
 

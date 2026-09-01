@@ -25,7 +25,12 @@ export const MobileInvoicePDFViewer = () => {
 
   // The PDF itself is generated once by `InvoicePdfInstanceProvider` and shared with the
   // download button, we only turn the resulting blob URL into a scrollable preview here.
-  const { url, loading, error } = useInvoicePdfInstance();
+  //
+  // `loading` is deliberately not read: while a new version is generated `usePDF` keeps
+  // serving the previous `url`, so we keep the document we already have on screen. Reacting
+  // to `loading` would unmount it on every edit of the form, and that costs a full re-parse
+  // (plus a spinner) even when the viewer sits in the closed tab.
+  const { url, error } = useInvoicePdfInstance();
 
   // On mobile, we need to use the 'react-pdf' (https://github.com/wojtekmaj/react-pdf) to generate a PDF preview
   // This is because the PDF viewer is not supported on Android Chrome devices
@@ -54,7 +59,8 @@ export const MobileInvoicePDFViewer = () => {
     );
   }
 
-  if (loading || !url) {
+  // Only the very first render has nothing to show at all
+  if (!url) {
     return (
       <div className="flex h-[520px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
         <div className="text-center">
@@ -70,7 +76,7 @@ export const MobileInvoicePDFViewer = () => {
     <Document
       // we use a key to force a re-render of the PDF viewer in case of error
       key={key}
-      file={url || ""}
+      file={url}
       noData={
         <div className="flex h-[520px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
           <div className="text-center">

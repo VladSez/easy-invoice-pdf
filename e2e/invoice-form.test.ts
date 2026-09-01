@@ -248,6 +248,106 @@ test.describe("Invoice Generator Page", () => {
     await expect(termsOfServiceLinkDesktop).toHaveAttribute("href", "/tos");
   });
 
+  test("keeps a form edit made right before switching to the preview tab", async ({
+    page,
+    isMobile,
+  }) => {
+    // the tabs only exist in the mobile layout
+    // eslint-disable-next-line playwright/no-skipped-test -- mobile UI flow, mobile projects only
+    test.skip(!isMobile, "mobile only flow, runs on the mobile projects");
+
+    const NEW_INVOICE_NUMBER = "QUICK-TAB-SWITCH/2026";
+
+    const invoiceNumberValueInput = page
+      .getByRole("group", { name: "Invoice Number" })
+      .getByRole("textbox", { name: "Value" });
+
+    await expect(invoiceNumberValueInput).toHaveValue(
+      INITIAL_INVOICE_DATA.invoiceNumberObject.value,
+    );
+
+    // The form saves itself to localStorage (and regenerates the PDF) on a debounce, so
+    // leaving the tab right after typing used to unmount the form mid debounce and drop
+    // the edit. No wait between the two actions on purpose: the switch has to happen
+    // inside the debounce window for this to test anything.
+    await invoiceNumberValueInput.fill(NEW_INVOICE_NUMBER);
+    await page.getByRole("tab", { name: "Preview PDF" }).click();
+
+    await expect(
+      page.getByRole("tab", { name: "Preview PDF" }),
+    ).toHaveAttribute("aria-selected", "true");
+
+    // the pending save still lands, even though the form tab is closed by now
+    await expect
+      .poll(async () => {
+        const storedData = await page.evaluate((key) => {
+          return localStorage.getItem(key);
+        }, PDF_DATA_LOCAL_STORAGE_KEY);
+
+        return storedData
+          ? (JSON.parse(storedData) as InvoiceData).invoiceNumberObject?.value
+          : null;
+      })
+      .toBe(NEW_INVOICE_NUMBER);
+
+    // and the edit is still there when the user comes back to the form
+    await page.getByRole("tab", { name: "Edit Invoice" }).click();
+
+    await expect(invoiceNumberValueInput).toHaveValue(NEW_INVOICE_NUMBER);
+  });
+
+  test("commits a pending form edit when leaving the form tab", async ({
+    page,
+    isMobile,
+  }) => {
+    // the tabs only exist in the mobile layout
+    // eslint-disable-next-line playwright/no-skipped-test -- mobile UI flow, mobile projects only
+    test.skip(!isMobile, "mobile only flow, runs on the mobile projects");
+
+    const NEW_INVOICE_NUMBER = "FLUSHED-ON-TAB-SWITCH/2026";
+
+    const readStoredInvoice = () => {
+      return page.evaluate((key) => {
+        return String(localStorage.getItem(key));
+      }, PDF_DATA_LOCAL_STORAGE_KEY);
+    };
+
+    // Pausing the clock takes the 500ms debounce out of the picture entirely: it can no
+    // longer fire on its own, so anything that reaches localStorage below got there
+    // because leaving the form tab flushed it. `install()` alone is not enough, the fake
+    // clock keeps ticking until it is paused.
+    await page.clock.install();
+    await page.goto("/?template=default");
+
+    // pause ahead of where the page's fake clock already is: `pauseAt` fast forwards to
+    // the given time and rejects a target that is already in the past, so the margin has
+    // to outlast the round trip that reads the clock (100ms did not, once the suite ran
+    // its workers in parallel). It also has to stay under the app's own idle timers, so
+    // the jump does not fire them - the earliest of those is the changelog popup at
+    // 1500ms.
+    const CLOCK_PAUSE_MARGIN = 1000;
+
+    const pageTime = await page.evaluate(() => {
+      return Date.now();
+    });
+
+    await page.clock.pauseAt(new Date(pageTime + CLOCK_PAUSE_MARGIN));
+
+    const invoiceNumberValueInput = page
+      .getByRole("group", { name: "Invoice Number" })
+      .getByRole("textbox", { name: "Value" });
+
+    await invoiceNumberValueInput.fill(NEW_INVOICE_NUMBER);
+
+    // the debounce is frozen, so nothing has been written yet
+    expect(await readStoredInvoice()).not.toContain(NEW_INVOICE_NUMBER);
+
+    await page.getByRole("tab", { name: "Preview PDF" }).click();
+
+    // ...and switching tabs commits it right away instead of waiting out the debounce
+    await expect.poll(readStoredInvoice).toContain(NEW_INVOICE_NUMBER);
+  });
+
   test("displays initial form state correctly", async ({ page }) => {
     // **CHECK GENERAL INFORMATION SECTION**
     const generalInfoSection = page.getByTestId(`general-information-section`);

@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import type { Dispatch, SetStateAction } from "react";
+import { useRef, useState, type Dispatch, type SetStateAction } from "react";
 
 import {
   type InvoiceData,
@@ -140,15 +140,65 @@ export function InvoiceClientPage({
   const defaultMobileTab =
     appMetadata?.lastVisitedMobileTab || DEFAULT_MOBILE_TAB;
 
+  const [activeMobileTab, setActiveMobileTab] =
+    useState<MobileTabsValues>(defaultMobileTab);
+
+  // Tabs whose panel has been opened at least once. Radix unmounts the panel of the
+  // inactive tab, and both panels lose something real when that happens:
+  //
+  // - the preview threw away the rendered document, so `react-pdf` parsed and rasterized
+  //   the very same PDF again (with its loading spinner in between) on every switch back
+  // - the form cancelled the debounced save that `InvoiceForm` schedules 500ms after a
+  //   keystroke, so an edit followed by a quick tab switch was silently lost
+  //
+  // Once a panel has been opened we keep it mounted and hide it with CSS instead. Panels
+  // stay lazy until their first visit, so the preview costs nothing for a user who never
+  // opens it.
+  const [openedMobileTabs, setOpenedMobileTabs] = useState<MobileTabsValues[]>(
+    () => {
+      return [defaultMobileTab];
+    },
+  );
+
+  /**
+   * Determines if a given mobile tab should remain mounted.
+   *
+   * This is useful for maintaining state or performance optimizations where certain tabs
+   * should not be unmounted when inactive, such as when using libraries that unmount inactive panels by default.
+   */
+  const keepMounted = (tab: MobileTabsValues) => {
+    // `forceMount` only accepts `true | undefined`, `false` would still force the mount
+    return openedMobileTabs.includes(tab) || undefined;
+  };
+
+  /**
+   * Filled in by `InvoiceForm`. The form only writes an edit through after a 500ms
+   * debounce, so leaving for the preview would otherwise show the previous version of the
+   * invoice for a moment.
+   */
+  const flushPendingFormChangesRef = useRef<(() => void) | null>(null);
+
   return (
     <>
       {isMobile ? (
         <div>
           <Tabs
-            defaultValue={defaultMobileTab}
+            value={activeMobileTab}
             className="w-full"
             onValueChange={(value) => {
               const newValue = value as MobileTabsValues;
+
+              // commit whatever was typed just before the switch, so the preview opens on
+              // the current invoice instead of catching up half a second later
+              flushPendingFormChangesRef.current?.();
+
+              setActiveMobileTab(newValue);
+
+              setOpenedMobileTabs((current) => {
+                return current.includes(newValue)
+                  ? current
+                  : [...current, newValue];
+              });
 
               // update the last visited mobile tab in the app metadata
               updateAppMetadata((current) => {
@@ -173,17 +223,28 @@ export function InvoiceClientPage({
                 </span>
               </TabsTrigger>
             </TabsList>
-            <TabsContent value={TAB_INVOICE_FORM} className="mt-1">
+            <TabsContent
+              value={TAB_INVOICE_FORM}
+              forceMount={keepMounted(TAB_INVOICE_FORM)}
+              className="mt-1 data-[state=inactive]:hidden"
+            >
               <MobileFormScrollContainer className="h-[520px] overflow-auto rounded-lg border-b px-3 shadow-sm">
                 <InvoiceForm
                   invoiceData={invoiceDataState}
                   handleInvoiceDataChange={handleInvoiceDataChange}
                   isMobile
                   setInvoiceFormHasErrors={setInvoiceFormHasErrors}
+                  flushPendingChangesRef={flushPendingFormChangesRef}
                 />
               </MobileFormScrollContainer>
             </TabsContent>
-            <TabsContent value={TAB_INVOICE_PREVIEW} className="mt-1">
+            <TabsContent
+              value={TAB_INVOICE_PREVIEW}
+              // `forceMount` keeps the panel in the tree, but it also stops Radix from
+              // hiding it, so the inactive state is hidden with CSS here instead
+              forceMount={keepMounted(TAB_INVOICE_PREVIEW)}
+              className="mt-1 data-[state=inactive]:hidden"
+            >
               <div className="flex h-[520px] w-full items-center justify-center">
                 <PdfViewer isMobile={isMobile} />
               </div>

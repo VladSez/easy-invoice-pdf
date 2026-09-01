@@ -8,6 +8,7 @@ import {
   useEffect,
   useState,
   type Dispatch,
+  type RefObject,
   type SetStateAction,
 } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
@@ -54,8 +55,16 @@ import { formErrorsToToast } from "./utils/form-errors-to-toast";
 import { hasAnyItemTotalsChanged } from "./utils/has-item-totals-changed";
 import { parseValidatedInvoiceItems } from "./utils/validated-invoice-items";
 
+/**
+ * Time in milliseconds to debounce updates in the invoice form,
+ * e.g. for delayed applying of changes before persisting/syncing.
+ */
 const DEBOUNCE_TIMEOUT = 500;
 
+/**
+ * Default values for the invoice form's accordion sections.
+ * These correspond to the different sections of the form that can be expanded or collapsed.
+ */
 const DEFAULT_ACCORDION_VALUES = [
   "general",
   "seller",
@@ -75,6 +84,11 @@ interface InvoiceFormProps {
   handleInvoiceDataChange: (updatedData: InvoiceData) => void;
   isMobile?: boolean;
   setInvoiceFormHasErrors: Dispatch<SetStateAction<boolean>>;
+  /**
+   * Filled in with a function that commits a pending (debounced) edit immediately, so the
+   * parent can flush the form before the user's attention moves elsewhere.
+   */
+  flushPendingChangesRef?: RefObject<(() => void) | null>;
 }
 
 export const InvoiceForm = memo(function InvoiceForm({
@@ -82,6 +96,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   handleInvoiceDataChange,
   isMobile = false,
   setInvoiceFormHasErrors,
+  flushPendingChangesRef,
 }: InvoiceFormProps) {
   const form = useForm<InvoiceData>({
     resolver: zodResolverForOutput(invoiceSchema),
@@ -238,6 +253,24 @@ export const InvoiceForm = memo(function InvoiceForm({
       return subscription.unsubscribe();
     };
   }, [debouncedRegeneratePdfOnFormChange, watch]);
+
+  // Hands the parent a way to commit a pending edit right away instead of waiting out the
+  // debounce. The mobile tabs use it when the user leaves the form for the PDF preview, so
+  // the preview shows what was just typed instead of the previous version for half a second.
+  useEffect(() => {
+    if (!flushPendingChangesRef) {
+      return;
+    }
+
+    flushPendingChangesRef.current = () => {
+      // a no-op when nothing is pending
+      void debouncedRegeneratePdfOnFormChange.flush();
+    };
+
+    return () => {
+      flushPendingChangesRef.current = null;
+    };
+  }, [debouncedRegeneratePdfOnFormChange, flushPendingChangesRef]);
 
   const template = useWatch({ control, name: "template" });
   const taxLabelText = useWatch({ control, name: "taxLabelText" }) || "VAT";
