@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   formatDateOfServiceEnd,
   formatServicePeriodRange,
+  getCurrentMonthAndYear,
   getServicePeriod,
   isFirstDayOfMonth,
   isServicePeriodStartInCurrentMonth,
@@ -95,6 +96,38 @@ describe("format-service-period", () => {
       } as InvoiceData);
 
       expect(result).toBe("2025-06-14 – 2025-06-20");
+    });
+  });
+
+  describe("getCurrentMonthAndYear", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("should zero-pad single digit months", () => {
+      vi.setSystemTime(new Date("2025-06-15T12:00:00Z"));
+
+      expect(getCurrentMonthAndYear()).toBe("06-2025");
+    });
+
+    it("should not pad double digit months", () => {
+      vi.setSystemTime(new Date("2025-12-31T12:00:00Z"));
+
+      expect(getCurrentMonthAndYear()).toBe("12-2025");
+    });
+
+    it("should be recomputed on every call, so a tab open past the month boundary rolls over", () => {
+      vi.setSystemTime(new Date("2025-12-31T12:00:00Z"));
+      const beforeRollover = getCurrentMonthAndYear();
+
+      vi.setSystemTime(new Date("2026-01-01T12:00:00Z"));
+
+      expect(beforeRollover).toBe("12-2025");
+      expect(getCurrentMonthAndYear()).toBe("01-2026");
     });
   });
 });

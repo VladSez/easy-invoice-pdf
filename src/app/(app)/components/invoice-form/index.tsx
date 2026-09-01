@@ -15,6 +15,7 @@ import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 
+import { formatDateWithLocale } from "@/app/(app)/utils/format-date-with-locale";
 import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
@@ -129,6 +130,19 @@ export const InvoiceForm = memo(function InvoiceForm({
   const isPaymentDue14DaysFromDateOfIssue =
     dayjs(paymentDue).isAfter(dayjs(dateOfIssue).add(14, "days")) ||
     dayjs(paymentDue).isSame(dayjs(dateOfIssue).add(14, "days"));
+
+  // Helper texts quote dates back to the user, so they are formatted the way the
+  // PDF will render them: the invoice's date format AND its language.
+  const formattedDateOfIssue = formatDateWithLocale({
+    date: dateOfIssue,
+    selectedDateFormat,
+    language,
+  });
+  const formattedSuggestedPaymentDue = formatDateWithLocale({
+    date: dayjs(dateOfIssue).add(14, "days"),
+    selectedDateFormat,
+    language,
+  });
 
   const { fields, append } = useFieldArray({
     control,
@@ -610,7 +624,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                 <span className="flex items-center text-balance text-amber-800">
                   <AlertIcon />
                   Payment due date is before date of issue (
-                  {dayjs(dateOfIssue).format(selectedDateFormat)})
+                  {formattedDateOfIssue})
                 </span>
                 <ButtonHelper
                   onClick={() => {
@@ -622,11 +636,8 @@ export const InvoiceForm = memo(function InvoiceForm({
                   }}
                 >
                   <span className="text-pretty">
-                    Set payment due date to{" "}
-                    {dayjs(dateOfIssue)
-                      .add(14, "days")
-                      .format(selectedDateFormat)}{" "}
-                    (14 days from issue date)
+                    Set payment due date to {formattedSuggestedPaymentDue} (14
+                    days from issue date)
                   </span>
                 </ButtonHelper>
               </InputHelperMessage>
@@ -648,11 +659,8 @@ export const InvoiceForm = memo(function InvoiceForm({
                   }}
                 >
                   <span className="text-pretty">
-                    Set payment due date to{" "}
-                    {dayjs(dateOfIssue)
-                      .add(14, "days")
-                      .format(selectedDateFormat)}{" "}
-                    (14 days from issue date)
+                    Set payment due date to {formattedSuggestedPaymentDue} (14
+                    days from issue date)
                   </span>
                 </ButtonHelper>
               </InputHelperMessage>

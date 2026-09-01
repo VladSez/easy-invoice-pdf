@@ -70,3 +70,13 @@ export function formatServicePeriodRange(
 
   return `${start.format(invoiceData.dateFormat)} – ${end.format(invoiceData.dateFormat)}`;
 }
+
+/**
+ * Current month and year in the `MM-YYYY` shape invoice numbers use (e.g. `04-2025`).
+ * Computed on call rather than at module load, so a long-lived tab (and a test with
+ * mocked timers) sees the month it is actually in.
+ * @returns The current month and year, `MM-YYYY`.
+ */
+export function getCurrentMonthAndYear(): string {
+  return dayjs().format("MM-YYYY");
+}

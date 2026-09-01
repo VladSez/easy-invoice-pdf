@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { AlertTriangle, InfoIcon, RefreshCw, Upload, X } from "lucide-react";
+import { InfoIcon, Upload, X } from "lucide-react";
 import { memo, useCallback, useRef } from "react";
 import {
   type Control,
@@ -19,7 +19,9 @@ import {
   getDefaultInvoiceNumberLabel,
   INVOICE_PDF_TRANSLATIONS,
 } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { formatTodayWithLocale } from "@/app/(app)/utils/format-date-with-locale";
 import {
+  getCurrentMonthAndYear,
   isFirstDayOfMonth,
   isServicePeriodStartInCurrentMonth,
 } from "@/app/(app)/utils/format-service-period";
@@ -34,7 +36,6 @@ import {
   TEMPLATE_TO_LABEL,
 } from "@/app/schema";
 import { CurrencyCombobox } from "@/components/currency-combobox";
-import { Button } from "@/components/ui/button";
 import { ButtonHelper } from "@/components/ui/button-helper";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
@@ -45,7 +46,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
-const CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
+import { convertFileToBase64, validateImageSize } from "../utils/logo-upload";
+import { StaleDatesBanner } from "./components/stale-dates-banner";
 
 interface GeneralInformationProps {
   control: Control<InvoiceData>;
@@ -126,7 +128,7 @@ export const GeneralInformation = memo(function GeneralInformation({
   )?.[1];
 
   const isInvoiceNumberInCurrentMonth =
-    extractInvoiceMonthAndYear === CURRENT_MONTH_AND_YEAR;
+    extractInvoiceMonthAndYear === getCurrentMonthAndYear();
 
   // Logo upload handlers
   const handleLogoUpload = useCallback(
@@ -419,7 +421,10 @@ export const GeneralInformation = memo(function GeneralInformation({
                   )}
                 >
                   {SUPPORTED_DATE_FORMATS.map((format) => {
-                    const preview = dayjs().locale(language).format(format);
+                    const preview = formatTodayWithLocale({
+                      selectedDateFormat: format,
+                      language,
+                    });
                     const isDefault = format === DEFAULT_DATE_FORMAT;
 
                     return (
@@ -587,7 +592,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               >
                 <span className="text-pretty">
                   Set date of issue to today (
-                  {dayjs().format(selectedDateFormat)})
+                  {formatTodayWithLocale({ selectedDateFormat, language })})
                 </span>
               </ButtonHelper>
             </InputHelperMessage>
@@ -862,6 +867,7 @@ export const GeneralInformation = memo(function GeneralInformation({
             invoiceNumberValue={invoiceNumberValue ?? ""}
             paymentDue={paymentDue ?? ""}
             selectedDateFormat={selectedDateFormat ?? DEFAULT_DATE_FORMAT}
+            language={language}
             setValue={setValue}
             isMobile={isMobile}
           />
@@ -1020,245 +1026,3 @@ export const GeneralInformation = memo(function GeneralInformation({
     </div>
   );
 });
-
-interface OutOfDateDatesHelperProps {
-  dateOfIssue: string;
-  dateOfService: string;
-  dateOfServiceStart: string;
-  invoiceNumberValue: string;
-  paymentDue: string;
-  selectedDateFormat: string;
-  setValue: UseFormSetValue<InvoiceData>;
-  isMobile: boolean;
-}
-
-/**
- * Displays a helper (banner) component that detects and allows updating stale invoice dates.
- *
- * This component checks if the invoice dates (date of issue, service period start/end,
- * payment due) and invoice number are outdated compared to the current date. If any are stale,
- * it displays a banner with a table showing the old vs new values and provides a button to update all dates at once.
- */
-function StaleDatesBanner({
-  dateOfIssue,
-  dateOfService,
-  dateOfServiceStart,
-  invoiceNumberValue,
-  paymentDue,
-  selectedDateFormat,
-  setValue,
-  isMobile,
-}: OutOfDateDatesHelperProps) {
-  const formatDate = (date: string) => {
-    return dayjs(date).locale("en").format(selectedDateFormat);
-  };
-
-  const isDateOfIssueStale = !dayjs(dateOfIssue).isSame(dayjs(), "day");
-  const isDateOfServiceStale = !dayjs(dateOfService).isSame(
-    dayjs().endOf("month"),
-    "day",
-  );
-  const isDateOfServiceStartStale =
-    !!dateOfServiceStart &&
-    !isServicePeriodStartInCurrentMonth(dateOfServiceStart);
-  const extractedMonthYear = /(\d{2}-\d{4})/.exec(invoiceNumberValue)?.[1];
-  const isInvoiceNumberStale = extractedMonthYear !== CURRENT_MONTH_AND_YEAR;
-
-  /**
-   * Checks if the payment due date is stale (outdated).
-   * A payment due date is considered stale if:
-   * - It's not set (empty/undefined), OR
-   * - It doesn't match the expected date (14 days after the date of issue)
-   */
-  const isPaymentDueStale =
-    !paymentDue ||
-    !dayjs(paymentDue).isSame(dayjs(dateOfIssue).add(14, "days"), "day");
-
-  const targetToday = dayjs().locale("en").format(selectedDateFormat);
-  const targetEndOfMonth = dayjs()
-    .locale("en")
-    .endOf("month")
-    .format(selectedDateFormat);
-  const targetStartOfMonth = dayjs()
-    .locale("en")
-    .startOf("month")
-    .format(selectedDateFormat);
-  const targetPaymentDue = dayjs()
-    .locale("en")
-    .add(14, "days")
-    .format(selectedDateFormat);
-
-  const targetInvoiceNumber = `1/${CURRENT_MONTH_AND_YEAR}`;
-
-  const fallbackValue = "(not set)";
-
-  /**
-   * Array of items to check for staleness.
-   * Each item is either false (not stale) or an object containing:
-   * - label: Display name of the field
-   * - oldValue: Current/outdated value
-   * - newValue: Suggested updated value
-   * - hint: Description of what the new value represents
-   */
-  const ITEMS: (
-    | boolean
-    | {
-        label: string;
-        oldValue: string;
-        newValue: string;
-        hint: string;
-      }
-  )[] = [
-    isDateOfIssueStale && {
-      label: "Date of issue",
-      oldValue: dateOfIssue ? formatDate(dateOfIssue) : fallbackValue,
-      newValue: targetToday,
-      hint: "today",
-    },
-    isDateOfServiceStale && {
-      label: "Service period end",
-      oldValue: dateOfService ? formatDate(dateOfService) : fallbackValue,
-      newValue: targetEndOfMonth,
-      hint: "end of current month",
-    },
-    isDateOfServiceStartStale && {
-      label: "Service period start",
-      oldValue: dateOfServiceStart
-        ? formatDate(dateOfServiceStart)
-        : fallbackValue,
-      newValue: targetStartOfMonth,
-      hint: "start of current month",
-    },
-    isInvoiceNumberStale && {
-      label: "Invoice number",
-      oldValue: invoiceNumberValue ? invoiceNumberValue : fallbackValue,
-      newValue: targetInvoiceNumber,
-      hint: "current month",
-    },
-    isPaymentDueStale && {
-      label: "Payment due",
-      oldValue: paymentDue ? formatDate(paymentDue) : fallbackValue,
-      newValue: targetPaymentDue,
-      hint: "date of issue + 14 days",
-    },
-  ];
-
-  const staleItems = ITEMS.filter(Boolean) as {
-    label: string;
-    oldValue: string;
-    newValue: string;
-    hint: string;
-  }[];
-
-  return (
-    <div
-      className="rounded-md border border-amber-200 bg-amber-50/90 px-3 py-4 shadow-sm shadow-amber-200/50 duration-300 animate-in fade-in slide-in-from-bottom-2"
-      role="region"
-      aria-live="polite"
-      data-testid="out-of-date-dates-helper"
-    >
-      <div className="mb-3 flex items-center gap-1.5 text-xs font-medium text-amber-800">
-        <AlertTriangle className="size-3.5 shrink-0 text-amber-600" />
-        <span>
-          {staleItems.length}{" "}
-          {staleItems.length === 1 ? "field is" : "fields are"} out of date
-        </span>
-      </div>
-
-      <table className="w-full border-collapse overflow-hidden rounded border border-amber-300 text-xs">
-        <thead>
-          <tr className="border-b border-amber-300 bg-amber-100/60 text-left text-amber-800">
-            <th className="w-[65px] max-w-[65px] px-2.5 py-1.5 font-semibold">
-              Field
-            </th>
-            <th className="px-2.5 py-1.5 font-semibold">Change</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {staleItems.map((item) => {
-            return (
-              <tr
-                key={item.label}
-                className="border-b border-amber-300 last:border-b-0"
-              >
-                <td className="w-[65px] max-w-[65px] px-2.5 py-1.5 text-amber-800">
-                  {item.label}
-                </td>
-
-                <td className="text-pretty px-2.5 py-1.5 pr-0">
-                  <span className="bg-red-100 text-amber-800 line-through decoration-amber-700/50">
-                    {item.oldValue}
-                  </span>
-                  <span className="mx-1 text-amber-700">→</span>
-                  <span className="bg-green-200 font-semibold text-green-800">
-                    {item.newValue}
-                  </span>
-                  {item.hint ? (
-                    <span className="ml-1 font-normal text-green-700">
-                      ({item.hint})
-                    </span>
-                  ) : null}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-
-      <Button
-        type="button"
-        size="sm"
-        className="mt-3.5 gap-1.5 bg-amber-600 text-white shadow-sm hover:bg-amber-600/95"
-        onClick={() => {
-          const today = dayjs().format("YYYY-MM-DD");
-
-          const firstDayOfCurrentMonth = dayjs()
-            .startOf("month")
-            .format("YYYY-MM-DD");
-          const lastDayOfCurrentMonth = dayjs()
-            .endOf("month")
-            .format("YYYY-MM-DD");
-
-          setValue("dateOfServiceStart", firstDayOfCurrentMonth);
-          setValue("dateOfService", lastDayOfCurrentMonth);
-          setValue("dateOfIssue", today);
-          setValue("invoiceNumberObject.value", targetInvoiceNumber);
-
-          const newPaymentDue = dayjs(today)
-            .add(14, "days")
-            .format("YYYY-MM-DD");
-
-          setValue("paymentDue", newPaymentDue);
-
-          toast.success("All dates updated successfully", {
-            position: isMobile ? "top-center" : "bottom-right",
-          });
-        }}
-      >
-        <RefreshCw className="size-3.5" />
-        Update All Dates
-      </Button>
-    </div>
-  );
-}
-
-// Logo helper functions
-const validateImageSize = (file: File): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const maxSize = 3 * 1024 * 1024; // 3MB in bytes
-
-    resolve(file.size <= maxSize);
-  });
-};
-
-const convertFileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      return resolve(reader.result as string);
-    });
-    reader.addEventListener("error", reject);
-    reader.readAsDataURL(file);
-  });
-};

@@ -3,7 +3,7 @@ import { assert, describe, expect, it } from "vitest";
 import type { InvoiceItemData } from "@/app/schema";
 import { MOCK_INVOICE_ITEM_DATA } from "@/utils/__tests__/data";
 
-import { parseValidatedInvoiceItems } from "../utils/validated-invoice-items";
+import { parseValidatedInvoiceItems } from "../validated-invoice-items";
 
 function createItem(overrides: Partial<InvoiceItemData> = {}): InvoiceItemData {
   return {

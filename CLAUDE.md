@@ -113,3 +113,16 @@ From `.cursor/rules/` (all apply here):
 - Model expected errors as return values, use guard clauses, zod for all validation.
 - `console.log` is lint-banned (`console.error/info/warn` allowed); `process`/`node:process` imports are banned — use `@/env`.
 - Reference material and known upstream bugs are collected in `KNOWLEDGE-BASE.md`.
+
+Beyond `.cursor/rules/`:
+
+- **Take a single object argument, not positional ones.** Any function with more than one parameter destructures an object:
+
+  ```ts
+  // yes
+  formatDateWithLocale({ date, selectedDateFormat, language });
+  // no
+  formatDateWithLocale(date, selectedDateFormat, language);
+  ```
+
+  Call sites say what each value means without opening the signature, two same-typed parameters can't be swapped by accident, and adding a parameter doesn't touch every caller. Type the object as a named `interface` above the function and document each field with a doc comment on the property rather than `@param` tags — see `src/app/(app)/utils/format-date-with-locale.ts`. One-parameter functions stay positional.

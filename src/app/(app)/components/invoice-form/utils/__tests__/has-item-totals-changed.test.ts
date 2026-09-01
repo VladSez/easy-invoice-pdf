@@ -6,8 +6,8 @@ import { MOCK_INVOICE_ITEM_DATA } from "@/utils/__tests__/data";
 import {
   hasAnyItemTotalsChanged,
   hasItemTotalsChanged,
-} from "../utils/has-item-totals-changed";
-import { parseValidatedInvoiceItems } from "../utils/validated-invoice-items";
+} from "../has-item-totals-changed";
+import { parseValidatedInvoiceItems } from "../validated-invoice-items";
 
 function createItem(overrides: Partial<InvoiceItemData> = {}) {
   return {
