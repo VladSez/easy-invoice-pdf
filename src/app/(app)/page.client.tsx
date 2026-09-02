@@ -130,7 +130,15 @@ export function AppPageClient({
 
   const [isHowItWorksDialogOpen, setIsHowItWorksDialogOpen] = useState(false);
 
-  const [invoiceFormHasErrors, setInvoiceFormHasErrors] = useState(false);
+  /**
+   * Reads the invoice form at click time: its current values, or `null` when it has
+   * validation errors. A ref rather than state, because the answer is only needed inside
+   * handleShareInvoice — mirroring it into render would re-render the page (and the PDF)
+   * on every keystroke that flips validity, and could answer with a stale value.
+   */
+  const currentInvoiceFormDataRef = useRef<(() => InvoiceData | null) | null>(
+    null,
+  );
 
   // Refs to track original URL invoice data
   const originalUrlInvoiceDataRef = useRef<InvoiceData | null>(null);
@@ -560,8 +568,17 @@ export function AppPageClient({
       return;
     }
 
+    // Read the form directly rather than trusting `invoiceDataState`, which only catches
+    // up on the DEBOUNCE_TIMEOUT commit: a click inside that window would otherwise share
+    // the pre-edit snapshot, and the edit landing a moment later would strip ?data= again
+    // via checkForInvoiceChanges. Falls back to `invoiceDataState` when the form is not
+    // mounted (mobile opens on the preview tab), where the tab switch has already flushed.
+    const currentInvoiceData = currentInvoiceFormDataRef.current
+      ? currentInvoiceFormDataRef.current()
+      : invoiceDataState;
+
     // prevent sharing invoice if there are form errors
-    if (invoiceFormHasErrors) {
+    if (!currentInvoiceData) {
       toast.error("Unable to Share Invoice", {
         id: "unable-to-share-invoice-form-errors-toast",
         duration: 6000,
@@ -578,9 +595,9 @@ export function AppPageClient({
     }
 
     // if invoice data state is valid, generate the shareable link and update the url
-    if (invoiceDataState) {
+    if (currentInvoiceData) {
       try {
-        const newInvoiceDataValidated = invoiceSchema.parse(invoiceDataState);
+        const newInvoiceDataValidated = invoiceSchema.parse(currentInvoiceData);
 
         // trigger haptic feedback on mobile devices
         haptic();
@@ -613,7 +630,7 @@ export function AppPageClient({
         }
 
         const currentParams = new URLSearchParams(searchParams.toString());
-        currentParams.set("template", invoiceDataState.template);
+        currentParams.set("template", newInvoiceDataValidated.template);
         currentParams.set("data", compressedData);
 
         router.replace(`?${currentParams.toString()}`, { scroll: false });
@@ -774,7 +791,7 @@ export function AppPageClient({
                 handleShareInvoice={handleShareInvoice}
                 isMobile={isMobile}
                 canShareInvoice={canShareInvoice}
-                setInvoiceFormHasErrors={setInvoiceFormHasErrors}
+                currentInvoiceFormDataRef={currentInvoiceFormDataRef}
               />
             </div>
           </div>

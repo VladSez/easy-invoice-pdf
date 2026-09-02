@@ -2,15 +2,7 @@
 
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
-import {
-  memo,
-  useCallback,
-  useEffect,
-  useState,
-  type Dispatch,
-  type RefObject,
-  type SetStateAction,
-} from "react";
+import { memo, useCallback, useEffect, useState, type RefObject } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
@@ -84,7 +76,12 @@ interface InvoiceFormProps {
   invoiceData: InvoiceData;
   handleInvoiceDataChange: (updatedData: InvoiceData) => void;
   isMobile?: boolean;
-  setInvoiceFormHasErrors: Dispatch<SetStateAction<boolean>>;
+  /**
+   * Filled in with a getter returning the form's current values, or `null` when the form
+   * has validation errors. The parent only needs this when the user clicks "Get link", so
+   * it asks at that moment rather than mirroring form state into its own render.
+   */
+  currentInvoiceFormDataRef?: RefObject<(() => InvoiceData | null) | null>;
   /**
    * Filled in with a function that commits a pending (debounced) edit immediately, so the
    * parent can flush the form before the user's attention moves elsewhere.
@@ -96,7 +93,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   invoiceData,
   handleInvoiceDataChange,
   isMobile = false,
-  setInvoiceFormHasErrors,
+  currentInvoiceFormDataRef,
   flushPendingChangesRef,
 }: InvoiceFormProps) {
   const form = useForm<InvoiceData>({
@@ -219,8 +216,6 @@ export const InvoiceForm = memo(function InvoiceForm({
       toast.dismiss("invalid-invoice-url-error-toast");
       toast.dismiss("unable-to-share-invoice-form-errors-toast");
 
-      setInvoiceFormHasErrors(false);
-
       // TODO: double check if we need this code, because we already save to local storage in the page.client.tsx (parent component) (line: 267) useEffect "Save to localStorage whenever data changes on form update"
       try {
         // trigger form validations
@@ -230,8 +225,6 @@ export const InvoiceForm = memo(function InvoiceForm({
           // show errors to the user
           // Debounce error toast to avoid showing too fast
           debouncedShowFormErrorsToast();
-
-          setInvoiceFormHasErrors(true);
 
           return;
         }
@@ -253,6 +246,42 @@ export const InvoiceForm = memo(function InvoiceForm({
     // debounce delay in ms
     DEBOUNCE_TIMEOUT,
   );
+
+  // Let the parent read the form at click time: both whether it is valid, and what is
+  // currently in it.
+  //
+  // Both used to lag by DEBOUNCE_TIMEOUT. The validity flag was pushed up from inside
+  // debouncedRegeneratePdfOnFormChange, and the data the parent shares is only committed
+  // on that same debounce. `mode: "onChange"` renders the inline error immediately, so
+  // for those 500ms the user could see "Net price is required" and still have "Get link"
+  // produce a link for an invalid invoice, and a click just after any edit shared the
+  // pre-edit snapshot. Reading on demand cannot go stale, and the answer is only ever
+  // needed in an event handler — never during render.
+  //
+  // `formState.errors` covers both validation paths: onChange populates it per field, and
+  // the debounced trigger(undefined) fills in fields the user never touched.
+  useEffect(() => {
+    if (!currentInvoiceFormDataRef) {
+      return;
+    }
+
+    // This function allows the parent component to access the current state of the invoice form data.
+    // It checks if there are any validation errors in the form (via formState.errors).
+    // If errors exist, it returns null, indicating the form data is not currently valid.
+    // Otherwise, it returns the current form values.
+    currentInvoiceFormDataRef.current = () => {
+      if (Object.keys(form.formState.errors).length > 0) {
+        // There are validation errors; signal invalid data to the parent.
+        return null;
+      }
+      // No validation errors; provide the current form values to the parent.
+      return form.getValues();
+    };
+
+    return () => {
+      currentInvoiceFormDataRef.current = null;
+    };
+  }, [form, currentInvoiceFormDataRef]);
 
   // IMPORTANT
   // TODO: rewrite to subscribe()? https://react-hook-form.com/docs/useform/subscribe

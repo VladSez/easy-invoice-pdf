@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useRef, useState, type Dispatch, type SetStateAction } from "react";
+import { useRef, useState, type RefObject } from "react";
 
 import {
   type InvoiceData,
@@ -120,14 +120,14 @@ export function InvoiceClientPage({
   handleShareInvoice,
   isMobile,
   canShareInvoice,
-  setInvoiceFormHasErrors,
+  currentInvoiceFormDataRef,
 }: {
   invoiceDataState: InvoiceData;
   handleInvoiceDataChange: (invoiceData: InvoiceData) => void;
   handleShareInvoice: () => void;
   isMobile: boolean;
   canShareInvoice: boolean;
-  setInvoiceFormHasErrors: Dispatch<SetStateAction<boolean>>;
+  currentInvoiceFormDataRef: RefObject<(() => InvoiceData | null) | null>;
 }) {
   const appMetadata = getAppMetadata();
 
@@ -233,7 +233,7 @@ export function InvoiceClientPage({
                   invoiceData={invoiceDataState}
                   handleInvoiceDataChange={handleInvoiceDataChange}
                   isMobile
-                  setInvoiceFormHasErrors={setInvoiceFormHasErrors}
+                  currentInvoiceFormDataRef={currentInvoiceFormDataRef}
                   flushPendingChangesRef={flushPendingFormChangesRef}
                 />
               </MobileFormScrollContainer>
@@ -361,7 +361,7 @@ export function InvoiceClientPage({
               <InvoiceForm
                 invoiceData={invoiceDataState}
                 handleInvoiceDataChange={handleInvoiceDataChange}
-                setInvoiceFormHasErrors={setInvoiceFormHasErrors}
+                currentInvoiceFormDataRef={currentInvoiceFormDataRef}
               />
             </div>
 

@@ -77,7 +77,6 @@ function renderInvoiceForm({
       <InvoiceForm
         invoiceData={invoiceData}
         handleInvoiceDataChange={vi.fn()}
-        setInvoiceFormHasErrors={vi.fn()}
       />
     </TooltipProvider>,
   );
