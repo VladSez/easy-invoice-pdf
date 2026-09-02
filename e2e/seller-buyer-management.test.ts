@@ -1,7 +1,12 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 import { DEFAULT_BUYER_DATA, DEFAULT_SELLER_DATA } from "@/app/constants";
-import type { BuyerData, SellerData } from "@/app/schema";
+import {
+  BUYERS_LOCAL_STORAGE_KEY,
+  SELLERS_LOCAL_STORAGE_KEY,
+  type BuyerData,
+  type SellerData,
+} from "@/app/schema";
 
 /**
  * Sellers and buyers are managed through the same UI: a "New <party>" dialog, a
@@ -20,12 +25,12 @@ const PARTY_CONFIG = {
   seller: {
     /** Capitalized party name, as used in buttons and toasts ("New Seller") */
     label: "Seller",
-    storageKey: "EASY_INVOICE_PDF_SELLERS",
+    storageKey: SELLERS_LOCAL_STORAGE_KEY,
     defaults: DEFAULT_SELLER_DATA,
   },
   buyer: {
     label: "Buyer",
-    storageKey: "EASY_INVOICE_PDF_BUYERS",
+    storageKey: BUYERS_LOCAL_STORAGE_KEY,
     defaults: DEFAULT_BUYER_DATA,
   },
 } as const satisfies Record<

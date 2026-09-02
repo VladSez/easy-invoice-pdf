@@ -7,6 +7,10 @@ import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 
+import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(app)/utils/app-local-storage";
 import { formatDateWithLocale } from "@/app/(app)/utils/format-date-with-locale";
 import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 import {
@@ -233,12 +237,19 @@ export const InvoiceForm = memo(function InvoiceForm({
 
         const stringifiedData = JSON.stringify(validatedData);
 
-        localStorage.setItem(PDF_DATA_LOCAL_STORAGE_KEY, stringifiedData);
+        // Persisting is best-effort and must never gate `onSubmit`: when storage is
+        // unavailable (an iOS in-app webview exposes `localStorage` as `null`) an
+        // unguarded write threw here, so the edit never reached the parent and the PDF
+        // preview stayed frozen on the previous version for the whole session.
+        setAppStorageItem({
+          key: PDF_DATA_LOCAL_STORAGE_KEY,
+          value: stringifiedData,
+        });
 
         // pass the updated data to the parent component, to update the invoice data state (use state hook)
         onSubmit(validatedData);
       } catch (error) {
-        console.error("Error saving to local storage:", error);
+        console.error("Error regenerating invoice from form change:", error);
 
         Sentry.captureException(error);
       }
@@ -374,9 +385,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   >(() => {
     // Try to load from localStorage
     try {
-      const savedState = localStorage.getItem(
-        ACCORDION_STATE_LOCAL_STORAGE_KEY,
-      );
+      const savedState = getAppStorageItem(ACCORDION_STATE_LOCAL_STORAGE_KEY);
 
       if (savedState) {
         const parsedState = JSON.parse(savedState) as AccordionState;
@@ -420,10 +429,10 @@ export const InvoiceForm = memo(function InvoiceForm({
         invoiceItems: value.includes(ACCORDION_ITEMS),
       });
 
-      localStorage.setItem(
-        ACCORDION_STATE_LOCAL_STORAGE_KEY,
-        JSON.stringify(stateToSave),
-      );
+      setAppStorageItem({
+        key: ACCORDION_STATE_LOCAL_STORAGE_KEY,
+        value: JSON.stringify(stateToSave),
+      });
     } catch (error) {
       console.error("Error saving accordion state:", error);
 

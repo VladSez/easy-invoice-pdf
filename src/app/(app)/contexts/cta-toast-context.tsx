@@ -2,25 +2,28 @@
 
 import { createContext, useContext, useState, useCallback } from "react";
 
-const CTA_TOAST_STORAGE_KEY = "EASY_INVOICE_CTA_LAST_SHOWN_AT";
+import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(app)/utils/app-local-storage";
+import { CTA_TOAST_STORAGE_KEY } from "@/app/schema";
+
 const CTA_TOAST_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 function isCTAToastInCooldown() {
-  try {
-    const stored = localStorage.getItem(CTA_TOAST_STORAGE_KEY);
-    if (!stored) return false;
+  const stored = getAppStorageItem(CTA_TOAST_STORAGE_KEY);
 
-    // if the timestamp is older than 7 days, return false
-    return Date.now() - Number(stored) < CTA_TOAST_COOLDOWN_MS;
-  } catch {
-    return false;
-  }
+  if (!stored) return false;
+
+  // if the timestamp is older than 7 days, return false
+  return Date.now() - Number(stored) < CTA_TOAST_COOLDOWN_MS;
 }
 
 function setCTAToastShownTimestamp() {
-  try {
-    localStorage.setItem(CTA_TOAST_STORAGE_KEY, String(Date.now()));
-  } catch {}
+  setAppStorageItem({
+    key: CTA_TOAST_STORAGE_KEY,
+    value: String(Date.now()),
+  });
 }
 
 interface CTAToastContextValue {

@@ -983,6 +983,8 @@ export const sellerSchema = z.object({
 
 export type SellerData = z.infer<typeof sellerSchema>;
 
+export const SELLERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_SELLERS";
+
 export const buyerSchema = z.object({
   id: z.string().optional(),
 
@@ -1035,6 +1037,8 @@ export const buyerSchema = z.object({
 });
 
 export type BuyerData = z.infer<typeof buyerSchema>;
+
+export const BUYERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_BUYERS";
 
 /**
  * Invoice object schema (without cross-field transforms)
@@ -1400,6 +1404,63 @@ export const metadataSchema = z.object({
 export type Metadata = z.infer<typeof metadataSchema>;
 
 export const METADATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_METADATA";
+
+// __________________________________________________________
+// Local storage keys
+// __________________________________________________________
+
+/**
+ * Remembers that the user has already seen the welcome popup. The value is a version
+ * marker, so bumping it shows the popup again.
+ */
+export const WELCOME_POPUP_SEEN_STORAGE_KEY = "EASY_INVOICE_WELCOME_POPUP_SEEN";
+
+/** The slug of the newest changelog entry the user has seen. */
+export const CHANGELOG_SEEN_STORAGE_KEY =
+  "EASY_INVOICE_LAST_SEEN_CHANGELOG_SLUG";
+
+/** When the CTA toast was last shown, as an epoch-milliseconds string. */
+export const CTA_TOAST_STORAGE_KEY = "EASY_INVOICE_CTA_LAST_SHOWN_AT";
+
+/**
+ * Every key the app is allowed to write to `localStorage`.
+ *
+ * The keys themselves are declared next to whatever describes their contents (the
+ * invoice, seller and metadata schemas above); this is the one list of all of them, and
+ * it is what `getAppStorageItem` / `setAppStorageItem` accept. Anything persisted by the
+ * app belongs here, so that "what do we store, and can two features collide?" has a
+ * single answer.
+ */
+export const LOCAL_STORAGE_KEYS = [
+  PDF_DATA_LOCAL_STORAGE_KEY,
+  METADATA_LOCAL_STORAGE_KEY,
+  ACCORDION_STATE_LOCAL_STORAGE_KEY,
+  SELLERS_LOCAL_STORAGE_KEY,
+  BUYERS_LOCAL_STORAGE_KEY,
+  WELCOME_POPUP_SEEN_STORAGE_KEY,
+  CHANGELOG_SEEN_STORAGE_KEY,
+  CTA_TOAST_STORAGE_KEY,
+] as const;
+
+export type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[number];
+
+// __________________________________________________________
+// Validate that local storage keys are unique
+// __________________________________________________________
+
+// Two features sharing a key would silently overwrite each other's data, and the union
+// type above cannot catch it - a duplicate literal collapses into the same member.
+const uniqueLocalStorageKeys = new Set<string>(LOCAL_STORAGE_KEYS);
+
+if (uniqueLocalStorageKeys.size !== LOCAL_STORAGE_KEYS.length) {
+  const duplicates = LOCAL_STORAGE_KEYS.filter((key, index) => {
+    return LOCAL_STORAGE_KEYS.indexOf(key) !== index;
+  });
+
+  throw new Error(
+    `LOCAL_STORAGE_KEYS contains duplicate entries: ${duplicates.join(", ")}`,
+  );
+}
 
 // __________________________________________________________
 // Validate that currencies are unique

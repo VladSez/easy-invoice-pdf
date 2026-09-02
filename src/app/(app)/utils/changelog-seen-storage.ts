@@ -1,38 +1,23 @@
 "use client";
 
-import { isLocalStorageAvailable } from "@/lib/check-local-storage";
-
-/**
- * The key used in localStorage to store the last seen changelog slug.
- */
-const CHANGELOG_SEEN_STORAGE_KEY = "EASY_INVOICE_LAST_SEEN_CHANGELOG_SLUG";
+import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(app)/utils/app-local-storage";
+import { CHANGELOG_SEEN_STORAGE_KEY } from "@/app/schema";
 
 /**
  * Retrieves the last seen changelog slug from localStorage.
  */
 function getLastSeenChangelogSlug(): string | null {
-  if (!isLocalStorageAvailable) {
-    return null;
-  }
-
-  try {
-    return localStorage.getItem(CHANGELOG_SEEN_STORAGE_KEY);
-  } catch {
-    return null;
-  }
+  return getAppStorageItem(CHANGELOG_SEEN_STORAGE_KEY);
 }
 
 /**
  * Marks the provided changelog slug as seen by storing it in localStorage.
  */
 export function markChangelogAsSeen(slug: string): void {
-  if (!isLocalStorageAvailable) {
-    return;
-  }
-
-  try {
-    localStorage.setItem(CHANGELOG_SEEN_STORAGE_KEY, slug);
-  } catch {}
+  setAppStorageItem({ key: CHANGELOG_SEEN_STORAGE_KEY, value: slug });
 }
 
 /**

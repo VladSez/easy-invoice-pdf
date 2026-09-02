@@ -4,8 +4,17 @@ import { useId, useState, useEffect } from "react";
 import type { UseFormSetValue } from "react-hook-form";
 import { toast } from "sonner";
 
+import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(app)/utils/app-local-storage";
 import { DEFAULT_BUYER_DATA } from "@/app/constants";
-import { buyerSchema, type InvoiceData, type BuyerData } from "@/app/schema";
+import {
+  BUYERS_LOCAL_STORAGE_KEY,
+  buyerSchema,
+  type InvoiceData,
+  type BuyerData,
+} from "@/app/schema";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,13 +29,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { SelectNative } from "@/components/ui/select-native";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { useIsLocalStorageAvailable } from "@/lib/use-is-local-storage-available";
 import { cn } from "@/lib/utils";
 
 import { BuyerDialog } from "./buyer-dialog";
-
-export const BUYERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_BUYERS";
 
 interface BuyerManagementProps {
   setValue: UseFormSetValue<InvoiceData>;
@@ -78,12 +85,14 @@ export function BuyerManagement({
 
   const buyerSelectId = useId();
 
+  const isLocalStorageAvailable = useIsLocalStorageAvailable();
+
   const isEditMode = Boolean(editingBuyer);
 
   // Load buyers from localStorage on component mount
   useEffect(() => {
     try {
-      const savedBuyers = localStorage.getItem(BUYERS_LOCAL_STORAGE_KEY);
+      const savedBuyers = getAppStorageItem(BUYERS_LOCAL_STORAGE_KEY);
       const parsedBuyers: unknown = savedBuyers ? JSON.parse(savedBuyers) : [];
 
       const rawBuyers = Array.isArray(parsedBuyers) ? parsedBuyers : [];
@@ -119,10 +128,10 @@ export function BuyerManagement({
           ),
         );
 
-        localStorage.setItem(
-          BUYERS_LOCAL_STORAGE_KEY,
-          JSON.stringify(validBuyers),
-        );
+        setAppStorageItem({
+          key: BUYERS_LOCAL_STORAGE_KEY,
+          value: JSON.stringify(validBuyers),
+        });
       }
 
       const selectedBuyer = validBuyers.find((buyer: BuyerData) => {
@@ -154,7 +163,22 @@ export function BuyerManagement({
       const newBuyers = [...buyersSelectOptions, newBuyerWithId];
 
       // Save to localStorage
-      localStorage.setItem(BUYERS_LOCAL_STORAGE_KEY, JSON.stringify(newBuyers));
+      const persisted = setAppStorageItem({
+        key: BUYERS_LOCAL_STORAGE_KEY,
+        value: JSON.stringify(newBuyers),
+      });
+
+      // Nothing to show the user later if the list could not be saved, so stop here
+      // rather than reporting a success the next page load would contradict.
+      if (!persisted) {
+        showBuyerStorageErrorToast({
+          message: "Failed to add buyer",
+          id: "add_buyer_error_toast",
+          isMobile,
+        });
+
+        return;
+      }
 
       // Update the buyers state
       setBuyersSelectOptions(newBuyers);
@@ -199,10 +223,20 @@ export function BuyerManagement({
         return buyer.id === editedBuyer.id ? editedBuyer : buyer;
       });
 
-      localStorage.setItem(
-        BUYERS_LOCAL_STORAGE_KEY,
-        JSON.stringify(updatedBuyers),
-      );
+      const persisted = setAppStorageItem({
+        key: BUYERS_LOCAL_STORAGE_KEY,
+        value: JSON.stringify(updatedBuyers),
+      });
+
+      if (!persisted) {
+        showBuyerStorageErrorToast({
+          message: "Failed to edit buyer",
+          id: "edit_buyer_error_toast",
+          isMobile,
+        });
+
+        return;
+      }
 
       setBuyersSelectOptions(updatedBuyers);
       setValue("buyer", editedBuyer);
@@ -267,17 +301,26 @@ export function BuyerManagement({
 
   const handleDeleteBuyer = () => {
     try {
-      setBuyersSelectOptions((prevBuyers) => {
-        const updatedBuyers = prevBuyers.filter((buyer) => {
-          return buyer.id !== selectedBuyerId;
+      const updatedBuyers = buyersSelectOptions.filter((buyer) => {
+        return buyer.id !== selectedBuyerId;
+      });
+
+      const persisted = setAppStorageItem({
+        key: BUYERS_LOCAL_STORAGE_KEY,
+        value: JSON.stringify(updatedBuyers),
+      });
+
+      if (!persisted) {
+        showBuyerStorageErrorToast({
+          message: "Failed to delete buyer",
+          id: "delete_buyer_error_toast",
+          isMobile,
         });
 
-        localStorage.setItem(
-          BUYERS_LOCAL_STORAGE_KEY,
-          JSON.stringify(updatedBuyers),
-        );
-        return updatedBuyers;
-      });
+        return;
+      }
+
+      setBuyersSelectOptions(updatedBuyers);
       // Clear the selected buyer index
       setSelectedBuyerId("");
       // Clear the buyer from the form if it was selected
@@ -509,4 +552,32 @@ export function BuyerManagement({
       </AlertDialog>
     </>
   );
+}
+
+interface ShowBuyerStorageErrorToastOptions {
+  /** What the user was trying to do, e.g. "Failed to add buyer". */
+  message: string;
+  /** Stable toast id, so repeated failures replace each other instead of stacking. */
+  id: string;
+  /** Mobile shows toasts at the top, desktop at the bottom right. */
+  isMobile: boolean;
+}
+
+/**
+ * Tells the user their buyer list could not be saved.
+ *
+ * A rejected write is not an application error — it is a full or disabled store — so it
+ * is surfaced to the user and deliberately not reported to Sentry.
+ */
+function showBuyerStorageErrorToast({
+  message,
+  id,
+  isMobile,
+}: ShowBuyerStorageErrorToastOptions) {
+  toast.error(message, {
+    id,
+    description: "Please try again",
+    closeButton: true,
+    position: isMobile ? "top-center" : "bottom-right",
+  });
 }

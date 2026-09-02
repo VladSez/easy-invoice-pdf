@@ -14,6 +14,10 @@ import { InvoicePageHeader } from "@/app/(app)/components/invoice-page-header";
 import { InvoicePdfInstanceProvider } from "@/app/(app)/contexts/invoice-pdf-instance-context";
 import { InvoicePageLoadingSkeleton } from "@/app/(app)/loading";
 import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(app)/utils/app-local-storage";
+import {
   DEFAULT_METADATA,
   getAppMetadata,
   updateAppMetadata,
@@ -198,13 +202,13 @@ export function AppPageClient({
 
       // add metadata with default values if missing for all users
       if (!appMetadata) {
-        localStorage.setItem(
-          METADATA_LOCAL_STORAGE_KEY,
-          JSON.stringify(DEFAULT_METADATA),
-        );
+        setAppStorageItem({
+          key: METADATA_LOCAL_STORAGE_KEY,
+          value: JSON.stringify(DEFAULT_METADATA),
+        });
       }
 
-      const savedData = localStorage.getItem(PDF_DATA_LOCAL_STORAGE_KEY);
+      const savedData = getAppStorageItem(PDF_DATA_LOCAL_STORAGE_KEY);
 
       if (savedData) {
         const json: unknown = JSON.parse(savedData);
@@ -325,10 +329,10 @@ export function AppPageClient({
 
         // add metadata with default values if missing for all users
         if (!appMetadata) {
-          localStorage.setItem(
-            METADATA_LOCAL_STORAGE_KEY,
-            JSON.stringify(DEFAULT_METADATA),
-          );
+          setAppStorageItem({
+            key: METADATA_LOCAL_STORAGE_KEY,
+            value: JSON.stringify(DEFAULT_METADATA),
+          });
         }
       } catch (error) {
         console.error(

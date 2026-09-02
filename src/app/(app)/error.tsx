@@ -4,6 +4,7 @@ import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
+import { setAppStorageItem } from "@/app/(app)/utils/app-local-storage";
 import { DEFAULT_METADATA } from "@/app/(app)/utils/get-app-metadata";
 import {
   METADATA_LOCAL_STORAGE_KEY,
@@ -97,15 +98,18 @@ export default function Error({
               <AlertDialogAction
                 onClick={() => {
                   try {
-                    localStorage.setItem(
-                      PDF_DATA_LOCAL_STORAGE_KEY,
-                      JSON.stringify(getInitialInvoiceData()),
-                    );
+                    // Best effort: a store that rejects writes cannot be holding the
+                    // data that broke the app either, and `reset()` below is what gets
+                    // the user off this error screen — it must not be skipped.
+                    setAppStorageItem({
+                      key: PDF_DATA_LOCAL_STORAGE_KEY,
+                      value: JSON.stringify(getInitialInvoiceData()),
+                    });
 
-                    localStorage.setItem(
-                      METADATA_LOCAL_STORAGE_KEY,
-                      JSON.stringify(DEFAULT_METADATA),
-                    );
+                    setAppStorageItem({
+                      key: METADATA_LOCAL_STORAGE_KEY,
+                      value: JSON.stringify(DEFAULT_METADATA),
+                    });
 
                     reset();
 

@@ -4,7 +4,15 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { useConfirmDiscard } from "@/app/(app)/components/invoice-form/sections/hooks/use-confirm-discard";
-import { buyerSchema, type BuyerData } from "@/app/schema";
+import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(app)/utils/app-local-storage";
+import {
+  BUYERS_LOCAL_STORAGE_KEY,
+  buyerSchema,
+  type BuyerData,
+} from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,7 +39,6 @@ import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
 
 import { InputHelperMessage } from "../../../../../../../components/ui/input-helper-message";
 import { ConfirmDiscardDialog } from "../confirm-discard-dialog";
-import { BUYERS_LOCAL_STORAGE_KEY } from "./buyer-management";
 
 const BUYER_FORM_ID = "buyer-form";
 
@@ -206,7 +213,7 @@ export function BuyerDialog({
       // **RUNNING SOME VALIDATIONS FIRST**
 
       // Get existing buyers or initialize empty array
-      const buyers = localStorage.getItem(BUYERS_LOCAL_STORAGE_KEY);
+      const buyers = getAppStorageItem(BUYERS_LOCAL_STORAGE_KEY);
       const existingBuyers: unknown = buyers ? JSON.parse(buyers) : [];
 
       const rawBuyers = Array.isArray(existingBuyers) ? existingBuyers : [];
@@ -238,10 +245,10 @@ export function BuyerDialog({
 
       // If we had invalid buyers, save the valid buyers back to localStorage
       if (hadInvalidBuyers) {
-        localStorage.setItem(
-          BUYERS_LOCAL_STORAGE_KEY,
-          JSON.stringify(validBuyers),
-        );
+        setAppStorageItem({
+          key: BUYERS_LOCAL_STORAGE_KEY,
+          value: JSON.stringify(validBuyers),
+        });
       }
 
       // Validate buyer data against existing buyers

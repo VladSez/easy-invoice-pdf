@@ -69,6 +69,34 @@
         ]
       }
     ],
+    // `localStorage` is not safe to touch directly in the browsers we ship to: iOS
+    // in-app webviews (Telegram, Instagram, Facebook) expose it as `null`, so an
+    // unguarded `localStorage.getItem` throws `TypeError: null is not an object`, and
+    // Safari with cookies blocked throws on the property access itself. The helpers in
+    // `@/lib/safe-local-storage` return a value instead of throwing, which also stops a
+    // failed read/write from skipping the code that follows it inside a `try` block.
+    // Two rules because they see different syntax: `no-restricted-globals` catches the
+    // bare `localStorage`, `no-restricted-properties` catches `window.localStorage`.
+    "no-restricted-globals": [
+      "error",
+      {
+        "name": "localStorage",
+        "message": "Please use **getAppStorageItem / setAppStorageItem** from @/app/(app)/utils/app-local-storage instead - direct access throws in iOS in-app webviews and in Safari with cookies blocked, and those only accept a key declared in LOCAL_STORAGE_KEYS. To branch on availability during render, use **useIsLocalStorageAvailable** from @/lib/use-is-local-storage-available."
+      }
+    ],
+    "no-restricted-properties": [
+      "error",
+      {
+        "object": "window",
+        "property": "localStorage",
+        "message": "Please use **getAppStorageItem / setAppStorageItem** from @/app/(app)/utils/app-local-storage instead - direct access throws in iOS in-app webviews and in Safari with cookies blocked, and those only accept a key declared in LOCAL_STORAGE_KEYS. To branch on availability during render, use **useIsLocalStorageAvailable** from @/lib/use-is-local-storage-available."
+      },
+      {
+        "object": "globalThis",
+        "property": "localStorage",
+        "message": "Please use **getAppStorageItem / setAppStorageItem** from @/app/(app)/utils/app-local-storage instead - direct access throws in iOS in-app webviews and in Safari with cookies blocked, and those only accept a key declared in LOCAL_STORAGE_KEYS. To branch on availability during render, use **useIsLocalStorageAvailable** from @/lib/use-is-local-storage-available."
+      }
+    ],
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     // one import statement per module - `preferInline` folds a separate
     // `import type { X }` back into the value import as `{ type X }`, which is
@@ -210,6 +238,16 @@
   },
   "overrides": [
     {
+      // The one file allowed to touch `localStorage` directly: it is the wrapper the
+      // `no-restricted-globals` / `no-restricted-properties` rules above point everyone
+      // else at.
+      "files": ["src/lib/safe-local-storage.ts"],
+      "rules": {
+        "no-restricted-globals": "off",
+        "no-restricted-properties": "off"
+      }
+    },
+    {
       // Config files are not in tsconfig, so every import comes back as `any`
       // and the type-aware rules just shout. eslint only ran tseslint on ts/tsx.
       "files": ["**/*.{js,cjs,mjs}"],
@@ -252,6 +290,10 @@
       // `playwright/flat-recommended`, expanded (see the note above).
       "rules": {
         "no-empty-pattern": "off", // playwright fixtures destructure `{}`
+        // `localStorage` inside `page.evaluate` runs in the browser under test, which
+        // is exactly where we want to read what the app actually persisted
+        "no-restricted-globals": "off",
+        "no-restricted-properties": "off",
         "playwright/consistent-spacing-between-blocks": "warn",
         "playwright/expect-expect": "warn",
         "playwright/max-nested-describe": "warn",
@@ -297,6 +339,10 @@
       "files": ["src/**/*.test.ts", "src/**/*.test.tsx"],
       "plugins": ["vitest"],
       "rules": {
+        // tests seed and assert on the real store, and stub it to simulate the
+        // browsers the helper exists for
+        "no-restricted-globals": "off",
+        "no-restricted-properties": "off",
         // the categories at the top of this file now also pull in vitest's
         // correctness rules; this one wants an explicit type parameter on
         // every `vi.fn()` (68 call sites) - not a fight worth having.

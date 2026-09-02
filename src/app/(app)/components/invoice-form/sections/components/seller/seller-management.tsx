@@ -11,8 +11,17 @@ import type { UseFormSetValue } from "react-hook-form";
 import { toast } from "sonner";
 
 import { SellerDialog } from "@/app/(app)/components/invoice-form/sections/components/seller/seller-dialog";
+import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(app)/utils/app-local-storage";
 import { DEFAULT_SELLER_DATA } from "@/app/constants";
-import { sellerSchema, type InvoiceData, type SellerData } from "@/app/schema";
+import {
+  SELLERS_LOCAL_STORAGE_KEY,
+  sellerSchema,
+  type InvoiceData,
+  type SellerData,
+} from "@/app/schema";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,11 +36,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { SelectNative } from "@/components/ui/select-native";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { isLocalStorageAvailable } from "@/lib/check-local-storage";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { useIsLocalStorageAvailable } from "@/lib/use-is-local-storage-available";
 import { cn } from "@/lib/utils";
-
-export const SELLERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_SELLERS";
 
 interface SellerManagementProps {
   setValue: UseFormSetValue<InvoiceData>;
@@ -83,12 +90,14 @@ export function SellerManagement({
 
   const sellerSelectId = useId();
 
+  const isLocalStorageAvailable = useIsLocalStorageAvailable();
+
   const isEditMode = Boolean(editingSeller);
 
   // Load sellers from localStorage on component mount
   useEffect(() => {
     try {
-      const savedSellers = localStorage.getItem(SELLERS_LOCAL_STORAGE_KEY);
+      const savedSellers = getAppStorageItem(SELLERS_LOCAL_STORAGE_KEY);
       const parsedSellers: unknown = savedSellers
         ? JSON.parse(savedSellers)
         : [];
@@ -126,10 +135,10 @@ export function SellerManagement({
           ),
         );
 
-        localStorage.setItem(
-          SELLERS_LOCAL_STORAGE_KEY,
-          JSON.stringify(validSellers),
-        );
+        setAppStorageItem({
+          key: SELLERS_LOCAL_STORAGE_KEY,
+          value: JSON.stringify(validSellers),
+        });
       }
 
       const selectedSeller = validSellers.find((seller: SellerData) => {
@@ -163,10 +172,22 @@ export function SellerManagement({
       const newSellers = [...sellersSelectOptions, newSellerWithId];
 
       // Save to localStorage
-      localStorage.setItem(
-        SELLERS_LOCAL_STORAGE_KEY,
-        JSON.stringify(newSellers),
-      );
+      const persisted = setAppStorageItem({
+        key: SELLERS_LOCAL_STORAGE_KEY,
+        value: JSON.stringify(newSellers),
+      });
+
+      // Nothing to show the user later if the list could not be saved, so stop here
+      // rather than reporting a success the next page load would contradict.
+      if (!persisted) {
+        showSellerStorageErrorToast({
+          message: "Failed to add seller",
+          id: "add_seller_error_toast",
+          isMobile,
+        });
+
+        return;
+      }
 
       // Update the sellers state
       setSellersSelectOptions(newSellers);
@@ -211,10 +232,20 @@ export function SellerManagement({
         return seller.id === editedSeller.id ? editedSeller : seller;
       });
 
-      localStorage.setItem(
-        SELLERS_LOCAL_STORAGE_KEY,
-        JSON.stringify(updatedSellers),
-      );
+      const persisted = setAppStorageItem({
+        key: SELLERS_LOCAL_STORAGE_KEY,
+        value: JSON.stringify(updatedSellers),
+      });
+
+      if (!persisted) {
+        showSellerStorageErrorToast({
+          message: "Failed to edit seller",
+          id: "edit_seller_error_toast",
+          isMobile,
+        });
+
+        return;
+      }
 
       setSellersSelectOptions(updatedSellers);
       setValue("seller", editedSeller);
@@ -279,17 +310,26 @@ export function SellerManagement({
 
   const handleDeleteSeller = () => {
     try {
-      setSellersSelectOptions((prevSellers) => {
-        const updatedSellers = prevSellers.filter((seller) => {
-          return seller.id !== selectedSellerId;
+      const updatedSellers = sellersSelectOptions.filter((seller) => {
+        return seller.id !== selectedSellerId;
+      });
+
+      const persisted = setAppStorageItem({
+        key: SELLERS_LOCAL_STORAGE_KEY,
+        value: JSON.stringify(updatedSellers),
+      });
+
+      if (!persisted) {
+        showSellerStorageErrorToast({
+          message: "Failed to delete seller",
+          id: "delete_seller_error_toast",
+          isMobile,
         });
 
-        localStorage.setItem(
-          SELLERS_LOCAL_STORAGE_KEY,
-          JSON.stringify(updatedSellers),
-        );
-        return updatedSellers;
-      });
+        return;
+      }
+
+      setSellersSelectOptions(updatedSellers);
       // Clear the selected seller index
       setSelectedSellerId("");
       // Clear the seller from the form if it was selected
@@ -524,4 +564,32 @@ export function SellerManagement({
       </AlertDialog>
     </>
   );
+}
+
+interface ShowSellerStorageErrorToastOptions {
+  /** What the user was trying to do, e.g. "Failed to add seller". */
+  message: string;
+  /** Stable toast id, so repeated failures replace each other instead of stacking. */
+  id: string;
+  /** Mobile shows toasts at the top, desktop at the bottom right. */
+  isMobile: boolean;
+}
+
+/**
+ * Tells the user their seller list could not be saved.
+ *
+ * A rejected write is not an application error — it is a full or disabled store — so it
+ * is surfaced to the user and deliberately not reported to Sentry.
+ */
+function showSellerStorageErrorToast({
+  message,
+  id,
+  isMobile,
+}: ShowSellerStorageErrorToastOptions) {
+  toast.error(message, {
+    id,
+    description: "Please try again",
+    closeButton: true,
+    position: isMobile ? "top-center" : "bottom-right",
+  });
 }

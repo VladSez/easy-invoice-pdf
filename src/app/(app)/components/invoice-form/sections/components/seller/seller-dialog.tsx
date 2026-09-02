@@ -4,7 +4,15 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { useConfirmDiscard } from "@/app/(app)/components/invoice-form/sections/hooks/use-confirm-discard";
-import { sellerSchema, type SellerData } from "@/app/schema";
+import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(app)/utils/app-local-storage";
+import {
+  SELLERS_LOCAL_STORAGE_KEY,
+  sellerSchema,
+  type SellerData,
+} from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,7 +39,6 @@ import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
 
 import { InputHelperMessage } from "../../../../../../../components/ui/input-helper-message";
 import { ConfirmDiscardDialog } from "../confirm-discard-dialog";
-import { SELLERS_LOCAL_STORAGE_KEY } from "./seller-management";
 
 const SELLER_FORM_ID = "seller-form";
 
@@ -218,7 +225,7 @@ export function SellerDialog({
       // **RUNNING SOME VALIDATIONS FIRST**
 
       // Get existing sellers or initialize empty array
-      const sellers = localStorage.getItem(SELLERS_LOCAL_STORAGE_KEY);
+      const sellers = getAppStorageItem(SELLERS_LOCAL_STORAGE_KEY);
       const existingSellers: unknown = sellers ? JSON.parse(sellers) : [];
 
       const rawSellers = Array.isArray(existingSellers) ? existingSellers : [];
@@ -249,10 +256,10 @@ export function SellerDialog({
 
       // If we had invalid sellers, save the valid sellers back to localStorage
       if (hadInvalidSellers) {
-        localStorage.setItem(
-          SELLERS_LOCAL_STORAGE_KEY,
-          JSON.stringify(validSellers),
-        );
+        setAppStorageItem({
+          key: SELLERS_LOCAL_STORAGE_KEY,
+          value: JSON.stringify(validSellers),
+        });
       }
 
       // we don't need to validate the name if we are editing an existing seller
