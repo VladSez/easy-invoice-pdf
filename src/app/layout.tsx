@@ -5,6 +5,7 @@ import Script from "next/script";
 import { Toaster } from "sonner";
 
 import { ResponsiveIndicator } from "@/components/dev/responsive-indicator";
+import { SentryIndicator } from "@/components/dev/sentry-indicator";
 import { PERSONAL_WEBSITE_URL, STATIC_ASSETS_URL } from "@/config";
 import { DeviceContextProvider } from "@/contexts/device-context";
 import { checkDeviceUserAgent } from "@/lib/check-device.server";
@@ -93,7 +94,11 @@ export default async function RootLayout({
             <Toaster visibleToasts={1} richColors closeButton />
             {/* show responsive indicator(tailwind breakpoint) for debugging responsive designs */}
             {process.env.NODE_ENV === "development" ? (
-              <ResponsiveIndicator />
+              <>
+                <ResponsiveIndicator />
+                {/* only renders while the browser Sentry SDK is actually live */}
+                <SentryIndicator />
+              </>
             ) : null}
             {/* should only be enabled in production */}
             {process.env.VERCEL_ENV === "production" ? (

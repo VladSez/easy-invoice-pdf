@@ -161,9 +161,10 @@ export const InvoiceForm = memo(function InvoiceForm({
     const validatedItemsResult = parseValidatedInvoiceItems(invoiceItems);
 
     if (!validatedItemsResult.success) {
+      // Not reported to Sentry on purpose: this branch is the expected state while
+      // someone is still typing (a cleared amount field, a half-entered VAT), so it
+      // fires constantly and says nothing about a broken app.
       console.error("Invalid items:", validatedItemsResult.error);
-
-      Sentry.captureException(validatedItemsResult.error);
 
       return;
     }

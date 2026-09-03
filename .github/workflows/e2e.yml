@@ -61,8 +61,13 @@ jobs:
         id: playwright
         env:
           BASE_URL: ${{ github.event_name == 'deployment_status' && github.event.deployment_status.environment_url }}
-          SENTRY_ENABLED: false
-          NEXT_PUBLIC_SENTRY_ENABLED: false
+          # NOTE: Sentry cannot be switched off from here. These tests drive a real
+          # Vercel preview deployment, which runs with its own env vars — anything set
+          # on this step only reaches the Playwright process. The browser SDK is opted
+          # out inside the app instead: `playwright.config.ts` seeds the
+          # `sentry.disabled` localStorage key. Server and edge events caused by a run
+          # are still reported.
+          #
           # Needed by the /api/generate-invoice/preview e2e snapshots. Must match the
           # AUTH_TOKEN of the deployment under test. The preview tests fail when it is
           # unset so CI cannot pass without exercising the authenticated endpoint.

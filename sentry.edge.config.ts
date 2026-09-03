@@ -6,33 +6,19 @@
 import * as Sentry from "@sentry/nextjs";
 
 import {
-  scrubSensitiveUrlParamsBeforeBreadcrumb,
-  scrubSensitiveUrlParamsFromEvent,
-} from "@/lib/sentry/scrub-sensitive-url-params";
+  isSentryEnabled,
+  logSentryEnabledLocally,
+  SENTRY_SHARED_INIT_OPTIONS,
+} from "@/lib/sentry/sentry-init-options";
 
-const isCI = process.env.CI === "true";
+// Opt-in via `SENTRY_ENABLED`, on every deployment and locally — see `isSentryEnabled`.
+if (
+  isSentryEnabled({
+    enabledFlag: process.env.SENTRY_ENABLED,
+    ci: process.env.CI,
+  })
+) {
+  Sentry.init(SENTRY_SHARED_INIT_OPTIONS);
 
-const isSentryEnabled = process.env.SENTRY_ENABLED === "true" && !isCI;
-
-if (isSentryEnabled) {
-  Sentry.init({
-    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-    enabled: isSentryEnabled,
-
-    // Adjust sampling in production for better performance/cost balance
-    tracesSampleRate: 0.15, // Sample 15% of transactions
-
-    // Recommended production settings
-    debug: false,
-
-    // Privacy: the invoice data lives in the `?data=` query param, redact it in
-    // every URL we report (request url, referrer, breadcrumbs, spans)
-    beforeSend: scrubSensitiveUrlParamsFromEvent,
-    beforeSendTransaction: scrubSensitiveUrlParamsFromEvent,
-    beforeBreadcrumb: scrubSensitiveUrlParamsBeforeBreadcrumb,
-
-    // Performance settings
-    replaysSessionSampleRate: 0.1, // Sample 10% of sessions
-    replaysOnErrorSampleRate: 1.0, // But capture all sessions with errors
-  });
+  logSentryEnabledLocally("edge");
 }

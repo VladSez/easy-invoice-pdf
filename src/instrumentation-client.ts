@@ -5,45 +5,33 @@
 
 import * as Sentry from "@sentry/nextjs";
 
+import { safeLocalStorageGetItem } from "@/lib/safe-local-storage";
+import { SENTRY_E2E_DISABLED_STORAGE_KEY } from "@/lib/sentry/sentry-e2e-flags";
 import {
-  scrubSensitiveUrlParamsBeforeBreadcrumb,
-  scrubSensitiveUrlParamsFromEvent,
-} from "@/lib/sentry/scrub-sensitive-url-params";
+  isSentryEnabled,
+  logSentryEnabledLocally,
+  SENTRY_SHARED_INIT_OPTIONS,
+} from "@/lib/sentry/sentry-init-options";
 
-const isCI = process.env.CI === "true";
+// The Playwright projects seed this key before the first page script runs, so an e2e
+// run never boots the SDK (and never burns replay/transaction quota).
+const isDisabledByE2eTests =
+  safeLocalStorageGetItem(SENTRY_E2E_DISABLED_STORAGE_KEY) === "1";
 
-// Check if we're on a Vercel preview deployment, we want to run only on prod domain
-const isVercelPreview =
-  typeof window !== "undefined" &&
-  window.location.hostname.includes(".vercel.app");
-
-// This is the client config, so we need to check the NEXT_PUBLIC_SENTRY_ENABLED environment variable
-const isSentryEnabled =
-  process.env.NEXT_PUBLIC_SENTRY_ENABLED === "true" &&
-  !isCI &&
-  !isVercelPreview;
-
-if (isSentryEnabled) {
+// Opt-in via `NEXT_PUBLIC_SENTRY_ENABLED`, on every deployment and locally.
+if (
+  !isDisabledByE2eTests &&
+  isSentryEnabled({ enabledFlag: process.env.NEXT_PUBLIC_SENTRY_ENABLED })
+) {
   Sentry.init({
-    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-    enabled: isSentryEnabled,
+    ...SENTRY_SHARED_INIT_OPTIONS,
 
-    // Adjust sampling in production for better performance/cost balance
-    tracesSampleRate: 0.15, // Sample 15% of transactions
-
-    // Recommended production settings
-    debug: false,
-
-    // Privacy: the invoice data lives in the `?data=` query param, redact it in
-    // every URL we report (request url, referrer, breadcrumbs, spans)
-    beforeSend: scrubSensitiveUrlParamsFromEvent,
-    beforeSendTransaction: scrubSensitiveUrlParamsFromEvent,
-    beforeBreadcrumb: scrubSensitiveUrlParamsBeforeBreadcrumb,
-
-    // Performance settings
+    // Session Replay is browser-only
     replaysSessionSampleRate: 0.1, // Sample 10% of sessions
     replaysOnErrorSampleRate: 1.0, // But capture all sessions with errors
   });
+
+  logSentryEnabledLocally("browser");
 }
 
 // Required by Sentry to instrument client-side router navigations (App Router).
