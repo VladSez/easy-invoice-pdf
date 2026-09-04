@@ -1,5 +1,7 @@
 TODO list
 
+- Update to Next js 16 and latest next-intl
+
 DISCOUNTS FEATURE:
 
 - should be per item based discount, not total based discount
@@ -10,8 +12,6 @@ DISCOUNTS FEATURE:
 ---
 
 - [ ] when adding invoice item, generate unique id for the item and store in local storage (should be backward compatible with existing invoice items)
-
-- [ ] add unit test for next js api routes (for generate-invoice route)
 
 - [ ] run playwright tests in docker, add local docker UBUNTU setup and re-use docker setup on ci
 

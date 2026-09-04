@@ -1,0 +1,69 @@
+export const metadata = {
+  title:
+    "EasyInvoicePDF v1.0.4 - Faster PDF preview, redesigned mobile tabs, and a fix for missing characters in PDFs",
+  description:
+    "The invoice PDF is now generated once and shared across the page, mobile tabs were redesigned with a sliding indicator, dates in the form match the PDF language, and PDFs no longer drop the first characters of labels.",
+  date: "2026-09-04",
+  version: "1.0.4",
+  type: "minor",
+};
+
+## ✨ Highlights
+
+- **Faster, flicker-free preview** - the invoice PDF is generated **once** and shared by the desktop preview, the mobile viewer and the download button, instead of being rendered separately by each of them
+- **Redesigned mobile tabs** - a pill-shaped track with a single indicator that slides between the invoice form and the preview
+- **Dates in the form now match the PDF** - helper texts and the out-of-date banner render dates in the invoice's own language and date format, so what you see in the form is what the PDF will say
+- **Fixed PDFs missing the first characters of labels** - `Cobrar de` no longer renders as `obrar de` in rare cases
+
+---
+
+**No PDF flickering or unnecessary re-renders**
+
+<video
+  src="https://github.com/user-attachments/assets/3c87d026-a1c3-4d69-b161-f7d72616c394"
+  controls
+  style={{ width: "100%", borderRadius: "8px" }}
+/>
+
+**Better mobile tabs**
+
+<video
+  src="https://github.com/user-attachments/assets/0226c46b-1f65-4027-b670-1f36fa7adb9f"
+  controls
+  style={{ width: "100%", borderRadius: "8px" }}
+/>
+
+---
+
+### Changed
+
+- The out-of-date dates banner now also detects a stale month in the invoice number, not just the dates
+- Upgraded to Next.js 15, React 19 and Sentry 10
+- Switched linting and formatting to oxlint and oxfmt, and expanded unit and end-to-end test coverage across the invoice form, PDF templates and storage handling
+
+### Fixed
+
+- PDFs intermittently dropped the first one or two characters of labels (for example `Fatura` → `atura`, `Data de emissão` → `ata de emissão`) after switching the template and the language in quick succession. It affected the preview and the downloaded file alike, and hit Portuguese and Spanish hardest
+- Text typed just before switching mobile tabs was silently lost; both panels now stay mounted once opened
+- The app crashed in iOS in-app webviews, which expose `localStorage` as `null`, and in Safari with "Block all cookies" enabled. All storage access is now guarded, and invoices still work in-session when storage is unavailable
+- The preview rendered the PDF twice when switching between the default and Stripe templates
+
+[View Release Notes for v1.0.4 on GitHub](https://github.com/VladSez/easy-invoice-pdf/releases/tag/v1.0.4)
+
+---
+
+<div className="rounded-lg border-2 border-blue-200 bg-blue-50 px-8 py-4 dark:border-blue-900 dark:bg-blue-950" data-testid="ready-to-start-invoicing-cta">
+<h2 className="!mt-4">Create your next invoice</h2>
+
+EasyInvoicePDF is free and open source. There's no sign-up, and you can go from blank form to downloaded PDF in under a minute.
+
+<div className="mt-6">
+  <a
+    href="https://easyinvoicepdf.com?ref=changelog"
+    className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-slate-900 px-8 text-lg font-medium no-underline transition-all hover:bg-slate-800 active:scale-[0.98]"
+  >
+    <span className="text-white">Start Invoicing</span>
+  </a>
+</div>
+
+</div>
