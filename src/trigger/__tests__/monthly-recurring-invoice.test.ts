@@ -24,21 +24,27 @@ type TaskConfig = {
 let runMonthlyRecurringInvoice: TaskRun | undefined;
 let monthlyRecurringInvoiceRetry: TaskConfig["retry"];
 
-vi.mock("@trigger.dev/sdk", () => ({
-  logger: {
-    log: (...args: unknown[]) => mockLoggerLog(...args) as void,
-  },
-  wait: {
-    until: (...args: unknown[]) => mockWaitUntil(...args) as void,
-  },
-  schedules: {
-    task: (config: TaskConfig) => {
-      runMonthlyRecurringInvoice = config.run;
-      monthlyRecurringInvoiceRetry = config.retry;
-      return { id: "monthly-recurring-invoice" };
+vi.mock("@trigger.dev/sdk", () => {
+  return {
+    logger: {
+      log: (...args: unknown[]) => {
+        return mockLoggerLog(...args) as void;
+      },
     },
-  },
-}));
+    wait: {
+      until: (...args: unknown[]) => {
+        return mockWaitUntil(...args) as void;
+      },
+    },
+    schedules: {
+      task: (config: TaskConfig) => {
+        runMonthlyRecurringInvoice = config.run;
+        monthlyRecurringInvoiceRetry = config.retry;
+        return { id: "monthly-recurring-invoice" };
+      },
+    },
+  };
+});
 
 // Saturday/Sunday on the 10th, Warsaw wall time (weekday checks only; hour matches warsaw-time.test.ts payloads).
 const SATURDAY_JAN_10_2026 = new Date("2026-01-10T12:00:00Z");
@@ -72,7 +78,9 @@ function mockFetchResponse({
   return vi.fn().mockResolvedValue({
     ok,
     status,
-    text: () => Promise.resolve(body),
+    text: () => {
+      return Promise.resolve(body);
+    },
   });
 }
 

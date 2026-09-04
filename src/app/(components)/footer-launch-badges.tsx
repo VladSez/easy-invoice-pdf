@@ -14,13 +14,13 @@ import {
  * Renders launch/featured badges in footer: Startup Fame, LaunchPanda, Tiny Startups, etc.
  */
 export function FooterLaunchBadges() {
-  const [autoScrollPlugin] = useState(() =>
-    AutoScroll({
+  const [autoScrollPlugin] = useState(() => {
+    return AutoScroll({
       playOnInit: true,
       speed: 0.35,
       stopOnInteraction: false,
-    }),
-  );
+    });
+  });
 
   return (
     <Carousel
@@ -145,6 +145,7 @@ export function FooterLaunchBadges() {
           <a
             href="https://buildhop.io/discover/easyinvoicepdf-54735f67-1b04-4e01-a1ca-6ec6e716de5f"
             target="_blank"
+            aria-label="Trending on BuildHop: EasyInvoicePDF"
             rel="noopener noreferrer"
             title="Trending on BuildHop: EasyInvoicePDF"
           >
@@ -253,6 +254,7 @@ export function FooterLaunchBadges() {
           <a
             href="https://www.tinystartups.com/startup/easyinvoicepdf"
             target="_blank"
+            aria-label="Launched on Tiny Startups: EasyInvoicePDF"
             rel="noopener"
             style={{
               display: "inline-flex",

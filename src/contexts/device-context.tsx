@@ -1,8 +1,9 @@
 "use client";
 
+import { createContext, useContext, useEffect, useState } from "react";
+
 import { useIsDesktop } from "@/hooks/use-media-query";
 import type { InAppInfo } from "@/lib/check-device.server";
-import { createContext, useContext, useEffect, useState } from "react";
 
 interface DeviceContextType {
   isDesktop: boolean;
@@ -48,6 +49,7 @@ export function DeviceContextProvider({
    */
   useEffect(() => {
     if (isMediaQueryDesktop !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect, react-you-might-not-need-an-effect/no-derived-state
       setIsDesktopClient(isMediaQueryDesktop);
     }
   }, [isMediaQueryDesktop]);

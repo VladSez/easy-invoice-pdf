@@ -1,12 +1,14 @@
+import type { Attachment } from "resend";
 import { describe, it, expect, vi } from "vitest";
+
+import { MOCK_INVOICE_DATA } from "@/utils/__tests__/data";
+
 import {
   generateInvoice,
   type GenerateInvoiceDeps,
   type GenerateInvoiceInput,
   type GenerateInvoiceReport,
 } from "../generate-invoice";
-import { MOCK_INVOICE_DATA } from "@/utils/__tests__/data";
-import type { Attachment } from "resend";
 
 // No vi.mock() here — all external boundaries are injected via deps.
 
@@ -136,6 +138,43 @@ describe("generateInvoice", () => {
       );
     });
 
+    it("should use Warsaw time for date-based output", async () => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(new Date("2026-08-31T22:30:00.000Z"));
+
+      try {
+        const deps = buildDeps();
+        await generateInvoice(deps, {
+          ...MOCK_INPUT,
+          englishInvoiceData: {
+            ...MOCK_INPUT.englishInvoiceData,
+            invoiceNumberObject: {
+              label: "Invoice Number",
+              value: "",
+            },
+          },
+        });
+
+        expect(deps.createOrFindInvoiceFolder).toHaveBeenCalledWith(
+          expect.objectContaining({ month: "09", year: "2026" }),
+        );
+        expect(deps.uploadFile).toHaveBeenCalledWith(
+          expect.objectContaining({ fileName: "invoice-EN-09-2026.pdf" }),
+        );
+
+        const telegramCall = vi.mocked(deps.sendTelegramMessage).mock
+          .calls[0][0];
+        expect(telegramCall.message).toContain("Invoices for September 2026");
+        expect(telegramCall.message).toContain("Date: *September 1, 2026*");
+
+        const emailCall = vi.mocked(deps.sendEmail).mock.calls[0][0];
+        expect(emailCall.subject).toBe("📝 Invoices for September 2026");
+        expect(emailCall.html).toContain("Date: <b>September 1, 2026</b>");
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
     it("should send Telegram notification with 2 file attachments", async () => {
       const deps = buildDeps();
       await generateInvoice(deps, MOCK_INPUT);
@@ -181,7 +220,7 @@ describe("generateInvoice", () => {
       const uploadCalls = vi.mocked(deps.uploadFile).mock.invocationCallOrder;
 
       // Last uploadFile() invocation (want to ensure all uploads precede notifications)
-      const lastUploadOrder = uploadCalls[uploadCalls.length - 1];
+      const lastUploadOrder = uploadCalls.at(-1)!;
 
       // Get call order numbers for the first sendTelegramMessage and sendEmail calls
       const telegramOrder = vi.mocked(deps.sendTelegramMessage).mock
@@ -646,7 +685,7 @@ describe("generateInvoice", () => {
       await generateInvoice(deps, MOCK_INPUT);
 
       const formattedNumber =
-        MOCK_INVOICE_DATA.invoiceNumberObject.value.replace(/\//g, "-");
+        MOCK_INVOICE_DATA.invoiceNumberObject.value.replaceAll("/", "-");
 
       for (const call of vi.mocked(deps.uploadFile).mock.calls) {
         expect(call[0].fileName).toContain(formattedNumber);

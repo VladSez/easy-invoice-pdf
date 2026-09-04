@@ -9,28 +9,32 @@ export default function Loading() {
           <div className="h-4 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
 
           {/* Sections */}
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="space-y-4">
-              <div className="h-px w-full bg-gray-200 dark:bg-gray-700" />
-              <div className="h-6 w-40 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-              <div className="space-y-2">
-                <div className="h-4 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-                <div className="h-4 w-5/6 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-                <div className="h-4 w-4/6 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-              </div>
-              {i % 2 === 0 && (
-                <div className="space-y-2 pl-4">
-                  {Array.from({ length: 3 }).map((_, j) => (
-                    <div
-                      key={j}
-                      className="h-4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
-                      style={{ width: `${75 + j * 5}%` }}
-                    />
-                  ))}
+          {Array.from({ length: 8 }).map((_, i) => {
+            return (
+              <div key={i} className="space-y-4">
+                <div className="h-px w-full bg-gray-200 dark:bg-gray-700" />
+                <div className="h-6 w-40 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+                <div className="space-y-2">
+                  <div className="h-4 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+                  <div className="h-4 w-5/6 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+                  <div className="h-4 w-4/6 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
                 </div>
-              )}
-            </div>
-          ))}
+                {i % 2 === 0 ? (
+                  <div className="space-y-2 pl-4">
+                    {Array.from({ length: 3 }).map((_, j) => {
+                      return (
+                        <div
+                          key={j}
+                          className="h-4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+                          style={{ width: `${75 + j * 5}%` }}
+                        />
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

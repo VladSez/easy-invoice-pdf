@@ -1,41 +1,43 @@
 // @ts-check
 
-import { withSentryConfig } from "@sentry/nextjs";
-import createNextIntlPlugin from "next-intl/plugin";
-import createMDX from "@next/mdx";
-import { createJiti } from "jiti";
-import remarkGfm from "remark-gfm";
-
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import fs from "node:fs";
+import path from "node:path";
 
-const loadTsFileViaJiti = createJiti(fileURLToPath(import.meta.url));
+import createMDX from "@next/mdx";
+import { withSentryConfig } from "@sentry/nextjs";
+import { createJiti } from "jiti";
+import createNextIntlPlugin from "next-intl/plugin";
 
-// Import ENV file here to validate during build. Using jiti@^1 we can import .ts files :)
-loadTsFileViaJiti("./src/env");
+const loadTsFileViaJiti = createJiti(import.meta.filename);
+
+// Import ENV file here to validate during build. jiti lets us import .ts files :)
+// (jiti v2 deprecated the callable form in favour of `.import()`)
+await loadTsFileViaJiti.import("./src/env");
 
 // Validate all i18n files, that are used to translate the /about page
 async function validatei18nAndInvoicePDFTranslationFiles() {
   // Validates our custom translations object against the schema, that is used to translate PDF fields, invoice items table, etc.
   try {
-    // Import the translations schema using jiti
+    // Import the translations schema and catalog using jiti
     // @ts-ignore
-    const { invoicePDFtranslationsSchema, INVOICE_PDF_TRANSLATIONS } =
-      await loadTsFileViaJiti.import(
-        "./src/app/(app)/pdf-i18n-translations/pdf-translations.ts",
-      );
+    const { invoicePDFTranslationsSchema } = await loadTsFileViaJiti.import(
+      "./src/app/(app)/pdf-i18n-translations/pdf-translations-schema.ts",
+    );
+    // @ts-ignore
+    const { INVOICE_PDF_TRANSLATIONS } = await loadTsFileViaJiti.import(
+      "./src/app/(app)/pdf-i18n-translations/pdf-translations.ts",
+    );
 
-    const result = invoicePDFtranslationsSchema.safeParse(
+    const result = invoicePDFTranslationsSchema.safeParse(
       INVOICE_PDF_TRANSLATIONS,
     );
 
     if (!result.success) {
-      console.error("❌ Invalid translations:", result.error.message);
+      console.error("❌ Invalid PDF translations:", result.error.message);
       process.exit(1);
     }
   } catch (error) {
-    console.error("❌ Error validating translations:", error);
+    console.error("❌ Error validating PDF translations:", error);
     process.exit(1);
   }
 
@@ -48,9 +50,9 @@ async function validatei18nAndInvoicePDFTranslationFiles() {
   );
 
   // Validate messages
-  const is18nJSONMessageFiles = fs
-    .readdirSync(messagesDir)
-    .filter((file) => file.endsWith(".json"));
+  const is18nJSONMessageFiles = fs.readdirSync(messagesDir).filter((file) => {
+    return file.endsWith(".json");
+  });
 
   const validationPromises = is18nJSONMessageFiles.map(async (file) => {
     try {
@@ -83,11 +85,12 @@ async function validatei18nAndInvoicePDFTranslationFiles() {
 
   const results = await Promise.allSettled(validationPromises);
 
-  const hasErrors = results.some(
-    (result) =>
+  const hasErrors = results.some((result) => {
+    return (
       result.status === "rejected" ||
-      (result.status === "fulfilled" && !result.value.success),
-  );
+      (result.status === "fulfilled" && !result.value.success)
+    );
+  });
 
   if (hasErrors) {
     results.forEach((result) => {
@@ -106,7 +109,9 @@ async function validatei18nAndInvoicePDFTranslationFiles() {
   }
 }
 
-// Since the function is now async, we need to handle it properly
+// Deliberately not awaited at the top level: validation runs alongside the rest of
+// the config evaluation instead of blocking it, and failures exit the process below.
+// oxlint-disable-next-line unicorn/prefer-top-level-await
 validatei18nAndInvoicePDFTranslationFiles().catch((error) => {
   console.error("❌ Fatal error during validation:", error);
   process.exit(1);
@@ -122,7 +127,9 @@ const withMDX = createMDX({
   // Add markdown plugins here, as desired
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [remarkGfm],
+    // Plugins must be referenced by name (not imported) so Turbopack can
+    // serialize the loader options and resolve them itself.
+    remarkPlugins: [["remark-gfm"]],
     rehypePlugins: [],
   },
 });
@@ -131,12 +138,6 @@ const withMDX = createMDX({
 const nextConfig = {
   // Configure the file extensions that Next.js should handle
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   compiler: {
     removeConsole: process.env.VERCEL_ENV === "production",
   },
@@ -186,9 +187,16 @@ export default withSentryConfig(withNextIntl(withMDX(nextConfig)), {
   // Upload a larger set of source maps for prettier stack traces (increases build time)
   widenClientFileUpload: true,
 
-  // Automatically annotate React components to show their full name in breadcrumbs and session replay
-  reactComponentAnnotation: {
-    enabled: true,
+  webpack: {
+    // Automatically annotate React components to show their full name in breadcrumbs and session replay
+    reactComponentAnnotation: {
+      enabled: true,
+    },
+
+    treeshake: {
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      removeDebugLogging: true,
+    },
   },
 
   // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
@@ -196,7 +204,4 @@ export default withSentryConfig(withNextIntl(withMDX(nextConfig)), {
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
   // side errors will fail.
   // tunnelRoute: "/monitoring",
-
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
 });

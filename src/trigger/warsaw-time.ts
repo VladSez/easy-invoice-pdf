@@ -57,8 +57,13 @@ function getWarsawDateParts(date: Date): {
     day: "2-digit",
   }).formatToParts(date);
 
-  const getPart = (type: Intl.DateTimeFormatPartTypes) =>
-    Number(parts.find((part) => part.type === type)?.value);
+  const getPart = (type: Intl.DateTimeFormatPartTypes) => {
+    return Number(
+      parts.find((part) => {
+        return part.type === type;
+      })?.value,
+    );
+  };
 
   return {
     year: getPart("year"),
@@ -104,8 +109,13 @@ function getWarsawOffsetMs(date: Date): number {
     hour12: false,
   }).formatToParts(date);
 
-  const getPart = (type: Intl.DateTimeFormatPartTypes) =>
-    Number(parts.find((part) => part.type === type)?.value);
+  const getPart = (type: Intl.DateTimeFormatPartTypes) => {
+    return Number(
+      parts.find((part) => {
+        return part.type === type;
+      })?.value,
+    );
+  };
 
   const asUtc = Date.UTC(
     getPart("year"),

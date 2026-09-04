@@ -1,9 +1,10 @@
 "use client";
 
+import { Play } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
+
 import { cn } from "@/lib/utils";
-import { Play } from "lucide-react";
 
 interface SharedVideoProps extends React.ComponentPropsWithRef<"div"> {
   src: string;
@@ -83,6 +84,7 @@ export function AutoPlayVideo({
   // - If in viewport and not paused, play the video
   // - If out of viewport, pause to save resources
   useEffect(() => {
+    // oxlint-disable-next-line react-you-might-not-need-an-effect/no-event-handler -- there is no event to hang this on: `inView` comes from an IntersectionObserver and `srcAdded` tells us the <source> is in the DOM, both of which have to be synchronised with the <video> element
     if (!srcAdded) return;
 
     if (paused) pauseVideo();
@@ -103,7 +105,9 @@ export function AutoPlayVideo({
     }
 
     video.addEventListener("click", handleClick);
-    return () => video.removeEventListener("click", handleClick);
+    return () => {
+      return video.removeEventListener("click", handleClick);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -185,13 +189,17 @@ export function ManualPlayVideo({
 
   // Effect: Pauses video when it scrolls out of view
   // This prevents videos from playing audio/consuming resources when not visible
-  // Only triggers when video is currently playing to avoid unnecessary operations
+  // Pausing an already paused video is a no-op, so this does not check `isPlaying`
   useEffect(() => {
-    if (!inView && isPlaying) {
-      videoRef.current?.pause();
-      setIsPlaying(false);
+    if (inView) {
+      return;
     }
-  }, [inView, isPlaying]);
+
+    videoRef.current?.pause();
+
+    // oxlint-disable-next-line react/set-state-in-effect -- the <video> element is an external system and `inView` comes from an IntersectionObserver; there is no event here to update this from
+    setIsPlaying(false);
+  }, [inView]);
 
   // Effect: Ensures only one video plays at a time across the page
   // When any video starts playing, it dispatches a "video-play" event with its unique ID.
@@ -211,7 +219,9 @@ export function ManualPlayVideo({
     window.addEventListener("video-play", handler);
 
     // Cleanup: remove listener when component unmounts
-    return () => window.removeEventListener("video-play", handler);
+    return () => {
+      return window.removeEventListener("video-play", handler);
+    };
   }, [videoId]);
 
   // Handler: Called when user clicks the play button
@@ -257,7 +267,7 @@ export function ManualPlayVideo({
           >
             <source src={src} type="video/mp4" />
           </video>
-          {/* 
+          {/*
             Play button overlay - only shown when video is not playing
           */}
           {!isPlaying ? (

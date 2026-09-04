@@ -1,20 +1,18 @@
-import { DeviceContextProvider } from "@/contexts/device-context";
-import { checkDeviceUserAgent } from "@/lib/check-device.server";
-import { NextIntlClientProvider } from "next-intl";
-import { ResponsiveIndicator } from "@/components/dev/responsive-indicator";
-
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
+import { NextIntlClientProvider } from "next-intl";
 import Script from "next/script";
-
 import { Toaster } from "sonner";
 
+import { ResponsiveIndicator } from "@/components/dev/responsive-indicator";
+import { SentryIndicator } from "@/components/dev/sentry-indicator";
 import { PERSONAL_WEBSITE_URL, STATIC_ASSETS_URL } from "@/config";
+import { DeviceContextProvider } from "@/contexts/device-context";
+import { checkDeviceUserAgent } from "@/lib/check-device.server";
 import { JsonLdScript } from "@/lib/seo/render-json-ld";
 import { buildSiteWideJsonLdGraph } from "@/lib/seo/site-entities";
 
 import "./globals.css";
-
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
@@ -96,10 +94,14 @@ export default async function RootLayout({
             <Toaster visibleToasts={1} richColors closeButton />
             {/* show responsive indicator(tailwind breakpoint) for debugging responsive designs */}
             {process.env.NODE_ENV === "development" ? (
-              <ResponsiveIndicator />
+              <>
+                <ResponsiveIndicator />
+                {/* only renders while the browser Sentry SDK is actually live */}
+                <SentryIndicator />
+              </>
             ) : null}
             {/* should only be enabled in production */}
-            {process.env.VERCEL_ENV === "production" && (
+            {process.env.VERCEL_ENV === "production" ? (
               <>
                 <SpeedInsights
                   sampleRate={0.3} // send only x% of the requests to Speed Insights (for cost-saving)
@@ -112,7 +114,7 @@ export default async function RootLayout({
                   defer
                 />
               </>
-            )}
+            ) : null}
             <JsonLdScript id="site-wide-json-ld" data={siteWideJsonLd} />
           </NextIntlClientProvider>
         </DeviceContextProvider>

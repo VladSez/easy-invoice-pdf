@@ -1,5 +1,8 @@
-import { PDF_DATA_LOCAL_STORAGE_KEY, type InvoiceData } from "@/app/schema";
 import { expect, test } from "@playwright/test";
+
+import { PDF_DATA_LOCAL_STORAGE_KEY, type InvoiceData } from "@/app/schema";
+
+import { waitForPdfRegeneration } from "../utils/pdf-download";
 import { uploadLogoFile } from "./utils";
 
 test.describe("Stripe Invoice Sharing Logic", () => {
@@ -34,7 +37,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await shareButton.click();
 
     // Verify URL contains shared data
-    await page.waitForURL((url) => url.searchParams.has("data"));
+    await page.waitForURL((url) => {
+      return url.searchParams.has("data");
+    });
     const url = page.url();
     expect(url).toContain(`?template=stripe&data=`);
 
@@ -160,11 +165,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .selectOption("stripe");
 
     // Upload logo
-    await uploadLogoFile(page);
-
-    // Wait debounce timeout
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
+    await waitForPdfRegeneration(page, async () => {
+      await uploadLogoFile(page);
+    });
 
     const generalInfoSection = page.getByTestId("general-information-section");
     await expect(
@@ -205,7 +208,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     ).toBeVisible();
 
     // verify URL contains data parameter
-    await page.waitForURL((url) => url.searchParams.has("data"));
+    await page.waitForURL((url) => {
+      return url.searchParams.has("data");
+    });
 
     const url = page.url();
     expect(url).toContain(`?template=stripe&data=`);
@@ -286,20 +291,18 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // Verify share button is disabled
     await expect(shareButton).toHaveAttribute("data-disabled", "true");
 
-    // Wait a moment for any debounced localStorage updates
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
+    // Verify the logo is actually saved in localStorage (it is written with a debounce)
+    await expect
+      .poll(async () => {
+        const storedData = await page.evaluate((key) => {
+          return localStorage.getItem(key);
+        }, PDF_DATA_LOCAL_STORAGE_KEY);
 
-    // Verify data is actually saved in localStorage
-    const storedData = (await page.evaluate((key) => {
-      return localStorage.getItem(key);
-    }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
-
-    expect(storedData).toBeTruthy();
-
-    const parsedData = JSON.parse(storedData) as InvoiceData;
-
-    expect(parsedData.logo).toBeTruthy();
+        return storedData
+          ? Boolean((JSON.parse(storedData) as InvoiceData).logo)
+          : false;
+      })
+      .toBe(true);
 
     // Reload the page
     await page.reload();
@@ -320,12 +323,17 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
   test("sharing functionality works correctly in mobile view (mobile UI is a bit different)", async ({
     page,
-  }) => {
+  }, testInfo) => {
+    // the mobile sharing UI is what this test is about, so we run it on a real
+    // mobile project instead of re-running the same flow on every project
+    // eslint-disable-next-line playwright/no-skipped-test -- mobile UI flow, Mobile Chrome only
+    test.skip(
+      testInfo.project.name !== "Mobile Chrome",
+      "mobile only flow, runs on the Mobile Chrome project",
+    );
+
     // Verify default template is selected by default
     await expect(page).toHaveURL("/?template=default");
-
-    // Set mobile viewport
-    await page.setViewportSize({ width: 375, height: 667 });
 
     // Verify share button is visible and enabled in mobile
     const shareButton = page.getByRole("button", {
@@ -340,11 +348,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .selectOption("stripe");
 
     // Upload logo
-    await uploadLogoFile(page);
-
-    // Wait for logo to be uploaded
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
+    await waitForPdfRegeneration(page, async () => {
+      await uploadLogoFile(page);
+    });
 
     // Verify share button is disabled in mobile view too
     await expect(shareButton).toHaveAttribute("data-disabled", "true");
@@ -390,9 +396,8 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // Clear the Net Price field to trigger "Net price is required" validation error
     await netPriceInput.clear();
 
-    // Wait for debounce timeout so form validation runs and invoiceFormHasErrors becomes true
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
+    // the rendered validation error tells us that the form validation has run
+    await expect(page.getByText("Net price is required")).toBeVisible();
 
     // Click share button — should show error toast because form has validation errors
     const shareButton = page.getByRole("button", {
@@ -411,9 +416,8 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // Fill back the Net Price with a valid value
     await netPriceInput.fill("100");
 
-    // Wait for debounce timeout so form validation passes and invoiceFormHasErrors resets to false
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(700);
+    // the validation error disappears once the form is valid again
+    await expect(page.getByText("Net price is required")).toBeHidden();
 
     // Click share button again — should succeed this time
     await shareButton.click();
@@ -429,7 +433,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     ).toBeVisible();
 
     // Verify link was generated: URL should contain data param
-    await page.waitForURL((url) => url.searchParams.has("data"));
+    await page.waitForURL((url) => {
+      return url.searchParams.has("data");
+    });
     const url = page.url();
     expect(url).toContain("?template=stripe&data=");
 

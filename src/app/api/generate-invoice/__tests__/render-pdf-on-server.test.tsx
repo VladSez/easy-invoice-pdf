@@ -1,7 +1,8 @@
 // @vitest-environment node
 
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import { describe, expect, it, vi } from "vitest";
+
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 
 import {
   getPolishInvoiceRealData,
@@ -13,34 +14,15 @@ import {
   SERVER_PDF_MOCK_INVOICE_DATA,
 } from "./pdf-test-utils";
 
-vi.mock("@/env", () => ({
-  env: {
-    AUTH_TOKEN: "test-auth-token",
-    RESEND_API_KEY: "re_test_123",
-    UPSTASH_REDIS_REST_URL: "https://redis.test",
-    UPSTASH_REDIS_REST_TOKEN: "redis-token",
-    TELEGRAM_BOT_TOKEN: "telegram-token",
-    TELEGRAM_CHAT_ID: "telegram-chat-id",
-    SELLER_NAME: "Test Seller",
-    SELLER_ADDRESS: "Seller Address",
-    SELLER_VAT_NO: "SELLER-VAT",
-    SELLER_EMAIL: "seller@test.com",
-    SELLER_ACCOUNT_NUMBER: "123456789",
-    SELLER_SWIFT_BIC: "TESTBIC",
-    BUYER_NAME: "Test Buyer",
-    BUYER_ADDRESS: "Buyer Address",
-    BUYER_VAT_NO: "BUYER-VAT",
-    BUYER_EMAIL: "buyer@test.com",
-    INVOICE_NET_PRICE: "1000",
-    INVOICE_EMAIL_RECIPIENT: "recipient@test.com",
-    INVOICE_EMAIL_COMPANY_TO: "company@test.com",
-    GOOGLE_DRIVE_PARENT_FOLDER_ID: "folder-123",
-    GOOGLE_DRIVE_CLIENT_EMAIL: "drive@test.com",
-    GOOGLE_DRIVE_PRIVATE_KEY: "private-key",
-    GITHUB_TOKEN: "github-token",
-    NEXT_PUBLIC_SENTRY_DSN: "https://sentry.test",
-  },
-}));
+// Real PDF rendering (font fetch + @react-pdf layout) takes seconds on a cold
+// worker, and several suites do it in parallel — the 5s default is too tight.
+vi.setConfig({ testTimeout: 30_000, hookTimeout: 30_000 });
+
+vi.mock("@/env", async () => {
+  // dynamic import: vi.mock factories are hoisted above the static imports
+  const { TEST_ENV } = await import("./test-env");
+  return { env: TEST_ENV };
+});
 
 describe("renderInvoicePdfBuffer", () => {
   it("should produce a valid English PDF buffer", async () => {

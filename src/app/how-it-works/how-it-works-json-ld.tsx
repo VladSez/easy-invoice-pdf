@@ -1,5 +1,6 @@
-import { buildHowItWorksJsonLd } from "./build-how-it-works-json-ld";
 import { JsonLdScript } from "@/lib/seo/render-json-ld";
+
+import { buildHowItWorksJsonLd } from "./build-how-it-works-json-ld";
 
 export function HowItWorksJsonLd() {
   return (

@@ -1,5 +1,29 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
+import {
+  compressToEncodedURIComponent,
+  decompressFromEncodedURIComponent,
+} from "lz-string";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
+
+import { InvoicePageHeader } from "@/app/(app)/components/invoice-page-header";
+import { InvoicePdfInstanceProvider } from "@/app/(app)/contexts/invoice-pdf-instance-context";
+import { InvoicePageLoadingSkeleton } from "@/app/(app)/loading";
+import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(app)/utils/app-local-storage";
+import {
+  DEFAULT_METADATA,
+  getAppMetadata,
+  updateAppMetadata,
+} from "@/app/(app)/utils/get-app-metadata";
+import { Footer } from "@/app/(components)/footer";
+import type { ChangelogSummary } from "@/app/changelog/utils";
 import { getInitialInvoiceData } from "@/app/constants";
 import {
   invoiceSchema,
@@ -8,46 +32,25 @@ import {
   SUPPORTED_TEMPLATES,
   type InvoiceData,
 } from "@/app/schema";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { useDeviceContext } from "@/contexts/device-context";
-import { useRouter } from "next/navigation";
-
-import { InvoicePageHeader } from "@/app/(app)/components/invoice-page-header";
-import {
-  DEFAULT_METADATA,
-  getAppMetadata,
-  updateAppMetadata,
-} from "@/app/(app)/utils/get-app-metadata";
-import { Footer } from "@/app/(components)/footer";
 import { GitHubStarCTA } from "@/components/github-star-cta";
 import { Button } from "@/components/ui/button";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { useDeviceContext } from "@/contexts/device-context";
 import { haptic } from "@/lib/haptic";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import {
   compressInvoiceData,
   decompressInvoiceData,
 } from "@/utils/url-compression";
-import * as Sentry from "@sentry/nextjs";
-import {
-  compressToEncodedURIComponent,
-  decompressFromEncodedURIComponent,
-} from "lz-string";
-import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
-import { z } from "zod";
+
 import { InvoiceClientPage } from "./components";
 import { ChangelogUpdatePopup } from "./components/changelog-update-popup";
 import { HowItWorksVideoDialog } from "./components/how-it-works-video-dialog";
-import { showRandomCTAToast } from "./components/cta-toasts";
-import { useCTAToast } from "./contexts/cta-toast-context";
 import { useChangelogUpdatePopup } from "./hooks/use-changelog-update-popup";
-import { useShowRandomCTAToastOnIdle } from "./hooks/use-show-random-cta-toast";
-import type { ChangelogSummary } from "@/app/changelog/utils";
+import { useInAppBrowserNotice } from "./hooks/use-in-app-browser-notice";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
 import { selectInvoiceTemplate } from "./utils/select-invoice-template";
-import { InvoicePageLoadingSkeleton } from "@/app/(app)/loading";
 
 // TODO: enable later when PRO version is released, this is PRO FEATURE =)
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
@@ -62,7 +65,6 @@ import { InvoicePageLoadingSkeleton } from "@/app/(app)/loading";
  * - Invoice data state management and updates
  * - PDF generation and download functionality
  * - Share invoice functionality with URL generation
- * - CTA toast notifications for user engagement
  * - Error handling and user feedback
  *
  * @returns The rendered invoice application page with form, preview, and controls
@@ -77,8 +79,6 @@ export function AppPageClient({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const { markCTAActionTriggered, incrementInteractionCount } = useCTAToast();
-
   const urlTemplateSearchParam = searchParams.get("template");
 
   // Validate template parameter with zod
@@ -89,6 +89,9 @@ export function AppPageClient({
 
   const { isDesktop, isUADesktop } = useDeviceContext();
   const isMobile = !isDesktop;
+
+  // Warns the user when they are inside an in-app browser, where downloads are blocked
+  useInAppBrowserNotice();
 
   /**
    * State for storing the current invoice data.
@@ -104,9 +107,6 @@ export function AppPageClient({
     null,
   );
 
-  const [errorWhileGeneratingPdfIsShown, setErrorWhileGeneratingPdfIsShown] =
-    useState(false);
-
   const canShareInvoice = !invoiceDataState?.logo;
 
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
@@ -120,7 +120,6 @@ export function AppPageClient({
     isOpen: isChangelogPopupOpen,
     dismiss: dismissChangelogPopup,
     variant: changelogPopupVariant,
-    latestChangelog: changelogForPopup,
   } = useChangelogUpdatePopup({
     latestChangelog,
     isViewingSharedInvoice,
@@ -129,10 +128,22 @@ export function AppPageClient({
 
   const [isHowItWorksDialogOpen, setIsHowItWorksDialogOpen] = useState(false);
 
-  const [invoiceFormHasErrors, setInvoiceFormHasErrors] = useState(false);
+  /**
+   * Reads the invoice form at click time: its current values, or `null` when it has
+   * validation errors. A ref rather than state, because the answer is only needed inside
+   * handleShareInvoice — mirroring it into render would re-render the page (and the PDF)
+   * on every keystroke that flips validity, and could answer with a stale value.
+   */
+  const currentInvoiceFormDataRef = useRef<(() => InvoiceData | null) | null>(
+    null,
+  );
 
   // Refs to track original URL invoice data
   const originalUrlInvoiceDataRef = useRef<InvoiceData | null>(null);
+
+  // Tracks whether the invoice data has already been initialized (from URL or localStorage).
+  // Initialization must happen exactly once per page load, see the effect below for details.
+  const hasInitializedInvoiceDataRef = useRef(false);
 
   // Generate QR code data URL when qrCodeData changes
   useEffect(() => {
@@ -172,12 +183,6 @@ export function AppPageClient({
     };
   }, [invoiceDataState?.qrCodeData, invoiceDataState?.qrCodeIsVisible]);
 
-  // Only show CTA toast on idle in non-CI environments
-  if (!process.env.CI) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useShowRandomCTAToastOnIdle();
-  }
-
   // Helper function to load from localStorage
   const loadFromLocalStorage = useCallback(() => {
     try {
@@ -185,13 +190,13 @@ export function AppPageClient({
 
       // add metadata with default values if missing for all users
       if (!appMetadata) {
-        localStorage.setItem(
-          METADATA_LOCAL_STORAGE_KEY,
-          JSON.stringify(DEFAULT_METADATA),
-        );
+        setAppStorageItem({
+          key: METADATA_LOCAL_STORAGE_KEY,
+          value: JSON.stringify(DEFAULT_METADATA),
+        });
       }
 
-      const savedData = localStorage.getItem(PDF_DATA_LOCAL_STORAGE_KEY);
+      const savedData = getAppStorageItem(PDF_DATA_LOCAL_STORAGE_KEY);
 
       if (savedData) {
         const json: unknown = JSON.parse(savedData);
@@ -207,14 +212,12 @@ export function AppPageClient({
           : parsedData;
 
         setInvoiceDataState(selectedInvoiceData);
+      } else if (templateValidation.success) {
+        // if no data in local storage and template is in url, set initial data with template from url
+        setInvoiceDataState(getInitialInvoiceData(templateValidation.data));
       } else {
-        if (templateValidation.success) {
-          // if no data in local storage and template is in url, set initial data with template from url
-          setInvoiceDataState(getInitialInvoiceData(templateValidation.data));
-        } else {
-          // if no data in local storage, set initial data
-          setInvoiceDataState(getInitialInvoiceData());
-        }
+        // if no data in local storage, set initial data
+        setInvoiceDataState(getInitialInvoiceData());
       }
     } catch (error) {
       console.error("Failed to load saved invoice data:", error);
@@ -247,6 +250,21 @@ export function AppPageClient({
 
   // Initialize data from URL (via shared invoice link) or localStorage on page load
   useEffect(() => {
+    // Run only once per page load.
+    //
+    // This effect depends on `searchParams`, and the app rewrites the URL with
+    // `router.replace` on its own (e.g. to keep ?template= in sync, or to add ?data=
+    // when a share link is generated). Without this guard, every one of those rewrites
+    // re-ran the initialization, re-read localStorage and called `setInvoiceDataState`
+    // with a brand new (but identical) object. That extra state update makes react-pdf
+    // regenerate the very same PDF a second time, which shows up as a visible flicker /
+    // double render in the preview when the user switches the invoice template.
+    if (hasInitializedInvoiceDataRef.current) {
+      return;
+    }
+
+    hasInitializedInvoiceDataRef.current = true;
+
     const compressedInvoiceDataInUrl = searchParams.get("data");
     const urlTemplateSearchParam = searchParams.get("template");
 
@@ -258,7 +276,7 @@ export function AppPageClient({
 
     // first try to load from url i.e. if user has shared invoice link
     if (compressedInvoiceDataInUrl) {
-      console.log("[useEffect] [initialize invoice data from ** URL **]");
+      console.warn("[useEffect] [initialize invoice data from ** URL **]");
 
       try {
         const decompressedData = decompressFromEncodedURIComponent(
@@ -277,7 +295,7 @@ export function AppPageClient({
 
         const validatedDataFromURL = invoiceSchema.parse(updatedJson);
 
-        console.log(
+        console.warn(
           "[useEffect] [initialize invoice data from ** URL **] validatedDataFromURL",
           validatedDataFromURL,
         );
@@ -299,10 +317,10 @@ export function AppPageClient({
 
         // add metadata with default values if missing for all users
         if (!appMetadata) {
-          localStorage.setItem(
-            METADATA_LOCAL_STORAGE_KEY,
-            JSON.stringify(DEFAULT_METADATA),
-          );
+          setAppStorageItem({
+            key: METADATA_LOCAL_STORAGE_KEY,
+            value: JSON.stringify(DEFAULT_METADATA),
+          });
         }
       } catch (error) {
         console.error(
@@ -340,14 +358,14 @@ export function AppPageClient({
               </Button>
             </div>
           ),
-          duration: 20000,
+          duration: 20_000,
           closeButton: true,
         });
 
         Sentry.captureException(error);
       }
     } else {
-      console.log(
+      console.warn(
         "[useEffect] [initialize invoice data from ** LOCAL STORAGE **]",
       );
 
@@ -361,12 +379,19 @@ export function AppPageClient({
    * If missing, adds it based on the current invoice data state.
    */
   useEffect(() => {
-    // Only run if we have invoice data and no template in URL
+    // Only run if we have invoice data and no template in URL.
+    //
+    // `no-event-handler` wants this written where the invoice data is set, but `router.replace`
+    // is dropped when it is called from the initialization effect while the App Router is still
+    // mounting -- under load the shared-link e2e tests then sit on a URL that never grows its
+    // `?template=`. Reacting to `invoiceDataState` defers the call by one render, which is what
+    // makes it land.
+    // oxlint-disable-next-line react-you-might-not-need-an-effect/no-event-handler
     if (!invoiceDataState || searchParams.get("template")) {
       return;
     }
 
-    console.log("[useEffect] [add missing template to URL]", {
+    console.warn("[useEffect] [add missing template to URL]", {
       template: invoiceDataState.template,
     });
 
@@ -386,7 +411,7 @@ export function AppPageClient({
    */
   const checkForInvoiceChanges = useCallback(
     (currentData: InvoiceData) => {
-      console.log("[checkForInvoiceChanges]", currentData.template, {
+      console.warn("[checkForInvoiceChanges]", currentData.template, {
         originalUrlInvoiceDataRef: originalUrlInvoiceDataRef.current,
       });
 
@@ -395,7 +420,7 @@ export function AppPageClient({
 
       // Skip if no original URL data or no data in url
       if (!originalUrlInvoiceDataRef.current || !urlData) {
-        console.log("[checkForInvoiceChanges] skipping");
+        console.warn("[checkForInvoiceChanges] skipping");
 
         return;
       }
@@ -406,7 +431,7 @@ export function AppPageClient({
         JSON.stringify(currentData);
 
       if (invoiceHasChanged) {
-        console.log("[checkForInvoiceChanges] invoice has changed");
+        console.warn("[checkForInvoiceChanges] invoice has changed");
 
         toast.info(
           <div className="space-y-2">
@@ -453,10 +478,10 @@ export function AppPageClient({
    *
    */
   const handleInvoiceDataChange = (updatedData: InvoiceData) => {
-    console.log("[handleInvoiceDataChange]");
+    console.warn("[handleInvoiceDataChange]");
 
     if (isInvoiceUrlCorrupted) {
-      console.log("[handleInvoiceDataChange] clearing url due to corruption");
+      console.warn("[handleInvoiceDataChange] clearing url due to corruption");
 
       /** CLEAR URL IN CASE OF CORRUPTED INVOICE URL (i.e. "/?data=") for better UX and consistency */
 
@@ -497,21 +522,18 @@ export function AppPageClient({
     setInvoiceDataState(updatedData);
     checkForInvoiceChanges(updatedData);
 
-    // this is used to show CTA toast
-    incrementInteractionCount();
-
     const currentTemplate = searchParams.get("template");
 
     // update the url with the new template
     if (currentTemplate !== updatedData.template) {
-      console.log("[handleInvoiceDataChange] update url with new template", {
+      console.warn("[handleInvoiceDataChange] update url with new template", {
         currentTemplate,
         updatedDataTemplate: updatedData.template,
       });
 
       router.replace(`/?template=${updatedData.template}`, { scroll: false });
     } else {
-      console.log("[handleInvoiceDataChange] invoice template did not change");
+      console.warn("[handleInvoiceDataChange] invoice template did not change");
     }
   };
 
@@ -535,8 +557,17 @@ export function AppPageClient({
       return;
     }
 
+    // Read the form directly rather than trusting `invoiceDataState`, which only catches
+    // up on the DEBOUNCE_TIMEOUT commit: a click inside that window would otherwise share
+    // the pre-edit snapshot, and the edit landing a moment later would strip ?data= again
+    // via checkForInvoiceChanges. Falls back to `invoiceDataState` when the form is not
+    // mounted (mobile opens on the preview tab), where the tab switch has already flushed.
+    const currentInvoiceData = currentInvoiceFormDataRef.current
+      ? currentInvoiceFormDataRef.current()
+      : invoiceDataState;
+
     // prevent sharing invoice if there are form errors
-    if (invoiceFormHasErrors) {
+    if (!currentInvoiceData) {
       toast.error("Unable to Share Invoice", {
         id: "unable-to-share-invoice-form-errors-toast",
         duration: 6000,
@@ -553,9 +584,9 @@ export function AppPageClient({
     }
 
     // if invoice data state is valid, generate the shareable link and update the url
-    if (invoiceDataState) {
+    if (currentInvoiceData) {
       try {
-        const newInvoiceDataValidated = invoiceSchema.parse(invoiceDataState);
+        const newInvoiceDataValidated = invoiceSchema.parse(currentInvoiceData);
 
         // trigger haptic feedback on mobile devices
         haptic();
@@ -588,10 +619,16 @@ export function AppPageClient({
         }
 
         const currentParams = new URLSearchParams(searchParams.toString());
-        currentParams.set("template", invoiceDataState.template);
+        currentParams.set("template", newInvoiceDataValidated.template);
         currentParams.set("data", compressedData);
 
         router.replace(`?${currentParams.toString()}`, { scroll: false });
+
+        // Remember the invoice that was just shared, so later edits are detected and the
+        // "Invoice Updated" toast is shown. Previously this ref was (re)populated as a
+        // side effect of the initialization effect re-running on the ?data= URL change,
+        // which no longer happens now that initialization runs once per page load.
+        originalUrlInvoiceDataRef.current = newInvoiceDataValidated;
 
         // Construct full URL with locale and compressed data
         const newGeneratedLinkFullUrl = `${window.location.origin}/?${currentParams.toString()}`;
@@ -619,40 +656,37 @@ export function AppPageClient({
               .then(() => {
                 umamiTrackEvent("share_invoice_link_mobile");
 
-                updateAppMetadata((current) => ({
-                  ...current,
-                  invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
-                }));
+                updateAppMetadata((current) => {
+                  return {
+                    ...current,
+                    invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
+                  };
+                });
 
                 // dismiss other toasts when navigator.share is successful (for better UX)
                 setTimeout(() => {
                   toast.dismiss();
-                }, 1_500);
-
-                // show CTA toast after x seconds
-                setTimeout(() => {
-                  showRandomCTAToast();
-                }, 2_500);
+                }, 1500);
               })
-              .catch((err) => {
+              .catch((error) => {
                 console.error(
                   "[handleShareInvoice] failed to share invoice:",
-                  err,
+                  error,
                 );
 
                 // dismiss all other toasts for better UX
                 toast.dismiss();
 
                 // Only show error if it's not an abort error (user cancelled the share)
-                if (err instanceof Error && err?.name !== "AbortError") {
+                if (error instanceof Error && error?.name !== "AbortError") {
                   toast.error("Failed to share invoice", {
                     id: "failed-to-share-invoice-error-toast",
                     description: `Please try again or copy the link manually from the address bar`,
                     position: isMobile ? "top-center" : "bottom-right",
-                    duration: 5_000,
+                    duration: 5000,
                   });
 
-                  Sentry.captureException(err);
+                  Sentry.captureException(error);
                 }
               });
           } catch (shareError) {
@@ -678,27 +712,22 @@ export function AppPageClient({
                   </p>
                 ),
                 position: isMobile ? "top-center" : "bottom-right",
-                duration: 5_000,
+                duration: 5000,
               });
 
               umamiTrackEvent("share_invoice_link");
 
-              updateAppMetadata((current) => ({
-                ...current,
-                invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
-              }));
-
-              // show CTA toast after x seconds (after invoice link notification is shown)
-              setTimeout(() => {
-                showRandomCTAToast();
-              }, 5_500);
+              updateAppMetadata((current) => {
+                return {
+                  ...current,
+                  invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
+                };
+              });
             })
-            .catch((err) => {
-              Sentry.captureException(err);
+            .catch((error) => {
+              Sentry.captureException(error);
             });
         }
-
-        markCTAActionTriggered();
       } catch (error) {
         console.error("Failed to share invoice:", error);
         toast.error("Failed to generate shareable link", {
@@ -717,46 +746,43 @@ export function AppPageClient({
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
-        <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 min-[1400px]:max-w-7xl 2xl:max-w-[1480px]">
-          <InvoicePageHeader
-            canShareInvoice={canShareInvoice}
-            handleShareInvoice={handleShareInvoice}
-            isDesktop={isDesktop}
-            invoiceDataState={invoiceDataState}
-            errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
-            setErrorWhileGeneratingPdfIsShown={
-              setErrorWhileGeneratingPdfIsShown
-            }
-            qrCodeDataUrl={qrCodeDataUrl}
-            isMobile={isMobile}
-            isSharedInvoice={isViewingSharedInvoice}
-          />
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-            <InvoiceClientPage
-              invoiceDataState={invoiceDataState}
-              handleInvoiceDataChange={handleInvoiceDataChange}
-              handleShareInvoice={handleShareInvoice}
-              isMobile={isMobile}
-              errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
-              setErrorWhileGeneratingPdfIsShown={
-                setErrorWhileGeneratingPdfIsShown
-              }
+      {/* Generates the invoice PDF once and shares it with the preview and the download button */}
+      <InvoicePdfInstanceProvider
+        invoiceData={invoiceDataState}
+        qrCodeDataUrl={qrCodeDataUrl}
+      >
+        <div className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
+          <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 min-[1400px]:max-w-7xl 2xl:max-w-[1480px]">
+            <InvoicePageHeader
               canShareInvoice={canShareInvoice}
-              qrCodeDataUrl={qrCodeDataUrl}
-              setInvoiceFormHasErrors={setInvoiceFormHasErrors}
+              handleShareInvoice={handleShareInvoice}
+              isDesktop={isDesktop}
+              invoiceDataState={invoiceDataState}
+              isMobile={isMobile}
+              isSharedInvoice={isViewingSharedInvoice}
             />
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+              <InvoiceClientPage
+                invoiceDataState={invoiceDataState}
+                handleInvoiceDataChange={handleInvoiceDataChange}
+                handleShareInvoice={handleShareInvoice}
+                isMobile={isMobile}
+                canShareInvoice={canShareInvoice}
+                currentInvoiceFormDataRef={currentInvoiceFormDataRef}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </InvoicePdfInstanceProvider>
       <Footer />
       {changelogPopupVariant ? (
         <ChangelogUpdatePopup
           variant={changelogPopupVariant}
-          latestChangelog={changelogForPopup}
           isOpen={isChangelogPopupOpen}
           onDismiss={dismissChangelogPopup}
-          onHowItWorksClick={() => setIsHowItWorksDialogOpen(true)}
+          onHowItWorksClick={() => {
+            return setIsHowItWorksDialogOpen(true);
+          }}
         />
       ) : null}
       <HowItWorksVideoDialog

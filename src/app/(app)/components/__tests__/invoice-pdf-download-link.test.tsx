@@ -1,12 +1,5 @@
 // @vitest-environment happy-dom
 
-import { getInitialInvoiceData } from "@/app/constants";
-import { CTAToastProvider } from "@/app/(app)/contexts/cta-toast-context";
-import { CTA_TOAST_TIMEOUT } from "@/app/(app)/components/cta-toasts";
-import { DeviceContextProvider } from "@/contexts/device-context";
-import type { InvoiceData } from "@/app/schema";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   cleanup,
   fireEvent,
@@ -15,6 +8,29 @@ import {
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { toast } from "sonner";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+  CTA_TOAST_TIMEOUT,
+  showCTAToast,
+} from "@/app/(app)/components/cta-toasts";
+import { CTAToastProvider } from "@/app/(app)/contexts/cta-toast-context";
+import { InvoicePdfInstanceProvider } from "@/app/(app)/contexts/invoice-pdf-instance-context";
+import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
+import { getInitialInvoiceData } from "@/app/constants";
+import { CTA_TOAST_STORAGE_KEY, type InvoiceData } from "@/app/schema";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { DeviceContextProvider } from "@/contexts/device-context";
+import { haptic } from "@/lib/haptic";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
+
+import {
+  InvoicePDFDownloadLink,
+  LOADING_BUTTON_TEXT,
+} from "../invoice-pdf-download-link";
+
 import "@testing-library/jest-dom/vitest";
 
 const { mockUpdatePdfInstance, mockPdfStateRef, resetMockPdfState } =
@@ -45,68 +61,71 @@ vi.mock("@react-pdf/renderer/lib/react-pdf.browser", async (importOriginal) => {
 
   return {
     ...(actual as object),
-    usePDF: () => [mockPdfStateRef.current, mockUpdatePdfInstance],
+    usePDF: () => {
+      return [mockPdfStateRef.current, mockUpdatePdfInstance];
+    },
   };
 });
 
-vi.mock("@/lib/umami-analytics-track-event", () => ({
-  umamiTrackEvent: vi.fn(),
-}));
+vi.mock("@/lib/umami-analytics-track-event", () => {
+  return {
+    umamiTrackEvent: vi.fn(),
+  };
+});
 
-vi.mock("@sentry/nextjs", () => ({
-  captureException: vi.fn(),
-}));
+vi.mock("@sentry/nextjs", () => {
+  return {
+    captureException: vi.fn(),
+  };
+});
 
-vi.mock("@/utils/is-telegram-in-app-browser", () => ({
-  isTelegramInAppBrowser: vi.fn(() => false),
-}));
+vi.mock("@/utils/is-telegram-in-app-browser", () => {
+  return {
+    isTelegramInAppBrowser: vi.fn(() => {
+      return false;
+    }),
+  };
+});
 
-vi.mock("@/app/(app)/utils/get-app-metadata", () => ({
-  updateAppMetadata: vi.fn(),
-}));
+vi.mock("@/app/(app)/utils/get-app-metadata", () => {
+  return {
+    updateAppMetadata: vi.fn(),
+  };
+});
 
 vi.mock("@/app/(app)/components/cta-toasts", async () => {
   const actual = await vi.importActual("@/app/(app)/components/cta-toasts");
 
   return {
     ...(actual as object),
-    showRandomCTAToast: vi.fn(),
+    showCTAToast: vi.fn(),
   };
 });
 
-vi.mock("@/lib/haptic", () => ({
-  haptic: vi.fn(),
-}));
+vi.mock("@/lib/haptic", () => {
+  return {
+    haptic: vi.fn(),
+  };
+});
 
-vi.mock("@/components/ui/toasts/error-generating-pdf-toast", () => ({
-  ErrorGeneratingPdfToast: vi.fn(),
-}));
+vi.mock("@/components/ui/toasts/error-generating-pdf-toast", () => {
+  return {
+    ErrorGeneratingPdfToast: vi.fn(),
+  };
+});
 
-vi.mock("sonner", () => ({
-  toast: Object.assign(vi.fn(), {
-    error: vi.fn(),
-    info: vi.fn(),
-    dismiss: vi.fn(),
-  }),
-}));
-
-import {
-  InvoicePDFDownloadLink,
-  LOADING_BUTTON_TEXT,
-} from "../invoice-pdf-download-link";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import * as Sentry from "@sentry/nextjs";
-import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
-import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
-import { showRandomCTAToast } from "@/app/(app)/components/cta-toasts";
-import { haptic } from "@/lib/haptic";
-import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
-import { toast } from "sonner";
+vi.mock("sonner", () => {
+  return {
+    toast: Object.assign(vi.fn(), {
+      error: vi.fn(),
+      info: vi.fn(),
+      dismiss: vi.fn(),
+    }),
+  };
+});
 
 interface RenderOptions {
   invoiceData?: InvoiceData;
-  errorWhileGeneratingPdfIsShown?: boolean;
-  setErrorWhileGeneratingPdfIsShown?: (error: boolean) => void;
   qrCodeDataUrl?: string;
   isMobile?: boolean;
   inAppInfo?: { isInApp: boolean; name: string | null };
@@ -114,8 +133,6 @@ interface RenderOptions {
 
 function renderInvoicePDFDownloadLink({
   invoiceData = getInitialInvoiceData(),
-  errorWhileGeneratingPdfIsShown = false,
-  setErrorWhileGeneratingPdfIsShown = vi.fn(),
   qrCodeDataUrl = "data:image/png;base64,abc",
   isMobile = false,
   inAppInfo = { isInApp: false, name: null },
@@ -129,15 +146,16 @@ function renderInvoicePDFDownloadLink({
         inAppInfo={inAppInfo}
       >
         <CTAToastProvider>
-          <InvoicePDFDownloadLink
+          {/* The download link reads the PDF from the shared instance, so it needs the provider */}
+          <InvoicePdfInstanceProvider
             invoiceData={invoiceData}
-            errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
-            setErrorWhileGeneratingPdfIsShown={
-              setErrorWhileGeneratingPdfIsShown
-            }
             qrCodeDataUrl={qrCodeDataUrl}
-            isMobile={isMobile}
-          />
+          >
+            <InvoicePDFDownloadLink
+              invoiceData={invoiceData}
+              isMobile={isMobile}
+            />
+          </InvoicePdfInstanceProvider>
         </CTAToastProvider>
       </DeviceContextProvider>
     </TooltipProvider>,
@@ -152,6 +170,8 @@ describe("InvoicePDFDownloadLink", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resetMockPdfState();
+    // the CTA toast cooldown is persisted, so it has to be cleared between tests
+    localStorage.clear();
     vi.mocked(isTelegramInAppBrowser).mockReturnValue(false);
   });
 
@@ -229,7 +249,47 @@ describe("InvoicePDFDownloadLink", () => {
 
     await vi.advanceTimersByTimeAsync(CTA_TOAST_TIMEOUT);
 
-    expect(showRandomCTAToast).toHaveBeenCalledTimes(1);
+    expect(showCTAToast).toHaveBeenCalledTimes(1);
+  });
+
+  it("should not show the CTA toast again while the cooldown is active", async () => {
+    vi.useFakeTimers();
+
+    // pretend a CTA toast was shown a minute ago
+    localStorage.setItem(CTA_TOAST_STORAGE_KEY, String(Date.now() - 60_000));
+
+    renderInvoicePDFDownloadLink();
+
+    fireEvent.click(getDownloadLink());
+
+    // the download itself still goes through
+    expect(umamiTrackEvent).toHaveBeenCalledWith("download_invoice", {
+      data: {
+        invoice_template: "default",
+      },
+    });
+
+    await vi.advanceTimersByTimeAsync(CTA_TOAST_TIMEOUT);
+
+    expect(showCTAToast).not.toHaveBeenCalled();
+  });
+
+  it("should show the CTA toast again once the cooldown has expired", async () => {
+    vi.useFakeTimers();
+
+    // the cooldown is 24 hours, so a toast shown two days ago no longer suppresses it
+    localStorage.setItem(
+      CTA_TOAST_STORAGE_KEY,
+      String(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    );
+
+    renderInvoicePDFDownloadLink();
+
+    fireEvent.click(getDownloadLink());
+
+    await vi.advanceTimersByTimeAsync(CTA_TOAST_TIMEOUT);
+
+    expect(showCTAToast).toHaveBeenCalledTimes(1);
   });
 
   it("should show error toast when url is missing on click", async () => {
@@ -290,41 +350,26 @@ describe("InvoicePDFDownloadLink", () => {
     expect(umamiTrackEvent).not.toHaveBeenCalled();
   });
 
-  it("should show in-app browser info toast on mount", () => {
-    renderInvoicePDFDownloadLink({
-      inAppInfo: { isInApp: true, name: "Facebook" },
-    });
-
-    expect(toast.info).toHaveBeenCalledWith(
-      "In-App Browser Detected",
-      expect.objectContaining({
-        id: "in-app-browser-toast",
-      }),
-    );
-  });
-
-  it("should show error generating PDF toast when PDF error occurs", () => {
-    const setErrorWhileGeneratingPdfIsShown = vi.fn();
-    const pdfError = new Error("PDF generation failed");
+  it("should not track a download when the PDF failed to generate", async () => {
+    const user = userEvent.setup();
 
     mockPdfStateRef.current = {
       loading: false,
-      url: null,
-      error: pdfError,
+      url: "blob:http://localhost/fake-pdf",
+      error: new Error("PDF generation failed"),
     };
 
-    renderInvoicePDFDownloadLink({
-      errorWhileGeneratingPdfIsShown: false,
-      setErrorWhileGeneratingPdfIsShown,
-    });
+    renderInvoicePDFDownloadLink();
 
-    expect(ErrorGeneratingPdfToast).toHaveBeenCalledTimes(1);
-    expect(setErrorWhileGeneratingPdfIsShown).toHaveBeenCalledWith(true);
-    expect(umamiTrackEvent).toHaveBeenCalledWith(
-      "error_generating_document_link",
-      { data: { error: pdfError } },
+    await user.click(getDownloadLink());
+
+    // the provider reports the failure itself, the button just must not count it
+    // as a download
+    expect(umamiTrackEvent).not.toHaveBeenCalledWith(
+      "download_invoice",
+      expect.anything(),
     );
-    expect(Sentry.captureException).toHaveBeenCalledWith(pdfError);
+    expect(haptic).not.toHaveBeenCalled();
   });
 
   it("should show responsibility tooltip on hover", async () => {

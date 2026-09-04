@@ -1,8 +1,9 @@
-import { env } from "@/env";
-import type { drive_v3 } from "googleapis";
-import { google } from "googleapis";
 import { Readable } from "node:stream";
+
+import { type drive_v3, google } from "googleapis";
 import { z } from "zod";
+
+import { env } from "@/env";
 
 type GoogleDriveFile = drive_v3.Schema$File;
 
@@ -52,7 +53,10 @@ export async function initializeGoogleDrive() {
     return cachedDrive;
   }
 
-  const googlePrivateKey = env.GOOGLE_DRIVE_PRIVATE_KEY.replace(/\\n/g, "\n");
+  const googlePrivateKey = env.GOOGLE_DRIVE_PRIVATE_KEY.replaceAll(
+    String.raw`\n`,
+    "\n",
+  );
 
   const auth = new google.auth.GoogleAuth({
     credentials: {
@@ -95,7 +99,9 @@ async function createFolder(
  * @param {Buffer} buffer - The input buffer containing file data
  * @returns {Readable} A readable stream created from the buffer using Node's Readable.from()
  */
-const bufferToStream = (buffer: Buffer): Readable => Readable.from(buffer);
+const bufferToStream = (buffer: Buffer): Readable => {
+  return Readable.from(buffer);
+};
 
 export async function uploadFile({
   googleDrive,
@@ -184,8 +190,7 @@ export async function createOrFindInvoiceFolder({
     // if the month folder already exists, use it
     monthFolder = monthFolderResponse.data.files[0];
 
-    // eslint-disable-next-line no-console
-    console.log(
+    console.info(
       "\n\n________month folder already exists, using it: ",
       monthFolder,
       { monthFolderName, yearFolderName },
@@ -238,8 +243,7 @@ export async function createOrFindInvoiceFolder({
 
   const googleDriveFolderPath = `/${yearFolder.name}/${monthFolder.name}/${folderToUploadInvoices.name}`;
 
-  // eslint-disable-next-line no-console
-  console.log(
+  console.info(
     "\n\n________invoice to upload Google Drive folder path: ",
     googleDriveFolderPath,
     "\n\n",

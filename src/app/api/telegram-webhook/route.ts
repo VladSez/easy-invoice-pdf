@@ -1,3 +1,6 @@
+import { waitUntil } from "@vercel/functions";
+import { NextResponse, type NextRequest } from "next/server";
+
 import { runProductionGenerateMonthlyInvoice } from "@/app/api/generate-invoice/run-production-generate-invoice";
 import {
   clearQueuedJob,
@@ -6,9 +9,6 @@ import {
 import { telegramUpdateSchema } from "@/app/api/telegram-webhook/schema/telegram-schema";
 import { env } from "@/env";
 import { sendTelegramMessage } from "@/lib/telegram";
-
-import { waitUntil } from "@vercel/functions";
-import { NextResponse, type NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     if (!parseResult.success) {
       console.error(
         "[telegram-webhook] Invalid webhook payload:",
-        parseResult.error.errors,
+        parseResult.error.issues,
       );
 
       await sendTelegramMessage({
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     const update = parseResult.data;
 
     const senderChatId = update.message.from.id;
-    const allowedChatId = parseInt(env.TELEGRAM_CHAT_ID, 10);
+    const allowedChatId = Number(env.TELEGRAM_CHAT_ID);
 
     if (senderChatId !== allowedChatId) {
       console.error(
@@ -130,8 +130,7 @@ async function handleInvoiceGenerate({ chatId }: { chatId: number }) {
       shouldUploadToGoogleDrive: isProduction,
     });
 
-    // eslint-disable-next-line no-console
-    console.log("[telegram-webhook] Report:", result.report);
+    console.info("[telegram-webhook] Report:", result.report);
 
     if (!result.ok) {
       console.error(
@@ -154,8 +153,8 @@ async function handleInvoiceGenerate({ chatId }: { chatId: number }) {
       await sendTelegramMessage({
         message: `🚨 Error: ${error instanceof Error ? error.message : "Unknown error"}`,
       });
-    } catch (e) {
-      console.error("[telegram-webhook] Failed to send error message:", e);
+    } catch (error) {
+      console.error("[telegram-webhook] Failed to send error message:", error);
     }
   } finally {
     await clearQueuedJob(chatId);

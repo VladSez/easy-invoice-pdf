@@ -1,3 +1,5 @@
+import { expect, test } from "@playwright/test";
+
 import {
   INVOICE_PDF_FONTS,
   MARKETING_FEATURES_CARDS,
@@ -5,7 +7,6 @@ import {
   VIDEO_DEMO_FALLBACK_IMG,
   VIDEO_DEMO_URL,
 } from "@/config";
-import { expect, test } from "@playwright/test";
 
 test.describe("Static assets (fonts, images, videos) should be accessible", () => {
   test("should load static assets successfully", async ({ page }) => {

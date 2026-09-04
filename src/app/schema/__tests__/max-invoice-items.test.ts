@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { assert, describe, expect, it } from "vitest";
+
 import { MAX_INVOICE_ITEMS, invoiceSchema } from "@/app/schema";
 import {
   MOCK_INVOICE_DATA,
@@ -8,9 +9,11 @@ import {
 function createInvoiceWithItemCount(itemCount: number) {
   return {
     ...MOCK_INVOICE_DATA,
-    items: Array.from({ length: itemCount }, () => ({
-      ...MOCK_INVOICE_ITEM_DATA,
-    })),
+    items: Array.from({ length: itemCount }, () => {
+      return {
+        ...MOCK_INVOICE_ITEM_DATA,
+      };
+    }),
   };
 }
 
@@ -28,11 +31,8 @@ describe("invoiceSchema max invoice items", () => {
       createInvoiceWithItemCount(MAX_INVOICE_ITEMS + 1),
     );
 
-    expect(result.success).toBe(false);
-
-    if (result.success) {
-      return;
-    }
+    // `assert` fails the test and narrows the safeParse union in one step
+    assert(!result.success);
 
     expect(result.error.issues).toEqual(
       expect.arrayContaining([

@@ -1,0 +1,441 @@
+// Lint config for oxlint (JSONC - comments are allowed).
+//
+// Instead of listing every rule (what `npx @oxlint/migrate` generated), we lean on
+// oxlint's rule categories, the way the old eslint config leaned on `extends`:
+//   correctness -> error, suspicious + pedantic -> warn, everything else -> off.
+// Only the deviations are spelled out below. Type-aware rules (the old tseslint
+// `*TypeChecked` configs) come from `options.typeAware` + the `oxlint-tsgolint` dep.
+//
+// Still missing vs. the old eslint config: `@typescript-eslint/prefer-optional-chain`
+// (oxlint nursery only). `react/jsx-no-leaked-render` is back as a JS plugin, see the
+// last override.
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "react",
+    "nextjs",
+    "jsx-a11y",
+    "import",
+    "typescript",
+    "unicorn",
+    "oxc"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "pedantic": "warn"
+  },
+  "options": {
+    "typeAware": true,
+    // was `linterOptions.reportUnusedDisableDirectives` in eslint.config.mjs
+    "reportUnusedDisableDirectives": "warn"
+  },
+  "env": { "builtin": true, "browser": true, "node": true },
+  "settings": { "react": { "version": "19.2" } },
+  "ignorePatterns": [
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "playwright-output/**",
+    ".trigger/**"
+  ],
+  "rules": {
+    "oxc/approx-constant": "error",
+    "oxc/bad-bitwise-operator": "error",
+    "oxc/bad-char-at-comparison": "error",
+    "oxc/bad-comparison-sequence": "error",
+    "oxc/bad-min-max-func": "error",
+    "oxc/bad-object-literal-comparison": "error",
+    "oxc/bad-replace-all-arg": "error",
+    "oxc/const-comparisons": "error",
+    "oxc/double-comparisons": "error",
+    "oxc/misrefactored-assign-op": "error",
+    "oxc/missing-throw": "error",
+    "oxc/number-arg-out-of-range": "error",
+    "oxc/uninvoked-array-callback": "error",
+    // --- project rules, carried over from eslint.config.mjs ---
+    "no-console": ["warn", { "allow": ["error", "info", "warn"] }],
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "@react-pdf/renderer",
+            "message": "Please use **@react-pdf/renderer/lib/react-pdf.browser** instead. Check https://github.com/diegomura/react-pdf/issues/2890#issuecomment-2443831013 for more details."
+          },
+          { "name": "node:process", "message": "Please use @/env.ts instead." },
+          { "name": "process", "message": "Please use @/env.ts instead." }
+        ]
+      }
+    ],
+    // `localStorage` is not safe to touch directly in the browsers we ship to: iOS
+    // in-app webviews (Telegram, Instagram, Facebook) expose it as `null`, so an
+    // unguarded `localStorage.getItem` throws `TypeError: null is not an object`, and
+    // Safari with cookies blocked throws on the property access itself. The helpers in
+    // `@/lib/safe-local-storage` return a value instead of throwing, which also stops a
+    // failed read/write from skipping the code that follows it inside a `try` block.
+    // Two rules because they see different syntax: `no-restricted-globals` catches the
+    // bare `localStorage`, `no-restricted-properties` catches `window.localStorage`.
+    "no-restricted-globals": [
+      "error",
+      {
+        "name": "localStorage",
+        "message": "Please use **getAppStorageItem / setAppStorageItem** from @/app/(app)/utils/app-local-storage instead - direct access throws in iOS in-app webviews and in Safari with cookies blocked, and those only accept a key declared in LOCAL_STORAGE_KEYS. To branch on availability during render, use **useIsLocalStorageAvailable** from @/lib/use-is-local-storage-available."
+      }
+    ],
+    "no-restricted-properties": [
+      "error",
+      {
+        "object": "window",
+        "property": "localStorage",
+        "message": "Please use **getAppStorageItem / setAppStorageItem** from @/app/(app)/utils/app-local-storage instead - direct access throws in iOS in-app webviews and in Safari with cookies blocked, and those only accept a key declared in LOCAL_STORAGE_KEYS. To branch on availability during render, use **useIsLocalStorageAvailable** from @/lib/use-is-local-storage-available."
+      },
+      {
+        "object": "globalThis",
+        "property": "localStorage",
+        "message": "Please use **getAppStorageItem / setAppStorageItem** from @/app/(app)/utils/app-local-storage instead - direct access throws in iOS in-app webviews and in Safari with cookies blocked, and those only accept a key declared in LOCAL_STORAGE_KEYS. To branch on availability during render, use **useIsLocalStorageAvailable** from @/lib/use-is-local-storage-available."
+      }
+    ],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    // one import statement per module - `preferInline` folds a separate
+    // `import type { X }` back into the value import as `{ type X }`, which is
+    // the style `typescript/consistent-type-imports` below already enforces
+    "import/no-duplicates": ["error", { "preferInline": true }],
+    "no-var": "error",
+    "no-useless-catch": "error",
+    "prefer-const": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-empty-object-type": "error",
+    "typescript/no-misused-promises": [
+      "error",
+      { "checksVoidReturn": { "attributes": false } }
+    ],
+    "typescript/consistent-type-imports": [
+      "error",
+      { "prefer": "type-imports", "fixStyle": "inline-type-imports" }
+    ],
+    // always use a block body for arrow functions
+    "arrow-body-style": ["warn", "always"],
+    // keep `return await` - it keeps the caller's frame on the async stack, so
+    // failures carry a useful stack trace
+    "typescript/return-await": ["warn", "always"],
+
+    // --- rules the eslint config had that live outside the categories above ---
+    "jsx-a11y/alt-text": ["warn", { "elements": ["img"], "img": ["Image"] }],
+    "import/no-anonymous-default-export": "warn",
+    "no-empty-function": "error",
+    "prefer-rest-params": "error",
+    "prefer-spread": "error",
+    "react/unsupported-syntax": "warn",
+    "typescript/adjacent-overload-signatures": "error",
+    "typescript/ban-tslint-comment": "error",
+    "typescript/class-literal-property-style": "error",
+    "typescript/consistent-generic-constructors": "error",
+    "typescript/consistent-type-assertions": "error",
+    "typescript/dot-notation": "error",
+    "typescript/no-inferrable-types": "error",
+    "typescript/no-namespace": "error",
+    "typescript/no-require-imports": "error",
+    "typescript/prefer-find": "error",
+    "typescript/prefer-for-of": "error",
+    "typescript/prefer-function-type": "error",
+    "typescript/prefer-regexp-exec": "error",
+    "typescript/prefer-string-starts-ends-with": "error",
+    "unicorn/catch-error-name": "error",
+    "unicorn/consistent-empty-array-spread": "error",
+    "unicorn/consistent-function-scoping": "error",
+    "unicorn/no-abusive-eslint-disable": "error",
+    "unicorn/no-hex-escape": "error",
+    "unicorn/no-invalid-fetch-options": "error",
+    "unicorn/no-magic-array-flat-depth": "error",
+    "unicorn/no-typeof-undefined": "error",
+    "unicorn/no-unnecessary-slice-end": "error",
+    "unicorn/no-useless-promise-resolve-reject": "error",
+    "unicorn/no-useless-spread": "error",
+    "unicorn/numeric-separators-style": "error",
+    "unicorn/prefer-array-flat-map": "error",
+    "unicorn/prefer-array-index-of": "error",
+    "unicorn/prefer-array-some": "error",
+    "unicorn/prefer-at": "error",
+    "unicorn/prefer-dom-node-append": "error",
+    "unicorn/prefer-import-meta-properties": "error",
+    "unicorn/prefer-native-coercion-functions": "error",
+    "unicorn/prefer-node-protocol": "error",
+    "unicorn/prefer-number-properties": "error",
+    "unicorn/prefer-optional-catch-binding": "error",
+    "unicorn/prefer-set-size": "error",
+    "unicorn/prefer-single-call": "error",
+    "unicorn/prefer-string-raw": "error",
+    "unicorn/prefer-string-replace-all": "error",
+    "unicorn/prefer-string-slice": "error",
+    "unicorn/prefer-structured-clone": "error",
+    "unicorn/prefer-top-level-await": "error",
+    "unicorn/text-encoding-identifier-case": "error",
+
+    // render props and next-intl `t.rich` chunk formatters are functions passed
+    // as props, not components defined during render - that is what this option is for
+    "react/no-unstable-nested-components": ["error", { "allowAsProps": true }],
+    // our two iframes are a YouTube embed and the blob-url PDF preview; both need
+    // scripts + same-origin, so a `sandbox` attribute would either be a no-op or
+    // break rendering
+    "react/iframe-missing-sandbox": "off",
+    // we always spread into a new array before sorting/reversing, so nothing is
+    // mutated; `toSorted`/`toReversed` are ES2023 and above our browser floor
+    "unicorn/no-array-sort": "off",
+    "unicorn/no-array-reverse": "off",
+
+    // --- the react-hooks rules, at the severities next/core-web-vitals used ---
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "warn",
+
+    // --- opinions we don't share (none of these were enabled under eslint) ---
+    "max-lines": "off",
+    "max-lines-per-function": "off",
+    "no-inline-comments": "off",
+    "no-negated-condition": "off",
+    "no-shadow": "off",
+    "no-underscore-dangle": "off",
+    "no-warning-comments": "off",
+    "require-await": "off",
+    "require-unicode-regexp": "off",
+    "import/max-dependencies": "off",
+    "import/no-unassigned-import": "off",
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "nextjs/no-img-element": "off",
+    "react/jsx-no-target-blank": "off",
+    "react/jsx-no-useless-fragment": "off",
+    "react/react-in-jsx-scope": "off",
+    "unicorn/no-negated-condition": "off",
+    "unicorn/no-useless-undefined": "off",
+    "typescript/consistent-return": "off",
+    "typescript/no-confusing-void-expression": "off",
+    "typescript/no-unsafe-type-assertion": "off",
+    "typescript/prefer-nullish-coalescing": "off",
+    "typescript/prefer-readonly-parameter-types": "off",
+    "typescript/require-await": "off",
+    "typescript/strict-boolean-expressions": "off",
+    "typescript/strict-void-return": "off",
+    "typescript/unbound-method": "off",
+    "typescript/no-useless-default-assignment": "off",
+
+    // --- real findings we haven't worked through yet: keep them visible as
+    // --- warnings instead of failing the build (mostly a11y + react-hooks v7)
+    "jsx-a11y/click-events-have-key-events": "warn",
+    "jsx-a11y/control-has-associated-label": "warn",
+    "jsx-a11y/html-has-lang": "warn",
+    "jsx-a11y/label-has-associated-control": "warn",
+    "jsx-a11y/lang": "warn",
+    "jsx-a11y/no-static-element-interactions": "warn",
+    "jsx-a11y/role-has-required-aria-props": "warn",
+    "import/namespace": "warn",
+    "react/incompatible-library": "warn",
+    "react/preserve-manual-memoization": "warn",
+    "react/refs": "warn",
+    "react/set-state-in-effect": "warn",
+    "unicorn/no-new-array": "warn",
+    "typescript/no-deprecated": "warn"
+  },
+  "overrides": [
+    {
+      // The one file allowed to touch `localStorage` directly: it is the wrapper the
+      // `no-restricted-globals` / `no-restricted-properties` rules above point everyone
+      // else at.
+      "files": ["src/lib/safe-local-storage.ts"],
+      "rules": {
+        "no-restricted-globals": "off",
+        "no-restricted-properties": "off"
+      }
+    },
+    {
+      // Config files are not in tsconfig, so every import comes back as `any`
+      // and the type-aware rules just shout. eslint only ran tseslint on ts/tsx.
+      "files": ["**/*.{js,cjs,mjs}"],
+      "rules": {
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-return": "off",
+        "typescript/restrict-template-expressions": "off"
+      }
+    },
+    {
+      // oxlint's `react/display-name` flags `React.memo(SomeImportedComponent)`,
+      // which eslint-plugin-react does not. Our shadcn primitives re-export Radix
+      // components that way, so the rule only produces noise here.
+      "files": ["src/components/ui/**"],
+      "rules": { "react/display-name": "off" }
+    },
+    {
+      "files": ["src/**/*.ts", "src/**/*.tsx"],
+      "jsPlugins": ["eslint-plugin-react-you-might-not-need-an-effect"],
+      // JS plugin rules have to be listed one by one - oxlint cannot read an
+      // eslint plugin's own `recommended` config. This is the plugin's full set.
+      "rules": {
+        "react-you-might-not-need-an-effect/no-adjust-state-on-prop-change": "warn",
+        "react-you-might-not-need-an-effect/no-chain-state-updates": "warn",
+        "react-you-might-not-need-an-effect/no-derived-state": "warn",
+        "react-you-might-not-need-an-effect/no-event-handler": "warn",
+        "react-you-might-not-need-an-effect/no-external-store-subscription": "warn",
+        "react-you-might-not-need-an-effect/no-initialize-state": "warn",
+        "react-you-might-not-need-an-effect/no-pass-data-to-parent": "warn",
+        "react-you-might-not-need-an-effect/no-pass-live-state-to-parent": "warn",
+        "react-you-might-not-need-an-effect/no-reset-all-state-on-prop-change": "warn"
+      }
+    },
+    {
+      "files": ["e2e/**"],
+      "jsPlugins": ["eslint-plugin-playwright"],
+      // `playwright/flat-recommended`, expanded (see the note above).
+      "rules": {
+        "no-empty-pattern": "off", // playwright fixtures destructure `{}`
+        // `localStorage` inside `page.evaluate` runs in the browser under test, which
+        // is exactly where we want to read what the app actually persisted
+        "no-restricted-globals": "off",
+        "no-restricted-properties": "off",
+        "playwright/consistent-spacing-between-blocks": "warn",
+        "playwright/expect-expect": "warn",
+        "playwright/max-nested-describe": "warn",
+        "playwright/missing-playwright-await": "error",
+        "playwright/no-conditional-expect": "warn",
+        "playwright/no-conditional-in-test": "warn",
+        "playwright/no-duplicate-hooks": "warn",
+        "playwright/no-duplicate-slow": "warn",
+        "playwright/no-element-handle": "warn",
+        "playwright/no-eval": "warn",
+        "playwright/no-focused-test": "error",
+        "playwright/no-force-option": "warn",
+        "playwright/no-nested-step": "warn",
+        "playwright/no-networkidle": "error",
+        "playwright/no-page-pause": "warn",
+        "playwright/no-skipped-test": "warn",
+        "playwright/no-standalone-expect": "error",
+        "playwright/no-unnecessary-assertions": "error",
+        "playwright/no-unsafe-references": "error",
+        "playwright/no-unused-locators": "error",
+        "playwright/no-useless-await": "warn",
+        "playwright/no-useless-not": "warn",
+        "playwright/no-wait-for-navigation": "error",
+        "playwright/no-wait-for-selector": "warn",
+        "playwright/no-wait-for-timeout": "warn",
+        "playwright/prefer-hooks-in-order": "warn",
+        "playwright/prefer-hooks-on-top": "warn",
+        "playwright/prefer-locator": "warn",
+        "playwright/prefer-to-have-count": "warn",
+        "playwright/prefer-to-have-length": "warn",
+        "playwright/prefer-web-first-assertions": "error",
+        "playwright/valid-describe-callback": "error",
+        "playwright/valid-expect": "error",
+        "playwright/valid-expect-in-promise": "error",
+        "playwright/valid-test-tags": "error",
+        "playwright/valid-title": "error"
+      }
+    },
+    {
+      // Vitest unit tests. `@vitest/eslint-plugin` is ported natively into
+      // oxlint, so this needs no `jsPlugins` entry (and no extra dependency)
+      // the way the playwright block above does.
+      "files": ["src/**/*.test.ts", "src/**/*.test.tsx"],
+      "plugins": ["vitest"],
+      "rules": {
+        // tests seed and assert on the real store, and stub it to simulate the
+        // browsers the helper exists for
+        "no-restricted-globals": "off",
+        "no-restricted-properties": "off",
+        // the categories at the top of this file now also pull in vitest's
+        // correctness rules; this one wants an explicit type parameter on
+        // every `vi.fn()` (68 call sites) - not a fight worth having.
+        "vitest/require-mock-type-parameters": "off",
+        // recommended set
+        "vitest/expect-expect": [
+          "error",
+          {
+            // some tests assert through local `assertX(...)` helpers
+            // (e.g. `assertValidPdfBuffer`) rather than a bare `expect`.
+            "assertFunctionNames": [
+              "expect",
+              "expectTypeOf",
+              "assert",
+              "assertType",
+              "assert*"
+            ]
+          }
+        ],
+        "vitest/no-identical-title": "error",
+        "vitest/no-commented-out-tests": "warn",
+        "vitest/valid-describe-callback": "error",
+        "vitest/valid-expect": "error",
+        "vitest/valid-expect-in-promise": "error",
+        "vitest/valid-title": "error",
+        "vitest/require-local-test-context-for-concurrent-snapshots": "error",
+        "vitest/no-import-node-test": "error",
+        // things that silently skip or weaken a test in CI
+        "vitest/no-focused-tests": "error",
+        "vitest/no-standalone-expect": "error",
+        // warn, not error: the tests lean on
+        // `expect(result.success).toBe(true); if (result.success) { ... }` to
+        // narrow zod `safeParse` results, which trips this and
+        // `no-conditional-in-test`.
+        "vitest/no-conditional-expect": "warn",
+        "vitest/no-disabled-tests": "warn",
+        "vitest/no-test-prefixes": "warn",
+        "vitest/no-test-return-statement": "warn",
+        "vitest/no-conditional-in-test": "warn",
+        "vitest/no-duplicate-hooks": "warn",
+        "vitest/no-interpolation-in-snapshots": "warn",
+        "vitest/no-mocks-import": "warn",
+        "vitest/require-to-throw-message": "warn",
+        "vitest/max-nested-describe": "warn",
+        // house style: `it(...)` everywhere, globals imported from "vitest"
+        // (vitest.config.ts does not set `globals: true`)
+        "vitest/consistent-test-it": [
+          "warn",
+          {
+            "fn": "it"
+          }
+        ],
+        "vitest/prefer-importing-vitest-globals": "error",
+        // matcher / mock sharpening
+        "vitest/no-alias-methods": "warn",
+        "vitest/prefer-to-be": "warn",
+        "vitest/prefer-to-be-object": "warn",
+        // off on purpose: `toBe(true)`/`toBe(false)` is a stricter assertion
+        // than `toBeTruthy()`/`toBeFalsy()`, and the tests use it deliberately.
+        "vitest/prefer-to-be-truthy": "off",
+        "vitest/prefer-to-be-falsy": "off",
+        "vitest/prefer-to-contain": "warn",
+        "vitest/prefer-to-have-length": "warn",
+        "vitest/prefer-comparison-matcher": "warn",
+        "vitest/prefer-equality-matcher": "warn",
+        "vitest/prefer-called-with": "warn",
+        "vitest/prefer-to-have-been-called-times": "warn",
+        "vitest/prefer-mock-promise-shorthand": "warn",
+        "vitest/prefer-spy-on": "warn",
+        "vitest/prefer-each": "warn",
+        "vitest/prefer-todo": "warn",
+        "vitest/prefer-hooks-in-order": "warn",
+        "vitest/prefer-hooks-on-top": "warn"
+      }
+    },
+    {
+      // `jsx-no-leaked-render` has no oxlint equivalent (see the header note),
+      // so it comes from `eslint-plugin-react` as a JS plugin. It has to be
+      // aliased - the bare plugin would claim the `react/` namespace that
+      // oxlint's own react plugin already owns, and oxlint rejects that.
+      "files": ["src/**/*.tsx"],
+      "jsPlugins": [
+        { "name": "eslint-react", "specifier": "eslint-plugin-react" }
+      ],
+      "rules": {
+        // `{count && <X />}` renders a literal `0` when count is 0. Require the
+        // explicit `{count ? <X /> : null}` form; "coerce" (`{!!count && ...}`)
+        // is deliberately left out of `validStrategies`.
+        "eslint-react/jsx-no-leaked-render": [
+          "warn",
+          { "validStrategies": ["ternary"] }
+        ]
+      }
+    }
+  ]
+}

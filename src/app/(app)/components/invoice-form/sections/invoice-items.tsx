@@ -1,12 +1,4 @@
-import { inputErrorClassName } from "@/app/(app)/components/invoice-form/common";
-import {
-  type InvoiceData,
-  type SupportedCurrencies,
-  type SupportedLanguages,
-} from "@/app/schema";
-import { cn } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { Plus, Trash2 } from "lucide-react";
 import { memo, useState } from "react";
 import {
   type Control,
@@ -16,19 +8,15 @@ import {
   type UseFieldArrayAppend,
 } from "react-hook-form";
 
-import { Input } from "@/components/ui/input";
-import { InputHelperMessage } from "@/components/ui/input-helper-message";
-import { MoneyInput, ReadOnlyMoneyInput } from "@/components/ui/money-input";
-import { Textarea } from "@/components/ui/textarea";
-import { CustomTooltip } from "@/components/ui/tooltip";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { Plus, Trash2 } from "lucide-react";
-import { Legend } from "@/components/legend";
+import { inputErrorClassName } from "@/app/(app)/components/invoice-form/common";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import {
-  getAmountInWords,
-  getNumberFractionalPart,
-} from "@/utils/invoice.utils";
-import { Button } from "@/components/ui/button";
+  type InvoiceData,
+  type SupportedCurrencies,
+  type SupportedLanguages,
+  MAX_INVOICE_ITEMS,
+} from "@/app/schema";
+import { Legend } from "@/components/legend";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,8 +27,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-import { MAX_INVOICE_ITEMS } from "@/app/schema";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { InputHelperMessage } from "@/components/ui/input-helper-message";
+import { Label } from "@/components/ui/label";
+import { MoneyInput, ReadOnlyMoneyInput } from "@/components/ui/money-input";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { CustomTooltip } from "@/components/ui/tooltip";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { cn } from "@/lib/utils";
+import {
+  getAmountInWords,
+  getNumberFractionalPart,
+} from "@/utils/invoice.utils";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;
@@ -48,7 +48,7 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
 
 interface InvoiceItemsSettingsProps {
   control: Control<InvoiceData>;
-  fields: FieldArrayWithId<InvoiceData, "items", "id">[];
+  fields: FieldArrayWithId<InvoiceData, "items">[];
   handleRemoveInvoiceItem: (index: number) => void;
   append: UseFieldArrayAppend<InvoiceData, "items">;
   errors: FieldErrors<InvoiceData>;
@@ -92,7 +92,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                   trigger={
                     <button
                       type="button"
-                      onClick={() => setDeleteItemIndex(index)}
+                      onClick={() => {
+                        return setDeleteItemIndex(index);
+                      }}
                       className="flex items-center justify-center rounded-full bg-red-600 p-2 transition-colors hover:bg-red-700 active:scale-[98%] active:transition-transform"
                     >
                       <span className="sr-only">
@@ -120,16 +122,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <Controller
                         name={`items.${index}.nameFieldIsVisible`}
                         control={control}
-                        render={({ field: { value, onChange, ...field } }) => (
-                          <Switch
-                            {...field}
-                            id={`itemNameFieldIsVisible${index}`}
-                            checked={value}
-                            onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                            aria-label={`Show the 'Name of Goods/Service' Column in the PDF for item ${index + 1}`}
-                          />
-                        )}
+                        render={({ field: { value, onChange, ...field } }) => {
+                          return (
+                            <Switch
+                              {...field}
+                              id={`itemNameFieldIsVisible${index}`}
+                              checked={value}
+                              onCheckedChange={onChange}
+                              className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                              aria-label={`Show the 'Name of Goods/Service' Column in the PDF for item ${index + 1}`}
+                            />
+                          );
+                        }}
                       />
                       <CustomTooltip
                         trigger={
@@ -147,16 +151,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                 <Controller
                   name={`items.${index}.name`}
                   control={control}
-                  render={({ field }) => (
-                    <Textarea
-                      {...field}
-                      rows={4}
-                      id={`itemName${index}`}
-                      className={inputErrorClassName(
-                        !!errors.items?.[index]?.name,
-                      )}
-                    />
-                  )}
+                  render={({ field }) => {
+                    return (
+                      <Textarea
+                        {...field}
+                        rows={4}
+                        id={`itemName${index}`}
+                        className={inputErrorClassName(
+                          !!errors.items?.[index]?.name,
+                        )}
+                      />
+                    );
+                  }}
                 />
                 {errors.items?.[index]?.name ? (
                   <ErrorMessage>
@@ -166,7 +172,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               </div>
 
               {/* Invoice Item Type of GTU - Only show for default template */}
-              {template === "default" && (
+              {template === "default" ? (
                 <div>
                   <div className="mb-2 flex items-center justify-between">
                     <Label htmlFor={`itemTypeOfGTU${index}`} className="">
@@ -181,16 +187,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                           control={control}
                           render={({
                             field: { value, onChange, ...field },
-                          }) => (
-                            <Switch
-                              {...field}
-                              id={`itemTypeOfGTUFieldIsVisible${index}`}
-                              checked={value}
-                              onCheckedChange={onChange}
-                              className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                              aria-label={`Show the 'Type of GTU' Column in the PDF for item ${index + 1}`}
-                            />
-                          )}
+                          }) => {
+                            return (
+                              <Switch
+                                {...field}
+                                id={`itemTypeOfGTUFieldIsVisible${index}`}
+                                checked={value}
+                                onCheckedChange={onChange}
+                                className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                                aria-label={`Show the 'Type of GTU' Column in the PDF for item ${index + 1}`}
+                              />
+                            );
+                          }}
                         />
                         <CustomTooltip
                           trigger={
@@ -210,16 +218,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                   <Controller
                     name={`items.${index}.typeOfGTU`}
                     control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        id={`itemTypeOfGTU${index}`}
-                        className={inputErrorClassName(
-                          !!errors.items?.[index]?.typeOfGTU,
-                        )}
-                        type="text"
-                      />
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <Input
+                          {...field}
+                          id={`itemTypeOfGTU${index}`}
+                          className={inputErrorClassName(
+                            !!errors.items?.[index]?.typeOfGTU,
+                          )}
+                          type="text"
+                        />
+                      );
+                    }}
                   />
                   {errors.items?.[index]?.typeOfGTU ? (
                     <ErrorMessage>
@@ -227,7 +237,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     </ErrorMessage>
                   ) : null}
                 </div>
-              )}
+              ) : null}
 
               {/* Invoice Item Amount */}
               <div>
@@ -242,16 +252,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <Controller
                         name={`items.${index}.amountFieldIsVisible`}
                         control={control}
-                        render={({ field: { value, onChange, ...field } }) => (
-                          <Switch
-                            {...field}
-                            id={`itemAmountFieldIsVisible${index}`}
-                            checked={value}
-                            onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                            aria-label={`Show the 'Amount' Column in the PDF for item ${index + 1}`}
-                          />
-                        )}
+                        render={({ field: { value, onChange, ...field } }) => {
+                          return (
+                            <Switch
+                              {...field}
+                              id={`itemAmountFieldIsVisible${index}`}
+                              checked={value}
+                              onCheckedChange={onChange}
+                              className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                              aria-label={`Show the 'Amount' Column in the PDF for item ${index + 1}`}
+                            />
+                          );
+                        }}
                       />
                       <CustomTooltip
                         trigger={
@@ -270,6 +282,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                   name={`items.${index}.amount`}
                   control={control}
                   render={({ field }) => {
+                    // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- `<Input type="number">` gives back a string at runtime, the schema type says number
                     const fieldValueNumber = Number(field.value) || 0;
                     const previewFormattedValue =
                       fieldValueNumber.toLocaleString("en-US", {
@@ -289,11 +302,11 @@ export const InvoiceItems = memo(function InvoiceItems({
                             !!errors.items?.[index]?.amount,
                           )}
                         />
-                        {!errors.items?.[index]?.amount && (
+                        {!errors.items?.[index]?.amount ? (
                           <InputHelperMessage>
                             Preview: {previewFormattedValue}
                           </InputHelperMessage>
-                        )}
+                        ) : null}
                       </>
                     );
                   }}
@@ -318,16 +331,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <Controller
                         name={`items.${index}.unitFieldIsVisible`}
                         control={control}
-                        render={({ field: { value, onChange, ...field } }) => (
-                          <Switch
-                            {...field}
-                            id={`itemUnitFieldIsVisible${index}`}
-                            checked={value}
-                            onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                            aria-label={`Show the 'Unit' Column in the PDF for item ${index + 1}`}
-                          />
-                        )}
+                        render={({ field: { value, onChange, ...field } }) => {
+                          return (
+                            <Switch
+                              {...field}
+                              id={`itemUnitFieldIsVisible${index}`}
+                              checked={value}
+                              onCheckedChange={onChange}
+                              className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                              aria-label={`Show the 'Unit' Column in the PDF for item ${index + 1}`}
+                            />
+                          );
+                        }}
                       />
                       <CustomTooltip
                         trigger={
@@ -345,16 +360,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                 <Controller
                   name={`items.${index}.unit`}
                   control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id={`itemUnit${index}`}
-                      type="text"
-                      className={inputErrorClassName(
-                        !!errors.items?.[index]?.unit,
-                      )}
-                    />
-                  )}
+                  render={({ field }) => {
+                    return (
+                      <Input
+                        {...field}
+                        id={`itemUnit${index}`}
+                        type="text"
+                        className={inputErrorClassName(
+                          !!errors.items?.[index]?.unit,
+                        )}
+                      />
+                    );
+                  }}
                 />
                 {errors.items?.[index]?.unit ? (
                   <ErrorMessage>
@@ -376,16 +393,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <Controller
                         name={`items.${index}.netPriceFieldIsVisible`}
                         control={control}
-                        render={({ field: { value, onChange, ...field } }) => (
-                          <Switch
-                            {...field}
-                            id={`itemNetPriceFieldIsVisible${index}`}
-                            checked={value}
-                            onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                            aria-label={`Show the 'Net Price' Column in the PDF for item ${index + 1}`}
-                          />
-                        )}
+                        render={({ field: { value, onChange, ...field } }) => {
+                          return (
+                            <Switch
+                              {...field}
+                              id={`itemNetPriceFieldIsVisible${index}`}
+                              checked={value}
+                              onCheckedChange={onChange}
+                              className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                              aria-label={`Show the 'Net Price' Column in the PDF for item ${index + 1}`}
+                            />
+                          );
+                        }}
                       />
                       <CustomTooltip
                         trigger={
@@ -405,6 +424,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                     name={`items.${index}.netPrice`}
                     control={control}
                     render={({ field }) => {
+                      // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- `<Input type="number">` gives back a string at runtime, the schema type says number
                       const fieldValueNumber = Number(field.value) || 0;
 
                       const previewFormattedValue =
@@ -440,13 +460,13 @@ export const InvoiceItems = memo(function InvoiceItems({
                             )}
                             dataTestId={`itemNetPrice${index}`}
                           />
-                          {!errors.items?.[index]?.netPrice && (
+                          {!errors.items?.[index]?.netPrice ? (
                             <InputHelperMessage>
                               Preview: {previewFormattedValue} (
                               {previewAmountInWords} {currency}{" "}
                               {previewNumberFractionalPart}/100)
                             </InputHelperMessage>
-                          )}
+                          ) : null}
                         </div>
                       );
                     }}
@@ -471,16 +491,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <Controller
                         name={`items.${index}.vatFieldIsVisible`}
                         control={control}
-                        render={({ field: { value, onChange, ...field } }) => (
-                          <Switch
-                            {...field}
-                            id={`itemVatFieldIsVisible${index}`}
-                            checked={value}
-                            onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                            aria-label={`Show the '${taxLabelText}' Column in the PDF for item ${index + 1}`}
-                          />
-                        )}
+                        render={({ field: { value, onChange, ...field } }) => {
+                          return (
+                            <Switch
+                              {...field}
+                              id={`itemVatFieldIsVisible${index}`}
+                              checked={value}
+                              onCheckedChange={onChange}
+                              className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                              aria-label={`Show the '${taxLabelText}' Column in the PDF for item ${index + 1}`}
+                            />
+                          );
+                        }}
                       />
                       <CustomTooltip
                         trigger={
@@ -499,29 +521,31 @@ export const InvoiceItems = memo(function InvoiceItems({
                   <Controller
                     name="taxLabelText"
                     control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        type="text"
-                        id="taxLabelText"
-                        placeholder="Enter tax label (e.g., VAT, Tax, GST, Sales Tax)"
-                        className={cn(
-                          "mt-1 block w-full",
-                          inputErrorClassName(!!errors.taxLabelText),
-                        )}
-                      />
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <Input
+                          {...field}
+                          type="text"
+                          id="taxLabelText"
+                          placeholder="Enter tax label (e.g., VAT, Tax, GST, Sales Tax)"
+                          className={cn(
+                            "mt-1 block w-full",
+                            inputErrorClassName(!!errors.taxLabelText),
+                          )}
+                        />
+                      );
+                    }}
                   />
                   {errors.taxLabelText ? (
                     <ErrorMessage>{errors.taxLabelText.message}</ErrorMessage>
                   ) : null}
-                  {!errors.taxLabelText && (
+                  {!errors.taxLabelText ? (
                     <InputHelperMessage>
                       Customize the tax label on your invoice (e.g., VAT, Sales
                       Tax, IVA). Default:{" "}
                       {INVOICE_PDF_TRANSLATIONS[language].invoiceItemsTable.vat}
                     </InputHelperMessage>
-                  )}
+                  ) : null}
                 </div>
                 <div data-testid={`itemVat${index}`} className="mt-4">
                   <div className="mb-2 flex items-center justify-between">
@@ -534,16 +558,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                   <Controller
                     name={`items.${index}.vat`}
                     control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        id={`itemVat${index}`}
-                        type="text"
-                        className={inputErrorClassName(
-                          !!errors.items?.[index]?.vat,
-                        )}
-                      />
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <Input
+                          {...field}
+                          id={`itemVat${index}`}
+                          type="text"
+                          className={inputErrorClassName(
+                            !!errors.items?.[index]?.vat,
+                          )}
+                        />
+                      );
+                    }}
                   />
 
                   {errors.items?.[index]?.vat ? (
@@ -571,16 +597,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <Controller
                         name={`items.${index}.netAmountFieldIsVisible`}
                         control={control}
-                        render={({ field: { value, onChange, ...field } }) => (
-                          <Switch
-                            {...field}
-                            id={`itemNetAmountFieldIsVisible${index}`}
-                            checked={value}
-                            onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                            aria-label={`Show the 'Net Amount' Column in the PDF for item ${index + 1}`}
-                          />
-                        )}
+                        render={({ field: { value, onChange, ...field } }) => {
+                          return (
+                            <Switch
+                              {...field}
+                              id={`itemNetAmountFieldIsVisible${index}`}
+                              checked={value}
+                              onCheckedChange={onChange}
+                              className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                              aria-label={`Show the 'Net Amount' Column in the PDF for item ${index + 1}`}
+                            />
+                          );
+                        }}
                       />
                       <CustomTooltip
                         trigger={
@@ -643,16 +671,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <Controller
                         name={`items.${index}.vatAmountFieldIsVisible`}
                         control={control}
-                        render={({ field: { value, onChange, ...field } }) => (
-                          <Switch
-                            {...field}
-                            id={`itemVatAmountFieldIsVisible${index}`}
-                            checked={value}
-                            onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                            aria-label={`Show the '${taxLabelText} Amount' Column in the PDF for item ${index + 1}`}
-                          />
-                        )}
+                        render={({ field: { value, onChange, ...field } }) => {
+                          return (
+                            <Switch
+                              {...field}
+                              id={`itemVatAmountFieldIsVisible${index}`}
+                              checked={value}
+                              onCheckedChange={onChange}
+                              className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                              aria-label={`Show the '${taxLabelText} Amount' Column in the PDF for item ${index + 1}`}
+                            />
+                          );
+                        }}
                       />
                       <CustomTooltip
                         trigger={
@@ -716,16 +746,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                       <Controller
                         name={`items.${index}.preTaxAmountFieldIsVisible`}
                         control={control}
-                        render={({ field: { value, onChange, ...field } }) => (
-                          <Switch
-                            {...field}
-                            id={`itemPreTaxAmountFieldIsVisible${index}`}
-                            checked={value}
-                            onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                            aria-label={`Show the 'Pre-tax Amount' Column in the PDF for item ${index + 1}`}
-                          />
-                        )}
+                        render={({ field: { value, onChange, ...field } }) => {
+                          return (
+                            <Switch
+                              {...field}
+                              id={`itemPreTaxAmountFieldIsVisible${index}`}
+                              checked={value}
+                              onCheckedChange={onChange}
+                              className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                              aria-label={`Show the 'Pre-tax Amount' Column in the PDF for item ${index + 1}`}
+                            />
+                          );
+                        }}
                       />
                       <CustomTooltip
                         trigger={
@@ -825,7 +857,7 @@ export const InvoiceItems = memo(function InvoiceItems({
       />
 
       {/** we only want to show "Show Number Column" and "Show Tax Table Summary" settings for default template */}
-      {template === "default" && (
+      {template === "default" ? (
         <div className="mt-6 space-y-4 rounded-md border p-4">
           {/* Show Number column on PDF switch */}
           <div className="relative flex items-center justify-between gap-2">
@@ -839,15 +871,17 @@ export const InvoiceItems = memo(function InvoiceItems({
             <Controller
               name={`items.0.invoiceItemNumberIsVisible`}
               control={control}
-              render={({ field: { value, onChange, ...field } }) => (
-                <Switch
-                  {...field}
-                  id={`itemInvoiceItemNumberIsVisible0`}
-                  checked={value}
-                  onCheckedChange={onChange}
-                  className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                />
-              )}
+              render={({ field: { value, onChange, ...field } }) => {
+                return (
+                  <Switch
+                    {...field}
+                    id={`itemInvoiceItemNumberIsVisible0`}
+                    checked={value}
+                    onCheckedChange={onChange}
+                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                  />
+                );
+              }}
             />
           </div>
 
@@ -863,19 +897,21 @@ export const InvoiceItems = memo(function InvoiceItems({
             <Controller
               name={`vatTableSummaryIsVisible`}
               control={control}
-              render={({ field: { value, onChange, ...field } }) => (
-                <Switch
-                  {...field}
-                  id={`vatTableSummaryIsVisible`}
-                  checked={value}
-                  onCheckedChange={onChange}
-                  className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                />
-              )}
+              render={({ field: { value, onChange, ...field } }) => {
+                return (
+                  <Switch
+                    {...field}
+                    id={`vatTableSummaryIsVisible`}
+                    checked={value}
+                    onCheckedChange={onChange}
+                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                  />
+                );
+              }}
             />
           </div>
         </div>
-      )}
+      ) : null}
 
       <DeleteInvoiceItemConfirmationDialog
         deleteItemIndex={deleteItemIndex}

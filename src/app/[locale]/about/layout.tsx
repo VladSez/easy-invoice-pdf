@@ -1,34 +1,42 @@
-import { hasLocale, type Locale } from "next-intl";
-import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
-import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
-import type EnMessages from "../../../../messages/en.json";
-import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
-import { AboutJsonLd } from "./about-json-ld";
+import { hasLocale, type Locale } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
+import { notFound } from "next/navigation";
 
+import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
+import { routing } from "@/i18n/routing";
 import { OPEN_GRAPH_LOCALE_BY_LOCALE } from "@/lib/seo/locale-utils";
 
+import type EnMessages from "../../../../messages/en.json";
+import { AboutJsonLd } from "./about-json-ld";
+
 // Add metadata to make sure search engines can index the page
+// Next.js types dynamic segments as `string`, so we narrow to `Locale` below
 export async function generateMetadata({
   params,
-}: {
-  params: { locale: Locale };
-}): Promise<Metadata> {
+}: Pick<LayoutProps<"/[locale]/about">, "params">): Promise<Metadata> {
+  const { locale } = await params;
+
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+
   try {
     // Load the messages for the requested locale
-    const messages = await import(
-      `../../../../messages/${params.locale}.json`
-    ).then((module: { default: typeof EnMessages }) => module.default);
+    const messages = await import(`../../../../messages/${locale}.json`).then(
+      (module: { default: typeof EnMessages }) => {
+        return module.default;
+      },
+    );
 
     return {
       title: messages.Metadata.about.title,
       description: messages.Metadata.about.description,
       keywords: messages.Metadata.about.keywords,
       alternates: {
-        canonical: `${APP_URL}/${params.locale}/about`,
+        canonical: `${APP_URL}/${locale}/about`,
         types: {
-          "text/markdown": `${APP_URL}/${params.locale}/about.md`,
+          "text/markdown": `${APP_URL}/${locale}/about.md`,
         },
         languages: {
           // @ts-expect-error - x-default is not a valid locale
@@ -49,10 +57,10 @@ export async function generateMetadata({
         title: messages.Metadata.about.title,
         description: messages.Metadata.about.description,
         siteName: messages.Metadata.about.siteName,
-        locale: OPEN_GRAPH_LOCALE_BY_LOCALE[params.locale],
+        locale: OPEN_GRAPH_LOCALE_BY_LOCALE[locale],
         alternateLocale: Object.values(OPEN_GRAPH_LOCALE_BY_LOCALE),
         type: "website",
-        url: `${APP_URL}/${params.locale}/about`,
+        url: `${APP_URL}/${locale}/about`,
         images: [
           {
             url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
@@ -94,15 +102,13 @@ export async function generateMetadata({
   }
 }
 
+// Next.js types dynamic segments as `string`, so we narrow to `Locale` below
 export default async function AboutLocaleLayout({
   children,
   params,
-}: {
-  children: React.ReactNode;
-  params: { locale: Locale };
-}) {
+}: LayoutProps<"/[locale]/about">) {
   // Ensure that the incoming `locale` is valid
-  const { locale } = params;
+  const { locale } = await params;
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();

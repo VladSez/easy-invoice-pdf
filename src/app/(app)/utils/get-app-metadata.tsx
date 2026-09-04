@@ -1,5 +1,12 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
+import dayjs from "dayjs";
+
+import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(app)/utils/app-local-storage";
 import {
   METADATA_LOCAL_STORAGE_KEY,
   metadataSchema,
@@ -8,8 +15,6 @@ import {
   type Metadata,
   DEFAULT_MOBILE_TAB,
 } from "@/app/schema";
-import * as Sentry from "@sentry/nextjs";
-import dayjs from "dayjs";
 
 export const DEFAULT_METADATA = {
   appVersion: APP_VERSION,
@@ -37,7 +42,7 @@ export const DEFAULT_METADATA = {
  */
 export function getAppMetadata() {
   try {
-    const metadata = localStorage.getItem(METADATA_LOCAL_STORAGE_KEY);
+    const metadata = getAppStorageItem(METADATA_LOCAL_STORAGE_KEY);
 
     if (!metadata) return null;
 
@@ -102,10 +107,10 @@ export function updateAppMetadata(updater: (current: Metadata) => Metadata) {
       console.error("[updateAppMetadata] Validation error:", parsed.error);
 
       // reset the metadata to default if validation fails, we want to fail silently and not block the app
-      localStorage.setItem(
-        METADATA_LOCAL_STORAGE_KEY,
-        JSON.stringify(DEFAULT_METADATA),
-      );
+      setAppStorageItem({
+        key: METADATA_LOCAL_STORAGE_KEY,
+        value: JSON.stringify(DEFAULT_METADATA),
+      });
 
       Sentry.captureException(parsed.error);
 
@@ -113,10 +118,10 @@ export function updateAppMetadata(updater: (current: Metadata) => Metadata) {
     }
 
     // save the updated metadata to local storage
-    localStorage.setItem(
-      METADATA_LOCAL_STORAGE_KEY,
-      JSON.stringify(parsed.data),
-    );
+    setAppStorageItem({
+      key: METADATA_LOCAL_STORAGE_KEY,
+      value: JSON.stringify(parsed.data),
+    });
   } catch (error) {
     console.error("[updateAppMetadata] Failed to save metadata:", error);
     Sentry.captureException(error);

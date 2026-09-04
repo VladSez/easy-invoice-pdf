@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Input } from "./input";
+
 import {
   CURRENCY_SYMBOLS,
   SUPPORTED_CURRENCIES,
@@ -7,6 +7,8 @@ import {
   type InvoiceData,
 } from "@/app/schema";
 import { cn } from "@/lib/utils";
+
+import { Input } from "./input";
 
 function getCurrencyPadding(currencySymbol: CurrencySymbols) {
   if (!currencySymbol) return "ps-3";

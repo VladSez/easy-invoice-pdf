@@ -1,8 +1,8 @@
-import { SUPPORTED_LANGUAGES } from "@/app/schema";
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { z } from "zod";
+
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { SUPPORTED_LANGUAGES } from "@/app/schema";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 
 /**
  * This function handles the breaking change of the invoice number field.

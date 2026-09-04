@@ -1,6 +1,16 @@
 "use client"; // Error boundaries must be Client Components
 
-import { Button } from "@/components/ui/button";
+import * as Sentry from "@sentry/nextjs";
+import { useEffect } from "react";
+import { toast } from "sonner";
+
+import { setAppStorageItem } from "@/app/(app)/utils/app-local-storage";
+import { DEFAULT_METADATA } from "@/app/(app)/utils/get-app-metadata";
+import {
+  METADATA_LOCAL_STORAGE_KEY,
+  PDF_DATA_LOCAL_STORAGE_KEY,
+} from "@/app/schema";
+import { ErrorMessage } from "@/components/etc/error-message";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,18 +22,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useEffect } from "react";
-import { toast } from "sonner";
-import { getInitialInvoiceData } from "../constants";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import * as Sentry from "@sentry/nextjs";
-import { ErrorMessage } from "@/components/etc/error-message";
-import {
-  METADATA_LOCAL_STORAGE_KEY,
-  PDF_DATA_LOCAL_STORAGE_KEY,
-} from "@/app/schema";
+import { Button } from "@/components/ui/button";
 import { BUG_REPORT_URL } from "@/config";
-import { DEFAULT_METADATA } from "@/app/(app)/utils/get-app-metadata";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+
+import { getInitialInvoiceData } from "../constants";
 
 export default function Error({
   error,
@@ -95,15 +98,18 @@ export default function Error({
               <AlertDialogAction
                 onClick={() => {
                   try {
-                    localStorage.setItem(
-                      PDF_DATA_LOCAL_STORAGE_KEY,
-                      JSON.stringify(getInitialInvoiceData()),
-                    );
+                    // Best effort: a store that rejects writes cannot be holding the
+                    // data that broke the app either, and `reset()` below is what gets
+                    // the user off this error screen — it must not be skipped.
+                    setAppStorageItem({
+                      key: PDF_DATA_LOCAL_STORAGE_KEY,
+                      value: JSON.stringify(getInitialInvoiceData()),
+                    });
 
-                    localStorage.setItem(
-                      METADATA_LOCAL_STORAGE_KEY,
-                      JSON.stringify(DEFAULT_METADATA),
-                    );
+                    setAppStorageItem({
+                      key: METADATA_LOCAL_STORAGE_KEY,
+                      value: JSON.stringify(DEFAULT_METADATA),
+                    });
 
                     reset();
 

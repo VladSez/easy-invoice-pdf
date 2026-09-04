@@ -1,10 +1,11 @@
+import type { Metadata } from "next";
+
 import { SeoLandingShell } from "@/app/(seo-landings)/components/seo-landing-shell";
 import {
   SEO_LANDING_DEFINITIONS,
   type SeoLandingSlug,
 } from "@/app/(seo-landings)/seo-landing-definitions";
 import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
-import type { Metadata } from "next";
 
 export function buildSeoLandingMetadata(slug: SeoLandingSlug): Metadata {
   const definition = SEO_LANDING_DEFINITIONS[slug];

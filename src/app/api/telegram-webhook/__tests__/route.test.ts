@@ -1,12 +1,13 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
 import type {
   GenerateInvoiceResult,
   GenerateInvoiceReport,
 } from "@/app/api/generate-invoice/generate-invoice";
 
-const ALLOWED_CHAT_ID = 12345;
-const CHAT_ID = 67890;
+const ALLOWED_CHAT_ID = 12_345;
+const CHAT_ID = 67_890;
 
 const MOCK_REPORT = {
   invoiceENgeneratedSuccessfully: true,
@@ -29,30 +30,46 @@ const mockClearQueuedJob = vi.fn();
 
 const waitUntilPromises: Promise<unknown>[] = [];
 
-vi.mock("@/env", () => ({ env: { ...MOCK_ENV } }));
+vi.mock("@/env", () => {
+  return { env: { ...MOCK_ENV } };
+});
 
-vi.mock("@vercel/functions", () => ({
-  waitUntil: (promise: Promise<unknown>) => {
-    waitUntilPromises.push(promise);
-  },
-}));
+vi.mock("@vercel/functions", () => {
+  return {
+    waitUntil: (promise: Promise<unknown>) => {
+      waitUntilPromises.push(promise);
+    },
+  };
+});
 
-vi.mock("@/app/api/generate-invoice/run-production-generate-invoice", () => ({
-  runProductionGenerateMonthlyInvoice: (...args: unknown[]) =>
-    mockRunProduction(...args) as unknown as Promise<GenerateInvoiceResult>,
-}));
+vi.mock("@/app/api/generate-invoice/run-production-generate-invoice", () => {
+  return {
+    runProductionGenerateMonthlyInvoice: (...args: unknown[]) => {
+      return mockRunProduction(
+        ...args,
+      ) as unknown as Promise<GenerateInvoiceResult>;
+    },
+  };
+});
 
-vi.mock("@/lib/telegram", () => ({
-  sendTelegramMessage: (...args: unknown[]) =>
-    mockSendTelegramMessage(...args) as unknown as Promise<void>,
-}));
+vi.mock("@/lib/telegram", () => {
+  return {
+    sendTelegramMessage: (...args: unknown[]) => {
+      return mockSendTelegramMessage(...args) as unknown as Promise<void>;
+    },
+  };
+});
 
-vi.mock("@/app/api/telegram-webhook/lib/telegram-queue", () => ({
-  queueInvoiceGeneration: (...args: unknown[]) =>
-    mockQueueInvoiceGeneration(...args) as unknown as Promise<boolean>,
-  clearQueuedJob: (...args: unknown[]) =>
-    mockClearQueuedJob(...args) as unknown as Promise<void>,
-}));
+vi.mock("@/app/api/telegram-webhook/lib/telegram-queue", () => {
+  return {
+    queueInvoiceGeneration: (...args: unknown[]) => {
+      return mockQueueInvoiceGeneration(...args) as unknown as Promise<boolean>;
+    },
+    clearQueuedJob: (...args: unknown[]) => {
+      return mockClearQueuedJob(...args) as unknown as Promise<void>;
+    },
+  };
+});
 
 function createValidUpdate({
   senderId = ALLOWED_CHAT_ID,
@@ -155,7 +172,7 @@ describe("POST /api/telegram-webhook — HTTP layer", () => {
     it("should return 200 and notify when sender is unauthorized", async () => {
       const { POST } = await import("../route");
       const response = await POST(
-        createRequest(createValidUpdate({ senderId: 99999 })),
+        createRequest(createValidUpdate({ senderId: 99_999 })),
       );
 
       expect(response.status).toBe(200);

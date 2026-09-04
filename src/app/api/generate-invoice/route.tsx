@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { env } from "@/env";
 import { ipLimiter } from "@/lib/rate-limit";
+
 import { runProductionGenerateMonthlyInvoice } from "./run-production-generate-invoice";
 
 export const dynamic = "force-dynamic";
@@ -50,8 +51,7 @@ export async function GET(req: NextRequest) {
       shouldUploadToGoogleDrive,
     });
 
-    // eslint-disable-next-line no-console
-    console.log("[generate-invoice] Report:", result.report);
+    console.info("[generate-invoice] Report:", result.report);
 
     if (!result.ok) {
       const status = result.kind === "no_attachments" ? 400 : 500;

@@ -1,9 +1,10 @@
-import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "@/app/schema";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import * as Sentry from "@sentry/nextjs";
 import n2words from "n2words";
 import { toast } from "sonner";
 import { z } from "zod";
+
+import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "@/app/schema";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 
 /**
  * Get the amount in words (e.g. 123.45 -> "one hundred twenty-three and 45/100 dollars")
@@ -18,9 +19,10 @@ export function getAmountInWords({
   amount: number;
   language: SupportedLanguages;
 }) {
+  // zod v4's `z.number()` rejects non-finite values on its own, so the old
+  // `.finite()` call is no longer needed.
   const amountSchema = z
     .number()
-    .finite()
     .nonnegative("Amount must be non-negative")
     .transform(Math.floor);
 
@@ -75,7 +77,7 @@ export function getAmountInWords({
  * @returns The fractional part of the total
  */
 export function getNumberFractionalPart(total = 0) {
-  const schema = z.number().finite().nonnegative("Amount must be non-negative");
+  const schema = z.number().nonnegative("Amount must be non-negative");
 
   const parsedTotal = schema.safeParse(total);
 

@@ -1,11 +1,11 @@
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-import { formatServicePeriodRange } from "@/app/(app)/utils/format-service-period";
-import { formatCurrency } from "@/app/(app)/utils/format-currency";
-import type { InvoiceData } from "@/app/schema";
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import dayjs from "dayjs";
 
 import type { STRIPE_TEMPLATE_STYLES } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { formatCurrency } from "@/app/(app)/utils/format-currency";
+import { formatServicePeriodRange } from "@/app/(app)/utils/format-service-period";
+import type { InvoiceData } from "@/app/schema";
 
 import "dayjs/locale/de";
 import "dayjs/locale/en";

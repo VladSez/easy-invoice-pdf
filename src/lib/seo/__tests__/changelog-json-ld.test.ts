@@ -9,7 +9,8 @@ import { JSON_LD_IDS } from "../json-ld-ids";
 describe("buildChangelogIndexJsonLdGraph", () => {
   it("includes CollectionPage, Blog, Organization, and BreadcrumbList", () => {
     const graph = buildChangelogIndexJsonLdGraph("2026-01-15");
-    const parsed = JSON.parse(JSON.stringify(graph)) as {
+    const serializedGraph = JSON.stringify(graph);
+    const parsed = JSON.parse(serializedGraph) as {
       "@graph": Array<Record<string, unknown>>;
     };
     const nodes = parsed["@graph"];
@@ -41,7 +42,8 @@ describe("buildChangelogIndexJsonLdGraph", () => {
 
   it("should omit dateModified when latestDateModified is null", () => {
     const graph = buildChangelogIndexJsonLdGraph(null);
-    const parsed = JSON.parse(JSON.stringify(graph)) as {
+    const serializedGraph = JSON.stringify(graph);
+    const parsed = JSON.parse(serializedGraph) as {
       "@graph": Array<Record<string, unknown>>;
     };
     const blog = parsed["@graph"][1];
@@ -64,10 +66,13 @@ describe("buildChangelogPostJsonLdGraph", () => {
         date: "2026-02-01",
         version: "1.0.0",
       },
-      Component: () => null,
+      Component: () => {
+        return null;
+      },
     });
 
-    const parsed = JSON.parse(JSON.stringify(graph)) as {
+    const serializedGraph = JSON.stringify(graph);
+    const parsed = JSON.parse(serializedGraph) as {
       "@graph": Array<Record<string, unknown>>;
     };
     const blogPosting = parsed["@graph"][1];
@@ -94,10 +99,13 @@ describe("buildChangelogPostJsonLdGraph", () => {
         date: "2026-02-01",
         version: "1.0.0",
       },
-      Component: () => null,
+      Component: () => {
+        return null;
+      },
     });
 
-    const parsed = JSON.parse(JSON.stringify(graph)) as {
+    const serializedGraph = JSON.stringify(graph);
+    const parsed = JSON.parse(serializedGraph) as {
       "@graph": Array<Record<string, unknown>>;
     };
     const webPage = parsed["@graph"][0];

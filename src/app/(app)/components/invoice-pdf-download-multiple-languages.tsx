@@ -1,20 +1,20 @@
 "use client";
 
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { pdf } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
+import { useState } from "react";
 import { toast } from "sonner";
+
+import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
 import {
   LANGUAGE_TO_LABEL,
   SUPPORTED_LANGUAGES,
   type InvoiceData,
   type SupportedLanguages,
 } from "@/app/schema";
-import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
-
 import { MultiSelect } from "@/components/ui/multi-select";
-import { useEffect, useState } from "react";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 
 const SUPPORTED_LANGUAGES_OPTIONS = SUPPORTED_LANGUAGES.map((language) => {
   return {
@@ -41,11 +41,15 @@ export function InvoicePDFDownloadMultipleLanguages({
     SupportedLanguages[]
   >([language]);
 
-  useEffect(() => {
-    if (language) {
-      setSelectedLanguages([language]);
-    }
-  }, [language]);
+  // Reset the selection to the invoice language whenever the invoice language
+  // changes. Adjusting state during render (instead of in an effect) avoids the
+  // extra render pass that would otherwise show the stale selection first.
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [previousLanguage, setPreviousLanguage] = useState(language);
+  if (language && language !== previousLanguage) {
+    setPreviousLanguage(language);
+    setSelectedLanguages([language]);
+  }
 
   const generateAndZipPDFs = async (
     selectedLanguages: SupportedLanguages[],
@@ -116,9 +120,13 @@ export function InvoicePDFDownloadMultipleLanguages({
         placeholder="Download PDF"
         variant="inverted"
         maxCount={3}
-        handleDownload={() =>
-          generateAndZipPDFs(selectedLanguages.map((lang) => lang))
-        }
+        handleDownload={() => {
+          return generateAndZipPDFs(
+            selectedLanguages.map((lang) => {
+              return lang;
+            }),
+          );
+        }}
       />
     </>
   );

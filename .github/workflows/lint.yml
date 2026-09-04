@@ -1,4 +1,4 @@
-name: 🧹 ESLint
+name: 🧹 Oxlint
 on:
   push:
     branches: [main]
@@ -7,11 +7,10 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   lint:
-    name: Run linting
+    name: Run linting and format check
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
@@ -43,26 +42,21 @@ jobs:
       - name: 🔎 Run linting
         id: lint
         continue-on-error: true
-        run: pnpm eslint .
-
-      - name: 🔍 Get PR URL
-        if: steps.lint.outcome == 'failure'
-        id: pr-url
+        # `--format=github` turns findings into inline PR annotations.
+        # Type-aware rules run too (see `options.typeAware` in .oxlintrc.json).
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPOSITORY: ${{ github.repository }}
-          GH_REPOSITORY_OWNER: ${{ github.repository_owner }}
-          GH_REF_NAME: ${{ github.ref_name }}
-        run: |
-          PR_URL=$(curl -s \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$GH_REPOSITORY/pulls?head=$GH_REPOSITORY_OWNER:$GH_REF_NAME" \
-            | jq -r '.[0].html_url // empty')
-          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+          # `next typegen` loads next.config.mjs, which validates src/env.ts.
+          # Runtime secrets are not needed (and not available) for linting.
+          SKIP_ENV_VALIDATION: "true"
+        run: pnpm lint --format=github --quiet
+
+      - name: 💅 Check formatting
+        id: format
+        continue-on-error: true
+        run: pnpm format:check
 
       - name: 📧 Send email
-        if: steps.lint.outcome == 'failure'
+        if: steps.lint.outcome == 'failure' || steps.format.outcome == 'failure'
         # https://github.com/dawidd6/action-send-mail
         uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
         with:
@@ -72,14 +66,17 @@ jobs:
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: ❌ Linting Failed for ${{ github.repository }}
+          subject: "❌ ${{ steps.lint.outcome == 'failure' && (steps.format.outcome == 'failure' && 'Linting and formatting failed' || 'Linting failed') || 'Formatting failed' }} for ${{ github.repository }}"
           body: |
-            Linting for ${{ github.repository }} has failed.
+            Linting or formatting for ${{ github.repository }} has failed.
+
+            - 🔎 Lint (oxlint): ${{ steps.lint.outcome == 'failure' && '❌ failed' || '✅ passed' }}
+            - 💅 Format (oxfmt): ${{ steps.format.outcome == 'failure' && '❌ failed' || '✅ passed' }}
 
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
+            ${{ github.event.pull_request.html_url && format('- Pull Request: {0}', github.event.pull_request.html_url) }}
 
-      - name: ❌ Mark workflow failed on Linting failure
-        if: steps.lint.outcome == 'failure'
+      - name: ❌ Mark workflow failed on linting or formatting failure
+        if: steps.lint.outcome == 'failure' || steps.format.outcome == 'failure'
         run: exit 1

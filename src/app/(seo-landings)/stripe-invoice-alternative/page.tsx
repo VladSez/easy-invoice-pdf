@@ -5,8 +5,9 @@ import {
 
 export const dynamic = "force-static";
 
-export const generateMetadata = () =>
-  buildSeoLandingMetadata("stripe-invoice-alternative");
+export const generateMetadata = () => {
+  return buildSeoLandingMetadata("stripe-invoice-alternative");
+};
 
 export default function StripeInvoiceAlternativePage() {
   return <SeoLandingRoutePage slug="stripe-invoice-alternative" />;

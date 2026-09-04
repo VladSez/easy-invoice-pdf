@@ -1,6 +1,6 @@
-import { PROD_WEBSITE_URL, HOW_IT_WORKS_VIDEOS } from "@/config";
 import type { Graph } from "schema-dts";
 
+import { PROD_WEBSITE_URL, HOW_IT_WORKS_VIDEOS } from "@/config";
 import { buildBreadcrumbList } from "@/lib/seo/breadcrumb";
 import {
   JSON_LD_IDS,
@@ -16,25 +16,27 @@ const PAGE_DESCRIPTION =
 export function buildHowItWorksJsonLd(baseUrl = PROD_WEBSITE_URL): Graph {
   const pageUrl = `${baseUrl}/how-it-works`;
 
-  const videoItems = HOW_IT_WORKS_VIDEOS.map((video, index) => ({
-    "@type": "ListItem" as const,
-    position: index + 1,
-    item: {
-      "@type": "VideoObject" as const,
-      name: video.title,
-      description: video.description,
-      uploadDate: video.uploadDate,
-      thumbnailUrl: video.thumbnailUrl,
-      embedUrl: video.embedUrl,
-      contentUrl: video.watchUrl,
-      url: `${pageUrl}#${video.id}`,
-      publisher: {
-        "@type": "Organization" as const,
-        name: "EasyInvoicePDF",
-        url: baseUrl,
+  const videoItems = HOW_IT_WORKS_VIDEOS.map((video, index) => {
+    return {
+      "@type": "ListItem" as const,
+      position: index + 1,
+      item: {
+        "@type": "VideoObject" as const,
+        name: video.title,
+        description: video.description,
+        uploadDate: video.uploadDate,
+        thumbnailUrl: video.thumbnailUrl,
+        embedUrl: video.embedUrl,
+        contentUrl: video.watchUrl,
+        url: `${pageUrl}#${video.id}`,
+        publisher: {
+          "@type": "Organization" as const,
+          name: "EasyInvoicePDF",
+          url: baseUrl,
+        },
       },
-    },
-  }));
+    };
+  });
 
   return {
     "@context": "https://schema.org",

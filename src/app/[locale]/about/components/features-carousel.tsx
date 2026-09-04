@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState, useSyncExternalStore } from "react";
 
 import {
   Carousel,
@@ -10,6 +10,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
+
 import { FeatureCard, type FeatureCardProps } from "./feature-card";
 
 interface FeaturesCarouselProps {
@@ -22,6 +23,11 @@ interface FeaturesCarouselProps {
   };
 }
 
+/** Used while embla has no api yet: there is nothing to unsubscribe from */
+const noop = () => {
+  return undefined;
+};
+
 /**
  * Carousel with the marketing feature demos: one card per view on mobile,
  * two per view from `lg` up (same as the grid it replaced).
@@ -33,26 +39,45 @@ export function FeaturesCarousel({
   translations,
 }: FeaturesCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
-  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  useEffect(() => {
-    if (!api) return;
+  // The embla instance owns the selected slide, so read it straight from the
+  // carousel rather than mirroring it into state. `setApi` re-renders once the
+  // instance exists, which is when the snapshot below starts returning it.
+  const subscribeToSelectedIndex = useCallback(
+    (onStoreChange: () => void) => {
+      // there is nothing to subscribe to until embla hands over its api
+      if (!api) {
+        return noop;
+      }
 
-    function syncSelectedIndex(carouselApi: CarouselApi) {
-      if (carouselApi) setSelectedIndex(carouselApi.selectedScrollSnap());
-    }
+      api.on("select", onStoreChange);
+      api.on("reInit", onStoreChange);
 
-    syncSelectedIndex(api);
-    api.on("select", syncSelectedIndex);
-    api.on("reInit", syncSelectedIndex);
+      return () => {
+        api.off("select", onStoreChange);
+        api.off("reInit", onStoreChange);
+      };
+    },
+    [api],
+  );
 
-    return () => {
-      api.off("select", syncSelectedIndex);
-      api.off("reInit", syncSelectedIndex);
-    };
-  }, [api]);
+  const selectedIndex = useSyncExternalStore(
+    subscribeToSelectedIndex,
+    () => {
+      return api?.selectedScrollSnap() ?? 0;
+    },
+    // the carousel only exists on the client, so the first slide is always selected on the server
+    () => {
+      return 0;
+    },
+  );
 
-  const scrollTo = useCallback((index: number) => api?.scrollTo(index), [api]);
+  const scrollTo = useCallback(
+    (index: number) => {
+      return api?.scrollTo(index);
+    },
+    [api],
+  );
 
   return (
     <Carousel
@@ -70,19 +95,21 @@ export function FeaturesCarousel({
           Cards stretch to the tallest one at every breakpoint, so swiping never changes
           the height of the carousel. */}
       <CarouselContent className="-ml-6 -mr-2 items-stretch sm:-ml-4 sm:mr-0 lg:-ml-6 xl:-ml-10">
-        {features.map((feature) => (
-          <CarouselItem
-            key={feature.translationKey}
-            // one card per view on mobile, two from `lg` up. Mobile takes the full
-            // width so the demo video is as large as it can be; the arrows and dots
-            // below carry the "there is more" affordance that the peeking card did.
-            // The `pl-4` that `CarouselItem` hardcodes is the gutter between cards; the
-            // track's `-ml-6` pulls it off-screen so it only shows while scrolling
-            className="basis-full sm:basis-[70%] md:basis-[55%] lg:basis-1/2 lg:pl-6 xl:pl-10"
-          >
-            <FeatureCard {...feature} />
-          </CarouselItem>
-        ))}
+        {features.map((feature) => {
+          return (
+            <CarouselItem
+              key={feature.translationKey}
+              // one card per view on mobile, two from `lg` up. Mobile takes the full
+              // width so the demo video is as large as it can be; the arrows and dots
+              // below carry the "there is more" affordance that the peeking card did.
+              // The `pl-4` that `CarouselItem` hardcodes is the gutter between cards; the
+              // track's `-ml-6` pulls it off-screen so it only shows while scrolling
+              className="basis-full sm:basis-[70%] md:basis-[55%] lg:basis-1/2 lg:pl-6 xl:pl-10"
+            >
+              <FeatureCard {...feature} />
+            </CarouselItem>
+          );
+        })}
       </CarouselContent>
 
       {/* Controls: previous/next arrows and one dot per feature */}
@@ -90,38 +117,46 @@ export function FeaturesCarousel({
         <button
           type="button"
           aria-label={translations.previousFeature}
-          onClick={() => api?.scrollPrev()}
+          onClick={() => {
+            return api?.scrollPrev();
+          }}
           className={arrowButtonClassName}
         >
           <ChevronLeft className="size-5" aria-hidden="true" />
         </button>
 
         <div role="group" className="flex items-center gap-2">
-          {features.map((feature, index) => (
-            <button
-              key={feature.translationKey}
-              type="button"
-              // the feature title keeps the label localized, unlike a hardcoded "Go to slide N"
-              aria-label={feature.title}
-              aria-current={index === selectedIndex}
-              onClick={() => scrollTo(index)}
-              className="rounded-full p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
-            >
-              <span
-                aria-hidden="true"
-                className={cn(
-                  "block size-2 rounded-full bg-slate-300 transition-colors",
-                  index === selectedIndex && "bg-slate-900",
-                )}
-              />
-            </button>
-          ))}
+          {features.map((feature, index) => {
+            return (
+              <button
+                key={feature.translationKey}
+                type="button"
+                // the feature title keeps the label localized, unlike a hardcoded "Go to slide N"
+                aria-label={feature.title}
+                aria-current={index === selectedIndex}
+                onClick={() => {
+                  return scrollTo(index);
+                }}
+                className="rounded-full p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "block size-2 rounded-full bg-slate-300 transition-colors",
+                    index === selectedIndex && "bg-slate-900",
+                  )}
+                />
+              </button>
+            );
+          })}
         </div>
 
         <button
           type="button"
           aria-label={translations.nextFeature}
-          onClick={() => api?.scrollNext()}
+          onClick={() => {
+            return api?.scrollNext();
+          }}
           className={arrowButtonClassName}
         >
           <ChevronRight className="size-5" aria-hidden="true" />

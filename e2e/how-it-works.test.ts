@@ -1,3 +1,5 @@
+import { expect, test } from "@playwright/test";
+
 import {
   DISCORD_COMMUNITY_URL,
   REDDIT_COMMUNITY_URL,
@@ -5,7 +7,6 @@ import {
   YOUTUBE_VIDEO_HOW_TO_ADD_BUYER,
   YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
 } from "@/config";
-import { expect, test } from "@playwright/test";
 
 test.describe("How it works page", () => {
   test("should display page content and video tutorials", async ({ page }) => {

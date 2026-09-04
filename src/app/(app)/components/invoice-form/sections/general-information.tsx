@@ -1,3 +1,15 @@
+import dayjs from "dayjs";
+import { InfoIcon, Upload, X } from "lucide-react";
+import { memo, useCallback, useRef } from "react";
+import {
+  type Control,
+  Controller,
+  type FieldErrors,
+  type UseFormSetValue,
+  useWatch,
+} from "react-hook-form";
+import { toast } from "sonner";
+
 import {
   AlertIcon,
   ErrorMessage,
@@ -7,7 +19,9 @@ import {
   getDefaultInvoiceNumberLabel,
   INVOICE_PDF_TRANSLATIONS,
 } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { formatTodayWithLocale } from "@/app/(app)/utils/format-date-with-locale";
 import {
+  getCurrentMonthAndYear,
   isFirstDayOfMonth,
   isServicePeriodStartInCurrentMonth,
 } from "@/app/(app)/utils/format-service-period";
@@ -22,7 +36,6 @@ import {
   TEMPLATE_TO_LABEL,
 } from "@/app/schema";
 import { CurrencyCombobox } from "@/components/currency-combobox";
-import { Button } from "@/components/ui/button";
 import { ButtonHelper } from "@/components/ui/button-helper";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
@@ -32,19 +45,9 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import dayjs from "dayjs";
-import { AlertTriangle, InfoIcon, RefreshCw, Upload, X } from "lucide-react";
-import { memo, useCallback, useRef } from "react";
-import {
-  type Control,
-  Controller,
-  type FieldErrors,
-  type UseFormSetValue,
-  useWatch,
-} from "react-hook-form";
-import { toast } from "sonner";
 
-const CURRENT_MONTH_AND_YEAR = dayjs().format("MM-YYYY");
+import { convertFileToBase64, validateImageSize } from "../utils/logo-upload";
+import { StaleDatesBanner } from "./components/stale-dates-banner";
 
 interface GeneralInformationProps {
   control: Control<InvoiceData>;
@@ -125,7 +128,7 @@ export const GeneralInformation = memo(function GeneralInformation({
   )?.[1];
 
   const isInvoiceNumberInCurrentMonth =
-    extractInvoiceMonthAndYear === CURRENT_MONTH_AND_YEAR;
+    extractInvoiceMonthAndYear === getCurrentMonthAndYear();
 
   // Logo upload handlers
   const handleLogoUpload = useCallback(
@@ -210,62 +213,67 @@ export const GeneralInformation = memo(function GeneralInformation({
           <Controller
             name="template"
             control={control}
-            render={({ field }) => (
-              <SelectNative
-                {...field}
-                id={`template`}
-                className={cn("block", inputErrorClassName(!!errors.template))}
-                onChange={(e) => {
-                  const newTemplate =
-                    e.target.value === "stripe" ? "stripe" : "default";
+            render={({ field }) => {
+              return (
+                <SelectNative
+                  {...field}
+                  id={`template`}
+                  className={cn(
+                    "block",
+                    inputErrorClassName(!!errors.template),
+                  )}
+                  onChange={(e) => {
+                    const newTemplate =
+                      e.target.value === "stripe" ? "stripe" : "default";
 
-                  field.onChange(e);
+                    field.onChange(e);
 
-                  // When the user changes the invoice template, automatically update the invoice number label
-                  // so it matches the default convention for the selected template and current language.
-                  setValue(
-                    "invoiceNumberObject.label",
-                    getDefaultInvoiceNumberLabel(language, newTemplate),
-                  );
+                    // When the user changes the invoice template, automatically update the invoice number label
+                    // so it matches the default convention for the selected template and current language.
+                    setValue(
+                      "invoiceNumberObject.label",
+                      getDefaultInvoiceNumberLabel(language, newTemplate),
+                    );
 
-                  // Handles template-specific form updates for better UX
+                    // Handles template-specific form updates for better UX
 
-                  if (newTemplate === "stripe") {
-                    // Set date format to "MMMM D, YYYY" when template is Stripe
-                    setValue("dateFormat", STRIPE_DEFAULT_DATE_FORMAT);
+                    if (newTemplate === "stripe") {
+                      // Set date format to "MMMM D, YYYY" when template is Stripe
+                      setValue("dateFormat", STRIPE_DEFAULT_DATE_FORMAT);
 
-                    // Set unit field to be HIDDEN by default for Stripe template (matches stripe template behaviour)
-                    setValue("items.0.unitFieldIsVisible", false);
+                      // Set unit field to be HIDDEN by default for Stripe template (matches stripe template behaviour)
+                      setValue("items.0.unitFieldIsVisible", false);
 
-                    // Set service period field to be VISIBLE for Stripe template (for backwards compatibility)
-                    setValue("servicePeriodFieldIsVisible", true);
-                  } else {
-                    // DEFAULT TEMPLATE
+                      // Set service period field to be VISIBLE for Stripe template (for backwards compatibility)
+                      setValue("servicePeriodFieldIsVisible", true);
+                    } else {
+                      // DEFAULT TEMPLATE
 
-                    // Clear Stripe-specific fields when not using Stripe template
-                    if (errors.stripePayOnlineUrl) {
-                      setValue("stripePayOnlineUrl", "");
+                      // Clear Stripe-specific fields when not using Stripe template
+                      if (errors.stripePayOnlineUrl) {
+                        setValue("stripePayOnlineUrl", "");
+                      }
+
+                      // Set date format to "YYYY-MM-DD" when template is default
+                      setValue("dateFormat", DEFAULT_DATE_FORMAT);
+
+                      // Set unit field to be VISIBLE for default template
+                      setValue("items.0.unitFieldIsVisible", true);
                     }
+                  }}
+                >
+                  {SUPPORTED_TEMPLATES.map((template) => {
+                    const templateLabel = TEMPLATE_TO_LABEL[template];
 
-                    // Set date format to "YYYY-MM-DD" when template is default
-                    setValue("dateFormat", DEFAULT_DATE_FORMAT);
-
-                    // Set unit field to be VISIBLE for default template
-                    setValue("items.0.unitFieldIsVisible", true);
-                  }
-                }}
-              >
-                {SUPPORTED_TEMPLATES.map((template) => {
-                  const templateLabel = TEMPLATE_TO_LABEL[template];
-
-                  return (
-                    <option key={template} value={template}>
-                      {templateLabel}
-                    </option>
-                  );
-                })}
-              </SelectNative>
-            )}
+                    return (
+                      <option key={template} value={template}>
+                        {templateLabel}
+                      </option>
+                    );
+                  })}
+                </SelectNative>
+              );
+            }}
           />
           {errors.template ? (
             <ErrorMessage>{errors.template.message}</ErrorMessage>
@@ -284,72 +292,78 @@ export const GeneralInformation = memo(function GeneralInformation({
           <Controller
             name="language"
             control={control}
-            render={({ field }) => (
-              <SelectNative
-                {...field}
-                id={`language`}
-                className={cn("block", inputErrorClassName(!!errors.language))}
-                onChange={(e) => {
-                  field.onChange(e);
+            render={({ field }) => {
+              return (
+                <SelectNative
+                  {...field}
+                  id={`language`}
+                  className={cn(
+                    "block",
+                    inputErrorClassName(!!errors.language),
+                  )}
+                  onChange={(e) => {
+                    field.onChange(e);
 
-                  // IMPORTANT: for BETTER USER EXPERIENCE, when switching language, we update the invoice number and labels to the new language
+                    // IMPORTANT: for BETTER USER EXPERIENCE, when switching language, we update the invoice number and labels to the new language
 
-                  // Update INVOICE NUMBER and LABELS when language changes
-                  const newLanguage = e.target
-                    .value as keyof typeof INVOICE_PDF_TRANSLATIONS;
+                    // Update INVOICE NUMBER and LABELS when language changes
+                    const newLanguage = e.target
+                      .value as keyof typeof INVOICE_PDF_TRANSLATIONS;
 
-                  // we need to keep the invoice number suffix (e.g. 1/MM-YYYY) for better user experience, when switching language
-                  setValue(
-                    "invoiceNumberObject.label",
-                    getDefaultInvoiceNumberLabel(newLanguage, template),
-                  );
-                  setValue("invoiceNumberObject.value", invoiceNumberValue);
+                    // we need to keep the invoice number suffix (e.g. 1/MM-YYYY) for better user experience, when switching language
+                    setValue(
+                      "invoiceNumberObject.label",
+                      getDefaultInvoiceNumberLabel(newLanguage, template),
+                    );
+                    setValue("invoiceNumberObject.value", invoiceNumberValue);
 
-                  // Update SELLER VAT NO (Account Number) LABEL TEXT when language changes
-                  setValue(
-                    "seller.vatNoLabelText",
-                    INVOICE_PDF_TRANSLATIONS[newLanguage].seller.vatNo,
-                  );
+                    // Update SELLER VAT NO (Account Number) LABEL TEXT when language changes
+                    setValue(
+                      "seller.vatNoLabelText",
+                      INVOICE_PDF_TRANSLATIONS[newLanguage].seller.vatNo,
+                    );
 
-                  // Update BUYER VAT NO (Account Number) LABEL TEXT when language changes
-                  setValue(
-                    "buyer.vatNoLabelText",
-                    INVOICE_PDF_TRANSLATIONS[newLanguage].buyer.vatNo,
-                  );
+                    // Update BUYER VAT NO (Account Number) LABEL TEXT when language changes
+                    setValue(
+                      "buyer.vatNoLabelText",
+                      INVOICE_PDF_TRANSLATIONS[newLanguage].buyer.vatNo,
+                    );
 
-                  const newTranslation =
-                    INVOICE_PDF_TRANSLATIONS[newLanguage].invoiceItemsTable.vat;
+                    const newTranslation =
+                      INVOICE_PDF_TRANSLATIONS[newLanguage].invoiceItemsTable
+                        .vat;
 
-                  // Update TAX LABEL TEXT (VAT/GST/etc.) when language changes
-                  // This ensures the tax column header in the invoice items table
-                  // displays the correct translation for the selected language
-                  setValue("taxLabelText", newTranslation);
+                    // Update TAX LABEL TEXT (VAT/GST/etc.) when language changes
+                    // This ensures the tax column header in the invoice items table
+                    // displays the correct translation for the selected language
+                    setValue("taxLabelText", newTranslation);
 
-                  setValue(
-                    "servicePeriodLabelText",
-                    INVOICE_PDF_TRANSLATIONS[newLanguage].servicePeriod,
-                  );
-                  setValue(
-                    "dateOfServiceLabelText",
-                    INVOICE_PDF_TRANSLATIONS[newLanguage].dateOfService,
-                  );
-                }}
-              >
-                {SUPPORTED_LANGUAGES.map((lang) => {
-                  const languageName = LANGUAGE_TO_LABEL[lang];
+                    setValue(
+                      "servicePeriodLabelText",
+                      INVOICE_PDF_TRANSLATIONS[newLanguage].servicePeriod,
+                    );
+                    setValue(
+                      "dateOfServiceLabelText",
+                      INVOICE_PDF_TRANSLATIONS[newLanguage].dateOfService,
+                    );
+                  }}
+                >
+                  {SUPPORTED_LANGUAGES.map((lang) => {
+                    const languageName = LANGUAGE_TO_LABEL[lang];
 
-                  if (!languageName) {
-                    return null;
-                  }
+                    if (!languageName) {
+                      return null;
+                    }
 
-                  return (
-                    <option key={lang} value={lang}>
-                      {languageName}
-                    </option>
-                  );
-                })}
-              </SelectNative>
-            )}
+                    return (
+                      <option key={lang} value={lang}>
+                        {languageName}
+                      </option>
+                    );
+                  })}
+                </SelectNative>
+              );
+            }}
           />
           {errors.language ? (
             <ErrorMessage>{errors.language.message}</ErrorMessage>
@@ -368,14 +382,16 @@ export const GeneralInformation = memo(function GeneralInformation({
           <Controller
             name="currency"
             control={control}
-            render={({ field }) => (
-              <CurrencyCombobox
-                id={`currency`}
-                value={field.value}
-                onChange={field.onChange}
-                hasError={!!errors.currency}
-              />
-            )}
+            render={({ field }) => {
+              return (
+                <CurrencyCombobox
+                  id={`currency`}
+                  value={field.value}
+                  onChange={field.onChange}
+                  hasError={!!errors.currency}
+                />
+              );
+            }}
           />
           {errors.currency ? (
             <ErrorMessage>{errors.currency.message}</ErrorMessage>
@@ -394,27 +410,32 @@ export const GeneralInformation = memo(function GeneralInformation({
           <Controller
             name="dateFormat"
             control={control}
-            render={({ field }) => (
-              <SelectNative
-                {...field}
-                id={`dateFormat`}
-                className={cn(
-                  "block",
-                  inputErrorClassName(!!errors.dateFormat),
-                )}
-              >
-                {SUPPORTED_DATE_FORMATS.map((format) => {
-                  const preview = dayjs().locale(language).format(format);
-                  const isDefault = format === DEFAULT_DATE_FORMAT;
+            render={({ field }) => {
+              return (
+                <SelectNative
+                  {...field}
+                  id={`dateFormat`}
+                  className={cn(
+                    "block",
+                    inputErrorClassName(!!errors.dateFormat),
+                  )}
+                >
+                  {SUPPORTED_DATE_FORMATS.map((format) => {
+                    const preview = formatTodayWithLocale({
+                      selectedDateFormat: format,
+                      language,
+                    });
+                    const isDefault = format === DEFAULT_DATE_FORMAT;
 
-                  return (
-                    <option key={format} value={format}>
-                      {format} ({preview}) {isDefault ? "(default)" : ""}
-                    </option>
-                  );
-                })}
-              </SelectNative>
-            )}
+                    return (
+                      <option key={format} value={format}>
+                        {format} ({preview}) {isDefault ? "(default)" : ""}
+                      </option>
+                    );
+                  })}
+                </SelectNative>
+              );
+            }}
           />
 
           {errors.dateFormat ? (
@@ -437,18 +458,22 @@ export const GeneralInformation = memo(function GeneralInformation({
               <Controller
                 name="invoiceNumberObject.label"
                 control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text"
-                    id="invoiceNumberLabel"
-                    placeholder="Enter invoice number label"
-                    className={cn(
-                      "mt-1 block w-full",
-                      inputErrorClassName(!!errors.invoiceNumberObject?.label),
-                    )}
-                  />
-                )}
+                render={({ field }) => {
+                  return (
+                    <Input
+                      {...field}
+                      type="text"
+                      id="invoiceNumberLabel"
+                      placeholder="Enter invoice number label"
+                      className={cn(
+                        "mt-1 block w-full",
+                        inputErrorClassName(
+                          !!errors.invoiceNumberObject?.label,
+                        ),
+                      )}
+                    />
+                  );
+                }}
               />
               {errors.invoiceNumberObject?.label ? (
                 <ErrorMessage>
@@ -456,20 +481,20 @@ export const GeneralInformation = memo(function GeneralInformation({
                 </ErrorMessage>
               ) : null}
               {!isDefaultInvoiceNumberLabel &&
-                !errors.invoiceNumberObject?.label && (
-                  <InputHelperMessage>
-                    <ButtonHelper
-                      onClick={() => {
-                        setValue(
-                          "invoiceNumberObject.label",
-                          defaultInvoiceNumberLabel,
-                        );
-                      }}
-                    >
-                      Reset to default (&quot;{defaultInvoiceNumberLabel}&quot;)
-                    </ButtonHelper>
-                  </InputHelperMessage>
-                )}
+              !errors.invoiceNumberObject?.label ? (
+                <InputHelperMessage>
+                  <ButtonHelper
+                    onClick={() => {
+                      setValue(
+                        "invoiceNumberObject.label",
+                        defaultInvoiceNumberLabel,
+                      );
+                    }}
+                  >
+                    Reset to default (&quot;{defaultInvoiceNumberLabel}&quot;)
+                  </ButtonHelper>
+                </InputHelperMessage>
+              ) : null}
             </div>
 
             <div>
@@ -477,18 +502,22 @@ export const GeneralInformation = memo(function GeneralInformation({
               <Controller
                 name="invoiceNumberObject.value"
                 control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="text"
-                    id="invoiceNumberValue"
-                    placeholder="Enter invoice number value"
-                    className={cn(
-                      "mt-1 block w-full",
-                      inputErrorClassName(!!errors.invoiceNumberObject?.value),
-                    )}
-                  />
-                )}
+                render={({ field }) => {
+                  return (
+                    <Input
+                      {...field}
+                      type="text"
+                      id="invoiceNumberValue"
+                      placeholder="Enter invoice number value"
+                      className={cn(
+                        "mt-1 block w-full",
+                        inputErrorClassName(
+                          !!errors.invoiceNumberObject?.value,
+                        ),
+                      )}
+                    />
+                  );
+                }}
               />
               {errors.invoiceNumberObject?.value ? (
                 <ErrorMessage>
@@ -497,14 +526,14 @@ export const GeneralInformation = memo(function GeneralInformation({
               ) : null}
 
               {!isInvoiceNumberInCurrentMonth &&
-                !errors.invoiceNumberObject?.value && (
-                  <InputHelperMessage>
-                    <span className="flex items-center text-amber-800">
-                      <AlertIcon />
-                      Invoice number does not match current month
-                    </span>
-                  </InputHelperMessage>
-                )}
+              !errors.invoiceNumberObject?.value ? (
+                <InputHelperMessage>
+                  <span className="flex items-center text-amber-800">
+                    <AlertIcon />
+                    Invoice number does not match current month
+                  </span>
+                </InputHelperMessage>
+              ) : null}
             </div>
           </div>
         </fieldset>
@@ -517,27 +546,29 @@ export const GeneralInformation = memo(function GeneralInformation({
           <Controller
             name="dateOfIssue"
             control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="date"
-                id={`dateOfIssue`}
-                className={inputErrorClassName(!!errors.dateOfIssue)}
-                onChange={(e) => {
-                  field.onChange(e);
+            render={({ field }) => {
+              return (
+                <Input
+                  {...field}
+                  type="date"
+                  id={`dateOfIssue`}
+                  className={inputErrorClassName(!!errors.dateOfIssue)}
+                  onChange={(e) => {
+                    field.onChange(e);
 
-                  const newDate = e.target.value;
+                    const newDate = e.target.value;
 
-                  // Automatically update payment due date to 14 days after the new date of issue for better UX
-                  if (newDate) {
-                    setValue(
-                      "paymentDue",
-                      dayjs(newDate).add(14, "days").format("YYYY-MM-DD"),
-                    );
-                  }
-                }}
-              />
-            )}
+                    // Automatically update payment due date to 14 days after the new date of issue for better UX
+                    if (newDate) {
+                      setValue(
+                        "paymentDue",
+                        dayjs(newDate).add(14, "days").format("YYYY-MM-DD"),
+                      );
+                    }
+                  }}
+                />
+              );
+            }}
           />
           {errors.dateOfIssue ? (
             <ErrorMessage>{errors.dateOfIssue.message}</ErrorMessage>
@@ -561,7 +592,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               >
                 <span className="text-pretty">
                   Set date of issue to today (
-                  {dayjs().format(selectedDateFormat)})
+                  {formatTodayWithLocale({ selectedDateFormat, language })})
                 </span>
               </ButtonHelper>
             </InputHelperMessage>
@@ -579,17 +610,19 @@ export const GeneralInformation = memo(function GeneralInformation({
               <Controller
                 name="servicePeriodFieldIsVisible"
                 control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id="servicePeriodFieldIsVisible"
-                    data-testid="servicePeriodFieldIsVisible"
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    aria-label='Show the "Service period" (Service period start and end) field in the PDF'
-                  />
-                )}
+                render={({ field: { value, onChange, ...field } }) => {
+                  return (
+                    <Switch
+                      {...field}
+                      id="servicePeriodFieldIsVisible"
+                      data-testid="servicePeriodFieldIsVisible"
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      aria-label='Show the "Service period" (Service period start and end) field in the PDF'
+                    />
+                  );
+                }}
               />
               <CustomTooltip
                 trigger={
@@ -611,27 +644,31 @@ export const GeneralInformation = memo(function GeneralInformation({
               <Controller
                 name="dateOfServiceStart"
                 control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="date"
-                    id="dateOfServiceStart"
-                    className={inputErrorClassName(!!errors.dateOfServiceStart)}
-                    onChange={(e) => {
-                      field.onChange(e);
+                render={({ field }) => {
+                  return (
+                    <Input
+                      {...field}
+                      type="date"
+                      id="dateOfServiceStart"
+                      className={inputErrorClassName(
+                        !!errors.dateOfServiceStart,
+                      )}
+                      onChange={(e) => {
+                        field.onChange(e);
 
-                      const newServicePeriodStartDate = e.target.value;
+                        const newServicePeriodStartDate = e.target.value;
 
-                      // auto-show "Service period" in PDF when start date is not first day of its month
-                      if (
-                        newServicePeriodStartDate &&
-                        !isFirstDayOfMonth(newServicePeriodStartDate)
-                      ) {
-                        setValue("servicePeriodFieldIsVisible", true);
-                      }
-                    }}
-                  />
-                )}
+                        // auto-show "Service period" in PDF when start date is not first day of its month
+                        if (
+                          newServicePeriodStartDate &&
+                          !isFirstDayOfMonth(newServicePeriodStartDate)
+                        ) {
+                          setValue("servicePeriodFieldIsVisible", true);
+                        }
+                      }}
+                    />
+                  );
+                }}
               />
               {errors.dateOfServiceStart ? (
                 <ErrorMessage>{errors.dateOfServiceStart.message}</ErrorMessage>
@@ -674,14 +711,16 @@ export const GeneralInformation = memo(function GeneralInformation({
               <Controller
                 name="dateOfService"
                 control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="date"
-                    id="dateOfService"
-                    className={inputErrorClassName(!!errors.dateOfService)}
-                  />
-                )}
+                render={({ field }) => {
+                  return (
+                    <Input
+                      {...field}
+                      type="date"
+                      id="dateOfService"
+                      className={inputErrorClassName(!!errors.dateOfService)}
+                    />
+                  );
+                }}
               />
               {errors.dateOfService ? (
                 <ErrorMessage>{errors.dateOfService.message}</ErrorMessage>
@@ -708,18 +747,20 @@ export const GeneralInformation = memo(function GeneralInformation({
                 <Controller
                   name="servicePeriodLabelText"
                   control={control}
-                  render={({ field }) => (
-                    <Textarea
-                      {...field}
-                      id="servicePeriodLabelText"
-                      rows={2}
-                      placeholder="Enter service period PDF label"
-                      className={cn(
-                        "mt-1 block w-full",
-                        inputErrorClassName(!!errors.servicePeriodLabelText),
-                      )}
-                    />
-                  )}
+                  render={({ field }) => {
+                    return (
+                      <Textarea
+                        {...field}
+                        id="servicePeriodLabelText"
+                        rows={2}
+                        placeholder="Enter service period PDF label"
+                        className={cn(
+                          "mt-1 block w-full",
+                          inputErrorClassName(!!errors.servicePeriodLabelText),
+                        )}
+                      />
+                    );
+                  }}
                 />
                 {errors.servicePeriodLabelText ? (
                   <ErrorMessage>
@@ -751,17 +792,19 @@ export const GeneralInformation = memo(function GeneralInformation({
                     <Controller
                       name="dateOfServiceFieldIsVisible"
                       control={control}
-                      render={({ field: { value, onChange, ...field } }) => (
-                        <Switch
-                          {...field}
-                          id="dateOfServiceFieldIsVisible"
-                          data-testid="dateOfServiceFieldIsVisible"
-                          checked={value}
-                          onCheckedChange={onChange}
-                          className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                          aria-label='Show the "Date of sales/of executing the service" field in the PDF'
-                        />
-                      )}
+                      render={({ field: { value, onChange, ...field } }) => {
+                        return (
+                          <Switch
+                            {...field}
+                            id="dateOfServiceFieldIsVisible"
+                            data-testid="dateOfServiceFieldIsVisible"
+                            checked={value}
+                            onCheckedChange={onChange}
+                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            aria-label='Show the "Date of sales/of executing the service" field in the PDF'
+                          />
+                        );
+                      }}
                     />
                     <CustomTooltip
                       trigger={
@@ -776,18 +819,20 @@ export const GeneralInformation = memo(function GeneralInformation({
                 <Controller
                   name="dateOfServiceLabelText"
                   control={control}
-                  render={({ field }) => (
-                    <Textarea
-                      {...field}
-                      id="dateOfServiceLabelText"
-                      rows={2}
-                      placeholder="Enter date of sales (Service period end) PDF label"
-                      className={cn(
-                        "block w-full",
-                        inputErrorClassName(!!errors.dateOfServiceLabelText),
-                      )}
-                    />
-                  )}
+                  render={({ field }) => {
+                    return (
+                      <Textarea
+                        {...field}
+                        id="dateOfServiceLabelText"
+                        rows={2}
+                        placeholder="Enter date of sales (Service period end) PDF label"
+                        className={cn(
+                          "block w-full",
+                          inputErrorClassName(!!errors.dateOfServiceLabelText),
+                        )}
+                      />
+                    );
+                  }}
                 />
                 {errors.dateOfServiceLabelText ? (
                   <ErrorMessage>
@@ -822,6 +867,7 @@ export const GeneralInformation = memo(function GeneralInformation({
             invoiceNumberValue={invoiceNumberValue ?? ""}
             paymentDue={paymentDue ?? ""}
             selectedDateFormat={selectedDateFormat ?? DEFAULT_DATE_FORMAT}
+            language={language}
             setValue={setValue}
             isMobile={isMobile}
           />
@@ -839,16 +885,18 @@ export const GeneralInformation = memo(function GeneralInformation({
               <Controller
                 name={`invoiceTypeFieldIsVisible`}
                 control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`invoiceTypeFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    aria-label={`Show the "Header Notes" Field in the PDF`}
-                  />
-                )}
+                render={({ field: { value, onChange, ...field } }) => {
+                  return (
+                    <Switch
+                      {...field}
+                      id={`invoiceTypeFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      aria-label={`Show the "Header Notes" Field in the PDF`}
+                    />
+                  );
+                }}
               />
               <CustomTooltip
                 trigger={
@@ -864,15 +912,17 @@ export const GeneralInformation = memo(function GeneralInformation({
           <Controller
             name="invoiceType"
             control={control}
-            render={({ field }) => (
-              <Textarea
-                {...field}
-                id={`invoiceType`}
-                rows={2}
-                className={inputErrorClassName(!!errors.invoiceType)}
-                placeholder="Enter header notes"
-              />
-            )}
+            render={({ field }) => {
+              return (
+                <Textarea
+                  {...field}
+                  id={`invoiceType`}
+                  rows={2}
+                  className={inputErrorClassName(!!errors.invoiceType)}
+                  placeholder="Enter header notes"
+                />
+              );
+            }}
           />
           {errors.invoiceType ? (
             <ErrorMessage>{errors.invoiceType.message}</ErrorMessage>
@@ -939,7 +989,7 @@ export const GeneralInformation = memo(function GeneralInformation({
         </div>
 
         {/* Pay Online URL - Only for Stripe template */}
-        {template === "stripe" && (
+        {template === "stripe" ? (
           <div className="">
             <Label htmlFor={`stripePayOnlineUrl`} className="">
               Payment Link URL
@@ -948,17 +998,19 @@ export const GeneralInformation = memo(function GeneralInformation({
             <Controller
               name="stripePayOnlineUrl"
               control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  id={`stripePayOnlineUrl`}
-                  type="url"
-                  className={cn(
-                    "mt-1",
-                    inputErrorClassName(!!errors.stripePayOnlineUrl),
-                  )}
-                />
-              )}
+              render={({ field }) => {
+                return (
+                  <Input
+                    {...field}
+                    id={`stripePayOnlineUrl`}
+                    type="url"
+                    className={cn(
+                      "mt-1",
+                      inputErrorClassName(!!errors.stripePayOnlineUrl),
+                    )}
+                  />
+                );
+              }}
             />
             {errors.stripePayOnlineUrl ? (
               <ErrorMessage>{errors.stripePayOnlineUrl.message}</ErrorMessage>
@@ -969,245 +1021,8 @@ export const GeneralInformation = memo(function GeneralInformation({
               </InputHelperMessage>
             )}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
 });
-
-interface OutOfDateDatesHelperProps {
-  dateOfIssue: string;
-  dateOfService: string;
-  dateOfServiceStart: string;
-  invoiceNumberValue: string;
-  paymentDue: string;
-  selectedDateFormat: string;
-  setValue: UseFormSetValue<InvoiceData>;
-  isMobile: boolean;
-}
-
-/**
- * Displays a helper (banner) component that detects and allows updating stale invoice dates.
- *
- * This component checks if the invoice dates (date of issue, service period start/end,
- * payment due) and invoice number are outdated compared to the current date. If any are stale,
- * it displays a banner with a table showing the old vs new values and provides a button to update all dates at once.
- */
-function StaleDatesBanner({
-  dateOfIssue,
-  dateOfService,
-  dateOfServiceStart,
-  invoiceNumberValue,
-  paymentDue,
-  selectedDateFormat,
-  setValue,
-  isMobile,
-}: OutOfDateDatesHelperProps) {
-  const formatDate = (date: string) =>
-    dayjs(date).locale("en").format(selectedDateFormat);
-
-  const isDateOfIssueStale = !dayjs(dateOfIssue).isSame(dayjs(), "day");
-  const isDateOfServiceStale = !dayjs(dateOfService).isSame(
-    dayjs().endOf("month"),
-    "day",
-  );
-  const isDateOfServiceStartStale =
-    !!dateOfServiceStart &&
-    !isServicePeriodStartInCurrentMonth(dateOfServiceStart);
-  const extractedMonthYear = /(\d{2}-\d{4})/.exec(invoiceNumberValue)?.[1];
-  const isInvoiceNumberStale = extractedMonthYear !== CURRENT_MONTH_AND_YEAR;
-
-  /**
-   * Checks if the payment due date is stale (outdated).
-   * A payment due date is considered stale if:
-   * - It's not set (empty/undefined), OR
-   * - It doesn't match the expected date (14 days after the date of issue)
-   */
-  const isPaymentDueStale =
-    !paymentDue ||
-    !dayjs(paymentDue).isSame(dayjs(dateOfIssue).add(14, "days"), "day");
-
-  const targetToday = dayjs().locale("en").format(selectedDateFormat);
-  const targetEndOfMonth = dayjs()
-    .locale("en")
-    .endOf("month")
-    .format(selectedDateFormat);
-  const targetStartOfMonth = dayjs()
-    .locale("en")
-    .startOf("month")
-    .format(selectedDateFormat);
-  const targetPaymentDue = dayjs()
-    .locale("en")
-    .add(14, "days")
-    .format(selectedDateFormat);
-
-  const targetInvoiceNumber = `1/${CURRENT_MONTH_AND_YEAR}`;
-
-  const fallbackValue = "(not set)";
-
-  /**
-   * Array of items to check for staleness.
-   * Each item is either false (not stale) or an object containing:
-   * - label: Display name of the field
-   * - oldValue: Current/outdated value
-   * - newValue: Suggested updated value
-   * - hint: Description of what the new value represents
-   */
-  const ITEMS: (
-    | boolean
-    | {
-        label: string;
-        oldValue: string;
-        newValue: string;
-        hint: string;
-      }
-  )[] = [
-    isDateOfIssueStale && {
-      label: "Date of issue",
-      oldValue: dateOfIssue ? formatDate(dateOfIssue) : fallbackValue,
-      newValue: targetToday,
-      hint: "today",
-    },
-    isDateOfServiceStale && {
-      label: "Service period end",
-      oldValue: dateOfService ? formatDate(dateOfService) : fallbackValue,
-      newValue: targetEndOfMonth,
-      hint: "end of current month",
-    },
-    isDateOfServiceStartStale && {
-      label: "Service period start",
-      oldValue: dateOfServiceStart
-        ? formatDate(dateOfServiceStart)
-        : fallbackValue,
-      newValue: targetStartOfMonth,
-      hint: "start of current month",
-    },
-    isInvoiceNumberStale && {
-      label: "Invoice number",
-      oldValue: invoiceNumberValue ? invoiceNumberValue : fallbackValue,
-      newValue: targetInvoiceNumber,
-      hint: "current month",
-    },
-    isPaymentDueStale && {
-      label: "Payment due",
-      oldValue: paymentDue ? formatDate(paymentDue) : fallbackValue,
-      newValue: targetPaymentDue,
-      hint: "date of issue + 14 days",
-    },
-  ];
-
-  const staleItems = ITEMS.filter(Boolean) as {
-    label: string;
-    oldValue: string;
-    newValue: string;
-    hint: string;
-  }[];
-
-  return (
-    <div
-      className="rounded-md border border-amber-200 bg-amber-50/90 px-3 py-4 shadow-sm shadow-amber-200/50 duration-300 animate-in fade-in slide-in-from-bottom-2"
-      role="region"
-      aria-live="polite"
-      data-testid="out-of-date-dates-helper"
-    >
-      <div className="mb-3 flex items-center gap-1.5 text-xs font-medium text-amber-800">
-        <AlertTriangle className="size-3.5 shrink-0 text-amber-600" />
-        <span>
-          {staleItems.length}{" "}
-          {staleItems.length === 1 ? "field is" : "fields are"} out of date
-        </span>
-      </div>
-
-      <table className="w-full border-collapse overflow-hidden rounded border border-amber-300 text-xs">
-        <thead>
-          <tr className="border-b border-amber-300 bg-amber-100/60 text-left text-amber-800">
-            <th className="w-[65px] max-w-[65px] px-2.5 py-1.5 font-semibold">
-              Field
-            </th>
-            <th className="px-2.5 py-1.5 font-semibold">Change</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {staleItems.map((item) => (
-            <tr
-              key={item.label}
-              className="border-b border-amber-300 last:border-b-0"
-            >
-              <td className="w-[65px] max-w-[65px] px-2.5 py-1.5 text-amber-800">
-                {item.label}
-              </td>
-
-              <td className="text-pretty px-2.5 py-1.5 pr-0">
-                <span className="bg-red-100 text-amber-800 line-through decoration-amber-700/50">
-                  {item.oldValue}
-                </span>
-                <span className="mx-1 text-amber-700">→</span>
-                <span className="bg-green-200 font-semibold text-green-800">
-                  {item.newValue}
-                </span>
-                {item.hint ? (
-                  <span className="ml-1 font-normal text-green-700">
-                    ({item.hint})
-                  </span>
-                ) : null}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <Button
-        type="button"
-        size="sm"
-        className="mt-3.5 gap-1.5 bg-amber-600 text-white shadow-sm hover:bg-amber-600/95"
-        onClick={() => {
-          const today = dayjs().format("YYYY-MM-DD");
-
-          const firstDayOfCurrentMonth = dayjs()
-            .startOf("month")
-            .format("YYYY-MM-DD");
-          const lastDayOfCurrentMonth = dayjs()
-            .endOf("month")
-            .format("YYYY-MM-DD");
-
-          setValue("dateOfServiceStart", firstDayOfCurrentMonth);
-          setValue("dateOfService", lastDayOfCurrentMonth);
-          setValue("dateOfIssue", today);
-          setValue("invoiceNumberObject.value", targetInvoiceNumber);
-
-          const newPaymentDue = dayjs(today)
-            .add(14, "days")
-            .format("YYYY-MM-DD");
-
-          setValue("paymentDue", newPaymentDue);
-
-          toast.success("All dates updated successfully", {
-            position: isMobile ? "top-center" : "bottom-right",
-          });
-        }}
-      >
-        <RefreshCw className="size-3.5" />
-        Update All Dates
-      </Button>
-    </div>
-  );
-}
-
-// Logo helper functions
-const validateImageSize = (file: File): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const maxSize = 3 * 1024 * 1024; // 3MB in bytes
-
-    resolve(file.size <= maxSize);
-  });
-};
-
-const convertFileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-};

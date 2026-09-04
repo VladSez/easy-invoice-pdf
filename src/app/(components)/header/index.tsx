@@ -1,6 +1,7 @@
+import type { Locale } from "next-intl";
+
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { HeaderClient } from "@/app/(components)/header/header.client";
-import type { Locale } from "next-intl";
 
 export interface HeaderProps {
   locale: Locale;

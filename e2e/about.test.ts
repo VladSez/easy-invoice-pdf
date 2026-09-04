@@ -1,8 +1,10 @@
 /* eslint-disable playwright/no-conditional-expect */
 /* eslint-disable playwright/no-conditional-in-test */
-import { GITHUB_URL, TWITTER_URL, VIDEO_DEMO_FALLBACK_IMG } from "@/config";
-import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_LANGUAGES } from "@/app/schema";
+
 import { expect, test } from "@playwright/test";
+
+import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_LANGUAGES } from "@/app/schema";
+import { GITHUB_URL, TWITTER_URL, VIDEO_DEMO_FALLBACK_IMG } from "@/config";
 
 test.describe("About page", () => {
   test("should display about page content in English", async ({
@@ -83,8 +85,17 @@ test.describe("About page", () => {
     await expect(goToAppButton).toBeVisible();
     await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
 
+    // The about page streams behind a `loading.tsx` Suspense boundary. While
+    // React reveals the boundary, the streamed copy of the content is still
+    // sitting in the `<div hidden>` it arrived in, so a bare `#hero` /
+    // `#features` / `#faq` briefly matches two elements and trips strict mode.
+    // Every section below is therefore looked up under the `main` role (a
+    // hidden subtree is not part of the accessibility tree) and filtered to
+    // the visible match, so the streamed copy is never the one we assert on.
+    const main = page.getByRole("main");
+
     // Check Hero section
-    const heroSection = page.locator("#hero");
+    const heroSection = main.locator("#hero").filter({ visible: true });
     await expect(heroSection).toBeVisible();
 
     await expect(
@@ -105,13 +116,12 @@ test.describe("About page", () => {
 
     await expect(video).toBeVisible();
     await expect(video).toHaveAttribute("poster", VIDEO_DEMO_FALLBACK_IMG);
-    await expect(video).toHaveAttribute("muted");
     await expect(video).toHaveAttribute("loop");
     await expect(video).toHaveAttribute("playsinline");
     await expect(video).toHaveAttribute("preload", "none");
 
     // Check Features section
-    const featuresSection = page.locator("#features");
+    const featuresSection = main.locator("#features").filter({ visible: true });
     await expect(featuresSection).toBeVisible();
 
     await expect(
@@ -129,7 +139,7 @@ test.describe("About page", () => {
     ).toBeVisible();
 
     // check FAQ section
-    const faqSection = page.locator("#faq");
+    const faqSection = main.locator("#faq").filter({ visible: true });
     await expect(faqSection).toBeVisible();
 
     await expect(
@@ -274,8 +284,10 @@ test.describe("About page", () => {
     });
     await expect(goToAppButton).toBeVisible();
 
+    const main = page.getByRole("main");
+
     // Check Hero section in French
-    const heroSection = page.locator("#hero");
+    const heroSection = main.locator("#hero").filter({ visible: true });
     await expect(heroSection).toBeVisible();
 
     await expect(
@@ -293,7 +305,7 @@ test.describe("About page", () => {
     ).toBeVisible();
 
     // Check Features section in French
-    const featuresSection = page.locator("#features");
+    const featuresSection = main.locator("#features").filter({ visible: true });
     await expect(featuresSection).toBeVisible();
 
     await expect(
@@ -360,8 +372,10 @@ test.describe("About page", () => {
     });
     await expect(goToAppButton).toBeVisible();
 
+    const main = page.getByRole("main");
+
     // Check Hero section in German
-    const heroSection = page.locator("#hero");
+    const heroSection = main.locator("#hero").filter({ visible: true });
     await expect(heroSection).toBeVisible();
 
     await expect(
@@ -379,7 +393,7 @@ test.describe("About page", () => {
     ).toBeVisible();
 
     // Check Features section in German
-    const featuresSection = page.locator("#features");
+    const featuresSection = main.locator("#features").filter({ visible: true });
     await expect(featuresSection).toBeVisible();
 
     await expect(

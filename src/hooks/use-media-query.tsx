@@ -16,11 +16,18 @@ function attachMediaListener(
 ) {
   try {
     query.addEventListener("change", callback);
-    return () => query.removeEventListener("change", callback);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (e: unknown) {
+    return () => {
+      return query.removeEventListener("change", callback);
+    };
+  } catch {
+    // deprecated on purpose: this is the fallback path for Safari <= Catalina,
+    // which has no `addEventListener` on MediaQueryList (see the note above)
+    // oxlint-disable-next-line typescript/no-deprecated
     query.addListener(callback);
-    return () => query.removeListener(callback);
+    return () => {
+      // oxlint-disable-next-line typescript/no-deprecated
+      return query.removeListener(callback);
+    };
   }
 }
 
@@ -39,10 +46,11 @@ function getInitialValue(query: string, initialValue?: boolean) {
 function useMediaQuery(
   query: string,
   initialValue?: boolean,
-  { getInitialValueInEffect }: UseMediaQueryOptions = {
-    getInitialValueInEffect: true,
-  },
+  options?: UseMediaQueryOptions,
 ) {
+  const { getInitialValueInEffect } = options ?? {
+    getInitialValueInEffect: true,
+  };
   const [matches, setMatches] = useState(
     getInitialValueInEffect ? initialValue : getInitialValue(query),
   );
@@ -52,9 +60,9 @@ function useMediaQuery(
     if ("matchMedia" in window) {
       queryRef.current = window.matchMedia(query);
       setMatches(queryRef.current.matches);
-      return attachMediaListener(queryRef.current, (event) =>
-        setMatches(event.matches),
-      );
+      return attachMediaListener(queryRef.current, (event) => {
+        return setMatches(event.matches);
+      });
     }
 
     return undefined;

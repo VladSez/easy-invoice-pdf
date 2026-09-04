@@ -1,3 +1,6 @@
+import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
+
 import { Footer, FooterLinkGroup } from "@/app/(components)/footer";
 import {
   DISCORD_COMMUNITY_URL,
@@ -5,8 +8,6 @@ import {
   PRODUCT_TWITTER_URL,
   REDDIT_COMMUNITY_URL,
 } from "@/config";
-import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
 
 /**
  * Footer of the about page.
@@ -26,15 +27,19 @@ export function AboutFooter() {
         aboutHeading: t("footer.headings.about"),
         solutionsHeading: t("footer.headings.solutions"),
         footerDescription: t.rich("footer.description", {
-          br: () => <br />,
-          tosLink: (chunks) => (
-            <Link
-              href="/tos"
-              className="text-slate-700 underline hover:text-slate-900"
-            >
-              {chunks}
-            </Link>
-          ),
+          br: () => {
+            return <br />;
+          },
+          tosLink: (chunks) => {
+            return (
+              <Link
+                href="/tos"
+                className="text-slate-700 underline hover:text-slate-900"
+              >
+                {chunks}
+              </Link>
+            );
+          },
         }),
         footerCreatedBy: t("footer.createdBy"),
         resources: t("footer.links.resources"),

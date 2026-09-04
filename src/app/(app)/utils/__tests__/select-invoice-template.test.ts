@@ -1,10 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { getInitialInvoiceData, INITIAL_INVOICE_DATA } from "@/app/constants";
+
 import {
   getDefaultInvoiceNumberLabel,
   INVOICE_PDF_TRANSLATIONS,
 } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { getInitialInvoiceData, INITIAL_INVOICE_DATA } from "@/app/constants";
 import type { InvoiceData } from "@/app/schema";
+
 import { selectInvoiceTemplate } from "../select-invoice-template";
 
 describe("selectInvoiceTemplate", () => {

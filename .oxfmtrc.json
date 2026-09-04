@@ -1,0 +1,24 @@
+// Generated with `oxfmt --migrate=prettier` from the old `.prettierrc.js` and
+// `.prettierignore`. Comments are allowed here (oxfmt parses JSONC).
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "trailingComma": "all",
+  "singleQuote": false,
+  "semi": true,
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "endOfLine": "lf",
+  "printWidth": 80,
+  "tabWidth": 2,
+  "useTabs": false,
+  // oxfmt has Tailwind class sorting built in, replacing prettier-plugin-tailwindcss.
+  // Point it at the v3 config explicitly - autodiscovery only looks for
+  // `tailwind.config.js`, and ours is TypeScript.
+  "sortTailwindcss": {
+    "config": "./tailwind.config.ts",
+    "functions": ["cn", "cva", "clsx"]
+  },
+  "sortPackageJson": true,
+  "sortImports": true,
+  "ignorePatterns": ["messages/en.d.json.ts", "pnpm-lock.yaml"]
+}

@@ -9,7 +9,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { HOW_IT_WORKS_VIDEOS } from "@/config";
-import { useEffect, useState } from "react";
 
 interface HowItWorksVideoDialogProps {
   open: boolean;
@@ -25,17 +24,6 @@ export function HowItWorksVideoDialog({
   open,
   onOpenChange,
 }: HowItWorksVideoDialogProps) {
-  const [resetKey, setResetKey] = useState(0);
-
-  // Reset video iframe when dialog opens by incrementing a key.
-  // This forces the HowItWorksVideos component to re-mount and reload video.
-  // eslint-disable-next-line react-you-might-not-need-an-effect/you-might-not-need-an-effect
-  useEffect(() => {
-    if (open) {
-      setResetKey((key) => key + 1);
-    }
-  }, [open]);
-
   const activeVideo = HOW_IT_WORKS_VIDEOS[0];
 
   return (
@@ -47,7 +35,9 @@ export function HowItWorksVideoDialog({
         </DialogHeader>
 
         <HowItWorksVideos
-          resetKey={resetKey}
+          // Radix keeps the dialog content mounted after it closes, so remount the
+          // player on every open: it starts from `initialVideoId` with a fresh iframe
+          key={String(open)}
           initialVideoId={DEFAULT_VIDEO_ID}
           showIframe={open}
           className="gap-0"

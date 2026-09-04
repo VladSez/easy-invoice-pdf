@@ -1,10 +1,11 @@
+// oxlint-disable react-you-might-not-need-an-effect/no-pass-data-to-parent react-you-might-not-need-an-effect/no-event-handler react/set-state-in-effect
 "use client";
 
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import * as React from "react";
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -75,8 +76,12 @@ const Carousel = React.forwardRef<
       setCanScrollNext(carouselApi.canScrollNext());
     }, []);
 
-    const scrollPrev = React.useCallback(() => api?.scrollPrev(), [api]);
-    const scrollNext = React.useCallback(() => api?.scrollNext(), [api]);
+    const scrollPrev = React.useCallback(() => {
+      return api?.scrollPrev();
+    }, [api]);
+    const scrollNext = React.useCallback(() => {
+      return api?.scrollNext();
+    }, [api]);
 
     const handleKeyDown = React.useCallback(
       (event: React.KeyboardEvent<HTMLDivElement>) => {

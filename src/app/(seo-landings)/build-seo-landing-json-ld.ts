@@ -1,6 +1,6 @@
-import { GITHUB_URL, PROD_WEBSITE_URL } from "@/config";
 import type { Graph } from "schema-dts";
 
+import { GITHUB_URL, PROD_WEBSITE_URL } from "@/config";
 import { buildBreadcrumbList } from "@/lib/seo/breadcrumb";
 import {
   JSON_LD_IDS,
@@ -45,14 +45,16 @@ export function buildSeoLandingJsonLd(
   const isOpenSourceLanding =
     definition.slug === "open-source-invoice-generator";
 
-  const faqEntities = definition.faq.map((item) => ({
-    "@type": "Question" as const,
-    name: item.question,
-    acceptedAnswer: {
-      "@type": "Answer" as const,
-      text: item.answer,
-    },
-  }));
+  const faqEntities = definition.faq.map((item) => {
+    return {
+      "@type": "Question" as const,
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer" as const,
+        text: item.answer,
+      },
+    };
+  });
 
   const webPage = {
     "@type": "WebPage" as const,

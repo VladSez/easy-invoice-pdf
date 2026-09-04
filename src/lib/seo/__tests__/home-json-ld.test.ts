@@ -6,27 +6,28 @@ import { JSON_LD_IDS } from "../json-ld-ids";
 describe("buildHomeJsonLdGraph", () => {
   it("includes full WebSite, Organization, WebApplication, site nav, and WebPage linked by @id", () => {
     const graph = buildHomeJsonLdGraph();
-    const parsed = JSON.parse(JSON.stringify(graph)) as {
+    const serializedGraph = JSON.stringify(graph);
+    const parsed = JSON.parse(serializedGraph) as {
       "@graph": Array<Record<string, unknown>>;
     };
 
     expect(parsed["@graph"]).toHaveLength(5);
 
-    const webSite = parsed["@graph"].find(
-      (node) => node["@type"] === "WebSite",
-    );
-    const organization = parsed["@graph"].find(
-      (node) => node["@type"] === "Organization",
-    );
-    const webApplication = parsed["@graph"].find(
-      (node) => node["@type"] === "WebApplication",
-    );
-    const siteNavigation = parsed["@graph"].find(
-      (node) => node["@type"] === "ItemList",
-    );
-    const webPage = parsed["@graph"].find(
-      (node) => node["@type"] === "WebPage",
-    );
+    const webSite = parsed["@graph"].find((node) => {
+      return node["@type"] === "WebSite";
+    });
+    const organization = parsed["@graph"].find((node) => {
+      return node["@type"] === "Organization";
+    });
+    const webApplication = parsed["@graph"].find((node) => {
+      return node["@type"] === "WebApplication";
+    });
+    const siteNavigation = parsed["@graph"].find((node) => {
+      return node["@type"] === "ItemList";
+    });
+    const webPage = parsed["@graph"].find((node) => {
+      return node["@type"] === "WebPage";
+    });
 
     expect(webSite).toMatchObject({
       "@id": JSON_LD_IDS.website,

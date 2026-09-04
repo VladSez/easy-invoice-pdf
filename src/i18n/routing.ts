@@ -1,4 +1,5 @@
 import { defineRouting } from "next-intl/routing";
+
 import { SUPPORTED_LANGUAGES } from "@/app/schema";
 
 const defaultLocaleEN = SUPPORTED_LANGUAGES[0];

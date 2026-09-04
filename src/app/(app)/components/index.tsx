@@ -1,11 +1,3 @@
-import { InvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
-import { StripeInvoicePdfTemplate } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
-import type { InvoiceData, MobileTabsValues } from "@/app/schema";
-import { DEFAULT_MOBILE_TAB, MOBILE_TABS_VALUES } from "@/app/schema";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CustomTooltip } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import {
   AlertCircleIcon,
@@ -14,112 +6,90 @@ import {
   PencilIcon,
 } from "lucide-react";
 import dynamic from "next/dynamic";
-
 import Link from "next/link";
-import type { Dispatch, SetStateAction } from "react";
+import { useRef, useState, type RefObject } from "react";
+
+import {
+  type InvoiceData,
+  type MobileTabsValues,
+  DEFAULT_MOBILE_TAB,
+  MOBILE_TABS_VALUES,
+} from "@/app/schema";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CustomTooltip } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+
 import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
-
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { MobileFormScrollContainer } from "./mobile-form-scroll-container";
 
-const DesktopPDFViewerModuleLoading = () => (
-  <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-    <div className="text-center">
-      <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-      <p className="text-gray-600">Loading PDF viewer...</p>
+const DesktopPDFViewerModuleLoading = () => {
+  return (
+    <div className="flex h-[580px] w-full items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+      <div className="text-center">
+        <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+        <p className="text-gray-600">Loading PDF viewer...</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
-const MobileInvoicePDFViewerModuleLoading = () => (
-  <div className="flex h-[520px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
-    <div className="text-center">
-      <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-      <p className="text-gray-600">Loading PDF viewer...</p>
+const MobileInvoicePDFViewerModuleLoading = () => {
+  return (
+    <div className="flex h-[520px] w-[650px] items-center justify-center border border-gray-200 bg-gray-200 lg:h-[620px] 2xl:h-[700px]">
+      <div className="text-center">
+        <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+        <p className="text-gray-600">Loading PDF viewer...</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const DesktopInvoicePDFViewer = dynamic(
-  () =>
-    import("./invoice-pdf-preview/desktop-pdf-viewer").then(
-      (mod) => mod.DesktopInvoicePDFViewer,
-    ),
+  () => {
+    return import("./invoice-pdf-preview/desktop-pdf-viewer").then((mod) => {
+      return mod.DesktopInvoicePDFViewer;
+    });
+  },
 
   {
     ssr: false,
-    loading: () => <DesktopPDFViewerModuleLoading />,
+    loading: () => {
+      return <DesktopPDFViewerModuleLoading />;
+    },
   },
 );
 
 const MobileInvoicePDFViewer = dynamic(
-  () =>
-    import("./invoice-pdf-preview/mobile-pdf-viewer").then(
-      (mod) => mod.MobileInvoicePDFViewer,
-    ),
+  () => {
+    return import("./invoice-pdf-preview/mobile-pdf-viewer").then((mod) => {
+      return mod.MobileInvoicePDFViewer;
+    });
+  },
   {
     ssr: false,
-    loading: () => <MobileInvoicePDFViewerModuleLoading />,
+    loading: () => {
+      return <MobileInvoicePDFViewerModuleLoading />;
+    },
   },
 );
 
-const PdfViewer = ({
-  invoiceData,
-  errorWhileGeneratingPdfIsShown,
-  isMobile,
-  qrCodeDataUrl,
-}: {
-  invoiceData: InvoiceData;
-  errorWhileGeneratingPdfIsShown: boolean;
-  isMobile: boolean;
-  qrCodeDataUrl: string;
-}) => {
-  // Render the appropriate template based on the selected template
-  const renderTemplate = () => {
-    switch (invoiceData.template) {
-      case "stripe":
-        return (
-          <StripeInvoicePdfTemplate
-            invoiceData={invoiceData}
-            qrCodeDataUrl={qrCodeDataUrl}
-          />
-        );
-      case "default":
-      default:
-        return (
-          <InvoicePdfTemplate
-            invoiceData={invoiceData}
-            qrCodeDataUrl={qrCodeDataUrl}
-          />
-        );
-    }
-  };
-
+const PdfViewer = ({ isMobile }: { isMobile: boolean }) => {
+  // Both viewers read the single PDF generated by `InvoicePdfInstanceProvider`.
+  //
   // Use Mobile PDF viewer for:
   // 1. Mobile devices
   // 2. Any in-app browser/WebView environment (new logic for platforms like X.com, LinkedIn, etc.)
   // This is due to limitations of the standard PDF viewer in these environments
   // https://github.com/diegomura/react-pdf/issues/714
   if (isMobile) {
-    return (
-      <MobileInvoicePDFViewer
-        invoiceData={invoiceData}
-        qrCodeDataUrl={qrCodeDataUrl}
-      />
-    );
+    return <MobileInvoicePDFViewer />;
   }
 
-  const template = renderTemplate();
-
   // Normal version for standard desktop browsers
-  return (
-    <DesktopInvoicePDFViewer
-      errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
-    >
-      {template}
-    </DesktopInvoicePDFViewer>
-  );
+  return <DesktopInvoicePDFViewer />;
 };
 
 const TAB_INVOICE_FORM = MOBILE_TABS_VALUES[0];
@@ -149,21 +119,15 @@ export function InvoiceClientPage({
   handleInvoiceDataChange,
   handleShareInvoice,
   isMobile,
-  errorWhileGeneratingPdfIsShown,
-  setErrorWhileGeneratingPdfIsShown,
   canShareInvoice,
-  qrCodeDataUrl,
-  setInvoiceFormHasErrors,
+  currentInvoiceFormDataRef,
 }: {
   invoiceDataState: InvoiceData;
   handleInvoiceDataChange: (invoiceData: InvoiceData) => void;
   handleShareInvoice: () => void;
   isMobile: boolean;
-  errorWhileGeneratingPdfIsShown: boolean;
-  setErrorWhileGeneratingPdfIsShown: (error: boolean) => void;
   canShareInvoice: boolean;
-  qrCodeDataUrl: string;
-  setInvoiceFormHasErrors: Dispatch<SetStateAction<boolean>>;
+  currentInvoiceFormDataRef: RefObject<(() => InvoiceData | null) | null>;
 }) {
   const appMetadata = getAppMetadata();
 
@@ -176,15 +140,65 @@ export function InvoiceClientPage({
   const defaultMobileTab =
     appMetadata?.lastVisitedMobileTab || DEFAULT_MOBILE_TAB;
 
+  const [activeMobileTab, setActiveMobileTab] =
+    useState<MobileTabsValues>(defaultMobileTab);
+
+  // Tabs whose panel has been opened at least once. Radix unmounts the panel of the
+  // inactive tab, and both panels lose something real when that happens:
+  //
+  // - the preview threw away the rendered document, so `react-pdf` parsed and rasterized
+  //   the very same PDF again (with its loading spinner in between) on every switch back
+  // - the form cancelled the debounced save that `InvoiceForm` schedules 500ms after a
+  //   keystroke, so an edit followed by a quick tab switch was silently lost
+  //
+  // Once a panel has been opened we keep it mounted and hide it with CSS instead. Panels
+  // stay lazy until their first visit, so the preview costs nothing for a user who never
+  // opens it.
+  const [openedMobileTabs, setOpenedMobileTabs] = useState<MobileTabsValues[]>(
+    () => {
+      return [defaultMobileTab];
+    },
+  );
+
+  /**
+   * Determines if a given mobile tab should remain mounted.
+   *
+   * This is useful for maintaining state or performance optimizations where certain tabs
+   * should not be unmounted when inactive, such as when using libraries that unmount inactive panels by default.
+   */
+  const keepMounted = (tab: MobileTabsValues) => {
+    // `forceMount` only accepts `true | undefined`, `false` would still force the mount
+    return openedMobileTabs.includes(tab) || undefined;
+  };
+
+  /**
+   * Filled in by `InvoiceForm`. The form only writes an edit through after a 500ms
+   * debounce, so leaving for the preview would otherwise show the previous version of the
+   * invoice for a moment.
+   */
+  const flushPendingFormChangesRef = useRef<(() => void) | null>(null);
+
   return (
     <>
       {isMobile ? (
         <div>
           <Tabs
-            defaultValue={defaultMobileTab}
+            value={activeMobileTab}
             className="w-full"
             onValueChange={(value) => {
               const newValue = value as MobileTabsValues;
+
+              // commit whatever was typed just before the switch, so the preview opens on
+              // the current invoice instead of catching up half a second later
+              flushPendingFormChangesRef.current?.();
+
+              setActiveMobileTab(newValue);
+
+              setOpenedMobileTabs((current) => {
+                return current.includes(newValue)
+                  ? current
+                  : [...current, newValue];
+              });
 
               // update the last visited mobile tab in the app metadata
               updateAppMetadata((current) => {
@@ -195,116 +209,152 @@ export function InvoiceClientPage({
               });
             }}
           >
-            <TabsList className="w-full">
-              <TabsTrigger value={TAB_INVOICE_FORM} className="flex-1">
-                <span className="flex items-center gap-1">
-                  <PencilIcon className="h-4 w-4" />
-                  Edit Invoice
-                </span>
-              </TabsTrigger>
-              <TabsTrigger value={TAB_INVOICE_PREVIEW} className="flex-1">
-                <span className="flex items-center gap-1">
-                  <FileTextIcon className="h-4 w-4" />
-                  Preview PDF
-                </span>
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value={TAB_INVOICE_FORM} className="mt-1">
+            <TabsContent
+              value={TAB_INVOICE_FORM}
+              forceMount={keepMounted(TAB_INVOICE_FORM)}
+              className="mt-1 data-[state=inactive]:hidden"
+            >
               <MobileFormScrollContainer className="h-[520px] overflow-auto rounded-lg border-b px-3 shadow-sm">
                 <InvoiceForm
                   invoiceData={invoiceDataState}
                   handleInvoiceDataChange={handleInvoiceDataChange}
                   isMobile
-                  setInvoiceFormHasErrors={setInvoiceFormHasErrors}
+                  currentInvoiceFormDataRef={currentInvoiceFormDataRef}
+                  flushPendingChangesRef={flushPendingFormChangesRef}
                 />
               </MobileFormScrollContainer>
             </TabsContent>
-            <TabsContent value={TAB_INVOICE_PREVIEW} className="mt-1">
+            <TabsContent
+              value={TAB_INVOICE_PREVIEW}
+              // `forceMount` keeps the panel in the tree, but it also stops Radix from
+              // hiding it, so the inactive state is hidden with CSS here instead
+              forceMount={keepMounted(TAB_INVOICE_PREVIEW)}
+              className="mt-1 data-[state=inactive]:hidden"
+            >
               <div className="flex h-[520px] w-full items-center justify-center">
-                <PdfViewer
-                  invoiceData={invoiceDataState}
-                  errorWhileGeneratingPdfIsShown={
-                    errorWhileGeneratingPdfIsShown
-                  }
-                  isMobile={isMobile}
-                  qrCodeDataUrl={qrCodeDataUrl}
-                />
+                <PdfViewer isMobile={isMobile} />
               </div>
             </TabsContent>
-          </Tabs>
-          <div className="sticky bottom-0 z-50 mt-2 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
-            <CustomTooltip
-              className={cn(!canShareInvoice && "bg-red-50")}
-              trigger={
-                <Button
-                  data-disabled={!canShareInvoice} // for better UX than 'disabled'
-                  onClick={handleShareInvoice}
-                  variant="outline"
-                  className={cn("mx-2 w-full")}
+            <div className="sticky bottom-0 z-50 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
+              {/*
+                The switch lives in the dock rather than at the top of the page, so it sits
+                in the same thumb zone as the two buttons it belongs with.
+
+                Styled after HeroUI's tabs: a pill-shaped track and a single indicator that
+                slides between the two tabs, instead of a background that appears on the
+                active trigger. The indicator is a plain element Radix never sees — with
+                exactly two equal-width tabs it is half the track wide and moves by its own
+                width, so there are no magic offsets to keep in sync.
+              */}
+              {/*
+                `gap-0` matters: the base `TabsList` spaces its triggers by 8px, which would
+                make each one 4px narrower than the indicator and leave the pill sitting
+                slightly off its label. With no gap, a trigger and the indicator are both
+                exactly half the track minus the 4px inset.
+              */}
+              <TabsList className="relative h-10 w-full gap-0 rounded-full bg-slate-200 p-1">
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "pointer-events-none absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-white",
+                    "shadow-[0_2px_4px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.06),0_0_1px_rgba(0,0,0,0.06)]",
+                    "transition-transform duration-300 [transition-timing-function:cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none",
+                    activeMobileTab === TAB_INVOICE_PREVIEW &&
+                      "translate-x-full",
+                  )}
+                />
+                <TabsTrigger
+                  value={TAB_INVOICE_FORM}
+                  // `bg-transparent` and `shadow-none` are load-bearing: without them the
+                  // trigger paints its own white pill on top of the sliding indicator
+                  className="z-10 flex-1 rounded-full text-slate-600 hover:bg-transparent hover:text-slate-900 data-[state=active]:bg-transparent data-[state=active]:text-slate-900 data-[state=active]:shadow-none"
+                  data-testid="edit-invoice-tab"
                 >
-                  <LinkIcon className="mr-1.5 size-4" />
-                  Get link
-                </Button>
-              }
-              content={
-                canShareInvoice ? (
-                  <div className="flex items-center gap-3 p-2">
-                    <div className="space-y-1">
-                      <p className="text-sm font-semibold text-slate-900">
-                        Share Invoice Online
-                      </p>
-                      <p className="text-pretty text-xs leading-relaxed text-slate-700">
-                        Generate a link to share this invoice with your clients.
-                        They can view and download it directly from their
-                        browser.
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    data-testid="share-invoice-tooltip-content"
-                    className="flex items-center gap-3 bg-red-50 p-3"
+                  <span className="flex items-center gap-1">
+                    <PencilIcon className="h-4 w-4" />
+                    Edit Invoice
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value={TAB_INVOICE_PREVIEW}
+                  className="z-10 flex-1 rounded-full text-slate-600 hover:bg-transparent hover:text-slate-900 data-[state=active]:bg-transparent data-[state=active]:text-slate-900 data-[state=active]:shadow-none"
+                  data-testid="preview-pdf-tab"
+                >
+                  <span className="flex items-center gap-1">
+                    <FileTextIcon className="h-4 w-4" />
+                    Preview PDF
+                  </span>
+                </TabsTrigger>
+              </TabsList>
+              <CustomTooltip
+                className={cn(!canShareInvoice && "bg-red-50")}
+                trigger={
+                  <Button
+                    data-disabled={!canShareInvoice} // for better UX than 'disabled'
+                    onClick={handleShareInvoice}
+                    variant="outline"
+                    className={cn("mx-2 w-full")}
                   >
-                    <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
-                    <div className="space-y-1">
-                      <p className="text-sm font-semibold text-red-800">
-                        Unable to Share Invoice
-                      </p>
-                      <p className="text-pretty text-xs leading-relaxed text-red-700">
-                        Invoices with logos cannot be shared. Please remove the
-                        logo to generate a shareable link. You can still
-                        download the invoice as PDF and share it.
-                      </p>
+                    <LinkIcon className="mr-1.5 size-4" />
+                    Get link
+                  </Button>
+                }
+                content={
+                  canShareInvoice ? (
+                    <div className="flex items-center gap-3 p-2">
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold text-slate-900">
+                          Share Invoice Online
+                        </p>
+                        <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                          Generate a link to share this invoice with your
+                          clients. They can view and download it directly from
+                          their browser.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                )
-              }
-            />
-            <InvoicePDFDownloadLink
-              invoiceData={invoiceDataState}
-              errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
-              setErrorWhileGeneratingPdfIsShown={
-                setErrorWhileGeneratingPdfIsShown
-              }
-              qrCodeDataUrl={qrCodeDataUrl}
-              isMobile={isMobile}
-            />
-          </div>
+                  ) : (
+                    <div
+                      data-testid="share-invoice-tooltip-content"
+                      className="flex items-center gap-3 bg-red-50 p-3"
+                    >
+                      <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold text-red-800">
+                          Unable to Share Invoice
+                        </p>
+                        <p className="text-pretty text-xs leading-relaxed text-red-700">
+                          Invoices with logos cannot be shared. Please remove
+                          the logo to generate a shareable link. You can still
+                          download the invoice as PDF and share it.
+                        </p>
+                      </div>
+                    </div>
+                  )
+                }
+              />
+              <InvoicePDFDownloadLink
+                invoiceData={invoiceDataState}
+                isMobile={isMobile}
+              />
+            </div>
+          </Tabs>
           {/** Mobile version */}
           <div className="relative mx-2 mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
-            <LocalStorageNotice />
             {invoiceLastUpdatedAtFormatted ? (
               <>
-                <span
-                  className="hidden h-3 w-px bg-zinc-400 min-[453px]:block"
-                  aria-hidden="true"
-                />
-                <span>
+                <span data-testid="mobile-invoice-last-updated">
                   <span className="font-semibold">Invoice last updated:</span>{" "}
                   {invoiceLastUpdatedAtFormatted}
                 </span>
               </>
             ) : null}
+            {/* Separator */}
+            <span
+              className="hidden h-3 w-px bg-zinc-400 min-[453px]:block"
+              aria-hidden="true"
+            />
+            <LocalStorageNotice />
           </div>
 
           <div
@@ -348,7 +398,7 @@ export function InvoiceClientPage({
               <InvoiceForm
                 invoiceData={invoiceDataState}
                 handleInvoiceDataChange={handleInvoiceDataChange}
-                setInvoiceFormHasErrors={setInvoiceFormHasErrors}
+                currentInvoiceFormDataRef={currentInvoiceFormDataRef}
               />
             </div>
 
@@ -384,7 +434,7 @@ export function InvoiceClientPage({
                       className="hidden h-3 w-px bg-zinc-400 sm:block"
                       aria-hidden="true"
                     />
-                    <span>
+                    <span data-testid="desktop-invoice-last-updated">
                       <span className="font-semibold">
                         Invoice last updated:
                       </span>{" "}
@@ -394,12 +444,7 @@ export function InvoiceClientPage({
                 ) : null}
               </div>
             </div>
-            <PdfViewer
-              invoiceData={invoiceDataState}
-              errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
-              isMobile={false}
-              qrCodeDataUrl={qrCodeDataUrl}
-            />
+            <PdfViewer isMobile={false} />
             <div
               className="absolute -bottom-6 right-0 text-right text-xs text-zinc-800"
               data-testid="desktop-terms-of-service-link"

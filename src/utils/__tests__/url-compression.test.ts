@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  compressInvoiceData,
-  decompressInvoiceData,
-  INVOICE_KEY_COMPRESSION_MAP,
-} from "../url-compression";
+
 import {
   type InvoiceData,
   type InvoiceItemData,
@@ -14,7 +10,35 @@ import {
   buyerSchema,
   invoiceItemSchema,
 } from "@/app/schema";
+
+import {
+  compressInvoiceData,
+  decompressInvoiceData,
+  INVOICE_KEY_COMPRESSION_MAP,
+} from "../url-compression";
 import { MOCK_INVOICE_DATA, MOCK_INVOICE_ITEM_DATA } from "./data";
+
+// Extract all keys recursively from the mock data. Declared at module scope so its
+// recursion guards are not conditionals inside `it`.
+function getAllKeys(obj: unknown, keySet = new Set<string>()): Set<string> {
+  if (obj === null || typeof obj !== "object") {
+    return keySet;
+  }
+
+  if (Array.isArray(obj)) {
+    obj.forEach((item) => {
+      return getAllKeys(item, keySet);
+    });
+    return keySet;
+  }
+
+  Object.keys(obj).forEach((key) => {
+    keySet.add(key);
+    getAllKeys(obj[key as keyof typeof obj], keySet);
+  });
+
+  return keySet;
+}
 
 describe("URL Compression Utilities", () => {
   describe("compressInvoiceData", () => {
@@ -419,9 +443,7 @@ describe("URL Compression Utilities", () => {
         notes: undefined,
       };
 
-      const compressedData = compressInvoiceData(
-        dataWithUndefined as unknown as InvoiceData,
-      );
+      const compressedData = compressInvoiceData(dataWithUndefined);
       const decompressedData = decompressInvoiceData(compressedData);
 
       expect(decompressedData.invoiceNumberObject).toBeUndefined();
@@ -467,9 +489,7 @@ describe("URL Compression Utilities", () => {
         ],
       };
 
-      const compressedData = compressInvoiceData(
-        complexData as unknown as InvoiceData,
-      );
+      const compressedData = compressInvoiceData(complexData);
       const decompressedData = decompressInvoiceData(compressedData);
 
       expect(decompressedData).toEqual(complexData);
@@ -494,7 +514,7 @@ describe("URL Compression Utilities", () => {
       const compressedNull = compressInvoiceData(
         null as unknown as InvoiceData,
       );
-      expect(compressedNull).toBe(null);
+      expect(compressedNull).toBeNull();
     });
 
     it("should maintain data types after compression/decompression", () => {
@@ -557,79 +577,31 @@ describe("URL Compression Utilities", () => {
           ...invoiceItemKeys,
         ];
 
-        // Check that each key exists in INVOICE_KEY_COMPRESSION_MAP
-        const missingKeys: string[] = [];
-
-        allKeys.forEach((key) => {
-          if (!(key in INVOICE_KEY_COMPRESSION_MAP)) {
-            missingKeys.push(key);
-          }
+        // Check that each key exists in INVOICE_KEY_COMPRESSION_MAP.
+        // A failure prints the missing keys, so no extra logging is needed.
+        const missingKeys = allKeys.filter((key) => {
+          return !(key in INVOICE_KEY_COMPRESSION_MAP);
         });
 
         expect(missingKeys).toEqual([]);
-
-        if (missingKeys.length > 0) {
-          console.log(
-            "Missing keys in INVOICE_KEY_COMPRESSION_MAP:",
-            missingKeys,
-          );
-        }
       });
 
       it("should not have duplicate compressed values in INVOICE_KEY_COMPRESSION_MAP", () => {
         const compressedValues = Object.values(INVOICE_KEY_COMPRESSION_MAP);
-        const uniqueValues = Array.from(new Set(compressedValues));
+        const duplicates = compressedValues.filter((value, index) => {
+          return compressedValues.indexOf(value) !== index;
+        });
 
-        expect(compressedValues).toHaveLength(uniqueValues.length);
-
-        if (compressedValues.length !== uniqueValues.length) {
-          const duplicates = compressedValues.filter(
-            (value, index) => compressedValues.indexOf(value) !== index,
-          );
-          console.log("Duplicate compressed values:", duplicates);
-        }
+        expect(duplicates).toEqual([]);
       });
 
       it("should have a INVOICE_KEY_COMPRESSION_MAP entry for every key used in MOCK_INVOICE_DATA", () => {
-        // Extract all keys recursively from the mock data
-        function getAllKeys(
-          obj: unknown,
-          keySet = new Set<string>(),
-        ): Set<string> {
-          if (obj === null || typeof obj !== "object") {
-            return keySet;
-          }
-
-          if (Array.isArray(obj)) {
-            obj.forEach((item) => getAllKeys(item, keySet));
-            return keySet;
-          }
-
-          Object.keys(obj).forEach((key) => {
-            keySet.add(key);
-            getAllKeys(obj[key as keyof typeof obj], keySet);
-          });
-
-          return keySet;
-        }
-
         const allKeysInMockData = getAllKeys(MOCK_INVOICE_DATA);
-        const missingKeys: string[] = [];
-
-        allKeysInMockData.forEach((key) => {
-          if (!(key in INVOICE_KEY_COMPRESSION_MAP)) {
-            missingKeys.push(key);
-          }
+        const missingKeys = Array.from(allKeysInMockData).filter((key) => {
+          return !(key in INVOICE_KEY_COMPRESSION_MAP);
         });
 
         expect(missingKeys).toStrictEqual([]);
-
-        if (missingKeys.length > 0) {
-          console.log(
-            "Keys in MOCK_INVOICE_DATA missing from INVOICE_KEY_COMPRESSION_MAP:",
-            missingKeys,
-          );
-        }
       });
     });
   });
@@ -651,12 +623,14 @@ describe("URL Compression Utilities", () => {
     it("should demonstrate compression effectiveness with multiple items", () => {
       const largeInvoiceData = {
         ...MOCK_INVOICE_DATA,
-        items: Array.from({ length: 10 }, (_, index) => ({
-          ...MOCK_INVOICE_ITEM_DATA,
-          name: `Product ${index + 1}`,
-          amount: index + 1,
-          netPrice: (index + 1) * 10.5,
-        })),
+        items: Array.from({ length: 10 }, (_, index) => {
+          return {
+            ...MOCK_INVOICE_ITEM_DATA,
+            name: `Product ${index + 1}`,
+            amount: index + 1,
+            netPrice: (index + 1) * 10.5,
+          };
+        }),
       };
 
       const originalJson = JSON.stringify(largeInvoiceData);
@@ -671,9 +645,9 @@ describe("URL Compression Utilities", () => {
       expect(reductionRatio).toBeGreaterThan(0.25);
 
       // Log the size reduction for visibility
-      console.log(`Original size: ${originalJson.length} characters`);
-      console.log(`Compressed size: ${compressedJson.length} characters`);
-      console.log(`Size reduction: ${(reductionRatio * 100).toFixed(1)}%`);
+      console.info(`Original size: ${originalJson.length} characters`);
+      console.info(`Compressed size: ${compressedJson.length} characters`);
+      console.info(`Size reduction: ${(reductionRatio * 100).toFixed(1)}%`);
     });
   });
 });

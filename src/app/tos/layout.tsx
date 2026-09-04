@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { Footer } from "@/app/(components)/footer";
 import { Header } from "@/app/(components)/header";
 import {
@@ -5,7 +7,6 @@ import {
   STATIC_ASSETS_URL,
   TWITTER_CREATOR,
 } from "@/config";
-import type { Metadata } from "next";
 
 export const dynamic = "force-static";
 

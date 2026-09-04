@@ -1,4 +1,5 @@
 import type { InvoiceItemData } from "@/app/schema";
+
 import { calculateItemTotals } from "./calculate-item-totals";
 
 /**
@@ -29,5 +30,7 @@ export function hasItemTotalsChanged(item: InvoiceItemData): boolean {
 export function hasAnyItemTotalsChanged(
   items: ReadonlyArray<InvoiceItemData>,
 ): boolean {
-  return items.some(hasItemTotalsChanged);
+  return items.some((item) => {
+    return hasItemTotalsChanged(item);
+  });
 }

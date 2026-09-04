@@ -1,5 +1,18 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
+import dayjs from "dayjs";
+import { memo, useCallback, useEffect, useState, type RefObject } from "react";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
+import { useDebouncedCallback } from "use-debounce";
+
+import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(app)/utils/app-local-storage";
+import { formatDateWithLocale } from "@/app/(app)/utils/format-date-with-locale";
+import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   accordionSchema,
@@ -25,37 +38,30 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
 import type { NonReadonly, Prettify } from "@/types";
+
+import { AlertIcon, ErrorMessage } from "./common";
+import { BuyerInformation } from "./sections/buyer-information";
+import { GeneralInformation } from "./sections/general-information";
+import { InvoiceItems } from "./sections/invoice-items";
+import { SellerInformation } from "./sections/seller-information";
 import { calculateInvoiceTotal } from "./utils/calculate-invoice-total";
 import { calculateItemTotals } from "./utils/calculate-item-totals";
 import { formErrorsToToast } from "./utils/form-errors-to-toast";
 import { hasAnyItemTotalsChanged } from "./utils/has-item-totals-changed";
 import { parseValidatedInvoiceItems } from "./utils/validated-invoice-items";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as Sentry from "@sentry/nextjs";
-import dayjs from "dayjs";
-import {
-  memo,
-  useCallback,
-  useEffect,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
-import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
-import { toast } from "sonner";
-import { useDebouncedCallback } from "use-debounce";
-
-import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
-import { AlertIcon, ErrorMessage } from "./common";
-import { BuyerInformation } from "./sections/buyer-information";
-import { GeneralInformation } from "./sections/general-information";
-import { InvoiceItems } from "./sections/invoice-items";
-import { SellerInformation } from "./sections/seller-information";
-
+/**
+ * Time in milliseconds to debounce updates in the invoice form,
+ * e.g. for delayed applying of changes before persisting/syncing.
+ */
 const DEBOUNCE_TIMEOUT = 500;
 
+/**
+ * Default values for the invoice form's accordion sections.
+ * These correspond to the different sections of the form that can be expanded or collapsed.
+ */
 const DEFAULT_ACCORDION_VALUES = [
   "general",
   "seller",
@@ -74,17 +80,28 @@ interface InvoiceFormProps {
   invoiceData: InvoiceData;
   handleInvoiceDataChange: (updatedData: InvoiceData) => void;
   isMobile?: boolean;
-  setInvoiceFormHasErrors: Dispatch<SetStateAction<boolean>>;
+  /**
+   * Filled in with a getter returning the form's current values, or `null` when the form
+   * has validation errors. The parent only needs this when the user clicks "Get link", so
+   * it asks at that moment rather than mirroring form state into its own render.
+   */
+  currentInvoiceFormDataRef?: RefObject<(() => InvoiceData | null) | null>;
+  /**
+   * Filled in with a function that commits a pending (debounced) edit immediately, so the
+   * parent can flush the form before the user's attention moves elsewhere.
+   */
+  flushPendingChangesRef?: RefObject<(() => void) | null>;
 }
 
 export const InvoiceForm = memo(function InvoiceForm({
   invoiceData,
   handleInvoiceDataChange,
   isMobile = false,
-  setInvoiceFormHasErrors,
+  currentInvoiceFormDataRef,
+  flushPendingChangesRef,
 }: InvoiceFormProps) {
   const form = useForm<InvoiceData>({
-    resolver: zodResolver(invoiceSchema),
+    resolver: zodResolverForOutput(invoiceSchema),
     defaultValues: invoiceData,
     mode: "onChange",
   });
@@ -115,6 +132,19 @@ export const InvoiceForm = memo(function InvoiceForm({
     dayjs(paymentDue).isAfter(dayjs(dateOfIssue).add(14, "days")) ||
     dayjs(paymentDue).isSame(dayjs(dateOfIssue).add(14, "days"));
 
+  // Helper texts quote dates back to the user, so they are formatted the way the
+  // PDF will render them: the invoice's date format AND its language.
+  const formattedDateOfIssue = formatDateWithLocale({
+    date: dateOfIssue,
+    selectedDateFormat,
+    language,
+  });
+  const formattedSuggestedPaymentDue = formatDateWithLocale({
+    date: dayjs(dateOfIssue).add(14, "days"),
+    selectedDateFormat,
+    language,
+  });
+
   const { fields, append } = useFieldArray({
     control,
     name: "items",
@@ -131,16 +161,16 @@ export const InvoiceForm = memo(function InvoiceForm({
     const validatedItemsResult = parseValidatedInvoiceItems(invoiceItems);
 
     if (!validatedItemsResult.success) {
+      // Not reported to Sentry on purpose: this branch is the expected state while
+      // someone is still typing (a cleared amount field, a half-entered VAT), so it
+      // fires constantly and says nothing about a broken app.
       console.error("Invalid items:", validatedItemsResult.error);
-
-      Sentry.captureException(validatedItemsResult.error);
 
       return;
     }
 
     const total = calculateInvoiceTotal(invoiceItems);
 
-    // eslint-disable-next-line no-console
     console.info(
       "[useEffect] recalculating totals because invoice items changed",
       {
@@ -161,7 +191,9 @@ export const InvoiceForm = memo(function InvoiceForm({
 
     // Only update if there are actual changes
     const updatedItems = invoiceItems
-      .map(calculateItemTotals)
+      .map((item) => {
+        return calculateItemTotals(item);
+      })
       .filter(Boolean) as InvoiceItemData[];
 
     // Batch updates
@@ -174,7 +206,9 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   // top level of component
   const debouncedShowFormErrorsToast = useDebouncedCallback(
-    () => formErrorsToToast({ errors, isMobile }),
+    () => {
+      return formErrorsToToast({ errors, isMobile });
+    },
     isMobile ? 3000 : 1000,
   );
 
@@ -187,8 +221,6 @@ export const InvoiceForm = memo(function InvoiceForm({
       toast.dismiss("invalid-invoice-url-error-toast");
       toast.dismiss("unable-to-share-invoice-form-errors-toast");
 
-      setInvoiceFormHasErrors(false);
-
       // TODO: double check if we need this code, because we already save to local storage in the page.client.tsx (parent component) (line: 267) useEffect "Save to localStorage whenever data changes on form update"
       try {
         // trigger form validations
@@ -199,8 +231,6 @@ export const InvoiceForm = memo(function InvoiceForm({
           // Debounce error toast to avoid showing too fast
           debouncedShowFormErrorsToast();
 
-          setInvoiceFormHasErrors(true);
-
           return;
         }
 
@@ -208,12 +238,19 @@ export const InvoiceForm = memo(function InvoiceForm({
 
         const stringifiedData = JSON.stringify(validatedData);
 
-        localStorage.setItem(PDF_DATA_LOCAL_STORAGE_KEY, stringifiedData);
+        // Persisting is best-effort and must never gate `onSubmit`: when storage is
+        // unavailable (an iOS in-app webview exposes `localStorage` as `null`) an
+        // unguarded write threw here, so the edit never reached the parent and the PDF
+        // preview stayed frozen on the previous version for the whole session.
+        setAppStorageItem({
+          key: PDF_DATA_LOCAL_STORAGE_KEY,
+          value: stringifiedData,
+        });
 
         // pass the updated data to the parent component, to update the invoice data state (use state hook)
         onSubmit(validatedData);
       } catch (error) {
-        console.error("Error saving to local storage:", error);
+        console.error("Error regenerating invoice from form change:", error);
 
         Sentry.captureException(error);
       }
@@ -222,16 +259,73 @@ export const InvoiceForm = memo(function InvoiceForm({
     DEBOUNCE_TIMEOUT,
   );
 
+  // Let the parent read the form at click time: both whether it is valid, and what is
+  // currently in it.
+  //
+  // Both used to lag by DEBOUNCE_TIMEOUT. The validity flag was pushed up from inside
+  // debouncedRegeneratePdfOnFormChange, and the data the parent shares is only committed
+  // on that same debounce. `mode: "onChange"` renders the inline error immediately, so
+  // for those 500ms the user could see "Net price is required" and still have "Get link"
+  // produce a link for an invalid invoice, and a click just after any edit shared the
+  // pre-edit snapshot. Reading on demand cannot go stale, and the answer is only ever
+  // needed in an event handler — never during render.
+  //
+  // `formState.errors` covers both validation paths: onChange populates it per field, and
+  // the debounced trigger(undefined) fills in fields the user never touched.
+  useEffect(() => {
+    if (!currentInvoiceFormDataRef) {
+      return;
+    }
+
+    // This function allows the parent component to access the current state of the invoice form data.
+    // It checks if there are any validation errors in the form (via formState.errors).
+    // If errors exist, it returns null, indicating the form data is not currently valid.
+    // Otherwise, it returns the current form values.
+    currentInvoiceFormDataRef.current = () => {
+      if (Object.keys(form.formState.errors).length > 0) {
+        // There are validation errors; signal invalid data to the parent.
+        return null;
+      }
+      // No validation errors; provide the current form values to the parent.
+      return form.getValues();
+    };
+
+    return () => {
+      currentInvoiceFormDataRef.current = null;
+    };
+  }, [form, currentInvoiceFormDataRef]);
+
   // IMPORTANT
   // TODO: rewrite to subscribe()? https://react-hook-form.com/docs/useform/subscribe
   // subscribe to form changes to regenerate pdf on every input change
   useEffect(() => {
+    // oxlint-disable-next-line react/incompatible-library
     const subscription = watch((value) => {
       void debouncedRegeneratePdfOnFormChange(value as unknown as InvoiceData);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      return subscription.unsubscribe();
+    };
   }, [debouncedRegeneratePdfOnFormChange, watch]);
+
+  // Hands the parent a way to commit a pending edit right away instead of waiting out the
+  // debounce. The mobile tabs use it when the user leaves the form for the PDF preview, so
+  // the preview shows what was just typed instead of the previous version for half a second.
+  useEffect(() => {
+    if (!flushPendingChangesRef) {
+      return;
+    }
+
+    flushPendingChangesRef.current = () => {
+      // a no-op when nothing is pending
+      void debouncedRegeneratePdfOnFormChange.flush();
+    };
+
+    return () => {
+      flushPendingChangesRef.current = null;
+    };
+  }, [debouncedRegeneratePdfOnFormChange, flushPendingChangesRef]);
 
   const template = useWatch({ control, name: "template" });
   const taxLabelText = useWatch({ control, name: "taxLabelText" }) || "VAT";
@@ -245,7 +339,9 @@ export const InvoiceForm = memo(function InvoiceForm({
     (index: number) => {
       setValue(
         "items",
-        invoiceItems.filter((_, i) => i !== index),
+        invoiceItems.filter((_, i) => {
+          return i !== index;
+        }),
         {
           shouldValidate: true,
           shouldTouch: true,
@@ -290,9 +386,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   >(() => {
     // Try to load from localStorage
     try {
-      const savedState = localStorage.getItem(
-        ACCORDION_STATE_LOCAL_STORAGE_KEY,
-      );
+      const savedState = getAppStorageItem(ACCORDION_STATE_LOCAL_STORAGE_KEY);
 
       if (savedState) {
         const parsedState = JSON.parse(savedState) as AccordionState;
@@ -301,8 +395,12 @@ export const InvoiceForm = memo(function InvoiceForm({
 
         if (validatedState.success) {
           const arrayOfOpenSections = Object.entries(validatedState.data)
-            .filter(([_, isOpen]) => isOpen)
-            .map(([section]) => section) as Prettify<AccordionKeys>;
+            .filter(([_, isOpen]) => {
+              return isOpen;
+            })
+            .map(([section]) => {
+              return section;
+            }) as Prettify<AccordionKeys>;
 
           return arrayOfOpenSections;
         }
@@ -332,10 +430,10 @@ export const InvoiceForm = memo(function InvoiceForm({
         invoiceItems: value.includes(ACCORDION_ITEMS),
       });
 
-      localStorage.setItem(
-        ACCORDION_STATE_LOCAL_STORAGE_KEY,
-        JSON.stringify(stateToSave),
-      );
+      setAppStorageItem({
+        key: ACCORDION_STATE_LOCAL_STORAGE_KEY,
+        value: JSON.stringify(stateToSave),
+      });
     } catch (error) {
       console.error("Error saving accordion state:", error);
 
@@ -453,17 +551,19 @@ export const InvoiceForm = memo(function InvoiceForm({
             <Controller
               name="total"
               control={control}
-              render={({ field }) => (
-                <ReadOnlyMoneyInput
-                  {...field}
-                  id={`total`}
-                  currency={currency}
-                  value={field.value.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                />
-              )}
+              render={({ field }) => {
+                return (
+                  <ReadOnlyMoneyInput
+                    {...field}
+                    id={`total`}
+                    currency={currency}
+                    value={field.value.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  />
+                );
+              }}
             />
           </div>
           {errors.total ? (
@@ -477,7 +577,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         </div>
 
         {/* Payment Method (Only show for default template) */}
-        {template === "default" && (
+        {template === "default" ? (
           <div>
             <div className="relative mb-2 mt-6 flex items-center justify-between">
               <Label htmlFor={`paymentMethod`} className="">
@@ -489,16 +589,18 @@ export const InvoiceForm = memo(function InvoiceForm({
                 <Controller
                   name={`paymentMethodFieldIsVisible`}
                   control={control}
-                  render={({ field: { value, onChange, ...field } }) => (
-                    <Switch
-                      {...field}
-                      id={`paymentMethodFieldIsVisible`}
-                      checked={value}
-                      onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                      data-testid="paymentMethodFieldIsVisible"
-                    />
-                  )}
+                  render={({ field: { value, onChange, ...field } }) => {
+                    return (
+                      <Switch
+                        {...field}
+                        id={`paymentMethodFieldIsVisible`}
+                        checked={value}
+                        onCheckedChange={onChange}
+                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        data-testid="paymentMethodFieldIsVisible"
+                      />
+                    );
+                  }}
                 />
                 <CustomTooltip
                   trigger={
@@ -514,20 +616,22 @@ export const InvoiceForm = memo(function InvoiceForm({
             <Controller
               name="paymentMethod"
               control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  id={`paymentMethod`}
-                  type="text"
-                  className="mt-1"
-                />
-              )}
+              render={({ field }) => {
+                return (
+                  <Input
+                    {...field}
+                    id={`paymentMethod`}
+                    type="text"
+                    className="mt-1"
+                  />
+                );
+              }}
             />
             {errors.paymentMethod ? (
               <ErrorMessage>{errors.paymentMethod.message}</ErrorMessage>
             ) : null}
           </div>
-        )}
+        ) : null}
 
         {/* Payment Due */}
         <div>
@@ -538,9 +642,16 @@ export const InvoiceForm = memo(function InvoiceForm({
             <Controller
               name="paymentDue"
               control={control}
-              render={({ field }) => (
-                <Input {...field} id={`paymentDue`} type="date" className="" />
-              )}
+              render={({ field }) => {
+                return (
+                  <Input
+                    {...field}
+                    id={`paymentDue`}
+                    type="date"
+                    className=""
+                  />
+                );
+              }}
             />
             {errors.paymentDue ? (
               <ErrorMessage>{errors.paymentDue.message}</ErrorMessage>
@@ -552,7 +663,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                 <span className="flex items-center text-balance text-amber-800">
                   <AlertIcon />
                   Payment due date is before date of issue (
-                  {dayjs(dateOfIssue).format(selectedDateFormat)})
+                  {formattedDateOfIssue})
                 </span>
                 <ButtonHelper
                   onClick={() => {
@@ -564,11 +675,8 @@ export const InvoiceForm = memo(function InvoiceForm({
                   }}
                 >
                   <span className="text-pretty">
-                    Set payment due date to{" "}
-                    {dayjs(dateOfIssue)
-                      .add(14, "days")
-                      .format(selectedDateFormat)}{" "}
-                    (14 days from issue date)
+                    Set payment due date to {formattedSuggestedPaymentDue} (14
+                    days from issue date)
                   </span>
                 </ButtonHelper>
               </InputHelperMessage>
@@ -590,11 +698,8 @@ export const InvoiceForm = memo(function InvoiceForm({
                   }}
                 >
                   <span className="text-pretty">
-                    Set payment due date to{" "}
-                    {dayjs(dateOfIssue)
-                      .add(14, "days")
-                      .format(selectedDateFormat)}{" "}
-                    (14 days from issue date)
+                    Set payment due date to {formattedSuggestedPaymentDue} (14
+                    days from issue date)
                   </span>
                 </ButtonHelper>
               </InputHelperMessage>
@@ -614,15 +719,17 @@ export const InvoiceForm = memo(function InvoiceForm({
               <Controller
                 name={`notesFieldIsVisible`}
                 control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`notesFieldIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                  />
-                )}
+                render={({ field: { value, onChange, ...field } }) => {
+                  return (
+                    <Switch
+                      {...field}
+                      id={`notesFieldIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    />
+                  );
+                }}
               />
               <CustomTooltip
                 trigger={
@@ -635,15 +742,17 @@ export const InvoiceForm = memo(function InvoiceForm({
           <Controller
             name="notes"
             control={control}
-            render={({ field }) => (
-              <Textarea
-                {...field}
-                id={`notes`}
-                rows={3}
-                className=""
-                data-testid="notes"
-              />
-            )}
+            render={({ field }) => {
+              return (
+                <Textarea
+                  {...field}
+                  id={`notes`}
+                  rows={3}
+                  className=""
+                  data-testid="notes"
+                />
+              );
+            }}
           />
           {errors?.notes ? (
             <ErrorMessage>{errors?.notes?.message}</ErrorMessage>
@@ -662,16 +771,18 @@ export const InvoiceForm = memo(function InvoiceForm({
               <Controller
                 name={`qrCodeIsVisible`}
                 control={control}
-                render={({ field: { value, onChange, ...field } }) => (
-                  <Switch
-                    {...field}
-                    id={`qrCodeIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                    aria-label="Show QR Code in PDF"
-                  />
-                )}
+                render={({ field: { value, onChange, ...field } }) => {
+                  return (
+                    <Switch
+                      {...field}
+                      id={`qrCodeIsVisible`}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      aria-label="Show QR Code in PDF"
+                    />
+                  );
+                }}
               />
               <CustomTooltip
                 trigger={<Label htmlFor={`qrCodeIsVisible`}>Show in PDF</Label>}
@@ -689,15 +800,17 @@ export const InvoiceForm = memo(function InvoiceForm({
               <Controller
                 name="qrCodeData"
                 control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    id={`qrCodeData`}
-                    type="text"
-                    placeholder="Enter URL or text to encode"
-                    data-testid="qrCodeData"
-                  />
-                )}
+                render={({ field }) => {
+                  return (
+                    <Input
+                      {...field}
+                      id={`qrCodeData`}
+                      type="text"
+                      placeholder="Enter URL or text to encode"
+                      data-testid="qrCodeData"
+                    />
+                  );
+                }}
               />
               <InputHelperMessage>
                 Enter any text or URL to generate a QR code. The QR code will
@@ -716,15 +829,17 @@ export const InvoiceForm = memo(function InvoiceForm({
               <Controller
                 name="qrCodeDescription"
                 control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    id={`qrCodeDescription`}
-                    type="text"
-                    placeholder="Enter a description for the QR code"
-                    data-testid="qrCodeDescription"
-                  />
-                )}
+                render={({ field }) => {
+                  return (
+                    <Input
+                      {...field}
+                      id={`qrCodeDescription`}
+                      type="text"
+                      placeholder="Enter a description for the QR code"
+                      data-testid="qrCodeDescription"
+                    />
+                  );
+                }}
               />
               <InputHelperMessage>
                 Optional text that will be displayed below the QR code in the
@@ -740,7 +855,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         {/*
             Stripe template doesn't have these fields
         */}
-        {invoiceData.template === "default" && (
+        {invoiceData.template === "default" ? (
           <>
             <fieldset className="rounded-md border px-4 pb-4">
               <legend className="text-base font-semibold lg:text-lg">
@@ -752,16 +867,18 @@ export const InvoiceForm = memo(function InvoiceForm({
                   <Controller
                     name="personAuthorizedToReceiveFieldIsVisible"
                     control={control}
-                    render={({ field: { value, onChange, ...field } }) => (
-                      <Switch
-                        {...field}
-                        id="personAuthorizedToReceiveFieldIsVisible"
-                        checked={value}
-                        onCheckedChange={onChange}
-                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                        aria-label="Show Person Authorized to Receive in PDF"
-                      />
-                    )}
+                    render={({ field: { value, onChange, ...field } }) => {
+                      return (
+                        <Switch
+                          {...field}
+                          id="personAuthorizedToReceiveFieldIsVisible"
+                          checked={value}
+                          onCheckedChange={onChange}
+                          className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                          aria-label="Show Person Authorized to Receive in PDF"
+                        />
+                      );
+                    }}
                   />
                   <CustomTooltip
                     trigger={
@@ -784,15 +901,17 @@ export const InvoiceForm = memo(function InvoiceForm({
                 <Controller
                   name="personAuthorizedToReceiveName"
                   control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id="personAuthorizedToReceiveName"
-                      type="text"
-                      placeholder="Enter name of person authorized to receive"
-                      data-testid="personAuthorizedToReceiveName"
-                    />
-                  )}
+                  render={({ field }) => {
+                    return (
+                      <Input
+                        {...field}
+                        id="personAuthorizedToReceiveName"
+                        type="text"
+                        placeholder="Enter name of person authorized to receive"
+                        data-testid="personAuthorizedToReceiveName"
+                      />
+                    );
+                  }}
                 />
                 <InputHelperMessage>
                   Name displayed above the signature line in the PDF.
@@ -815,16 +934,18 @@ export const InvoiceForm = memo(function InvoiceForm({
                   <Controller
                     name="personAuthorizedToIssueFieldIsVisible"
                     control={control}
-                    render={({ field: { value, onChange, ...field } }) => (
-                      <Switch
-                        {...field}
-                        id="personAuthorizedToIssueFieldIsVisible"
-                        checked={value}
-                        onCheckedChange={onChange}
-                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
-                        aria-label="Show Person Authorized to Issue in PDF"
-                      />
-                    )}
+                    render={({ field: { value, onChange, ...field } }) => {
+                      return (
+                        <Switch
+                          {...field}
+                          id="personAuthorizedToIssueFieldIsVisible"
+                          checked={value}
+                          onCheckedChange={onChange}
+                          className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                          aria-label="Show Person Authorized to Issue in PDF"
+                        />
+                      );
+                    }}
                   />
                   <CustomTooltip
                     trigger={
@@ -847,15 +968,17 @@ export const InvoiceForm = memo(function InvoiceForm({
                 <Controller
                   name="personAuthorizedToIssueName"
                   control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id="personAuthorizedToIssueName"
-                      type="text"
-                      placeholder="Enter name of person authorized to issue"
-                      data-testid="personAuthorizedToIssueName"
-                    />
-                  )}
+                  render={({ field }) => {
+                    return (
+                      <Input
+                        {...field}
+                        id="personAuthorizedToIssueName"
+                        type="text"
+                        placeholder="Enter name of person authorized to issue"
+                        data-testid="personAuthorizedToIssueName"
+                      />
+                    );
+                  }}
                 />
                 <InputHelperMessage>
                   Name displayed above the signature line in the PDF.
@@ -868,7 +991,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               </div>
             </fieldset>
           </>
-        )}
+        ) : null}
       </div>
     </form>
   );

@@ -8,16 +8,19 @@ const Label = React.memo(
   React.forwardRef<
     HTMLLabelElement,
     React.LabelHTMLAttributes<HTMLLabelElement>
-  >(({ className, ...props }, ref) => (
-    <label
-      ref={ref}
-      className={cn(
-        "block text-pretty text-xs font-medium text-gray-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-slate-50",
-        className,
-      )}
-      {...props}
-    />
-  )),
+  >(({ className, ...props }, ref) => {
+    return (
+      // oxlint-disable-next-line jsx-a11y/label-has-associated-control -- primitive wrapper; callers pass `htmlFor`
+      <label
+        ref={ref}
+        className={cn(
+          "block text-pretty text-xs font-medium text-gray-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-slate-50",
+          className,
+        )}
+        {...props}
+      />
+    );
+  }),
 );
 Label.displayName = "Label";
 

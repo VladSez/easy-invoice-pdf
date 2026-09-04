@@ -16,9 +16,14 @@ const telegramMessageSchema = z
     text: z
       .string()
       .min(1, "Text cannot be empty")
-      .refine((val) => val === "/generate", {
-        message: "Only '/generate' command is supported",
-      })
+      .refine(
+        (val) => {
+          return val === "/generate";
+        },
+        {
+          message: "Only '/generate' command is supported",
+        },
+      )
       .optional(),
     entities: z
       .array(

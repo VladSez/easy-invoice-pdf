@@ -1,26 +1,26 @@
 "use client";
 
-import { type InvoiceData } from "@/app/schema";
-import { ProjectLogo } from "@/components/etc/project-logo";
-import { Button } from "@/components/ui/button";
-import { HowItWorksVideoDialog } from "@/app/(app)/components/how-it-works-video-dialog";
-import { CustomTooltip } from "@/components/ui/tooltip";
+import { AlertCircleIcon, LinkIcon } from "lucide-react";
+import { useState } from "react";
 
+import { HowItWorksVideoDialog } from "@/app/(app)/components/how-it-works-video-dialog";
 import { InvoicePDFDownloadLink } from "@/app/(app)/components/invoice-pdf-download-link";
 import { ProjectLogoDescription } from "@/app/(components)/project-logo-description";
+import { type InvoiceData } from "@/app/schema";
 import { GithubIcon } from "@/components/etc/github-logo";
+import { ProjectLogo } from "@/components/etc/project-logo";
+import { Button } from "@/components/ui/button";
+import { CustomTooltip } from "@/components/ui/tooltip";
 import { DISCORD_COMMUNITY_URL, GITHUB_URL } from "@/config";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
-import { AlertCircleIcon, LinkIcon } from "lucide-react";
-import { useState } from "react";
 
 /**
  * Header component for the invoice page.
  *
  * Displays the project logo, description, and action buttons including:
  * - Share invoice button (with conditional rendering based on shareability)
- * - Download PDF button with error handling
+ * - Download PDF button
  * @returns The rendered invoice page header with logo, description, and action buttons
  */
 export function InvoicePageHeader({
@@ -28,9 +28,6 @@ export function InvoicePageHeader({
   handleShareInvoice,
   isDesktop,
   invoiceDataState,
-  errorWhileGeneratingPdfIsShown,
-  setErrorWhileGeneratingPdfIsShown,
-  qrCodeDataUrl,
   isMobile,
   isSharedInvoice,
 }: {
@@ -38,9 +35,6 @@ export function InvoicePageHeader({
   handleShareInvoice: () => void;
   isDesktop: boolean;
   invoiceDataState: InvoiceData;
-  errorWhileGeneratingPdfIsShown: boolean;
-  setErrorWhileGeneratingPdfIsShown: (value: boolean) => void;
-  qrCodeDataUrl: string;
   isMobile: boolean;
   isSharedInvoice: boolean;
 }) {
@@ -137,11 +131,6 @@ export function InvoicePageHeader({
               />
               <InvoicePDFDownloadLink
                 invoiceData={invoiceDataState}
-                errorWhileGeneratingPdfIsShown={errorWhileGeneratingPdfIsShown}
-                setErrorWhileGeneratingPdfIsShown={
-                  setErrorWhileGeneratingPdfIsShown
-                }
-                qrCodeDataUrl={qrCodeDataUrl}
                 isMobile={isMobile}
               />
             </>

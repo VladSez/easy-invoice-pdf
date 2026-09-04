@@ -1,5 +1,7 @@
 {
   "recommendations": [
+    // oxlint + oxfmt language server (linting, quick fixes, format on save)
+    "oxc.oxc-vscode",
     "bradlc.vscode-tailwindcss",
     "yoavbls.pretty-ts-errors",
     "usernamehw.errorlens",

@@ -1,4 +1,18 @@
-import { sellerSchema, type SellerData } from "@/app/schema";
+import * as Sentry from "@sentry/nextjs";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+import { useConfirmDiscard } from "@/app/(app)/components/invoice-form/sections/hooks/use-confirm-discard";
+import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(app)/utils/app-local-storage";
+import {
+  SELLERS_LOCAL_STORAGE_KEY,
+  sellerSchema,
+  type SellerData,
+} from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,17 +35,30 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as Sentry from "@sentry/nextjs";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { ConfirmDiscardDialog } from "../confirm-discard-dialog";
-import { SELLERS_LOCAL_STORAGE_KEY } from "./seller-management";
+import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
+
 import { InputHelperMessage } from "../../../../../../../components/ui/input-helper-message";
-import { useConfirmDiscard } from "@/app/(app)/components/invoice-form/sections/hooks/use-confirm-discard";
+import { ConfirmDiscardDialog } from "../confirm-discard-dialog";
 
 const SELLER_FORM_ID = "seller-form";
+
+/** The seller form with nothing filled in yet */
+const EMPTY_SELLER_FORM_VALUES = {
+  id: "",
+  name: "",
+  address: "",
+  vatNo: "",
+  vatNoLabelText: "VAT no",
+  email: "",
+  emailFieldIsVisible: true,
+  accountNumber: "",
+  swiftBic: "",
+  vatNoFieldIsVisible: true,
+  accountNumberFieldIsVisible: true,
+  swiftBicFieldIsVisible: true,
+  notes: "",
+  notesFieldIsVisible: true,
+} satisfies SellerData;
 
 interface SellerDialogProps {
   isOpen: boolean;
@@ -74,7 +101,7 @@ export function SellerDialog({
   formValues,
 }: SellerDialogProps) {
   const form = useForm<SellerData>({
-    resolver: zodResolver(sellerSchema),
+    resolver: zodResolverForOutput(sellerSchema),
     defaultValues: {
       id: initialData?.id ?? "",
       name: initialData?.name ?? "",
@@ -116,62 +143,74 @@ export function SellerDialog({
     (() => void) | null
   >(null);
 
-  // Effect to update form values when switch is toggled
-  useEffect(() => {
-    // if the switch is on and we have form values, we want to apply the form values to the form
-    if (shouldApplyInlineFormValues && formValues && !isEditMode) {
-      form.reset({
-        ...form.getValues(),
-        ...formValues,
-      });
+  /**
+   * Resets the dialog form to the seller it was opened with, or to an empty
+   * form when adding a new one.
+   *
+   * `form.reset()` with no arguments cannot be used for this: react-hook-form treats
+   * the values of the last `reset(values)` call as the new defaults, so after a
+   * pre-fill it would restore the pre-filled values instead of clearing them.
+   */
+  function resetFormToInitialValues() {
+    form.reset(initialData ?? EMPTY_SELLER_FORM_VALUES);
+  }
+
+  /**
+   * Applies the pre-fill switch to the dialog form.
+   *
+   * Switch ON: fills the form with the values from the current invoice form, so the
+   * invoice's seller can be saved as a new seller.
+   * Switch OFF: clears the form back to the initial (or empty) seller.
+   *
+   * Leaves the form alone in edit mode, so the seller being edited is never overwritten.
+   */
+  function applyPrefillSwitch(newValue: boolean) {
+    setShouldApplyInlineFormValues(newValue);
+
+    if (isEditMode) {
+      return;
     }
 
-    // if the switch is off and we have initial data, we want to apply the initial data to the form
-    else if (!shouldApplyInlineFormValues && !isEditMode) {
-      form.reset(
-        initialData ?? {
-          id: "",
-          name: "",
-          address: "",
-          vatNo: "",
-          vatNoLabelText: "VAT no",
-          email: "",
-          emailFieldIsVisible: true,
-          accountNumber: "",
-          swiftBic: "",
-          vatNoFieldIsVisible: true,
-          accountNumberFieldIsVisible: true,
-          swiftBicFieldIsVisible: true,
-          notes: "",
-          notesFieldIsVisible: true,
-        },
-      );
+    // Switch is ON: pre-fill the form with the current invoice seller data
+    if (newValue) {
+      if (formValues) {
+        form.reset({
+          ...form.getValues(),
+          ...formValues,
+        });
+      }
+      return;
     }
-  }, [shouldApplyInlineFormValues, formValues, initialData, isEditMode, form]);
+
+    // Switch is OFF: reset the form to the initial data, or to an empty form
+    resetFormToInitialValues();
+  }
 
   /**
    * Guards the pre-fill switch toggle against dirty form state.
    *
    * When the form has unsaved changes, opens the ConfirmDiscardDialog before
-   * applying the switch change. Only updates shouldApplyFormValues (and thus
-   * triggers form.reset via the effect above) after the user confirms discard.
+   * applying the switch change. Only applies the switch after the user confirms
+   * discard.
    */
   function handlePrefillSwitchToggle(newValue: boolean) {
     if (isDirty) {
-      setPendingDiscardAction(
-        () => () => setShouldApplyInlineFormValues(newValue),
-      );
+      setPendingDiscardAction(() => {
+        return () => {
+          return applyPrefillSwitch(newValue);
+        };
+      });
       setIsConfirmDiscardDialogOpen(true);
       return;
     }
-    setShouldApplyInlineFormValues(newValue);
+    applyPrefillSwitch(newValue);
   }
 
   /**
    * Closes the seller dialog and resets the form to its default state.
    */
   function closeDialog() {
-    form.reset();
+    resetFormToInitialValues();
 
     // by default, we don't want to apply the inline form values to the dialog form
     setShouldApplyInlineFormValues(false);
@@ -186,7 +225,7 @@ export function SellerDialog({
       // **RUNNING SOME VALIDATIONS FIRST**
 
       // Get existing sellers or initialize empty array
-      const sellers = localStorage.getItem(SELLERS_LOCAL_STORAGE_KEY);
+      const sellers = getAppStorageItem(SELLERS_LOCAL_STORAGE_KEY);
       const existingSellers: unknown = sellers ? JSON.parse(sellers) : [];
 
       const rawSellers = Array.isArray(existingSellers) ? existingSellers : [];
@@ -217,19 +256,18 @@ export function SellerDialog({
 
       // If we had invalid sellers, save the valid sellers back to localStorage
       if (hadInvalidSellers) {
-        localStorage.setItem(
-          SELLERS_LOCAL_STORAGE_KEY,
-          JSON.stringify(validSellers),
-        );
+        setAppStorageItem({
+          key: SELLERS_LOCAL_STORAGE_KEY,
+          value: JSON.stringify(validSellers),
+        });
       }
 
       // we don't need to validate the name if we are editing an existing seller
 
       // Validate seller data against existing sellers
-      const isDuplicateName = validSellers.some(
-        (seller: SellerData) =>
-          seller.name === formValues.name && seller.id !== formValues.id,
-      );
+      const isDuplicateName = validSellers.some((seller: SellerData) => {
+        return seller.name === formValues.name && seller.id !== formValues.id;
+      });
 
       if (isDuplicateName) {
         form.setError("name", {
@@ -283,7 +321,9 @@ export function SellerDialog({
             // If there are unsaved changes (isDirty), opens the confirmation dialog.
             // Otherwise, closes the dialog immediately.
             if (isDirty) {
-              setPendingDiscardAction(() => closeDialog);
+              setPendingDiscardAction(() => {
+                return closeDialog;
+              });
               setIsConfirmDiscardDialogOpen(true);
               return;
             }
@@ -308,7 +348,7 @@ export function SellerDialog({
 
           <div className="overflow-y-auto px-6 py-4">
             {/* Show Use Current Form Values switch only when creating new seller */}
-            {!isEditMode && (
+            {!isEditMode ? (
               <div className="mb-4">
                 <div className="flex items-center gap-2">
                   <Switch
@@ -329,7 +369,7 @@ export function SellerDialog({
                   entered in your current invoice form.
                 </span>
               </div>
-            )}
+            ) : null}
 
             <Form {...form}>
               <form
@@ -340,37 +380,41 @@ export function SellerDialog({
                 <FormField
                   control={form.control}
                   name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name (Required)</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          rows={3}
-                          placeholder="Enter seller name"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    return (
+                      <FormItem>
+                        <FormLabel>Name (Required)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            rows={3}
+                            placeholder="Enter seller name"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
 
                 <FormField
                   control={form.control}
                   name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address (Required)</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          rows={3}
-                          placeholder="Enter seller address"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    return (
+                      <FormItem>
+                        <FormLabel>Address (Required)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            rows={3}
+                            placeholder="Enter seller address"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
 
                 <fieldset className="rounded-md border px-4 pb-4">
@@ -384,27 +428,29 @@ export function SellerDialog({
                       <FormField
                         control={form.control}
                         name="vatNoFieldIsVisible"
-                        render={({ field }) => (
-                          <FormItem>
-                            <div className="flex items-center gap-2">
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                                id="vatNoFieldIsVisible"
-                                aria-label={`Show the 'Tax Number' field in the PDF`}
-                              />
-                              <CustomTooltip
-                                trigger={
-                                  <Label htmlFor="vatNoFieldIsVisible">
-                                    Show in PDF
-                                  </Label>
-                                }
-                                content='Show the "Tax Number" field in the PDF'
-                                className="z-[1000]"
-                              />
-                            </div>
-                          </FormItem>
-                        )}
+                        render={({ field }) => {
+                          return (
+                            <FormItem>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  id="vatNoFieldIsVisible"
+                                  aria-label={`Show the 'Tax Number' field in the PDF`}
+                                />
+                                <CustomTooltip
+                                  trigger={
+                                    <Label htmlFor="vatNoFieldIsVisible">
+                                      Show in PDF
+                                    </Label>
+                                  }
+                                  content='Show the "Tax Number" field in the PDF'
+                                  className="z-[1000]"
+                                />
+                              </div>
+                            </FormItem>
+                          );
+                        }}
                       />
                     </div>
                   </div>
@@ -413,45 +459,49 @@ export function SellerDialog({
                     <FormField
                       control={form.control}
                       name="vatNoLabelText"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Label</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Enter Tax number label"
-                            />
-                          </FormControl>
-                          {form.formState.errors.vatNoLabelText ? (
-                            <FormMessage>
-                              {form.formState.errors.vatNoLabelText.message}
-                            </FormMessage>
-                          ) : null}
+                      render={({ field }) => {
+                        return (
+                          <FormItem>
+                            <FormLabel>Label</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Enter Tax number label"
+                              />
+                            </FormControl>
+                            {form.formState.errors.vatNoLabelText ? (
+                              <FormMessage>
+                                {form.formState.errors.vatNoLabelText.message}
+                              </FormMessage>
+                            ) : null}
 
-                          {!form.formState.errors.vatNoLabelText && (
-                            <InputHelperMessage>
-                              Set a custom label (e.g. VAT no, Tax no, etc.)
-                            </InputHelperMessage>
-                          )}
-                        </FormItem>
-                      )}
+                            {!form.formState.errors.vatNoLabelText ? (
+                              <InputHelperMessage>
+                                Set a custom label (e.g. VAT no, Tax no, etc.)
+                              </InputHelperMessage>
+                            ) : null}
+                          </FormItem>
+                        );
+                      }}
                     />
 
                     <FormField
                       control={form.control}
                       name="vatNo"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Value</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Enter Tax number value"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      render={({ field }) => {
+                        return (
+                          <FormItem>
+                            <FormLabel>Value</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Enter Tax number value"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        );
+                      }}
                     />
                   </div>
                 </fieldset>
@@ -461,49 +511,53 @@ export function SellerDialog({
                   <FormField
                     control={form.control}
                     name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="mb-2 font-medium">
-                          Email
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="email"
-                            placeholder="seller@email.com"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel className="mb-2 font-medium">
+                            Email
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="email"
+                              placeholder="seller@email.com"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
                   />
                   <FormField
                     control={form.control}
                     name="emailFieldIsVisible"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center gap-2">
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              id="emailFieldIsVisible"
-                              data-testid={`sellerEmailDialogFieldVisibilitySwitch`}
-                              aria-label={`Show the 'Email' field in the PDF`}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                id="emailFieldIsVisible"
+                                data-testid={`sellerEmailDialogFieldVisibilitySwitch`}
+                                aria-label={`Show the 'Email' field in the PDF`}
+                              />
+                            </FormControl>
+                            <CustomTooltip
+                              trigger={
+                                <Label htmlFor="emailFieldIsVisible">
+                                  Show Seller Email in PDF
+                                </Label>
+                              }
+                              content='Show the "Email" field in the PDF'
+                              className="z-[1000]"
                             />
-                          </FormControl>
-                          <CustomTooltip
-                            trigger={
-                              <Label htmlFor="emailFieldIsVisible">
-                                Show Seller Email in PDF
-                              </Label>
-                            }
-                            content='Show the "Email" field in the PDF'
-                            className="z-[1000]"
-                          />
-                        </div>
-                      </FormItem>
-                    )}
+                          </div>
+                        </FormItem>
+                      );
+                    }}
                   />
                 </div>
 
@@ -512,46 +566,50 @@ export function SellerDialog({
                   <FormField
                     control={form.control}
                     name="accountNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="mb-2 font-medium">
-                          Account Number
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea
-                            {...field}
-                            rows={3}
-                            placeholder="Enter account number"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel className="mb-2 font-medium">
+                            Account Number
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              rows={3}
+                              placeholder="Enter account number"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
                   />
                   <FormField
                     control={form.control}
                     name="accountNumberFieldIsVisible"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center gap-2">
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            id="accountNumberFieldIsVisible"
-                            aria-label={`Show the 'Account Number' field in the PDF`}
-                          />
-                          <CustomTooltip
-                            trigger={
-                              <Label htmlFor="accountNumberFieldIsVisible">
-                                Show Seller Account Number in PDF
-                              </Label>
-                            }
-                            content='Show the "Account Number" field in the PDF'
-                            className="z-[1000]"
-                          />
-                        </div>
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              id="accountNumberFieldIsVisible"
+                              aria-label={`Show the 'Account Number' field in the PDF`}
+                            />
+                            <CustomTooltip
+                              trigger={
+                                <Label htmlFor="accountNumberFieldIsVisible">
+                                  Show Seller Account Number in PDF
+                                </Label>
+                              }
+                              content='Show the "Account Number" field in the PDF'
+                              className="z-[1000]"
+                            />
+                          </div>
+                        </FormItem>
+                      );
+                    }}
                   />
                 </div>
 
@@ -560,46 +618,50 @@ export function SellerDialog({
                   <FormField
                     control={form.control}
                     name="swiftBic"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="mb-2 font-medium">
-                          SWIFT/BIC
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea
-                            {...field}
-                            rows={3}
-                            placeholder="Enter SWIFT/BIC code"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel className="mb-2 font-medium">
+                            SWIFT/BIC
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              rows={3}
+                              placeholder="Enter SWIFT/BIC code"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
                   />
                   <FormField
                     control={form.control}
                     name="swiftBicFieldIsVisible"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center gap-2">
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            id="swiftBicFieldIsVisible"
-                            aria-label={`Show the 'SWIFT/BIC' field in the PDF`}
-                          />
-                          <CustomTooltip
-                            trigger={
-                              <Label htmlFor="swiftBicFieldIsVisible">
-                                Show Seller SWIFT/BIC in PDF
-                              </Label>
-                            }
-                            content='Show the "SWIFT/BIC" field in the PDF'
-                            className="z-[1000]"
-                          />
-                        </div>
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              id="swiftBicFieldIsVisible"
+                              aria-label={`Show the 'SWIFT/BIC' field in the PDF`}
+                            />
+                            <CustomTooltip
+                              trigger={
+                                <Label htmlFor="swiftBicFieldIsVisible">
+                                  Show Seller SWIFT/BIC in PDF
+                                </Label>
+                              }
+                              content='Show the "SWIFT/BIC" field in the PDF'
+                              className="z-[1000]"
+                            />
+                          </div>
+                        </FormItem>
+                      );
+                    }}
                   />
                 </div>
 
@@ -608,57 +670,61 @@ export function SellerDialog({
                   <FormField
                     control={form.control}
                     name="notes"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="mb-2 font-medium">
-                          Notes
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea
-                            {...field}
-                            rows={3}
-                            placeholder="Enter notes (max 750 characters)"
-                            maxLength={750}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel className="mb-2 font-medium">
+                            Notes
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              rows={3}
+                              placeholder="Enter notes (max 750 characters)"
+                              maxLength={750}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
                   />
                   <FormField
                     control={form.control}
                     name="notesFieldIsVisible"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center gap-2">
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              id="notes-field-visibility"
-                              data-testid={`sellerNotesDialogFieldVisibilitySwitch`}
-                              aria-label={`Show the 'Notes' field in the PDF`}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                id="notes-field-visibility"
+                                data-testid={`sellerNotesDialogFieldVisibilitySwitch`}
+                                aria-label={`Show the 'Notes' field in the PDF`}
+                              />
+                            </FormControl>
+                            <CustomTooltip
+                              trigger={
+                                <Label htmlFor="notes-field-visibility">
+                                  Show Seller Notes in PDF
+                                </Label>
+                              }
+                              content="Show the notes field in the PDF"
+                              className="z-[1000]"
                             />
-                          </FormControl>
-                          <CustomTooltip
-                            trigger={
-                              <Label htmlFor="notes-field-visibility">
-                                Show Seller Notes in PDF
-                              </Label>
-                            }
-                            content="Show the notes field in the PDF"
-                            className="z-[1000]"
-                          />
-                        </div>
-                      </FormItem>
-                    )}
+                          </div>
+                        </FormItem>
+                      );
+                    }}
                   />
                 </div>
               </form>
             </Form>
 
             {/* Apply to Current Invoice switch remains at the bottom */}
-            {!isEditMode && (
+            {!isEditMode ? (
               <div className="mt-4 flex flex-col gap-1 border-t pt-4">
                 <div className="flex items-center gap-2">
                   <Switch
@@ -679,7 +745,7 @@ export function SellerDialog({
                   generated PDF.
                 </span>
               </div>
-            )}
+            ) : null}
           </div>
           <DialogFooter className="border-border border-t px-6 py-4">
             <Button
@@ -690,7 +756,9 @@ export function SellerDialog({
                 // If there are unsaved changes (isDirty), opens the confirmation dialog.
                 // Otherwise, closes the dialog immediately.
                 if (isDirty) {
-                  setPendingDiscardAction(() => closeDialog);
+                  setPendingDiscardAction(() => {
+                    return closeDialog;
+                  });
                   setIsConfirmDiscardDialogOpen(true);
                   return;
                 }

@@ -1,7 +1,9 @@
-import { GITHUB_URL } from "@/config";
-import { readdir } from "fs/promises";
-import { join } from "path";
+import { readdir } from "node:fs/promises";
+import { join } from "node:path";
+
 import { z } from "zod";
+
+import { GITHUB_URL } from "@/config";
 
 export interface ChangelogSummary {
   slug: string;
@@ -51,7 +53,7 @@ export interface ChangelogEntry {
 const changelogEntryMetadataSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  date: z.string().date(),
+  date: z.iso.date(),
   version: z.string().optional(),
   type: z.enum(["major", "minor", "patch"]).optional(),
 });
@@ -90,7 +92,9 @@ async function getChangelogFiles(): Promise<string[]> {
       "content",
     );
     const files = await readdir(changelogDir);
-    return files.filter((file) => file.endsWith(".mdx"));
+    return files.filter((file) => {
+      return file.endsWith(".mdx");
+    });
   } catch (error) {
     console.error("Failed to read changelog directory:", error);
     return [];
@@ -122,7 +126,7 @@ async function importChangelogFile(filename: string) {
       if (error instanceof z.ZodError) {
         console.error(
           `Invalid metadata in changelog file ${filename}:`,
-          error.errors,
+          error.issues,
         );
         return null;
       }
@@ -159,10 +163,7 @@ export async function getChangelogEntries(): Promise<ChangelogEntry[]> {
     }
 
     const { slug, module } = imported;
-    const { metadata, default: Component } = module as {
-      metadata: ChangelogMetadata;
-      default: React.ComponentType;
-    };
+    const { metadata, default: Component } = module;
 
     entries.push({
       slug,
@@ -175,10 +176,11 @@ export async function getChangelogEntries(): Promise<ChangelogEntry[]> {
   }
 
   // Sort by date (newest first)
-  return entries.sort(
-    (a, b) =>
-      new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime(),
-  );
+  return entries.sort((a, b) => {
+    return (
+      new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime()
+    );
+  });
 }
 
 /**
@@ -188,7 +190,9 @@ export async function getChangelogEntry(
   slug: string,
 ): Promise<ChangelogEntry | null> {
   const files = await getChangelogFiles();
-  const filename = files.find((file) => filenameToSlug(file) === slug);
+  const filename = files.find((file) => {
+    return filenameToSlug(file) === slug;
+  });
 
   if (!filename) {
     return null;
@@ -200,10 +204,7 @@ export async function getChangelogEntry(
   }
 
   const { module } = imported;
-  const { metadata, default: Component } = module as {
-    metadata: ChangelogMetadata;
-    default: React.ComponentType;
-  };
+  const { metadata, default: Component } = module;
 
   return {
     slug,
@@ -233,9 +234,9 @@ export async function getNextChangelogEntry(
   currentSlug: string,
 ): Promise<ChangelogEntry | null> {
   const allEntries = await getChangelogEntries();
-  const currentIndex = allEntries.findIndex(
-    (entry) => entry.slug === currentSlug,
-  );
+  const currentIndex = allEntries.findIndex((entry) => {
+    return entry.slug === currentSlug;
+  });
 
   // If current entry is not found or is the first one (newest), return null
   if (currentIndex === -1 || currentIndex === 0) {
@@ -253,9 +254,9 @@ export async function getPreviousChangelogEntry(
   currentSlug: string,
 ): Promise<ChangelogEntry | null> {
   const allEntries = await getChangelogEntries();
-  const currentIndex = allEntries.findIndex(
-    (entry) => entry.slug === currentSlug,
-  );
+  const currentIndex = allEntries.findIndex((entry) => {
+    return entry.slug === currentSlug;
+  });
 
   // If current entry is not found or is the last one (oldest), return null
   if (currentIndex === -1 || currentIndex === allEntries.length - 1) {

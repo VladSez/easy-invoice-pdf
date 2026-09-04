@@ -24,16 +24,20 @@ function buildGenerateInvoiceDeps(
   polishInvoiceData: InvoiceData,
 ): GenerateInvoiceDeps {
   return {
-    renderEnInvoice: () =>
-      renderInvoicePdfBuffer({ invoiceData: englishInvoiceData }),
-    renderPlInvoice: () =>
-      renderInvoicePdfBuffer({ invoiceData: polishInvoiceData }),
+    renderEnInvoice: () => {
+      return renderInvoicePdfBuffer({ invoiceData: englishInvoiceData });
+    },
+    renderPlInvoice: () => {
+      return renderInvoicePdfBuffer({ invoiceData: polishInvoiceData });
+    },
     initializeGoogleDrive,
 
     createOrFindInvoiceFolder,
     uploadFile,
     sendTelegramMessage,
-    sendEmail: (args) => resend.emails.send(args),
+    sendEmail: (args) => {
+      return resend.emails.send(args);
+    },
   };
 }
 
@@ -52,7 +56,7 @@ export async function runProductionGenerateMonthlyInvoice(options: {
   const englishInvoiceData = getEnglishInvoiceRealData();
   const polishInvoiceData = getPolishInvoiceRealData(englishInvoiceData);
 
-  return generateInvoice(
+  return await generateInvoice(
     buildGenerateInvoiceDeps(englishInvoiceData, polishInvoiceData),
     {
       shouldSendEmail: options.shouldSendEmail,

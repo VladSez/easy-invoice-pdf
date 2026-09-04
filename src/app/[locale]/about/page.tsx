@@ -1,11 +1,21 @@
-import { GithubIcon } from "@/components/etc/github-logo";
+import { hasLocale, useTranslations } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { use } from "react";
+
+import { type HeaderProps, Header } from "@/app/(components)/header";
 import {
   BlackGoToAppButton,
   GoToAppButton,
 } from "@/app/(components)/header/go-to-app-button-cta";
+import { ABOUT_FAQ_ITEM_KEYS } from "@/app/[locale]/about/about-faq-item-keys";
+import { AboutFooter } from "@/app/[locale]/about/components/about-footer";
+import { FeaturesCarousel } from "@/app/[locale]/about/components/features-carousel";
+import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
+import { GithubIcon } from "@/components/etc/github-logo";
 import { Button } from "@/components/ui/button";
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
-
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AutoPlayVideo } from "@/components/video";
 import {
@@ -15,22 +25,21 @@ import {
   VIDEO_DEMO_URL,
 } from "@/config";
 import { routing } from "@/i18n/routing";
-import { useTranslations, type Locale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
-import Link from "next/link";
-import { ABOUT_FAQ_ITEM_KEYS } from "@/app/[locale]/about/about-faq-item-keys";
-import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
-import { FeaturesCarousel } from "@/app/[locale]/about/components/features-carousel";
-import { AboutFooter } from "@/app/[locale]/about/components/about-footer";
-import { type HeaderProps, Header } from "@/app/(components)/header";
 
 // statically generate the pages for all locales
 export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
+  return routing.locales.map((locale) => {
+    return { locale };
+  });
 }
 
-export default function AboutPage({ params }: { params: { locale: Locale } }) {
-  const { locale } = params;
+// Next.js types dynamic segments as `string`, so we narrow to `Locale` below
+export default function AboutPage({ params }: PageProps<"/[locale]/about">) {
+  const { locale } = use(params);
+
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
 
   // Enables static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
   setRequestLocale(locale);
@@ -219,14 +228,16 @@ function HeroSection() {
 function FeaturesSection() {
   const t = useTranslations("About");
 
-  const features = MARKETING_FEATURES_CARDS.map((feature) => ({
-    translationKey: feature.translationKey,
-    videoSrc: feature.videoSrc,
-    videoFallbackImg: feature.videoFallbackImg,
-    videoDescription: feature.videoDescription,
-    title: t(`features.items.${feature.translationKey}.title`),
-    description: t(`features.items.${feature.translationKey}.description`),
-  }));
+  const features = MARKETING_FEATURES_CARDS.map((feature) => {
+    return {
+      translationKey: feature.translationKey,
+      videoSrc: feature.videoSrc,
+      videoFallbackImg: feature.videoFallbackImg,
+      videoDescription: feature.videoDescription,
+      title: t(`features.items.${feature.translationKey}.title`),
+      description: t(`features.items.${feature.translationKey}.description`),
+    };
+  });
 
   return (
     <section
@@ -287,15 +298,17 @@ function FaqSection() {
         </div>
         <div className="mx-auto mt-14 max-w-3xl">
           <FaqAccordion>
-            {ABOUT_FAQ_ITEM_KEYS.map((translationKey) => (
-              <FaqAccordionItem
-                key={translationKey}
-                question={t(`items.${translationKey}.question`)}
-                className="border-stone-300 bg-white"
-              >
-                {t(`items.${translationKey}.answer`)}
-              </FaqAccordionItem>
-            ))}
+            {ABOUT_FAQ_ITEM_KEYS.map((translationKey) => {
+              return (
+                <FaqAccordionItem
+                  key={translationKey}
+                  question={t(`items.${translationKey}.question`)}
+                  className="border-stone-300 bg-white"
+                >
+                  {t(`items.${translationKey}.answer`)}
+                </FaqAccordionItem>
+              );
+            })}
           </FaqAccordion>
         </div>
       </div>

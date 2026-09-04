@@ -1,35 +1,23 @@
 "use client";
 
-import { isLocalStorageAvailable } from "@/lib/check-local-storage";
-
-const WELCOME_POPUP_SEEN_STORAGE_KEY = "EASY_INVOICE_WELCOME_POPUP_SEEN";
+import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(app)/utils/app-local-storage";
+import { WELCOME_POPUP_SEEN_STORAGE_KEY } from "@/app/schema";
 
 const WELCOME_POPUP_SEEN_VALUE = "v1";
 
 export function hasSeenWelcomePopup() {
-  if (!isLocalStorageAvailable) {
-    return false;
-  }
-
-  try {
-    return (
-      localStorage.getItem(WELCOME_POPUP_SEEN_STORAGE_KEY) ===
-      WELCOME_POPUP_SEEN_VALUE
-    );
-  } catch {
-    return false;
-  }
+  return (
+    getAppStorageItem(WELCOME_POPUP_SEEN_STORAGE_KEY) ===
+    WELCOME_POPUP_SEEN_VALUE
+  );
 }
 
 export function markWelcomePopupSeen() {
-  if (!isLocalStorageAvailable) {
-    return;
-  }
-
-  try {
-    localStorage.setItem(
-      WELCOME_POPUP_SEEN_STORAGE_KEY,
-      WELCOME_POPUP_SEEN_VALUE,
-    );
-  } catch {}
+  setAppStorageItem({
+    key: WELCOME_POPUP_SEEN_STORAGE_KEY,
+    value: WELCOME_POPUP_SEEN_VALUE,
+  });
 }

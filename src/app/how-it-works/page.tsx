@@ -1,9 +1,10 @@
-import { HowItWorksVideos } from "@/app/(app)/components/how-it-works-videos";
-import { HOW_IT_WORKS_VIDEOS } from "@/config";
-import { cn } from "@/lib/utils";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
+
+import { HowItWorksVideos } from "@/app/(app)/components/how-it-works-videos";
+import { HOW_IT_WORKS_VIDEOS } from "@/config";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-static";
 
@@ -67,33 +68,35 @@ export default function HowItWorksPage() {
             All tutorials
           </h2>
           <ul className="mt-6 space-y-8">
-            {HOW_IT_WORKS_VIDEOS.map((video) => (
-              <li key={video.id}>
-                <section id={video.id}>
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    {video.title}
-                  </h3>
-                  <p className="mt-2 text-gray-600">{video.description}</p>
-                  <p className="mt-3">
-                    <Link
-                      href={`/how-it-works?video=${video.id}`}
-                      className={cn(linkClassName)}
-                    >
-                      Watch tutorial
-                    </Link>
-                    {" · "}
-                    <a
-                      href={video.watchUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={cn(linkClassName)}
-                    >
-                      Watch on YouTube
-                    </a>
-                  </p>
-                </section>
-              </li>
-            ))}
+            {HOW_IT_WORKS_VIDEOS.map((video) => {
+              return (
+                <li key={video.id}>
+                  <section id={video.id}>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {video.title}
+                    </h3>
+                    <p className="mt-2 text-gray-600">{video.description}</p>
+                    <p className="mt-3">
+                      <Link
+                        href={`/how-it-works?video=${video.id}`}
+                        className={cn(linkClassName)}
+                      >
+                        Watch tutorial
+                      </Link>
+                      {" · "}
+                      <a
+                        href={video.watchUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(linkClassName)}
+                      >
+                        Watch on YouTube
+                      </a>
+                    </p>
+                  </section>
+                </li>
+              );
+            })}
           </ul>
         </section>
 

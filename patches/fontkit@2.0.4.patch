@@ -1,0 +1,48 @@
+diff --git a/dist/browser-module.mjs b/dist/browser-module.mjs
+index 4d0a389de8a3db767f1fef99ed186790431aa844..1dec1342d6a370d8497bbdf1237575064771cebe 100644
+--- a/dist/browser-module.mjs
++++ b/dist/browser-module.mjs
+@@ -12668,6 +12668,7 @@ class $4c1709dee528ea76$export$2e2bcd8739ae039 {
+    * @param {number[]} characters
+    * @return {Glyph}
+    */ getGlyph(glyph, characters = []) {
++        if (characters.length > 0 && this._glyphs[glyph] && this._glyphs[glyph].codePoints.length === 0) { this._glyphs[glyph] = null; }
+         if (!this._glyphs[glyph]) {
+             if (this.directory.tables.sbix) this._glyphs[glyph] = new (0, $25d8f049c222084c$export$2e2bcd8739ae039)(glyph, characters, this);
+             else if (this.directory.tables.COLR && this.directory.tables.CPAL) this._glyphs[glyph] = new (0, $0d411f0165859681$export$2e2bcd8739ae039)(glyph, characters, this);
+diff --git a/dist/browser.cjs b/dist/browser.cjs
+index a5fa901b5608575f84390e3ef0474a7789e8269a..8bb429dd566808b596da6ba730952755bf4152e7 100644
+--- a/dist/browser.cjs
++++ b/dist/browser.cjs
+@@ -12685,6 +12685,7 @@ class $0a8ef2660a6ce4b6$export$2e2bcd8739ae039 {
+    * @param {number[]} characters
+    * @return {Glyph}
+    */ getGlyph(glyph, characters = []) {
++        if (characters.length > 0 && this._glyphs[glyph] && this._glyphs[glyph].codePoints.length === 0) { this._glyphs[glyph] = null; }
+         if (!this._glyphs[glyph]) {
+             if (this.directory.tables.sbix) this._glyphs[glyph] = new (0, $55855d6d316b015e$export$2e2bcd8739ae039)(glyph, characters, this);
+             else if (this.directory.tables.COLR && this.directory.tables.CPAL) this._glyphs[glyph] = new (0, $42d9dbd2de9ee2d8$export$2e2bcd8739ae039)(glyph, characters, this);
+diff --git a/dist/main.cjs b/dist/main.cjs
+index 851b2d2bbcae17e91f9f2468f61112ee2dc8fbd8..5adcdafc15ea82aad9ebe451c27e125fbf652f37 100644
+--- a/dist/main.cjs
++++ b/dist/main.cjs
+@@ -12706,6 +12706,7 @@ class $0a8ef2660a6ce4b6$export$2e2bcd8739ae039 {
+    * @param {number[]} characters
+    * @return {Glyph}
+    */ getGlyph(glyph, characters = []) {
++        if (characters.length > 0 && this._glyphs[glyph] && this._glyphs[glyph].codePoints.length === 0) { this._glyphs[glyph] = null; }
+         if (!this._glyphs[glyph]) {
+             if (this.directory.tables.sbix) this._glyphs[glyph] = new (0, $55855d6d316b015e$export$2e2bcd8739ae039)(glyph, characters, this);
+             else if (this.directory.tables.COLR && this.directory.tables.CPAL) this._glyphs[glyph] = new (0, $42d9dbd2de9ee2d8$export$2e2bcd8739ae039)(glyph, characters, this);
+diff --git a/dist/module.mjs b/dist/module.mjs
+index fde88fc3f23e6fff533da842186fee8402cbcde1..d429a765280923848a38c24e59caa59a3e94d9af 100644
+--- a/dist/module.mjs
++++ b/dist/module.mjs
+@@ -12689,6 +12689,7 @@ class $4c1709dee528ea76$export$2e2bcd8739ae039 {
+    * @param {number[]} characters
+    * @return {Glyph}
+    */ getGlyph(glyph, characters = []) {
++        if (characters.length > 0 && this._glyphs[glyph] && this._glyphs[glyph].codePoints.length === 0) { this._glyphs[glyph] = null; }
+         if (!this._glyphs[glyph]) {
+             if (this.directory.tables.sbix) this._glyphs[glyph] = new (0, $25d8f049c222084c$export$2e2bcd8739ae039)(glyph, characters, this);
+             else if (this.directory.tables.COLR && this.directory.tables.CPAL) this._glyphs[glyph] = new (0, $0d411f0165859681$export$2e2bcd8739ae039)(glyph, characters, this);

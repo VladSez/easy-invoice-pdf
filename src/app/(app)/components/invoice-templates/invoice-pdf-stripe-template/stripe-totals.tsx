@@ -1,9 +1,9 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
-import { type InvoiceData } from "@/app/schema";
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-import { formatCurrency } from "@/app/(app)/utils/format-currency";
 
 import type { STRIPE_TEMPLATE_STYLES } from "@/app/(app)/components/invoice-templates/invoice-pdf-stripe-template";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { formatCurrency } from "@/app/(app)/utils/format-currency";
+import { type InvoiceData } from "@/app/schema";
 
 /**
  * Subtotal, total excluding tax, VAT, total and amount due fields
@@ -22,10 +22,9 @@ export function StripeVatSummaryTableTotals({
   const taxLabelText = invoiceData.taxLabelText || "VAT";
 
   // Calculate subtotal (sum of all items)
-  const subtotal = invoiceData.items.reduce(
-    (sum, item) => sum + item.netAmount,
-    0,
-  );
+  const subtotal = invoiceData.items.reduce((sum, item) => {
+    return sum + item.netAmount;
+  }, 0);
   const formattedSubtotal = formatCurrency({
     amount: subtotal,
     currency: invoiceData.currency,
@@ -39,9 +38,9 @@ export function StripeVatSummaryTableTotals({
   });
 
   // Check if any items have numeric VAT values (not "NP" or "OO")
-  const hasNumericVat = invoiceData.items.some(
-    (item) => typeof item.vat === "number",
-  );
+  const hasNumericVat = invoiceData.items.some((item) => {
+    return typeof item.vat === "number";
+  });
 
   // we use .reverse() to mimic stripe behavior
   const vatRows = [...(invoiceData?.items ?? [])].reverse();

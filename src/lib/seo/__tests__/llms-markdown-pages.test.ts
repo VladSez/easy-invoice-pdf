@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { describe, expect, it } from "vitest";
+
+import { assert, describe, expect, it } from "vitest";
 import { z } from "zod";
 
 const MARKDOWN_PATHS = [
@@ -31,10 +32,9 @@ const UPDATE_DATE_LABELS = {
   nl: "Laatst bijgewerkt",
 } as const;
 
-const UPDATE_DATE_SCHEMA = z
-  .string()
-  .date()
-  .transform((value) => new Date(`${value}T00:00:00.000Z`));
+const UPDATE_DATE_SCHEMA = z.iso.date().transform((value) => {
+  return new Date(`${value}T00:00:00.000Z`);
+});
 
 function readPublicFile(path: string) {
   return readFileSync(resolve(process.cwd(), "public", path), "utf8");
@@ -65,7 +65,7 @@ function extractUpdateDate(content: string, path: string) {
   const locale = pathLocale in UPDATE_DATE_LABELS ? pathLocale : "en";
   const label = UPDATE_DATE_LABELS[locale as keyof typeof UPDATE_DATE_LABELS];
 
-  const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escapedLabel = label.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 
   const match = new RegExp(
     `^>\\s*${escapedLabel}\\s*:\\s*(\\S+)\\s*$`,
@@ -89,15 +89,14 @@ describe("LLM-facing Markdown pages", () => {
     ).not.toBeNull();
 
     const updatedAt = UPDATE_DATE_SCHEMA.safeParse(updateDate);
-    expect(
+    assert(
       updatedAt.success,
       `expected a valid YYYY-MM-DD calendar date, got ${updateDate}`,
-    ).toBe(true);
-    if (!updatedAt.success) return;
+    );
 
     expect(updatedAt.data.getTime()).toBeLessThanOrEqual(Date.now());
 
-    expect(content.length).toBeGreaterThan(1_000);
+    expect(content.length).toBeGreaterThan(1000);
   });
 
   it("rejects content without the localized update date field", () => {
@@ -115,7 +114,9 @@ describe("LLM-facing Markdown pages", () => {
 
     const linkedPaths = [
       ...llmsTxt.matchAll(/https:\/\/easyinvoicepdf\.com\/(\S+?\.md)/g),
-    ].map((match) => match[1]);
+    ].map((match) => {
+      return match[1];
+    });
 
     expect(new Set(linkedPaths)).toEqual(new Set(MARKDOWN_PATHS));
   });

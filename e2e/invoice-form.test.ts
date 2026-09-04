@@ -1,3 +1,7 @@
+import { expect, test } from "@playwright/test";
+import dayjs from "dayjs";
+
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   CURRENCY_SYMBOLS,
@@ -11,10 +15,6 @@ import {
   type AccordionState,
   type InvoiceData,
 } from "@/app/schema";
-import { expect, test } from "@playwright/test";
-import dayjs from "dayjs";
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
-import { INITIAL_INVOICE_DATA } from "../src/app/constants";
 import {
   DISCORD_COMMUNITY_URL,
   GITHUB_URL,
@@ -23,6 +23,8 @@ import {
   VIDEO_DEMO_YOUTUBE_URL,
   YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
 } from "@/config";
+
+import { INITIAL_INVOICE_DATA } from "../src/app/constants";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -244,6 +246,106 @@ test.describe("Invoice Generator Page", () => {
       "By using this tool, you agree to the Terms of Service",
     );
     await expect(termsOfServiceLinkDesktop).toHaveAttribute("href", "/tos");
+  });
+
+  test("keeps a form edit made right before switching to the preview tab", async ({
+    page,
+    isMobile,
+  }) => {
+    // the tabs only exist in the mobile layout
+    // eslint-disable-next-line playwright/no-skipped-test -- mobile UI flow, mobile projects only
+    test.skip(!isMobile, "mobile only flow, runs on the mobile projects");
+
+    const NEW_INVOICE_NUMBER = "QUICK-TAB-SWITCH/2026";
+
+    const invoiceNumberValueInput = page
+      .getByRole("group", { name: "Invoice Number" })
+      .getByRole("textbox", { name: "Value" });
+
+    await expect(invoiceNumberValueInput).toHaveValue(
+      INITIAL_INVOICE_DATA.invoiceNumberObject.value,
+    );
+
+    // The form saves itself to localStorage (and regenerates the PDF) on a debounce, so
+    // leaving the tab right after typing used to unmount the form mid debounce and drop
+    // the edit. No wait between the two actions on purpose: the switch has to happen
+    // inside the debounce window for this to test anything.
+    await invoiceNumberValueInput.fill(NEW_INVOICE_NUMBER);
+    await page.getByRole("tab", { name: "Preview PDF" }).click();
+
+    await expect(
+      page.getByRole("tab", { name: "Preview PDF" }),
+    ).toHaveAttribute("aria-selected", "true");
+
+    // the pending save still lands, even though the form tab is closed by now
+    await expect
+      .poll(async () => {
+        const storedData = await page.evaluate((key) => {
+          return localStorage.getItem(key);
+        }, PDF_DATA_LOCAL_STORAGE_KEY);
+
+        return storedData
+          ? (JSON.parse(storedData) as InvoiceData).invoiceNumberObject?.value
+          : null;
+      })
+      .toBe(NEW_INVOICE_NUMBER);
+
+    // and the edit is still there when the user comes back to the form
+    await page.getByRole("tab", { name: "Edit Invoice" }).click();
+
+    await expect(invoiceNumberValueInput).toHaveValue(NEW_INVOICE_NUMBER);
+  });
+
+  test("commits a pending form edit when leaving the form tab", async ({
+    page,
+    isMobile,
+  }) => {
+    // the tabs only exist in the mobile layout
+    // eslint-disable-next-line playwright/no-skipped-test -- mobile UI flow, mobile projects only
+    test.skip(!isMobile, "mobile only flow, runs on the mobile projects");
+
+    const NEW_INVOICE_NUMBER = "FLUSHED-ON-TAB-SWITCH/2026";
+
+    const readStoredInvoice = () => {
+      return page.evaluate((key) => {
+        return String(localStorage.getItem(key));
+      }, PDF_DATA_LOCAL_STORAGE_KEY);
+    };
+
+    // Pausing the clock takes the 500ms debounce out of the picture entirely: it can no
+    // longer fire on its own, so anything that reaches localStorage below got there
+    // because leaving the form tab flushed it. `install()` alone is not enough, the fake
+    // clock keeps ticking until it is paused.
+    await page.clock.install();
+    await page.goto("/?template=default");
+
+    // pause ahead of where the page's fake clock already is: `pauseAt` fast forwards to
+    // the given time and rejects a target that is already in the past, so the margin has
+    // to outlast the round trip that reads the clock (100ms did not, once the suite ran
+    // its workers in parallel). It also has to stay under the app's own idle timers, so
+    // the jump does not fire them - the earliest of those is the changelog popup at
+    // 1500ms.
+    const CLOCK_PAUSE_MARGIN = 1000;
+
+    const pageTime = await page.evaluate(() => {
+      return Date.now();
+    });
+
+    await page.clock.pauseAt(new Date(pageTime + CLOCK_PAUSE_MARGIN));
+
+    const invoiceNumberValueInput = page
+      .getByRole("group", { name: "Invoice Number" })
+      .getByRole("textbox", { name: "Value" });
+
+    await invoiceNumberValueInput.fill(NEW_INVOICE_NUMBER);
+
+    // the debounce is frozen, so nothing has been written yet
+    expect(await readStoredInvoice()).not.toContain(NEW_INVOICE_NUMBER);
+
+    await page.getByRole("tab", { name: "Preview PDF" }).click();
+
+    // ...and switching tabs commits it right away instead of waiting out the debounce
+    await expect.poll(readStoredInvoice).toContain(NEW_INVOICE_NUMBER);
   });
 
   test("displays initial form state correctly", async ({ page }) => {
@@ -788,7 +890,9 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     await expect(
-      page.getByText('Are you sure you want to delete the invoice item "#2"?'),
+      page.getByText(
+        'Are you sure you want to delete the invoice item "TEST INVOICE ITEM"?',
+      ),
     ).toBeVisible();
 
     // --- Test cancel flow first ---
@@ -802,7 +906,9 @@ test.describe("Invoice Generator Page", () => {
     ).toBeHidden();
 
     await expect(
-      page.getByText('Are you sure you want to delete the invoice item "#2"?'),
+      page.getByText(
+        'Are you sure you want to delete the invoice item "TEST INVOICE ITEM"?',
+      ),
     ).toBeHidden();
 
     // Item should still be present
@@ -1028,69 +1134,79 @@ test.describe("Invoice Generator Page", () => {
     await expect(page.getByLabel("Notifications alt+T")).toBeHidden();
   });
 
-  test("persists data in local storage", async ({ page }) => {
-    // Fill in some data
-    const invoiceNumberFieldset = page.getByRole("group", {
-      name: "Invoice Number",
-    });
+  test(
+    "persists data in local storage",
+    {
+      // form state -> localStorage -> rehydrate on reload, verified on Gecko too
+      tag: "@firefox-smoke",
+    },
+    async ({ page }) => {
+      // Fill in some data
+      const invoiceNumberFieldset = page.getByRole("group", {
+        name: "Invoice Number",
+      });
 
-    const invoiceNumberValueField = invoiceNumberFieldset.getByRole("textbox", {
-      name: "Value",
-    });
+      const invoiceNumberValueField = invoiceNumberFieldset.getByRole(
+        "textbox",
+        {
+          name: "Value",
+        },
+      );
 
-    await invoiceNumberValueField.fill("TEST/2024");
+      await invoiceNumberValueField.fill("TEST/2024");
 
-    const finalSection = page.getByTestId(`final-section`);
+      const finalSection = page.getByTestId(`final-section`);
 
-    await finalSection
-      .getByRole("textbox", { name: "Notes", exact: true })
-      .fill("Test note");
+      await finalSection
+        .getByRole("textbox", { name: "Notes", exact: true })
+        .fill("Test note");
 
-    // Check that "Invoice last updated:" text is displayed after filling in the data
-    await expect(
-      page.getByText("Invoice last updated:", { exact: false }),
-    ).toBeVisible();
+      // Check that "Invoice last updated:" text is displayed after filling in the data
+      await expect(
+        page.getByText("Invoice last updated:", { exact: false }),
+      ).toBeVisible();
 
-    // Wait a moment for any debounced localStorage updates
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(500);
+      // Wait a moment for any debounced localStorage updates
+      // eslint-disable-next-line playwright/no-wait-for-timeout
+      await page.waitForTimeout(500);
 
-    // Verify data is actually saved in localStorage
-    const storedData = (await page.evaluate((key) => {
-      return localStorage.getItem(key);
-    }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
+      // Verify data is actually saved in localStorage
+      const storedData = (await page.evaluate((key) => {
+        return localStorage.getItem(key);
+      }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
 
-    expect(storedData).toBeTruthy();
+      expect(storedData).toBeTruthy();
 
-    const parsedData = JSON.parse(storedData) as InvoiceData;
-    expect(parsedData).toMatchObject({
-      invoiceNumberObject: {
-        label: "Invoice No. of:",
-        value: "TEST/2024",
-      },
-      notes: "Test note",
-    } satisfies Pick<InvoiceData, "notes" | "invoiceNumberObject">);
+      const parsedData = JSON.parse(storedData) as InvoiceData;
+      expect(parsedData).toMatchObject({
+        invoiceNumberObject: {
+          label: "Invoice No. of:",
+          value: "TEST/2024",
+        },
+        notes: "Test note",
+      } satisfies Pick<InvoiceData, "notes" | "invoiceNumberObject">);
 
-    // Reload page
-    await page.reload();
+      // Reload page
+      await page.reload();
 
-    // Check if data persists in UI
-    const invoiceNumberFieldset2 = page.getByRole("group", {
-      name: "Invoice Number",
-    });
+      // Check if data persists in UI
+      const invoiceNumberFieldset2 = page.getByRole("group", {
+        name: "Invoice Number",
+      });
 
-    const invoiceNumberValueField2 = invoiceNumberFieldset2.getByRole(
-      "textbox",
-      {
-        name: "Value",
-      },
-    );
-    await expect(invoiceNumberValueField2).toHaveValue("TEST/2024");
+      const invoiceNumberValueField2 = invoiceNumberFieldset2.getByRole(
+        "textbox",
+        {
+          name: "Value",
+        },
+      );
+      await expect(invoiceNumberValueField2).toHaveValue("TEST/2024");
 
-    await expect(
-      finalSection.getByRole("textbox", { name: "Notes", exact: true }),
-    ).toHaveValue("Test note");
-  });
+      await expect(
+        finalSection.getByRole("textbox", { name: "Notes", exact: true }),
+      ).toHaveValue("Test note");
+    },
+  );
 
   test("handles currency switching", async ({ page }) => {
     const invoiceItemsSection = page.getByTestId(`invoice-items-section`);

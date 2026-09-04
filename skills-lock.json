@@ -99,6 +99,12 @@
       "skillPath": ".agents/skills/seo-project-setup/SKILL.md",
       "computedHash": "5872bc785e0ab88674a5787f70da513ecf487b6778acbbf99c35f6a8ff59fc99"
     },
+    "typescript-advanced-types": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "skillPath": "plugins/javascript-typescript/skills/typescript-advanced-types/SKILL.md",
+      "computedHash": "8cbf2bf600f392d7260e476e3202932a876e2281cda3b15a8b6a5a43f383252d"
+    },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",

@@ -74,18 +74,25 @@ function LoadingHeader() {
 function MobileEditorLoading() {
   return (
     <div className="min-h-[814px] lg:hidden">
-      <div className="flex h-10 w-full items-center gap-2 rounded-md bg-slate-200 p-1">
-        <Skeleton className="h-7 flex-1 bg-white" />
-        <Skeleton className="h-7 flex-1 bg-slate-300" />
-      </div>
-
       <div className="mx-3">
-        <div className="mt-3 h-[520px] overflow-hidden rounded-lg border px-4 shadow-sm">
+        <div className="mt-1 h-[520px] overflow-hidden rounded-lg border px-4 shadow-sm">
           <FormLoadingContent />
         </div>
       </div>
 
-      <div className="sticky bottom-0 z-50 mt-2 flex h-[108px] flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3">
+      {/*
+        Mirrors the dock in `InvoiceClientPage`: the Edit / Preview switch sits inside it,
+        above the two buttons, as a pill track with the indicator on the active tab.
+      */}
+      <div className="sticky bottom-0 z-50 mt-2 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="flex h-10 w-full items-center rounded-full bg-slate-200 p-1">
+          <div className="flex h-8 flex-1 items-center justify-center rounded-full bg-white shadow-[0_2px_4px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.06),0_0_1px_rgba(0,0,0,0.06)]">
+            <Skeleton className="h-3 w-[86px] bg-slate-200" />
+          </div>
+          <div className="flex h-8 flex-1 items-center justify-center">
+            <Skeleton className="h-3 w-[86px] bg-slate-300" />
+          </div>
+        </div>
         <Skeleton className="h-9 w-full bg-slate-100" />
         <Skeleton className="h-9 w-full bg-slate-100" />
       </div>
@@ -134,13 +141,15 @@ function FormLoadingContent() {
         <Skeleton className="h-6 w-[190px]" />
         <Skeleton className="size-6 shrink-0 rounded-full" />
       </div>
-      {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="space-y-2">
-          <Skeleton className="h-3 w-28" />
-          <Skeleton className="h-9 w-full bg-slate-100" />
-          <Skeleton className="h-2.5 w-4/5" />
-        </div>
-      ))}
+      {Array.from({ length: 4 }).map((_, index) => {
+        return (
+          <div key={index} className="space-y-2">
+            <Skeleton className="h-3 w-28" />
+            <Skeleton className="h-9 w-full bg-slate-100" />
+            <Skeleton className="h-2.5 w-4/5" />
+          </div>
+        );
+      })}
       <div className="rounded-md border border-slate-200 p-4">
         <Skeleton className="mb-4 h-5 w-36" />
         <div className="space-y-3">

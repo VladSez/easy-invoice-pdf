@@ -1,22 +1,24 @@
 "use client";
 
+import { Star } from "lucide-react";
+
 import { GITHUB_URL } from "@/config";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-import { Star } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { githubStarCountFormatter } from "@/utils/number-formatter";
+
 import { GithubIcon } from "./etc/github-logo";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { githubStarCountFormatter } from "@/utils/number-formatter";
-import { cn } from "@/lib/utils";
+
+const handleStarClick = () => {
+  umamiTrackEvent("github_star_cta_clicked");
+};
 
 export function GitHubStarCTA({
   githubStarsCount = 0,
 }: {
   githubStarsCount: number;
 }) {
-  const handleStarClick = () => {
-    umamiTrackEvent("github_star_cta_clicked");
-  };
-
   const gitHubStarCountFormatted = githubStarCountFormatter
     .format(githubStarsCount)
     .toLowerCase();

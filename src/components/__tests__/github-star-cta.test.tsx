@@ -1,17 +1,20 @@
 // @vitest-environment happy-dom
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
 
 import { GITHUB_URL } from "@/config";
+
 import { GitHubStarCTA } from "../github-star-cta";
 import { TooltipProvider } from "../ui/tooltip";
 
-vi.mock("@/lib/umami-analytics-track-event", () => ({
-  umamiTrackEvent: vi.fn(),
-}));
+vi.mock("@/lib/umami-analytics-track-event", () => {
+  return {
+    umamiTrackEvent: vi.fn(),
+  };
+});
 
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 
@@ -87,7 +90,7 @@ describe("GitHubStarCTA", () => {
   });
 
   it("should show lowercase formatted star count when count is over 10k", () => {
-    const githubStarsCount = 15000;
+    const githubStarsCount = 15_000;
 
     renderGitHubStarCTA(githubStarsCount);
 

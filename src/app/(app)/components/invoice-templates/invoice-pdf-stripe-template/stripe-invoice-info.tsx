@@ -1,8 +1,9 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
-import { type InvoiceData } from "@/app/schema";
 import dayjs from "dayjs";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { type InvoiceData } from "@/app/schema";
+
 import type { STRIPE_TEMPLATE_STYLES } from ".";
 
 export function StripeInvoiceInfo({

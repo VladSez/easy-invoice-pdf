@@ -1,6 +1,7 @@
-import type { InvoiceData } from "@/app/schema";
 import type { FieldErrors } from "react-hook-form";
 import { toast } from "sonner";
+
+import type { InvoiceData } from "@/app/schema";
 
 /**
  * Show toast listing form validation errors.
@@ -34,15 +35,20 @@ export function formErrorsToToast({
             }
 
             if (Array.isArray(error)) {
-              return error.map((item, index) =>
-                Object.entries(
+              return error.map((item, index) => {
+                return Object.entries(
                   item as { [key: string]: { message?: string } },
-                ).map(([fieldName, fieldError]) => (
-                  <li key={`${key}.${index}.${fieldName}`} className="text-sm">
-                    {fieldError?.message || "Unknown error"}
-                  </li>
-                )),
-              );
+                ).map(([fieldName, fieldError]) => {
+                  return (
+                    <li
+                      key={`${key}.${index}.${fieldName}`}
+                      className="text-sm"
+                    >
+                      {fieldError?.message || "Unknown error"}
+                    </li>
+                  );
+                });
+              });
             }
 
             if (error && typeof error === "object") {

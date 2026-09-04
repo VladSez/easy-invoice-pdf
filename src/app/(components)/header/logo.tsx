@@ -1,5 +1,5 @@
-import { FinalProjectLogo } from "@/components/etc/final-project-logo";
 import { ProjectLogoDescription } from "@/app/(components)/project-logo-description";
+import { FinalProjectLogo } from "@/components/etc/final-project-logo";
 import { cn } from "@/lib/utils";
 
 export function Logo({

@@ -1,9 +1,9 @@
-import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
 
-export interface SelectPropsNative
-  extends React.SelectHTMLAttributes<HTMLSelectElement> {
+import { cn } from "@/lib/utils";
+
+export interface SelectPropsNative extends React.SelectHTMLAttributes<HTMLSelectElement> {
   children: React.ReactNode;
 }
 
@@ -28,11 +28,11 @@ const SelectNative = React.forwardRef<HTMLSelectElement, SelectPropsNative>(
         >
           {children}
         </select>
-        {!props.multiple && (
+        {!props.multiple ? (
           <span className="pointer-events-none absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center text-slate-500/80 peer-disabled:opacity-50 dark:text-slate-400/80">
             <ChevronDown size={16} strokeWidth={2} aria-hidden="true" />
           </span>
-        )}
+        ) : null}
       </div>
     );
   },

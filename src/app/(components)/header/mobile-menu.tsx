@@ -1,17 +1,19 @@
 "use client";
 
-import { GithubIcon } from "@/components/etc/github-logo";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { ArrowRightIcon, StarIcon } from "lucide-react";
 import type { Locale } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef } from "react";
-import { LanguageSwitcher } from "./language-switcher";
-import { GITHUB_URL } from "@/config";
+import { useEffect, useId } from "react";
+
 import type { HeaderProps } from "@/app/(components)/header";
+import { GithubIcon } from "@/components/etc/github-logo";
+import { Button } from "@/components/ui/button";
+import { GITHUB_URL } from "@/config";
+import { cn } from "@/lib/utils";
 import { githubStarCountFormatter } from "@/utils/number-formatter";
+
+import { LanguageSwitcher } from "./language-switcher";
 
 interface MobileMenuSharedProps {
   locale: Locale;
@@ -58,19 +60,20 @@ export function MobileMenuPanel({
   const isTosActive = pathname === "/tos";
   const isHomeActive = pathname === `/${locale}/about`;
 
-  const onOpenChangeRef = useRef(onOpenChange);
-  onOpenChangeRef.current = onOpenChange;
-
   // close mobile menu when escape key is pressed
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onOpenChangeRef.current(false);
+      if (e.key === "Escape") onOpenChange(false);
     }
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+    return () => {
+      return window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onOpenChange]);
 
-  const close = () => onOpenChange(false);
+  const close = () => {
+    return onOpenChange(false);
+  };
 
   return (
     <div

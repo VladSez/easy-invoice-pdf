@@ -1,7 +1,13 @@
-import { defineConfig, devices } from "@playwright/test";
-
-import dotenv from "dotenv";
 import path from "node:path";
+
+import {
+  defineConfig,
+  devices,
+  type PlaywrightTestOptions,
+} from "@playwright/test";
+import dotenv from "dotenv";
+
+import { SENTRY_E2E_DISABLED_STORAGE_KEY } from "./src/lib/sentry/sentry-e2e-flags";
 
 /**
  * Read environment variables from file.
@@ -17,6 +23,33 @@ const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
 
 // @ts-expect-error - NODE_ENV is not defined in the environment variables
 const isLocal = process.env.NODE_ENV === "local";
+
+/**
+ * Analytics and error reporting are switched off for every project.
+ *
+ * The suite runs against a real preview deployment, which has Sentry enabled like
+ * production does, so an env var on the CI job cannot tell e2e traffic apart from a
+ * human browsing the same URL — the browser has to say so itself. `sentry.disabled` is
+ * read by `src/instrumentation-client.ts` before the SDK starts up.
+ */
+const STORAGE_STATE = {
+  cookies: [],
+  origins: [
+    {
+      origin: BASE_URL,
+      localStorage: [
+        {
+          name: "umami.disabled",
+          value: "1",
+        },
+        {
+          name: SENTRY_E2E_DISABLED_STORAGE_KEY,
+          value: "1",
+        },
+      ],
+    },
+  ],
+} as const satisfies PlaywrightTestOptions["storageState"];
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -76,27 +109,34 @@ export default defineConfig({
         launchOptions: {
           args: ["--disable-font-subpixel-positioning", "--disable-lcd-text"],
         },
-        // Set localStorage to disable umami analytics
-        storageState: {
-          cookies: [],
-          origins: [
-            {
-              origin: BASE_URL,
-              localStorage: [
-                {
-                  name: "umami.disabled",
-                  value: "1",
-                },
-              ],
-            },
-          ],
-        },
+        storageState: STORAGE_STATE,
       },
     },
-    // {
-    //   name: "webkit",
-    //   use: { ...devices["Desktop Safari"] },
-    // },
+    /**
+     * Gecko smoke coverage.
+     *
+     * `Mobile Safari` already covers WebKit, so Firefox is the only engine we
+     * would otherwise never run. It is scoped with `grep` to the handful of
+     * tests tagged `@firefox-smoke` (the riskiest engine-sensitive paths:
+     * client side PDF generation + download, localStorage persistence and the
+     * shared invoice URL round trip) instead of the full suite.
+     *
+     * NOTE: no `channel` and no `launchOptions.args` here - those are Chromium
+     * only. Clipboard permissions are omitted too, Firefox rejects
+     * `clipboard-read`/`clipboard-write`.
+     *
+     * Visual snapshots are never compared on this project, see
+     * DEFAULT_SNAPSHOT_PROJECT in `e2e/utils/pdf-download.ts`, so it needs no
+     * screenshot baselines of its own.
+     */
+    {
+      name: "Desktop Firefox",
+      grep: /@firefox-smoke/,
+      use: {
+        ...devices["Desktop Firefox"],
+        storageState: STORAGE_STATE,
+      },
+    },
 
     // /* Test against mobile viewports. */
     {
@@ -109,21 +149,7 @@ export default defineConfig({
         launchOptions: {
           args: ["--disable-font-subpixel-positioning", "--disable-lcd-text"],
         },
-        // Set localStorage to disable umami analytics
-        storageState: {
-          cookies: [],
-          origins: [
-            {
-              origin: BASE_URL,
-              localStorage: [
-                {
-                  name: "umami.disabled",
-                  value: "1",
-                },
-              ],
-            },
-          ],
-        },
+        storageState: STORAGE_STATE,
       },
     },
     {
@@ -135,21 +161,7 @@ export default defineConfig({
         launchOptions: {
           args: ["--disable-font-subpixel-positioning", "--disable-lcd-text"],
         },
-        // Set localStorage to disable umami analytics
-        storageState: {
-          cookies: [],
-          origins: [
-            {
-              origin: BASE_URL,
-              localStorage: [
-                {
-                  name: "umami.disabled",
-                  value: "1",
-                },
-              ],
-            },
-          ],
-        },
+        storageState: STORAGE_STATE,
       },
     },
 

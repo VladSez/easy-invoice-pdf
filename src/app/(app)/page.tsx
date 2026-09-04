@@ -1,12 +1,14 @@
+import * as Sentry from "@sentry/nextjs";
 import type { Metadata } from "next";
-import { AppPageClient } from "./page.client";
-import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
+
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { getLatestChangelogSummary } from "@/app/changelog/utils";
+import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
+import { computeIndexingFlags } from "@/lib/seo/indexing-utils";
+
 import { CTAToastProvider } from "./contexts/cta-toast-context";
 import { HomeJsonLd } from "./home-json-ld";
-import { computeIndexingFlags } from "@/lib/seo/indexing-utils";
-import * as Sentry from "@sentry/nextjs";
+import { AppPageClient } from "./page.client";
 
 const APP_PAGE_DESCRIPTION =
   "Create professional PDF invoices online for free. Customize invoice templates, add your logo, download instantly, and send invoices without signup.";
@@ -131,10 +133,12 @@ function resolveAppPageRobots(
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }): Promise<Metadata> {
-  const { shouldIndex } = computeIndexingFlags(searchParams);
-  const isStripeTemplate = Boolean(searchParams?.template === "stripe");
+  const resolvedSearchParams = await searchParams;
+
+  const { shouldIndex } = computeIndexingFlags(resolvedSearchParams);
+  const isStripeTemplate = resolvedSearchParams?.template === "stripe";
 
   const templateMetadata = buildTemplateMetadata(
     isStripeTemplate ? STRIPE_TEMPLATE_META : DEFAULT_TEMPLATE_META,
@@ -151,9 +155,9 @@ export async function generateMetadata({
 export default async function AppPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { shouldIndex } = computeIndexingFlags(searchParams);
+  const { shouldIndex } = computeIndexingFlags(await searchParams);
 
   const [githubStarsCount, latestChangelog] = await Promise.all([
     fetchGithubStars(),

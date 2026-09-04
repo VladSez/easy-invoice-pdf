@@ -3,19 +3,26 @@ import type { KnipConfig } from "knip";
 // https://knip.dev/reference/configuration#_top
 const config: KnipConfig = {
   // Trigger.dev entry points (https://trigger.dev/docs/config/config-file)
-  entry: ["trigger.config.ts", "src/trigger/monthly-recurring-invoice.ts"],
+  entry: [
+    "trigger.config.ts",
+    "src/trigger/monthly-recurring-invoice.ts",
+    // spawned as a child process by e2e/server-render-pdf/server-render-pdf.test.ts
+    "e2e/server-render-pdf/render-server-pdf.mjs",
+  ],
   ignoreDependencies: [
     "shadcn",
     "@radix-ui/react-separator",
     "@types/ua-parser-js",
-    "eslint-plugin-react-hooks",
     "file-saver",
     "jszip",
-    "@next/eslint-plugin-next",
     "@types/file-saver",
-    "eslint-config-next",
-    "@ianvs/prettier-plugin-sort-imports",
-    "pdfjs-dist",
+    // loaded by oxlint through `jsPlugins` in .oxlintrc.json, never imported
+    "eslint-plugin-playwright",
+    "eslint-plugin-react",
+    "eslint-plugin-react-you-might-not-need-an-effect",
+    // Sentry resolves these directly when instrumenting Next.js in development.
+    "import-in-the-middle",
+    "require-in-the-middle",
   ],
   ignore: [
     "src/app/**/invoice-pdf-download-multiple-languages.tsx",
@@ -24,7 +31,7 @@ const config: KnipConfig = {
     "src/i18n/**/*",
     "src/app/schema/**/*",
     "src/app/changelog/content/**/*",
-    "src/app/(app)/pdf-i18n-translations/pdf-translations.ts",
+    "src/app/(app)/pdf-i18n-translations/pdf-translations-schema.ts",
   ],
   includeEntryExports: true,
   // ignore tags

@@ -1,10 +1,18 @@
-import { invoiceSchema, type InvoiceData } from "@/app/schema";
-import type { InvoiceFolderResult } from "@/lib/google-drive";
-import { compressInvoiceData } from "@/utils/url-compression";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import type { drive_v3 } from "googleapis";
 import { compressToEncodedURIComponent } from "lz-string";
 import type { Attachment, CreateEmailResponse } from "resend";
+
+import { invoiceSchema, type InvoiceData } from "@/app/schema";
+import type { InvoiceFolderResult } from "@/lib/google-drive";
+import { compressInvoiceData } from "@/utils/url-compression";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const WARSAW_TIME_ZONE = "Europe/Warsaw";
 
 /**
  * Formats milliseconds into a human-readable duration string.
@@ -154,6 +162,7 @@ export async function generateInvoice(
   input: GenerateInvoiceInput,
 ): Promise<GenerateInvoiceResult> {
   const startTime = performance.now();
+  const warsawNow = dayjs().tz(WARSAW_TIME_ZONE);
 
   const {
     renderEnInvoice,
@@ -181,26 +190,30 @@ export async function generateInvoice(
 
   const renderedInvoices = await Promise.allSettled([
     renderEnInvoice()
-      .then((buf) => ({ language: "en", document: buf }))
-      .catch((err) => {
+      .then((buf) => {
+        return { language: "en", document: buf };
+      })
+      .catch((error) => {
         console.error(
           "[generate-invoice] Error during `renderToBuffer` for ENGLISH invoice:",
-          err,
+          error,
         );
-        throw err;
+        throw error;
       }),
     renderPlInvoice()
-      .then((buf) => ({ language: "pl", document: buf }))
-      .catch((err) => {
+      .then((buf) => {
+        return { language: "pl", document: buf };
+      })
+      .catch((error) => {
         console.error(
           "[generate-invoice] Error during `renderToBuffer` for POLISH invoice:",
-          err,
+          error,
         );
-        throw err;
+        throw error;
       }),
   ]);
 
-  console.log(
+  console.info(
     "[generate-invoice] PDF rendering completed in",
     formatDuration(performance.now() - renderStartTime),
   );
@@ -229,8 +242,8 @@ export async function generateInvoice(
   const invoiceNumber =
     englishInvoiceData?.invoiceNumberObject?.value?.trim() || "";
   const formattedInvoiceNumber = invoiceNumber
-    ? invoiceNumber.replace(/\//g, "-")
-    : dayjs().format("MM-YYYY");
+    ? invoiceNumber.replaceAll("/", "-")
+    : warsawNow.format("MM-YYYY");
 
   const attachments = fulfilledInvoices.map((doc) => {
     const fileName = `invoice-${doc.language.toUpperCase()}-${formattedInvoiceNumber}.pdf`;
@@ -242,7 +255,7 @@ export async function generateInvoice(
   });
 
   // Guard: if every render failed, there is nothing to upload or send.
-  if (!attachments.length) {
+  if (attachments.length === 0) {
     return {
       ok: false,
       kind: "no_attachments",
@@ -266,7 +279,7 @@ export async function generateInvoice(
   const compressedData = compressToEncodedURIComponent(compressedJson);
   const invoiceUrl = `https://easyinvoicepdf.com/?template=${newInvoiceDataValidated.template}&data=${compressedData}`;
 
-  const monthAndYear = dayjs().format("MMMM YYYY");
+  const monthAndYear = warsawNow.format("MMMM YYYY");
   const invoiceNumberValue = englishInvoiceData?.invoiceNumberObject?.value;
 
   // ─── Step 3: Upload PDFs to Google Drive ─────────────────────────────────
@@ -279,8 +292,8 @@ export async function generateInvoice(
       // Authenticate, then resolve (or create) the month/year folder in Drive.
       const googleDrive = await initializeGoogleDrive();
 
-      const currentMonth = dayjs().format("MM");
-      const currentYear = dayjs().format("YYYY");
+      const currentMonth = warsawNow.format("MM");
+      const currentYear = warsawNow.format("YYYY");
 
       const folderResult = await createOrFindInvoiceFolder({
         googleDrive,
@@ -300,23 +313,25 @@ export async function generateInvoice(
       const uploadStartTime = performance.now();
 
       const uploadResults = await Promise.allSettled(
-        attachments.map((attachment) =>
-          uploadFile({
+        attachments.map((attachment) => {
+          return uploadFile({
             googleDrive,
             fileName: attachment.filename,
             fileContent: Buffer.from(attachment.content),
             folderId: folderToUploadInvoices.id,
-          }),
-        ),
+          });
+        }),
       );
 
-      console.log(
+      console.info(
         "[generate-invoice] PDF uploading to Google Drive completed in",
         formatDuration(performance.now() - uploadStartTime),
       );
 
       const failedUploads = uploadResults.filter(
-        (r): r is PromiseRejectedResult => r.status === "rejected",
+        (r): r is PromiseRejectedResult => {
+          return r.status === "rejected";
+        },
       );
 
       if (failedUploads.length > 0) {
@@ -340,14 +355,14 @@ export async function generateInvoice(
       }
 
       savedToGoogleDrive = true;
-    } catch (err) {
-      console.error("[generate-invoice] Google Drive setup failed:", err);
+    } catch (error) {
+      console.error("[generate-invoice] Google Drive setup failed:", error);
 
       return {
         ok: false,
         kind: "upload_failed",
         error: `[generate-invoice] Failed to initialize Google Drive: ${
-          err instanceof Error ? err.message : "Unknown error"
+          error instanceof Error ? error.message : "Unknown error"
         }`,
         report: {
           invoiceENgeneratedSuccessfully,
@@ -385,7 +400,9 @@ export async function generateInvoice(
   const testModeWarningBlock =
     testModeWarnings.length > 0
       ? `\n\n⚠️⚠️⚠️ *Test mode warning:* ⚠️⚠️⚠️\n\n${testModeWarnings
-          .map((w) => `- ${w}`)
+          .map((w) => {
+            return `- ${w}`;
+          })
           .join("\n")}\n\n⚠️⚠️⚠️ *Test mode warning ends here* ⚠️⚠️⚠️\n\n`
       : "";
 
@@ -409,7 +426,7 @@ export async function generateInvoice(
       message: `${testModeWarningBlock}📝 *Invoices for ${monthAndYear}*
 
 Invoice No. of: *${invoiceNumberValue}*
-Date: *${dayjs().format("MMMM D, YYYY")}*
+Date: *${warsawNow.format("MMMM D, YYYY")}*
 
 The generated invoices are included in the attachments. Please check them carefully.
 
@@ -423,10 +440,12 @@ Have a nice day!
 
 Best regards,
 EasyInvoicePDF.com`,
-      files: attachments.map((attachment) => ({
-        filename: attachment.filename,
-        buffer: Buffer.from(attachment.content),
-      })),
+      files: attachments.map((attachment) => {
+        return {
+          filename: attachment.filename,
+          buffer: Buffer.from(attachment.content),
+        };
+      }),
     }),
   ];
 
@@ -438,7 +457,7 @@ EasyInvoicePDF.com`,
         subject: `📝 Invoices for ${monthAndYear}`,
         html: `${emailGoogleDriveWarningHtml}<p>Hello,</p>
     <span>Invoice No. of: <b>${invoiceNumberValue}</b><br/>
-    Date: <b>${dayjs().format("MMMM D, YYYY")}</b>
+    Date: <b>${warsawNow.format("MMMM D, YYYY")}</b>
     <br/>
     <br/>
 
@@ -470,7 +489,7 @@ EasyInvoicePDF.com`,
 
   const notificationResults = await Promise.allSettled(notifications);
 
-  console.log(
+  console.info(
     "[generate-invoice] Notifications sending completed in",
     formatDuration(performance.now() - notificationStartTime),
   );
@@ -482,7 +501,9 @@ EasyInvoicePDF.com`,
     : false;
 
   const failedNotifications = notificationResults.filter(
-    (r): r is PromiseRejectedResult => r.status === "rejected",
+    (r): r is PromiseRejectedResult => {
+      return r.status === "rejected";
+    },
   );
 
   if (failedNotifications.length > 0) {

@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
+
 import {
   AnimatedDiv,
   blockEnterSpring,
 } from "@/app/founder/components/animated-div";
 import { AnimatedSignature } from "@/app/founder/components/animated-signature";
 import { LINKEDIN_URL, TWITTER_URL } from "@/config";
-import Link from "next/link";
 
 export default function ContactPage() {
   return (
