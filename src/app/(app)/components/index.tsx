@@ -209,20 +209,6 @@ export function InvoiceClientPage({
               });
             }}
           >
-            <TabsList className="w-full">
-              <TabsTrigger value={TAB_INVOICE_FORM} className="flex-1">
-                <span className="flex items-center gap-1">
-                  <PencilIcon className="h-4 w-4" />
-                  Edit Invoice
-                </span>
-              </TabsTrigger>
-              <TabsTrigger value={TAB_INVOICE_PREVIEW} className="flex-1">
-                <span className="flex items-center gap-1">
-                  <FileTextIcon className="h-4 w-4" />
-                  Preview PDF
-                </span>
-              </TabsTrigger>
-            </TabsList>
             <TabsContent
               value={TAB_INVOICE_FORM}
               forceMount={keepMounted(TAB_INVOICE_FORM)}
@@ -249,60 +235,110 @@ export function InvoiceClientPage({
                 <PdfViewer isMobile={isMobile} />
               </div>
             </TabsContent>
-          </Tabs>
-          <div className="sticky bottom-0 z-50 mt-2 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
-            <CustomTooltip
-              className={cn(!canShareInvoice && "bg-red-50")}
-              trigger={
-                <Button
-                  data-disabled={!canShareInvoice} // for better UX than 'disabled'
-                  onClick={handleShareInvoice}
-                  variant="outline"
-                  className={cn("mx-2 w-full")}
+            <div className="sticky bottom-0 z-50 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
+              {/*
+                The switch lives in the dock rather than at the top of the page, so it sits
+                in the same thumb zone as the two buttons it belongs with.
+
+                Styled after HeroUI's tabs: a pill-shaped track and a single indicator that
+                slides between the two tabs, instead of a background that appears on the
+                active trigger. The indicator is a plain element Radix never sees — with
+                exactly two equal-width tabs it is half the track wide and moves by its own
+                width, so there are no magic offsets to keep in sync.
+              */}
+              {/*
+                `gap-0` matters: the base `TabsList` spaces its triggers by 8px, which would
+                make each one 4px narrower than the indicator and leave the pill sitting
+                slightly off its label. With no gap, a trigger and the indicator are both
+                exactly half the track minus the 4px inset.
+              */}
+              <TabsList className="relative h-10 w-full gap-0 rounded-full bg-slate-200 p-1">
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "pointer-events-none absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-white",
+                    "shadow-[0_2px_4px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.06),0_0_1px_rgba(0,0,0,0.06)]",
+                    "transition-transform duration-300 [transition-timing-function:cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none",
+                    activeMobileTab === TAB_INVOICE_PREVIEW &&
+                      "translate-x-full",
+                  )}
+                />
+                <TabsTrigger
+                  value={TAB_INVOICE_FORM}
+                  // `bg-transparent` and `shadow-none` are load-bearing: without them the
+                  // trigger paints its own white pill on top of the sliding indicator
+                  className="z-10 flex-1 rounded-full text-slate-600 hover:bg-transparent hover:text-slate-900 data-[state=active]:bg-transparent data-[state=active]:text-slate-900 data-[state=active]:shadow-none"
+                  data-testid="edit-invoice-tab"
                 >
-                  <LinkIcon className="mr-1.5 size-4" />
-                  Get link
-                </Button>
-              }
-              content={
-                canShareInvoice ? (
-                  <div className="flex items-center gap-3 p-2">
-                    <div className="space-y-1">
-                      <p className="text-sm font-semibold text-slate-900">
-                        Share Invoice Online
-                      </p>
-                      <p className="text-pretty text-xs leading-relaxed text-slate-700">
-                        Generate a link to share this invoice with your clients.
-                        They can view and download it directly from their
-                        browser.
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    data-testid="share-invoice-tooltip-content"
-                    className="flex items-center gap-3 bg-red-50 p-3"
+                  <span className="flex items-center gap-1">
+                    <PencilIcon className="h-4 w-4" />
+                    Edit Invoice
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value={TAB_INVOICE_PREVIEW}
+                  className="z-10 flex-1 rounded-full text-slate-600 hover:bg-transparent hover:text-slate-900 data-[state=active]:bg-transparent data-[state=active]:text-slate-900 data-[state=active]:shadow-none"
+                  data-testid="preview-pdf-tab"
+                >
+                  <span className="flex items-center gap-1">
+                    <FileTextIcon className="h-4 w-4" />
+                    Preview PDF
+                  </span>
+                </TabsTrigger>
+              </TabsList>
+              <CustomTooltip
+                className={cn(!canShareInvoice && "bg-red-50")}
+                trigger={
+                  <Button
+                    data-disabled={!canShareInvoice} // for better UX than 'disabled'
+                    onClick={handleShareInvoice}
+                    variant="outline"
+                    className={cn("mx-2 w-full")}
                   >
-                    <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
-                    <div className="space-y-1">
-                      <p className="text-sm font-semibold text-red-800">
-                        Unable to Share Invoice
-                      </p>
-                      <p className="text-pretty text-xs leading-relaxed text-red-700">
-                        Invoices with logos cannot be shared. Please remove the
-                        logo to generate a shareable link. You can still
-                        download the invoice as PDF and share it.
-                      </p>
+                    <LinkIcon className="mr-1.5 size-4" />
+                    Get link
+                  </Button>
+                }
+                content={
+                  canShareInvoice ? (
+                    <div className="flex items-center gap-3 p-2">
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold text-slate-900">
+                          Share Invoice Online
+                        </p>
+                        <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                          Generate a link to share this invoice with your
+                          clients. They can view and download it directly from
+                          their browser.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                )
-              }
-            />
-            <InvoicePDFDownloadLink
-              invoiceData={invoiceDataState}
-              isMobile={isMobile}
-            />
-          </div>
+                  ) : (
+                    <div
+                      data-testid="share-invoice-tooltip-content"
+                      className="flex items-center gap-3 bg-red-50 p-3"
+                    >
+                      <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold text-red-800">
+                          Unable to Share Invoice
+                        </p>
+                        <p className="text-pretty text-xs leading-relaxed text-red-700">
+                          Invoices with logos cannot be shared. Please remove
+                          the logo to generate a shareable link. You can still
+                          download the invoice as PDF and share it.
+                        </p>
+                      </div>
+                    </div>
+                  )
+                }
+              />
+              <InvoicePDFDownloadLink
+                invoiceData={invoiceDataState}
+                isMobile={isMobile}
+              />
+            </div>
+          </Tabs>
           {/** Mobile version */}
           <div className="relative mx-2 mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
             {invoiceLastUpdatedAtFormatted ? (
