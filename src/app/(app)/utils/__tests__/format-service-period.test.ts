@@ -5,7 +5,6 @@ import {
   formatServicePeriodRange,
   getCurrentMonthAndYear,
   getServicePeriod,
-  isFirstDayOfMonth,
   isServicePeriodStartInCurrentMonth,
 } from "@/app/(app)/utils/format-service-period";
 import type { InvoiceData } from "@/app/schema";
@@ -45,18 +44,6 @@ describe("format-service-period", () => {
       } as InvoiceData);
 
       expect(result).toBe("2025-06-20");
-    });
-  });
-
-  describe("isFirstDayOfMonth", () => {
-    it("should return true for the first day of any month", () => {
-      expect(isFirstDayOfMonth("2026-05-01")).toBe(true);
-      expect(isFirstDayOfMonth("2025-12-01")).toBe(true);
-    });
-
-    it("should return false for non-first days regardless of current month", () => {
-      expect(isFirstDayOfMonth("2026-05-11")).toBe(false);
-      expect(isFirstDayOfMonth("2025-06-14")).toBe(false);
     });
   });
 

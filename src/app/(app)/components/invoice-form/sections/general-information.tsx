@@ -22,7 +22,6 @@ import {
 import { formatTodayWithLocale } from "@/app/(app)/utils/format-date-with-locale";
 import {
   getCurrentMonthAndYear,
-  isFirstDayOfMonth,
   isServicePeriodStartInCurrentMonth,
 } from "@/app/(app)/utils/format-service-period";
 import {
@@ -246,9 +245,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                       // Set service period field to be VISIBLE for Stripe template (for backwards compatibility)
                       setValue("servicePeriodFieldIsVisible", true);
-                    } else {
-                      // DEFAULT TEMPLATE
-
+                    } else if (newTemplate === "default") {
                       // Clear Stripe-specific fields when not using Stripe template
                       if (errors.stripePayOnlineUrl) {
                         setValue("stripePayOnlineUrl", "");
@@ -259,6 +256,9 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                       // Set unit field to be VISIBLE for default template
                       setValue("items.0.unitFieldIsVisible", true);
+
+                      // Set service period field to be HIDDEN for default template (matches the default template behaviour)
+                      setValue("servicePeriodFieldIsVisible", false);
                     }
                   }}
                 >
@@ -653,19 +653,6 @@ export const GeneralInformation = memo(function GeneralInformation({
                       className={inputErrorClassName(
                         !!errors.dateOfServiceStart,
                       )}
-                      onChange={(e) => {
-                        field.onChange(e);
-
-                        const newServicePeriodStartDate = e.target.value;
-
-                        // auto-show "Service period" in PDF when start date is not first day of its month
-                        if (
-                          newServicePeriodStartDate &&
-                          !isFirstDayOfMonth(newServicePeriodStartDate)
-                        ) {
-                          setValue("servicePeriodFieldIsVisible", true);
-                        }
-                      }}
                     />
                   );
                 }}
