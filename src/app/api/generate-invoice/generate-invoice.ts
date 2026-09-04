@@ -1,6 +1,3 @@
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import type { drive_v3 } from "googleapis";
 import { compressToEncodedURIComponent } from "lz-string";
 import type { Attachment, CreateEmailResponse } from "resend";
@@ -9,10 +6,7 @@ import { invoiceSchema, type InvoiceData } from "@/app/schema";
 import type { InvoiceFolderResult } from "@/lib/google-drive";
 import { compressInvoiceData } from "@/utils/url-compression";
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-const WARSAW_TIME_ZONE = "Europe/Warsaw";
+import { warsawNow } from "./warsaw-now";
 
 /**
  * Formats milliseconds into a human-readable duration string.
@@ -162,7 +156,7 @@ export async function generateInvoice(
   input: GenerateInvoiceInput,
 ): Promise<GenerateInvoiceResult> {
   const startTime = performance.now();
-  const warsawNow = dayjs().tz(WARSAW_TIME_ZONE);
+  const now = warsawNow();
 
   const {
     renderEnInvoice,
@@ -243,7 +237,7 @@ export async function generateInvoice(
     englishInvoiceData?.invoiceNumberObject?.value?.trim() || "";
   const formattedInvoiceNumber = invoiceNumber
     ? invoiceNumber.replaceAll("/", "-")
-    : warsawNow.format("MM-YYYY");
+    : now.format("MM-YYYY");
 
   const attachments = fulfilledInvoices.map((doc) => {
     const fileName = `invoice-${doc.language.toUpperCase()}-${formattedInvoiceNumber}.pdf`;
@@ -279,7 +273,7 @@ export async function generateInvoice(
   const compressedData = compressToEncodedURIComponent(compressedJson);
   const invoiceUrl = `https://easyinvoicepdf.com/?template=${newInvoiceDataValidated.template}&data=${compressedData}`;
 
-  const monthAndYear = warsawNow.format("MMMM YYYY");
+  const monthAndYear = now.format("MMMM YYYY");
   const invoiceNumberValue = englishInvoiceData?.invoiceNumberObject?.value;
 
   // ─── Step 3: Upload PDFs to Google Drive ─────────────────────────────────
@@ -292,8 +286,8 @@ export async function generateInvoice(
       // Authenticate, then resolve (or create) the month/year folder in Drive.
       const googleDrive = await initializeGoogleDrive();
 
-      const currentMonth = warsawNow.format("MM");
-      const currentYear = warsawNow.format("YYYY");
+      const currentMonth = now.format("MM");
+      const currentYear = now.format("YYYY");
 
       const folderResult = await createOrFindInvoiceFolder({
         googleDrive,
@@ -426,7 +420,7 @@ export async function generateInvoice(
       message: `${testModeWarningBlock}📝 *Invoices for ${monthAndYear}*
 
 Invoice No. of: *${invoiceNumberValue}*
-Date: *${warsawNow.format("MMMM D, YYYY")}*
+Date: *${now.format("MMMM D, YYYY")}*
 
 The generated invoices are included in the attachments. Please check them carefully.
 
@@ -457,7 +451,7 @@ EasyInvoicePDF.com`,
         subject: `📝 Invoices for ${monthAndYear}`,
         html: `${emailGoogleDriveWarningHtml}<p>Hello,</p>
     <span>Invoice No. of: <b>${invoiceNumberValue}</b><br/>
-    Date: <b>${warsawNow.format("MMMM D, YYYY")}</b>
+    Date: <b>${now.format("MMMM D, YYYY")}</b>
     <br/>
     <br/>
 
