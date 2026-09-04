@@ -1,4 +1,4 @@
-import { GiftIcon, Heart, Star, XIcon } from "lucide-react";
+import { GiftIcon, XIcon } from "lucide-react";
 import { toast as sonnerToast } from "sonner";
 
 import { GithubIcon } from "@/components/etc/github-logo";
@@ -12,51 +12,11 @@ interface ToastProps {
   description: string;
 }
 
-/**
- * Renders a premium donation toast
- */
-function customPremiumToast(toast: ToastProps) {
-  // dismiss any existing toasts
-  sonnerToast.dismiss();
-
-  return sonnerToast.custom(
-    (id) => {
-      return (
-        <PremiumDonationToast
-          id={id}
-          title={toast.title}
-          description={toast.description}
-        />
-      );
-    },
-    {
-      duration: Infinity,
-    },
-  );
-}
-
-/**
- * Renders a default donation toast
- */
-function customDefaultToast(toast: ToastProps) {
-  // dismiss any existing toasts
-  sonnerToast.dismiss();
-
-  return sonnerToast.custom(
-    (id) => {
-      return (
-        <DefaultDonationToast
-          id={id}
-          title={toast.title}
-          description={toast.description}
-        />
-      );
-    },
-    {
-      duration: Infinity,
-    },
-  );
-}
+const CTA_TOAST = {
+  title: "Support Open Source",
+  description:
+    "Your contribution helps me maintain and improve this open-source project for everyone! 🚀",
+} as const;
 
 const SonnerCloseButton = (
   props: React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -151,109 +111,27 @@ function PremiumDonationToast(props: ToastProps) {
   );
 }
 
-function DefaultDonationToast(props: ToastProps) {
-  const { title, description, id } = props;
+/**
+ * Shows the donation CTA toast. Triggered only after the user downloads a PDF.
+ */
+export const showCTAToast = () => {
+  // dismiss any existing toasts
+  sonnerToast.dismiss();
 
-  return (
-    <div
-      className="flex w-full items-start gap-3 rounded-lg border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4 shadow-xl lg:max-w-md"
-      data-testid="download-pdf-toast"
-    >
-      {/* Close button - styled like default Sonner toast */}
-      <SonnerCloseButton
-        onClick={() => {
-          return sonnerToast.dismiss(id);
-        }}
-      />
-
-      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-600">
-        <Heart className="h-5 w-5 fill-current text-white" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="mb-1 flex items-center gap-2">
-          <p className="text-sm font-semibold text-gray-900">{title}</p>
-        </div>
-        <p className="mb-3 text-xs leading-relaxed text-gray-600">
-          {description}
-        </p>
-        <div className="flex items-end justify-end gap-2">
-          <Button
-            size="sm"
-            className="group h-8 max-w-[150px] bg-gray-900 px-3 text-xs font-medium text-white transition-all duration-200 hover:bg-gray-800"
-            asChild
-          >
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                umamiTrackEvent("gh_star_btn_click_download_pdf_toast_default");
-
-                sonnerToast.dismiss(id);
-              }}
-            >
-              <Star className="mr-1 size-3.5 fill-yellow-300 text-yellow-300" />
-              Star on GitHub
-            </a>
-          </Button>
-          <Button
-            size="sm"
-            className="h-8 max-w-[150px] flex-1 border border-gray-300 bg-gray-100 text-xs text-gray-900 transition-all duration-200 hover:bg-gray-200"
-            variant="secondary"
-            asChild
-            data-testid="toast-cta-btn"
-          >
-            <a
-              href={DISCORD_FEEDBACK_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                umamiTrackEvent(
-                  "feedback_btn_click_download_pdf_toast_default",
-                );
-
-                sonnerToast.dismiss(id);
-              }}
-            >
-              Share Feedback
-            </a>
-          </Button>
-        </div>
-      </div>
-    </div>
+  return sonnerToast.custom(
+    (id) => {
+      return (
+        <PremiumDonationToast
+          id={id}
+          title={CTA_TOAST.title}
+          description={CTA_TOAST.description}
+        />
+      );
+    },
+    {
+      duration: Infinity,
+    },
   );
-}
-
-const CTA_TOASTS = [
-  {
-    id: "premium-donation-toast-client-page",
-    title: "Support Open Source",
-    description:
-      "Your contribution helps me maintain and improve this open-source project for everyone! 🚀",
-    show: customPremiumToast,
-  },
-  {
-    id: "default-donation-toast-client-page",
-    title: "Like this open-source project?",
-    description:
-      "Help me keep this free tool running! Your support enables me to add new features and maintain the service. 🙏",
-    show: customDefaultToast,
-  },
-] as const satisfies {
-  id: string;
-  title: string;
-  description: string;
-  show: (toast: ToastProps) => void;
-}[];
-
-export const showRandomCTAToast = () => {
-  const variant = CTA_TOASTS[Math.floor(Math.random() * CTA_TOASTS.length)];
-
-  variant.show({
-    id: variant.id,
-    title: variant.title,
-    description: variant.description,
-  });
 };
 
 /**

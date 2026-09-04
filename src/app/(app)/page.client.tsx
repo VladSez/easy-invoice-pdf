@@ -45,12 +45,9 @@ import {
 
 import { InvoiceClientPage } from "./components";
 import { ChangelogUpdatePopup } from "./components/changelog-update-popup";
-import { showRandomCTAToast } from "./components/cta-toasts";
 import { HowItWorksVideoDialog } from "./components/how-it-works-video-dialog";
-import { useCTAToast } from "./contexts/cta-toast-context";
 import { useChangelogUpdatePopup } from "./hooks/use-changelog-update-popup";
 import { useInAppBrowserNotice } from "./hooks/use-in-app-browser-notice";
-import { useShowRandomCTAToastOnIdle } from "./hooks/use-show-random-cta-toast";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
 import { selectInvoiceTemplate } from "./utils/select-invoice-template";
@@ -68,7 +65,6 @@ import { selectInvoiceTemplate } from "./utils/select-invoice-template";
  * - Invoice data state management and updates
  * - PDF generation and download functionality
  * - Share invoice functionality with URL generation
- * - CTA toast notifications for user engagement
  * - Error handling and user feedback
  *
  * @returns The rendered invoice application page with form, preview, and controls
@@ -82,8 +78,6 @@ export function AppPageClient({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  const { markCTAActionTriggered, incrementInteractionCount } = useCTAToast();
 
   const urlTemplateSearchParam = searchParams.get("template");
 
@@ -188,12 +182,6 @@ export function AppPageClient({
       active = false;
     };
   }, [invoiceDataState?.qrCodeData, invoiceDataState?.qrCodeIsVisible]);
-
-  // Only show CTA toast on idle in non-CI environments
-  if (!process.env.CI) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useShowRandomCTAToastOnIdle();
-  }
 
   // Helper function to load from localStorage
   const loadFromLocalStorage = useCallback(() => {
@@ -534,9 +522,6 @@ export function AppPageClient({
     setInvoiceDataState(updatedData);
     checkForInvoiceChanges(updatedData);
 
-    // this is used to show CTA toast
-    incrementInteractionCount();
-
     const currentTemplate = searchParams.get("template");
 
     // update the url with the new template
@@ -682,11 +667,6 @@ export function AppPageClient({
                 setTimeout(() => {
                   toast.dismiss();
                 }, 1500);
-
-                // show CTA toast after x seconds
-                setTimeout(() => {
-                  showRandomCTAToast();
-                }, 2500);
               })
               .catch((error) => {
                 console.error(
@@ -743,18 +723,11 @@ export function AppPageClient({
                   invoiceSharedCount: (current?.invoiceSharedCount ?? 0) + 1,
                 };
               });
-
-              // show CTA toast after x seconds (after invoice link notification is shown)
-              setTimeout(() => {
-                showRandomCTAToast();
-              }, 5500);
             })
             .catch((error) => {
               Sentry.captureException(error);
             });
         }
-
-        markCTAActionTriggered();
       } catch (error) {
         console.error("Failed to share invoice:", error);
         toast.error("Failed to generate shareable link", {

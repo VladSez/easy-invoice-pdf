@@ -13,13 +13,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   CTA_TOAST_TIMEOUT,
-  showRandomCTAToast,
+  showCTAToast,
 } from "@/app/(app)/components/cta-toasts";
 import { CTAToastProvider } from "@/app/(app)/contexts/cta-toast-context";
 import { InvoicePdfInstanceProvider } from "@/app/(app)/contexts/invoice-pdf-instance-context";
 import { updateAppMetadata } from "@/app/(app)/utils/get-app-metadata";
 import { getInitialInvoiceData } from "@/app/constants";
-import type { InvoiceData } from "@/app/schema";
+import { CTA_TOAST_STORAGE_KEY, type InvoiceData } from "@/app/schema";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DeviceContextProvider } from "@/contexts/device-context";
 import { haptic } from "@/lib/haptic";
@@ -98,7 +98,7 @@ vi.mock("@/app/(app)/components/cta-toasts", async () => {
 
   return {
     ...(actual as object),
-    showRandomCTAToast: vi.fn(),
+    showCTAToast: vi.fn(),
   };
 });
 
@@ -170,6 +170,8 @@ describe("InvoicePDFDownloadLink", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resetMockPdfState();
+    // the CTA toast cooldown is persisted, so it has to be cleared between tests
+    localStorage.clear();
     vi.mocked(isTelegramInAppBrowser).mockReturnValue(false);
   });
 
@@ -247,7 +249,47 @@ describe("InvoicePDFDownloadLink", () => {
 
     await vi.advanceTimersByTimeAsync(CTA_TOAST_TIMEOUT);
 
-    expect(showRandomCTAToast).toHaveBeenCalledTimes(1);
+    expect(showCTAToast).toHaveBeenCalledTimes(1);
+  });
+
+  it("should not show the CTA toast again while the cooldown is active", async () => {
+    vi.useFakeTimers();
+
+    // pretend a CTA toast was shown a minute ago
+    localStorage.setItem(CTA_TOAST_STORAGE_KEY, String(Date.now() - 60_000));
+
+    renderInvoicePDFDownloadLink();
+
+    fireEvent.click(getDownloadLink());
+
+    // the download itself still goes through
+    expect(umamiTrackEvent).toHaveBeenCalledWith("download_invoice", {
+      data: {
+        invoice_template: "default",
+      },
+    });
+
+    await vi.advanceTimersByTimeAsync(CTA_TOAST_TIMEOUT);
+
+    expect(showCTAToast).not.toHaveBeenCalled();
+  });
+
+  it("should show the CTA toast again once the cooldown has expired", async () => {
+    vi.useFakeTimers();
+
+    // the cooldown is 24 hours, so a toast shown two days ago no longer suppresses it
+    localStorage.setItem(
+      CTA_TOAST_STORAGE_KEY,
+      String(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    );
+
+    renderInvoicePDFDownloadLink();
+
+    fireEvent.click(getDownloadLink());
+
+    await vi.advanceTimersByTimeAsync(CTA_TOAST_TIMEOUT);
+
+    expect(showCTAToast).toHaveBeenCalledTimes(1);
   });
 
   it("should show error toast when url is missing on click", async () => {

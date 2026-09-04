@@ -18,7 +18,7 @@ import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
 
 import { useCTAToast } from "../contexts/cta-toast-context";
 import { updateAppMetadata } from "../utils/get-app-metadata";
-import { CTA_TOAST_TIMEOUT, showRandomCTAToast } from "./cta-toasts";
+import { CTA_TOAST_TIMEOUT, showCTAToast } from "./cta-toasts";
 
 const LOADING_BUTTON_TIMEOUT = 400;
 export const LOADING_BUTTON_TEXT = "Generating Document...";
@@ -60,7 +60,7 @@ export function InvoicePDFDownloadLink({
   isMobile: boolean;
 }) {
   const { inAppInfo } = useDeviceContext();
-  const { markCTAActionTriggered } = useCTAToast();
+  const { hasTriggeredCTAAction, markCTAActionTriggered } = useCTAToast();
 
   // The very same PDF the preview shows, generated once by `InvoicePdfInstanceProvider`
   const { loading: pdfLoading, url, error } = useInvoicePdfInstance();
@@ -132,11 +132,15 @@ export function InvoicePDFDownloadLink({
         // close all other toasts (if any)
         toast.dismiss();
 
-        markCTAActionTriggered();
+        // downloading the PDF is the only thing that shows the CTA toast, and it
+        // is shown at most once every 24 hours (cooldown lives in `useCTAToast`)
+        if (!hasTriggeredCTAAction) {
+          markCTAActionTriggered();
 
-        setTimeout(() => {
-          showRandomCTAToast();
-        }, CTA_TOAST_TIMEOUT);
+          setTimeout(() => {
+            showCTAToast();
+          }, CTA_TOAST_TIMEOUT);
+        }
       }
     },
     [
@@ -148,6 +152,7 @@ export function InvoicePDFDownloadLink({
       error,
       isMobile,
       invoiceData.template,
+      hasTriggeredCTAAction,
       markCTAActionTriggered,
     ],
   );

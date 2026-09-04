@@ -343,16 +343,17 @@ export function InvoiceClientPage({
           <div className="relative mx-2 mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
             {invoiceLastUpdatedAtFormatted ? (
               <>
-                <span
-                  className="hidden h-3 w-px bg-zinc-400 min-[453px]:block"
-                  aria-hidden="true"
-                />
                 <span data-testid="mobile-invoice-last-updated">
                   <span className="font-semibold">Invoice last updated:</span>{" "}
                   {invoiceLastUpdatedAtFormatted}
                 </span>
               </>
             ) : null}
+            {/* Separator */}
+            <span
+              className="hidden h-3 w-px bg-zinc-400 min-[453px]:block"
+              aria-hidden="true"
+            />
             <LocalStorageNotice />
           </div>
 
