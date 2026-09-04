@@ -37,17 +37,6 @@ export function formatDateOfServiceEnd(invoiceData: InvoiceData): string {
 }
 
 /**
- * Check if given date is the first day of its own month.
- * @param date - ISO date string.
- * @returns True if date is the first day of its month.
- */
-export function isFirstDayOfMonth(date: string): boolean {
-  const parsed = dayjs(date);
-
-  return parsed.isSame(parsed.startOf("month"), "day");
-}
-
-/**
  * Check if given dateOfServiceStart is in the current calendar month.
  * @param dateOfServiceStart - ISO date string.
  * @returns True if date is in the current month and year.

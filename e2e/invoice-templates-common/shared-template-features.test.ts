@@ -42,6 +42,21 @@ async function selectTemplate(page: Page, template: Template) {
 }
 
 /**
+ * Selecting the Stripe template turns the "Service period" PDF field on; the default
+ * template leaves it off, so there it has to be switched on by hand.
+ */
+async function showServicePeriodInPdf(
+  servicePeriodSwitch: Locator,
+  template: Template,
+) {
+  if (template === "default") {
+    await servicePeriodSwitch.click();
+  }
+
+  await expect(servicePeriodSwitch).toBeChecked();
+}
+
+/**
  * The "Service period"/"Date of sales" PDF label inputs only exist for the default
  * template — the Stripe PDF template does not print these labels at all.
  */
@@ -361,7 +376,8 @@ test.describe("Invoice Template shared features", () => {
           name: "Service period end",
         }),
       ).toHaveValue(SERVICE_PERIOD_TEST_DATA.end);
-      await expect(servicePeriodSwitch).toBeChecked();
+
+      await showServicePeriodInPdf(servicePeriodSwitch, template);
 
       await expectPdfScreenshot(page, {
         downloadDir,

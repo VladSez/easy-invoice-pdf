@@ -757,6 +757,47 @@ test.describe("Stripe Invoice Template", () => {
     await expect(paymentMethodVisibilitySwitch).toBeChecked(); // Should maintain its state
   });
 
+  test("shows the service period in the PDF for Stripe and hides it for default", async ({
+    page,
+  }) => {
+    await expect(page).toHaveURL("/?template=default");
+
+    const templateCombobox = page.getByRole("combobox", {
+      name: "Invoice Template",
+    });
+    const servicePeriodSwitch = page
+      .getByRole("group", { name: "Service period" })
+      .getByRole("switch", {
+        name: 'Show the "Service period" (Service period start and end) field in the PDF',
+      });
+
+    // the default template hides the service period
+    await expect(servicePeriodSwitch).not.toBeChecked();
+
+    await templateCombobox.selectOption("stripe");
+    await page.waitForURL("/?template=stripe");
+
+    await expect(servicePeriodSwitch).toBeChecked();
+
+    // switching back restores the default template's own behaviour
+    await templateCombobox.selectOption("default");
+    await page.waitForURL("/?template=default");
+
+    await expect(servicePeriodSwitch).not.toBeChecked();
+
+    // an explicit choice on the default template survives until the template changes again
+    await servicePeriodSwitch.click();
+    await expect(servicePeriodSwitch).toBeChecked();
+
+    await templateCombobox.selectOption("stripe");
+    await page.waitForURL("/?template=stripe");
+    await expect(servicePeriodSwitch).toBeChecked();
+
+    await templateCombobox.selectOption("default");
+    await page.waitForURL("/?template=default");
+    await expect(servicePeriodSwitch).not.toBeChecked();
+  });
+
   test("automatically sets date format when switching to Stripe template", async ({
     page,
     browserName,
