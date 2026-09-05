@@ -1,7 +1,7 @@
 // IMPORTANT: it's fine to use this import directly on server side
 // eslint-disable-next-line no-restricted-imports
 import { Document, Font, Page, renderToBuffer } from "@react-pdf/renderer";
-import dayjs from "dayjs";
+import type dayjs from "dayjs";
 
 import { PDF_DEFAULT_TEMPLATE_STYLES } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
 import { InvoiceBody } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template/invoice-body";
@@ -10,6 +10,8 @@ import { getInvoiceDefaultNumberValue } from "@/app/constants";
 import { type InvoiceData, type SupportedLanguages } from "@/app/schema";
 import { INVOICE_PDF_FONTS } from "@/config";
 import { env } from "@/env";
+
+import { DEFAULT_INVOICE_TIME_ZONE, nowInTimeZone } from "./invoice-time-zone";
 
 // Open sans seems to be working fine with EN and PL
 const fontFamily = "Open Sans";
@@ -99,12 +101,17 @@ const translateInvoiceNumberLabel = ({
 
 const INVOICE_NET_PRICE = Number(env.INVOICE_NET_PRICE) || 0;
 
-/** Recomputed each call so warm servers do not reuse module-load dates. (to avoid outdated dates in the PDF) */
-function getInvoiceDefaultDates(): Pick<
+/**
+ * Recomputed each call so warm servers do not reuse module-load dates. (to avoid outdated dates in the PDF)
+ *
+ * @param now - Current time in the invoice's timezone, see {@link nowInTimeZone}.
+ */
+function getInvoiceDefaultDates(
+  now: dayjs.Dayjs,
+): Pick<
   InvoiceData,
   "dateOfIssue" | "dateOfService" | "paymentDue" | "dateOfServiceStart"
 > {
-  const now = dayjs();
   const lastDayOfMonth = now.endOf("month").format("YYYY-MM-DD");
   const firstDayOfMonth = now.startOf("month").format("YYYY-MM-DD");
 
@@ -218,14 +225,20 @@ const ENGLISH_INVOICE_PROD_DATA_BASE = {
  * Spreads ENGLISH_INVOICE_PROD_DATA_BASE and injects freshly computed date fields
  * using getInvoiceDefaultDates() on each call, ensuring no stale data due to
  * serverless warm starts.
+ *
+ * @param timeZone - IANA timezone the invoice is dated in.
  */
-export function getEnglishInvoiceRealData() {
+export function getEnglishInvoiceRealData({ timeZone }: { timeZone: string }) {
+  // One `now` for both the dates and the invoice number, so a call that straddles
+  // midnight cannot mix two calendar days into a single invoice.
+  const now = nowInTimeZone(timeZone);
+
   return {
     ...ENGLISH_INVOICE_PROD_DATA_BASE,
-    ...getInvoiceDefaultDates(), // IMPORTANT: recomputed each call so warm servers do not reuse module-load dates (to avoid outdated dates in the PDF)
+    ...getInvoiceDefaultDates(now), // IMPORTANT: recomputed each call so warm servers do not reuse module-load dates (to avoid outdated dates in the PDF)
     invoiceNumberObject: {
       label: "Invoice No. of:",
-      value: getInvoiceDefaultNumberValue(),
+      value: getInvoiceDefaultNumberValue(now),
     },
   } as const satisfies InvoiceData;
 }
@@ -251,7 +264,8 @@ export function getPolishInvoiceRealData(englishInvoiceData: InvoiceData) {
       label: translateInvoiceNumberLabel({ language: "pl" }),
       value:
         englishInvoiceData.invoiceNumberObject?.value ??
-        getInvoiceDefaultNumberValue(),
+        // Defensive fallback: `getEnglishInvoiceRealData` always sets this.
+        getInvoiceDefaultNumberValue(nowInTimeZone(DEFAULT_INVOICE_TIME_ZONE)),
     },
     buyer: {
       ...englishInvoiceData.buyer,

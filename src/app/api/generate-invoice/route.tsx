@@ -3,6 +3,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import { env } from "@/env";
 import { ipLimiter } from "@/lib/rate-limit";
 
+import {
+  DEFAULT_INVOICE_TIME_ZONE,
+  isValidTimeZone,
+} from "./invoice-time-zone";
 import { runProductionGenerateMonthlyInvoice } from "./run-production-generate-invoice";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +15,16 @@ export const dynamic = "force-dynamic";
 // https://vercel.com/docs/functions/configuring-functions/duration
 export const maxDuration = 30;
 
+/**
+ * Generates the monthly invoice, then uploads and sends it.
+ *
+ * Query params:
+ * - `sendEmail` — "false" skips the email step. Defaults to on in production, off locally.
+ * - `uploadToGoogleDrive` — "false" skips the Drive upload. Defaults to on in production, off locally.
+ * - `timezone` — IANA name (e.g. "America/New_York") the invoice is dated in.
+ *   Defaults to `DEFAULT_INVOICE_TIME_ZONE`; the process timezone is UTC on
+ *   Vercel and is never used, so the dates do not shift around midnight.
+ */
 export async function GET(req: NextRequest) {
   try {
     if (req.headers.get("Authorization") !== `Bearer ${env.AUTH_TOKEN}`) {
@@ -46,9 +60,22 @@ export async function GET(req: NextRequest) {
         ? isProduction
         : uploadToGoogleDriveParam !== "false";
 
+    const timeZone =
+      req.nextUrl.searchParams.get("timezone") ?? DEFAULT_INVOICE_TIME_ZONE;
+
+    if (!isValidTimeZone(timeZone)) {
+      return NextResponse.json(
+        {
+          error: `Unknown timezone "${timeZone}". Expected an IANA name, e.g. "${DEFAULT_INVOICE_TIME_ZONE}".`,
+        },
+        { status: 400 },
+      );
+    }
+
     const result = await runProductionGenerateMonthlyInvoice({
       shouldSendEmail,
       shouldUploadToGoogleDrive,
+      timeZone,
     });
 
     console.info("[generate-invoice] Report:", result.report);

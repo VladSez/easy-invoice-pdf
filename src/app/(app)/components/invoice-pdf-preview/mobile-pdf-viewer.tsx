@@ -8,7 +8,13 @@ import { BUG_REPORT_URL } from "@/config";
 // This import registers the PDF.js worker globally so that react-pdf can render PDFs in the browser.
 // https://github.com/wojtekmaj/react-pdf/issues/1824#issuecomment-2266150831
 // https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#configure-pdfjs-worker
-import "pdfjs-dist/build/pdf.worker.min.mjs";
+//
+// `legacy/` (rather than `build/`) on purpose: the modern pdf.js build calls
+// `URL.parse()` and `Promise.withResolvers()`, which iOS Safari only gained in 18.4
+// and 17.4. The legacy build is the same code plus core-js polyfills, and it keeps
+// the viewer alive on older iPhones. `next.config.mjs` aliases the matching
+// main-thread build that `react-pdf` itself imports.
+import "pdfjs-dist/legacy/build/pdf.worker.min.mjs";
 
 /**
  * Mobile PDF viewer.
@@ -41,7 +47,7 @@ export const MobileInvoicePDFViewer = () => {
         <div className="text-center">
           <p className="text-red-600">Error generating PDF preview</p>
           <p className="mx-6 mt-2 text-balance text-sm text-gray-600">
-            Something went wrong.
+            <b>Something went wrong.</b>
             <br /> Please try refreshing the page or using the{" "}
             <span className="font-bold">Chrome</span> browser. If the issue
             persists, please fill a bug report{" "}

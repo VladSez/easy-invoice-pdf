@@ -52,9 +52,12 @@ const DEFAULT_TEMPLATE = SUPPORTED_TEMPLATES[0];
  * Format: 1/MM-YYYY (e.g., 1/03-2024)
  *
  * Used as default **invoice number** when creating a new invoice
+ *
+ * @param date - Instant the number is derived from. Defaults to `dayjs()`, which
+ * follows the process timezone — server callers pass an explicit zoned instant.
  */
-export function getInvoiceDefaultNumberValue() {
-  return `1/${dayjs().format("MM-YYYY")}` as const;
+export function getInvoiceDefaultNumberValue(date: dayjs.Dayjs = dayjs()) {
+  return `1/${date.format("MM-YYYY")}` as const;
 }
 
 /**

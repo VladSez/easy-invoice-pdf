@@ -146,8 +146,30 @@ const nextConfig = {
       fullUrl: true,
     },
   },
-  webpack: (config) => {
+  // `react-pdf` imports the bare `pdfjs-dist` specifier, which resolves to pdf.js's
+  // *modern* build. That build calls `URL.parse()` (Safari 18.4+) and
+  // `Promise.withResolvers()` (Safari 17.4+) unguarded, so the mobile PDF viewer dies
+  // with "URL.parse is not a function" on any slightly older iOS Safari.
+  //
+  // pdf.js ships a `legacy/` build for exactly this: same API, plus the core-js
+  // polyfills. We point the browser bundle at it (the worker is imported by its
+  // legacy path directly in `mobile-pdf-viewer.tsx`).
+  //
+  // Turbopack powers `next dev`, webpack powers `next build`, so both need the alias.
+  turbopack: {
+    resolveAlias: {
+      "pdfjs-dist": { browser: "pdfjs-dist/legacy/build/pdf.mjs" },
+    },
+  },
+  webpack: (config, { isServer }) => {
     config.resolve.alias.canvas = false;
+
+    if (!isServer) {
+      // `$` = exact match only, so deep imports (`pdfjs-dist/legacy/build/...`) are
+      // left alone.
+      config.resolve.alias["pdfjs-dist$"] = "pdfjs-dist/legacy/build/pdf.mjs";
+    }
+
     return config;
   },
   async rewrites() {

@@ -16,6 +16,7 @@ const MOCK_REPORT = {
   notifiedByTelegram: true,
   notifiedByEmail: true,
   totalTimeTook: "1.23s",
+  timeZone: "Europe/Warsaw",
 } as const satisfies GenerateInvoiceReport;
 
 const MOCK_ENV = {
@@ -225,6 +226,7 @@ describe("POST /api/telegram-webhook — HTTP layer", () => {
       expect(mockRunProduction).toHaveBeenCalledWith({
         shouldSendEmail: false,
         shouldUploadToGoogleDrive: false,
+        timeZone: "Europe/Warsaw",
       });
       expect(mockClearQueuedJob).toHaveBeenCalledWith(CHAT_ID);
     });
@@ -239,6 +241,7 @@ describe("POST /api/telegram-webhook — HTTP layer", () => {
       expect(mockRunProduction).toHaveBeenCalledWith({
         shouldSendEmail: true,
         shouldUploadToGoogleDrive: true,
+        timeZone: "Europe/Warsaw",
       });
       expect(mockSendTelegramMessage).toHaveBeenCalledTimes(1);
       expect(mockSendTelegramMessage).toHaveBeenCalledWith({

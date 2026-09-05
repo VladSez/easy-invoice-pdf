@@ -128,6 +128,19 @@ _**Add payment QR codes** with any invoice-related information (payment links, U
 
 ## 📢 What's New
 
+### EasyInvoicePDF v1.0.4 - Faster PDF Preview & Mobile Polish (September 4, 2026)
+
+- **Faster, flicker-free preview** - the invoice PDF is generated **once** and shared by the desktop preview, the mobile viewer and the download button
+- **Redesigned mobile tabs** - a pill-shaped track with a single indicator that slides between the invoice form and the preview
+- **Dates in the form now match the PDF** - helper texts and the out-of-date banner use the invoice's own language and date format
+- **Fixed PDFs missing the first characters of labels** - `Cobrar de` no longer renders as `obrar de` in rare cases
+
+https://github.com/user-attachments/assets/3c87d026-a1c3-4d69-b161-f7d72616c394
+
+[Full release notes for v1.0.4](https://github.com/VladSez/easy-invoice-pdf/releases/tag/v1.0.4)
+
+---
+
 ### EasyInvoicePDF v1.0.3 — Seller & Buyer Improvements (March 29, 2026)
 
 - **Seller & Buyer Email visibility toggle** — control whether email addresses appear in the generated PDF
