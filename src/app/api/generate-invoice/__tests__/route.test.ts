@@ -13,6 +13,7 @@ const MOCK_REPORT = {
   notifiedByTelegram: true,
   notifiedByEmail: true,
   totalTimeTook: "1.23s",
+  timeZone: "Europe/Warsaw",
 } as const satisfies GenerateInvoiceReport;
 
 const TEST_AUTH_TOKEN = "test-auth-token";
@@ -356,6 +357,51 @@ describe("GET /api/generate-invoice — HTTP layer", () => {
         shouldUploadToGoogleDrive: boolean;
       };
       expect(callOptions.shouldUploadToGoogleDrive).toBe(true);
+    });
+
+    it("should default the timezone to Europe/Warsaw", async () => {
+      mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
+
+      const { GET } = await import("../route");
+      await GET(createRequest({ authToken: TEST_AUTH_TOKEN }));
+
+      const callOptions = mockRunProduction.mock.calls[0][0] as {
+        timeZone: string;
+      };
+      expect(callOptions.timeZone).toBe("Europe/Warsaw");
+    });
+
+    it("should pass the timezone query param through", async () => {
+      mockRunProduction.mockResolvedValue({ ok: true, report: MOCK_REPORT });
+
+      const { GET } = await import("../route");
+      await GET(
+        createRequest({
+          authToken: TEST_AUTH_TOKEN,
+          searchParams: { timezone: "America/New_York" },
+        }),
+      );
+
+      const callOptions = mockRunProduction.mock.calls[0][0] as {
+        timeZone: string;
+      };
+      expect(callOptions.timeZone).toBe("America/New_York");
+    });
+
+    it("should return 400 and generate nothing for an unknown timezone", async () => {
+      const { GET } = await import("../route");
+      const response = await GET(
+        createRequest({
+          authToken: TEST_AUTH_TOKEN,
+          searchParams: { timezone: "Mars/Olympus_Mons" },
+        }),
+      );
+
+      expect(response.status).toBe(400);
+      expect(((await response.json()) as { error: string }).error).toContain(
+        "Mars/Olympus_Mons",
+      );
+      expect(mockRunProduction).not.toHaveBeenCalled();
     });
   });
 });

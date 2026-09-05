@@ -11,7 +11,7 @@ import { type InvoiceData, type SupportedLanguages } from "@/app/schema";
 import { INVOICE_PDF_FONTS } from "@/config";
 import { env } from "@/env";
 
-import { warsawNow } from "./warsaw-now";
+import { DEFAULT_INVOICE_TIME_ZONE, nowInTimeZone } from "./invoice-time-zone";
 
 // Open sans seems to be working fine with EN and PL
 const fontFamily = "Open Sans";
@@ -104,7 +104,7 @@ const INVOICE_NET_PRICE = Number(env.INVOICE_NET_PRICE) || 0;
 /**
  * Recomputed each call so warm servers do not reuse module-load dates. (to avoid outdated dates in the PDF)
  *
- * @param now - Current time in Warsaw wall time, see {@link warsawNow}.
+ * @param now - Current time in the invoice's timezone, see {@link nowInTimeZone}.
  */
 function getInvoiceDefaultDates(
   now: dayjs.Dayjs,
@@ -225,11 +225,13 @@ const ENGLISH_INVOICE_PROD_DATA_BASE = {
  * Spreads ENGLISH_INVOICE_PROD_DATA_BASE and injects freshly computed date fields
  * using getInvoiceDefaultDates() on each call, ensuring no stale data due to
  * serverless warm starts.
+ *
+ * @param timeZone - IANA timezone the invoice is dated in.
  */
-export function getEnglishInvoiceRealData() {
+export function getEnglishInvoiceRealData({ timeZone }: { timeZone: string }) {
   // One `now` for both the dates and the invoice number, so a call that straddles
   // midnight cannot mix two calendar days into a single invoice.
-  const now = warsawNow();
+  const now = nowInTimeZone(timeZone);
 
   return {
     ...ENGLISH_INVOICE_PROD_DATA_BASE,
@@ -262,7 +264,8 @@ export function getPolishInvoiceRealData(englishInvoiceData: InvoiceData) {
       label: translateInvoiceNumberLabel({ language: "pl" }),
       value:
         englishInvoiceData.invoiceNumberObject?.value ??
-        getInvoiceDefaultNumberValue(warsawNow()),
+        // Defensive fallback: `getEnglishInvoiceRealData` always sets this.
+        getInvoiceDefaultNumberValue(nowInTimeZone(DEFAULT_INVOICE_TIME_ZONE)),
     },
     buyer: {
       ...englishInvoiceData.buyer,

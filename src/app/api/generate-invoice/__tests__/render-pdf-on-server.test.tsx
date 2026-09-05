@@ -127,11 +127,13 @@ describe("getEnglishInvoiceRealData", () => {
     }
   });
 
-  it("dates the invoice in Warsaw time, not the process timezone (CEST, UTC+2)", () => {
+  it("dates the invoice in the given timezone, not the process timezone (CEST, UTC+2)", () => {
     // 23:30 UTC on June 30th is already 01:30 on July 1st in Warsaw
     vi.setSystemTime(new Date("2025-06-30T23:30:00Z"));
 
-    const invoiceData = getEnglishInvoiceRealData();
+    const invoiceData = getEnglishInvoiceRealData({
+      timeZone: "Europe/Warsaw",
+    });
 
     expect(invoiceData.dateOfIssue).toBe("2025-07-01");
     expect(invoiceData.dateOfServiceStart).toBe("2025-07-01");
@@ -140,15 +142,31 @@ describe("getEnglishInvoiceRealData", () => {
     expect(invoiceData.invoiceNumberObject.value).toBe("1/07-2025");
   });
 
-  it("dates the invoice in Warsaw time across a year boundary (CET, UTC+1)", () => {
+  it("dates the invoice in the given timezone across a year boundary (CET, UTC+1)", () => {
     // 23:30 UTC on December 31st is already 00:30 on January 1st in Warsaw
     vi.setSystemTime(new Date("2025-12-31T23:30:00Z"));
 
-    const invoiceData = getEnglishInvoiceRealData();
+    const invoiceData = getEnglishInvoiceRealData({
+      timeZone: "Europe/Warsaw",
+    });
 
     expect(invoiceData.dateOfIssue).toBe("2026-01-01");
     expect(invoiceData.dateOfServiceStart).toBe("2026-01-01");
     expect(invoiceData.dateOfService).toBe("2026-01-31");
     expect(invoiceData.invoiceNumberObject.value).toBe("1/01-2026");
+  });
+
+  it("dates the invoice behind UTC when the timezone is behind UTC", () => {
+    // 00:30 UTC on July 1st is still 20:30 on June 30th in New York (EDT, UTC-4)
+    vi.setSystemTime(new Date("2025-07-01T00:30:00Z"));
+
+    const invoiceData = getEnglishInvoiceRealData({
+      timeZone: "America/New_York",
+    });
+
+    expect(invoiceData.dateOfIssue).toBe("2025-06-30");
+    expect(invoiceData.dateOfServiceStart).toBe("2025-06-01");
+    expect(invoiceData.dateOfService).toBe("2025-06-30");
+    expect(invoiceData.invoiceNumberObject.value).toBe("1/06-2025");
   });
 });

@@ -41,6 +41,7 @@ const MOCK_INPUT = {
   invoiceEmailRecipient: "recipient@test.com",
   englishInvoiceData: MOCK_INVOICE_DATA,
   polishInvoiceData: { ...MOCK_INVOICE_DATA, language: "pl" },
+  timeZone: "Europe/Warsaw",
 } as const satisfies GenerateInvoiceInput;
 
 /**
@@ -90,6 +91,7 @@ describe("generateInvoice", () => {
             totalTimeTook: expect.any(
               String,
             ) as GenerateInvoiceReport["totalTimeTook"],
+            timeZone: MOCK_INPUT.timeZone,
           },
         }),
       );
@@ -187,6 +189,20 @@ describe("generateInvoice", () => {
         filename: expect.stringMatching(/^invoice-EN-.+\.pdf$/) as string,
         buffer: expect.any(Buffer) as Buffer,
       });
+    });
+
+    it("should name the invoice timezone in the Telegram message", async () => {
+      const deps = buildDeps();
+      await generateInvoice(deps, {
+        ...MOCK_INPUT,
+        timeZone: "America/New_York",
+      });
+
+      const call = vi.mocked(deps.sendTelegramMessage).mock.calls[0][0];
+      // Backticks, not bare text: Telegram parses the message as legacy Markdown,
+      // where the underscore in a name like `America/New_York` would open an
+      // unclosed italic span and the whole send would fail with a parse error.
+      expect(call.message).toContain("(`America/New_York`)");
     });
 
     it("should send email with correct recipient and 2 attachments", async () => {

@@ -6,7 +6,7 @@ import { invoiceSchema, type InvoiceData } from "@/app/schema";
 import type { InvoiceFolderResult } from "@/lib/google-drive";
 import { compressInvoiceData } from "@/utils/url-compression";
 
-import { warsawNow } from "./warsaw-now";
+import { nowInTimeZone } from "./invoice-time-zone";
 
 /**
  * Formats milliseconds into a human-readable duration string.
@@ -32,6 +32,9 @@ export interface GenerateInvoiceReport {
   notifiedByTelegram: boolean;
   notifiedByEmail: boolean;
   totalTimeTook: string;
+  /** IANA timezone the invoice was dated in — echoed back so a caller can tell
+   * which timezone produced the dates printed on the PDF. */
+  timeZone: string;
 }
 
 /**
@@ -132,6 +135,12 @@ export interface GenerateInvoiceInput {
   englishInvoiceData: InvoiceData;
   /** Validated invoice data for the Polish PDF. */
   polishInvoiceData: InvoiceData;
+  /**
+   * IANA timezone the invoice is dated in — the Drive folder, the file names and
+   * the notification dates all follow it, so they cannot drift from the dates
+   * printed inside the PDF.
+   */
+  timeZone: string;
 }
 
 /**
@@ -156,7 +165,6 @@ export async function generateInvoice(
   input: GenerateInvoiceInput,
 ): Promise<GenerateInvoiceResult> {
   const startTime = performance.now();
-  const now = warsawNow();
 
   const {
     renderEnInvoice,
@@ -175,7 +183,10 @@ export async function generateInvoice(
     invoiceEmailCompanyTo,
     invoiceEmailRecipient,
     englishInvoiceData,
+    timeZone,
   } = input;
+
+  const now = nowInTimeZone(timeZone);
 
   // ─── Step 1: Render PDFs ──────────────────────────────────────────────────
   // Run both renders concurrently. `allSettled` ensures a failure in one
@@ -261,6 +272,7 @@ export async function generateInvoice(
         notifiedByTelegram: false,
         notifiedByEmail: false,
         totalTimeTook: formatDuration(performance.now() - startTime),
+        timeZone,
       },
     };
   }
@@ -344,6 +356,7 @@ export async function generateInvoice(
             notifiedByTelegram: false,
             notifiedByEmail: false,
             totalTimeTook: formatDuration(performance.now() - startTime),
+            timeZone,
           },
         };
       }
@@ -365,6 +378,7 @@ export async function generateInvoice(
           notifiedByTelegram: false,
           notifiedByEmail: false,
           totalTimeTook: formatDuration(performance.now() - startTime),
+          timeZone,
         },
       };
     }
@@ -420,7 +434,7 @@ export async function generateInvoice(
       message: `${testModeWarningBlock}📝 *Invoices for ${monthAndYear}*
 
 Invoice No. of: *${invoiceNumberValue}*
-Date: *${now.format("MMMM D, YYYY")}*
+Date: *${now.format("MMMM D, YYYY")}* (\`${timeZone}\`)
 
 The generated invoices are included in the attachments. Please check them carefully.
 
@@ -534,6 +548,7 @@ EasyInvoicePDF.com`,
         notifiedByTelegram,
         notifiedByEmail,
         totalTimeTook: formatDuration(performance.now() - startTime),
+        timeZone,
       },
     };
   }
@@ -547,6 +562,7 @@ EasyInvoicePDF.com`,
       notifiedByTelegram,
       notifiedByEmail,
       totalTimeTook: formatDuration(performance.now() - startTime),
+      timeZone,
     },
   };
 }

@@ -1,6 +1,7 @@
 import { waitUntil } from "@vercel/functions";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { DEFAULT_INVOICE_TIME_ZONE } from "@/app/api/generate-invoice/invoice-time-zone";
 import { runProductionGenerateMonthlyInvoice } from "@/app/api/generate-invoice/run-production-generate-invoice";
 import {
   clearQueuedJob,
@@ -128,6 +129,7 @@ async function handleInvoiceGenerate({ chatId }: { chatId: number }) {
     const result = await runProductionGenerateMonthlyInvoice({
       shouldSendEmail: isProduction,
       shouldUploadToGoogleDrive: isProduction,
+      timeZone: DEFAULT_INVOICE_TIME_ZONE,
     });
 
     console.info("[telegram-webhook] Report:", result.report);

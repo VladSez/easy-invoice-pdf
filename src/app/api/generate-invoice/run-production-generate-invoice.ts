@@ -48,12 +48,16 @@ function buildGenerateInvoiceDeps(
  *
  * @param options.shouldSendEmail - Set true to send invoice email to recipient.
  * @param options.shouldUploadToGoogleDrive - Set true to upload invoices to Google Drive.
+ * @param options.timeZone - IANA timezone the invoice is dated in.
  */
 export async function runProductionGenerateMonthlyInvoice(options: {
   shouldSendEmail: boolean;
   shouldUploadToGoogleDrive: boolean;
+  timeZone: string;
 }): Promise<GenerateInvoiceResult> {
-  const englishInvoiceData = getEnglishInvoiceRealData();
+  const englishInvoiceData = getEnglishInvoiceRealData({
+    timeZone: options.timeZone,
+  });
   const polishInvoiceData = getPolishInvoiceRealData(englishInvoiceData);
 
   return await generateInvoice(
@@ -66,6 +70,7 @@ export async function runProductionGenerateMonthlyInvoice(options: {
       invoiceEmailRecipient: env.INVOICE_EMAIL_RECIPIENT,
       englishInvoiceData,
       polishInvoiceData,
+      timeZone: options.timeZone,
     },
   );
 }
