@@ -12,7 +12,7 @@ export function DesktopInvoicePDFViewer() {
         <div className="text-center">
           <p className="text-red-600">Error generating PDF preview</p>
           <p className="mx-6 mt-2 max-w-xl text-balance text-sm text-gray-600">
-            Something went wrong.
+            <b>Something went wrong.</b>
             <br /> Please try refreshing the page or using the{" "}
             <span className="font-bold">Chrome</span> browser. If the issue
             persists, please fill a bug report{" "}

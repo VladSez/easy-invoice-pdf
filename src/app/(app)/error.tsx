@@ -52,7 +52,7 @@ export default function Error({
     <div className="flex h-dvh flex-col items-center justify-center gap-4">
       <div className="flex flex-col items-center justify-center gap-4">
         <ErrorMessage>
-          Something went wrong.
+          <b>Something went wrong.</b>
           <br /> Please try refreshing the page or using the Chrome browser.
         </ErrorMessage>
         <ErrorMessage>
