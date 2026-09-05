@@ -208,45 +208,60 @@ test.describe("Invoice Generator Page", () => {
     ).toBeEnabled();
   });
 
-  test("handles mobile/desktop views", async ({ page }) => {
-    // Test mobile view
-    await page.setViewportSize({ width: 375, height: 667 });
+  test(
+    "handles mobile/desktop views",
+    {
+      // the `useIsDesktop` matchMedia listener swapping the mobile tabs for the
+      // desktop layout, and `src/hooks/use-media-query.tsx` carries a Safari
+      // specific fallback, so this runs on desktop WebKit too
+      tag: "@webkit-desktop-smoke",
+    },
+    async ({ page }) => {
+      // Test mobile view
+      await page.setViewportSize({ width: 375, height: 667 });
 
-    // check that tabs are visible in mobile view
-    await expect(page.getByRole("tab", { name: "Edit Invoice" })).toBeVisible();
-    await expect(page.getByRole("tab", { name: "Preview PDF" })).toBeVisible();
+      // check that tabs are visible in mobile view
+      await expect(
+        page.getByRole("tab", { name: "Edit Invoice" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("tab", { name: "Preview PDF" }),
+      ).toBeVisible();
 
-    const termsOfServiceMobile = page.getByTestId(
-      "mobile-terms-of-service-link",
-    );
-    const termsOfServiceLinkMobile = termsOfServiceMobile.getByRole("link");
+      const termsOfServiceMobile = page.getByTestId(
+        "mobile-terms-of-service-link",
+      );
+      const termsOfServiceLinkMobile = termsOfServiceMobile.getByRole("link");
 
-    // Check that Terms of Service are displayed
-    await expect(termsOfServiceMobile).toBeVisible();
-    await expect(termsOfServiceMobile).toHaveText(
-      "By using this tool, you agree to the Terms of Service",
-    );
-    await expect(termsOfServiceLinkMobile).toHaveAttribute("href", "/tos");
+      // Check that Terms of Service are displayed
+      await expect(termsOfServiceMobile).toBeVisible();
+      await expect(termsOfServiceMobile).toHaveText(
+        "By using this tool, you agree to the Terms of Service",
+      );
+      await expect(termsOfServiceLinkMobile).toHaveAttribute("href", "/tos");
 
-    // Test desktop view
-    await page.setViewportSize({ width: 1280, height: 800 });
+      // Test desktop view
+      await page.setViewportSize({ width: 1280, height: 800 });
 
-    // check that tabs are not visible in desktop view
-    await expect(page.getByRole("tab", { name: "Edit Invoice" })).toBeHidden();
-    await expect(page.getByRole("tab", { name: "Preview PDF" })).toBeHidden();
+      // check that tabs are not visible in desktop view
+      await expect(
+        page.getByRole("tab", { name: "Edit Invoice" }),
+      ).toBeHidden();
+      await expect(page.getByRole("tab", { name: "Preview PDF" })).toBeHidden();
 
-    const termsOfServiceDesktop = page.getByTestId(
-      "desktop-terms-of-service-link",
-    );
-    const termsOfServiceLinkDesktop = termsOfServiceDesktop.getByRole("link");
+      const termsOfServiceDesktop = page.getByTestId(
+        "desktop-terms-of-service-link",
+      );
+      const termsOfServiceLinkDesktop = termsOfServiceDesktop.getByRole("link");
 
-    // Check that Terms of Service are displayed
-    await expect(termsOfServiceDesktop).toBeVisible();
-    await expect(termsOfServiceDesktop).toHaveText(
-      "By using this tool, you agree to the Terms of Service",
-    );
-    await expect(termsOfServiceLinkDesktop).toHaveAttribute("href", "/tos");
-  });
+      // Check that Terms of Service are displayed
+      await expect(termsOfServiceDesktop).toBeVisible();
+      await expect(termsOfServiceDesktop).toHaveText(
+        "By using this tool, you agree to the Terms of Service",
+      );
+      await expect(termsOfServiceLinkDesktop).toHaveAttribute("href", "/tos");
+    },
+  );
 
   test("keeps a form edit made right before switching to the preview tab", async ({
     page,
@@ -1137,8 +1152,9 @@ test.describe("Invoice Generator Page", () => {
   test(
     "persists data in local storage",
     {
-      // form state -> localStorage -> rehydrate on reload, verified on Gecko too
-      tag: "@firefox-smoke",
+      // form state -> localStorage -> rehydrate on reload, verified on Gecko and
+      // desktop WebKit too
+      tag: ["@firefox-smoke", "@webkit-desktop-smoke"],
     },
     async ({ page }) => {
       // Fill in some data

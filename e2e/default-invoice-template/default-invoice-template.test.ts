@@ -24,8 +24,9 @@ test.describe("Default Invoice Template", () => {
     "downloads PDF in English and verifies content",
     {
       // client side PDF generation + download is the most engine sensitive path
-      // we have, so it is part of the Gecko smoke run
-      tag: "@firefox-smoke",
+      // we have, so it is part of both engine smoke runs. On `Desktop Safari` it is
+      // also the only place the desktop preview pane renders on WebKit
+      tag: ["@firefox-smoke", "@webkit-desktop-smoke"],
     },
     async ({ page, browserName, downloadDir }) => {
       const { suggestedFilename, numPages } = await expectPdfScreenshot(page, {

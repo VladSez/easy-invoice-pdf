@@ -138,6 +138,35 @@ export default defineConfig({
       },
     },
 
+    /**
+     * Desktop WebKit smoke coverage.
+     *
+     * `Mobile Safari` already runs WebKit, but only ever below the 1024px
+     * breakpoint that `useIsDesktop` (`src/hooks/use-media-query.tsx`) switches on,
+     * so it exercises the mobile tab layout and never the desktop one. This project
+     * is the only place the desktop code path runs on WebKit: the shared `usePDF`
+     * preview pane next to the form, the download link, and the `matchMedia`
+     * listener that flips between the two layouts.
+     *
+     * Scoped with `grep` to the tests tagged `@webkit-desktop-smoke` instead of the
+     * full suite, exactly like `Desktop Firefox` above.
+     *
+     * NOTE: no `channel` and no `launchOptions.args` here - those are Chromium
+     * only. Clipboard permissions are omitted too, like on `Mobile Safari`.
+     *
+     * Visual snapshots are never compared on this project, see
+     * DEFAULT_SNAPSHOT_PROJECT in `e2e/utils/pdf-download.ts`, so it needs no
+     * screenshot baselines of its own.
+     */
+    {
+      name: "Desktop Safari",
+      grep: /@webkit-desktop-smoke/,
+      use: {
+        ...devices["Desktop Safari"],
+        storageState: STORAGE_STATE,
+      },
+    },
+
     // /* Test against mobile viewports. */
     {
       name: "Mobile Chrome",

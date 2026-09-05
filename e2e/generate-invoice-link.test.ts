@@ -49,8 +49,8 @@ test.describe("Generate Invoice Link (Get link)", () => {
     "can share invoice and data is persisted in new tab",
     {
       // the URL encoded/compressed invoice state round trip, a likely place for a
-      // Gecko vs Chromium divergence to hide
-      tag: "@firefox-smoke",
+      // Gecko or WebKit vs Chromium divergence to hide
+      tag: ["@firefox-smoke", "@webkit-desktop-smoke"],
     },
     async ({ page, context }) => {
       // Verify shared invoice badge is NOT visible before sharing

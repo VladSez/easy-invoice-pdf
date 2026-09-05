@@ -136,6 +136,12 @@ const withMDX = createMDX({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // pdfjs-dist ships untranspiled ES2022 (static init blocks, private static
+  // methods). Next does not compile node_modules, so the chunk reaches the
+  // browser as-is and any Safari < 16.4 dies parsing it with
+  // "SyntaxError: Unexpected token '{'". Running it through SWC with our
+  // browser targets lowers that syntax.
+  transpilePackages: ["pdfjs-dist"],
   // Configure the file extensions that Next.js should handle
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
   compiler: {
