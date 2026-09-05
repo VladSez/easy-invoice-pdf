@@ -9,6 +9,7 @@ import {
   type GenerateInvoiceInput,
   type GenerateInvoiceReport,
 } from "../generate-invoice";
+import { nowInTimeZone } from "../invoice-time-zone";
 
 // No vi.mock() here — all external boundaries are injected via deps.
 
@@ -42,6 +43,7 @@ const MOCK_INPUT = {
   englishInvoiceData: MOCK_INVOICE_DATA,
   polishInvoiceData: { ...MOCK_INVOICE_DATA, language: "pl" },
   timeZone: "Europe/Warsaw",
+  now: nowInTimeZone("Europe/Warsaw"),
 } as const satisfies GenerateInvoiceInput;
 
 /**
@@ -148,6 +150,9 @@ describe("generateInvoice", () => {
         const deps = buildDeps();
         await generateInvoice(deps, {
           ...MOCK_INPUT,
+          // Built after the clock is faked: `generateInvoice` no longer reads the
+          // clock itself, the caller hands it the invoice's timestamp.
+          now: nowInTimeZone(MOCK_INPUT.timeZone),
           englishInvoiceData: {
             ...MOCK_INPUT.englishInvoiceData,
             invoiceNumberObject: {
@@ -177,6 +182,51 @@ describe("generateInvoice", () => {
       }
     });
 
+    it("should date everything from the passed timestamp, not the clock at send time", async () => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      // 23:59 in Warsaw (CEST, UTC+2) on the last day of August.
+      vi.setSystemTime(new Date("2026-08-31T21:59:00.000Z"));
+
+      try {
+        const now = nowInTimeZone(MOCK_INPUT.timeZone);
+
+        // The run straddles local midnight: rendering and uploading finish when
+        // Warsaw is already in September. Everything must still say August,
+        // matching the dates the caller printed on the PDF.
+        vi.setSystemTime(new Date("2026-08-31T22:01:00.000Z"));
+
+        const deps = buildDeps();
+        await generateInvoice(deps, {
+          ...MOCK_INPUT,
+          now,
+          englishInvoiceData: {
+            ...MOCK_INPUT.englishInvoiceData,
+            invoiceNumberObject: {
+              label: "Invoice Number",
+              value: "",
+            },
+          },
+        });
+
+        expect(deps.createOrFindInvoiceFolder).toHaveBeenCalledWith(
+          expect.objectContaining({ month: "08", year: "2026" }),
+        );
+        expect(deps.uploadFile).toHaveBeenCalledWith(
+          expect.objectContaining({ fileName: "invoice-EN-08-2026.pdf" }),
+        );
+
+        const telegramCall = vi.mocked(deps.sendTelegramMessage).mock
+          .calls[0][0];
+        expect(telegramCall.message).toContain("Invoices for August 2026");
+        expect(telegramCall.message).toContain("Date: *August 31, 2026*");
+
+        const emailCall = vi.mocked(deps.sendEmail).mock.calls[0][0];
+        expect(emailCall.subject).toBe("📝 Invoices for August 2026");
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
     it("should send Telegram notification with 2 file attachments", async () => {
       const deps = buildDeps();
       await generateInvoice(deps, MOCK_INPUT);
@@ -196,6 +246,7 @@ describe("generateInvoice", () => {
       await generateInvoice(deps, {
         ...MOCK_INPUT,
         timeZone: "America/New_York",
+        now: nowInTimeZone("America/New_York"),
       });
 
       const call = vi.mocked(deps.sendTelegramMessage).mock.calls[0][0];

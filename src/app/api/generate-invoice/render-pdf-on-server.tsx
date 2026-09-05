@@ -226,13 +226,12 @@ const ENGLISH_INVOICE_PROD_DATA_BASE = {
  * using getInvoiceDefaultDates() on each call, ensuring no stale data due to
  * serverless warm starts.
  *
- * @param timeZone - IANA timezone the invoice is dated in.
+ * @param now - The run's single timestamp, already in the invoice's timezone
+ *   (see {@link nowInTimeZone}). Taken as an argument rather than read here so
+ *   the PDF dates, the Drive folder and the notification text all come from the
+ *   same instant, even when the run straddles local midnight.
  */
-export function getEnglishInvoiceRealData({ timeZone }: { timeZone: string }) {
-  // One `now` for both the dates and the invoice number, so a call that straddles
-  // midnight cannot mix two calendar days into a single invoice.
-  const now = nowInTimeZone(timeZone);
-
+export function getEnglishInvoiceRealData({ now }: { now: dayjs.Dayjs }) {
   return {
     ...ENGLISH_INVOICE_PROD_DATA_BASE,
     ...getInvoiceDefaultDates(now), // IMPORTANT: recomputed each call so warm servers do not reuse module-load dates (to avoid outdated dates in the PDF)

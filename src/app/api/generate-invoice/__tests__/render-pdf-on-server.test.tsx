@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
 
+import { nowInTimeZone } from "../invoice-time-zone";
 import {
   getEnglishInvoiceRealData,
   getPolishInvoiceRealData,
@@ -132,7 +133,7 @@ describe("getEnglishInvoiceRealData", () => {
     vi.setSystemTime(new Date("2025-06-30T23:30:00Z"));
 
     const invoiceData = getEnglishInvoiceRealData({
-      timeZone: "Europe/Warsaw",
+      now: nowInTimeZone("Europe/Warsaw"),
     });
 
     expect(invoiceData.dateOfIssue).toBe("2025-07-01");
@@ -147,7 +148,7 @@ describe("getEnglishInvoiceRealData", () => {
     vi.setSystemTime(new Date("2025-12-31T23:30:00Z"));
 
     const invoiceData = getEnglishInvoiceRealData({
-      timeZone: "Europe/Warsaw",
+      now: nowInTimeZone("Europe/Warsaw"),
     });
 
     expect(invoiceData.dateOfIssue).toBe("2026-01-01");
@@ -161,7 +162,7 @@ describe("getEnglishInvoiceRealData", () => {
     vi.setSystemTime(new Date("2025-07-01T00:30:00Z"));
 
     const invoiceData = getEnglishInvoiceRealData({
-      timeZone: "America/New_York",
+      now: nowInTimeZone("America/New_York"),
     });
 
     expect(invoiceData.dateOfIssue).toBe("2025-06-30");

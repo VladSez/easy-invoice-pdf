@@ -1,3 +1,4 @@
+import type dayjs from "dayjs";
 import type { drive_v3 } from "googleapis";
 import { compressToEncodedURIComponent } from "lz-string";
 import type { Attachment, CreateEmailResponse } from "resend";
@@ -5,8 +6,6 @@ import type { Attachment, CreateEmailResponse } from "resend";
 import { invoiceSchema, type InvoiceData } from "@/app/schema";
 import type { InvoiceFolderResult } from "@/lib/google-drive";
 import { compressInvoiceData } from "@/utils/url-compression";
-
-import { nowInTimeZone } from "./invoice-time-zone";
 
 /**
  * Formats milliseconds into a human-readable duration string.
@@ -141,6 +140,13 @@ export interface GenerateInvoiceInput {
    * printed inside the PDF.
    */
   timeZone: string;
+  /**
+   * The single timestamp the whole invoice is dated by, already in `timeZone`
+   * (see `nowInTimeZone`). It is captured once by the caller and reused for the
+   * PDF dates, the Drive folder, the file names and the notification text, so a
+   * run that straddles local midnight cannot mix two calendar days.
+   */
+  now: dayjs.Dayjs;
 }
 
 /**
@@ -184,9 +190,8 @@ export async function generateInvoice(
     invoiceEmailRecipient,
     englishInvoiceData,
     timeZone,
+    now,
   } = input;
-
-  const now = nowInTimeZone(timeZone);
 
   // ─── Step 1: Render PDFs ──────────────────────────────────────────────────
   // Run both renders concurrently. `allSettled` ensures a failure in one
