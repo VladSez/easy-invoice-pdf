@@ -1,8 +1,5 @@
-import { hasLocale, useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { use } from "react";
 
 import { type HeaderProps, Header } from "@/app/(components)/header";
 import {
@@ -24,26 +21,11 @@ import {
   VIDEO_DEMO_FALLBACK_IMG,
   VIDEO_DEMO_URL,
 } from "@/config";
-import { routing } from "@/i18n/routing";
 
-// statically generate the pages for all locales
-export function generateStaticParams() {
-  return routing.locales.map((locale) => {
-    return { locale };
-  });
-}
-
-// Next.js types dynamic segments as `string`, so we narrow to `Locale` below
-export default function AboutPage({ params }: PageProps<"/[locale]/about">) {
-  const { locale } = use(params);
-
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
-
-  // Enables static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
-  setRequestLocale(locale);
-
+// The locale is validated by the `about` layout and resolved from the `[locale]`
+// root param in `src/i18n/request.ts`; the static params live in `src/app/[locale]/layout.tsx`.
+export default function AboutPage() {
+  const locale = useLocale();
   const t = useTranslations("About");
 
   const navLinks = {

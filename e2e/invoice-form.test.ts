@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import dayjs from "dayjs";
 
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   CURRENCY_SYMBOLS,

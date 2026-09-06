@@ -21,11 +21,11 @@ async function validatei18nAndInvoicePDFTranslationFiles() {
     // Import the translations schema and catalog using jiti
     // @ts-ignore
     const { invoicePDFTranslationsSchema } = await loadTsFileViaJiti.import(
-      "./src/app/(app)/pdf-i18n-translations/pdf-translations-schema.ts",
+      "./src/app/(main)/(app)/pdf-i18n-translations/pdf-translations-schema.ts",
     );
     // @ts-ignore
     const { INVOICE_PDF_TRANSLATIONS } = await loadTsFileViaJiti.import(
-      "./src/app/(app)/pdf-i18n-translations/pdf-translations.ts",
+      "./src/app/(main)/(app)/pdf-i18n-translations/pdf-translations.ts",
     );
 
     const result = invoicePDFTranslationsSchema.safeParse(
@@ -161,22 +161,13 @@ const nextConfig = {
   // polyfills. We point the browser bundle at it (the worker is imported by its
   // legacy path directly in `mobile-pdf-viewer.tsx`).
   //
-  // Turbopack powers `next dev`, webpack powers `next build`, so both need the alias.
+  // Turbopack powers both `next dev` and `next build` since Next.js 16 (a `webpack`
+  // key here would make `next build` refuse to run). Only the bare specifier is
+  // aliased; deep imports (`pdfjs-dist/legacy/build/...`) are left alone.
   turbopack: {
     resolveAlias: {
       "pdfjs-dist": { browser: "pdfjs-dist/legacy/build/pdf.mjs" },
     },
-  },
-  webpack: (config, { isServer }) => {
-    config.resolve.alias.canvas = false;
-
-    if (!isServer) {
-      // `$` = exact match only, so deep imports (`pdfjs-dist/legacy/build/...`) are
-      // left alone.
-      config.resolve.alias["pdfjs-dist$"] = "pdfjs-dist/legacy/build/pdf.mjs";
-    }
-
-    return config;
   },
   async rewrites() {
     return [
@@ -215,15 +206,18 @@ export default withSentryConfig(withNextIntl(withMDX(nextConfig)), {
   // Upload a larger set of source maps for prettier stack traces (increases build time)
   widenClientFileUpload: true,
 
-  webpack: {
-    // Automatically annotate React components to show their full name in breadcrumbs and session replay
-    reactComponentAnnotation: {
-      enabled: true,
-    },
+  bundleSizeOptimizations: {
+    // Automatically tree-shake Sentry logger statements to reduce bundle size
+    // (bundler-agnostic replacement for `webpack.treeshake.removeDebugLogging`)
+    excludeDebugStatements: true,
+  },
 
-    treeshake: {
-      // Automatically tree-shake Sentry logger statements to reduce bundle size
-      removeDebugLogging: true,
+  _experimental: {
+    // Automatically annotate React components to show their full name in breadcrumbs
+    // and session replay. `webpack.reactComponentAnnotation` is a no-op under
+    // Turbopack; this is its Turbopack counterpart (Next.js 16+).
+    turbopackReactComponentAnnotation: {
+      enabled: true,
     },
   },
 

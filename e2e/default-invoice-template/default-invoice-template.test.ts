@@ -1,4 +1,4 @@
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
 
 import { uploadLogoFile } from "../stripe-invoice-template/utils";

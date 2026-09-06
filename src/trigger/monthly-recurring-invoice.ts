@@ -19,8 +19,6 @@ const INVOICE_GENERATION_HOUR = 13;
  * the /api/generate-invoice endpoint.
  *
  * Replaces the old .github/workflows/monthly-recurring-invoice.yml workflow.
- *
- * @lintignore consumed by the Trigger.dev CLI, not by app code
  */
 export const monthlyRecurringInvoice = schedules.task({
   id: "monthly-recurring-invoice",

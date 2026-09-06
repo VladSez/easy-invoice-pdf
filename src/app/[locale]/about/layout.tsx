@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { hasLocale, type Locale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { locale as rootLocale } from "next/root-params";
 
 import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
 import { routing } from "@/i18n/routing";
@@ -11,15 +11,8 @@ import type EnMessages from "../../../../messages/en.json";
 import { AboutJsonLd } from "./about-json-ld";
 
 // Add metadata to make sure search engines can index the page
-// Next.js types dynamic segments as `string`, so we narrow to `Locale` below
-export async function generateMetadata({
-  params,
-}: Pick<LayoutProps<"/[locale]/about">, "params">): Promise<Metadata> {
-  const { locale } = await params;
-
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getValidatedLocale();
 
   try {
     // Load the messages for the requested locale
@@ -102,20 +95,10 @@ export async function generateMetadata({
   }
 }
 
-// Next.js types dynamic segments as `string`, so we narrow to `Locale` below
 export default async function AboutLocaleLayout({
   children,
-  params,
 }: LayoutProps<"/[locale]/about">) {
-  // Ensure that the incoming `locale` is valid
-  const { locale } = await params;
-
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
-
-  // Enables static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
-  setRequestLocale(locale);
+  const locale = await getValidatedLocale();
 
   return (
     <>
@@ -124,4 +107,20 @@ export default async function AboutLocaleLayout({
       {children}
     </>
   );
+}
+
+/**
+ * The `[locale]` root param matches any single path segment (`/xx/about`), and
+ * `src/i18n/request.ts` maps unknown values to the default locale so the root
+ * layout can still render. Here an unknown value is a 404 instead, rendered by
+ * `src/app/[locale]/not-found.tsx` inside the locale root layout.
+ */
+async function getValidatedLocale(): Promise<Locale> {
+  const requested = await rootLocale();
+
+  if (!hasLocale(routing.locales, requested)) {
+    notFound();
+  }
+
+  return requested;
 }

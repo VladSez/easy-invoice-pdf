@@ -16,10 +16,9 @@ const config: KnipConfig = {
     "file-saver",
     "jszip",
     "@types/file-saver",
-    // loaded by oxlint through `jsPlugins` in .oxlintrc.json, never imported
-    "eslint-plugin-playwright",
-    "eslint-plugin-react",
-    "eslint-plugin-react-you-might-not-need-an-effect",
+    // knip's react-email plugin assumes `email dev` needs this package on react-email
+    // < 6, but 4.x bundles its preview server and has no @react-email/* dependency.
+    "@react-email/preview-server",
     // Sentry resolves these directly when instrumenting Next.js in development.
     "import-in-the-middle",
     "require-in-the-middle",
@@ -30,14 +29,16 @@ const config: KnipConfig = {
     "global.ts",
     "src/i18n/**/*",
     "src/app/schema/**/*",
-    "src/app/changelog/content/**/*",
-    "src/app/(app)/pdf-i18n-translations/pdf-translations-schema.ts",
+    // `*` instead of the literal route-group names: parentheses are glob syntax
+    // loaded with a dynamic `import(\`./content/${filename}\`)` in changelog/utils.ts
+    "src/app/*/changelog/content/**/*",
+    "src/app/*/*/pdf-i18n-translations/pdf-translations-schema.ts",
   ],
   includeEntryExports: true,
   // ignore tags
   // https://knip.dev/reference/configuration#tags
   tags: ["-@lintignore"],
-  ignoreBinaries: ["act", "zizmor", "printf", "cloudflared"],
+  ignoreBinaries: ["act", "zizmor", "cloudflared"],
 };
 
 export default config;

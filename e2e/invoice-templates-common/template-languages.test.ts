@@ -3,7 +3,7 @@ import type { Page } from "@playwright/test";
 import {
   getDefaultInvoiceNumberLabel,
   INVOICE_PDF_TRANSLATIONS,
-} from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+} from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import {
   CURRENCY_SYMBOLS,
   CURRENCY_TO_LABEL,

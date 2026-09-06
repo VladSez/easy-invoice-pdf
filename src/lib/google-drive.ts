@@ -7,7 +7,7 @@ import { env } from "@/env";
 
 type GoogleDriveFile = drive_v3.Schema$File;
 
-export interface DriveFolderRef {
+interface DriveFolderRef {
   id: string;
   webViewLink: string;
 }
