@@ -31,6 +31,72 @@ export const DEFAULT_METADATA = {
 } as const satisfies Metadata;
 
 /**
+ * Subscribers to the metadata store, notified after every successful write.
+ *
+ * `localStorage` has no change event for the tab that wrote it, so a component reading
+ * metadata has no way of hearing about its own app's updates. This is that event.
+ */
+const appMetadataListeners = new Set<() => void>();
+
+function notifyAppMetadataListeners() {
+  for (const listener of appMetadataListeners) {
+    listener();
+  }
+}
+
+/**
+ * Subscribes to app metadata writes. Shaped for `useSyncExternalStore`.
+ *
+ * @param onStoreChange - Called after every write made through {@link updateAppMetadata}.
+ * @returns The unsubscribe function.
+ */
+export function subscribeToAppMetadata(onStoreChange: () => void) {
+  appMetadataListeners.add(onStoreChange);
+
+  return () => {
+    appMetadataListeners.delete(onStoreChange);
+  };
+}
+
+/** The last value {@link getAppMetadataSnapshot} returned, and the raw string it came from. */
+let cachedRawMetadata: string | null = null;
+let cachedMetadata: Metadata | null = null;
+let hasCachedMetadata = false;
+
+/**
+ * The current metadata, as a value that keeps its identity until the stored string changes.
+ *
+ * {@link getAppMetadata} parses and validates on every call and so hands back a new object
+ * each time -- fine for a one-off read in an effect, but `useSyncExternalStore` compares
+ * snapshots by identity and would spin forever on it. Caching against the raw string also
+ * means the `JSON.parse` and the zod validation only run when the metadata actually changed,
+ * rather than on every render of every component that displays it.
+ */
+export function getAppMetadataSnapshot(): Metadata | null {
+  const raw = getAppStorageItem(METADATA_LOCAL_STORAGE_KEY);
+
+  if (hasCachedMetadata && raw === cachedRawMetadata) {
+    return cachedMetadata;
+  }
+
+  cachedRawMetadata = raw;
+  cachedMetadata = getAppMetadata();
+  hasCachedMetadata = true;
+
+  return cachedMetadata;
+}
+
+/**
+ * Metadata as seen while server rendering: there is no `localStorage` there.
+ *
+ * A separate function from the client snapshot because React requires a server snapshot to
+ * be constant, and it must not be the cached client value.
+ */
+export function getServerAppMetadataSnapshot(): Metadata | null {
+  return null;
+}
+
+/**
  * Retrieves and validates the app metadata from **local storage**.
  *
  * The metadata schema includes:
@@ -70,6 +136,39 @@ export function getAppMetadata() {
   }
 }
 /**
+ * Overwrites the stored metadata with the defaults.
+ *
+ * Note this is *not* expressible as an `updateAppMetadata` call: that one reads the current
+ * metadata first and bails when there is none, which is exactly the situation both callers of
+ * {@link ensureAppMetadata} are in.
+ */
+export function resetAppMetadata() {
+  setAppStorageItem({
+    key: METADATA_LOCAL_STORAGE_KEY,
+    value: JSON.stringify(DEFAULT_METADATA),
+  });
+
+  notifyAppMetadataListeners();
+}
+
+/**
+ * Seeds the defaults for anyone who has none stored yet -- a first-time visitor, or someone
+ * who used the app before metadata existed.
+ *
+ * Lives here rather than at the call sites so that every write to the metadata key goes
+ * through this module and therefore notifies {@link subscribeToAppMetadata}. The call sites
+ * used to write `localStorage` directly, which was invisible to subscribers; harmless while
+ * both of them ran before anything had subscribed, but only by accident.
+ */
+export function ensureAppMetadata() {
+  if (getAppMetadata()) {
+    return;
+  }
+
+  resetAppMetadata();
+}
+
+/**
  * Updates the app metadata in **local storage** using an updater function.
  *
  * This function retrieves the current metadata, applies the updater function to it,
@@ -107,10 +206,7 @@ export function updateAppMetadata(updater: (current: Metadata) => Metadata) {
       console.error("[updateAppMetadata] Validation error:", parsed.error);
 
       // reset the metadata to default if validation fails, we want to fail silently and not block the app
-      setAppStorageItem({
-        key: METADATA_LOCAL_STORAGE_KEY,
-        value: JSON.stringify(DEFAULT_METADATA),
-      });
+      resetAppMetadata();
 
       Sentry.captureException(parsed.error);
 
@@ -122,6 +218,8 @@ export function updateAppMetadata(updater: (current: Metadata) => Metadata) {
       key: METADATA_LOCAL_STORAGE_KEY,
       value: JSON.stringify(parsed.data),
     });
+
+    notifyAppMetadataListeners();
   } catch (error) {
     console.error("[updateAppMetadata] Failed to save metadata:", error);
     Sentry.captureException(error);

@@ -37,6 +37,7 @@ import { ReadOnlyMoneyInput } from "@/components/ui/money-input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
+import { debugLog } from "@/lib/debug-log";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
 import type { NonReadonly, Prettify } from "@/types";
@@ -161,24 +162,21 @@ export const InvoiceForm = memo(function InvoiceForm({
     const validatedItemsResult = parseValidatedInvoiceItems(invoiceItems);
 
     if (!validatedItemsResult.success) {
-      // Not reported to Sentry on purpose: this branch is the expected state while
-      // someone is still typing (a cleared amount field, a half-entered VAT), so it
-      // fires constantly and says nothing about a broken app.
-      console.error("Invalid items:", validatedItemsResult.error);
+      // Not reported to Sentry on purpose, and not a `console.error` either: this branch is
+      // the expected state while someone is still typing (a cleared amount field, a
+      // half-entered VAT), so it fires constantly and says nothing about a broken app.
+      debugLog("Invalid items:", validatedItemsResult.error);
 
       return;
     }
 
     const total = calculateInvoiceTotal(invoiceItems);
 
-    console.info(
-      "[useEffect] recalculating totals because invoice items changed",
-      {
-        invoiceItems,
-        validatedItemsResult,
-        total,
-      },
-    );
+    debugLog("[useEffect] recalculating totals because invoice items changed", {
+      invoiceItems,
+      validatedItemsResult,
+      total,
+    });
 
     // Update total first
     setValue("total", total, { shouldValidate: true });

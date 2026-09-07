@@ -1,10 +1,5 @@
 import dayjs from "dayjs";
-import {
-  AlertCircleIcon,
-  FileTextIcon,
-  LinkIcon,
-  PencilIcon,
-} from "lucide-react";
+import { FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRef, useState, type RefObject } from "react";
@@ -15,15 +10,16 @@ import {
   DEFAULT_MOBILE_TAB,
   MOBILE_TABS_VALUES,
 } from "@/app/schema";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
-import { getAppMetadata, updateAppMetadata } from "../utils/get-app-metadata";
+import { useAppMetadata } from "../hooks/use-app-metadata";
+import { updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { MobileFormScrollContainer } from "./mobile-form-scroll-container";
+import { ShareInvoiceButton } from "./share-invoice-button";
 
 const DesktopPDFViewerModuleLoading = () => {
   return (
@@ -95,6 +91,41 @@ const PdfViewer = ({ isMobile }: { isMobile: boolean }) => {
 const TAB_INVOICE_FORM = MOBILE_TABS_VALUES[0];
 const TAB_INVOICE_PREVIEW = MOBILE_TABS_VALUES[1];
 
+/**
+ * "Made by Vlad Sazonau" with the avatar, linking to `/founder`.
+ *
+ * The mobile dock and the desktop column render the same credit; before this they held two
+ * copies of the same markup, differing only in a shade of grey and a top margin.
+ */
+function FounderCredit({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-1.5 text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2",
+        className,
+      )}
+    >
+      <a href={"/founder"}>
+        <img
+          src="https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459"
+          alt="Vlad Sazonau"
+          className="size-6 rounded-full"
+          height="24"
+          width="24"
+          loading="lazy"
+          decoding="async"
+        />
+      </a>
+      <span>
+        Made by{" "}
+        <a href={"/founder"} className="underline hover:text-black">
+          Vlad Sazonau
+        </a>
+      </span>
+    </div>
+  );
+}
+
 function LocalStorageNotice() {
   return (
     <CustomTooltip
@@ -129,7 +160,7 @@ export function InvoiceClientPage({
   canShareInvoice: boolean;
   currentInvoiceFormDataRef: RefObject<(() => InvoiceData | null) | null>;
 }) {
-  const appMetadata = getAppMetadata();
+  const appMetadata = useAppMetadata();
 
   const invoiceLastUpdatedAtFormatted = appMetadata?.invoiceLastUpdatedAt
     ? dayjs(appMetadata.invoiceLastUpdatedAt)
@@ -286,52 +317,10 @@ export function InvoiceClientPage({
                   </span>
                 </TabsTrigger>
               </TabsList>
-              <CustomTooltip
-                className={cn(!canShareInvoice && "bg-red-50")}
-                trigger={
-                  <Button
-                    data-disabled={!canShareInvoice} // for better UX than 'disabled'
-                    onClick={handleShareInvoice}
-                    variant="outline"
-                    className={cn("mx-2 w-full")}
-                  >
-                    <LinkIcon className="mr-1.5 size-4" />
-                    Get link
-                  </Button>
-                }
-                content={
-                  canShareInvoice ? (
-                    <div className="flex items-center gap-3 p-2">
-                      <div className="space-y-1">
-                        <p className="text-sm font-semibold text-slate-900">
-                          Share Invoice Online
-                        </p>
-                        <p className="text-pretty text-xs leading-relaxed text-slate-700">
-                          Generate a link to share this invoice with your
-                          clients. They can view and download it directly from
-                          their browser.
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      data-testid="share-invoice-tooltip-content"
-                      className="flex items-center gap-3 bg-red-50 p-3"
-                    >
-                      <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
-                      <div className="space-y-1">
-                        <p className="text-sm font-semibold text-red-800">
-                          Unable to Share Invoice
-                        </p>
-                        <p className="text-pretty text-xs leading-relaxed text-red-700">
-                          Invoices with logos cannot be shared. Please remove
-                          the logo to generate a shareable link. You can still
-                          download the invoice as PDF and share it.
-                        </p>
-                      </div>
-                    </div>
-                  )
-                }
+              <ShareInvoiceButton
+                canShareInvoice={canShareInvoice}
+                handleShareInvoice={handleShareInvoice}
+                className="mx-2 w-full"
               />
               <InvoicePDFDownloadLink
                 invoiceData={invoiceDataState}
@@ -368,25 +357,7 @@ export function InvoiceClientPage({
           </div>
           {/* Founders info section (Mobile version) */}
           <div className="mt-5 flex w-full justify-center">
-            <div className="flex items-center gap-1.5 text-xs text-zinc-700 duration-500 animate-in fade-in slide-in-from-bottom-2">
-              <a href={"/founder"}>
-                <img
-                  src="https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459"
-                  alt="Vlad Sazonau"
-                  className="size-6 rounded-full"
-                  height="24"
-                  width="24"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </a>
-              <span>
-                Made by{" "}
-                <a href={"/founder"} className="underline hover:text-black">
-                  Vlad Sazonau
-                </a>
-              </span>
-            </div>
+            <FounderCredit />
           </div>
         </div>
       ) : (
@@ -403,25 +374,7 @@ export function InvoiceClientPage({
             </div>
 
             {/* Founders info section (Desktop version) */}
-            <div className="mt-1 flex items-center gap-1.5 text-xs text-zinc-800 duration-500 animate-in fade-in slide-in-from-bottom-2">
-              <a href={"/founder"}>
-                <img
-                  src="https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459"
-                  alt="Vlad Sazonau"
-                  className="size-6 rounded-full"
-                  height="24"
-                  width="24"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </a>
-              <span>
-                Made by{" "}
-                <a href={"/founder"} className="underline hover:text-black">
-                  Vlad Sazonau
-                </a>
-              </span>
-            </div>
+            <FounderCredit className="mt-1 text-zinc-800" />
           </div>
           {/* Invoice preview section i.e. right column (Desktop version) */}
           <div className="relative col-span-8 h-[620px] w-full max-w-full 2xl:h-[700px]">

@@ -5,12 +5,9 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 import { setAppStorageItem } from "@/app/(main)/(app)/utils/app-local-storage";
-import { DEFAULT_METADATA } from "@/app/(main)/(app)/utils/get-app-metadata";
+import { resetAppMetadata } from "@/app/(main)/(app)/utils/get-app-metadata";
 import { getInitialInvoiceData } from "@/app/constants";
-import {
-  METADATA_LOCAL_STORAGE_KEY,
-  PDF_DATA_LOCAL_STORAGE_KEY,
-} from "@/app/schema";
+import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema";
 import { ErrorMessage } from "@/components/etc/error-message";
 import {
   AlertDialog,
@@ -105,10 +102,7 @@ export default function Error({
                       value: JSON.stringify(getInitialInvoiceData()),
                     });
 
-                    setAppStorageItem({
-                      key: METADATA_LOCAL_STORAGE_KEY,
-                      value: JSON.stringify(DEFAULT_METADATA),
-                    });
+                    resetAppMetadata();
 
                     reset();
 

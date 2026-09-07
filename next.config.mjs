@@ -141,11 +141,19 @@ const nextConfig = {
   // browser as-is and any Safari < 16.4 dies parsing it with
   // "SyntaxError: Unexpected token '{'". Running it through SWC with our
   // browser targets lowers that syntax.
+  //
+  // Those targets come from `.browserslistrc`, which pins the Next 15 list --
+  // Next 16's built-in default is `safari 16.4`, under which there would be
+  // nothing left for this entry to lower.
   transpilePackages: ["pdfjs-dist"],
   // Configure the file extensions that Next.js should handle
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
   compiler: {
-    removeConsole: process.env.VERCEL_ENV === "production",
+    // `console.error` survives: the traces that used to make the production console
+    // unreadable are gated behind `debugLog` now, so what is left is genuine failures --
+    // worth having in a user's console when they send a screenshot of one.
+    removeConsole:
+      process.env.VERCEL_ENV === "production" ? { exclude: ["error"] } : false,
   },
   logging: {
     fetches: {

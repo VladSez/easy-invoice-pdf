@@ -14,7 +14,7 @@ export default function Loading() {
 export function InvoicePageLoadingSkeleton() {
   return (
     <>
-      <div
+      <main
         className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen"
         aria-busy="true"
         aria-label="Loading invoice editor"
@@ -27,7 +27,7 @@ export function InvoicePageLoadingSkeleton() {
             <DesktopEditorLoading />
           </div>
         </div>
-      </div>
+      </main>
       <Footer />
     </>
   );

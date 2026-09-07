@@ -5,8 +5,8 @@ import {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,
 } from "lz-string";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -14,20 +14,15 @@ import { Footer } from "@/app/(components)/footer";
 import { InvoicePageHeader } from "@/app/(main)/(app)/components/invoice-page-header";
 import { InvoicePdfInstanceProvider } from "@/app/(main)/(app)/contexts/invoice-pdf-instance-context";
 import { InvoicePageLoadingSkeleton } from "@/app/(main)/(app)/loading";
+import { getAppStorageItem } from "@/app/(main)/(app)/utils/app-local-storage";
 import {
-  getAppStorageItem,
-  setAppStorageItem,
-} from "@/app/(main)/(app)/utils/app-local-storage";
-import {
-  DEFAULT_METADATA,
-  getAppMetadata,
+  ensureAppMetadata,
   updateAppMetadata,
 } from "@/app/(main)/(app)/utils/get-app-metadata";
 import type { ChangelogSummary } from "@/app/(main)/changelog/utils";
 import { getInitialInvoiceData } from "@/app/constants";
 import {
   invoiceSchema,
-  METADATA_LOCAL_STORAGE_KEY,
   PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_TEMPLATES,
   type InvoiceData,
@@ -36,6 +31,7 @@ import { GitHubStarCTA } from "@/components/github-star-cta";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useDeviceContext } from "@/contexts/device-context";
+import { debugLog } from "@/lib/debug-log";
 import { haptic } from "@/lib/haptic";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import {
@@ -46,6 +42,7 @@ import {
 import { InvoiceClientPage } from "./components";
 import { ChangelogUpdatePopup } from "./components/changelog-update-popup";
 import { HowItWorksVideoDialog } from "./components/how-it-works-video-dialog";
+import { CANNOT_SHARE_INVOICE_DESCRIPTION } from "./components/share-invoice-button";
 import { useChangelogUpdatePopup } from "./hooks/use-changelog-update-popup";
 import { useInAppBrowserNotice } from "./hooks/use-in-app-browser-notice";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
@@ -54,6 +51,28 @@ import { selectInvoiceTemplate } from "./utils/select-invoice-template";
 
 // TODO: enable later when PRO version is released, this is PRO FEATURE =)
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
+
+/**
+ * Rewrites the query string of `/` in place.
+ *
+ * Every URL rewrite on this page is cosmetic -- keeping `?template=` in sync, adding or
+ * dropping `?data=` -- and lands on the page that is already rendered. `router.replace`
+ * treats each one as a navigation and refetches the RSC payload for `/`, so a plain page
+ * load spent a whole extra server round trip just to append `?template=default`. Next's
+ * router syncs with the native History API, so `useSearchParams()` still updates and
+ * nothing is refetched.
+ *
+ * @param params - The complete query string to put in the address bar.
+ */
+function replaceUrlQuery(params: URLSearchParams) {
+  const query = params.toString();
+
+  window.history.replaceState(
+    null,
+    "",
+    query ? `?${query}` : window.location.pathname,
+  );
+}
 
 /**
  * Main client component for the invoice application page.
@@ -76,16 +95,23 @@ export function AppPageClient({
   githubStarsCount: number;
   latestChangelog: ChangelogSummary | null;
 }) {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const urlTemplateSearchParam = searchParams.get("template");
 
-  // Validate template parameter with zod
-  const templateValidation = z
-    .enum(SUPPORTED_TEMPLATES)
-    .default("default")
-    .safeParse(urlTemplateSearchParam);
+  /**
+   * The `?template=` parameter, validated.
+   *
+   * Memoized so the parse happens once per URL rather than once per render, and so the result
+   * keeps its identity -- `loadFromLocalStorage` below closes over it, and a fresh object every
+   * render would make that callback (and everything keyed on it) unstable for no reason.
+   */
+  const templateValidation = useMemo(() => {
+    return z
+      .enum(SUPPORTED_TEMPLATES)
+      .default("default")
+      .safeParse(urlTemplateSearchParam);
+  }, [urlTemplateSearchParam]);
 
   const { isDesktop, isUADesktop } = useDeviceContext();
   const isMobile = !isDesktop;
@@ -186,15 +212,8 @@ export function AppPageClient({
   // Helper function to load from localStorage
   const loadFromLocalStorage = useCallback(() => {
     try {
-      const appMetadata = getAppMetadata();
-
       // add metadata with default values if missing for all users
-      if (!appMetadata) {
-        setAppStorageItem({
-          key: METADATA_LOCAL_STORAGE_KEY,
-          value: JSON.stringify(DEFAULT_METADATA),
-        });
-      }
+      ensureAppMetadata();
 
       const savedData = getAppStorageItem(PDF_DATA_LOCAL_STORAGE_KEY);
 
@@ -252,8 +271,8 @@ export function AppPageClient({
   useEffect(() => {
     // Run only once per page load.
     //
-    // This effect depends on `searchParams`, and the app rewrites the URL with
-    // `router.replace` on its own (e.g. to keep ?template= in sync, or to add ?data=
+    // This effect depends on `searchParams`, and the app rewrites the URL on its own
+    // (e.g. to keep ?template= in sync, or to add ?data=
     // when a share link is generated). Without this guard, every one of those rewrites
     // re-ran the initialization, re-read localStorage and called `setInvoiceDataState`
     // with a brand new (but identical) object. That extra state update makes react-pdf
@@ -266,17 +285,10 @@ export function AppPageClient({
     hasInitializedInvoiceDataRef.current = true;
 
     const compressedInvoiceDataInUrl = searchParams.get("data");
-    const urlTemplateSearchParam = searchParams.get("template");
-
-    // Validate template parameter with zod
-    const templateValidation = z
-      .enum(SUPPORTED_TEMPLATES)
-      .default("default")
-      .safeParse(urlTemplateSearchParam);
 
     // first try to load from url i.e. if user has shared invoice link
     if (compressedInvoiceDataInUrl) {
-      console.warn("[useEffect] [initialize invoice data from ** URL **]");
+      debugLog("[useEffect] [initialize invoice data from ** URL **]");
 
       try {
         const decompressedData = decompressFromEncodedURIComponent(
@@ -295,7 +307,7 @@ export function AppPageClient({
 
         const validatedDataFromURL = invoiceSchema.parse(updatedJson);
 
-        console.warn(
+        debugLog(
           "[useEffect] [initialize invoice data from ** URL **] validatedDataFromURL",
           validatedDataFromURL,
         );
@@ -313,15 +325,8 @@ export function AppPageClient({
         // Store the original URL invoice data for change detection
         originalUrlInvoiceDataRef.current = selectedInvoiceData;
 
-        const appMetadata = getAppMetadata();
-
         // add metadata with default values if missing for all users
-        if (!appMetadata) {
-          setAppStorageItem({
-            key: METADATA_LOCAL_STORAGE_KEY,
-            value: JSON.stringify(DEFAULT_METADATA),
-          });
-        }
+        ensureAppMetadata();
       } catch (error) {
         console.error(
           "[useEffect] [initialize invoice data from ** URL **] Failed to parse URL data:",
@@ -345,11 +350,17 @@ export function AppPageClient({
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  const currentTemplate =
-                    searchParams.get("template") || "default";
-                  router.replace(`/?template=${currentTemplate}`, {
-                    scroll: false,
-                  });
+                  // drop the corrupted `?data=`, keep everything else the visitor arrived with
+                  const clearedParams = new URLSearchParams(
+                    window.location.search,
+                  );
+                  clearedParams.delete("data");
+                  clearedParams.set(
+                    "template",
+                    clearedParams.get("template") || "default",
+                  );
+
+                  replaceUrlQuery(clearedParams);
 
                   toast.dismiss();
                 }}
@@ -365,14 +376,14 @@ export function AppPageClient({
         Sentry.captureException(error);
       }
     } else {
-      console.warn(
+      debugLog(
         "[useEffect] [initialize invoice data from ** LOCAL STORAGE **]",
       );
 
       // if no data in url, load from local storage
       loadFromLocalStorage();
     }
-  }, [loadFromLocalStorage, router, searchParams]);
+  }, [loadFromLocalStorage, searchParams, templateValidation]);
 
   /**
    * Ensures the template query parameter is present in the URL (for better user experience)
@@ -381,17 +392,17 @@ export function AppPageClient({
   useEffect(() => {
     // Only run if we have invoice data and no template in URL.
     //
-    // `no-event-handler` wants this written where the invoice data is set, but `router.replace`
-    // is dropped when it is called from the initialization effect while the App Router is still
-    // mounting -- under load the shared-link e2e tests then sit on a URL that never grows its
-    // `?template=`. Reacting to `invoiceDataState` defers the call by one render, which is what
-    // makes it land.
+    // `no-event-handler` wants this written where the invoice data is set, but the template
+    // being written *is* `invoiceDataState.template`, which the initialization effect has not
+    // resolved yet at that point. (It was also load-bearing back when this used
+    // `router.replace`, which the App Router dropped when called mid-mount -- under load the
+    // shared-link e2e tests then sat on a URL that never grew its `?template=`.)
     // oxlint-disable-next-line react-you-might-not-need-an-effect/no-event-handler
     if (!invoiceDataState || searchParams.get("template")) {
       return;
     }
 
-    console.warn("[useEffect] [add missing template to URL]", {
+    debugLog("[useEffect] [add missing template to URL]", {
       template: invoiceDataState.template,
     });
 
@@ -402,8 +413,8 @@ export function AppPageClient({
     currentParams.set("template", invoiceDataState.template);
 
     // Update the browser URL without triggering a page reload or scroll
-    router.replace(`?${currentParams.toString()}`, { scroll: false });
-  }, [invoiceDataState, searchParams, router]);
+    replaceUrlQuery(currentParams);
+  }, [invoiceDataState, searchParams]);
 
   /**
    * Checks if the invoice has changed from the original shared URL version.
@@ -411,7 +422,7 @@ export function AppPageClient({
    */
   const checkForInvoiceChanges = useCallback(
     (currentData: InvoiceData) => {
-      console.warn("[checkForInvoiceChanges]", currentData.template, {
+      debugLog("[checkForInvoiceChanges]", currentData.template, {
         originalUrlInvoiceDataRef: originalUrlInvoiceDataRef.current,
       });
 
@@ -420,7 +431,7 @@ export function AppPageClient({
 
       // Skip if no original URL data or no data in url
       if (!originalUrlInvoiceDataRef.current || !urlData) {
-        console.warn("[checkForInvoiceChanges] skipping");
+        debugLog("[checkForInvoiceChanges] skipping");
 
         return;
       }
@@ -431,7 +442,7 @@ export function AppPageClient({
         JSON.stringify(currentData);
 
       if (invoiceHasChanged) {
-        console.warn("[checkForInvoiceChanges] invoice has changed");
+        debugLog("[checkForInvoiceChanges] invoice has changed");
 
         toast.info(
           <div className="space-y-2">
@@ -462,10 +473,10 @@ export function AppPageClient({
 
         // Update the browser URL without triggering a page reload or scroll
         // This keeps the URL in sync with the invoice state while maintaining user position
-        router.replace(`?${currentParams.toString()}`, { scroll: false });
+        replaceUrlQuery(currentParams);
       }
     },
-    [router, isMobile, searchParams],
+    [isMobile, searchParams],
   );
 
   /**
@@ -476,81 +487,95 @@ export function AppPageClient({
    * - Handles invoice URL corruption by clearing invalid URL parameters and notifying the user
    * - Triggers change detection to show toast if invoice is modified from the URL-loaded version
    *
+   * Stable across renders on purpose: `InvoiceForm` is wrapped in `memo`, and this function
+   * is one of its props. As a fresh closure on every render it made that `memo` unable to
+   * ever hold, so re-renders that have nothing to do with the invoice -- opening the "How it
+   * works" dialog, the changelog popup, a regenerated QR code -- re-rendered the whole form.
+   * The form still re-renders when its own edit comes back through `invoiceDataState`, which
+   * is inherent to that round trip.
    */
-  const handleInvoiceDataChange = (updatedData: InvoiceData) => {
-    console.warn("[handleInvoiceDataChange]");
+  const handleInvoiceDataChange = useCallback(
+    (updatedData: InvoiceData) => {
+      debugLog("[handleInvoiceDataChange]");
 
-    if (isInvoiceUrlCorrupted) {
-      console.warn("[handleInvoiceDataChange] clearing url due to corruption");
+      if (isInvoiceUrlCorrupted) {
+        debugLog("[handleInvoiceDataChange] clearing url due to corruption");
 
-      /** CLEAR URL IN CASE OF CORRUPTED INVOICE URL (i.e. "/?data=") for better UX and consistency */
+        /** CLEAR URL IN CASE OF CORRUPTED INVOICE URL (i.e. "/?data=") for better UX and consistency */
 
-      // Remove the ?data parameter from URL since the invoice has been modified (clean url, because it's no longer valid)
-      const currentParams = new URLSearchParams(searchParams.toString());
-      currentParams.delete("data");
+        // Remove the ?data parameter from URL since the invoice has been modified (clean url, because it's no longer valid)
+        const currentParams = new URLSearchParams(searchParams.toString());
+        currentParams.delete("data");
 
-      // update the url
-      router.replace(`?${currentParams.toString()}`, { scroll: false });
+        // update the url
+        replaceUrlQuery(currentParams);
 
-      // Show notification that URL was cleared due to corruption
-      toast.info(
-        <div className="space-y-2">
-          <p className="text-sm font-semibold">Corrupted URL Cleared</p>
-          <p className="text-muted-foreground text-pretty leading-relaxed">
-            The invalid invoice URL has been removed from the address bar.
-          </p>
-          <p className="text-muted-foreground text-pretty leading-relaxed">
-            Click{" "}
-            <span className="font-semibold text-foreground">
-              &apos;Get link&apos;
-            </span>{" "}
-            to create a new shareable link.
-          </p>
-        </div>,
-        {
-          id: "corrupted-url-cleared-toast",
-          duration: 15_000,
-          closeButton: true,
-          position: isMobile ? "top-center" : "bottom-right",
-        },
-      );
+        // Show notification that URL was cleared due to corruption
+        toast.info(
+          <div className="space-y-2">
+            <p className="text-sm font-semibold">Corrupted URL Cleared</p>
+            <p className="text-muted-foreground text-pretty leading-relaxed">
+              The invalid invoice URL has been removed from the address bar.
+            </p>
+            <p className="text-muted-foreground text-pretty leading-relaxed">
+              Click{" "}
+              <span className="font-semibold text-foreground">
+                &apos;Get link&apos;
+              </span>{" "}
+              to create a new shareable link.
+            </p>
+          </div>,
+          {
+            id: "corrupted-url-cleared-toast",
+            duration: 15_000,
+            closeButton: true,
+            position: isMobile ? "top-center" : "bottom-right",
+          },
+        );
 
-      // Reset the invoice url corruption state
-      setIsInvoiceUrlCorrupted(false);
-    }
+        // Reset the invoice url corruption state
+        setIsInvoiceUrlCorrupted(false);
+      }
 
-    setInvoiceDataState(updatedData);
-    checkForInvoiceChanges(updatedData);
+      setInvoiceDataState(updatedData);
+      checkForInvoiceChanges(updatedData);
 
-    const currentTemplate = searchParams.get("template");
+      const currentTemplate = searchParams.get("template");
 
-    // update the url with the new template
-    if (currentTemplate !== updatedData.template) {
-      console.warn("[handleInvoiceDataChange] update url with new template", {
-        currentTemplate,
-        updatedDataTemplate: updatedData.template,
-      });
+      // update the url with the new template
+      if (currentTemplate !== updatedData.template) {
+        debugLog("[handleInvoiceDataChange] update url with new template", {
+          currentTemplate,
+          updatedDataTemplate: updatedData.template,
+        });
 
-      router.replace(`/?template=${updatedData.template}`, { scroll: false });
-    } else {
-      console.warn("[handleInvoiceDataChange] invoice template did not change");
-    }
-  };
+        // Rebuilt from the current params rather than replacing the whole query string:
+        // this used to be a bare `/?template=...`, which also threw away anything else the
+        // visitor arrived with (utm tags and the like). `data` is still dropped on purpose --
+        // a template switch is a change from the shared version, which is exactly what
+        // `checkForInvoiceChanges` above has just told the user about.
+        const templateParams = new URLSearchParams(searchParams.toString());
+        templateParams.set("template", updatedData.template);
+        templateParams.delete("data");
+
+        replaceUrlQuery(templateParams);
+      } else {
+        debugLog("[handleInvoiceDataChange] invoice template did not change");
+      }
+    },
+    [checkForInvoiceChanges, isInvoiceUrlCorrupted, isMobile, searchParams],
+  );
 
   /** Generate a shareable invoice link */
-  const handleShareInvoice = async () => {
+  const handleShareInvoice = useCallback(async () => {
     if (!canShareInvoice) {
       toast.error("Unable to Share Invoice", {
         id: "unable-to-share-invoice-error-toast",
         duration: 10_000,
         description: (
-          <>
-            <p className="text-pretty text-xs leading-relaxed text-red-700">
-              Invoices with logos cannot be shared. Please remove the logo to
-              generate a shareable link. You can still download the invoice as
-              PDF and share it.
-            </p>
-          </>
+          <p className="text-pretty text-xs leading-relaxed text-red-700">
+            {CANNOT_SHARE_INVOICE_DESCRIPTION}
+          </p>
         ),
       });
 
@@ -622,7 +647,7 @@ export function AppPageClient({
         currentParams.set("template", newInvoiceDataValidated.template);
         currentParams.set("data", compressedData);
 
-        router.replace(`?${currentParams.toString()}`, { scroll: false });
+        replaceUrlQuery(currentParams);
 
         // Remember the invoice that was just shared, so later edits are detected and the
         // "Invoice Updated" toast is shown. Previously this ref was (re)populated as a
@@ -737,7 +762,7 @@ export function AppPageClient({
         Sentry.captureException(error);
       }
     }
-  };
+  }, [canShareInvoice, invoiceDataState, isMobile, isUADesktop, searchParams]);
 
   // we only want to render the page on client side
   if (!invoiceDataState) {
@@ -751,7 +776,7 @@ export function AppPageClient({
         invoiceData={invoiceDataState}
         qrCodeDataUrl={qrCodeDataUrl}
       >
-        <div className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
+        <main className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
           <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 min-[1400px]:max-w-7xl 2xl:max-w-[1480px]">
             <InvoicePageHeader
               canShareInvoice={canShareInvoice}
@@ -772,7 +797,7 @@ export function AppPageClient({
               />
             </div>
           </div>
-        </div>
+        </main>
       </InvoicePdfInstanceProvider>
       <Footer />
       {changelogPopupVariant ? (
