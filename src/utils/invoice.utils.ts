@@ -1,10 +1,26 @@
 import * as Sentry from "@sentry/nextjs";
-import n2words from "n2words";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "@/app/schema";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { numberToWords } from "@/utils/number-to-words";
+
+/**
+ * The digits of a whole amount, for the two paths where it cannot be spelled out.
+ *
+ * Not `toString()`: from 10^21 up that switches to exponential notation and would print
+ * "1e+21" on the invoice. `<input type="number">` accepts "1e21" as typed input, so a value
+ * that large really can arrive from the form.
+ *
+ * @param amount - A whole, non-negative amount.
+ */
+function amountAsDigits(amount: number) {
+  return amount.toLocaleString("en-US", {
+    useGrouping: false,
+    maximumFractionDigits: 0,
+  });
+}
 
 /**
  * Get the amount in words (e.g. 123.45 -> "one hundred twenty-three and 45/100 dollars")
@@ -46,9 +62,15 @@ export function getAmountInWords({
 
   let amountInWords = "";
   try {
-    amountInWords = n2words(result.data.amount, {
-      lang: result.data.language,
+    const words = numberToWords({
+      value: result.data.amount,
+      language: result.data.language,
     });
+
+    // `null` means the amount is past the largest scale word these languages carry. That is
+    // an unusual invoice, not a broken one -- in VND or IDR it is an ordinary sum -- so it
+    // falls back to the digits quietly, without the toast and the Sentry report below.
+    amountInWords = words ?? amountAsDigits(result.data.amount);
   } catch (error) {
     console.error("Failed to convert number to words:", error);
     toast.error("Failed to convert number to words", {
@@ -65,7 +87,7 @@ export function getAmountInWords({
       Sentry.captureException(error);
     }
 
-    amountInWords = Math.floor(amount ?? 0).toString();
+    amountInWords = amountAsDigits(Math.floor(amount));
   }
 
   return amountInWords;

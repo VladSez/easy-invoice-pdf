@@ -13,7 +13,7 @@ import { METADATA_LOCAL_STORAGE_KEY } from "@/app/schema";
 async function loadStore() {
   vi.resetModules();
 
-  return import("../get-app-metadata");
+  return await import("../get-app-metadata");
 }
 
 beforeEach(() => {
