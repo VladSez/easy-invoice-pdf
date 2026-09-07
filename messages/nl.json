@@ -129,5 +129,15 @@
         "answer": "In tegenstelling tot traditionele facturatieplatforms heb je voor EasyInvoicePDF geen account nodig en wordt je factuur volledig in je browser verwerkt."
       }
     }
+  },
+  "BrowserSupport": {
+    "outdated": {
+      "title": "Je browser is verouderd",
+      "description": "{browser} {version} is meer dan drie jaar oud. Werk hem bij naar de nieuwste versie zodat alles goed werkt."
+    },
+    "unsupported": {
+      "title": "Je browser wordt niet meer ondersteund",
+      "description": "{browser} {version} is te oud om deze app betrouwbaar te draaien. Werk hem bij naar de nieuwste versie."
+    }
   }
 }

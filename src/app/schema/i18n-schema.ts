@@ -148,11 +148,27 @@ const faqSchema = z
   })
   .strict();
 
+const browserSupportNoticeSchema = z
+  .object({
+    title: z.string(),
+    description: z.string(),
+  })
+  .strict();
+
+/** Copy for the "your browser is old" toast, see `src/components/browser-support-notice.tsx`. */
+const browserSupportSchema = z
+  .object({
+    outdated: browserSupportNoticeSchema,
+    unsupported: browserSupportNoticeSchema,
+  })
+  .strict();
+
 export const messagesSchema = z
   .object({
     About: aboutSchema,
     Metadata: metadataSchema,
     FAQ: faqSchema,
+    BrowserSupport: browserSupportSchema,
   })
   .strict();
 

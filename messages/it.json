@@ -129,5 +129,15 @@
         "answer": "A differenza delle piattaforme di fatturazione tradizionali, EasyInvoicePDF non richiede un account ed elabora la fattura interamente nel tuo browser."
       }
     }
+  },
+  "BrowserSupport": {
+    "outdated": {
+      "title": "Il tuo browser non è aggiornato",
+      "description": "{browser} {version} ha più di tre anni. Aggiornalo all'ultima versione per far funzionare tutto correttamente."
+    },
+    "unsupported": {
+      "title": "Il tuo browser non è più supportato",
+      "description": "{browser} {version} è troppo vecchio per far funzionare questa app in modo affidabile. Aggiornalo all'ultima versione."
+    }
   }
 }

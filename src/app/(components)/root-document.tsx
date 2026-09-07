@@ -4,6 +4,7 @@ import { NextIntlClientProvider, type Locale } from "next-intl";
 import Script from "next/script";
 import { Toaster } from "sonner";
 
+import { BrowserSupportNotice } from "@/components/browser-support-notice";
 import { ResponsiveIndicator } from "@/components/dev/responsive-indicator";
 import { SentryIndicator } from "@/components/dev/sentry-indicator";
 import { PERSONAL_WEBSITE_URL, STATIC_ASSETS_URL } from "@/config";
@@ -50,6 +51,9 @@ export function RootDocument({ lang, children }: RootDocumentProps) {
 
           {/* https://sonner.emilkowal.ski/ */}
           <Toaster visibleToasts={1} richColors closeButton />
+          {/* toasts visitors on a browser older than the `.browserslistrc` floor,
+              or simply older than three years, into updating it */}
+          <BrowserSupportNotice />
           {/* show responsive indicator(tailwind breakpoint) for debugging responsive designs */}
           {process.env.NODE_ENV === "development" ? (
             <>

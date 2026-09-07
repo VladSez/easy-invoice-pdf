@@ -129,5 +129,15 @@
         "answer": "Unlike traditional invoicing platforms, EasyInvoicePDF requires no account and processes your invoice entirely inside your browser."
       }
     }
+  },
+  "BrowserSupport": {
+    "outdated": {
+      "title": "Your browser is out of date",
+      "description": "{browser} {version} is more than three years old. Update to the latest version for the best experience."
+    },
+    "unsupported": {
+      "title": "Your browser is no longer supported",
+      "description": "{browser} {version} is too old to run this app reliably. Please update to the latest version."
+    }
   }
 }
