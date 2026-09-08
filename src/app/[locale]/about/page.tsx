@@ -8,19 +8,14 @@ import {
 } from "@/app/(components)/header/go-to-app-button-cta";
 import { ABOUT_FAQ_ITEM_KEYS } from "@/app/[locale]/about/about-faq-item-keys";
 import { AboutFooter } from "@/app/[locale]/about/components/about-footer";
-import { FeaturesCarousel } from "@/app/[locale]/about/components/features-carousel";
+import { FeaturesShowcase } from "@/app/[locale]/about/components/features-showcase";
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
+import { HeroDemoVideo } from "@/app/[locale]/about/components/hero-demo-video";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { Button } from "@/components/ui/button";
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AutoPlayVideo } from "@/components/video";
-import {
-  GITHUB_URL,
-  MARKETING_FEATURES_CARDS,
-  VIDEO_DEMO_FALLBACK_IMG,
-  VIDEO_DEMO_URL,
-} from "@/config";
+import { GITHUB_URL, MARKETING_FEATURES_CARDS } from "@/config";
 
 // The locale is validated by the `about` layout and resolved from the `[locale]`
 // root param in `src/i18n/request.ts`; the static params live in `src/app/[locale]/layout.tsx`.
@@ -191,12 +186,7 @@ function HeroSection() {
               </div>
               {/* Video container */}
               <div className="relative aspect-video w-full">
-                <AutoPlayVideo
-                  src={VIDEO_DEMO_URL}
-                  posterImg={VIDEO_DEMO_FALLBACK_IMG}
-                  testId="hero-about-page-video"
-                  description="How to create and download an invoice as a PDF in EasyInvoicePDF.com"
-                />
+                <HeroDemoVideo />
               </div>
             </div>
           </div>
@@ -246,7 +236,7 @@ function FeaturesSection() {
         </div>
 
         {/* Features cards */}
-        <FeaturesCarousel
+        <FeaturesShowcase
           features={features}
           translations={{
             label: t("features.title"),

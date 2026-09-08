@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import {
   BROWSER_SUPPORT_TABLES,
   detectBrowser,
+  detectIosVersion,
   getBrowserSupport,
+  supportsInlineVideo,
 } from "../browser-support";
 
 /**
@@ -50,6 +52,14 @@ const USER_AGENTS = {
     "Mozilla/5.0 (Linux; Android 10; SM-A505F Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/96.0.4664.104 Mobile Safari/537.36",
   iosWebView:
     "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
+  // an iPhone 6s on the last iOS it can run: WebKit 15 no matter which browser
+  chromeIosOld:
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 15_8 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/126.0.6478.54 Mobile/15E148 Safari/604.1",
+  iosWebViewOld:
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 15_8 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
+  // iPad drops the `iPhone` from the OS token
+  ipadSafariOld:
+    "Mozilla/5.0 (iPad; CPU OS 15_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6 Mobile/15E148 Safari/604.1",
   googlebot:
     "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
 } as const;
@@ -163,6 +173,86 @@ describe("getBrowserSupport", () => {
   });
 });
 
+describe("detectIosVersion", () => {
+  it("reads the OS version from any browser on iOS", () => {
+    expect(detectIosVersion(USER_AGENTS.iosSafariOld)).toBe(15);
+    expect(detectIosVersion(USER_AGENTS.iosSafariRecent)).toBe(18);
+    expect(detectIosVersion(USER_AGENTS.chromeIos)).toBe(17);
+    expect(detectIosVersion(USER_AGENTS.firefoxIos)).toBe(17);
+    // a WebView says nothing about the browser, but still says which iOS it is
+    expect(detectIosVersion(USER_AGENTS.iosWebView)).toBe(17);
+    // iPad writes `CPU OS 15_6`, without the `iPhone`
+    expect(detectIosVersion(USER_AGENTS.ipadSafariOld)).toBe(15);
+  });
+
+  it("returns null off iOS", () => {
+    expect(detectIosVersion(USER_AGENTS.safariRecent)).toBeNull();
+    expect(detectIosVersion(USER_AGENTS.chromeRecent)).toBeNull();
+    expect(detectIosVersion(USER_AGENTS.androidWebView)).toBeNull();
+    expect(detectIosVersion("")).toBeNull();
+  });
+});
+
+describe("supportsInlineVideo", () => {
+  it("sends every browser on an old iOS to the YouTube fallback", () => {
+    // On iOS the OS decides, not the badge on the browser: `CriOS/126` and a
+    // WebView with no browser token at all are the same WebKit 15 underneath.
+    const oldIos = [
+      USER_AGENTS.iosSafariOld,
+      USER_AGENTS.chromeIosOld,
+      USER_AGENTS.iosWebViewOld,
+      USER_AGENTS.ipadSafariOld,
+    ];
+
+    for (const userAgent of oldIos) {
+      expect(supportsInlineVideo(userAgent)).toBe(false);
+    }
+  });
+
+  it("sends old desktop Safari to the YouTube fallback too", () => {
+    expect(supportsInlineVideo(USER_AGENTS.safariOld)).toBe(false);
+    expect(supportsInlineVideo(USER_AGENTS.safariAncient)).toBe(false);
+  });
+
+  it("keeps the inline video on everything that plays it", () => {
+    const supported = [
+      USER_AGENTS.chromeRecent,
+      // three years old, but Chromium has never had a problem with these files
+      USER_AGENTS.chromeOld,
+      USER_AGENTS.chromeIos,
+      USER_AGENTS.edgeRecent,
+      USER_AGENTS.firefoxRecent,
+      USER_AGENTS.firefoxOld,
+      USER_AGENTS.firefoxIos,
+      USER_AGENTS.safariRecent,
+      USER_AGENTS.iosSafariRecent,
+      USER_AGENTS.iosWebView,
+      USER_AGENTS.operaRecent,
+      USER_AGENTS.samsungRecent,
+      // Samsung Internet has no video floor of its own
+      USER_AGENTS.samsungOld,
+      USER_AGENTS.androidWebView,
+    ];
+
+    for (const userAgent of supported) {
+      expect(supportsInlineVideo(userAgent)).toBe(true);
+    }
+  });
+
+  it("falls back to the inline video when it cannot place the browser", () => {
+    // Swapping a working <video> for a third party iframe is its own regression,
+    // so an unknown user agent keeps the default path.
+    expect(supportsInlineVideo(USER_AGENTS.googlebot)).toBe(true);
+    expect(supportsInlineVideo("")).toBe(true);
+  });
+
+  it("drops browsers below the `.browserslistrc` floor as well", () => {
+    expect(supportsInlineVideo(USER_AGENTS.chromeAncient)).toBe(false);
+    expect(supportsInlineVideo(USER_AGENTS.edgeLegacy)).toBe(false);
+    expect(supportsInlineVideo(USER_AGENTS.operaPresto)).toBe(false);
+  });
+});
+
 describe("version tables", () => {
   it("keeps the unsupported floor in sync with .browserslistrc", async () => {
     const { readFile } = await import("node:fs/promises");
@@ -205,6 +295,19 @@ describe("version tables", () => {
       opera: configured.get("opera"),
       safari: configured.get("safari"),
     });
+  });
+
+  it("only gives Safari a video floor of its own", () => {
+    // Every other entry tracks the browserslist floor on purpose: below it the
+    // bundle is not compiled for the browser anyway, and above it there is no
+    // known video problem outside WebKit.
+    const { minimumInlineVideo, minimumSupported } = BROWSER_SUPPORT_TABLES;
+
+    expect(minimumInlineVideo).toEqual({
+      ...minimumSupported,
+      safari: 16,
+    });
+    expect(BROWSER_SUPPORT_TABLES.minimumInlineVideoIos).toBe(16);
   });
 
   it("fails once the three-year table has drifted by a full year", () => {

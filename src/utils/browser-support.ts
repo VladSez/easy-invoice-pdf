@@ -118,6 +118,97 @@ const MINIMUM_SUPPORTED_VERSION = {
   safari: 12,
 } as const satisfies Partial<Record<BrowserId, number>>;
 
+/**
+ * Oldest major version of each browser that plays the self-hosted `<video>` demos on
+ * the marketing pages reliably. Below it we swap them for a YouTube embed, which
+ * brings its own player and picks a rendition the device can actually decode — see
+ * {@link supportsInlineVideo} and `src/hooks/use-supports-inline-video.ts`.
+ *
+ * Only Safari has a floor of its own: iOS 15 and older is where the "the demo videos
+ * never start" reports come from. Every other entry mirrors
+ * {@link MINIMUM_SUPPORTED_VERSION}, the point at which the bundle stops being
+ * compiled for the browser at all — there is no evidence of a video-specific problem
+ * anywhere above it, and swapping a working `<video>` for a third party iframe is not
+ * free. Samsung Internet is Chromium and has no entry, i.e. no video floor.
+ */
+const MINIMUM_INLINE_VIDEO_VERSION = {
+  chrome: MINIMUM_SUPPORTED_VERSION.chrome,
+  edge: MINIMUM_SUPPORTED_VERSION.edge,
+  firefox: MINIMUM_SUPPORTED_VERSION.firefox,
+  opera: MINIMUM_SUPPORTED_VERSION.opera,
+  safari: 16,
+} as const satisfies Partial<Record<BrowserId, number>>;
+
+/**
+ * Oldest iOS major version that plays the demos reliably, checked ahead of
+ * {@link MINIMUM_INLINE_VIDEO_VERSION}.
+ *
+ * On iOS every browser is WebKit underneath, but only Safari says so: Chrome reports
+ * `CriOS/141`, Firefox `FxiOS/145` and a WebView reports no browser at all, so the
+ * version in {@link detectBrowser} says nothing about the engine that has to decode
+ * the video. The OS version in the user agent does.
+ */
+const MINIMUM_INLINE_VIDEO_IOS_VERSION = 16;
+
+/**
+ * Matches the OS version iOS puts in every user agent on the platform, Safari or not:
+ * `CPU iPhone OS 15_6 like Mac OS X` on iPhone, `CPU OS 15_6 like Mac OS X` on iPad.
+ */
+const IOS_VERSION_PATTERN = /\bCPU (?:iPhone )?OS (\d+)(?:_\d+)* like Mac OS X/;
+
+/**
+ * Major iOS version behind a user agent, or `null` when it is not iOS.
+ *
+ * iPadOS 13 and later lie about themselves in desktop mode (`Macintosh; Intel Mac OS
+ * X`), which lands here as `null` — those are iPads new enough to be well above the
+ * floor anyway.
+ */
+export function detectIosVersion(userAgent: string): number | null {
+  const match = IOS_VERSION_PATTERN.exec(userAgent);
+
+  if (!match?.[1]) {
+    return null;
+  }
+
+  // the pattern only ever captures digits, so `Number` is safe here
+  const majorVersion = Number(match[1]);
+
+  return Number.isFinite(majorVersion) ? majorVersion : null;
+}
+
+/**
+ * Whether the browser behind `userAgent` can be trusted to play the self-hosted MP4
+ * demos inline.
+ *
+ * Fails open — an unrecognised browser gets the `<video>` element — for the same
+ * reason {@link detectBrowser} does: the fallback is a third party iframe, and
+ * serving that to a browser that never had a problem is its own regression.
+ */
+export function supportsInlineVideo(userAgent: string): boolean {
+  const iosVersion = detectIosVersion(userAgent);
+
+  // iOS first: it settles the engine for every browser on the platform, including
+  // the ones `detectBrowser` reads as recent Chrome/Firefox or cannot place at all
+  if (iosVersion !== null) {
+    return iosVersion >= MINIMUM_INLINE_VIDEO_IOS_VERSION;
+  }
+
+  const browser = detectBrowser(userAgent);
+
+  if (!browser) {
+    return true;
+  }
+
+  const minimumVersion =
+    browser.id in MINIMUM_INLINE_VIDEO_VERSION
+      ? MINIMUM_INLINE_VIDEO_VERSION[
+          browser.id as keyof typeof MINIMUM_INLINE_VIDEO_VERSION
+        ]
+      : null;
+
+  return minimumVersion === null || browser.majorVersion >= minimumVersion;
+}
+
 const BROWSER_SUPPORT_STATUSES = [
   /** Recent enough that we say nothing. */
   "supported",
@@ -195,4 +286,6 @@ export function getBrowserSupport(userAgent: string): BrowserSupport | null {
 export const BROWSER_SUPPORT_TABLES = {
   minimumRecent: MINIMUM_RECENT_VERSION,
   minimumSupported: MINIMUM_SUPPORTED_VERSION,
+  minimumInlineVideo: MINIMUM_INLINE_VIDEO_VERSION,
+  minimumInlineVideoIos: MINIMUM_INLINE_VIDEO_IOS_VERSION,
 } as const;

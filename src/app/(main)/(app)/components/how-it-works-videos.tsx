@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { YouTubeEmbed } from "@/components/youtube-embed";
 import {
   DISCORD_COMMUNITY_URL,
   HOW_IT_WORKS_VIDEOS,
@@ -139,15 +140,11 @@ export function HowItWorksVideos({
 
       <div className="aspect-video min-h-[300px] w-full shrink-0 overflow-hidden">
         {showIframe ? (
-          <iframe
+          <YouTubeEmbed
             key={activeVideoId}
             src={activeVideo.embedUrl}
             title={activeVideo.iframeTitle}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-            className="h-full w-full border-0"
-            data-testid="how-it-works-video"
+            testId="how-it-works-video"
           />
         ) : null}
       </div>
