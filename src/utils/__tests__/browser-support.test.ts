@@ -62,6 +62,10 @@ const USER_AGENTS = {
     "Mozilla/5.0 (iPad; CPU OS 15_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6 Mobile/15E148 Safari/604.1",
   googlebot:
     "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+  // Playwright's `iPhone 13 Pro` descriptor, verbatim: a modern WebKit behind an OS
+  // token frozen at `15_0`. No real device emits this pair - iOS 15 ships Safari 15.
+  emulatedIphone:
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.4 Mobile/15E148 Safari/604.1",
 } as const;
 
 describe("detectBrowser", () => {
@@ -237,6 +241,16 @@ describe("supportsInlineVideo", () => {
     for (const userAgent of supported) {
       expect(supportsInlineVideo(userAgent)).toBe(true);
     }
+  });
+
+  it("goes by Safari's own version on iOS, not the OS token", () => {
+    // Emulated iPhones (Playwright, devtools device mode) pair a current WebKit with
+    // a stale OS token. Safari reports the engine itself in `Version/`, so that is
+    // what decides - otherwise every WebKit e2e run gets the YouTube fallback.
+    expect(supportsInlineVideo(USER_AGENTS.emulatedIphone)).toBe(true);
+
+    // and a real iOS 15, where the two agree, is still sent to the fallback
+    expect(supportsInlineVideo(USER_AGENTS.iosSafariOld)).toBe(false);
   });
 
   it("falls back to the inline video when it cannot place the browser", () => {

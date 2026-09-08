@@ -283,6 +283,21 @@ export function InvoiceClientPage({
                 slightly off its label. With no gap, a trigger and the indicator are both
                 exactly half the track minus the 4px inset.
               */}
+              {/*
+                The track is 40px tall and inset by 4px, so a trigger's own box is only
+                32px high and stops 4px short of the pill's edge — under the 44px thumb
+                target, with dead pixels around it that swallow a tap. `hit-area-*` grows
+                each trigger's tap zone with an invisible pseudo-element instead of a
+                bigger box, so nothing moves:
+
+                - `hit-area-y-1.5` adds 6px above and below (32px -> 44px), half of the
+                  12px that separates the track from the dock's top edge and from the
+                  share button, so neither is stolen from.
+                - `hit-area-l-4` / `hit-area-r-4` reach 16px outward — the 4px track inset
+                  plus the dock's 12px of padding — so the two tabs cover the dock's full
+                  width. Only the outer side of each is grown: they already meet in the
+                  middle, and growing both inward would overlap them there.
+              */}
               <TabsList className="relative h-10 w-full gap-0 rounded-full bg-slate-200 p-1">
                 <span
                   aria-hidden="true"
@@ -298,7 +313,7 @@ export function InvoiceClientPage({
                   value={TAB_INVOICE_FORM}
                   // `bg-transparent` and `shadow-none` are load-bearing: without them the
                   // trigger paints its own white pill on top of the sliding indicator
-                  className="z-10 flex-1 rounded-full text-slate-600 hover:bg-transparent hover:text-slate-900 data-[state=active]:bg-transparent data-[state=active]:text-slate-900 data-[state=active]:shadow-none"
+                  className="z-10 flex-1 rounded-full text-slate-600 hit-area-l-4 hit-area-y-1.5 hover:bg-transparent hover:text-slate-900 data-[state=active]:bg-transparent data-[state=active]:text-slate-900 data-[state=active]:shadow-none"
                   data-testid="edit-invoice-tab"
                 >
                   <span className="flex items-center gap-1">
@@ -308,7 +323,7 @@ export function InvoiceClientPage({
                 </TabsTrigger>
                 <TabsTrigger
                   value={TAB_INVOICE_PREVIEW}
-                  className="z-10 flex-1 rounded-full text-slate-600 hover:bg-transparent hover:text-slate-900 data-[state=active]:bg-transparent data-[state=active]:text-slate-900 data-[state=active]:shadow-none"
+                  className="z-10 flex-1 rounded-full text-slate-600 hit-area-r-4 hit-area-y-1.5 hover:bg-transparent hover:text-slate-900 data-[state=active]:bg-transparent data-[state=active]:text-slate-900 data-[state=active]:shadow-none"
                   data-testid="preview-pdf-tab"
                 >
                   <span className="flex items-center gap-1">

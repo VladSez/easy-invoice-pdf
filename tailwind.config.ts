@@ -1,5 +1,9 @@
 import type { Config } from "tailwindcss";
 
+// relative, not `@/`: Tailwind loads this config through jiti, which does not resolve
+// the tsconfig path aliases
+import { hitAreaPlugin } from "./src/lib/tailwind-hit-area-plugin";
+
 const config: Config = {
   darkMode: ["class"],
   content: [
@@ -107,8 +111,13 @@ const config: Config = {
       },
     },
   },
-  // tailwind v3 resolves plugins through CJS `require`
-  // oxlint-disable-next-line typescript/no-require-imports
-  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+  plugins: [
+    // tailwind v3 resolves published plugins through CJS `require`
+    // oxlint-disable-next-line typescript/no-require-imports
+    require("tailwindcss-animate"),
+    // oxlint-disable-next-line typescript/no-require-imports
+    require("@tailwindcss/typography"),
+    hitAreaPlugin,
+  ],
 };
 export default config;

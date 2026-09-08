@@ -141,12 +141,18 @@ const MINIMUM_INLINE_VIDEO_VERSION = {
 
 /**
  * Oldest iOS major version that plays the demos reliably, checked ahead of
- * {@link MINIMUM_INLINE_VIDEO_VERSION}.
+ * {@link MINIMUM_INLINE_VIDEO_VERSION} for every browser on iOS *except* Safari.
  *
  * On iOS every browser is WebKit underneath, but only Safari says so: Chrome reports
  * `CriOS/141`, Firefox `FxiOS/145` and a WebView reports no browser at all, so the
  * version in {@link detectBrowser} says nothing about the engine that has to decode
  * the video. The OS version in the user agent does.
+ *
+ * Safari is the exception: its `Version/` token *is* the WebKit version, so it is the
+ * more precise of the two signals and the one {@link supportsInlineVideo} goes by.
+ * Kept equal to `MINIMUM_INLINE_VIDEO_VERSION.safari` — on a real device the two move
+ * together (iOS 15 ships Safari 15) and only ever disagree on a synthesised user
+ * agent, where the OS token is the half that is stale.
  */
 const MINIMUM_INLINE_VIDEO_IOS_VERSION = 16;
 
@@ -185,15 +191,17 @@ export function detectIosVersion(userAgent: string): number | null {
  * serving that to a browser that never had a problem is its own regression.
  */
 export function supportsInlineVideo(userAgent: string): boolean {
+  const browser = detectBrowser(userAgent);
   const iosVersion = detectIosVersion(userAgent);
 
-  // iOS first: it settles the engine for every browser on the platform, including
-  // the ones `detectBrowser` reads as recent Chrome/Firefox or cannot place at all
-  if (iosVersion !== null) {
+  // iOS settles the engine for every browser on the platform, including the ones
+  // `detectBrowser` reads as recent Chrome/Firefox or cannot place at all - but not
+  // for Safari, which reports the engine itself in `Version/`. Browser emulation
+  // (Playwright's iPhone descriptors, devtools device mode) pairs a modern WebKit
+  // with a years-old OS token, and it is the OS token that is the fiction there.
+  if (iosVersion !== null && browser?.id !== "safari") {
     return iosVersion >= MINIMUM_INLINE_VIDEO_IOS_VERSION;
   }
-
-  const browser = detectBrowser(userAgent);
 
   if (!browser) {
     return true;
