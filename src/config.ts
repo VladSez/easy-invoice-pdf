@@ -133,42 +133,54 @@ export const MARKETING_FEATURES_CARDS = [
     videoSrc: `${STATIC_ASSETS_URL}/demo-videos/live-preview-v1.mp4`,
     videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/live-preview-fallback-v1.png`,
     videoDescription: "Live preview of the invoice as you make changes",
+    youtubeVideoId: "pWkb_JcKouU",
   },
   {
     translationKey: "instantDownload",
     videoSrc: `${STATIC_ASSETS_URL}/demo-videos/instand-download-v1.mp4`,
     videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/instant-download-fallback-04-03-2026.png`,
     videoDescription: "Instant download of the invoice as a PDF file",
+    youtubeVideoId: "I4ygKyyyJ4I",
   },
   {
     translationKey: "shareableLinks",
     videoSrc: `${STATIC_ASSETS_URL}/demo-videos/share-invoice-v1.mp4`,
     videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/share-invoice-fallback-v1.png`,
     videoDescription: "Shareable links to your invoice",
+    youtubeVideoId: "GBNQtBciCJI",
   },
   {
     translationKey: "taxSupport",
     videoSrc: `${STATIC_ASSETS_URL}/demo-videos/tax-custom-v1.mp4`,
     videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/tax-custom-fallback-v1.png`,
     videoDescription: "Customizable tax system support",
+    youtubeVideoId: "F_iJxZ3PHbk",
   },
   {
     translationKey: "multiLanguage",
     videoSrc: `${STATIC_ASSETS_URL}/demo-videos/multi-lang-v1.mp4`,
     videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/multi-lang-fallback-v1.png`,
     videoDescription: "Multiple languages and currencies support",
+    youtubeVideoId: "ITMeKohyz3I",
   },
   {
     translationKey: "openSource",
     videoSrc: `${STATIC_ASSETS_URL}/demo-videos/open-source-v1.mp4`,
     videoFallbackImg: `${STATIC_ASSETS_URL}/demo-videos/open-source-fallback-v1.png`,
     videoDescription: "Open source invoice generator",
+    youtubeVideoId: "mBam1T7peJA",
   },
 ] as const satisfies {
   translationKey: string;
   videoSrc: string;
   videoFallbackImg: string;
   videoDescription: string;
+  /**
+   * Bare YouTube video id of the same demo, played on mobile instead of the MP4.
+   * Stored as an id rather than a URL because looping a single video needs it
+   * twice — once in the path and once as `playlist` (see `AutoPlayYouTubeEmbed`).
+   */
+  youtubeVideoId: string;
 }[];
 
 /**

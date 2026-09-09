@@ -1,4 +1,7 @@
-import { AutoPlayVideo, ManualPlayVideo } from "@/components/video";
+import { AutoPlayVideo } from "@/components/video";
+import { AutoPlayYouTubeEmbed } from "@/components/youtube-embed-autoplay";
+import { useIsXlUp } from "@/hooks/use-media-query";
+import { useSupportsInlineVideo } from "@/hooks/use-supports-inline-video";
 import { cn } from "@/lib/utils";
 
 export interface FeatureCardProps {
@@ -7,6 +10,13 @@ export interface FeatureCardProps {
   videoSrc: string;
   videoFallbackImg: string;
   videoDescription: string;
+  /** Bare YouTube id of the same demo, played on the narrow layout. */
+  youtubeVideoId: string;
+  /**
+   * Whether this is the carousel slide currently in view. Only the active card
+   * mounts its YouTube player — see {@link AutoPlayYouTubeEmbed}.
+   */
+  isActive: boolean;
   /**
    * Used to build the video `data-testid`, e.g. `livePreview-demo-video`
    */
@@ -17,6 +27,18 @@ export interface FeatureCardProps {
 /**
  * A single marketing feature card: title, description and a demo video
  * inside a Mac OS like browser frame.
+ *
+ * The demo is the self-hosted MP4 on wide screens and the same clip on YouTube below
+ * `xl`: YouTube serves a rendition sized for the device instead of the full-width MP4,
+ * and it autoplays there, which is what the narrow layout used to ask for a tap for.
+ * The two cannot be swapped with `hidden`/`xl:block` the way they were — an iframe in
+ * a display-none container still loads the whole player — so this is a real branch.
+ *
+ * A wide screen on a browser that cannot play the MP4s inline (iOS 15 and desktop
+ * Safari 15 and older) takes the YouTube path too. That used to be handled a level up,
+ * by swapping the whole section for the "How it works" tutorials, because there was no
+ * YouTube copy of each individual demo; there is one per feature now, so those visitors
+ * get the same six cards as everyone else.
  */
 export function FeatureCard({
   title,
@@ -24,10 +46,19 @@ export function FeatureCard({
   videoSrc,
   videoFallbackImg,
   videoDescription,
+  youtubeVideoId,
+  isActive,
   translationKey,
   className,
 }: FeatureCardProps) {
   const testId = `${translationKey}-demo-video`;
+
+  // `false` until the effect runs, so the first client render matches the server and
+  // the narrow layout — the one that renders a still, not a player — is what hydrates
+  const isXlUp = useIsXlUp();
+  const canPlayInlineVideo = useSupportsInlineVideo();
+
+  const showsYouTube = !isXlUp || !canPlayInlineVideo;
 
   return (
     <div
@@ -62,22 +93,24 @@ export function FeatureCard({
           </div>
           {/* Video container */}
           <div className="relative aspect-[16.6/8.9] h-full w-full lg:aspect-[16.99/9.1]">
-            {/* Auto play video for desktop */}
-            <AutoPlayVideo
-              className="hidden xl:block"
-              src={videoSrc}
-              posterImg={videoFallbackImg}
-              description={videoDescription}
-              testId={testId}
-            />
-            {/* Manual play video for mobile for better UX */}
-            <ManualPlayVideo
-              className="xl:hidden"
-              src={videoSrc}
-              posterImg={videoFallbackImg}
-              description={videoDescription}
-              testId={testId}
-            />
+            {showsYouTube ? (
+              /* The same demo from YouTube on mobile, tablet and old browsers */
+              <AutoPlayYouTubeEmbed
+                videoId={youtubeVideoId}
+                title={videoDescription}
+                posterImg={videoFallbackImg}
+                isActive={isActive}
+                testId={`${testId}-youtube`}
+              />
+            ) : (
+              /* Self-hosted demo on desktop */
+              <AutoPlayVideo
+                src={videoSrc}
+                posterImg={videoFallbackImg}
+                description={videoDescription}
+                testId={testId}
+              />
+            )}
           </div>
         </div>
       </div>

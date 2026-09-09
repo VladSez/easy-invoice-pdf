@@ -1,26 +1,20 @@
 // @vitest-environment happy-dom
 
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { VIDEO_DEMO_FALLBACK_IMG, VIDEO_DEMO_YOUTUBE_URL } from "@/config";
 
-// `HowItWorksVideos` reads `?video=`, which needs a router this far from Next
-vi.mock("next/navigation", () => {
-  return {
-    useSearchParams: () => {
-      return new URLSearchParams();
-    },
-  };
-});
-
-import { FeaturesShowcase } from "../features-showcase";
+import { FeaturesCarousel } from "../features-carousel";
 import { HeroDemoVideo } from "../hero-demo-video";
 
 /**
  * The two ends of the `useSupportsInlineVideo` swap on the about page. The thresholds
  * themselves live in `src/utils/__tests__/browser-support.test.ts`; this is about the
  * components actually rendering the other branch once the hook says so.
+ *
+ * The feature cards pick their player on two axes — viewport width and whether the
+ * browser can play the MP4s inline — so both are stubbed here.
  */
 
 const CHROME_141 =
@@ -30,11 +24,38 @@ const IOS_SAFARI_15 =
   "Mozilla/5.0 (iPhone; CPU iPhone OS 15_8 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6 Mobile/15E148 Safari/604.1";
 
 const ORIGINAL_USER_AGENT = window.navigator.userAgent;
+const ORIGINAL_MATCH_MEDIA = window.matchMedia;
 
 function setUserAgent(userAgent: string) {
   Object.defineProperty(window.navigator, "userAgent", {
     value: userAgent,
     configurable: true,
+  });
+}
+
+/**
+ * `useIsXlUp` is the only media query the feature cards ask about, so a stub that
+ * answers every query the same way is enough to put them on either side of `xl`.
+ */
+function setIsXlUp(matches: boolean) {
+  Object.defineProperty(window, "matchMedia", {
+    configurable: true,
+    value: (query: string) => {
+      return {
+        matches,
+        media: query,
+        onchange: null,
+        addEventListener: () => {
+          return undefined;
+        },
+        removeEventListener: () => {
+          return undefined;
+        },
+        dispatchEvent: () => {
+          return false;
+        },
+      };
+    },
   });
 }
 
@@ -46,6 +67,7 @@ const FEATURES = [
     videoSrc: "https://example.com/live-preview.mp4",
     videoFallbackImg: "https://example.com/live-preview.png",
     videoDescription: "Live preview demo",
+    youtubeVideoId: "pWkb_JcKouU",
   },
   {
     translationKey: "openSource",
@@ -54,6 +76,7 @@ const FEATURES = [
     videoSrc: "https://example.com/open-source.mp4",
     videoFallbackImg: "https://example.com/open-source.png",
     videoDescription: "Open source demo",
+    youtubeVideoId: "mBam1T7peJA",
   },
 ];
 
@@ -63,10 +86,20 @@ const CAROUSEL_TRANSLATIONS = {
   nextFeature: "Next feature",
 };
 
+// the embed only mounts once the card is both selected and on screen, so the still it
+// stands behind is what says "this card went the YouTube way" in a DOM without one
+function getYouTubeStills() {
+  return screen.queryAllByTestId(/-demo-video-youtube-poster$/);
+}
+
 afterEach(() => {
   // this project runs vitest without globals, so RTL does not auto-cleanup
   cleanup();
   setUserAgent(ORIGINAL_USER_AGENT);
+  Object.defineProperty(window, "matchMedia", {
+    configurable: true,
+    value: ORIGINAL_MATCH_MEDIA,
+  });
 });
 
 describe("HeroDemoVideo", () => {
@@ -95,35 +128,49 @@ describe("HeroDemoVideo", () => {
   });
 });
 
-describe("FeaturesShowcase", () => {
-  it("shows the carousel of demo videos on a browser that can play them", () => {
-    setUserAgent(CHROME_141);
-
-    render(
-      <FeaturesShowcase
+describe("FeaturesCarousel", () => {
+  function renderCarousel() {
+    return render(
+      <FeaturesCarousel
         features={FEATURES}
         translations={CAROUSEL_TRANSLATIONS}
       />,
     );
+  }
 
-    expect(screen.getByTestId("features-carousel")).toBeDefined();
-    expect(screen.queryByTestId("features-youtube-fallback")).toBeNull();
+  it("plays the self-hosted demos on a wide screen that can play them", () => {
+    setUserAgent(CHROME_141);
+    setIsXlUp(true);
+
+    renderCarousel();
+
+    expect(screen.getByTestId("livePreview-demo-video")).toBeDefined();
+    expect(screen.getByTestId("openSource-demo-video")).toBeDefined();
+    expect(getYouTubeStills()).toHaveLength(0);
   });
 
-  it("shows the YouTube tutorials and the feature copy on iOS 15", () => {
+  it("hands every card to YouTube below xl", () => {
+    setUserAgent(CHROME_141);
+    setIsXlUp(false);
+
+    renderCarousel();
+
+    expect(getYouTubeStills()).toHaveLength(FEATURES.length);
+    expect(screen.queryByTestId("livePreview-demo-video")).toBeNull();
+  });
+
+  it("keeps the cards, on YouTube, on a wide screen running iOS 15", () => {
     setUserAgent(IOS_SAFARI_15);
+    setIsXlUp(true);
 
-    render(
-      <FeaturesShowcase
-        features={FEATURES}
-        translations={CAROUSEL_TRANSLATIONS}
-      />,
-    );
+    renderCarousel();
 
-    expect(screen.getByTestId("features-youtube-fallback")).toBeDefined();
-    expect(screen.queryByTestId("features-carousel")).toBeNull();
+    // the section used to be swapped wholesale for the "How it works" tutorials here,
+    // because there was no YouTube copy of each demo; there is one per feature now
+    expect(screen.getByTestId("features-carousel")).toBeDefined();
+    expect(getYouTubeStills()).toHaveLength(FEATURES.length);
+    expect(screen.queryByTestId("livePreview-demo-video")).toBeNull();
 
-    // the copy survives the swap even though the per-feature demos do not
     expect(screen.getByText("Live preview")).toBeDefined();
     expect(screen.getByText("Every line of it is on GitHub.")).toBeDefined();
   });

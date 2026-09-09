@@ -8,7 +8,7 @@ import {
 } from "@/app/(components)/header/go-to-app-button-cta";
 import { ABOUT_FAQ_ITEM_KEYS } from "@/app/[locale]/about/about-faq-item-keys";
 import { AboutFooter } from "@/app/[locale]/about/components/about-footer";
-import { FeaturesShowcase } from "@/app/[locale]/about/components/features-showcase";
+import { FeaturesCarousel } from "@/app/[locale]/about/components/features-carousel";
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
 import { HeroDemoVideo } from "@/app/[locale]/about/components/hero-demo-video";
 import { GithubIcon } from "@/components/etc/github-logo";
@@ -206,6 +206,7 @@ function FeaturesSection() {
       videoSrc: feature.videoSrc,
       videoFallbackImg: feature.videoFallbackImg,
       videoDescription: feature.videoDescription,
+      youtubeVideoId: feature.youtubeVideoId,
       title: t(`features.items.${feature.translationKey}.title`),
       description: t(`features.items.${feature.translationKey}.description`),
     };
@@ -236,7 +237,7 @@ function FeaturesSection() {
         </div>
 
         {/* Features cards */}
-        <FeaturesShowcase
+        <FeaturesCarousel
           features={features}
           translations={{
             label: t("features.title"),
