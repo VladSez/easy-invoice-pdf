@@ -19,8 +19,19 @@ jobs:
 
     name: Run e2e tests via ${{ github.event_name == 'deployment_status' && 'Vercel deployment' }}
     timeout-minutes: 50
-    # we use macos-latest because I am using mac os locally and generating snapshots (screenshots) for the PDF tests locally, so we need to use the same OS on the CI. https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job#choosing-github-hosted-runners
-    runs-on: macos-14
+    # We pin a macOS runner because the PDF snapshots (screenshots) are generated locally on
+    # macOS, so CI has to rasterize on the same OS family to match them.
+    # https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job#choosing-github-hosted-runners
+    #
+    # NOT `macos-14`: Playwright freezes WebKit on that image (`revisionOverrides` in
+    # `playwright-core/browsers.json` pins mac14/mac14-arm64 to an old revision), so the
+    # `Desktop Safari` / `Mobile Safari` projects would silently test a stale engine and
+    # every run logs "You are using a frozen webkit browser which does not receive updates
+    # anymore on mac14-arm64". `macos-15` gets the current WebKit build.
+    #
+    # NOT `macos-latest` either - it follows GitHub's newest stable image, and an image bump
+    # would invalidate the PDF snapshot baselines without a commit to point at.
+    runs-on: macos-15
     env:
       TZ: Europe/Warsaw # we use Europe/Warsaw timezone for consistent date handling across local machines and CI
     steps:
