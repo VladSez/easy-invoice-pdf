@@ -197,6 +197,14 @@ export function StaleDatesBanner({
         type="button"
         size="sm"
         className="mt-3.5 gap-1.5 bg-amber-600 text-white shadow-sm hover:bg-amber-600/95"
+        // The banner sits under the date fields, so this is nearly always tapped straight
+        // from a focused input -- the case where Safari moves focus to the nearest
+        // focusable ancestor, scrolls it into view and retargets the click away from the
+        // button. Keeping focus put makes the tap land. See the same note in
+        // `sections/invoice-items.tsx`.
+        onMouseDown={(event) => {
+          event.preventDefault();
+        }}
         onClick={() => {
           const today = dayjs().format("YYYY-MM-DD");
 

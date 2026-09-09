@@ -92,6 +92,16 @@ export const InvoiceItems = memo(function InvoiceItems({
                   trigger={
                     <button
                       type="button"
+                      // Safari does not focus a button on mousedown, so focus leaves the
+                      // field the user was editing and lands on the nearest focusable
+                      // ancestor -- on mobile that is Radix's tab panel, which Safari then
+                      // scrolls into view (smoothly, see `globals.css`). The button drifts
+                      // out from under the finger between mousedown and mouseup, and the
+                      // browser dispatches the `click` on the common ancestor instead: the
+                      // tap does nothing. Keeping focus where it is avoids the scroll.
+                      onMouseDown={(event) => {
+                        event.preventDefault();
+                      }}
                       onClick={() => {
                         return setDeleteItemIndex(index);
                       }}
