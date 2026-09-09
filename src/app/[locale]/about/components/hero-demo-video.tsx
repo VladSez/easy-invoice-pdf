@@ -27,6 +27,9 @@ export function HeroDemoVideo() {
       <YouTubeEmbed
         src={VIDEO_DEMO_YOUTUBE_URL}
         title={VIDEO_DESCRIPTION}
+        // the hero demo runs by itself on every other browser, and this is the same
+        // clip standing in for it
+        autoPlay
         className="absolute left-0 top-0"
         testId="hero-about-page-video-youtube"
       />

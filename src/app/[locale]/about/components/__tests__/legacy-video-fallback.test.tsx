@@ -122,8 +122,17 @@ describe("HeroDemoVideo", () => {
     render(<HeroDemoVideo />);
 
     const embed = screen.getByTestId("hero-about-page-video-youtube");
+    // oxlint-disable-next-line vitest/no-conditional-in-test
+    const src = new URL(embed.getAttribute("src") ?? "");
 
-    expect(embed.getAttribute("src")).toBe(VIDEO_DEMO_YOUTUBE_URL);
+    expect(src.origin + src.pathname).toBe(
+      new URL(VIDEO_DEMO_YOUTUBE_URL).origin +
+        new URL(VIDEO_DEMO_YOUTUBE_URL).pathname,
+    );
+    // the clip it stands in for starts on its own, so this one does too
+    expect(src.searchParams.get("autoplay")).toBe("1");
+    expect(src.searchParams.get("mute")).toBe("1");
+    expect(src.searchParams.get("playsinline")).toBe("1");
     expect(screen.queryByTestId("hero-about-page-video")).toBeNull();
   });
 });
