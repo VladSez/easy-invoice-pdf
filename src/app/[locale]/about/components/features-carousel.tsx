@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { FeatureCard, type FeatureCardProps } from "./feature-card";
 
 interface FeaturesCarouselProps {
-  features: Omit<FeatureCardProps, "className" | "isActive">[];
+  features: Omit<FeatureCardProps, "className">[];
   translations: {
     /** Accessible name for the carousel region, e.g. "Product features" */
     label: string;
@@ -95,7 +95,7 @@ export function FeaturesCarousel({
           Cards stretch to the tallest one at every breakpoint, so swiping never changes
           the height of the carousel. */}
       <CarouselContent className="-ml-6 -mr-2 items-stretch sm:-ml-4 sm:mr-0 lg:-ml-6 xl:-ml-10">
-        {features.map((feature, index) => {
+        {features.map((feature) => {
           return (
             <CarouselItem
               key={feature.translationKey}
@@ -106,9 +106,7 @@ export function FeaturesCarousel({
               // track's `-ml-6` pulls it off-screen so it only shows while scrolling
               className="basis-full sm:basis-[70%] md:basis-[55%] lg:basis-1/2 lg:pl-6 xl:pl-10"
             >
-              {/* Only the selected card plays: on the narrow layout the demo is a
-                  YouTube player, and there is no reason to run more than one */}
-              <FeatureCard {...feature} isActive={index === selectedIndex} />
+              <FeatureCard {...feature} />
             </CarouselItem>
           );
         })}

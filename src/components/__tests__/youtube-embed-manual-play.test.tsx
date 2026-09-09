@@ -9,18 +9,18 @@ import {
 } from "react-intersection-observer/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AutoPlayYouTubeEmbed } from "../youtube-embed-autoplay";
+import { ManualPlayYouTubeEmbed } from "../youtube-embed-manual-play";
 
 const VIDEO_ID = "pWkb_JcKouU";
 const POSTER = "https://example.com/live-preview.png";
+const TITLE = "Live preview demo";
 
-function renderEmbed({ isActive }: { isActive: boolean }) {
+function renderEmbed() {
   return render(
-    <AutoPlayYouTubeEmbed
+    <ManualPlayYouTubeEmbed
       videoId={VIDEO_ID}
-      title="Live preview demo"
+      title={TITLE}
       posterImg={POSTER}
-      isActive={isActive}
       testId="live-preview-demo-video-youtube"
     />,
   );
@@ -32,6 +32,18 @@ function getEmbed() {
 
 function getPoster() {
   return screen.queryByTestId("live-preview-demo-video-youtube-poster");
+}
+
+function pressPlay() {
+  act(() => {
+    return screen.getByRole("button", { name: TITLE }).click();
+  });
+}
+
+function setInView(inView: boolean) {
+  act(() => {
+    return mockAllIsIntersecting(inView);
+  });
 }
 
 // this project runs vitest without globals, so the `beforeEach` that `test-utils`
@@ -46,39 +58,20 @@ afterEach(() => {
   resetIntersectionMocking();
 });
 
-describe("AutoPlayYouTubeEmbed", () => {
-  it("shows the still, and no player, while the card is off screen", () => {
-    renderEmbed({ isActive: true });
-
-    act(() => {
-      return mockAllIsIntersecting(false);
-    });
+describe("ManualPlayYouTubeEmbed", () => {
+  it("shows a still and a play button, and loads no player, until asked", () => {
+    renderEmbed();
+    setInView(true);
 
     expect(getEmbed()).toBeNull();
-    expect(
-      screen
-        .getByTestId("live-preview-demo-video-youtube-poster")
-        .getAttribute("src"),
-    ).toBe(POSTER);
+    expect(getPoster()?.getAttribute("src")).toBe(POSTER);
+    expect(screen.getByRole("button", { name: TITLE })).toBeDefined();
   });
 
-  it("keeps the still on a card that is on screen but not the selected slide", () => {
-    renderEmbed({ isActive: false });
-
-    act(() => {
-      return mockAllIsIntersecting(true);
-    });
-
-    expect(getEmbed()).toBeNull();
-    expect(getPoster()).not.toBeNull();
-  });
-
-  it("mounts an autoplaying, muted, looping player once selected and in view", () => {
-    renderEmbed({ isActive: true });
-
-    act(() => {
-      return mockAllIsIntersecting(true);
-    });
+  it("mounts a muted, looping player when the play button is pressed", () => {
+    renderEmbed();
+    setInView(true);
+    pressPlay();
 
     // `getByTestId` rather than the nullable helper: the assertions below read
     // attributes off the element, and optional chaining in a test reads as a branch
@@ -90,13 +83,15 @@ describe("AutoPlayYouTubeEmbed", () => {
     expect(src.origin + src.pathname).toBe(
       `https://www.youtube.com/embed/${VIDEO_ID}`,
     );
+    // the press is the gesture; this is what saves it from needing a second one on
+    // YouTube's own play button
     expect(src.searchParams.get("autoplay")).toBe("1");
-    // autoplay is only ever granted to a muted, inline player
     expect(src.searchParams.get("mute")).toBe("1");
     expect(src.searchParams.get("playsinline")).toBe("1");
     // `loop` needs the video to name itself as a single-entry playlist
     expect(src.searchParams.get("loop")).toBe("1");
     expect(src.searchParams.get("playlist")).toBe(VIDEO_ID);
+    expect(src.searchParams.get("controls")).toBe("1");
 
     // ...and the Permissions Policy has to delegate autoplay to the iframe, or the
     // player is not allowed to start itself whatever the URL asks for
@@ -105,19 +100,27 @@ describe("AutoPlayYouTubeEmbed", () => {
     expect(getPoster()).toBeNull();
   });
 
-  it("unmounts the player when the card scrolls away, so only one is ever live", () => {
-    renderEmbed({ isActive: true });
-
-    act(() => {
-      return mockAllIsIntersecting(true);
-    });
+  it("unmounts the player once it scrolls out of view", () => {
+    renderEmbed();
+    setInView(true);
+    pressPlay();
     expect(getEmbed()).not.toBeNull();
 
-    act(() => {
-      return mockAllIsIntersecting(false);
-    });
+    setInView(false);
 
     expect(getEmbed()).toBeNull();
     expect(getPoster()).not.toBeNull();
+  });
+
+  it("does not start again on its own when it scrolls back into view", () => {
+    renderEmbed();
+    setInView(true);
+    pressPlay();
+    setInView(false);
+
+    setInView(true);
+
+    expect(getEmbed()).toBeNull();
+    expect(screen.getByRole("button", { name: TITLE })).toBeDefined();
   });
 });

@@ -1,5 +1,5 @@
 import { AutoPlayVideo } from "@/components/video";
-import { AutoPlayYouTubeEmbed } from "@/components/youtube-embed-autoplay";
+import { ManualPlayYouTubeEmbed } from "@/components/youtube-embed-manual-play";
 import { useIsXlUp } from "@/hooks/use-media-query";
 import { useSupportsInlineVideo } from "@/hooks/use-supports-inline-video";
 import { cn } from "@/lib/utils";
@@ -13,11 +13,6 @@ export interface FeatureCardProps {
   /** Bare YouTube id of the same demo, played on the narrow layout. */
   youtubeVideoId: string;
   /**
-   * Whether this is the carousel slide currently in view. Only the active card
-   * mounts its YouTube player — see {@link AutoPlayYouTubeEmbed}.
-   */
-  isActive: boolean;
-  /**
    * Used to build the video `data-testid`, e.g. `livePreview-demo-video`
    */
   translationKey: string;
@@ -29,10 +24,10 @@ export interface FeatureCardProps {
  * inside a Mac OS like browser frame.
  *
  * The demo is the self-hosted MP4 on wide screens and the same clip on YouTube below
- * `xl`: YouTube serves a rendition sized for the device instead of the full-width MP4,
- * and it autoplays there, which is what the narrow layout used to ask for a tap for.
- * The two cannot be swapped with `hidden`/`xl:block` the way they were — an iframe in
- * a display-none container still loads the whole player — so this is a real branch.
+ * `xl`, where YouTube serves a rendition sized for the device instead of the
+ * full-width MP4. Both narrow paths wait for a tap, as the MP4 one always has. The two
+ * cannot be swapped with `hidden`/`xl:block` the way they were — an iframe in a
+ * display-none container still loads the whole player — so this is a real branch.
  *
  * A wide screen on a browser that cannot play the MP4s inline (iOS 15 and desktop
  * Safari 15 and older) takes the YouTube path too. That used to be handled a level up,
@@ -47,7 +42,6 @@ export function FeatureCard({
   videoFallbackImg,
   videoDescription,
   youtubeVideoId,
-  isActive,
   translationKey,
   className,
 }: FeatureCardProps) {
@@ -95,11 +89,10 @@ export function FeatureCard({
           <div className="relative aspect-[16.6/8.9] h-full w-full lg:aspect-[16.99/9.1]">
             {showsYouTube ? (
               /* The same demo from YouTube on mobile, tablet and old browsers */
-              <AutoPlayYouTubeEmbed
+              <ManualPlayYouTubeEmbed
                 videoId={youtubeVideoId}
                 title={videoDescription}
                 posterImg={videoFallbackImg}
-                isActive={isActive}
                 testId={`${testId}-youtube`}
               />
             ) : (

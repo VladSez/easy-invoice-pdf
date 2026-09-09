@@ -86,8 +86,8 @@ const CAROUSEL_TRANSLATIONS = {
   nextFeature: "Next feature",
 };
 
-// the embed only mounts once the card is both selected and on screen, so the still it
-// stands behind is what says "this card went the YouTube way" in a DOM without one
+// the embed waits for a play button press, so the still it stands behind is what says
+// "this card went the YouTube way"
 function getYouTubeStills() {
   return screen.queryAllByTestId(/-demo-video-youtube-poster$/);
 }
