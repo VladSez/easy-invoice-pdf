@@ -42,6 +42,9 @@ export function HeroDemoVideo() {
       posterImg={VIDEO_DEMO_FALLBACK_IMG}
       testId="hero-about-page-video"
       description={VIDEO_DESCRIPTION}
+      // the browser frame is wide and short of the fold on a phone, where half of it is
+      // never on screen at once; a sliver is enough to mean the demo is being looked at
+      inViewThreshold={0.15}
     />
   );
 }
