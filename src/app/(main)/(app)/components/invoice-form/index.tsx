@@ -110,6 +110,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   const {
     control,
     setValue,
+    getValues,
     formState: { errors },
     watch,
     trigger,
@@ -531,7 +532,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               append={append}
               template={template}
               taxLabelText={taxLabelText}
-              invoiceData={invoiceData}
+              getValues={getValues}
             />
           </AccordionContent>
         </AccordionItem>

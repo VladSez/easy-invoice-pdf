@@ -23,6 +23,14 @@ interface AutoPlayVideoProps extends SharedVideoProps {
    * video on its own. Falls back to `description`, then to a generic label.
    */
   playButtonLabel?: string;
+  /**
+   * How much of the video has to be on screen before it starts, as a fraction of the
+   * element's area. A frame that is large next to the viewport — the hero demo on a
+   * phone — never reaches the default half, so lower it there.
+   *
+   * @default 0.5
+   */
+  inViewThreshold?: number;
 }
 
 /**
@@ -48,6 +56,7 @@ export function AutoPlayVideo({
   prefersReducedMotion = false,
   renderReducedMotionFallback,
   playButtonLabel,
+  inViewThreshold = 0.5,
   testId = "",
   ...props
 }: AutoPlayVideoProps) {
@@ -64,7 +73,7 @@ export function AutoPlayVideo({
   const descriptionID = useId();
 
   const { ref, inView } = useInView({
-    threshold: 0.5,
+    threshold: inViewThreshold,
     rootMargin: "50px",
   });
 

@@ -3,7 +3,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { VIDEO_DEMO_FALLBACK_IMG, VIDEO_DEMO_YOUTUBE_URL } from "@/config";
+import { VIDEO_DEMO_FALLBACK_IMG, VIDEO_DEMO_HERO_YOUTUBE_URL } from "@/config";
 
 import { FeaturesCarousel } from "../features-carousel";
 import { HeroDemoVideo } from "../hero-demo-video";
@@ -126,13 +126,15 @@ describe("HeroDemoVideo", () => {
     const src = new URL(embed.getAttribute("src") ?? "");
 
     expect(src.origin + src.pathname).toBe(
-      new URL(VIDEO_DEMO_YOUTUBE_URL).origin +
-        new URL(VIDEO_DEMO_YOUTUBE_URL).pathname,
+      new URL(VIDEO_DEMO_HERO_YOUTUBE_URL).origin +
+        new URL(VIDEO_DEMO_HERO_YOUTUBE_URL).pathname,
     );
     // the clip it stands in for starts on its own, so this one does too
     expect(src.searchParams.get("autoplay")).toBe("1");
     expect(src.searchParams.get("mute")).toBe("1");
     expect(src.searchParams.get("playsinline")).toBe("1");
+    // ...and carries no player chrome, like the MP4 it replaces
+    expect(src.searchParams.get("controls")).toBe("1");
     expect(screen.queryByTestId("hero-about-page-video")).toBeNull();
   });
 });

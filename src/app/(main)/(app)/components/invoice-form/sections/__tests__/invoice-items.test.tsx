@@ -5,8 +5,8 @@ import userEvent from "@testing-library/user-event";
 import { useMemo } from "react";
 import {
   type Control,
-  type FieldArrayWithId,
   type UseFieldArrayAppend,
+  useFieldArray,
   useForm,
 } from "react-hook-form";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -20,7 +20,7 @@ import "@testing-library/jest-dom/vitest";
 
 const { MOCK_MAX_INVOICE_ITEMS } = vi.hoisted(() => {
   return {
-    MOCK_MAX_INVOICE_ITEMS: 3,
+    MOCK_MAX_INVOICE_ITEMS: 5,
   };
 });
 
@@ -55,47 +55,56 @@ interface InvoiceItemsTestHarnessProps {
   itemCount: number;
   append?: UseFieldArrayAppend<InvoiceData, "items">;
   onRemove?: (index: number) => void;
+  /** Overrides the name of the item at each given index. */
+  itemNames?: Record<number, string>;
 }
 
 function InvoiceItemsTestHarness({
   itemCount,
-  append = vi.fn(),
+  append,
   onRemove = vi.fn(),
+  itemNames,
 }: InvoiceItemsTestHarnessProps) {
   const invoiceData = useMemo(() => {
     return {
       ...getInitialInvoiceData(),
-      items: Array.from({ length: itemCount }, () => {
+      items: Array.from({ length: itemCount }, (_, index) => {
         return {
           ...MOCK_INVOICE_ITEM_DATA,
+          name: itemNames?.[index] ?? MOCK_INVOICE_ITEM_DATA.name,
         };
       }),
     };
-  }, [itemCount]);
+  }, [itemCount, itemNames]);
 
-  const { control } = useForm<InvoiceData>({
+  const { control, getValues } = useForm<InvoiceData>({
     defaultValues: invoiceData,
   });
 
-  const fields = Array.from({ length: itemCount }, (_, index) => {
-    return {
-      id: `item-${index}`,
-    };
-  }) as FieldArrayWithId<InvoiceData, "items">[];
+  // A real field array, so confirming a delete actually drops the item and re-indexes the
+  // ones after it, the way `useFieldArray` does in the form.
+  const {
+    fields,
+    append: appendField,
+    remove,
+  } = useFieldArray({ control, name: "items" });
 
   return (
     <TooltipProvider delayDuration={0}>
       <InvoiceItems
         control={control as Control<InvoiceData>}
         fields={fields}
-        handleRemoveInvoiceItem={onRemove}
-        append={append}
+        handleRemoveInvoiceItem={(index) => {
+          onRemove(index);
+          remove(index);
+        }}
+        append={append ?? appendField}
         errors={{}}
         currency="EUR"
         language="en"
         template="default"
         taxLabelText="VAT"
-        invoiceData={invoiceData}
+        getValues={getValues}
       />
     </TooltipProvider>
   );
@@ -107,6 +116,20 @@ function renderInvoiceItems(props: InvoiceItemsTestHarnessProps) {
 
 function getAddInvoiceItemButton() {
   return screen.getByRole("button", { name: "Add invoice item" });
+}
+
+function getDeleteItemButton(itemNumber: number) {
+  return screen.getByRole("button", {
+    name: `Delete Invoice Item ${itemNumber}`,
+  });
+}
+
+function getDialog() {
+  return screen.getByRole("alertdialog");
+}
+
+function getItemFieldsets() {
+  return screen.getAllByRole("group", { name: /^Item \d+$/ });
 }
 
 describe("InvoiceItems max invoice items", () => {
@@ -213,5 +236,247 @@ describe("InvoiceItems max invoice items", () => {
     expect(fieldsets).toHaveLength(2);
     expect(within(fieldsets[0]).getByText("Item 1")).toBeInTheDocument();
     expect(within(fieldsets[1]).getByText("Item 2")).toBeInTheDocument();
+  });
+});
+
+describe("InvoiceItems delete confirmation dialog", () => {
+  // The dialog's own copy, truncation and focus behaviour is covered directly in
+  // `sections/components/__tests__/delete-invoice-item-dialog.test.tsx`. What is left here is
+  // the wiring: that the trash buttons open it for the right item, name it from the *form*
+  // rather than from a debounced copy of the data, and hand the right index back on confirm.
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("does not render the dialog until an item's delete button is pressed", () => {
+    renderInvoiceItems({ itemCount: 2 });
+
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  });
+
+  it("has no delete button for the first item, which cannot be removed", () => {
+    renderInvoiceItems({ itemCount: 2 });
+
+    expect(
+      screen.queryByRole("button", { name: "Delete Invoice Item 1" }),
+    ).not.toBeInTheDocument();
+    expect(getDeleteItemButton(2)).toBeInTheDocument();
+  });
+
+  it("names the item the user is deleting, reading the name from the form", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 2, itemNames: { 1: "Consulting" } });
+
+    // Rename the item, then delete it straight away: the dialog has to pick up the edit that
+    // is still sitting in the form rather than the name the invoice data was created with.
+    const itemNameInput = screen.getByLabelText("Name", {
+      selector: "#itemName1",
+    });
+    await user.clear(itemNameInput);
+    await user.type(itemNameInput, "Renamed just now");
+
+    await user.click(getDeleteItemButton(2));
+
+    expect(getDialog()).toHaveTextContent('"Renamed just now"');
+  });
+
+  it("passes the pressed item's index to the remove handler", async () => {
+    const user = userEvent.setup();
+    const onRemove = vi.fn();
+
+    renderInvoiceItems({ itemCount: 3, onRemove });
+
+    await user.click(getDeleteItemButton(3));
+    await user.click(screen.getByRole("button", { name: "Delete Item 3" }));
+
+    expect(onRemove).toHaveBeenCalledExactlyOnceWith(2);
+  });
+
+  it("does not remove anything when the dialog is cancelled", async () => {
+    const user = userEvent.setup();
+    const onRemove = vi.fn();
+
+    renderInvoiceItems({ itemCount: 2, onRemove });
+
+    await user.click(getDeleteItemButton(2));
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(onRemove).not.toHaveBeenCalled();
+  });
+});
+
+describe("InvoiceItems with several invoice items", () => {
+  /** Distinct names, so a test can tell which item the UI actually acted on. */
+  const ITEM_NAMES = {
+    0: "Design work",
+    1: "Backend work",
+    2: "QA work",
+    3: "Docs work",
+  };
+
+  const ITEM_COUNT = 4;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("gives every item but the first its own delete button", () => {
+    renderInvoiceItems({ itemCount: ITEM_COUNT, itemNames: ITEM_NAMES });
+
+    expect(getItemFieldsets()).toHaveLength(ITEM_COUNT);
+    expect(
+      screen.queryByRole("button", { name: "Delete Invoice Item 1" }),
+    ).not.toBeInTheDocument();
+
+    for (const itemNumber of [2, 3, 4]) {
+      expect(getDeleteItemButton(itemNumber)).toBeInTheDocument();
+    }
+  });
+
+  it.each([
+    [2, "Backend work"],
+    [3, "QA work"],
+    [4, "Docs work"],
+  ])(
+    "opens the dialog for item %i and names it %s",
+    async (itemNumber, expectedName) => {
+      const user = userEvent.setup();
+
+      renderInvoiceItems({ itemCount: ITEM_COUNT, itemNames: ITEM_NAMES });
+
+      await user.click(getDeleteItemButton(itemNumber));
+
+      const dialog = getDialog();
+
+      expect(
+        within(dialog).getByRole("heading", {
+          name: `Delete Item ${itemNumber}?`,
+        }),
+      ).toBeInTheDocument();
+      expect(dialog).toHaveTextContent(`"${expectedName}"`);
+    },
+  );
+
+  it("removes a middle item and renumbers the ones after it", async () => {
+    const user = userEvent.setup();
+    const onRemove = vi.fn();
+
+    renderInvoiceItems({
+      itemCount: ITEM_COUNT,
+      itemNames: ITEM_NAMES,
+      onRemove,
+    });
+
+    await user.click(getDeleteItemButton(2));
+    await user.click(screen.getByRole("button", { name: "Delete Item 2" }));
+
+    expect(onRemove).toHaveBeenCalledExactlyOnceWith(1);
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+
+    // Three items remain, numbered without a gap
+    expect(getItemFieldsets()).toHaveLength(3);
+    expect(
+      screen.queryByRole("button", { name: "Delete Invoice Item 4" }),
+    ).not.toBeInTheDocument();
+
+    // ...and what used to be item 3 has slid into position 2, name and all
+    await user.click(getDeleteItemButton(2));
+
+    expect(getDialog()).toHaveTextContent('"QA work"');
+  });
+
+  it("removes the last item without disturbing the ones before it", async () => {
+    const user = userEvent.setup();
+    const onRemove = vi.fn();
+
+    renderInvoiceItems({
+      itemCount: ITEM_COUNT,
+      itemNames: ITEM_NAMES,
+      onRemove,
+    });
+
+    await user.click(getDeleteItemButton(ITEM_COUNT));
+    await user.click(
+      screen.getByRole("button", { name: `Delete Item ${ITEM_COUNT}` }),
+    );
+
+    expect(onRemove).toHaveBeenCalledExactlyOnceWith(ITEM_COUNT - 1);
+    expect(getItemFieldsets()).toHaveLength(3);
+
+    await user.click(getDeleteItemButton(3));
+
+    expect(getDialog()).toHaveTextContent('"QA work"');
+  });
+
+  it("keeps every item when the dialog is cancelled", async () => {
+    const user = userEvent.setup();
+    const onRemove = vi.fn();
+
+    renderInvoiceItems({
+      itemCount: ITEM_COUNT,
+      itemNames: ITEM_NAMES,
+      onRemove,
+    });
+
+    await user.click(getDeleteItemButton(3));
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(onRemove).not.toHaveBeenCalled();
+    expect(getItemFieldsets()).toHaveLength(ITEM_COUNT);
+  });
+
+  it("deletes repeatedly, targeting the right item each time", async () => {
+    const user = userEvent.setup();
+    const onRemove = vi.fn();
+
+    renderInvoiceItems({
+      itemCount: ITEM_COUNT,
+      itemNames: ITEM_NAMES,
+      onRemove,
+    });
+
+    // Delete "Backend work" (item 2), then "QA work" which takes its place
+    await user.click(getDeleteItemButton(2));
+    await user.click(screen.getByRole("button", { name: "Delete Item 2" }));
+
+    await user.click(getDeleteItemButton(2));
+    expect(getDialog()).toHaveTextContent('"QA work"');
+    await user.click(screen.getByRole("button", { name: "Delete Item 2" }));
+
+    expect(onRemove).toHaveBeenNthCalledWith(1, 1);
+    expect(onRemove).toHaveBeenNthCalledWith(2, 1);
+    expect(getItemFieldsets()).toHaveLength(2);
+
+    // "Design work" and "Docs work" are what survive
+    await user.click(getDeleteItemButton(2));
+
+    expect(getDialog()).toHaveTextContent('"Docs work"');
+  });
+
+  it("only offers the 'Show in PDF' column switches on the first item", () => {
+    renderInvoiceItems({ itemCount: ITEM_COUNT, itemNames: ITEM_NAMES });
+
+    const fieldsets = getItemFieldsets();
+
+    expect(
+      within(fieldsets[0]).getAllByRole("switch", {
+        name: /Show the .* Column/,
+      }).length,
+    ).toBeGreaterThan(0);
+
+    for (const fieldset of fieldsets.slice(1)) {
+      expect(
+        within(fieldset).queryByRole("switch", { name: /Show the .* Column/ }),
+      ).not.toBeInTheDocument();
+    }
   });
 });

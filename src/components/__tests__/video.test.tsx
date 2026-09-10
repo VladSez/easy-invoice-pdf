@@ -136,6 +136,35 @@ describe("AutoPlayVideo", () => {
     expect(screen.queryByTestId("demo-play-button")).toBeNull();
   });
 
+  it("starts on a sliver of the video when the threshold asks for one", () => {
+    render(
+      <AutoPlayVideo
+        src={SRC}
+        posterImg={POSTER}
+        testId="demo"
+        inViewThreshold={0.15}
+      />,
+    );
+
+    // a fifth of the hero frame is all a phone ever has on screen at once, and the
+    // default half would leave the demo sitting on its poster there
+    act(() => {
+      return mockAllIsIntersecting(0.2);
+    });
+
+    expect(play).toHaveBeenCalledWith();
+  });
+
+  it("waits for half the video by default", () => {
+    render(<AutoPlayVideo src={SRC} posterImg={POSTER} testId="demo" />);
+
+    act(() => {
+      return mockAllIsIntersecting(0.2);
+    });
+
+    expect(play).not.toHaveBeenCalled();
+  });
+
   it("starts the video and drops the button when it is pressed", async () => {
     play.mockRejectedValue(NOT_ALLOWED);
 

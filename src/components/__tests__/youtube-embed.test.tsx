@@ -58,6 +58,26 @@ describe("YouTubeEmbed", () => {
     expect(src.searchParams.get("playlist")).toBe("iAROeCIcZ40");
   });
 
+  it("keeps the player's controls by default", () => {
+    render(<YouTubeEmbed src={SRC} title="Demo" autoPlay testId="embed" />);
+
+    expect(getSrc().searchParams.get("controls")).toBe("1");
+  });
+
+  it("drops the controls where the embed is decoration", () => {
+    render(
+      <YouTubeEmbed
+        src={SRC}
+        title="Demo"
+        autoPlay
+        showControls={false}
+        testId="embed"
+      />,
+    );
+
+    expect(getSrc().searchParams.get("controls")).toBe("0");
+  });
+
   it("keeps the parameters the url arrived with", () => {
     render(<YouTubeEmbed src={SRC} title="Demo" autoPlay testId="embed" />);
 

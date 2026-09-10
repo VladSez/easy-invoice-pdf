@@ -1,14 +1,19 @@
 import { Plus, Trash2 } from "lucide-react";
-import { memo, useState } from "react";
+import { memo, useRef, useState } from "react";
 import {
   type Control,
   Controller,
   type FieldArrayWithId,
   type FieldErrors,
   type UseFieldArrayAppend,
+  type UseFormGetValues,
 } from "react-hook-form";
 
 import { inputErrorClassName } from "@/app/(main)/(app)/components/invoice-form/common";
+import {
+  DeleteInvoiceItemDialog,
+  type ItemPendingDeletion,
+} from "@/app/(main)/(app)/components/invoice-form/sections/components/delete-invoice-item-dialog";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import {
   type InvoiceData,
@@ -17,16 +22,6 @@ import {
   MAX_INVOICE_ITEMS,
 } from "@/app/schema";
 import { Legend } from "@/components/legend";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
@@ -56,7 +51,7 @@ interface InvoiceItemsSettingsProps {
   language: SupportedLanguages;
   template: InvoiceData["template"];
   taxLabelText: string;
-  invoiceData: InvoiceData;
+  getValues: UseFormGetValues<InvoiceData>;
 }
 
 export const InvoiceItems = memo(function InvoiceItems({
@@ -69,9 +64,12 @@ export const InvoiceItems = memo(function InvoiceItems({
   append,
   template,
   taxLabelText,
-  invoiceData,
+  getValues,
 }: InvoiceItemsSettingsProps) {
-  const [deleteItemIndex, setDeleteItemIndex] = useState<number | null>(null);
+  const [itemPendingDeletion, setItemPendingDeletion] =
+    useState<ItemPendingDeletion | null>(null);
+  const addItemButtonRef = useRef<HTMLButtonElement>(null);
+  const deleteTriggerRef = useRef<HTMLButtonElement | null>(null);
   const hasReachedItemLimit = fields.length >= MAX_INVOICE_ITEMS;
 
   return (
@@ -102,8 +100,17 @@ export const InvoiceItems = memo(function InvoiceItems({
                       onMouseDown={(event) => {
                         event.preventDefault();
                       }}
-                      onClick={() => {
-                        return setDeleteItemIndex(index);
+                      onClick={(event) => {
+                        // Radix returns focus to its `Trigger` on close, and this dialog is
+                        // controlled rather than triggered, so remember the button ourselves.
+                        deleteTriggerRef.current = event.currentTarget;
+
+                        // Read the name from the form rather than from the parent's debounced
+                        // copy of it, so the dialog names what the user is actually looking at.
+                        return setItemPendingDeletion({
+                          index,
+                          name: getValues(`items.${index}.name`),
+                        });
                       }}
                       className="flex items-center justify-center rounded-full bg-red-600 p-2 transition-colors hover:bg-red-700 active:scale-[98%] active:transition-transform"
                     >
@@ -824,6 +831,7 @@ export const InvoiceItems = memo(function InvoiceItems({
       <CustomTooltip
         trigger={
           <Button
+            ref={addItemButtonRef}
             onClick={() => {
               append({
                 invoiceItemNumberIsVisible: true,
@@ -923,68 +931,15 @@ export const InvoiceItems = memo(function InvoiceItems({
         </div>
       ) : null}
 
-      <DeleteInvoiceItemConfirmationDialog
-        deleteItemIndex={deleteItemIndex}
-        setDeleteItemIndex={setDeleteItemIndex}
-        handleRemoveInvoiceItem={handleRemoveInvoiceItem}
-        invoiceData={invoiceData}
+      <DeleteInvoiceItemDialog
+        itemPendingDeletion={itemPendingDeletion}
+        onClose={() => {
+          return setItemPendingDeletion(null);
+        }}
+        onConfirm={handleRemoveInvoiceItem}
+        addItemButtonRef={addItemButtonRef}
+        deleteTriggerRef={deleteTriggerRef}
       />
     </>
   );
 });
-
-interface DeleteInvoiceItemConfirmationDialogProps {
-  deleteItemIndex: number | null;
-  setDeleteItemIndex: (index: number | null) => void;
-  handleRemoveInvoiceItem: (index: number) => void;
-  invoiceData: InvoiceData;
-}
-
-/**
- * A confirmation dialog for deleting an invoice item.
- */
-function DeleteInvoiceItemConfirmationDialog({
-  deleteItemIndex = 0,
-  setDeleteItemIndex,
-  handleRemoveInvoiceItem,
-  invoiceData,
-}: DeleteInvoiceItemConfirmationDialogProps) {
-  const itemNumber = deleteItemIndex ?? 0;
-
-  const itemName =
-    invoiceData?.items?.[itemNumber]?.name || `#${itemNumber + 1}`;
-
-  return (
-    <AlertDialog
-      open={deleteItemIndex !== null}
-      onOpenChange={(open) => {
-        if (!open) setDeleteItemIndex(null);
-      }}
-    >
-      <AlertDialogContent data-testid="delete-invoice-item-confirmation-dialog">
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete Invoice Item</AlertDialogTitle>
-          <AlertDialogDescription className="text-balance">
-            Are you sure you want to delete the invoice item{" "}
-            <strong>&quot;{itemName}&quot;</strong>? This action cannot be
-            undone.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={() => {
-              if (deleteItemIndex !== null) {
-                handleRemoveInvoiceItem(deleteItemIndex);
-                setDeleteItemIndex(null);
-              }
-            }}
-            className="bg-red-500 text-red-50 hover:bg-red-500/90"
-          >
-            Delete
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-}

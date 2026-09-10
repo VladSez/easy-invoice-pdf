@@ -9,6 +9,7 @@ import { computeIndexingFlags } from "@/lib/seo/indexing-utils";
 import { CTAToastProvider } from "./contexts/cta-toast-context";
 import { HomeJsonLd } from "./home-json-ld";
 import { AppPageClient } from "./page.client";
+import { RobotsMetaSync } from "./robots-meta-sync";
 
 const APP_PAGE_DESCRIPTION =
   "Create professional PDF invoices online for free. Customize invoice templates, add your logo, download instantly, and send invoices without signup.";
@@ -157,7 +158,9 @@ export default async function AppPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { shouldIndex } = computeIndexingFlags(await searchParams);
+  const { isIndexableEnvironment, shouldIndex } = computeIndexingFlags(
+    await searchParams,
+  );
 
   const [githubStarsCount, latestChangelog] = await Promise.all([
     fetchGithubStars(),
@@ -177,6 +180,9 @@ export default async function AppPage({
 
   return (
     <CTAToastProvider>
+      {/* sharing an invoice adds `?data=` without a navigation, so the server-rendered
+          robots metadata has to be re-applied on the client */}
+      <RobotsMetaSync isIndexableEnvironment={isIndexableEnvironment} />
       {shouldIndex ? <HomeJsonLd /> : null}
       <AppPageClient
         githubStarsCount={githubStarsCount}

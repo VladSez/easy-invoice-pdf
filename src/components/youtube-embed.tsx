@@ -13,6 +13,17 @@ interface YouTubeEmbedProps {
    * should wait to be asked.
    */
   autoPlay?: boolean;
+  /**
+   * Show the player's own controls.
+   *
+   * Part of the `autoPlay` parameter set, so it does nothing without it — a URL that
+   * is not rewritten keeps whatever it arrived with.
+   *
+   * Turn it off where the embed stands in for a chrome-less looping video, like the
+   * hero demo. Note that this also takes away the only way to unmute, pause or go
+   * fullscreen, which is only acceptable for decoration.
+   */
+  showControls?: boolean;
   className?: string;
   testId?: string;
 }
@@ -29,12 +40,13 @@ export function YouTubeEmbed({
   src,
   title,
   autoPlay = false,
+  showControls = true,
   className,
   testId,
 }: YouTubeEmbedProps) {
   return (
     <iframe
-      src={autoPlay ? buildAutoPlayUrl(src) : src}
+      src={autoPlay ? buildAutoPlayUrl({ src, showControls }) : src}
       title={title}
       // `autoplay` here is the Permissions Policy delegation: without it the player is
       // not allowed to start itself, whatever the URL asks for
@@ -45,6 +57,13 @@ export function YouTubeEmbed({
       data-testid={testId}
     />
   );
+}
+
+interface BuildAutoPlayUrlArgs {
+  /** The `https://www.youtube.com/embed/...` URL to rewrite. */
+  src: string;
+  /** Whether the player keeps its own controls. */
+  showControls: boolean;
 }
 
 /**
@@ -58,7 +77,7 @@ export function YouTubeEmbed({
  *
  * @see https://developers.google.com/youtube/player_parameters
  */
-function buildAutoPlayUrl(src: string) {
+function buildAutoPlayUrl({ src, showControls }: BuildAutoPlayUrlArgs) {
   let url: URL;
 
   try {
@@ -73,8 +92,9 @@ function buildAutoPlayUrl(src: string) {
   url.searchParams.set("mute", "1");
   // without this iOS takes the video fullscreen the moment it starts
   url.searchParams.set("playsinline", "1");
-  // the only way to pause, scrub, unmute or go fullscreen once it is running
-  url.searchParams.set("controls", "1");
+  // the only way to pause, scrub, unmute or go fullscreen once it is running, so it
+  // stays on unless the caller wants a plain looping picture
+  url.searchParams.set("controls", showControls ? "1" : "0");
   url.searchParams.set("rel", "0");
   url.searchParams.set("modestbranding", "1");
   // no annotations over the demo
