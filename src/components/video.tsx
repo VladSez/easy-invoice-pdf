@@ -74,7 +74,7 @@ export function AutoPlayVideo({
 
   const { ref, inView } = useInView({
     threshold: inViewThreshold,
-    rootMargin: "50px",
+    rootMargin: "30px",
   });
 
   /**
