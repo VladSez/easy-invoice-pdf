@@ -74,3 +74,8 @@ function useMediaQuery(
 export const useIsDesktop = () => {
   return useMediaQuery("(min-width: 1024px)");
 };
+
+/** Tailwind's `xl` breakpoint, where the marketing demos switch from YouTube to MP4. */
+export const useIsXlUp = () => {
+  return useMediaQuery("(min-width: 1280px)");
+};

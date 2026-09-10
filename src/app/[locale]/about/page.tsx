@@ -1,8 +1,5 @@
-import { hasLocale, useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { use } from "react";
 
 import { type HeaderProps, Header } from "@/app/(components)/header";
 import {
@@ -13,37 +10,17 @@ import { ABOUT_FAQ_ITEM_KEYS } from "@/app/[locale]/about/about-faq-item-keys";
 import { AboutFooter } from "@/app/[locale]/about/components/about-footer";
 import { FeaturesCarousel } from "@/app/[locale]/about/components/features-carousel";
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
+import { HeroDemoVideo } from "@/app/[locale]/about/components/hero-demo-video";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { Button } from "@/components/ui/button";
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AutoPlayVideo } from "@/components/video";
-import {
-  GITHUB_URL,
-  MARKETING_FEATURES_CARDS,
-  VIDEO_DEMO_FALLBACK_IMG,
-  VIDEO_DEMO_URL,
-} from "@/config";
-import { routing } from "@/i18n/routing";
+import { GITHUB_URL, MARKETING_FEATURES_CARDS } from "@/config";
 
-// statically generate the pages for all locales
-export function generateStaticParams() {
-  return routing.locales.map((locale) => {
-    return { locale };
-  });
-}
-
-// Next.js types dynamic segments as `string`, so we narrow to `Locale` below
-export default function AboutPage({ params }: PageProps<"/[locale]/about">) {
-  const { locale } = use(params);
-
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
-
-  // Enables static rendering to prevent an error: https://nextjs.org/docs/messages/dynamic-server-error
-  setRequestLocale(locale);
-
+// The locale is validated by the `about` layout and resolved from the `[locale]`
+// root param in `src/i18n/request.ts`; the static params live in `src/app/[locale]/layout.tsx`.
+export default function AboutPage() {
+  const locale = useLocale();
   const t = useTranslations("About");
 
   const navLinks = {
@@ -209,12 +186,7 @@ function HeroSection() {
               </div>
               {/* Video container */}
               <div className="relative aspect-video w-full">
-                <AutoPlayVideo
-                  src={VIDEO_DEMO_URL}
-                  posterImg={VIDEO_DEMO_FALLBACK_IMG}
-                  testId="hero-about-page-video"
-                  description="How to create and download an invoice as a PDF in EasyInvoicePDF.com"
-                />
+                <HeroDemoVideo />
               </div>
             </div>
           </div>
@@ -234,6 +206,7 @@ function FeaturesSection() {
       videoSrc: feature.videoSrc,
       videoFallbackImg: feature.videoFallbackImg,
       videoDescription: feature.videoDescription,
+      youtubeVideoId: feature.youtubeVideoId,
       title: t(`features.items.${feature.translationKey}.title`),
       description: t(`features.items.${feature.translationKey}.description`),
     };

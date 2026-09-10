@@ -2,8 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
+/* Anyone who asked their OS for less motion gets instant jumps instead. Playwright sets
+   `reducedMotion: "reduce"` for the same reason: WebKit honours `scroll-behavior` in
+   Playwright's scroll-into-view (Chromium's does not), so an animated scroll left buttons
+   drifting out from under the cursor between mousedown and mouseup. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {

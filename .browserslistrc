@@ -1,0 +1,31 @@
+# Browser targets for the client bundle (SWC syntax lowering, Lightning CSS and
+# autoprefixer all read this file).
+#
+# Next.js 16 raised its built-in default from Next 15's
+# `chrome 64, edge 79, firefox 67, opera 51, safari 12` to "baseline widely
+# available" -- `chrome 111, edge 111, firefox 111, safari 16.4`. That silently
+# drops everything older than iOS 16.4 / Safari 16.4 (March 2023), which is a
+# real slice of the traffic for a tool people open on whatever phone they have.
+#
+# So we keep Next 15's list explicitly. Next only falls back to its own default
+# when no browserslist config resolves, so this file is what restores it.
+#
+# It is also what makes `transpilePackages: ["pdfjs-dist"]` in `next.config.mjs`
+# do anything: that entry exists to lower pdf.js's ES2022 syntax for older
+# Safari, and under the Next 16 default targets there was nothing left to lower.
+#
+# Caveat: this only lowers *syntax*. Missing built-ins (`Object.hasOwn`,
+# `Array.prototype.at`, `structuredClone`, ...) are not polyfilled -- exactly as
+# in Next 15. If we ever need those, add
+# `experimental.swcEnvOptions: { mode: "usage", coreJs: "3.x" }`.
+
+chrome 64
+edge 79
+firefox 67
+opera 51
+safari 12
+
+# Next 15's list only named desktop `safari`, and browserslist does not treat
+# that as implying iOS. Spelled out here because this app is opened on phones
+# more than on desktops: iOS 12 is the last release for the iPhone 5s/6/6 Plus.
+ios_saf 12

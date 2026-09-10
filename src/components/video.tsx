@@ -1,7 +1,7 @@
 "use client";
 
 import { Play } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 import { cn } from "@/lib/utils";
@@ -18,6 +18,11 @@ interface SharedVideoProps extends React.ComponentPropsWithRef<"div"> {
 
 interface AutoPlayVideoProps extends SharedVideoProps {
   paused?: boolean;
+  /**
+   * Accessible name for the play button shown when the browser refuses to start the
+   * video on its own. Falls back to `description`, then to a generic label.
+   */
+  playButtonLabel?: string;
 }
 
 /**
@@ -42,11 +47,20 @@ export function AutoPlayVideo({
   loop = true,
   prefersReducedMotion = false,
   renderReducedMotionFallback,
+  playButtonLabel,
   testId = "",
   ...props
 }: AutoPlayVideoProps) {
+  // `description` defaults to an empty string, which would be an unnamed button
+  const playLabel = playButtonLabel || description || "Play video";
+
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [srcAdded, setSrcAdded] = useState(false);
+  // iOS refuses to start a video on its own in Low Power Mode, in Low Data Mode, and
+  // with "Auto-Play Video Previews" switched off under Accessibility > Motion. None of
+  // that is ours to override, so a refusal turns the poster into a play button rather
+  // than leaving a still frame that looks broken.
+  const [autoplayRefused, setAutoplayRefused] = useState(false);
   const descriptionID = useId();
 
   const { ref, inView } = useInView({
@@ -54,23 +68,53 @@ export function AutoPlayVideo({
     rootMargin: "50px",
   });
 
+  /**
+   * React assigns `muted` as a DOM property and never writes the attribute — not on
+   * the client and not into the prerendered HTML. WebKit reads the attribute when it
+   * decides whether a video may start without a tap, so a `<video muted>` React
+   * rendered is, for that decision, a video with sound. `defaultMuted` is the property
+   * that reflects the attribute.
+   */
+  const attachVideo = useCallback((video: HTMLVideoElement | null) => {
+    videoRef.current = video;
+
+    if (!video) return;
+
+    video.defaultMuted = true;
+    video.muted = true;
+  }, []);
+
   function pauseVideo() {
     videoRef.current?.pause();
   }
 
-  // Attempts to play the video with retry logic for autoplay restrictions
-  // Some browsers block autoplay until user interaction, so we retry once after 100ms
   function playVideo() {
     const video = videoRef.current;
     if (!video || paused) return;
-    video.play().catch(() => {
-      // Retry once if initial play fails (common with autoplay policies)
-      setTimeout(() => {
-        void video.play().catch(() => {
-          // if play fails again, do nothing
-        });
-      }, 100);
-    });
+
+    // the gesture-free start is granted to a muted element and taken back the moment
+    // it is not one, so this is asserted on every attempt rather than only on mount
+    video.muted = true;
+
+    void video.play().then(
+      () => {
+        return setAutoplayRefused(false);
+      },
+      (error: unknown) => {
+        // `AbortError` is this attempt being cut short — by the load it just kicked
+        // off, or by the pause that follows scrolling away — not the browser refusing.
+        // The `canplay` handler below asks again once there is something to play.
+        if (error instanceof DOMException && error.name === "AbortError")
+          return;
+
+        // the `autoplay` attribute is a second, independent way in, and it can have
+        // succeeded while this call was being turned down; a play button over a
+        // playing video is worse than no button at all
+        if (!video.paused) return;
+
+        setAutoplayRefused(true);
+      },
+    );
   }
 
   // Lazy-load video source when component enters viewport
@@ -84,7 +128,7 @@ export function AutoPlayVideo({
   // - If in viewport and not paused, play the video
   // - If out of viewport, pause to save resources
   useEffect(() => {
-    // oxlint-disable-next-line react-you-might-not-need-an-effect/no-event-handler -- there is no event to hang this on: `inView` comes from an IntersectionObserver and `srcAdded` tells us the <source> is in the DOM, both of which have to be synchronised with the <video> element
+    // oxlint-disable-next-line react-you-might-not-need-an-effect/no-event-handler -- there is no event to hang this on: `inView` comes from an IntersectionObserver and `srcAdded` tells us the source is on the element, both of which have to be synchronised with the <video> element
     if (!srcAdded) return;
 
     if (paused) pauseVideo();
@@ -92,6 +136,24 @@ export function AutoPlayVideo({
     else pauseVideo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, srcAdded, paused, prefersReducedMotion]);
+
+  // `preload="none"` means the first `play()` above usually lands on an element with
+  // nothing decoded yet. Asking again on `canplay` is what turns that into playback
+  // without guessing at a delay, and it covers a stall mid-scroll for free.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    function handleCanPlay() {
+      if (inView && !paused) playVideo();
+    }
+
+    video.addEventListener("canplay", handleCanPlay);
+    return () => {
+      return video.removeEventListener("canplay", handleCanPlay);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, paused]);
 
   // Add click handler to toggle play/pause on user interaction
   // This provides manual control over autoplay videos
@@ -128,7 +190,7 @@ export function AutoPlayVideo({
             </p>
           ) : null}
           <video
-            ref={videoRef}
+            ref={attachVideo}
             aria-describedby={description ? descriptionID : undefined}
             className="h-full w-full cursor-pointer"
             autoPlay
@@ -137,145 +199,24 @@ export function AutoPlayVideo({
             playsInline
             preload="none"
             poster={posterImg}
+            // The URL goes on the element rather than into a `<source>` child, because
+            // this one arrives after the element is already in the DOM: a media element
+            // that has finished picking a resource does not go back and look at a
+            // `<source>` appended afterwards, while assigning `src` restarts that pick
+            // by itself. `#t=0.001` keeps iOS on the first frame instead of a blank
+            // element while the poster loads.
+            src={srcAdded ? `${src}#t=0.001` : undefined}
             data-testid={testId}
-          >
-            {srcAdded ? (
-              <source src={`${src}#t=0.001`} type="video/mp4" />
-            ) : null}
-          </video>
-        </>
-      )}
-    </div>
-  );
-}
-
-type ManualPlayVideoProps = SharedVideoProps;
-
-/**
- * ManualPlayVideo component displays a video that requires user interaction to play.
- *
- * This component is designed for **mobile and touch devices** where autoplay may not be desired
- * or supported. It ensures only one video plays at a time by listening to custom
- * "video-play" events and pausing other videos when a new one starts.
- *
- * @example
- * ```tsx
- * <ManualPlayVideo
- *   src="/videos/demo.mp4"
- *   posterImg="/images/poster.jpg"
- *   testId="demo-video"
- * />
- * ```
- */
-export function ManualPlayVideo({
-  className,
-  src,
-  posterImg,
-  description = "",
-  loop = true,
-  prefersReducedMotion = false,
-  renderReducedMotionFallback,
-  testId = "",
-  ...props
-}: ManualPlayVideoProps) {
-  const descriptionID = useId();
-  const videoId = useId();
-
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const { ref: inViewRef, inView } = useInView({ threshold: 0.3 });
-
-  // Effect: Pauses video when it scrolls out of view
-  // This prevents videos from playing audio/consuming resources when not visible
-  // Pausing an already paused video is a no-op, so this does not check `isPlaying`
-  useEffect(() => {
-    if (inView) {
-      return;
-    }
-
-    videoRef.current?.pause();
-
-    // oxlint-disable-next-line react/set-state-in-effect -- the <video> element is an external system and `inView` comes from an IntersectionObserver; there is no event here to update this from
-    setIsPlaying(false);
-  }, [inView]);
-
-  // Effect: Ensures only one video plays at a time across the page
-  // When any video starts playing, it dispatches a "video-play" event with its unique ID.
-  // This effect listens for those events and pauses this video if a different video started playing.
-  useEffect(() => {
-    function handler(e: Event) {
-      // Check if the event came from this video instance
-      // If so, ignore it (don't pause ourselves)
-      if ((e as CustomEvent<{ id: string }>).detail.id === videoId) return;
-
-      // Another video started playing, so pause this one
-      videoRef.current?.pause();
-      setIsPlaying(false);
-    }
-
-    // Listen for video-play events from any video on the page
-    window.addEventListener("video-play", handler);
-
-    // Cleanup: remove listener when component unmounts
-    return () => {
-      return window.removeEventListener("video-play", handler);
-    };
-  }, [videoId]);
-
-  // Handler: Called when user clicks the play button
-  function handlePlay() {
-    // Broadcast that this video is starting to play
-    // This will trigger the useEffect in other ManualPlayVideo instances to pause themselves
-    window.dispatchEvent(
-      new CustomEvent("video-play", { detail: { id: videoId } }),
-    );
-
-    // Start playing this video
-    void videoRef.current?.play();
-    setIsPlaying(true);
-  }
-
-  return (
-    <div
-      ref={inViewRef}
-      className={cn("absolute left-0 top-0 h-full w-full", className)}
-      {...props}
-    >
-      {prefersReducedMotion &&
-      typeof renderReducedMotionFallback === "function" ? (
-        renderReducedMotionFallback()
-      ) : (
-        <>
-          {description ? (
-            <p id={descriptionID} className="sr-only">
-              {description}
-            </p>
-          ) : null}
-          <video
-            ref={videoRef}
-            aria-describedby={description ? descriptionID : undefined}
-            className="h-full w-full"
-            playsInline
-            preload="none"
-            loop={loop}
-            muted
-            controls={isPlaying}
-            poster={posterImg}
-            data-testid={testId}
-          >
-            <source src={src} type="video/mp4" />
-          </video>
-          {/*
-            Play button overlay - only shown when video is not playing
-          */}
-          {!isPlaying ? (
+          />
+          {autoplayRefused ? (
             <button
               type="button"
-              aria-label={description ? description : "Play video"}
+              aria-label={playLabel}
+              onClick={() => {
+                return playVideo();
+              }}
               className="absolute inset-0 flex items-center justify-center backdrop-blur-[1px]"
-              onClick={handlePlay}
+              data-testid={testId ? `${testId}-play-button` : undefined}
             >
               <span className="flex size-14 items-center justify-center rounded-full bg-slate-800/90 shadow-lg transition-transform duration-150 hover:scale-110 active:scale-95">
                 <Play className="ml-1 h-6 w-6 fill-white text-white" />

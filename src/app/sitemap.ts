@@ -1,9 +1,9 @@
 import { type MetadataRoute } from "next";
 
-import { SEO_LANDING_SLUGS } from "@/app/(seo-landings)/seo-landing-definitions";
+import { SEO_LANDING_SLUGS } from "@/app/(main)/(seo-landings)/seo-landing-definitions";
 import { APP_URL } from "@/config";
 
-import { getChangelogEntries } from "./changelog/utils";
+import { getChangelogEntries } from "./(main)/changelog/utils";
 import { SUPPORTED_LANGUAGES } from "./schema";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

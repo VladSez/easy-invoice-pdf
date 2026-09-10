@@ -81,7 +81,7 @@
       "error",
       {
         "name": "localStorage",
-        "message": "Please use **getAppStorageItem / setAppStorageItem** from @/app/(app)/utils/app-local-storage instead - direct access throws in iOS in-app webviews and in Safari with cookies blocked, and those only accept a key declared in LOCAL_STORAGE_KEYS. To branch on availability during render, use **useIsLocalStorageAvailable** from @/lib/use-is-local-storage-available."
+        "message": "Please use **getAppStorageItem / setAppStorageItem** from @/app/(main)/(app)/utils/app-local-storage instead - direct access throws in iOS in-app webviews and in Safari with cookies blocked, and those only accept a key declared in LOCAL_STORAGE_KEYS. To branch on availability during render, use **useIsLocalStorageAvailable** from @/lib/use-is-local-storage-available."
       }
     ],
     "no-restricted-properties": [
@@ -89,12 +89,12 @@
       {
         "object": "window",
         "property": "localStorage",
-        "message": "Please use **getAppStorageItem / setAppStorageItem** from @/app/(app)/utils/app-local-storage instead - direct access throws in iOS in-app webviews and in Safari with cookies blocked, and those only accept a key declared in LOCAL_STORAGE_KEYS. To branch on availability during render, use **useIsLocalStorageAvailable** from @/lib/use-is-local-storage-available."
+        "message": "Please use **getAppStorageItem / setAppStorageItem** from @/app/(main)/(app)/utils/app-local-storage instead - direct access throws in iOS in-app webviews and in Safari with cookies blocked, and those only accept a key declared in LOCAL_STORAGE_KEYS. To branch on availability during render, use **useIsLocalStorageAvailable** from @/lib/use-is-local-storage-available."
       },
       {
         "object": "globalThis",
         "property": "localStorage",
-        "message": "Please use **getAppStorageItem / setAppStorageItem** from @/app/(app)/utils/app-local-storage instead - direct access throws in iOS in-app webviews and in Safari with cookies blocked, and those only accept a key declared in LOCAL_STORAGE_KEYS. To branch on availability during render, use **useIsLocalStorageAvailable** from @/lib/use-is-local-storage-available."
+        "message": "Please use **getAppStorageItem / setAppStorageItem** from @/app/(main)/(app)/utils/app-local-storage instead - direct access throws in iOS in-app webviews and in Safari with cookies blocked, and those only accept a key declared in LOCAL_STORAGE_KEYS. To branch on availability during render, use **useIsLocalStorageAvailable** from @/lib/use-is-local-storage-available."
       }
     ],
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],

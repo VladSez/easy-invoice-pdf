@@ -1,11 +1,12 @@
-import { defineConfig } from "@trigger.dev/sdk/v3";
+import { defineConfig } from "@trigger.dev/sdk";
 
 /**
  * @lintignore consumed by the Trigger.dev CLI, not by app code
  */
 export default defineConfig({
   project: "proj_fuwfkbtfwembbzndcipt",
-  runtime: "node",
+  // "node" is Node 21.7.3, deprecated: new deploys using it fail from 2026-10-05.
+  runtime: "node-24",
   logLevel: "log",
   // The max compute seconds a task is allowed to run. If the task run exceeds this duration, it will be stopped.
   // You can override this on an individual task.

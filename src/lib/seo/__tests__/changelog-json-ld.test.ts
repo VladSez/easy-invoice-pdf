@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   buildChangelogIndexJsonLdGraph,
   buildChangelogPostJsonLdGraph,
-} from "../../../app/changelog/build-changelog-json-ld";
+} from "@/app/(main)/changelog/build-changelog-json-ld";
+
 import { JSON_LD_IDS } from "../json-ld-ids";
 
 describe("buildChangelogIndexJsonLdGraph", () => {

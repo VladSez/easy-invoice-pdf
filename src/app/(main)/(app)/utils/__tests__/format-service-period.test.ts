@@ -1,0 +1,120 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+  formatDateOfServiceEnd,
+  formatServicePeriodRange,
+  getCurrentMonthAndYear,
+  getServicePeriod,
+  isServicePeriodStartInCurrentMonth,
+} from "@/app/(main)/(app)/utils/format-service-period";
+import type { InvoiceData } from "@/app/schema";
+
+const baseInvoiceData = {
+  dateFormat: "YYYY-MM-DD",
+} as Pick<InvoiceData, "dateFormat">;
+
+describe("format-service-period", () => {
+  describe("getServicePeriod", () => {
+    it("should derive start from end month when start is missing", () => {
+      const { start, end } = getServicePeriod({
+        dateOfService: "2025-06-20",
+      });
+
+      expect(start.format("YYYY-MM-DD")).toBe("2025-06-01");
+      expect(end.format("YYYY-MM-DD")).toBe("2025-06-20");
+    });
+
+    it("should use explicit start when provided", () => {
+      const { start, end } = getServicePeriod({
+        dateOfServiceStart: "2025-06-14",
+        dateOfService: "2025-06-20",
+      });
+
+      expect(start.format("YYYY-MM-DD")).toBe("2025-06-14");
+      expect(end.format("YYYY-MM-DD")).toBe("2025-06-20");
+    });
+  });
+
+  describe("formatDateOfServiceEnd", () => {
+    it("should always return the formatted end date", () => {
+      const result = formatDateOfServiceEnd({
+        ...baseInvoiceData,
+        dateOfServiceStart: "2025-06-14",
+        dateOfService: "2025-06-20",
+      } as InvoiceData);
+
+      expect(result).toBe("2025-06-20");
+    });
+  });
+
+  describe("isServicePeriodStartInCurrentMonth", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2025-06-15T12:00:00Z"));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("should return true when start is the first day of the current month", () => {
+      expect(isServicePeriodStartInCurrentMonth("2025-06-01")).toBe(true);
+    });
+
+    it("should return true when start is mid-month in the current month", () => {
+      expect(isServicePeriodStartInCurrentMonth("2025-06-14")).toBe(true);
+    });
+
+    it("should return false when start is in a different month of the same year", () => {
+      expect(isServicePeriodStartInCurrentMonth("2025-05-01")).toBe(false);
+    });
+
+    it("should return false when start is in the same month of a different year", () => {
+      expect(isServicePeriodStartInCurrentMonth("2024-06-01")).toBe(false);
+    });
+  });
+
+  describe("formatServicePeriodRange", () => {
+    it("should always show start and end separated by an en dash", () => {
+      const result = formatServicePeriodRange({
+        ...baseInvoiceData,
+        dateOfServiceStart: "2025-06-14",
+        dateOfService: "2025-06-20",
+      } as InvoiceData);
+
+      expect(result).toBe("2025-06-14 – 2025-06-20");
+    });
+  });
+
+  describe("getCurrentMonthAndYear", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("should zero-pad single digit months", () => {
+      vi.setSystemTime(new Date("2025-06-15T12:00:00Z"));
+
+      expect(getCurrentMonthAndYear()).toBe("06-2025");
+    });
+
+    it("should not pad double digit months", () => {
+      vi.setSystemTime(new Date("2025-12-31T12:00:00Z"));
+
+      expect(getCurrentMonthAndYear()).toBe("12-2025");
+    });
+
+    it("should be recomputed on every call, so a tab open past the month boundary rolls over", () => {
+      vi.setSystemTime(new Date("2025-12-31T12:00:00Z"));
+      const beforeRollover = getCurrentMonthAndYear();
+
+      vi.setSystemTime(new Date("2026-01-01T12:00:00Z"));
+
+      expect(beforeRollover).toBe("12-2025");
+      expect(getCurrentMonthAndYear()).toBe("01-2026");
+    });
+  });
+});

@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "next-devtools": {
+      "args": ["-y", "next-devtools-mcp@0.4.0"],
+      "command": "npx"
+    },
+    "playwright": {
+      "args": ["@playwright/mcp@0.0.80"],
+      "command": "npx"
+    },
+    "trigger": {
+      "args": ["trigger.dev@4.5.6", "mcp", "--dev-only"],
+      "command": "npx"
+    }
+  }
+}

@@ -27,9 +27,9 @@ mkdir -p .claude/skills && for src in .agents/skills .cursor/skills; do for d in
 ## Commands
 
 ```bash
-pnpm dev                      # next dev --turbopack, port 3000
-pnpm build                    # never run while a dev server is up (shared .next)
-pnpm type-check               # next typegen + tsc --noEmit
+pnpm dev                      # next dev (Turbopack), port 3000, writes to .next/dev
+pnpm build                    # next build (Turbopack); writes to .next, separate from .next/dev
+pnpm type-check               # next typegen + tsc --noEmit (TypeScript 7 native tsc)
 pnpm type-check:fast          # oxlint --type-check (faster, tsgolint)
 pnpm lint                     # oxlint --type-aware (replaces eslint)
 pnpm format                   # oxfmt (replaces prettier)
@@ -60,16 +60,16 @@ The pre-commit hook (`lint-staged.config.js`) runs `type-check:fast`, `lint`, `z
 
 `src/app/schema/index.ts` (~1450 lines) is the single source of truth: zod schemas plus every supported currency, language, date format and template, and the `localStorage` key constants. Everything downstream (form, PDF templates, share links, API route) derives its types from it.
 
-1. `src/app/(app)/page.client.tsx` owns `invoiceDataState`. On mount it hydrates from `?data=` (shared link) or `localStorage`, validating with `invoiceSchema`.
-2. `src/app/(app)/components/invoice-form/` is a `react-hook-form` form resolved against `invoiceSchema`. Changes are debounced (`DEBOUNCE_TIMEOUT = 500ms`) before being pushed up and written to `localStorage` — e2e helpers wait on this debounce.
-3. `InvoicePdfInstanceProvider` (`src/app/(app)/contexts/invoice-pdf-instance-context.tsx`) renders the PDF **once** via `usePDF` and shares the blob/URL with the desktop preview, the mobile viewer and the download link. Do not add a second `usePDF`/`<PDFViewer>`/`<BlobProvider>` on the page — react-pdf's module-level listener registry makes every instance re-render on any commit (flicker + duplicate work).
+1. `src/app/(main)/(app)/page.client.tsx` owns `invoiceDataState`. On mount it hydrates from `?data=` (shared link) or `localStorage`, validating with `invoiceSchema`.
+2. `src/app/(main)/(app)/components/invoice-form/` is a `react-hook-form` form resolved against `invoiceSchema`. Changes are debounced (`DEBOUNCE_TIMEOUT = 500ms`) before being pushed up and written to `localStorage` — e2e helpers wait on this debounce.
+3. `InvoicePdfInstanceProvider` (`src/app/(main)/(app)/contexts/invoice-pdf-instance-context.tsx`) renders the PDF **once** via `usePDF` and shares the blob/URL with the desktop preview, the mobile viewer and the download link. Do not add a second `usePDF`/`<PDFViewer>`/`<BlobProvider>` on the page — react-pdf's module-level listener registry makes every instance re-render on any commit (flicker + duplicate work).
 4. Sharing: `src/utils/url-compression.ts` remaps long JSON keys to one-character keys, then `lz-string` encodes it into `?data=`. Adding a schema field means adding it to `INVOICE_KEY_COMPRESSION_MAP` (the map is type-checked against the schema keys).
 
 Use `zodResolverForOutput` (`src/lib/zod-resolver-for-output.ts`) instead of `zodResolver` — form state is typed on the schema's _output_ type.
 
 ### PDF templates
 
-Two templates under `src/app/(app)/components/invoice-templates/`: `invoice-pdf-default-template/` and `invoice-pdf-stripe-template/`, selected by `invoiceData.template`. A change to one usually needs the mirrored change in the other, plus new snapshots.
+Two templates under `src/app/(main)/(app)/components/invoice-templates/`: `invoice-pdf-default-template/` and `invoice-pdf-stripe-template/`, selected by `invoiceData.template`. A change to one usually needs the mirrored change in the other, plus new snapshots.
 
 - Always import from `@react-pdf/renderer/lib/react-pdf.browser`, never `@react-pdf/renderer` (lint-enforced).
 - Fonts are self-hosted and registered per template via `INVOICE_PDF_FONTS` in `src/config.ts`; `src` must stay an absolute URL.
@@ -77,21 +77,21 @@ Two templates under `src/app/(app)/components/invoice-templates/`: `invoice-pdf-
 
 ### fontkit patch (do not remove)
 
-`patches/fontkit@2.0.4.patch` fixes dropped leading characters in generated PDFs (`"Cobrar de"` → `"obrar de"`). The version is baked into the patch filename, so **bumping fontkit silently drops the fix**. `patches/README.md` has the full root cause, and `src/app/(app)/components/invoice-templates/__tests__/fontkit-glyph-cache-patch.test.ts` fails if the patch is not actually applied to the resolved copy.
+`patches/fontkit@2.0.4.patch` fixes dropped leading characters in generated PDFs (`"Cobrar de"` → `"obrar de"`). The version is baked into the patch filename, so **bumping fontkit silently drops the fix**. `patches/README.md` has the full root cause, and `src/app/(main)/(app)/components/invoice-templates/__tests__/fontkit-glyph-cache-patch.test.ts` fails if the patch is not actually applied to the resolved copy.
 
 ### i18n — two separate systems
 
-- **UI/marketing copy**: `next-intl`, messages in `messages/*.json`, locale-prefixed routes under `src/app/[locale]/` (`src/middleware.ts` matches only those). The locale matcher is a static literal — keep it in sync with `SUPPORTED_LANGUAGES`.
-- **PDF content**: a hand-rolled catalog, `src/app/(app)/pdf-i18n-translations/pdf-translations.ts`, validated against `pdf-translations-schema.ts`. Some entries are functions (e.g. `vatAmount({ customTaxLabel })`) so tax labels can be customized per invoice.
+- **UI/marketing copy**: `next-intl`, messages in `messages/*.json`, locale-prefixed routes under `src/app/[locale]/` (`src/proxy.ts`, the Next 16 `proxy` convention, matches only those). The locale matcher is a static literal — keep it in sync with `SUPPORTED_LANGUAGES`.
+- **PDF content**: a hand-rolled catalog, `src/app/(main)/(app)/pdf-i18n-translations/pdf-translations.ts`, validated against `pdf-translations-schema.ts`. Some entries are functions (e.g. `vatAmount({ customTaxLabel })`) so tax labels can be customized per invoice.
 
 `next.config.mjs` validates both — every `messages/*.json` against `src/app/schema/i18n-schema.ts` and the PDF catalog against its schema — and `process.exit(1)`s on failure, so a missing translation key breaks `dev` and `build`.
 
 ### Routing groups
 
-- `src/app/(app)/` — the invoice generator itself, served at `/`.
-- `src/app/(seo-landings)/` — data-driven landing pages; content lives in `seo-landing-definitions.ts` and pages are built by `seo-landing-route.tsx`. Add a slug to `SEO_LANDING_SLUGS` plus a directory, don't hand-write the page.
-- `src/app/[locale]/` — the localized `/about` page and catch-all.
-- `src/app/changelog/` — MDX posts in `content/`, rendered via `@next/mdx`.
+There are **two root layouts**, both rendering the shared `<html>`/`<body>` shell from `src/app/(components)/root-document.tsx` (navigating between them is a full page load):
+
+- `src/app/(main)/` — root layout for the unprefixed, English-only routes. `(app)/` is the invoice generator itself, served at `/`; `(seo-landings)/` are data-driven landing pages (content in `seo-landing-definitions.ts`, pages built by `seo-landing-route.tsx` — add a slug to `SEO_LANDING_SLUGS` plus a directory, don't hand-write the page); `changelog/` renders MDX posts from `content/` via `@next/mdx`; plus `founder/`, `how-it-works/`, `tos/` and `not-found.tsx`.
+- `src/app/[locale]/` — root layout for the localized `/about` page and catch-all. Because nothing sits above it, `locale` is a **root param**: `src/i18n/request.ts` reads it with `next/root-params`, so components use `useLocale()`/`getLocale()` and never `setRequestLocale()` or `params.locale`. Unknown locales fall back to the default in `request.ts`; `about/layout.tsx` turns them into a 404. The about page is prerendered per locale: `generateStaticParams` in the `[locale]` layout plus `dynamic = "force-static"` in `about/layout.tsx`, which is what lets the root document's `headers()`-based device detection run at build time (the same pattern as `/changelog`, `/tos`, ...).
 - `src/app/api/generate-invoice/` — Bearer-token + Upstash rate-limited route that renders a PDF server-side, emails it (Resend) and uploads it to Google Drive. Scheduled by the Trigger.dev task in `src/trigger/monthly-recurring-invoice.ts`.
 
 ## Testing
@@ -125,4 +125,4 @@ Beyond `.cursor/rules/`:
   formatDateWithLocale(date, selectedDateFormat, language);
   ```
 
-  Call sites say what each value means without opening the signature, two same-typed parameters can't be swapped by accident, and adding a parameter doesn't touch every caller. Type the object as a named `interface` above the function and document each field with a doc comment on the property rather than `@param` tags — see `src/app/(app)/utils/format-date-with-locale.ts`. One-parameter functions stay positional.
+  Call sites say what each value means without opening the signature, two same-typed parameters can't be swapped by accident, and adding a parameter doesn't touch every caller. Type the object as a named `interface` above the function and document each field with a doc comment on the property rather than `@param` tags — see `src/app/(main)/(app)/utils/format-date-with-locale.ts`. One-parameter functions stay positional.

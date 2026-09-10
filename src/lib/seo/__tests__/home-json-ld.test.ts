@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { buildHomeJsonLdGraph } from "../../../app/(app)/home-json-ld";
+import { buildHomeJsonLdGraph } from "@/app/(main)/(app)/home-json-ld";
+
 import { JSON_LD_IDS } from "../json-ld-ids";
 
 describe("buildHomeJsonLdGraph", () => {

@@ -13,8 +13,8 @@ import { SUPPORTED_LANGUAGES } from "@/app/schema";
  * locale is actually wired up — the page is served and the translations of that
  * locale (not the English fallback) are rendered.
  *
- * NOTE: `<html lang>` is hardcoded to "en" in the root layout, so it is not
- * asserted here.
+ * `<html lang>` is rendered by the `[locale]` root layout from the locale resolved
+ * through `next/root-params`, so it is asserted too.
  */
 type Messages = { About: { tagline: string } };
 
@@ -48,6 +48,7 @@ test.describe("Localized about page", () => {
 
       expect(response?.status()).toBe(200);
       await expect(page).toHaveURL(`/${locale}/about`);
+      await expect(page.locator("html")).toHaveAttribute("lang", locale);
 
       // the page renders this locale's translations, not the English fallback
       await expect(

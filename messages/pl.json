@@ -129,5 +129,15 @@
         "answer": "W przeciwieństwie do tradycyjnych platform do fakturowania EasyInvoicePDF nie wymaga konta i przetwarza fakturę w całości w Twojej przeglądarce."
       }
     }
+  },
+  "BrowserSupport": {
+    "outdated": {
+      "title": "Twoja przeglądarka jest nieaktualna",
+      "description": "{browser} {version} ma ponad trzy lata. Zaktualizuj ją do najnowszej wersji, aby wszystko działało poprawnie."
+    },
+    "unsupported": {
+      "title": "Twoja przeglądarka nie jest już obsługiwana",
+      "description": "{browser} {version} jest zbyt stara, aby aplikacja działała poprawnie. Zaktualizuj ją do najnowszej wersji."
+    }
   }
 }

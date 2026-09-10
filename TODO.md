@@ -1,7 +1,5 @@
 TODO list
 
-- Update to Next js 16 and latest next-intl
-
 DISCOUNTS FEATURE:
 
 - should be per item based discount, not total based discount

@@ -96,7 +96,7 @@ https://github.com/foliojs/fontkit/issues/154#issuecomment-4187174366.
 
 ## Automated guard
 
-`src/app/(app)/components/invoice-templates/__tests__/fontkit-glyph-cache-patch.test.ts`
+`src/app/(main)/(app)/components/invoice-templates/__tests__/fontkit-glyph-cache-patch.test.ts`
 fails if the patch stops being applied. It resolves the exact fontkit instance
 `@react-pdf/renderer` renders with, and reproduces the poisoning against a real
 TTF that ships with `pdfjs-dist` (no committed asset, no network).

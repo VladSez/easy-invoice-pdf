@@ -10,7 +10,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "allowArbitraryExtensions": true,
     "noImplicitReturns": true,
@@ -31,10 +31,15 @@
   },
   "include": [
     "next-env.d.ts",
+    // must come before any file importing `next/root-params`: TypeScript takes the
+    // first declaration it sees, and the one shipped in node_modules is a shorthand
+    // (`any`) - see src/types/next-root-params.d.ts
+    "src/types/next-root-params.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "trigger.config.ts"
+    "trigger.config.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

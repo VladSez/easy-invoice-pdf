@@ -3,9 +3,9 @@
 import { Document, Font, Page, renderToBuffer } from "@react-pdf/renderer";
 import type dayjs from "dayjs";
 
-import { PDF_DEFAULT_TEMPLATE_STYLES } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template";
-import { InvoiceBody } from "@/app/(app)/components/invoice-templates/invoice-pdf-default-template/invoice-body";
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(app)/pdf-i18n-translations/pdf-translations";
+import { PDF_DEFAULT_TEMPLATE_STYLES } from "@/app/(main)/(app)/components/invoice-templates/invoice-pdf-default-template";
+import { InvoiceBody } from "@/app/(main)/(app)/components/invoice-templates/invoice-pdf-default-template/invoice-body";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import { getInvoiceDefaultNumberValue } from "@/app/constants";
 import { type InvoiceData, type SupportedLanguages } from "@/app/schema";
 import { INVOICE_PDF_FONTS } from "@/config";

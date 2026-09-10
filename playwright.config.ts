@@ -90,6 +90,20 @@ export default defineConfig({
     // set timezone to Europe/Warsaw by default for consistent date handling across local machines and CI inside browser
     timezoneId: "Europe/Warsaw",
 
+    /**
+     * Emulate `prefers-reduced-motion: reduce`, which switches off the smooth scrolling
+     * in `src/app/globals.css`.
+     *
+     * Playwright's scroll-into-view honours `scroll-behavior` on WebKit (Chromium's is
+     * always instant), so with smooth scrolling on, a click could be measured mid
+     * animation: the element drifted out from under the cursor between mousedown and
+     * mouseup and the browser dispatched the `click` on an ancestor, while Playwright
+     * still reported "click action done". Only Mobile Safari ever flaked on it.
+     */
+    contextOptions: {
+      reducedMotion: "reduce",
+    },
+
     // applies to: page.goto(), redirects, page.waitForURL(), clicking links that trigger navigation, form submits that navigate
     navigationTimeout: 45_000,
     // Applies to interactions: locator.click(), fill(), check(), hover(), press(), dragTo()

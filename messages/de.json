@@ -129,5 +129,15 @@
         "answer": "Anders als herkömmliche Rechnungsplattformen erfordert EasyInvoicePDF kein Konto und verarbeitet Ihre Rechnung vollständig in Ihrem Browser."
       }
     }
+  },
+  "BrowserSupport": {
+    "outdated": {
+      "title": "Ihr Browser ist veraltet",
+      "description": "{browser} {version} ist über drei Jahre alt. Aktualisieren Sie auf die neueste Version, damit alles richtig funktioniert."
+    },
+    "unsupported": {
+      "title": "Ihr Browser wird nicht mehr unterstützt",
+      "description": "{browser} {version} ist zu alt, um diese App zuverlässig auszuführen. Bitte aktualisieren Sie auf die neueste Version."
+    }
   }
 }
