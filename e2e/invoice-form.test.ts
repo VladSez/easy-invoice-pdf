@@ -1197,25 +1197,25 @@ test.describe("Invoice Generator Page", () => {
         page.getByText("Invoice last updated:", { exact: false }),
       ).toBeVisible();
 
-      // Wait a moment for any debounced localStorage updates
-      // eslint-disable-next-line playwright/no-wait-for-timeout
-      await page.waitForTimeout(500);
+      // The form only writes to localStorage after DEBOUNCE_TIMEOUT (500ms), and a
+      // loaded CI machine can push that write past a fixed 500ms wait, which is what
+      // made this flaky (localStorage still empty when it was read). Poll until the
+      // stored payload matches instead of sleeping for exactly one debounce.
+      await expect
+        .poll(async () => {
+          const storedData = await page.evaluate((key) => {
+            return localStorage.getItem(key);
+          }, PDF_DATA_LOCAL_STORAGE_KEY);
 
-      // Verify data is actually saved in localStorage
-      const storedData = (await page.evaluate((key) => {
-        return localStorage.getItem(key);
-      }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
-
-      expect(storedData).toBeTruthy();
-
-      const parsedData = JSON.parse(storedData) as InvoiceData;
-      expect(parsedData).toMatchObject({
-        invoiceNumberObject: {
-          label: "Invoice No. of:",
-          value: "TEST/2024",
-        },
-        notes: "Test note",
-      } satisfies Pick<InvoiceData, "notes" | "invoiceNumberObject">);
+          return storedData ? (JSON.parse(storedData) as InvoiceData) : null;
+        })
+        .toMatchObject({
+          invoiceNumberObject: {
+            label: "Invoice No. of:",
+            value: "TEST/2024",
+          },
+          notes: "Test note",
+        } satisfies Pick<InvoiceData, "notes" | "invoiceNumberObject">);
 
       // Reload page
       await page.reload();

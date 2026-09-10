@@ -28,7 +28,7 @@ interface AutoPlayVideoProps extends SharedVideoProps {
    * element's area. A frame that is large next to the viewport — the hero demo on a
    * phone — never reaches the default half, so lower it there.
    *
-   * @default 0.25
+   * @default 0.5
    */
   inViewThreshold?: number;
 }

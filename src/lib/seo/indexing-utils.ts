@@ -12,7 +12,7 @@ import { PROD_WEBSITE_URL } from "@/config";
 export function computeIndexingFlags(searchParams: {
   [key: string]: string | string[] | undefined;
 }) {
-  const hasShareableData = Boolean(searchParams?.data);
+  const hasShareableData = searchParams?.data !== undefined;
 
   const isProd =
     process.env.VERCEL_ENV === "production" &&
