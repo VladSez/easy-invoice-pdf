@@ -11,8 +11,24 @@ export const STATIC_ASSETS_URL = "https://static.easyinvoicepdf.com";
 
 /**
  * Main demo video on marketing page and "How it works" dialog
+ *
+ * **Must stay `+faststart`.** `v1` had its `moov` atom at byte 3,744,792 of 3,798,059,
+ * so nothing could be decoded until the very end of the file had arrived, and it was
+ * the only demo here shipped that way — which is exactly why it was the only one iOS
+ * never started. `preload="none"` means the load does not begin until `play()`, and
+ * WebKit gives up on a gesture-free autoplay attempt well before metadata that far in
+ * lands, so `canplay` never fires and the retry in `AutoPlayVideo` never gets its
+ * second chance. Desktop merely looked slow; the phone looked broken.
+ *
+ * `v2` is `v1` with nothing changed but that: `ffmpeg -c copy -movflags +faststart`
+ * reorders the container and leaves the H.264 bitstream byte for byte identical
+ * (2534x1496, 60 fps, High L5.1, 3.8 MB). The bug is in where the metadata sits, not
+ * in the encode, so re-encoding to fix it only costs quality.
+ *
+ * Verify a replacement before uploading — `moov` has to be the first atom after `ftyp`:
+ * `ffmpeg -i in.mp4 -c copy -movflags +faststart out.mp4`
  */
-export const VIDEO_DEMO_URL = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026-v1.mp4`;
+export const VIDEO_DEMO_URL = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026-v3.mp4`;
 
 /**
  * Fallback image for main demo video on marketing page and "How it works" dialog
