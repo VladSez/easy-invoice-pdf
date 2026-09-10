@@ -6,6 +6,23 @@ import { useInView } from "react-intersection-observer";
 
 import { cn } from "@/lib/utils";
 
+import {
+  reportVideoPlaybackIssue,
+  VIDEO_PLAYBACK_FAILURE_REASONS,
+  type VideoPlaybackFailureReason,
+} from "./video-playback-diagnostics";
+
+/**
+ * How long a video that was asked to play gets before we treat the silence as a
+ * failure and report it.
+ *
+ * Generous on purpose: `preload="none"` means the fetch only starts at `play()`, and a
+ * phone on a slow connection can legitimately spend several seconds on the first
+ * frame. Anything past this is not slowness, it is a video that is never going to
+ * start on its own.
+ */
+const AUTOPLAY_GRACE_PERIOD_MS = 8000;
+
 interface SharedVideoProps extends React.ComponentPropsWithRef<"div"> {
   src: string;
   posterImg?: string;
@@ -72,6 +89,38 @@ export function AutoPlayVideo({
   const [autoplayRefused, setAutoplayRefused] = useState(false);
   const descriptionID = useId();
 
+  /**
+   * One report per failure shape per mount. The marketing page is the busiest thing
+   * here and a broken video fails on every scroll into view, so without this a single
+   * visitor could raise dozens of identical events.
+   */
+  const reportedReasonsRef = useRef(new Set<VideoPlaybackFailureReason>());
+  const stallTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const reportPlaybackIssue = useCallback(
+    ({
+      reason,
+      cause,
+    }: {
+      reason: VideoPlaybackFailureReason;
+      cause?: unknown;
+    }) => {
+      const video = videoRef.current;
+      if (!video) return;
+
+      if (reportedReasonsRef.current.has(reason)) return;
+      reportedReasonsRef.current.add(reason);
+
+      reportVideoPlaybackIssue({
+        video,
+        reason,
+        videoId: testId || "unnamed",
+        cause,
+      });
+    },
+    [testId],
+  );
+
   const { ref, inView } = useInView({
     threshold: inViewThreshold,
     rootMargin: "30px",
@@ -93,7 +142,37 @@ export function AutoPlayVideo({
     video.muted = true;
   }, []);
 
+  function clearStallWatchdog() {
+    if (stallTimerRef.current === null) return;
+
+    clearTimeout(stallTimerRef.current);
+    stallTimerRef.current = null;
+  }
+
+  /**
+   * Catches the failure that leaves no other trace: `play()` neither resolving nor
+   * rejecting, so no handler below ever runs and the poster just sits there. Armed on
+   * every attempt and disarmed the moment the video is deliberately stopped, so
+   * scrolling away is never mistaken for a stall.
+   */
+  function startStallWatchdog() {
+    clearStallWatchdog();
+
+    stallTimerRef.current = setTimeout(() => {
+      const video = videoRef.current;
+      if (!video || paused) return;
+
+      // it got going after all
+      if (!video.paused && video.currentTime > 0) return;
+
+      reportPlaybackIssue({
+        reason: VIDEO_PLAYBACK_FAILURE_REASONS.neverStarted,
+      });
+    }, AUTOPLAY_GRACE_PERIOD_MS);
+  }
+
   function pauseVideo() {
+    clearStallWatchdog();
     videoRef.current?.pause();
   }
 
@@ -105,8 +184,11 @@ export function AutoPlayVideo({
     // it is not one, so this is asserted on every attempt rather than only on mount
     video.muted = true;
 
+    startStallWatchdog();
+
     void video.play().then(
       () => {
+        clearStallWatchdog();
         return setAutoplayRefused(false);
       },
       (error: unknown) => {
@@ -121,6 +203,11 @@ export function AutoPlayVideo({
         // playing video is worse than no button at all
         if (!video.paused) return;
 
+        clearStallWatchdog();
+        reportPlaybackIssue({
+          reason: VIDEO_PLAYBACK_FAILURE_REASONS.playRejected,
+          cause: error,
+        });
         setAutoplayRefused(true);
       },
     );
@@ -163,6 +250,34 @@ export function AutoPlayVideo({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, paused]);
+
+  // The loud failure: a URL that 404s, a CDN that cannot be reached, a file this
+  // browser will not decode. It never reaches the `play()` handlers — the element
+  // fires `error` instead and stays on its poster — so it needs its own listener.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    function handleError() {
+      clearStallWatchdog();
+      reportPlaybackIssue({
+        reason: VIDEO_PLAYBACK_FAILURE_REASONS.mediaError,
+      });
+    }
+
+    video.addEventListener("error", handleError);
+    return () => {
+      return video.removeEventListener("error", handleError);
+    };
+  }, [reportPlaybackIssue]);
+
+  // a pending watchdog outliving the component would report on a video that is no
+  // longer on the page
+  useEffect(() => {
+    return () => {
+      return clearStallWatchdog();
+    };
+  }, []);
 
   // Add click handler to toggle play/pause on user interaction
   // This provides manual control over autoplay videos
