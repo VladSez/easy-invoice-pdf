@@ -905,8 +905,12 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     await expect(
+      page.getByRole("alertdialog", { name: "Delete Item 2?" }),
+    ).toBeVisible();
+
+    await expect(
       page.getByText(
-        'Are you sure you want to delete the invoice item "TEST INVOICE ITEM"?',
+        '"TEST INVOICE ITEM" will be removed from this invoice, and the totals recalculated.',
       ),
     ).toBeVisible();
 
@@ -921,15 +925,20 @@ test.describe("Invoice Generator Page", () => {
     ).toBeHidden();
 
     await expect(
-      page.getByText(
-        'Are you sure you want to delete the invoice item "TEST INVOICE ITEM"?',
-      ),
+      page.getByRole("alertdialog", { name: "Delete Item 2?" }),
     ).toBeHidden();
 
     // Item should still be present
     await expect(
       invoiceItemsSection.getByText("Item 2", { exact: true }),
     ).toBeVisible();
+
+    // Cancelling puts focus back on the button that opened the dialog
+    await expect(
+      invoiceItemsSection.getByRole("button", {
+        name: "Delete Invoice Item 2",
+      }),
+    ).toBeFocused();
 
     // --- Now confirm deletion flow ---
 
@@ -943,12 +952,18 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     // Confirm deletion
-    await page.getByRole("button", { name: "Delete" }).click();
+    await page.getByRole("button", { name: "Delete Item 2" }).click();
 
     // Verify success message
     await expect(
       page.getByText("Invoice item removed successfully", { exact: true }),
     ).toBeVisible();
+
+    // The field that had focus was inside the deleted item, so focus moves to a control that
+    // still exists rather than being dropped on <body>
+    await expect(
+      page.getByRole("button", { name: "Add invoice item" }),
+    ).toBeFocused();
 
     // Verify item is removed
     await expect(
