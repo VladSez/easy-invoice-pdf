@@ -118,7 +118,7 @@ test.describe("About page", () => {
     await expect(video).toHaveAttribute("poster", VIDEO_DEMO_FALLBACK_IMG);
     await expect(video).toHaveAttribute("loop");
     await expect(video).toHaveAttribute("playsinline");
-    await expect(video).toHaveAttribute("preload", "none");
+    await expect(video).toHaveAttribute("preload", "metadata");
 
     // Check Features section
     const featuresSection = main.locator("#features").filter({ visible: true });

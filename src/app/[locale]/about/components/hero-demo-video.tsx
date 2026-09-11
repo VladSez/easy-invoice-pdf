@@ -46,6 +46,9 @@ export function HeroDemoVideo() {
       // the browser frame is wide and short of the fold on a phone, where half of it is
       // never on screen at once; a sliver is enough to mean the demo is being looked at
       inViewThreshold={0.15}
+      // this one is on screen at load, so waiting for the observer only delays the
+      // fetch and leaves iOS a `<video>` with no resource to autoplay
+      eager
     />
   );
 }
