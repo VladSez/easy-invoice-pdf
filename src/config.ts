@@ -25,14 +25,6 @@ export const VIDEO_DEMO_FALLBACK_IMG = `${STATIC_ASSETS_URL}/demo-videos/easy-in
 export const VIDEO_DEMO_YOUTUBE_URL =
   "https://www.youtube.com/embed/iAROeCIcZ40?si=EyJKCsUr43Z8zY1f";
 
-/**
- * YouTube URL for the hero demo video on the marketing page — the stand-in shown to
- * browsers that cannot play the self-hosted MP4 inline. It is its own upload, cut for
- * the hero's browser frame, rather than the longer walkthrough above.
- */
-export const VIDEO_DEMO_HERO_YOUTUBE_URL =
-  "https://www.youtube.com/embed/wkecHuXWLSQ";
-
 export const YOUTUBE_VIDEO_HOW_TO_ADD_SELLER =
   "https://www.youtube.com/embed/xfSF35c0vfU";
 

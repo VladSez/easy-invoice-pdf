@@ -3,7 +3,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { VIDEO_DEMO_FALLBACK_IMG, VIDEO_DEMO_HERO_YOUTUBE_URL } from "@/config";
+import { VIDEO_DEMO_FALLBACK_IMG } from "@/config";
 
 import { FeaturesCarousel } from "../features-carousel";
 import { HeroDemoVideo } from "../hero-demo-video";
@@ -14,7 +14,8 @@ import { HeroDemoVideo } from "../hero-demo-video";
  * components actually rendering the other branch once the hook says so.
  *
  * The feature cards pick their player on two axes — viewport width and whether the
- * browser can play the MP4s inline — so both are stubbed here.
+ * browser can play the MP4s inline — so both are stubbed here. The hero is not one of
+ * them: it plays the self-hosted MP4 on every browser.
  */
 
 const CHROME_141 =
@@ -103,7 +104,7 @@ afterEach(() => {
 });
 
 describe("HeroDemoVideo", () => {
-  it("plays the self-hosted demo on a browser that can", () => {
+  it("plays the self-hosted demo", () => {
     setUserAgent(CHROME_141);
 
     render(<HeroDemoVideo />);
@@ -113,29 +114,14 @@ describe("HeroDemoVideo", () => {
     // the <source> is only added once the video scrolls into view, so the poster
     // is what identifies it here
     expect(video.getAttribute("poster")).toBe(VIDEO_DEMO_FALLBACK_IMG);
-    expect(screen.queryByTestId("hero-about-page-video-youtube")).toBeNull();
   });
 
-  it("swaps in the YouTube embed on iOS 15", () => {
+  it("keeps the self-hosted demo on iOS 15", () => {
     setUserAgent(IOS_SAFARI_15);
 
     render(<HeroDemoVideo />);
 
-    const embed = screen.getByTestId("hero-about-page-video-youtube");
-    // oxlint-disable-next-line vitest/no-conditional-in-test
-    const src = new URL(embed.getAttribute("src") ?? "");
-
-    expect(src.origin + src.pathname).toBe(
-      new URL(VIDEO_DEMO_HERO_YOUTUBE_URL).origin +
-        new URL(VIDEO_DEMO_HERO_YOUTUBE_URL).pathname,
-    );
-    // the clip it stands in for starts on its own, so this one does too
-    expect(src.searchParams.get("autoplay")).toBe("1");
-    expect(src.searchParams.get("mute")).toBe("1");
-    expect(src.searchParams.get("playsinline")).toBe("1");
-    // ...and carries no player chrome, like the MP4 it replaces
-    expect(src.searchParams.get("controls")).toBe("1");
-    expect(screen.queryByTestId("hero-about-page-video")).toBeNull();
+    expect(screen.getByTestId("hero-about-page-video")).toBeDefined();
   });
 });
 
