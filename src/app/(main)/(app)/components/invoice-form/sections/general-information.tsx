@@ -25,11 +25,11 @@ import {
   isServicePeriodStartInCurrentMonth,
 } from "@/app/(main)/(app)/utils/format-service-period";
 import {
-  DEFAULT_DATE_FORMAT,
   type InvoiceData,
   LANGUAGE_TO_LABEL,
-  STRIPE_DEFAULT_DATE_FORMAT,
+  DEFAULT_DATE_FORMAT,
   SUPPORTED_DATE_FORMATS,
+  getDefaultDateFormat,
   SUPPORTED_LANGUAGES,
   SUPPORTED_TEMPLATES,
   TEMPLATE_TO_LABEL,
@@ -236,10 +236,14 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                     // Handles template-specific form updates for better UX
 
-                    if (newTemplate === "stripe") {
-                      // Set date format to "MMMM D, YYYY" when template is Stripe
-                      setValue("dateFormat", STRIPE_DEFAULT_DATE_FORMAT);
+                    // The template decides whether the month is spelled out, the language
+                    // decides how that month is written.
+                    setValue(
+                      "dateFormat",
+                      getDefaultDateFormat({ language, template: newTemplate }),
+                    );
 
+                    if (newTemplate === "stripe") {
                       // Set unit field to be HIDDEN by default for Stripe template (matches stripe template behaviour)
                       setValue("items.0.unitFieldIsVisible", false);
 
@@ -250,9 +254,6 @@ export const GeneralInformation = memo(function GeneralInformation({
                       if (errors.stripePayOnlineUrl) {
                         setValue("stripePayOnlineUrl", "");
                       }
-
-                      // Set date format to "YYYY-MM-DD" when template is default
-                      setValue("dateFormat", DEFAULT_DATE_FORMAT);
 
                       // Set unit field to be VISIBLE for default template
                       setValue("items.0.unitFieldIsVisible", true);
@@ -337,6 +338,13 @@ export const GeneralInformation = memo(function GeneralInformation({
                     // This ensures the tax column header in the invoice items table
                     // displays the correct translation for the selected language
                     setValue("taxLabelText", newTranslation);
+
+                    // Update DATE FORMAT when language changes, so the spelled-out month
+                    // the Stripe template prints reads the way the language writes it
+                    setValue(
+                      "dateFormat",
+                      getDefaultDateFormat({ language: newLanguage, template }),
+                    );
 
                     setValue(
                       "servicePeriodLabelText",
@@ -425,7 +433,11 @@ export const GeneralInformation = memo(function GeneralInformation({
                       selectedDateFormat: format,
                       language,
                     });
-                    const isDefault = format === DEFAULT_DATE_FORMAT;
+                    // The marker follows the same resolver the form applies, so it
+                    // points at the Stripe template's long date when that is what a
+                    // reset would pick.
+                    const isDefault =
+                      format === getDefaultDateFormat({ language, template });
 
                     return (
                       <option key={format} value={format}>

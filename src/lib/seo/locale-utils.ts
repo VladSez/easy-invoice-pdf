@@ -5,6 +5,7 @@ export const OPEN_GRAPH_LOCALE_BY_LOCALE = {
   pl: "pl_PL",
   de: "de_DE",
   es: "es_ES",
+  sv: "sv_SE",
   pt: "pt_PT",
   ru: "ru_RU",
   uk: "uk_UA",

@@ -19,6 +19,7 @@ const EXPECTED_LONG_DATE: Record<SupportedLanguages, string> = {
   pl: "wrzesień 1, 2026",
   de: "September 1, 2026",
   es: "septiembre 1, 2026",
+  sv: "september 1, 2026",
   pt: "setembro 1, 2026",
   ru: "сентябрь 1, 2026",
   uk: "вересень 1, 2026",

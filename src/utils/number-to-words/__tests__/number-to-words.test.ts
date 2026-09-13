@@ -369,6 +369,43 @@ const EXPECTED = {
       "negenhonderdnegenennegentig miljard negenhonderdnegenennegentig miljoen negenhonderdnegenennegentigduizend negenhonderdnegenennegentig",
     ],
   ],
+  /**
+   * Swedish is the one language here with no `n2words` counterpart to capture: the package
+   * never shipped it. These rows are read from the grammar instead -- the compounds that
+   * stay one word, the `ett`/`en` split before the scale nouns, and the tripled consonant
+   * in `ettusen` -- so they are the specification rather than a recording of one.
+   */
+  sv: [
+    [0, "noll"],
+    [1, "ett"],
+    [11, "elva"],
+    [19, "nitton"],
+    [21, "tjugoett"],
+    [42, "fyrtiotvå"],
+    [80, "åttio"],
+    [81, "åttioett"],
+    [99, "nittionio"],
+    [100, "etthundra"],
+    [101, "etthundraett"],
+    [111, "etthundraelva"],
+    [200, "tvåhundra"],
+    [700, "sjuhundra"],
+    [999, "niohundranittionio"],
+    [1000, "ettusen"],
+    [1100, "ettusenetthundra"],
+    [1234, "ettusentvåhundratrettiofyra"],
+    [2021, "tvåtusentjugoett"],
+    [9999, "niotusenniohundranittionio"],
+    [123_456, "etthundratjugotretusenfyrahundrafemtiosex"],
+    [1_000_000, "en miljon"],
+    [2_000_000, "två miljoner"],
+    [1_234_567, "en miljon tvåhundratrettiofyratusenfemhundrasextiosju"],
+    [1_000_000_000, "en miljard"],
+    [
+      999_999_999_999,
+      "niohundranittionio miljarder niohundranittionio miljoner niohundranittioniotusenniohundranittionio",
+    ],
+  ],
 } satisfies Record<SupportedLanguages, readonly (readonly [number, string])[]>;
 
 describe.each(SUPPORTED_LANGUAGES)("numberToWords in %s", (language) => {

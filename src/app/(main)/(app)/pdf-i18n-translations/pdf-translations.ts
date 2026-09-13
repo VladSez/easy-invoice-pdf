@@ -4,6 +4,29 @@ import {
 } from "../../../schema/index";
 import type { TranslationSchema } from "./pdf-translations-schema";
 
+/**
+ * Join a tax label onto the Swedish noun it qualifies.
+ *
+ * "Moms" is an ordinary Swedish word and compounds straight onto the noun ("Momsbelopp");
+ * an abbreviation the user typed instead takes a hyphen ("VAT-belopp"). The templates
+ * always pass a label -- they fall back to "VAT", and the language picker resets it to the
+ * language's own word -- but an empty one reads as the Swedish default rather than
+ * producing a stray hyphen.
+ */
+function swedishTaxCompound({
+  customTaxLabel,
+  noun,
+}: {
+  /** The label shown in the tax column, e.g. "Moms", "VAT", "GST". */
+  customTaxLabel: string;
+  /** The noun it qualifies, e.g. "sats". May start with a line break for narrow columns. */
+  noun: string;
+}) {
+  return !customTaxLabel || customTaxLabel.toLowerCase() === "moms"
+    ? `Moms${noun}`
+    : `${customTaxLabel}-${noun}`;
+}
+
 export const INVOICE_PDF_TRANSLATIONS = {
   en: {
     invoiceNumber: "Invoice No. of",
@@ -918,6 +941,99 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Bedrag te betalen",
       page: "Pagina",
       of: "van",
+    },
+  },
+  sv: {
+    invoiceNumber: "Fakturanummer",
+    dateOfIssue: "Fakturadatum",
+    dateOfService: "Datum för försäljning/utförd tjänst",
+    servicePeriod: "Tjänsteperiod",
+    invoiceType: "Fakturatyp",
+    seller: {
+      name: "Säljare",
+      vatNo: "Momsreg.nr",
+      email: "E-post",
+      accountNumber: "Kontonummer",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Köpare",
+      vatNo: "Momsreg.nr",
+      email: "E-post",
+    },
+    invoiceItemsTable: {
+      no: "Nr",
+      nameOfGoodsService: "Benämning vara/tjänst",
+      typeOfGTU: "GTU-typ",
+      amount: "Antal",
+      unit: "Enhet",
+      netPrice: () => {
+        return `Nettopris`;
+      },
+      vat: "Moms",
+      /**
+       * These three are single compound words in Swedish, so the narrow columns would
+       * hyphenate them mid-word ("Moms-be-lopp"). The break is placed at the compound
+       * seam instead, the same way the other languages break their two-word labels.
+       */
+      netAmount: () => {
+        return `Netto\n belopp`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return swedishTaxCompound({ customTaxLabel, noun: `\n belopp` });
+      },
+      preTaxAmount: () => {
+        return `Brutto\n belopp`;
+      },
+      sum: "SUMMA",
+    },
+    paymentInfo: {
+      paymentMethod: "Betalningsmetod",
+      paymentDate: "Förfallodatum",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return swedishTaxCompound({ customTaxLabel, noun: "sats" });
+      },
+      net: () => {
+        return `Netto`;
+      },
+      vat: "Moms",
+      preTax: () => {
+        return `Brutto`;
+      },
+      total: "Totalt",
+    },
+    paymentTotals: {
+      toPay: "Att betala",
+      paid: "Betalt",
+      leftToPay: "Kvar att betala",
+      amountInWords: "Belopp i ord",
+    },
+    personAuthorizedToReceive: "Person behörig att ta emot",
+    personAuthorizedToIssue: "Person behörig att utfärda",
+    createdWith: "Skapad med",
+    stripe: {
+      invoice: "Faktura",
+      invoiceNumber: "Fakturanummer",
+      dateOfIssue: "Fakturadatum",
+      dateDue: "Förfallodatum",
+      servicePeriod: "Tjänsteperiod",
+      billTo: "Faktureras till",
+      due: "förfaller",
+      payOnline: "Betala online",
+      description: "Beskrivning",
+      qty: "Antal",
+      unit: "Enhet",
+      unitPrice: "Styckpris",
+      amount: "Belopp",
+      tax: "Skatt",
+      subtotal: "Delsumma",
+      totalExcludingTax: "Totalt exklusive skatt",
+      total: "Totalt",
+      amountDue: "Att betala",
+      page: "Sida",
+      of: "av",
     },
   },
 } as const satisfies Record<SupportedLanguages, TranslationSchema>;

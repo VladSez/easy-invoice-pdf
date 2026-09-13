@@ -35,6 +35,7 @@ const LANGUAGE_TO_CURRENCY = {
   pl: "PLN",
   de: "EUR",
   es: "MXN",
+  sv: "SEK",
   pt: "BRL",
   ru: "RUB",
   uk: "UAH",

@@ -662,17 +662,30 @@ export const TEMPLATE_TO_LABEL = {
 export type TemplateLabels =
   (typeof TEMPLATE_TO_LABEL)[keyof typeof TEMPLATE_TO_LABEL];
 
+/**
+ * Every language an invoice can be written in.
+ *
+ * This order is what the language pickers render, so it is sorted the way a reader scans
+ * them -- by name rather than by code: English and Polish lead, then the rest alphabetically
+ * by their English label ({@link LANGUAGE_TO_LABEL}). That is why the codes below look
+ * unsorted; adding a language means slotting its code in where its *name* belongs, and
+ * mirroring the position in the maps that follow.
+ *
+ * `en` has to stay first for a second reason: it is read as the default locale
+ * (`SUPPORTED_LANGUAGES[0]`) by the i18n routing and the invoice defaults.
+ */
 export const SUPPORTED_LANGUAGES = [
   "en",
   "pl",
+  "nl",
+  "fr",
   "de",
-  "es",
+  "it",
   "pt",
   "ru",
+  "es",
+  "sv",
   "uk",
-  "fr",
-  "it",
-  "nl",
 ] as const;
 export type SupportedLanguages = (typeof SUPPORTED_LANGUAGES)[number];
 
@@ -681,14 +694,15 @@ export const MAX_INVOICE_ITEMS = 100;
 export const LANGUAGE_TO_LABEL = {
   en: "English",
   pl: "Polish",
+  nl: "Dutch",
+  fr: "French",
   de: "German",
-  es: "Spanish",
+  it: "Italian",
   pt: "Portuguese",
   ru: "Russian",
+  es: "Spanish",
+  sv: "Swedish",
   uk: "Ukrainian",
-  fr: "French",
-  it: "Italian",
-  nl: "Dutch",
 } as const satisfies Record<SupportedLanguages, string>;
 
 /**
@@ -699,14 +713,15 @@ export const LANGUAGE_TO_LABEL = {
 export const LANGUAGE_TO_NATIVE_LABEL = {
   en: "English",
   pl: "Polski",
+  nl: "Nederlands",
+  fr: "Français",
   de: "Deutsch",
-  es: "Español",
+  it: "Italiano",
   pt: "Português",
   ru: "Русский",
+  es: "Español",
+  sv: "Svenska",
   uk: "Українська",
-  fr: "Français",
-  it: "Italiano",
-  nl: "Nederlands",
 } as const satisfies Record<SupportedLanguages, string>;
 
 export const SUPPORTED_DATE_FORMATS = [
@@ -728,6 +743,60 @@ export const SUPPORTED_DATE_FORMATS = [
 
 export const DEFAULT_DATE_FORMAT = "YYYY-MM-DD";
 export const STRIPE_DEFAULT_DATE_FORMAT = "MMMM D, YYYY";
+
+/**
+ * The long date each language writes by convention, used by the Stripe template.
+ *
+ * English leads with the month ("December 17, 2025"); every other language here leads with
+ * the day. That is not only word order: dayjs chooses the grammatical case of the month
+ * name from its position, so Polish, Russian and Ukrainian are only correct with the day in
+ * front -- "17 grudnia 2025", where "grudzień 17, 2025" puts the month in the nominative
+ * and reads like a column heading rather than a date.
+ *
+ * German, Spanish and Portuguese still lose a small piece of their convention here: they
+ * want "17. Dezember 2025" and "17 de diciembre de 2025", and neither the trailing period
+ * nor the connectors can be spelled with the tokens in {@link SUPPORTED_DATE_FORMATS}.
+ */
+export const LANGUAGE_TO_LONG_DATE_FORMAT = {
+  en: STRIPE_DEFAULT_DATE_FORMAT,
+  pl: "D MMMM YYYY",
+  nl: "D MMMM YYYY",
+  fr: "D MMMM YYYY",
+  de: "D MMMM YYYY",
+  it: "D MMMM YYYY",
+  pt: "D MMMM YYYY",
+  ru: "D MMMM YYYY",
+  es: "D MMMM YYYY",
+  sv: "D MMMM YYYY",
+  uk: "D MMMM YYYY",
+} as const satisfies Record<
+  SupportedLanguages,
+  (typeof SUPPORTED_DATE_FORMATS)[number]
+>;
+
+interface GetDefaultDateFormatArgs {
+  /** The invoice PDF language. */
+  language: SupportedLanguages;
+  /** The template the invoice is rendered with. */
+  template: SupportedTemplates;
+}
+
+/**
+ * The date format an invoice starts with, for a language and template.
+ *
+ * The default template stays on ISO `YYYY-MM-DD` whatever the language: an invoice crosses
+ * borders, and it is the one format no reader can misread by a month. (It is also exactly
+ * what Swedish writes anyway.) The Stripe template spells the month out, so there it is the
+ * language that decides -- see {@link LANGUAGE_TO_LONG_DATE_FORMAT}.
+ */
+export function getDefaultDateFormat({
+  language,
+  template,
+}: GetDefaultDateFormatArgs) {
+  return template === "stripe"
+    ? LANGUAGE_TO_LONG_DATE_FORMAT[language]
+    : DEFAULT_DATE_FORMAT;
+}
 
 /**
  * Supported date formats
