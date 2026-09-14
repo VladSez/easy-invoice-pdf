@@ -185,6 +185,9 @@ export function InvoicePDFDownloadLink({
     return;
   }, [pdfLoading]);
 
+  const isLongLanguageString =
+    invoiceData.language === "pt" || invoiceData.language === "nb";
+
   return (
     <CustomTooltip
       content={
@@ -214,7 +217,7 @@ export function InvoicePDFDownloadLink({
             "dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 lg:mb-0 lg:w-[230px]",
             {
               "pointer-events-none opacity-70": isLoading,
-              "lg:w-[250px]": invoiceData.language === "pt",
+              "lg:w-[250px]": isLongLanguageString,
             },
           )}
         >
