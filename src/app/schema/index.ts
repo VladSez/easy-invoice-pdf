@@ -732,6 +732,10 @@ export const SUPPORTED_DATE_FORMATS = [
   "MM-DD-YYYY", // 03-20-2024
   "M/D/YYYY", // 3/20/2024
   "D MMMM YYYY", // 20 March 2024
+  "D. MMMM YYYY", // 20. März 2024 (German long date)
+  "D [de] MMMM [de] YYYY", // 20 de marzo de 2024 (Spanish and Portuguese long date)
+  "D MMMM YYYY [г.]", // 20 марта 2024 г. (Russian long date)
+  "D MMMM YYYY [р.]", // 20 березня 2024 р. (Ukrainian long date)
   "D MMM YYYY", // 20 Mar 2024
   "MMMM D, YYYY", // March 20, 2024 (Stripe template default date format)
   "MMM D, YYYY", // Mar 20, 2024
@@ -753,26 +757,62 @@ export const STRIPE_DEFAULT_DATE_FORMAT = "MMMM D, YYYY";
  * front -- "17 grudnia 2025", where "grudzień 17, 2025" puts the month in the nominative
  * and reads like a column heading rather than a date.
  *
- * German, Spanish and Portuguese still lose a small piece of their convention here: they
- * want "17. Dezember 2025" and "17 de diciembre de 2025", and neither the trailing period
- * nor the connectors can be spelled with the tokens in {@link SUPPORTED_DATE_FORMATS}.
+ * Five of them carry punctuation the bare day-month-year cannot express, so they get their
+ * own tokens: the ordinal period in German's "17. Dezember 2025", the connectors in Spanish
+ * and Portuguese's "17 de diciembre de 2025", and the year marker that a spelled-out date
+ * takes in a Russian or Ukrainian document -- "17 декабря 2025 г.", "17 грудня 2025 р.",
+ * where dropping the "г."/"р." leaves the date reading like a sentence fragment.
+ *
+ * All five read as nonsense in any other language ("17 de december de 2025"), so a picker
+ * only offers a language the ones that belong to it; see {@link getDateFormatsForLanguage}.
  */
 export const LANGUAGE_TO_LONG_DATE_FORMAT = {
   en: STRIPE_DEFAULT_DATE_FORMAT,
   pl: "D MMMM YYYY",
   nl: "D MMMM YYYY",
   fr: "D MMMM YYYY",
-  de: "D MMMM YYYY",
+  de: "D. MMMM YYYY",
   it: "D MMMM YYYY",
-  pt: "D MMMM YYYY",
-  ru: "D MMMM YYYY",
-  es: "D MMMM YYYY",
+  pt: "D [de] MMMM [de] YYYY",
+  ru: "D MMMM YYYY [г.]",
+  es: "D [de] MMMM [de] YYYY",
   sv: "D MMMM YYYY",
-  uk: "D MMMM YYYY",
+  uk: "D MMMM YYYY [р.]",
 } as const satisfies Record<
   SupportedLanguages,
   (typeof SUPPORTED_DATE_FORMATS)[number]
 >;
+
+/**
+ * Long date formats that only read correctly in the languages whose convention they are.
+ *
+ * Everything else in {@link SUPPORTED_DATE_FORMATS} is either numeric or a plain
+ * day-month-year that any language can wear, so these are the only ones a picker has to
+ * keep out of the wrong hands.
+ */
+const LANGUAGE_SPECIFIC_DATE_FORMATS = [
+  "D. MMMM YYYY",
+  "D [de] MMMM [de] YYYY",
+  "D MMMM YYYY [г.]",
+  "D MMMM YYYY [р.]",
+] as const satisfies readonly (typeof SUPPORTED_DATE_FORMATS)[number][];
+
+/**
+ * The date formats worth offering in a given language.
+ *
+ * The full list carries a couple of formats that spell out another language's punctuation,
+ * and they do not degrade gracefully: picking Spanish's in Swedish renders "17 de december
+ * de 2025". Each language sees the shared formats plus its own long one, so a picker never
+ * shows a preview that is not a real date somewhere.
+ */
+export function getDateFormatsForLanguage(language: SupportedLanguages) {
+  const ownLongFormat = LANGUAGE_TO_LONG_DATE_FORMAT[language];
+  const languageSpecific: readonly string[] = LANGUAGE_SPECIFIC_DATE_FORMATS;
+
+  return SUPPORTED_DATE_FORMATS.filter((format) => {
+    return !languageSpecific.includes(format) || format === ownLongFormat;
+  });
+}
 
 interface GetDefaultDateFormatArgs {
   /** The invoice PDF language. */

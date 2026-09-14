@@ -44,26 +44,8 @@ describe("getDefaultDateFormat", () => {
     expect(rendered.startsWith("17")).toBe(true);
   });
 
-  /**
-   * The reason the non-English languages lead with the day is grammatical, not cosmetic:
-   * dayjs picks the case of the month name from its position, so the month-first format
-   * leaves the Slavic languages in the nominative ("grudzień 17, 2025").
-   */
-  it.each([
-    ["pl", "17 grudnia 2025"],
-    ["ru", "17 декабря 2025"],
-    ["uk", "17 грудня 2025"],
-    ["sv", "17 december 2025"],
-  ] as const)("declines the month correctly in %s", (language, expected) => {
-    expect(
-      formatDateWithLocale({
-        date: DATE,
-        selectedDateFormat: getDefaultDateFormat({
-          language,
-          template: "stripe",
-        }),
-        language,
-      }),
-    ).toBe(expected);
-  });
+  // The exact string each language renders -- including why the day has to lead, which is
+  // grammatical rather than cosmetic -- is asserted for all of them in
+  // `language-date-formats.test.ts`. Deliberately not repeated here: two copies of the same
+  // expected strings only ever drift apart.
 });

@@ -28,7 +28,7 @@ import {
   type InvoiceData,
   LANGUAGE_TO_LABEL,
   DEFAULT_DATE_FORMAT,
-  SUPPORTED_DATE_FORMATS,
+  getDateFormatsForLanguage,
   getDefaultDateFormat,
   SUPPORTED_LANGUAGES,
   SUPPORTED_TEMPLATES,
@@ -428,7 +428,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                     inputErrorClassName(!!errors.dateFormat),
                   )}
                 >
-                  {SUPPORTED_DATE_FORMATS.map((format) => {
+                  {getDateFormatsForLanguage(language).map((format) => {
                     const preview = formatTodayWithLocale({
                       selectedDateFormat: format,
                       language,
@@ -439,9 +439,15 @@ export const GeneralInformation = memo(function GeneralInformation({
                     const isDefault =
                       format === getDefaultDateFormat({ language, template });
 
+                    // `[de]` is dayjs escape syntax for a literal. The brackets mean
+                    // nothing to the reader, so the pattern is shown without them.
+                    // oxlint-disable-next-line unicorn/prefer-string-replace-all -- `String#replaceAll` is Safari 13.1; `.browserslistrc` targets Safari 12, and SWC lowers syntax but never polyfills a built-in
+                    const patternLabel = format.replace(/[[\]]/g, "");
+
                     return (
                       <option key={format} value={format}>
-                        {format} ({preview}) {isDefault ? "(default)" : ""}
+                        {patternLabel} ({preview}){" "}
+                        {isDefault ? "(default)" : ""}
                       </option>
                     );
                   })}
