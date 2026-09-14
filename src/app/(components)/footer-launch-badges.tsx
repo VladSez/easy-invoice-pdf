@@ -323,6 +323,23 @@ export function FooterLaunchBadges() {
             </span>
           </a>
         </BadgeSlide>
+
+        {/* Badge for Featured on tinyshelf */}
+        <BadgeSlide>
+          <a
+            href="https://www.tinyshelf.co/?ref=easyinvoicepdf.com"
+            target="_blank"
+            rel="noopener"
+            title="Featured on tinyshelf"
+          >
+            <img
+              src="https://www.tinyshelf.co/badge/tinyshelf-badge-light-5ca4026a.svg"
+              alt="Featured on tinyshelf"
+              width="216"
+              height="64"
+            />
+          </a>
+        </BadgeSlide>
       </CarouselContent>
     </Carousel>
   );
