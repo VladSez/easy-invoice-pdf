@@ -11,6 +11,7 @@ export const OPEN_GRAPH_LOCALE_BY_LOCALE = {
   uk: "uk_UA",
   fr: "fr_FR",
   it: "it_IT",
+  nb: "nb_NO",
   nl: "nl_NL",
 } as const satisfies Record<Locale, string>;
 

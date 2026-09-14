@@ -41,6 +41,7 @@ describe("getDateFormatsForLanguage", () => {
     ["fr", []],
     ["de", ["D. MMMM YYYY"]],
     ["it", []],
+    ["nb", ["D. MMMM YYYY"]],
     ["pt", ["D [de] MMMM [de] YYYY"]],
     ["ru", ["D MMMM YYYY [г.]"]],
     ["es", ["D [de] MMMM [de] YYYY"]],
@@ -97,6 +98,7 @@ describe("the Stripe default reads as a real date in every language", () => {
     ["nl", "17 december 2025"],
     ["fr", "17 décembre 2025"],
     ["it", "17 dicembre 2025"],
+    ["nb", "17. desember 2025"],
     ["en", "December 17, 2025"],
   ] as const)("renders %s as the language writes it", (language, expected) => {
     expect(

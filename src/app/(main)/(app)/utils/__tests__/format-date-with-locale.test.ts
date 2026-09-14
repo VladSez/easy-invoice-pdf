@@ -25,6 +25,7 @@ const EXPECTED_LONG_DATE: Record<SupportedLanguages, string> = {
   uk: "вересень 1, 2026",
   fr: "septembre 1, 2026",
   it: "settembre 1, 2026",
+  nb: "september 1, 2026",
   nl: "september 1, 2026",
 };
 

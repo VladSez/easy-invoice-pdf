@@ -406,6 +406,45 @@ const EXPECTED = {
       "niohundranittionio miljarder niohundranittionio miljoner niohundranittioniotusenniohundranittionio",
     ],
   ],
+  /**
+   * Like Swedish, Norwegian has no `n2words` counterpart to capture, so these rows are read
+   * from the grammar: tens and units joined into one word ("tjueen"), `og` before the last
+   * group under a hundred, and the neuter `ett` before "hundre" and "tusen".
+   */
+  nb: [
+    [0, "null"],
+    [1, "en"],
+    [11, "elleve"],
+    [19, "nitten"],
+    [21, "tjueen"],
+    [42, "førtito"],
+    [80, "åtti"],
+    [81, "åttien"],
+    [99, "nittini"],
+    [100, "ett hundre"],
+    [101, "ett hundre og en"],
+    [111, "ett hundre og elleve"],
+    [200, "to hundre"],
+    [700, "sju hundre"],
+    [999, "ni hundre og nittini"],
+    [1000, "ett tusen"],
+    [1001, "ett tusen og en"],
+    [1234, "ett tusen to hundre og trettifire"],
+    [2021, "to tusen og tjueen"],
+    [9999, "ni tusen ni hundre og nittini"],
+    [123_456, "ett hundre og tjuetre tusen fire hundre og femtiseks"],
+    [1_000_000, "en million"],
+    [2_000_000, "to millioner"],
+    [
+      1_234_567,
+      "en million to hundre og trettifire tusen fem hundre og sekstisju",
+    ],
+    [1_000_000_000, "en milliard"],
+    [
+      999_999_999_999,
+      "ni hundre og nittini milliarder ni hundre og nittini millioner ni hundre og nittini tusen ni hundre og nittini",
+    ],
+  ],
 } satisfies Record<SupportedLanguages, readonly (readonly [number, string])[]>;
 
 describe.each(SUPPORTED_LANGUAGES)("numberToWords in %s", (language) => {

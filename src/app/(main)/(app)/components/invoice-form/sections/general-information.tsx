@@ -43,6 +43,7 @@ import { SelectNative } from "@/components/ui/select-native";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
 
 import { convertFileToBase64, validateImageSize } from "../utils/logo-upload";
@@ -227,6 +228,15 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                     field.onChange(e);
 
+                    // `invoice_template` is the key `download_invoice` already reports the
+                    // template under, so the two read together in the dashboard.
+                    umamiTrackEvent("invoice_template_changed", {
+                      data: {
+                        invoice_template: newTemplate,
+                        previous_invoice_template: template,
+                      },
+                    });
+
                     // When the user changes the invoice template, automatically update the invoice number label
                     // so it matches the default convention for the selected template and current language.
                     setValue(
@@ -310,6 +320,14 @@ export const GeneralInformation = memo(function GeneralInformation({
                     // Update INVOICE NUMBER and LABELS when language changes
                     const newLanguage = e.target
                       .value as keyof typeof INVOICE_PDF_TRANSLATIONS;
+
+                    umamiTrackEvent("invoice_language_changed", {
+                      data: {
+                        language: newLanguage,
+                        previous_language: language,
+                        invoice_template: template,
+                      },
+                    });
 
                     // we need to keep the invoice number suffix (e.g. 1/MM-YYYY) for better user experience, when switching language
                     setValue(

@@ -1036,6 +1036,102 @@ export const INVOICE_PDF_TRANSLATIONS = {
       of: "av",
     },
   },
+  nb: {
+    invoiceNumber: "Fakturanummer",
+    dateOfIssue: "Fakturadato",
+    dateOfService: "Dato for salg/utført tjeneste",
+    servicePeriod: "Tjenesteperiode",
+    invoiceType: "Fakturatype",
+    seller: {
+      name: "Selger",
+      vatNo: "Org.nr",
+      email: "E-post",
+      accountNumber: "Kontonummer",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Kjøper",
+      vatNo: "Org.nr",
+      email: "E-post",
+    },
+    invoiceItemsTable: {
+      no: "Nr",
+      nameOfGoodsService: "Beskrivelse vare/tjeneste",
+      typeOfGTU: "GTU-type",
+      amount: "Antall",
+      unit: "Enhet",
+      netPrice: () => {
+        return `Nettopris`;
+      },
+      vat: "MVA",
+      /**
+       * Single compound words, like the Swedish ones, so the narrow columns would
+       * hyphenate them mid-word. The break goes at the compound seam instead.
+       */
+      netAmount: () => {
+        return `Netto\n beløp`;
+      },
+      /**
+       * "MVA" is an abbreviation, and Norwegian hyphenates a compound whose first part is
+       * one -- "MVA-beløp", the same shape German uses for "MwSt.-Betrag".
+       */
+      vatAmount: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "MVA"}-\n beløp`;
+      },
+      preTaxAmount: () => {
+        return `Brutto\n beløp`;
+      },
+      sum: "SUM",
+    },
+    paymentInfo: {
+      paymentMethod: "Betalingsmåte",
+      paymentDate: "Forfallsdato",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "MVA"}-sats`;
+      },
+      net: () => {
+        return `Netto`;
+      },
+      vat: "MVA",
+      preTax: () => {
+        return `Brutto`;
+      },
+      total: "Totalt",
+    },
+    paymentTotals: {
+      toPay: "Å betale",
+      paid: "Betalt",
+      leftToPay: "Gjenstår å betale",
+      amountInWords: "Beløp i ord",
+    },
+    personAuthorizedToReceive: "Person autorisert til å motta",
+    personAuthorizedToIssue: "Person autorisert til å utstede",
+    createdWith: "Laget med",
+    stripe: {
+      invoice: "Faktura",
+      invoiceNumber: "Fakturanummer",
+      dateOfIssue: "Fakturadato",
+      dateDue: "Forfallsdato",
+      servicePeriod: "Tjenesteperiode",
+      billTo: "Faktureres til",
+      due: "forfaller",
+      payOnline: "Betal på nett",
+      description: "Beskrivelse",
+      qty: "Antall",
+      unit: "Enhet",
+      unitPrice: "Stykkpris",
+      amount: "Beløp",
+      tax: "Skatt",
+      subtotal: "Delsum",
+      totalExcludingTax: "Totalt eksklusiv skatt",
+      total: "Totalt",
+      amountDue: "Å betale",
+      page: "Side",
+      of: "av",
+    },
+  },
 } as const satisfies Record<SupportedLanguages, TranslationSchema>;
 
 /**

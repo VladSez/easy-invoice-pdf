@@ -5,6 +5,7 @@ import { toWords as toWordsEN } from "./en";
 import { toWords as toWordsES } from "./es";
 import { toWords as toWordsFR } from "./fr";
 import { toWords as toWordsIT } from "./it";
+import { toWords as toWordsNB } from "./nb";
 import { toWords as toWordsNL } from "./nl";
 import { toWords as toWordsPL } from "./pl";
 import { toWords as toWordsPT } from "./pt";
@@ -25,6 +26,7 @@ const CONVERTERS = {
   fr: toWordsFR,
   de: toWordsDE,
   it: toWordsIT,
+  nb: toWordsNB,
   pt: toWordsPT,
   ru: toWordsRU,
   es: toWordsES,

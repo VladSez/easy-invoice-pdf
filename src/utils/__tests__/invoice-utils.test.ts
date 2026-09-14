@@ -34,6 +34,7 @@ const AMOUNT_IN_WORDS_BY_LANGUAGE = {
   uk: "одна тисяча двiстi тридцять чотири",
   fr: "mille deux cent trente-quatre",
   it: "milleduecentotrentaquattro",
+  nb: "ett tusen to hundre og trettifire",
   nl: "twaalfhonderd vierendertig",
 } as const satisfies Record<(typeof SUPPORTED_LANGUAGES)[number], string>;
 

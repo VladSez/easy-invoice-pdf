@@ -41,6 +41,7 @@ const LANGUAGE_TO_CURRENCY = {
   uk: "UAH",
   fr: "CHF",
   it: "EUR",
+  nb: "NOK",
   nl: "EUR",
 } as const satisfies Record<SupportedLanguages, SupportedCurrencies>;
 
