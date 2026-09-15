@@ -26,6 +26,7 @@ import {
 } from "@/config";
 
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
+import { expectYouTubeEmbedToShow } from "./utils/youtube-embed";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -166,11 +167,14 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(embed).toBeVisible();
 
-    await expect(embed).toHaveAttribute("src", VIDEO_DEMO_YOUTUBE_URL);
+    await expectYouTubeEmbedToShow({ embed, embedUrl: VIDEO_DEMO_YOUTUBE_URL });
     await expect(embed).toHaveAttribute("title", "EasyInvoicePDF Demo Video");
 
     await dialog.getByTestId("how-it-works-tab-add-seller").click();
-    await expect(embed).toHaveAttribute("src", YOUTUBE_VIDEO_HOW_TO_ADD_SELLER);
+    await expectYouTubeEmbedToShow({
+      embed,
+      embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
+    });
 
     await expect(
       dialog.getByRole("heading", { name: "How to add a seller" }),

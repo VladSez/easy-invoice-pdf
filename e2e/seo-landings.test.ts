@@ -5,6 +5,8 @@ import {
   type SeoLandingSlug,
 } from "@/app/(main)/(seo-landings)/seo-landing-definitions";
 
+import { expectYouTubeEmbedToShow } from "./utils/youtube-embed";
+
 const SLUGS = Object.keys(SEO_LANDING_DEFINITIONS) as SeoLandingSlug[];
 
 const SEO_LANDING_CASES = SLUGS.map((slug) => {
@@ -183,8 +185,17 @@ test.describe("SEO landing hero art", () => {
       const video = page.getByTestId("seo-landing-hero-video");
 
       await expect(video).toBeVisible();
-      await expect(video).toHaveAttribute("src", heroVideo?.embedUrl ?? "");
       await expect(video).toHaveAttribute("title", heroVideo?.title ?? "");
+
+      await expectYouTubeEmbedToShow({
+        embed: video,
+        embedUrl: heroVideo?.embedUrl ?? "",
+      });
+
+      // the hero waits to be pressed; nothing on a landing page starts by itself
+      const src = new URL((await video.getAttribute("src")) ?? "");
+
+      expect(src.searchParams.get("autoplay")).toBeNull();
 
       // the clip is only visible to search engines through its VideoObject, so the
       // fields Google requires for it have to reach the page
