@@ -22,8 +22,9 @@ export function GoToAppButton({
         className,
       )}
       asChild
+      data-testid="go-to-app-button"
     >
-      <Link href={href} scroll={false}>
+      <Link href={href}>
         <ArrowRight className="mr-2 size-6 transition-transform group-hover:scale-110" />
         {children}
       </Link>

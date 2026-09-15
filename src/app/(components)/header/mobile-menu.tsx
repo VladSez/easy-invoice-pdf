@@ -182,7 +182,6 @@ export function MobileMenuPanel({
             >
               <Link
                 href="/?template=default"
-                scroll={false}
                 className="flex items-center"
                 onClick={close}
               >
