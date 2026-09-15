@@ -6,11 +6,11 @@ Icon weight, states, sizing and direction, the details that make icons sit natur
 
 A hairline icon beside semibold text reads as broken; a heavy icon beside regular text shouts.
 
-| Adjacent text | Icon stroke width (24px grid) |
-| --- | --- |
-| Regular (400), 14–16px | `1.5px` |
-| Medium/Semibold (500–600) | `2px` |
-| Bold (700), or emphasized standalone | `2.5px` |
+| Adjacent text                        | Icon stroke width (24px grid) |
+| ------------------------------------ | ----------------------------- |
+| Regular (400), 14–16px               | `1.5px`                       |
+| Medium/Semibold (500–600)            | `2px`                         |
+| Bold (700), or emphasized standalone | `2.5px`                       |
 
 ```html
 <!-- Good: stroke tuned to the label weight -->
@@ -41,15 +41,25 @@ Never ship separate assets for default, hover, selected and disabled states. Use
 ```
 
 ```css
-.icon-button { color: oklch(0.552 0.016 285.938); }
-.icon-button:hover { color: oklch(0.21 0.006 285.885); }
-.icon-button[aria-pressed="true"] { color: oklch(0.623 0.188 259.815); }
-.icon-button:disabled { opacity: 0.4; }
+.icon-button {
+  color: oklch(0.552 0.016 285.938);
+}
+.icon-button:hover {
+  color: oklch(0.21 0.006 285.885);
+}
+.icon-button[aria-pressed="true"] {
+  color: oklch(0.623 0.188 259.815);
+}
+.icon-button:disabled {
+  opacity: 0.4;
+}
 ```
 
 ```html
 <!-- Tailwind -->
-<button class="text-zinc-500 hover:text-zinc-900 aria-pressed:text-blue-600 disabled:opacity-40">
+<button
+  class="text-zinc-500 hover:text-zinc-900 aria-pressed:text-blue-600 disabled:opacity-40"
+>
   <BookmarkIcon />
 </button>
 ```
@@ -60,10 +70,10 @@ Hardcoded fills inside the SVG, such as `fill="#666"`, break this. Strip them to
 
 Where an icon set offers outline and filled variants, use them as a state pair, never interchangeably:
 
-| Variant | Use for |
-| --- | --- |
-| Outline | Default state: toolbars, list rows, inline with text |
-| Fill | Selected/active state: the active tab, a toggled bookmark, a liked heart |
+| Variant | Use for                                                                  |
+| ------- | ------------------------------------------------------------------------ |
+| Outline | Default state: toolbars, list rows, inline with text                     |
+| Fill    | Selected/active state: the active tab, a toggled bookmark, a liked heart |
 
 ```tsx
 // Good: variant communicates state
@@ -88,12 +98,12 @@ An icon that looks great at 48px collapses into mush at 16px. Thin interior line
 
 Under `dir="rtl"`, flip icons whose meaning is tied to reading direction, and leave the rest alone:
 
-| Flip | Don't flip |
-| --- | --- |
-| Back/forward arrows, chevrons in navigation | Logos and brand marks |
-| Text-block glyphs (alignment, lists, indent) | Checkmarks |
-| Speaker/volume waves (emanate in reading direction) | Physical objects: clocks, cups, pencils |
-| "Send" style directional glyphs | Media playback (play/rewind refer to tape direction, convention keeps them LTR) |
+| Flip                                                | Don't flip                                                                      |
+| --------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Back/forward arrows, chevrons in navigation         | Logos and brand marks                                                           |
+| Text-block glyphs (alignment, lists, indent)        | Checkmarks                                                                      |
+| Speaker/volume waves (emanate in reading direction) | Physical objects: clocks, cups, pencils                                         |
+| "Send" style directional glyphs                     | Media playback (play/rewind refer to tape direction, convention keeps them LTR) |
 
 ```css
 /* Good: mirror only direction-dependent icons */

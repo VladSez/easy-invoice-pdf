@@ -74,14 +74,14 @@ It helps most for `scale`, `rotation` and movement through `transform`. For othe
 
 ### Useful properties
 
-| Property | GPU-compositable | Worth using `will-change` |
-| --- | --- | --- |
-| `transform` | Yes | Yes |
-| `opacity` | Yes | Yes |
-| `filter` (blur, brightness) | Yes | Yes |
-| `clip-path` | Newer Chromium only | Rarely; not reliable cross-browser |
-| `top`, `left`, `width`, `height` | No | No |
-| `background`, `border`, `color` | No | No |
+| Property                         | GPU-compositable    | Worth using `will-change`          |
+| -------------------------------- | ------------------- | ---------------------------------- |
+| `transform`                      | Yes                 | Yes                                |
+| `opacity`                        | Yes                 | Yes                                |
+| `filter` (blur, brightness)      | Yes                 | Yes                                |
+| `clip-path`                      | Newer Chromium only | Rarely; not reliable cross-browser |
+| `top`, `left`, `width`, `height` | No                  | No                                 |
+| `background`, `border`, `color`  | No                  | No                                 |
 
 ### When to skip
 

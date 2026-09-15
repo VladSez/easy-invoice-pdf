@@ -87,14 +87,14 @@ Every animated state change also needs a static cue: color, an icon, or a label.
 
 ## Before you finish
 
-| Mistake | Fix |
-| --- | --- |
-| Icons look off-center | Nudge optically with padding, or fix the SVG |
-| Jarring staged entrance or exit | Stagger infrequent entrances; keep exits subtle |
+| Mistake                                | Fix                                                                         |
+| -------------------------------------- | --------------------------------------------------------------------------- |
+| Icons look off-center                  | Nudge optically with padding, or fix the SVG                                |
+| Jarring staged entrance or exit        | Stagger infrequent entrances; keep exits subtle                             |
 | Theme toggle crossfades the whole page | Disable transitions for the swap, force a reflow, restore on the next frame |
-| `transition: all` on elements | Specify exact properties |
-| First-frame animation stutter | Add `will-change: transform` (sparingly) |
-| Hairline icon beside bold text | Match the stroke width to the text weight |
+| `transition: all` on elements          | Specify exact properties                                                    |
+| First-frame animation stutter          | Add `will-change: transform` (sparingly)                                    |
+| Hairline icon beside bold text         | Match the stroke width to the text weight                                   |
 
 ## Reporting
 
@@ -105,7 +105,7 @@ Every animated state change also needs a static cue: color, an icon, or a label.
 **Format.** Group findings under the principle each violates, ordered by severity, one row per root cause listing every location it appears in:
 
 | Severity | Location | Before | After | Why |
-| --- | --- | --- | --- | --- |
+| -------- | -------- | ------ | ----- | --- |
 
 `Location` is `path/to/file:line`. `Why` names the principle and the user impact.
 

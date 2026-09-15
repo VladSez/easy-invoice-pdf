@@ -127,12 +127,10 @@ Three layers. The first acts as a 1px border ring, the second adds subtle lift, 
 ```css
 :root {
   --shadow-border:
-    0px 0px 0px 1px oklch(0 0 0 / 0.06),
-    0px 1px 2px -1px oklch(0 0 0 / 0.06),
+    0px 0px 0px 1px oklch(0 0 0 / 0.06), 0px 1px 2px -1px oklch(0 0 0 / 0.06),
     0px 2px 4px 0px oklch(0 0 0 / 0.04);
   --shadow-border-hover:
-    0px 0px 0px 1px oklch(0 0 0 / 0.08),
-    0px 1px 2px -1px oklch(0 0 0 / 0.08),
+    0px 0px 0px 1px oklch(0 0 0 / 0.08), 0px 1px 2px -1px oklch(0 0 0 / 0.08),
     0px 2px 4px 0px oklch(0 0 0 / 0.06);
 }
 ```
@@ -167,13 +165,13 @@ Apply the variable and add `transition-[box-shadow]` for a smooth hover:
 
 ### When to use shadows vs. borders
 
-| Use shadows | Use borders |
-| --- | --- |
-| Cards, containers with depth | Dividers between list items |
-| Buttons with bordered styles | Table cell boundaries |
+| Use shadows                           | Use borders                             |
+| ------------------------------------- | --------------------------------------- |
+| Cards, containers with depth          | Dividers between list items             |
+| Buttons with bordered styles          | Table cell boundaries                   |
 | Elevated elements (dropdowns, modals) | Form input outlines (for accessibility) |
-| Elements on varied backgrounds | Hairline separators in dense UI |
-| Hover/focus states for lift effect | |
+| Elements on varied backgrounds        | Hairline separators in dense UI         |
+| Hover/focus states for lift effect    |                                         |
 
 ## Image outlines
 
