@@ -33,6 +33,18 @@ export const VIDEO_DEMO_YOUTUBE_URL =
 export const VIDEO_DEMO_HERO_YOUTUBE_URL =
   "https://www.youtube.com/embed/wkecHuXWLSQ";
 
+/** Demo for the live PDF preview, used on the open-source landing page. */
+export const VIDEO_LIVE_PREVIEW_YOUTUBE_URL =
+  "https://www.youtube.com/embed/pWkb_JcKouU";
+
+/** Demo for the Swedish and Norwegian landing pages. */
+export const VIDEO_NORDIC_INVOICE_YOUTUBE_URL =
+  "https://www.youtube.com/embed/cFFR-Y_obcU";
+
+/** Demo for the multi-language landing page. */
+export const VIDEO_MULTI_LANGUAGE_YOUTUBE_URL =
+  "https://www.youtube.com/embed/ITMeKohyz3I";
+
 export const YOUTUBE_VIDEO_HOW_TO_ADD_SELLER =
   "https://www.youtube.com/embed/xfSF35c0vfU";
 

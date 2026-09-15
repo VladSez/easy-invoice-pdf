@@ -3,10 +3,12 @@ import Link from "next/link";
 import { Footer } from "@/app/(components)/footer";
 import { Header } from "@/app/(components)/header";
 import { BlackGoToAppButton } from "@/app/(components)/header/go-to-app-button-cta";
+import { seoHeroCtaMarker } from "@/app/(main)/(seo-landings)/components/seo-cta-marker";
 import { StickySeoCta } from "@/app/(main)/(seo-landings)/components/sticky-seo-cta";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { Button } from "@/components/ui/button";
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
+import { YouTubeEmbed } from "@/components/youtube-embed";
 import { GITHUB_URL } from "@/config";
 
 import {
@@ -21,6 +23,15 @@ interface SeoLandingShellProps {
 }
 
 /**
+ * Where the mid-page CTA sits, counting sections from zero.
+ *
+ * A reader who has finished two sections has the answer they searched for, and the next
+ * CTA is otherwise below the FAQ. The sticky bar covers the rest of the page, so one
+ * inline prompt here is enough.
+ */
+const INLINE_CTA_AFTER_SECTION_INDEX = 1;
+
+/**
  * Renders a complete SEO landing page shell with hero section, CTA buttons, and layout structure.
  *
  * @param {SeoLandingShellProps} props - Component props
@@ -29,8 +40,12 @@ interface SeoLandingShellProps {
 export function SeoLandingShell({ definition }: SeoLandingShellProps) {
   return (
     <>
-      {/** Sticky CTA component displayed at bottom of SEO landing pages. */}
-      <StickySeoCta href={definition.hero.ctaHref} />
+      {/** Shown only while none of the in-page CTAs below is on screen. */}
+      <StickySeoCta
+        href={definition.hero.ctaHref}
+        label={definition.hero.ctaLabel}
+        slug={definition.slug}
+      />
       <SeoLandingJsonLd definition={definition} />
 
       <div className="flex min-h-screen flex-col bg-slate-50">
@@ -41,10 +56,18 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
               <h1 className="text-balance text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
                 {definition.hero.h1}
               </h1>
-              <h2 className="mt-4 max-w-3xl text-xl leading-relaxed text-slate-600 md:text-2xl">
+              {/*
+                The hero's opening paragraph, not a heading. It runs to a couple of
+                sentences, and a heading that long dilutes the page outline that search
+                engines and answer engines read the section titles from.
+              */}
+              <p className="mt-4 max-w-3xl text-xl leading-relaxed text-slate-600 md:text-2xl">
                 {definition.hero.subheading}
-              </h2>
-              <div className="mt-8 flex flex-col gap-4 md:flex-row">
+              </p>
+              <div
+                className="mt-8 flex flex-col gap-4 md:flex-row"
+                {...seoHeroCtaMarker}
+              >
                 <BlackGoToAppButton
                   className="w-full px-8 py-6 text-base lg:w-[325px] lg:px-10"
                   href={definition.hero.ctaHref}
@@ -67,7 +90,15 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                   </Link>
                 </Button>
               </div>
-              {definition.hero.heroImage ? (
+              {definition.hero.heroVideo ? (
+                <div className="mt-8 aspect-video overflow-hidden rounded-lg bg-slate-100/80 shadow-sm">
+                  <YouTubeEmbed
+                    src={definition.hero.heroVideo.embedUrl}
+                    title={definition.hero.heroVideo.title}
+                    testId="seo-landing-hero-video"
+                  />
+                </div>
+              ) : definition.hero.heroImage ? (
                 <div className="mt-8">
                   <a href={definition.hero.ctaHref}>
                     <img
@@ -93,6 +124,33 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
           </div>
 
           <div className="container mx-auto max-w-4xl flex-1 px-4 pt-6 md:px-6 md:pt-10">
+            {definition.factsTable ? (
+              <section
+                className="border-b border-slate-100 py-6"
+                data-testid="seo-landing-facts-table"
+              >
+                <h2 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
+                  {definition.factsTable.heading}
+                </h2>
+                <dl className="mt-6 divide-y divide-slate-100 border-y border-slate-100">
+                  {definition.factsTable.rows.map((row) => {
+                    return (
+                      <div
+                        key={row.label}
+                        className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4"
+                      >
+                        <dt className="text-base font-medium text-slate-900">
+                          {row.label}
+                        </dt>
+                        <dd className="text-base text-slate-700 sm:col-span-2">
+                          {row.value}
+                        </dd>
+                      </div>
+                    );
+                  })}
+                </dl>
+              </section>
+            ) : null}
             {definition.sections.map((section, id) => {
               const canShowComparisonTable =
                 section?.showComparisonTable ?? false;
@@ -103,10 +161,16 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                   <div className="my-2">
                     <SeoSectionBlock section={section} id={id} />
                   </div>
+                  {id === INLINE_CTA_AFTER_SECTION_INDEX ? (
+                    <SeoInlineCta
+                      href={definition.hero.ctaHref}
+                      label={definition.hero.ctaLabel}
+                    />
+                  ) : null}
                   {canShowComparisonTable && comparisonTable ? (
                     <div className="py-6 md:py-8">
                       <h2 className="w-fit bg-rose-500 text-2xl font-semibold italic tracking-tight text-white dark:bg-cyan-600 dark:text-white md:text-3xl">
-                        👉 Feature comparison
+                        {comparisonTable?.heading ?? "Feature comparison"}
                       </h2>
                       {comparisonTable?.intro ? (
                         <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600">
@@ -161,6 +225,32 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
         <Footer />
       </div>
     </>
+  );
+}
+
+/** Mid-page prompt to open the app, shown once between the sections. */
+function SeoInlineCta({ href, label }: { href: string; label: string }) {
+  return (
+    <div
+      className="my-6 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-6"
+      data-testid="seo-landing-inline-cta"
+    >
+      <div>
+        <p className="text-base font-semibold text-slate-900">
+          Ready to try it?
+        </p>
+        <p className="mt-1 text-sm text-slate-600">
+          The form opens with an empty invoice. Fill it in and download the PDF.
+          No account needed.
+        </p>
+      </div>
+      <BlackGoToAppButton
+        className="w-full shrink-0 px-6 py-5 text-base sm:w-auto"
+        href={href}
+      >
+        <span className="truncate">{label}</span>
+      </BlackGoToAppButton>
+    </div>
   );
 }
 

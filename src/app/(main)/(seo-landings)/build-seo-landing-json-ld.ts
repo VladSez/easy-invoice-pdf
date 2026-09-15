@@ -36,6 +36,33 @@ function buildLandingSoftwareApplication(
   };
 }
 
+/**
+ * The hero demo as a `VideoObject`.
+ *
+ * A clip inside a YouTube iframe is invisible to anything reading the page, so the
+ * fields Google requires for video rich results (`name`, `description`, `thumbnailUrl`,
+ * `uploadDate`) are declared here instead.
+ *
+ * @see https://developers.google.com/search/docs/appearance/structured-data/video
+ */
+function buildLandingVideo(
+  pageUrl: string,
+  heroVideo: NonNullable<SeoLandingDefinition["hero"]["heroVideo"]>,
+) {
+  return {
+    "@type": "VideoObject" as const,
+    name: heroVideo.title,
+    description: heroVideo.description,
+    thumbnailUrl: heroVideo.thumbnailUrl,
+    uploadDate: heroVideo.uploadDate,
+    embedUrl: heroVideo.embedUrl,
+    contentUrl: heroVideo.watchUrl,
+    isPartOf: {
+      "@id": pageWebPageId(pageUrl),
+    },
+  };
+}
+
 export function buildSeoLandingJsonLd(
   definition: SeoLandingDefinition,
   baseUrl = PROD_WEBSITE_URL,
@@ -85,14 +112,17 @@ export function buildSeoLandingJsonLd(
     { name: definition.metadata.title },
   ]);
 
-  const graph = isOpenSourceLanding
-    ? [
-        webPage,
-        buildLandingSoftwareApplication(pageUrl, definition),
-        faqPage,
-        breadcrumb,
-      ]
-    : [webPage, faqPage, breadcrumb];
+  const heroVideo = definition.hero.heroVideo;
+
+  const graph = [
+    webPage,
+    ...(isOpenSourceLanding
+      ? [buildLandingSoftwareApplication(pageUrl, definition)]
+      : []),
+    faqPage,
+    ...(heroVideo ? [buildLandingVideo(pageUrl, heroVideo)] : []),
+    breadcrumb,
+  ];
 
   return {
     "@context": "https://schema.org",
