@@ -5,10 +5,12 @@ import { toWords as toWordsEN } from "./en";
 import { toWords as toWordsES } from "./es";
 import { toWords as toWordsFR } from "./fr";
 import { toWords as toWordsIT } from "./it";
+import { toWords as toWordsNB } from "./nb";
 import { toWords as toWordsNL } from "./nl";
 import { toWords as toWordsPL } from "./pl";
 import { toWords as toWordsPT } from "./pt";
 import { toWords as toWordsRU } from "./ru";
+import { toWords as toWordsSV } from "./sv";
 import { toWords as toWordsUK } from "./uk";
 
 /**
@@ -20,14 +22,16 @@ import { toWords as toWordsUK } from "./uk";
 const CONVERTERS = {
   en: toWordsEN,
   pl: toWordsPL,
+  nl: toWordsNL,
+  fr: toWordsFR,
   de: toWordsDE,
-  es: toWordsES,
+  it: toWordsIT,
+  nb: toWordsNB,
   pt: toWordsPT,
   ru: toWordsRU,
+  es: toWordsES,
+  sv: toWordsSV,
   uk: toWordsUK,
-  fr: toWordsFR,
-  it: toWordsIT,
-  nl: toWordsNL,
 } satisfies Record<SupportedLanguages, (value: number) => string>;
 
 /**

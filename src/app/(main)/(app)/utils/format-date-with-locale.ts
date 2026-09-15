@@ -11,10 +11,12 @@ import "dayjs/locale/en";
 import "dayjs/locale/es";
 import "dayjs/locale/fr";
 import "dayjs/locale/it";
+import "dayjs/locale/nb";
 import "dayjs/locale/nl";
 import "dayjs/locale/pl";
 import "dayjs/locale/pt";
 import "dayjs/locale/ru";
+import "dayjs/locale/sv";
 import "dayjs/locale/uk";
 
 interface FormatDateWithLocaleArgs {

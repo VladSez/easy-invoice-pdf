@@ -26,8 +26,9 @@ export function buildHowItWorksJsonLd(baseUrl = PROD_WEBSITE_URL): Graph {
         description: video.description,
         uploadDate: video.uploadDate,
         thumbnailUrl: video.thumbnailUrl,
+        // `embedUrl` alone: `contentUrl` is for the video file's own bytes, which
+        // YouTube never hands out, and the watch page is what it must not be
         embedUrl: video.embedUrl,
-        contentUrl: video.watchUrl,
         url: `${pageUrl}#${video.id}`,
         publisher: {
           "@type": "Organization" as const,

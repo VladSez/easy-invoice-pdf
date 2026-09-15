@@ -662,17 +662,31 @@ export const TEMPLATE_TO_LABEL = {
 export type TemplateLabels =
   (typeof TEMPLATE_TO_LABEL)[keyof typeof TEMPLATE_TO_LABEL];
 
+/**
+ * Every language an invoice can be written in.
+ *
+ * This order is what the language pickers render, so it is sorted the way a reader scans
+ * them -- by name rather than by code: English and Polish lead, then the rest alphabetically
+ * by their English label ({@link LANGUAGE_TO_LABEL}). That is why the codes below look
+ * unsorted; adding a language means slotting its code in where its *name* belongs, and
+ * mirroring the position in the maps that follow.
+ *
+ * `en` has to stay first for a second reason: it is read as the default locale
+ * (`SUPPORTED_LANGUAGES[0]`) by the i18n routing and the invoice defaults.
+ */
 export const SUPPORTED_LANGUAGES = [
   "en",
   "pl",
+  "nl",
+  "fr",
   "de",
-  "es",
+  "it",
+  "nb",
   "pt",
   "ru",
+  "es",
+  "sv",
   "uk",
-  "fr",
-  "it",
-  "nl",
 ] as const;
 export type SupportedLanguages = (typeof SUPPORTED_LANGUAGES)[number];
 
@@ -681,14 +695,16 @@ export const MAX_INVOICE_ITEMS = 100;
 export const LANGUAGE_TO_LABEL = {
   en: "English",
   pl: "Polish",
+  nl: "Dutch",
+  fr: "French",
   de: "German",
-  es: "Spanish",
+  it: "Italian",
+  nb: "Norwegian",
   pt: "Portuguese",
   ru: "Russian",
+  es: "Spanish",
+  sv: "Swedish",
   uk: "Ukrainian",
-  fr: "French",
-  it: "Italian",
-  nl: "Dutch",
 } as const satisfies Record<SupportedLanguages, string>;
 
 /**
@@ -699,14 +715,16 @@ export const LANGUAGE_TO_LABEL = {
 export const LANGUAGE_TO_NATIVE_LABEL = {
   en: "English",
   pl: "Polski",
+  nl: "Nederlands",
+  fr: "Français",
   de: "Deutsch",
-  es: "Español",
+  it: "Italiano",
+  nb: "Norsk bokmål",
   pt: "Português",
   ru: "Русский",
+  es: "Español",
+  sv: "Svenska",
   uk: "Українська",
-  fr: "Français",
-  it: "Italiano",
-  nl: "Nederlands",
 } as const satisfies Record<SupportedLanguages, string>;
 
 export const SUPPORTED_DATE_FORMATS = [
@@ -717,6 +735,10 @@ export const SUPPORTED_DATE_FORMATS = [
   "MM-DD-YYYY", // 03-20-2024
   "M/D/YYYY", // 3/20/2024
   "D MMMM YYYY", // 20 March 2024
+  "D. MMMM YYYY", // 20. März 2024 (German long date)
+  "D [de] MMMM [de] YYYY", // 20 de marzo de 2024 (Spanish and Portuguese long date)
+  "D MMMM YYYY [г.]", // 20 марта 2024 г. (Russian long date)
+  "D MMMM YYYY [р.]", // 20 березня 2024 р. (Ukrainian long date)
   "D MMM YYYY", // 20 Mar 2024
   "MMMM D, YYYY", // March 20, 2024 (Stripe template default date format)
   "MMM D, YYYY", // Mar 20, 2024
@@ -728,6 +750,97 @@ export const SUPPORTED_DATE_FORMATS = [
 
 export const DEFAULT_DATE_FORMAT = "YYYY-MM-DD";
 export const STRIPE_DEFAULT_DATE_FORMAT = "MMMM D, YYYY";
+
+/**
+ * The long date each language writes by convention, used by the Stripe template.
+ *
+ * English leads with the month ("December 17, 2025"); every other language here leads with
+ * the day. That is not only word order: dayjs chooses the grammatical case of the month
+ * name from its position, so Polish, Russian and Ukrainian are only correct with the day in
+ * front -- "17 grudnia 2025", where "grudzień 17, 2025" puts the month in the nominative
+ * and reads like a column heading rather than a date.
+ *
+ * Five of them carry punctuation the bare day-month-year cannot express, so they get their
+ * own tokens: the ordinal period in German's "17. Dezember 2025", the connectors in Spanish
+ * and Portuguese's "17 de diciembre de 2025", and the year marker that a spelled-out date
+ * takes in a Russian or Ukrainian document -- "17 декабря 2025 г.", "17 грудня 2025 р.",
+ * where dropping the "г."/"р." leaves the date reading like a sentence fragment.
+ *
+ * All five read as nonsense in any other language ("17 de december de 2025"), so a picker
+ * only offers a language the ones that belong to it; see {@link getDateFormatsForLanguage}.
+ */
+export const LANGUAGE_TO_LONG_DATE_FORMAT = {
+  en: STRIPE_DEFAULT_DATE_FORMAT,
+  pl: "D MMMM YYYY",
+  nl: "D MMMM YYYY",
+  fr: "D MMMM YYYY",
+  de: "D. MMMM YYYY",
+  it: "D MMMM YYYY",
+  nb: "D. MMMM YYYY",
+  pt: "D [de] MMMM [de] YYYY",
+  ru: "D MMMM YYYY [г.]",
+  es: "D [de] MMMM [de] YYYY",
+  sv: "D MMMM YYYY",
+  uk: "D MMMM YYYY [р.]",
+} as const satisfies Record<
+  SupportedLanguages,
+  (typeof SUPPORTED_DATE_FORMATS)[number]
+>;
+
+/**
+ * Long date formats that only read correctly in the languages whose convention they are.
+ *
+ * Everything else in {@link SUPPORTED_DATE_FORMATS} is either numeric or a plain
+ * day-month-year that any language can wear, so these are the only ones a picker has to
+ * keep out of the wrong hands.
+ */
+const LANGUAGE_SPECIFIC_DATE_FORMATS = [
+  "D. MMMM YYYY",
+  "D [de] MMMM [de] YYYY",
+  "D MMMM YYYY [г.]",
+  "D MMMM YYYY [р.]",
+] as const satisfies readonly (typeof SUPPORTED_DATE_FORMATS)[number][];
+
+/**
+ * The date formats worth offering in a given language.
+ *
+ * The full list carries a couple of formats that spell out another language's punctuation,
+ * and they do not degrade gracefully: picking Spanish's in Swedish renders "17 de december
+ * de 2025". Each language sees the shared formats plus its own long one, so a picker never
+ * shows a preview that is not a real date somewhere.
+ */
+export function getDateFormatsForLanguage(language: SupportedLanguages) {
+  const ownLongFormat = LANGUAGE_TO_LONG_DATE_FORMAT[language];
+  const languageSpecific: readonly string[] = LANGUAGE_SPECIFIC_DATE_FORMATS;
+
+  return SUPPORTED_DATE_FORMATS.filter((format) => {
+    return !languageSpecific.includes(format) || format === ownLongFormat;
+  });
+}
+
+interface GetDefaultDateFormatArgs {
+  /** The invoice PDF language. */
+  language: SupportedLanguages;
+  /** The template the invoice is rendered with. */
+  template: SupportedTemplates;
+}
+
+/**
+ * The date format an invoice starts with, for a language and template.
+ *
+ * The default template stays on ISO `YYYY-MM-DD` whatever the language: an invoice crosses
+ * borders, and it is the one format no reader can misread by a month. (It is also exactly
+ * what Swedish writes anyway.) The Stripe template spells the month out, so there it is the
+ * language that decides -- see {@link LANGUAGE_TO_LONG_DATE_FORMAT}.
+ */
+export function getDefaultDateFormat({
+  language,
+  template,
+}: GetDefaultDateFormatArgs) {
+  return template === "stripe"
+    ? LANGUAGE_TO_LONG_DATE_FORMAT[language]
+    : DEFAULT_DATE_FORMAT;
+}
 
 /**
  * Supported date formats

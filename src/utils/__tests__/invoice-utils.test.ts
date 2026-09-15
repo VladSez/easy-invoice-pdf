@@ -28,11 +28,13 @@ const AMOUNT_IN_WORDS_BY_LANGUAGE = {
   pl: "tysiąc dwieście trzydzieści cztery",
   de: "eintausendzweihundertvierunddreißig",
   es: "mil doscientos treinta y cuatro",
+  sv: "ettusentvåhundratrettiofyra",
   pt: "mil duzentos e trinta e quatro",
   ru: "одна тысяча двести тридцать четыре",
   uk: "одна тисяча двiстi тридцять чотири",
   fr: "mille deux cent trente-quatre",
   it: "milleduecentotrentaquattro",
+  nb: "ett tusen to hundre og trettifire",
   nl: "twaalfhonderd vierendertig",
 } as const satisfies Record<(typeof SUPPORTED_LANGUAGES)[number], string>;
 

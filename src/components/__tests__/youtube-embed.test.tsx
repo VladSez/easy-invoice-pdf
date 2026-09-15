@@ -9,6 +9,9 @@ import { YouTubeEmbed } from "../youtube-embed";
  * The player parameters behind the hero fallback. `autoplay=1` on its own is not
  * enough anywhere that matters — no browser hands a gesture-free start to a player
  * that could make noise — so the interesting part is what travels with it.
+ *
+ * The parameters that keep the player on EasyInvoicePDF's own videos travel with
+ * every embed instead, autoplaying or not.
  */
 
 const SRC = "https://www.youtube.com/embed/iAROeCIcZ40?si=EyJKCsUr43Z8zY1f";
@@ -23,10 +26,28 @@ function getSrc() {
 }
 
 describe("YouTubeEmbed", () => {
-  it("leaves the url alone by default", () => {
+  it("keeps the suggestions on our own videos", () => {
     render(<YouTubeEmbed src={SRC} title="Demo" testId="embed" />);
 
-    expect(screen.getByTestId("embed").getAttribute("src")).toBe(SRC);
+    const src = getSrc();
+
+    // `rel=0` narrows the end screen to the channel the clip came from rather than
+    // turning suggestions off, so a demo does not finish on a grid of competitors
+    expect(src.searchParams.get("rel")).toBe("0");
+    expect(src.searchParams.get("modestbranding")).toBe("1");
+    // no annotations over the demo
+    expect(src.searchParams.get("iv_load_policy")).toBe("3");
+    // without this iOS takes the video fullscreen the moment it starts
+    expect(src.searchParams.get("playsinline")).toBe("1");
+  });
+
+  it("waits to be asked by default", () => {
+    render(<YouTubeEmbed src={SRC} title="Demo" testId="embed" />);
+
+    const src = getSrc();
+
+    expect(src.searchParams.get("autoplay")).toBeNull();
+    expect(src.searchParams.get("loop")).toBeNull();
   });
 
   it("delegates autoplay through the permissions policy", () => {

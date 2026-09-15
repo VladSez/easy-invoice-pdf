@@ -5,11 +5,13 @@ export const OPEN_GRAPH_LOCALE_BY_LOCALE = {
   pl: "pl_PL",
   de: "de_DE",
   es: "es_ES",
+  sv: "sv_SE",
   pt: "pt_PT",
   ru: "ru_RU",
   uk: "uk_UA",
   fr: "fr_FR",
   it: "it_IT",
+  nb: "nb_NO",
   nl: "nl_NL",
 } as const satisfies Record<Locale, string>;
 

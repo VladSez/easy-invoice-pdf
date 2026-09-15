@@ -20,5 +20,5 @@ export const config = {
   //
   // Next.js requires a static literal here, so this list cannot be derived from
   // `routing.locales` — keep it in sync with SUPPORTED_LANGUAGES.
-  matcher: ["/(en|pl|de|es|pt|ru|uk|fr|it|nl)/:path*"],
+  matcher: ["/(en|pl|nl|fr|de|it|nb|pt|ru|es|sv|uk)/:path*"],
 };

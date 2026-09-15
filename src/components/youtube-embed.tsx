@@ -9,15 +9,15 @@ interface YouTubeEmbedProps {
    * Start the clip on its own, muted and looping, the way the self-hosted demo it
    * stands in for does.
    *
-   * Off by default: a player someone opened on purpose, like the "How it works" tabs,
-   * should wait to be asked.
+   * Off by default: a player someone opened on purpose, like the "How it works" tabs
+   * or an SEO landing hero, should wait to be asked.
    */
   autoPlay?: boolean;
   /**
    * Show the player's own controls.
    *
-   * Part of the `autoPlay` parameter set, so it does nothing without it — a URL that
-   * is not rewritten keeps whatever it arrived with.
+   * Part of the `autoPlay` parameter set, so it does nothing without it — a player the
+   * viewer has to press anyway keeps the controls that press goes through.
    *
    * Turn it off where the embed stands in for a chrome-less looping video, like the
    * hero demo. Note that this also takes away the only way to unmute, pause or go
@@ -46,7 +46,7 @@ export function YouTubeEmbed({
 }: YouTubeEmbedProps) {
   return (
     <iframe
-      src={autoPlay ? buildAutoPlayUrl({ src, showControls }) : src}
+      src={buildPlayerUrl({ src, autoPlay, showControls })}
       title={title}
       // `autoplay` here is the Permissions Policy delegation: without it the player is
       // not allowed to start itself, whatever the URL asks for
@@ -59,25 +59,27 @@ export function YouTubeEmbed({
   );
 }
 
-interface BuildAutoPlayUrlArgs {
+interface BuildPlayerUrlArgs {
   /** The `https://www.youtube.com/embed/...` URL to rewrite. */
   src: string;
-  /** Whether the player keeps its own controls. */
+  /** Whether the player starts itself, muted and looping. */
+  autoPlay: boolean;
+  /** Whether the player keeps its own controls. Only read when `autoPlay` is set. */
   showControls: boolean;
 }
 
 /**
- * The same URL with the parameters that make the player behave like the muted, looping
- * demo it replaces.
+ * The same URL with the player parameters every embed on the site gets, plus the ones
+ * that make it behave like the muted, looping demo it replaces when `autoPlay` is set.
  *
  * Existing parameters on `src` are kept. A URL that cannot be parsed is handed back
- * untouched — this is the fallback path for browsers old enough that the MP4 does not
- * play, and a player that waits for a tap is a far better outcome there than a hero
- * with a broken iframe in it.
+ * untouched — this also serves the fallback path for browsers old enough that the MP4
+ * does not play, and a player that waits for a tap is a far better outcome there than
+ * a hero with a broken iframe in it.
  *
  * @see https://developers.google.com/youtube/player_parameters
  */
-function buildAutoPlayUrl({ src, showControls }: BuildAutoPlayUrlArgs) {
+function buildPlayerUrl({ src, autoPlay, showControls }: BuildPlayerUrlArgs) {
   let url: URL;
 
   try {
@@ -86,19 +88,28 @@ function buildAutoPlayUrl({ src, showControls }: BuildAutoPlayUrlArgs) {
     return src;
   }
 
-  url.searchParams.set("autoplay", "1");
-  // no browser grants a gesture-free start to a player that can make noise, and a
-  // marketing page should not make noise either way
-  url.searchParams.set("mute", "1");
-  // without this iOS takes the video fullscreen the moment it starts
-  url.searchParams.set("playsinline", "1");
-  // the only way to pause, scrub, unmute or go fullscreen once it is running, so it
-  // stays on unless the caller wants a plain looping picture
-  url.searchParams.set("controls", showControls ? "1" : "0");
+  // Every embed gets these, whether it starts itself or waits to be pressed. `rel=0`
+  // no longer turns suggestions off, it narrows them to the channel the clip came
+  // from, which is what keeps the end screen of a marketing demo on EasyInvoicePDF's
+  // own videos instead of on a grid of competitors.
   url.searchParams.set("rel", "0");
   url.searchParams.set("modestbranding", "1");
   // no annotations over the demo
   url.searchParams.set("iv_load_policy", "3");
+  // without this iOS takes the video fullscreen the moment it starts
+  url.searchParams.set("playsinline", "1");
+
+  if (!autoPlay) {
+    return url.toString();
+  }
+
+  url.searchParams.set("autoplay", "1");
+  // no browser grants a gesture-free start to a player that can make noise, and a
+  // marketing page should not make noise either way
+  url.searchParams.set("mute", "1");
+  // the only way to pause, scrub, unmute or go fullscreen once it is running, so it
+  // stays on unless the caller wants a plain looping picture
+  url.searchParams.set("controls", showControls ? "1" : "0");
 
   // `loop` is a playlist feature: a single video has to name itself as the playlist
   const videoId = url.pathname.split("/").pop();

@@ -18,12 +18,9 @@ export function BlackAnimatedGoToAppBtn({
         "group relative overflow-hidden bg-zinc-900 px-3 text-white transition-all duration-300 hover:scale-[1.02] hover:bg-zinc-800 hover:text-white active:scale-[0.98] sm:px-8"
       }
       asChild
+      data-testid="black-animated-go-to-app-btn"
     >
-      <Link
-        href="/?template=default"
-        scroll={false}
-        className="flex items-center"
-      >
+      <Link href="/?template=default" className="flex items-center">
         <ArrowRightIcon className="mr-2 size-5 animate-pulse-arrow transition-transform group-hover:scale-110" />
 
         {children}

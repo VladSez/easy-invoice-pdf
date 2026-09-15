@@ -35,11 +35,13 @@ const LANGUAGE_TO_CURRENCY = {
   pl: "PLN",
   de: "EUR",
   es: "MXN",
+  sv: "SEK",
   pt: "BRL",
   ru: "RUB",
   uk: "UAH",
   fr: "CHF",
   it: "EUR",
+  nb: "NOK",
   nl: "EUR",
 } as const satisfies Record<SupportedLanguages, SupportedCurrencies>;
 

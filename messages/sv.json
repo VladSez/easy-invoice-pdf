@@ -1,0 +1,143 @@
+{
+  "Metadata": {
+    "about": {
+      "title": "Om EasyInvoicePDF – gratis fakturagenerator med öppen källkod",
+      "description": "Läs hur EasyInvoicePDF hjälper frilansare och småföretag att skapa professionella PDF-fakturor gratis – öppen källkod, integritet först, ingen registrering.",
+      "keywords": "gratis fakturagenerator, skapa PDF-faktura, fakturaverktyg online, faktureringsprogram, fakturagenerator med öppen källkod",
+      "siteName": "EasyInvoicePDF.com | Gratis fakturagenerator"
+    }
+  },
+  "About": {
+    "tagline": "Gratis fakturagenerator med öppen källkod",
+    "hero": {
+      "title": "Skapa professionella fakturor på några sekunder",
+      "description": "EasyInvoicePDF är en <span>gratis fakturagenerator med öppen källkod</span> och förhandsvisning i realtid. Skapa, anpassa och ladda ner professionella fakturor. <span>Ingen registrering krävs.</span>"
+    },
+    "features": {
+      "badge": "Funktioner",
+      "title": "Allt du behöver för professionell fakturering",
+      "description": "Skapa professionella fakturor med förhandsvisning i realtid, direkt PDF-nedladdning, stöd för flera språk, flexibla skattesystem och mer.",
+      "comingSoon": "API-stöd och återkommande fakturor – kommer snart",
+      "items": {
+        "livePreview": {
+          "title": "Förhandsvisning i realtid",
+          "description": "Se fakturan uppdateras i realtid när du gör ändringar, så att den ser ut precis som du vill."
+        },
+        "shareableLinks": {
+          "title": "Delbara länkar",
+          "description": "Skapa länkar för att dela fakturor direkt med kunder utan att skicka bilagor."
+        },
+        "instantDownload": {
+          "title": "Direkt nedladdning",
+          "description": "Ladda ner fakturan som PDF med ett klick, klar att skickas eller skrivas ut."
+        },
+        "multiLanguage": {
+          "title": "Flera språk och valutor",
+          "description": "Skapa fakturor på 10+ språk med stöd för alla större valutor och automatisk formatering."
+        },
+        "taxSupport": {
+          "title": "Stöd för flexibla skattesystem",
+          "description": "Stöd för alla skattesystem, inklusive moms, försäljningsskatt, GST och fler. Helt anpassningsbart efter dina lokala krav."
+        },
+        "openSource": {
+          "title": "Öppen källkod",
+          "description": "Helt gratis och med öppen källkod. Använd det online eller kör det på egen server med full tillgång till koden."
+        },
+        "qrCodeMultiPDFpageSupport": {
+          "title": "QR-kod och PDF med flera sidor",
+          "description": "Lägg till QR-koder med betalningslänkar på fakturorna och skapa PDF:er med flera sidor för längre fakturor med många rader."
+        }
+      }
+    },
+    "cta": {
+      "title": "Klar att förenkla din fakturering?",
+      "description": "Börja skapa professionella fakturor på några sekunder med vårt gratisverktyg med öppen källkod.",
+      "noSignup": "Ingen registrering krävs. 100 % gratis och öppen källkod."
+    },
+    "footer": {
+      "description": "Skapa professionella fakturor på några sekunder med vår gratis fakturagenerator med öppen källkod. 100 % i webbläsaren, ingen registrering krävs. Innehåller förhandsvisning av PDF i realtid och en mall i Stripe-stil – perfekt för frilansare, startups och småföretag.<br></br><br></br>Detta är inte ett bokföringsprogram. Inga garantier om regelefterlevnad. Genom att använda verktyget godkänner du <tosLink>användarvillkoren</tosLink>.",
+      "headings": {
+        "about": "Om EasyInvoicePDF",
+        "solutions": "Lösningar",
+        "product": "Produkt",
+        "company": "Företag",
+        "community": "Community"
+      },
+      "links": {
+        "invoiceGenerator": "Fakturagenerator",
+        "features": "Funktioner",
+        "github": "GitHub",
+        "howItWorks": "Så fungerar det",
+        "changelog": "Ändringslogg",
+        "founder": "Grundare",
+        "resources": "Resurser",
+        "termsOfService": "Användarvillkor"
+      },
+      "createdBy": "Skapad av"
+    },
+    "buttons": {
+      "goToApp": "Öppna appen",
+      "home": "Om oss",
+      "viewOnGithub": "Stjärnmärk på GitHub",
+      "starOnGithub": "Stjärnmärk på GitHub",
+      "switchLanguage": "Byt språk",
+      "shareFeedback": "Lämna feedback",
+      "app": "App",
+      "startInvoicing": "Börja fakturera",
+      "previousFeature": "Föregående funktion",
+      "nextFeature": "Nästa funktion"
+    }
+  },
+  "FAQ": {
+    "title": "Vanliga frågor",
+    "description": "Svar om vår gratis PDF-fakturagenerator: pris, integritet, anpassning av mallar, användning utan konto och delning av fakturor med kunder.",
+    "items": {
+      "whatIs": {
+        "question": "Vad är EasyInvoicePDF?",
+        "answer": "EasyInvoicePDF är en gratis PDF-fakturagenerator online med öppen källkod. Du skapar professionella fakturor i webbläsaren med förhandsvisning av PDF i realtid, flexibla inställningar för skatt och valuta samt utskrivna etiketter på flera språk. Det passar frilansare, konsulter och småföretag som vill fakturera snabbt utan att installera betalprogram."
+      },
+      "isFree": {
+        "question": "Är EasyInvoicePDF gratis att använda?",
+        "answer": "Ja. Grundläggande fakturering, förhandsvisning i realtid och PDF-nedladdning är gratis utan betald prenumeration. Projektet har öppen källkod på GitHub, så du kan granska koden eller köra den på egen server om du föredrar det."
+      },
+      "accountNeeded": {
+        "question": "Behöver jag ett konto för att skapa eller ladda ner en PDF-faktura?",
+        "answer": "Ingen registrering eller inloggning krävs. Öppna redigeraren, fyll i dina uppgifter och ladda ner en PDF med ett klick. Ditt utkast ligger kvar i webbläsaren till dess att du lämnar sidan eller rensar det."
+      },
+      "customization": {
+        "question": "Kan jag anpassa fakturamallen och fälten?",
+        "answer": "Ja. Du kan ange uppgifter om säljare och köpare, fakturarader, valuta, skatteetiketter och belopp, språk för datum och etiketter samt layoutval som ändrar hur PDF:en ser ut. Nya inställningar för mallen tillkommer löpande."
+      },
+      "dataSecurity": {
+        "question": "Är mina fakturauppgifter säkra och privata?",
+        "answer": "Förhandsvisning och PDF-generering körs i din webbläsare utifrån de uppgifter du fyller i där. Vi lagrar inte ditt fakturainnehåll på våra servrar vid vanlig redigering och nedladdning. Delbara länkar bär en komprimerad kopia av fakturan i själva URL:en, inte i ett användarkonto på våra servrar."
+      },
+      "sharing": {
+        "question": "Hur delar jag en faktura med en kund?",
+        "answer": "Använd delningsfunktionen i redigeraren för att kopiera en länk. Länken bär dina fakturauppgifter, så mottagaren kan öppna den i sin webbläsare, granska fakturan och ladda ner PDF:en utan att registrera sig. Alla som har hela länken kan öppna den, så skicka den bara till personer du litar på."
+      },
+      "howItWorks": {
+        "question": "Hur fungerar EasyInvoicePDF?",
+        "answer": "Fyll i dina fakturauppgifter, förhandsvisa PDF:en direkt och ladda sedan ner eller dela fakturan."
+      },
+      "whoItIsFor": {
+        "question": "Vem är EasyInvoicePDF för?",
+        "answer": "EasyInvoicePDF är byggt för frilansare, konsulter, byråer, uppdragstagare och småföretag som behöver en snabb faktura utan komplicerade bokföringsprogram."
+      },
+      "whyEasyInvoicePdf": {
+        "question": "Varför välja EasyInvoicePDF?",
+        "answer": "Till skillnad från traditionella faktureringsplattformar kräver EasyInvoicePDF inget konto och behandlar din faktura helt inne i webbläsaren."
+      }
+    }
+  },
+  "BrowserSupport": {
+    "outdated": {
+      "title": "Din webbläsare är inte uppdaterad",
+      "description": "{browser} {version} är mer än tre år gammal. Uppdatera till den senaste versionen för bästa upplevelse."
+    },
+    "unsupported": {
+      "title": "Din webbläsare stöds inte längre",
+      "description": "{browser} {version} är för gammal för att köra appen tillförlitligt. Uppdatera till den senaste versionen."
+    }
+  }
+}

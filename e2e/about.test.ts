@@ -51,13 +51,13 @@ test.describe("About page", () => {
       await expect(productLink).toBeVisible();
       await expect(productLink).toHaveAttribute("href", "/en/about");
 
-      const changelogLink = header.getByRole("link", {
-        name: "Changelog",
+      const howItWorksLink = header.getByRole("link", {
+        name: "How it works",
         exact: true,
       });
 
-      await expect(changelogLink).toBeVisible();
-      await expect(changelogLink).toHaveAttribute("href", "/changelog");
+      await expect(howItWorksLink).toBeVisible();
+      await expect(howItWorksLink).toHaveAttribute("href", "/how-it-works");
 
       const githubLink = header.getByRole("link", {
         name: "GitHub",
@@ -542,12 +542,17 @@ test.describe("About page", () => {
     await expect(productLink).toBeVisible();
     await expect(productLink).toHaveAttribute("href", "/en/about");
 
-    const changelogLink = header.getByRole("link", {
-      name: "Changelog",
+    const howItWorksLink = header.getByRole("link", {
+      name: "How it works",
       exact: true,
     });
-    await expect(changelogLink).toBeVisible();
-    await expect(changelogLink).toHaveAttribute("href", "/changelog");
+    await expect(howItWorksLink).toBeVisible();
+    await expect(howItWorksLink).toHaveAttribute("href", "/how-it-works");
+
+    // changelog lives in the mobile menu only
+    await expect(
+      header.getByRole("link", { name: "Changelog", exact: true }),
+    ).toBeHidden();
 
     const termsOfServiceLink = header.getByRole("link", {
       name: "Terms of Service",
@@ -625,6 +630,13 @@ test.describe("About page", () => {
     });
     await expect(productLink).toBeVisible();
     await expect(productLink).toHaveAttribute("href", "/en/about");
+
+    const howItWorksLinkMobile = sheet.getByRole("link", {
+      name: "How it works",
+      exact: true,
+    });
+    await expect(howItWorksLinkMobile).toBeVisible();
+    await expect(howItWorksLinkMobile).toHaveAttribute("href", "/how-it-works");
 
     const changelogLink = sheet.getByRole("link", {
       name: "Changelog",

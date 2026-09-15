@@ -7,6 +7,7 @@ import {
   CURRENCY_SYMBOLS,
   CURRENCY_TO_LABEL,
   DEFAULT_DATE_FORMAT,
+  getDateFormatsForLanguage,
   LANGUAGE_TO_LABEL,
   PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_CURRENCIES,
@@ -25,6 +26,7 @@ import {
 } from "@/config";
 
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
+import { expectYouTubeEmbedToShow } from "./utils/youtube-embed";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -165,11 +167,14 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(embed).toBeVisible();
 
-    await expect(embed).toHaveAttribute("src", VIDEO_DEMO_YOUTUBE_URL);
+    await expectYouTubeEmbedToShow({ embed, embedUrl: VIDEO_DEMO_YOUTUBE_URL });
     await expect(embed).toHaveAttribute("title", "EasyInvoicePDF Demo Video");
 
     await dialog.getByTestId("how-it-works-tab-add-seller").click();
-    await expect(embed).toHaveAttribute("src", YOUTUBE_VIDEO_HOW_TO_ADD_SELLER);
+    await expectYouTubeEmbedToShow({
+      embed,
+      embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
+    });
 
     await expect(
       dialog.getByRole("heading", { name: "How to add a seller" }),
@@ -427,8 +432,15 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(dateFormatSelect).toHaveValue(INITIAL_INVOICE_DATA.dateFormat);
 
-    // Verify all supported date formats are available as options with correct labels
-    for (const dateFormat of SUPPORTED_DATE_FORMATS) {
+    // Verify the date formats offered in the initial language are listed with correct
+    // labels. The list is per language: the formats carrying another language's
+    // punctuation ("17. Dezember", "17 de diciembre de", "2025 г.") are left out of
+    // the rest.
+    const offeredDateFormats = getDateFormatsForLanguage(
+      INITIAL_INVOICE_DATA.language,
+    );
+
+    for (const dateFormat of offeredDateFormats) {
       const preview = dayjs().format(dateFormat);
       const isDefault = dateFormat === DEFAULT_DATE_FORMAT;
 
@@ -437,6 +449,26 @@ test.describe("Invoice Generator Page", () => {
       ).toHaveText(
         `${dateFormat} (${preview}) ${isDefault ? "(default)" : ""}`,
       );
+    }
+
+    // and the ones that belong to another language are not offered at all
+    const notOfferedDateFormats = SUPPORTED_DATE_FORMATS.filter(
+      (dateFormat) => {
+        return !offeredDateFormats.includes(dateFormat);
+      },
+    );
+
+    expect(notOfferedDateFormats).toEqual([
+      "D. MMMM YYYY",
+      "D [de] MMMM [de] YYYY",
+      "D MMMM YYYY [г.]",
+      "D MMMM YYYY [р.]",
+    ]);
+
+    for (const dateFormat of notOfferedDateFormats) {
+      await expect(
+        dateFormatSelect.locator(`option[value="${dateFormat}"]`),
+      ).toHaveCount(0);
     }
 
     // Invoice Number

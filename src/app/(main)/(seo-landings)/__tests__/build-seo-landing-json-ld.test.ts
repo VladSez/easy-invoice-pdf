@@ -21,7 +21,7 @@ describe("buildSeoLandingJsonLd", () => {
     expect(webPage).toMatchObject({
       "@type": "WebPage",
       "@id": "https://easyinvoicepdf.com/invoice-generator-no-login#webpage",
-      name: "Invoice Generator With No Login or Signup Required",
+      name: "Free Invoice Generator - No Login, No Signup",
       mainEntity: {
         "@id": "https://easyinvoicepdf.com/invoice-generator-no-login#faq",
       },
@@ -58,7 +58,7 @@ describe("buildSeoLandingJsonLd", () => {
       "@type": "SoftwareApplication",
       "@id":
         "https://easyinvoicepdf.com/open-source-invoice-generator#software",
-      name: "Open Source Invoice Generator (Free, No Signup) | EasyInvoicePDF",
+      name: "Open Source Invoice Generator - Free, Self-Hostable",
       offers: {
         price: "0",
         priceCurrency: "EUR",

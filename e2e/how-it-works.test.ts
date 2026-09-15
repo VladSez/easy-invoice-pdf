@@ -8,6 +8,8 @@ import {
   YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
 } from "@/config";
 
+import { expectYouTubeEmbedToShow } from "./utils/youtube-embed";
+
 test.describe("How it works page", () => {
   test("should display page content and video tutorials", async ({ page }) => {
     await page.goto("/how-it-works");
@@ -43,13 +45,16 @@ test.describe("How it works page", () => {
     const embed = page.getByTestId("how-it-works-video");
 
     await expect(embed).toBeVisible();
-    await expect(embed).toHaveAttribute("src", VIDEO_DEMO_YOUTUBE_URL);
+    await expectYouTubeEmbedToShow({ embed, embedUrl: VIDEO_DEMO_YOUTUBE_URL });
     await expect(embed).toHaveAttribute("title", "EasyInvoicePDF Demo Video");
 
     const sellerTab = page.getByTestId("how-it-works-tab-add-seller");
 
     await sellerTab.click();
-    await expect(embed).toHaveAttribute("src", YOUTUBE_VIDEO_HOW_TO_ADD_SELLER);
+    await expectYouTubeEmbedToShow({
+      embed,
+      embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
+    });
 
     await expect(sellerTab).toBeVisible();
     await expect(sellerTab).toHaveAttribute("role", "tab");
@@ -93,7 +98,10 @@ test.describe("How it works page", () => {
 
     const embed = page.getByTestId("how-it-works-video");
 
-    await expect(embed).toHaveAttribute("src", YOUTUBE_VIDEO_HOW_TO_ADD_BUYER);
+    await expectYouTubeEmbedToShow({
+      embed,
+      embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_BUYER,
+    });
 
     const buyerTab = page.getByTestId("how-it-works-tab-add-buyer");
     await expect(buyerTab).toBeVisible();

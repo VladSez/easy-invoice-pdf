@@ -25,11 +25,11 @@ import {
   isServicePeriodStartInCurrentMonth,
 } from "@/app/(main)/(app)/utils/format-service-period";
 import {
-  DEFAULT_DATE_FORMAT,
   type InvoiceData,
   LANGUAGE_TO_LABEL,
-  STRIPE_DEFAULT_DATE_FORMAT,
-  SUPPORTED_DATE_FORMATS,
+  DEFAULT_DATE_FORMAT,
+  getDateFormatsForLanguage,
+  getDefaultDateFormat,
   SUPPORTED_LANGUAGES,
   SUPPORTED_TEMPLATES,
   TEMPLATE_TO_LABEL,
@@ -43,6 +43,7 @@ import { SelectNative } from "@/components/ui/select-native";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
 
 import { convertFileToBase64, validateImageSize } from "../utils/logo-upload";
@@ -227,6 +228,15 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                     field.onChange(e);
 
+                    // `invoice_template` is the key `download_invoice` already reports the
+                    // template under, so the two read together in the dashboard.
+                    umamiTrackEvent("invoice_template_changed", {
+                      data: {
+                        invoice_template: newTemplate,
+                        previous_invoice_template: template,
+                      },
+                    });
+
                     // When the user changes the invoice template, automatically update the invoice number label
                     // so it matches the default convention for the selected template and current language.
                     setValue(
@@ -236,10 +246,14 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                     // Handles template-specific form updates for better UX
 
-                    if (newTemplate === "stripe") {
-                      // Set date format to "MMMM D, YYYY" when template is Stripe
-                      setValue("dateFormat", STRIPE_DEFAULT_DATE_FORMAT);
+                    // The template decides whether the month is spelled out, the language
+                    // decides how that month is written.
+                    setValue(
+                      "dateFormat",
+                      getDefaultDateFormat({ language, template: newTemplate }),
+                    );
 
+                    if (newTemplate === "stripe") {
                       // Set unit field to be HIDDEN by default for Stripe template (matches stripe template behaviour)
                       setValue("items.0.unitFieldIsVisible", false);
 
@@ -250,9 +264,6 @@ export const GeneralInformation = memo(function GeneralInformation({
                       if (errors.stripePayOnlineUrl) {
                         setValue("stripePayOnlineUrl", "");
                       }
-
-                      // Set date format to "YYYY-MM-DD" when template is default
-                      setValue("dateFormat", DEFAULT_DATE_FORMAT);
 
                       // Set unit field to be VISIBLE for default template
                       setValue("items.0.unitFieldIsVisible", true);
@@ -310,6 +321,14 @@ export const GeneralInformation = memo(function GeneralInformation({
                     const newLanguage = e.target
                       .value as keyof typeof INVOICE_PDF_TRANSLATIONS;
 
+                    umamiTrackEvent("invoice_language_changed", {
+                      data: {
+                        language: newLanguage,
+                        previous_language: language,
+                        invoice_template: template,
+                      },
+                    });
+
                     // we need to keep the invoice number suffix (e.g. 1/MM-YYYY) for better user experience, when switching language
                     setValue(
                       "invoiceNumberObject.label",
@@ -337,6 +356,13 @@ export const GeneralInformation = memo(function GeneralInformation({
                     // This ensures the tax column header in the invoice items table
                     // displays the correct translation for the selected language
                     setValue("taxLabelText", newTranslation);
+
+                    // Update DATE FORMAT when language changes, so the spelled-out month
+                    // the Stripe template prints reads the way the language writes it
+                    setValue(
+                      "dateFormat",
+                      getDefaultDateFormat({ language: newLanguage, template }),
+                    );
 
                     setValue(
                       "servicePeriodLabelText",
@@ -420,16 +446,26 @@ export const GeneralInformation = memo(function GeneralInformation({
                     inputErrorClassName(!!errors.dateFormat),
                   )}
                 >
-                  {SUPPORTED_DATE_FORMATS.map((format) => {
+                  {getDateFormatsForLanguage(language).map((format) => {
                     const preview = formatTodayWithLocale({
                       selectedDateFormat: format,
                       language,
                     });
-                    const isDefault = format === DEFAULT_DATE_FORMAT;
+                    // The marker follows the same resolver the form applies, so it
+                    // points at the Stripe template's long date when that is what a
+                    // reset would pick.
+                    const isDefault =
+                      format === getDefaultDateFormat({ language, template });
+
+                    // `[de]` is dayjs escape syntax for a literal. The brackets mean
+                    // nothing to the reader, so the pattern is shown without them.
+                    // oxlint-disable-next-line unicorn/prefer-string-replace-all -- `String#replaceAll` is Safari 13.1; `.browserslistrc` targets Safari 12, and SWC lowers syntax but never polyfills a built-in
+                    const patternLabel = format.replace(/[[\]]/g, "");
 
                     return (
                       <option key={format} value={format}>
-                        {format} ({preview}) {isDefault ? "(default)" : ""}
+                        {patternLabel} ({preview}){" "}
+                        {isDefault ? "(default)" : ""}
                       </option>
                     );
                   })}

@@ -45,7 +45,10 @@ export function HeaderClient({
     .toLowerCase();
 
   return (
-    <header className="sticky top-4 z-50 w-full px-2 md:px-6">
+    <header
+      className="sticky top-4 z-50 w-full px-2 md:px-6"
+      data-testid="header"
+    >
       <div className="flex items-center justify-center">
         <div className="container h-16 rounded-3xl bg-gradient-to-r from-white/90 to-white/95 px-4 shadow-sm ring-1 ring-stone-200 backdrop-blur-md md:px-6">
           <div className="flex h-full items-center justify-between gap-4">
@@ -98,8 +101,8 @@ export function HeaderClient({
                 </a>
 
                 {/*  eslint-disable-next-line @next/next/no-html-link-for-pages */}
-                <a href="/changelog" className={cn(desktopNavLinkClass)}>
-                  {translations.changelogLinkText}
+                <a href="/how-it-works" className={cn(desktopNavLinkClass)}>
+                  {translations.howItWorksLinkText}
                 </a>
                 {/*  eslint-disable-next-line @next/next/no-html-link-for-pages */}
                 <a href="/tos" className={cn(desktopNavLinkClass)}>
@@ -175,6 +178,7 @@ const defaultTranslations = {
   switchLanguageText: "Switch Language",
   goToAppText: "Open app",
   startInvoicingButtonText: "Start Invoicing",
+  howItWorksLinkText: "How it works",
   changelogLinkText: "Changelog",
   termsOfServiceLinkText: "Terms of Service",
 } as const satisfies HeaderProps["translations"];
