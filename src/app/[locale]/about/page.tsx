@@ -37,6 +37,7 @@ export default function AboutPage() {
 
   const startInvoicingButtonText = t("buttons.startInvoicing");
 
+  const howItWorksLinkText = t("footer.links.howItWorks");
   const changelogLinkText = t("footer.links.changelog");
   const termsOfServiceLinkText = t("footer.links.termsOfService");
 
@@ -51,6 +52,7 @@ export default function AboutPage() {
             switchLanguageText,
             goToAppText,
             startInvoicingButtonText,
+            howItWorksLinkText,
             changelogLinkText,
             termsOfServiceLinkText,
           }}

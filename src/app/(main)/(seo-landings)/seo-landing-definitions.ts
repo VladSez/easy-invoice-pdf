@@ -67,17 +67,22 @@ export interface SeoLandingDefinition {
      * otherwise invisible to both search engines and answer engines.
      */
     heroVideo?: {
-      /** `https://www.youtube.com/embed/<id>`, what the iframe loads. */
+      /**
+       * `https://www.youtube.com/embed/<id>`, what the iframe loads and what the
+       * `VideoObject` declares. There is no `contentUrl` alongside it: that property is
+       * for the video file's own bytes, which YouTube never hands out.
+       */
       embedUrl: string;
-      /** `https://www.youtube.com/watch?v=<id>`, the canonical page for the clip. */
-      watchUrl: string;
       /** The video's own title, as published. */
       title: string;
       /** One sentence on what the clip shows. */
       description: string;
       /** Publication timestamp, ISO 8601. Required for video rich results. */
       uploadDate: string;
-      /** Poster frame, e.g. `https://i.ytimg.com/vi/<id>/maxresdefault.jpg`. */
+      /**
+       * Poster frame, e.g. `https://i.ytimg.com/vi/<id>/maxresdefault.jpg`. Spelled out
+       * rather than derived from {@link embedUrl}: it must name the same video id.
+       */
       thumbnailUrl: string;
     };
   };
@@ -124,7 +129,6 @@ export const SEO_LANDING_DEFINITIONS = {
       heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_DEMO_HERO_YOUTUBE_URL,
-        watchUrl: "https://www.youtube.com/watch?v=wkecHuXWLSQ",
         title: "EasyInvoicePDF: Full demo #invoice #oss #freelancelife",
         description:
           "A full walkthrough of filling in an invoice and downloading it as a PDF, without an account.",
@@ -315,7 +319,6 @@ export const SEO_LANDING_DEFINITIONS = {
       heroImage: `${STATIC_ASSETS_URL}/seo-content/str-tmp-v2.png`,
       heroVideo: {
         embedUrl: VIDEO_LIVE_PREVIEW_YOUTUBE_URL,
-        watchUrl: "https://www.youtube.com/watch?v=pWkb_JcKouU",
         title: "EasyInvoicePDF: Live PDF Preview #invoice #oss #freelancelife",
         description:
           "The PDF preview updating as the invoice form is filled in, rendered in the browser.",
@@ -652,7 +655,6 @@ export const SEO_LANDING_DEFINITIONS = {
       heroImage: `${STATIC_ASSETS_URL}/seo-content/def-tmp-v2.png`,
       heroVideo: {
         embedUrl: VIDEO_DEMO_HERO_YOUTUBE_URL,
-        watchUrl: "https://www.youtube.com/watch?v=wkecHuXWLSQ",
         title: "EasyInvoicePDF: Full demo #invoice #oss #freelancelife",
         description:
           "A full walkthrough of filling in an invoice and downloading it as a PDF, without an account.",
@@ -854,7 +856,6 @@ export const SEO_LANDING_DEFINITIONS = {
       heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_MULTI_LANGUAGE_YOUTUBE_URL,
-        watchUrl: "https://www.youtube.com/watch?v=ITMeKohyz3I",
         title:
           "EasyInvoicePDF: 10 languages and 100+ currencies support #invoice #oss #freelancelife",
         description:
@@ -1046,7 +1047,6 @@ export const SEO_LANDING_DEFINITIONS = {
       heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_NORDIC_INVOICE_YOUTUBE_URL,
-        watchUrl: "https://www.youtube.com/watch?v=cFFR-Y_obcU",
         title: "EasyInvoicePDF: Swedish and Norwegian Invoice Generator",
         description:
           "A walkthrough of creating an invoice in Swedish and in Norwegian, with SEK and NOK amounts.",
@@ -1221,7 +1221,6 @@ export const SEO_LANDING_DEFINITIONS = {
       heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_NORDIC_INVOICE_YOUTUBE_URL,
-        watchUrl: "https://www.youtube.com/watch?v=cFFR-Y_obcU",
         title: "EasyInvoicePDF: Swedish and Norwegian Invoice Generator",
         description:
           "A walkthrough of creating an invoice in Swedish and in Norwegian, with SEK and NOK amounts.",

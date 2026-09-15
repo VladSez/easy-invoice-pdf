@@ -56,6 +56,7 @@ export function MobileMenuPanel({
     .format(githubStarsCount)
     .toLowerCase();
 
+  const isHowItWorksActive = pathname === "/how-it-works";
   const isChangelogActive = pathname === "/changelog";
   const isTosActive = pathname === "/tos";
   const isHomeActive = pathname === `/${locale}/about`;
@@ -79,6 +80,7 @@ export function MobileMenuPanel({
     <div
       role="dialog"
       aria-modal="false"
+      data-testid="mobile-menu"
       aria-labelledby={titleId}
       aria-describedby={descriptionId}
       className={cn(
@@ -90,8 +92,9 @@ export function MobileMenuPanel({
         Mobile Menu
       </h2>
       <p id={descriptionId} className="sr-only">
-        Mobile navigation menu with links to features, FAQ, changelog, terms of
-        service, invoice pdf generator app, and language settings
+        Mobile navigation menu with links to features, FAQ, how it works,
+        changelog, terms of service, invoice pdf generator app, and language
+        settings
       </p>
 
       <div className="flex w-full flex-col justify-center gap-1 px-6 py-4 sm:px-8 sm:py-5 md:gap-3 md:px-12 md:py-8">
@@ -105,6 +108,18 @@ export function MobileMenuPanel({
             onClick={close}
           >
             {translations.navLinks.home}
+          </a>
+
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a
+            href="/how-it-works"
+            className={cn(
+              mobileNavLinkClass,
+              isHowItWorksActive ? activeMobileNavLinkClass : "text-slate-700",
+            )}
+            onClick={close}
+          >
+            {translations.howItWorksLinkText}
           </a>
 
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}

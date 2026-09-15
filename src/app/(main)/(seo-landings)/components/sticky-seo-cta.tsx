@@ -94,7 +94,7 @@ export function StickySeoCta({
         <Button
           asChild
           size="sm"
-          className="h-9 min-w-0 rounded-full border border-white/40 bg-transparent px-4 text-sm text-white hover:bg-white/10 hover:text-white"
+          className="h-9 min-w-0 rounded-full border border-white/40 !bg-zinc-900 px-4 text-sm text-white hover:bg-white/10 hover:text-white"
         >
           <Link
             href={href}

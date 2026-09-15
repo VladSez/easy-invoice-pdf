@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "better-ui": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-ui/SKILL.md",
+      "computedHash": "d05cf568f197e47b15e71e21b19be1897eba2bf187ef7b0a341bc5ffaf3ffd4d"
+    },
     "caveman": {
       "source": "JuliusBrussee/caveman",
       "sourceType": "github",
@@ -25,9 +31,10 @@
       "computedHash": "9645a4829de2bedaa2b91418ddd877eab8ea1d2e9da9683c660d47d033428244"
     },
     "emil-design-eng": {
-      "source": "emilkowalski/skill",
+      "source": "emilkowalski/skills",
       "sourceType": "github",
-      "computedHash": "32f63a1e56fc41f53497f7b19d6391b7c3e55bedd884c5a4d10bc4eacd2310e4"
+      "skillPath": "skills/emil-design-eng/SKILL.md",
+      "computedHash": "41b0a4dc1a27164fe297845a6c6850a39e9242c42c9be999967fcee9df2c5974"
     },
     "frontend-design": {
       "source": "anthropics/skills",

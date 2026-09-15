@@ -17,6 +17,7 @@ export interface HeaderProps {
     switchLanguageText: string;
     goToAppText: string;
     startInvoicingButtonText: string;
+    howItWorksLinkText: string;
     changelogLinkText: string;
     termsOfServiceLinkText: string;
   };
