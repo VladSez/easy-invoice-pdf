@@ -98,7 +98,6 @@ export function StickySeoCta({
         >
           <Link
             href={href}
-            scroll={false}
             data-testid="seo-sticky-cta"
             onClick={() => {
               umamiTrackEvent("seo_sticky_cta_clicked", {
