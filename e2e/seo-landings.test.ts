@@ -121,9 +121,13 @@ test.describe("SEO landing pages", () => {
     // counts an `opacity: 0` element as visible
     await expect(stickyRoot).toHaveAttribute("inert", "");
 
-    // scrolling the hero CTA away brings it out
+    // scrolling the hero CTA away brings it out. The scroll is programmatic rather than
+    // `mouse.wheel`, which mobile WebKit does not support at all, and it moves two
+    // viewports past the hero CTA so the hero is gone on a phone as well as a desktop.
     await heroCta.first().scrollIntoViewIfNeeded();
-    await page.mouse.wheel(0, 1400);
+    await page.evaluate(() => {
+      window.scrollBy(0, window.innerHeight * 2);
+    });
     await expect(stickyRoot).not.toHaveAttribute("inert", "");
 
     // the CTAs further down no longer send it away
@@ -134,7 +138,9 @@ test.describe("SEO landing pages", () => {
     await expect(stickyRoot).not.toHaveAttribute("inert", "");
 
     // back at the top it parks again
-    await page.mouse.wheel(0, -20_000);
+    await page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
     await expect(stickyRoot).toHaveAttribute("inert", "");
   });
 
