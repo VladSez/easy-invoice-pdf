@@ -20,7 +20,7 @@
     {
       "id": 2,
       "prompt": "Create a comparison page strategy. We want pages like 'Notion vs Asana', 'Notion vs Monday', etc. for all our competitors. We have 15 competitors.",
-      "expected_output": "Should identify this as the Comparisons playbook. Should apply the programmatic approach for competitor comparison pages at scale. Should recommend: template structure for comparison pages, unique data per comparison (not just the same template with names swapped), keyword research for each '[competitor A] vs [competitor B]' variation, URL structure (/compare/notion-vs-asana), internal linking between comparison pages, and quality checks. Should cross-reference the competitors skill for page content structure.",
+      "expected_output": "Should identify this as the Comparisons playbook. Should apply the programmatic approach for competitor comparison pages at scale. Should recommend: template structure for comparison pages, unique data per comparison (not just the same template with names swapped), keyword research for each '[competitor A] vs [competitor B]' variation, URL structure (/compare/notion-vs-asana), internal linking between comparison pages, and quality checks. Should cross-reference the competitor-analysis skill for page content structure.",
       "assertions": [
         "Identifies as Comparisons playbook",
         "Recommends template structure for scale",
@@ -28,7 +28,7 @@
         "Includes keyword research for variations",
         "Provides URL structure recommendation",
         "Includes internal linking strategy",
-        "Cross-references competitors skill",
+        "Cross-references competitor-analysis skill",
         "Applies quality checks"
       ],
       "files": []
