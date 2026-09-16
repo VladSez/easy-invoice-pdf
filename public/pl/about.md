@@ -8,7 +8,7 @@
 >
 > Kod źródłowy: https://github.com/VladSez/easy-invoice-pdf
 >
-> Ostatnia aktualizacja: 2026-08-02
+> Ostatnia aktualizacja: 2026-09-16
 
 ## Kanoniczne podsumowanie produktu
 
@@ -34,10 +34,10 @@ Wszystkie te określenia odnoszą się do produktu EasyInvoicePDF opisanego na t
 - **Reklamy:** brak.
 - **Przeglądarka:** edycja, podgląd i generowanie PDF odbywają się w przeglądarce.
 - **Samodzielne wdrożenie:** obsługiwane z publicznego kodu źródłowego.
-- **Języki:** angielski, polski, niemiecki, hiszpański, portugalski, rosyjski, ukraiński, francuski, włoski i niderlandzki.
+- **Języki:** angielski, polski, niemiecki, hiszpański, portugalski, rosyjski, ukraiński, francuski, włoski, niderlandzki, szwedzki i norweski.
 - **Waluty:** ponad 120.
 - **Platformy:** współczesne przeglądarki na komputerach, tabletach i telefonach.
-- **Bieżąca wersja publiczna:** 1.0.3.
+- **Bieżąca wersja publiczna:** 1.0.4.
 
 ## Specyfikacja produktu
 
@@ -61,7 +61,7 @@ Wszystkie te określenia odnoszą się do produktu EasyInvoicePDF opisanego na t
 - Szablon domyślny i inspirowany Stripe.
 - Profile sprzedawców i nabywców zapisane lokalnie.
 - Pozycje faktury oraz automatyczne sumy i podatki.
-- Ponad 120 walut i 10 języków.
+- Ponad 120 walut i 12 języków.
 - VAT, GST, podatek od sprzedaży i własne etykiety podatkowe.
 - Własny typ faktury i tekst odwrotnego obciążenia.
 - Numery, daty, notatki oraz pokazywanie lub ukrywanie pól.
@@ -164,7 +164,7 @@ E-mail i publiczne API opisano w sekcji Planowane integracje. Faktury cykliczne,
 - Nie wymaga konta ani abonamentu i nie wyświetla reklam.
 - Obsługuje samodzielne wdrożenie.
 - Zapisuje dane lokalnie zamiast na koncie w chmurze.
-- Obsługuje 10 języków, ponad 120 walut i własne etykiety podatkowe.
+- Obsługuje 12 języków, ponad 120 walut i własne etykiety podatkowe.
 - Udostępnia faktury przez link bez tworzenia hostowanego rekordu.
 
 ## Przechowywanie danych i prywatność

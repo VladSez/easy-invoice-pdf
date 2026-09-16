@@ -5,7 +5,10 @@ import { locale as rootLocale } from "next/root-params";
 
 import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
 import { routing } from "@/i18n/routing";
-import { OPEN_GRAPH_LOCALE_BY_LOCALE } from "@/lib/seo/locale-utils";
+import {
+  buildHreflangAlternates,
+  OPEN_GRAPH_LOCALE_BY_LOCALE,
+} from "@/lib/seo/locale-utils";
 
 import type EnMessages from "../../../../messages/en.json";
 import { AboutJsonLd } from "./about-json-ld";
@@ -31,20 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
         types: {
           "text/markdown": `${APP_URL}/${locale}/about.md`,
         },
-        languages: {
-          // @ts-expect-error - x-default is not a valid locale
-          "x-default": `${APP_URL}/en/about`,
-          en: `${APP_URL}/en/about`,
-          pl: `${APP_URL}/pl/about`,
-          de: `${APP_URL}/de/about`,
-          es: `${APP_URL}/es/about`,
-          pt: `${APP_URL}/pt/about`,
-          ru: `${APP_URL}/ru/about`,
-          uk: `${APP_URL}/uk/about`,
-          fr: `${APP_URL}/fr/about`,
-          it: `${APP_URL}/it/about`,
-          nl: `${APP_URL}/nl/about`,
-        } satisfies Record<Locale, string>,
+        languages: buildHreflangAlternates("about"),
       },
       openGraph: {
         title: messages.Metadata.about.title,

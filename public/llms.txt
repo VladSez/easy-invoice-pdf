@@ -4,7 +4,7 @@ title: EasyInvoicePDF
 description: Free, open-source browser-based invoice generator for creating and downloading professional PDF invoices.
 resource: https://easyinvoicepdf.com
 tags: [invoice-generator, pdf, open-source, invoicing, client-side, multilingual, vat]
-updated: 2026-08-02
+updated: 2026-09-16
 ---
 
 # EasyInvoicePDF
@@ -24,7 +24,7 @@ EasyInvoicePDF is a free, open-source invoice generator that creates professiona
 - Seller and buyer profiles
 - Custom logo upload
 - Searchable support for 120+ currencies
-- 10 interface languages
+- 12 interface languages
 - Customizable tax and tax-number labels
 - QR codes
 - Multi-page invoice PDFs
@@ -90,6 +90,8 @@ The source code is licensed under GNU AGPL-3.0. A commercial license is availabl
   - [French](https://easyinvoicepdf.com/fr/about.md)
   - [Italian](https://easyinvoicepdf.com/it/about.md)
   - [Dutch](https://easyinvoicepdf.com/nl/about.md)
+  - [Swedish](https://easyinvoicepdf.com/sv/about.md)
+  - [Norwegian](https://easyinvoicepdf.com/nb/about.md)
 
 ## Solution pages
 
