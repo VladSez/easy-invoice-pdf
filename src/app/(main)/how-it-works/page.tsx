@@ -7,17 +7,12 @@ import { HOW_IT_WORKS_VIDEOS } from "@/config";
 import { cn } from "@/lib/utils";
 
 /**
- * A 1px ring plus two depth layers, all transparent, so a surface reads the same on
+ * A 1px ring plus a soft drop shadow, both transparent, so a surface reads the same on
  * white and on a tinted background. Hairlines that divide rather than lift stay borders.
  */
-const SURFACE_SHADOW =
-  "shadow-[0px_0px_0px_1px_oklch(0_0_0/0.06),0px_1px_2px_-1px_oklch(0_0_0/0.06),0px_2px_4px_0px_oklch(0_0_0/0.04)]";
+const SURFACE_SHADOW = "shadow-sm ring-1 ring-black/[0.06]";
 
-const SURFACE_SHADOW_HOVER =
-  "hover:shadow-[0px_0px_0px_1px_oklch(0_0_0/0.08),0px_2px_4px_-2px_oklch(0_0_0/0.10),0px_8px_16px_-6px_oklch(0_0_0/0.08)]";
-
-/** Strong ease-out. The built-in `ease-out` is too weak to read as intentional. */
-const EASE_OUT = "ease-[cubic-bezier(0.23,1,0.32,1)]";
+const SURFACE_SHADOW_HOVER = "hover:shadow-lg hover:ring-black/[0.08]";
 
 const linkClassName =
   "font-medium text-slate-950 underline decoration-slate-400 underline-offset-2 transition-colors hover:text-slate-950/90 hover:decoration-slate-500";
@@ -94,8 +89,7 @@ export default function HowItWorksPage() {
                   className={cn(
                     // Outer radius = inner radius + padding: 16 = 12 + 4.
                     "group flex h-full flex-col rounded-2xl bg-white p-1",
-                    "transition-[box-shadow] duration-200",
-                    EASE_OUT,
+                    "transition-[box-shadow] duration-200 ease-out-strong",
                     SURFACE_SHADOW,
                     SURFACE_SHADOW_HOVER,
                   )}
@@ -192,8 +186,7 @@ function TutorialThumbnail({ src, className }: TutorialThumbnailProps) {
           // A neutral hairline, never a tinted one: a tinted outline picks up the
           // surface underneath and reads as dirt on the image edge.
           "h-full w-full object-cover outline outline-1 -outline-offset-1 outline-black/10",
-          "transition-transform duration-300 motion-safe:group-hover:scale-[1.03]",
-          EASE_OUT,
+          "transition-transform duration-300 ease-out-strong motion-safe:group-hover:scale-[1.03]",
         )}
       />
       <span
@@ -203,8 +196,7 @@ function TutorialThumbnail({ src, className }: TutorialThumbnailProps) {
         <span
           className={cn(
             "flex size-11 items-center justify-center rounded-full bg-white/95 shadow-sm",
-            "transition-transform duration-200 motion-safe:group-hover:scale-105",
-            EASE_OUT,
+            "transition-transform duration-200 ease-out-strong motion-safe:group-hover:scale-105",
           )}
         >
           {/* Triangles sit left of their optical centre; nudge the glyph right. */}
@@ -228,17 +220,13 @@ function StartInvoicingButton() {
         // not look pushed against the edge.
         "group inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-white pe-[30px] ps-8 text-base font-medium text-slate-900",
         // Press feedback: never below 0.95, which reads as a bounce rather than a press.
-        "transition-[background-color,transform] duration-150 hover:bg-slate-100 active:scale-[0.96]",
+        "transition-[background-color,transform] duration-150 ease-out-strong hover:bg-slate-100 active:scale-[0.96]",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
-        EASE_OUT,
       )}
     >
       <span>Start Invoicing</span>
       <ArrowRightIcon
-        className={cn(
-          "size-5 transition-transform duration-200 motion-safe:group-hover:translate-x-1",
-          EASE_OUT,
-        )}
+        className="size-5 transition-transform duration-200 ease-out-strong motion-safe:group-hover:translate-x-1"
         strokeWidth={2}
         aria-hidden
       />

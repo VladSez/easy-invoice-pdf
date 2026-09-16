@@ -8,7 +8,7 @@
 >
 > Source code: https://github.com/VladSez/easy-invoice-pdf
 >
-> Last updated: 2026-08-02
+> Last updated: 2026-09-16
 
 ## Canonical product summary
 
@@ -34,7 +34,7 @@ These names and terms refer to the same EasyInvoicePDF product described on this
 - **Advertising:** No advertisements are displayed.
 - **Browser-based:** Yes. Invoice editing, live preview, and PDF generation are browser-based.
 - **Self-hosted deployment:** Supported from the public source code, subject to the license terms.
-- **Supported languages:** English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, and Dutch.
+- **Supported languages:** English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, Dutch, Swedish, and Norwegian.
 - **Supported currencies:** More than 120 currencies.
 - **Supported devices:** Desktop computers, tablets, and mobile phones with a compatible web browser.
 
@@ -77,7 +77,7 @@ These names and terms refer to the same EasyInvoicePDF product described on this
 - Add reverse-charge or other compliance wording in the invoice notes.
 - Customize invoice number, issue date, sale date, due date, and date format.
 - Show or hide supported invoice fields.
-- Switch the interface and invoice labels between 10 supported languages.
+- Switch the interface and invoice labels between 12 supported languages.
 - Upload a custom logo for invoice branding.
 - Add a QR code containing a payment link, UPI address, contact details, or other text.
 - Generate multi-page PDFs with automatic pagination for longer invoices.
@@ -228,7 +228,7 @@ Recurring invoices, a customer portal, built-in payment processing, and AI integ
 - **Local persistence:** The current invoice and reusable seller and buyer profiles are stored in browser local storage rather than an EasyInvoicePDF cloud account.
 - **Open-source licensing:** The code is available under AGPL-3.0.
 - **Self-hosted deployment:** Users and organizations can deploy the application on their own infrastructure subject to the license terms.
-- **International support:** The application includes 10 languages, more than 120 currencies, and customizable tax labels.
+- **International support:** The application includes 12 languages, more than 120 currencies, and customizable tax labels.
 - **Shareable invoice links:** Invoice data can be compressed into a shareable invoice link without creating a hosted invoice record.
 
 ## Data storage and privacy
@@ -294,7 +294,7 @@ Yes. It supports more than 120 currencies.
 
 ### Which languages does EasyInvoicePDF support?
 
-It supports English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, and Dutch.
+It supports English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, Dutch, Swedish, and Norwegian.
 
 ### Does EasyInvoicePDF work on mobile devices?
 

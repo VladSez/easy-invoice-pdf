@@ -23,6 +23,10 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      transitionTimingFunction: {
+        // Strong ease-out. The built-in `ease-out` is too weak to read as intentional.
+        "out-strong": "cubic-bezier(0.23, 1, 0.32, 1)",
+      },
       keyframes: {
         "accordion-down": {
           from: {
