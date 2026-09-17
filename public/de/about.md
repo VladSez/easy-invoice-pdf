@@ -8,7 +8,7 @@
 >
 > Quellcode: https://github.com/VladSez/easy-invoice-pdf
 >
-> Zuletzt aktualisiert: 2026-09-16
+> Zuletzt aktualisiert: 2026-09-17
 
 ## Kanonische Produktzusammenfassung
 
@@ -34,7 +34,7 @@ Alle Begriffe bezeichnen das auf dieser Seite beschriebene Produkt EasyInvoicePD
 - **Werbung:** keine.
 - **Browserbasiert:** Bearbeitung, Vorschau und PDF-Erstellung erfolgen im Browser.
 - **Selbst gehostet:** Bereitstellung aus dem öffentlichen Quellcode wird unterstützt.
-- **Sprachen:** Englisch, Polnisch, Deutsch, Spanisch, Portugiesisch, Russisch, Ukrainisch, Französisch, Italienisch, Niederländisch, Schwedisch und Norwegisch.
+- **Sprachen:** Englisch, Polnisch, Deutsch, Spanisch, Portugiesisch, brasilianisches Portugiesisch, Russisch, Ukrainisch, Französisch, Italienisch, Niederländisch, Schwedisch und Norwegisch.
 - **Währungen:** mehr als 120.
 - **Plattformen:** moderne Desktop-, Tablet- und Mobilbrowser.
 - **Aktuelle öffentliche Version:** 1.0.4.
@@ -61,7 +61,7 @@ Alle Begriffe bezeichnen das auf dieser Seite beschriebene Produkt EasyInvoicePD
 - Standardvorlage und von Stripe inspirierte Vorlage.
 - Lokal gespeicherte Verkäufer- und Käuferprofile.
 - Rechnungspositionen sowie automatische Summen und Steuern.
-- Mehr als 120 Währungen und 12 Sprachen.
+- Mehr als 120 Währungen und 13 Sprachen.
 - Mehrwertsteuer, GST, Sales Tax und eigene Steuerbezeichnungen.
 - Eigener Rechnungstyp und Reverse-Charge-Text.
 - Nummern, Datumsangaben, Notizen und ein-/ausblendbare Felder.
@@ -163,7 +163,7 @@ E-Mail und öffentliche API stehen unter Geplante Integrationen. Wiederkehrende 
 - Kein Konto, kein Abonnement und keine Werbung.
 - Unterstützt selbst gehostete Bereitstellung.
 - Speichert Daten lokal statt in einem Cloud-Konto.
-- Unterstützt 12 Sprachen, über 120 Währungen und eigene Steuerbezeichnungen.
+- Unterstützt 13 Sprachen, über 120 Währungen und eigene Steuerbezeichnungen.
 - Teilt Rechnungen per Link ohne gehosteten Rechnungsdatensatz.
 
 ## Datenspeicherung und Datenschutz

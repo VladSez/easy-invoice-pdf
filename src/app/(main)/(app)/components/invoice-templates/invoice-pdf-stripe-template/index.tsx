@@ -32,6 +32,7 @@ import "dayjs/locale/it";
 import "dayjs/locale/nb";
 import "dayjs/locale/nl";
 import "dayjs/locale/pl";
+import "dayjs/locale/pt-br";
 import "dayjs/locale/pt";
 import "dayjs/locale/ru";
 import "dayjs/locale/sv";

@@ -1,12 +1,12 @@
 import { defineRouting } from "next-intl/routing";
 
-import { SUPPORTED_LANGUAGES } from "@/app/schema";
+import { SUPPORTED_I18N_LOCALES } from "@/app/schema";
 
-const defaultLocaleEN = SUPPORTED_LANGUAGES[0];
+const defaultLocaleEN = SUPPORTED_I18N_LOCALES[0];
 
 export const routing = defineRouting({
   // A list of all locales that are supported
-  locales: SUPPORTED_LANGUAGES,
+  locales: SUPPORTED_I18N_LOCALES,
 
   // Used when no locale matches
   defaultLocale: defaultLocaleEN,

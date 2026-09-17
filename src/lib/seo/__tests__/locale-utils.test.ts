@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { SUPPORTED_LANGUAGES } from "@/app/schema";
+import { SUPPORTED_I18N_LOCALES } from "@/app/schema";
 import { APP_URL } from "@/config";
 import {
   buildHreflangAlternates,
@@ -8,16 +8,16 @@ import {
 } from "@/lib/seo/locale-utils";
 
 describe("buildHreflangAlternates", () => {
-  it("annotates every supported language plus x-default", () => {
+  it("annotates every supported locale plus x-default", () => {
     const alternates = buildHreflangAlternates("about");
 
     expect(Object.keys(alternates).toSorted()).toEqual(
-      ["x-default", ...SUPPORTED_LANGUAGES].toSorted(),
+      ["x-default", ...SUPPORTED_I18N_LOCALES].toSorted(),
     );
     expect(alternates["x-default"]).toBe(`${APP_URL}/en/about`);
   });
 
-  it.each(SUPPORTED_LANGUAGES)(
+  it.each(SUPPORTED_I18N_LOCALES)(
     "gives /%s/about a self-referencing annotation",
     (locale) => {
       // Google discards an hreflang cluster whose pages are not listed in it,
@@ -28,9 +28,9 @@ describe("buildHreflangAlternates", () => {
     },
   );
 
-  it("covers every supported language with an Open Graph locale", () => {
+  it("covers every supported locale with an Open Graph locale", () => {
     expect(Object.keys(OPEN_GRAPH_LOCALE_BY_LOCALE).toSorted()).toEqual(
-      [...SUPPORTED_LANGUAGES].toSorted(),
+      [...SUPPORTED_I18N_LOCALES].toSorted(),
     );
   });
 });

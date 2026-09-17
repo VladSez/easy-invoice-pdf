@@ -3,7 +3,7 @@ import Link from "next/link";
 /* eslint-disable @next/next/no-html-link-for-pages */
 import { FooterLaunchBadges } from "@/app/(components)/footer-launch-badges";
 import { SEO_FOOTER_SOLUTION_LINKS } from "@/app/(main)/(seo-landings)/seo-landing-footer-links";
-import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_LANGUAGES } from "@/app/schema";
+import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_I18N_LOCALES } from "@/app/schema";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import {
   DISCORD_COMMUNITY_URL,
@@ -106,7 +106,7 @@ export function Footer({ links, translations }: FooterProps) {
                   {aboutHeading}
                 </h3>
                 <ul className="grid grid-cols-2 gap-x-6 gap-y-2">
-                  {SUPPORTED_LANGUAGES.map((lang) => {
+                  {SUPPORTED_I18N_LOCALES.map((lang) => {
                     return (
                       <li key={lang}>
                         <Link

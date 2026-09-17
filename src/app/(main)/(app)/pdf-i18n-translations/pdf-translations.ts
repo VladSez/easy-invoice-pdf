@@ -503,6 +503,101 @@ export const INVOICE_PDF_TRANSLATIONS = {
       of: "de",
     },
   },
+  /**
+   * Brazilian Portuguese is a separate invoice rather than a different spelling of the
+   * European one: Brazil has no IVA and no NIF, so the tax number is the "CNPJ/CPF" that
+   * every nota fiscal carries, the tax column is the generic "Imposto" (the user renames it
+   * to ICMS, ISS or whatever applies), its rate is an "Alíquota", and the parties are the
+   * "Emitente" and "Destinatário" of the NF-e layout rather than a seller and a buyer.
+   */
+  "pt-BR": {
+    invoiceNumber: "Fatura nº",
+    dateOfIssue: "Data de emissão",
+    dateOfService: "Data da venda/prestação do serviço",
+    servicePeriod: "Período de serviço",
+    invoiceType: "Tipo de fatura",
+    seller: {
+      name: "Emitente",
+      vatNo: "CNPJ/CPF",
+      email: "E-mail",
+      accountNumber: "Conta bancária",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Destinatário",
+      vatNo: "CNPJ/CPF",
+      email: "E-mail",
+    },
+    invoiceItemsTable: {
+      no: "Nº",
+      nameOfGoodsService: "Descrição do produto/serviço",
+      typeOfGTU: "Tipo\n GTU",
+      amount: "Quantidade",
+      unit: "Unidade",
+      netPrice: () => {
+        return `Preço\n líquido`;
+      },
+      vat: "Imposto",
+      netAmount: () => {
+        return `Valor\n líquido`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Valor do ${customTaxLabel || "imposto"}`;
+      },
+      preTaxAmount: () => {
+        return `Valor bruto`;
+      },
+      sum: "TOTAL",
+    },
+    paymentInfo: {
+      paymentMethod: "Forma de pagamento",
+      paymentDate: "Data do pagamento",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return `Alíquota do ${customTaxLabel || "imposto"}`;
+      },
+      net: () => {
+        return `Líquido`;
+      },
+      vat: "Imposto",
+      preTax: () => {
+        return `Bruto`;
+      },
+      total: "Total",
+    },
+    paymentTotals: {
+      toPay: "Total a pagar",
+      paid: "Valor pago",
+      leftToPay: "Saldo a pagar",
+      amountInWords: "Valor por extenso",
+    },
+    personAuthorizedToReceive: "Pessoa autorizada a receber",
+    personAuthorizedToIssue: "Pessoa autorizada a emitir",
+    createdWith: "Criado com",
+    stripe: {
+      invoice: "Fatura",
+      invoiceNumber: "Número da fatura",
+      dateOfIssue: "Data de emissão",
+      dateDue: "Data de vencimento",
+      servicePeriod: "Período de serviço",
+      billTo: "Faturar para",
+      due: "com vencimento em",
+      payOnline: "Pagar online",
+      description: "Descrição",
+      qty: "Qtd.",
+      unit: "Unidade",
+      unitPrice: "Preço unitário",
+      amount: "Valor",
+      tax: "Imposto",
+      subtotal: "Subtotal",
+      totalExcludingTax: "Total sem impostos",
+      total: "Total",
+      amountDue: "Valor a pagar",
+      page: "Página",
+      of: "de",
+    },
+  },
   ru: {
     invoiceNumber: "Инвойс №",
     dateOfIssue: "Дата выставления",

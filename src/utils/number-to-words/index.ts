@@ -1,4 +1,7 @@
-import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "@/app/schema";
+import {
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
+  type SupportedLanguages,
+} from "@/app/schema";
 
 import { toWords as toWordsDE } from "./de";
 import { toWords as toWordsEN } from "./en";
@@ -9,6 +12,7 @@ import { toWords as toWordsNB } from "./nb";
 import { toWords as toWordsNL } from "./nl";
 import { toWords as toWordsPL } from "./pl";
 import { toWords as toWordsPT } from "./pt";
+import { toWords as toWordsPTBR } from "./pt-br";
 import { toWords as toWordsRU } from "./ru";
 import { toWords as toWordsSV } from "./sv";
 import { toWords as toWordsUK } from "./uk";
@@ -16,7 +20,7 @@ import { toWords as toWordsUK } from "./uk";
 /**
  * The number-to-words converter for each language the app offers.
  *
- * `satisfies` is what keeps this honest: adding a language to `SUPPORTED_LANGUAGES`
+ * `satisfies` is what keeps this honest: adding a language to `SUPPORTED_INVOICE_PDF_LANGUAGES`
  * without a converter here is a type error rather than a runtime hole.
  */
 const CONVERTERS = {
@@ -28,6 +32,7 @@ const CONVERTERS = {
   it: toWordsIT,
   nb: toWordsNB,
   pt: toWordsPT,
+  "pt-BR": toWordsPTBR,
   ru: toWordsRU,
   es: toWordsES,
   sv: toWordsSV,
@@ -81,7 +86,7 @@ export function numberToWords({
 
   if (!convert) {
     throw new Error(
-      `No converter for language "${language}". Supported: ${SUPPORTED_LANGUAGES.join(", ")}.`,
+      `No converter for language "${language}". Supported: ${SUPPORTED_INVOICE_PDF_LANGUAGES.join(", ")}.`,
     );
   }
 

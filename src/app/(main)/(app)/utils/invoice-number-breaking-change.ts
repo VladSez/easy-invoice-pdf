@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import { SUPPORTED_LANGUAGES } from "@/app/schema";
+import { SUPPORTED_INVOICE_PDF_LANGUAGES } from "@/app/schema";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 
 /**
@@ -29,14 +29,14 @@ export function handleInvoiceNumberBreakingChange(json: unknown) {
     let lang: keyof typeof INVOICE_PDF_TRANSLATIONS;
 
     const invoiceLanguage = z
-      .enum(SUPPORTED_LANGUAGES)
+      .enum(SUPPORTED_INVOICE_PDF_LANGUAGES)
       .safeParse(json.language);
 
     if (!invoiceLanguage.success) {
       console.error("Invalid invoice language:", invoiceLanguage.error);
 
       // fallback to default language
-      lang = SUPPORTED_LANGUAGES[0];
+      lang = SUPPORTED_INVOICE_PDF_LANGUAGES[0];
     } else {
       lang = invoiceLanguage.data;
     }

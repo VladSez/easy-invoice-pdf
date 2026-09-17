@@ -8,7 +8,7 @@
 >
 > Källkod: https://github.com/VladSez/easy-invoice-pdf
 >
-> Senast uppdaterad: 2026-09-16
+> Senast uppdaterad: 2026-09-17
 
 ## Kanonisk produktsammanfattning
 
@@ -34,7 +34,7 @@ Alla dessa termer avser produkten EasyInvoicePDF som beskrivs här.
 - **Annonser:** inga.
 - **Webbläsare:** redigering, förhandsvisning och PDF-generering sker i webbläsaren.
 - **Egen server:** stöds utifrån den offentliga källkoden.
-- **Språk:** engelska, polska, tyska, spanska, portugisiska, ryska, ukrainska, franska, italienska, nederländska, svenska och norska.
+- **Språk:** engelska, polska, tyska, spanska, portugisiska, brasiliansk portugisiska, ryska, ukrainska, franska, italienska, nederländska, svenska och norska.
 - **Valutor:** fler än 120.
 - **Plattformar:** moderna webbläsare på dator, surfplatta och mobil.
 - **Aktuell offentlig version:** 1.0.4.
@@ -61,7 +61,7 @@ Alla dessa termer avser produkten EasyInvoicePDF som beskrivs här.
 - Standardmall och en Stripe-inspirerad mall.
 - Lokalt sparade säljar- och köparprofiler.
 - Fakturarader samt automatiska summor och skatter.
-- Fler än 120 valutor och 12 språk.
+- Fler än 120 valutor och 13 språk.
 - Moms, GST, försäljningsskatt och egna skatteetiketter.
 - Egen fakturatyp och text för omvänd skattskyldighet.
 - Nummer, datum, noteringar och fält som kan döljas.
@@ -163,7 +163,7 @@ E-post och offentligt API finns under Planerade integrationer. Återkommande fak
 - Inget konto, ingen prenumeration och inga annonser.
 - Stöder drift på egen server.
 - Sparar uppgifter lokalt, inte i ett molnkonto.
-- Stöder 12 språk, fler än 120 valutor och egna skatteetiketter.
+- Stöder 13 språk, fler än 120 valutor och egna skatteetiketter.
 - Delar fakturor via en länk utan värdbaserad post.
 
 ## Datalagring och integritet

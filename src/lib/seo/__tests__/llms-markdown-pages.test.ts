@@ -4,18 +4,18 @@ import { resolve } from "node:path";
 import { assert, describe, expect, it } from "vitest";
 import { z } from "zod";
 
-import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "@/app/schema";
+import { SUPPORTED_I18N_LOCALES, type SupportedLocale } from "@/app/schema";
 
 /**
- * Derived from {@link SUPPORTED_LANGUAGES} rather than hand-listed: the about
+ * Derived from {@link SUPPORTED_I18N_LOCALES} rather than hand-listed: the about
  * page advertises `<link rel="alternate" type="text/markdown">` for every
- * locale, so a language added without its Markdown page ships a 404 that a
+ * locale, so a locale added without its Markdown page ships a 404 that a
  * hardcoded list here would never notice.
  */
 const MARKDOWN_PATHS = [
   "invoice-generator.md",
   "how-it-works.md",
-  ...SUPPORTED_LANGUAGES.map((locale) => {
+  ...SUPPORTED_I18N_LOCALES.map((locale) => {
     return `${locale}/about.md`;
   }),
 ] as const;
@@ -33,7 +33,7 @@ const UPDATE_DATE_LABELS = {
   nl: "Laatst bijgewerkt",
   sv: "Senast uppdaterad",
   nb: "Sist oppdatert",
-} as const satisfies Record<SupportedLanguages, string>;
+} as const satisfies Record<SupportedLocale, string>;
 
 const UPDATE_DATE_SCHEMA = z.iso.date().transform((value) => {
   return new Date(`${value}T00:00:00.000Z`);

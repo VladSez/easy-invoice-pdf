@@ -8,7 +8,7 @@ import {
   CURRENCY_SYMBOLS,
   CURRENCY_TO_LABEL,
   LANGUAGE_TO_LABEL,
-  SUPPORTED_LANGUAGES,
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
   type SupportedCurrencies,
   type SupportedLanguages,
   type SupportedTemplates,
@@ -36,7 +36,8 @@ const LANGUAGE_TO_CURRENCY = {
   de: "EUR",
   es: "MXN",
   sv: "SEK",
-  pt: "BRL",
+  pt: "EUR",
+  "pt-BR": "BRL",
   ru: "RUB",
   uk: "UAH",
   fr: "CHF",
@@ -46,7 +47,7 @@ const LANGUAGE_TO_CURRENCY = {
 } as const satisfies Record<SupportedLanguages, SupportedCurrencies>;
 
 const PDF_LANGUAGE_CASES = [
-  ...SUPPORTED_LANGUAGES.map((language) => {
+  ...SUPPORTED_INVOICE_PDF_LANGUAGES.map((language) => {
     return {
       language,
       currency: LANGUAGE_TO_CURRENCY[language],
@@ -225,7 +226,7 @@ test.describe("PDF language test data", () => {
   });
 
   test("default invoice number labels come from the language translations", () => {
-    for (const language of SUPPORTED_LANGUAGES) {
+    for (const language of SUPPORTED_INVOICE_PDF_LANGUAGES) {
       expect(getDefaultInvoiceNumberLabel(language, "default")).toBe(
         `${INVOICE_PDF_TRANSLATIONS[language].invoiceNumber}:`,
       );

@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/nextjs";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { SUPPORTED_LANGUAGES } from "@/app/schema";
+import { SUPPORTED_INVOICE_PDF_LANGUAGES } from "@/app/schema";
 import { MAX_SPELLABLE } from "@/utils/number-to-words";
 
 import { getAmountInWords } from "../invoice.utils";
@@ -30,24 +30,31 @@ const AMOUNT_IN_WORDS_BY_LANGUAGE = {
   es: "mil doscientos treinta y cuatro",
   sv: "ettusentvåhundratrettiofyra",
   pt: "mil duzentos e trinta e quatro",
+  "pt-BR": "mil duzentos e trinta e quatro",
   ru: "одна тысяча двести тридцать четыре",
   uk: "одна тисяча двiстi тридцять чотири",
   fr: "mille deux cent trente-quatre",
   it: "milleduecentotrentaquattro",
   nb: "ett tusen to hundre og trettifire",
   nl: "twaalfhonderd vierendertig",
-} as const satisfies Record<(typeof SUPPORTED_LANGUAGES)[number], string>;
+} as const satisfies Record<
+  (typeof SUPPORTED_INVOICE_PDF_LANGUAGES)[number],
+  string
+>;
 
 describe("getAmountInWords", () => {
-  it.each(SUPPORTED_LANGUAGES)("converts 1234 in %s", (language) => {
-    expect(getAmountInWords({ amount: 1234, language })).toBe(
-      AMOUNT_IN_WORDS_BY_LANGUAGE[language],
-    );
-  });
+  it.each(SUPPORTED_INVOICE_PDF_LANGUAGES)(
+    "converts 1234 in %s",
+    (language) => {
+      expect(getAmountInWords({ amount: 1234, language })).toBe(
+        AMOUNT_IN_WORDS_BY_LANGUAGE[language],
+      );
+    },
+  );
 
   it("covers every supported language", () => {
     expect(Object.keys(AMOUNT_IN_WORDS_BY_LANGUAGE).sort()).toEqual(
-      [...SUPPORTED_LANGUAGES].sort(),
+      [...SUPPORTED_INVOICE_PDF_LANGUAGES].sort(),
     );
   });
 

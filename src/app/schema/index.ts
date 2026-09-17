@@ -671,10 +671,44 @@ export type TemplateLabels =
  * unsorted; adding a language means slotting its code in where its *name* belongs, and
  * mirroring the position in the maps that follow.
  *
- * `en` has to stay first for a second reason: it is read as the default locale
- * (`SUPPORTED_LANGUAGES[0]`) by the i18n routing and the invoice defaults.
+ * `en` has to stay first for a second reason: it is the invoice's default language.
+ *
+ * This is the PDF's language, not the site's -- see {@link SUPPORTED_I18N_LOCALES}.
  */
-export const SUPPORTED_LANGUAGES = [
+export const SUPPORTED_INVOICE_PDF_LANGUAGES = [
+  "en",
+  "pl",
+  "nl",
+  "fr",
+  "de",
+  "it",
+  "nb",
+  "pt",
+  "pt-BR",
+  "ru",
+  "es",
+  "sv",
+  "uk",
+] as const;
+export type SupportedLanguages =
+  (typeof SUPPORTED_INVOICE_PDF_LANGUAGES)[number];
+
+/**
+ * The languages the *interface* is translated into.
+ *
+ * Every one of these is a route (`/pt/about`), a `messages/<locale>.json`, a
+ * `public/<locale>/about.md`, a sitemap entry and a footer link, so a locale costs a page
+ * to write and keep up to date. An invoice language costs a column of labels, which is why
+ * the two lists are allowed to differ: `pt-BR` prints a Brazilian invoice without
+ * committing the site to a second Portuguese translation.
+ *
+ * `satisfies` keeps it a subset -- a locale has to be a language the PDF can be written in
+ * too, since the about page links straight into the generator.
+ *
+ * `en` has to stay first: it is read as the default locale (`SUPPORTED_I18N_LOCALES[0]`) by the
+ * i18n routing.
+ */
+export const SUPPORTED_I18N_LOCALES = [
   "en",
   "pl",
   "nl",
@@ -687,8 +721,8 @@ export const SUPPORTED_LANGUAGES = [
   "es",
   "sv",
   "uk",
-] as const;
-export type SupportedLanguages = (typeof SUPPORTED_LANGUAGES)[number];
+] as const satisfies readonly SupportedLanguages[];
+export type SupportedLocale = (typeof SUPPORTED_I18N_LOCALES)[number];
 
 export const MAX_INVOICE_ITEMS = 100;
 
@@ -701,6 +735,7 @@ export const LANGUAGE_TO_LABEL = {
   it: "Italian",
   nb: "Norwegian",
   pt: "Portuguese",
+  "pt-BR": "Portuguese (BR)",
   ru: "Russian",
   es: "Spanish",
   sv: "Swedish",
@@ -711,11 +746,11 @@ export const LANGUAGE_TO_LABEL = {
  * The same names as {@link LANGUAGE_TO_LABEL}, with the region spelled out for the
  * languages that are written differently in more than one country.
  *
- * Only Portuguese needs it today, and the invoice is European Portuguese throughout: the
- * PDF catalog labels the tax number "NIF" and the tax "IVA" (a Brazilian invoice carries
- * neither), the amount in words spells "dezasseis" and "bilião", and the dates come from
- * dayjs' `pt` locale. Naming the country lets a reader in Brazil see that while they are
- * picking the language, instead of after they generate the PDF.
+ * Only Portuguese needs it today, and the two are separate invoices rather than separate
+ * spellings: `pt` labels the tax number "NIF" and the tax "IVA", spells "dezasseis" and
+ * counts in the long scale ("mil milhões"); `pt-BR` labels them "CNPJ/CPF" and "Imposto",
+ * spells "dezesseis" and counts in the short one ("bilhões"). Naming the country lets a
+ * reader pick the right one up front, instead of finding out after generating the PDF.
  *
  * This is for pickers only. Everywhere the language is merely stated rather than chosen --
  * the download button, where the name sits inside a fixed-width label -- keeps the short
@@ -724,6 +759,7 @@ export const LANGUAGE_TO_LABEL = {
 export const LANGUAGE_TO_LABEL_WITH_REGION = {
   ...LANGUAGE_TO_LABEL,
   pt: "Portuguese (Portugal)",
+  "pt-BR": "Portuguese (Brazil)",
 } as const satisfies Record<SupportedLanguages, string>;
 
 /**
@@ -740,6 +776,7 @@ export const LANGUAGE_TO_NATIVE_LABEL = {
   it: "Italiano",
   nb: "Norsk bokmål",
   pt: "Português",
+  "pt-BR": "Português (Brasil)",
   ru: "Русский",
   es: "Español",
   sv: "Svenska",
@@ -797,6 +834,7 @@ export const LANGUAGE_TO_LONG_DATE_FORMAT = {
   it: "D MMMM YYYY",
   nb: "D. MMMM YYYY",
   pt: "D [de] MMMM [de] YYYY",
+  "pt-BR": "D [de] MMMM [de] YYYY",
   ru: "D MMMM YYYY [г.]",
   es: "D [de] MMMM [de] YYYY",
   sv: "D MMMM YYYY",
@@ -1178,7 +1216,7 @@ export const BUYERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_BUYERS";
  * Exported for tests that need access to `.shape` (e.g. URL compression key map).
  */
 export const invoiceObjectSchema = z.object({
-  language: z.enum(SUPPORTED_LANGUAGES).default("en"),
+  language: z.enum(SUPPORTED_INVOICE_PDF_LANGUAGES).default("en"),
   dateFormat: z.enum(SUPPORTED_DATE_FORMATS).default("YYYY-MM-DD"),
   currency: z.enum(SUPPORTED_CURRENCIES).default("EUR"),
   template: z.enum(SUPPORTED_TEMPLATES).default("default"),

@@ -9,19 +9,21 @@ import { toast } from "sonner";
 import { InvoicePdfTemplate } from "@/app/(main)/(app)/components/invoice-templates/invoice-pdf-default-template";
 import {
   LANGUAGE_TO_LABEL,
-  SUPPORTED_LANGUAGES,
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
   type InvoiceData,
   type SupportedLanguages,
 } from "@/app/schema";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 
-const SUPPORTED_LANGUAGES_OPTIONS = SUPPORTED_LANGUAGES.map((language) => {
-  return {
-    label: LANGUAGE_TO_LABEL[language],
-    value: language,
-  };
-});
+const SUPPORTED_LANGUAGES_OPTIONS = SUPPORTED_INVOICE_PDF_LANGUAGES.map(
+  (language) => {
+    return {
+      label: LANGUAGE_TO_LABEL[language],
+      value: language,
+    };
+  },
+);
 
 // TODO: add later when PRO version is released, this is PRO FEATURE =)
 // TODO: allow to select languages that user wants to download. Use select multiple component https://github.com/sersavan/shadcn-multi-select-component but style it like a button when merging PR on github with multiple options to select from dropdown

@@ -30,7 +30,7 @@ import {
   DEFAULT_DATE_FORMAT,
   getDateFormatsForLanguage,
   getDefaultDateFormat,
-  SUPPORTED_LANGUAGES,
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
   SUPPORTED_TEMPLATES,
   TEMPLATE_TO_LABEL,
 } from "@/app/schema";
@@ -374,7 +374,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                     );
                   }}
                 >
-                  {SUPPORTED_LANGUAGES.map((lang) => {
+                  {SUPPORTED_INVOICE_PDF_LANGUAGES.map((lang) => {
                     const languageName = LANGUAGE_TO_LABEL_WITH_REGION[lang];
 
                     if (!languageName) {

@@ -2,7 +2,7 @@ import { type MetadataRoute } from "next";
 
 import { APP_URL } from "@/config";
 
-import { SUPPORTED_LANGUAGES } from "./schema";
+import { SUPPORTED_I18N_LOCALES } from "./schema";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -13,7 +13,7 @@ export default function robots(): MetadataRoute.Robots {
           // Allow main app page (now at /)
           "/",
           // Allow about pages in all languages
-          ...SUPPORTED_LANGUAGES.map((locale) => {
+          ...SUPPORTED_I18N_LOCALES.map((locale) => {
             return `/${locale}/about`;
           }),
           // Allow template parameter URLs

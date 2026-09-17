@@ -12,7 +12,7 @@ import {
   PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_CURRENCIES,
   SUPPORTED_DATE_FORMATS,
-  SUPPORTED_LANGUAGES,
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
   type AccordionState,
   type InvoiceData,
 } from "@/app/schema";
@@ -384,7 +384,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(languageSelect).toHaveValue(INITIAL_INVOICE_DATA.language);
 
     // Verify all supported languages are available as options with correct labels
-    for (const lang of SUPPORTED_LANGUAGES) {
+    for (const lang of SUPPORTED_INVOICE_PDF_LANGUAGES) {
       const languageName = LANGUAGE_TO_LABEL_WITH_REGION[lang];
 
       await expect(
