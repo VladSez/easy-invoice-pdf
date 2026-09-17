@@ -42,10 +42,10 @@ export default function HowItWorksPage() {
             <Link href="/" className={linkClassName}>
               free invoice generator
             </Link>
-            , save seller and buyer details, add branding, and prepare weekly
-            invoices. Whether you need an invoice maker for a one-off bill or a
-            small business invoice template you can reuse, you can start in
-            seconds.
+            , save seller and buyer details, add branding, set up VAT or your
+            own tax label, and prepare weekly invoices. Whether you need an
+            invoice maker for a one-off bill or a small business invoice
+            template you can reuse, you can start in seconds.
           </p>
         </div>
       </div>
