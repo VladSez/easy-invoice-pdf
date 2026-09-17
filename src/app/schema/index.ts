@@ -708,6 +708,25 @@ export const LANGUAGE_TO_LABEL = {
 } as const satisfies Record<SupportedLanguages, string>;
 
 /**
+ * The same names as {@link LANGUAGE_TO_LABEL}, with the region spelled out for the
+ * languages that are written differently in more than one country.
+ *
+ * Only Portuguese needs it today, and the invoice is European Portuguese throughout: the
+ * PDF catalog labels the tax number "NIF" and the tax "IVA" (a Brazilian invoice carries
+ * neither), the amount in words spells "dezasseis" and "bilião", and the dates come from
+ * dayjs' `pt` locale. Naming the country lets a reader in Brazil see that while they are
+ * picking the language, instead of after they generate the PDF.
+ *
+ * This is for pickers only. Everywhere the language is merely stated rather than chosen --
+ * the download button, where the name sits inside a fixed-width label -- keeps the short
+ * {@link LANGUAGE_TO_LABEL} name.
+ */
+export const LANGUAGE_TO_LABEL_WITH_REGION = {
+  ...LANGUAGE_TO_LABEL,
+  pt: "Portuguese (Portugal)",
+} as const satisfies Record<SupportedLanguages, string>;
+
+/**
  * Mapping from language code to its native language label.
  * Used for language selectors, footer, and UI where displaying the language in its native form is preferred.
  * Example: { en: "English", pl: "Polski" }

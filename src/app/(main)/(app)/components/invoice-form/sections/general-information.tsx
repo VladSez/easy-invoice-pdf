@@ -26,7 +26,7 @@ import {
 } from "@/app/(main)/(app)/utils/format-service-period";
 import {
   type InvoiceData,
-  LANGUAGE_TO_LABEL,
+  LANGUAGE_TO_LABEL_WITH_REGION,
   DEFAULT_DATE_FORMAT,
   getDateFormatsForLanguage,
   getDefaultDateFormat,
@@ -375,7 +375,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                   }}
                 >
                   {SUPPORTED_LANGUAGES.map((lang) => {
-                    const languageName = LANGUAGE_TO_LABEL[lang];
+                    const languageName = LANGUAGE_TO_LABEL_WITH_REGION[lang];
 
                     if (!languageName) {
                       return null;
