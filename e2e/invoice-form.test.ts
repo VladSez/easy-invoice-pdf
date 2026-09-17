@@ -8,7 +8,7 @@ import {
   CURRENCY_TO_LABEL,
   DEFAULT_DATE_FORMAT,
   getDateFormatsForLanguage,
-  LANGUAGE_TO_LABEL,
+  LANGUAGE_TO_LABEL_WITH_REGION,
   PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_CURRENCIES,
   SUPPORTED_DATE_FORMATS,
@@ -385,7 +385,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Verify all supported languages are available as options with correct labels
     for (const lang of SUPPORTED_LANGUAGES) {
-      const languageName = LANGUAGE_TO_LABEL[lang];
+      const languageName = LANGUAGE_TO_LABEL_WITH_REGION[lang];
 
       await expect(
         languageSelect.locator(`option[value="${lang}"]`),
