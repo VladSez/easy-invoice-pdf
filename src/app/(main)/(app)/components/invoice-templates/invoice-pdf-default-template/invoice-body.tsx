@@ -3,9 +3,10 @@ import dayjs from "dayjs";
 
 import { InvoiceQRCode } from "@/app/(main)/(app)/components/invoice-templates/common/invoice-qr-code";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import { type InvoiceData } from "@/app/schema";
+import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
+import { formatAmount } from "../../../utils/format-amount";
 import { InvoiceFooter } from "./invoice-footer";
 import { InvoiceHeader } from "./invoice-header";
 import { InvoiceItemsTable } from "./invoice-items-table";
@@ -44,15 +45,10 @@ export const InvoiceBody = ({
 
   const invoiceTotal = invoiceData?.total;
 
-  const formattedInvoiceTotal =
-    typeof invoiceTotal === "number"
-      ? invoiceTotal
-          .toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })
-          .replaceAll(",", " ")
-      : "0.00";
+  const formattedInvoiceTotal = formatAmount({
+    amount: invoiceTotal,
+    numberFormatLocale: resolveNumberFormatLocale(invoiceData),
+  });
 
   const signatureSectionIsVisible =
     invoiceData.personAuthorizedToReceiveFieldIsVisible ||

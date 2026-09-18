@@ -910,6 +910,96 @@ export function getDefaultDateFormat({
 export type SupportedDateFormat = (typeof SUPPORTED_DATE_FORMATS)[number];
 
 /**
+ * The locales an invoice's numbers can be written in, on top of the invoice's own language.
+ *
+ * `international` is what the default template printed before this setting existed:
+ * thousands grouped with a no-break space, the decimal marked with a dot (`321 200.00`). It
+ * belongs to no locale on purpose -- `321.200` reads as three hundred thousand in the US and
+ * as a fraction of one in Germany, while a space reads the same everywhere, which is what an
+ * invoice that crosses a border wants.
+ *
+ * Every other value is one of the languages the PDF can be written in, because the language
+ * of the labels and the way the numbers are punctuated are separate concerns: a Polish
+ * issuer writing an English invoice may well want `10 000,00 EUR` under English headings.
+ *
+ * None of it changes which currency the invoice is in. It does change how that currency is
+ * written: the default template prints an ISO 4217 code next to the amount whatever the
+ * locale, while the Stripe template prints the symbol where the locale puts it -- `$321,200.00`
+ * formatted in English, `321.200,00 $` formatted in German.
+ */
+export const SUPPORTED_NUMBER_FORMAT_LOCALES = [
+  "international",
+  ...SUPPORTED_INVOICE_PDF_LANGUAGES,
+] as const;
+
+export type SupportedNumberFormatLocale =
+  (typeof SUPPORTED_NUMBER_FORMAT_LOCALES)[number];
+
+interface ResolveNumberFormatLocaleArgs {
+  /** The invoice PDF language. */
+  language: SupportedLanguages;
+  /** The override, on the invoices that carry one. */
+  numberFormatLocale?: SupportedNumberFormatLocale;
+}
+
+/**
+ * The locale an invoice writes its numbers in.
+ *
+ * The form keeps the stored value in step with the invoice language -- picking a language
+ * picks its number format too -- so this fallback is for the invoices that predate the
+ * setting: they carry no value and are written in their own language, which is exactly what
+ * they should go on printing.
+ */
+export function resolveNumberFormatLocale({
+  language,
+  numberFormatLocale,
+}: ResolveNumberFormatLocaleArgs) {
+  return numberFormatLocale ?? language;
+}
+
+interface GetNumberFormatLocaleAfterLanguageChangeArgs {
+  /** The language the invoice is being switched away from. */
+  previousLanguage: SupportedLanguages;
+  /** The language the invoice is being switched to. */
+  nextLanguage: SupportedLanguages;
+  /** The format the invoice carries, on the invoices that carry one. */
+  numberFormatLocale?: SupportedNumberFormatLocale;
+  /**
+   * Whether the invoice pins its number format, see
+   * {@link invoiceObjectSchema.shape.preserveNumberFormatOnLanguageChange}.
+   */
+  preserveNumberFormatOnLanguageChange?: boolean;
+}
+
+/**
+ * The number format an invoice should carry once its language changes.
+ *
+ * Unpinned, the format follows the language: most invoices want Polish numbers under
+ * Polish headings, and the form has moved the two together since the setting shipped.
+ *
+ * Pinned, it returns the *resolved* previous format rather than the stored one. The
+ * difference matters on an invoice that never picked a format: it carries none and
+ * {@link resolveNumberFormatLocale} falls back to its language, so returning `undefined`
+ * would let the format follow the new language -- the opposite of preserving it. Naming
+ * the language being left behind is what actually keeps the numbers on screen unchanged.
+ */
+export function getNumberFormatLocaleAfterLanguageChange({
+  previousLanguage,
+  nextLanguage,
+  numberFormatLocale,
+  preserveNumberFormatOnLanguageChange,
+}: GetNumberFormatLocaleAfterLanguageChangeArgs): SupportedNumberFormatLocale {
+  if (!preserveNumberFormatOnLanguageChange) {
+    return nextLanguage;
+  }
+
+  return resolveNumberFormatLocale({
+    language: previousLanguage,
+    numberFormatLocale,
+  });
+}
+
+/**
  *
  * This is the version of the app and the schema of the app's data model
  */
@@ -1219,6 +1309,28 @@ export const invoiceObjectSchema = z.object({
   language: z.enum(SUPPORTED_INVOICE_PDF_LANGUAGES).default("en"),
   dateFormat: z.enum(SUPPORTED_DATE_FORMATS).default("YYYY-MM-DD"),
   currency: z.enum(SUPPORTED_CURRENCIES).default("EUR"),
+  /**
+   * The locale the numbers are punctuated in. The form writes it alongside `language` and
+   * lets it be changed on its own afterwards, so the two can differ; it is absent only on
+   * invoices saved before the setting existed, see {@link resolveNumberFormatLocale}.
+   *
+   * Whether a later language switch overwrites it is up to
+   * {@link invoiceObjectSchema.shape.preserveNumberFormatOnLanguageChange}.
+   */
+  numberFormatLocale: z.enum(SUPPORTED_NUMBER_FORMAT_LOCALES).optional(),
+  /**
+   * Keep `numberFormatLocale` as it is when the invoice language changes.
+   *
+   * Off, which is the absence of the field, the two move together: picking Polish picks
+   * Polish number formatting, which is what most invoices want. On, the format is pinned
+   * and only the labels follow the language -- for the issuer who writes the same
+   * `10 000,00` whoever is reading it.
+   *
+   * Like `numberFormatLocale` it is deliberately not `.default()`ed, so an invoice carries
+   * it only once someone has turned it on, and it stays out of every share link and
+   * `localStorage` entry that predates the setting.
+   */
+  preserveNumberFormatOnLanguageChange: z.boolean().optional(),
   template: z.enum(SUPPORTED_TEMPLATES).default("default"),
 
   /**

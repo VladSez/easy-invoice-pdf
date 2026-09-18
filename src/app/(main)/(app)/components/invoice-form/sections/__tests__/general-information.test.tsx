@@ -47,12 +47,17 @@ interface HarnessProps {
   language?: SupportedLanguages;
   dateFormat?: InvoiceData["dateFormat"];
   dateOfIssue?: string;
+  /** Left out by default, like an invoice that has never picked a number format. */
+  numberFormatLocale?: InvoiceData["numberFormatLocale"];
+  preserveNumberFormatOnLanguageChange?: InvoiceData["preserveNumberFormatOnLanguageChange"];
 }
 
 function GeneralInformationHarness({
   language = "en",
   dateFormat = "MMMM D, YYYY",
   dateOfIssue = STALE_DATE_OF_ISSUE,
+  numberFormatLocale,
+  preserveNumberFormatOnLanguageChange,
 }: HarnessProps) {
   const { control, setValue } = useForm<InvoiceData>({
     defaultValues: {
@@ -60,6 +65,8 @@ function GeneralInformationHarness({
       language,
       dateFormat,
       dateOfIssue,
+      numberFormatLocale,
+      preserveNumberFormatOnLanguageChange,
     },
   });
 
@@ -88,6 +95,27 @@ function renderGeneralInformation(props: HarnessProps = {}) {
 
 function getSetDateOfIssueToTodayButton() {
   return screen.getByRole("button", { name: /set date of issue to today/i });
+}
+
+function getNumberFormatSelect() {
+  return screen.getByLabelText("Format");
+}
+
+function getPreserveNumberFormatSwitch() {
+  return screen.getByTestId("preserveNumberFormatOnLanguageChange");
+}
+
+async function selectInvoiceLanguage({
+  user,
+  language,
+}: {
+  user: ReturnType<typeof userEvent.setup>;
+  language: SupportedLanguages;
+}) {
+  await user.selectOptions(
+    screen.getByLabelText("Invoice PDF Language"),
+    language,
+  );
 }
 
 describe("GeneralInformation date helper texts", () => {
@@ -208,6 +236,97 @@ describe("GeneralInformation date helper texts", () => {
           name: "YYYY-MM-DD (2026-09-15) (default)",
         }),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe('"Keep format when language changes" switch', () => {
+    it("is off on an invoice that has never turned it on", () => {
+      renderGeneralInformation();
+
+      expect(getPreserveNumberFormatSwitch()).not.toBeChecked();
+    });
+
+    /**
+     * No `aria-label` overriding it, so what a screen reader announces is the text on
+     * screen -- which is what lets someone say "keep format when language changes" to a
+     * voice control tool and have it hit this switch (WCAG 2.5.3).
+     */
+    it("is named by its visible label", () => {
+      renderGeneralInformation();
+
+      expect(
+        screen.getByRole("switch", {
+          name: "Keep format when language changes",
+        }),
+      ).toBe(getPreserveNumberFormatSwitch());
+    });
+
+    it("is toggled by its own visible label", async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+      renderGeneralInformation();
+
+      // the label is what a pointer lands on, so `htmlFor` has to reach the switch
+      await user.click(screen.getByText("Keep format when language changes"));
+
+      expect(getPreserveNumberFormatSwitch()).toBeChecked();
+    });
+
+    it("lets the number format follow the language while it is off", async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+      renderGeneralInformation({ language: "en", numberFormatLocale: "en" });
+
+      await selectInvoiceLanguage({ user, language: "pl" });
+
+      expect(getNumberFormatSelect()).toHaveValue("pl");
+    });
+
+    it("keeps the picked number format across a language switch once it is on", async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+      renderGeneralInformation({
+        language: "en",
+        numberFormatLocale: "international",
+        preserveNumberFormatOnLanguageChange: true,
+      });
+
+      await selectInvoiceLanguage({ user, language: "pl" });
+
+      expect(getNumberFormatSelect()).toHaveValue("international");
+    });
+
+    /**
+     * The case the switch exists for. Nothing is stored, so the amounts on screen are
+     * punctuated the way the language being left behind punctuates them -- switching
+     * has to pin that language, or there would be nothing to preserve.
+     */
+    it("pins the previous language when no format was ever picked", async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+      renderGeneralInformation({ language: "de" });
+
+      expect(getNumberFormatSelect()).toHaveValue("de");
+
+      await user.click(getPreserveNumberFormatSwitch());
+      await selectInvoiceLanguage({ user, language: "en" });
+
+      expect(getNumberFormatSelect()).toHaveValue("de");
+    });
+
+    it("still moves the labels when the format is pinned", async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+      renderGeneralInformation({
+        language: "en",
+        numberFormatLocale: "international",
+        preserveNumberFormatOnLanguageChange: true,
+      });
+
+      await selectInvoiceLanguage({ user, language: "pl" });
+
+      expect(screen.getByLabelText("Label")).toHaveValue("Faktura nr:");
+      expect(getNumberFormatSelect()).toHaveValue("international");
     });
   });
 

@@ -19,6 +19,8 @@ import {
   getDefaultInvoiceNumberLabel,
   INVOICE_PDF_TRANSLATIONS,
 } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
+import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
+import { formatCurrency } from "@/app/(main)/(app)/utils/format-currency";
 import { formatTodayWithLocale } from "@/app/(main)/(app)/utils/format-date-with-locale";
 import {
   getCurrentMonthAndYear,
@@ -30,7 +32,12 @@ import {
   DEFAULT_DATE_FORMAT,
   getDateFormatsForLanguage,
   getDefaultDateFormat,
+  getNumberFormatLocaleAfterLanguageChange,
+  type SupportedCurrencies,
+  type SupportedNumberFormatLocale,
+  type SupportedTemplates,
   SUPPORTED_INVOICE_PDF_LANGUAGES,
+  SUPPORTED_NUMBER_FORMAT_LOCALES,
   SUPPORTED_TEMPLATES,
   TEMPLATE_TO_LABEL,
 } from "@/app/schema";
@@ -92,6 +99,13 @@ export const GeneralInformation = memo(function GeneralInformation({
   const template = useWatch({ control, name: "template" });
   const logo = useWatch({ control, name: "logo" });
   const selectedDateFormat = useWatch({ control, name: "dateFormat" });
+  const currency = useWatch({ control, name: "currency" });
+  const numberFormatLocale = useWatch({ control, name: "numberFormatLocale" });
+  const preserveNumberFormatOnLanguageChange = useWatch({
+    control,
+    name: "preserveNumberFormatOnLanguageChange",
+  });
+  const invoiceTotal = useWatch({ control, name: "total" });
   const paymentDue = useWatch({ control, name: "paymentDue" });
 
   const t = INVOICE_PDF_TRANSLATIONS[language];
@@ -326,6 +340,8 @@ export const GeneralInformation = memo(function GeneralInformation({
                         language: newLanguage,
                         previous_language: language,
                         invoice_template: template,
+                        number_format_preserved:
+                          !!preserveNumberFormatOnLanguageChange,
                       },
                     });
 
@@ -362,6 +378,27 @@ export const GeneralInformation = memo(function GeneralInformation({
                     setValue(
                       "dateFormat",
                       getDefaultDateFormat({ language: newLanguage, template }),
+                    );
+
+                    // Update NUMBER FORMAT when language changes, so the amounts are
+                    // punctuated the way the new language punctuates them. It stays a
+                    // separate field because the two can legitimately differ -- a Polish
+                    // issuer writing an English invoice may still want "10 000,00 EUR",
+                    // which is what `preserveNumberFormatOnLanguageChange` is for.
+                    //
+                    // Preserving it has to write the resolved value rather than skip the
+                    // write: an invoice that never picked a format carries none and falls
+                    // back to its own language, so leaving it empty would let the format
+                    // follow the language anyway. Pinning the language being left behind
+                    // is what actually preserves what is on screen.
+                    setValue(
+                      "numberFormatLocale",
+                      getNumberFormatLocaleAfterLanguageChange({
+                        previousLanguage: language,
+                        nextLanguage: newLanguage,
+                        numberFormatLocale,
+                        preserveNumberFormatOnLanguageChange,
+                      }),
                     );
 
                     setValue(
@@ -482,6 +519,109 @@ export const GeneralInformation = memo(function GeneralInformation({
             </InputHelperMessage>
           )}
         </div>
+
+        {/* Number Format */}
+        <fieldset className="rounded-md border p-4">
+          <legend className="px-1 text-lg font-semibold text-gray-900">
+            Number Format
+          </legend>
+          <div>
+            <Label htmlFor={`numberFormatLocale`} className="mb-1">
+              Format
+            </Label>
+            <Controller
+              name="numberFormatLocale"
+              control={control}
+              render={({ field }) => {
+                return (
+                  <SelectNative
+                    {...field}
+                    // invoices saved before this setting existed carry no value, and they
+                    // are written in their own language, which is what they fall back to
+                    value={field.value ?? language}
+                    id={`numberFormatLocale`}
+                    className={cn(
+                      "block",
+                      inputErrorClassName(!!errors.numberFormatLocale),
+                    )}
+                  >
+                    {SUPPORTED_NUMBER_FORMAT_LOCALES.map(
+                      (supportedNumberFormatLocale) => {
+                        const label =
+                          supportedNumberFormatLocale === "international"
+                            ? "International"
+                            : LANGUAGE_TO_LABEL_WITH_REGION[
+                                supportedNumberFormatLocale
+                              ];
+
+                        // the invoice's own total, written the way the selected template
+                        // writes it, so the picker shows the number this invoice's reader
+                        // will actually see
+                        const preview = formatNumberFormatPreview({
+                          amount: invoiceTotal,
+                          currency,
+                          numberFormatLocale: supportedNumberFormatLocale,
+                          template,
+                        });
+
+                        // switching the invoice language moves the format with it, so the
+                        // marker sits on the language the invoice is written in
+                        const isDefault =
+                          supportedNumberFormatLocale === language;
+
+                        return (
+                          <option
+                            key={supportedNumberFormatLocale}
+                            value={supportedNumberFormatLocale}
+                          >
+                            {label} ({preview}) {isDefault ? "(default)" : ""}
+                          </option>
+                        );
+                      },
+                    )}
+                  </SelectNative>
+                );
+              }}
+            />
+
+            {errors.numberFormatLocale ? (
+              <ErrorMessage>{errors.numberFormatLocale.message}</ErrorMessage>
+            ) : (
+              <InputHelperMessage>
+                Select how amounts are grouped and punctuated in the PDF
+              </InputHelperMessage>
+            )}
+          </div>
+
+          {/** Keep the format when the PDF language changes */}
+          <div className="mt-5 inline-flex items-center gap-2">
+            <Controller
+              name="preserveNumberFormatOnLanguageChange"
+              control={control}
+              render={({ field: { value, onChange, ...field } }) => {
+                return (
+                  <Switch
+                    {...field}
+                    id="preserveNumberFormatOnLanguageChange"
+                    data-testid="preserveNumberFormatOnLanguageChange"
+                    // the field is absent until someone turns it on, and absent is off
+                    checked={!!value}
+                    onCheckedChange={onChange}
+                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                  />
+                );
+              }}
+            />
+            <CustomTooltip
+              trigger={
+                <Label htmlFor="preserveNumberFormatOnLanguageChange">
+                  Keep format when language changes
+                </Label>
+              }
+              content="Keep the number format you picked when the invoice PDF language changes, so an invoice can be written in your client's language and still use your own number formatting"
+            />
+          </div>
+        </fieldset>
 
         {/* Invoice Number */}
         <fieldset className="rounded-md border p-4">
@@ -1049,3 +1189,34 @@ export const GeneralInformation = memo(function GeneralInformation({
     </div>
   );
 });
+
+interface FormatNumberFormatPreviewArgs {
+  /** The invoice total, which is what the picker previews. */
+  amount: number;
+  /** The invoice's currency. */
+  currency: SupportedCurrencies;
+  /** The option being previewed. */
+  numberFormatLocale: SupportedNumberFormatLocale;
+  /** The template the invoice is rendered with. */
+  template: SupportedTemplates;
+}
+
+/**
+ * One option's preview, written the way its template writes money.
+ *
+ * The two templates present a currency differently -- the default one puts an ISO 4217 code
+ * next to the amount, the Stripe one puts the symbol wherever the locale puts it -- and a
+ * preview that showed the wrong one would promise a PDF the invoice is not going to be.
+ */
+function formatNumberFormatPreview({
+  amount,
+  currency,
+  numberFormatLocale,
+  template,
+}: FormatNumberFormatPreviewArgs) {
+  if (template === "default") {
+    return `${formatAmount({ amount, numberFormatLocale })} ${currency}`;
+  }
+
+  return formatCurrency({ amount, currency, numberFormatLocale });
+}

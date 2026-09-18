@@ -2,11 +2,11 @@ import { Link, Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import dayjs from "dayjs";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import { type InvoiceData } from "@/app/schema";
+import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 import { PROD_WEBSITE_URL } from "@/config";
 
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
-import { formatCurrency } from "../../../utils/format-currency";
+import { formatAmount } from "../../../utils/format-amount";
 
 export function InvoiceFooter({
   invoiceData,
@@ -26,10 +26,14 @@ export function InvoiceFooter({
 
   const invoiceTotal = invoiceData?.total;
 
-  const formattedInvoiceTotal = formatCurrency({
+  /**
+   * The footer writes the total the same way the body does -- it used to be the one place in
+   * this template that localised the number and printed a currency symbol, so a German
+   * invoice read "321 200.00 EUR" in its totals and "321.200,00 €" at its foot.
+   */
+  const formattedInvoiceTotal = formatAmount({
     amount: invoiceTotal,
-    currency: invoiceData.currency,
-    language,
+    numberFormatLocale: resolveNumberFormatLocale(invoiceData),
   });
 
   return (
@@ -43,7 +47,8 @@ export function InvoiceFooter({
             </>
           ) : null}
           <Text style={[styles.fontSize8]}>
-            {formattedInvoiceTotal} {t.stripe.due} {paymentDueDate}
+            {formattedInvoiceTotal} {invoiceData.currency} {t.stripe.due}{" "}
+            {paymentDueDate}
           </Text>
           <Text style={[styles.fontSize8]}>·</Text>
           <Text style={[styles.fontSize8]}>

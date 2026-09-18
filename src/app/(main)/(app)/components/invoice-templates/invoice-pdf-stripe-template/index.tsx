@@ -13,7 +13,7 @@ import dayjs from "dayjs";
 
 import { InvoiceQRCode } from "@/app/(main)/(app)/components/invoice-templates/common/invoice-qr-code";
 import { formatCurrency } from "@/app/(main)/(app)/utils/format-currency";
-import { type InvoiceData } from "@/app/schema";
+import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 import { INVOICE_PDF_FONTS } from "@/config";
 
 import { StripeDueAmount } from "./stripe-due-amount";
@@ -226,6 +226,7 @@ export function StripeInvoicePdfTemplate({
   qrCodeDataUrl?: string;
 }) {
   const language = invoiceData.language;
+  const numberFormatLocale = resolveNumberFormatLocale(invoiceData);
 
   // Set dayjs locale based on invoice language
   dayjs.locale(language);
@@ -239,12 +240,24 @@ export function StripeInvoicePdfTemplate({
   const formattedInvoiceTotal = formatCurrency({
     amount: invoiceData?.total,
     currency: invoiceData.currency,
-    language,
+    numberFormatLocale,
   });
 
-  // we want to mimic the Stripe invoice format, so we need to add the currency code only for USD in English
+  /**
+   * We want to mimic the Stripe invoice format, which prints "$1,234.00 USD": English
+   * renders USD as a bare `$`, and that is also the Canadian, Australian and Singapore
+   * dollar, so the code goes back on.
+   *
+   * It follows the *format* locale rather than the invoice language, because that is what
+   * decides the symbol -- an English invoice formatted in French already prints `$US`, and a
+   * German invoice formatted in English would otherwise print a bare `$`. `international` is
+   * built from `en-US`, so it prints that same bare `$`.
+   */
   const currencyCode =
-    invoiceData.currency === "USD" && language === "en" ? " USD" : "";
+    invoiceData.currency === "USD" &&
+    (numberFormatLocale === "en" || numberFormatLocale === "international")
+      ? " USD"
+      : "";
 
   const formattedInvoiceTotalWithCurrency = `${formattedInvoiceTotal}${currencyCode}`;
 

@@ -542,7 +542,6 @@ export function SellerDialog({
                                 onCheckedChange={field.onChange}
                                 id="emailFieldIsVisible"
                                 data-testid={`sellerEmailDialogFieldVisibilitySwitch`}
-                                aria-label={`Show the 'Email' field in the PDF`}
                               />
                             </FormControl>
                             <CustomTooltip
@@ -595,7 +594,6 @@ export function SellerDialog({
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               id="accountNumberFieldIsVisible"
-                              aria-label={`Show the 'Account Number' field in the PDF`}
                             />
                             <CustomTooltip
                               trigger={
@@ -647,7 +645,6 @@ export function SellerDialog({
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               id="swiftBicFieldIsVisible"
-                              aria-label={`Show the 'SWIFT/BIC' field in the PDF`}
                             />
                             <CustomTooltip
                               trigger={
@@ -702,7 +699,6 @@ export function SellerDialog({
                                 onCheckedChange={field.onChange}
                                 id="notes-field-visibility"
                                 data-testid={`sellerNotesDialogFieldVisibilitySwitch`}
-                                aria-label={`Show the 'Notes' field in the PDF`}
                               />
                             </FormControl>
                             <CustomTooltip
