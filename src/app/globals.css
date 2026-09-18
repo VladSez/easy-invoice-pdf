@@ -24,6 +24,37 @@ textarea {
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Slim, pill-shaped scrollbar for scrollable panels (dialogs, lists).
+   * Firefox only exposes the two `scrollbar-*` properties; Chrome/Safari get
+   * the rounded thumb through the ::-webkit-scrollbar pseudo-elements. */
+  .scrollbar-rounded {
+    scrollbar-width: thin;
+    scrollbar-color: theme(colors.slate.300) transparent;
+  }
+
+  .scrollbar-rounded::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .scrollbar-rounded::-webkit-scrollbar-track,
+  .scrollbar-rounded::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  .scrollbar-rounded::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background-color: theme(colors.slate.300);
+    /* The transparent border plus content-box clipping insets the thumb so it
+     * does not touch the rounded edge of its container. */
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .scrollbar-rounded::-webkit-scrollbar-thumb:hover {
+    background-color: theme(colors.slate.400);
+  }
 }
 
 @layer components {

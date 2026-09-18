@@ -14,7 +14,10 @@ import { Footer } from "@/app/(components)/footer";
 import { InvoicePageHeader } from "@/app/(main)/(app)/components/invoice-page-header";
 import { InvoicePdfInstanceProvider } from "@/app/(main)/(app)/contexts/invoice-pdf-instance-context";
 import { InvoicePageLoadingSkeleton } from "@/app/(main)/(app)/loading";
-import { getAppStorageItem } from "@/app/(main)/(app)/utils/app-local-storage";
+import {
+  getAppStorageItem,
+  setAppStorageItem,
+} from "@/app/(main)/(app)/utils/app-local-storage";
 import {
   ensureAppMetadata,
   updateAppMetadata,
@@ -23,6 +26,8 @@ import type { ChangelogSummary } from "@/app/(main)/changelog/utils";
 import { getInitialInvoiceData } from "@/app/constants";
 import {
   invoiceSchema,
+  LEGACY_INVOICE_RECOVERY_LOCAL_STORAGE_KEY,
+  MAX_INVOICE_ITEMS,
   PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_TEMPLATES,
   type InvoiceData,
@@ -48,6 +53,16 @@ import { useInAppBrowserNotice } from "./hooks/use-in-app-browser-notice";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
 import { selectInvoiceTemplate } from "./utils/select-invoice-template";
+
+/** Detects legacy invoices that exceed the editor and Send safety limit. */
+function hasTooManyInvoiceItems(value: unknown): boolean {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    Array.isArray((value as { items?: unknown }).items) &&
+    (value as { items: unknown[] }).items.length > MAX_INVOICE_ITEMS
+  );
+}
 
 // TODO: enable later when PRO version is released, this is PRO FEATURE =)
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
@@ -164,6 +179,40 @@ export function AppPageClient({
     null,
   );
 
+  /** Preserves an oversized legacy invoice and offers it as a JSON download. */
+  const preserveAndOfferLegacyInvoice = useCallback(
+    (value: unknown, source: "saved" | "shared") => {
+      const recoveryJson = JSON.stringify(value, null, 2);
+      setAppStorageItem({
+        key: LEGACY_INVOICE_RECOVERY_LOCAL_STORAGE_KEY,
+        value: recoveryJson,
+      });
+
+      toast.error(
+        `This ${source} invoice has more than ${MAX_INVOICE_ITEMS} line items and cannot be opened in the editor. A recovery copy has been preserved.`,
+        {
+          id: "legacy-invoice-recovery-toast",
+          duration: Infinity,
+          closeButton: true,
+          action: {
+            label: "Download recovery copy",
+            onClick: () => {
+              const url = URL.createObjectURL(
+                new Blob([recoveryJson], { type: "application/json" }),
+              );
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = "easy-invoice-recovery.json";
+              link.click();
+              URL.revokeObjectURL(url);
+            },
+          },
+        },
+      );
+    },
+    [],
+  );
+
   // Refs to track original URL invoice data
   const originalUrlInvoiceDataRef = useRef<InvoiceData | null>(null);
 
@@ -220,6 +269,12 @@ export function AppPageClient({
       if (savedData) {
         const json: unknown = JSON.parse(savedData);
 
+        if (hasTooManyInvoiceItems(json)) {
+          preserveAndOfferLegacyInvoice(json, "saved");
+          setInvoiceDataState(getInitialInvoiceData());
+          return;
+        }
+
         // we patch the invoice number breaking change here
         // this should happen before parsing the data with zod
         const updatedJson = handleInvoiceNumberBreakingChange(json);
@@ -260,7 +315,11 @@ export function AppPageClient({
 
       Sentry.captureException(error);
     }
-  }, [templateValidation.data, templateValidation.success]);
+  }, [
+    preserveAndOfferLegacyInvoice,
+    templateValidation.data,
+    templateValidation.success,
+  ]);
 
   useEffect(() => {
     // Scroll to top of the page on first render for better UX
@@ -301,6 +360,13 @@ export function AppPageClient({
         const decompressedKeys = decompressInvoiceData(
           parsedJSON as Record<string, unknown>,
         );
+
+        if (hasTooManyInvoiceItems(decompressedKeys)) {
+          preserveAndOfferLegacyInvoice(decompressedKeys, "shared");
+          setInvoiceDataState(getInitialInvoiceData());
+          setIsInvoiceUrlCorrupted(true);
+          return;
+        }
 
         // we patch the invoice number breaking change here (this should happen before parsing the data with zod)
         const updatedJson = handleInvoiceNumberBreakingChange(decompressedKeys);
@@ -383,7 +449,12 @@ export function AppPageClient({
       // if no data in url, load from local storage
       loadFromLocalStorage();
     }
-  }, [loadFromLocalStorage, searchParams, templateValidation]);
+  }, [
+    loadFromLocalStorage,
+    preserveAndOfferLegacyInvoice,
+    searchParams,
+    templateValidation,
+  ]);
 
   /**
    * Ensures the template query parameter is present in the URL (for better user experience)
@@ -785,6 +856,7 @@ export function AppPageClient({
               invoiceDataState={invoiceDataState}
               isMobile={isMobile}
               isSharedInvoice={isViewingSharedInvoice}
+              qrCodeDataUrl={qrCodeDataUrl}
             />
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
               <InvoiceClientPage
@@ -794,6 +866,7 @@ export function AppPageClient({
                 isMobile={isMobile}
                 canShareInvoice={canShareInvoice}
                 currentInvoiceFormDataRef={currentInvoiceFormDataRef}
+                qrCodeDataUrl={qrCodeDataUrl}
               />
             </div>
           </div>

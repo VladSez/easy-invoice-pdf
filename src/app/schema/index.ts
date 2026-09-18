@@ -1536,6 +1536,17 @@ export const CHANGELOG_SEEN_STORAGE_KEY =
 export const CTA_TOAST_STORAGE_KEY = "EASY_INVOICE_CTA_LAST_SHOWN_AT";
 
 /**
+ * A legacy invoice that exceeds `MAX_INVOICE_ITEMS`, kept verbatim so the user can
+ * download a recovery copy. The editor refuses to open it, so this is the only place
+ * that data survives.
+ */
+export const LEGACY_INVOICE_RECOVERY_LOCAL_STORAGE_KEY =
+  "easy-invoice-pdf-legacy-invoice-recovery";
+
+/** The in-progress Send message body, kept across the OAuth round trip's refresh. */
+export const SEND_MESSAGE_LOCAL_STORAGE_KEY = "easyinvoice-send-message-v1";
+
+/**
  * Every key the app is allowed to write to `localStorage`.
  *
  * The keys themselves are declared next to whatever describes their contents (the
@@ -1553,6 +1564,8 @@ export const LOCAL_STORAGE_KEYS = [
   WELCOME_POPUP_SEEN_STORAGE_KEY,
   CHANGELOG_SEEN_STORAGE_KEY,
   CTA_TOAST_STORAGE_KEY,
+  LEGACY_INVOICE_RECOVERY_LOCAL_STORAGE_KEY,
+  SEND_MESSAGE_LOCAL_STORAGE_KEY,
 ] as const;
 
 export type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[number];

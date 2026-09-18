@@ -396,7 +396,9 @@ export async function generateInvoice(
     `https://outlook.office.com/mail/deeplink/compose` +
     `?to=${encodeURIComponent(invoiceEmailCompanyTo)}` +
     `&subject=${encodeURIComponent(`Invoice for ${monthAndYear}`)}` +
-    `&body=${encodeURIComponent(`Hello,\nThe invoice for ${monthAndYear} is in the attachment.\n\nHave a nice day.`)}`;
+    `&body=${encodeURIComponent(
+      `Hello,\n\nPlease find your invoice for ${monthAndYear} attached.\n\nBest regards,\nVlad Sazonau`,
+    )}`;
 
   const testModeWarnings: string[] = [];
 

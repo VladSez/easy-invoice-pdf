@@ -250,6 +250,33 @@ EasyInvoicePDF is [AGPL v3](#license); self-host your own instance locally or on
 - Copy `.env.example to .env.local` (`cp .env.example .env.local`)
 - Run `pnpm run dev`
 
+### Optional: Send invoices from Gmail or Outlook
+
+Send is feature-flagged and remains completely disabled by default. The normal
+invoice editor does not need Clerk or OAuth configuration.
+
+To develop Send locally:
+
+1. Create a Clerk application and enable Google and Microsoft social connections
+   with Gmail `gmail.send` and Microsoft delegated `Mail.Send` permission.
+2. Set `NEXT_PUBLIC_SEND_INVOICE_ENABLED="true"`,
+   `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, and `CLERK_SECRET_KEY` in `.env.local`.
+3. Start the app with `pnpm dev`.
+
+Clerk is the only persistence layer used by Send V1. Users can connect multiple
+Gmail and Outlook accounts and choose the exact sender. The browser renders the
+PDF and uploads it to the Hono API as multipart form data; the attachment limit
+is 2.5 MB. Interactive API docs are available at `/api/docs`, backed by the
+OpenAPI 3.1 document at `/api/openapi.json`. Both are local development tooling
+and are served only when `NODE_ENV=development`, so deployments return 404. The
+docs page is a Next route inside `ClerkProvider`, so Swagger's
+`requestInterceptor` mints a fresh session token with `getToken()` for every
+request and you never paste one — sign in at `http://localhost:3000` first. See
+the
+[Send operations runbook](docs/send-invoice-operations.md) and
+[provider launch checklist](docs/send-invoice-provider-readiness.md) before
+turning the feature on outside local development.
+
 For the full app experience, you’ll need to obtain and set values from the following services:
 
 - [Resend](https://resend.com/)

@@ -108,26 +108,39 @@ function MobileEditorLoading() {
 function DesktopEditorLoading() {
   return (
     <>
+      {/* Desktop left panel: Editor card */}
       <div className="col-span-4 -mt-0.5 mb-7 mr-[27px] hidden lg:block">
+        {/* Main card container with rounded top corners, border, and shadow */}
         <div className="rounded-t-lg border shadow">
+          {/* Editor area content, responsive height for 2xl screens */}
           <div className="h-[618px] overflow-hidden px-4 pb-4 pt-0 2xl:h-[700px]">
+            {/* Editor skeleton content (form fields, etc.) */}
             <FormLoadingContent />
           </div>
         </div>
       </div>
 
+      {/* Desktop preview area container */}
       <div className="relative col-span-8 hidden h-[620px] w-full max-w-full lg:block 2xl:h-[700px]">
+        {/* Outer frame of the document preview */}
         <div className="flex h-full items-center justify-center overflow-hidden rounded-sm border border-slate-200 bg-slate-100">
+          {/* Simulated document/card */}
           <div className="h-[92%] w-[68%] rounded-sm bg-white shadow-sm">
+            {/* Content skeletons inside the preview */}
             <div className="space-y-4 p-8">
+              {/* Main heading skeleton */}
               <Skeleton className="h-5 w-2/5" />
+              {/* Subheading skeleton */}
               <Skeleton className="h-3 w-1/3" />
-              <Skeleton className="mt-10 h-3 w-full" />
+              {/* Spacer and big form content skeletons */}
+              <Skeleton className="w/full mt-10 h-3" />
               <Skeleton className="h-3 w-4/5" />
+              {/* Large textarea or content area skeleton */}
               <Skeleton className="mt-8 h-32 w-full" />
             </div>
           </div>
         </div>
+        {/* Faded bottom bar or toolbar skeleton */}
         <Skeleton className="absolute -bottom-5 right-0 h-3 w-[254px]" />
       </div>
     </>
