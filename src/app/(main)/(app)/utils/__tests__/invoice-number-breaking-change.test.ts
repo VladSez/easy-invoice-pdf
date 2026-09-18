@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import { SUPPORTED_LANGUAGES, type InvoiceData } from "@/app/schema";
+import {
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
+  type InvoiceData,
+} from "@/app/schema";
 
 import { handleInvoiceNumberBreakingChange } from "../invoice-number-breaking-change";
 
@@ -125,7 +128,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
 
       const result = handleInvoiceNumberBreakingChange(input);
 
-      const defaultLanguage = SUPPORTED_LANGUAGES[0];
+      const defaultLanguage = SUPPORTED_INVOICE_PDF_LANGUAGES[0];
       expect(result).toEqual({
         language: "invalid-lang",
         invoiceNumberObject: {
@@ -158,7 +161,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
 
       const result = handleInvoiceNumberBreakingChange(input);
 
-      const defaultLanguage = SUPPORTED_LANGUAGES[0];
+      const defaultLanguage = SUPPORTED_INVOICE_PDF_LANGUAGES[0];
       expect(result).toEqual({
         language: 123,
         invoiceNumberObject: {
@@ -297,7 +300,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
     });
 
     it("should handle all supported languages correctly", () => {
-      SUPPORTED_LANGUAGES.forEach((lang) => {
+      SUPPORTED_INVOICE_PDF_LANGUAGES.forEach((lang) => {
         const input = {
           invoiceNumber: `INV-${lang}`,
           language: lang,
@@ -315,7 +318,9 @@ describe("handleInvoiceNumberBreakingChange", () => {
       });
 
       // Should track one event per language
-      expect(umamiTrackEvent).toHaveBeenCalledTimes(SUPPORTED_LANGUAGES.length);
+      expect(umamiTrackEvent).toHaveBeenCalledTimes(
+        SUPPORTED_INVOICE_PDF_LANGUAGES.length,
+      );
     });
 
     it("should handle special characters in invoiceNumber", () => {

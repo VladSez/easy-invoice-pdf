@@ -618,7 +618,7 @@ test.describe("Default Invoice Template", () => {
 
     await expect(
       page.getByRole("button", {
-        name: `Reset to default ("Fatura N°:")`,
+        name: `Reset to default ("${INVOICE_PDF_TRANSLATIONS.pt.invoiceNumber}:")`,
       }),
     ).toBeVisible();
 

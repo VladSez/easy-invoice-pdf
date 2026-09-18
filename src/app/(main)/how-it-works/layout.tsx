@@ -15,7 +15,7 @@ const HOW_IT_WORKS_PAGE_URL = "https://easyinvoicepdf.com/how-it-works";
 const PAGE_TITLE = "How EasyInvoicePDF Works | Video Tutorials";
 
 const PAGE_DESCRIPTION =
-  "Watch step-by-step video tutorials on creating invoices, saving seller and buyer details, and generating weekly invoices with EasyInvoicePDF.";
+  "Watch step-by-step video tutorials on creating invoices, saving seller and buyer details, customizing tax, and generating weekly invoices with EasyInvoicePDF.";
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -26,6 +26,8 @@ export const metadata: Metadata = {
     "create invoice video",
     "add seller invoice",
     "add buyer invoice",
+    "custom tax invoice",
+    "vat invoice tutorial",
     "weekly invoices",
     "easyinvoicepdf demo",
     "pdf invoice generator guide",

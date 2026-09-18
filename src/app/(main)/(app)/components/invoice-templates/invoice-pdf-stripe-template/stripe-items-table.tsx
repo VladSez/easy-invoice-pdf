@@ -3,9 +3,10 @@ import dayjs from "dayjs";
 
 import type { STRIPE_TEMPLATE_STYLES } from "@/app/(main)/(app)/components/invoice-templates/invoice-pdf-stripe-template";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
+import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
 import { formatCurrency } from "@/app/(main)/(app)/utils/format-currency";
 import { formatServicePeriodRange } from "@/app/(main)/(app)/utils/format-service-period";
-import type { InvoiceData } from "@/app/schema";
+import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 
 import "dayjs/locale/de";
 import "dayjs/locale/en";
@@ -26,6 +27,7 @@ export function StripeItemsTable({
   styles: typeof STRIPE_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
+  const numberFormatLocale = resolveNumberFormatLocale(invoiceData);
   const t = INVOICE_PDF_TRANSLATIONS[language];
   const taxLabelText = invoiceData.taxLabelText || "VAT";
 
@@ -76,17 +78,21 @@ export function StripeItemsTable({
         const formattedNetPrice = formatCurrency({
           amount: item.netPrice,
           currency: invoiceData.currency,
-          language,
+          numberFormatLocale,
         });
 
         const formattedPreTaxAmount = formatCurrency({
           amount: item.netAmount,
           currency: invoiceData.currency,
-          language,
+          numberFormatLocale,
         });
 
-        const formattedAmount = item.amount.toLocaleString("en-US", {
-          style: "decimal",
+        // The quantity column carries no currency, and the Stripe template rounds it to
+        // whole units
+        const formattedAmount = formatAmount({
+          amount: item.amount,
+          numberFormatLocale,
+          minimumFractionDigits: 0,
           maximumFractionDigits: 0,
         });
 

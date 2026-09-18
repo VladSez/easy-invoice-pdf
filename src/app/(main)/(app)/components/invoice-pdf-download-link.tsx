@@ -185,8 +185,11 @@ export function InvoicePDFDownloadLink({
     return;
   }, [pdfLoading]);
 
+  // The button is a fixed width so the layout does not shift while the PDF regenerates,
+  // which means "Download PDF in <language>" has to be measured against the longest name.
   const isLongLanguageString =
     invoiceData.language === "pt" || invoiceData.language === "nb";
+  const isExtraLongLanguageString = invoiceData.language === "pt-BR";
 
   return (
     <CustomTooltip
@@ -218,6 +221,7 @@ export function InvoicePDFDownloadLink({
             {
               "pointer-events-none opacity-70": isLoading,
               "lg:w-[250px]": isLongLanguageString,
+              "lg:w-[275px]": isExtraLongLanguageString,
             },
           )}
         >

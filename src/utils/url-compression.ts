@@ -43,6 +43,8 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   language: "a",
   dateFormat: "b",
   currency: "c",
+  numberFormatLocale: "%",
+  preserveNumberFormatOnLanguageChange: "^",
   template: "d",
   logo: "e",
   invoiceNumberObject: "f",

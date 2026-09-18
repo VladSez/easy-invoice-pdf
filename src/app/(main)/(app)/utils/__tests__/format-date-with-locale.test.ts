@@ -5,14 +5,17 @@ import {
   formatDateWithLocale,
   formatTodayWithLocale,
 } from "@/app/(main)/(app)/utils/format-date-with-locale";
-import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "@/app/schema";
+import {
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
+  type SupportedLanguages,
+} from "@/app/schema";
 
 const DATE = "2026-09-01";
 
 /**
  * Expected rendering of {@link DATE} with the `MMMM D, YYYY` format in every
  * supported language. Typed as an exhaustive record, so adding a language to
- * `SUPPORTED_LANGUAGES` without registering its dayjs locale fails to compile here.
+ * `SUPPORTED_INVOICE_PDF_LANGUAGES` without registering its dayjs locale fails to compile here.
  */
 const EXPECTED_LONG_DATE: Record<SupportedLanguages, string> = {
   en: "September 1, 2026",
@@ -21,6 +24,7 @@ const EXPECTED_LONG_DATE: Record<SupportedLanguages, string> = {
   es: "septiembre 1, 2026",
   sv: "september 1, 2026",
   pt: "setembro 1, 2026",
+  "pt-BR": "setembro 1, 2026",
   ru: "сентябрь 1, 2026",
   uk: "вересень 1, 2026",
   fr: "septembre 1, 2026",
@@ -30,7 +34,7 @@ const EXPECTED_LONG_DATE: Record<SupportedLanguages, string> = {
 };
 
 describe("formatDateWithLocale", () => {
-  it.each(SUPPORTED_LANGUAGES)(
+  it.each(SUPPORTED_INVOICE_PDF_LANGUAGES)(
     "formats a date in %s, so the locale is actually registered",
     (language) => {
       expect(
@@ -46,7 +50,7 @@ describe("formatDateWithLocale", () => {
   it("renders month names differently per language", () => {
     // Guards against the silent dayjs fallback: an unregistered locale keeps the
     // previous one, which would make every language render identically.
-    const rendered = SUPPORTED_LANGUAGES.map((language) => {
+    const rendered = SUPPORTED_INVOICE_PDF_LANGUAGES.map((language) => {
       return formatDateWithLocale({
         date: DATE,
         selectedDateFormat: "D MMM YYYY",
@@ -60,7 +64,7 @@ describe("formatDateWithLocale", () => {
   });
 
   it("leaves numeric formats untouched across languages", () => {
-    for (const language of SUPPORTED_LANGUAGES) {
+    for (const language of SUPPORTED_INVOICE_PDF_LANGUAGES) {
       expect(
         formatDateWithLocale({
           date: DATE,

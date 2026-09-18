@@ -54,6 +54,9 @@ export const YOUTUBE_VIDEO_HOW_TO_ADD_BUYER =
 const YOUTUBE_VIDEO_HOW_TO_ADD_INVOICE_FOR_ONE_WEEK =
   "https://www.youtube.com/embed/6KzDBBiAJmg";
 
+const YOUTUBE_VIDEO_HOW_TO_CUSTOMIZE_TAX =
+  "https://www.youtube.com/embed/F_iJxZ3PHbk";
+
 /**
  * Video catalog for the "How it works" dialog
  */
@@ -105,6 +108,19 @@ export const HOW_IT_WORKS_VIDEOS = [
     uploadDate: "2026-06-13T13:23:38-07:00",
     thumbnailUrl: "https://i.ytimg.com/vi/6KzDBBiAJmg/maxresdefault.jpg",
     iframeTitle: "How to create weekly invoices - EasyInvoicePDF",
+  },
+  {
+    id: "custom-tax",
+    tabLabel: "Customizable tax",
+    tabLabelShort: "Tax",
+    title: "How to customize tax",
+    description:
+      "Rename VAT to GST, Sales Tax, or any label, and set a rate per item.",
+    embedUrl: YOUTUBE_VIDEO_HOW_TO_CUSTOMIZE_TAX,
+    watchUrl: "https://www.youtube.com/watch?v=F_iJxZ3PHbk",
+    uploadDate: "2026-09-08T16:22:57-07:00",
+    thumbnailUrl: "https://i.ytimg.com/vi/F_iJxZ3PHbk/maxresdefault.jpg",
+    iframeTitle: "How to customize tax on an invoice - EasyInvoicePDF",
   },
 ] as const satisfies {
   id: string;

@@ -1,9 +1,10 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import type { InvoiceData } from "@/app/schema";
+import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
+import { formatAmount } from "../../../utils/format-amount";
 
 export function InvoiceVATSummaryTable({
   invoiceData,
@@ -15,6 +16,7 @@ export function InvoiceVATSummaryTable({
   styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
+  const numberFormatLocale = resolveNumberFormatLocale(invoiceData);
   const t = INVOICE_PDF_TRANSLATIONS[language];
 
   /**
@@ -56,22 +58,18 @@ export function InvoiceVATSummaryTable({
   const totalNetAmount = sortedItems.reduce((acc, item) => {
     return acc + item.netAmount;
   }, 0);
-  const formattedTotalNetAmount = totalNetAmount
-    .toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-    .replaceAll(",", " ");
+  const formattedTotalNetAmount = formatAmount({
+    amount: totalNetAmount,
+    numberFormatLocale,
+  });
 
   const totalVATAmount = sortedItems.reduce((acc, item) => {
     return acc + item.vatAmount;
   }, 0);
-  const formattedTotalVATAmount = totalVATAmount
-    .toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-    .replaceAll(",", " ");
+  const formattedTotalVATAmount = formatAmount({
+    amount: totalVATAmount,
+    numberFormatLocale,
+  });
 
   return (
     <View style={[styles.table, { width: "100%" }]}>
@@ -100,35 +98,20 @@ export function InvoiceVATSummaryTable({
       START: Table body rows
       */}
       {sortedItems?.map((item, index) => {
-        const formattedNetAmount =
-          typeof item.netAmount === "number"
-            ? item.netAmount
-                .toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-                .replaceAll(",", " ")
-            : "0.00";
+        const formattedNetAmount = formatAmount({
+          amount: item.netAmount,
+          numberFormatLocale,
+        });
 
-        const formattedPreTaxAmount =
-          typeof item.preTaxAmount === "number"
-            ? item.preTaxAmount
-                .toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-                .replaceAll(",", " ")
-            : "0.00";
+        const formattedPreTaxAmount = formatAmount({
+          amount: item.preTaxAmount,
+          numberFormatLocale,
+        });
 
-        const formattedVatAmount =
-          typeof item.vatAmount === "number"
-            ? item.vatAmount
-                .toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-                .replaceAll(",", " ")
-            : "0.00";
+        const formattedVatAmount = formatAmount({
+          amount: item.vatAmount,
+          numberFormatLocale,
+        });
 
         // Table row start
         return (

@@ -528,7 +528,6 @@ export function BuyerDialog({
                                 onCheckedChange={field.onChange}
                                 id="emailFieldIsVisible"
                                 data-testid={`buyerEmailDialogFieldVisibilitySwitch`}
-                                aria-label={`Show the 'Email' field in the PDF`}
                               />
                             </FormControl>
                             <CustomTooltip
@@ -584,7 +583,6 @@ export function BuyerDialog({
                                 onCheckedChange={field.onChange}
                                 id="notes-field-visibility"
                                 data-testid={`buyerNotesDialogFieldVisibilitySwitch`}
-                                aria-label={`Show the 'Notes' field in the PDF`}
                               />
                             </FormControl>
                             <CustomTooltip

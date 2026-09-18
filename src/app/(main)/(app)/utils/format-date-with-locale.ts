@@ -6,6 +6,8 @@ import type { SupportedLanguages } from "@/app/schema";
 // dayjs singleton. `.locale("fr")` on an unregistered locale is a silent no-op
 // (the date keeps the previous locale), so every language we support has to be
 // imported here. This is the single place that does it for the invoice form.
+//
+// dayjs lowercases the name it is handed, so `"pt-BR"` finds `dayjs/locale/pt-br`.
 import "dayjs/locale/de";
 import "dayjs/locale/en";
 import "dayjs/locale/es";
@@ -14,6 +16,7 @@ import "dayjs/locale/it";
 import "dayjs/locale/nb";
 import "dayjs/locale/nl";
 import "dayjs/locale/pl";
+import "dayjs/locale/pt-br";
 import "dayjs/locale/pt";
 import "dayjs/locale/ru";
 import "dayjs/locale/sv";

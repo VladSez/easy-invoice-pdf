@@ -4,7 +4,11 @@ import { GlobeIcon } from "lucide-react";
 import type { Locale } from "next-intl";
 import { useTransition } from "react";
 
-import { LANGUAGE_TO_NATIVE_LABEL } from "@/app/schema";
+import {
+  LANGUAGE_TO_NATIVE_LABEL,
+  SUPPORTED_I18N_LOCALES,
+  type SupportedLocale,
+} from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,13 +25,16 @@ import {
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
-const MAP_LOCALE_TO_LANGUAGE = LANGUAGE_TO_NATIVE_LABEL satisfies Record<
-  Locale,
-  string
->;
-
-type SupportedLocale = keyof typeof MAP_LOCALE_TO_LANGUAGE;
-type LanguageLabel = (typeof MAP_LOCALE_TO_LANGUAGE)[SupportedLocale];
+/**
+ * The locales this switcher offers, in the order the language pickers use.
+ *
+ * Narrowed to {@link SUPPORTED_I18N_LOCALES} rather than taken from
+ * {@link LANGUAGE_TO_NATIVE_LABEL} wholesale: that map is keyed by invoice PDF language,
+ * and the ones the site itself is not translated into (`pt-BR`) have no route to switch to.
+ */
+const LOCALE_OPTIONS = SUPPORTED_I18N_LOCALES.map((locale) => {
+  return [locale, LANGUAGE_TO_NATIVE_LABEL[locale]] as const;
+}) satisfies readonly (readonly [Locale, string])[];
 
 interface LanguageSwitcherProps {
   locale: SupportedLocale;
@@ -76,11 +83,7 @@ export function LanguageSwitcher({
         </Tooltip>
       </TooltipProvider>
       <DropdownMenuContent loop>
-        {(
-          Object.entries(MAP_LOCALE_TO_LANGUAGE) as Array<
-            [SupportedLocale, LanguageLabel]
-          >
-        ).map(([itemLocale, label]) => {
+        {LOCALE_OPTIONS.map(([itemLocale, label]) => {
           const isCurrentLocale = itemLocale === locale;
 
           return (

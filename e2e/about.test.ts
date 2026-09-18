@@ -3,7 +3,7 @@
 
 import { expect, test } from "@playwright/test";
 
-import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_LANGUAGES } from "@/app/schema";
+import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_I18N_LOCALES } from "@/app/schema";
 import { GITHUB_URL, TWITTER_URL, VIDEO_DEMO_FALLBACK_IMG } from "@/config";
 
 test.describe("About page", () => {
@@ -467,7 +467,7 @@ test.describe("About page", () => {
       }),
     ).toBeVisible();
 
-    for (const lang of SUPPORTED_LANGUAGES) {
+    for (const lang of SUPPORTED_I18N_LOCALES) {
       const link = footerAboutLinks.getByRole("link", {
         name: LANGUAGE_TO_NATIVE_LABEL[lang],
         exact: true,

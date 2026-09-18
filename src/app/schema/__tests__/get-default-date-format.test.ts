@@ -5,14 +5,14 @@ import {
   DEFAULT_DATE_FORMAT,
   getDefaultDateFormat,
   STRIPE_DEFAULT_DATE_FORMAT,
-  SUPPORTED_LANGUAGES,
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
 } from "@/app/schema";
 
 /** A date whose day and month can never be confused for one another. */
 const DATE = "2025-12-17";
 
 describe("getDefaultDateFormat", () => {
-  it.each(SUPPORTED_LANGUAGES)(
+  it.each(SUPPORTED_INVOICE_PDF_LANGUAGES)(
     "keeps the default template on ISO in %s, whatever the language",
     (language) => {
       expect(getDefaultDateFormat({ language, template: "default" })).toBe(
@@ -28,7 +28,7 @@ describe("getDefaultDateFormat", () => {
   });
 
   it.each(
-    SUPPORTED_LANGUAGES.filter((language) => {
+    SUPPORTED_INVOICE_PDF_LANGUAGES.filter((language) => {
       return language !== "en";
     }),
   )("leads the Stripe template's date with the day in %s", (language) => {

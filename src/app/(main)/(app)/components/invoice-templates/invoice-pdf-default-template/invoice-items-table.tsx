@@ -1,9 +1,10 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import type { InvoiceData } from "@/app/schema";
+import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
+import { formatAmount } from "../../../utils/format-amount";
 
 export function InvoiceItemsTable({
   invoiceData,
@@ -15,6 +16,7 @@ export function InvoiceItemsTable({
   styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
+  const numberFormatLocale = resolveNumberFormatLocale(invoiceData);
   const t = INVOICE_PDF_TRANSLATIONS[language];
 
   // we need to check only the first row, because all next rows are the same
@@ -152,40 +154,33 @@ export function InvoiceItemsTable({
           START: Table body rows
         */}
         {invoiceData?.items.map((item, index) => {
-          const formattedAmount = item.amount
-            .toLocaleString("en-US", {
-              style: "decimal",
-              maximumFractionDigits: 3,
-            })
-            .replaceAll(",", " ");
+          // The quantity column is not money: it carries no forced decimals and allows three
+          const formattedAmount = formatAmount({
+            amount: item.amount,
+            numberFormatLocale,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 3,
+          });
 
-          const formattedNetPrice = item.netPrice
-            .toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-            .replaceAll(",", " ");
+          const formattedNetPrice = formatAmount({
+            amount: item.netPrice,
+            numberFormatLocale,
+          });
 
-          const formattedNetAmount = item.netAmount
-            .toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-            .replaceAll(",", " ");
+          const formattedNetAmount = formatAmount({
+            amount: item.netAmount,
+            numberFormatLocale,
+          });
 
-          const formattedVATAmount = item.vatAmount
-            .toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-            .replaceAll(",", " ");
+          const formattedVATAmount = formatAmount({
+            amount: item.vatAmount,
+            numberFormatLocale,
+          });
 
-          const formattedPreTaxAmount = item.preTaxAmount
-            .toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-            .replaceAll(",", " ");
+          const formattedPreTaxAmount = formatAmount({
+            amount: item.preTaxAmount,
+            numberFormatLocale,
+          });
 
           const formattedVat = Number.isNaN(Number(item.vat))
             ? item.vat
@@ -236,9 +231,7 @@ export function InvoiceItemsTable({
                       { textAlign: "right", marginRight: 2 },
                     ]}
                   >
-                    {typeof item?.amount === "number"
-                      ? formattedAmount
-                      : "0.00"}
+                    {formattedAmount}
                   </Text>
                 </View>
               ) : null}
@@ -261,9 +254,7 @@ export function InvoiceItemsTable({
                       { textAlign: "right", marginRight: 2 },
                     ]}
                   >
-                    {typeof item?.netPrice === "number"
-                      ? formattedNetPrice
-                      : "0.00"}
+                    {formattedNetPrice}
                   </Text>
                 </View>
               ) : null}
@@ -292,9 +283,7 @@ export function InvoiceItemsTable({
                       { textAlign: "right", marginRight: 2 },
                     ]}
                   >
-                    {typeof item?.netAmount === "number"
-                      ? formattedNetAmount
-                      : "0.00"}
+                    {formattedNetAmount}
                   </Text>
                 </View>
               ) : null}
@@ -308,9 +297,7 @@ export function InvoiceItemsTable({
                       { textAlign: "right", marginRight: 2 },
                     ]}
                   >
-                    {typeof item?.vatAmount === "number"
-                      ? formattedVATAmount
-                      : "0.00"}
+                    {formattedVATAmount}
                   </Text>
                 </View>
               ) : null}
@@ -327,9 +314,7 @@ export function InvoiceItemsTable({
                       },
                     ]}
                   >
-                    {typeof item?.preTaxAmount === "number"
-                      ? formattedPreTaxAmount
-                      : "0.00"}
+                    {formattedPreTaxAmount}
                   </Text>
                 </View>
               ) : null}

@@ -2,7 +2,10 @@ import * as Sentry from "@sentry/nextjs";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "@/app/schema";
+import {
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
+  type SupportedLanguages,
+} from "@/app/schema";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { numberToWords } from "@/utils/number-to-words";
 
@@ -42,7 +45,7 @@ export function getAmountInWords({
     .nonnegative("Amount must be non-negative")
     .transform(Math.floor);
 
-  const languageSchema = z.enum(SUPPORTED_LANGUAGES).default("en");
+  const languageSchema = z.enum(SUPPORTED_INVOICE_PDF_LANGUAGES).default("en");
 
   const result = z
     .object({

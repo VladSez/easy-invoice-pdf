@@ -3,7 +3,7 @@ import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import type { STRIPE_TEMPLATE_STYLES } from "@/app/(main)/(app)/components/invoice-templates/invoice-pdf-stripe-template";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import { formatCurrency } from "@/app/(main)/(app)/utils/format-currency";
-import { type InvoiceData } from "@/app/schema";
+import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 
 /**
  * Subtotal, total excluding tax, VAT, total and amount due fields
@@ -18,6 +18,7 @@ export function StripeVatSummaryTableTotals({
   styles: typeof STRIPE_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
+  const numberFormatLocale = resolveNumberFormatLocale(invoiceData);
   const t = INVOICE_PDF_TRANSLATIONS[language];
   const taxLabelText = invoiceData.taxLabelText || "VAT";
 
@@ -28,13 +29,13 @@ export function StripeVatSummaryTableTotals({
   const formattedSubtotal = formatCurrency({
     amount: subtotal,
     currency: invoiceData.currency,
-    language,
+    numberFormatLocale,
   });
 
   const invoiceTotal = formatCurrency({
     amount: invoiceData?.total,
     currency: invoiceData.currency,
-    language,
+    numberFormatLocale,
   });
 
   // Check if any items have numeric VAT values (not "NP" or "OO")
@@ -101,13 +102,13 @@ export function StripeVatSummaryTableTotals({
               const formattedVatAmount = formatCurrency({
                 amount: item.vatAmount,
                 currency: invoiceData.currency,
-                language,
+                numberFormatLocale,
               });
 
               const formattedNetAmount = formatCurrency({
                 amount: item.netAmount,
                 currency: invoiceData.currency,
-                language,
+                numberFormatLocale,
               });
 
               return (
