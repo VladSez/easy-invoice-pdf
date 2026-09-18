@@ -34,13 +34,20 @@ export const env = createEnv({
     GOOGLE_DRIVE_PRIVATE_KEY: z.string(),
 
     GITHUB_TOKEN: z.string(),
+
+    // Required in every build, including one that ships Send invoice dark, so
+    // a deployment can never be one dashboard edit away from a broken feature.
+    CLERK_SECRET_KEY: z.string(),
   },
   client: {
     NEXT_PUBLIC_SENTRY_DSN: z.string(),
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
   runtimeEnv: {
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
 
     AUTH_TOKEN: process.env.AUTH_TOKEN,
 
@@ -73,6 +80,8 @@ export const env = createEnv({
     GOOGLE_DRIVE_PRIVATE_KEY: process.env.GOOGLE_DRIVE_PRIVATE_KEY,
 
     GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+
+    CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
   },
   // `next typegen` (used by `pnpm type-check` and `pnpm lint`) loads next.config.mjs,
   // which imports this file. CI runs those jobs without runtime secrets, so they set

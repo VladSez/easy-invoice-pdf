@@ -1,79 +1,13 @@
-// IMPORTANT: it's fine to use this import directly on server side
-// eslint-disable-next-line no-restricted-imports
-import { Document, Font, Page, renderToBuffer } from "@react-pdf/renderer";
 import type dayjs from "dayjs";
 
-import { PDF_DEFAULT_TEMPLATE_STYLES } from "@/app/(main)/(app)/components/invoice-templates/invoice-pdf-default-template";
-import { InvoiceBody } from "@/app/(main)/(app)/components/invoice-templates/invoice-pdf-default-template/invoice-body";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import { getInvoiceDefaultNumberValue } from "@/app/constants";
 import { type InvoiceData, type SupportedLanguages } from "@/app/schema";
-import { INVOICE_PDF_FONTS } from "@/config";
 import { env } from "@/env";
 
 import { DEFAULT_INVOICE_TIME_ZONE, nowInTimeZone } from "./invoice-time-zone";
 
-// Open sans seems to be working fine with EN and PL
-const fontFamily = "Open Sans";
-
-// we need to duplicate font registration from /invoice-pdf-template/index.tsx due to some technical limitations, otherwise fonts are not applied in the PDF
-Font.register({
-  family: fontFamily,
-  fonts: [
-    {
-      src: INVOICE_PDF_FONTS.DEFAULT_TEMPLATE.OPEN_SANS_REGULAR,
-    },
-    {
-      src: INVOICE_PDF_FONTS.DEFAULT_TEMPLATE.OPEN_SANS_700,
-      fontWeight: 700,
-    },
-  ],
-});
-
-/**
- * This component is used to render the invoice PDF template on the backend
- *
- * It is used to generate the PDF file for the invoice and is DUPLICATED from the frontend component (/invoice-pdf-template/index.tsx), due to technical limitations.
- */
-const InvoicePdfTemplateToRenderOnBackend = ({
-  invoiceData,
-}: {
-  invoiceData: InvoiceData;
-}) => {
-  const invoiceNumberLabel = invoiceData?.invoiceNumberObject?.label;
-
-  const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
-
-  const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`;
-  const invoiceDocTitle = `${invoiceNumber} | Created with https://easyinvoicepdf.com`;
-
-  return (
-    <Document title={invoiceDocTitle}>
-      <Page size="A4" style={PDF_DEFAULT_TEMPLATE_STYLES.page}>
-        <InvoiceBody
-          invoiceData={invoiceData}
-          styles={PDF_DEFAULT_TEMPLATE_STYLES}
-          shouldLocaliseDates={false}
-        />
-      </Page>
-    </Document>
-  );
-};
-
-/**
- * Renders invoice data to a PDF buffer for server-side (backend) usage.
- *
- * @param invoiceData - Data for invoice to be rendered.
- */
-export function renderInvoicePdfBuffer({
-  invoiceData,
-}: {
-  invoiceData: InvoiceData;
-}) {
-  return renderToBuffer(
-    <InvoicePdfTemplateToRenderOnBackend invoiceData={invoiceData} />,
-  );
-}
+export { renderInvoicePdfBuffer } from "@/lib/pdf/render-invoice-pdf";
 
 /**
  * Returns translated invoice number label based on language.

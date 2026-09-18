@@ -6,8 +6,10 @@ import { useState } from "react";
 import { ProjectLogoDescription } from "@/app/(components)/project-logo-description";
 import { HowItWorksVideoDialog } from "@/app/(main)/(app)/components/how-it-works-video-dialog";
 import { InvoicePDFDownloadLink } from "@/app/(main)/(app)/components/invoice-pdf-download-link";
+import { SendInvoiceFeature } from "@/app/(main)/(app)/components/send-invoice/send-invoice-dialog";
 import { ShareInvoiceButton } from "@/app/(main)/(app)/components/share-invoice-button";
 import { type InvoiceData } from "@/app/schema";
+import { UserAccountButton } from "@/components/auth/user-account-button";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { CustomTooltip } from "@/components/ui/tooltip";
@@ -29,6 +31,7 @@ export function InvoicePageHeader({
   invoiceDataState,
   isMobile,
   isSharedInvoice,
+  qrCodeDataUrl,
 }: {
   canShareInvoice: boolean;
   handleShareInvoice: () => void;
@@ -36,6 +39,7 @@ export function InvoicePageHeader({
   invoiceDataState: InvoiceData;
   isMobile: boolean;
   isSharedInvoice: boolean;
+  qrCodeDataUrl: string;
 }) {
   return (
     <div data-testid="header">
@@ -45,20 +49,23 @@ export function InvoicePageHeader({
       </p>
       <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
         <div className="relative bottom-2 mt-2 flex w-full flex-col justify-center sm:bottom-4 sm:mt-0">
-          <div className="flex items-center">
-            <ProjectLogo className="h-8 w-8" />
-            <ProjectLogoDescription
-              title={
-                <h1 className="text-balance text-xl font-bold text-slate-800 lg:text-2xl">
-                  EasyInvoicePDF
-                </h1>
-              }
-              description={
-                <h2 className="text-balance text-[12px] text-slate-700 sm:text-[13px]">
-                  Free & Open-Source Invoice Generator
-                </h2>
-              }
-            />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <ProjectLogo className="h-8 w-8" />
+              <ProjectLogoDescription
+                title={
+                  <h1 className="text-balance text-xl font-bold text-slate-800 lg:text-2xl">
+                    EasyInvoicePDF
+                  </h1>
+                }
+                description={
+                  <h2 className="text-balance text-[12px] text-slate-700 sm:text-[13px]">
+                    Free & Open-Source Invoice Generator
+                  </h2>
+                }
+              />
+            </div>
+            {isMobile ? <UserAccountButton /> : null}
           </div>
         </div>
         {/* desktop only section (hidden on mobile) */}
@@ -81,10 +88,15 @@ export function InvoicePageHeader({
           {/* On mobile version, we show it in different place (bottom of the page)*/}
           {isDesktop ? (
             <>
+              <UserAccountButton />
               <ShareInvoiceButton
                 canShareInvoice={canShareInvoice}
                 handleShareInvoice={handleShareInvoice}
                 className="mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
+              />
+              <SendInvoiceFeature
+                invoiceData={invoiceDataState}
+                qrCodeDataUrl={qrCodeDataUrl}
               />
               <InvoicePDFDownloadLink
                 invoiceData={invoiceDataState}

@@ -205,6 +205,15 @@ export default withSentryConfig(withNextIntl(withMDX(nextConfig)), {
   org: "easyinvoicepdf",
   project: "easy-invoice-pdf",
 
+  // Keep local/disabled builds offline and avoid publishing source maps unless
+  // Sentry is explicitly enabled for the deployment.
+  sourcemaps: {
+    disable: process.env.SENTRY_ENABLED !== "true",
+  },
+  unstable_sentryWebpackPluginOptions: {
+    disable: process.env.SENTRY_ENABLED !== "true",
+  },
+
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
 

@@ -57,3 +57,4 @@ messages/en.d.json.ts
 
 .github/workflows/.secrets
 .trigger
+.env*

@@ -19,6 +19,7 @@ import { updateAppMetadata } from "../utils/get-app-metadata";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePDFDownloadLink } from "./invoice-pdf-download-link";
 import { MobileFormScrollContainer } from "./mobile-form-scroll-container";
+import { SendInvoiceFeature } from "./send-invoice/send-invoice-dialog";
 import { ShareInvoiceButton } from "./share-invoice-button";
 
 const DesktopPDFViewerModuleLoading = () => {
@@ -137,7 +138,7 @@ function LocalStorageNotice() {
           Saved locally in your browser
         </button>
       }
-      content="No data is uploaded to the server"
+      content="Invoice data stays local unless you explicitly use Send"
       side="bottom"
       popoverOnMobile
       className="w-fit"
@@ -152,6 +153,7 @@ export function InvoiceClientPage({
   isMobile,
   canShareInvoice,
   currentInvoiceFormDataRef,
+  qrCodeDataUrl,
 }: {
   invoiceDataState: InvoiceData;
   handleInvoiceDataChange: (invoiceData: InvoiceData) => void;
@@ -159,6 +161,7 @@ export function InvoiceClientPage({
   isMobile: boolean;
   canShareInvoice: boolean;
   currentInvoiceFormDataRef: RefObject<(() => InvoiceData | null) | null>;
+  qrCodeDataUrl: string;
 }) {
   const appMetadata = useAppMetadata();
 
@@ -332,6 +335,11 @@ export function InvoiceClientPage({
                   </span>
                 </TabsTrigger>
               </TabsList>
+              <SendInvoiceFeature
+                invoiceData={invoiceDataState}
+                qrCodeDataUrl={qrCodeDataUrl}
+                triggerClassName="mx-2 h-11 w-full"
+              />
               <ShareInvoiceButton
                 canShareInvoice={canShareInvoice}
                 handleShareInvoice={handleShareInvoice}
