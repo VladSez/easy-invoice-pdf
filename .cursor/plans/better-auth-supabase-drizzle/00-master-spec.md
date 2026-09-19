@@ -59,6 +59,7 @@ first.
 | 8 | better-auth mounts on its own Next route handler and is **not** flag-gated | `src/app/api/auth/[...all]/route.ts`. The Hono API and the Send UI stay behind `send-invoice`; the auth endpoints do not. |
 | 9 | Migrations are committed SQL, applied by hand | `drizzle-kit generate` writes to `drizzle/`, the files are reviewed and committed, and `drizzle-kit migrate` is run against Supabase manually. No migration step in CI or at build time. |
 | 10 | Tests keep mocking the boundary | Mock the Drizzle client and the better-auth server module the way `@clerk/backend` is mocked today. No pglite, no test containers, no real database in the suite. |
+| 11 | Local development runs Postgres in Docker Compose | One plain `postgres` service, no Supabase CLI stack. Development and manual testing only — it does not change decision #10, and no CI workflow uses it. See `01a`. |
 
 ---
 
@@ -284,6 +285,11 @@ DATABASE_URL="postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supab
 # Direct connection (port 5432) for drizzle-kit, which needs session mode for DDL.
 DIRECT_DATABASE_URL="postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres"
 
+# Locally, both point at the Docker Compose Postgres from task 01a. There is no
+# pooler there, so the split above collapses to one URL.
+# DATABASE_URL="postgresql://postgres:postgres@localhost:54322/easy_invoice_pdf"
+# DIRECT_DATABASE_URL="postgresql://postgres:postgres@localhost:54322/easy_invoice_pdf"
+
 # openssl rand -base64 32
 # Rotating this invalidates every encrypted OAuth token: all mailboxes must be reconnected.
 BETTER_AUTH_SECRET=""
@@ -314,6 +320,7 @@ working until task 07.
 
 | # | Task | File |
 |---|---|---|
+| 01a | Local Postgres with Docker Compose | `01a-local-database-docker-compose.md` |
 | 01 | Postgres, Drizzle and the better-auth server instance | `01-database-and-auth-server.md` |
 | 02 | Auth route handler and browser auth client | `02-auth-route-and-client.md` |
 | 03 | Rewrite the mailbox service on better-auth | `03-mailbox-service.md` |
@@ -321,6 +328,9 @@ working until task 07.
 | 05 | Auth UI: sign-in dialog and account menu | `05-auth-ui.md` |
 | 06 | Send dialog and the `use-mailboxes` hook | `06-send-dialog-and-hook.md` |
 | 07 | Remove Clerk, update env, docs, tests and CI | `07-remove-clerk.md` |
+
+Task 01a is a prerequisite of task 01 for anyone who would rather not point
+early work at a cloud database; it is listed first for that reason.
 
 Tasks 01 and 02 add the new stack alongside Clerk and change no behaviour.
 Tasks 03 to 06 swap one layer at a time. Task 07 removes the old one.
@@ -372,6 +382,11 @@ pnpm e2e e2e/send-invoice.test.ts --project="Desktop Chrome"
   runtime, not at build.
 - **`drizzle-kit` needs the direct connection.** DDL over the transaction
   pooler fails. This is the single most common Supabase + Drizzle setup error.
+- **The local database is not behind a pooler.** Task 01a runs a plain
+  Postgres, so connection-limit and session-state behaviour that only appears
+  through Supabase's transaction pooler will not reproduce locally. Prepared
+  statements are the exception: `prepare: false` is set in code, so that one
+  cannot hide.
 - **The `reauthorization-required` list status becomes unreachable.** See §6.
 - **Google verification and the consent interstitial are unchanged**, but the
   redirect URI change means the consent screen configuration must be updated

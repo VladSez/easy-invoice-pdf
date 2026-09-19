@@ -11,6 +11,10 @@ imports any of it yet.
 
 ## Prerequisites (manual, outside the repository)
 
+Steps 1 and 2 are for the deployed environments. For local work, do **task 01a**
+instead — it brings up Postgres in Docker Compose and needs no Supabase account.
+Doing both is the normal case: compose locally, Supabase on Vercel.
+
 1. Create a Supabase project. Note the project ref, region and database
    password.
 2. Collect both connection strings from **Project Settings → Database**: the
@@ -260,4 +264,4 @@ looks like.
 
 Route handlers, the browser client, and any change to the mailbox service. No
 RLS policies: the app connects as one server role and the tables are not
-exposed through Supabase's Data API.
+exposed through Supabase's Data API. The Docker Compose setup is task 01a.
