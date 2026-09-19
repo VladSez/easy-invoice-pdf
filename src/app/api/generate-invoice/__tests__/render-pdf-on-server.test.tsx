@@ -72,6 +72,33 @@ describe("renderInvoicePdfBuffer", () => {
     expect(text).toContain("Odwrotne obciążenie");
     expect(text).toContain("NIP");
   });
+
+  it("should produce a valid PDF with a server-generated QR code", async () => {
+    const buffer = await renderInvoicePdfBuffer({
+      invoiceData: {
+        ...SERVER_PDF_MOCK_INVOICE_DATA,
+        qrCodeData: "https://easyinvoicepdf.com/pay/INV-2024-001",
+        qrCodeDescription: "Scan to pay",
+        qrCodeIsVisible: true,
+      },
+    });
+
+    assertValidPdfBuffer(buffer);
+  });
+
+  it("should produce a valid PDF with a safe logo and QR code", async () => {
+    const buffer = await renderInvoicePdfBuffer({
+      invoiceData: {
+        ...SERVER_PDF_MOCK_INVOICE_DATA,
+        logo: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        qrCodeData: "INV-2024-001",
+        qrCodeDescription: "Invoice reference",
+        qrCodeIsVisible: true,
+      },
+    });
+
+    assertValidPdfBuffer(buffer);
+  });
 });
 
 describe("getPolishInvoiceRealData", () => {

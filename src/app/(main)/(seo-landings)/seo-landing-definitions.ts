@@ -170,10 +170,10 @@ export const SEO_LANDING_DEFINITIONS = {
           "Here there is no account to make. Open the page and an empty invoice is already in the form.",
         ],
         bullets: [
-          "No signup form, no confirmation email, no password to store",
-          "No trial that expires and locks the invoice you already wrote",
-          "No marketing list to unsubscribe from later",
-          "The invoice you last edited stays in your browser, so a refresh does not lose it",
+          "No registration",
+          "Invoice drafts stay in your browser during normal editing and PDF downloads",
+          "No hidden paywalls",
+          "Just open, fill, download.",
         ],
       },
       {

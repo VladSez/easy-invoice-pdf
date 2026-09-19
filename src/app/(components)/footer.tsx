@@ -188,10 +188,11 @@ export function Footer({ links, translations }: FooterProps) {
 const DEFAULT_FOOTER_DESCRIPTION = (
   <>
     Create professional PDF invoices in seconds with our free, open-source
-    invoice generator. 100% in-browser, no sign-up required, and no ads. Your
-    data stays on your device. Includes live PDF preview, instant PDF download,
-    and customizable templates, including a Stripe-style layout - ideal for
-    freelancers, startups, and small businesses.
+    invoice generator. No sign-up required for editing or downloading, and no
+    ads. Invoice drafts stay on your device; the optional Send feature processes
+    an invoice only when requested. Includes live PDF preview, instant PDF
+    download, and customizable templates, including a Stripe-style layout -
+    ideal for freelancers, startups, and small businesses.
     <br /> <br />
     Not accounting software. No compliance guarantees. By using this tool, you
     agree to the{" "}
@@ -260,6 +261,7 @@ function DefaultFooterLinks() {
         links={[
           { href: "/en/about", label: "About Us" },
           { href: "/founder", label: "Founder" },
+          { href: "/privacy", label: "Privacy Policy" },
           { href: "/tos", label: "Terms of Service" },
         ]}
       />

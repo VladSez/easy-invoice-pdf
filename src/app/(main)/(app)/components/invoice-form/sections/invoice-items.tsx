@@ -833,6 +833,8 @@ export const InvoiceItems = memo(function InvoiceItems({
           <Button
             ref={addItemButtonRef}
             onClick={() => {
+              if (hasReachedItemLimit) return;
+
               append({
                 invoiceItemNumberIsVisible: true,
                 name: "",

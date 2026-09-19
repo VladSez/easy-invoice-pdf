@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function TermsOfServicePage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
@@ -34,8 +36,9 @@ export default function TermsOfServicePage() {
               international laws or tax regulations
             </li>
             <li>
-              does not store or process user data on servers (all data is
-              handled locally in your browser)
+              keeps invoice drafts in your browser and, only when you use the
+              optional Send feature, processes the browser-rendered PDF and
+              message temporarily to submit the requested email
             </li>
             <li>does not act as a system of record for invoices</li>
             <li>does not provide accounting, tax, or legal advice</li>
@@ -117,10 +120,14 @@ export default function TermsOfServicePage() {
           </ul>
           <hr />
 
-          <h2>8. No Data Storage</h2>
+          <h2>8. Data Handling</h2>
           <p>
-            All data entered into the Service remains in your browser. We do not
-            store, transmit, or retain invoice data on any servers.
+            Invoice drafts remain in your browser. We do not retain invoice
+            records or generated PDFs on our servers. The optional Send feature
+            transmits invoice data temporarily to generate the attachment and
+            submit it through your connected email provider. Account and OAuth
+            connection data is handled as described in our{" "}
+            <Link href="/privacy">Privacy Policy</Link>.
           </p>
           <p>You are responsible for saving and backing up your data.</p>
           <hr />

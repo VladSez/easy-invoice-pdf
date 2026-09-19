@@ -3,7 +3,9 @@ import type { Metadata } from "next";
 
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { getLatestChangelogSummary } from "@/app/(main)/changelog/utils";
+import { SendInvoiceProvider } from "@/components/send-invoice-provider";
 import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
+import { sendInvoiceFlag } from "@/flags";
 import { computeIndexingFlags } from "@/lib/seo/indexing-utils";
 
 import { CTAToastProvider } from "./contexts/cta-toast-context";
@@ -162,32 +164,41 @@ export default async function AppPage({
     await searchParams,
   );
 
-  const [githubStarsCount, latestChangelog] = await Promise.all([
-    fetchGithubStars(),
-    getLatestChangelogSummary().catch((error) => {
-      // don't fail the page if we can't load the latest changelog summary
-      console.error("[AppPage] Failed to load latest changelog summary", error);
+  const [sendInvoiceEnabled, githubStarsCount, latestChangelog] =
+    await Promise.all([
+      // Resolved once here and handed to the client tree: flags evaluate on the
+      // server only, and one evaluation keeps every gate in agreement.
+      sendInvoiceFlag(),
+      fetchGithubStars(),
+      getLatestChangelogSummary().catch((error) => {
+        // don't fail the page if we can't load the latest changelog summary
+        console.error(
+          "[AppPage] Failed to load latest changelog summary",
+          error,
+        );
 
-      Sentry.captureException(
-        new Error(
-          `[AppPage] Failed to load latest changelog summary: ${error}`,
-        ),
-      );
+        Sentry.captureException(
+          new Error(
+            `[AppPage] Failed to load latest changelog summary: ${error}`,
+          ),
+        );
 
-      return null;
-    }),
-  ]);
+        return null;
+      }),
+    ]);
 
   return (
-    <CTAToastProvider>
-      {/* sharing an invoice adds `?data=` without a navigation, so the server-rendered
-          robots metadata has to be re-applied on the client */}
-      <RobotsMetaSync isIndexableEnvironment={isIndexableEnvironment} />
-      {shouldIndex ? <HomeJsonLd /> : null}
-      <AppPageClient
-        githubStarsCount={githubStarsCount}
-        latestChangelog={latestChangelog}
-      />
-    </CTAToastProvider>
+    <SendInvoiceProvider enabled={sendInvoiceEnabled}>
+      <CTAToastProvider>
+        {/* sharing an invoice adds `?data=` without a navigation, so the server-rendered
+            robots metadata has to be re-applied on the client */}
+        <RobotsMetaSync isIndexableEnvironment={isIndexableEnvironment} />
+        {shouldIndex ? <HomeJsonLd /> : null}
+        <AppPageClient
+          githubStarsCount={githubStarsCount}
+          latestChangelog={latestChangelog}
+        />
+      </CTAToastProvider>
+    </SendInvoiceProvider>
   );
 }

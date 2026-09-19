@@ -56,6 +56,8 @@ const STORAGE_STATE = {
  */
 export default defineConfig({
   testDir: "./e2e",
+  /* Mints the Clerk testing token once, before any worker starts */
+  globalSetup: "./e2e/global.setup.ts",
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
