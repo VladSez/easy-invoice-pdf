@@ -544,6 +544,23 @@ export const GeneralInformation = memo(function GeneralInformation({
                       "block",
                       inputErrorClassName(!!errors.numberFormatLocale),
                     )}
+                    onChange={(e) => {
+                      field.onChange(e);
+
+                      // the previous value falls back the same way the rendered
+                      // value does, so the event reports the format that was on
+                      // screen rather than an empty one
+                      umamiTrackEvent("invoice_number_format_changed", {
+                        data: {
+                          number_format_locale: e.target
+                            .value as SupportedNumberFormatLocale,
+                          previous_number_format_locale:
+                            numberFormatLocale ?? language,
+                          invoice_language: language,
+                          invoice_template: template,
+                        },
+                      });
+                    }}
                   >
                     {SUPPORTED_NUMBER_FORMAT_LOCALES.map(
                       (supportedNumberFormatLocale) => {
@@ -606,7 +623,22 @@ export const GeneralInformation = memo(function GeneralInformation({
                     data-testid="preserveNumberFormatOnLanguageChange"
                     // the field is absent until someone turns it on, and absent is off
                     checked={!!value}
-                    onCheckedChange={onChange}
+                    onCheckedChange={(checked) => {
+                      onChange(checked);
+
+                      umamiTrackEvent(
+                        "invoice_number_format_preserve_toggled",
+                        {
+                          data: {
+                            preserve_number_format: checked,
+                            number_format_locale:
+                              numberFormatLocale ?? language,
+                            invoice_language: language,
+                            invoice_template: template,
+                          },
+                        },
+                      );
+                    }}
                     className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
                   />
                 );

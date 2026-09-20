@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 /* eslint-disable @next/next/no-html-link-for-pages */
+import { FooterCopyright } from "@/app/(components)/footer-copyright";
 import { FooterLaunchBadges } from "@/app/(components)/footer-launch-badges";
 import { SEO_FOOTER_SOLUTION_LINKS } from "@/app/(main)/(seo-landings)/seo-landing-footer-links";
 import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_I18N_LOCALES } from "@/app/schema";
@@ -157,9 +158,7 @@ export function Footer({ links, translations }: FooterProps) {
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
-          <p className="text-sm text-slate-700">
-            © {new Date().getFullYear()} EasyInvoicePDF.com
-          </p>
+          <FooterCopyright />
           <div className="flex items-center gap-1.5 text-sm text-slate-700">
             <a href="/founder">
               <img

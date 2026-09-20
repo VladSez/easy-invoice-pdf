@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { formatCurrency } from "@/app/(main)/(app)/utils/format-currency";
-import { SUPPORTED_INVOICE_PDF_LANGUAGES } from "@/app/schema";
+import {
+  formatCurrency,
+  formatCurrencyChunks,
+} from "@/app/(main)/(app)/utils/format-currency";
+import {
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
+  SUPPORTED_NUMBER_FORMAT_LOCALES,
+} from "@/app/schema";
 
 const AMOUNT = 321_200;
 
@@ -89,5 +95,55 @@ describe("formatCurrency", () => {
 
     expect(formatted).toBe(`${EURO}321${NBSP}200.00`);
     expect(formatted).not.toContain(",");
+  });
+});
+
+describe("formatCurrencyChunks", () => {
+  /**
+   * The symbol rides along on the piece it sits next to, so a wrapped total can never leave
+   * it stranded on a line of its own.
+   */
+  it("cuts at the thousands boundaries and keeps the symbol attached", () => {
+    expect(
+      formatCurrencyChunks({
+        amount: 1_000_000,
+        currency: "USD",
+        numberFormatLocale: "en",
+      }),
+    ).toEqual(["$1,", "000,", "000.00"]);
+
+    expect(
+      formatCurrencyChunks({
+        amount: 1_000_000,
+        currency: "EUR",
+        numberFormatLocale: "de",
+      }),
+    ).toEqual(["1.", "000.", `000,00${NBSP}${EURO}`]);
+  });
+
+  it.each(SUPPORTED_NUMBER_FORMAT_LOCALES)(
+    "joins back up into the string %s prints",
+    (numberFormatLocale) => {
+      expect(
+        formatCurrencyChunks({
+          amount: AMOUNT,
+          currency: "EUR",
+          numberFormatLocale,
+        }).join(""),
+      ).toBe(
+        formatCurrency({ amount: AMOUNT, currency: "EUR", numberFormatLocale }),
+      );
+    },
+  );
+
+  it("falls back to a single 0.00 when the currency is not one Intl knows", () => {
+    expect(
+      formatCurrencyChunks({
+        // @ts-expect-error -- the runtime guard exists for data restored from localStorage/share links
+        currency: "NOT_A_CURRENCY",
+        amount: AMOUNT,
+        numberFormatLocale: "en",
+      }),
+    ).toEqual(["0.00"]);
   });
 });

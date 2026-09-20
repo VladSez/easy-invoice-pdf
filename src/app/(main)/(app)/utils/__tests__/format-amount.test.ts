@@ -2,9 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatAmount,
+  formatAmountChunks,
   formatAmountInWordsWithCurrency,
 } from "@/app/(main)/(app)/utils/format-amount";
-import { SUPPORTED_INVOICE_PDF_LANGUAGES } from "@/app/schema";
+import {
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
+  SUPPORTED_NUMBER_FORMAT_LOCALES,
+} from "@/app/schema";
 
 const AMOUNT = 321_200;
 
@@ -95,6 +99,65 @@ describe("formatAmount", () => {
     expect(formatAmount({ amount: Number.NaN, numberFormatLocale: "de" })).toBe(
       "0,00",
     );
+  });
+});
+
+describe("formatAmountChunks", () => {
+  it("cuts the number at its thousands boundaries, separator and all", () => {
+    expect(
+      formatAmountChunks({ amount: 1_000_000_000, numberFormatLocale: "en" }),
+    ).toEqual(["1,", "000,", "000,", "000.00"]);
+
+    expect(
+      formatAmountChunks({ amount: 1_000_000_000, numberFormatLocale: "de" }),
+    ).toEqual(["1.", "000.", "000.", "000,00"]);
+
+    expect(
+      formatAmountChunks({
+        amount: 1_000_000_000,
+        numberFormatLocale: "international",
+      }),
+    ).toEqual([`1${NBSP}`, `000${NBSP}`, `000${NBSP}`, "000.00"]);
+  });
+
+  /**
+   * The cut follows what `Intl` calls a group, not what the digits look like: German writes
+   * both its grouping and its decimals with a `.`, and only the first of the two may break.
+   */
+  it("never cuts at the decimal separator", () => {
+    expect(
+      formatAmountChunks({ amount: 1234.56, numberFormatLocale: "de" }),
+    ).toEqual(["1.", "234,56"]);
+
+    expect(
+      formatAmountChunks({
+        amount: 1.234,
+        numberFormatLocale: "en",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 3,
+      }),
+    ).toEqual(["1.234"]);
+  });
+
+  it("leaves a number with nothing to group in one piece", () => {
+    expect(
+      formatAmountChunks({ amount: 999, numberFormatLocale: "en" }),
+    ).toEqual(["999.00"]);
+  });
+
+  it.each(SUPPORTED_NUMBER_FORMAT_LOCALES)(
+    "joins back up into the string %s prints",
+    (numberFormatLocale) => {
+      expect(
+        formatAmountChunks({ amount: AMOUNT, numberFormatLocale }).join(""),
+      ).toBe(formatAmount({ amount: AMOUNT, numberFormatLocale }));
+    },
+  );
+
+  it("writes zero when the amount is not a finite number", () => {
+    expect(
+      formatAmountChunks({ amount: Number.NaN, numberFormatLocale: "en" }),
+    ).toEqual(["0.00"]);
   });
 });
 

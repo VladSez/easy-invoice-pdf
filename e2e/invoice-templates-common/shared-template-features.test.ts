@@ -193,6 +193,57 @@ const SERVICE_PERIOD_TITLE =
 const MULTI_PAGE_TITLE = "generates multi-page PDF when invoice has many items";
 const EMAIL_VISIBILITY_TITLE =
   "toggles seller and buyer email visibility in PDF";
+const LARGE_AMOUNTS_TITLE =
+  "wraps large amounts inside their column in the PDF";
+const LARGE_QUANTITY_TITLE =
+  "wraps large amounts multiplied by a quantity in the PDF";
+
+/**
+ * One billion, which is fifteen characters wide once it is grouped and given its decimals --
+ * more than any money column in either template can hold on one line.
+ */
+const LARGE_NET_PRICE = "1000000000";
+
+/** A rate, so the tax and total columns carry large numbers of their own rather than zeroes. */
+const LARGE_AMOUNTS_TAX_RATE = "20";
+
+/** The quantity the item is billed at by default, which prints as a bare `1`. */
+const SINGLE_QUANTITY = "1";
+
+/**
+ * A hundred of them, which takes the net amount to a hundred billion and the pre-tax total
+ * past a hundred and twenty -- two thousands groups more than the columns were drawn for.
+ */
+const LARGE_QUANTITY = "100";
+
+interface FillLargeFirstItemArgs {
+  /** The "Invoice items" section of the form. */
+  invoiceItemsSection: Locator;
+  /** How many of the item to bill for. */
+  quantity: string;
+}
+
+/**
+ * Bills the first item at {@link LARGE_NET_PRICE}, so that every money column in both
+ * templates has to print a number too wide to sit on one line.
+ */
+async function fillLargeFirstItem({
+  invoiceItemsSection,
+  quantity,
+}: FillLargeFirstItemArgs) {
+  await invoiceItemsSection
+    .getByRole("spinbutton", { name: "Amount (Quantity)" })
+    .fill(quantity);
+
+  await invoiceItemsSection
+    .getByRole("spinbutton", { name: "Net Price (Rate or Unit Price)" })
+    .fill(LARGE_NET_PRICE);
+
+  await invoiceItemsSection
+    .getByRole("group", { name: "Tax Settings" })
+    .getByRole("textbox", { name: "VAT Rate", exact: true })
+    .fill(LARGE_AMOUNTS_TAX_RATE);
+}
 
 test.describe("Invoice Template shared features", () => {
   test.beforeEach(async ({ page }) => {
@@ -672,6 +723,94 @@ test.describe("Invoice Template shared features", () => {
         name: `email-visible-in-pdf-${template}-template.png`,
         notes: `Test: ${EMAIL_VISIBILITY_TITLE} - emails visible (${testInfo.project.name})`,
       });
+    });
+
+    /**
+     * A number is one unbreakable word, so a column too narrow for `1,000,000,000.00` used to
+     * paint it over the column next to it -- and, in the last column of the default
+     * template's items table, out past the table's own border. `WrappableAmount` breaks the
+     * amount at a thousands boundary instead, and these are the screenshots of it doing so.
+     *
+     * Both grouping characters are worth a picture, because they fail differently: a comma
+     * offers react-pdf no break at all, and `international`'s no-break space offers one it is
+     * forbidden to take.
+     */
+    test(`${LARGE_AMOUNTS_TITLE} (${template} template)`, async ({
+      page,
+      browserName,
+      downloadDir,
+    }, testInfo) => {
+      await selectTemplate(page, template);
+
+      await fillLargeFirstItem({
+        invoiceItemsSection: page.getByTestId("invoice-items-section"),
+        quantity: SINGLE_QUANTITY,
+      });
+
+      await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        name: `large-amounts-in-pdf-${template}-template.png`,
+        notes: `Test: ${LARGE_AMOUNTS_TITLE} (${testInfo.project.name})`,
+      });
+
+      /**
+       * THE SAME INVOICE GROUPED WITH A NO-BREAK SPACE INSTEAD OF A COMMA
+       */
+
+      // the screenshot leaves the app on about:blank; the invoice comes back from localStorage
+      await page.goto("/");
+      await expect(page).toHaveURL(`/?template=${template}`);
+
+      const numberFormatSelect = page
+        .getByRole("group", { name: "Number Format" })
+        .getByRole("combobox", { name: "Format" });
+
+      await waitForPdfRegeneration(page, async () => {
+        await numberFormatSelect.selectOption("international");
+      });
+
+      await expect(numberFormatSelect).toHaveValue("international");
+
+      await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        filePrefix: "international-",
+        name: `large-amounts-international-format-in-pdf-${template}-template.png`,
+        notes: `Test: ${LARGE_AMOUNTS_TITLE} - international number format (${testInfo.project.name})`,
+      });
+    });
+
+    /**
+     * The same billion, billed a hundred times over. It is the widest thing either template
+     * ever has to print -- the net amount reaches a hundred billion and the pre-tax total a
+     * hundred and twenty -- so it is where an amount wraps onto a second line even in the
+     * columns that hold a single billion comfortably.
+     *
+     * Only the default grouping is worth a picture here; the sibling test above is the one
+     * that covers what changes when the separator does.
+     */
+    test(`${LARGE_QUANTITY_TITLE} (${template} template)`, async ({
+      page,
+      browserName,
+      downloadDir,
+    }, testInfo) => {
+      await selectTemplate(page, template);
+
+      await fillLargeFirstItem({
+        invoiceItemsSection: page.getByTestId("invoice-items-section"),
+        quantity: LARGE_QUANTITY,
+      });
+
+      const { numPages } = await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        name: `large-amounts-with-quantity-in-pdf-${template}-template.png`,
+        notes: `Test: ${LARGE_QUANTITY_TITLE} (${testInfo.project.name})`,
+      });
+
+      // one item, however wide its amounts, still belongs on a single page
+      expect(numPages).toBe(1);
     });
   }
 });

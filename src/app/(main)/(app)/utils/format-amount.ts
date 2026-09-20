@@ -5,7 +5,11 @@ import type {
   SupportedNumberFormatLocale,
 } from "@/app/schema";
 
-import { formatNumberForPdf, NO_BREAK_SPACE } from "./format-currency";
+import {
+  FALLBACK_AMOUNT,
+  formatNumberChunksForPdf,
+  NO_BREAK_SPACE,
+} from "./format-currency";
 
 interface FormatAmountArgs {
   /** The number to write. Anything that is not a finite number is written as zero. */
@@ -22,18 +26,16 @@ interface FormatAmountArgs {
 }
 
 /**
- * A bare number, for the columns that print no currency of their own -- the default
- * template's amounts, which carry an ISO code next to the totals instead of a symbol, and
- * both templates' quantities.
+ * {@link formatAmount} cut at its thousands boundaries, for a cell that may have to wrap.
  */
-export function formatAmount({
+export function formatAmountChunks({
   amount,
   numberFormatLocale,
   minimumFractionDigits = 2,
   maximumFractionDigits = 2,
 }: FormatAmountArgs) {
   try {
-    return formatNumberForPdf({
+    return formatNumberChunksForPdf({
       amount,
       numberFormatLocale,
       options: {
@@ -45,8 +47,17 @@ export function formatAmount({
   } catch (error) {
     Sentry.captureException(error);
 
-    return "0.00";
+    return [FALLBACK_AMOUNT];
   }
+}
+
+/**
+ * A bare number, for the columns that print no currency of their own -- the default
+ * template's amounts, which carry an ISO code next to the totals instead of a symbol, and
+ * both templates' quantities.
+ */
+export function formatAmount(args: FormatAmountArgs) {
+  return formatAmountChunks(args).join("");
 }
 
 interface FormatAmountInWordsWithCurrencyArgs {

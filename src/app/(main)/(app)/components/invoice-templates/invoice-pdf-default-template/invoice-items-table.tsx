@@ -4,7 +4,8 @@ import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translatio
 import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
-import { formatAmount } from "../../../utils/format-amount";
+import { formatAmountChunks } from "../../../utils/format-amount";
+import { WrappableAmount } from "../common/wrappable-amount";
 
 export function InvoiceItemsTable({
   invoiceData,
@@ -155,29 +156,29 @@ export function InvoiceItemsTable({
         */}
         {invoiceData?.items.map((item, index) => {
           // The quantity column is not money: it carries no forced decimals and allows three
-          const formattedAmount = formatAmount({
+          const amountChunks = formatAmountChunks({
             amount: item.amount,
             numberFormatLocale,
             minimumFractionDigits: 0,
             maximumFractionDigits: 3,
           });
 
-          const formattedNetPrice = formatAmount({
+          const netPriceChunks = formatAmountChunks({
             amount: item.netPrice,
             numberFormatLocale,
           });
 
-          const formattedNetAmount = formatAmount({
+          const netAmountChunks = formatAmountChunks({
             amount: item.netAmount,
             numberFormatLocale,
           });
 
-          const formattedVATAmount = formatAmount({
+          const vatAmountChunks = formatAmountChunks({
             amount: item.vatAmount,
             numberFormatLocale,
           });
 
-          const formattedPreTaxAmount = formatAmount({
+          const preTaxAmountChunks = formatAmountChunks({
             amount: item.preTaxAmount,
             numberFormatLocale,
           });
@@ -225,14 +226,13 @@ export function InvoiceItemsTable({
               {/* Amount */}
               {isAmountFieldVisible ? (
                 <View style={[styles.tableCol, styles.colAmount]}>
-                  <Text
+                  <WrappableAmount
+                    chunks={amountChunks}
                     style={[
                       styles.tableCell,
                       { textAlign: "right", marginRight: 2 },
                     ]}
-                  >
-                    {formattedAmount}
-                  </Text>
+                  />
                 </View>
               ) : null}
 
@@ -248,14 +248,13 @@ export function InvoiceItemsTable({
               {/* Net price */}
               {isNetPriceFieldVisible ? (
                 <View style={[styles.tableCol, styles.colNetPrice]}>
-                  <Text
+                  <WrappableAmount
+                    chunks={netPriceChunks}
                     style={[
                       styles.tableCell,
                       { textAlign: "right", marginRight: 2 },
                     ]}
-                  >
-                    {formattedNetPrice}
-                  </Text>
+                  />
                 </View>
               ) : null}
 
@@ -277,45 +276,39 @@ export function InvoiceItemsTable({
               {/* Net amount */}
               {isNetAmountFieldVisible ? (
                 <View style={[styles.tableCol, styles.colNetAmount]}>
-                  <Text
+                  <WrappableAmount
+                    chunks={netAmountChunks}
                     style={[
                       styles.tableCell,
                       { textAlign: "right", marginRight: 2 },
                     ]}
-                  >
-                    {formattedNetAmount}
-                  </Text>
+                  />
                 </View>
               ) : null}
 
               {/* VAT amount */}
               {isVATAmountFieldVisible ? (
                 <View style={[styles.tableCol, styles.colVATAmount]}>
-                  <Text
+                  <WrappableAmount
+                    chunks={vatAmountChunks}
                     style={[
                       styles.tableCell,
                       { textAlign: "right", marginRight: 2 },
                     ]}
-                  >
-                    {formattedVATAmount}
-                  </Text>
+                  />
                 </View>
               ) : null}
 
               {/* Pre-tax amount */}
               {isPreTaxAmountFieldVisible ? (
                 <View style={[styles.tableCol, styles.colPreTaxAmount]}>
-                  <Text
+                  <WrappableAmount
+                    chunks={preTaxAmountChunks}
                     style={[
                       styles.tableCell,
-                      {
-                        textAlign: "right",
-                        marginRight: 2,
-                      },
+                      { textAlign: "right", marginRight: 2 },
                     ]}
-                  >
-                    {formattedPreTaxAmount}
-                  </Text>
+                  />
                 </View>
               ) : null}
             </View>

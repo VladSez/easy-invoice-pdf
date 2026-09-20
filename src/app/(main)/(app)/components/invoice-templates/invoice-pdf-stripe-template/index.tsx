@@ -12,7 +12,7 @@ import {
 import dayjs from "dayjs";
 
 import { InvoiceQRCode } from "@/app/(main)/(app)/components/invoice-templates/common/invoice-qr-code";
-import { formatCurrency } from "@/app/(main)/(app)/utils/format-currency";
+import { formatCurrencyChunks } from "@/app/(main)/(app)/utils/format-currency";
 import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 import { INVOICE_PDF_FONTS } from "@/config";
 
@@ -213,7 +213,7 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
   },
 
   vatColValue: {
-    flex: 1.3,
+    flex: 1.4,
     textAlign: "right",
   },
 } as const satisfies Styles);
@@ -237,11 +237,13 @@ export function StripeInvoicePdfTemplate({
   const invoiceDocTitle =
     `Invoice ${invoiceNumber} | Created with https://easyinvoicepdf.com` as const;
 
-  const formattedInvoiceTotal = formatCurrency({
+  const invoiceTotalChunks = formatCurrencyChunks({
     amount: invoiceData?.total,
     currency: invoiceData.currency,
     numberFormatLocale,
   });
+
+  const formattedInvoiceTotal = invoiceTotalChunks.join("");
 
   /**
    * We want to mimic the Stripe invoice format, which prints "$1,234.00 USD": English
@@ -260,6 +262,18 @@ export function StripeInvoicePdfTemplate({
       : "";
 
   const formattedInvoiceTotalWithCurrency = `${formattedInvoiceTotal}${currencyCode}`;
+
+  /**
+   * The same total for the totals column, which is narrow enough that a large amount has to
+   * wrap. The code rides along on the last piece so it can never be left on a line of its own.
+   */
+  const invoiceTotalWithCurrencyChunks = invoiceTotalChunks.map(
+    (chunk, index) => {
+      return index === invoiceTotalChunks.length - 1
+        ? `${chunk}${currencyCode}`
+        : chunk;
+    },
+  );
 
   const isQrCodeVisible =
     invoiceData?.qrCodeIsVisible && qrCodeDataUrl && qrCodeDataUrl.length > 0;
@@ -309,7 +323,7 @@ export function StripeInvoicePdfTemplate({
           {/* VAT summary table (VAT rates, net amounts, VAT amounts, pre-tax amounts) */}
           <StripeVatSummaryTableTotals
             invoiceData={invoiceData}
-            formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
+            invoiceTotalChunks={invoiceTotalWithCurrencyChunks}
             styles={STRIPE_TEMPLATE_STYLES}
           />
 
