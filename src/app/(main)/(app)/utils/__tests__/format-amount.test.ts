@@ -8,6 +8,7 @@ import {
 import {
   SUPPORTED_INVOICE_PDF_LANGUAGES,
   SUPPORTED_NUMBER_FORMAT_LOCALES,
+  type SupportedNumberFormatLocale,
 } from "@/app/schema";
 
 const AMOUNT = 321_200;
@@ -20,6 +21,34 @@ const NBSP = String.fromCodePoint(0x00_a0);
 const NARROW_SPACES_REGEX = new RegExp(
   `[${String.fromCodePoint(0x20_2f)}${String.fromCodePoint(0x20_09)}]`,
 );
+
+/**
+ * What each supported locale prints for {@link AMOUNT}, written out by hand.
+ *
+ * It has to be written out. `formatAmount` *is* `formatAmountChunks(...).join("")`, so
+ * comparing the two compares a value with itself and passes however badly the formatter
+ * behaves; and deriving the expectation from `Intl` here would have to repeat the narrow-space
+ * rewrite and the `international` base locale, which are the two things most worth pinning.
+ *
+ * Typing it as a complete `Record` means a new entry in `SUPPORTED_NUMBER_FORMAT_LOCALES`
+ * fails to compile until someone writes down what it prints.
+ */
+const AMOUNT_PER_LOCALE: Record<SupportedNumberFormatLocale, string> = {
+  international: `321${NBSP}200.00`,
+  en: "321,200.00",
+  pl: `321${NBSP}200,00`,
+  nl: "321.200,00",
+  fr: `321${NBSP}200,00`,
+  de: "321.200,00",
+  it: "321.200,00",
+  nb: `321${NBSP}200,00`,
+  pt: "321.200,00",
+  "pt-BR": "321.200,00",
+  ru: `321${NBSP}200,00`,
+  es: "321.200,00",
+  sv: `321${NBSP}200,00`,
+  uk: `321${NBSP}200,00`,
+};
 
 describe("formatAmount", () => {
   it("writes the number the way the given locale does", () => {
@@ -103,7 +132,7 @@ describe("formatAmount", () => {
 });
 
 describe("formatAmountChunks", () => {
-  it("cuts the number at its thousands boundaries, separator and all", () => {
+  it("cuts the number at its thousands boundaries, keeping a visible separator", () => {
     expect(
       formatAmountChunks({ amount: 1_000_000_000, numberFormatLocale: "en" }),
     ).toEqual(["1,", "000,", "000,", "000.00"]);
@@ -111,14 +140,40 @@ describe("formatAmountChunks", () => {
     expect(
       formatAmountChunks({ amount: 1_000_000_000, numberFormatLocale: "de" }),
     ).toEqual(["1.", "000.", "000.", "000,00"]);
+  });
 
+  /**
+   * `WrappableAmount` right-aligns every line it lays out, so a piece that *ended* on the
+   * space would hold it inside the line box and push the digits left of the column's edge.
+   * At the head of the next piece the same space costs nothing.
+   */
+  it("hands a blank separator to the piece it opens rather than the one it closes", () => {
     expect(
       formatAmountChunks({
         amount: 1_000_000_000,
         numberFormatLocale: "international",
       }),
-    ).toEqual([`1${NBSP}`, `000${NBSP}`, `000${NBSP}`, "000.00"]);
+    ).toEqual(["1", `${NBSP}000`, `${NBSP}000`, `${NBSP}000.00`]);
+
+    // ...and the locales that group with a space of their own go the same way
+    expect(
+      formatAmountChunks({ amount: 1_000_000_000, numberFormatLocale: "pl" }),
+    ).toEqual(["1", `${NBSP}000`, `${NBSP}000`, `${NBSP}000,00`]);
   });
+
+  it.each(SUPPORTED_NUMBER_FORMAT_LOCALES)(
+    "never ends a piece on something you cannot see, in %s",
+    (numberFormatLocale) => {
+      const chunks = formatAmountChunks({
+        amount: 1_000_000_000,
+        numberFormatLocale,
+      });
+
+      for (const chunk of chunks) {
+        expect(chunk).toBe(chunk.trimEnd());
+      }
+    },
+  );
 
   /**
    * The cut follows what `Intl` calls a group, not what the digits look like: German writes
@@ -150,7 +205,7 @@ describe("formatAmountChunks", () => {
     (numberFormatLocale) => {
       expect(
         formatAmountChunks({ amount: AMOUNT, numberFormatLocale }).join(""),
-      ).toBe(formatAmount({ amount: AMOUNT, numberFormatLocale }));
+      ).toBe(AMOUNT_PER_LOCALE[numberFormatLocale]);
     },
   );
 

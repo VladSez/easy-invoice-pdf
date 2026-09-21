@@ -50,8 +50,8 @@ export const InvoiceBody = ({
     numberFormatLocale: resolveNumberFormatLocale(invoiceData),
   });
 
-  // The VAT summary prints the total into a quarter-width cell and takes the pieces; every
-  // other place prints it into running text and takes them joined back up
+  // The VAT summary prints the total into a 69pt cell and takes the pieces; every other
+  // place prints it into running text and takes them joined back up
   const formattedInvoiceTotal = invoiceTotalChunks.join("");
 
   const signatureSectionIsVisible =

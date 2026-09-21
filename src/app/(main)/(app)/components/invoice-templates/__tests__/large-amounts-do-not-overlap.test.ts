@@ -3,6 +3,7 @@
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 import { describe, expect, it, vi } from "vitest";
 
+import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
 import { SERVER_PDF_MOCK_INVOICE_DATA } from "@/app/api/generate-invoice/__tests__/server-pdf-fixture";
 import { renderInvoicePdfBuffer } from "@/app/api/generate-invoice/render-pdf-on-server";
 import type { InvoiceData, SupportedNumberFormatLocale } from "@/app/schema";
@@ -22,6 +23,26 @@ vi.mock("@/env", async () => {
 
 /** One billion: fifteen characters once it is grouped and given its decimals. */
 const HUGE_AMOUNT = 1_000_000_000;
+
+/**
+ * A *different* billion for the invoice total.
+ *
+ * The total is the one amount that also reaches running text -- the items table's `SUM`, "To
+ * pay", "Left to pay", the footer -- where it is joined back into a single run on purpose.
+ * Giving it a value of its own keeps {@link HUGE_AMOUNT}'s formatted string to the table
+ * cells, which are the only places that have to break it, while still leaving the running
+ * text wide enough to catch the page's right-hand edge.
+ */
+const HUGE_TOTAL = 2_000_000_000;
+
+/**
+ * The largest quantity the schema allows, in whole units.
+ *
+ * The quantity column is not money -- it prints with no forced decimals and up to three of
+ * them -- but it is still a grouped number in a column of its own, and the narrowest one
+ * either template draws. Left at the fixture's `1` it proved nothing.
+ */
+const HUGE_QUANTITY = 999_999;
 
 /** A4 in PostScript points, the size `render-pdf-on-server.tsx` renders at. */
 const A4_WIDTH = 595.28;
@@ -50,15 +71,20 @@ function buildHugeInvoice(
   return {
     ...SERVER_PDF_MOCK_INVOICE_DATA,
     numberFormatLocale,
+    // Every money field carries the same billion on purpose: the point is that each column
+    // has something too wide to sit on one line, and one shared value means one string to
+    // search the rendered page for. The arithmetic between them is nobody's business here.
     items: SERVER_PDF_MOCK_INVOICE_DATA.items.map((item) => {
       return {
         ...item,
+        amount: HUGE_QUANTITY,
         netPrice: HUGE_AMOUNT,
         netAmount: HUGE_AMOUNT,
+        vatAmount: HUGE_AMOUNT,
         preTaxAmount: HUGE_AMOUNT,
       };
     }),
-    total: HUGE_AMOUNT,
+    total: HUGE_TOTAL,
   };
 }
 
@@ -89,14 +115,65 @@ async function readTextRuns(buffer: Buffer) {
 }
 
 /**
+ * pdf.js hands back the no-break space `international` groups with as a plain U+0020, so
+ * both sides of the comparison below are flattened before they meet.
+ */
+function flattenSpaces(value: string) {
+  return value.replaceAll(/\s/g, " ");
+}
+
+/**
+ * Every table cell that printed its amount as one unbreakable run.
+ *
+ * This is the half of the bug the page's right-hand edge cannot see. Only the last column of
+ * the items table overflows far enough to leave the paper; the money columns to its left
+ * spill into the column beside them and stop well short of the margin -- in the render this
+ * test was written against, a Net price of a billion ends at 371.2 with the page's edge at
+ * 565.3 -- so a regression in any of them would keep the edge check green.
+ *
+ * What every one of them has in common is the cause rather than the symptom: a whole grouped
+ * amount in a single run has nowhere to break, which is the thing `WrappableAmount` exists to
+ * prevent. A cell that still hands the PDF `1,000,000,000.00` in one piece has regressed,
+ * wherever on the page it happens to land.
+ */
+function findUnbrokenAmounts({
+  runs,
+  amounts,
+}: {
+  runs: TextRun[];
+  /**
+   * The numbers as the cells print them, e.g. `1,000,000,000.00` for the money columns and
+   * `999,999` for the quantity, which is punctuated on its own terms.
+   */
+  amounts: string[];
+}) {
+  const needles = amounts.map((amount) => {
+    return flattenSpaces(amount);
+  });
+
+  return runs
+    .filter((run) => {
+      const text = flattenSpaces(run.text);
+
+      return needles.some((needle) => {
+        return text.includes(needle);
+      });
+    })
+    .map((run) => {
+      return `"${run.text}" is a single run, ending at ${run.end.toFixed(1)}`;
+    });
+}
+
+/**
  * Regression test for amounts running over the column next to them.
  *
  * A number is one unbreakable word, so a cell too narrow for `1,000,000,000.00` paints it
  * straight across the column next to it -- and the last column in the items table paints it
- * out past the table's own border and into the page margin, which is what this measures. The
- * default template got away with this for as long as it grouped every amount with a plain
- * space, which react-pdf breaks at; grouping the way the invoice's number format asks took
- * that away, and `WrappableAmount` gives the break back.
+ * out past the table's own border and into the page margin. Both are measured here, because
+ * only the last column's overflow ever reaches the margin: {@link findUnbrokenAmounts} is
+ * what covers the rest. The default template got away with this for as long as it grouped
+ * every amount with a plain space, which react-pdf breaks at; grouping the way the invoice's
+ * number format asks took that away, and `WrappableAmount` gives the break back.
  *
  * All three grouping characters are covered, because they fail differently: a comma and a
  * dot offer react-pdf no break at all, and the no-break space offers one it is forbidden to
@@ -108,7 +185,7 @@ describe("large amounts in the default template", () => {
     { numberFormatLocale: "de", grouping: "dot" },
     { numberFormatLocale: "international", grouping: "no-break space" },
   ] as const)(
-    "keeps every amount inside the page when grouped with a $grouping",
+    "breaks every amount and keeps it inside the page when grouped with a $grouping",
     async ({ numberFormatLocale }) => {
       const buffer = await renderInvoicePdfBuffer({
         invoiceData: buildHugeInvoice(numberFormatLocale),
@@ -119,6 +196,24 @@ describe("large amounts in the default template", () => {
       // a render that produced nothing at all would otherwise pass
       expect(runs.length).toBeGreaterThan(0);
 
+      // every cell broke its number, so none of them can paint across the column next to it
+      expect(
+        findUnbrokenAmounts({
+          runs,
+          amounts: [
+            formatAmount({ amount: HUGE_AMOUNT, numberFormatLocale }),
+            // the quantity column is not money: no forced decimals, and it allows three
+            formatAmount({
+              amount: HUGE_QUANTITY,
+              numberFormatLocale,
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 3,
+            }),
+          ],
+        }),
+      ).toEqual([]);
+
+      // and nothing paints out past the table's own border
       const overflowing = runs.filter((run) => {
         return run.end > CONTENT_RIGHT_EDGE + OVERFLOW_TOLERANCE;
       });

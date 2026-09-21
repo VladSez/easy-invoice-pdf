@@ -153,9 +153,21 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     paddingVertical: 4,
   },
   // Column widths for Stripe-style table
-  colDescription: { flex: 3, textAlign: "left" },
+  /**
+   * The description hands a slice of its width to the quantity beside it. The two grow
+   * factors still add up to 3.3, so every column to the right of them keeps the exact
+   * width -- and the exact position -- it had before.
+   */
+  colDescription: { flex: 2.7, textAlign: "left" },
+  /**
+   * Wide enough for a quantity with a thousands separator in it. At `flex: 0.3` the cell
+   * came to 20.7pt, which `999` already fills, so `WrappableAmount` stacked every
+   * four-digit quantity onto two lines (`1,` over `000`). `0.6` buys 42.7pt, which holds
+   * everything up to `100,000`; a quantity past that still wraps, which is what the
+   * wrapping is there for.
+   */
   colQty: {
-    flex: 0.3,
+    flex: 0.6,
     textAlign: "right",
     marginRight: 16,
   },

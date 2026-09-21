@@ -207,14 +207,24 @@ const LARGE_NET_PRICE = "1000000000";
 /** A rate, so the tax and total columns carry large numbers of their own rather than zeroes. */
 const LARGE_AMOUNTS_TAX_RATE = "20";
 
-/** The quantity the item is billed at by default, which prints as a bare `1`. */
-const SINGLE_QUANTITY = "1";
+/**
+ * A quantity small enough to keep the money columns the subject of the screenshot, but not
+ * `1`: billed at one of itself the net price and the net amount print the same number, and a
+ * column that quietly took its neighbour's value would still look right.
+ */
+const SMALL_QUANTITY = "2";
 
 /**
- * A hundred of them, which takes the net amount to a hundred billion and the pre-tax total
- * past a hundred and twenty -- two thousands groups more than the columns were drawn for.
+ * Ten thousand of them, which takes the net amount to ten trillion and the pre-tax total to
+ * twelve -- two thousands groups more than the money columns were drawn for, and the widest
+ * thing either template ever has to print.
+ *
+ * Five figures also puts a thousands separator in the quantity column itself. That is the
+ * narrowest column in either template -- the Stripe one draws it at 42.7pt against the 36pt
+ * `10,000` needs -- so it is the one place a grouped number has ever been at risk of being
+ * split in half.
  */
-const LARGE_QUANTITY = "100";
+const LARGE_QUANTITY = "10000";
 
 interface FillLargeFirstItemArgs {
   /** The "Invoice items" section of the form. */
@@ -744,7 +754,7 @@ test.describe("Invoice Template shared features", () => {
 
       await fillLargeFirstItem({
         invoiceItemsSection: page.getByTestId("invoice-items-section"),
-        quantity: SINGLE_QUANTITY,
+        quantity: SMALL_QUANTITY,
       });
 
       await expectPdfScreenshot(page, {
@@ -782,10 +792,14 @@ test.describe("Invoice Template shared features", () => {
     });
 
     /**
-     * The same billion, billed a hundred times over. It is the widest thing either template
-     * ever has to print -- the net amount reaches a hundred billion and the pre-tax total a
-     * hundred and twenty -- so it is where an amount wraps onto a second line even in the
-     * columns that hold a single billion comfortably.
+     * The same billion, billed ten thousand times over. It is the widest thing either
+     * template ever has to print -- the net amount reaches ten trillion and the pre-tax total
+     * twelve -- so it is where an amount wraps onto a second line even in the columns that
+     * hold a single billion comfortably.
+     *
+     * A five-figure quantity is also the only thing that puts a thousands separator in the
+     * quantity column, which is the narrowest column either template has and the one place a
+     * grouped number has ever been at risk of being split in half.
      *
      * Only the default grouping is worth a picture here; the sibling test above is the one
      * that covers what changes when the separator does.

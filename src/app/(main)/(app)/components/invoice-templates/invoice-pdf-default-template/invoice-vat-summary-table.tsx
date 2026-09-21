@@ -8,16 +8,16 @@ import { formatAmountChunks } from "../../../utils/format-amount";
 import { WrappableAmount } from "../common/wrappable-amount";
 
 /**
- * The rate column is pinned to the width it has always had: a quarter of the table back when
- * the table filled half the printable width, which is 66.9pt and all that a `20%`, an `NP` or
- * the word for "Total" has ever needed. Points rather than a percentage, so that widening the
- * table (see `invoice-body.tsx`) does not widen this column with it.
+ * The rate column is pinned at 60pt, under the 66.9pt a quarter of this table comes to
+ * (`invoice-body.tsx` gives it half of the 535.3pt A4 content width), and far more than the
+ * `20%`, the `NP` and the six-letter word for "Total" it has to hold. Points rather than a
+ * percentage, so that the three money columns absorb every bit of width this one does not
+ * need, and keep absorbing it if the table is ever widened.
  *
- * The three money columns take what is left, a third each, which is where the extra width
- * goes -- an equal quarter of the old table had the amounts wrapping a thousands group onto a
- * second line sooner than they had to.
+ * Those three take what is left, a third each -- 69.2pt against the 66.9pt an equal quarter
+ * gave them, which is the margin by which an amount stays on one line here.
  */
-const VAT_RATE_COLUMN_WIDTH = { width: 65 } as const;
+const VAT_RATE_COLUMN_WIDTH = { width: 60 } as const;
 const VAT_AMOUNT_COLUMN_WIDTH = { flex: 1 } as const;
 
 export function InvoiceVATSummaryTable({

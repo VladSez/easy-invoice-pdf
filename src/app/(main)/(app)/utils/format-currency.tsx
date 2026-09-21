@@ -77,15 +77,25 @@ interface FormatNumberForPdfArgs {
  * amount never wraps on the separator's terms; where it has to wrap, it wraps on the
  * template's, which is what the pieces are for.
  *
- * Every piece but the last ends on a group separator -- `1,000,000,000.00` comes back as
- * `["1,", "000,", "000,", "000.00"]` -- because a thousands boundary is the only place an
- * amount may be broken. `Intl` marks those boundaries itself, which is what keeps the cut
- * right in every locale: the `.` that groups a German amount and the `.` that marks its
- * decimals are told apart by the formatter rather than by guessing from the digits around
- * them.
+ * The cut is always at a thousands boundary, because that is the only place an amount may
+ * be broken. `Intl` marks those boundaries itself, which is what keeps the cut right in
+ * every locale: the `.` that groups a German amount and the `.` that marks its decimals are
+ * told apart by the formatter rather than by guessing from the digits around them.
+ *
+ * Which side of the cut the separator lands on depends on whether you can see it:
+ *
+ * - a visible one closes the piece it belongs to, the way a number broken across two lines
+ *   is written -- `1,000,000,000.00` comes back as `["1,", "000,", "000,", "000.00"]`;
+ * - a blank one opens the next piece instead -- `1 000 000 000.00` comes back as
+ *   `["1", " 000", " 000", " 000.00"]`. `WrappableAmount` right-aligns each line it lays
+ *   out, so a line that *ended* on the space would keep it inside its box and leave the
+ *   digits sitting short of the column's edge, out of line with every other amount in it.
+ *   At the head of a line the same space is simply invisible. Half the locales here group
+ *   with a space, `international` among them.
  *
  * Only `WrappableAmount` keeps the pieces apart, because it needs them as separate boxes to
- * lay out. Anything printing an amount into running text joins them back up.
+ * lay out. Anything printing an amount into running text joins them back up, and that join
+ * is the string `Intl` printed either way.
  */
 export function formatNumberChunksForPdf({
   amount,
@@ -104,14 +114,20 @@ export function formatNumberChunksForPdf({
   let chunk = "";
 
   for (const part of parts) {
-    const isGroupSeparator = part.type === "group";
+    if (part.type !== "group") {
+      chunk += toPdfSafeSpaces(part.value);
+      continue;
+    }
 
-    chunk += toPdfSafeSpaces(
-      isGroupSeparator && isInternational ? NO_BREAK_SPACE : part.value,
+    const separator = toPdfSafeSpaces(
+      isInternational ? NO_BREAK_SPACE : part.value,
     );
 
-    if (isGroupSeparator) {
+    if (separator.trim() === "") {
       chunks.push(chunk);
+      chunk = separator;
+    } else {
+      chunks.push(chunk + separator);
       chunk = "";
     }
   }
