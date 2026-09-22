@@ -23,7 +23,9 @@ export function StripeVatSummaryTableTotals({
   styles: typeof STRIPE_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
+
   const numberFormatLocale = resolveNumberFormatLocale(invoiceData);
+
   const t = INVOICE_PDF_TRANSLATIONS[language];
   const taxLabelText = invoiceData.taxLabelText || "VAT";
 
@@ -31,6 +33,7 @@ export function StripeVatSummaryTableTotals({
   const subtotal = invoiceData.items.reduce((sum, item) => {
     return sum + item.netAmount;
   }, 0);
+
   const subtotalChunks = formatCurrencyChunks({
     amount: subtotal,
     currency: invoiceData.currency,
@@ -170,7 +173,7 @@ export function StripeVatSummaryTableTotals({
               {t.stripe.amountDue}
             </Text>
           </View>
-          <View style={[styles.vatColValue, { flex: 1.5 }]}>
+          <View style={[styles.vatColValue]}>
             <WrappableAmount
               chunks={invoiceTotalChunks}
               style={[styles.fontSize9, styles.fontBold, styles.textDark]}

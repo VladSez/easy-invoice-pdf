@@ -123,18 +123,17 @@ function flattenSpaces(value: string) {
 }
 
 /**
- * Every table cell that printed its amount as one unbreakable run.
+ * Every table cell that printed its number as one unbreakable run.
  *
  * This is the half of the bug the page's right-hand edge cannot see. Only the last column of
  * the items table overflows far enough to leave the paper; the money columns to its left
- * spill into the column beside them and stop well short of the margin -- in the render this
- * test was written against, a Net price of a billion ends at 371.2 with the page's edge at
- * 565.3 -- so a regression in any of them would keep the edge check green.
+ * spill into the column beside them and stop well short of the margin, so a regression in any
+ * of them would keep the edge check green.
  *
  * What every one of them has in common is the cause rather than the symptom: a whole grouped
- * amount in a single run has nowhere to break, which is the thing `WrappableAmount` exists to
- * prevent. A cell that still hands the PDF `1,000,000,000.00` in one piece has regressed,
- * wherever on the page it happens to land.
+ * number in a single run has nowhere to break, which is the thing `WrappableAmount` exists to
+ * prevent. A cell that still hands the PDF `1,000,000,000.00` -- or a `999,999` quantity --
+ * in one piece has regressed, wherever on the page it happens to land.
  */
 function findUnbrokenAmounts({
   runs,

@@ -986,4 +986,76 @@ test.describe("Stripe Invoice Template", () => {
       name: "pdf-with-logo-and-payment-url-when-using-stripe-template.png",
     });
   });
+
+  /**
+   * The Stripe template is the only one whose money cells carry a currency token, and some
+   * locales render that token in more than one font run: `it` prints `123.400.000,00 USD`
+   * and `fr` prints `123 400 000,00 $US`, both joining the number to the code with a
+   * no-break space that Inter has no glyph for. react-pdf splits the run there, which is
+   * enough to break a wrapping strategy that assumes it gets the whole amount in one piece.
+   *
+   * When that happened the amount stopped breaking at its thousands boundaries *and*
+   * react-pdf painted a hyphen into it -- `123.400.000,00 -` above a lone `USD`, and in
+   * French a hyphen inside the currency symbol itself, `$-` above `US`. Both are in these
+   * screenshots if they ever come back.
+   *
+   * The numbers are the ones that first showed it: a hundred thousand of an item priced at
+   * 123.4 million, which takes the line total past twelve trillion and forces every money
+   * column to wrap.
+   */
+  for (const language of ["it", "fr"] as const) {
+    test(`wraps a wide amount without hyphenating it when ${language} renders the currency in several runs`, async ({
+      page,
+      browserName,
+      downloadDir,
+    }) => {
+      await page.evaluate(
+        ({ invoiceData, storageKey }) => {
+          localStorage.setItem(storageKey, JSON.stringify(invoiceData));
+        },
+        {
+          storageKey: PDF_DATA_LOCAL_STORAGE_KEY,
+          invoiceData: {
+            ...INITIAL_INVOICE_DATA,
+            template: "stripe",
+            language,
+            // `INITIAL_INVOICE_DATA` takes its dates and invoice number from `dayjs()` at
+            // import time -- in the test runner, where `page.clock` does not reach -- so they
+            // are pinned here instead. Without this the screenshot changes every day.
+            invoiceNumberObject: { label: "Invoice", value: "1/12-2025" },
+            dateOfIssue: "2025-12-17",
+            dateOfServiceStart: "2025-12-01",
+            dateOfService: "2025-12-31",
+            paymentDue: "2025-12-31",
+            // the number format follows the language unless it is pinned, and it is the
+            // format -- not the language -- that decides how the currency is written
+            numberFormatLocale: language,
+            currency: "USD",
+            dateFormat: STRIPE_DEFAULT_DATE_FORMAT,
+            items: [
+              {
+                ...INITIAL_INVOICE_DATA.items[0],
+                amount: 100_000,
+                netPrice: 123_400_000,
+                netAmount: 12_340_000_000_000,
+                vat: 20,
+                vatAmount: 2_468_000_000_000,
+                preTaxAmount: 14_808_000_000_000,
+              },
+            ],
+            total: 14_808_000_000_000,
+          } satisfies InvoiceData,
+        },
+      );
+
+      await page.goto("/?template=stripe");
+      await expect(page).toHaveURL("/?template=stripe");
+
+      await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        name: `wide-amount-with-multi-run-currency-${language}-stripe-template.png`,
+      });
+    });
+  }
 });

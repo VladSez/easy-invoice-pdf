@@ -219,13 +219,38 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     paddingVertical: 2,
   },
 
+  /**
+   * The label takes whatever the amount beside it leaves over, and wraps -- it is prose, so
+   * it has somewhere to wrap to. See {@link STRIPE_TEMPLATE_STYLES.vatColValue}.
+   */
   vatColLabel: {
-    flex: 3,
-    paddingRight: 6,
+    flex: 1,
+    paddingRight: 8,
   },
 
+  /**
+   * The amount column is as wide as the amount in it, not a fixed share of the block.
+   *
+   * A fixed share made the wrap depend on the row's font weight. Every row here prints the
+   * same kind of number, but "Amount due" prints it semibold, which is about 4% wider than
+   * the regular rows above it -- enough that a share sized to fit `EUR 10.000.000.000,00`
+   * at 400 (87.4pt of a 92pt column) did not fit it at 600 (91.2pt), and the one row a
+   * reader actually looks for was the only one that broke across two lines.
+   *
+   * Sizing each cell to its own content takes the weight out of it: an amount wraps when it
+   * is genuinely too wide for the block, not when the column's share happens to fall between
+   * one weight's width and another's. The right edge is where it always was, because the
+   * cell is the row's last item and its contents are right-aligned, so the rows stay in a
+   * column whatever width each one takes.
+   *
+   * {@link maxWidth} is what the label keeps back for itself. Past it the amount wraps again
+   * -- it has to go somewhere -- but by then every row in the block is wrapping, which is
+   * the behaviour this is here to get.
+   */
   vatColValue: {
-    flex: 1.4,
+    flexGrow: 0,
+    flexShrink: 0,
+    maxWidth: "60%",
     textAlign: "right",
   },
 } as const satisfies Styles);
