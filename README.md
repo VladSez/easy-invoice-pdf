@@ -4,16 +4,16 @@
     <img src="https://github.com/user-attachments/assets/cb9bcc91-b4c8-40b1-b406-bc606c5d9315" alt="EasyInvoicePDF Logo" width="80" height="80">
   </a>
   <h1>EasyInvoicePDF</h1>
-  <h3>Free & Open-Source Invoice Generator</h3>
-  <p>Create professional invoices instantly in your browser with <strong>Live Preview</strong>, <strong>Instant PDF Export</strong>, <strong>Multiple Customizable Templates</strong> (including a Stripe-style design). <strong>No Ads</strong>. <strong>No Sign-Up Required</strong>.</p>
-  <p><a href="https://easyinvoicepdf.com"><strong>Start Invoicing</strong></a></p>
+  <h3>Free and Open-Source Invoice Generator</h3>
+  <p>Create professional invoices instantly. No account. No ads. No limits. Your data stays yours.</p>
+  <p>Live PDF preview · Stripe-style template · 10+ languages · 120+ currencies · Saved seller &amp; buyer profiles</p>
   <p>
-      <a href="https://easyinvoicepdf.com/en/about?ref=github">About us</a>
-      ·
-      <a href="https://github.com/VladSez/easy-invoice-pdf/releases">Releases</a>
-    </p>
-
-<strong>⭐ Like the project? <a href="https://github.com/VladSez/easy-invoice-pdf" title="Star EasyInvoicePDF on GitHub - free & open-source invoice generator">Star it on GitHub</a></strong>
+    <a href="https://easyinvoicepdf.com/?ref=github"><strong>Start Invoicing</strong></a>
+    ·
+    <a href="https://easyinvoicepdf.com/how-it-works?ref=github">How it works</a>
+    ·
+    <a href="https://easyinvoicepdf.com/en/about?ref=github">About</a>
+  </p>
 
 <p align="center" style="margin-top: 20px;">
   <a href="https://vladsazon.com">
@@ -22,6 +22,8 @@
   <br />
   Made by <a href="https://vladsazon.com" title="Software Engineer and founder of EasyInvoicePDF"><strong>Vlad Sazonau</strong></a> - a software engineer and design enthusiast
 </p>
+
+<strong>⭐ Like the project? <a href="https://github.com/VladSez/easy-invoice-pdf" title="Star EasyInvoicePDF on GitHub - free and open-source invoice generator">Star it on GitHub</a></strong>
 
   </div>
 
@@ -38,16 +40,16 @@
 
 ## ✨ Feature Highlights
 
-- 📺 **Instant PDF generation** with live preview
-- 🚀 **No sign-up required** - start immediately
-- 🎉 **Ad-free experience**
-- 👤 **Save Seller & Buyer Profiles** - reuse seller & buyer details for future invoices
-- 🎨 **Multiple fully customizable templates** including modern Stripe-style design
-- 🧾 **Smart invoicing tools** - VAT, GST, sales tax & custom tax support with automatic calculations
-- 🏷️ **Logo support** for custom branding
+- 🔒 **Privacy-first** - runs entirely in your browser, invoice data is never uploaded
+- 📄 **Live PDF preview** - see every change as you type, download in one click
+- 🎨 **Two templates** - classic and Stripe-style, with logo support
+- 🧾 **Flexible taxes** - VAT, GST, sales tax or your own label, calculated automatically
+- 👤 **Saved seller & buyer profiles** - reuse details across invoices
+- 🔗 **Shareable links** - send an invoice as a link, no attachment needed
+- 🏞️ **Payment QR codes** and automatic multi-page layout for long invoices
+- 🌍 **10+ languages, 120+ currencies**
 - 📱 **Mobile-friendly** - works on any device
-- 🌍 **Multi-language & multi-currency** (10+ languages, 120+ currencies)
-- 🔒 **Privacy-first** - browser-only, no server uploads
+- 🚀 **Free, no sign-up, no ads**
 
 <h4>Learn more about <a href="https://easyinvoicepdf.com/en/about#features">features</a>.</h4>
 
@@ -81,7 +83,7 @@ _**One-click PDF download** ready for printing or sending_
 
 <img src="https://github.com/user-attachments/assets/719f74a1-9be0-4b95-a8c1-a2749246aff3" width="800" alt="Language & Currency Demo">
 
-_**Switch between 10 languages and 120+ currencies instantly** with live PDF preview updates_
+_**Switch between 10+ languages and 120+ currencies instantly** with live PDF preview updates_
 
 ---
 
