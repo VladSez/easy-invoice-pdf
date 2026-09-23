@@ -58,6 +58,19 @@ export const FALLBACK_AMOUNT = "0.00";
  */
 const INTERNATIONAL_FORMAT_BASE_LOCALE = "en-US";
 
+/**
+ * Group every amount from the thousands up, including four-digit ones.
+ *
+ * CLDR gives Polish, Spanish and Italian `minimumGroupingDigits: 2`, so by default `Intl`
+ * leaves a four-digit amount ungrouped: `8111,00` next to `18 111,00` in the same column.
+ * On an invoice, where amounts sit one above another and are read by their groups, that
+ * looks like a missing space rather than a rule. `"always"` groups them all the same way.
+ *
+ * A browser that predates the string values reads `"always"` as `true`, which is the
+ * locale default, so it falls back to today's output rather than failing.
+ */
+const ALWAYS_GROUP_THOUSANDS = "always";
+
 interface FormatNumberForPdfArgs {
   /** The number to write. Anything that is not a finite number is written as zero. */
   amount: number;
@@ -107,7 +120,7 @@ export function formatNumberChunksForPdf({
 
   const parts = new Intl.NumberFormat(
     isInternational ? INTERNATIONAL_FORMAT_BASE_LOCALE : numberFormatLocale,
-    options,
+    { useGrouping: ALWAYS_GROUP_THOUSANDS, ...options },
   ).formatToParts(validAmount);
 
   const chunks: string[] = [];

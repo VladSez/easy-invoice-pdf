@@ -51,6 +51,20 @@ const AMOUNT_PER_LOCALE: Record<SupportedNumberFormatLocale, string> = {
 };
 
 describe("formatAmount", () => {
+  it("groups four-digit amounts in locales whose CLDR default skips them", () => {
+    expect(formatAmount({ amount: 8111, numberFormatLocale: "pl" })).toBe(
+      `8${NBSP}111,00`,
+    );
+
+    expect(formatAmount({ amount: 8111, numberFormatLocale: "es" })).toBe(
+      "8.111,00",
+    );
+
+    expect(
+      formatAmountChunks({ amount: 8111, numberFormatLocale: "pl" }),
+    ).toEqual(["8", `${NBSP}111,00`]);
+  });
+
   it("writes the number the way the given locale does", () => {
     expect(formatAmount({ amount: AMOUNT, numberFormatLocale: "en" })).toBe(
       "321,200.00",

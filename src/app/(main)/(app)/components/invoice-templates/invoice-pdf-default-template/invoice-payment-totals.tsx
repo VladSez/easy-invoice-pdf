@@ -40,7 +40,7 @@ export function InvoicePaymentTotals({
   /**
    * Nothing is ever paid up front, so the paid line is a hardcoded zero -- but it still has
    * to be punctuated like every other number on the invoice, or a Polish invoice reads
-   * "0.00 EUR" one line above "3300,00 EUR".
+   * "0.00 EUR" one line above "3 300,00 EUR".
    */
   const formattedZero = formatAmount({
     amount: 0,
