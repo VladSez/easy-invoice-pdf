@@ -117,7 +117,7 @@ function HeroSection() {
               </h1>
 
               <div className="flex justify-center xl:justify-start">
-                <h2 className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
+                <p className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
                   {(() => {
                     let colorIndex = 0;
 
@@ -143,7 +143,7 @@ function HeroSection() {
                       },
                     });
                   })()}
-                </h2>
+                </p>
               </div>
             </div>
 

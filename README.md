@@ -40,7 +40,7 @@
 
 ## ✨ Feature Highlights
 
-- 🔒 **Privacy-first** - runs entirely in your browser, invoice data is never uploaded
+- 🔒 **Privacy-first** - invoices are created and stored in your browser by default
 - 📄 **Live PDF preview** - see every change as you type, download in one click
 - 🎨 **Two templates** - classic and Stripe-style, with logo support
 - 🧾 **Flexible taxes** - VAT, GST, sales tax or your own label, calculated automatically
