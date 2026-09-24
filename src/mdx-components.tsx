@@ -39,17 +39,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       );
     },
 
-    // Enhanced inline code styling
-    code: ({ children, ...props }) => {
-      return (
-        <code
-          {...props}
-          className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-sm text-gray-800 dark:bg-gray-800 dark:text-gray-200"
-        >
-          {children}
-        </code>
-      );
-    },
+    // Inline `code` is styled by the typography theme in `tailwind.config.ts`
 
     // Custom blockquote with accent color
     blockquote: ({ children, ...props }) => {

@@ -41,14 +41,12 @@ function renderChangelogPopupHook(
   overrides: Partial<{
     latestChangelog: ChangelogSummary | null;
     isViewingSharedInvoice: boolean;
-    isMobile: boolean;
   }> = {},
 ) {
   return renderHook(() => {
     return useChangelogUpdatePopup({
       latestChangelog: null,
       isViewingSharedInvoice: false,
-      isMobile: false,
       ...overrides,
     });
   });
@@ -87,7 +85,6 @@ describe("useChangelogUpdatePopup", () => {
         return useChangelogUpdatePopup({
           latestChangelog: latest,
           isViewingSharedInvoice: false,
-          isMobile: false,
         });
       },
       { initialProps: { latest: null as ChangelogSummary | null } },
@@ -121,7 +118,6 @@ describe("useChangelogUpdatePopup", () => {
         return useChangelogUpdatePopup({
           latestChangelog: latest,
           isViewingSharedInvoice: false,
-          isMobile: false,
         });
       },
       { initialProps: { latest: null as ChangelogSummary | null } },
@@ -186,7 +182,6 @@ describe("useChangelogUpdatePopup", () => {
         return useChangelogUpdatePopup({
           latestChangelog: latest,
           isViewingSharedInvoice: false,
-          isMobile: false,
         });
       },
       { initialProps: { latest: previousChangelog } },
@@ -229,17 +224,6 @@ describe("useChangelogUpdatePopup", () => {
     vi.mocked(shouldShowChangelogPopup).mockReturnValue(false);
 
     const { result } = renderChangelogPopupHook({ latestChangelog });
-
-    act(() => {
-      vi.advanceTimersByTime(1500);
-    });
-
-    expect(result.current.isOpen).toBe(false);
-    expect(result.current.variant).toBeNull();
-  });
-
-  it("should not show popup on mobile", () => {
-    const { result } = renderChangelogPopupHook({ isMobile: true });
 
     act(() => {
       vi.advanceTimersByTime(1500);

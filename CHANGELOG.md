@@ -1,5 +1,57 @@
 # Changelog
 
+## [1.0.5] - 2026-09-24
+
+### Added
+
+- Number Format setting: choose how amounts are grouped and punctuated in the PDF, independently of the invoice language, including a locale-neutral **International** format (`321 200.00`). Each option previews the invoice's own total in the selected template's style
+- "Keep format when language changes" switch, which pins the number format across language switches
+- Brazilian Portuguese (`pt-BR`) as a PDF language, with `CNPJ/CPF` and `Imposto` labels and amounts in words on the short scale (`um bilhão`). The site itself stays translated into European Portuguese only: invoice PDF languages (`SUPPORTED_INVOICE_PDF_LANGUAGES`) and site locales (`SUPPORTED_I18N_LOCALES`) are now separate lists
+- `WrappableAmount` PDF component: amounts too wide for their cell wrap at a thousands boundary instead of overflowing into the next column, in both templates
+- "How to customize tax" video in the "How it works" guide
+
+### Changed
+
+- The default template now punctuates amounts in the invoice language by default (`321,200.00` in English, `321.200,00` in German) instead of always printing `321 200.00`. This includes invoices saved or shared before this release, which may re-download with different punctuation; picking **International** restores the old output
+- Four-digit amounts are grouped in Polish, Spanish and Italian (`8 111,00` rather than `8111,00`), via `useGrouping: "always"`
+- The default template's footer writes the total like the rest of the invoice, with the ISO currency code rather than a localized symbol
+- Language pickers name the region for Portuguese: "Portuguese (Portugal)" and "Portuguese (Brazil)"
+- Clearer Stripe-template "due" and "amount due" wording in German, Spanish, French, Italian and Portuguese
+- Wider quantity column in the Stripe template, so four- and five-digit quantities stay on one line
+- Seller and buyer visibility switches are now named by their visible labels instead of separate `aria-label`s
+
+### Fixed
+
+- French amounts in the default template's footer printed `/` in place of the thousands separator (`321/200,00 €`): U+202F is now mapped to a no-break space the PDF fonts cover
+- The amount in words no longer leaves `00/100` alone on the next line
+- Hydration mismatch on the footer copyright year when the build year and the visitor's year differ
+
+## [1.0.4] - 2026-09-04
+
+### Added
+
+- Redesigned mobile tabs: a pill-shaped track with a single indicator that slides between the invoice form and the preview
+- Service period fields in the invoice form
+- Terms of Service and founder pages, SEO landing pages, and Markdown versions of key pages
+- Welcome popup and a changelog update popup
+- Monthly recurring invoice as a Trigger.dev scheduled task
+
+### Changed
+
+- The invoice PDF is rendered once and shared by the desktop preview, the mobile viewer and the download button, removing flicker and duplicate renders
+- Dates in the form's helper texts and the out-of-date banner use the invoice's own language and date format, matching the PDF
+- The out-of-date dates banner also detects a stale month in the invoice number
+- Upgraded to Next.js 15, React 19 and Sentry 10
+- Switched linting and formatting to oxlint and oxfmt, and expanded unit and end-to-end test coverage
+- Hardened GitHub Actions workflows with zizmor static analysis
+
+### Fixed
+
+- PDFs intermittently dropped the first one or two characters of labels (for example `Fatura` → `atura`) after switching template and language in quick succession
+- Text typed just before switching mobile tabs was lost; both panels now stay mounted once opened
+- The app crashed in iOS in-app webviews that expose `localStorage` as `null`, and in Safari with "Block all cookies" enabled
+- The preview rendered the PDF twice when switching between the default and Stripe templates
+
 ## [1.0.3] - 2026-03-29
 
 ### Added
@@ -100,6 +152,8 @@
 - Invoice numbering, dating, and payment terms
 - No sign-up required — fully browser-based with no server-side data storage
 
+[1.0.5]: https://github.com/VladSez/easy-invoice-pdf/compare/v1.0.4...v1.0.5
+[1.0.4]: https://github.com/VladSez/easy-invoice-pdf/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/VladSez/easy-invoice-pdf/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/VladSez/easy-invoice-pdf/compare/EasyInvoicePDF-1.0.1...v1.0.2
 [1.0.1]: https://github.com/VladSez/easy-invoice-pdf/compare/EasyInvoicePDF-v1.0.0...EasyInvoicePDF-1.0.1

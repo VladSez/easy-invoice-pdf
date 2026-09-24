@@ -946,9 +946,14 @@ interface ResolveNumberFormatLocaleArgs {
  * The locale an invoice writes its numbers in.
  *
  * The form keeps the stored value in step with the invoice language -- picking a language
- * picks its number format too -- so this fallback is for the invoices that predate the
- * setting: they carry no value and are written in their own language, which is exactly what
- * they should go on printing.
+ * picks its number format too -- so this fallback is for an invoice that carries no value:
+ * one saved before the setting existed, or a new one nobody has touched. It is written in
+ * its own language, so an English invoice reads `321,200.00`.
+ *
+ * That is a deliberate change for the default template, which printed every amount
+ * `international` (`321 200.00`) whatever the language before this setting existed: such
+ * an invoice, re-downloaded, now follows its language instead. The Stripe template always
+ * did, so it prints what it always printed.
  */
 export function resolveNumberFormatLocale({
   language,
@@ -1696,6 +1701,12 @@ export const METADATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_METADATA";
  * marker, so bumping it shows the popup again.
  */
 export const WELCOME_POPUP_SEEN_STORAGE_KEY = "EASY_INVOICE_WELCOME_POPUP_SEEN";
+
+/**
+ * The value {@link WELCOME_POPUP_SEEN_STORAGE_KEY} holds once the welcome popup has been
+ * seen. Exported for `playwright.config.ts`, which marks it seen for every e2e run.
+ */
+export const WELCOME_POPUP_SEEN_VALUE = "v1";
 
 /** The slug of the newest changelog entry the user has seen. */
 export const CHANGELOG_SEEN_STORAGE_KEY =

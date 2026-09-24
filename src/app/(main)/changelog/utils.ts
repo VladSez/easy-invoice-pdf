@@ -11,6 +11,8 @@ export interface ChangelogSummary {
   description: string;
   version?: string;
   date: string;
+  /** A few words about the release for the "What's new" popup, see `popupSummary` below. */
+  popupSummary?: string;
 }
 
 /** Maps metadata `version` (e.g. "1.0.1") to the GitHub release tag name. */
@@ -42,6 +44,12 @@ interface ChangelogMetadata {
   version?: string;
   type?: "major" | "minor" | "patch";
   slug?: string;
+  /**
+   * A few words about the release, shown in the "What's new" popup in place of its generic
+   * line. The popup is small and shares its space with the mascot, so keep it to a short
+   * sentence; leave it out and the popup falls back to the generic line.
+   */
+  popupSummary?: string;
 }
 
 export interface ChangelogEntry {
@@ -57,6 +65,7 @@ const changelogEntryMetadataSchema = z.object({
   date: z.iso.date(),
   version: z.string().optional(),
   type: z.enum(["major", "minor", "patch"]).optional(),
+  popupSummary: z.string().min(1).max(80).optional(),
 });
 
 /**
@@ -77,6 +86,7 @@ export async function getLatestChangelogSummary(): Promise<ChangelogSummary | nu
     description: metadata.description,
     version: metadata.version,
     date: metadata.date,
+    popupSummary: metadata.popupSummary,
   };
 }
 
