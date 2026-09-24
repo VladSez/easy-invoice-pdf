@@ -103,6 +103,7 @@
     "remark-gfm": "4.0.1",
     "require-in-the-middle": "8.0.1",
     "resend": "4.2.0",
+    "rough-notation": "0.5.1",
     "sonner": "1.7.4",
     "tailwind-merge": "2.6.0",
     "tailwindcss-animate": "1.0.7",
