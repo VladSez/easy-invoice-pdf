@@ -328,7 +328,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
   },
   es: {
-    invoiceNumber: "Factura N°",
+    invoiceNumber: "Factura n.º",
     dateOfIssue: "Fecha de emisión",
     dateOfService: "Fecha de venta/prestación del servicio",
     servicePeriod: "Periodo de servicio",
@@ -346,7 +346,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
       email: "Correo electrónico",
     },
     invoiceItemsTable: {
-      no: "N°",
+      no: "N.º",
       nameOfGoodsService: "Descripción del producto/servicio",
       typeOfGTU: "Tipo\n GTU",
       amount: "Cantidad",
@@ -416,7 +416,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
   },
   pt: {
-    invoiceNumber: "Fatura N.º",
+    invoiceNumber: "Fatura n.º",
     dateOfIssue: "Data de emissão",
     dateOfService: "Data de venda/prestação do serviço",
     servicePeriod: "Período de serviço",
@@ -775,7 +775,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
   },
   fr: {
-    invoiceNumber: "Facture N°",
+    invoiceNumber: "Facture n°",
     dateOfIssue: "Date d'émission",
     dateOfService: "Date de vente/prestation de service",
     servicePeriod: "Période de service",
@@ -863,7 +863,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
   },
   it: {
-    invoiceNumber: "Fattura N°",
+    invoiceNumber: "Fattura n°",
     dateOfIssue: "Data di emissione",
     dateOfService: "Data di vendita/prestazione del servizio",
     servicePeriod: "Periodo di servizio",
