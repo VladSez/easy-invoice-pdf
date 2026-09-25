@@ -66,8 +66,26 @@ const INVOICE_ITEM = {
   quantity: "3",
   netPrice: "1234.56",
   // 3 * 1234.56
-  total: "3,703.68",
+  total: 3703.68,
 } as const;
+
+/**
+ * The invoice total as the read-only "Total" field writes it: in the number format the
+ * language switch selected.
+ */
+function expectedTotal(language: SupportedLanguages) {
+  return (
+    new Intl.NumberFormat(language, {
+      // like the app, group a four-digit amount too, which Polish and Spanish don't by default
+      useGrouping: "always",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+      .format(INVOICE_ITEM.total)
+      // the app swaps the narrow no-break space French groups with for a regular no-break one
+      .replaceAll(String.fromCodePoint(0x20_2f), String.fromCodePoint(0x00_a0))
+  );
+}
 
 async function selectTemplate(page: Page, template: Template) {
   if (template !== "default") {
@@ -191,9 +209,9 @@ test.describe("Invoice Template PDF languages", () => {
           })
           .fill(INVOICE_ITEM.netPrice);
 
-        // Check that the total is correct
+        // Check that the total is correct, written in the selected language's number format
         await expect(page.getByRole("textbox", { name: "Total" })).toHaveValue(
-          INVOICE_ITEM.total,
+          expectedTotal(language),
         );
 
         const { suggestedFilename } = await expectPdfScreenshot(page, {
