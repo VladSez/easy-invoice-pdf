@@ -19,6 +19,6 @@ export const config = {
   // `/api/*` and assets are untouched.
   //
   // Next.js requires a static literal here, so this list cannot be derived from
-  // `routing.locales` — keep it in sync with SUPPORTED_LANGUAGES.
+  // `routing.locales` — keep it in sync with SUPPORTED_I18N_LOCALES.
   matcher: ["/(en|pl|nl|fr|de|it|nb|pt|ru|es|sv|uk)/:path*"],
 };

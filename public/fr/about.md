@@ -8,7 +8,7 @@
 >
 > Code source : https://github.com/VladSez/easy-invoice-pdf
 >
-> Dernière mise à jour : 2026-09-16
+> Dernière mise à jour : 2026-09-17
 
 ## Résumé canonique du produit
 
@@ -34,7 +34,7 @@ Tous ces termes désignent le produit EasyInvoicePDF décrit ici.
 - **Publicité :** aucune.
 - **Navigateur :** édition, aperçu et génération PDF dans le navigateur.
 - **Auto-hébergement :** pris en charge depuis le code public.
-- **Langues :** anglais, polonais, allemand, espagnol, portugais, russe, ukrainien, français, italien, néerlandais, suédois et norvégien.
+- **Langues :** anglais, polonais, allemand, espagnol, portugais, portugais du Brésil, russe, ukrainien, français, italien, néerlandais, suédois et norvégien.
 - **Devises :** plus de 120.
 - **Plateformes :** navigateurs modernes sur ordinateur, tablette et mobile.
 - **Version publique actuelle :** 1.0.4.
@@ -61,7 +61,7 @@ Tous ces termes désignent le produit EasyInvoicePDF décrit ici.
 - Modèles par défaut et inspiré de Stripe.
 - Profils vendeur et client enregistrés localement.
 - Lignes, totaux et taxes calculés automatiquement.
-- Plus de 120 devises et 12 langues.
+- Plus de 120 devises et 13 langues.
 - TVA, GST, taxe de vente et libellés personnalisés.
 - Type de facture et texte d’autoliquidation personnalisés.
 - Numéros, dates, notes et champs affichables ou masquables.
@@ -163,7 +163,7 @@ L’e-mail et l’API publique figurent dans les Intégrations prévues. Facture
 - Sans compte, abonnement ni publicité.
 - Auto-hébergement pris en charge.
 - Données stockées localement, pas dans un compte cloud.
-- 12 langues, plus de 120 devises et libellés fiscaux personnalisés.
+- 13 langues, plus de 120 devises et libellés fiscaux personnalisés.
 - Partage par lien sans créer de dossier hébergé.
 
 ## Stockage et confidentialité

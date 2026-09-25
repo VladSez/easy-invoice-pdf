@@ -671,10 +671,44 @@ export type TemplateLabels =
  * unsorted; adding a language means slotting its code in where its *name* belongs, and
  * mirroring the position in the maps that follow.
  *
- * `en` has to stay first for a second reason: it is read as the default locale
- * (`SUPPORTED_LANGUAGES[0]`) by the i18n routing and the invoice defaults.
+ * `en` has to stay first for a second reason: it is the invoice's default language.
+ *
+ * This is the PDF's language, not the site's -- see {@link SUPPORTED_I18N_LOCALES}.
  */
-export const SUPPORTED_LANGUAGES = [
+export const SUPPORTED_INVOICE_PDF_LANGUAGES = [
+  "en",
+  "pl",
+  "nl",
+  "fr",
+  "de",
+  "it",
+  "nb",
+  "pt",
+  "pt-BR",
+  "ru",
+  "es",
+  "sv",
+  "uk",
+] as const;
+export type SupportedLanguages =
+  (typeof SUPPORTED_INVOICE_PDF_LANGUAGES)[number];
+
+/**
+ * The languages the *interface* is translated into.
+ *
+ * Every one of these is a route (`/pt/about`), a `messages/<locale>.json`, a
+ * `public/<locale>/about.md`, a sitemap entry and a footer link, so a locale costs a page
+ * to write and keep up to date. An invoice language costs a column of labels, which is why
+ * the two lists are allowed to differ: `pt-BR` prints a Brazilian invoice without
+ * committing the site to a second Portuguese translation.
+ *
+ * `satisfies` keeps it a subset -- a locale has to be a language the PDF can be written in
+ * too, since the about page links straight into the generator.
+ *
+ * `en` has to stay first: it is read as the default locale (`SUPPORTED_I18N_LOCALES[0]`) by the
+ * i18n routing.
+ */
+export const SUPPORTED_I18N_LOCALES = [
   "en",
   "pl",
   "nl",
@@ -687,8 +721,8 @@ export const SUPPORTED_LANGUAGES = [
   "es",
   "sv",
   "uk",
-] as const;
-export type SupportedLanguages = (typeof SUPPORTED_LANGUAGES)[number];
+] as const satisfies readonly SupportedLanguages[];
+export type SupportedLocale = (typeof SUPPORTED_I18N_LOCALES)[number];
 
 export const MAX_INVOICE_ITEMS = 100;
 
@@ -701,10 +735,31 @@ export const LANGUAGE_TO_LABEL = {
   it: "Italian",
   nb: "Norwegian",
   pt: "Portuguese",
+  "pt-BR": "Portuguese (BR)",
   ru: "Russian",
   es: "Spanish",
   sv: "Swedish",
   uk: "Ukrainian",
+} as const satisfies Record<SupportedLanguages, string>;
+
+/**
+ * The same names as {@link LANGUAGE_TO_LABEL}, with the region spelled out for the
+ * languages that are written differently in more than one country.
+ *
+ * Only Portuguese needs it today, and the two are separate invoices rather than separate
+ * spellings: `pt` labels the tax number "NIF" and the tax "IVA", spells "dezasseis" and
+ * counts in the long scale ("mil milhões"); `pt-BR` labels them "CNPJ/CPF" and "Imposto",
+ * spells "dezesseis" and counts in the short one ("bilhões"). Naming the country lets a
+ * reader pick the right one up front, instead of finding out after generating the PDF.
+ *
+ * This is for pickers only. Everywhere the language is merely stated rather than chosen --
+ * the download button, where the name sits inside a fixed-width label -- keeps the short
+ * {@link LANGUAGE_TO_LABEL} name.
+ */
+export const LANGUAGE_TO_LABEL_WITH_REGION = {
+  ...LANGUAGE_TO_LABEL,
+  pt: "Portuguese (Portugal)",
+  "pt-BR": "Portuguese (Brazil)",
 } as const satisfies Record<SupportedLanguages, string>;
 
 /**
@@ -721,6 +776,7 @@ export const LANGUAGE_TO_NATIVE_LABEL = {
   it: "Italiano",
   nb: "Norsk bokmål",
   pt: "Português",
+  "pt-BR": "Português (Brasil)",
   ru: "Русский",
   es: "Español",
   sv: "Svenska",
@@ -778,6 +834,7 @@ export const LANGUAGE_TO_LONG_DATE_FORMAT = {
   it: "D MMMM YYYY",
   nb: "D. MMMM YYYY",
   pt: "D [de] MMMM [de] YYYY",
+  "pt-BR": "D [de] MMMM [de] YYYY",
   ru: "D MMMM YYYY [г.]",
   es: "D [de] MMMM [de] YYYY",
   sv: "D MMMM YYYY",
@@ -851,6 +908,101 @@ export function getDefaultDateFormat({
  *  @lintignore ignore for now in knip
  */
 export type SupportedDateFormat = (typeof SUPPORTED_DATE_FORMATS)[number];
+
+/**
+ * The locales an invoice's numbers can be written in, on top of the invoice's own language.
+ *
+ * `international` is what the default template printed before this setting existed:
+ * thousands grouped with a no-break space, the decimal marked with a dot (`321 200.00`). It
+ * belongs to no locale on purpose -- `321.200` reads as three hundred thousand in the US and
+ * as a fraction of one in Germany, while a space reads the same everywhere, which is what an
+ * invoice that crosses a border wants.
+ *
+ * Every other value is one of the languages the PDF can be written in, because the language
+ * of the labels and the way the numbers are punctuated are separate concerns: a Polish
+ * issuer writing an English invoice may well want `10 000,00 EUR` under English headings.
+ *
+ * None of it changes which currency the invoice is in. It does change how that currency is
+ * written: the default template prints an ISO 4217 code next to the amount whatever the
+ * locale, while the Stripe template prints the symbol where the locale puts it -- `$321,200.00`
+ * formatted in English, `321.200,00 $` formatted in German.
+ */
+export const SUPPORTED_NUMBER_FORMAT_LOCALES = [
+  "international",
+  ...SUPPORTED_INVOICE_PDF_LANGUAGES,
+] as const;
+
+export type SupportedNumberFormatLocale =
+  (typeof SUPPORTED_NUMBER_FORMAT_LOCALES)[number];
+
+interface ResolveNumberFormatLocaleArgs {
+  /** The invoice PDF language. */
+  language: SupportedLanguages;
+  /** The override, on the invoices that carry one. */
+  numberFormatLocale?: SupportedNumberFormatLocale;
+}
+
+/**
+ * The locale an invoice writes its numbers in.
+ *
+ * The form keeps the stored value in step with the invoice language -- picking a language
+ * picks its number format too -- so this fallback is for an invoice that carries no value:
+ * one saved before the setting existed, or a new one nobody has touched. It is written in
+ * its own language, so an English invoice reads `321,200.00`.
+ *
+ * That is a deliberate change for the default template, which printed every amount
+ * `international` (`321 200.00`) whatever the language before this setting existed: such
+ * an invoice, re-downloaded, now follows its language instead. The Stripe template always
+ * did, so it prints what it always printed.
+ */
+export function resolveNumberFormatLocale({
+  language,
+  numberFormatLocale,
+}: ResolveNumberFormatLocaleArgs) {
+  return numberFormatLocale ?? language;
+}
+
+interface GetNumberFormatLocaleAfterLanguageChangeArgs {
+  /** The language the invoice is being switched away from. */
+  previousLanguage: SupportedLanguages;
+  /** The language the invoice is being switched to. */
+  nextLanguage: SupportedLanguages;
+  /** The format the invoice carries, on the invoices that carry one. */
+  numberFormatLocale?: SupportedNumberFormatLocale;
+  /**
+   * Whether the invoice pins its number format, see
+   * {@link invoiceObjectSchema.shape.preserveNumberFormatOnLanguageChange}.
+   */
+  preserveNumberFormatOnLanguageChange?: boolean;
+}
+
+/**
+ * The number format an invoice should carry once its language changes.
+ *
+ * Unpinned, the format follows the language: most invoices want Polish numbers under
+ * Polish headings, and the form has moved the two together since the setting shipped.
+ *
+ * Pinned, it returns the *resolved* previous format rather than the stored one. The
+ * difference matters on an invoice that never picked a format: it carries none and
+ * {@link resolveNumberFormatLocale} falls back to its language, so returning `undefined`
+ * would let the format follow the new language -- the opposite of preserving it. Naming
+ * the language being left behind is what actually keeps the numbers on screen unchanged.
+ */
+export function getNumberFormatLocaleAfterLanguageChange({
+  previousLanguage,
+  nextLanguage,
+  numberFormatLocale,
+  preserveNumberFormatOnLanguageChange,
+}: GetNumberFormatLocaleAfterLanguageChangeArgs): SupportedNumberFormatLocale {
+  if (!preserveNumberFormatOnLanguageChange) {
+    return nextLanguage;
+  }
+
+  return resolveNumberFormatLocale({
+    language: previousLanguage,
+    numberFormatLocale,
+  });
+}
 
 /**
  *
@@ -1159,9 +1311,31 @@ export const BUYERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_BUYERS";
  * Exported for tests that need access to `.shape` (e.g. URL compression key map).
  */
 export const invoiceObjectSchema = z.object({
-  language: z.enum(SUPPORTED_LANGUAGES).default("en"),
+  language: z.enum(SUPPORTED_INVOICE_PDF_LANGUAGES).default("en"),
   dateFormat: z.enum(SUPPORTED_DATE_FORMATS).default("YYYY-MM-DD"),
   currency: z.enum(SUPPORTED_CURRENCIES).default("EUR"),
+  /**
+   * The locale the numbers are punctuated in. The form writes it alongside `language` and
+   * lets it be changed on its own afterwards, so the two can differ; it is absent only on
+   * invoices saved before the setting existed, see {@link resolveNumberFormatLocale}.
+   *
+   * Whether a later language switch overwrites it is up to
+   * {@link invoiceObjectSchema.shape.preserveNumberFormatOnLanguageChange}.
+   */
+  numberFormatLocale: z.enum(SUPPORTED_NUMBER_FORMAT_LOCALES).optional(),
+  /**
+   * Keep `numberFormatLocale` as it is when the invoice language changes.
+   *
+   * Off, which is the absence of the field, the two move together: picking Polish picks
+   * Polish number formatting, which is what most invoices want. On, the format is pinned
+   * and only the labels follow the language -- for the issuer who writes the same
+   * `10 000,00` whoever is reading it.
+   *
+   * Like `numberFormatLocale` it is deliberately not `.default()`ed, so an invoice carries
+   * it only once someone has turned it on, and it stays out of every share link and
+   * `localStorage` entry that predates the setting.
+   */
+  preserveNumberFormatOnLanguageChange: z.boolean().optional(),
   template: z.enum(SUPPORTED_TEMPLATES).default("default"),
 
   /**
@@ -1527,6 +1701,12 @@ export const METADATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_METADATA";
  * marker, so bumping it shows the popup again.
  */
 export const WELCOME_POPUP_SEEN_STORAGE_KEY = "EASY_INVOICE_WELCOME_POPUP_SEEN";
+
+/**
+ * The value {@link WELCOME_POPUP_SEEN_STORAGE_KEY} holds once the welcome popup has been
+ * seen. Exported for `playwright.config.ts`, which marks it seen for every e2e run.
+ */
+export const WELCOME_POPUP_SEEN_VALUE = "v1";
 
 /** The slug of the newest changelog entry the user has seen. */
 export const CHANGELOG_SEEN_STORAGE_KEY =

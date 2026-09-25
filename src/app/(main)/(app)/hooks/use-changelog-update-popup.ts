@@ -20,7 +20,6 @@ export type AppUpdatePopupVariant = "welcome" | "changelog";
 interface UseChangelogUpdatePopupOptions {
   latestChangelog: ChangelogSummary | null;
   isViewingSharedInvoice: boolean;
-  isMobile: boolean;
 }
 
 interface UseChangelogUpdatePopupResult {
@@ -47,8 +46,10 @@ function resolvePopupVariant(
  * Hook to manage showing welcome or changelog update popup to user.
  *
  * Shows welcome popup on first visit, then changelog popup when a new
- * changelog version is unseen. Never shows on mobile or when viewing a
- * shared invoice.
+ * changelog version is unseen. Never shows when viewing a shared invoice.
+ *
+ * It decides only *whether* a popup shows; where it sits is up to the page --
+ * a floating card on desktop, a notice inside the bottom dock on mobile.
  *
  * A popup is marked as seen the moment it is shown, so each one appears only
  * once per browser - whether or not the user interacts with it. At most one
@@ -58,7 +59,6 @@ function resolvePopupVariant(
 export function useChangelogUpdatePopup({
   latestChangelog,
   isViewingSharedInvoice,
-  isMobile,
 }: UseChangelogUpdatePopupOptions): UseChangelogUpdatePopupResult {
   /** The popup the timer below decided to show, if any */
   const [shownVariant, setShownVariant] =
@@ -72,8 +72,8 @@ export function useChangelogUpdatePopup({
   }, []);
 
   useEffect(() => {
-    // Never show popup on mobile or when viewing a shared invoice
-    if (isMobile || isViewingSharedInvoice) {
+    // Never show popup when viewing a shared invoice
+    if (isViewingSharedInvoice) {
       return;
     }
 
@@ -108,15 +108,11 @@ export function useChangelogUpdatePopup({
     return () => {
       window.clearTimeout(timer);
     };
-  }, [isMobile, isViewingSharedInvoice, latestChangelog]);
-
-  // Switching to a mobile viewport hides an already shown popup, so this is
-  // derived rather than stored
-  const variant = isMobile ? null : shownVariant;
+  }, [isViewingSharedInvoice, latestChangelog]);
 
   return {
-    isOpen: variant !== null && !isDismissed,
+    isOpen: shownVariant !== null && !isDismissed,
     dismiss,
-    variant,
+    variant: shownVariant,
   };
 }

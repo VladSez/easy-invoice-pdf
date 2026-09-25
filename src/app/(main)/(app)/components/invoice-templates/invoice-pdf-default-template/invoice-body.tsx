@@ -3,9 +3,10 @@ import dayjs from "dayjs";
 
 import { InvoiceQRCode } from "@/app/(main)/(app)/components/invoice-templates/common/invoice-qr-code";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import { type InvoiceData } from "@/app/schema";
+import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
+import { formatAmountChunks } from "../../../utils/format-amount";
 import { InvoiceFooter } from "./invoice-footer";
 import { InvoiceHeader } from "./invoice-header";
 import { InvoiceItemsTable } from "./invoice-items-table";
@@ -44,15 +45,14 @@ export const InvoiceBody = ({
 
   const invoiceTotal = invoiceData?.total;
 
-  const formattedInvoiceTotal =
-    typeof invoiceTotal === "number"
-      ? invoiceTotal
-          .toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })
-          .replaceAll(",", " ")
-      : "0.00";
+  const invoiceTotalChunks = formatAmountChunks({
+    amount: invoiceTotal,
+    numberFormatLocale: resolveNumberFormatLocale(invoiceData),
+  });
+
+  // The VAT summary prints the total into a 69pt cell and takes the pieces; every other
+  // place prints it into running text and takes them joined back up
+  const formattedInvoiceTotal = invoiceTotalChunks.join("");
 
   const signatureSectionIsVisible =
     invoiceData.personAuthorizedToReceiveFieldIsVisible ||
@@ -90,7 +90,7 @@ export const InvoiceBody = ({
           <View style={{ width: "50%" }}>
             <InvoiceVATSummaryTable
               invoiceData={invoiceData}
-              formattedInvoiceTotal={formattedInvoiceTotal}
+              invoiceTotalChunks={invoiceTotalChunks}
               styles={styles}
             />
           </View>

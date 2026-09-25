@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { SUPPORTED_LANGUAGES } from "../../../schema/index";
+import { SUPPORTED_INVOICE_PDF_LANGUAGES } from "../../../schema/index";
 
 const customTaxLabelInputSchema = z
   .object({
@@ -180,7 +180,7 @@ export const translationSchema = z
 
 /** Schema for the complete PDF translation catalog. */
 export const invoicePDFTranslationsSchema = z.record(
-  z.enum(SUPPORTED_LANGUAGES),
+  z.enum(SUPPORTED_INVOICE_PDF_LANGUAGES),
   translationSchema,
 );
 

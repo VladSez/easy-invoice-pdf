@@ -6,6 +6,10 @@ import { BlackGoToAppButton } from "@/app/(components)/header/go-to-app-button-c
 import { seoHeroCtaMarker } from "@/app/(main)/(seo-landings)/components/seo-cta-marker";
 import { StickySeoCta } from "@/app/(main)/(seo-landings)/components/sticky-seo-cta";
 import { GithubIcon } from "@/components/etc/github-logo";
+import {
+  type RoughAnnotationType,
+  RoughAnnotation,
+} from "@/components/rough-annotation";
 import { Button } from "@/components/ui/button";
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 import { YouTubeEmbed } from "@/components/youtube-embed";
@@ -129,8 +133,18 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                 className="border-b border-slate-100 py-6"
                 data-testid="seo-landing-facts-table"
               >
-                <h2 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
-                  {definition.factsTable.heading}
+                <h2
+                  className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl"
+                  data-testid="seo-landing-section-facts-table-title"
+                >
+                  <RoughAnnotation
+                    type="underline"
+                    // blue-500
+                    color="rgb(59 130 246)"
+                    strokeWidth={2.5}
+                  >
+                    {definition.factsTable.heading}
+                  </RoughAnnotation>
                 </h2>
                 <dl className="mt-6 divide-y divide-slate-100 border-y border-slate-100">
                   {definition.factsTable.rows.map((row) => {
@@ -169,8 +183,18 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                   ) : null}
                   {canShowComparisonTable && comparisonTable ? (
                     <div className="py-6 md:py-8">
-                      <h2 className="w-fit bg-rose-500 text-2xl font-semibold italic tracking-tight text-white dark:bg-cyan-600 dark:text-white md:text-3xl">
-                        {comparisonTable?.heading ?? "Feature comparison"}
+                      <h2
+                        className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl"
+                        data-testid="seo-landing-section-comparison-table-title"
+                      >
+                        <RoughAnnotation
+                          type="highlight"
+                          // rose-300
+                          color="rgb(253 164 175)"
+                          className="font-bold italic"
+                        >
+                          {comparisonTable?.heading ?? "Feature comparison"}
+                        </RoughAnnotation>
                       </h2>
                       {comparisonTable?.intro ? (
                         <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600">
@@ -255,27 +279,25 @@ function SeoInlineCta({ href, label }: { href: string; label: string }) {
 }
 
 function SeoSectionBlock({ section, id }: { section: SeoSection; id: number }) {
-  const colors = [
-    "bg-yellow-300/90 text-black dark:bg-yellow-600 dark:text-black",
-    "bg-purple-500/90 dark:bg-purple-500 text-white dark:text-white",
-    "bg-green-500/90 dark:bg-green-500 text-white dark:text-white",
-    "bg-blue-500/90 dark:bg-blue-500 text-white dark:text-white",
-    "bg-orange-500/90 dark:bg-orange-500 text-white dark:text-white",
-    "bg-teal-500/90 dark:bg-teal-500 text-white dark:text-white",
-    "bg-red-500/90 dark:bg-red-500 text-white dark:text-white",
-  ] as const;
-
-  const color = colors[id % colors.length];
+  const mark = SECTION_TITLE_MARKS[id % SECTION_TITLE_MARKS.length];
 
   return (
     <section
       className="border-b border-slate-100 py-6 last:border-b-0"
       data-testid={`seo-landing-section-${section.title}`}
     >
-      <h2 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
-        <span className={`${color} px-3 font-bold italic`}>
+      <h2
+        className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl"
+        data-testid={"seo-landing-section-title"}
+      >
+        <RoughAnnotation
+          type={mark.type}
+          color={mark.color}
+          strokeWidth={mark.type === "highlight" ? undefined : 2.5}
+          className="font-bold italic"
+        >
           {section.title}
-        </span>
+        </RoughAnnotation>
       </h2>
       {section.lead ? (
         <p className="mt-4 max-w-3xl text-balance text-lg leading-relaxed text-slate-800">
@@ -357,3 +379,19 @@ function SeoComparisonTable({ table }: { table: ComparisonTable }) {
     </div>
   );
 }
+
+/**
+ * The hand-drawn marks on the section titles, cycled in order so neighbouring
+ * sections never repeat one. Each draws when its title scrolls into view. No `circle`:
+ * on a title this long the ellipse cuts through the first and last letters.
+ */
+const SECTION_TITLE_MARKS = [
+  // yellow-300
+  { type: "highlight", color: "rgb(253 224 71)" },
+  // purple-500
+  { type: "underline", color: "rgb(168 85 247)" },
+  // green-500
+  { type: "box", color: "rgb(34 197 94)" },
+  // orange-500
+  { type: "bracket", color: "rgb(249 115 22)" },
+] as const satisfies { type: RoughAnnotationType; color: string }[];

@@ -3,7 +3,7 @@
 
 import { expect, test } from "@playwright/test";
 
-import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_LANGUAGES } from "@/app/schema";
+import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_I18N_LOCALES } from "@/app/schema";
 import { GITHUB_URL, TWITTER_URL, VIDEO_DEMO_FALLBACK_IMG } from "@/config";
 
 test.describe("About page", () => {
@@ -108,7 +108,7 @@ test.describe("About page", () => {
 
     await expect(
       heroSection.getByText(
-        "EasyInvoicePDF is a free, open-source invoice generator with real-time preview. Create, customize, and download professional invoices. No sign-up required.",
+        "A free, open-source invoice generator that runs entirely in your browser. No sign-up, no ads, and your data stays yours.",
       ),
     ).toBeVisible();
 
@@ -300,7 +300,7 @@ test.describe("About page", () => {
 
     await expect(
       heroSection.getByText(
-        "EasyInvoicePDF est un outil gratuit et open-source qui vous permet de créer, personnaliser et télécharger des factures professionnelles avec aperçu en temps réel. Fonctionne entièrement dans votre navigateur.",
+        "Un générateur de factures gratuit et open-source qui fonctionne entièrement dans votre navigateur. Sans inscription, sans publicité, et vos données restent les vôtres.",
       ),
     ).toBeVisible();
 
@@ -388,7 +388,7 @@ test.describe("About page", () => {
 
     await expect(
       heroSection.getByText(
-        "EasyInvoicePDF ist ein kostenloses Open-Source-Tool, mit dem Sie professionelle Rechnungen mit Echtzeit-Vorschau erstellen, anpassen und herunterladen können.",
+        "Ein kostenloser Open-Source-Rechnungsgenerator, der vollständig in Ihrem Browser läuft.",
       ),
     ).toBeVisible();
 
@@ -467,7 +467,7 @@ test.describe("About page", () => {
       }),
     ).toBeVisible();
 
-    for (const lang of SUPPORTED_LANGUAGES) {
+    for (const lang of SUPPORTED_I18N_LOCALES) {
       const link = footerAboutLinks.getByRole("link", {
         name: LANGUAGE_TO_NATIVE_LABEL[lang],
         exact: true,

@@ -11,7 +11,7 @@ import {
 const PAGE_TITLE = "How EasyInvoicePDF Works | Video Tutorials";
 
 const PAGE_DESCRIPTION =
-  "Watch step-by-step video tutorials on creating invoices, saving seller and buyer details, and generating weekly invoices with EasyInvoicePDF.";
+  "Watch step-by-step video tutorials on creating invoices, saving seller and buyer details, customizing tax, and generating weekly invoices with EasyInvoicePDF.";
 
 export function buildHowItWorksJsonLd(baseUrl = PROD_WEBSITE_URL): Graph {
   const pageUrl = `${baseUrl}/how-it-works`;

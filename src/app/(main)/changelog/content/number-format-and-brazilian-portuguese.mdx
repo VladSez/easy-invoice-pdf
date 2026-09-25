@@ -1,0 +1,69 @@
+export const metadata = {
+  title:
+    "EasyInvoicePDF v1.0.5 - Number format setting, Brazilian Portuguese invoices, and large amounts that fit their columns",
+  description:
+    "Choose how amounts are punctuated independently of the invoice language, write invoices in Brazilian Portuguese, and large amounts now wrap inside their column instead of running over the next one.",
+  date: "2026-09-24",
+  version: "1.0.5",
+  type: "minor",
+  popupSummary:
+    "Choose your preferred number format and create invoices in Brazilian Portuguese.",
+};
+
+<iframe
+  src="https://www.youtube-nocookie.com/embed/hZM2DYXo63k"
+  title="EasyInvoicePDF: Customize number formatting and create invoices in Brazilian Portuguese"
+  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerPolicy="strict-origin-when-cross-origin"
+  allowFullScreen
+  loading="lazy"
+  style={{
+    width: "100%",
+    aspectRatio: "16 / 9",
+    border: 0,
+    borderRadius: "8px",
+    marginTop: "1.5rem",
+  }}
+/>
+
+## ✨ Highlights
+
+- **Number format setting** - pick how amounts are grouped and punctuated in the PDF, separately from the invoice language. An English invoice can print `10 000,00 EUR`, and a new **International** format prints `321 200.00`, which reads the same in every country. Each option previews your invoice's own total, so you see exactly what the PDF will show
+- **Keep format when language changes** - a switch that pins the number format, so you can write an invoice in your client's language and keep your own number formatting
+- **Brazilian Portuguese invoices** - a new `Portuguese (Brazil)` PDF language, with `CNPJ/CPF` for the tax number, `Imposto` for the tax column, and amounts in words counted the Brazilian way (`um bilhão`, not `mil milhões`)
+- **Large amounts fit their columns** - an amount too wide for its cell now wraps onto a second line at a thousands boundary, instead of painting over the column next to it
+
+---
+
+### Changed
+
+- **Amounts now follow the invoice language by default in the default template.** Before this release it printed every amount as `321 200.00`, whatever the language. It now punctuates them the way the language does: `321,200.00` in English, `321.200,00` in German, `321 200,00` in Polish. This also applies to invoices saved in your browser or shared by link before this release, so re-downloading one may print its numbers differently from the copy you sent. To keep the old look, pick **International** under **Number Format**. The Stripe template already followed the language
+- Four-digit amounts are now grouped in Polish, Spanish and Italian (`8 111,00` rather than `8111,00`), so they line up with larger amounts in the same column
+- The default template's footer now writes the total the same way as the rest of the invoice, with the currency code rather than a symbol
+- The language pickers name the country for Portuguese: `Portuguese (Portugal)` and `Portuguese (Brazil)`
+- Clearer Stripe-template wording for the due date and the amount due in German, Spanish, French, Italian and Portuguese
+- The Stripe template's quantity column is wider, so four- and five-digit quantities stay on one line
+- A new "How to customize tax" video in the "How it works" guide
+
+### Fixed
+
+- French amounts in the default template's footer printed a `/` in place of the thousands space (`321/200,00 €`)
+- The amount in words no longer leaves `00/100` alone on the next line
+
+---
+
+<div className="rounded-lg border-2 border-blue-200 bg-blue-50 px-8 py-4 dark:border-blue-900 dark:bg-blue-950" data-testid="ready-to-start-invoicing-cta">
+<h2 className="!mt-4">Create your next invoice</h2>
+
+EasyInvoicePDF is free and open source. There's no sign-up, and you can go from blank form to downloaded PDF in under a minute.
+
+<div className="mt-6">
+  <a
+    href="https://easyinvoicepdf.com?ref=changelog"
+    className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-slate-900 px-8 text-lg font-medium no-underline transition-all hover:bg-slate-800 active:scale-[0.98]"
+  >
+    <span className="text-white">Start Invoicing</span>
+  </a>
+</div>
+
+</div>

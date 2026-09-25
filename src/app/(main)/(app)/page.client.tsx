@@ -149,10 +149,25 @@ export function AppPageClient({
   } = useChangelogUpdatePopup({
     latestChangelog,
     isViewingSharedInvoice,
-    isMobile,
   });
 
   const [isHowItWorksDialogOpen, setIsHowItWorksDialogOpen] = useState(false);
+
+  // One popup, placed by viewport: a floating card on desktop, a notice inside the bottom
+  // dock on mobile, where a floating card would cover the dock's buttons
+  const changelogPopup = changelogPopupVariant ? (
+    <ChangelogUpdatePopup
+      variant={changelogPopupVariant}
+      isOpen={isChangelogPopupOpen}
+      onDismiss={dismissChangelogPopup}
+      releaseSummary={latestChangelog?.popupSummary}
+      releaseSlug={latestChangelog?.slug}
+      layout={isMobile ? "dock" : "floating"}
+      onHowItWorksClick={() => {
+        return setIsHowItWorksDialogOpen(true);
+      }}
+    />
+  ) : null;
 
   /**
    * Reads the invoice form at click time: its current values, or `null` when it has
@@ -794,22 +809,14 @@ export function AppPageClient({
                 isMobile={isMobile}
                 canShareInvoice={canShareInvoice}
                 currentInvoiceFormDataRef={currentInvoiceFormDataRef}
+                mobileDockNotice={isMobile ? changelogPopup : null}
               />
             </div>
           </div>
         </main>
       </InvoicePdfInstanceProvider>
       <Footer />
-      {changelogPopupVariant ? (
-        <ChangelogUpdatePopup
-          variant={changelogPopupVariant}
-          isOpen={isChangelogPopupOpen}
-          onDismiss={dismissChangelogPopup}
-          onHowItWorksClick={() => {
-            return setIsHowItWorksDialogOpen(true);
-          }}
-        />
-      ) : null}
+      {isMobile ? null : changelogPopup}
       <HowItWorksVideoDialog
         open={isHowItWorksDialogOpen}
         onOpenChange={setIsHowItWorksDialogOpen}

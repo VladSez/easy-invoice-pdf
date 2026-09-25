@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { SUPPORTED_LANGUAGES, type SupportedLanguages } from "@/app/schema";
+import {
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
+  type SupportedLanguages,
+} from "@/app/schema";
 
 import { MAX_SPELLABLE, numberToWords } from "..";
 
@@ -197,6 +200,47 @@ const EXPECTED = {
     [
       999_999_999_999,
       "novecentos e noventa e nove mil novecentos e noventa e nove milhões novecentos e noventa e nove mil novecentos e noventa e nove",
+    ],
+  ],
+  // The rows `pt` and `pt-BR` disagree on are the point of this table: the teens
+  // ("dezesseis", not "dezasseis") and every value from 10^9 up, where Brazil counts on
+  // the short scale -- "um bilhão" against Portugal's "mil milhões".
+  "pt-BR": [
+    [0, "zero"],
+    [1, "um"],
+    [11, "onze"],
+    [14, "quatorze"],
+    [16, "dezesseis"],
+    [17, "dezessete"],
+    [19, "dezenove"],
+    [21, "vinte e um"],
+    [42, "quarenta e dois"],
+    [80, "oitenta"],
+    [81, "oitenta e um"],
+    [99, "noventa e nove"],
+    [100, "cem"],
+    [101, "cento e um"],
+    [111, "cento e onze"],
+    [200, "duzentos"],
+    [700, "setecentos"],
+    [999, "novecentos e noventa e nove"],
+    [1000, "mil"],
+    [1100, "mil e cem"],
+    [1234, "mil duzentos e trinta e quatro"],
+    [2021, "dois mil e vinte e um"],
+    [9999, "nove mil novecentos e noventa e nove"],
+    [123_456, "cento e vinte e três mil quatrocentos e cinquenta e seis"],
+    [1_000_000, "um milhão"],
+    [2_000_000, "dois milhões"],
+    [
+      1_234_567,
+      "um milhão duzentos e trinta e quatro mil quinhentos e sessenta e sete",
+    ],
+    [1_000_000_000, "um bilhão"],
+    [2_000_000_000, "dois bilhões"],
+    [
+      999_999_999_999,
+      "novecentos e noventa e nove bilhões novecentos e noventa e nove milhões novecentos e noventa e nove mil novecentos e noventa e nove",
     ],
   ],
   ru: [
@@ -447,28 +491,31 @@ const EXPECTED = {
   ],
 } satisfies Record<SupportedLanguages, readonly (readonly [number, string])[]>;
 
-describe.each(SUPPORTED_LANGUAGES)("numberToWords in %s", (language) => {
-  it.each(EXPECTED[language])("spells out %i", (value, words) => {
-    expect(numberToWords({ value, language })).toBe(words);
-  });
+describe.each(SUPPORTED_INVOICE_PDF_LANGUAGES)(
+  "numberToWords in %s",
+  (language) => {
+    it.each(EXPECTED[language])("spells out %i", (value, words) => {
+      expect(numberToWords({ value, language })).toBe(words);
+    });
 
-  it("never returns an empty string", () => {
-    for (let value = 0; value <= 2000; value++) {
-      expect(numberToWords({ value, language })).not.toBe("");
-    }
-  });
+    it("never returns an empty string", () => {
+      for (let value = 0; value <= 2000; value++) {
+        expect(numberToWords({ value, language })).not.toBe("");
+      }
+    });
 
-  it("spells out every value up to the cap", () => {
-    for (let value = 0; value <= 2000; value++) {
-      expect(numberToWords({ value, language })).not.toBeNull();
-    }
-  });
-});
+    it("spells out every value up to the cap", () => {
+      for (let value = 0; value <= 2000; value++) {
+        expect(numberToWords({ value, language })).not.toBeNull();
+      }
+    });
+  },
+);
 
 describe("numberToWords", () => {
   it("covers every supported language", () => {
     expect(Object.keys(EXPECTED).sort()).toEqual(
-      [...SUPPORTED_LANGUAGES].sort(),
+      [...SUPPORTED_INVOICE_PDF_LANGUAGES].sort(),
     );
   });
 

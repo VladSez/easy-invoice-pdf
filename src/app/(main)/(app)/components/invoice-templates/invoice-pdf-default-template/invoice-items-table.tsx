@@ -1,9 +1,11 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import type { InvoiceData } from "@/app/schema";
+import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
+import { formatAmountChunks } from "../../../utils/format-amount";
+import { WrappableAmount } from "../common/wrappable-amount";
 
 export function InvoiceItemsTable({
   invoiceData,
@@ -15,6 +17,7 @@ export function InvoiceItemsTable({
   styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
+  const numberFormatLocale = resolveNumberFormatLocale(invoiceData);
   const t = INVOICE_PDF_TRANSLATIONS[language];
 
   // we need to check only the first row, because all next rows are the same
@@ -152,40 +155,33 @@ export function InvoiceItemsTable({
           START: Table body rows
         */}
         {invoiceData?.items.map((item, index) => {
-          const formattedAmount = item.amount
-            .toLocaleString("en-US", {
-              style: "decimal",
-              maximumFractionDigits: 3,
-            })
-            .replaceAll(",", " ");
+          // The quantity column is not money: it carries no forced decimals and allows three
+          const amountChunks = formatAmountChunks({
+            amount: item.amount,
+            numberFormatLocale,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 3,
+          });
 
-          const formattedNetPrice = item.netPrice
-            .toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-            .replaceAll(",", " ");
+          const netPriceChunks = formatAmountChunks({
+            amount: item.netPrice,
+            numberFormatLocale,
+          });
 
-          const formattedNetAmount = item.netAmount
-            .toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-            .replaceAll(",", " ");
+          const netAmountChunks = formatAmountChunks({
+            amount: item.netAmount,
+            numberFormatLocale,
+          });
 
-          const formattedVATAmount = item.vatAmount
-            .toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-            .replaceAll(",", " ");
+          const vatAmountChunks = formatAmountChunks({
+            amount: item.vatAmount,
+            numberFormatLocale,
+          });
 
-          const formattedPreTaxAmount = item.preTaxAmount
-            .toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-            .replaceAll(",", " ");
+          const preTaxAmountChunks = formatAmountChunks({
+            amount: item.preTaxAmount,
+            numberFormatLocale,
+          });
 
           const formattedVat = Number.isNaN(Number(item.vat))
             ? item.vat
@@ -230,16 +226,13 @@ export function InvoiceItemsTable({
               {/* Amount */}
               {isAmountFieldVisible ? (
                 <View style={[styles.tableCol, styles.colAmount]}>
-                  <Text
+                  <WrappableAmount
+                    chunks={amountChunks}
                     style={[
                       styles.tableCell,
                       { textAlign: "right", marginRight: 2 },
                     ]}
-                  >
-                    {typeof item?.amount === "number"
-                      ? formattedAmount
-                      : "0.00"}
-                  </Text>
+                  />
                 </View>
               ) : null}
 
@@ -255,16 +248,13 @@ export function InvoiceItemsTable({
               {/* Net price */}
               {isNetPriceFieldVisible ? (
                 <View style={[styles.tableCol, styles.colNetPrice]}>
-                  <Text
+                  <WrappableAmount
+                    chunks={netPriceChunks}
                     style={[
                       styles.tableCell,
                       { textAlign: "right", marginRight: 2 },
                     ]}
-                  >
-                    {typeof item?.netPrice === "number"
-                      ? formattedNetPrice
-                      : "0.00"}
-                  </Text>
+                  />
                 </View>
               ) : null}
 
@@ -286,51 +276,39 @@ export function InvoiceItemsTable({
               {/* Net amount */}
               {isNetAmountFieldVisible ? (
                 <View style={[styles.tableCol, styles.colNetAmount]}>
-                  <Text
+                  <WrappableAmount
+                    chunks={netAmountChunks}
                     style={[
                       styles.tableCell,
                       { textAlign: "right", marginRight: 2 },
                     ]}
-                  >
-                    {typeof item?.netAmount === "number"
-                      ? formattedNetAmount
-                      : "0.00"}
-                  </Text>
+                  />
                 </View>
               ) : null}
 
               {/* VAT amount */}
               {isVATAmountFieldVisible ? (
                 <View style={[styles.tableCol, styles.colVATAmount]}>
-                  <Text
+                  <WrappableAmount
+                    chunks={vatAmountChunks}
                     style={[
                       styles.tableCell,
                       { textAlign: "right", marginRight: 2 },
                     ]}
-                  >
-                    {typeof item?.vatAmount === "number"
-                      ? formattedVATAmount
-                      : "0.00"}
-                  </Text>
+                  />
                 </View>
               ) : null}
 
               {/* Pre-tax amount */}
               {isPreTaxAmountFieldVisible ? (
                 <View style={[styles.tableCol, styles.colPreTaxAmount]}>
-                  <Text
+                  <WrappableAmount
+                    chunks={preTaxAmountChunks}
                     style={[
                       styles.tableCell,
-                      {
-                        textAlign: "right",
-                        marginRight: 2,
-                      },
+                      { textAlign: "right", marginRight: 2 },
                     ]}
-                  >
-                    {typeof item?.preTaxAmount === "number"
-                      ? formattedPreTaxAmount
-                      : "0.00"}
-                  </Text>
+                  />
                 </View>
               ) : null}
             </View>

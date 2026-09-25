@@ -81,7 +81,7 @@ Two templates under `src/app/(main)/(app)/components/invoice-templates/`: `invoi
 
 ### i18n — two separate systems
 
-- **UI/marketing copy**: `next-intl`, messages in `messages/*.json`, locale-prefixed routes under `src/app/[locale]/` (`src/proxy.ts`, the Next 16 `proxy` convention, matches only those). The locale matcher is a static literal — keep it in sync with `SUPPORTED_LANGUAGES`.
+- **UI/marketing copy**: `next-intl`, messages in `messages/*.json`, locale-prefixed routes under `src/app/[locale]/` (`src/proxy.ts`, the Next 16 `proxy` convention, matches only those). The locale matcher is a static literal — keep it in sync with `SUPPORTED_I18N_LOCALES` (the languages the site is translated into, a subset of `SUPPORTED_INVOICE_PDF_LANGUAGES`, which is the PDF's own list).
 - **PDF content**: a hand-rolled catalog, `src/app/(main)/(app)/pdf-i18n-translations/pdf-translations.ts`, validated against `pdf-translations-schema.ts`. Some entries are functions (e.g. `vatAmount({ customTaxLabel })`) so tax labels can be customized per invoice.
 
 `next.config.mjs` validates both — every `messages/*.json` against `src/app/schema/i18n-schema.ts` and the PDF catalog against its schema — and `process.exit(1)`s on failure, so a missing translation key breaks `dev` and `build`.

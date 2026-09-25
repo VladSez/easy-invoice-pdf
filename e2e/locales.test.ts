@@ -3,10 +3,10 @@ import path from "node:path";
 
 import { expect, test } from "@playwright/test";
 
-import { SUPPORTED_LANGUAGES } from "@/app/schema";
+import { SUPPORTED_I18N_LOCALES } from "@/app/schema";
 
 /**
- * The app ships a translation file per supported language (`messages/<locale>.json`)
+ * The app ships a translation file per supported locale (`messages/<locale>.json`)
  * and serves a localized about page for each of them (`localePrefix: "always"`).
  *
  * These are smoke tests: they don't check every string, they check that **every**
@@ -35,7 +35,7 @@ test.describe("Localized about page", () => {
     );
   });
 
-  for (const locale of SUPPORTED_LANGUAGES) {
+  for (const locale of SUPPORTED_I18N_LOCALES) {
     test(`serves /${locale}/about with ${locale} translations`, async ({
       page,
     }) => {

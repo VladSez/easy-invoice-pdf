@@ -4,9 +4,10 @@ import {
   getAppStorageItem,
   setAppStorageItem,
 } from "@/app/(main)/(app)/utils/app-local-storage";
-import { WELCOME_POPUP_SEEN_STORAGE_KEY } from "@/app/schema";
-
-const WELCOME_POPUP_SEEN_VALUE = "v1";
+import {
+  WELCOME_POPUP_SEEN_STORAGE_KEY,
+  WELCOME_POPUP_SEEN_VALUE,
+} from "@/app/schema";
 
 export function hasSeenWelcomePopup() {
   return (

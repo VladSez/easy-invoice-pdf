@@ -6,7 +6,7 @@ import {
   getDefaultDateFormat,
   LANGUAGE_TO_LONG_DATE_FORMAT,
   SUPPORTED_DATE_FORMATS,
-  SUPPORTED_LANGUAGES,
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
 } from "@/app/schema";
 
 /** A date whose day and month can never be confused for one another. */
@@ -24,11 +24,14 @@ const LANGUAGE_SPECIFIC = [
 ] as const;
 
 describe("getDateFormatsForLanguage", () => {
-  it.each(SUPPORTED_LANGUAGES)("offers %s its own long format", (language) => {
-    expect(getDateFormatsForLanguage(language)).toContain(
-      LANGUAGE_TO_LONG_DATE_FORMAT[language],
-    );
-  });
+  it.each(SUPPORTED_INVOICE_PDF_LANGUAGES)(
+    "offers %s its own long format",
+    (language) => {
+      expect(getDateFormatsForLanguage(language)).toContain(
+        LANGUAGE_TO_LONG_DATE_FORMAT[language],
+      );
+    },
+  );
 
   /**
    * Spelled out per language rather than derived, so that pointing a language at a
@@ -43,6 +46,7 @@ describe("getDateFormatsForLanguage", () => {
     ["it", []],
     ["nb", ["D. MMMM YYYY"]],
     ["pt", ["D [de] MMMM [de] YYYY"]],
+    ["pt-BR", ["D [de] MMMM [de] YYYY"]],
     ["ru", ["D MMMM YYYY [г.]"]],
     ["es", ["D [de] MMMM [de] YYYY"]],
     ["sv", []],
@@ -66,7 +70,7 @@ describe("getDateFormatsForLanguage", () => {
       return !languageSpecific.includes(format);
     });
 
-    for (const language of SUPPORTED_LANGUAGES) {
+    for (const language of SUPPORTED_INVOICE_PDF_LANGUAGES) {
       expect(getDateFormatsForLanguage(language)).toEqual(
         expect.arrayContaining([...shared]),
       );
@@ -74,7 +78,7 @@ describe("getDateFormatsForLanguage", () => {
   });
 
   it("preserves the order of the full list", () => {
-    for (const language of SUPPORTED_LANGUAGES) {
+    for (const language of SUPPORTED_INVOICE_PDF_LANGUAGES) {
       const offered: readonly string[] = getDateFormatsForLanguage(language);
 
       expect(getDateFormatsForLanguage(language)).toEqual(
@@ -91,6 +95,7 @@ describe("the Stripe default reads as a real date in every language", () => {
     ["de", "17. Dezember 2025"],
     ["es", "17 de diciembre de 2025"],
     ["pt", "17 de dezembro de 2025"],
+    ["pt-BR", "17 de dezembro de 2025"],
     ["pl", "17 grudnia 2025"],
     ["ru", "17 декабря 2025 г."],
     ["uk", "17 грудня 2025 р."],

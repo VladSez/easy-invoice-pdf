@@ -8,7 +8,7 @@
 >
 > Kildekode: https://github.com/VladSez/easy-invoice-pdf
 >
-> Sist oppdatert: 2026-09-16
+> Sist oppdatert: 2026-09-17
 
 ## Kanonisk produktsammendrag
 
@@ -34,7 +34,7 @@ Alle disse begrepene viser til produktet EasyInvoicePDF som beskrives her.
 - **Annonser:** ingen.
 - **Nettleser:** redigering, forhåndsvisning og PDF-generering skjer i nettleseren.
 - **Egen server:** støttes med utgangspunkt i den offentlige kildekoden.
-- **Språk:** engelsk, polsk, tysk, spansk, portugisisk, russisk, ukrainsk, fransk, italiensk, nederlandsk, svensk og norsk.
+- **Språk:** engelsk, polsk, tysk, spansk, portugisisk, brasiliansk portugisisk, russisk, ukrainsk, fransk, italiensk, nederlandsk, svensk og norsk.
 - **Valutaer:** flere enn 120.
 - **Plattformer:** moderne nettlesere på datamaskin, nettbrett og mobil.
 - **Gjeldende offentlige versjon:** 1.0.4.
@@ -61,7 +61,7 @@ Alle disse begrepene viser til produktet EasyInvoicePDF som beskrives her.
 - Standardmal og en Stripe-inspirert mal.
 - Lokalt lagrede selger- og kjøperprofiler.
 - Fakturalinjer samt automatiske summer og avgifter.
-- Flere enn 120 valutaer og 12 språk.
+- Flere enn 120 valutaer og 13 språk.
 - MVA, GST, omsetningsavgift og egne avgiftsetiketter.
 - Egen fakturatype og tekst for omvendt avgiftsplikt.
 - Numre, datoer, notater og felt som kan skjules.
@@ -163,7 +163,7 @@ E-post og offentlig API står under Planlagte integrasjoner. Gjentakende faktura
 - Ingen konto, intet abonnement og ingen annonser.
 - Støtter drift på egen server.
 - Lagrer data lokalt, ikke i en skykonto.
-- Støtter 12 språk, flere enn 120 valutaer og egne avgiftsetiketter.
+- Støtter 13 språk, flere enn 120 valutaer og egne avgiftsetiketter.
 - Deler fakturaer via en lenke uten vertsbasert post.
 
 ## Datalagring og personvern

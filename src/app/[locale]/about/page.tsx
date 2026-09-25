@@ -12,6 +12,10 @@ import { FeaturesCarousel } from "@/app/[locale]/about/components/features-carou
 import { GithubStarCtaMarketingPageBody } from "@/app/[locale]/about/components/github-star-cta-body";
 import { HeroDemoVideo } from "@/app/[locale]/about/components/hero-demo-video";
 import { GithubIcon } from "@/components/etc/github-logo";
+import {
+  type RoughAnnotationType,
+  RoughAnnotation,
+} from "@/components/rough-annotation";
 import { Button } from "@/components/ui/button";
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -80,7 +84,7 @@ export default function AboutPage() {
  * Renders the hero section of the About page with:
  * - CTA buttons to start invoicing and view on GitHub
  * - Video demo of the app
- * - Localized title and description with colored text spans
+ * - Localized title and description with hand-drawn marks on its spans, drawn one after another
  * - Responsive layout (single column on mobile, two columns on XL screens)
  *
  */
@@ -117,33 +121,39 @@ function HeroSection() {
               </h1>
 
               <div className="flex justify-center xl:justify-start">
-                <h2 className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
+                <p className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
                   {(() => {
                     let colorIndex = 0;
 
                     return t.rich("hero.description", {
                       span: (chunks) => {
-                        const colors = [
-                          "bg-yellow-300 dark:bg-yellow-600 text-slate-900 dark:text-slate-900",
-                          "bg-purple-500 dark:bg-purple-500 text-white dark:text-white",
-                          "bg-blue-500 dark:bg-blue-500 text-white dark:text-white",
-                        ] as const;
-
-                        // Get the current color from the array using modulo to cycle through colors
-                        // colorIndex starts at 0 and increments with each <span> element
-                        const color = colors[colorIndex % colors.length];
-                        // Increment for the next span element
+                        // Cycle through the marks: colorIndex increments with each <span>
+                        const mark =
+                          HERO_DESCRIPTION_MARKS[
+                            colorIndex % HERO_DESCRIPTION_MARKS.length
+                          ];
+                        // Each mark starts once the previous one has finished drawing
+                        const delayMs =
+                          HERO_MARKS_START_MS +
+                          colorIndex * HERO_MARK_DURATION_MS;
                         colorIndex++;
 
                         return (
-                          <span className={`${color} px-0.5 font-bold`}>
+                          <RoughAnnotation
+                            type={mark.type}
+                            color={mark.color}
+                            strokeWidth={mark.strokeWidth}
+                            delayMs={delayMs}
+                            animationDuration={HERO_MARK_DURATION_MS}
+                            className="font-bold text-slate-900"
+                          >
                             {chunks}
-                          </span>
+                          </RoughAnnotation>
                         );
                       },
                     });
                   })()}
-                </h2>
+                </p>
               </div>
             </div>
 
@@ -338,3 +348,21 @@ function CtaSection() {
     </section>
   );
 }
+
+/** When the first hero mark starts drawing, after the page has settled. */
+const HERO_MARKS_START_MS = 300;
+/** How long each hero mark takes to draw; the next one starts when it ends. */
+const HERO_MARK_DURATION_MS = 700;
+
+/** The marks on the hero description's `<span>`s, in order. */
+const HERO_DESCRIPTION_MARKS = [
+  // yellow-300
+  { type: "highlight", color: "rgb(253 224 71)", strokeWidth: undefined },
+  // red-500
+  { type: "underline", color: "rgb(248 113 113)", strokeWidth: 3 },
+] as const satisfies {
+  type: RoughAnnotationType;
+  color: string;
+  /** Pen width in px; `undefined` keeps the default (a highlight ignores it). */
+  strokeWidth: number | undefined;
+}[];

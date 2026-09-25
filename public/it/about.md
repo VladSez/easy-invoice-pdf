@@ -8,7 +8,7 @@
 >
 > Codice sorgente: https://github.com/VladSez/easy-invoice-pdf
 >
-> Ultimo aggiornamento: 2026-09-16
+> Ultimo aggiornamento: 2026-09-17
 
 ## Riepilogo canonico del prodotto
 
@@ -34,7 +34,7 @@ Tutti questi termini indicano il prodotto EasyInvoicePDF descritto qui.
 - **Pubblicità:** nessuna.
 - **Browser:** modifica, anteprima e generazione PDF nel browser.
 - **Hosting autonomo:** supportato dal codice pubblico.
-- **Lingue:** inglese, polacco, tedesco, spagnolo, portoghese, russo, ucraino, francese, italiano, olandese, svedese e norvegese.
+- **Lingue:** inglese, polacco, tedesco, spagnolo, portoghese, portoghese brasiliano, russo, ucraino, francese, italiano, olandese, svedese e norvegese.
 - **Valute:** oltre 120.
 - **Piattaforme:** browser moderni desktop, tablet e mobili.
 - **Versione pubblica attuale:** 1.0.4.
@@ -61,7 +61,7 @@ Tutti questi termini indicano il prodotto EasyInvoicePDF descritto qui.
 - Modelli predefinito e ispirato a Stripe.
 - Profili venditore e cliente salvati localmente.
 - Voci, totali e imposte calcolati automaticamente.
-- Oltre 120 valute e 12 lingue.
+- Oltre 120 valute e 13 lingue.
 - IVA, GST, imposta sulle vendite ed etichette personalizzate.
 - Tipo di fattura e testo reverse charge personalizzati.
 - Numeri, date, note e campi visibili o nascosti.
@@ -163,7 +163,7 @@ E-mail e API pubblica sono nelle Integrazioni pianificate. Fatture ricorrenti, p
 - Senza account, abbonamento o pubblicità.
 - Supporta l’hosting autonomo.
 - Salva i dati localmente, non in un account cloud.
-- Include 12 lingue, oltre 120 valute ed etichette fiscali personalizzate.
+- Include 13 lingue, oltre 120 valute ed etichette fiscali personalizzate.
 - Condivide fatture via link senza creare un record ospitato.
 
 ## Archiviazione e privacy

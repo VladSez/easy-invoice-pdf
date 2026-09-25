@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import { FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useRef, useState, type RefObject } from "react";
+import { useRef, useState, type ReactNode, type RefObject } from "react";
 
 import {
   type InvoiceData,
@@ -152,6 +152,7 @@ export function InvoiceClientPage({
   isMobile,
   canShareInvoice,
   currentInvoiceFormDataRef,
+  mobileDockNotice,
 }: {
   invoiceDataState: InvoiceData;
   handleInvoiceDataChange: (invoiceData: InvoiceData) => void;
@@ -159,6 +160,11 @@ export function InvoiceClientPage({
   isMobile: boolean;
   canShareInvoice: boolean;
   currentInvoiceFormDataRef: RefObject<(() => InvoiceData | null) | null>;
+  /**
+   * Shown at the top of the mobile dock, above the Edit/Preview tabs -- the welcome and
+   * "What's new" popup on phones. Ignored on desktop, where the popup floats instead.
+   */
+  mobileDockNotice?: ReactNode;
 }) {
   const appMetadata = useAppMetadata();
 
@@ -267,6 +273,7 @@ export function InvoiceClientPage({
               </div>
             </TabsContent>
             <div className="sticky bottom-0 z-50 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
+              {mobileDockNotice}
               {/*
                 The switch lives in the dock rather than at the top of the page, so it sits
                 in the same thumb zone as the two buttons it belongs with.

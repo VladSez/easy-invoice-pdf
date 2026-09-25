@@ -34,7 +34,7 @@ EasyInvoicePDF is a free, open-source, browser-based invoice generator for creat
 - Custom logo and QR-code support.
 - Reusable seller and buyer details.
 - More than 120 currencies.
-- Invoice labels and formatting in English, Polish, German, Spanish, Portuguese, Russian, Ukrainian, French, Italian, Dutch, Swedish, and Norwegian.
+- Invoice labels and formatting in English, Polish, German, Spanish, Portuguese, Brazilian Portuguese, Russian, Ukrainian, French, Italian, Dutch, Swedish, and Norwegian.
 - Flexible VAT, GST, sales-tax, and custom tax labels.
 - Shareable invoice links with invoice data encoded in the URL.
 - Open-source code under the GNU AGPL-3.0 license.

@@ -1,20 +1,37 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import type { InvoiceData } from "@/app/schema";
+import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
+import { formatAmountChunks } from "../../../utils/format-amount";
+import { WrappableAmount } from "../common/wrappable-amount";
+
+/**
+ * The rate column is pinned at 60pt, under the 66.9pt a quarter of this table comes to
+ * (`invoice-body.tsx` gives it half of the 535.3pt A4 content width), and far more than the
+ * `20%`, the `NP` and the six-letter word for "Total" it has to hold. Points rather than a
+ * percentage, so that the three money columns absorb every bit of width this one does not
+ * need, and keep absorbing it if the table is ever widened.
+ *
+ * Those three take what is left, a third each -- 69.2pt against the 66.9pt an equal quarter
+ * gave them, which is the margin by which an amount stays on one line here.
+ */
+const VAT_RATE_COLUMN_WIDTH = { width: 60 } as const;
+const VAT_AMOUNT_COLUMN_WIDTH = { flex: 1 } as const;
 
 export function InvoiceVATSummaryTable({
   invoiceData,
-  formattedInvoiceTotal,
+  invoiceTotalChunks,
   styles,
 }: {
   invoiceData: InvoiceData;
-  formattedInvoiceTotal: string;
+  /** The invoice total, cut at its thousands boundaries -- see `formatAmountChunks`. */
+  invoiceTotalChunks: string[];
   styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
+  const numberFormatLocale = resolveNumberFormatLocale(invoiceData);
   const t = INVOICE_PDF_TRANSLATIONS[language];
 
   /**
@@ -56,22 +73,18 @@ export function InvoiceVATSummaryTable({
   const totalNetAmount = sortedItems.reduce((acc, item) => {
     return acc + item.netAmount;
   }, 0);
-  const formattedTotalNetAmount = totalNetAmount
-    .toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-    .replaceAll(",", " ");
+  const totalNetAmountChunks = formatAmountChunks({
+    amount: totalNetAmount,
+    numberFormatLocale,
+  });
 
   const totalVATAmount = sortedItems.reduce((acc, item) => {
     return acc + item.vatAmount;
   }, 0);
-  const formattedTotalVATAmount = totalVATAmount
-    .toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-    .replaceAll(",", " ");
+  const totalVatAmountChunks = formatAmountChunks({
+    amount: totalVATAmount,
+    numberFormatLocale,
+  });
 
   return (
     <View style={[styles.table, { width: "100%" }]}>
@@ -79,16 +92,16 @@ export function InvoiceVATSummaryTable({
       START: Table header row (top of the VAT summary table)
       */}
       <View style={[styles.tableRow, { borderTopWidth: 1 }]} fixed>
-        <View style={[styles.tableCol, { width: "25%" }]}>
+        <View style={[styles.tableCol, VAT_RATE_COLUMN_WIDTH]}>
           <Text style={styles.tableCellBold}>{vatRateColumnLabel}</Text>
         </View>
-        <View style={[styles.tableCol, { width: "25%" }]}>
+        <View style={[styles.tableCol, VAT_AMOUNT_COLUMN_WIDTH]}>
           <Text style={styles.tableCellBold}>{netColumnLabel}</Text>
         </View>
-        <View style={[styles.tableCol, { width: "25%" }]}>
+        <View style={[styles.tableCol, VAT_AMOUNT_COLUMN_WIDTH]}>
           <Text style={styles.tableCellBold}>{taxLabelText}</Text>
         </View>
-        <View style={[styles.tableCol, { width: "25%" }]}>
+        <View style={[styles.tableCol, VAT_AMOUNT_COLUMN_WIDTH]}>
           <Text style={styles.tableCellBold}>{preTaxColumnLabel}</Text>
         </View>
       </View>
@@ -100,35 +113,20 @@ export function InvoiceVATSummaryTable({
       START: Table body rows
       */}
       {sortedItems?.map((item, index) => {
-        const formattedNetAmount =
-          typeof item.netAmount === "number"
-            ? item.netAmount
-                .toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-                .replaceAll(",", " ")
-            : "0.00";
+        const netAmountChunks = formatAmountChunks({
+          amount: item.netAmount,
+          numberFormatLocale,
+        });
 
-        const formattedPreTaxAmount =
-          typeof item.preTaxAmount === "number"
-            ? item.preTaxAmount
-                .toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-                .replaceAll(",", " ")
-            : "0.00";
+        const preTaxAmountChunks = formatAmountChunks({
+          amount: item.preTaxAmount,
+          numberFormatLocale,
+        });
 
-        const formattedVatAmount =
-          typeof item.vatAmount === "number"
-            ? item.vatAmount
-                .toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-                .replaceAll(",", " ")
-            : "0.00";
+        const vatAmountChunks = formatAmountChunks({
+          amount: item.vatAmount,
+          numberFormatLocale,
+        });
 
         // Table row start
         return (
@@ -139,7 +137,7 @@ export function InvoiceVATSummaryTable({
             minPresenceAhead={30}
           >
             {/* VAT rate */}
-            <View style={[styles.tableCol, { width: "25%" }]}>
+            <View style={[styles.tableCol, VAT_RATE_COLUMN_WIDTH]}>
               <Text
                 style={[
                   styles.tableCell,
@@ -150,37 +148,34 @@ export function InvoiceVATSummaryTable({
               </Text>
             </View>
             {/* Net */}
-            <View style={[styles.tableCol, { width: "25%" }]}>
-              <Text
+            <View style={[styles.tableCol, VAT_AMOUNT_COLUMN_WIDTH]}>
+              <WrappableAmount
+                chunks={netAmountChunks}
                 style={[
                   styles.tableCell,
                   { textAlign: "right", marginRight: 2 },
                 ]}
-              >
-                {formattedNetAmount}
-              </Text>
+              />
             </View>
             {/* VAT */}
-            <View style={[styles.tableCol, { width: "25%" }]}>
-              <Text
+            <View style={[styles.tableCol, VAT_AMOUNT_COLUMN_WIDTH]}>
+              <WrappableAmount
+                chunks={vatAmountChunks}
                 style={[
                   styles.tableCell,
                   { textAlign: "right", marginRight: 2 },
                 ]}
-              >
-                {formattedVatAmount}
-              </Text>
+              />
             </View>
             {/* Pre-tax */}
-            <View style={[styles.tableCol, { width: "25%" }]}>
-              <Text
+            <View style={[styles.tableCol, VAT_AMOUNT_COLUMN_WIDTH]}>
+              <WrappableAmount
+                chunks={preTaxAmountChunks}
                 style={[
                   styles.tableCell,
                   { textAlign: "right", marginRight: 2 },
                 ]}
-              >
-                {formattedPreTaxAmount}
-              </Text>
+              />
             </View>
           </View>
         );
@@ -193,7 +188,7 @@ export function InvoiceVATSummaryTable({
       START: Total row (bottom of the VAT summary table)
       */}
       <View style={styles.tableRow}>
-        <View style={[styles.tableCol, { width: "25%" }]}>
+        <View style={[styles.tableCol, VAT_RATE_COLUMN_WIDTH]}>
           <Text
             style={[styles.tableCell, { textAlign: "right", marginRight: 2 }]}
           >
@@ -201,28 +196,25 @@ export function InvoiceVATSummaryTable({
           </Text>
         </View>
         {/* Net */}
-        <View style={[styles.tableCol, { width: "25%" }]}>
-          <Text
+        <View style={[styles.tableCol, VAT_AMOUNT_COLUMN_WIDTH]}>
+          <WrappableAmount
+            chunks={totalNetAmountChunks}
             style={[styles.tableCell, { textAlign: "right", marginRight: 2 }]}
-          >
-            {formattedTotalNetAmount}
-          </Text>
+          />
         </View>
         {/* VAT */}
-        <View style={[styles.tableCol, { width: "25%" }]}>
-          <Text
+        <View style={[styles.tableCol, VAT_AMOUNT_COLUMN_WIDTH]}>
+          <WrappableAmount
+            chunks={totalVatAmountChunks}
             style={[styles.tableCell, { textAlign: "right", marginRight: 2 }]}
-          >
-            {formattedTotalVATAmount}
-          </Text>
+          />
         </View>
         {/* Pre-tax */}
-        <View style={[styles.tableCol, { width: "25%" }]}>
-          <Text
+        <View style={[styles.tableCol, VAT_AMOUNT_COLUMN_WIDTH]}>
+          <WrappableAmount
+            chunks={invoiceTotalChunks}
             style={[styles.tableCell, { textAlign: "right", marginRight: 2 }]}
-          >
-            {formattedInvoiceTotal}
-          </Text>
+          />
         </View>
       </View>
       {/*

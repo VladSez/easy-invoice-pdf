@@ -4,7 +4,7 @@ import { SEO_LANDING_SLUGS } from "@/app/(main)/(seo-landings)/seo-landing-defin
 import { APP_URL } from "@/config";
 
 import { getChangelogEntries } from "./(main)/changelog/utils";
-import { SUPPORTED_LANGUAGES } from "./schema";
+import { SUPPORTED_I18N_LOCALES } from "./schema";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
@@ -27,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     // About pages in all languages
-    ...SUPPORTED_LANGUAGES.map((locale) => {
+    ...SUPPORTED_I18N_LOCALES.map((locale) => {
       return {
         url: `${APP_URL}/${locale}/about`,
         lastModified,

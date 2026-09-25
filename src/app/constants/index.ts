@@ -6,7 +6,7 @@ import {
 } from "../(main)/(app)/pdf-i18n-translations/pdf-translations";
 import {
   SUPPORTED_CURRENCIES,
-  SUPPORTED_LANGUAGES,
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
   SUPPORTED_TEMPLATES,
   DEFAULT_DATE_FORMAT,
   type InvoiceData,
@@ -44,7 +44,7 @@ const LAST_DAY_OF_MONTH = dayjs().endOf("month").format("YYYY-MM-DD");
 const PAYMENT_DUE = dayjs(TODAY).add(14, "days").format("YYYY-MM-DD");
 
 const EUR = SUPPORTED_CURRENCIES[0];
-const EN = SUPPORTED_LANGUAGES[0];
+const EN = SUPPORTED_INVOICE_PDF_LANGUAGES[0];
 const DEFAULT_TEMPLATE = SUPPORTED_TEMPLATES[0];
 
 /**

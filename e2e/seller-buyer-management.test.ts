@@ -145,10 +145,10 @@ async function toggleBankDetailsOff(dialog: Locator, party: Party) {
   }
 
   const accountNumberSwitch = dialog.getByRole("switch", {
-    name: `Show the 'Account Number' field in the PDF`,
+    name: "Show Seller Account Number in PDF",
   });
   const swiftBicSwitch = dialog.getByRole("switch", {
-    name: `Show the 'SWIFT/BIC' field in the PDF`,
+    name: "Show Seller SWIFT/BIC in PDF",
   });
 
   await expect(accountNumberSwitch).toBeChecked();
@@ -175,14 +175,10 @@ async function expectBankDetailsInDialog(dialog: Locator, party: Party) {
   );
 
   await expect(
-    dialog.getByRole("switch", {
-      name: `Show the 'Account Number' field in the PDF`,
-    }),
+    dialog.getByRole("switch", { name: "Show Seller Account Number in PDF" }),
   ).not.toBeChecked();
   await expect(
-    dialog.getByRole("switch", {
-      name: `Show the 'SWIFT/BIC' field in the PDF`,
-    }),
+    dialog.getByRole("switch", { name: "Show Seller SWIFT/BIC in PDF" }),
   ).not.toBeChecked();
 }
 
@@ -317,7 +313,7 @@ for (const party of PARTIES) {
       await fillBankDetails(manageDialog, party);
 
       const emailSwitchInDialogForm = manageDialog.getByRole("switch", {
-        name: `Show the 'Email' field in the PDF`,
+        name: `Show ${PARTY_CONFIG[party].label} Email in PDF`,
       });
 
       const taxNumberSwitchInDialogForm = manageDialog.getByRole("switch", {

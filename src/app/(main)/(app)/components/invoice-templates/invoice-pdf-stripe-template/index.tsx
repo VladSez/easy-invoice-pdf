@@ -12,8 +12,8 @@ import {
 import dayjs from "dayjs";
 
 import { InvoiceQRCode } from "@/app/(main)/(app)/components/invoice-templates/common/invoice-qr-code";
-import { formatCurrency } from "@/app/(main)/(app)/utils/format-currency";
-import { type InvoiceData } from "@/app/schema";
+import { formatCurrencyChunks } from "@/app/(main)/(app)/utils/format-currency";
+import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 import { INVOICE_PDF_FONTS } from "@/config";
 
 import { StripeDueAmount } from "./stripe-due-amount";
@@ -32,6 +32,7 @@ import "dayjs/locale/it";
 import "dayjs/locale/nb";
 import "dayjs/locale/nl";
 import "dayjs/locale/pl";
+import "dayjs/locale/pt-br";
 import "dayjs/locale/pt";
 import "dayjs/locale/ru";
 import "dayjs/locale/sv";
@@ -152,9 +153,21 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     paddingVertical: 4,
   },
   // Column widths for Stripe-style table
-  colDescription: { flex: 3, textAlign: "left" },
+  /**
+   * The description hands a slice of its width to the quantity beside it. The two grow
+   * factors still add up to 3.3, so every column to the right of them keeps the exact
+   * width -- and the exact position -- it had before.
+   */
+  colDescription: { flex: 2.7, textAlign: "left" },
+  /**
+   * Wide enough for a quantity with a thousands separator in it. At `flex: 0.3` the cell
+   * came to 20.7pt, which `999` already fills, so `WrappableAmount` stacked every
+   * four-digit quantity onto two lines (`1,` over `000`). `0.6` buys 42.7pt, which holds
+   * everything up to `100,000`; a quantity past that still wraps, which is what the
+   * wrapping is there for.
+   */
   colQty: {
-    flex: 0.3,
+    flex: 0.6,
     textAlign: "right",
     marginRight: 16,
   },
@@ -206,13 +219,38 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
     paddingVertical: 2,
   },
 
+  /**
+   * The label takes whatever the amount beside it leaves over, and wraps -- it is prose, so
+   * it has somewhere to wrap to. See {@link STRIPE_TEMPLATE_STYLES.vatColValue}.
+   */
   vatColLabel: {
-    flex: 3,
-    paddingRight: 6,
+    flex: 1,
+    paddingRight: 8,
   },
 
+  /**
+   * The amount column is as wide as the amount in it, not a fixed share of the block.
+   *
+   * A fixed share made the wrap depend on the row's font weight. Every row here prints the
+   * same kind of number, but "Amount due" prints it semibold, which is about 4% wider than
+   * the regular rows above it -- enough that a share sized to fit `EUR 10.000.000.000,00`
+   * at 400 (87.4pt of a 92pt column) did not fit it at 600 (91.2pt), and the one row a
+   * reader actually looks for was the only one that broke across two lines.
+   *
+   * Sizing each cell to its own content takes the weight out of it: an amount wraps when it
+   * is genuinely too wide for the block, not when the column's share happens to fall between
+   * one weight's width and another's. The right edge is where it always was, because the
+   * cell is the row's last item and its contents are right-aligned, so the rows stay in a
+   * column whatever width each one takes.
+   *
+   * {@link maxWidth} is what the label keeps back for itself. Past it the amount wraps again
+   * -- it has to go somewhere -- but by then every row in the block is wrapping, which is
+   * the behaviour this is here to get.
+   */
   vatColValue: {
-    flex: 1.3,
+    flexGrow: 0,
+    flexShrink: 0,
+    maxWidth: "60%",
     textAlign: "right",
   },
 } as const satisfies Styles);
@@ -225,6 +263,7 @@ export function StripeInvoicePdfTemplate({
   qrCodeDataUrl?: string;
 }) {
   const language = invoiceData.language;
+  const numberFormatLocale = resolveNumberFormatLocale(invoiceData);
 
   // Set dayjs locale based on invoice language
   dayjs.locale(language);
@@ -235,17 +274,43 @@ export function StripeInvoicePdfTemplate({
   const invoiceDocTitle =
     `Invoice ${invoiceNumber} | Created with https://easyinvoicepdf.com` as const;
 
-  const formattedInvoiceTotal = formatCurrency({
+  const invoiceTotalChunks = formatCurrencyChunks({
     amount: invoiceData?.total,
     currency: invoiceData.currency,
-    language,
+    numberFormatLocale,
   });
 
-  // we want to mimic the Stripe invoice format, so we need to add the currency code only for USD in English
+  const formattedInvoiceTotal = invoiceTotalChunks.join("");
+
+  /**
+   * We want to mimic the Stripe invoice format, which prints "$1,234.00 USD": English
+   * renders USD as a bare `$`, and that is also the Canadian, Australian and Singapore
+   * dollar, so the code goes back on.
+   *
+   * It follows the *format* locale rather than the invoice language, because that is what
+   * decides the symbol -- an English invoice formatted in French already prints `$US`, and a
+   * German invoice formatted in English would otherwise print a bare `$`. `international` is
+   * built from `en-US`, so it prints that same bare `$`.
+   */
   const currencyCode =
-    invoiceData.currency === "USD" && language === "en" ? " USD" : "";
+    invoiceData.currency === "USD" &&
+    (numberFormatLocale === "en" || numberFormatLocale === "international")
+      ? " USD"
+      : "";
 
   const formattedInvoiceTotalWithCurrency = `${formattedInvoiceTotal}${currencyCode}`;
+
+  /**
+   * The same total for the totals column, which is narrow enough that a large amount has to
+   * wrap. The code rides along on the last piece so it can never be left on a line of its own.
+   */
+  const invoiceTotalWithCurrencyChunks = invoiceTotalChunks.map(
+    (chunk, index) => {
+      return index === invoiceTotalChunks.length - 1
+        ? `${chunk}${currencyCode}`
+        : chunk;
+    },
+  );
 
   const isQrCodeVisible =
     invoiceData?.qrCodeIsVisible && qrCodeDataUrl && qrCodeDataUrl.length > 0;
@@ -295,7 +360,7 @@ export function StripeInvoicePdfTemplate({
           {/* VAT summary table (VAT rates, net amounts, VAT amounts, pre-tax amounts) */}
           <StripeVatSummaryTableTotals
             invoiceData={invoiceData}
-            formattedInvoiceTotal={formattedInvoiceTotalWithCurrency}
+            invoiceTotalChunks={invoiceTotalWithCurrencyChunks}
             styles={STRIPE_TEMPLATE_STYLES}
           />
 

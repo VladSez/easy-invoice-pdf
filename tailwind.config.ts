@@ -14,6 +14,39 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // Inline `code` in prose (changelog posts): drop the plugin's literal backtick
+      // pseudo-elements and render it as a quiet chip instead.
+      typography: ({ theme }: { theme: (path: string) => string }) => {
+        return {
+          DEFAULT: {
+            css: {
+              code: {
+                fontWeight: "500",
+                color: theme("colors.gray.900"),
+                fontSize: "0.875em",
+                backgroundColor: theme("colors.gray.100"),
+                border: `1px solid ${theme("colors.gray.300")}`,
+                borderRadius: "0.375rem",
+                padding: "0.125rem 0.375rem",
+                // keeps the padding and border on both halves when a chip wraps
+                boxDecorationBreak: "clone",
+                WebkitBoxDecorationBreak: "clone",
+              },
+              "code::before": { content: "none" },
+              "code::after": { content: "none" },
+            },
+          },
+          invert: {
+            css: {
+              code: {
+                backgroundColor: theme("colors.gray.800"),
+                color: theme("colors.gray.50"),
+                borderColor: theme("colors.gray.700"),
+              },
+            },
+          },
+        };
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

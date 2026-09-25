@@ -264,7 +264,7 @@ export default async function ChangelogEntryPage({
             </div>
 
             {/* Entry content */}
-            <div className="prose-headings:mt-8 prose-headings:font-semibold prose-headings:text-black prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg prose-h5:text-base prose-h6:text-sm prose-p:text-gray-600 prose-blockquote:border-l-blue-500 prose-strong:text-gray-900 prose-code:rounded prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-pre:bg-gray-100 prose-li:text-gray-600 prose-img:rounded-lg prose-img:shadow-lg dark:prose-headings:text-white dark:prose-p:text-gray-300 dark:prose-strong:text-gray-100 dark:prose-code:bg-gray-800 dark:prose-pre:bg-gray-800 dark:prose-li:text-gray-300">
+            <div className="prose-headings:mt-8 prose-headings:font-semibold prose-headings:text-black prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg prose-h5:text-base prose-h6:text-sm prose-p:text-gray-600 prose-blockquote:border-l-blue-500 prose-strong:text-gray-900 prose-pre:bg-gray-100 prose-li:text-gray-600 prose-img:rounded-lg prose-img:shadow-lg dark:prose-headings:text-white dark:prose-p:text-gray-300 dark:prose-strong:text-gray-100 dark:prose-pre:bg-gray-800 dark:prose-li:text-gray-300">
               <Suspense
                 fallback={
                   <div className="h-64 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>

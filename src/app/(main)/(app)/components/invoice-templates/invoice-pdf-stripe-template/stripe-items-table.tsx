@@ -1,11 +1,13 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import dayjs from "dayjs";
 
+import { WrappableAmount } from "@/app/(main)/(app)/components/invoice-templates/common/wrappable-amount";
 import type { STRIPE_TEMPLATE_STYLES } from "@/app/(main)/(app)/components/invoice-templates/invoice-pdf-stripe-template";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import { formatCurrency } from "@/app/(main)/(app)/utils/format-currency";
+import { formatAmountChunks } from "@/app/(main)/(app)/utils/format-amount";
+import { formatCurrencyChunks } from "@/app/(main)/(app)/utils/format-currency";
 import { formatServicePeriodRange } from "@/app/(main)/(app)/utils/format-service-period";
-import type { InvoiceData } from "@/app/schema";
+import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 
 import "dayjs/locale/de";
 import "dayjs/locale/en";
@@ -26,6 +28,7 @@ export function StripeItemsTable({
   styles: typeof STRIPE_TEMPLATE_STYLES;
 }) {
   const language = invoiceData.language;
+  const numberFormatLocale = resolveNumberFormatLocale(invoiceData);
   const t = INVOICE_PDF_TRANSLATIONS[language];
   const taxLabelText = invoiceData.taxLabelText || "VAT";
 
@@ -73,20 +76,24 @@ export function StripeItemsTable({
 
       {/* Rows */}
       {invoiceData.items.map((item, index) => {
-        const formattedNetPrice = formatCurrency({
+        const netPriceChunks = formatCurrencyChunks({
           amount: item.netPrice,
           currency: invoiceData.currency,
-          language,
+          numberFormatLocale,
         });
 
-        const formattedPreTaxAmount = formatCurrency({
+        const preTaxAmountChunks = formatCurrencyChunks({
           amount: item.netAmount,
           currency: invoiceData.currency,
-          language,
+          numberFormatLocale,
         });
 
-        const formattedAmount = item.amount.toLocaleString("en-US", {
-          style: "decimal",
+        // The quantity column carries no currency, and the Stripe template rounds it to
+        // whole units
+        const amountChunks = formatAmountChunks({
+          amount: item.amount,
+          numberFormatLocale,
+          minimumFractionDigits: 0,
           maximumFractionDigits: 0,
         });
 
@@ -111,9 +118,10 @@ export function StripeItemsTable({
               ) : null}
             </View>
             <View style={styles.colQty}>
-              <Text style={[styles.fontSize11, styles.textDark]}>
-                {formattedAmount}
-              </Text>
+              <WrappableAmount
+                chunks={amountChunks}
+                style={[styles.fontSize11, styles.textDark]}
+              />
             </View>
             {unitFieldIsVisible ? (
               <View style={styles.colUnit}>
@@ -123,9 +131,10 @@ export function StripeItemsTable({
               </View>
             ) : null}
             <View style={styles.colUnitPrice}>
-              <Text style={[styles.fontSize11, styles.textDark]}>
-                {formattedNetPrice}
-              </Text>
+              <WrappableAmount
+                chunks={netPriceChunks}
+                style={[styles.fontSize11, styles.textDark]}
+              />
             </View>
             {vatAmountFieldIsVisible ? (
               <View style={styles.colTax}>
@@ -135,15 +144,14 @@ export function StripeItemsTable({
               </View>
             ) : null}
             <View style={[styles.colAmount]}>
-              <Text
+              <WrappableAmount
+                chunks={preTaxAmountChunks}
                 style={[
                   styles.fontSize11,
                   styles.textDark,
                   { paddingLeft: 10 },
                 ]}
-              >
-                {formattedPreTaxAmount.split("")}
-              </Text>
+              />
             </View>
           </View>
         );
