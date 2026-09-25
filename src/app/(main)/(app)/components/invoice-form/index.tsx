@@ -18,6 +18,7 @@ import {
   accordionSchema,
   invoiceSchema,
   PDF_DATA_LOCAL_STORAGE_KEY,
+  resolveNumberFormatLocale,
   type AccordionState,
   type InvoiceData,
   type InvoiceItemData,
@@ -328,6 +329,14 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   const template = useWatch({ control, name: "template" });
   const taxLabelText = useWatch({ control, name: "taxLabelText" }) || "VAT";
+  const selectedNumberFormatLocale = useWatch({
+    control,
+    name: "numberFormatLocale",
+  });
+  const numberFormatLocale = resolveNumberFormatLocale({
+    language,
+    numberFormatLocale: selectedNumberFormatLocale,
+  });
 
   /**
    * Remove an invoice item from the form and trigger the form update
@@ -532,6 +541,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               append={append}
               template={template}
               taxLabelText={taxLabelText}
+              numberFormatLocale={numberFormatLocale}
               getValues={getValues}
             />
           </AccordionContent>

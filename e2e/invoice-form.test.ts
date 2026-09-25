@@ -1285,7 +1285,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(netAmountFormElement).toHaveText("€EUR");
 
     await expect(
-      invoiceItemsSection.getByText("Preview: €0.00 (zero EUR 00/100)"),
+      invoiceItemsSection.getByText("Preview: 0.00 EUR (zero EUR 00/100)"),
     ).toBeVisible();
 
     const currencyCombobox = page.getByRole("combobox", { name: "Currency" });
@@ -1315,7 +1315,7 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(
       invoiceItemsSection.getByText(
-        "Preview: $100.75 (one hundred USD 75/100)",
+        "Preview: 100.75 USD (one hundred USD 75/100)",
         {
           exact: true,
         },
