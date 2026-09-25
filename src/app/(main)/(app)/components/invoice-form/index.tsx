@@ -11,6 +11,7 @@ import {
   getAppStorageItem,
   setAppStorageItem,
 } from "@/app/(main)/(app)/utils/app-local-storage";
+import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
 import { formatDateWithLocale } from "@/app/(main)/(app)/utils/format-date-with-locale";
 import { updateAppMetadata } from "@/app/(main)/(app)/utils/get-app-metadata";
 import {
@@ -566,9 +567,9 @@ export const InvoiceForm = memo(function InvoiceForm({
                     {...field}
                     id={`total`}
                     currency={currency}
-                    value={field.value.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
+                    value={formatAmount({
+                      amount: field.value,
+                      numberFormatLocale,
                     })}
                   />
                 );

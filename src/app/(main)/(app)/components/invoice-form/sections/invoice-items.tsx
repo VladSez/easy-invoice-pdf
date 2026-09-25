@@ -659,9 +659,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                         {...field}
                         id={`itemNetAmount${index}`}
                         currency={currency}
-                        value={field.value.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
+                        value={formatAmount({
+                          amount: field.value,
+                          numberFormatLocale,
                         })}
                         className={inputErrorClassName(
                           !!errors.items?.[index]?.netAmount,
@@ -733,9 +733,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                         {...field}
                         id={`itemVatAmount${index}`}
                         currency={currency}
-                        value={field.value.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
+                        value={formatAmount({
+                          amount: field.value,
+                          numberFormatLocale,
                         })}
                         className={inputErrorClassName(
                           !!errors.items?.[index]?.vatAmount,
@@ -808,9 +808,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                         {...field}
                         id={`itemPreTaxAmount${index}`}
                         currency={currency}
-                        value={field.value.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
+                        value={formatAmount({
+                          amount: field.value,
+                          numberFormatLocale,
                         })}
                         className={inputErrorClassName(
                           !!errors.items?.[index]?.preTaxAmount,

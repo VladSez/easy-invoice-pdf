@@ -554,3 +554,29 @@ describe("InvoiceItems amount preview", () => {
     },
   );
 });
+
+describe("InvoiceItems read-only amounts", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it.each([
+    ["en", { netAmount: "201.00", vatAmount: "46.23", preTaxAmount: "247.23" }],
+    ["de", { netAmount: "201,00", vatAmount: "46,23", preTaxAmount: "247,23" }],
+  ] as const)(
+    "writes the calculated amounts in the '%s' number format",
+    (numberFormatLocale, expectedAmounts) => {
+      renderInvoiceItems({ itemCount: 1, numberFormatLocale });
+
+      expect(screen.getByRole("textbox", { name: "Net Amount" })).toHaveValue(
+        expectedAmounts.netAmount,
+      );
+      expect(screen.getByRole("textbox", { name: "VAT Amount" })).toHaveValue(
+        expectedAmounts.vatAmount,
+      );
+      expect(
+        screen.getByRole("textbox", { name: "Pre-tax Amount" }),
+      ).toHaveValue(expectedAmounts.preTaxAmount);
+    },
+  );
+});
