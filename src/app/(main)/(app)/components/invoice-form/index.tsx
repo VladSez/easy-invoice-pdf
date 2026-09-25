@@ -11,6 +11,7 @@ import {
   getAppStorageItem,
   setAppStorageItem,
 } from "@/app/(main)/(app)/utils/app-local-storage";
+import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
 import { formatDateWithLocale } from "@/app/(main)/(app)/utils/format-date-with-locale";
 import { updateAppMetadata } from "@/app/(main)/(app)/utils/get-app-metadata";
 import {
@@ -18,6 +19,7 @@ import {
   accordionSchema,
   invoiceSchema,
   PDF_DATA_LOCAL_STORAGE_KEY,
+  resolveNumberFormatLocale,
   type AccordionState,
   type InvoiceData,
   type InvoiceItemData,
@@ -328,6 +330,14 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   const template = useWatch({ control, name: "template" });
   const taxLabelText = useWatch({ control, name: "taxLabelText" }) || "VAT";
+  const selectedNumberFormatLocale = useWatch({
+    control,
+    name: "numberFormatLocale",
+  });
+  const numberFormatLocale = resolveNumberFormatLocale({
+    language,
+    numberFormatLocale: selectedNumberFormatLocale,
+  });
 
   /**
    * Remove an invoice item from the form and trigger the form update
@@ -532,6 +542,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               append={append}
               template={template}
               taxLabelText={taxLabelText}
+              numberFormatLocale={numberFormatLocale}
               getValues={getValues}
             />
           </AccordionContent>
@@ -556,9 +567,9 @@ export const InvoiceForm = memo(function InvoiceForm({
                     {...field}
                     id={`total`}
                     currency={currency}
-                    value={field.value.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
+                    value={formatAmount({
+                      amount: field.value,
+                      numberFormatLocale,
                     })}
                   />
                 );

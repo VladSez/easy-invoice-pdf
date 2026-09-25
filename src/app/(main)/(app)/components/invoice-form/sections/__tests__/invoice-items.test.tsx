@@ -13,7 +13,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getInitialInvoiceData } from "@/app/constants";
 import type * as InvoiceSchema from "@/app/schema";
-import type { InvoiceData } from "@/app/schema";
+import type { InvoiceData, SupportedNumberFormatLocale } from "@/app/schema";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { MOCK_INVOICE_ITEM_DATA } from "@/utils/__tests__/data";
 import "@testing-library/jest-dom/vitest";
@@ -57,6 +57,10 @@ interface InvoiceItemsTestHarnessProps {
   onRemove?: (index: number) => void;
   /** Overrides the name of the item at each given index. */
   itemNames?: Record<number, string>;
+  /** The invoice's resolved number format, `en` unless a test picks another one. */
+  numberFormatLocale?: SupportedNumberFormatLocale;
+  /** The invoice's template, `default` unless a test picks another one. */
+  template?: InvoiceData["template"];
 }
 
 function InvoiceItemsTestHarness({
@@ -64,6 +68,8 @@ function InvoiceItemsTestHarness({
   append,
   onRemove = vi.fn(),
   itemNames,
+  numberFormatLocale = "en",
+  template = "default",
 }: InvoiceItemsTestHarnessProps) {
   const invoiceData = useMemo(() => {
     return {
@@ -102,8 +108,9 @@ function InvoiceItemsTestHarness({
         errors={{}}
         currency="EUR"
         language="en"
-        template="default"
+        template={template}
         taxLabelText="VAT"
+        numberFormatLocale={numberFormatLocale}
         getValues={getValues}
       />
     </TooltipProvider>
@@ -479,4 +486,97 @@ describe("InvoiceItems with several invoice items", () => {
       ).not.toBeInTheDocument();
     }
   });
+});
+
+/** Previews print grouping spaces as no-break ones, so compare with plain spaces. */
+function getPreviewText(pattern: RegExp) {
+  return screen.getByText(pattern).textContent?.replaceAll("\u00A0", " ");
+}
+
+describe("InvoiceItems net price preview", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it.each([
+    ["en", "default", "12,345.67 EUR"],
+    ["de", "default", "12.345,67 EUR"],
+    ["pl", "default", "12 345,67 EUR"],
+    ["international", "default", "12 345.67 EUR"],
+    ["en", "stripe", "€12,345.67"],
+    ["de", "stripe", "12.345,67 €"],
+  ] as const)(
+    "writes the preview in the '%s' number format for the '%s' template",
+    async (numberFormatLocale, template, expectedPreview) => {
+      const user = userEvent.setup();
+
+      renderInvoiceItems({ itemCount: 1, numberFormatLocale, template });
+
+      const netPriceInput = screen.getByRole("spinbutton", {
+        name: /^Net Price/,
+      });
+      await user.clear(netPriceInput);
+      await user.type(netPriceInput, "12345.67");
+
+      expect(getPreviewText(/^Preview: .*12/)).toContain(
+        `Preview: ${expectedPreview} (`,
+      );
+    },
+  );
+});
+
+describe("InvoiceItems amount preview", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it.each([
+    ["en", "1,234.5"],
+    ["de", "1.234,5"],
+    ["pl", "1 234,5"],
+    ["international", "1 234.5"],
+  ] as const)(
+    "writes the preview in the '%s' number format",
+    async (numberFormatLocale, expectedPreview) => {
+      const user = userEvent.setup();
+
+      renderInvoiceItems({ itemCount: 1, numberFormatLocale });
+
+      const amountInput = screen.getByRole("spinbutton", {
+        name: /^Amount/,
+      });
+      await user.clear(amountInput);
+      await user.type(amountInput, "1234.5");
+
+      expect(getPreviewText(/^Preview: 1\D234/)).toBe(
+        `Preview: ${expectedPreview}`,
+      );
+    },
+  );
+});
+
+describe("InvoiceItems read-only amounts", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it.each([
+    ["en", { netAmount: "201.00", vatAmount: "46.23", preTaxAmount: "247.23" }],
+    ["de", { netAmount: "201,00", vatAmount: "46,23", preTaxAmount: "247,23" }],
+  ] as const)(
+    "writes the calculated amounts in the '%s' number format",
+    (numberFormatLocale, expectedAmounts) => {
+      renderInvoiceItems({ itemCount: 1, numberFormatLocale });
+
+      expect(screen.getByRole("textbox", { name: "Net Amount" })).toHaveValue(
+        expectedAmounts.netAmount,
+      );
+      expect(screen.getByRole("textbox", { name: "VAT Amount" })).toHaveValue(
+        expectedAmounts.vatAmount,
+      );
+      expect(
+        screen.getByRole("textbox", { name: "Pre-tax Amount" }),
+      ).toHaveValue(expectedAmounts.preTaxAmount);
+    },
+  );
 });

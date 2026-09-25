@@ -243,7 +243,7 @@ export function ChangelogUpdatePopup({
                     onDismiss();
                   }}
                 >
-                  See what&apos;s new
+                  Learn more
                 </Link>
               </Button>
             )}
@@ -332,7 +332,7 @@ function DockNotice({
               onDismiss();
             }}
           >
-            See what&apos;s new
+            Learn more
           </Link>
         )}
       </p>

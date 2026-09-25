@@ -96,9 +96,10 @@ describe("ChangelogUpdatePopup", () => {
 
       expect(popup).toHaveAttribute("data-layout", "dock");
       expect(popup).toHaveTextContent(`What's new: ${RELEASE_SUMMARY}`);
-      expect(
-        screen.getByRole("link", { name: "See what's new" }),
-      ).toHaveAttribute("href", "/changelog");
+      expect(screen.getByRole("link", { name: "Learn more" })).toHaveAttribute(
+        "href",
+        "/changelog",
+      );
       expect(
         screen.queryByRole("button", { name: "Continue" }),
       ).not.toBeInTheDocument();

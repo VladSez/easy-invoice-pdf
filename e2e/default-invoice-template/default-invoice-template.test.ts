@@ -110,9 +110,10 @@ test.describe("Default Invoice Template", () => {
 
     const finalSection = page.getByTestId(`final-section`);
 
-    // Check that the total is correct (should be 3,300.00)
+    // Check that the total is correct, written in the Polish number format the language
+    // switch selected (the grouping space is a no-break one, which `\s` matches)
     const totalTextbox = page.getByRole("textbox", { name: "Total" });
-    await expect(totalTextbox).toHaveValue("3,300.00");
+    await expect(totalTextbox).toHaveValue(/^3\s300,00$/);
 
     /** TEST PERSON AUTHORIZED TO RECEIVE FIELD */
     const personAuthorizedToReceiveFieldset = finalSection.getByRole("group", {
@@ -489,25 +490,25 @@ test.describe("Default Invoice Template", () => {
       }),
     ).toHaveValue("23");
 
-    // Verify calculations are correct
+    // Verify calculations are correct, written in the French number format
     await expect(
       invoiceItemsSection.getByRole("textbox", {
         name: "Net Amount",
         exact: true,
       }),
-    ).toHaveValue("150.00");
+    ).toHaveValue("150,00");
     await expect(
       invoiceItemsSection.getByRole("textbox", {
         name: "TVA Amount",
         exact: true,
       }),
-    ).toHaveValue("34.50");
+    ).toHaveValue("34,50");
     await expect(
       invoiceItemsSection.getByRole("textbox", {
         name: "Pre-tax Amount",
         exact: true,
       }),
-    ).toHaveValue("184.50");
+    ).toHaveValue("184,50");
   });
 
   test("should display and persist invoice number in different languages", async ({

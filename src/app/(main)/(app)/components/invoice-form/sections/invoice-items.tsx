@@ -15,10 +15,13 @@ import {
   type ItemPendingDeletion,
 } from "@/app/(main)/(app)/components/invoice-form/sections/components/delete-invoice-item-dialog";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
+import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
+import { formatMoneyForTemplate } from "@/app/(main)/(app)/utils/format-money-for-template";
 import {
   type InvoiceData,
   type SupportedCurrencies,
   type SupportedLanguages,
+  type SupportedNumberFormatLocale,
   MAX_INVOICE_ITEMS,
 } from "@/app/schema";
 import { Legend } from "@/components/legend";
@@ -51,6 +54,8 @@ interface InvoiceItemsSettingsProps {
   language: SupportedLanguages;
   template: InvoiceData["template"];
   taxLabelText: string;
+  /** The invoice's number format, already resolved against its language. */
+  numberFormatLocale: SupportedNumberFormatLocale;
   getValues: UseFormGetValues<InvoiceData>;
 }
 
@@ -64,6 +69,7 @@ export const InvoiceItems = memo(function InvoiceItems({
   append,
   template,
   taxLabelText,
+  numberFormatLocale,
   getValues,
 }: InvoiceItemsSettingsProps) {
   const [itemPendingDeletion, setItemPendingDeletion] =
@@ -301,11 +307,12 @@ export const InvoiceItems = memo(function InvoiceItems({
                   render={({ field }) => {
                     // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- `<Input type="number">` gives back a string at runtime, the schema type says number
                     const fieldValueNumber = Number(field.value) || 0;
-                    const previewFormattedValue =
-                      fieldValueNumber.toLocaleString("en-US", {
-                        style: "decimal",
-                        maximumFractionDigits: 3,
-                      });
+                    const previewFormattedValue = formatAmount({
+                      amount: fieldValueNumber,
+                      numberFormatLocale,
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 3,
+                    });
 
                     return (
                       <>
@@ -444,13 +451,14 @@ export const InvoiceItems = memo(function InvoiceItems({
                       // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- `<Input type="number">` gives back a string at runtime, the schema type says number
                       const fieldValueNumber = Number(field.value) || 0;
 
-                      const previewFormattedValue =
-                        fieldValueNumber.toLocaleString("en-US", {
-                          style: "currency",
-                          currency: currency,
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        });
+                      // written in the invoice's number format and the way its template
+                      // shows the currency, so the preview matches the PDF
+                      const previewFormattedValue = formatMoneyForTemplate({
+                        amount: fieldValueNumber,
+                        currency,
+                        numberFormatLocale,
+                        template,
+                      });
 
                       const previewAmountInWords = getAmountInWords({
                         amount: fieldValueNumber,
@@ -651,9 +659,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                         {...field}
                         id={`itemNetAmount${index}`}
                         currency={currency}
-                        value={field.value.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
+                        value={formatAmount({
+                          amount: field.value,
+                          numberFormatLocale,
                         })}
                         className={inputErrorClassName(
                           !!errors.items?.[index]?.netAmount,
@@ -725,9 +733,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                         {...field}
                         id={`itemVatAmount${index}`}
                         currency={currency}
-                        value={field.value.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
+                        value={formatAmount({
+                          amount: field.value,
+                          numberFormatLocale,
                         })}
                         className={inputErrorClassName(
                           !!errors.items?.[index]?.vatAmount,
@@ -800,9 +808,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                         {...field}
                         id={`itemPreTaxAmount${index}`}
                         currency={currency}
-                        value={field.value.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
+                        value={formatAmount({
+                          amount: field.value,
+                          numberFormatLocale,
                         })}
                         className={inputErrorClassName(
                           !!errors.items?.[index]?.preTaxAmount,

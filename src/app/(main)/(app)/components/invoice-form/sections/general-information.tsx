@@ -19,9 +19,8 @@ import {
   getDefaultInvoiceNumberLabel,
   INVOICE_PDF_TRANSLATIONS,
 } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
-import { formatCurrency } from "@/app/(main)/(app)/utils/format-currency";
 import { formatTodayWithLocale } from "@/app/(main)/(app)/utils/format-date-with-locale";
+import { formatMoneyForTemplate } from "@/app/(main)/(app)/utils/format-money-for-template";
 import {
   getCurrentMonthAndYear,
   isServicePeriodStartInCurrentMonth,
@@ -33,9 +32,7 @@ import {
   getDateFormatsForLanguage,
   getDefaultDateFormat,
   getNumberFormatLocaleAfterLanguageChange,
-  type SupportedCurrencies,
   type SupportedNumberFormatLocale,
-  type SupportedTemplates,
   SUPPORTED_INVOICE_PDF_LANGUAGES,
   SUPPORTED_NUMBER_FORMAT_LOCALES,
   SUPPORTED_TEMPLATES,
@@ -574,7 +571,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                         // the invoice's own total, written the way the selected template
                         // writes it, so the picker shows the number this invoice's reader
                         // will actually see
-                        const preview = formatNumberFormatPreview({
+                        const preview = formatMoneyForTemplate({
                           amount: invoiceTotal,
                           currency,
                           numberFormatLocale: supportedNumberFormatLocale,
@@ -1221,34 +1218,3 @@ export const GeneralInformation = memo(function GeneralInformation({
     </div>
   );
 });
-
-interface FormatNumberFormatPreviewArgs {
-  /** The invoice total, which is what the picker previews. */
-  amount: number;
-  /** The invoice's currency. */
-  currency: SupportedCurrencies;
-  /** The option being previewed. */
-  numberFormatLocale: SupportedNumberFormatLocale;
-  /** The template the invoice is rendered with. */
-  template: SupportedTemplates;
-}
-
-/**
- * One option's preview, written the way its template writes money.
- *
- * The two templates present a currency differently -- the default one puts an ISO 4217 code
- * next to the amount, the Stripe one puts the symbol wherever the locale puts it -- and a
- * preview that showed the wrong one would promise a PDF the invoice is not going to be.
- */
-function formatNumberFormatPreview({
-  amount,
-  currency,
-  numberFormatLocale,
-  template,
-}: FormatNumberFormatPreviewArgs) {
-  if (template === "default") {
-    return `${formatAmount({ amount, numberFormatLocale })} ${currency}`;
-  }
-
-  return formatCurrency({ amount, currency, numberFormatLocale });
-}
