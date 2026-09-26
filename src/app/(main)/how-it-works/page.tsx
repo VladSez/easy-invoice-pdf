@@ -74,7 +74,7 @@ export default function HowItWorksPage() {
             All tutorials
           </h2>
           <p className="mx-auto mt-2 max-w-md text-pretty text-sm text-slate-600">
-            Four minutes of video, start to finish. Pick the one you need.
+            Five minutes of video, start to finish. Pick the one you need.
           </p>
         </div>
 

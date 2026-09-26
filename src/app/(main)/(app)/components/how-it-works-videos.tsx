@@ -116,10 +116,13 @@ export function HowItWorksVideos({
         </p>
       </div>
 
-      <div className="flex justify-center px-4 pb-3 sm:px-6 sm:pb-4">
-        <div className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
+      <div className="px-4 pb-1 sm:px-6 sm:pb-2">
+        {/* The scroller must be the one with a fixed width: as a flex item it would grow
+            to fit the tabs and widen the page instead. `mx-auto` centres the strip while
+            it fits and falls back to 0 once it overflows, so it scrolls from the start. */}
+        <div className="-mx-4 overflow-x-auto px-4 pb-2 [scrollbar-width:thin] sm:-mx-6 sm:px-6">
           <Tabs value={activeVideoId} onValueChange={handleTabChange}>
-            <TabsList className="inline-flex h-auto w-max min-w-full justify-center gap-0.5 sm:min-w-0 sm:gap-1">
+            <TabsList className="mx-auto h-auto w-max gap-0.5 sm:gap-1">
               {HOW_IT_WORKS_VIDEOS.map((video) => {
                 return (
                   <TabsTrigger

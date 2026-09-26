@@ -57,6 +57,9 @@ const YOUTUBE_VIDEO_HOW_TO_ADD_INVOICE_FOR_ONE_WEEK =
 const YOUTUBE_VIDEO_HOW_TO_CUSTOMIZE_TAX =
   "https://www.youtube.com/embed/F_iJxZ3PHbk";
 
+/** A vertical YouTube Short; the 16:9 player pillarboxes it. */
+const YOUTUBE_VIDEO_MOBILE_DEMO = "https://www.youtube.com/embed/TKOegsmNnKM";
+
 /**
  * Video catalog for the "How it works" dialog
  */
@@ -121,6 +124,18 @@ export const HOW_IT_WORKS_VIDEOS = [
     uploadDate: "2026-09-08T16:22:57-07:00",
     thumbnailUrl: "https://i.ytimg.com/vi/F_iJxZ3PHbk/maxresdefault.jpg",
     iframeTitle: "How to customize tax on an invoice - EasyInvoicePDF",
+  },
+  {
+    id: "mobile",
+    tabLabel: "On mobile",
+    tabLabelShort: "Mobile",
+    title: "How to use EasyInvoicePDF on mobile",
+    description: "Create, preview, and download an invoice from your phone.",
+    embedUrl: YOUTUBE_VIDEO_MOBILE_DEMO,
+    watchUrl: "https://www.youtube.com/shorts/TKOegsmNnKM",
+    uploadDate: "2026-09-25T17:18:51-07:00",
+    thumbnailUrl: "https://i.ytimg.com/vi/TKOegsmNnKM/maxresdefault.jpg",
+    iframeTitle: "EasyInvoicePDF mobile demo",
   },
 ] as const satisfies {
   id: string;
