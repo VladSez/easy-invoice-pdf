@@ -10,6 +10,10 @@ import {
 import type { UseFormSetValue } from "react-hook-form";
 import { toast } from "sonner";
 
+import {
+  ContactsBackupMenu,
+  SAVED_CONTACTS_IMPORTED_EVENT,
+} from "@/app/(main)/(app)/components/invoice-form/sections/components/contacts-backup-menu";
 import { SellerDialog } from "@/app/(main)/(app)/components/invoice-form/sections/components/seller/seller-dialog";
 import {
   getAppStorageItem,
@@ -94,65 +98,78 @@ export function SellerManagement({
 
   const isEditMode = Boolean(editingSeller);
 
-  // Load sellers from localStorage on component mount
+  // Load sellers from localStorage on mount, and again after a backup import
   useEffect(() => {
-    try {
-      const savedSellers = getAppStorageItem(SELLERS_LOCAL_STORAGE_KEY);
-      const parsedSellers: unknown = savedSellers
-        ? JSON.parse(savedSellers)
-        : [];
+    const loadSavedSellers = () => {
+      try {
+        const savedSellers = getAppStorageItem(SELLERS_LOCAL_STORAGE_KEY);
+        const parsedSellers: unknown = savedSellers
+          ? JSON.parse(savedSellers)
+          : [];
 
-      const rawSellers = Array.isArray(parsedSellers) ? parsedSellers : [];
+        const rawSellers = Array.isArray(parsedSellers) ? parsedSellers : [];
 
-      const validSellers: SellerData[] = [];
-      const invalidSellers: SellerData[] = [];
+        const validSellers: SellerData[] = [];
+        const invalidSellers: SellerData[] = [];
 
-      // Validate each seller individually — drop only invalid items
-      for (const item of rawSellers) {
-        const result = sellerSchema.safeParse(item);
-        if (result.success) {
-          validSellers.push(result.data);
-        } else {
-          invalidSellers.push(item as SellerData);
+        // Validate each seller individually — drop only invalid items
+        for (const item of rawSellers) {
+          const result = sellerSchema.safeParse(item);
+          if (result.success) {
+            validSellers.push(result.data);
+          } else {
+            invalidSellers.push(item as SellerData);
 
-          console.error(
-            "[seller-management] Invalid seller entry:",
-            result.error,
-          );
+            console.error(
+              "[seller-management] Invalid seller entry:",
+              result.error,
+            );
+          }
         }
-      }
 
-      // If we have invalid sellers, drop them and save the valid sellers back to localStorage
-      if (invalidSellers.length > 0) {
-        console.error(
-          `[seller-management] Dropped ${invalidSellers.length} invalid seller entries:`,
-          invalidSellers,
-        );
+        // If we have invalid sellers, drop them and save the valid sellers back to localStorage
+        if (invalidSellers.length > 0) {
+          console.error(
+            `[seller-management] Dropped ${invalidSellers.length} invalid seller entries:`,
+            invalidSellers,
+          );
 
-        Sentry.captureException(
-          new Error(
-            `[seller-management] Invalid seller data in localStorage: ${rawSellers.length - validSellers.length} items dropped`,
-          ),
-        );
+          Sentry.captureException(
+            new Error(
+              `[seller-management] Invalid seller data in localStorage: ${rawSellers.length - validSellers.length} items dropped`,
+            ),
+          );
 
-        setAppStorageItem({
-          key: SELLERS_LOCAL_STORAGE_KEY,
-          value: JSON.stringify(validSellers),
+          setAppStorageItem({
+            key: SELLERS_LOCAL_STORAGE_KEY,
+            value: JSON.stringify(validSellers),
+          });
+        }
+
+        const selectedSeller = validSellers.find((seller: SellerData) => {
+          return seller?.id === invoiceData?.seller?.id;
         });
+
+        setSellersSelectOptions(validSellers);
+        setSelectedSellerId(selectedSeller?.id ?? "");
+      } catch (error) {
+        console.error("Failed to load sellers:", error);
+
+        Sentry.captureException(error);
       }
+    };
 
-      const selectedSeller = validSellers.find((seller: SellerData) => {
-        return seller?.id === invoiceData?.seller?.id;
-      });
+    // oxlint-disable-next-line react-you-might-not-need-an-effect/no-external-store-subscription -- this component also writes the list itself (add/edit/delete) and picks the selected seller from `invoiceData`, which a plain store snapshot would not cover
+    loadSavedSellers();
 
-      // oxlint-disable-next-line react/set-state-in-effect react-you-might-not-need-an-effect/no-adjust-state-on-prop-change -- localStorage is an external system: the saved sellers cannot be derived during render, they have to be read after mount
-      setSellersSelectOptions(validSellers);
-      setSelectedSellerId(selectedSeller?.id ?? "");
-    } catch (error) {
-      console.error("Failed to load sellers:", error);
+    window.addEventListener(SAVED_CONTACTS_IMPORTED_EVENT, loadSavedSellers);
 
-      Sentry.captureException(error);
-    }
+    return () => {
+      window.removeEventListener(
+        SAVED_CONTACTS_IMPORTED_EVENT,
+        loadSavedSellers,
+      );
+    };
   }, [invoiceData?.seller?.id, setSelectedSellerId]);
 
   // Update sellers when a new one is added
@@ -453,71 +470,77 @@ export function SellerManagement({
           </div>
         ) : null}
 
-        <CustomTooltip
-          side="bottom"
-          className={cn(!isLocalStorageAvailable && "bg-red-50")}
-          trigger={
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => {
-                if (isLocalStorageAvailable) {
-                  // dismiss any existing toast for better UX
-                  toast.dismiss();
+        <div className="flex gap-2">
+          <CustomTooltip
+            side="bottom"
+            className={cn(!isLocalStorageAvailable && "bg-red-50")}
+            trigger={
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => {
+                  if (isLocalStorageAvailable) {
+                    // dismiss any existing toast for better UX
+                    toast.dismiss();
 
-                  // open seller dialog
-                  setIsSellerDialogOpen(true);
-                } else {
-                  toast.error("Unable to add seller", {
-                    id: "unable-to-add-seller-error-toast",
-                    closeButton: true,
-                    description: (
-                      <>
-                        <p className="text-pretty text-xs leading-relaxed text-red-700">
-                          Local storage is not available in your browser. Please
-                          enable it or try another browser.
-                        </p>
-                      </>
-                    ),
-                    position: isMobile ? "top-center" : "bottom-right",
-                  });
-                }
-              }}
-              aria-disabled={!isLocalStorageAvailable} // better UX than 'disabled'
-            >
-              New Seller
-              <Plus className="ml-1 size-3" />
-            </Button>
-          }
-          content={
-            isLocalStorageAvailable ? (
-              <div className="flex items-center gap-3 p-2">
-                <div className="space-y-1">
-                  <p className="text-sm font-semibold text-slate-900">
-                    Save Sellers for Quick Access
-                  </p>
-                  <p className="text-pretty text-xs leading-relaxed text-slate-700">
-                    Store multiple sellers to easily reuse their information in
-                    future invoices. All data is saved locally in your browser.
-                  </p>
+                    // open seller dialog
+                    setIsSellerDialogOpen(true);
+                  } else {
+                    toast.error("Unable to add seller", {
+                      id: "unable-to-add-seller-error-toast",
+                      closeButton: true,
+                      description: (
+                        <>
+                          <p className="text-pretty text-xs leading-relaxed text-red-700">
+                            Local storage is not available in your browser.
+                            Please enable it or try another browser.
+                          </p>
+                        </>
+                      ),
+                      position: isMobile ? "top-center" : "bottom-right",
+                    });
+                  }
+                }}
+                aria-disabled={!isLocalStorageAvailable} // better UX than 'disabled'
+                className="flex-1"
+              >
+                New Seller
+                <Plus className="ml-1 size-3" />
+              </Button>
+            }
+            content={
+              isLocalStorageAvailable ? (
+                <div className="flex items-center gap-3 p-2">
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-slate-900">
+                      Save Sellers for Quick Access
+                    </p>
+                    <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                      Store multiple sellers to easily reuse their information
+                      in future invoices. All data is saved locally in your
+                      browser.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3 bg-red-50 p-3">
-                <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
-                <div className="space-y-1">
-                  <p className="text-sm font-semibold text-red-800">
-                    Storage Not Available
-                  </p>
-                  <p className="text-pretty text-xs leading-relaxed text-red-700">
-                    Local storage is not available in your browser. Please
-                    enable it or try another browser to save seller information.
-                  </p>
+              ) : (
+                <div className="flex items-center gap-3 bg-red-50 p-3">
+                  <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-red-800">
+                      Storage Not Available
+                    </p>
+                    <p className="text-pretty text-xs leading-relaxed text-red-700">
+                      Local storage is not available in your browser. Please
+                      enable it or try another browser to save seller
+                      information.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )
-          }
-        />
+              )
+            }
+          />
+          <ContactsBackupMenu isMobile={isMobile} />
+        </div>
       </div>
 
       <SellerDialog

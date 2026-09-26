@@ -5,6 +5,10 @@ import type { UseFormSetValue } from "react-hook-form";
 import { toast } from "sonner";
 
 import {
+  ContactsBackupMenu,
+  SAVED_CONTACTS_IMPORTED_EVENT,
+} from "@/app/(main)/(app)/components/invoice-form/sections/components/contacts-backup-menu";
+import {
   getAppStorageItem,
   setAppStorageItem,
 } from "@/app/(main)/(app)/utils/app-local-storage";
@@ -89,63 +93,78 @@ export function BuyerManagement({
 
   const isEditMode = Boolean(editingBuyer);
 
-  // Load buyers from localStorage on component mount
+  // Load buyers from localStorage on mount, and again after a backup import
   useEffect(() => {
-    try {
-      const savedBuyers = getAppStorageItem(BUYERS_LOCAL_STORAGE_KEY);
-      const parsedBuyers: unknown = savedBuyers ? JSON.parse(savedBuyers) : [];
+    const loadSavedBuyers = () => {
+      try {
+        const savedBuyers = getAppStorageItem(BUYERS_LOCAL_STORAGE_KEY);
+        const parsedBuyers: unknown = savedBuyers
+          ? JSON.parse(savedBuyers)
+          : [];
 
-      const rawBuyers = Array.isArray(parsedBuyers) ? parsedBuyers : [];
+        const rawBuyers = Array.isArray(parsedBuyers) ? parsedBuyers : [];
 
-      const validBuyers: BuyerData[] = [];
-      const invalidBuyers: BuyerData[] = [];
+        const validBuyers: BuyerData[] = [];
+        const invalidBuyers: BuyerData[] = [];
 
-      // Validate each buyer individually — drop only invalid items
-      for (const item of rawBuyers) {
-        const result = buyerSchema.safeParse(item);
-        if (result.success) {
-          validBuyers.push(result.data);
-        } else {
-          invalidBuyers.push(item as BuyerData);
+        // Validate each buyer individually — drop only invalid items
+        for (const item of rawBuyers) {
+          const result = buyerSchema.safeParse(item);
+          if (result.success) {
+            validBuyers.push(result.data);
+          } else {
+            invalidBuyers.push(item as BuyerData);
 
-          console.error(
-            "[buyer-management] Invalid buyer entry:",
-            result.error,
-          );
+            console.error(
+              "[buyer-management] Invalid buyer entry:",
+              result.error,
+            );
+          }
         }
-      }
 
-      // If we have invalid buyers, drop them and save the valid buyers back to localStorage
-      if (invalidBuyers.length > 0) {
-        console.error(
-          `[buyer-management] Dropped ${invalidBuyers.length} invalid buyer entries:`,
-          invalidBuyers,
-        );
+        // If we have invalid buyers, drop them and save the valid buyers back to localStorage
+        if (invalidBuyers.length > 0) {
+          console.error(
+            `[buyer-management] Dropped ${invalidBuyers.length} invalid buyer entries:`,
+            invalidBuyers,
+          );
 
-        Sentry.captureException(
-          new Error(
-            `[buyer-management] Invalid buyer data in localStorage: ${rawBuyers.length - validBuyers.length} items dropped`,
-          ),
-        );
+          Sentry.captureException(
+            new Error(
+              `[buyer-management] Invalid buyer data in localStorage: ${rawBuyers.length - validBuyers.length} items dropped`,
+            ),
+          );
 
-        setAppStorageItem({
-          key: BUYERS_LOCAL_STORAGE_KEY,
-          value: JSON.stringify(validBuyers),
+          setAppStorageItem({
+            key: BUYERS_LOCAL_STORAGE_KEY,
+            value: JSON.stringify(validBuyers),
+          });
+        }
+
+        const selectedBuyer = validBuyers.find((buyer: BuyerData) => {
+          return buyer?.id === invoiceData?.buyer?.id;
         });
+
+        setBuyersSelectOptions(validBuyers);
+        setSelectedBuyerId(selectedBuyer?.id ?? "");
+      } catch (error) {
+        console.error("Failed to load buyers:", error);
+
+        Sentry.captureException(error);
       }
+    };
 
-      const selectedBuyer = validBuyers.find((buyer: BuyerData) => {
-        return buyer?.id === invoiceData?.buyer?.id;
-      });
+    // oxlint-disable-next-line react-you-might-not-need-an-effect/no-external-store-subscription -- this component also writes the list itself (add/edit/delete) and picks the selected buyer from `invoiceData`, which a plain store snapshot would not cover
+    loadSavedBuyers();
 
-      // oxlint-disable-next-line react/set-state-in-effect react-you-might-not-need-an-effect/no-adjust-state-on-prop-change -- localStorage is an external system: the saved buyers cannot be derived during render, they have to be read after mount
-      setBuyersSelectOptions(validBuyers);
-      setSelectedBuyerId(selectedBuyer?.id ?? "");
-    } catch (error) {
-      console.error("Failed to load buyers:", error);
+    window.addEventListener(SAVED_CONTACTS_IMPORTED_EVENT, loadSavedBuyers);
 
-      Sentry.captureException(error);
-    }
+    return () => {
+      window.removeEventListener(
+        SAVED_CONTACTS_IMPORTED_EVENT,
+        loadSavedBuyers,
+      );
+    };
   }, [invoiceData?.buyer?.id, setSelectedBuyerId]);
 
   // Update buyers when a new one is added
@@ -444,70 +463,76 @@ export function BuyerManagement({
           </div>
         ) : null}
 
-        <CustomTooltip
-          side="bottom"
-          className={cn(!isLocalStorageAvailable && "bg-red-50")}
-          trigger={
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => {
-                if (isLocalStorageAvailable) {
-                  // dismiss any existing toast for better UX
-                  toast.dismiss();
+        <div className="flex gap-2">
+          <CustomTooltip
+            side="bottom"
+            className={cn(!isLocalStorageAvailable && "bg-red-50")}
+            trigger={
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => {
+                  if (isLocalStorageAvailable) {
+                    // dismiss any existing toast for better UX
+                    toast.dismiss();
 
-                  // open buyer dialog
-                  setIsBuyerDialogOpen(true);
-                } else {
-                  toast.error("Unable to add buyer", {
-                    id: "unable-to-add-buyer-error-toast",
-                    description: (
-                      <>
-                        <p className="text-pretty text-xs leading-relaxed text-red-700">
-                          Local storage is not available in your browser. Please
-                          enable it or try another browser.
-                        </p>
-                      </>
-                    ),
-                    position: isMobile ? "top-center" : "bottom-right",
-                  });
-                }
-              }}
-              aria-disabled={!isLocalStorageAvailable} // better UX than 'disabled'
-            >
-              New Buyer
-              <Plus className="ml-1 size-3" />
-            </Button>
-          }
-          content={
-            isLocalStorageAvailable ? (
-              <div className="flex items-center gap-3 p-2">
-                <div className="space-y-1">
-                  <p className="text-sm font-semibold text-slate-900">
-                    Save Buyers for Quick Access
-                  </p>
-                  <p className="text-pretty text-xs leading-relaxed text-slate-700">
-                    Store multiple buyers to easily reuse their information in
-                    future invoices. All data is saved locally in your browser.
-                  </p>
+                    // open buyer dialog
+                    setIsBuyerDialogOpen(true);
+                  } else {
+                    toast.error("Unable to add buyer", {
+                      id: "unable-to-add-buyer-error-toast",
+                      description: (
+                        <>
+                          <p className="text-pretty text-xs leading-relaxed text-red-700">
+                            Local storage is not available in your browser.
+                            Please enable it or try another browser.
+                          </p>
+                        </>
+                      ),
+                      position: isMobile ? "top-center" : "bottom-right",
+                    });
+                  }
+                }}
+                aria-disabled={!isLocalStorageAvailable} // better UX than 'disabled'
+                className="flex-1"
+              >
+                New Buyer
+                <Plus className="ml-1 size-3" />
+              </Button>
+            }
+            content={
+              isLocalStorageAvailable ? (
+                <div className="flex items-center gap-3 p-2">
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-slate-900">
+                      Save Buyers for Quick Access
+                    </p>
+                    <p className="text-pretty text-xs leading-relaxed text-slate-700">
+                      Store multiple buyers to easily reuse their information in
+                      future invoices. All data is saved locally in your
+                      browser.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3 bg-red-50 p-3">
-                <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
-                <div className="space-y-1">
-                  <p className="text-sm font-semibold text-red-800">
-                    Storage Not Available
-                  </p>
-                  <p className="text-pretty text-xs leading-relaxed text-red-700">
-                    Local storage is not available in your browser. Please
-                    enable it or try another browser to save buyer information.
-                  </p>
+              ) : (
+                <div className="flex items-center gap-3 bg-red-50 p-3">
+                  <AlertCircleIcon className="h-5 w-5 flex-shrink-0 fill-red-600 text-white" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-red-800">
+                      Storage Not Available
+                    </p>
+                    <p className="text-pretty text-xs leading-relaxed text-red-700">
+                      Local storage is not available in your browser. Please
+                      enable it or try another browser to save buyer
+                      information.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )
-          }
-        />
+              )
+            }
+          />
+          <ContactsBackupMenu isMobile={isMobile} />
+        </div>
       </div>
 
       <BuyerDialog
