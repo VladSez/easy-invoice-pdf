@@ -1,31 +1,13 @@
-import * as Sentry from "@sentry/nextjs";
 import { Plus, Trash2, Pencil, AlertCircleIcon } from "lucide-react";
-import {
-  useId,
-  useState,
-  useEffect,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { useId, useState, type Dispatch, type SetStateAction } from "react";
 import type { UseFormSetValue } from "react-hook-form";
 import { toast } from "sonner";
 
-import {
-  ContactsBackupMenu,
-  SAVED_CONTACTS_IMPORTED_EVENT,
-} from "@/app/(main)/(app)/components/invoice-form/sections/components/contacts-backup-menu";
+import { ContactsBackupMenu } from "@/app/(main)/(app)/components/invoice-form/sections/components/contacts-backup-menu";
 import { SellerDialog } from "@/app/(main)/(app)/components/invoice-form/sections/components/seller/seller-dialog";
-import {
-  getAppStorageItem,
-  setAppStorageItem,
-} from "@/app/(main)/(app)/utils/app-local-storage";
-import { DEFAULT_SELLER_DATA } from "@/app/constants";
-import {
-  SELLERS_LOCAL_STORAGE_KEY,
-  sellerSchema,
-  type InvoiceData,
-  type SellerData,
-} from "@/app/schema";
+import { usePartyActions } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-party-actions";
+import { useSavedParties } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-saved-parties";
+import { type InvoiceData, type SellerData } from "@/app/schema";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,7 +22,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { SelectNative } from "@/components/ui/select-native";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { useIsLocalStorageAvailable } from "@/lib/use-is-local-storage-available";
 import { cn } from "@/lib/utils";
 
@@ -84,12 +65,7 @@ export function SellerManagement({
   const [isSellerDialogOpen, setIsSellerDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // State to store the list of saved sellers for the dropdown selection.
-  const [sellersSelectOptions, setSellersSelectOptions] = useState<
-    SellerData[]
-  >([]);
-
-  // State to track the seller currently being edited (null if not editing).
+  // The saved seller being edited in the dialog; `null` while adding a new one
   const [editingSeller, setEditingSeller] = useState<SellerData | null>(null);
 
   const sellerSelectId = useId();
@@ -98,290 +74,30 @@ export function SellerManagement({
 
   const isEditMode = Boolean(editingSeller);
 
-  // Load sellers from localStorage on mount, and again after a backup import
-  useEffect(() => {
-    const loadSavedSellers = () => {
-      try {
-        const savedSellers = getAppStorageItem(SELLERS_LOCAL_STORAGE_KEY);
-        const parsedSellers: unknown = savedSellers
-          ? JSON.parse(savedSellers)
-          : [];
+  const { savedParties: savedSellers, saveParties } = useSavedParties({
+    party: "seller",
+    invoicePartyId: invoiceData?.seller?.id,
+    setSelectedId: setSelectedSellerId,
+  });
 
-        const rawSellers = Array.isArray(parsedSellers) ? parsedSellers : [];
+  const { addParty, editParty, deleteSelectedParty, selectParty } =
+    usePartyActions({
+      party: "seller",
+      savedParties: savedSellers,
+      saveParties,
+      selectedId: selectedSellerId,
+      setSelectedId: setSelectedSellerId,
+      applyToInvoice: (seller) => {
+        setValue("seller", seller);
+      },
+      isMobile,
+    });
 
-        const validSellers: SellerData[] = [];
-        const invalidSellers: SellerData[] = [];
-
-        // Validate each seller individually — drop only invalid items
-        for (const item of rawSellers) {
-          const result = sellerSchema.safeParse(item);
-          if (result.success) {
-            validSellers.push(result.data);
-          } else {
-            invalidSellers.push(item as SellerData);
-
-            console.error(
-              "[seller-management] Invalid seller entry:",
-              result.error,
-            );
-          }
-        }
-
-        // If we have invalid sellers, drop them and save the valid sellers back to localStorage
-        if (invalidSellers.length > 0) {
-          console.error(
-            `[seller-management] Dropped ${invalidSellers.length} invalid seller entries:`,
-            invalidSellers,
-          );
-
-          Sentry.captureException(
-            new Error(
-              `[seller-management] Invalid seller data in localStorage: ${rawSellers.length - validSellers.length} items dropped`,
-            ),
-          );
-
-          setAppStorageItem({
-            key: SELLERS_LOCAL_STORAGE_KEY,
-            value: JSON.stringify(validSellers),
-          });
-        }
-
-        const selectedSeller = validSellers.find((seller: SellerData) => {
-          return seller?.id === invoiceData?.seller?.id;
-        });
-
-        setSellersSelectOptions(validSellers);
-        setSelectedSellerId(selectedSeller?.id ?? "");
-      } catch (error) {
-        console.error("Failed to load sellers:", error);
-
-        Sentry.captureException(error);
-      }
-    };
-
-    // oxlint-disable-next-line react-you-might-not-need-an-effect/no-external-store-subscription -- this component also writes the list itself (add/edit/delete) and picks the selected seller from `invoiceData`, which a plain store snapshot would not cover
-    loadSavedSellers();
-
-    window.addEventListener(SAVED_CONTACTS_IMPORTED_EVENT, loadSavedSellers);
-
-    return () => {
-      window.removeEventListener(
-        SAVED_CONTACTS_IMPORTED_EVENT,
-        loadSavedSellers,
-      );
-    };
-  }, [invoiceData?.seller?.id, setSelectedSellerId]);
-
-  // Update sellers when a new one is added
-  const handleSellerAdd = (
-    newSeller: SellerData,
-    {
-      shouldApplyNewSellerToInvoice,
-    }: { shouldApplyNewSellerToInvoice: boolean },
-  ) => {
-    try {
-      const newSellerWithId = {
-        ...newSeller,
-        // Generate a unique ID for the new seller (IMPORTANT!) =)
-        id: Date.now().toString(),
-      } satisfies SellerData;
-
-      const newSellers = [...sellersSelectOptions, newSellerWithId];
-
-      // Save to localStorage
-      const persisted = setAppStorageItem({
-        key: SELLERS_LOCAL_STORAGE_KEY,
-        value: JSON.stringify(newSellers),
-      });
-
-      // Nothing to show the user later if the list could not be saved, so stop here
-      // rather than reporting a success the next page load would contradict.
-      if (!persisted) {
-        showSellerStorageErrorToast({
-          message: "Failed to add seller",
-          id: "add_seller_error_toast",
-          isMobile,
-        });
-
-        return;
-      }
-
-      // Update the sellers state
-      setSellersSelectOptions(newSellers);
-
-      // Apply the new seller to the invoice if the user wants to, otherwise just add it to the list and use it later if needed
-      if (shouldApplyNewSellerToInvoice) {
-        setValue("seller", newSellerWithId);
-        setSelectedSellerId(newSellerWithId?.id);
-      }
-
-      toast.success(
-        shouldApplyNewSellerToInvoice
-          ? "Seller added and applied to invoice"
-          : "Seller added successfully",
-        {
-          id: "add_seller_success_toast",
-          richColors: true,
-          position: isMobile ? "top-center" : "bottom-right",
-        },
-      );
-
-      // analytics track event
-      umamiTrackEvent("add_seller_success");
-    } catch (error) {
-      console.error("Failed to add seller:", error);
-
-      toast.error("Failed to add seller", {
-        id: "add_seller_error_toast",
-        description: "Please try again",
-        closeButton: true,
-        position: isMobile ? "top-center" : "bottom-right",
-      });
-
-      Sentry.captureException(error);
-    }
-  };
-
-  // Update sellers when edited
-  const handleSellerEdit = (editedSeller: SellerData) => {
-    try {
-      const updatedSellers = sellersSelectOptions.map((seller) => {
-        return seller.id === editedSeller.id ? editedSeller : seller;
-      });
-
-      const persisted = setAppStorageItem({
-        key: SELLERS_LOCAL_STORAGE_KEY,
-        value: JSON.stringify(updatedSellers),
-      });
-
-      if (!persisted) {
-        showSellerStorageErrorToast({
-          message: "Failed to edit seller",
-          id: "edit_seller_error_toast",
-          isMobile,
-        });
-
-        return;
-      }
-
-      setSellersSelectOptions(updatedSellers);
-      setValue("seller", editedSeller);
-
-      // end edit mode
-      setEditingSeller(null);
-
-      toast.success("Seller updated successfully", {
-        id: "edit_seller_success_toast",
-        richColors: true,
-        position: isMobile ? "top-center" : "bottom-right",
-      });
-
-      // analytics track event
-      umamiTrackEvent("edit_seller_success");
-    } catch (error) {
-      console.error("Failed to edit seller:", error);
-
-      toast.error("Failed to edit seller", {
-        id: "edit_seller_error_toast",
-        description: "Please try again",
-        closeButton: true,
-        position: isMobile ? "top-center" : "bottom-right",
-      });
-
-      Sentry.captureException(error);
-    }
-  };
-
-  const handleSellerChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const id = event.target.value;
-
-    if (id) {
-      setSelectedSellerId(id);
-      const selectedSeller = sellersSelectOptions.find((seller) => {
-        return seller.id === id;
-      });
-
-      if (selectedSeller) {
-        setValue("seller", selectedSeller);
-        toast.success(`Seller "${selectedSeller.name}" applied to invoice`, {
-          id: "change_seller_success_toast",
-          richColors: true,
-          position: isMobile ? "top-center" : "bottom-right",
-        });
-      }
-    } else {
-      // Clear the seller from the form if the user selects the empty option
-      setSelectedSellerId("");
-      setValue("seller", DEFAULT_SELLER_DATA);
-
-      toast.success("Seller restored to default", {
-        id: "reset_seller_success_toast",
-        richColors: true,
-        position: isMobile ? "top-center" : "bottom-right",
-      });
-    }
-
-    // analytics track event
-    umamiTrackEvent("change_seller");
-  };
-
-  const handleDeleteSeller = () => {
-    try {
-      const updatedSellers = sellersSelectOptions.filter((seller) => {
-        return seller.id !== selectedSellerId;
-      });
-
-      const persisted = setAppStorageItem({
-        key: SELLERS_LOCAL_STORAGE_KEY,
-        value: JSON.stringify(updatedSellers),
-      });
-
-      if (!persisted) {
-        showSellerStorageErrorToast({
-          message: "Failed to delete seller",
-          id: "delete_seller_error_toast",
-          isMobile,
-        });
-
-        return;
-      }
-
-      setSellersSelectOptions(updatedSellers);
-      // Clear the selected seller index
-      setSelectedSellerId("");
-      // Clear the seller from the form if it was selected
-      setValue("seller", DEFAULT_SELLER_DATA);
-
-      // Close the delete dialog
-      setIsDeleteDialogOpen(false);
-
-      toast.success("Seller deleted successfully", {
-        id: "delete_seller_success_toast",
-        richColors: true,
-        position: isMobile ? "top-center" : "bottom-right",
-      });
-
-      // analytics track event
-      umamiTrackEvent("delete_seller_success");
-    } catch (error) {
-      console.error("Failed to delete seller:", error);
-
-      toast.error("Failed to delete seller", {
-        id: "delete_seller_error_toast",
-        description: "Please try again",
-        closeButton: true,
-        position: isMobile ? "top-center" : "bottom-right",
-      });
-
-      Sentry.captureException(error);
-    }
-  };
-
-  const activeSeller = sellersSelectOptions.find((seller) => {
+  const activeSeller = savedSellers.find((seller) => {
     return seller.id === selectedSellerId;
   });
 
-  const hasSellers = sellersSelectOptions.length > 0;
+  const hasSellers = savedSellers.length > 0;
 
   return (
     <>
@@ -407,12 +123,14 @@ export function SellerManagement({
                   "block h-8 w-full text-[12px]",
                   !selectedSellerId && "italic text-gray-700",
                 )}
-                onChange={handleSellerChange}
+                onChange={(event) => {
+                  selectParty(event.target.value);
+                }}
                 value={selectedSellerId}
                 title={activeSeller?.name}
               >
                 <option value="">No seller selected (default)</option>
-                {sellersSelectOptions.map((seller) => {
+                {savedSellers.map((seller) => {
                   return (
                     <option key={seller.id} value={seller.id}>
                       {seller.name}
@@ -551,8 +269,18 @@ export function SellerManagement({
           setIsSellerDialogOpen(false);
           setEditingSeller(null);
         }}
-        handleSellerAdd={handleSellerAdd}
-        handleSellerEdit={handleSellerEdit}
+        handleSellerAdd={(newSeller, { shouldApplyNewSellerToInvoice }) => {
+          addParty({
+            partyData: newSeller,
+            shouldApplyToInvoice: shouldApplyNewSellerToInvoice,
+          });
+        }}
+        handleSellerEdit={(editedSeller) => {
+          if (editParty(editedSeller)) {
+            // end edit mode
+            setEditingSeller(null);
+          }
+        }}
         initialData={editingSeller}
         isEditMode={isEditMode}
         formValues={formValues}
@@ -577,7 +305,11 @@ export function SellerManagement({
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDeleteSeller}
+              onClick={() => {
+                if (deleteSelectedParty()) {
+                  setIsDeleteDialogOpen(false);
+                }
+              }}
               className="bg-red-500 text-red-50 hover:bg-red-500/90"
             >
               Delete
@@ -587,32 +319,4 @@ export function SellerManagement({
       </AlertDialog>
     </>
   );
-}
-
-interface ShowSellerStorageErrorToastOptions {
-  /** What the user was trying to do, e.g. "Failed to add seller". */
-  message: string;
-  /** Stable toast id, so repeated failures replace each other instead of stacking. */
-  id: string;
-  /** Mobile shows toasts at the top, desktop at the bottom right. */
-  isMobile: boolean;
-}
-
-/**
- * Tells the user their seller list could not be saved.
- *
- * A rejected write is not an application error — it is a full or disabled store — so it
- * is surfaced to the user and deliberately not reported to Sentry.
- */
-function showSellerStorageErrorToast({
-  message,
-  id,
-  isMobile,
-}: ShowSellerStorageErrorToastOptions) {
-  toast.error(message, {
-    id,
-    description: "Please try again",
-    closeButton: true,
-    position: isMobile ? "top-center" : "bottom-right",
-  });
 }
