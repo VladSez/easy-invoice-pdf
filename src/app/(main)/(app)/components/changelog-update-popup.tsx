@@ -27,10 +27,9 @@ interface ChangelogUpdatePopupProps {
   releaseSlug?: string;
   /**
    * Where the popup sits. `floating` is the desktop card in the bottom-right corner, with
-   * the mascot. `dock` is the compact mobile notice rendered inside the bottom dock, above
-   * the Edit/Preview tabs: no mascot and no fixed positioning, so it can never cover the
-   * dock's own buttons, and it takes the phone's full width instead of a sliver beside a
-   * 200px illustration.
+   * the mascot. `dock` is the compact mobile card, rendered inside the bottom dock and
+   * floated just above it: out of the flow, so the dock doesn't grow (and the page doesn't
+   * shift) when it appears 1.5s after load, and it never covers the dock's own buttons.
    */
   layout?: "floating" | "dock";
 }
@@ -279,9 +278,10 @@ interface DockNoticeProps {
 }
 
 /**
- * The popup as a compact notice for the mobile dock: one sentence with its action at the
- * end, and a close button. There is no "Continue" button here -- on a phone it would only
- * repeat the close button and cost the dock a whole row.
+ * The popup as a compact card floating just above the mobile dock: one sentence with its
+ * action at the end, and a close button. It must render inside the (sticky) dock, which it
+ * is positioned against. There is no "Continue" button here -- on a phone it would only
+ * repeat the close button and cover more of the form.
  */
 function DockNotice({
   variant,
@@ -303,7 +303,7 @@ function DockNotice({
       data-testid="changelog-update-popup"
       data-layout="dock"
       className={cn(
-        "relative w-full rounded-md bg-slate-50 py-2.5 pl-3 pr-10 ring-1 ring-slate-200",
+        "absolute inset-x-0 bottom-full mb-2 rounded-lg bg-white py-2.5 pl-3 pr-10 shadow-[0_4px_16px_rgba(0,0,0,0.12)] ring-1 ring-slate-200",
         "duration-300 ease-out animate-in fade-in slide-in-from-bottom-2 motion-reduce:animate-none",
       )}
     >

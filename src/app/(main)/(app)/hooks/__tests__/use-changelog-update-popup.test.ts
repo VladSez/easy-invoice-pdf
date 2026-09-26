@@ -41,12 +41,14 @@ function renderChangelogPopupHook(
   overrides: Partial<{
     latestChangelog: ChangelogSummary | null;
     isViewingSharedInvoice: boolean;
+    canShowChangelog: boolean;
   }> = {},
 ) {
   return renderHook(() => {
     return useChangelogUpdatePopup({
       latestChangelog: null,
       isViewingSharedInvoice: false,
+      canShowChangelog: true,
       ...overrides,
     });
   });
@@ -85,6 +87,7 @@ describe("useChangelogUpdatePopup", () => {
         return useChangelogUpdatePopup({
           latestChangelog: latest,
           isViewingSharedInvoice: false,
+          canShowChangelog: true,
         });
       },
       { initialProps: { latest: null as ChangelogSummary | null } },
@@ -118,6 +121,7 @@ describe("useChangelogUpdatePopup", () => {
         return useChangelogUpdatePopup({
           latestChangelog: latest,
           isViewingSharedInvoice: false,
+          canShowChangelog: true,
         });
       },
       { initialProps: { latest: null as ChangelogSummary | null } },
@@ -182,6 +186,7 @@ describe("useChangelogUpdatePopup", () => {
         return useChangelogUpdatePopup({
           latestChangelog: latest,
           isViewingSharedInvoice: false,
+          canShowChangelog: true,
         });
       },
       { initialProps: { latest: previousChangelog } },
@@ -233,6 +238,38 @@ describe("useChangelogUpdatePopup", () => {
     expect(result.current.variant).toBeNull();
   });
 
+  it("should not show changelog popup when it is disabled (mobile)", () => {
+    vi.mocked(hasSeenWelcomePopup).mockReturnValue(true);
+
+    const { result } = renderChangelogPopupHook({
+      latestChangelog,
+      canShowChangelog: false,
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+
+    expect(result.current.isOpen).toBe(false);
+    expect(result.current.variant).toBeNull();
+    // left unseen, so the next desktop visit still shows it
+    expect(markChangelogAsSeen).not.toHaveBeenCalled();
+  });
+
+  it("should still show welcome popup when changelog is disabled (mobile)", () => {
+    const { result } = renderChangelogPopupHook({
+      latestChangelog,
+      canShowChangelog: false,
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.variant).toBe("welcome");
+  });
+
   it("should not show popup when viewing a shared invoice", () => {
     const { result } = renderChangelogPopupHook({
       isViewingSharedInvoice: true,
@@ -261,5 +298,22 @@ describe("useChangelogUpdatePopup", () => {
     });
 
     expect(result.current.isOpen).toBe(false);
+  });
+
+  it("should ignore dismiss before the popup is shown", () => {
+    const { result } = renderChangelogPopupHook();
+
+    // e.g. switching the mobile Edit/Preview tabs within the show delay
+    act(() => {
+      result.current.dismiss();
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+
+    expect(markWelcomePopupSeen).toHaveBeenCalledOnce();
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.variant).toBe("welcome");
   });
 });

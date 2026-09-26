@@ -149,6 +149,7 @@ export function AppPageClient({
   } = useChangelogUpdatePopup({
     latestChangelog,
     isViewingSharedInvoice,
+    canShowChangelog: !isMobile,
   });
 
   const [isHowItWorksDialogOpen, setIsHowItWorksDialogOpen] = useState(false);
@@ -810,6 +811,9 @@ export function AppPageClient({
                 canShareInvoice={canShareInvoice}
                 currentInvoiceFormDataRef={currentInvoiceFormDataRef}
                 mobileDockNotice={isMobile ? changelogPopup : null}
+                // switching tabs means the user found their way around, so the welcome
+                // notice has done its job
+                onMobileTabChange={dismissChangelogPopup}
               />
             </div>
           </div>

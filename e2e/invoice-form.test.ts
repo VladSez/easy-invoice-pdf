@@ -170,7 +170,7 @@ test.describe("Invoice Generator Page", () => {
     await expectYouTubeEmbedToShow({ embed, embedUrl: VIDEO_DEMO_YOUTUBE_URL });
     await expect(embed).toHaveAttribute("title", "EasyInvoicePDF Demo Video");
 
-    await dialog.getByTestId("how-it-works-tab-add-seller").click();
+    await dialog.getByTestId("how-it-works-playlist-item-add-seller").click();
     await expectYouTubeEmbedToShow({
       embed,
       embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,

@@ -1,9 +1,9 @@
 "use client";
 
+import { PlayIcon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { YouTubeEmbed } from "@/components/youtube-embed";
 import {
   DISCORD_COMMUNITY_URL,
@@ -16,6 +16,9 @@ import { cn } from "@/lib/utils";
 type HowItWorksVideoId = (typeof HOW_IT_WORKS_VIDEOS)[number]["id"];
 
 const DEFAULT_VIDEO_ID = HOW_IT_WORKS_VIDEOS[0].id;
+
+/** Rows per column once the playlist splits in two. */
+const PLAYLIST_ROWS = Math.ceil(HOW_IT_WORKS_VIDEOS.length / 2);
 
 const VALID_VIDEO_IDS = new Set(
   HOW_IT_WORKS_VIDEOS.map((video) => {
@@ -41,7 +44,7 @@ interface HowItWorksVideosProps {
 }
 
 /**
- * Tabbed video player for "How it works" tutorials.
+ * Video player for "How it works" tutorials, with the full playlist under it.
  * Shared by the in-app dialog and the dedicated /how-it-works page.
  */
 export function HowItWorksVideos({
@@ -85,10 +88,10 @@ export function HowItWorksVideos({
       return video.id === activeVideoId;
     }) ?? HOW_IT_WORKS_VIDEOS[0];
 
-  function handleTabChange(value: string) {
-    const videoId = value as HowItWorksVideoId;
+  function handleVideoChange(videoId: HowItWorksVideoId) {
     setSelectedVideoId(videoId);
-    umamiTrackEvent(`how-it-works-video-tab-${value}`);
+    // The event keeps its "tab" name so the analytics series stays continuous.
+    umamiTrackEvent(`how-it-works-video-tab-${videoId}`);
     onVideoChange?.(videoId);
   }
 
@@ -116,28 +119,6 @@ export function HowItWorksVideos({
         </p>
       </div>
 
-      <div className="flex justify-center px-4 pb-3 sm:px-6 sm:pb-4">
-        <div className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
-          <Tabs value={activeVideoId} onValueChange={handleTabChange}>
-            <TabsList className="inline-flex h-auto w-max min-w-full justify-center gap-0.5 sm:min-w-0 sm:gap-1">
-              {HOW_IT_WORKS_VIDEOS.map((video) => {
-                return (
-                  <TabsTrigger
-                    key={video.id}
-                    value={video.id}
-                    className="shrink-0 whitespace-nowrap px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm"
-                    data-testid={`how-it-works-tab-${video.id}`}
-                  >
-                    <span className="sm:hidden">{video.tabLabelShort}</span>
-                    <span className="hidden sm:inline">{video.tabLabel}</span>
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
-          </Tabs>
-        </div>
-      </div>
-
       <div className="aspect-video min-h-[300px] w-full shrink-0 overflow-hidden">
         {showIframe ? (
           <YouTubeEmbed
@@ -148,6 +129,64 @@ export function HowItWorksVideos({
           />
         ) : null}
       </div>
+
+      {/* A list rather than tabs: every tutorial keeps its full title and length at any
+          width, and the list grows with the catalog instead of running out of row. From
+          `sm` it splits into two columns that fill top to bottom, so the numbers read
+          down the first column and then the second, as a playlist should. */}
+      <ol
+        className="grid shrink-0 gap-1 border-t border-slate-200 p-2 sm:grid-flow-col sm:grid-cols-2 sm:grid-rows-[repeat(var(--playlist-rows),auto)] sm:p-3"
+        style={{ "--playlist-rows": PLAYLIST_ROWS } as CSSProperties}
+        aria-label="Tutorials"
+        data-testid="how-it-works-playlist"
+      >
+        {HOW_IT_WORKS_VIDEOS.map((video, index) => {
+          const isActive = video.id === activeVideoId;
+
+          return (
+            <li key={video.id}>
+              <button
+                type="button"
+                onClick={() => {
+                  return handleVideoChange(video.id);
+                }}
+                aria-current={isActive ? "true" : undefined}
+                className={cn(
+                  "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
+                  "focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-slate-900",
+                  isActive
+                    ? "bg-slate-200 text-slate-950"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+                )}
+                data-testid={`how-it-works-playlist-item-${video.id}`}
+              >
+                <span
+                  aria-hidden
+                  className="flex w-4 shrink-0 justify-center text-xs font-medium tabular-nums text-slate-400"
+                >
+                  {isActive ? (
+                    <PlayIcon className="size-3 translate-x-px fill-slate-900 stroke-slate-900" />
+                  ) : (
+                    index + 1
+                  )}
+                </span>
+                <span
+                  className={cn(
+                    "min-w-0 flex-1 truncate",
+                    isActive ? "font-medium" : null,
+                  )}
+                >
+                  <span className="sm:hidden">{video.shortTitle}</span>
+                  <span className="hidden sm:inline">{video.title}</span>
+                </span>
+                <span className="shrink-0 text-xs tabular-nums text-slate-500">
+                  {formatDuration(video.durationSeconds)}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
 
       <div className="shrink-0 border-t border-slate-200 px-4 py-3 text-center text-xs leading-relaxed text-slate-600 sm:px-6 sm:py-4 sm:text-left sm:text-sm">
         Questions or feedback? Join our{" "}
@@ -180,4 +219,12 @@ export function HowItWorksVideos({
       </div>
     </div>
   );
+}
+
+/** `79` → `"1:19"`, the way YouTube labels a video's length. */
+function formatDuration(totalSeconds: number) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
