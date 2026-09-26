@@ -153,6 +153,7 @@ export function InvoiceClientPage({
   canShareInvoice,
   currentInvoiceFormDataRef,
   mobileDockNotice,
+  onMobileTabChange,
 }: {
   invoiceDataState: InvoiceData;
   handleInvoiceDataChange: (invoiceData: InvoiceData) => void;
@@ -161,10 +162,12 @@ export function InvoiceClientPage({
   canShareInvoice: boolean;
   currentInvoiceFormDataRef: RefObject<(() => InvoiceData | null) | null>;
   /**
-   * Shown at the top of the mobile dock, above the Edit/Preview tabs -- the welcome and
-   * "What's new" popup on phones. Ignored on desktop, where the popup floats instead.
+   * Rendered inside the mobile dock, which it positions itself against to float just above
+   * it -- the welcome popup on phones. Ignored on desktop, where the popup floats instead.
    */
   mobileDockNotice?: ReactNode;
+  /** Called when the user switches between the Edit/Preview tabs on mobile */
+  onMobileTabChange?: () => void;
 }) {
   const appMetadata = useAppMetadata();
 
@@ -230,6 +233,7 @@ export function InvoiceClientPage({
               flushPendingFormChangesRef.current?.();
 
               setActiveMobileTab(newValue);
+              onMobileTabChange?.();
 
               setOpenedMobileTabs((current) => {
                 return current.includes(newValue)

@@ -20,6 +20,12 @@ export type AppUpdatePopupVariant = "welcome" | "changelog";
 interface UseChangelogUpdatePopupOptions {
   latestChangelog: ChangelogSummary | null;
   isViewingSharedInvoice: boolean;
+  /**
+   * Whether the "What's new" popup may show. Off on mobile, where it costs the dock a row
+   * for news nobody opened a phone to read; the welcome popup is unaffected. A release that
+   * wasn't shown stays unseen, so it still appears on the next desktop visit.
+   */
+  canShowChangelog: boolean;
 }
 
 interface UseChangelogUpdatePopupResult {
@@ -28,14 +34,25 @@ interface UseChangelogUpdatePopupResult {
   variant: AppUpdatePopupVariant | null;
 }
 
-function resolvePopupVariant(
-  latestChangelog: ChangelogSummary | null,
-): AppUpdatePopupVariant | null {
+interface ResolvePopupVariantOptions {
+  latestChangelog: ChangelogSummary | null;
+  /** Whether the "What's new" popup is allowed at all, see `canShowChangelog` on the hook */
+  canShowChangelog: boolean;
+}
+
+function resolvePopupVariant({
+  latestChangelog,
+  canShowChangelog,
+}: ResolvePopupVariantOptions): AppUpdatePopupVariant | null {
   if (!hasSeenWelcomePopup()) {
     return "welcome";
   }
 
-  if (latestChangelog && shouldShowChangelogPopup(latestChangelog.slug)) {
+  if (
+    canShowChangelog &&
+    latestChangelog &&
+    shouldShowChangelogPopup(latestChangelog.slug)
+  ) {
     return "changelog";
   }
 
@@ -46,7 +63,8 @@ function resolvePopupVariant(
  * Hook to manage showing welcome or changelog update popup to user.
  *
  * Shows welcome popup on first visit, then changelog popup when a new
- * changelog version is unseen. Never shows when viewing a shared invoice.
+ * changelog version is unseen (desktop only). Never shows when viewing a shared
+ * invoice.
  *
  * It decides only *whether* a popup shows; where it sits is up to the page --
  * a floating card on desktop, a notice inside the bottom dock on mobile.
@@ -59,6 +77,7 @@ function resolvePopupVariant(
 export function useChangelogUpdatePopup({
   latestChangelog,
   isViewingSharedInvoice,
+  canShowChangelog,
 }: UseChangelogUpdatePopupOptions): UseChangelogUpdatePopupResult {
   /** The popup the timer below decided to show, if any */
   const [shownVariant, setShownVariant] =
@@ -68,6 +87,12 @@ export function useChangelogUpdatePopup({
   const hasShownPopupRef = useRef(false);
 
   const dismiss = useCallback(() => {
+    // Nothing to dismiss before the timer shows a popup. Latching `isDismissed` early would
+    // hide the popup the timer then marks as seen, so the user would never get to see it
+    if (!hasShownPopupRef.current) {
+      return;
+    }
+
     setIsDismissed(true);
   }, []);
 
@@ -87,7 +112,10 @@ export function useChangelogUpdatePopup({
     // show is decided when the timer fires, so the decision reflects what the user
     // has seen by then.
     const timer = window.setTimeout(() => {
-      const nextVariant = resolvePopupVariant(latestChangelog);
+      const nextVariant = resolvePopupVariant({
+        latestChangelog,
+        canShowChangelog,
+      });
 
       // Mark as seen on show, not on dismiss: the user got their one look at it
       // even if they navigate away without touching it
@@ -108,7 +136,7 @@ export function useChangelogUpdatePopup({
     return () => {
       window.clearTimeout(timer);
     };
-  }, [isViewingSharedInvoice, latestChangelog]);
+  }, [canShowChangelog, isViewingSharedInvoice, latestChangelog]);
 
   return {
     isOpen: shownVariant !== null && !isDismissed,
