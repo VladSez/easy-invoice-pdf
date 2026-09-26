@@ -25,6 +25,7 @@ export function buildHowItWorksJsonLd(baseUrl = PROD_WEBSITE_URL): Graph {
         name: video.title,
         description: video.description,
         uploadDate: video.uploadDate,
+        duration: toIsoDuration(video.durationSeconds),
         thumbnailUrl: video.thumbnailUrl,
         // `embedUrl` alone: `contentUrl` is for the video file's own bytes, which
         // YouTube never hands out, and the watch page is what it must not be
@@ -68,4 +69,12 @@ export function buildHowItWorksJsonLd(baseUrl = PROD_WEBSITE_URL): Graph {
       ]),
     ],
   };
+}
+
+/** `79` → `"PT1M19S"`, the ISO 8601 form schema.org's `duration` takes. */
+function toIsoDuration(totalSeconds: number) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  return minutes > 0 ? `PT${minutes}M${seconds}S` : `PT${seconds}S`;
 }

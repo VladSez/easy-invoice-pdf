@@ -66,86 +66,88 @@ const YOUTUBE_VIDEO_MOBILE_DEMO = "https://www.youtube.com/embed/TKOegsmNnKM";
 export const HOW_IT_WORKS_VIDEOS = [
   {
     id: "overview",
-    tabLabel: "Overview",
-    tabLabelShort: "Overview",
     title: "How EasyInvoicePDF Works",
+    shortTitle: "Overview",
     description: "Learn how to create and customize your invoices.",
     embedUrl: VIDEO_DEMO_YOUTUBE_URL,
     watchUrl: "https://www.youtube.com/watch?v=iAROeCIcZ40",
     uploadDate: "2026-04-16T15:49:53-07:00",
+    durationSeconds: 70,
     thumbnailUrl: "https://i.ytimg.com/vi/iAROeCIcZ40/maxresdefault.jpg",
     iframeTitle: "EasyInvoicePDF Demo Video",
   },
   {
     id: "add-seller",
-    tabLabel: "Add seller",
-    tabLabelShort: "Seller",
     title: "How to add a seller",
+    shortTitle: "Add a seller",
     description: "Save seller details and reuse them on future invoices.",
     embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
     watchUrl: "https://www.youtube.com/watch?v=xfSF35c0vfU",
     uploadDate: "2026-06-13T13:06:34-07:00",
+    durationSeconds: 42,
     thumbnailUrl: "https://i.ytimg.com/vi/xfSF35c0vfU/maxresdefault.jpg",
     iframeTitle: "How to add a seller - EasyInvoicePDF",
   },
   {
     id: "add-buyer",
-    tabLabel: "Add buyer",
-    tabLabelShort: "Buyer",
     title: "How to add a buyer",
+    shortTitle: "Add a buyer",
     description: "Save buyer details and reuse them on future invoices.",
     embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_BUYER,
     watchUrl: "https://www.youtube.com/watch?v=XxAY0YGgXIk",
     uploadDate: "2026-06-13T13:17:28-07:00",
+    durationSeconds: 45,
     thumbnailUrl: "https://i.ytimg.com/vi/XxAY0YGgXIk/maxresdefault.jpg",
     iframeTitle: "How to add a buyer - EasyInvoicePDF",
   },
   {
     id: "weekly-invoices",
-    tabLabel: "Weekly invoices",
-    tabLabelShort: "Weekly",
     title: "How to create invoices for one week",
+    shortTitle: "Weekly invoices",
     description: "Learn how to generate invoices for a week of work.",
     embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_INVOICE_FOR_ONE_WEEK,
     watchUrl: "https://www.youtube.com/watch?v=6KzDBBiAJmg",
     uploadDate: "2026-06-13T13:23:38-07:00",
+    durationSeconds: 35,
     thumbnailUrl: "https://i.ytimg.com/vi/6KzDBBiAJmg/maxresdefault.jpg",
     iframeTitle: "How to create weekly invoices - EasyInvoicePDF",
   },
   {
     id: "custom-tax",
-    tabLabel: "Customizable tax",
-    tabLabelShort: "Tax",
     title: "How to customize tax",
+    shortTitle: "Customize tax",
     description:
       "Rename VAT to GST, Sales Tax, or any label, and set a rate per item.",
     embedUrl: YOUTUBE_VIDEO_HOW_TO_CUSTOMIZE_TAX,
     watchUrl: "https://www.youtube.com/watch?v=F_iJxZ3PHbk",
     uploadDate: "2026-09-08T16:22:57-07:00",
+    durationSeconds: 19,
     thumbnailUrl: "https://i.ytimg.com/vi/F_iJxZ3PHbk/maxresdefault.jpg",
     iframeTitle: "How to customize tax on an invoice - EasyInvoicePDF",
   },
   {
     id: "mobile",
-    tabLabel: "On mobile",
-    tabLabelShort: "Mobile",
     title: "How to use EasyInvoicePDF on mobile",
+    shortTitle: "Use on mobile",
     description: "Create, preview, and download an invoice from your phone.",
     embedUrl: YOUTUBE_VIDEO_MOBILE_DEMO,
     watchUrl: "https://www.youtube.com/shorts/TKOegsmNnKM",
     uploadDate: "2026-09-25T17:18:51-07:00",
+    durationSeconds: 79,
     thumbnailUrl: "https://i.ytimg.com/vi/TKOegsmNnKM/maxresdefault.jpg",
     iframeTitle: "EasyInvoicePDF mobile demo",
   },
 ] as const satisfies {
   id: string;
-  tabLabel: string;
-  tabLabelShort: string;
   title: string;
+  /** Shown in the playlist on phones, where the full title would not fit a row. */
+  shortTitle: string;
   description: string;
   embedUrl: string;
   watchUrl: string;
   uploadDate: string;
+  /** Length on YouTube, shown in the playlist and emitted as the JSON-LD `duration`. */
+  durationSeconds: number;
   thumbnailUrl: string;
   iframeTitle: string;
 }[];

@@ -48,17 +48,21 @@ test.describe("How it works page", () => {
     await expectYouTubeEmbedToShow({ embed, embedUrl: VIDEO_DEMO_YOUTUBE_URL });
     await expect(embed).toHaveAttribute("title", "EasyInvoicePDF Demo Video");
 
-    const sellerTab = page.getByTestId("how-it-works-tab-add-seller");
+    const sellerItem = page.getByTestId(
+      "how-it-works-playlist-item-add-seller",
+    );
 
-    await sellerTab.click();
+    await sellerItem.click();
     await expectYouTubeEmbedToShow({
       embed,
       embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
     });
 
-    await expect(sellerTab).toBeVisible();
-    await expect(sellerTab).toHaveAttribute("role", "tab");
-    await expect(sellerTab).toHaveAttribute("aria-selected", "true");
+    await expect(sellerItem).toBeVisible();
+    await expect(sellerItem).toHaveAttribute("aria-current", "true");
+    await expect(
+      page.getByTestId("how-it-works-playlist-item-overview"),
+    ).not.toHaveAttribute("aria-current");
 
     const discordLink = page.getByTestId("how-it-works-discord");
     const redditLink = page.getByTestId("how-it-works-reddit");
@@ -103,11 +107,9 @@ test.describe("How it works page", () => {
       embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_BUYER,
     });
 
-    const buyerTab = page.getByTestId("how-it-works-tab-add-buyer");
-    await expect(buyerTab).toBeVisible();
+    const buyerItem = page.getByTestId("how-it-works-playlist-item-add-buyer");
+    await expect(buyerItem).toBeVisible();
 
-    await expect(buyerTab).toHaveAttribute("role", "tab");
-
-    await expect(buyerTab).toHaveAttribute("aria-selected", "true");
+    await expect(buyerItem).toHaveAttribute("aria-current", "true");
   });
 });
