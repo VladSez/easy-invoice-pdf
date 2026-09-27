@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
 import { Download, Ellipsis, Upload } from "lucide-react";
-import { useRef, useState } from "react";
+import { useId, useState } from "react";
 import { toast } from "sonner";
 import type { z } from "zod";
 
@@ -58,7 +58,8 @@ interface ContactsBackupMenuProps {
  * seller or buyer the current invoice uses.
  */
 export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputId = useId();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hasSavedContacts, setHasSavedContacts] = useState(false);
   const [invalidImportedEntries, setInvalidImportedEntries] = useState<
     InvalidImportedContact[]
@@ -259,7 +260,10 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
   return (
     <>
       <DropdownMenu
+        open={isMenuOpen}
         onOpenChange={(isOpen) => {
+          setIsMenuOpen(isOpen);
+
           if (!isOpen) {
             return;
           }
@@ -299,20 +303,34 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
             <Download className="size-3.5" />
             Export sellers & buyers
           </DropdownMenuItem>
+          {/*
+            A <label> for the file input rather than `input.click()` from `onSelect`: the
+            tap itself opens the picker, with no programmatic click for the browser to
+            refuse. Chrome on iOS ignores `input.click()` after the page has started a
+            download (e.g. right after an export), while Safari does not.
+          */}
           <DropdownMenuItem
+            asChild
             disabled={!isLocalStorageAvailable}
-            onSelect={() => {
-              fileInputRef.current?.click();
+            onSelect={(event) => {
+              // Keep the menu (and so this label) mounted until the click's default action
+              // has opened the picker, then close it.
+              event.preventDefault();
+              setTimeout(() => {
+                setIsMenuOpen(false);
+              }, 0);
             }}
           >
-            <Upload className="size-3.5" />
-            Import from file…
+            <label htmlFor={isLocalStorageAvailable ? fileInputId : undefined}>
+              <Upload className="size-3.5" />
+              Import from file…
+            </label>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
       <input
-        ref={fileInputRef}
+        id={fileInputId}
         type="file"
         accept="application/json,.json"
         className="hidden"
