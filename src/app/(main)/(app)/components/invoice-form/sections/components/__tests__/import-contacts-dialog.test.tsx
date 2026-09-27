@@ -1,6 +1,13 @@
 // @vitest-environment happy-dom
 
-import { cleanup, render, screen, within } from "@testing-library/react";
+import {
+  cleanup,
+  createEvent,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -196,3 +203,180 @@ describe("ImportContactsDialog preview", () => {
     expect(dialog).toHaveTextContent(`"${"x".repeat(119)}…`);
   });
 });
+
+describe("ImportContactsDialog drop", () => {
+  it("takes a file dropped anywhere, not only on the drop zone", () => {
+    const onFileSelected = vi.fn();
+    renderDropDialog({ state: { step: "choose" }, onFileSelected });
+
+    const file = new File(["{}"], "backup.json");
+    // Outside the dashed box: on the rules list, and on the page behind the dialog
+    const targets = [
+      screen.getByText("The invoice you’re working on isn’t touched."),
+      document.body,
+    ];
+
+    for (const target of targets) {
+      const drop = createEvent.drop(target, {
+        dataTransfer: fileDataTransfer(file),
+      });
+      fireEvent(target, drop);
+
+      // Cancelled, so the browser does not open the file in the tab
+      expect(drop.defaultPrevented).toBe(true);
+    }
+
+    expect(onFileSelected).toHaveBeenCalledTimes(2);
+    expect(onFileSelected).toHaveBeenCalledWith(file);
+  });
+
+  it("leaves drops alone while closed", () => {
+    renderDropDialog({ isOpen: false, state: { step: "choose" } });
+
+    const drop = createEvent.drop(document.body, {
+      dataTransfer: fileDataTransfer(new File(["{}"], "backup.json")),
+    });
+    fireEvent(document.body, drop);
+
+    expect(drop.defaultPrevented).toBe(false);
+  });
+
+  it("cancels but ignores a file dropped after the choose step", () => {
+    const onFileSelected = vi.fn();
+    const states: ImportContactsDialogState[] = [
+      {
+        step: "preview",
+        fileName: "backup.json",
+        sellers: emptyResult({ added: [ACME] }),
+        buyers: emptyResult(),
+      },
+      { step: "error", fileName: "broken.json", error: "Not JSON" },
+    ];
+
+    for (const state of states) {
+      renderDropDialog({ state, onFileSelected });
+
+      const drop = createEvent.drop(document.body, {
+        dataTransfer: fileDataTransfer(new File(["{}"], "other.json")),
+      });
+      fireEvent(document.body, drop);
+
+      // Still cancelled, so the browser does not navigate away to the file
+      expect(drop.defaultPrevented).toBe(true);
+
+      cleanup();
+    }
+
+    // A stray drop does not swap the file under review
+    expect(onFileSelected).not.toHaveBeenCalled();
+  });
+
+  it("leaves drags that carry no file alone", () => {
+    const onFileSelected = vi.fn();
+    renderDropDialog({ state: { step: "choose" }, onFileSelected });
+
+    const textDrag = { types: ["text/plain"], files: [] };
+
+    fireEvent.dragEnter(document.body, { dataTransfer: textDrag });
+    expect(getDropZone()).not.toHaveClass("border-slate-600");
+
+    const drop = createEvent.drop(document.body, { dataTransfer: textDrag });
+    fireEvent(document.body, drop);
+
+    expect(drop.defaultPrevented).toBe(false);
+    expect(onFileSelected).not.toHaveBeenCalled();
+  });
+
+  it("takes a Chromium file drag that lists only text/plain in its types", () => {
+    const onFileSelected = vi.fn();
+    renderDropDialog({ state: { step: "choose" }, onFileSelected });
+
+    const file = new File(["{}"], "backup.json");
+    // The file shows up only as an item of kind `file` (react-dropzone#1409)
+    const dataTransfer = {
+      types: ["text/plain"],
+      items: [{ kind: "file" }],
+      files: [file],
+    };
+
+    const drop = createEvent.drop(document.body, { dataTransfer });
+    fireEvent(document.body, drop);
+
+    expect(drop.defaultPrevented).toBe(true);
+    expect(onFileSelected).toHaveBeenCalledWith(file);
+  });
+
+  it("keeps the drop zone highlighted while the drag moves between elements", () => {
+    renderDropDialog({ state: { step: "choose" } });
+
+    const dataTransfer = fileDataTransfer(new File(["{}"], "backup.json"));
+    const rule = screen.getByText(
+      "The invoice you’re working on isn’t touched.",
+    );
+
+    fireEvent.dragEnter(document.body, { dataTransfer });
+    expect(getDropZone()).toHaveClass("border-slate-600");
+
+    // Into a child: WebKit fires the `dragleave` for the element being left with a null
+    // `relatedTarget`, which must not read as leaving the window
+    fireEvent.dragEnter(rule, { dataTransfer });
+    fireEvent.dragLeave(document.body, { dataTransfer });
+    expect(getDropZone()).toHaveClass("border-slate-600");
+
+    // Out of the window
+    fireEvent.dragLeave(rule, { dataTransfer });
+    expect(getDropZone()).not.toHaveClass("border-slate-600");
+  });
+
+  it("clears the highlight when Firefox enters the same element twice", () => {
+    renderDropDialog({ state: { step: "choose" } });
+
+    const dataTransfer = fileDataTransfer(new File(["{}"], "backup.json"));
+
+    fireEvent.dragEnter(document.body, { dataTransfer });
+    fireEvent.dragEnter(document.body, { dataTransfer });
+    fireEvent.dragLeave(document.body, { dataTransfer });
+
+    expect(getDropZone()).not.toHaveClass("border-slate-600");
+  });
+});
+
+interface RenderDropDialogOptions {
+  /** Whether the dialog is open. */
+  isOpen?: boolean;
+  /** The dialog step to render. */
+  state: ImportContactsDialogState;
+  /** Receives the dropped file. */
+  onFileSelected?: (file: File) => void;
+}
+
+function renderDropDialog({
+  isOpen = true,
+  state,
+  onFileSelected = vi.fn(),
+}: RenderDropDialogOptions) {
+  render(
+    <ImportContactsDialog
+      isOpen={isOpen}
+      onOpenChange={vi.fn()}
+      state={state}
+      onFileSelected={onFileSelected}
+      onConfirm={vi.fn()}
+    />,
+  );
+}
+
+/** The `dataTransfer` of a drag carrying `file`, as the browser reports it. */
+function fileDataTransfer(file: File) {
+  return { types: ["Files"], files: [file] };
+}
+
+function getDropZone() {
+  const label = screen.getByText("Drop a .json file here").closest("label");
+
+  if (!label) {
+    throw new Error("Drop zone not found");
+  }
+
+  return label;
+}

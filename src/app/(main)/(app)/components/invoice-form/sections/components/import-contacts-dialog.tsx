@@ -1,5 +1,5 @@
 import { Check, ChevronDown, FileUp, FileWarning } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 
 import {
   describeContactCounts,
@@ -64,6 +64,97 @@ export function ImportContactsDialog({
   onFileSelected,
   onConfirm,
 }: ImportContactsDialogProps) {
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
+
+  // An effect event, so the listeners below see the latest callback without
+  // re-subscribing on every render
+  const handleDroppedFile = useEffectEvent((file: File) => {
+    onFileSelected(file);
+  });
+
+  const isChoosingFile = state.step === "choose";
+
+  // The whole window takes the drop on the choose step, overlay included. A file released
+  // anywhere the page does not cancel `drop` gets the browser's default action, which
+  // opens it in the tab and navigates away from the app, so file drops are still cancelled
+  // on the other steps; they just import nothing, so a stray drop cannot swap the file
+  // under review. Drags that carry no file (selected text, links) are left alone.
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    // The elements the drag has entered and not yet left, as each child element the
+    // pointer crosses fires both events. `relatedTarget` cannot tell leaving the window
+    // from moving between children: WebKit leaves it null on every `dragleave`. A set
+    // rather than a count, because Firefox can fire `dragenter` more than once on the same
+    // element, which would leave a count above zero after the drag has left the window.
+    const enteredTargets = new Set<EventTarget>();
+
+    const handleDragEnter = (event: DragEvent) => {
+      if (!isChoosingFile || !isFileDrag(event) || !event.target) {
+        return;
+      }
+
+      enteredTargets.add(event.target);
+      setIsDraggingFile(true);
+    };
+
+    const handleDragLeave = (event: DragEvent) => {
+      if (!event.target) {
+        return;
+      }
+
+      enteredTargets.delete(event.target);
+
+      if (enteredTargets.size === 0) {
+        setIsDraggingFile(false);
+      }
+    };
+
+    const handleDragOver = (event: DragEvent) => {
+      if (!isFileDrag(event)) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (!isChoosingFile && event.dataTransfer) {
+        // Shows the "not allowed" cursor instead of suggesting the drop does something
+        event.dataTransfer.dropEffect = "none";
+      }
+    };
+
+    const handleDrop = (event: DragEvent) => {
+      if (!isFileDrag(event)) {
+        return;
+      }
+
+      event.preventDefault();
+      enteredTargets.clear();
+      setIsDraggingFile(false);
+
+      const file = event.dataTransfer?.files[0];
+
+      if (isChoosingFile && file) {
+        handleDroppedFile(file);
+      }
+    };
+
+    window.addEventListener("dragenter", handleDragEnter);
+    window.addEventListener("dragleave", handleDragLeave);
+    window.addEventListener("dragover", handleDragOver);
+    window.addEventListener("drop", handleDrop);
+
+    return () => {
+      window.removeEventListener("dragenter", handleDragEnter);
+      window.removeEventListener("dragleave", handleDragLeave);
+      window.removeEventListener("dragover", handleDragOver);
+      window.removeEventListener("drop", handleDrop);
+      setIsDraggingFile(false);
+    };
+  }, [isOpen, isChoosingFile]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
@@ -73,7 +164,10 @@ export function ImportContactsDialog({
         data-testid="import-contacts-dialog"
       >
         {state.step === "choose" ? (
-          <ChooseFileStep onFileSelected={onFileSelected} />
+          <ChooseFileStep
+            isDraggingFile={isDraggingFile}
+            onFileSelected={onFileSelected}
+          />
         ) : state.step === "error" ? (
           <FileErrorStep
             fileName={state.fileName}
@@ -95,12 +189,15 @@ export function ImportContactsDialog({
 }
 
 interface ChooseFileStepProps {
+  /** A file is being dragged over the page, so the drop zone shows it will take it. */
+  isDraggingFile: boolean;
   onFileSelected: (file: File) => void;
 }
 
-function ChooseFileStep({ onFileSelected }: ChooseFileStepProps) {
-  const [isDraggingOver, setIsDraggingOver] = useState(false);
-
+function ChooseFileStep({
+  isDraggingFile,
+  onFileSelected,
+}: ChooseFileStepProps) {
   return (
     <>
       <DialogHeader>
@@ -115,25 +212,8 @@ function ChooseFileStep({ onFileSelected }: ChooseFileStepProps) {
         onFileSelected={onFileSelected}
         className={cn(
           "flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 hover:bg-slate-50",
-          isDraggingOver && "border-slate-500 bg-slate-50",
+          isDraggingFile && "border-slate-600 bg-slate-100",
         )}
-        onDragOver={(event) => {
-          event.preventDefault();
-          setIsDraggingOver(true);
-        }}
-        onDragLeave={() => {
-          setIsDraggingOver(false);
-        }}
-        onDrop={(event) => {
-          event.preventDefault();
-          setIsDraggingOver(false);
-
-          const file = event.dataTransfer.files[0];
-
-          if (file) {
-            onFileSelected(file);
-          }
-        }}
       >
         <FileUp className="mb-1 size-5 text-slate-500" aria-hidden />
         <span className="text-sm font-medium text-slate-900">
@@ -542,10 +622,11 @@ function StatusBadge({ tone, children }: StatusBadgeProps) {
     <span
       className={cn(
         "shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium",
-        tone === "success" && "bg-green-50 text-green-700",
+        tone === "success" && "bg-green-200/80 text-green-900",
         tone === "neutral" && "bg-slate-100 text-slate-600",
-        tone === "danger" && "bg-red-50 text-red-700",
+        tone === "danger" && "bg-red-200/80 text-red-900",
       )}
+      data-testid="import-export-status-badge"
     >
       {children}
     </span>
@@ -719,6 +800,32 @@ function formatValue(value: unknown): string {
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Whether the drag carries files, as opposed to selected text or a link. Checked three
+ * ways, as react-dropzone does: some Chromium file drags list only `text/plain` in
+ * `types` but still have an item of kind `file` (react-dropzone#1409), and old Firefox
+ * reports `application/x-moz-file`. Missing one would leave that drop uncancelled, and
+ * the browser would open the file in the tab.
+ */
+function isFileDrag(event: DragEvent): boolean {
+  const dataTransfer = event.dataTransfer;
+
+  if (!dataTransfer) {
+    return false;
+  }
+
+  // `Array.from`: `types` was a `DOMStringList`, which has no `includes`, in older browsers
+  const types = Array.from(dataTransfer.types);
+
+  return (
+    types.includes("Files") ||
+    types.includes("application/x-moz-file") ||
+    Array.from(dataTransfer.items ?? []).some((item) => {
+      return item.kind === "file";
+    })
+  );
 }
 
 const IMPORT_RULES = [
