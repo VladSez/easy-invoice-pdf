@@ -2,7 +2,7 @@ import { assert, describe, expect, it } from "vitest";
 
 import {
   buildContactsBackupFileName,
-  describeImportResult,
+  describeContactCounts,
   mergeImportedContacts,
   parseContactsBackup,
   serializeContactsBackup,
@@ -215,8 +215,8 @@ describe("mergeImportedContacts", () => {
 
     expect(result).toStrictEqual({
       contacts: [SELLER, newSeller],
-      addedCount: 1,
-      duplicateCount: 0,
+      added: [newSeller],
+      duplicates: [],
       invalidEntries: [],
       nameConflicts: [],
     });
@@ -234,7 +234,7 @@ describe("mergeImportedContacts", () => {
     });
 
     expect(result.contacts).toStrictEqual([editedHere]);
-    expect(result.duplicateCount).toBe(1);
+    expect(result.duplicates).toHaveLength(1);
   });
 
   it("skips an entry with the same details under a different id", () => {
@@ -247,7 +247,7 @@ describe("mergeImportedContacts", () => {
     });
 
     expect(result.contacts).toStrictEqual([SELLER]);
-    expect(result.duplicateCount).toBe(1);
+    expect(result.duplicates).toHaveLength(1);
   });
 
   it("compares details after defaults and trimming are applied", () => {
@@ -266,8 +266,8 @@ describe("mergeImportedContacts", () => {
       createId,
     });
 
-    expect(result.addedCount).toBe(0);
-    expect(result.duplicateCount).toBe(1);
+    expect(result.added).toStrictEqual([]);
+    expect(result.duplicates).toHaveLength(1);
   });
 
   it("skips duplicates within the file itself", () => {
@@ -280,8 +280,8 @@ describe("mergeImportedContacts", () => {
     });
 
     expect(result.contacts).toStrictEqual([SELLER]);
-    expect(result.addedCount).toBe(1);
-    expect(result.duplicateCount).toBe(2);
+    expect(result.added).toHaveLength(1);
+    expect(result.duplicates).toHaveLength(2);
   });
 
   it("gives an entry without an id a new one", () => {
@@ -315,12 +315,12 @@ describe("mergeImportedContacts", () => {
 
     expect(result).toStrictEqual({
       contacts: [SELLER],
-      addedCount: 0,
-      duplicateCount: 0,
+      added: [],
+      duplicates: [],
       invalidEntries: [],
       nameConflicts: [
         {
-          label: "“Acme Ltd”",
+          label: "Acme Ltd",
           entry: sameNameElsewhere,
           issues: [
             {
@@ -346,7 +346,7 @@ describe("mergeImportedContacts", () => {
     });
 
     expect(result.nameConflicts).toHaveLength(1);
-    expect(result.addedCount).toBe(1);
+    expect(result.added).toHaveLength(1);
   });
 
   it("adds only the first of two different contacts sharing a name in the file", () => {
@@ -363,7 +363,7 @@ describe("mergeImportedContacts", () => {
       createId,
     });
 
-    expect(result.addedCount).toBe(1);
+    expect(result.added).toHaveLength(1);
     expect(result.contacts[0]?.address).toBe("Road 1");
     expect(result.nameConflicts[0]?.issues).toStrictEqual([
       { field: "name", message: "A buyer with this name is already saved" },
@@ -387,7 +387,7 @@ describe("mergeImportedContacts", () => {
     expect(result.contacts).toStrictEqual([SELLER]);
     expect(result.invalidEntries).toStrictEqual([
       {
-        label: "“Acme Ltd”",
+        label: "Acme Ltd",
         entry: { ...SELLER, email: "not-an-email" },
         issues: [{ field: "email", message: "Invalid email address" }],
       },
@@ -423,114 +423,13 @@ describe("mergeImportedContacts", () => {
   });
 });
 
-describe("describeImportResult", () => {
-  it("names only the lists that gained entries", () => {
-    expect(
-      describeImportResult({
-        addedSellerCount: 0,
-        addedBuyerCount: 1,
-        duplicateCount: 0,
-        invalidCount: 0,
-        nameConflictCount: 0,
-      }),
-    ).toStrictEqual({
-      tone: "success",
-      title: "Imported 1 buyer",
-      description: null,
-    });
-
-    expect(
-      describeImportResult({
-        addedSellerCount: 2,
-        addedBuyerCount: 1,
-        duplicateCount: 0,
-        invalidCount: 0,
-        nameConflictCount: 0,
-      }),
-    ).toStrictEqual({
-      tone: "success",
-      title: "Imported 2 sellers and 1 buyer",
-      description: null,
-    });
-  });
-
-  it("warns when some entries were imported and some were invalid", () => {
-    expect(
-      describeImportResult({
-        addedSellerCount: 2,
-        addedBuyerCount: 0,
-        duplicateCount: 1,
-        invalidCount: 1,
-        nameConflictCount: 0,
-      }),
-    ).toStrictEqual({
-      tone: "warning",
-      title: "Imported 2 sellers",
-      description:
-        "1 entry already saved, skipped. 1 entry has invalid data and was not imported.",
-    });
-  });
-
-  it("says nothing was imported when invalid entries are the reason", () => {
-    expect(
-      describeImportResult({
-        addedSellerCount: 0,
-        addedBuyerCount: 0,
-        duplicateCount: 0,
-        invalidCount: 3,
-        nameConflictCount: 0,
-      }),
-    ).toStrictEqual({
-      tone: "error",
-      title: "Nothing was imported",
-      description: "3 entries have invalid data and were not imported.",
-    });
-  });
-
-  it("reports names that are already saved", () => {
-    expect(
-      describeImportResult({
-        addedSellerCount: 1,
-        addedBuyerCount: 0,
-        duplicateCount: 0,
-        invalidCount: 1,
-        nameConflictCount: 2,
-      }),
-    ).toStrictEqual({
-      tone: "warning",
-      title: "Imported 1 seller",
-      description:
-        "1 entry has invalid data and was not imported. 2 entries use names already saved and were not imported.",
-    });
-
-    expect(
-      describeImportResult({
-        addedSellerCount: 0,
-        addedBuyerCount: 0,
-        duplicateCount: 0,
-        invalidCount: 0,
-        nameConflictCount: 1,
-      }),
-    ).toStrictEqual({
-      tone: "error",
-      title: "Nothing was imported",
-      description: "1 entry uses a name already saved and was not imported.",
-    });
-  });
-
-  it("keeps 'Nothing new to import' for a file that is all already saved", () => {
-    expect(
-      describeImportResult({
-        addedSellerCount: 0,
-        addedBuyerCount: 0,
-        duplicateCount: 2,
-        invalidCount: 0,
-        nameConflictCount: 0,
-      }),
-    ).toStrictEqual({
-      tone: "success",
-      title: "Nothing new to import",
-      description: "2 entries already saved, skipped.",
-    });
+describe("describeContactCounts", () => {
+  it("names only the lists that have any", () => {
+    expect(describeContactCounts({ sellerCount: 0, buyerCount: 1 })).toBe(
+      "1 buyer",
+    );
+    expect(describeContactCounts({ sellerCount: 2, buyerCount: 1 })).toBe(
+      "2 sellers and 1 buyer",
+    );
   });
 });

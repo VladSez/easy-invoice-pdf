@@ -168,13 +168,13 @@ interface MergeImportedContactsOptions<T extends SavedContact> {
   contactNoun: string;
 }
 
-interface MergeImportedContactsResult<T extends SavedContact> {
+export interface MergeImportedContactsResult<T extends SavedContact> {
   /** The existing contacts followed by the newly added ones. */
   contacts: T[];
-  /** How many imported entries were added. */
-  addedCount: number;
+  /** The imported entries that were added, with the ids they were saved under. */
+  added: T[];
   /** Imported entries skipped because the same id or the same details are already saved. */
-  duplicateCount: number;
+  duplicates: T[];
   /** Imported entries skipped because they failed validation. */
   invalidEntries: InvalidContactEntry[];
   /**
@@ -219,8 +219,8 @@ export function mergeImportedContacts<T extends SavedContact>({
     }),
   );
 
-  let addedCount = 0;
-  let duplicateCount = 0;
+  const added: T[] = [];
+  const duplicates: T[] = [];
   const invalidEntries: InvalidContactEntry[] = [];
   const nameConflicts: InvalidContactEntry[] = [];
 
@@ -246,7 +246,7 @@ export function mergeImportedContacts<T extends SavedContact>({
       knownFingerprints.has(fingerprint);
 
     if (isDuplicate) {
-      duplicateCount += 1;
+      duplicates.push(contact);
 
       continue;
     }
@@ -272,13 +272,13 @@ export function mergeImportedContacts<T extends SavedContact>({
     knownIds.add(contactWithId.id);
     knownFingerprints.add(fingerprint);
     knownNames.add(contactWithId.name);
-    addedCount += 1;
+    added.push(contactWithId);
   }
 
   return {
     contacts,
-    addedCount,
-    duplicateCount,
+    added,
+    duplicates,
     invalidEntries,
     nameConflicts,
   };
@@ -358,91 +358,33 @@ function labelInvalidEntry({ entry, index }: LabelInvalidEntryOptions): string {
       : undefined;
 
   return typeof name === "string" && name.trim()
-    ? `“${name.trim()}”`
+    ? name.trim()
     : `Entry #${index + 1}`;
 }
 
-interface DescribeImportResultOptions {
-  /** Sellers added to the saved list. */
-  addedSellerCount: number;
-  /** Buyers added to the saved list. */
-  addedBuyerCount: number;
-  /** Entries skipped because they were already saved. */
-  duplicateCount: number;
-  /** Entries skipped because they failed validation. */
-  invalidCount: number;
-  /** Entries skipped because a different contact already uses their name. */
-  nameConflictCount: number;
-}
-
-interface ImportResultDescription {
-  /**
-   * `success` when nothing needs the user's attention, `warning` when some entries were
-   * imported and some could not be, `error` when none could be.
-   */
-  tone: "success" | "warning" | "error";
-  title: string;
-  description: string | null;
+interface DescribeContactCountsOptions {
+  sellerCount: number;
+  buyerCount: number;
 }
 
 /**
- * The wording of the import result toast.
- *
- * "Nothing new to import" is kept for a file whose entries are all already saved; when
- * nothing was added because entries could not be imported, it says so instead.
+ * `2 sellers and 1 buyer`, `1 buyer`: only the lists that have any, for the import
+ * button and the toast after it.
  */
-export function describeImportResult({
-  addedSellerCount,
-  addedBuyerCount,
-  duplicateCount,
-  invalidCount,
-  nameConflictCount,
-}: DescribeImportResultOptions): ImportResultDescription {
-  const addedParts = [
-    addedSellerCount > 0
-      ? formatCount({ count: addedSellerCount, noun: "seller" })
+export function describeContactCounts({
+  sellerCount,
+  buyerCount,
+}: DescribeContactCountsOptions): string {
+  return [
+    sellerCount > 0
+      ? formatCount({ count: sellerCount, noun: "seller" })
       : null,
-    addedBuyerCount > 0
-      ? formatCount({ count: addedBuyerCount, noun: "buyer" })
-      : null,
-  ].filter((part) => {
-    return part !== null;
-  });
-
-  const hasAdded = addedParts.length > 0;
-  const hasProblems = invalidCount + nameConflictCount > 0;
-
-  const title = hasAdded
-    ? `Imported ${addedParts.join(" and ")}`
-    : hasProblems
-      ? "Nothing was imported"
-      : "Nothing new to import";
-
-  const duplicatesSummary =
-    duplicateCount > 0
-      ? `${formatCount({ count: duplicateCount, noun: "entry", plural: "entries" })} already saved, skipped.`
-      : null;
-
-  const invalidSummary =
-    invalidCount > 0
-      ? `${formatCount({ count: invalidCount, noun: "entry has", plural: "entries have" })} invalid data and ${invalidCount === 1 ? "was" : "were"} not imported.`
-      : null;
-
-  const nameConflictSummary =
-    nameConflictCount > 0
-      ? `${formatCount({ count: nameConflictCount, noun: "entry uses a name", plural: "entries use names" })} already saved and ${nameConflictCount === 1 ? "was" : "were"} not imported.`
-      : null;
-
-  const description =
-    [duplicatesSummary, invalidSummary, nameConflictSummary]
-      .filter((part) => {
-        return part !== null;
-      })
-      .join(" ") || null;
-
-  const tone = hasProblems ? (hasAdded ? "warning" : "error") : "success";
-
-  return { tone, title, description };
+    buyerCount > 0 ? formatCount({ count: buyerCount, noun: "buyer" }) : null,
+  ]
+    .filter((part) => {
+      return part !== null;
+    })
+    .join(" and ");
 }
 
 interface FormatCountOptions {

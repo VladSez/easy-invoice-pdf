@@ -1,13 +1,13 @@
 import * as Sentry from "@sentry/nextjs";
 import { Download, Ellipsis, Upload } from "lucide-react";
-import { useId, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import type { z } from "zod";
 
 import {
-  ImportIssuesDialog,
-  type InvalidImportedContact,
-} from "@/app/(main)/(app)/components/invoice-form/sections/components/import-issues-dialog";
+  ImportContactsDialog,
+  type ImportContactsDialogState,
+} from "@/app/(main)/(app)/components/invoice-form/sections/components/import-contacts-dialog";
 import {
   getAppStorageItem,
   setAppStorageItem,
@@ -15,7 +15,7 @@ import {
 import {
   MAX_CONTACTS_BACKUP_FILE_BYTES,
   buildContactsBackupFileName,
-  describeImportResult,
+  describeContactCounts,
   formatCount,
   mergeImportedContacts,
   parseContactsBackup,
@@ -58,14 +58,11 @@ interface ContactsBackupMenuProps {
  * seller or buyer the current invoice uses.
  */
 export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
-  const fileInputId = useId();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hasSavedContacts, setHasSavedContacts] = useState(false);
-  const [invalidImportedEntries, setInvalidImportedEntries] = useState<
-    InvalidImportedContact[]
-  >([]);
-  const [isImportIssuesDialogOpen, setIsImportIssuesDialogOpen] =
-    useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [importState, setImportState] = useState<ImportContactsDialogState>({
+    step: "choose",
+  });
 
   const isLocalStorageAvailable = useIsLocalStorageAvailable();
   const toastPosition = isMobile ? "top-center" : "bottom-right";
@@ -120,30 +117,17 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
     }
   };
 
-  const handleImportFile = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const input = event.currentTarget;
-    const file = input.files?.[0];
-
-    // Clear the input so picking the same file again still fires `change`.
-    input.value = "";
-
-    if (!file) {
-      return;
-    }
-
-    const showImportError = (description: string) => {
-      toast.error("Could not import sellers & buyers", {
-        id: "import_contacts_error_toast",
-        description,
-        closeButton: true,
-        position: toastPosition,
-      });
+  /**
+   * Reads the chosen file and works out what importing it would add and skip, without
+   * saving anything: the dialog shows that for the user to confirm.
+   */
+  const handleFileSelected = async (file: File) => {
+    const showFileError = (error: string) => {
+      setImportState({ step: "error", fileName: file.name, error });
     };
 
     if (file.size > MAX_CONTACTS_BACKUP_FILE_BYTES) {
-      showImportError("This file is too large to be a backup.");
+      showFileError("This file is too large to be a backup.");
 
       return;
     }
@@ -154,33 +138,62 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
       const parsed = parseContactsBackup(await new Response(file).text());
 
       if (!parsed.success) {
-        showImportError(parsed.error);
+        showFileError(parsed.error);
 
         return;
       }
 
-      const previousSellersJson = getAppStorageItem(SELLERS_LOCAL_STORAGE_KEY);
-
-      const sellers = mergeImportedContacts({
-        existing: readSavedContacts({
-          key: SELLERS_LOCAL_STORAGE_KEY,
+      setImportState({
+        step: "preview",
+        fileName: file.name,
+        sellers: mergeImportedContacts({
+          existing: readSavedContacts({
+            key: SELLERS_LOCAL_STORAGE_KEY,
+            schema: sellerSchema,
+          }),
+          imported: parsed.sellers,
           schema: sellerSchema,
+          createId: createContactId,
+          contactNoun: "seller",
         }),
-        imported: parsed.sellers,
-        schema: sellerSchema,
-        createId: createContactId,
-        contactNoun: "seller",
-      });
-      const buyers = mergeImportedContacts({
-        existing: readSavedContacts({
-          key: BUYERS_LOCAL_STORAGE_KEY,
+        buyers: mergeImportedContacts({
+          existing: readSavedContacts({
+            key: BUYERS_LOCAL_STORAGE_KEY,
+            schema: buyerSchema,
+          }),
+          imported: parsed.buyers,
           schema: buyerSchema,
+          createId: createContactId,
+          contactNoun: "buyer",
         }),
-        imported: parsed.buyers,
-        schema: buyerSchema,
-        createId: createContactId,
-        contactNoun: "buyer",
       });
+    } catch (error) {
+      console.error("Failed to read sellers & buyers backup:", error);
+
+      showFileError("Something went wrong while reading it. Please try again.");
+
+      Sentry.captureException(error);
+    }
+  };
+
+  const handleConfirmImport = () => {
+    if (importState.step !== "preview") {
+      return;
+    }
+
+    const { sellers, buyers } = importState;
+
+    const showImportError = (description: string) => {
+      toast.error("Could not import sellers & buyers", {
+        id: "import_contacts_error_toast",
+        description,
+        closeButton: true,
+        position: toastPosition,
+      });
+    };
+
+    try {
+      const previousSellersJson = getAppStorageItem(SELLERS_LOCAL_STORAGE_KEY);
 
       const areSellersPersisted = setAppStorageItem({
         key: SELLERS_LOCAL_STORAGE_KEY,
@@ -211,38 +224,24 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
 
       window.dispatchEvent(new Event(SAVED_CONTACTS_IMPORTED_EVENT));
 
-      // Invalid entries and name conflicts are listed together in the details dialog
-      const invalidEntries: InvalidImportedContact[] = [
-        ...[...sellers.invalidEntries, ...sellers.nameConflicts].map(
-          (entry) => {
-            return { ...entry, party: "Seller" as const };
-          },
-        ),
-        ...[...buyers.invalidEntries, ...buyers.nameConflicts].map((entry) => {
-          return { ...entry, party: "Buyer" as const };
-        }),
-      ];
+      setIsImportDialogOpen(false);
 
-      setInvalidImportedEntries(invalidEntries);
-
-      showImportResultToast({
-        addedSellerCount: sellers.addedCount,
-        addedBuyerCount: buyers.addedCount,
-        duplicateCount: sellers.duplicateCount + buyers.duplicateCount,
-        invalidCount:
-          sellers.invalidEntries.length + buyers.invalidEntries.length,
-        nameConflictCount:
-          sellers.nameConflicts.length + buyers.nameConflicts.length,
-        onViewDetails: () => {
-          setIsImportIssuesDialogOpen(true);
+      toast.success(
+        `Imported ${describeContactCounts({
+          sellerCount: sellers.added.length,
+          buyerCount: buyers.added.length,
+        })}`,
+        {
+          id: "import_contacts_success_toast",
+          richColors: true,
+          position: toastPosition,
         },
-        toastPosition,
-      });
+      );
 
       umamiTrackEvent("import_contacts_success", {
         data: {
-          sellersAdded: sellers.addedCount,
-          buyersAdded: buyers.addedCount,
+          sellersAdded: sellers.added.length,
+          buyersAdded: buyers.added.length,
           invalid: sellers.invalidEntries.length + buyers.invalidEntries.length,
           nameConflicts:
             sellers.nameConflicts.length + buyers.nameConflicts.length,
@@ -259,11 +258,13 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
 
   return (
     <>
+      {/*
+        Not modal: a modal menu blocks the rest of the page, so with it open a tap on the
+        other section's ⋯ (or anything else) only closed the menu and needed a second tap.
+      */}
       <DropdownMenu
-        open={isMenuOpen}
+        modal={false}
         onOpenChange={(isOpen) => {
-          setIsMenuOpen(isOpen);
-
           if (!isOpen) {
             return;
           }
@@ -303,48 +304,27 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
             <Download className="size-3.5" />
             Export sellers & buyers
           </DropdownMenuItem>
-          {/*
-            A <label> for the file input rather than `input.click()` from `onSelect`: the
-            tap itself opens the picker, with no programmatic click for the browser to
-            refuse. Chrome on iOS ignores `input.click()` after the page has started a
-            download (e.g. right after an export), while Safari does not.
-          */}
           <DropdownMenuItem
-            asChild
             disabled={!isLocalStorageAvailable}
-            onSelect={(event) => {
-              // Keep the menu (and so this label) mounted until the click's default action
-              // has opened the picker, then close it.
-              event.preventDefault();
-              setTimeout(() => {
-                setIsMenuOpen(false);
-              }, 0);
+            onSelect={() => {
+              setImportState({ step: "choose" });
+              setIsImportDialogOpen(true);
             }}
           >
-            <label htmlFor={isLocalStorageAvailable ? fileInputId : undefined}>
-              <Upload className="size-3.5" />
-              Import from file…
-            </label>
+            <Upload className="size-3.5" />
+            Import from file…
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <input
-        id={fileInputId}
-        type="file"
-        accept="application/json,.json"
-        className="hidden"
-        aria-label="Import sellers & buyers from file"
-        data-testid="contacts-backup-file-input"
-        onChange={(event) => {
-          void handleImportFile(event);
+      <ImportContactsDialog
+        isOpen={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
+        state={importState}
+        onFileSelected={(file) => {
+          void handleFileSelected(file);
         }}
-      />
-
-      <ImportIssuesDialog
-        isOpen={isImportIssuesDialogOpen}
-        onOpenChange={setIsImportIssuesDialogOpen}
-        invalidEntries={invalidImportedEntries}
+        onConfirm={handleConfirmImport}
       />
     </>
   );
@@ -404,54 +384,4 @@ function parseStoredJson(saved: string | null): unknown {
   } catch {
     return [];
   }
-}
-
-interface ShowImportResultToastOptions {
-  addedSellerCount: number;
-  addedBuyerCount: number;
-  /** Entries skipped because they were already saved. */
-  duplicateCount: number;
-  /** How many entries were skipped because they failed validation. */
-  invalidCount: number;
-  /** How many entries were skipped because a different contact already uses their name. */
-  nameConflictCount: number;
-  /** Opens the dialog that shows what is wrong with the invalid entries. */
-  onViewDetails: () => void;
-  toastPosition: "top-center" | "bottom-right";
-}
-
-/**
- * One toast summarizing the import. When entries were skipped as invalid it stays open,
- * with a button to the dialog that shows what is wrong with them.
- */
-function showImportResultToast({
-  onViewDetails,
-  toastPosition,
-  ...counts
-}: ShowImportResultToastOptions) {
-  const { tone, title, description } = describeImportResult(counts);
-
-  const options = {
-    id: "import_contacts_result_toast",
-    description,
-    position: toastPosition,
-  };
-
-  if (tone === "success") {
-    toast.success(title, { ...options, richColors: true });
-
-    return;
-  }
-
-  const showToast = tone === "warning" ? toast.warning : toast.error;
-
-  showToast(title, {
-    ...options,
-    duration: Infinity,
-    closeButton: true,
-    action: {
-      label: "View details",
-      onClick: onViewDetails,
-    },
-  });
 }

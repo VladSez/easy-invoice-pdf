@@ -15,7 +15,6 @@ vi.mock("sonner", () => {
   return {
     toast: {
       success: vi.fn(),
-      warning: vi.fn(),
       error: vi.fn(),
       dismiss: vi.fn(),
     },
@@ -54,14 +53,22 @@ async function importBackup({
     { type: "application/json" },
   );
 
-  fireEvent.change(screen.getByTestId("contacts-backup-file-input"), {
+  fireEvent.keyDown(
+    screen.getByRole("button", { name: "Import or export sellers & buyers" }),
+    { key: "Enter" },
+  );
+  fireEvent.click(
+    await screen.findByRole("menuitem", { name: "Import from file…" }),
+  );
+  fireEvent.change(await screen.findByTestId("contacts-backup-file-input"), {
     target: { files: [file] },
   });
+
+  fireEvent.click(await screen.findByRole("button", { name: /^Import \d/ }));
 
   await vi.waitFor(() => {
     expect(
       vi.mocked(toast.success).mock.calls.length +
-        vi.mocked(toast.warning).mock.calls.length +
         vi.mocked(toast.error).mock.calls.length,
     ).toBeGreaterThan(0);
   });
@@ -72,6 +79,71 @@ function readStoredList(key: string): unknown {
 }
 
 describe("ContactsBackupMenu import", () => {
+  it("saves nothing until the preview is confirmed", async () => {
+    render(<ContactsBackupMenu isMobile={false} />);
+
+    fireEvent.keyDown(
+      screen.getByRole("button", { name: "Import or export sellers & buyers" }),
+      { key: "Enter" },
+    );
+    fireEvent.click(
+      await screen.findByRole("menuitem", { name: "Import from file…" }),
+    );
+    fireEvent.change(await screen.findByTestId("contacts-backup-file-input"), {
+      target: {
+        files: [
+          new File(
+            [
+              JSON.stringify({
+                app: "easyinvoicepdf",
+                version: 1,
+                sellers: [{ name: "Acme", address: "1 Main St" }],
+              }),
+            ],
+            "backup.json",
+          ),
+        ],
+      },
+    });
+
+    expect(
+      await screen.findByRole("button", { name: "Import 1 seller" }),
+    ).toBeVisible();
+    expect(localStorage.getItem(SELLERS_LOCAL_STORAGE_KEY)).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(localStorage.getItem(SELLERS_LOCAL_STORAGE_KEY)).toBeNull();
+    expect(toast.success).not.toHaveBeenCalled();
+  });
+
+  it("shows why a file that is not a backup cannot be imported", async () => {
+    render(<ContactsBackupMenu isMobile={false} />);
+
+    fireEvent.keyDown(
+      screen.getByRole("button", { name: "Import or export sellers & buyers" }),
+      { key: "Enter" },
+    );
+    fireEvent.click(
+      await screen.findByRole("menuitem", { name: "Import from file…" }),
+    );
+    fireEvent.change(await screen.findByTestId("contacts-backup-file-input"), {
+      target: { files: [new File(["not json {"], "notes.json")] },
+    });
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "This file can’t be imported",
+      }),
+    ).toBeVisible();
+    expect(
+      screen.getByText(
+        /This file is not an EasyInvoicePDF sellers & buyers backup/,
+      ),
+    ).toBeVisible();
+    expect(toast.error).not.toHaveBeenCalled();
+  });
+
   it("recovers when a saved list is not valid JSON", async () => {
     localStorage.setItem(SELLERS_LOCAL_STORAGE_KEY, "[{ truncated");
 

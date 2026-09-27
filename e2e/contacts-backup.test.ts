@@ -38,6 +38,23 @@ const BUYER = {
   notesFieldIsVisible: true,
 } as const satisfies BuyerData;
 
+async function chooseBackupFile(
+  page: Page,
+  section: "seller" | "buyer",
+  filePath: string,
+) {
+  await openBackupMenu(page, section);
+  await page.getByRole("menuitem", { name: "Import from file…" }).click();
+
+  const fileChooserPromise = page.waitForEvent("filechooser");
+  await page
+    .getByTestId("import-contacts-dialog")
+    .getByText("choose a file", { exact: true })
+    .click();
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles(filePath);
+}
+
 async function openBackupMenu(page: Page, section: "seller" | "buyer") {
   await page
     .getByTestId(`${section}-information-section`)
@@ -128,13 +145,28 @@ test.describe("Sellers & buyers backup", () => {
     await expect(buyerDropdown).toBeHidden();
 
     // Import from the buyer section: both sections pick up the file
-    await openBackupMenu(page, "buyer");
+    await chooseBackupFile(page, "buyer", backupPath);
 
-    const fileChooserPromise = page.waitForEvent("filechooser");
-    await page.getByRole("menuitem", { name: "Import from file…" }).click();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles(backupPath);
+    const importDialog = page.getByTestId("import-contacts-dialog");
 
+    await expect(
+      importDialog.getByRole("heading", { name: "Review import" }),
+    ).toBeVisible();
+    await expect(
+      importDialog.getByRole("list", { name: "Sellers" }),
+    ).toContainText(SELLER.name);
+    await expect(
+      importDialog.getByRole("list", { name: "Buyers" }),
+    ).toContainText(BUYER.name);
+
+    // Nothing is saved before the user confirms
+    await expect(sellerDropdown).toBeHidden();
+
+    await importDialog
+      .getByRole("button", { name: "Import 1 seller and 1 buyer" })
+      .click();
+
+    await expect(importDialog).toBeHidden();
     await expect(
       page.getByText("Imported 1 seller and 1 buyer", { exact: true }),
     ).toBeVisible();
@@ -170,18 +202,16 @@ test.describe("Sellers & buyers backup", () => {
     });
 
     // Importing the same file again adds nothing
-    await openBackupMenu(page, "seller");
-
-    const secondFileChooserPromise = page.waitForEvent("filechooser");
-    await page.getByRole("menuitem", { name: "Import from file…" }).click();
-    const secondFileChooser = await secondFileChooserPromise;
-    await secondFileChooser.setFiles(backupPath);
+    await chooseBackupFile(page, "seller", backupPath);
 
     await expect(
-      page.getByText("Nothing new to import", { exact: true }),
+      importDialog.getByRole("heading", { name: "Nothing new to import" }),
     ).toBeVisible();
     await expect(
-      page.getByText("2 entries already saved, skipped."),
-    ).toBeVisible();
+      importDialog.getByRole("list", { name: "Sellers" }),
+    ).toContainText(`${SELLER.name}${SELLER.address}Already saved`);
+    await expect(
+      importDialog.getByRole("button", { name: /^Import/ }),
+    ).toBeHidden();
   });
 });
