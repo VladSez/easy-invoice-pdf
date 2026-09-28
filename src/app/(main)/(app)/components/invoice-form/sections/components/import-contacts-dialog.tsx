@@ -18,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
 
 /** Longer values are cut short, so one long address does not push the problem off screen. */
@@ -137,6 +138,7 @@ export function ImportContactsDialog({
       const file = event.dataTransfer?.files[0];
 
       if (isChoosingFile && file) {
+        umamiTrackEvent("import_contacts_file_dropped");
         handleDroppedFile(file);
       }
     };
@@ -469,11 +471,7 @@ function PartyPreview({ party, result }: PartyPreviewProps) {
       >
         {added.map((contact, index) => {
           return (
-            <PreviewRow
-              key={`added-${index}`}
-              name={contact.name}
-              address={contact.address}
-            >
+            <PreviewRow key={`added-${index}`} contact={contact}>
               <StatusBadge tone="success">New</StatusBadge>
             </PreviewRow>
           );
@@ -502,12 +500,7 @@ function PartyPreview({ party, result }: PartyPreviewProps) {
         })}
         {duplicates.map((contact, index) => {
           return (
-            <PreviewRow
-              key={`duplicate-${index}`}
-              name={contact.name}
-              address={contact.address}
-              isMuted
-            >
+            <PreviewRow key={`duplicate-${index}`} contact={contact} isMuted>
               <StatusBadge tone="neutral">Already saved</StatusBadge>
             </PreviewRow>
           );
@@ -518,35 +511,90 @@ function PartyPreview({ party, result }: PartyPreviewProps) {
 }
 
 interface PreviewRowProps {
-  name: string;
-  /** Can span several lines, as typed in the address field. */
-  address: string;
+  contact: SellerData | BuyerData;
   /** For entries that will be skipped. */
   isMuted?: boolean;
   /** The status badge. */
   children: React.ReactNode;
 }
 
-function PreviewRow({
-  name,
-  address,
-  isMuted = false,
-  children,
-}: PreviewRowProps) {
+/**
+ * Collapsed to the name and address by default; expanding it lists every other field the
+ * entry has, so the user can check the details before importing.
+ */
+function PreviewRow({ contact, isMuted = false, children }: PreviewRowProps) {
   return (
-    <li
-      className={cn(
-        "flex items-start justify-between gap-2 px-3 py-2",
-        isMuted && "text-slate-500",
-      )}
-    >
-      <div className="min-w-0">
-        <p className="truncate">{name}</p>
-        <ContactAddress address={address} />
-      </div>
-      {children}
+    <li className={cn(isMuted && "text-slate-500")}>
+      <details
+        className="group"
+        data-testid="import-preview-entry"
+        onToggle={(event) => {
+          if (event.currentTarget.open) {
+            umamiTrackEvent("import_contacts_entry_expanded", {
+              data: { status: isMuted ? "already_saved" : "new" },
+            });
+          }
+        }}
+      >
+        <summary className="flex cursor-pointer list-none items-start justify-between gap-2 px-3 py-2 hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
+          <div className="min-w-0">
+            <ContactName name={contact.name} />
+            <ContactAddress address={contact.address} />
+          </div>
+          <span className="flex shrink-0 items-center gap-1.5">
+            {children}
+            <ChevronDown
+              className="size-3.5 text-slate-500 transition-transform group-open:rotate-180"
+              aria-hidden
+            />
+          </span>
+        </summary>
+
+        <ContactFields contact={contact} />
+      </details>
     </li>
   );
+}
+
+interface ContactFieldsProps {
+  contact: SellerData | BuyerData;
+}
+
+/** Every filled-in field of the entry, with the ones hidden on the invoice marked so. */
+function ContactFields({ contact }: ContactFieldsProps) {
+  const fields = getContactFields(contact);
+
+  return (
+    <dl className="space-y-1.5 border-t border-slate-200 bg-slate-50/60 px-3 py-2 text-xs">
+      {fields.map(({ field, label, value, isHidden }) => {
+        return (
+          <div
+            key={field}
+            className="grid grid-cols-[7rem_minmax(0,1fr)] gap-2"
+          >
+            <dt className="text-slate-500">{label}</dt>
+            <dd className="whitespace-pre-line break-words text-slate-700">
+              {value}
+              {isHidden ? (
+                <span className="ml-1.5 text-slate-400">
+                  (hidden on invoice)
+                </span>
+              ) : null}
+            </dd>
+          </div>
+        );
+      })}
+    </dl>
+  );
+}
+
+interface ContactNameProps {
+  name: string;
+}
+
+/** Wraps rather than truncates, so a long name can be read in full. */
+function ContactName({ name }: ContactNameProps) {
+  return <p className="text-pretty break-words">{name}</p>;
 }
 
 interface ContactAddressProps {
@@ -584,7 +632,7 @@ function ProblemRow({ invalidEntry, badge }: ProblemRowProps) {
       <details open className="group" data-testid="import-problem-entry">
         <summary className="flex cursor-pointer list-none items-start justify-between gap-2 px-3 py-2 hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
           <div className="min-w-0">
-            <p className="truncate">{label}</p>
+            <ContactName name={label} />
             {address ? <ContactAddress address={address} /> : null}
           </div>
           <span className="flex shrink-0 items-center gap-1.5">
@@ -668,6 +716,7 @@ function FilePickerLabel({
           input.value = "";
 
           if (file) {
+            umamiTrackEvent("import_contacts_file_picked");
             onFileSelected(file);
           }
         }}
@@ -788,6 +837,83 @@ function EntryLine({ field, value, messages }: EntryLineProps) {
       })}
     </span>
   );
+}
+
+interface ContactField {
+  /** The schema key, used as the React key: labels can repeat, as the tax label is user-set. */
+  field: keyof SellerData;
+  label: string;
+  value: string;
+  /** The entry has the value but does not show it on the invoice. */
+  isHidden: boolean;
+}
+
+function getContactFields(contact: SellerData | BuyerData): ContactField[] {
+  const fields: (ContactField | null)[] = [
+    { field: "name", label: "Name", value: contact.name, isHidden: false },
+    {
+      field: "address",
+      label: "Address",
+      value: contact.address,
+      isHidden: false,
+    },
+    optionalField({
+      field: "vatNo",
+      label: contact.vatNoLabelText,
+      value: contact.vatNo,
+      isVisible: contact.vatNoFieldIsVisible,
+    }),
+    optionalField({
+      field: "email",
+      label: "Email",
+      value: contact.email,
+      isVisible: contact.emailFieldIsVisible,
+    }),
+    "accountNumber" in contact
+      ? optionalField({
+          field: "accountNumber",
+          label: "Account Number",
+          value: contact.accountNumber,
+          isVisible: contact.accountNumberFieldIsVisible,
+        })
+      : null,
+    "swiftBic" in contact
+      ? optionalField({
+          field: "swiftBic",
+          label: "SWIFT/BIC",
+          value: contact.swiftBic,
+          isVisible: contact.swiftBicFieldIsVisible,
+        })
+      : null,
+    optionalField({
+      field: "notes",
+      label: "Notes",
+      value: contact.notes,
+      isVisible: contact.notesFieldIsVisible,
+    }),
+  ];
+
+  return fields.filter((field) => {
+    return field !== null;
+  });
+}
+
+interface OptionalFieldOptions {
+  field: ContactField["field"];
+  label: string;
+  /** Left out of the list when empty. */
+  value: string | undefined;
+  /** The entry's `…FieldIsVisible` flag for this field. */
+  isVisible: boolean;
+}
+
+function optionalField({
+  field,
+  label,
+  value,
+  isVisible,
+}: OptionalFieldOptions): ContactField | null {
+  return value ? { field, label, value, isHidden: !isVisible } : null;
 }
 
 function formatValue(value: unknown): string {

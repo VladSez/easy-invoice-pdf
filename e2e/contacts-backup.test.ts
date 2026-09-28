@@ -93,7 +93,7 @@ test.describe("Sellers & buyers backup", () => {
     const download = await downloadPromise;
 
     expect(download.suggestedFilename()).toMatch(
-      /^easyinvoicepdf-contacts-\d{4}-\d{2}-\d{2}\.json$/,
+      /^easyinvoicepdf-contacts-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json$/,
     );
 
     const backupPath = path.join(downloadDir, download.suggestedFilename());

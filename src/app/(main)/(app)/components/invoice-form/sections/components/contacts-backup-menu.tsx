@@ -114,6 +114,8 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
       });
 
       Sentry.captureException(error);
+
+      umamiTrackEvent("export_contacts_error");
     }
   };
 
@@ -122,12 +124,17 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
    * saving anything: the dialog shows that for the user to confirm.
    */
   const handleFileSelected = async (file: File) => {
-    const showFileError = (error: string) => {
+    const showFileError = ({ error, reason }: ShowFileErrorOptions) => {
       setImportState({ step: "error", fileName: file.name, error });
+
+      umamiTrackEvent("import_contacts_file_error", { data: { reason } });
     };
 
     if (file.size > MAX_CONTACTS_BACKUP_FILE_BYTES) {
-      showFileError("This file is too large to be a backup.");
+      showFileError({
+        error: "This file is too large to be a backup.",
+        reason: "too_large",
+      });
 
       return;
     }
@@ -138,39 +145,57 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
       const parsed = parseContactsBackup(await new Response(file).text());
 
       if (!parsed.success) {
-        showFileError(parsed.error);
+        showFileError({ error: parsed.error, reason: "invalid_backup" });
 
         return;
       }
 
+      const sellers = mergeImportedContacts({
+        existing: readSavedContacts({
+          key: SELLERS_LOCAL_STORAGE_KEY,
+          schema: sellerSchema,
+        }),
+        imported: parsed.sellers,
+        schema: sellerSchema,
+        createId: createContactId,
+        contactNoun: "seller",
+      });
+
+      const buyers = mergeImportedContacts({
+        existing: readSavedContacts({
+          key: BUYERS_LOCAL_STORAGE_KEY,
+          schema: buyerSchema,
+        }),
+        imported: parsed.buyers,
+        schema: buyerSchema,
+        createId: createContactId,
+        contactNoun: "buyer",
+      });
+
       setImportState({
         step: "preview",
         fileName: file.name,
-        sellers: mergeImportedContacts({
-          existing: readSavedContacts({
-            key: SELLERS_LOCAL_STORAGE_KEY,
-            schema: sellerSchema,
-          }),
-          imported: parsed.sellers,
-          schema: sellerSchema,
-          createId: createContactId,
-          contactNoun: "seller",
-        }),
-        buyers: mergeImportedContacts({
-          existing: readSavedContacts({
-            key: BUYERS_LOCAL_STORAGE_KEY,
-            schema: buyerSchema,
-          }),
-          imported: parsed.buyers,
-          schema: buyerSchema,
-          createId: createContactId,
-          contactNoun: "buyer",
-        }),
+        sellers,
+        buyers,
+      });
+
+      umamiTrackEvent("import_contacts_preview_shown", {
+        data: {
+          sellersToAdd: sellers.added.length,
+          buyersToAdd: buyers.added.length,
+          alreadySaved: sellers.duplicates.length + buyers.duplicates.length,
+          invalid: sellers.invalidEntries.length + buyers.invalidEntries.length,
+          nameConflicts:
+            sellers.nameConflicts.length + buyers.nameConflicts.length,
+        },
       });
     } catch (error) {
       console.error("Failed to read sellers & buyers backup:", error);
 
-      showFileError("Something went wrong while reading it. Please try again.");
+      showFileError({
+        error: "Something went wrong while reading it. Please try again.",
+        reason: "read_failed",
+      });
 
       Sentry.captureException(error);
     }
@@ -183,7 +208,12 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
 
     const { sellers, buyers } = importState;
 
-    const showImportError = (description: string) => {
+    const showImportError = ({
+      description,
+      reason,
+    }: ShowImportErrorOptions) => {
+      umamiTrackEvent("import_contacts_error", { data: { reason } });
+
       toast.error("Could not import sellers & buyers", {
         id: "import_contacts_error_toast",
         description,
@@ -215,9 +245,11 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
           });
         }
 
-        showImportError(
-          "Your browser storage is full or unavailable. Nothing was imported.",
-        );
+        showImportError({
+          description:
+            "Your browser storage is full or unavailable. Nothing was imported.",
+          reason: "storage_unavailable",
+        });
 
         return;
       }
@@ -250,7 +282,7 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
     } catch (error) {
       console.error("Failed to import sellers & buyers:", error);
 
-      showImportError("Please try again");
+      showImportError({ description: "Please try again", reason: "unknown" });
 
       Sentry.captureException(error);
     }
@@ -268,6 +300,8 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
           if (!isOpen) {
             return;
           }
+
+          umamiTrackEvent("contacts_backup_menu_opened");
 
           // dismiss any existing toast for better UX
           toast.dismiss();
@@ -309,6 +343,8 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
             onSelect={() => {
               setImportState({ step: "choose" });
               setIsImportDialogOpen(true);
+
+              umamiTrackEvent("import_contacts_dialog_opened");
             }}
           >
             <Upload className="size-3.5" />
@@ -319,7 +355,16 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
 
       <ImportContactsDialog
         isOpen={isImportDialogOpen}
-        onOpenChange={setIsImportDialogOpen}
+        onOpenChange={(isOpen) => {
+          setIsImportDialogOpen(isOpen);
+
+          // A confirmed import closes the dialog itself, so this is only a dismissal
+          if (!isOpen) {
+            umamiTrackEvent("import_contacts_dialog_dismissed", {
+              data: { step: importState.step },
+            });
+          }
+        }}
         state={importState}
         onFileSelected={(file) => {
           void handleFileSelected(file);
@@ -328,6 +373,20 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
       />
     </>
   );
+}
+
+interface ShowFileErrorOptions {
+  /** A user-facing explanation of why the file cannot be imported. */
+  error: string;
+  /** Sent to analytics; the error text itself may hold parts of the file. */
+  reason: "too_large" | "invalid_backup" | "read_failed";
+}
+
+interface ShowImportErrorOptions {
+  /** The toast's description. */
+  description: string;
+  /** Sent to analytics. */
+  reason: "storage_unavailable" | "unknown";
 }
 
 interface ReadSavedContactsOptions<T> {

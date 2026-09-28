@@ -47,6 +47,8 @@ node_modules/
 /playwright-output/
 /playwright-test-downloads/
 
+.playwright-mcp
+
 # oxlint / oxfmt
 .oxlintcache
 
