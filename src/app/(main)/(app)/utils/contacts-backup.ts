@@ -72,10 +72,12 @@ export function serializeContactsBackup({
 }
 
 /**
- * `easyinvoicepdf-contacts-2026-09-26.json`, dated in the user's local time zone.
+ * `easyinvoicepdf-contacts-2026-09-26_23-59-07.json`, in the user's local time zone. The
+ * time keeps several exports from the same day apart, instead of the browser appending
+ * "(1)"; dashes rather than colons, which Windows and macOS do not allow in file names.
  */
 export function buildContactsBackupFileName(date: Date): string {
-  return `${CONTACTS_BACKUP_APP_ID}-contacts-${dayjs(date).format("YYYY-MM-DD")}.json`;
+  return `${CONTACTS_BACKUP_APP_ID}-contacts-${dayjs(date).format("YYYY-MM-DD_HH-mm-ss")}.json`;
 }
 
 type ParseContactsBackupResult =

@@ -101,6 +101,75 @@ describe("ImportContactsDialog preview", () => {
     ).toBeVisible();
   });
 
+  it("lists every filled-in field of a new or saved entry in a collapsed row", () => {
+    const dialog = renderDialog({
+      step: "preview",
+      fileName: "backup.json",
+      sellers: emptyResult({
+        added: [
+          sellerSchema.parse({
+            name: "Acme",
+            address: "1 Main",
+            vatNo: "PL123",
+            vatNoLabelText: "Tax no",
+            email: "billing@acme.test",
+            accountNumber: "DE89 3704",
+            accountNumberFieldIsVisible: false,
+          }),
+        ],
+      }),
+      buyers: emptyResult({ duplicates: [GLOBEX] }),
+    });
+
+    const [acme, globex] = within(dialog).getAllByTestId(
+      "import-preview-entry",
+    );
+
+    expect(acme).not.toHaveAttribute("open");
+
+    expect(acme).toHaveTextContent("Tax noPL123");
+    expect(acme).toHaveTextContent("Emailbilling@acme.test");
+    expect(acme).toHaveTextContent(
+      "Account NumberDE89 3704(hidden on invoice)",
+    );
+    expect(acme).not.toHaveTextContent("SWIFT/BIC");
+
+    // A buyer has no bank fields, and empty optional fields are left out
+    expect(globex).toHaveTextContent("Name");
+    expect(globex).not.toHaveTextContent("Email");
+  });
+
+  it("lists both fields when the tax label matches another field's label", () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {
+      return undefined;
+    });
+
+    const dialog = renderDialog({
+      step: "preview",
+      fileName: "backup.json",
+      sellers: emptyResult({
+        added: [
+          sellerSchema.parse({
+            name: "Acme",
+            address: "1 Main",
+            vatNo: "PL123",
+            vatNoLabelText: "Email",
+            email: "billing@acme.test",
+          }),
+        ],
+      }),
+      buyers: emptyResult(),
+    });
+
+    const acme = within(dialog).getByTestId("import-preview-entry");
+
+    expect(acme).toHaveTextContent("EmailPL123");
+    expect(acme).toHaveTextContent("Emailbilling@acme.test");
+    expect(consoleError).not.toHaveBeenCalled();
+
+    consoleError.mockRestore();
+  });
+
   it("shows the entry as written in the file with the failing field highlighted", () => {
     const dialog = renderDialog({
       step: "preview",

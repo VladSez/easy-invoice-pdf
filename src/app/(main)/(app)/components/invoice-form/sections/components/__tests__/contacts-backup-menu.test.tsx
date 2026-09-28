@@ -9,6 +9,7 @@ import {
   BUYERS_LOCAL_STORAGE_KEY,
   SELLERS_LOCAL_STORAGE_KEY,
 } from "@/app/schema";
+import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import "@testing-library/jest-dom/vitest";
 
 vi.mock("sonner", () => {
@@ -176,5 +177,37 @@ describe("ContactsBackupMenu import", () => {
     expect(buyers).toHaveLength(2);
     expect(buyers[0]?.id).toBeTruthy();
     expect(buyers[0]?.id).not.toBe(buyers[1]?.id);
+  });
+
+  it("tracks the preview and the import", async () => {
+    render(<ContactsBackupMenu isMobile={false} />);
+
+    await importBackup({
+      sellers: [{ name: "Acme", address: "1 Main St" }],
+      buyers: [{ name: "Globex" }],
+    });
+
+    const trackedEvents = vi.mocked(umamiTrackEvent).mock.calls;
+
+    expect(
+      trackedEvents.map(([eventName]) => {
+        return eventName;
+      }),
+    ).toEqual([
+      "contacts_backup_menu_opened",
+      "import_contacts_dialog_opened",
+      "import_contacts_file_picked",
+      "import_contacts_preview_shown",
+      "import_contacts_success",
+    ]);
+    expect(trackedEvents[3]?.[1]).toEqual({
+      data: {
+        sellersToAdd: 1,
+        buyersToAdd: 0,
+        alreadySaved: 0,
+        invalid: 1,
+        nameConflicts: 0,
+      },
+    });
   });
 });

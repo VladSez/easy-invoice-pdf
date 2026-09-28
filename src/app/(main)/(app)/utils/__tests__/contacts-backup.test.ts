@@ -142,9 +142,9 @@ describe("serializeContactsBackup", () => {
 });
 
 describe("buildContactsBackupFileName", () => {
-  it("dates the file", () => {
-    expect(buildContactsBackupFileName(new Date(2026, 8, 26, 23, 59))).toBe(
-      "easyinvoicepdf-contacts-2026-09-26.json",
+  it("dates and times the file", () => {
+    expect(buildContactsBackupFileName(new Date(2026, 8, 26, 23, 59, 7))).toBe(
+      "easyinvoicepdf-contacts-2026-09-26_23-59-07.json",
     );
   });
 });
