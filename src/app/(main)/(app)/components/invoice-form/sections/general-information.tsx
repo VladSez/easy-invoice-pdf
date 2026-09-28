@@ -602,7 +602,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               <ErrorMessage>{errors.numberFormatLocale.message}</ErrorMessage>
             ) : (
               <InputHelperMessage>
-                Select how amounts are grouped and punctuated in the PDF
+                Choose the number format used in the PDF
               </InputHelperMessage>
             )}
           </div>
@@ -647,9 +647,14 @@ export const GeneralInformation = memo(function GeneralInformation({
                   Keep format when language changes
                 </Label>
               }
-              content="Keep the number format you picked when the invoice PDF language changes, so an invoice can be written in your client's language and still use your own number formatting"
+              content="Turn on to keep your number format when the PDF language changes."
             />
           </div>
+          <InputHelperMessage>
+            {preserveNumberFormatOnLanguageChange
+              ? "The number format stays as it is when you switch the PDF language"
+              : "By default, the number format follows the PDF language"}
+          </InputHelperMessage>
         </fieldset>
 
         {/* Invoice Number */}

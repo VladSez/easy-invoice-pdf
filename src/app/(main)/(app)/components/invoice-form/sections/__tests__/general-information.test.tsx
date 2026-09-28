@@ -246,6 +246,26 @@ describe("GeneralInformation date helper texts", () => {
       expect(getPreserveNumberFormatSwitch()).not.toBeChecked();
     });
 
+    it("says under the switch whether the format follows the language", async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+      renderGeneralInformation();
+
+      expect(
+        screen.getByText(
+          "By default, the number format follows the PDF language",
+        ),
+      ).toBeInTheDocument();
+
+      await user.click(getPreserveNumberFormatSwitch());
+
+      expect(
+        screen.getByText(
+          "The number format stays as it is when you switch the PDF language",
+        ),
+      ).toBeInTheDocument();
+    });
+
     /**
      * No `aria-label` overriding it, so what a screen reader announces is the text on
      * screen -- which is what lets someone say "keep format when language changes" to a
