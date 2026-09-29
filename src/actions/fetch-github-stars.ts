@@ -9,7 +9,7 @@ import { env } from "@/env";
  * Fetches the current star count for the GitHub repository.
  *
  * This function is cached using React's `cache()` to prevent duplicate requests
- * during the same render cycle. The data is revalidated every hour.
+ * during the same render cycle. The data is revalidated every 4 hours.
  *
  * NOTE: `<Header />` renders on nearly every static page, so this `revalidate`
  * becomes the ISR revalidate time for those routes too -- Next.js takes the
@@ -26,7 +26,7 @@ export const fetchGithubStars = cache(async (): Promise<number> => {
         headers: {
           Authorization: `Bearer ${env.GITHUB_TOKEN}`,
         },
-        next: { revalidate: 3600 }, // revalidate every 1 hour (3600 seconds)
+        next: { revalidate: 14_400 }, // revalidate every 4 hours (14400 seconds)
       },
     );
 
