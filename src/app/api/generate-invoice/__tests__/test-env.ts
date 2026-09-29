@@ -29,4 +29,5 @@ export const TEST_ENV = {
   GOOGLE_DRIVE_PRIVATE_KEY: "private-key",
   GITHUB_TOKEN: "github-token",
   NEXT_PUBLIC_SENTRY_DSN: "https://sentry.test",
+  NEXT_PUBLIC_UMAMI_WEBSITE_ID: "umami-website-id",
 } as const;
