@@ -57,6 +57,12 @@ const YOUTUBE_VIDEO_HOW_TO_ADD_INVOICE_FOR_ONE_WEEK =
 const YOUTUBE_VIDEO_HOW_TO_CUSTOMIZE_TAX =
   "https://www.youtube.com/embed/F_iJxZ3PHbk";
 
+const YOUTUBE_VIDEO_HOW_TO_IMPORT_EXPORT_CONTACTS =
+  "https://www.youtube.com/embed/Vf2-QN-mB1c";
+
+const YOUTUBE_VIDEO_HOW_TO_CUSTOMIZE_NUMBER_FORMAT =
+  "https://www.youtube.com/embed/hZM2DYXo63k";
+
 /** A vertical YouTube Short; the 16:9 player pillarboxes it. */
 const YOUTUBE_VIDEO_MOBILE_DEMO = "https://www.youtube.com/embed/TKOegsmNnKM";
 
@@ -101,6 +107,19 @@ export const HOW_IT_WORKS_VIDEOS = [
     iframeTitle: "How to add a buyer - EasyInvoicePDF",
   },
   {
+    id: "import-export-contacts",
+    title: "How to import and export contacts",
+    shortTitle: "Import & export contacts",
+    description:
+      "Back up your saved sellers and buyers to a file and restore them on any device.",
+    embedUrl: YOUTUBE_VIDEO_HOW_TO_IMPORT_EXPORT_CONTACTS,
+    watchUrl: "https://www.youtube.com/watch?v=Vf2-QN-mB1c",
+    uploadDate: "2026-09-28T17:03:17-07:00",
+    durationSeconds: 42,
+    thumbnailUrl: "https://i.ytimg.com/vi/Vf2-QN-mB1c/maxresdefault.jpg",
+    iframeTitle: "How to import and export contacts - EasyInvoicePDF",
+  },
+  {
     id: "weekly-invoices",
     title: "How to create invoices for one week",
     shortTitle: "Weekly invoices",
@@ -124,6 +143,19 @@ export const HOW_IT_WORKS_VIDEOS = [
     durationSeconds: 19,
     thumbnailUrl: "https://i.ytimg.com/vi/F_iJxZ3PHbk/maxresdefault.jpg",
     iframeTitle: "How to customize tax on an invoice - EasyInvoicePDF",
+  },
+  {
+    id: "number-format",
+    title: "How to customize number formatting",
+    shortTitle: "Number formatting",
+    description:
+      "Choose how amounts are written, like 1,234.56 or 1.234,56, and create invoices in Brazilian Portuguese.",
+    embedUrl: YOUTUBE_VIDEO_HOW_TO_CUSTOMIZE_NUMBER_FORMAT,
+    watchUrl: "https://www.youtube.com/watch?v=hZM2DYXo63k",
+    uploadDate: "2026-09-24T05:17:16-07:00",
+    durationSeconds: 35,
+    thumbnailUrl: "https://i.ytimg.com/vi/hZM2DYXo63k/maxresdefault.jpg",
+    iframeTitle: "How to customize number formatting - EasyInvoicePDF",
   },
   {
     id: "mobile",

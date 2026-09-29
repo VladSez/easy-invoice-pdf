@@ -119,7 +119,9 @@ export function HowItWorksVideos({
         </p>
       </div>
 
-      <div className="aspect-video min-h-[300px] w-full shrink-0 overflow-hidden">
+      {/* A touch wider than 16:9 from `sm` up, so the player doesn't eat the whole
+          viewport on desktop; YouTube pillarboxes the video with thin black bars. */}
+      <div className="aspect-video min-h-[300px] w-full shrink-0 overflow-hidden bg-black sm:aspect-[16/8.5]">
         {showIframe ? (
           <YouTubeEmbed
             key={activeVideoId}
@@ -135,7 +137,7 @@ export function HowItWorksVideos({
           `sm` it splits into two columns that fill top to bottom, so the numbers read
           down the first column and then the second, as a playlist should. */}
       <ol
-        className="grid shrink-0 gap-1 border-t border-slate-200 p-2 sm:grid-flow-col sm:grid-cols-2 sm:grid-rows-[repeat(var(--playlist-rows),auto)] sm:p-3"
+        className="grid shrink-0 gap-2 border-t border-slate-200 p-3 sm:grid-flow-col sm:grid-cols-2 sm:grid-rows-[repeat(var(--playlist-rows),auto)] sm:p-4"
         style={{ "--playlist-rows": PLAYLIST_ROWS } as CSSProperties}
         aria-label="Tutorials"
         data-testid="how-it-works-playlist"
@@ -152,17 +154,23 @@ export function HowItWorksVideos({
                 }}
                 aria-current={isActive ? "true" : undefined}
                 className={cn(
-                  "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
-                  "focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-slate-900",
+                  "group flex w-full cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-left text-sm shadow-sm",
+                  "transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out active:scale-[0.98]",
+                  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900",
                   isActive
-                    ? "bg-slate-200 text-slate-950"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+                    ? "border-slate-900 bg-slate-900 text-white"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950 hover:shadow",
                 )}
                 data-testid={`how-it-works-playlist-item-${video.id}`}
               >
                 <span
                   aria-hidden
-                  className="flex w-4 shrink-0 justify-center text-xs font-medium tabular-nums text-slate-400"
+                  className={cn(
+                    "flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-medium tabular-nums transition-colors duration-150",
+                    isActive
+                      ? "bg-white text-slate-900"
+                      : "bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700",
+                  )}
                 >
                   {isActive ? (
                     <PlayIcon className="size-3 translate-x-px fill-slate-900 stroke-slate-900" />
@@ -179,7 +187,12 @@ export function HowItWorksVideos({
                   <span className="sm:hidden">{video.shortTitle}</span>
                   <span className="hidden sm:inline">{video.title}</span>
                 </span>
-                <span className="shrink-0 text-xs tabular-nums text-slate-500">
+                <span
+                  className={cn(
+                    "shrink-0 text-xs tabular-nums",
+                    isActive ? "text-slate-300" : "text-slate-500",
+                  )}
+                >
                   {formatDuration(video.durationSeconds)}
                 </span>
               </button>
