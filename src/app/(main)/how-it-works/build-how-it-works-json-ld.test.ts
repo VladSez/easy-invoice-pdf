@@ -49,8 +49,17 @@ describe("buildHowItWorksJsonLd", () => {
       return item.duration;
     });
 
+    // Looked up by id so adding or reordering tutorials doesn't shift the index
+    function durationOf(id: (typeof HOW_IT_WORKS_VIDEOS)[number]["id"]) {
+      return durations[
+        HOW_IT_WORKS_VIDEOS.findIndex((video) => {
+          return video.id === id;
+        })
+      ];
+    }
+
     // 70s overview and 19s tax tutorial: a minute part, and none under a minute
-    expect(durations[0]).toBe("PT1M10S");
-    expect(durations[4]).toBe("PT19S");
+    expect(durationOf("overview")).toBe("PT1M10S");
+    expect(durationOf("custom-tax")).toBe("PT19S");
   });
 });
