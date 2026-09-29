@@ -37,10 +37,13 @@ export const env = createEnv({
   },
   client: {
     NEXT_PUBLIC_SENTRY_DSN: z.string(),
+    // Umami website id, used by the analytics script in `root-document.tsx`
+    NEXT_PUBLIC_UMAMI_WEBSITE_ID: z.string(),
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
   runtimeEnv: {
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    NEXT_PUBLIC_UMAMI_WEBSITE_ID: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID,
 
     AUTH_TOKEN: process.env.AUTH_TOKEN,
 

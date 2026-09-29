@@ -8,6 +8,7 @@ import { BrowserSupportNotice } from "@/components/browser-support-notice";
 import { ResponsiveIndicator } from "@/components/dev/responsive-indicator";
 import { SentryIndicator } from "@/components/dev/sentry-indicator";
 import { PERSONAL_WEBSITE_URL, STATIC_ASSETS_URL } from "@/config";
+import { env } from "@/env";
 import { JsonLdScript } from "@/lib/seo/render-json-ld";
 import { buildSiteWideJsonLdGraph } from "@/lib/seo/site-entities";
 
@@ -72,7 +73,7 @@ export function RootDocument({ lang, children }: RootDocumentProps) {
               <Script
                 // we proxy umami check next.config.mjs rewrites
                 src="/stats/script.js"
-                data-website-id="1914352c-5ebb-4806-bfc3-f494712bb4a4"
+                data-website-id={env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
                 defer
               />
             </>
