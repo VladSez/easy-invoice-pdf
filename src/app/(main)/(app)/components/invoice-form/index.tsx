@@ -22,7 +22,6 @@ import {
   resolveNumberFormatLocale,
   type AccordionState,
   type InvoiceData,
-  type InvoiceItemData,
 } from "@/app/schema";
 import { Legend } from "@/components/legend";
 import {
@@ -39,21 +38,17 @@ import { ReadOnlyMoneyInput } from "@/components/ui/money-input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { debugLog } from "@/lib/debug-log";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
 import type { NonReadonly, Prettify } from "@/types";
 
 import { AlertIcon, ErrorMessage } from "./common";
+import { ItemTotalsSync } from "./item-totals-sync";
 import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
-import { calculateInvoiceTotal } from "./utils/calculate-invoice-total";
-import { calculateItemTotals } from "./utils/calculate-item-totals";
 import { formErrorsToToast } from "./utils/form-errors-to-toast";
-import { hasAnyItemTotalsChanged } from "./utils/has-item-totals-changed";
-import { parseValidatedInvoiceItems } from "./utils/validated-invoice-items";
 
 /**
  * Time in milliseconds to debounce updates in the invoice form,
@@ -119,7 +114,6 @@ export const InvoiceForm = memo(function InvoiceForm({
   } = form;
 
   const currency = useWatch({ control, name: "currency" });
-  const invoiceItems = useWatch({ control, name: "items" });
 
   const dateOfIssue = useWatch({ control, name: "dateOfIssue" });
 
@@ -153,57 +147,6 @@ export const InvoiceForm = memo(function InvoiceForm({
     control,
     name: "items",
   });
-
-  // calculate totals and other values when invoice items change
-  useEffect(() => {
-    // Bail out while the user is mid-edit with input the schema rejects, so we
-    // never turn half-typed values into totals and write them back. Clearing the
-    // amount field to retype it would otherwise zero out the item's totals, and
-    // a VAT of 500 would persist a bogus tax amount.
-    // `zodResolver` does not do this for us: it populates `errors`, but form
-    // state (and so `useWatch`) still holds the raw, unvalidated input.
-    const validatedItemsResult = parseValidatedInvoiceItems(invoiceItems);
-
-    if (!validatedItemsResult.success) {
-      // Not reported to Sentry on purpose, and not a `console.error` either: this branch is
-      // the expected state while someone is still typing (a cleared amount field, a
-      // half-entered VAT), so it fires constantly and says nothing about a broken app.
-      debugLog("Invalid items:", validatedItemsResult.error);
-
-      return;
-    }
-
-    const total = calculateInvoiceTotal(invoiceItems);
-
-    debugLog("[useEffect] recalculating totals because invoice items changed", {
-      invoiceItems,
-      validatedItemsResult,
-      total,
-    });
-
-    // Update total first
-    setValue("total", total, { shouldValidate: true });
-
-    // Skip rest of calculations if no items
-    if (!invoiceItems?.length) return;
-
-    // if no item totals changed (netAmount, vatAmount, preTaxAmount), skip the rest of the calculations
-    if (!hasAnyItemTotalsChanged(invoiceItems)) return;
-
-    // Only update if there are actual changes
-    const updatedItems = invoiceItems
-      .map((item) => {
-        return calculateItemTotals(item);
-      })
-      .filter(Boolean) as InvoiceItemData[];
-
-    // Batch updates
-    updatedItems.forEach((item, index) => {
-      setValue(`items.${index}`, item, {
-        shouldValidate: false, // Prevent validation during intermediate updates
-      });
-    });
-  }, [invoiceItems, setValue]);
 
   // top level of component
   const debouncedShowFormErrorsToast = useDebouncedCallback(
@@ -346,9 +289,10 @@ export const InvoiceForm = memo(function InvoiceForm({
    */
   const handleRemoveInvoiceItem = useCallback(
     (index: number) => {
+      // read at click time rather than watched, so item edits don't re-render the form
       setValue(
         "items",
-        invoiceItems.filter((_, i) => {
+        getValues("items").filter((_, i) => {
           return i !== index;
         }),
         {
@@ -368,7 +312,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       // analytics track event
       umamiTrackEvent("remove_invoice_item");
     },
-    [invoiceItems, setValue, isMobile],
+    [getValues, setValue, isMobile],
   );
 
   const onSubmit = (data: InvoiceData) => {
@@ -452,6 +396,11 @@ export const InvoiceForm = memo(function InvoiceForm({
 
   return (
     <form className="relative mb-4 space-y-3.5">
+      <ItemTotalsSync
+        control={control}
+        getValues={getValues}
+        setValue={setValue}
+      />
       <Accordion
         type="multiple"
         value={accordionValues}
