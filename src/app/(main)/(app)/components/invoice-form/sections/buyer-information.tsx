@@ -147,7 +147,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                           id="buyerVatNoFieldIsVisible"
                           checked={value}
                           onCheckedChange={onChange}
-                          className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                          size="sm"
                           data-testid="buyerVatNoFieldIsVisible"
                           aria-label="Show the 'Buyer Tax Number' Field in the PDF"
                         />
@@ -246,7 +246,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                         id="buyerEmailFieldIsVisible"
                         checked={value}
                         onCheckedChange={onChange}
-                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        size="sm"
                         data-testid="buyerEmailFieldIsVisible"
                         aria-label="Show the 'Email' field in the PDF"
                       />
@@ -300,7 +300,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                         id="buyerNotesFieldIsVisible"
                         checked={value}
                         onCheckedChange={onChange}
-                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        size="sm"
                         data-testid="buyerNotesInvoiceFormFieldVisibilitySwitch"
                         aria-label="Show the 'Notes' field in the PDF"
                       />
