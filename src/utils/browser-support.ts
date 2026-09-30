@@ -2,10 +2,9 @@
  * Client-side "is this browser too old?" check, used to nudge visitors on a stale
  * browser towards updating (`src/components/browser-support-notice.tsx`).
  *
- * Deliberately hand-rolled instead of reusing `ua-parser-js` (already a dependency,
- * but server-only today): all we need is the major version of the six engines that
- * make up practically all of the traffic, and that is a handful of regexes rather
- * than ~7 kB gzip of parser in the client bundle.
+ * Deliberately hand-rolled instead of using `ua-parser-js`: all we need is the major
+ * version of the six engines that make up practically all of the traffic, and that is
+ * a handful of regexes rather than ~7 kB gzip of parser in the client bundle.
  *
  * Everything here is a pure function of the user agent string so it can be unit
  * tested without a DOM — see `__tests__/browser-support.test.ts`.

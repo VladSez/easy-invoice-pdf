@@ -12,7 +12,6 @@ const config: KnipConfig = {
   ignoreDependencies: [
     "shadcn",
     "@radix-ui/react-separator",
-    "@types/ua-parser-js",
     "file-saver",
     "jszip",
     "@types/file-saver",

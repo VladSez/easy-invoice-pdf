@@ -22,9 +22,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .selectOption("stripe");
 
     // Wait for URL to be updated
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     // Verify share button is still enabled (no logo uploaded)
     const shareButton = page.getByRole("button", {
@@ -41,7 +41,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       return url.searchParams.has("data");
     });
     const url = page.url();
-    expect(url).toContain(`?template=stripe&data=`);
+    expect(url).toContain("/stripe-template?data=");
 
     // Verify data parameter is not empty
     const urlObj = new URL(url);
@@ -49,33 +49,28 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     expect(dataParam).toBeTruthy();
     expect(dataParam).not.toBe("");
 
-    // Verify that the shared URL is not indexed by search engines (to prevent sensitive data from being indexed)
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-      "content",
-      "noindex, nofollow",
-    );
-
     // ------------------------------------------------------------
     // Open URL in new tab
     // ------------------------------------------------------------
     const context = page.context();
     const newPage = await context.newPage();
-    await newPage.goto(url);
+    const newPageResponse = await newPage.goto(url);
+
+    // Verify that the shared URL is not indexed by search engines (to prevent sensitive
+    // data from being indexed). The page is prerendered, so this is a response header
+    // rather than the robots meta tag.
+    expect(newPageResponse?.headers()["x-robots-tag"]).toBe(
+      "noindex, nofollow",
+    );
 
     const newUrl = newPage.url();
-    expect(newUrl).toContain(`?template=stripe&data=`);
+    expect(newUrl).toContain("/stripe-template?data=");
 
     // Verify data parameter is not empty
     const newUrlObj = new URL(newUrl);
     const newDataParam = newUrlObj.searchParams.get("data");
     expect(newDataParam).toBeTruthy();
     expect(newDataParam).not.toBe("");
-
-    // Verify that the shared URL is not indexed by search engines (to prevent sensitive data from being indexed)
-    await expect(newPage.locator('meta[name="robots"]')).toHaveAttribute(
-      "content",
-      "noindex, nofollow",
-    );
 
     // Verify stripe template UI elements are visible
     const newPageGeneralInfoSection = newPage.getByTestId(
@@ -213,7 +208,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     });
 
     const url = page.url();
-    expect(url).toContain(`?template=stripe&data=`);
+    expect(url).toContain("/stripe-template?data=");
 
     // Verify data parameter is not empty
     const urlObj = new URL(url);
@@ -264,6 +259,43 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await expect(shareButton).toBeEnabled();
   });
 
+  test("switching templates after sharing clears the shared link from the URL", async ({
+    page,
+  }) => {
+    await expect(page).toHaveURL("/?template=default");
+
+    const shareButton = page.getByRole("button", { name: "Get link" });
+    const templateSelect = page.getByRole("combobox", {
+      name: "Invoice Template",
+    });
+
+    // Share on the default template...
+    await shareButton.click();
+    await page.waitForURL((url) => {
+      return url.searchParams.has("data");
+    });
+    expect(page.url()).toContain("/?template=default&data=");
+
+    // ...then switch to Stripe: the invoice no longer matches the shared link, so `?data=`
+    // has to go. (The template-to-URL sync used to put it back, reading the URL from the
+    // render before the switch.)
+    await templateSelect.selectOption("stripe");
+
+    await expect(page).toHaveURL("/stripe-template");
+    await expect(page.getByText("Invoice Updated")).toBeVisible();
+
+    // Same the other way round: share on Stripe, switch back to default
+    await shareButton.click();
+    await page.waitForURL((url) => {
+      return url.searchParams.has("data");
+    });
+    expect(page.url()).toContain("/stripe-template?data=");
+
+    await templateSelect.selectOption("default");
+
+    await expect(page).toHaveURL("/?template=default");
+  });
+
   test("preserves sharing state after page reload", async ({ page }) => {
     // Verify default template is selected by default
     await expect(page).toHaveURL("/?template=default");
@@ -273,7 +305,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     // Upload logo
     await uploadLogoFile(page);
@@ -307,7 +339,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     // Reload the page
     await page.reload();
 
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     // Verify state persists after reload
     await expect(
@@ -387,7 +419,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     // Locate the Net Price input for the first invoice item
     const netPriceInput = page.locator("#itemNetPrice0");
@@ -437,7 +469,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       return url.searchParams.has("data");
     });
     const url = page.url();
-    expect(url).toContain("?template=stripe&data=");
+    expect(url).toContain("/stripe-template?data=");
 
     // Verify data parameter is not empty
     const urlObj = new URL(url);

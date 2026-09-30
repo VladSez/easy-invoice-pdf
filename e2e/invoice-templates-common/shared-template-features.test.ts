@@ -2,6 +2,7 @@ import type { Locator, Page } from "@playwright/test";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import type { SupportedTemplates } from "@/app/schema";
+import { buildInvoiceAppUrl } from "@/utils/invoice-app-url";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { expect, test } from "../utils/extended-playwright-test";
@@ -37,8 +38,8 @@ async function selectTemplate(page: Page, template: Template) {
       .selectOption(template);
   }
 
-  await page.waitForURL(`/?template=${template}`);
-  await expect(page).toHaveURL(`/?template=${template}`);
+  await page.waitForURL(buildInvoiceAppUrl({ template }));
+  await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
 }
 
 /**
@@ -328,7 +329,7 @@ test.describe("Invoice Template shared features", () => {
 
       // navigate back to the previous page
       await page.goto("/");
-      await expect(page).toHaveURL(`/?template=${template}`);
+      await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
 
       const newFinalSection = page.getByTestId("final-section");
 
@@ -448,7 +449,7 @@ test.describe("Invoice Template shared features", () => {
       });
 
       await page.goto("/");
-      await expect(page).toHaveURL(`/?template=${template}`);
+      await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
 
       const newGeneralInfoSection = page.getByTestId(
         "general-information-section",
@@ -646,7 +647,7 @@ test.describe("Invoice Template shared features", () => {
        */
 
       await page.goto("/");
-      await expect(page).toHaveURL(`/?template=${template}`);
+      await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
 
       // Create seller via dialog with email visible
       await waitForPdfRegeneration(page, async () => {
@@ -770,7 +771,7 @@ test.describe("Invoice Template shared features", () => {
 
       // the screenshot leaves the app on about:blank; the invoice comes back from localStorage
       await page.goto("/");
-      await expect(page).toHaveURL(`/?template=${template}`);
+      await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
 
       const numberFormatSelect = page
         .getByRole("group", { name: "Number Format" })

@@ -1,33 +1,16 @@
-import { DeviceContextProvider } from "@/contexts/device-context";
-import { checkDeviceUserAgent } from "@/lib/check-device.server";
+import { UserAgentDeviceContextProvider } from "@/contexts/device-context";
 
 /**
- * Layout of the invoice generator itself (`/`).
+ * Layout of the invoice generator itself (`/` and `/stripe-template`).
  *
- * Server-side device detection lives here rather than in the shared root document
- * (`src/app/(components)/root-document.tsx`): `checkDeviceUserAgent()` reads
- * `headers()`, and from the root that made *every* route request-bound — which is
- * why the marketing pages all needed `export const dynamic = "force-static"` to stay
- * prerendered. `useDeviceContext()` is only consumed under this route group, and `/`
- * is rendered per request anyway (`page.tsx` reads `searchParams`), so nothing is
- * lost by scoping the header read to it.
+ * Device detection runs in the browser (`UserAgentDeviceContextProvider`), not from the
+ * request headers: reading `headers()` here made both routes render per request, and
+ * they have nothing else that needs the request -- the invoice lives in `localStorage`
+ * or `?data=`, both read on the client. Keeping this layout free of dynamic APIs is what
+ * lets the app be prerendered and served from the CDN.
  */
-export default async function AppLayout({ children }: LayoutProps<"/">) {
-  const {
-    isDesktop: isDesktopServer,
-    isAndroid,
-    isMobile,
-    inAppInfo,
-  } = await checkDeviceUserAgent();
-
+export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
-    <DeviceContextProvider
-      isDesktop={isDesktopServer}
-      isAndroid={isAndroid}
-      isMobile={isMobile}
-      inAppInfo={inAppInfo}
-    >
-      {children}
-    </DeviceContextProvider>
+    <UserAgentDeviceContextProvider>{children}</UserAgentDeviceContextProvider>
   );
 }

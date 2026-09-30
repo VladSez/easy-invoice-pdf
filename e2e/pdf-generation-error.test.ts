@@ -76,7 +76,7 @@ test.describe("PDF generation errors", () => {
   });
 
   test("the Stripe template surfaces the same error", async ({ page }) => {
-    await page.goto("/?template=stripe");
+    await page.goto("/stripe-template");
 
     await expect(page.getByText("Error Generating PDF Document")).toBeVisible();
   });

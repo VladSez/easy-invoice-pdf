@@ -41,7 +41,7 @@ test.describe("Stripe Invoice Template", () => {
       },
     );
 
-    await page.goto("/?template=stripe");
+    await page.goto("/stripe-template");
 
     const generalInfoSection = page.getByTestId("general-information-section");
     const invoiceNumberFieldset = generalInfoSection.getByRole("group", {
@@ -74,8 +74,8 @@ test.describe("Stripe Invoice Template", () => {
     await expect(page).toHaveURL("/?template=default");
 
     // Navigate to Stripe template
-    await page.goto("/?template=stripe");
-    await expect(page).toHaveURL("/?template=stripe");
+    await page.goto("/stripe-template");
+    await expect(page).toHaveURL("/stripe-template");
 
     const templateCombobox = page.getByRole("combobox", {
       name: "Invoice Template",
@@ -145,7 +145,7 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     // Logo section should still be visible on Stripe template
     await expect(
@@ -336,7 +336,7 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     const generalInfoSection = page.getByTestId("general-information-section");
     const paymentUrlInput = generalInfoSection.getByRole("textbox", {
@@ -382,7 +382,7 @@ test.describe("Stripe Invoice Template", () => {
       .selectOption("stripe");
 
     // Wait for URL to be updated
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     const generalInfoSection = page.getByTestId("general-information-section");
 
@@ -423,7 +423,7 @@ test.describe("Stripe Invoice Template", () => {
     // Reload page
     await page.reload();
 
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     // Verify template is still Stripe
     await expect(
@@ -501,7 +501,7 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     /** VERIFY SIGNATURE FIELDS ARE NOW HIDDEN */
 
@@ -650,7 +650,7 @@ test.describe("Stripe Invoice Template", () => {
       .selectOption("stripe");
 
     // Wait for URL to be updated
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     // All switches and Type of GTU field should now be hidden
     await expect(showNumberColumnSwitch).toBeHidden();
@@ -739,7 +739,7 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     // Verify Payment Method field is now hidden
     await expect(paymentMethodField).toBeHidden();
@@ -775,7 +775,7 @@ test.describe("Stripe Invoice Template", () => {
     await expect(servicePeriodSwitch).not.toBeChecked();
 
     await templateCombobox.selectOption("stripe");
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     await expect(servicePeriodSwitch).toBeChecked();
 
@@ -790,7 +790,7 @@ test.describe("Stripe Invoice Template", () => {
     await expect(servicePeriodSwitch).toBeChecked();
 
     await templateCombobox.selectOption("stripe");
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
     await expect(servicePeriodSwitch).toBeChecked();
 
     await templateCombobox.selectOption("default");
@@ -846,7 +846,7 @@ test.describe("Stripe Invoice Template", () => {
       .selectOption("stripe");
 
     // Wait for URL to be updated
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     const newInvoiceItemsSection = page.getByTestId("invoice-items-section");
 
@@ -885,7 +885,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // navigate back to the previous page
     await page.goto("/");
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     // verify that the stripe template is selected
     const templateCombobox = page.getByRole("combobox", {
@@ -941,7 +941,7 @@ test.describe("Stripe Invoice Template", () => {
       .selectOption("stripe");
 
     // Wait for URL to be updated
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     // Upload a valid logo
     await uploadLogoFile(page);
@@ -1048,8 +1048,8 @@ test.describe("Stripe Invoice Template", () => {
         },
       );
 
-      await page.goto("/?template=stripe");
-      await expect(page).toHaveURL("/?template=stripe");
+      await page.goto("/stripe-template");
+      await expect(page).toHaveURL("/stripe-template");
 
       await expectPdfScreenshot(page, {
         downloadDir,

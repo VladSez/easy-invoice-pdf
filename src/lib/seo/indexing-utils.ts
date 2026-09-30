@@ -1,19 +1,14 @@
 import { PROD_WEBSITE_URL } from "@/config";
 
 /**
- * Determine indexing-related flags from request search parameters and environment.
+ * Whether this deployment may be indexed at all: the canonical production deployment
+ * (or the local dev server, see below). Preview deployments never are.
  *
- * @param searchParams - Query params from request URL.
- * @returns Object with:
- *   hasShareableData: Whether query contains 'data' parameter (shareable invoice).
- *   isIndexableEnvironment: True if this deployment is allowed to be indexed at all.
- *   shouldIndex: True if page should be indexed (indexable environment, no share data).
+ * Depends only on the environment, so it is known at build time and prerendered pages
+ * can use it. Shared invoice links (`?data=`) are kept out of the index separately, by
+ * the `X-Robots-Tag` header in `next.config.mjs`.
  */
-export function computeIndexingFlags(searchParams: {
-  [key: string]: string | string[] | undefined;
-}) {
-  const hasShareableData = searchParams?.data !== undefined;
-
+export function getIsIndexableEnvironment() {
   const isProd =
     process.env.VERCEL_ENV === "production" &&
     `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` === PROD_WEBSITE_URL;
@@ -27,20 +22,5 @@ export function computeIndexingFlags(searchParams: {
    */
   const isLocalDevServer = process.env.NODE_ENV === "development";
 
-  const isIndexableEnvironment = isProd || isLocalDevServer;
-
-  const shouldIndex = isIndexableEnvironment && !hasShareableData;
-
-  return { hasShareableData, isIndexableEnvironment, shouldIndex };
+  return isProd || isLocalDevServer;
 }
-
-/**
- * The `content` values Next.js renders for `Metadata.robots` on the invoice app page.
- *
- * Kept here so the client-side sync in `RobotsMetaSync` writes exactly what
- * `resolveAppPageRobots` would have rendered for the same state.
- */
-export const ROBOTS_META_CONTENT = {
-  indexable: "index, follow",
-  nonIndexable: "noindex, nofollow",
-} as const;

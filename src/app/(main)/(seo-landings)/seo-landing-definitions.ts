@@ -5,6 +5,7 @@ import {
   VIDEO_MULTI_LANGUAGE_YOUTUBE_URL,
   VIDEO_NORDIC_INVOICE_YOUTUBE_URL,
 } from "@/config";
+import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
 
 export const SEO_LANDING_SLUGS = [
   "invoice-generator-no-login",
@@ -484,7 +485,7 @@ export const SEO_LANDING_DEFINITIONS = {
         "Free, with no signup",
       ],
       ctaLabel: "Create a Stripe-Style Invoice",
-      ctaHref: "/?template=stripe",
+      ctaHref: STRIPE_TEMPLATE_PATHNAME,
       heroImage: `${STATIC_ASSETS_URL}/seo-content/stripe-template-v1.png`,
     },
     factsTable: {

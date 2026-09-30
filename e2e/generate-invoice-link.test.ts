@@ -494,9 +494,9 @@ test.describe("Generate Invoice Link (Get link)", () => {
     //  Navigate to old uncompressed URL
     await page.goto(`/?data=${OLD_UNCOMPRESSED_URL}`, { waitUntil: "commit" });
 
-    // Verify the page loads without error
+    // Verify the page loads without error (and moves to the Stripe template's route)
     await expect(page).toHaveURL(
-      `/?data=${OLD_UNCOMPRESSED_URL}&template=stripe`,
+      `/stripe-template?data=${OLD_UNCOMPRESSED_URL}`,
     );
 
     const oldUrl = page.url();
@@ -556,8 +556,11 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
     await page.goto(newCompressedUrl, { waitUntil: "commit" });
 
-    // Verify the page loads without error
-    await expect(page).toHaveURL(newCompressedUrl);
+    // Verify the page loads without error: the legacy `/?template=stripe` link is
+    // redirected to the Stripe template's route, which drops the redundant param
+    await expect(page).toHaveURL(
+      newCompressedUrl.replace("/?template=stripe&", "/stripe-template?"),
+    );
 
     const newUrl = page.url();
 

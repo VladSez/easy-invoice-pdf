@@ -13,6 +13,7 @@ import {
   type SupportedLanguages,
   type SupportedTemplates,
 } from "@/app/schema";
+import { buildInvoiceAppUrl } from "@/utils/invoice-app-url";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { expect, test } from "../utils/extended-playwright-test";
@@ -94,8 +95,8 @@ async function selectTemplate(page: Page, template: Template) {
       .selectOption(template);
   }
 
-  await page.waitForURL(`/?template=${template}`);
-  await expect(page).toHaveURL(`/?template=${template}`);
+  await page.waitForURL(buildInvoiceAppUrl({ template }));
+  await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
 }
 
 /**

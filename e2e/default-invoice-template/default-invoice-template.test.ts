@@ -641,7 +641,7 @@ test.describe("Default Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     // Verify that the Stripe template is selected
     const templateSelect = page.getByRole("combobox", {
@@ -731,7 +731,7 @@ test.describe("Default Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     // Verify logo persists after template switch
     await expect(
