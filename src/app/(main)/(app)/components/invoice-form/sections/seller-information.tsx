@@ -149,7 +149,7 @@ export const SellerInformation = memo(function SellerInformation({
                           id="sellerVatNoFieldIsVisible"
                           checked={value}
                           onCheckedChange={onChange}
-                          className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                          size="sm"
                           data-testid="sellerVatNoFieldIsVisible"
                           aria-label="Show the 'Seller Tax Number' Field in the PDF"
                         />
@@ -250,7 +250,7 @@ export const SellerInformation = memo(function SellerInformation({
                         id="sellerEmailFieldIsVisible"
                         checked={value}
                         onCheckedChange={onChange}
-                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        size="sm"
                         data-testid="sellerEmailFieldIsVisible"
                         aria-label="Show the 'Email' field in the PDF"
                       />
@@ -306,7 +306,7 @@ export const SellerInformation = memo(function SellerInformation({
                         id="sellerAccountNumberFieldIsVisible"
                         checked={value}
                         onCheckedChange={onChange}
-                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        size="sm"
                         data-testid="sellerAccountNumberFieldIsVisible"
                         aria-label="Show the 'Account Number' Field in the PDF"
                       />
@@ -364,7 +364,7 @@ export const SellerInformation = memo(function SellerInformation({
                         id="sellerSwiftBicFieldIsVisible"
                         checked={value}
                         onCheckedChange={onChange}
-                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        size="sm"
                         data-testid="sellerSwiftBicFieldIsVisible"
                         aria-label="Show the 'SWIFT/BIC' Field in the PDF"
                       />
@@ -420,7 +420,7 @@ export const SellerInformation = memo(function SellerInformation({
                         id="sellerNotesFieldIsVisible"
                         checked={value}
                         onCheckedChange={onChange}
-                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        size="sm"
                         data-testid="sellerNotesInvoiceFormFieldVisibilitySwitch"
                         aria-label="Show the 'Notes' field in the PDF"
                       />

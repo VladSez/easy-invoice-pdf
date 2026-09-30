@@ -555,7 +555,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                         id={`paymentMethodFieldIsVisible`}
                         checked={value}
                         onCheckedChange={onChange}
-                        className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                        size="sm"
                         data-testid="paymentMethodFieldIsVisible"
                       />
                     );
@@ -685,7 +685,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                       id={`notesFieldIsVisible`}
                       checked={value}
                       onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      size="sm"
                     />
                   );
                 }}
@@ -737,7 +737,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                       id={`qrCodeIsVisible`}
                       checked={value}
                       onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      size="sm"
                       aria-label="Show QR Code in PDF"
                     />
                   );
@@ -833,7 +833,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                           id="personAuthorizedToReceiveFieldIsVisible"
                           checked={value}
                           onCheckedChange={onChange}
-                          className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                          size="sm"
                           aria-label="Show Person Authorized to Receive in PDF"
                         />
                       );
@@ -900,7 +900,7 @@ export const InvoiceForm = memo(function InvoiceForm({
                           id="personAuthorizedToIssueFieldIsVisible"
                           checked={value}
                           onCheckedChange={onChange}
-                          className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                          size="sm"
                           aria-label="Show Person Authorized to Issue in PDF"
                         />
                       );

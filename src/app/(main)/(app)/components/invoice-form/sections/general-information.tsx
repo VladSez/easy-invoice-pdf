@@ -636,7 +636,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                         },
                       );
                     }}
-                    className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                    size="sm"
                   />
                 );
               }}
@@ -828,7 +828,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                       data-testid="servicePeriodFieldIsVisible"
                       checked={value}
                       onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      size="sm"
                       aria-label='Show the "Service period" (Service period start and end) field in the PDF'
                     />
                   );
@@ -997,7 +997,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                             data-testid="dateOfServiceFieldIsVisible"
                             checked={value}
                             onCheckedChange={onChange}
-                            className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                            size="sm"
                             aria-label='Show the "Date of sales/of executing the service" field in the PDF'
                           />
                         );
@@ -1089,7 +1089,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                       id={`invoiceTypeFieldIsVisible`}
                       checked={value}
                       onCheckedChange={onChange}
-                      className="h-5 w-8 [&_span]:size-4 [&_span]:data-[state=checked]:translate-x-3 rtl:[&_span]:data-[state=checked]:-translate-x-3"
+                      size="sm"
                       aria-label={`Show the "Header Notes" Field in the PDF`}
                     />
                   );
