@@ -9,7 +9,7 @@ import {
   buildSiteNavigationList,
   buildWebApplication,
   HOME_PAGE_DESCRIPTION,
-  SITE_NAME,
+  HOME_PAGE_TITLE,
 } from "@/lib/seo/site-entities";
 
 /** The page a `WebPage` node describes: the invoice app at one of its routes. */
@@ -24,7 +24,7 @@ export interface InvoiceAppWebPage {
 /** The home page, `/`: the invoice app on the default template. */
 export const HOME_WEB_PAGE = {
   url: `${PROD_WEBSITE_URL}/`,
-  name: SITE_NAME,
+  name: HOME_PAGE_TITLE,
   description: HOME_PAGE_DESCRIPTION,
 } as const satisfies InvoiceAppWebPage;
 

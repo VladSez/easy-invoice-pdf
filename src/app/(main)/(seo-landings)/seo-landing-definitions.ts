@@ -15,6 +15,10 @@ export const SEO_LANDING_SLUGS = [
   "multi-language-invoice-generator",
   "swedish-invoice-generator",
   "norwegian-invoice-generator",
+  "contractor-invoice-template",
+  "freelance-invoice-template",
+  "proforma-invoice-generator",
+  "export-invoice-format",
 ] as const;
 
 export type SeoLandingSlug = (typeof SEO_LANDING_SLUGS)[number];
@@ -100,6 +104,14 @@ export interface SeoLandingDefinition {
   };
   comparisonTable?: ComparisonTable;
   faq: SeoFaqItem[];
+  /**
+   * Other landings this one links to, in a block under the FAQ.
+   *
+   * Before this the landings reached each other only through the footer list, which
+   * search engines weigh less than links in the body. Pick pages a reader of this one
+   * plausibly needs next, not a fixed set.
+   */
+  relatedSlugs: readonly SeoLandingSlug[];
 }
 
 /** The invoice app, opened on the visitor's last used template (default for new visitors). */
@@ -116,7 +128,7 @@ export const SEO_LANDING_DEFINITIONS = {
         "invoice generator, free invoice generator, invoice generator tool, invoice maker, invoice builder, create invoice free, free bill generator, invoice generator no login, no signup invoice maker, free invoice forms, bill template, browser invoice generator, ad-free invoice generator",
     },
     hero: {
-      h1: "Free Invoice Generator - No Login Required",
+      h1: "Free Invoice Generator - No Sign Up, No Login",
       subheading:
         "Fill in the form, watch the PDF redraw beside it, then download the file. No account, no email, no credit card. The invoice is rendered on your own machine, so nothing you type is uploaded.",
       bullets: [
@@ -253,6 +265,11 @@ export const SEO_LANDING_DEFINITIONS = {
         { feature: "Price", thisTool: "✅ Free", other: "⚠️ Paid plans" },
       ],
     },
+    relatedSlugs: [
+      "open-source-invoice-generator",
+      "invoice-template-pdf",
+      "freelance-invoice-template",
+    ],
     faq: [
       {
         question: "Do I need to create an account?",
@@ -393,7 +410,7 @@ export const SEO_LANDING_DEFINITIONS = {
       },
     ],
     comparisonTable: {
-      heading: "Open source compared",
+      heading: "Open-source invoice software compared",
       intro:
         "Most invoicing tools are closed products with an export button. This compares what changes when the code is public.",
       columnLabels: ["", "EasyInvoicePDF.com", "Closed invoicing tools"],
@@ -422,6 +439,11 @@ export const SEO_LANDING_DEFINITIONS = {
         { feature: "Price", thisTool: "✅ Free", other: "⚠️ Paid plans" },
       ],
     },
+    relatedSlugs: [
+      "invoice-generator-no-login",
+      "multi-language-invoice-generator",
+      "stripe-invoice-alternative",
+    ],
     faq: [
       {
         question: "Is it really open source?",
@@ -468,14 +490,14 @@ export const SEO_LANDING_DEFINITIONS = {
   "stripe-invoice-alternative": {
     slug: "stripe-invoice-alternative",
     metadata: {
-      title: "Free Stripe Invoice Alternative - PDF, No Account",
+      title: "Stripe Invoice Generator - Free, No Stripe Account",
       description:
-        "Need the invoice rather than the payment stack? Fill in a Stripe-style invoice, add your logo, and download the PDF. No Stripe account, no dashboard, free.",
+        "A free Stripe invoice generator for when you need the invoice, not the payment stack. Fill in the Stripe-style layout, add your logo, download the PDF.",
       keywords:
-        "stripe invoice alternative, invoice without stripe, create invoice without stripe, stripe style invoice template, invoice generator with logo, simple PDF invoice, invoice billing software, business billing software, wave accounting alternative, zoho billing alternative, ad-free invoicing",
+        "stripe invoice generator, stripe invoice pdf, stripe invoice alternative, invoice without stripe, create invoice without stripe, stripe style invoice template, invoice generator with logo, simple PDF invoice, invoice billing software, business billing software, wave accounting alternative, zoho billing alternative, ad-free invoicing",
     },
     hero: {
-      h1: "Create a Stripe-Style Invoice Without Stripe",
+      h1: "Stripe Invoice Generator, No Stripe Account Needed",
       subheading:
         "The Stripe-style template is here as a layout you fill in and download. No payments account, no products to configure, no dashboard to learn. Add your logo, pick the currency, press Download PDF.",
       bullets: [
@@ -589,6 +611,11 @@ export const SEO_LANDING_DEFINITIONS = {
         { feature: "Price", thisTool: "✅ Free", other: "⚠️ Paid" },
       ],
     },
+    relatedSlugs: [
+      "invoice-template-pdf",
+      "invoice-generator-no-login",
+      "proforma-invoice-generator",
+    ],
     faq: [
       {
         question: "Do I need a Stripe account?",
@@ -635,14 +662,14 @@ export const SEO_LANDING_DEFINITIONS = {
   "invoice-template-pdf": {
     slug: "invoice-template-pdf",
     metadata: {
-      title: "Free Invoice Template - Fill It In, Download a PDF",
+      title: "Free Invoice Template PDF - Fill In and Download",
       description:
         "A free invoice template that fills itself in. Type into the form, the PDF redraws beside it, download it. No Word formatting, no Google Docs table, no signup.",
       keywords:
         "free invoice template PDF, invoice template word, invoice format word, word document invoice template, invoice template google docs, bill template google docs, billing template google docs, invoice template canva, small business invoice template, bill template, billing template free, free sample invoice, free invoice example, printable invoice template, invoice PDF download",
     },
     hero: {
-      h1: "Free Invoice Template - Fill It In and Download a PDF",
+      h1: "Free Invoice Template PDF You Fill In Online",
       subheading:
         "A Word or Google Docs invoice template is a document you keep repairing. This one is a form: type into the fields, watch the PDF redraw beside them, and download it when it reads right.",
       bullets: [
@@ -785,6 +812,11 @@ export const SEO_LANDING_DEFINITIONS = {
         },
       ],
     },
+    relatedSlugs: [
+      "freelance-invoice-template",
+      "contractor-invoice-template",
+      "proforma-invoice-generator",
+    ],
     faq: [
       {
         question: "Is this better than a Word invoice template?",
@@ -838,9 +870,9 @@ export const SEO_LANDING_DEFINITIONS = {
     metadata: {
       title: "Multi-Language Invoice Generator - Free PDF, 13 Languages",
       description:
-        "Create a professional invoice in Swedish, Norwegian, German, Spanish, Brazilian Portuguese and eight more languages. Labels, dates and the amount in words are all localized. Free, no signup.",
+        "Create a professional invoice in 13 languages, from Swedish to Brazilian Portuguese. Labels, dates and the amount in words are all localized. Free, no signup.",
       keywords:
-        "multi language invoice generator, invoice in different languages, multilingual invoice template, swedish invoice generator, norwegian invoice generator, german invoice template, spanish invoice generator, brazilian portuguese invoice generator, invoice amount in words, foreign language invoice, international invoice PDF",
+        "multi language invoice generator, invoice in spanish, invoice in german, invoice in french, invoice in different languages, multilingual invoice template, swedish invoice generator, norwegian invoice generator, german invoice template, spanish invoice generator, brazilian portuguese invoice generator, invoice amount in words, foreign language invoice, international invoice PDF",
     },
     hero: {
       h1: "Invoice Generator in 13 Languages - Free PDF",
@@ -921,8 +953,22 @@ export const SEO_LANDING_DEFINITIONS = {
         ],
       },
       {
-        title: "All 13 languages",
-        lead: "English, Polski, Nederlands, Français, Deutsch, Italiano, Norsk bokmål, Português, Português (Brasil), Русский, Español, Svenska, Українська.",
+        title: "All 13 languages, and their word for invoice",
+        lead: "Each language titles the PDF with its own word for invoice. This is what the Stripe-style template prints at the top of the page:",
+        bullets: [
+          "English: Invoice",
+          "Spanish (Español): Factura",
+          "German (Deutsch): Rechnung",
+          "French (Français): Facture",
+          "Italian (Italiano): Fattura",
+          "Dutch (Nederlands): Factuur",
+          "Polish (Polski): Faktura",
+          "Swedish (Svenska): Faktura",
+          "Norwegian (Norsk bokmål): Faktura",
+          "Portuguese (Português), Portugal and Brazil: Fatura",
+          "Russian (Русский): Счет",
+          "Ukrainian (Українська): Рахунок",
+        ],
         paragraphs: [
           "Brazilian Portuguese is the most recent addition, and a separate entry rather than a spelling variant: it labels the tax number CNPJ/CPF instead of NIF, calls the tax Imposto and its rate Alíquota rather than IVA, and writes the total the way Brazil counts — um bilhão where Portugal says mil milhões.",
           "The language of the PDF is independent of the language you use the app in, and of the currency. Invoice a German client in EUR while working in English, or send a Swedish invoice in USD.",
@@ -982,6 +1028,11 @@ export const SEO_LANDING_DEFINITIONS = {
         { feature: "Free", thisTool: "✅ Always", other: "⚠️ Paid plans" },
       ],
     },
+    relatedSlugs: [
+      "swedish-invoice-generator",
+      "norwegian-invoice-generator",
+      "export-invoice-format",
+    ],
     faq: [
       {
         question: "Which languages can I create an invoice in?",
@@ -1019,6 +1070,11 @@ export const SEO_LANDING_DEFINITIONS = {
           "Yes. The generator is free and open-source, with no paid tier gating the languages. You can inspect the code on GitHub or host it yourself.",
       },
       {
+        question: "What is invoice in Spanish, German or French?",
+        answer:
+          "Factura in Spanish, Rechnung in German and Facture in French. Pick one of those as the invoice language and the PDF uses that word in its title, along with translated labels for every other field.",
+      },
+      {
         question: "Can I send the same invoice in two languages?",
         answer:
           "Switch the language and download again. The invoice content stays as you entered it, and only the generated labels change, so each download gives you a separate PDF.",
@@ -1032,7 +1088,7 @@ export const SEO_LANDING_DEFINITIONS = {
       description:
         "Create a Swedish invoice PDF with SEK amounts, moms wording and Swedish labels on every field. The total is written out in Swedish. Free, no account.",
       keywords:
-        "swedish invoice generator, invoice generator sweden, faktura mall, fakturamall gratis, swedish invoice template, invoice in SEK, moms invoice, swedish krona invoice, faktura pdf, invoice for swedish clients",
+        "swedish invoice generator, invoice svenska, faktura på engelska, invoice generator sweden, faktura mall, fakturamall gratis, swedish invoice template, invoice in SEK, moms invoice, swedish krona invoice, faktura pdf, invoice for swedish clients",
     },
     hero: {
       h1: "Create a Swedish invoice in SEK",
@@ -1116,6 +1172,21 @@ export const SEO_LANDING_DEFINITIONS = {
         ],
       },
       {
+        title: "Swedish invoice terms in English",
+        lead: "Billing a client who does not read Swedish, or reading a Swedish invoice yourself? These are the labels the PDF uses, and their English equivalents:",
+        bullets: [
+          "Faktura: Invoice",
+          "Säljare and Köpare: Seller and Buyer",
+          "Moms: VAT, and Momsreg.nr: VAT number",
+          "Förfallodatum: Due date",
+          "Att betala: Amount to pay",
+          "Kontonummer: Account number",
+        ],
+        paragraphs: [
+          "Need the invoice in English instead, a faktura på engelska? Switch the invoice language to English and keep SEK as the currency. Nothing else changes.",
+        ],
+      },
+      {
         title: "Create a Swedish invoice",
         lead: "Four steps, and nothing to download:",
         bullets: [
@@ -1160,12 +1231,28 @@ export const SEO_LANDING_DEFINITIONS = {
         { feature: "Price", thisTool: "✅ Free", other: "⚠️ Paid plans" },
       ],
     },
+    relatedSlugs: [
+      "norwegian-invoice-generator",
+      "multi-language-invoice-generator",
+      "freelance-invoice-template",
+    ],
     faq: [
       {
         question:
           "Can I write the invoice in Swedish but charge in another currency?",
         answer:
           "Yes. Language and currency are separate settings, so Swedish wording works with any of the 122 currencies. Billing a German client in euros while keeping Swedish labels takes one dropdown.",
+      },
+      {
+        question: "What is invoice in Swedish?",
+        answer:
+          "Faktura. With Swedish selected, the PDF is titled Faktura and the invoice number is labelled Fakturanummer.",
+      },
+      {
+        question:
+          "Can I write the invoice in English for a Swedish client, or the other way round?",
+        answer:
+          "Yes. Language is one dropdown, so the same invoice can be downloaded in Swedish and in English. Amounts, items and dates stay exactly as you entered them.",
       },
       {
         question: "Does the invoice say moms or VAT?",
@@ -1291,6 +1378,21 @@ export const SEO_LANDING_DEFINITIONS = {
         ],
       },
       {
+        title: "Norwegian invoice terms in English",
+        lead: "Billing a client who does not read Norwegian, or reading a Norwegian invoice yourself? These are the labels the PDF uses, and their English equivalents:",
+        bullets: [
+          "Faktura: Invoice",
+          "Selger and Kjøper: Seller and Buyer",
+          "MVA: VAT, and Org.nr: Organisation number",
+          "Forfallsdato: Due date",
+          "Å betale: Amount to pay",
+          "Kontonummer: Account number",
+        ],
+        paragraphs: [
+          "Need the invoice in English instead? Switch the invoice language to English and keep NOK as the currency. Nothing else changes.",
+        ],
+      },
+      {
         title: "Create a Norwegian invoice",
         lead: "Four steps, and nothing to download:",
         bullets: [
@@ -1339,12 +1441,22 @@ export const SEO_LANDING_DEFINITIONS = {
         { feature: "Price", thisTool: "✅ Free", other: "⚠️ Paid plans" },
       ],
     },
+    relatedSlugs: [
+      "swedish-invoice-generator",
+      "multi-language-invoice-generator",
+      "freelance-invoice-template",
+    ],
     faq: [
       {
         question:
           "Can I write the invoice in Norwegian but charge in another currency?",
         answer:
           "Yes. Language and currency are separate settings, so Norwegian wording works with any of the 122 currencies. Billing a Swedish client in SEK while keeping Norwegian labels takes one dropdown.",
+      },
+      {
+        question: "What is invoice in Norwegian?",
+        answer:
+          "Faktura. With Norwegian selected, the PDF is titled Faktura, and the line items, tax and totals use Bokmål labels.",
       },
       {
         question: "Does the invoice say MVA or VAT?",
@@ -1375,6 +1487,640 @@ export const SEO_LANDING_DEFINITIONS = {
         question: "Is this accounting software?",
         answer:
           "No. It produces invoice PDFs and does not file, track or reconcile anything, and it makes no compliance guarantees. Check the result against your own bookkeeping requirements.",
+      },
+    ],
+  },
+  "contractor-invoice-template": {
+    slug: "contractor-invoice-template",
+    metadata: {
+      title: "Free Contractor Invoice Template - PDF in USD",
+      description:
+        "A free independent contractor invoice template. Bill hours or a flat fee in US dollars, date it MM/DD/YYYY, and download the PDF. No signup, no Word file.",
+      keywords:
+        "contractor invoice template, independent contractor invoice template, invoice template for contractors, contractor invoice, independent contractor invoice, 1099 invoice template, 1099 contractor invoice template, hourly invoice template, contractor invoice pdf, free contractor invoice",
+    },
+    hero: {
+      h1: "Free Contractor Invoice Template",
+      subheading:
+        "Bill a client for hours or a flat fee, in US dollars, on a PDF that looks the same in every inbox. Type into the form and the invoice redraws beside it. No account, no Word file to fight with, and nothing you type leaves your browser.",
+      bullets: [
+        "Hours × rate, totaled for you",
+        "USD amounts, formatted $1,234.56",
+        "US dates: 03/20/2026 or March 20, 2026",
+        "Sales tax columns you can hide",
+        "Free, no signup",
+      ],
+      ctaLabel: "Create a Contractor Invoice",
+      ctaHref: APP_HREF,
+      heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
+    },
+    factsTable: {
+      heading: "A US contractor invoice at a glance",
+      rows: [
+        { label: "Currency", value: "USD, printed as $1,234.56" },
+        {
+          label: "Date format",
+          value: "MM/DD/YYYY, M/D/YYYY or March 20, 2026",
+        },
+        {
+          label: "Hourly billing",
+          value: "Quantity is the hours, unit is hrs, price is the rate",
+        },
+        {
+          label: "Sales tax",
+          value: "Label it Sales Tax, set a rate, or hide the tax columns",
+        },
+        {
+          label: "Service period",
+          value: "Optional from and to dates for the work billed",
+        },
+        { label: "Account required", value: "No" },
+        { label: "Price", value: "Free, and the source is on GitHub" },
+      ],
+    },
+    sections: [
+      {
+        title: "What a contractor invoice needs",
+        lead: "A client's accounts payable team pays faster when nothing has to be asked twice. These are the fields the template gives you, each one a form input:",
+        bullets: [
+          "Your name or business name, address and email",
+          "The client's name and billing address",
+          "A unique invoice number, and the date you issued it",
+          "The dates the work covers, as a service period",
+          "Each line of work, with hours or quantity, rate and amount",
+          "The total due, the due date, and how to pay you",
+        ],
+      },
+      {
+        title: "Billing by the hour",
+        lead: "Hourly work maps straight onto the line items.",
+        paragraphs: [
+          "Put the hours in the quantity field, write hrs as the unit, and enter your hourly rate as the price. The line total and the invoice total update as you type, so 32.5 hours at $85 shows as $2,762.50 before you download anything.",
+          "A flat-fee project is a single line with a quantity of 1. Mix both on one invoice when a job had a fixed scope plus extra hours.",
+        ],
+      },
+      {
+        title: "Sales tax, only if you charge it",
+        lead: "Many services are not taxed, but the rules change from state to state.",
+        paragraphs: [
+          "The tax label defaults to VAT, which reads oddly on a US invoice. Rename it to Sales Tax and set the rate, or hide the tax columns entirely and the invoice shows plain amounts. Check your own state's rules before deciding.",
+        ],
+      },
+      {
+        title: "Keep your SSN off the invoice",
+        lead: "A client who files a 1099-NEC for you needs your taxpayer identification number, but the invoice is the wrong place for it.",
+        paragraphs: [
+          "Send that number once, on a W-9, and leave it off the invoice that gets forwarded around the client's office. The template's tax number field is optional and can be hidden. If you have an EIN and want it on the invoice, rename the label to EIN and fill it in.",
+        ],
+      },
+      {
+        title: "Dates the way US clients read them",
+        lead: "The default template dates invoices 2026-03-20. A US client will find a month-first date easier to read.",
+        paragraphs: [
+          "Pick MM/DD/YYYY, M/D/YYYY or MM-DD-YYYY from the date format dropdown, or switch to the Stripe-style template, which writes March 20, 2026 out of the box.",
+        ],
+      },
+      {
+        title: "Create a contractor invoice",
+        lead: "Four steps, and nothing to install:",
+        bullets: [
+          "Open the generator and set the currency to USD",
+          "Choose a US date format and rename the tax label, or hide it",
+          "Add your hours or fixed-fee lines, watching the preview update",
+          "Download the PDF, or send your client a link to it",
+        ],
+      },
+    ],
+    comparisonTable: {
+      heading: "Template file or generator",
+      intro:
+        "Most contractor invoice templates are a Word or spreadsheet file you download and edit. This compares that with filling in a form that writes the PDF for you.",
+      columnLabels: ["", "EasyInvoicePDF.com", "Word or Excel template"],
+      rows: [
+        {
+          feature: "Hours × rate math",
+          thisTool: "✅ Automatic",
+          other: "⚠️ Formulas you maintain",
+        },
+        {
+          feature: "Layout breaks when you edit",
+          thisTool: "✅ Never",
+          other: "⚠️ Often",
+        },
+        {
+          feature: "Saves your details for next time",
+          thisTool: "✅ In your browser",
+          other: "⚠️ Copy the file",
+        },
+        {
+          feature: "Works on a phone",
+          thisTool: "✅ Yes",
+          other: "❌ Rarely",
+        },
+        { feature: "Account required", thisTool: "❌ No", other: "❌ No" },
+        { feature: "Price", thisTool: "✅ Free", other: "✅ Usually free" },
+      ],
+    },
+    relatedSlugs: [
+      "freelance-invoice-template",
+      "invoice-template-pdf",
+      "invoice-generator-no-login",
+    ],
+    faq: [
+      {
+        question: "Is this a 1099 invoice template?",
+        answer:
+          "There is no special 1099 invoice. A 1099 contractor sends an ordinary invoice, and the client files a 1099-NEC from its own records at year end. This template covers the invoice; your tax ID goes to the client on a W-9.",
+      },
+      {
+        question: "Can I bill by the hour?",
+        answer:
+          "Yes. Enter the hours as the quantity, hrs as the unit and your rate as the price. Totals are calculated as you type.",
+      },
+      {
+        question: "Do I have to show sales tax?",
+        answer:
+          "No. You can rename the tax label to Sales Tax and set a rate, or hide the tax columns so the invoice shows plain amounts. Whether your service is taxable depends on your state.",
+      },
+      {
+        question: "Can I add my logo?",
+        answer:
+          "Yes. Both templates accept a JPEG, PNG or WebP logo, which sits at the top of the PDF.",
+      },
+      {
+        question: "Do I need an account?",
+        answer:
+          "No. There is no signup and no email step. Your details are saved in your own browser so the next invoice starts filled in.",
+      },
+      {
+        question: "Is this accounting software?",
+        answer:
+          "No. It produces invoice PDFs and does not file, track or reconcile anything, and it makes no tax or compliance guarantees. Check the result against your own requirements.",
+      },
+    ],
+  },
+  "freelance-invoice-template": {
+    slug: "freelance-invoice-template",
+    metadata: {
+      title: "Free Freelance Invoice Template - Fill In, Get a PDF",
+      description:
+        "A free freelance invoice template for designers, writers, developers and consultants. Bill in any of 122 currencies and download the PDF. No signup.",
+      keywords:
+        "freelance invoice template, freelancer invoice template, freelance invoice, freelance invoice generator, consulting invoice template, self employed invoice template, freelance writer invoice template, freelance designer invoice, freelance invoice pdf",
+    },
+    hero: {
+      h1: "Free Freelance Invoice Template",
+      subheading:
+        "Bill a client for a project, a retainer or a month of hours. Fill in the form, watch the PDF redraw beside it, and download it. Your details stay saved in your browser, so the next invoice takes a minute.",
+      bullets: [
+        "Your details saved for the next invoice",
+        "122 currencies, 13 invoice languages",
+        "Share a link instead of attaching a file",
+        "Free and open source, no signup",
+      ],
+      ctaLabel: "Create a Freelance Invoice",
+      ctaHref: APP_HREF,
+      heroImage: `${STATIC_ASSETS_URL}/seo-content/def-tmp-v2.png`,
+    },
+    factsTable: {
+      heading: "Freelance invoices at a glance",
+      rows: [
+        { label: "Currencies", value: "122, each with its own symbol" },
+        { label: "Invoice languages", value: "13" },
+        {
+          label: "Templates",
+          value: "A classic layout and a Stripe-style one",
+        },
+        { label: "Logo", value: "JPEG, PNG or WebP" },
+        {
+          label: "Payment details",
+          value: "Bank account, SWIFT/BIC, and an optional QR code",
+        },
+        { label: "Account required", value: "No" },
+        { label: "Price", value: "Free, and the source is on GitHub" },
+      ],
+    },
+    sections: [
+      {
+        title: "Built for repeat invoices",
+        lead: "A freelancer rarely sends one invoice. The tool keeps what stays the same between them.",
+        paragraphs: [
+          "Your own details, your clients and your last invoice are kept in your browser's storage. Open the page next month, bump the invoice number and the dates, and the rest is already there. Seller and buyer lists can be exported to a file and imported on another computer.",
+        ],
+      },
+      {
+        title: "What to put on a freelance invoice",
+        lead: "Clients pay faster when the invoice answers their questions before they ask:",
+        bullets: [
+          "A unique invoice number and the issue date",
+          "Your name, address and email, and the client's",
+          "One line per deliverable or per block of hours",
+          "The period the work covers",
+          "The due date and the total",
+          "How to pay: bank details, a payment link or a QR code",
+        ],
+      },
+      {
+        title: "Clients abroad",
+        lead: "Freelance work crosses borders more often than most small businesses do.",
+        paragraphs: [
+          "Currency and language are separate settings. Bill a German client in euros with German labels, or a US client in dollars in English, from the same saved profile. All 122 currencies keep their own symbol and number format.",
+        ],
+      },
+      {
+        title: "A link instead of an attachment",
+        lead: "Share a link to the finished invoice and the client opens the same PDF you see.",
+        paragraphs: [
+          "The invoice data is compressed into the link itself, so there is no copy of it on a server. Anyone with the link can view and download the PDF.",
+        ],
+      },
+      {
+        title: "Create a freelance invoice",
+        lead: "Four steps, and nothing to install:",
+        bullets: [
+          "Open the generator and fill in your details once",
+          "Pick the client's currency and invoice language",
+          "Add your line items, watching the preview update",
+          "Download the PDF, or send your client a link to it",
+        ],
+      },
+    ],
+    comparisonTable: {
+      heading: "Freelance invoicing options compared",
+      intro:
+        "Freelancers usually choose between a template file and an invoicing app with an account. This compares both with a free generator.",
+      columnLabels: ["", "EasyInvoicePDF.com", "Invoicing app"],
+      rows: [
+        { feature: "Account required", thisTool: "❌ No", other: "✅ Yes" },
+        {
+          feature: "Monthly fee",
+          thisTool: "✅ None",
+          other: "⚠️ Often, past a free tier",
+        },
+        {
+          feature: "Invoice data stored",
+          thisTool: "✅ Your browser only",
+          other: "⚠️ Vendor's servers",
+        },
+        {
+          feature: "Payment tracking",
+          thisTool: "❌ No",
+          other: "✅ Usually",
+        },
+        {
+          feature: "Languages on the PDF",
+          thisTool: "✅ 13",
+          other: "⚠️ Varies",
+        },
+        { feature: "Open source", thisTool: "✅ AGPL-3.0", other: "❌ Rarely" },
+      ],
+    },
+    relatedSlugs: [
+      "contractor-invoice-template",
+      "multi-language-invoice-generator",
+      "export-invoice-format",
+    ],
+    faq: [
+      {
+        question: "Is the freelance invoice template really free?",
+        answer:
+          "Yes. There is no paid plan, no watermark and no limit on invoices. The source code is on GitHub under AGPL-3.0.",
+      },
+      {
+        question: "Can I bill a client in another currency?",
+        answer:
+          "Yes. Pick any of the 122 currencies. The invoice language is a separate setting, so English labels work with euros, pounds or rupees.",
+      },
+      {
+        question: "Does it work as a consulting invoice template?",
+        answer:
+          "Yes. Consulting invoices have the same parts: a line per engagement or block of hours, a service period, payment terms and a total.",
+      },
+      {
+        question: "Where are my invoices stored?",
+        answer:
+          "In your own browser's storage. Nothing is uploaded, so clearing your browser data removes them. Download the PDFs you need to keep.",
+      },
+      {
+        question: "Can it track whether a client paid?",
+        answer:
+          "No. It produces the invoice PDF and nothing more. Payment tracking and reminders belong to accounting software.",
+      },
+    ],
+  },
+  "proforma-invoice-generator": {
+    slug: "proforma-invoice-generator",
+    metadata: {
+      title: "Free Proforma Invoice Generator - Download PDF",
+      description:
+        "Create a proforma invoice online and download it as a PDF. Title it Proforma Invoice, list the goods or services, quote the total. Free, no signup.",
+      keywords:
+        "proforma invoice, proforma invoice generator, proforma invoice format, proforma invoice template, proforma invoice pdf, pro forma invoice, proforma invoice format in word, create proforma invoice online, proforma invoice maker",
+    },
+    hero: {
+      h1: "Free Proforma Invoice Generator",
+      subheading:
+        "Send a buyer the expected cost before the work starts or the goods ship. Rename the document to Proforma Invoice, fill in the lines, and download the PDF. No account, and the data stays in your browser.",
+      bullets: [
+        "Titled Proforma Invoice at the top of the PDF",
+        "Quote in any of 122 currencies",
+        "Taxes shown with your own label",
+        "Turn it into the final invoice later",
+        "Free, no signup",
+      ],
+      ctaLabel: "Create a Proforma Invoice",
+      ctaHref: STRIPE_TEMPLATE_PATHNAME,
+      heroImage: `${STATIC_ASSETS_URL}/seo-content/stripe-template-v1.png`,
+    },
+    factsTable: {
+      heading: "Proforma invoices at a glance",
+      rows: [
+        {
+          label: "What it is",
+          value: "A preliminary bill sent before a sale is final",
+        },
+        { label: "Legally a tax invoice", value: "No" },
+        {
+          label: "Common uses",
+          value: "Advance payments, import licences, letters of credit, quotes",
+        },
+        {
+          label: "Title on the PDF",
+          value: "Proforma Invoice, set in the invoice number label",
+        },
+        { label: "Currencies", value: "122" },
+        { label: "Account required", value: "No" },
+      ],
+    },
+    sections: [
+      {
+        title: "What a proforma invoice is",
+        lead: "A proforma invoice is a quote dressed as an invoice. It tells the buyer what they will be billed if they go ahead.",
+        paragraphs: [
+          "It lists the same things a final invoice does: seller, buyer, goods or services, quantities, prices, taxes and the total. The difference is its status. It does not record a completed sale, so it is not a tax invoice and is not entered in the books as revenue.",
+          "Buyers ask for one to approve a purchase internally, to pay an advance, to apply for an import licence, or to open a letter of credit with their bank.",
+        ],
+      },
+      {
+        title: "Proforma invoice format",
+        lead: "A proforma invoice usually carries:",
+        bullets: [
+          "The words Proforma Invoice, clearly at the top",
+          "A proforma number and the date of issue",
+          "Seller and buyer names, addresses and tax numbers",
+          "A description of each item, with quantity and unit price",
+          "Taxes, any shipping or other charges, and the total",
+          "Payment terms and how long the quote stays valid",
+        ],
+      },
+      {
+        title: "Making it say Proforma",
+        lead: "The generator does not have a separate proforma mode. Two fields do the job.",
+        paragraphs: [
+          "On the Stripe-style template, the invoice number label is the large title at the top of the page. Change it from Invoice to Proforma Invoice. On the default template, the same label sits beside the number, so Proforma Invoice No. reads naturally.",
+          "Use the header notes field for a line such as Valid for 30 days or Not a tax invoice. It prints under the title on both templates.",
+        ],
+      },
+      {
+        title: "From proforma to final invoice",
+        lead: "Once the buyer confirms, the numbers are already filled in.",
+        paragraphs: [
+          "Change the label back to Invoice, give it a number from your regular invoice series, update the dates, and download again. The proforma PDF you sent earlier stays as it was.",
+        ],
+      },
+      {
+        title: "Create a proforma invoice",
+        lead: "Four steps, and nothing to install:",
+        bullets: [
+          "Open the generator and set the invoice number label to Proforma Invoice",
+          "Pick the currency and add the goods or services",
+          "Note how long the quote is valid in the header notes",
+          "Download the PDF, or send your buyer a link to it",
+        ],
+      },
+    ],
+    comparisonTable: {
+      heading: "Proforma invoice vs tax invoice",
+      intro:
+        "The two documents look alike. What changes is when they are issued and what they prove.",
+      columnLabels: ["", "Proforma invoice", "Tax invoice"],
+      rows: [
+        {
+          feature: "Issued",
+          thisTool: "Before the sale",
+          other: "After the sale or delivery",
+        },
+        {
+          feature: "Payment demand",
+          thisTool: "No, an estimate",
+          other: "Yes",
+        },
+        {
+          feature: "Recorded as revenue",
+          thisTool: "No",
+          other: "Yes",
+        },
+        {
+          feature: "Tax can be claimed on it",
+          thisTool: "No",
+          other: "Yes, where rules allow",
+        },
+        {
+          feature: "Can change before final",
+          thisTool: "Yes",
+          other: "Only by credit note",
+        },
+      ],
+    },
+    relatedSlugs: [
+      "export-invoice-format",
+      "invoice-template-pdf",
+      "stripe-invoice-alternative",
+    ],
+    faq: [
+      {
+        question: "Is a proforma invoice a legal invoice?",
+        answer:
+          "No. It is a preliminary document. It does not record a completed sale, and in most countries, India included, the buyer cannot claim input tax on it.",
+      },
+      {
+        question: "Should a proforma invoice include tax?",
+        answer:
+          "Usually yes, so the buyer sees the full expected cost. Rename the tax label to match your tax, such as GST, VAT or Sales Tax, and set the rate.",
+      },
+      {
+        question: "Does a proforma invoice need its own number?",
+        answer:
+          "It is good practice. Many businesses use a separate series, such as PI-2026-001, so proformas never take a number from the tax invoice sequence.",
+      },
+      {
+        question: "Can I write the proforma in another language?",
+        answer:
+          "Yes. The PDF can be printed in 13 languages, and the label you type replaces the default title in any of them.",
+      },
+      {
+        question: "Do I need an account?",
+        answer:
+          "No. There is no signup and no email step. The PDF is built in your browser, so the quote never reaches a server.",
+      },
+    ],
+  },
+  "export-invoice-format": {
+    slug: "export-invoice-format",
+    metadata: {
+      title: "Export Invoice Format for Services, Free PDF",
+      description:
+        "Invoice a foreign client from India in USD, EUR or GBP. Add the LUT declaration, your GSTIN and SAC code, then download the PDF. Free, no signup.",
+      keywords:
+        "export invoice format, export invoice, export invoice template, lut invoice format, export invoice format under lut, export of services invoice format, invoice for foreign client, invoice in usd from india, freelancer invoice format india, invoice format for freelancers",
+    },
+    hero: {
+      h1: "Export Invoice Format for Services from India",
+      subheading:
+        "Bill a client abroad in their currency, with the LUT declaration and your GSTIN on the page. Fill in the form, watch the PDF redraw beside it, and download it. Free, no account, and nothing you type leaves your browser.",
+      bullets: [
+        "122 currencies, including USD, EUR and GBP",
+        "LUT declaration in the header notes",
+        "GSTIN and SAC code on the invoice",
+        "SWIFT/BIC and account number for the wire",
+        "Free and open source",
+      ],
+      ctaLabel: "Create an Export Invoice",
+      ctaHref: APP_HREF,
+      heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
+    },
+    factsTable: {
+      heading: "An export of services invoice at a glance",
+      rows: [
+        {
+          label: "Currency",
+          value: "The client's, e.g. USD printed as $1,234.56",
+        },
+        {
+          label: "Tax under LUT",
+          value: "IGST at 0%, with the LUT declaration printed",
+        },
+        { label: "Your tax number", value: "GSTIN, in the seller block" },
+        { label: "SAC code", value: "In each line item's description" },
+        {
+          label: "Bank details",
+          value: "Account number or IBAN, and SWIFT/BIC",
+        },
+        { label: "Date format", value: "DD/MM/YYYY or any of 17 others" },
+        { label: "Account required", value: "No" },
+      ],
+    },
+    sections: [
+      {
+        title: "What an export invoice for services needs",
+        lead: "A GST-registered exporter of services generally shows these on the invoice. Confirm the details for your business with your CA.",
+        bullets: [
+          "Your name, address and GSTIN",
+          "A consecutive invoice number of up to 16 characters, and the date",
+          "The client's name and full address, including the country",
+          "A description of the service with its SAC code",
+          "The value, in the client's currency",
+          "IGST charged, or the LUT declaration if you export without paying it",
+        ],
+      },
+      {
+        title: "The LUT declaration",
+        lead: "Exporting under a Letter of Undertaking means no IGST is charged, and the invoice has to say why.",
+        paragraphs: [
+          "Put the declaration in the header notes field, for example: Supply meant for export under Letter of Undertaking without payment of integrated tax. Add your LUT reference number on the next line. The header notes print near the top of the invoice on both templates.",
+          "Rename the tax label to IGST and set the rate to 0, or hide the tax columns and let the declaration speak for itself.",
+        ],
+      },
+      {
+        title: "GSTIN and SAC codes",
+        lead: "The generator has no India-specific fields, but its labels are yours to rename.",
+        paragraphs: [
+          "Rename the seller's tax number label to GSTIN and enter your number. There is no separate SAC column, so write the code at the start or end of each line description, for example: Software development services (SAC 998314).",
+        ],
+      },
+      {
+        title: "Getting paid from abroad",
+        lead: "A wire from a foreign client needs exact bank details.",
+        paragraphs: [
+          "Fill in your account number and SWIFT/BIC in the seller block. If you take payment through a link, such as PayPal or Wise, put it in the QR code field. The QR code prints on the invoice, and the client's phone opens the link.",
+        ],
+      },
+      {
+        title: "What it does not do",
+        lead: "Better to know before you start:",
+        bullets: [
+          "Rupee amounts use 1,234,567 grouping, not lakh and crore",
+          "The amount in words counts in thousands and millions",
+          "There are no separate CGST and SGST columns for domestic invoices",
+          "No e-invoice IRN or GST portal filing",
+        ],
+      },
+    ],
+    comparisonTable: {
+      heading: "Export invoice options compared",
+      intro:
+        "Freelancers in India usually invoice foreign clients from a Word or Excel format, or from GST billing software. This compares those with a free generator.",
+      columnLabels: ["", "EasyInvoicePDF.com", "GST billing software"],
+      rows: [
+        { feature: "Account required", thisTool: "❌ No", other: "✅ Yes" },
+        {
+          feature: "Invoice in USD, EUR, GBP",
+          thisTool: "✅ 122 currencies",
+          other: "⚠️ Often paid plans",
+        },
+        {
+          feature: "LUT declaration",
+          thisTool: "✅ Header notes",
+          other: "✅ Built in",
+        },
+        {
+          feature: "CGST/SGST split",
+          thisTool: "❌ No",
+          other: "✅ Yes",
+        },
+        {
+          feature: "E-invoice IRN",
+          thisTool: "❌ No",
+          other: "⚠️ Some",
+        },
+        { feature: "Price", thisTool: "✅ Free", other: "⚠️ Paid plans" },
+      ],
+    },
+    relatedSlugs: [
+      "proforma-invoice-generator",
+      "freelance-invoice-template",
+      "multi-language-invoice-generator",
+    ],
+    faq: [
+      {
+        question: "Should an export invoice be in rupees or dollars?",
+        answer:
+          "Most freelancers bill in the client's currency, such as USD, and record the rupee value in their books at the exchange rate. Set the invoice currency to whatever the contract says.",
+      },
+      {
+        question: "Do I charge GST to a foreign client?",
+        answer:
+          "Export of services is zero-rated. You either export under an LUT and charge no IGST, or pay IGST and claim a refund. Most freelancers file an LUT. Check your case with your CA.",
+      },
+      {
+        question: "Where does the LUT declaration go?",
+        answer:
+          "In the header notes field, which prints near the top of the invoice. Add your LUT reference number there too.",
+      },
+      {
+        question: "Can I use this for domestic GST invoices?",
+        answer:
+          "Only for a single tax line, such as IGST on an interstate sale. There are no separate CGST and SGST columns, so an intrastate invoice is better made in GST billing software.",
+      },
+      {
+        question: "Is this a commercial invoice for shipping goods?",
+        answer:
+          "It can list goods, but it has no fields for HS codes, ports, Incoterms or package weights, which customs paperwork needs. It is built for invoicing services.",
+      },
+      {
+        question: "Is this accounting software?",
+        answer:
+          "No. It produces invoice PDFs and does not file, track or reconcile anything, and it makes no compliance guarantees. Check the result against GST rules with your CA.",
       },
     ],
   },

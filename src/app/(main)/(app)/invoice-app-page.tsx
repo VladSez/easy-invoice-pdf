@@ -13,9 +13,13 @@ import {
   TWITTER_CREATOR,
 } from "@/config";
 import { getIsIndexableEnvironment } from "@/lib/seo/indexing-utils";
-import { HOME_PAGE_DESCRIPTION } from "@/lib/seo/site-entities";
+import {
+  HOME_PAGE_DESCRIPTION,
+  HOME_PAGE_TITLE,
+} from "@/lib/seo/site-entities";
 import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
 
+import { HomeSeoContent } from "./components/home-seo-content";
 import { CTAToastProvider } from "./contexts/cta-toast-context";
 import {
   HOME_WEB_PAGE,
@@ -68,12 +72,13 @@ export async function InvoiceAppPage({
           `loading.tsx`, above everything here -- the JSON-LD was left out of the static
           HTML. The editor is client-only anyway (the invoice lives in localStorage or
           `?data=`), and the fallback is the skeleton `loading.tsx` renders. */}
-      <Suspense fallback={<InvoicePageLoadingSkeleton />}>
+      <Suspense fallback={<InvoicePageLoadingSkeleton template={template} />}>
         <AppPageClient
           githubStarsCount={githubStarsCount}
           latestChangelog={latestChangelog}
         />
       </Suspense>
+      {template === "default" ? <HomeSeoContent /> : null}
       <Footer />
     </CTAToastProvider>
   );
@@ -145,7 +150,7 @@ function resolveAppPageRobots(
 
 const TEMPLATE_META = {
   default: {
-    title: "Free Invoice Generator - Create PDF Invoices Online",
+    title: HOME_PAGE_TITLE,
     description: HOME_PAGE_DESCRIPTION,
     canonical: `${APP_URL}/`, // we use root URL as canonical for SEO purposes
     images: [

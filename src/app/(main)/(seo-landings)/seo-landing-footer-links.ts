@@ -7,8 +7,9 @@ import type { SeoLandingSlug } from "./seo-landing-definitions";
  *
  * `/stripe-template` is the page meant to rank for "Stripe invoice template"; a link to it
  * from every page, with that phrase as the anchor, is the strongest internal signal we can
- * give it. The `stripe-invoice-alternative` landing below keeps its own "without Stripe"
- * wording, so the two do not compete for the same query.
+ * give it. The `stripe-invoice-alternative` landing below targets "Stripe invoice
+ * generator" instead (the "without Stripe" wording it started with had no search volume),
+ * so the two do not compete for the same query.
  */
 export const APP_FOOTER_SOLUTION_LINKS = [
   {
@@ -30,7 +31,7 @@ export const APP_FOOTER_SOLUTION_LINKS = [
 export const SEO_FOOTER_SOLUTION_LINKS = [
   {
     slug: "invoice-generator-no-login",
-    label: "Free Invoice Generator - No Login Required",
+    label: "Free Invoice Generator - No Sign Up, No Login",
   },
   {
     slug: "open-source-invoice-generator",
@@ -38,11 +39,11 @@ export const SEO_FOOTER_SOLUTION_LINKS = [
   },
   {
     slug: "stripe-invoice-alternative",
-    label: "Create a Stripe-Style Invoice Without Stripe",
+    label: "Stripe Invoice Generator, No Stripe Account Needed",
   },
   {
     slug: "invoice-template-pdf",
-    label: "Free Invoice Template - Fill It In and Download a PDF",
+    label: "Free Invoice Template PDF You Fill In Online",
   },
   {
     slug: "multi-language-invoice-generator",
@@ -55,6 +56,22 @@ export const SEO_FOOTER_SOLUTION_LINKS = [
   {
     slug: "norwegian-invoice-generator",
     label: "Norwegian Invoice Generator - Free PDF in NOK",
+  },
+  {
+    slug: "contractor-invoice-template",
+    label: "Free Contractor Invoice Template",
+  },
+  {
+    slug: "freelance-invoice-template",
+    label: "Free Freelance Invoice Template",
+  },
+  {
+    slug: "proforma-invoice-generator",
+    label: "Free Proforma Invoice Generator",
+  },
+  {
+    slug: "export-invoice-format",
+    label: "Export Invoice Format for Services from India",
   },
 ] as const satisfies {
   slug: SeoLandingSlug;

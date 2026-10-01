@@ -70,10 +70,10 @@ export function buildAboutJsonLdGraph(
         "@id": faqUrl,
         mainEntity: faqEntities,
       },
-      buildBreadcrumbList(pageUrl, [
-        { name: homeLabel, item: `${baseUrl}/` },
-        { name: aboutLabel },
-      ]),
+      buildBreadcrumbList({
+        pageUrl,
+        items: [{ name: homeLabel, item: `${baseUrl}/` }, { name: aboutLabel }],
+      }),
     ],
   };
 }

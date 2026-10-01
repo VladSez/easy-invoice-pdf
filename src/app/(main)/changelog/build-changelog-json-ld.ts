@@ -60,10 +60,13 @@ export function buildChangelogIndexJsonLdGraph(
         },
       },
       buildOrganization(),
-      buildBreadcrumbList(CHANGELOG_INDEX_URL, [
-        { name: "Start Invoicing", item: `${PROD_WEBSITE_URL}/` },
-        { name: "Changelog" },
-      ]),
+      buildBreadcrumbList({
+        pageUrl: CHANGELOG_INDEX_URL,
+        items: [
+          { name: "Start Invoicing", item: `${PROD_WEBSITE_URL}/` },
+          { name: "Changelog" },
+        ],
+      }),
     ],
   };
 }
@@ -117,11 +120,14 @@ export function buildChangelogPostJsonLdGraph(entry: ChangelogEntry): Graph {
         },
       },
       buildOrganization(),
-      buildBreadcrumbList(pageUrl, [
-        { name: "Start Invoicing", item: `${PROD_WEBSITE_URL}/` },
-        { name: "Changelog", item: CHANGELOG_INDEX_URL },
-        { name: title },
-      ]),
+      buildBreadcrumbList({
+        pageUrl,
+        items: [
+          { name: "Start Invoicing", item: `${PROD_WEBSITE_URL}/` },
+          { name: "Changelog", item: CHANGELOG_INDEX_URL },
+          { name: title },
+        ],
+      }),
     ],
   };
 }

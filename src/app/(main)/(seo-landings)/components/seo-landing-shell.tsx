@@ -18,8 +18,10 @@ import { GITHUB_URL } from "@/config";
 import {
   type ComparisonTable,
   type SeoLandingDefinition,
+  type SeoLandingSlug,
   type SeoSection,
 } from "../seo-landing-definitions";
+import { SEO_FOOTER_SOLUTION_LINKS } from "../seo-landing-footer-links";
 import { SeoLandingJsonLd } from "./seo-landing-json-ld";
 
 interface SeoLandingShellProps {
@@ -235,6 +237,8 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
               </FaqAccordion>
             </section>
 
+            <SeoRelatedLinks slugs={definition.relatedSlugs} />
+
             <div className="flex justify-center py-6 md:py-12">
               <BlackGoToAppButton
                 className="h-12 w-full px-8 text-base"
@@ -251,6 +255,53 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
     </>
   );
 }
+
+/**
+ * Links to the landings listed in `relatedSlugs`, under the FAQ.
+ *
+ * The anchor text is the footer's label for each page, which names what sits on the
+ * other end (see `SEO_FOOTER_SOLUTION_LINKS`).
+ */
+function SeoRelatedLinks({ slugs }: { slugs: readonly SeoLandingSlug[] }) {
+  if (slugs.length === 0) {
+    return null;
+  }
+
+  return (
+    <section
+      className="border-t border-slate-100 pt-10"
+      aria-labelledby="seo-landing-related-heading"
+      data-testid="seo-landing-related"
+    >
+      <h2
+        id="seo-landing-related-heading"
+        className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl"
+      >
+        Related
+      </h2>
+      <ul className="mt-4 space-y-2 text-base">
+        {slugs.map((slug) => {
+          return (
+            <li key={slug}>
+              <Link
+                href={`/${slug}`}
+                className="font-medium text-slate-900 underline underline-offset-4 hover:text-slate-600"
+              >
+                {SEO_FOOTER_LABEL_BY_SLUG[slug]}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+const SEO_FOOTER_LABEL_BY_SLUG = Object.fromEntries(
+  SEO_FOOTER_SOLUTION_LINKS.map(({ slug, label }) => {
+    return [slug, label];
+  }),
+) as Record<SeoLandingSlug, string>;
 
 /** Mid-page prompt to open the app, shown once between the sections. */
 function SeoInlineCta({ href, label }: { href: string; label: string }) {

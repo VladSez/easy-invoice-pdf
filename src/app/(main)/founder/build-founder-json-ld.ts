@@ -38,10 +38,13 @@ export function buildFounderJsonLdGraph(): Graph {
           "@id": JSON_LD_IDS.person,
         },
       },
-      buildBreadcrumbList(pageUrl, [
-        { name: "Start Invoicing", item: `${PROD_WEBSITE_URL}/` },
-        { name: "Founder" },
-      ]),
+      buildBreadcrumbList({
+        pageUrl,
+        items: [
+          { name: "Start Invoicing", item: `${PROD_WEBSITE_URL}/` },
+          { name: "Founder" },
+        ],
+      }),
     ],
   };
 }
