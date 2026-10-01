@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
 import type { Metadata } from "next";
-import { Suspense } from "react";
+import { type ReactNode, Suspense } from "react";
 
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { Footer } from "@/app/(components)/footer";
@@ -20,6 +20,7 @@ import {
 import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
 
 import { HomeSeoContent } from "./components/home-seo-content";
+import { StripeTemplateSeoContent } from "./components/stripe-template-seo-content";
 import { CTAToastProvider } from "./contexts/cta-toast-context";
 import {
   HOME_WEB_PAGE,
@@ -78,7 +79,7 @@ export async function InvoiceAppPage({
           latestChangelog={latestChangelog}
         />
       </Suspense>
-      {template === "default" ? <HomeSeoContent /> : null}
+      {TEMPLATE_SEO_CONTENT[template]}
       <Footer />
     </CTAToastProvider>
   );
@@ -188,6 +189,15 @@ const TEMPLATE_META = {
     images: NonNullable<Metadata["openGraph"]>["images"];
   }
 >;
+
+/**
+ * The crawlable copy below the editor on each template's route. Each says something
+ * different, so the two routes don't compete for the same queries.
+ */
+const TEMPLATE_SEO_CONTENT = {
+  default: <HomeSeoContent />,
+  stripe: <StripeTemplateSeoContent />,
+} as const satisfies Record<SupportedTemplates, ReactNode>;
 
 /** The `WebPage` JSON-LD node of each template's route. */
 const TEMPLATE_WEB_PAGE = {

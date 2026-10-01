@@ -16,8 +16,8 @@ import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
  * impressions. This says what the tool is in crawlable text, and links each landing page
  * with anchor text that names it, which a footer link list does less convincingly.
  *
- * Only on `/`: `/stripe-template` is the same app, and the same block there would be
- * duplicate content.
+ * Only on `/`: `/stripe-template` is indexed as its own page and has its own copy,
+ * `StripeTemplateSeoContent`, written for the Stripe template's queries.
  */
 export function HomeSeoContent() {
   return (
