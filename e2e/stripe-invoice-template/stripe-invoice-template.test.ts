@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import {
   DEFAULT_DATE_FORMAT,
@@ -1118,4 +1120,106 @@ test.describe("Stripe Invoice Template", () => {
     ).toHaveValue("default");
     await expect(page).toHaveURL("/");
   });
+
+  // A template switch moves the address bar between `/` and `/stripe-template` with
+  // `history.replaceState`, so the router still holds the route the page was loaded on. A
+  // client-side navigation back to that route used to reuse the mounted editor: the URL
+  // changed, the template did not. The footer links to the app's routes are full page loads,
+  // which is what these tests check for: a document request, which a client-side navigation
+  // never makes.
+  //
+  // The links are clicked with `dispatchEvent`: the template switch regenerates the PDF, and
+  // Chrome's PDF viewer takes focus when it loads, scrolling the preview back into view --
+  // a real click in that moment lands on the preview instead of the footer.
+  test("footer 'Free Stripe Invoice Template' opens the Stripe template after switching away from it", async ({
+    page,
+  }) => {
+    await page.goto("/stripe-template");
+
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("default");
+    await expect(page).toHaveURL("/");
+
+    const stripeTemplateDocumentRequest = waitForDocumentRequest({
+      page,
+      pathname: "/stripe-template",
+    });
+
+    await page
+      .locator("footer")
+      .getByRole("link", { name: "Free Stripe Invoice Template" })
+      .dispatchEvent("click");
+
+    await stripeTemplateDocumentRequest;
+
+    await expect(page).toHaveURL("/stripe-template");
+    await expect(
+      page.getByRole("combobox", { name: "Invoice Template" }),
+    ).toHaveValue("stripe");
+  });
+
+  test("footer 'Invoice Generator' opens the template just picked on the page", async ({
+    page,
+  }) => {
+    await expect(page).toHaveURL("/");
+
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+    await expect(page).toHaveURL("/stripe-template");
+
+    // the template is saved with a debounce
+    await expect
+      .poll(() => {
+        return page.evaluate((key) => {
+          const storedData = localStorage.getItem(key);
+
+          return storedData
+            ? (JSON.parse(storedData) as InvoiceData).template
+            : null;
+        }, PDF_DATA_LOCAL_STORAGE_KEY);
+      })
+      .toBe("stripe");
+
+    // The address bar already says `/stripe-template`, so the request also keeps the
+    // assertions below from passing before the navigation has even started.
+    const rootDocumentRequest = waitForDocumentRequest({ page, pathname: "/" });
+
+    await page
+      .locator("footer")
+      .getByRole("link", { name: "Invoice Generator", exact: true })
+      .dispatchEvent("click");
+
+    await rootDocumentRequest;
+
+    // a bare `/` follows the saved template, so this lands back on `/stripe-template`
+    await expect(page).toHaveURL("/stripe-template");
+    await expect(
+      page.getByRole("combobox", { name: "Invoice Template" }),
+    ).toHaveValue("stripe");
+  });
 });
+
+interface WaitForDocumentRequestParams {
+  page: Page;
+  /** The pathname the document is requested for, e.g. `/stripe-template`. */
+  pathname: string;
+}
+
+/**
+ * Resolves on the next document request for `pathname`: a full page load, which a
+ * client-side navigation (a fetch of the RSC payload) never makes.
+ */
+function waitForDocumentRequest({
+  page,
+  pathname,
+}: WaitForDocumentRequestParams) {
+  return page.waitForRequest((request) => {
+    return (
+      request.isNavigationRequest() &&
+      request.frame() === page.mainFrame() &&
+      new URL(request.url()).pathname === pathname
+    );
+  });
+}
