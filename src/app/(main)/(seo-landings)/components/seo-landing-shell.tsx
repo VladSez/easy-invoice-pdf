@@ -10,6 +10,7 @@ import {
   type RoughAnnotationType,
   RoughAnnotation,
 } from "@/components/rough-annotation";
+import { TrackClick } from "@/components/track-click";
 import { Button } from "@/components/ui/button";
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 import { YouTubeEmbed } from "@/components/youtube-embed";
@@ -60,7 +61,10 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
           <div className="border-b border-slate-200 bg-white">
             <div className="container mx-auto max-w-4xl px-4 pb-6 pt-12 md:px-6 md:py-16 md:pb-8">
               <h1 className="text-balance text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
-                {definition.hero.h1}
+                <MarkedHeading
+                  text={definition.hero.h1}
+                  mark={definition.hero.h1Mark}
+                />
               </h1>
               {/*
                 The hero's opening paragraph, not a heading. It runs to a couple of
@@ -74,12 +78,19 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                 className="mt-8 flex flex-col gap-4 md:flex-row"
                 {...seoHeroCtaMarker}
               >
-                <BlackGoToAppButton
-                  className="w-full px-8 py-6 text-base lg:w-[325px] lg:px-10"
-                  href={definition.hero.ctaHref}
+                <TrackClick
+                  {...ctaClickEvent({
+                    slug: definition.slug,
+                    position: "hero",
+                  })}
                 >
-                  <span className="truncate">{definition.hero.ctaLabel}</span>
-                </BlackGoToAppButton>
+                  <BlackGoToAppButton
+                    className="w-full px-8 py-6 text-base lg:w-[325px] lg:px-10"
+                    href={definition.hero.ctaHref}
+                  >
+                    <span className="truncate">{definition.hero.ctaLabel}</span>
+                  </BlackGoToAppButton>
+                </TrackClick>
                 <Button
                   size="lg"
                   variant="outline"
@@ -96,6 +107,38 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                   </Link>
                 </Button>
               </div>
+              {definition.hero.downloads ? (
+                <p
+                  className="mt-4 text-pretty text-base text-slate-600"
+                  data-testid="seo-landing-hero-downloads"
+                >
+                  {definition.hero.downloads.label}{" "}
+                  {definition.hero.downloads.files.map((file, index) => {
+                    return (
+                      <span key={file.href}>
+                        {index > 0 ? " · " : null}
+                        {/* a plain anchor: a route handler, not a page, and `download`
+                            saves the file instead of opening it */}
+                        <TrackClick
+                          event="seo_landing_file_downloaded"
+                          data={{
+                            slug: definition.slug,
+                            file: file.href.split("/").at(-1) ?? file.href,
+                          }}
+                        >
+                          <a
+                            href={file.href}
+                            download
+                            className="font-medium text-slate-900 underline underline-offset-4 hover:text-slate-600"
+                          >
+                            {file.label}
+                          </a>
+                        </TrackClick>
+                      </span>
+                    );
+                  })}
+                </p>
+              ) : null}
               {definition.hero.heroVideo ? (
                 <div className="mt-8 aspect-video overflow-hidden rounded-lg bg-slate-100/80 shadow-sm">
                   <YouTubeEmbed
@@ -181,6 +224,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                     <SeoInlineCta
                       href={definition.hero.ctaHref}
                       label={definition.hero.ctaLabel}
+                      slug={definition.slug}
                     />
                   ) : null}
                   {canShowComparisonTable && comparisonTable ? (
@@ -240,12 +284,19 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
             <SeoRelatedLinks slugs={definition.relatedSlugs} />
 
             <div className="flex justify-center py-6 md:py-12">
-              <BlackGoToAppButton
-                className="h-12 w-full px-8 text-base"
-                href={definition.hero.ctaHref}
+              <TrackClick
+                {...ctaClickEvent({
+                  slug: definition.slug,
+                  position: "bottom",
+                })}
               >
-                {definition.hero.ctaLabel}
-              </BlackGoToAppButton>
+                <BlackGoToAppButton
+                  className="h-12 w-full px-8 text-base"
+                  href={definition.hero.ctaHref}
+                >
+                  {definition.hero.ctaLabel}
+                </BlackGoToAppButton>
+              </TrackClick>
             </div>
           </div>
         </main>
@@ -303,8 +354,75 @@ const SEO_FOOTER_LABEL_BY_SLUG = Object.fromEntries(
   }),
 ) as Record<SeoLandingSlug, string>;
 
+/**
+ * The h1 text with its mark drawn on one phrase, see `hero.h1Mark`.
+ *
+ * Only the phrase is wrapped, so the heading's text (and its accessible name) is exactly
+ * `hero.h1` with or without the mark. A phrase that is not in the heading renders the
+ * plain text; `seo-landing-h1-marks.test.ts` fails before that ships.
+ */
+function MarkedHeading({
+  text,
+  mark,
+}: {
+  text: string;
+  mark: SeoLandingDefinition["hero"]["h1Mark"];
+}) {
+  const start = text.indexOf(mark.phrase);
+
+  if (start === -1) {
+    return text;
+  }
+
+  return (
+    <>
+      {text.slice(0, start)}
+      <RoughAnnotation
+        type={mark.type}
+        color={mark.color}
+        // after the hero has painted, so the drawing is seen rather than missed on load
+        delayMs={H1_MARK_DELAY_MS}
+        animationDuration={1000}
+        strokeWidth={mark.type === "underline" ? 3 : undefined}
+        // the heading's lines sit close together: a wider gap would reach the next line
+        padding={mark.type === "underline" ? 2 : 4}
+      >
+        {mark.phrase}
+      </RoughAnnotation>
+      {text.slice(start + mark.phrase.length)}
+    </>
+  );
+}
+
+const H1_MARK_DELAY_MS = 300;
+
+/**
+ * The Umami event for a click on one of the landing's in-page CTAs, which open the app.
+ *
+ * `seo_sticky_cta_clicked` covers the sticky bar; together they show how many readers of a
+ * landing go on to the generator, to set against `seo_landing_file_downloaded` on pages
+ * that offer a file.
+ */
+function ctaClickEvent({
+  slug,
+  position,
+}: {
+  slug: SeoLandingSlug;
+  position: "hero" | "inline" | "bottom";
+}) {
+  return { event: "seo_landing_cta_clicked", data: { slug, position } };
+}
+
 /** Mid-page prompt to open the app, shown once between the sections. */
-function SeoInlineCta({ href, label }: { href: string; label: string }) {
+function SeoInlineCta({
+  href,
+  label,
+  slug,
+}: {
+  href: string;
+  label: string;
+  slug: SeoLandingSlug;
+}) {
   return (
     <div
       className="my-6 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-6"
@@ -319,12 +437,14 @@ function SeoInlineCta({ href, label }: { href: string; label: string }) {
           No account needed.
         </p>
       </div>
-      <BlackGoToAppButton
-        className="w-full shrink-0 px-6 py-5 text-base sm:w-auto"
-        href={href}
-      >
-        <span className="truncate">{label}</span>
-      </BlackGoToAppButton>
+      <TrackClick {...ctaClickEvent({ slug, position: "inline" })}>
+        <BlackGoToAppButton
+          className="w-full shrink-0 px-6 py-5 text-base sm:w-auto"
+          href={href}
+        >
+          <span className="truncate">{label}</span>
+        </BlackGoToAppButton>
+      </TrackClick>
     </div>
   );
 }

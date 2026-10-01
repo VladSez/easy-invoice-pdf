@@ -1,3 +1,4 @@
+import type { RoughAnnotationType } from "@/components/rough-annotation";
 import {
   STATIC_ASSETS_URL,
   VIDEO_DEMO_HERO_YOUTUBE_URL,
@@ -15,6 +16,8 @@ export const SEO_LANDING_SLUGS = [
   "multi-language-invoice-generator",
   "swedish-invoice-generator",
   "norwegian-invoice-generator",
+  "spanish-invoice-generator",
+  "german-invoice-generator",
   "contractor-invoice-template",
   "freelance-invoice-template",
   "proforma-invoice-generator",
@@ -56,10 +59,43 @@ export interface SeoLandingDefinition {
   };
   hero: {
     h1: string;
+    /**
+     * The hand-drawn mark drawn on one phrase of the h1 once the page loads.
+     *
+     * A phrase, so the mark points at the reason to read on (No Sign Up, Factura, SEK)
+     * rather than painting the whole heading. Only highlight and underline: they draw one
+     * stroke per line if the phrase wraps, where a box or circle around a wide word cuts
+     * through its corners. Each landing gets its own type and colour pairing (checked in
+     * `seo-landing-h1-marks.test.ts`).
+     */
+    h1Mark: {
+      /**
+       * Text inside `h1` to annotate, matched exactly.
+       *
+       * rough-notation inserts its SVG beside the phrase (before a highlight, after an
+       * underline), and that absolutely positioned SVG counts as a word break in the
+       * heading's accessible name. So a highlight's phrase must follow a space or open the
+       * heading, and an underline's must precede a space or end it; otherwise the name
+       * reads "Spanish ( Factura)". Hence "(Factura)" with its parentheses.
+       */
+      phrase: string;
+      type: Extract<RoughAnnotationType, "highlight" | "underline">;
+      /** Any CSS colour; highlights sit behind the text, so keep them light. */
+      color: string;
+    };
     subheading: string;
     bullets: string[];
     ctaLabel: string;
     ctaHref: string;
+    /**
+     * Files to download straight from the hero, under the CTA. For queries where the
+     * searcher wants a file rather than a tool ("invoice template pdf").
+     */
+    downloads?: {
+      /** Lead-in before the links, e.g. "Prefer a blank PDF?" */
+      label: string;
+      files: { label: string; href: string }[];
+    };
     /**
      * Shown in the hero, and used as the poster frame when {@link heroVideo} is set.
      */
@@ -117,6 +153,15 @@ export interface SeoLandingDefinition {
 /** The invoice app, opened on the visitor's last used template (default for new visitors). */
 const APP_HREF = "/";
 
+/**
+ * The blank, fillable invoice PDFs, rendered at build time by the route handlers under
+ * `invoice-template-pdf/`.
+ */
+const BLANK_INVOICE_PDF_HREFS = {
+  a4: "/invoice-template-pdf/blank-invoice-template-a4.pdf",
+  letter: "/invoice-template-pdf/blank-invoice-template-letter.pdf",
+} as const;
+
 export const SEO_LANDING_DEFINITIONS = {
   "invoice-generator-no-login": {
     slug: "invoice-generator-no-login",
@@ -129,6 +174,12 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     hero: {
       h1: "Free Invoice Generator - No Sign Up, No Login",
+      // yellow-300
+      h1Mark: {
+        phrase: "No Sign Up",
+        type: "highlight",
+        color: "rgb(253 224 71)",
+      },
       subheading:
         "Fill in the form, watch the PDF redraw beside it, then download the file. No account, no email, no credit card. The invoice is rendered on your own machine, so nothing you type is uploaded.",
       bullets: [
@@ -324,6 +375,12 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     hero: {
       h1: "Open-Source Invoice Generator - Free and Self-Hostable",
+      // emerald-500
+      h1Mark: {
+        phrase: "Open-Source",
+        type: "underline",
+        color: "rgb(16 185 129)",
+      },
       subheading:
         "The whole generator is on GitHub under AGPL-3.0. Use the hosted copy, fork it, or run it on your own server. Either way the PDF is rendered in the browser and no account is involved.",
       bullets: [
@@ -498,6 +555,12 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     hero: {
       h1: "Stripe Invoice Generator, No Stripe Account Needed",
+      // Stripe's own blurple
+      h1Mark: {
+        phrase: "No Stripe Account Needed",
+        type: "underline",
+        color: "rgb(99 91 255)",
+      },
       subheading:
         "The Stripe-style template is here as a layout you fill in and download. No payments account, no products to configure, no dashboard to learn. Add your logo, pick the currency, press Download PDF.",
       bullets: [
@@ -664,12 +727,18 @@ export const SEO_LANDING_DEFINITIONS = {
     metadata: {
       title: "Free Invoice Template PDF - Fill In and Download",
       description:
-        "A free invoice template that fills itself in. Type into the form, the PDF redraws beside it, download it. No Word formatting, no Google Docs table, no signup.",
+        "A free invoice template PDF. Fill it in online with the totals done for you, or download a blank fillable PDF in A4 or US Letter. No signup, no Word file.",
       keywords:
-        "free invoice template PDF, invoice template word, invoice format word, word document invoice template, invoice template google docs, bill template google docs, billing template google docs, invoice template canva, small business invoice template, bill template, billing template free, free sample invoice, free invoice example, printable invoice template, invoice PDF download",
+        "free invoice template PDF, blank invoice template pdf, fillable invoice template pdf, printable invoice template pdf, invoice template word, invoice format word, word document invoice template, invoice template google docs, bill template google docs, billing template google docs, invoice template canva, small business invoice template, bill template, billing template free, free sample invoice, free invoice example, printable invoice template, invoice PDF download",
     },
     hero: {
       h1: "Free Invoice Template PDF You Fill In Online",
+      // rose-500
+      h1Mark: {
+        phrase: "Fill In Online",
+        type: "underline",
+        color: "rgb(244 63 94)",
+      },
       subheading:
         "A Word or Google Docs invoice template is a document you keep repairing. This one is a form: type into the fields, watch the PDF redraw beside them, and download it when it reads right.",
       bullets: [
@@ -681,6 +750,16 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Fill In and Download a PDF",
       ctaHref: APP_HREF,
+      downloads: {
+        label: "Prefer a blank PDF to fill in or print?",
+        files: [
+          { label: "Download A4", href: BLANK_INVOICE_PDF_HREFS.a4 },
+          {
+            label: "Download US Letter",
+            href: BLANK_INVOICE_PDF_HREFS.letter,
+          },
+        ],
+      },
       heroImage: `${STATIC_ASSETS_URL}/seo-content/def-tmp-v2.png`,
       heroVideo: {
         embedUrl: VIDEO_DEMO_HERO_YOUTUBE_URL,
@@ -695,6 +774,10 @@ export const SEO_LANDING_DEFINITIONS = {
       heading: "The template at a glance",
       rows: [
         { label: "What you get", value: "A PDF, generated in your browser" },
+        {
+          label: "Blank PDF",
+          value: "Fillable and printable, in A4 or US Letter",
+        },
         {
           label: "What you fill in",
           value: "A web form, not a document you have to edit",
@@ -754,6 +837,14 @@ export const SEO_LANDING_DEFINITIONS = {
           "Choose the date format, including ISO 2025-12-17 for cross-border work",
           "Upload a logo up to 3MB as JPEG, PNG or WebP",
           "Hide the fields you do not use, so the PDF has no empty rows",
+        ],
+      },
+      {
+        title: "A blank invoice template PDF, if you prefer one",
+        lead: "Some invoices are written by hand, or typed into a PDF reader. For those there is a blank template, in A4 and in US Letter.",
+        paragraphs: [
+          "Every field in it is a form field, so Acrobat, Preview or your browser lets you type straight into it. Each one also sits on a ruled line, so a printed copy works with a pen. It has room for ten line items, a subtotal, tax and total, payment details and notes.",
+          "What a blank PDF cannot do is the math. The subtotal, tax and total are yours to work out, which is where the online template above earns its keep.",
         ],
       },
       {
@@ -819,6 +910,11 @@ export const SEO_LANDING_DEFINITIONS = {
     ],
     faq: [
       {
+        question: "Can I download a blank invoice template PDF?",
+        answer:
+          "Yes, in A4 or US Letter, from the links at the top of the page. It is fillable, so you can type into it in any PDF reader, and printable, with ruled lines for writing by hand. It does not total anything for you; the online template does.",
+      },
+      {
         question: "Is this better than a Word invoice template?",
         answer:
           "For anything past the first invoice, yes. A .docx template makes you retype the totals, repair the table when you add a line item, and export to PDF at the end. Here the totals follow the line items and the PDF is what you are already looking at.",
@@ -876,6 +972,12 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     hero: {
       h1: "Invoice Generator in 13 Languages - Free PDF",
+      // sky-200
+      h1Mark: {
+        phrase: "13 Languages",
+        type: "highlight",
+        color: "rgb(186 230 253)",
+      },
       subheading:
         "Pick a language and the whole invoice follows: every label, the date format, the tax wording and the amount written out in words. Free, in your browser, with no signup.",
       bullets: [
@@ -1029,9 +1131,9 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
     },
     relatedSlugs: [
+      "spanish-invoice-generator",
+      "german-invoice-generator",
       "swedish-invoice-generator",
-      "norwegian-invoice-generator",
-      "export-invoice-format",
     ],
     faq: [
       {
@@ -1092,6 +1194,8 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     hero: {
       h1: "Create a Swedish invoice in SEK",
+      // blue-600, from the Swedish flag
+      h1Mark: { phrase: "Swedish", type: "underline", color: "rgb(37 99 235)" },
       subheading:
         "Set the invoice language to Swedish and every printed label changes with it: the seller and buyer blocks, the moms wording, the dates, and the total written out in words. Set the currency to SEK for Swedish krona. Nothing to install, and no account to make.",
       bullets: [
@@ -1297,6 +1401,12 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     hero: {
       h1: "Create a Norwegian invoice in NOK",
+      // red-600, from the Norwegian flag
+      h1Mark: {
+        phrase: "Norwegian",
+        type: "underline",
+        color: "rgb(220 38 38)",
+      },
       subheading:
         "Set the invoice language to Norwegian and every printed label changes with it: the seller and buyer blocks, the MVA wording, the dates, and the total written out in words. Set the currency to NOK for Norwegian kroner. Nothing to install, and no account to make.",
       bullets: [
@@ -1490,6 +1600,389 @@ export const SEO_LANDING_DEFINITIONS = {
       },
     ],
   },
+  "spanish-invoice-generator": {
+    slug: "spanish-invoice-generator",
+    metadata: {
+      title: "Invoice in Spanish - Free Factura Generator (PDF)",
+      description:
+        "Create an invoice in Spanish, a factura, with IVA wording and Spanish labels on every field. The total is written out in Spanish words. Free PDF, no signup.",
+      keywords:
+        "invoice in spanish, spanish invoice, spanish invoice template, how to say invoice in spanish, invoice in spanish translation, factura, factura en inglés, invoice en español, factura template, IVA invoice, bilingual invoice",
+    },
+    hero: {
+      h1: "Create an Invoice in Spanish (Factura)",
+      // orange-200
+      h1Mark: {
+        phrase: "(Factura)",
+        type: "highlight",
+        color: "rgb(254 215 170)",
+      },
+      subheading:
+        "Invoice in Spanish is factura. Set the invoice language to Spanish and every printed label changes with it: Vendedor and Comprador, IVA, the dates, and the total written out in Spanish words. Pick any currency. Nothing to install, and no account to make.",
+      bullets: [
+        "Spanish labels on every field of the PDF",
+        "IVA wording and the NIF/CIF tax number label",
+        "Total in words: mil doscientos treinta y cuatro",
+        "Free and open source",
+      ],
+      ctaLabel: "Create a Spanish Invoice",
+      ctaHref: APP_HREF,
+      heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
+      heroVideo: {
+        embedUrl: VIDEO_MULTI_LANGUAGE_YOUTUBE_URL,
+        title:
+          "EasyInvoicePDF: 10 languages and 100+ currencies support #invoice #oss #freelancelife",
+        description:
+          "A walkthrough of picking an invoice language and currency, and the PDF changing with them.",
+        uploadDate: "2026-09-08T16:36:13-07:00",
+        thumbnailUrl: "https://i.ytimg.com/vi/ITMeKohyz3I/maxresdefault.jpg",
+      },
+    },
+    factsTable: {
+      heading: "Spanish invoices at a glance",
+      rows: [
+        { label: "Invoice in Spanish", value: "Factura" },
+        { label: "Invoice language", value: "Spanish (Español)" },
+        { label: "Tax wording", value: "IVA, with Tipo IVA for the rate" },
+        { label: "Tax number label", value: "NIF/CIF, which you can rename" },
+        {
+          label: "Date on the invoice",
+          value:
+            "2025-12-17, or 17 de diciembre de 2025 on the Stripe-style template",
+        },
+        {
+          label: "Amounts",
+          value: "1.234,56, with a comma before the cents",
+        },
+        {
+          label: "Total in words",
+          value: "mil doscientos treinta y cuatro for 1234",
+        },
+        { label: "Account required", value: "No" },
+      ],
+    },
+    sections: [
+      {
+        title: "Spanish invoice terms in English",
+        lead: "Invoice in Spanish is factura, and an invoice in English is what a Spanish speaker means by factura en inglés. These are the labels the PDF prints, with their English equivalents:",
+        bullets: [
+          "Factura: Invoice, and Factura n.º: Invoice number",
+          "Vendedor and Comprador: Seller and Buyer",
+          "Fecha de emisión: Date of issue",
+          "Fecha de vencimiento: Due date",
+          "IVA: VAT, and NIF/CIF: Tax ID",
+          "Precio neto and Importe bruto: Net price and Gross amount",
+          "Total a pagar: Total to pay",
+          "Importe en letras: Amount in words",
+          "Forma de pago: Payment method",
+        ],
+      },
+      {
+        title: "What changes when you pick Spanish",
+        lead: "Choosing Spanish rewrites the PDF itself, not only the app around it. Each printed label comes from a Spanish translation rather than an English string with a Spanish title on top.",
+        paragraphs: [
+          "The tax column reads IVA, and the summary table gives the rate as Tipo IVA. If you bill under another name, such as IGIC in the Canary Islands or IVA with a Mexican RFC, rename the tax label and the tax number label, and the new wording appears everywhere they print.",
+        ],
+      },
+      {
+        title: "The total, written out in Spanish",
+        lead: "Spanish invoices often repeat the total in words, and the generator writes it the way Spanish counts.",
+        paragraphs: [
+          "1234 becomes mil doscientos treinta y cuatro. Note mil, never un mil, and the y that joins tens and units, as in treinta y cuatro.",
+        ],
+      },
+      {
+        title: "Spanish words, any currency",
+        showComparisonTable: true,
+        lead: "Currency is a separate setting, so a Spanish invoice can be billed in euros, Mexican pesos, US dollars or any of 122 currencies.",
+        paragraphs: [
+          "Amounts follow Spanish punctuation: a point between thousands and a comma before the cents, so 1.234,56. On the Stripe-style template the date reads 17 de diciembre de 2025.",
+        ],
+      },
+      {
+        title: "The same invoice in English and in Spanish",
+        lead: "Language is one dropdown, so a bilingual client can get both.",
+        paragraphs: [
+          "Download the Spanish PDF, switch the language to English and download again. The line items, amounts and dates stay exactly as you entered them; only the printed labels change.",
+        ],
+      },
+      {
+        title: "Create a Spanish invoice",
+        lead: "Four steps, and nothing to download:",
+        bullets: [
+          "Open the generator and set Invoice PDF Language to Spanish",
+          "Pick the currency your client pays in",
+          "Fill in your details and line items, watching the preview update",
+          "Download the PDF, or send your client a link to it",
+        ],
+      },
+    ],
+    comparisonTable: {
+      heading: "Spanish support compared",
+      intro:
+        "Many invoice tools translate their own interface and leave the document in English. This compares what reaches your client.",
+      columnLabels: [
+        "On the PDF",
+        "EasyInvoicePDF.com",
+        "Typical invoice tool",
+      ],
+      rows: [
+        {
+          feature: "Spanish labels",
+          thisTool: "✅ Every field",
+          other: "⚠️ Often partial",
+        },
+        {
+          feature: "IVA wording",
+          thisTool: "✅ Automatic",
+          other: "⚠️ Manual",
+        },
+        {
+          feature: "Total in Spanish words",
+          thisTool: "✅ Yes",
+          other: "❌ Rarely",
+        },
+        {
+          feature: "Spanish number format",
+          thisTool: "✅ 1.234,56",
+          other: "⚠️ Varies",
+        },
+        { feature: "Account required", thisTool: "❌ No", other: "✅ Usually" },
+        { feature: "Price", thisTool: "✅ Free", other: "⚠️ Paid plans" },
+      ],
+    },
+    relatedSlugs: [
+      "german-invoice-generator",
+      "multi-language-invoice-generator",
+      "freelance-invoice-template",
+    ],
+    faq: [
+      {
+        question: "How do you say invoice in Spanish?",
+        answer:
+          "Factura. With Spanish selected, the PDF is titled Factura and the number is labelled Factura n.º on the default template, or Número de factura on the Stripe-style one.",
+      },
+      {
+        question: "What is factura in English?",
+        answer:
+          "Invoice. To send a Spanish-speaking business an invoice in English, keep the language on English; to send it in Spanish, switch to Spanish. The content stays the same either way.",
+      },
+      {
+        question: "Does the invoice say IVA or VAT?",
+        answer:
+          "IVA. Picking Spanish sets the tax label to IVA on the line items and Tipo IVA in the summary. You can replace it with your own wording, such as IGIC, and it is used everywhere the tax appears.",
+      },
+      {
+        question: "Can I use it for Mexico or other Latin American countries?",
+        answer:
+          "For the wording, yes: rename NIF/CIF to RFC or your local tax ID and pick the currency. It produces a PDF, not a CFDI or any other government e-invoice, so check whether your invoices must be issued through one.",
+      },
+      {
+        question: "Do I need an account?",
+        answer:
+          "No. There is no signup and no email step. The PDF is built in your browser, so the invoice data never reaches a server.",
+      },
+      {
+        question: "Is this accounting software?",
+        answer:
+          "No. It produces invoice PDFs and does not file, track or reconcile anything, and it makes no compliance guarantees. Check the result against your own bookkeeping requirements.",
+      },
+    ],
+  },
+  "german-invoice-generator": {
+    slug: "german-invoice-generator",
+    metadata: {
+      title: "Invoice in German - Free Rechnung Generator (PDF)",
+      description:
+        "Create an invoice in German, a Rechnung, with MwSt. wording and German labels on every field. The total is written out in German. Free PDF, no signup.",
+      keywords:
+        "invoice in german, german invoice, german invoice template, invoice deutsch, rechnung englisch, rechnung auf englisch, englische rechnung vorlage, rechnungsvorlage englisch, MwSt invoice, kleinunternehmer rechnung englisch",
+    },
+    hero: {
+      h1: "Create an Invoice in German (Rechnung)",
+      // amber-500, the gold of the German flag
+      h1Mark: {
+        phrase: "(Rechnung)",
+        type: "underline",
+        color: "rgb(245 158 11)",
+      },
+      subheading:
+        "Invoice in German is Rechnung. Set the invoice language to German and every printed label changes with it: Verkäufer and Käufer, MwSt., the dates, and the total written out in German. Or keep it in English for a client abroad. Nothing to install, and no account to make.",
+      bullets: [
+        "German labels on every field of the PDF",
+        "MwSt. wording and the USt-IdNr label",
+        "Total in words: eintausendzweihundertvierunddreißig",
+        "Free and open source",
+      ],
+      ctaLabel: "Create a German Invoice",
+      ctaHref: APP_HREF,
+      heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
+      heroVideo: {
+        embedUrl: VIDEO_MULTI_LANGUAGE_YOUTUBE_URL,
+        title:
+          "EasyInvoicePDF: 10 languages and 100+ currencies support #invoice #oss #freelancelife",
+        description:
+          "A walkthrough of picking an invoice language and currency, and the PDF changing with them.",
+        uploadDate: "2026-09-08T16:36:13-07:00",
+        thumbnailUrl: "https://i.ytimg.com/vi/ITMeKohyz3I/maxresdefault.jpg",
+      },
+    },
+    factsTable: {
+      heading: "German invoices at a glance",
+      rows: [
+        { label: "Invoice in German", value: "Rechnung" },
+        { label: "Rechnung in English", value: "Invoice" },
+        { label: "Invoice language", value: "German (Deutsch)" },
+        { label: "Tax wording", value: "MwSt., with MwSt.-Satz for the rate" },
+        { label: "Tax number label", value: "USt-IdNr, which you can rename" },
+        {
+          label: "Date on the invoice",
+          value:
+            "2025-12-17, 17.12.2025 with DD.MM.YYYY, or 17. Dezember 2025 on the Stripe-style template",
+        },
+        {
+          label: "Total in words",
+          value: "eintausendzweihundertvierunddreißig for 1234",
+        },
+        { label: "Account required", value: "No" },
+      ],
+    },
+    sections: [
+      {
+        title: "German invoice terms in English",
+        lead: "Invoice in German is Rechnung, and Rechnung in English is invoice. These are the labels the PDF prints, with their English equivalents:",
+        bullets: [
+          "Rechnung: Invoice, and Rechnungsnummer: Invoice number",
+          "Verkäufer and Käufer: Seller and Buyer",
+          "Ausstellungsdatum: Date of issue",
+          "Leistungsdatum and Leistungszeitraum: Date and period of service",
+          "Fälligkeitsdatum: Due date",
+          "MwSt.: VAT, and USt-IdNr: VAT ID",
+          "Nettobetrag and Bruttobetrag: Net amount and Gross amount",
+          "Zu zahlen and Restbetrag: To pay and Balance due",
+          "Betrag in Worten: Amount in words",
+        ],
+      },
+      {
+        title: "Rechnung auf Englisch: the same invoice in English",
+        lead: "Billing a client outside Germany? Keep the invoice language on English and nothing else changes.",
+        paragraphs: [
+          "Every label prints in English, the currency stays whatever you set, and the total is written out in English words. Switch the language back to German and download again for a German-speaking client. The line items, amounts and dates stay exactly as you entered them.",
+        ],
+      },
+      {
+        title: "What a German invoice has to show",
+        lead: "German VAT law lists what an invoice must contain. The form has a field for each, and the German labels name them the way a German accountant expects:",
+        bullets: [
+          "Your full name and address, and your client's",
+          "Your Steuernummer or USt-IdNr",
+          "The date of issue and a unique, sequential invoice number",
+          "What you supplied, and how much of it",
+          "The date or period of the service",
+          "The net amount, the tax rate and the tax amount, or a note on why no tax is charged",
+        ],
+        paragraphs: [
+          "Check the result with your Steuerberater. German B2B invoicing is also moving to structured e-invoices, such as XRechnung and ZUGFeRD, in stages; a PDF from this tool is not one.",
+        ],
+      },
+      {
+        title: "Kleinunternehmer: an invoice without MwSt.",
+        lead: "Under the small business rule in § 19 UStG, no VAT is charged, and the invoice says so.",
+        paragraphs: [
+          "Hide the tax columns, or set the rate to 0, and add a note in the notes field that refers to § 19 UStG, for example: Gemäß § 19 UStG wird keine Umsatzsteuer berechnet. Check the exact wording with your Steuerberater.",
+        ],
+      },
+      {
+        title: "Dates and amounts the German way",
+        showComparisonTable: true,
+        lead: "German writes the day with a full stop after it, and the decimal with a comma.",
+        paragraphs: [
+          "On the Stripe-style template the date reads 17. Dezember 2025. On the default template, pick DD.MM.YYYY from the date format dropdown for 17.12.2025. Amounts follow German punctuation, so 1.234,56.",
+        ],
+      },
+      {
+        title: "Create a German invoice",
+        lead: "Four steps, and nothing to download:",
+        bullets: [
+          "Open the generator and set Invoice PDF Language to German",
+          "Set the currency, EUR for most German clients",
+          "Fill in your details and line items, watching the preview update",
+          "Download the PDF, or send your client a link to it",
+        ],
+      },
+    ],
+    comparisonTable: {
+      heading: "German support compared",
+      intro:
+        "Many invoice tools translate their own interface and leave the document in English. This compares what reaches your client.",
+      columnLabels: [
+        "On the PDF",
+        "EasyInvoicePDF.com",
+        "Typical invoice tool",
+      ],
+      rows: [
+        {
+          feature: "German labels",
+          thisTool: "✅ Every field",
+          other: "⚠️ Often partial",
+        },
+        {
+          feature: "MwSt. wording",
+          thisTool: "✅ Automatic",
+          other: "⚠️ Manual",
+        },
+        {
+          feature: "Total in German words",
+          thisTool: "✅ Yes",
+          other: "❌ Rarely",
+        },
+        {
+          feature: "Date with ordinal point",
+          thisTool: "✅ 17. Dezember",
+          other: "⚠️ Often dropped",
+        },
+        { feature: "Account required", thisTool: "❌ No", other: "✅ Usually" },
+        { feature: "Price", thisTool: "✅ Free", other: "⚠️ Paid plans" },
+      ],
+    },
+    relatedSlugs: [
+      "spanish-invoice-generator",
+      "multi-language-invoice-generator",
+      "freelance-invoice-template",
+    ],
+    faq: [
+      {
+        question: "What is invoice in German?",
+        answer:
+          "Rechnung. With German selected, the PDF is titled Rechnung and the number is labelled Rechnungsnummer.",
+      },
+      {
+        question: "What is Rechnung in English?",
+        answer:
+          "Invoice. To write a Rechnung auf Englisch, keep the invoice language on English; every label prints in English and the total is written out in English words.",
+      },
+      {
+        question: "Does the invoice say MwSt. or USt.?",
+        answer:
+          "MwSt. on the line items, and MwSt.-Satz for the rate in the summary. You can replace the label with USt. or any other wording, and it is used everywhere the tax appears.",
+      },
+      {
+        question: "Can I write a Kleinunternehmer invoice?",
+        answer:
+          "Yes. Hide the tax columns or set the rate to 0, and add the § 19 UStG note in the notes field. Check the exact wording with your Steuerberater.",
+      },
+      {
+        question: "Is this an XRechnung or ZUGFeRD e-invoice?",
+        answer:
+          "No. It produces a PDF. If your client or the law requires a structured e-invoice, you need a tool that issues one.",
+      },
+      {
+        question: "Do I need an account?",
+        answer:
+          "No. There is no signup and no email step. The PDF is built in your browser, so the invoice data never reaches a server.",
+      },
+    ],
+  },
   "contractor-invoice-template": {
     slug: "contractor-invoice-template",
     metadata: {
@@ -1501,6 +1994,12 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     hero: {
       h1: "Free Contractor Invoice Template",
+      // teal-500
+      h1Mark: {
+        phrase: "Contractor",
+        type: "underline",
+        color: "rgb(20 184 166)",
+      },
       subheading:
         "Bill a client for hours or a flat fee, in US dollars, on a PDF that looks the same in every inbox. Type into the form and the invoice redraws beside it. No account, no Word file to fight with, and nothing you type leaves your browser.",
       bullets: [
@@ -1670,6 +2169,12 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     hero: {
       h1: "Free Freelance Invoice Template",
+      // violet-200
+      h1Mark: {
+        phrase: "Freelance",
+        type: "highlight",
+        color: "rgb(221 214 254)",
+      },
       subheading:
         "Bill a client for a project, a retainer or a month of hours. Fill in the form, watch the PDF redraw beside it, and download it. Your details stay saved in your browser, so the next invoice takes a minute.",
       bullets: [
@@ -1819,6 +2324,12 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     hero: {
       h1: "Free Proforma Invoice Generator",
+      // pink-500
+      h1Mark: {
+        phrase: "Proforma",
+        type: "underline",
+        color: "rgb(236 72 153)",
+      },
       subheading:
         "Send a buyer the expected cost before the work starts or the goods ship. Rename the document to Proforma Invoice, fill in the lines, and download the PDF. No account, and the data stays in your browser.",
       bullets: [
@@ -1976,6 +2487,12 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     hero: {
       h1: "Export Invoice Format for Services from India",
+      // orange-500, saffron
+      h1Mark: {
+        phrase: "for Services",
+        type: "underline",
+        color: "rgb(249 115 22)",
+      },
       subheading:
         "Bill a client abroad in their currency, with the LUT declaration and your GSTIN on the page. Fill in the form, watch the PDF redraw beside it, and download it. Free, no account, and nothing you type leaves your browser.",
       bullets: [

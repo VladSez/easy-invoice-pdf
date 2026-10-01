@@ -276,6 +276,19 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       '[data-sonner-toast][data-front="true"]:not([data-removed="true"])',
     );
 
+    // Mobile projects share through `navigator.share`, not the clipboard. Keep that share
+    // sheet "open" forever: headless Chrome rejects the call, and the app would then swap the
+    // link's toast for "Failed to share invoice" before the assertion below sees it.
+    await page.evaluate(() => {
+      if (navigator.share) {
+        // A promise that never settles: the user is still looking at the share sheet.
+        const shareSheetLeftOpen = Promise.withResolvers<void>().promise;
+        navigator.share = () => {
+          return shareSheetLeftOpen;
+        };
+      }
+    });
+
     // Share on the default template...
     await shareButton.click();
     await page.waitForURL((url) => {
@@ -299,7 +312,11 @@ test.describe("Stripe Invoice Sharing Logic", () => {
       return url.searchParams.has("data");
     });
     expect(page.url()).toContain("/stripe-template?data=");
-    await expect(frontToast).toContainText("Invoice link generated");
+    // The new link's toast: "...copied to clipboard!" on desktop, "...Share it now." on
+    // mobile. Both carry the same description.
+    await expect(
+      frontToast.getByTestId("share-invoice-link-description-toast"),
+    ).toBeVisible();
 
     await templateSelect.selectOption("default");
 

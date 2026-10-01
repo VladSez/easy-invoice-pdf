@@ -58,6 +58,14 @@ export const SEO_FOOTER_SOLUTION_LINKS = [
     label: "Norwegian Invoice Generator - Free PDF in NOK",
   },
   {
+    slug: "spanish-invoice-generator",
+    label: "Invoice in Spanish - Free Factura Generator",
+  },
+  {
+    slug: "german-invoice-generator",
+    label: "Invoice in German - Free Rechnung Generator",
+  },
+  {
     slug: "contractor-invoice-template",
     label: "Free Contractor Invoice Template",
   },

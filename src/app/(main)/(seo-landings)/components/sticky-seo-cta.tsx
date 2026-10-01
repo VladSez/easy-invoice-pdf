@@ -94,7 +94,7 @@ export function StickySeoCta({
         <Button
           asChild
           size="sm"
-          className="h-9 min-w-0 rounded-full border border-white/40 !bg-zinc-900 px-4 text-sm text-white hover:bg-white/10 hover:text-white"
+          className="group h-9 min-w-0 rounded-full border border-white/40 !bg-zinc-900 px-4 text-sm text-white hover:bg-white/10 hover:text-white"
         >
           <Link
             href={href}
@@ -106,7 +106,22 @@ export function StickySeoCta({
             }}
           >
             <span className="truncate">{label}</span>
-            <ArrowRight className="ml-1.5 size-4" aria-hidden="true" />
+            {/*
+              Same periodic nudge as the header's "Open app" button. The class is only
+              applied while the bar is up, so the animation restarts each time it appears
+              instead of running unseen from mount. The keyframes sit idle for the first
+              70% (3.5s), so the negative delay skips that, minus the 300ms fade-in and a
+              500ms pause, so the first nudge lands half a second after the bar settles.
+            */}
+            <ArrowRight
+              className={cn(
+                "ml-1.5 size-4 transition-transform group-hover:scale-110",
+                isVisible
+                  ? "animate-pulse-arrow [animation-delay:-2.7s] motion-reduce:animate-none"
+                  : null,
+              )}
+              aria-hidden="true"
+            />
           </Link>
         </Button>
       </div>
