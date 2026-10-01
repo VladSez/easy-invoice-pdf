@@ -26,17 +26,23 @@ const GOOGLEBOT_USER_AGENT =
 const DATA = "N4IgjCBcIGoIIBUQBoQGYohSALFALgE4CuApqg";
 
 const SHARED_INVOICE_URLS = [
-  `/?template=default&data=${DATA}`,
-  `/?data=${DATA}&template=default`,
   `/?data=${DATA}`,
-  `/?utm_source=newsletter&template=default&data=${DATA}`,
+  `/?utm_source=newsletter&data=${DATA}`,
   `${STRIPE_TEMPLATE_PATHNAME}?data=${DATA}`,
   `${STRIPE_TEMPLATE_PATHNAME}?utm_source=newsletter&data=${DATA}`,
-  // legacy link, redirected to `/stripe-template` with its query string
+  // legacy links, from when the template was a query param
+  `/?template=default&data=${DATA}`,
+  `/?data=${DATA}&template=default`,
+  // redirected to `/stripe-template` with its query string
   `/?template=stripe&data=${DATA}`,
 ] as const;
 
-const APP_URLS = ["/", "/?template=default", STRIPE_TEMPLATE_PATHNAME] as const;
+const APP_URLS = [
+  "/",
+  STRIPE_TEMPLATE_PATHNAME,
+  // legacy link, from when the template was a query param
+  "/?template=default",
+] as const;
 
 test.describe("Shared invoice links are kept out of search engines", () => {
   // plain HTTP requests, no need to run them once per browser project

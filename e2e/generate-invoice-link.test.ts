@@ -42,7 +42,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
 
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
   });
 
   test(
@@ -192,14 +192,14 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
       // Get the current URL which should now contain the share data
       const sharedUrl = page.url();
-      expect(sharedUrl).toContain("?template=default&data=");
+      expect(sharedUrl).toContain("/?data=");
 
       // Open URL in new tab
       const newPage = await context.newPage();
       await newPage.goto(sharedUrl);
 
       // Verify the URL contains the shared invoice data
-      await expect(newPage).toHaveURL(/\?template=default&data=/);
+      await expect(newPage).toHaveURL(/\/\?data=/);
 
       // Get elements from the new page context
       const newInvoiceNumberFieldset = newPage.getByRole("group", {
@@ -351,7 +351,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     // Navigate to page with invalid data parameter
     await page.goto("/?data=invalid-data-string", { waitUntil: "commit" });
 
-    await expect(page).toHaveURL("/?data=invalid-data-string&template=default");
+    await expect(page).toHaveURL("/?data=invalid-data-string");
 
     // ensure page is loaded
     await expect(
@@ -397,7 +397,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     await expect(page.getByText("Try generating a new link.")).toBeHidden();
 
     // Wait for URL to be cleared and verify
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     // ensure page content is displayed
     await expect(
@@ -413,7 +413,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     // Navigate to page with invalid data parameter
     await page.goto("/?data=corrupted-url", { waitUntil: "commit" });
 
-    await expect(page).toHaveURL("/?data=corrupted-url&template=default");
+    await expect(page).toHaveURL("/?data=corrupted-url");
 
     /* Ensure page content is displayed */
 
@@ -473,7 +473,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     ).toBeVisible();
 
     // Wait for URL to be cleared and verify
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     /* Ensure page content is displayed */
 
@@ -699,7 +699,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
     // Get the current URL which should now contain the share data
     const sharedUrl = page.url();
-    expect(sharedUrl).toContain("?template=default&data=");
+    expect(sharedUrl).toContain("/?data=");
 
     /*
      * VERIFY SHARED INVOICE DATA IS LOADED IN NEW TAB
@@ -710,7 +710,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     await newPage.goto(sharedUrl);
 
     // Verify the URL contains the shared invoice data
-    await expect(newPage).toHaveURL(/\?template=default&data=/);
+    await expect(newPage).toHaveURL(/\/\?data=/);
 
     // Get the invoice number field from the new page
     const newInvoiceNumberFieldset = newPage.getByRole("group", {
@@ -784,7 +784,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     ).toBeVisible();
 
     // Verify the data parameter is removed from URL after modification
-    await expect(newPage).toHaveURL("?template=default");
+    await expect(newPage).toHaveURL("/");
 
     // Verify shared invoice badge is hidden after modification
     await expect(newPage.getByTestId("shared-invoice-badge")).toBeHidden();
@@ -989,7 +989,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     ).toBeVisible();
 
     // Verify URL was NOT updated with data parameter
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     // Verify toast is still visible after 2 seconds
     await expect(

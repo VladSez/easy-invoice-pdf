@@ -30,8 +30,8 @@ import { expectYouTubeEmbedToShow } from "./utils/youtube-embed";
 
 test.describe("Invoice Generator Page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/?template=default");
-    await expect(page).toHaveURL("/?template=default");
+    await page.goto("/");
+    await expect(page).toHaveURL("/");
   });
 
   test("returns permanent redirect from /:locale/app to /", async ({
@@ -51,7 +51,7 @@ test.describe("Invoice Generator Page", () => {
   test("displays correct OG meta tags for default template", async ({
     page,
   }) => {
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const templateCombobox = page.getByRole("combobox", {
       name: "Invoice Template",
@@ -95,7 +95,7 @@ test.describe("Invoice Generator Page", () => {
 
   test("displays correct buttons and links in header", async ({ page }) => {
     // Check URL is correct
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     // Check title and branding
     await expect(page).toHaveTitle(
@@ -337,7 +337,7 @@ test.describe("Invoice Generator Page", () => {
     // because leaving the form tab flushed it. `install()` alone is not enough, the fake
     // clock keeps ticking until it is paused.
     await page.clock.install();
-    await page.goto("/?template=default");
+    await page.goto("/");
 
     // pause ahead of where the page's fake clock already is: `pauseAt` fast forwards to
     // the given time and rejects a target that is already in the past, so the margin has
@@ -1738,8 +1738,8 @@ test.describe("Invoice Generator Page", () => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-01T00:00:00Z"));
 
-    await page.goto("/?template=default");
-    await expect(page).toHaveURL("/?template=default");
+    await page.goto("/");
+    await expect(page).toHaveURL("/");
 
     const generalInfoSection = page.getByRole("region", {
       name: "General Information",
@@ -1901,8 +1901,8 @@ test.describe("Invoice Generator Page", () => {
   }) => {
     await page.clock.setSystemTime(new Date("2025-12-01T00:00:00Z"));
 
-    await page.goto("/?template=default");
-    await expect(page).toHaveURL("/?template=default");
+    await page.goto("/");
+    await expect(page).toHaveURL("/");
 
     const generalInfoSection = page.getByRole("region", {
       name: "General Information",
@@ -1983,8 +1983,8 @@ test.describe("Invoice Generator Page", () => {
   test("allows setting a partial service period", async ({ page }) => {
     await page.clock.setSystemTime(new Date("2025-06-15T12:00:00Z"));
 
-    await page.goto("/?template=default");
-    await expect(page).toHaveURL("/?template=default");
+    await page.goto("/");
+    await expect(page).toHaveURL("/");
 
     const generalInfoSection = page.getByRole("region", {
       name: "General Information",

@@ -16,8 +16,8 @@ test.describe("Default Invoice Template", () => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
 
-    await page.goto("/?template=default");
-    await expect(page).toHaveURL("/?template=default");
+    await page.goto("/");
+    await expect(page).toHaveURL("/");
   });
 
   test(
@@ -437,7 +437,7 @@ test.describe("Default Invoice Template", () => {
 
     // Navigate back to the previous page
     await page.goto("/");
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     // Switch back to form tab
     await editInvoiceTab.click();
@@ -678,7 +678,7 @@ test.describe("Default Invoice Template", () => {
     browserName,
     downloadDir,
   }) => {
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const generalInfoSection = page.getByTestId("general-information-section");
 
@@ -711,8 +711,8 @@ test.describe("Default Invoice Template", () => {
      */
 
     // Navigate back and switch to Stripe template to verify logo persists
-    await page.goto("/?template=default");
-    await expect(page).toHaveURL("/?template=default");
+    await page.goto("/");
+    await expect(page).toHaveURL("/");
 
     // Verify logo is still present after navigation
     const newGeneralInfoSection = page.getByTestId(
@@ -754,7 +754,7 @@ test.describe("Default Invoice Template", () => {
   }, testInfo) => {
     const CUSTOM_DATE_OF_SALES_LABEL = "Sale date";
 
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const generalInfoSection = page.getByTestId("general-information-section");
     const servicePeriodFieldset = generalInfoSection.getByRole("group", {
@@ -798,7 +798,7 @@ test.describe("Default Invoice Template", () => {
     });
 
     await page.goto("/");
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const newGeneralInfoSection = page.getByTestId(
       "general-information-section",

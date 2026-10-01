@@ -20,7 +20,7 @@ test.describe("Stripe Invoice Template", () => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
 
-    await page.goto("/?template=default");
+    await page.goto("/");
   });
 
   test("uses template-specific default invoice number labels", async ({
@@ -71,7 +71,7 @@ test.describe("Stripe Invoice Template", () => {
   test("displays correct OG meta tags for Stripe template", async ({
     page,
   }) => {
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     // Navigate to Stripe template
     await page.goto("/stripe-template");
@@ -97,7 +97,8 @@ test.describe("Stripe Invoice Template", () => {
       page.locator('meta[property="og:description"]'),
     ).toHaveAttribute(
       "content",
-      "Create professional PDF invoices online for free. Customize invoice templates, add your logo, download instantly, and send invoices without signup.",
+      // the route has its own description, not `/`'s
+      "Free Stripe invoice template. Fill in a Stripe-style invoice, add your logo and a Pay online link, and download the PDF. No Stripe account, no signup.",
     );
     await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
       "content",
@@ -121,7 +122,7 @@ test.describe("Stripe Invoice Template", () => {
     page,
   }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const generalInfoSection = page.getByTestId("general-information-section");
 
@@ -446,7 +447,7 @@ test.describe("Stripe Invoice Template", () => {
   test("Signature fields only appears for default template", async ({
     page,
   }) => {
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const finalSection = page.getByTestId("final-section");
 
@@ -526,7 +527,7 @@ test.describe("Stripe Invoice Template", () => {
     page,
   }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
@@ -701,7 +702,7 @@ test.describe("Stripe Invoice Template", () => {
     page,
   }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const finalSection = page.getByTestId("final-section");
 
@@ -760,7 +761,7 @@ test.describe("Stripe Invoice Template", () => {
   test("shows the service period in the PDF for Stripe and hides it for default", async ({
     page,
   }) => {
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const templateCombobox = page.getByRole("combobox", {
       name: "Invoice Template",
@@ -781,7 +782,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // switching back restores the default template's own behaviour
     await templateCombobox.selectOption("default");
-    await page.waitForURL("/?template=default");
+    await page.waitForURL("/");
 
     await expect(servicePeriodSwitch).not.toBeChecked();
 
@@ -794,7 +795,7 @@ test.describe("Stripe Invoice Template", () => {
     await expect(servicePeriodSwitch).toBeChecked();
 
     await templateCombobox.selectOption("default");
-    await page.waitForURL("/?template=default");
+    await page.waitForURL("/");
     await expect(servicePeriodSwitch).not.toBeChecked();
   });
 
@@ -804,7 +805,7 @@ test.describe("Stripe Invoice Template", () => {
     downloadDir,
   }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
@@ -901,7 +902,7 @@ test.describe("Stripe Invoice Template", () => {
       .selectOption("default");
 
     // Wait for URL to be updated
-    await page.waitForURL("/?template=default");
+    await page.waitForURL("/");
 
     const newVatInput = page.getByRole("textbox", {
       name: "VAT Rate",
@@ -1058,4 +1059,63 @@ test.describe("Stripe Invoice Template", () => {
       });
     });
   }
+
+  test("'Open app' takes a returning visitor back to their last template", async ({
+    page,
+  }) => {
+    await expect(page).toHaveURL("/");
+
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+    await expect(page).toHaveURL("/stripe-template");
+
+    // the template is saved with a debounce
+    await expect
+      .poll(() => {
+        return page.evaluate((key) => {
+          const storedData = localStorage.getItem(key);
+
+          return storedData
+            ? (JSON.parse(storedData) as InvoiceData).template
+            : null;
+        }, PDF_DATA_LOCAL_STORAGE_KEY);
+      })
+      .toBe("stripe");
+
+    await page.goto("/changelog");
+
+    // "Open app" links to a bare `/`, which follows the saved template
+    await page
+      .locator("header")
+      .getByRole("link", { name: "Open app", exact: true })
+      .click();
+
+    await expect(page).toHaveURL("/stripe-template");
+    await expect(
+      page.getByRole("combobox", { name: "Invoice Template" }),
+    ).toHaveValue("stripe");
+  });
+
+  test("a legacy /?template=default link still opens the default template", async ({
+    page,
+  }) => {
+    await page.evaluate(
+      ({ invoiceData, storageKey }) => {
+        localStorage.setItem(storageKey, JSON.stringify(invoiceData));
+      },
+      {
+        storageKey: PDF_DATA_LOCAL_STORAGE_KEY,
+        invoiceData: { ...INITIAL_INVOICE_DATA, template: "stripe" },
+      },
+    );
+
+    // the param overrides the saved Stripe template, then drops out of the address bar
+    await page.goto("/?template=default");
+
+    await expect(
+      page.getByRole("combobox", { name: "Invoice Template" }),
+    ).toHaveValue("default");
+    await expect(page).toHaveURL("/");
+  });
 });

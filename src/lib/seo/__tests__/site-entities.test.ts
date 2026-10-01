@@ -53,7 +53,7 @@ describe("site-entities", () => {
     expect(app.creator).toMatchObject({ "@id": JSON_LD_IDS.organization });
     expect(app.potentialAction).toMatchObject({
       name: "Start Invoicing",
-      target: "https://easyinvoicepdf.com/?template=default",
+      target: "https://easyinvoicepdf.com/",
     });
   });
 
@@ -63,7 +63,7 @@ describe("site-entities", () => {
       expect.arrayContaining([
         expect.objectContaining({
           name: "Start Invoicing",
-          item: "https://easyinvoicepdf.com/?template=default",
+          item: "https://easyinvoicepdf.com/",
         }),
         expect.objectContaining({
           name: "About",

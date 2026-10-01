@@ -1,15 +1,28 @@
 import * as Sentry from "@sentry/nextjs";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
+import { Footer } from "@/app/(components)/footer";
 import { getLatestChangelogSummary } from "@/app/(main)/changelog/utils";
 import type { SupportedTemplates } from "@/app/schema";
-import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
+import {
+  APP_URL,
+  PROD_WEBSITE_URL,
+  STATIC_ASSETS_URL,
+  TWITTER_CREATOR,
+} from "@/config";
 import { getIsIndexableEnvironment } from "@/lib/seo/indexing-utils";
+import { HOME_PAGE_DESCRIPTION } from "@/lib/seo/site-entities";
 import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
 
 import { CTAToastProvider } from "./contexts/cta-toast-context";
-import { HomeJsonLd } from "./home-json-ld";
+import {
+  HOME_WEB_PAGE,
+  HomeJsonLd,
+  type InvoiceAppWebPage,
+} from "./home-json-ld";
+import { InvoicePageLoadingSkeleton } from "./loading";
 import { AppPageClient } from "./page.client";
 
 /**
@@ -20,7 +33,12 @@ import { AppPageClient } from "./page.client";
  * `fetchGithubStars` revalidate) instead of rendered per request. Everything that depends
  * on the URL -- the template, a shared `?data=` invoice -- is read on the client.
  */
-export async function InvoiceAppPage() {
+export async function InvoiceAppPage({
+  template,
+}: {
+  /** The template the route opens with. */
+  template: SupportedTemplates;
+}) {
   const isIndexableEnvironment = getIsIndexableEnvironment();
 
   const [githubStarsCount, latestChangelog] = await Promise.all([
@@ -41,11 +59,22 @@ export async function InvoiceAppPage() {
 
   return (
     <CTAToastProvider>
-      {isIndexableEnvironment ? <HomeJsonLd /> : null}
-      <AppPageClient
-        githubStarsCount={githubStarsCount}
-        latestChangelog={latestChangelog}
-      />
+      {isIndexableEnvironment ? (
+        <HomeJsonLd webPage={TEMPLATE_WEB_PAGE[template]} />
+      ) : null}
+      {/* `AppPageClient` reads `useSearchParams()`, which a prerendered page can only
+          resolve in the browser: the prerender falls back to the nearest Suspense boundary
+          and renders the rest on the client. Without a boundary of its own that was
+          `loading.tsx`, above everything here -- the JSON-LD was left out of the static
+          HTML. The editor is client-only anyway (the invoice lives in localStorage or
+          `?data=`), and the fallback is the skeleton `loading.tsx` renders. */}
+      <Suspense fallback={<InvoicePageLoadingSkeleton />}>
+        <AppPageClient
+          githubStarsCount={githubStarsCount}
+          latestChangelog={latestChangelog}
+        />
+      </Suspense>
+      <Footer />
     </CTAToastProvider>
   );
 }
@@ -60,11 +89,11 @@ export async function InvoiceAppPage() {
 export function buildInvoiceAppMetadata(
   template: SupportedTemplates,
 ): Metadata {
-  const { title, canonical, images } = TEMPLATE_META[template];
+  const { title, description, canonical, images } = TEMPLATE_META[template];
 
   return {
     title,
-    description: APP_PAGE_DESCRIPTION,
+    description,
     robots: resolveAppPageRobots(getIsIndexableEnvironment()),
     alternates: {
       canonical,
@@ -74,7 +103,7 @@ export function buildInvoiceAppMetadata(
     },
     openGraph: {
       title,
-      description: APP_PAGE_DESCRIPTION,
+      description,
       siteName: "EasyInvoicePDF.com | Free Invoice PDF Generator",
       locale: "en_US",
       type: "website",
@@ -84,7 +113,7 @@ export function buildInvoiceAppMetadata(
     twitter: {
       card: "summary_large_image",
       title,
-      description: APP_PAGE_DESCRIPTION,
+      description,
       creator: TWITTER_CREATOR,
       images: [...images],
     },
@@ -114,12 +143,10 @@ function resolveAppPageRobots(
   };
 }
 
-const APP_PAGE_DESCRIPTION =
-  "Create professional PDF invoices online for free. Customize invoice templates, add your logo, download instantly, and send invoices without signup.";
-
 const TEMPLATE_META = {
   default: {
     title: "Free Invoice Generator - Create PDF Invoices Online",
+    description: HOME_PAGE_DESCRIPTION,
     canonical: `${APP_URL}/`, // we use root URL as canonical for SEO purposes
     images: [
       {
@@ -133,6 +160,9 @@ const TEMPLATE_META = {
   },
   stripe: {
     title: "Stripe Invoice Template - Create Free PDF Invoice",
+    // its own wording, so the route does not share `/`'s description
+    description:
+      "Free Stripe invoice template. Fill in a Stripe-style invoice, add your logo and a Pay online link, and download the PDF. No Stripe account, no signup.",
     canonical: `${APP_URL}${STRIPE_TEMPLATE_PATHNAME}`, // its own route, so the Stripe template is indexed as its own page
     images: [
       {
@@ -148,7 +178,18 @@ const TEMPLATE_META = {
   SupportedTemplates,
   {
     title: string;
+    description: string;
     canonical: string;
     images: NonNullable<Metadata["openGraph"]>["images"];
   }
 >;
+
+/** The `WebPage` JSON-LD node of each template's route. */
+const TEMPLATE_WEB_PAGE = {
+  default: HOME_WEB_PAGE,
+  stripe: {
+    url: `${PROD_WEBSITE_URL}${STRIPE_TEMPLATE_PATHNAME}`,
+    name: TEMPLATE_META.stripe.title,
+    description: TEMPLATE_META.stripe.description,
+  },
+} as const satisfies Record<SupportedTemplates, InvoiceAppWebPage>;

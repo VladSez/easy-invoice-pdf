@@ -28,7 +28,7 @@ test.describe("PDF generation errors", () => {
   test("shows the error toast with recovery steps when the PDF cannot be generated", async ({
     page,
   }) => {
-    await page.goto("/?template=default");
+    await page.goto("/");
 
     // sonner renders the toast into a list item, we scope to it so the
     // assertions below cannot pass on text found elsewhere on the page
@@ -56,7 +56,7 @@ test.describe("PDF generation errors", () => {
   test("clicking download when no PDF is available explains why", async ({
     page,
   }) => {
-    await page.goto("/?template=default");
+    await page.goto("/");
 
     // wait for the failure to surface before clicking download
     await expect(page.getByText("Error Generating PDF Document")).toBeVisible();

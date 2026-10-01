@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export function GoToAppButton({
   className,
   children,
-  href = "/?template=default",
+  href = "/",
 }: {
   className?: string;
   children?: React.ReactNode;
@@ -35,7 +35,7 @@ export function GoToAppButton({
 export function BlackGoToAppButton({
   className,
   children,
-  href = "/?template=default",
+  href = "/",
 }: {
   className?: string;
   children?: React.ReactNode;

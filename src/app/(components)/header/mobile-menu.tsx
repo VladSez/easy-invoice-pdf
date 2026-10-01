@@ -180,11 +180,7 @@ export function MobileMenuPanel({
               }
               asChild
             >
-              <Link
-                href="/?template=default"
-                className="flex items-center"
-                onClick={close}
-              >
+              <Link href="/" className="flex items-center" onClick={close}>
                 <ArrowRightIcon className="mr-2 size-6 group-hover:scale-110" />
 
                 {translations.startInvoicingButtonText}

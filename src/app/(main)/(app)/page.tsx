@@ -5,5 +5,5 @@ import { buildInvoiceAppMetadata, InvoiceAppPage } from "./invoice-app-page";
 export const metadata: Metadata = buildInvoiceAppMetadata("default");
 
 export default function AppPage() {
-  return <InvoiceAppPage />;
+  return <InvoiceAppPage template="default" />;
 }

@@ -4,32 +4,37 @@ import { ProjectLogo } from "@/components/etc/project-logo";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Loading() {
-  return <InvoicePageLoadingSkeleton />;
+  return (
+    <>
+      <InvoicePageLoadingSkeleton />
+      <Footer />
+    </>
+  );
 }
 
 /**
  * Displays the loading skeleton for the Invoice Page.
- * Shows placeholders for the header, invoice editor, and footer while content is being loaded.
+ * Shows placeholders for the header and invoice editor while content is being loaded.
+ *
+ * The footer is not part of it: on the page it is rendered on the server, below the editor
+ * (see `InvoiceAppPage`), so it is in the prerendered HTML whatever the editor is doing.
  */
 export function InvoicePageLoadingSkeleton() {
   return (
-    <>
-      <main
-        className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen"
-        aria-busy="true"
-        aria-label="Loading invoice editor"
-      >
-        <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 min-[1400px]:max-w-7xl 2xl:max-w-[1480px]">
-          <LoadingHeader />
+    <main
+      className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen"
+      aria-busy="true"
+      aria-label="Loading invoice editor"
+    >
+      <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 min-[1400px]:max-w-7xl 2xl:max-w-[1480px]">
+        <LoadingHeader />
 
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-            <MobileEditorLoading />
-            <DesktopEditorLoading />
-          </div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+          <MobileEditorLoading />
+          <DesktopEditorLoading />
         </div>
-      </main>
-      <Footer />
-    </>
+      </div>
+    </main>
   );
 }
 

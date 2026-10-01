@@ -1,4 +1,4 @@
-import { Check, ChevronDown, FileUp, FileWarning } from "lucide-react";
+import { ChevronDown, FileUp, FileWarning } from "lucide-react";
 import { useEffect, useEffectEvent, useState } from "react";
 
 import {
@@ -226,17 +226,9 @@ function ChooseFileStep({
         </span>
       </FilePickerLabel>
 
-      <ul className="space-y-1.5 text-sm text-slate-600">
+      <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-600">
         {IMPORT_RULES.map((rule) => {
-          return (
-            <li key={rule} className="flex gap-2">
-              <Check
-                className="mt-0.5 size-3.5 shrink-0 text-green-600"
-                aria-hidden
-              />
-              {rule}
-            </li>
-          );
+          return <li key={rule}>{rule}</li>;
         })}
       </ul>
 
@@ -594,7 +586,7 @@ interface ContactNameProps {
 
 /** Wraps rather than truncates, so a long name can be read in full. */
 function ContactName({ name }: ContactNameProps) {
-  return <p className="text-pretty break-words">{name}</p>;
+  return <p className="text-pretty break-words pb-0.5">{name}</p>;
 }
 
 interface ContactAddressProps {

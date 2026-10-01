@@ -185,6 +185,12 @@ export function InvoicePDFDownloadLink({
     return;
   }, [pdfLoading]);
 
+  // `usePDF()` starts out as `{ url: null, loading: false }`, before the provider has queued
+  // the first render. Without counting that as loading the button read "Download PDF" with
+  // no file behind it (`href="#"`), and a click in that window only got the "File not
+  // available" toast. A failed render (`error`) is not loading: there the toast is right.
+  const isPreparingPdf = isLoading || (!url && !error);
+
   // The button is a fixed width so the layout does not shift while the PDF regenerates,
   // which means "Download PDF in <language>" has to be measured against the longest name.
   const isLongLanguageString =
@@ -219,14 +225,14 @@ export function InvoicePDFDownloadLink({
             "focus-visible:border-indigo-500 focus-visible:ring focus-visible:ring-indigo-200 focus-visible:ring-opacity-50",
             "dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 lg:mb-0 lg:w-[230px]",
             {
-              "pointer-events-none opacity-70": isLoading,
+              "pointer-events-none opacity-70": isPreparingPdf,
               "lg:w-[250px]": isLongLanguageString,
               "lg:w-[275px]": isExtraLongLanguageString,
             },
           )}
         >
           <ButtonContent
-            isLoading={isLoading}
+            isLoading={isPreparingPdf}
             isMobile={isMobile}
             language={invoiceData.language}
           />

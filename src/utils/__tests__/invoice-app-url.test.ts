@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildInvoiceAppUrl,
+  getRouteTemplate,
   getTemplateFromUrl,
   isUrlForTemplate,
   STRIPE_TEMPLATE_PATHNAME,
@@ -17,28 +18,11 @@ describe("getTemplateFromUrl", () => {
     ).toBe("stripe");
   });
 
-  it("reads ?template= on the root route", () => {
+  it("has no preference on a bare root route", () => {
     expect(
       getTemplateFromUrl({
         pathname: "/",
-        searchParams: new URLSearchParams("template=default"),
-      }),
-    ).toBe("default");
-
-    // legacy links, in case one arrives without going through the redirect
-    expect(
-      getTemplateFromUrl({
-        pathname: "/",
-        searchParams: new URLSearchParams("template=stripe"),
-      }),
-    ).toBe("stripe");
-  });
-
-  it("returns null when the URL has no (valid) template", () => {
-    expect(
-      getTemplateFromUrl({
-        pathname: "/",
-        searchParams: new URLSearchParams(),
+        searchParams: new URLSearchParams("data=abc"),
       }),
     ).toBeNull();
 
@@ -49,19 +33,47 @@ describe("getTemplateFromUrl", () => {
       }),
     ).toBeNull();
   });
+
+  it("honours a legacy ?template= on the root route", () => {
+    expect(
+      getTemplateFromUrl({
+        pathname: "/",
+        searchParams: new URLSearchParams("template=default"),
+      }),
+    ).toBe("default");
+
+    // in case one arrives without going through the redirect
+    expect(
+      getTemplateFromUrl({
+        pathname: "/",
+        searchParams: new URLSearchParams("template=stripe"),
+      }),
+    ).toBe("stripe");
+  });
+});
+
+describe("getRouteTemplate", () => {
+  it("reads the template from the route alone", () => {
+    expect(getRouteTemplate(STRIPE_TEMPLATE_PATHNAME)).toBe("stripe");
+    expect(getRouteTemplate("/")).toBe("default");
+  });
 });
 
 describe("buildInvoiceAppUrl", () => {
-  it("keeps ?template=default on the root route", () => {
-    expect(buildInvoiceAppUrl({ template: "default" })).toBe(
-      "/?template=default",
-    );
-  });
-
-  it("puts the Stripe template on its own route without ?template=", () => {
+  it("puts each template on its route, without ?template=", () => {
+    expect(buildInvoiceAppUrl({ template: "default" })).toBe("/");
     expect(buildInvoiceAppUrl({ template: "stripe" })).toBe(
       STRIPE_TEMPLATE_PATHNAME,
     );
+  });
+
+  it("drops a legacy ?template= and keeps the other params in order", () => {
+    expect(
+      buildInvoiceAppUrl({
+        template: "default",
+        searchParams: new URLSearchParams("template=default&data=abc&utm=x"),
+      }),
+    ).toBe("/?data=abc&utm=x");
 
     expect(
       buildInvoiceAppUrl({
@@ -69,22 +81,6 @@ describe("buildInvoiceAppUrl", () => {
         searchParams: new URLSearchParams("template=stripe&data=abc"),
       }),
     ).toBe(`${STRIPE_TEMPLATE_PATHNAME}?data=abc`);
-  });
-
-  it("keeps the other params and their order", () => {
-    expect(
-      buildInvoiceAppUrl({
-        template: "default",
-        searchParams: new URLSearchParams("template=stripe&data=abc&utm=x"),
-      }),
-    ).toBe("/?template=default&data=abc&utm=x");
-
-    expect(
-      buildInvoiceAppUrl({
-        template: "default",
-        searchParams: new URLSearchParams("data=abc"),
-      }),
-    ).toBe("/?data=abc&template=default");
   });
 
   it("does not mutate the params it is given", () => {
@@ -97,12 +93,12 @@ describe("buildInvoiceAppUrl", () => {
 });
 
 describe("isUrlForTemplate", () => {
-  it("accepts the canonical URL of each template, whatever the other params", () => {
+  it("accepts each template's route, whatever the other params", () => {
     expect(
       isUrlForTemplate({
         template: "default",
         pathname: "/",
-        searchParams: new URLSearchParams("template=default&data=abc"),
+        searchParams: new URLSearchParams("data=abc"),
       }),
     ).toBe(true);
 
@@ -128,25 +124,17 @@ describe("isUrlForTemplate", () => {
       isUrlForTemplate({
         template: "default",
         pathname: STRIPE_TEMPLATE_PATHNAME,
-        searchParams: new URLSearchParams("template=default"),
+        searchParams: new URLSearchParams(),
       }),
     ).toBe(false);
   });
 
-  it("rejects a missing, wrong or redundant ?template=", () => {
+  it("rejects a leftover legacy ?template=", () => {
     expect(
       isUrlForTemplate({
         template: "default",
         pathname: "/",
-        searchParams: new URLSearchParams(),
-      }),
-    ).toBe(false);
-
-    expect(
-      isUrlForTemplate({
-        template: "default",
-        pathname: "/",
-        searchParams: new URLSearchParams("template=stripe"),
+        searchParams: new URLSearchParams("template=default"),
       }),
     ).toBe(false);
 

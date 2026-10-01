@@ -17,7 +17,7 @@ test.describe("Changelog page", () => {
     });
 
     await expect(goToAppButton).toBeVisible();
-    await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
+    await expect(goToAppButton).toHaveAttribute("href", "/");
 
     // Check main heading
     await expect(
@@ -89,7 +89,7 @@ test.describe("Changelog page", () => {
       exact: true,
     });
     await expect(goToAppButton).toBeVisible();
-    await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
+    await expect(goToAppButton).toHaveAttribute("href", "/");
 
     // Check that we're on an individual entry page by looking for "Back to All Posts" link
     await expect(

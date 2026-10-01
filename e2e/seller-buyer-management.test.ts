@@ -254,9 +254,9 @@ for (const party of PARTIES) {
 
   test.describe(`${label} management`, () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/?template=default");
+      await page.goto("/");
 
-      await expect(page).toHaveURL("/?template=default");
+      await expect(page).toHaveURL("/");
     });
 
     test(`create/edit ${party}`, async ({ page }) => {
@@ -1253,8 +1253,8 @@ for (const party of PARTIES) {
         },
       );
 
-      await page.goto("/?template=default");
-      await expect(page).toHaveURL("/?template=default");
+      await page.goto("/");
+      await expect(page).toHaveURL("/");
 
       await openNewPartyDialog(page, party);
 

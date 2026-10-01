@@ -1,4 +1,24 @@
+import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
+
 import type { SeoLandingSlug } from "./seo-landing-definitions";
+
+/**
+ * Footer links to routes of the invoice app itself, listed before the landings.
+ *
+ * `/stripe-template` is the page meant to rank for "Stripe invoice template"; a link to it
+ * from every page, with that phrase as the anchor, is the strongest internal signal we can
+ * give it. The `stripe-invoice-alternative` landing below keeps its own "without Stripe"
+ * wording, so the two do not compete for the same query.
+ */
+export const APP_FOOTER_SOLUTION_LINKS = [
+  {
+    href: STRIPE_TEMPLATE_PATHNAME,
+    label: "Free Stripe Invoice Template",
+  },
+] as const satisfies {
+  href: string;
+  label: string;
+}[];
 
 /**
  * Anchor text for the landing links in the site footer.
@@ -26,7 +46,7 @@ export const SEO_FOOTER_SOLUTION_LINKS = [
   },
   {
     slug: "multi-language-invoice-generator",
-    label: "Invoice Generator in 12 Languages - Free PDF",
+    label: "Invoice Generator in 13 Languages - Free PDF",
   },
   {
     slug: "swedish-invoice-generator",

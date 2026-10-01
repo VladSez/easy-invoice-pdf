@@ -9,5 +9,5 @@ export const metadata: Metadata = buildInvoiceAppMetadata("stripe");
  * reads the template from the pathname (`getTemplateFromUrl`).
  */
 export default function StripeTemplateAppPage() {
-  return <InvoiceAppPage />;
+  return <InvoiceAppPage template="stripe" />;
 }

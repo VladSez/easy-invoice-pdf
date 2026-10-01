@@ -37,7 +37,7 @@ export const FOUNDER_PAGE_DESCRIPTION =
 
 export const OG_IMAGE_URL = `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`;
 
-const START_INVOICING_URL = `${JSON_LD_BASE}/?template=default`;
+const START_INVOICING_URL = `${JSON_LD_BASE}/`;
 
 const WEB_APPLICATION_FEATURES = [
   "Live preview as you type",

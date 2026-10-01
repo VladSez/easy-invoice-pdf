@@ -7,14 +7,14 @@ import { uploadLogoFile } from "./utils";
 
 test.describe("Stripe Invoice Sharing Logic", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/?template=default");
+    await page.goto("/");
   });
 
   test("can share invoice with Stripe template and *WITHOUT* logo", async ({
     page,
   }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     // Switch to Stripe template
     await page
@@ -113,7 +113,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     page,
   }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     // Switch to Stripe template
     await page
@@ -152,7 +152,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     page,
   }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     // Switch to Stripe template and upload logo
     await page
@@ -221,7 +221,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     page,
   }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     // Start with default template and verify share button is enabled
     const shareButton = page.getByRole("button", {
@@ -262,19 +262,26 @@ test.describe("Stripe Invoice Sharing Logic", () => {
   test("switching templates after sharing clears the shared link from the URL", async ({
     page,
   }) => {
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const shareButton = page.getByRole("button", { name: "Get link" });
     const templateSelect = page.getByRole("combobox", {
       name: "Invoice Template",
     });
 
+    // The toast actually on screen. The app shows one at a time (`visibleToasts={1}`); the
+    // ones behind it, and one on its way out, are still in the DOM -- and only hidden with
+    // opacity, which `toBeVisible()` does not treat as hidden.
+    const frontToast = page.locator(
+      '[data-sonner-toast][data-front="true"]:not([data-removed="true"])',
+    );
+
     // Share on the default template...
     await shareButton.click();
     await page.waitForURL((url) => {
       return url.searchParams.has("data");
     });
-    expect(page.url()).toContain("/?template=default&data=");
+    expect(page.url()).toContain("/?data=");
 
     // ...then switch to Stripe: the invoice no longer matches the shared link, so `?data=`
     // has to go. (The template-to-URL sync used to put it back, reading the URL from the
@@ -282,23 +289,27 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await templateSelect.selectOption("stripe");
 
     await expect(page).toHaveURL("/stripe-template");
-    await expect(page.getByText("Invoice Updated")).toBeVisible();
+    await expect(frontToast).toContainText("Invoice Updated");
 
-    // Same the other way round: share on Stripe, switch back to default
+    // Same the other way round: share on Stripe, switch back to default. A second round in
+    // one session used to show the stale toasts: "Invoice Updated" stayed in front of the new
+    // link's toast, and then the second "Invoice Updated" never appeared at all.
     await shareButton.click();
     await page.waitForURL((url) => {
       return url.searchParams.has("data");
     });
     expect(page.url()).toContain("/stripe-template?data=");
+    await expect(frontToast).toContainText("Invoice link generated");
 
     await templateSelect.selectOption("default");
 
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
+    await expect(frontToast).toContainText("Invoice Updated");
   });
 
   test("preserves sharing state after page reload", async ({ page }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     // Switch to Stripe template and upload logo
     await page
@@ -365,7 +376,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     );
 
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     // Verify share button is visible and enabled in mobile
     const shareButton = page.getByRole("button", {
@@ -412,7 +423,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     page,
   }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     // Switch to Stripe template
     await page

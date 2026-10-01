@@ -48,7 +48,7 @@ test.describe("SEO landing pages", () => {
       });
 
       await expect(goToAppButton).toBeVisible();
-      await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
+      await expect(goToAppButton).toHaveAttribute("href", "/");
 
       await expect(
         page.getByRole("heading", { level: 1, name: h1 }),

@@ -102,7 +102,8 @@ export interface SeoLandingDefinition {
   faq: SeoFaqItem[];
 }
 
-const DEFAULT_INVOICE_TEMPLATE_HREF = "/?template=default";
+/** The invoice app, opened on the visitor's last used template (default for new visitors). */
+const APP_HREF = "/";
 
 export const SEO_LANDING_DEFINITIONS = {
   "invoice-generator-no-login": {
@@ -126,7 +127,7 @@ export const SEO_LANDING_DEFINITIONS = {
         "No ads and no tracking pixels",
       ],
       ctaLabel: "Create and Download a PDF",
-      ctaHref: DEFAULT_INVOICE_TEMPLATE_HREF,
+      ctaHref: APP_HREF,
       heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_DEMO_HERO_YOUTUBE_URL,
@@ -153,7 +154,7 @@ export const SEO_LANDING_DEFINITIONS = {
           label: "Templates",
           value: "A default layout and a Stripe-style one",
         },
-        { label: "Languages on the PDF", value: "12" },
+        { label: "Languages on the PDF", value: "13" },
         {
           label: "Currencies",
           value: "122, picked separately from the language",
@@ -241,7 +242,7 @@ export const SEO_LANDING_DEFINITIONS = {
         },
         {
           feature: "Languages on the PDF",
-          thisTool: "✅ 12",
+          thisTool: "✅ 13",
           other: "⚠️ Usually one",
         },
         {
@@ -316,7 +317,7 @@ export const SEO_LANDING_DEFINITIONS = {
         "No account, no ads",
       ],
       ctaLabel: "Create and Download a PDF",
-      ctaHref: DEFAULT_INVOICE_TEMPLATE_HREF,
+      ctaHref: APP_HREF,
       heroImage: `${STATIC_ASSETS_URL}/seo-content/str-tmp-v2.png`,
       heroVideo: {
         embedUrl: VIDEO_LIVE_PREVIEW_YOUTUBE_URL,
@@ -345,7 +346,7 @@ export const SEO_LANDING_DEFINITIONS = {
           value: "Clone it, install with pnpm, deploy anywhere Next.js runs",
         },
         { label: "Account required", value: "No" },
-        { label: "Languages on the PDF", value: "12" },
+        { label: "Languages on the PDF", value: "13" },
         { label: "Currencies", value: "122" },
         { label: "Price", value: "Free, hosted and self-hosted alike" },
       ],
@@ -509,7 +510,7 @@ export const SEO_LANDING_DEFINITIONS = {
         },
         { label: "Your logo", value: "JPEG, PNG or WebP, up to 3MB" },
         { label: "Currencies", value: "122" },
-        { label: "Languages on the PDF", value: "12" },
+        { label: "Languages on the PDF", value: "13" },
         { label: "Price", value: "Free" },
       ],
     },
@@ -652,7 +653,7 @@ export const SEO_LANDING_DEFINITIONS = {
         "Free, with no signup",
       ],
       ctaLabel: "Fill In and Download a PDF",
-      ctaHref: DEFAULT_INVOICE_TEMPLATE_HREF,
+      ctaHref: APP_HREF,
       heroImage: `${STATIC_ASSETS_URL}/seo-content/def-tmp-v2.png`,
       heroVideo: {
         embedUrl: VIDEO_DEMO_HERO_YOUTUBE_URL,
@@ -677,7 +678,7 @@ export const SEO_LANDING_DEFINITIONS = {
           value: "A plain default one and a Stripe-style one",
         },
         { label: "Your logo", value: "JPEG, PNG or WebP, up to 3MB" },
-        { label: "Languages on the PDF", value: "12" },
+        { label: "Languages on the PDF", value: "13" },
         { label: "Currencies", value: "122" },
         {
           label: "Date formats",
@@ -774,7 +775,7 @@ export const SEO_LANDING_DEFINITIONS = {
         },
         {
           feature: "Languages on the document",
-          thisTool: "✅ 12",
+          thisTool: "✅ 13",
           other: "❌ Translate it yourself",
         },
         {
@@ -853,7 +854,7 @@ export const SEO_LANDING_DEFINITIONS = {
         "Free and open-source. No login.",
       ],
       ctaLabel: "Invoice in Your Language",
-      ctaHref: DEFAULT_INVOICE_TEMPLATE_HREF,
+      ctaHref: APP_HREF,
       heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_MULTI_LANGUAGE_YOUTUBE_URL,
@@ -1044,7 +1045,7 @@ export const SEO_LANDING_DEFINITIONS = {
         "Free and open source",
       ],
       ctaLabel: "Create a Swedish Invoice",
-      ctaHref: DEFAULT_INVOICE_TEMPLATE_HREF,
+      ctaHref: APP_HREF,
       heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_NORDIC_INVOICE_YOUTUBE_URL,
@@ -1218,7 +1219,7 @@ export const SEO_LANDING_DEFINITIONS = {
         "Free and open source",
       ],
       ctaLabel: "Create a Norwegian Invoice",
-      ctaHref: DEFAULT_INVOICE_TEMPLATE_HREF,
+      ctaHref: APP_HREF,
       heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_NORDIC_INVOICE_YOUTUBE_URL,
