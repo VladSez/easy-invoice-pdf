@@ -7,6 +7,7 @@
  * - author.name = person name only (no role suffix per Google Article guide).
  */
 
+import { APP_PAGE_TITLE } from "@/app/(main)/(app)/app-page-heading";
 import {
   SUPPORTED_CURRENCIES,
   SUPPORTED_INVOICE_PDF_LANGUAGES,
@@ -39,8 +40,7 @@ const SITE_DESCRIPTION =
   "Create and download professional invoices instantly with EasyInvoicePDF. Free and open-source. No signup required.";
 
 /** The `<title>` of `/`, also the name of its `WebPage` node. */
-export const HOME_PAGE_TITLE =
-  "Free Invoice Generator - Create PDF Invoices Online";
+export const HOME_PAGE_TITLE = APP_PAGE_TITLE.default;
 
 export const HOME_PAGE_DESCRIPTION =
   "Create professional PDF invoices online for free. Customize invoice templates, add your logo, download instantly, and send invoices without signup.";

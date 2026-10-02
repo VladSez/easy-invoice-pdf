@@ -1,5 +1,6 @@
 import type { Page } from "@playwright/test";
 
+import { APP_PAGE_TITLE } from "@/app/(main)/(app)/app-page-heading";
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import {
   DEFAULT_DATE_FORMAT,
@@ -1066,11 +1067,14 @@ test.describe("Stripe Invoice Template", () => {
     page,
   }) => {
     await expect(page).toHaveURL("/");
+    await expect(page).toHaveTitle(APP_PAGE_TITLE.default);
 
     await page
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
     await expect(page).toHaveURL("/stripe-template");
+    // the switch only rewrites the URL, so the page sets the title itself
+    await expect(page).toHaveTitle(APP_PAGE_TITLE.stripe);
 
     // the template is saved with a debounce
     await expect
@@ -1140,6 +1144,7 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("default");
     await expect(page).toHaveURL("/");
+    await expect(page).toHaveTitle(APP_PAGE_TITLE.default);
 
     const stripeTemplateDocumentRequest = waitForDocumentRequest({
       page,
@@ -1198,6 +1203,8 @@ test.describe("Stripe Invoice Template", () => {
     await expect(
       page.getByRole("combobox", { name: "Invoice Template" }),
     ).toHaveValue("stripe");
+    // loaded as `/`, whose prerendered title is the default template's
+    await expect(page).toHaveTitle(APP_PAGE_TITLE.stripe);
   });
 });
 

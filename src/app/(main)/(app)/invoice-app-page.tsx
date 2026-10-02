@@ -19,6 +19,7 @@ import {
 } from "@/lib/seo/site-entities";
 import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
 
+import { APP_PAGE_TITLE } from "./app-page-heading";
 import { HomeSeoContent } from "./components/home-seo-content";
 import { StripeTemplateSeoContent } from "./components/stripe-template-seo-content";
 import { CTAToastProvider } from "./contexts/cta-toast-context";
@@ -165,7 +166,7 @@ const TEMPLATE_META = {
     ],
   },
   stripe: {
-    title: "Stripe Invoice Template - Create Free PDF Invoice",
+    title: APP_PAGE_TITLE.stripe,
     // its own wording, so the route does not share `/`'s description
     description:
       "Free Stripe invoice template. Fill in a Stripe-style invoice, add your logo and a Pay online link, and download the PDF. No Stripe account, no signup.",

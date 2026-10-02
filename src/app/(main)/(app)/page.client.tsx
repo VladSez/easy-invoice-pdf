@@ -9,6 +9,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { APP_PAGE_TITLE } from "@/app/(main)/(app)/app-page-heading";
 import { InvoicePageHeader } from "@/app/(main)/(app)/components/invoice-page-header";
 import { InvoicePdfInstanceProvider } from "@/app/(main)/(app)/contexts/invoice-pdf-instance-context";
 import { InvoicePageLoadingSkeleton } from "@/app/(main)/(app)/loading";
@@ -461,6 +462,25 @@ export function AppPageClient({
     // Update the browser URL without triggering a page reload or scroll
     replaceUrl(expectedUrl);
   }, [invoiceDataState]);
+
+  /**
+   * Keeps the tab title on the route in the address bar. The title comes from the metadata
+   * of the route the page was *loaded* on, and a template switch only rewrites the URL, so
+   * a bare `/` that moved on to `/stripe-template` (a saved Stripe invoice), or a switch in
+   * the template picker, would keep the other route's title -- which is also what a
+   * bookmark or a history entry gets.
+   *
+   * An effect on `pathname` rather than a write in `replaceUrl`: Next re-renders the tree
+   * to sync `usePathname()` with `history.replaceState`, and React puts the metadata's
+   * `<title>` back in that commit. This runs after it.
+   *
+   * Known gap: on a client-side navigation into the app (e.g. "Open app" from another
+   * page), Next can commit the route's metadata title later still, putting the loaded
+   * route's title back.
+   */
+  useEffect(() => {
+    document.title = APP_PAGE_TITLE[getRouteTemplate(pathname)];
+  }, [pathname]);
 
   /**
    * Checks if the invoice has changed from the original shared URL version.
