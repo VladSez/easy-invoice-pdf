@@ -124,4 +124,45 @@ test.describe("Invoice app SEO content", () => {
     ).toHaveValue("default");
     await expect(page.getByTestId("home-seo-content")).toBeVisible();
   });
+
+  // A template switch rewrites the address bar in place and keeps the server-rendered
+  // block, so the one sentence of it that names a template follows the switch.
+  test("/stripe-template offers the Stripe template back after switching to the default one", async ({
+    page,
+  }) => {
+    await page.goto(STRIPE_TEMPLATE_PATHNAME);
+
+    const section = page.getByTestId("stripe-template-seo-content");
+    await expect(
+      section.getByRole("link", { name: "classic invoice template" }),
+    ).toBeVisible();
+
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("default");
+    await expect(page).toHaveURL("/");
+
+    // the block itself stays, only the sentence changes
+    await expect(section).toBeVisible();
+    await expect(
+      section.getByRole("link", { name: "classic invoice template" }),
+    ).toHaveCount(0);
+
+    const stripeTemplateLink = section.getByRole("link", {
+      name: "Stripe invoice template",
+      exact: true,
+    });
+    await expect(stripeTemplateLink).toHaveAttribute(
+      "href",
+      STRIPE_TEMPLATE_PATHNAME,
+    );
+
+    // `dispatchEvent` for the same PDF viewer focus reason as above
+    await stripeTemplateLink.dispatchEvent("click");
+
+    await expect(page).toHaveURL(STRIPE_TEMPLATE_PATHNAME);
+    await expect(
+      page.getByRole("combobox", { name: "Invoice Template" }),
+    ).toHaveValue("stripe");
+  });
 });

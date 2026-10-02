@@ -3,6 +3,8 @@ import Link from "next/link";
 import { SUPPORTED_INVOICE_PDF_LANGUAGES } from "@/app/schema";
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 
+import { StripeTemplateSwitchSentence } from "./stripe-template-switch-sentence";
+
 /**
  * Plain, server-rendered copy below the invoice editor on `/stripe-template`.
  *
@@ -32,10 +34,11 @@ export function StripeTemplateSeoContent() {
             A free Stripe-style invoice template
           </h2>
           <p className="mt-4 text-pretty text-lg leading-relaxed">
-            This template follows the layout of the invoices Stripe sends: the
-            amount due and its due date first, a single line-item table, and a
-            short summary of totals. Fill in the form, and the preview redraws
-            as you type. Download the PDF when it looks right.
+            The Stripe invoice template follows the layout of the invoices
+            Stripe sends. The amount due and its due date sit in bold above a
+            single table of line items, with a short summary of totals below.
+            Fill in the form and the preview redraws as you type, then download
+            the PDF.
           </p>
           <p className="mt-4 text-pretty text-lg leading-relaxed">
             You don&apos;t need a Stripe account. It is a layout you fill in,
@@ -89,19 +92,7 @@ export function StripeTemplateSeoContent() {
               );
             })}
           </ol>
-          <p className="mt-4 text-pretty text-base leading-relaxed">
-            Prefer a plainer A4 layout? Switch to the{" "}
-            {/* a full page load with an explicit template: a bare `/` sends a visitor whose
-                saved invoice uses this template straight back here */}
-            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            <a
-              href="/?template=default"
-              className="font-medium text-slate-900 underline underline-offset-4"
-            >
-              classic invoice template
-            </a>
-            . Your details carry over.
-          </p>
+          <StripeTemplateSwitchSentence />
         </div>
 
         <div>
@@ -134,7 +125,7 @@ export function StripeTemplateSeoContent() {
 }
 
 const TEMPLATE_PARTS = [
-  "The amount due and the due date at the top, where your client looks first",
+  "The amount due and the due date in bold, above the line items",
   "An optional Pay online link under the amount, pointing to any payment page you use",
   "A line-item table with quantity and unit price, then subtotal, tax and total",
   "Your logo beside the invoice title, and your details next to your client's",
