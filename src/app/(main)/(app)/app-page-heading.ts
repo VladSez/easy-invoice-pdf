@@ -20,7 +20,7 @@ export const APP_PAGE_HEADING = {
 /**
  * The `<title>` of each invoice app route: the route's metadata on the server, and the tab
  * title the editor sets on the client when a template switch moves the address bar to the
- * other route (see `AppPageClient`).
+ * other route (see `AppPageClient`, which moves the canonical URL along with it).
  */
 export const APP_PAGE_TITLE = {
   default: "Free Invoice Generator - Create PDF Invoices Online",

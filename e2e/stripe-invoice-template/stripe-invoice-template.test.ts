@@ -1075,6 +1075,8 @@ test.describe("Stripe Invoice Template", () => {
     await expect(page).toHaveURL("/stripe-template");
     // the switch only rewrites the URL, so the page sets the title itself
     await expect(page).toHaveTitle(APP_PAGE_TITLE.stripe);
+    // and the canonical, which is what Safari's own Share copies
+    await expectCanonicalPathname({ page, pathname: "/stripe-template" });
 
     // the template is saved with a debounce
     await expect
@@ -1145,6 +1147,7 @@ test.describe("Stripe Invoice Template", () => {
       .selectOption("default");
     await expect(page).toHaveURL("/");
     await expect(page).toHaveTitle(APP_PAGE_TITLE.default);
+    await expectCanonicalPathname({ page, pathname: "/" });
 
     const stripeTemplateDocumentRequest = waitForDocumentRequest({
       page,
@@ -1203,10 +1206,38 @@ test.describe("Stripe Invoice Template", () => {
     await expect(
       page.getByRole("combobox", { name: "Invoice Template" }),
     ).toHaveValue("stripe");
-    // loaded as `/`, whose prerendered title is the default template's
+    // loaded as `/`, whose prerendered title and canonical are the default template's
     await expect(page).toHaveTitle(APP_PAGE_TITLE.stripe);
+    await expectCanonicalPathname({ page, pathname: "/stripe-template" });
   });
 });
+
+interface ExpectCanonicalPathnameParams {
+  page: Page;
+  /** The pathname the canonical URL should point at, e.g. `/stripe-template`. */
+  pathname: string;
+}
+
+/**
+ * Asserts the path of `<link rel="canonical">`. Only the path: the origin is `APP_URL`,
+ * which differs between the dev server and a deployment.
+ */
+async function expectCanonicalPathname({
+  page,
+  pathname,
+}: ExpectCanonicalPathnameParams) {
+  await expect
+    .poll(() => {
+      return page.evaluate(() => {
+        const href = document
+          .querySelector('link[rel="canonical"]')
+          ?.getAttribute("href");
+
+        return href ? new URL(href).pathname : null;
+      });
+    })
+    .toBe(pathname);
+}
 
 interface WaitForDocumentRequestParams {
   page: Page;
