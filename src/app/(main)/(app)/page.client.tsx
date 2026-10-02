@@ -142,6 +142,17 @@ export function AppPageClient({
   const isViewingSharedInvoice =
     searchParams.get("data") !== null && !isInvoiceUrlCorrupted;
 
+  /**
+   * Whether the invoice on screen is still exactly the one opened from a shared link.
+   *
+   * Not the same as {@link isViewingSharedInvoice}: "Get link" puts `?data=` in the address
+   * bar too, but then the invoice is the user's own. Matters for "Invoice last updated",
+   * which comes from this browser's metadata and the link does not carry a timestamp: for
+   * an invoice opened from someone else's link it would show the viewer's own last edit.
+   */
+  const [isUnmodifiedInvoiceFromLink, setIsUnmodifiedInvoiceFromLink] =
+    useState(false);
+
   const {
     isOpen: isChangelogPopupOpen,
     dismiss: dismissChangelogPopup,
@@ -335,6 +346,7 @@ export function AppPageClient({
 
         // Store the original URL invoice data for change detection
         originalUrlInvoiceDataRef.current = selectedInvoiceData;
+        setIsUnmodifiedInvoiceFromLink(true);
 
         // add metadata with default values if missing for all users
         ensureAppMetadata();
@@ -477,6 +489,9 @@ export function AppPageClient({
 
       if (invoiceHasChanged) {
         debugLog("[checkForInvoiceChanges] invoice has changed");
+
+        // the edit that got us here also stamped a fresh "Invoice last updated"
+        setIsUnmodifiedInvoiceFromLink(false);
 
         // the link they confirm no longer matches the invoice
         for (const toastId of Object.values(SHARE_LINK_SUCCESS_TOAST_IDS)) {
@@ -853,6 +868,7 @@ export function AppPageClient({
                 isMobile={isMobile}
                 canShareInvoice={canShareInvoice}
                 currentInvoiceFormDataRef={currentInvoiceFormDataRef}
+                isUnmodifiedInvoiceFromLink={isUnmodifiedInvoiceFromLink}
                 mobileDockNotice={isMobile ? changelogPopup : null}
                 // switching tabs means the user found their way around, so the welcome
                 // notice has done its job
