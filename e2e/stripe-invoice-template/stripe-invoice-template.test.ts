@@ -1,3 +1,6 @@
+import type { Page } from "@playwright/test";
+
+import { APP_PAGE_TITLE } from "@/app/(main)/(app)/app-page-heading";
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import {
   DEFAULT_DATE_FORMAT,
@@ -20,7 +23,7 @@ test.describe("Stripe Invoice Template", () => {
     // we set the system time to a fixed date, so that the invoice number and other dates are consistent across tests
     await page.clock.setSystemTime(new Date("2025-12-17T00:00:00Z"));
 
-    await page.goto("/?template=default");
+    await page.goto("/");
   });
 
   test("uses template-specific default invoice number labels", async ({
@@ -41,7 +44,7 @@ test.describe("Stripe Invoice Template", () => {
       },
     );
 
-    await page.goto("/?template=stripe");
+    await page.goto("/stripe-template");
 
     const generalInfoSection = page.getByTestId("general-information-section");
     const invoiceNumberFieldset = generalInfoSection.getByRole("group", {
@@ -71,11 +74,11 @@ test.describe("Stripe Invoice Template", () => {
   test("displays correct OG meta tags for Stripe template", async ({
     page,
   }) => {
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     // Navigate to Stripe template
-    await page.goto("/?template=stripe");
-    await expect(page).toHaveURL("/?template=stripe");
+    await page.goto("/stripe-template");
+    await expect(page).toHaveURL("/stripe-template");
 
     const templateCombobox = page.getByRole("combobox", {
       name: "Invoice Template",
@@ -97,7 +100,8 @@ test.describe("Stripe Invoice Template", () => {
       page.locator('meta[property="og:description"]'),
     ).toHaveAttribute(
       "content",
-      "Create professional PDF invoices online for free. Customize invoice templates, add your logo, download instantly, and send invoices without signup.",
+      // the route has its own description, not `/`'s
+      "Free Stripe invoice template. Fill in a Stripe-style invoice, add your logo and a Pay online link, and download the PDF. No Stripe account, no signup.",
     );
     await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
       "content",
@@ -121,7 +125,7 @@ test.describe("Stripe Invoice Template", () => {
     page,
   }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const generalInfoSection = page.getByTestId("general-information-section");
 
@@ -145,7 +149,7 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     // Logo section should still be visible on Stripe template
     await expect(
@@ -336,7 +340,7 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     const generalInfoSection = page.getByTestId("general-information-section");
     const paymentUrlInput = generalInfoSection.getByRole("textbox", {
@@ -382,7 +386,7 @@ test.describe("Stripe Invoice Template", () => {
       .selectOption("stripe");
 
     // Wait for URL to be updated
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     const generalInfoSection = page.getByTestId("general-information-section");
 
@@ -423,7 +427,7 @@ test.describe("Stripe Invoice Template", () => {
     // Reload page
     await page.reload();
 
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     // Verify template is still Stripe
     await expect(
@@ -446,7 +450,7 @@ test.describe("Stripe Invoice Template", () => {
   test("Signature fields only appears for default template", async ({
     page,
   }) => {
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const finalSection = page.getByTestId("final-section");
 
@@ -501,7 +505,7 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     /** VERIFY SIGNATURE FIELDS ARE NOW HIDDEN */
 
@@ -526,7 +530,7 @@ test.describe("Stripe Invoice Template", () => {
     page,
   }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
@@ -650,7 +654,7 @@ test.describe("Stripe Invoice Template", () => {
       .selectOption("stripe");
 
     // Wait for URL to be updated
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     // All switches and Type of GTU field should now be hidden
     await expect(showNumberColumnSwitch).toBeHidden();
@@ -701,7 +705,7 @@ test.describe("Stripe Invoice Template", () => {
     page,
   }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const finalSection = page.getByTestId("final-section");
 
@@ -739,7 +743,7 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Invoice Template" })
       .selectOption("stripe");
 
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     // Verify Payment Method field is now hidden
     await expect(paymentMethodField).toBeHidden();
@@ -760,7 +764,7 @@ test.describe("Stripe Invoice Template", () => {
   test("shows the service period in the PDF for Stripe and hides it for default", async ({
     page,
   }) => {
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const templateCombobox = page.getByRole("combobox", {
       name: "Invoice Template",
@@ -775,13 +779,13 @@ test.describe("Stripe Invoice Template", () => {
     await expect(servicePeriodSwitch).not.toBeChecked();
 
     await templateCombobox.selectOption("stripe");
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     await expect(servicePeriodSwitch).toBeChecked();
 
     // switching back restores the default template's own behaviour
     await templateCombobox.selectOption("default");
-    await page.waitForURL("/?template=default");
+    await page.waitForURL("/");
 
     await expect(servicePeriodSwitch).not.toBeChecked();
 
@@ -790,11 +794,11 @@ test.describe("Stripe Invoice Template", () => {
     await expect(servicePeriodSwitch).toBeChecked();
 
     await templateCombobox.selectOption("stripe");
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
     await expect(servicePeriodSwitch).toBeChecked();
 
     await templateCombobox.selectOption("default");
-    await page.waitForURL("/?template=default");
+    await page.waitForURL("/");
     await expect(servicePeriodSwitch).not.toBeChecked();
   });
 
@@ -804,7 +808,7 @@ test.describe("Stripe Invoice Template", () => {
     downloadDir,
   }) => {
     // Verify default template is selected by default
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
@@ -846,7 +850,7 @@ test.describe("Stripe Invoice Template", () => {
       .selectOption("stripe");
 
     // Wait for URL to be updated
-    await page.waitForURL("/?template=stripe");
+    await page.waitForURL("/stripe-template");
 
     const newInvoiceItemsSection = page.getByTestId("invoice-items-section");
 
@@ -885,7 +889,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // navigate back to the previous page
     await page.goto("/");
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     // verify that the stripe template is selected
     const templateCombobox = page.getByRole("combobox", {
@@ -901,7 +905,7 @@ test.describe("Stripe Invoice Template", () => {
       .selectOption("default");
 
     // Wait for URL to be updated
-    await page.waitForURL("/?template=default");
+    await page.waitForURL("/");
 
     const newVatInput = page.getByRole("textbox", {
       name: "VAT Rate",
@@ -941,7 +945,7 @@ test.describe("Stripe Invoice Template", () => {
       .selectOption("stripe");
 
     // Wait for URL to be updated
-    await expect(page).toHaveURL("/?template=stripe");
+    await expect(page).toHaveURL("/stripe-template");
 
     // Upload a valid logo
     await uploadLogoFile(page);
@@ -1048,8 +1052,8 @@ test.describe("Stripe Invoice Template", () => {
         },
       );
 
-      await page.goto("/?template=stripe");
-      await expect(page).toHaveURL("/?template=stripe");
+      await page.goto("/stripe-template");
+      await expect(page).toHaveURL("/stripe-template");
 
       await expectPdfScreenshot(page, {
         downloadDir,
@@ -1058,4 +1062,202 @@ test.describe("Stripe Invoice Template", () => {
       });
     });
   }
+
+  test("'Open app' takes a returning visitor back to their last template", async ({
+    page,
+  }) => {
+    await expect(page).toHaveURL("/");
+    await expect(page).toHaveTitle(APP_PAGE_TITLE.default);
+
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+    await expect(page).toHaveURL("/stripe-template");
+    // the switch only rewrites the URL, so the page sets the title itself
+    await expect(page).toHaveTitle(APP_PAGE_TITLE.stripe);
+    // and the canonical, which is what Safari's own Share copies
+    await expectCanonicalPathname({ page, pathname: "/stripe-template" });
+
+    // the template is saved with a debounce
+    await expect
+      .poll(() => {
+        return page.evaluate((key) => {
+          const storedData = localStorage.getItem(key);
+
+          return storedData
+            ? (JSON.parse(storedData) as InvoiceData).template
+            : null;
+        }, PDF_DATA_LOCAL_STORAGE_KEY);
+      })
+      .toBe("stripe");
+
+    await page.goto("/changelog");
+
+    // "Open app" links to a bare `/`, which follows the saved template
+    await page
+      .locator("header")
+      .getByRole("link", { name: "Open app", exact: true })
+      .click();
+
+    await expect(page).toHaveURL("/stripe-template");
+    await expect(
+      page.getByRole("combobox", { name: "Invoice Template" }),
+    ).toHaveValue("stripe");
+  });
+
+  test("a legacy /?template=default link still opens the default template", async ({
+    page,
+  }) => {
+    await page.evaluate(
+      ({ invoiceData, storageKey }) => {
+        localStorage.setItem(storageKey, JSON.stringify(invoiceData));
+      },
+      {
+        storageKey: PDF_DATA_LOCAL_STORAGE_KEY,
+        invoiceData: { ...INITIAL_INVOICE_DATA, template: "stripe" },
+      },
+    );
+
+    // the param overrides the saved Stripe template, then drops out of the address bar
+    await page.goto("/?template=default");
+
+    await expect(
+      page.getByRole("combobox", { name: "Invoice Template" }),
+    ).toHaveValue("default");
+    await expect(page).toHaveURL("/");
+  });
+
+  // A template switch moves the address bar between `/` and `/stripe-template` with
+  // `history.replaceState`, so the router still holds the route the page was loaded on. A
+  // client-side navigation back to that route used to reuse the mounted editor: the URL
+  // changed, the template did not. The footer links to the app's routes are full page loads,
+  // which is what these tests check for: a document request, which a client-side navigation
+  // never makes.
+  //
+  // The links are clicked with `dispatchEvent`: the template switch regenerates the PDF, and
+  // Chrome's PDF viewer takes focus when it loads, scrolling the preview back into view --
+  // a real click in that moment lands on the preview instead of the footer.
+  test("footer 'Free Stripe Invoice Template' opens the Stripe template after switching away from it", async ({
+    page,
+  }) => {
+    await page.goto("/stripe-template");
+
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("default");
+    await expect(page).toHaveURL("/");
+    await expect(page).toHaveTitle(APP_PAGE_TITLE.default);
+    await expectCanonicalPathname({ page, pathname: "/" });
+
+    const stripeTemplateDocumentRequest = waitForDocumentRequest({
+      page,
+      pathname: "/stripe-template",
+    });
+
+    await page
+      .locator("footer")
+      .getByRole("link", { name: "Free Stripe Invoice Template" })
+      .dispatchEvent("click");
+
+    await stripeTemplateDocumentRequest;
+
+    await expect(page).toHaveURL("/stripe-template");
+    await expect(
+      page.getByRole("combobox", { name: "Invoice Template" }),
+    ).toHaveValue("stripe");
+  });
+
+  test("footer 'Invoice Generator' opens the template just picked on the page", async ({
+    page,
+  }) => {
+    await expect(page).toHaveURL("/");
+
+    await page
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+    await expect(page).toHaveURL("/stripe-template");
+
+    // the template is saved with a debounce
+    await expect
+      .poll(() => {
+        return page.evaluate((key) => {
+          const storedData = localStorage.getItem(key);
+
+          return storedData
+            ? (JSON.parse(storedData) as InvoiceData).template
+            : null;
+        }, PDF_DATA_LOCAL_STORAGE_KEY);
+      })
+      .toBe("stripe");
+
+    // The address bar already says `/stripe-template`, so the request also keeps the
+    // assertions below from passing before the navigation has even started.
+    const rootDocumentRequest = waitForDocumentRequest({ page, pathname: "/" });
+
+    await page
+      .locator("footer")
+      .getByRole("link", { name: "Invoice Generator", exact: true })
+      .dispatchEvent("click");
+
+    await rootDocumentRequest;
+
+    // a bare `/` follows the saved template, so this lands back on `/stripe-template`
+    await expect(page).toHaveURL("/stripe-template");
+    await expect(
+      page.getByRole("combobox", { name: "Invoice Template" }),
+    ).toHaveValue("stripe");
+    // loaded as `/`, whose prerendered title and canonical are the default template's
+    await expect(page).toHaveTitle(APP_PAGE_TITLE.stripe);
+    await expectCanonicalPathname({ page, pathname: "/stripe-template" });
+  });
 });
+
+interface ExpectCanonicalPathnameParams {
+  page: Page;
+  /** The pathname the canonical URL should point at, e.g. `/stripe-template`. */
+  pathname: string;
+}
+
+/**
+ * Asserts the path of `<link rel="canonical">`. Only the path: the origin is `APP_URL`,
+ * which differs between the dev server and a deployment.
+ */
+async function expectCanonicalPathname({
+  page,
+  pathname,
+}: ExpectCanonicalPathnameParams) {
+  await expect
+    .poll(() => {
+      return page.evaluate(() => {
+        const href = document
+          .querySelector('link[rel="canonical"]')
+          ?.getAttribute("href");
+
+        return href ? new URL(href).pathname : null;
+      });
+    })
+    .toBe(pathname);
+}
+
+interface WaitForDocumentRequestParams {
+  page: Page;
+  /** The pathname the document is requested for, e.g. `/stripe-template`. */
+  pathname: string;
+}
+
+/**
+ * Resolves on the next document request for `pathname`: a full page load, which a
+ * client-side navigation (a fetch of the RSC payload) never makes.
+ */
+function waitForDocumentRequest({
+  page,
+  pathname,
+}: WaitForDocumentRequestParams) {
+  return page.waitForRequest((request) => {
+    return (
+      request.isNavigationRequest() &&
+      request.frame() === page.mainFrame() &&
+      new URL(request.url()).pathname === pathname
+    );
+  });
+}

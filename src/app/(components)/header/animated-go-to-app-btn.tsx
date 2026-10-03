@@ -20,7 +20,7 @@ export function BlackAnimatedGoToAppBtn({
       asChild
       data-testid="black-animated-go-to-app-btn"
     >
-      <Link href="/?template=default" className="flex items-center">
+      <Link href="/" className="flex items-center">
         <ArrowRightIcon className="mr-2 size-5 animate-pulse-arrow transition-transform group-hover:scale-110" />
 
         {children}

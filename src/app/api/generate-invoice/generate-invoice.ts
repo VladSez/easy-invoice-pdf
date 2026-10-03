@@ -5,6 +5,7 @@ import type { Attachment, CreateEmailResponse } from "resend";
 
 import { invoiceSchema, type InvoiceData } from "@/app/schema";
 import type { InvoiceFolderResult } from "@/lib/google-drive";
+import { buildInvoiceAppUrl } from "@/utils/invoice-app-url";
 import { compressInvoiceData } from "@/utils/url-compression";
 
 /**
@@ -288,7 +289,10 @@ export async function generateInvoice(
   const compressedKeys = compressInvoiceData(newInvoiceDataValidated);
   const compressedJson = JSON.stringify(compressedKeys);
   const compressedData = compressToEncodedURIComponent(compressedJson);
-  const invoiceUrl = `https://easyinvoicepdf.com/?template=${newInvoiceDataValidated.template}&data=${compressedData}`;
+  const invoiceUrl = `https://easyinvoicepdf.com${buildInvoiceAppUrl({
+    template: newInvoiceDataValidated.template,
+    searchParams: new URLSearchParams({ data: compressedData }),
+  })}`;
 
   const monthAndYear = now.format("MMMM YYYY");
   const invoiceNumberValue = englishInvoiceData?.invoiceNumberObject?.value;

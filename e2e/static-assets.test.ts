@@ -64,7 +64,7 @@ test.describe("Static assets (fonts, images, videos) should be accessible", () =
     });
 
     await page.goto("/");
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
 
     expect(failed).toEqual([]);
   });

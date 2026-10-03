@@ -149,7 +149,7 @@ export const HOW_IT_WORKS_VIDEOS = [
     title: "How to customize number formatting",
     shortTitle: "Number formatting",
     description:
-      "Choose how amounts are written, like 1,234.56 or 1.234,56, and create invoices in Brazilian Portuguese.",
+      "Pick the thousands and decimal separators, like 10,000.00 or 10.000,00.",
     embedUrl: YOUTUBE_VIDEO_HOW_TO_CUSTOMIZE_NUMBER_FORMAT,
     watchUrl: "https://www.youtube.com/watch?v=hZM2DYXo63k",
     uploadDate: "2026-09-24T05:17:16-07:00",

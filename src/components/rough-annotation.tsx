@@ -64,6 +64,12 @@ export function RoughAnnotation({
         timeout = window.setTimeout(
           () => {
             annotation.show();
+            // The SVG is decoration, so keep it out of the accessibility tree. `show()` has
+            // just inserted it. (Hiding it does not stop it counting as a word break in the
+            // parent's accessible name: see `h1Mark.phrase` in the SEO landing definitions.)
+            element.parentElement
+              ?.querySelector(":scope > svg.rough-annotation")
+              ?.setAttribute("aria-hidden", "true");
           },
           reduceMotion ? 0 : delayMs,
         );

@@ -5,12 +5,11 @@ import {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,
 } from "lz-string";
-import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { z } from "zod";
 
-import { Footer } from "@/app/(components)/footer";
+import { APP_PAGE_TITLE } from "@/app/(main)/(app)/app-page-heading";
 import { InvoicePageHeader } from "@/app/(main)/(app)/components/invoice-page-header";
 import { InvoicePdfInstanceProvider } from "@/app/(main)/(app)/contexts/invoice-pdf-instance-context";
 import { InvoicePageLoadingSkeleton } from "@/app/(main)/(app)/loading";
@@ -24,7 +23,6 @@ import { getInitialInvoiceData } from "@/app/constants";
 import {
   invoiceSchema,
   PDF_DATA_LOCAL_STORAGE_KEY,
-  SUPPORTED_TEMPLATES,
   type InvoiceData,
 } from "@/app/schema";
 import { GitHubStarCTA } from "@/components/github-star-cta";
@@ -34,6 +32,12 @@ import { useDeviceContext } from "@/contexts/device-context";
 import { debugLog } from "@/lib/debug-log";
 import { haptic } from "@/lib/haptic";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import {
+  buildInvoiceAppUrl,
+  getRouteTemplate,
+  getTemplateFromUrl,
+  isUrlForTemplate,
+} from "@/utils/invoice-app-url";
 import {
   compressInvoiceData,
   decompressInvoiceData,
@@ -53,25 +57,31 @@ import { selectInvoiceTemplate } from "./utils/select-invoice-template";
 // import { InvoicePDFDownloadMultipleLanguages } from "./components/invoice-pdf-download-multiple-languages";
 
 /**
- * Rewrites the query string of `/` in place.
+ * Rewrites the URL of the invoice app in place.
  *
- * Every URL rewrite on this page is cosmetic -- keeping `?template=` in sync, adding or
- * dropping `?data=` -- and lands on the page that is already rendered. `router.replace`
- * treats each one as a navigation and refetches the RSC payload for `/`, so a plain page
- * load spent a whole extra server round trip just to append `?template=default`. Next's
- * router syncs with the native History API, so `useSearchParams()` still updates and
- * nothing is refetched.
+ * Every URL rewrite on this page is cosmetic -- keeping the template in sync (`/` vs
+ * `/stripe-template`), adding or dropping `?data=` -- and lands on the page
+ * that is already rendered. `router.replace` treats each one as a navigation and refetches
+ * the RSC payload (and, for a template switch, would remount the editor on the other
+ * route), so a plain page load spent a whole extra server round trip just to tidy up the
+ * URL. Next's router syncs with the native History API, so
+ * `usePathname()` and `useSearchParams()` still update and nothing is refetched.
+ *
+ * @param url - The root-relative URL to put in the address bar, see `buildInvoiceAppUrl`.
+ */
+function replaceUrl(url: string) {
+  window.history.replaceState(null, "", url);
+}
+
+/**
+ * Rewrites only the query string, keeping the current pathname (and so the template).
  *
  * @param params - The complete query string to put in the address bar.
  */
 function replaceUrlQuery(params: URLSearchParams) {
   const query = params.toString();
 
-  window.history.replaceState(
-    null,
-    "",
-    query ? `?${query}` : window.location.pathname,
-  );
+  replaceUrl(query ? `?${query}` : window.location.pathname);
 }
 
 /**
@@ -96,22 +106,13 @@ export function AppPageClient({
   latestChangelog: ChangelogSummary | null;
 }) {
   const searchParams = useSearchParams();
-
-  const urlTemplateSearchParam = searchParams.get("template");
+  const pathname = usePathname();
 
   /**
-   * The `?template=` parameter, validated.
-   *
-   * Memoized so the parse happens once per URL rather than once per render, and so the result
-   * keeps its identity -- `loadFromLocalStorage` below closes over it, and a fresh object every
-   * render would make that callback (and everything keyed on it) unstable for no reason.
+   * The template the URL asks for: `/stripe-template`, or a legacy `?template=` on `/`.
+   * `null` on a bare `/`, which has no preference: the saved invoice's template is used.
    */
-  const templateValidation = useMemo(() => {
-    return z
-      .enum(SUPPORTED_TEMPLATES)
-      .default("default")
-      .safeParse(urlTemplateSearchParam);
-  }, [urlTemplateSearchParam]);
+  const urlTemplate = getTemplateFromUrl({ pathname, searchParams });
 
   const { isDesktop, isUADesktop } = useDeviceContext();
   const isMobile = !isDesktop;
@@ -141,6 +142,17 @@ export function AppPageClient({
 
   const isViewingSharedInvoice =
     searchParams.get("data") !== null && !isInvoiceUrlCorrupted;
+
+  /**
+   * Whether the invoice on screen is still exactly the one opened from a shared link.
+   *
+   * Not the same as {@link isViewingSharedInvoice}: "Get link" puts `?data=` in the address
+   * bar too, but then the invoice is the user's own. Matters for "Invoice last updated",
+   * which comes from this browser's metadata and the link does not carry a timestamp: for
+   * an invoice opened from someone else's link it would show the viewer's own last edit.
+   */
+  const [isUnmodifiedInvoiceFromLink, setIsUnmodifiedInvoiceFromLink] =
+    useState(false);
 
   const {
     isOpen: isChangelogPopupOpen,
@@ -242,14 +254,14 @@ export function AppPageClient({
 
         const parsedData = invoiceSchema.parse(updatedJson);
 
-        const selectedInvoiceData = templateValidation.success
-          ? selectInvoiceTemplate(parsedData, templateValidation.data)
+        const selectedInvoiceData = urlTemplate
+          ? selectInvoiceTemplate(parsedData, urlTemplate)
           : parsedData;
 
         setInvoiceDataState(selectedInvoiceData);
-      } else if (templateValidation.success) {
+      } else if (urlTemplate) {
         // if no data in local storage and template is in url, set initial data with template from url
-        setInvoiceDataState(getInitialInvoiceData(templateValidation.data));
+        setInvoiceDataState(getInitialInvoiceData(urlTemplate));
       } else {
         // if no data in local storage, set initial data
         setInvoiceDataState(getInitialInvoiceData());
@@ -258,11 +270,7 @@ export function AppPageClient({
       console.error("Failed to load saved invoice data:", error);
 
       // fallback to initial data on error
-      setInvoiceDataState(
-        getInitialInvoiceData(
-          templateValidation.success ? templateValidation.data : undefined,
-        ),
-      );
+      setInvoiceDataState(getInitialInvoiceData(urlTemplate ?? undefined));
 
       toast.error(
         "Unable to load your saved invoice data. For your convenience, we've reset the form to default values. Please try creating a new invoice.",
@@ -276,7 +284,7 @@ export function AppPageClient({
 
       Sentry.captureException(error);
     }
-  }, [templateValidation.data, templateValidation.success]);
+  }, [urlTemplate]);
 
   useEffect(() => {
     // Scroll to top of the page on first render for better UX
@@ -288,7 +296,7 @@ export function AppPageClient({
     // Run only once per page load.
     //
     // This effect depends on `searchParams`, and the app rewrites the URL on its own
-    // (e.g. to keep ?template= in sync, or to add ?data=
+    // (e.g. to keep the template's route in sync, or to add ?data=
     // when a share link is generated). Without this guard, every one of those rewrites
     // re-ran the initialization, re-read localStorage and called `setInvoiceDataState`
     // with a brand new (but identical) object. That extra state update makes react-pdf
@@ -328,18 +336,18 @@ export function AppPageClient({
           validatedDataFromURL,
         );
 
-        // Override template from URL parameter if present for better UX
-        // The ?template parameter provides a cleaner URL and better user experience
-        // while ?data contains the actual invoice data including the template
-        // ?template=" " has higher priority than ?data=" " =)
-        const selectedInvoiceData = templateValidation.success
-          ? selectInvoiceTemplate(validatedDataFromURL, templateValidation.data)
+        // Override template from the URL (`/stripe-template` or ?template=) if present for
+        // better UX, while ?data contains the actual invoice data including the template.
+        // The URL template has higher priority than ?data=" " =)
+        const selectedInvoiceData = urlTemplate
+          ? selectInvoiceTemplate(validatedDataFromURL, urlTemplate)
           : validatedDataFromURL;
 
         setInvoiceDataState(selectedInvoiceData);
 
         // Store the original URL invoice data for change detection
         originalUrlInvoiceDataRef.current = selectedInvoiceData;
+        setIsUnmodifiedInvoiceFromLink(true);
 
         // add metadata with default values if missing for all users
         ensureAppMetadata();
@@ -371,12 +379,17 @@ export function AppPageClient({
                     window.location.search,
                   );
                   clearedParams.delete("data");
-                  clearedParams.set(
-                    "template",
-                    clearedParams.get("template") || "default",
-                  );
 
-                  replaceUrlQuery(clearedParams);
+                  replaceUrl(
+                    buildInvoiceAppUrl({
+                      template:
+                        getTemplateFromUrl({
+                          pathname: window.location.pathname,
+                          searchParams: clearedParams,
+                        }) ?? "default",
+                      searchParams: clearedParams,
+                    }),
+                  );
 
                   toast.dismiss();
                 }}
@@ -399,38 +412,93 @@ export function AppPageClient({
       // if no data in url, load from local storage
       loadFromLocalStorage();
     }
-  }, [loadFromLocalStorage, searchParams, templateValidation]);
+  }, [loadFromLocalStorage, searchParams, urlTemplate]);
 
   /**
-   * Ensures the template query parameter is present in the URL (for better user experience)
-   * If missing, adds it based on the current invoice data state.
+   * Ensures the URL is the route of the loaded invoice's template (for better user
+   * experience): `/` or `/stripe-template`. A visitor landing on a bare `/` with a saved
+   * Stripe invoice is moved to `/stripe-template`, and legacy links drop their now
+   * redundant `?template=` (`/?template=default`, or `/?template=stripe` after its
+   * redirect to `/stripe-template?template=stripe`).
    */
   useEffect(() => {
-    // Only run if we have invoice data and no template in URL.
-    //
     // `no-event-handler` wants this written where the invoice data is set, but the template
     // being written *is* `invoiceDataState.template`, which the initialization effect has not
     // resolved yet at that point. (It was also load-bearing back when this used
     // `router.replace`, which the App Router dropped when called mid-mount -- under load the
     // shared-link e2e tests then sat on a URL that never grew its `?template=`.)
     // oxlint-disable-next-line react-you-might-not-need-an-effect/no-event-handler
-    if (!invoiceDataState || searchParams.get("template")) {
+    if (!invoiceDataState) {
       return;
     }
 
-    debugLog("[useEffect] [add missing template to URL]", {
+    // Read the address bar itself, not `pathname`/`searchParams`: Next syncs those with
+    // `history.replaceState` a render later, so right after a template switch this effect
+    // sees the new invoice template next to the *previous* URL. Rebuilding from that stale
+    // URL put back the `?data=` that `handleInvoiceDataChange` had just dropped, leaving an
+    // edited invoice on its old share link.
+    const currentParams = new URLSearchParams(window.location.search);
+
+    if (
+      isUrlForTemplate({
+        template: invoiceDataState.template,
+        pathname: window.location.pathname,
+        searchParams: currentParams,
+      })
+    ) {
+      return;
+    }
+
+    const expectedUrl = buildInvoiceAppUrl({
       template: invoiceDataState.template,
+      searchParams: currentParams,
     });
 
-    // Create a new URLSearchParams object from the current search parameters
-    const currentParams = new URLSearchParams(searchParams.toString());
-
-    // Add the template parameter from the invoice data
-    currentParams.set("template", invoiceDataState.template);
+    debugLog("[useEffect] [sync template to URL]", {
+      template: invoiceDataState.template,
+      expectedUrl,
+    });
 
     // Update the browser URL without triggering a page reload or scroll
-    replaceUrlQuery(currentParams);
-  }, [invoiceDataState, searchParams]);
+    replaceUrl(expectedUrl);
+  }, [invoiceDataState]);
+
+  /**
+   * Keeps the tab title and the canonical URL on the route in the address bar. Both come
+   * from the metadata of the route the page was *loaded* on, and a template switch only
+   * rewrites the URL, so a bare `/` that moved on to `/stripe-template` (a saved Stripe
+   * invoice), or a switch in the template picker, would keep the other route's -- the
+   * title is what a bookmark or a history entry gets, and the canonical is what Safari's
+   * own Share (in its menu, not "Get link") copies instead of the address bar.
+   *
+   * Crawlers never see the rewrite: they have no saved invoice and don't switch templates.
+   *
+   * An effect on `pathname` rather than a write in `replaceUrl`: Next re-renders the tree
+   * to sync `usePathname()` with `history.replaceState`, and React puts the metadata's
+   * `<title>` back in that commit. This runs after it.
+   *
+   * Known gap: on a client-side navigation into the app (e.g. "Open app" from another
+   * page), Next can commit the route's metadata later still, putting the loaded route's
+   * title and canonical back.
+   */
+  useEffect(() => {
+    const routeTemplate = getRouteTemplate(pathname);
+
+    document.title = APP_PAGE_TITLE[routeTemplate];
+
+    const canonicalLink = document.querySelector<HTMLLinkElement>(
+      'link[rel="canonical"]',
+    );
+
+    if (canonicalLink) {
+      // resolved against the current canonical to keep its origin: `APP_URL` comes from a
+      // server-only env var, so the client bundle cannot build it
+      canonicalLink.href = new URL(
+        buildInvoiceAppUrl({ template: routeTemplate }),
+        canonicalLink.href,
+      ).href;
+    }
+  }, [pathname]);
 
   /**
    * Checks if the invoice has changed from the original shared URL version.
@@ -460,6 +528,14 @@ export function AppPageClient({
       if (invoiceHasChanged) {
         debugLog("[checkForInvoiceChanges] invoice has changed");
 
+        // the edit that got us here also stamped a fresh "Invoice last updated"
+        setIsUnmodifiedInvoiceFromLink(false);
+
+        // the link they confirm no longer matches the invoice
+        for (const toastId of Object.values(SHARE_LINK_SUCCESS_TOAST_IDS)) {
+          toast.dismiss(toastId);
+        }
+
         toast.info(
           <div className="space-y-2">
             <p className="text-sm font-semibold">Invoice Updated</p>
@@ -469,14 +545,14 @@ export function AppPageClient({
 
             <p className="text-muted-foreground text-pretty leading-relaxed">
               Click{" "}
-              <span className="font-semibold text-foreground">
-                &apos;Get link&apos;
+              <span className="font-semibold underline underline-offset-2">
+                Get link
               </span>{" "}
               to create an updated shareable link.
             </p>
           </div>,
           {
-            id: "invoice-has-changed-toast",
+            id: INVOICE_UPDATED_TOAST_ID,
             duration: 20_000,
             closeButton: true,
             position: isMobile ? "top-center" : "bottom-right",
@@ -556,7 +632,10 @@ export function AppPageClient({
       setInvoiceDataState(updatedData);
       checkForInvoiceChanges(updatedData);
 
-      const currentTemplate = searchParams.get("template");
+      // The template of the route in the address bar: read from `window.location`, which
+      // is never stale (unlike `pathname`, see the URL sync effect), and from the route
+      // alone -- a legacy `?template=` the sync effect has not dropped yet is not a switch.
+      const currentTemplate = getRouteTemplate(window.location.pathname);
 
       // update the url with the new template
       if (currentTemplate !== updatedData.template) {
@@ -570,11 +649,16 @@ export function AppPageClient({
         // visitor arrived with (utm tags and the like). `data` is still dropped on purpose --
         // a template switch is a change from the shared version, which is exactly what
         // `checkForInvoiceChanges` above has just told the user about.
-        const templateParams = new URLSearchParams(searchParams.toString());
-        templateParams.set("template", updatedData.template);
+        const templateParams = new URLSearchParams(window.location.search);
         templateParams.delete("data");
 
-        replaceUrlQuery(templateParams);
+        // moves between `/` and `/stripe-template`
+        replaceUrl(
+          buildInvoiceAppUrl({
+            template: updatedData.template,
+            searchParams: templateParams,
+          }),
+        );
       } else {
         debugLog("[handleInvoiceDataChange] invoice template did not change");
       }
@@ -660,10 +744,14 @@ export function AppPageClient({
         }
 
         const currentParams = new URLSearchParams(searchParams.toString());
-        currentParams.set("template", newInvoiceDataValidated.template);
         currentParams.set("data", compressedData);
 
-        replaceUrlQuery(currentParams);
+        const sharedInvoiceUrl = buildInvoiceAppUrl({
+          template: newInvoiceDataValidated.template,
+          searchParams: currentParams,
+        });
+
+        replaceUrl(sharedInvoiceUrl);
 
         // Remember the invoice that was just shared, so later edits are detected and the
         // "Invoice Updated" toast is shown. Previously this ref was (re)populated as a
@@ -671,15 +759,23 @@ export function AppPageClient({
         // which no longer happens now that initialization runs once per page load.
         originalUrlInvoiceDataRef.current = newInvoiceDataValidated;
 
+        // A new link makes "Invoice Updated" stale. It has to go before the next edit, too:
+        // the form dismisses that toast on every change, right before this page shows it again
+        // under the same id, and sonner treats that as an update to the toast on its way out --
+        // so a second share-then-edit in one session used to end with no toast at all. It also
+        // lets the success toast below come to the front: with `visibleToasts={1}` a toast
+        // updated in place under an existing id stays wherever it was in the stack.
+        toast.dismiss(INVOICE_UPDATED_TOAST_ID);
+
         // Construct full URL with locale and compressed data
-        const newGeneratedLinkFullUrl = `${window.location.origin}/?${currentParams.toString()}`;
+        const newGeneratedLinkFullUrl = `${window.location.origin}${sharedInvoiceUrl}`;
 
         // allow sharing invoice via navigator.share (on mobile and tablet) or copy to clipboard (on desktop)
         if (!isUADesktop && navigator?.share) {
           // MOBILE + TABLET
           try {
             toast.success("Your invoice link is ready. Share it now.", {
-              id: "invoice-link-generated-share-invoice-success-toast",
+              id: SHARE_LINK_SUCCESS_TOAST_IDS.shareSheet,
               description: (
                 <p data-testid="share-invoice-link-description-toast">
                   Share this link to let others view and edit this invoice
@@ -746,7 +842,7 @@ export function AppPageClient({
             ?.writeText(newGeneratedLinkFullUrl)
             .then(() => {
               toast.success("Invoice link generated and copied to clipboard!", {
-                id: "invoice-link-copied-to-clipboard-success-toast",
+                id: SHARE_LINK_SUCCESS_TOAST_IDS.clipboard,
                 description: (
                   <p data-testid="share-invoice-link-description-toast">
                     Share this link to let others view and edit this invoice
@@ -810,6 +906,7 @@ export function AppPageClient({
                 isMobile={isMobile}
                 canShareInvoice={canShareInvoice}
                 currentInvoiceFormDataRef={currentInvoiceFormDataRef}
+                isUnmodifiedInvoiceFromLink={isUnmodifiedInvoiceFromLink}
                 mobileDockNotice={isMobile ? changelogPopup : null}
                 // switching tabs means the user found their way around, so the welcome
                 // notice has done its job
@@ -819,7 +916,6 @@ export function AppPageClient({
           </div>
         </main>
       </InvoicePdfInstanceProvider>
-      <Footer />
       {isMobile ? null : changelogPopup}
       <HowItWorksVideoDialog
         open={isHowItWorksDialogOpen}
@@ -831,3 +927,16 @@ export function AppPageClient({
     </TooltipProvider>
   );
 }
+
+/**
+ * The "Invoice Updated" toast: the invoice no longer matches the shared link it was opened
+ * from (or that was just generated). `invoice-form/index.tsx` dismisses it by this id on
+ * every change.
+ */
+const INVOICE_UPDATED_TOAST_ID = "invoice-has-changed-toast";
+
+/** The toasts confirming a share link: the share sheet (mobile) and the clipboard (desktop). */
+const SHARE_LINK_SUCCESS_TOAST_IDS = {
+  shareSheet: "invoice-link-generated-share-invoice-success-toast",
+  clipboard: "invoice-link-copied-to-clipboard-success-toast",
+} as const;

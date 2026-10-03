@@ -25,7 +25,7 @@ test.describe("How it works page", () => {
     });
 
     await expect(goToAppButton).toBeVisible();
-    await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
+    await expect(goToAppButton).toHaveAttribute("href", "/");
 
     await expect(page.getByTestId("how-it-works-page-title")).toBeVisible();
     await expect(

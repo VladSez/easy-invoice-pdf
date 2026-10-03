@@ -50,7 +50,7 @@ export function AboutFooter() {
             heading={t("footer.headings.product")}
             links={[
               {
-                href: "/?template=default",
+                href: "/",
                 label: t("footer.links.invoiceGenerator"),
               },
               {

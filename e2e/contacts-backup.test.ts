@@ -67,7 +67,7 @@ test.describe("Sellers & buyers backup", () => {
     page,
     downloadDir,
   }) => {
-    await page.goto("/?template=default");
+    await page.goto("/");
 
     await page.evaluate(
       ({ sellersKey, buyersKey, sellers, buyers }) => {

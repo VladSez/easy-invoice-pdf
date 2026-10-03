@@ -186,12 +186,36 @@ const nextConfig = {
       },
     ];
   },
+  async headers() {
+    // The invoice app routes are prerendered, so their robots meta tags cannot depend on
+    // the query string. Shared invoice links (`?data=`) are kept out of the index with this
+    // header instead. A crawler always requests the link itself, so it always gets the
+    // header -- the `?data=` that sharing adds in place (`history.replaceState`) only ever
+    // exists in the sharer's own tab.
+    // Keep the paths in sync with `STRIPE_TEMPLATE_PATHNAME` in `src/utils/invoice-app-url.ts`.
+    return ["/", "/stripe-template"].map((source) => {
+      return {
+        source,
+        has: [{ type: "query", key: "data" }],
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      };
+    });
+  },
   async redirects() {
     return [
       // Redirect all /:locale/app requests to the root, because we changed the structure of the app
       {
         source: "/:locale/app",
         destination: "/",
+        permanent: true,
+      },
+      // The Stripe template moved from `/?template=stripe` to its own route. The query string
+      // is passed through (so `?data=` share links keep working); the app drops the leftover
+      // `?template=stripe` on the client.
+      {
+        source: "/",
+        has: [{ type: "query", key: "template", value: "stripe" }],
+        destination: "/stripe-template",
         permanent: true,
       },
     ];

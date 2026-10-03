@@ -13,9 +13,9 @@ export function ProjectLogoDescription({
         rel="noopener noreferrer"
       >
         {title || (
-          <h1 className="text-balance text-xl font-bold text-slate-800 lg:text-2xl">
+          <p className="text-balance text-xl font-bold text-slate-800 lg:text-2xl">
             EasyInvoicePDF
-          </h1>
+          </p>
         )}
       </a>
       {description || (

@@ -47,7 +47,7 @@ describe("buildHomeJsonLdGraph", () => {
       potentialAction: {
         "@type": "UseAction",
         name: "Start Invoicing",
-        target: "https://easyinvoicepdf.com/?template=default",
+        target: "https://easyinvoicepdf.com/",
       },
     });
 
@@ -59,7 +59,7 @@ describe("buildHomeJsonLdGraph", () => {
       expect.arrayContaining([
         expect.objectContaining({
           name: "Start Invoicing",
-          item: "https://easyinvoicepdf.com/?template=default",
+          item: "https://easyinvoicepdf.com/",
         }),
         expect.objectContaining({
           name: "About",
@@ -74,5 +74,32 @@ describe("buildHomeJsonLdGraph", () => {
       mainEntity: { "@id": JSON_LD_IDS.app },
       hasPart: { "@id": JSON_LD_IDS.siteNavigation },
     });
+  });
+
+  it("describes the route it is rendered on in its WebPage node", () => {
+    const stripeTemplatePage = {
+      url: "https://easyinvoicepdf.com/stripe-template",
+      name: "Stripe Invoice Template - Create Free PDF Invoice",
+      description: "Free Stripe invoice template.",
+    };
+
+    const graph = buildHomeJsonLdGraph(stripeTemplatePage) as unknown as {
+      "@graph": Array<Record<string, unknown>>;
+    };
+
+    const webPages = graph["@graph"].filter((node) => {
+      return node["@type"] === "WebPage";
+    });
+
+    expect(webPages).toEqual([
+      expect.objectContaining({
+        "@id": "https://easyinvoicepdf.com/stripe-template#webpage",
+        url: stripeTemplatePage.url,
+        name: stripeTemplatePage.name,
+        description: stripeTemplatePage.description,
+        isPartOf: { "@id": JSON_LD_IDS.website },
+        mainEntity: { "@id": JSON_LD_IDS.app },
+      }),
+    ]);
   });
 });

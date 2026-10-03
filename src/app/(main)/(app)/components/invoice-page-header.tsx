@@ -4,6 +4,7 @@ import { LinkIcon } from "lucide-react";
 import { useState } from "react";
 
 import { ProjectLogoDescription } from "@/app/(components)/project-logo-description";
+import { APP_PAGE_HEADING } from "@/app/(main)/(app)/app-page-heading";
 import { HowItWorksVideoDialog } from "@/app/(main)/(app)/components/how-it-works-video-dialog";
 import { InvoicePDFDownloadLink } from "@/app/(main)/(app)/components/invoice-pdf-download-link";
 import { ShareInvoiceButton } from "@/app/(main)/(app)/components/share-invoice-button";
@@ -48,15 +49,10 @@ export function InvoicePageHeader({
           <div className="flex items-center">
             <ProjectLogo className="h-8 w-8" />
             <ProjectLogoDescription
-              title={
-                <h1 className="text-balance text-xl font-bold text-slate-800 lg:text-2xl">
-                  EasyInvoicePDF
-                </h1>
-              }
               description={
-                <h2 className="text-balance text-[12px] text-slate-700 sm:text-[13px]">
-                  Free & Open-Source Invoice Generator
-                </h2>
+                <h1 className="text-balance text-[12px] text-slate-700 sm:text-[13px]">
+                  {APP_PAGE_HEADING[invoiceDataState.template]}
+                </h1>
               }
             />
           </div>

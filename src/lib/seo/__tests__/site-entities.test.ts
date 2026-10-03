@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
 
+import {
+  SUPPORTED_CURRENCIES,
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
+} from "@/app/schema";
+
 import { buildBreadcrumbList } from "../breadcrumb";
 import { JSON_LD_IDS } from "../json-ld-ids";
 import {
@@ -36,6 +41,28 @@ describe("site-entities", () => {
     });
   });
 
+  it("names the site by its brand alone, with other spellings as alternates", () => {
+    // Google reads the site name from WebSite.name and falls back to a guess when it
+    // holds a title-style tagline
+    const webSite = buildFullWebSite();
+    expect(webSite.name).toBe("EasyInvoicePDF");
+    expect(buildSlimWebSite().name).toBe(webSite.name);
+    expect(webSite.alternateName).not.toContain(webSite.name);
+  });
+
+  it("gives the organization a logo of at least 112×112", () => {
+    const { logo } = buildOrganization();
+    expect(logo.url).toMatch(/^https:\/\//);
+    expect(Number(logo.width)).toBeGreaterThanOrEqual(112);
+    expect(Number(logo.height)).toBeGreaterThanOrEqual(112);
+  });
+
+  it("states the real language and currency counts in the feature list", () => {
+    expect(buildWebApplication().featureList).toContain(
+      `Invoices in ${SUPPORTED_INVOICE_PDF_LANGUAGES.length} languages and ${SUPPORTED_CURRENCIES.length} currencies`,
+    );
+  });
+
   it("should use real name without role suffix for buildPerson", () => {
     const person = buildPerson();
     expect(person.name).toBe("Vlad Sazonau");
@@ -53,7 +80,7 @@ describe("site-entities", () => {
     expect(app.creator).toMatchObject({ "@id": JSON_LD_IDS.organization });
     expect(app.potentialAction).toMatchObject({
       name: "Start Invoicing",
-      target: "https://easyinvoicepdf.com/?template=default",
+      target: "https://easyinvoicepdf.com/",
     });
   });
 
@@ -63,7 +90,7 @@ describe("site-entities", () => {
       expect.arrayContaining([
         expect.objectContaining({
           name: "Start Invoicing",
-          item: "https://easyinvoicepdf.com/?template=default",
+          item: "https://easyinvoicepdf.com/",
         }),
         expect.objectContaining({
           name: "About",
@@ -85,10 +112,13 @@ describe("site-entities", () => {
 
 describe("buildBreadcrumbList", () => {
   it("should build ordered crumbs with optional last item URL", () => {
-    const breadcrumb = buildBreadcrumbList("https://easyinvoicepdf.com/foo", [
-      { name: "Start Invoicing", item: "https://easyinvoicepdf.com/" },
-      { name: "Foo" },
-    ]);
+    const breadcrumb = buildBreadcrumbList({
+      pageUrl: "https://easyinvoicepdf.com/foo",
+      items: [
+        { name: "Start Invoicing", item: "https://easyinvoicepdf.com/" },
+        { name: "Foo" },
+      ],
+    });
 
     expect(breadcrumb).toMatchObject({
       "@type": "BreadcrumbList",

@@ -16,7 +16,7 @@ test.describe("Terms of Service page", () => {
     });
 
     await expect(goToAppButton).toBeVisible();
-    await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
+    await expect(goToAppButton).toHaveAttribute("href", "/");
 
     await expect(page).toHaveTitle("Terms of Service | EasyInvoicePDF");
 

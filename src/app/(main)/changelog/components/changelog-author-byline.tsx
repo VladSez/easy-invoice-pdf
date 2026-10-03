@@ -37,7 +37,7 @@ export function ChangelogAuthorByline() {
         <span className="text-sm text-slate-500 dark:text-neutral-400">
           Founder,{" "}
           <Link
-            href="/?template=default"
+            href="/"
             className="text-slate-500 no-underline hover:underline hover:underline-offset-2 dark:text-neutral-400"
           >
             {" "}

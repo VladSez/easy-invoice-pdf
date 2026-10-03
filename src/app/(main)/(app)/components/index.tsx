@@ -152,6 +152,7 @@ export function InvoiceClientPage({
   isMobile,
   canShareInvoice,
   currentInvoiceFormDataRef,
+  isUnmodifiedInvoiceFromLink,
   mobileDockNotice,
   onMobileTabChange,
 }: {
@@ -162,6 +163,11 @@ export function InvoiceClientPage({
   canShareInvoice: boolean;
   currentInvoiceFormDataRef: RefObject<(() => InvoiceData | null) | null>;
   /**
+   * The invoice is still the one opened from a shared link. "Invoice last updated" is
+   * hidden then: it comes from this browser's metadata and says nothing about that invoice.
+   */
+  isUnmodifiedInvoiceFromLink: boolean;
+  /**
    * Rendered inside the mobile dock, which it positions itself against to float just above
    * it -- the welcome popup on phones. Ignored on desktop, where the popup floats instead.
    */
@@ -171,11 +177,12 @@ export function InvoiceClientPage({
 }) {
   const appMetadata = useAppMetadata();
 
-  const invoiceLastUpdatedAtFormatted = appMetadata?.invoiceLastUpdatedAt
-    ? dayjs(appMetadata.invoiceLastUpdatedAt)
-        .locale("en")
-        .format("MMM D, YYYY [at] HH:mm")
-    : null;
+  const invoiceLastUpdatedAtFormatted =
+    appMetadata?.invoiceLastUpdatedAt && !isUnmodifiedInvoiceFromLink
+      ? dayjs(appMetadata.invoiceLastUpdatedAt)
+          .locale("en")
+          .format("MMM D, YYYY [at] HH:mm")
+      : null;
 
   const defaultMobileTab =
     appMetadata?.lastVisitedMobileTab || DEFAULT_MOBILE_TAB;

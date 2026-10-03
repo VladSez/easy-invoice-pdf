@@ -4,7 +4,7 @@ import { renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DeviceContextProvider } from "@/contexts/device-context";
-import type { InAppInfo } from "@/lib/check-device.server";
+import type { InAppInfo } from "@/lib/detect-device";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
 
 import { useInAppBrowserNotice } from "../use-in-app-browser-notice";

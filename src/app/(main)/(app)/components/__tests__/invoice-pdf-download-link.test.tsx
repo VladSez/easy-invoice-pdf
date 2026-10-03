@@ -216,6 +216,22 @@ describe("InvoicePDFDownloadLink", () => {
     expect(link).toHaveClass("pointer-events-none");
   });
 
+  it("should show loading state before the first PDF exists", () => {
+    // what `usePDF()` returns before the provider has queued the first render
+    mockPdfStateRef.current = {
+      loading: false,
+      url: null,
+      error: null,
+    };
+
+    renderInvoicePDFDownloadLink();
+
+    const link = screen.getByRole("link", { name: LOADING_BUTTON_TEXT });
+
+    expect(link).toHaveClass("pointer-events-none");
+    expect(link).not.toHaveAttribute("download");
+  });
+
   it("should set href and download attributes when PDF url is available", () => {
     const invoiceData = {
       ...getInitialInvoiceData(),
@@ -294,11 +310,11 @@ describe("InvoicePDFDownloadLink", () => {
     expect(showCTAToast).toHaveBeenCalledTimes(1);
   });
 
-  it("should show error toast when url is missing on click", async () => {
+  it("should show error toast when the PDF failed to generate and there is no url", async () => {
     mockPdfStateRef.current = {
       loading: false,
       url: null,
-      error: null,
+      error: new Error("PDF generation failed"),
     };
 
     const user = userEvent.setup();
@@ -313,7 +329,11 @@ describe("InvoicePDFDownloadLink", () => {
         id: "file-not-available-error-toast",
       }),
     );
-    expect(umamiTrackEvent).not.toHaveBeenCalled();
+    // the provider reports the failed render itself; the click must not count a download
+    expect(umamiTrackEvent).not.toHaveBeenCalledWith(
+      "download_invoice",
+      expect.anything(),
+    );
   });
 
   it("should block download inside in-app browser", async () => {

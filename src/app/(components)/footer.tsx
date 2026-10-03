@@ -3,7 +3,10 @@ import Link from "next/link";
 /* eslint-disable @next/next/no-html-link-for-pages */
 import { FooterCopyright } from "@/app/(components)/footer-copyright";
 import { FooterLaunchBadges } from "@/app/(components)/footer-launch-badges";
-import { SEO_FOOTER_SOLUTION_LINKS } from "@/app/(main)/(seo-landings)/seo-landing-footer-links";
+import {
+  APP_FOOTER_SOLUTION_LINKS,
+  SEO_FOOTER_SOLUTION_LINKS,
+} from "@/app/(main)/(seo-landings)/seo-landing-footer-links";
 import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_I18N_LOCALES } from "@/app/schema";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import {
@@ -126,6 +129,19 @@ export function Footer({ links, translations }: FooterProps) {
                   {solutionsHeading}
                 </h3>
                 <ul className="space-y-2">
+                  {APP_FOOTER_SOLUTION_LINKS.map(({ href, label }) => {
+                    return (
+                      <li key={href}>
+                        {/* a full page load, see `FooterLinkItem.fullPageLoad` */}
+                        <a
+                          href={href}
+                          className="text-sm text-slate-500 hover:text-slate-900"
+                        >
+                          {label}
+                        </a>
+                      </li>
+                    );
+                  })}
                   {SEO_FOOTER_SOLUTION_LINKS.map(({ slug, label }) => {
                     return (
                       <li key={slug}>
@@ -206,6 +222,15 @@ interface FooterLinkItem {
   href: string;
   label: string;
   external?: boolean;
+  /**
+   * Render a plain `<a>` instead of `next/link`, so following it is a full page load.
+   *
+   * Needed for links to the invoice app's own routes (`/`, `/stripe-template`): a template
+   * switch moves the address bar between them with `history.replaceState`, so the router
+   * still holds the route the page was loaded on. A client-side navigation to that route
+   * reuses the mounted editor, which keeps the old template under the new URL.
+   */
+  fullPageLoad?: boolean;
 }
 
 export function FooterLinkGroup({
@@ -224,15 +249,21 @@ export function FooterLinkGroup({
         {links.map((link) => {
           return (
             <li key={`${heading}-${link.label}`}>
-              <Link
-                href={link.href}
-                className={FOOTER_LINK_CLASSNAME}
-                {...(link.external
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-              >
-                {link.label}
-              </Link>
+              {link.fullPageLoad ? (
+                <a href={link.href} className={FOOTER_LINK_CLASSNAME}>
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  href={link.href}
+                  className={FOOTER_LINK_CLASSNAME}
+                  {...(link.external
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                >
+                  {link.label}
+                </Link>
+              )}
             </li>
           );
         })}
@@ -247,7 +278,7 @@ function DefaultFooterLinks() {
       <FooterLinkGroup
         heading="Product"
         links={[
-          { href: "/", label: "Invoice Generator" },
+          { href: "/", label: "Invoice Generator", fullPageLoad: true },
           { href: GITHUB_URL, label: "GitHub", external: true },
           { href: "/how-it-works", label: "How it works" },
           { href: "/changelog", label: "Changelog" },

@@ -1,39 +1,64 @@
 import { Footer } from "@/app/(components)/footer";
 import { ProjectLogoDescription } from "@/app/(components)/project-logo-description";
+import { APP_PAGE_HEADING } from "@/app/(main)/(app)/app-page-heading";
+import type { SupportedTemplates } from "@/app/schema";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function Loading() {
-  return <InvoicePageLoadingSkeleton />;
-}
-
 /**
- * Displays the loading skeleton for the Invoice Page.
- * Shows placeholders for the header, invoice editor, and footer while content is being loaded.
+ * The route-level skeleton, shown on navigation to `/` or `/stripe-template`.
+ *
+ * It is in the prerendered HTML alongside the page's own fallback, and it cannot tell the
+ * two routes apart, so it renders the tagline without a heading: the h1 comes from the
+ * page's fallback (see `InvoiceAppPage`), which knows its template.
  */
-export function InvoicePageLoadingSkeleton() {
+export default function Loading() {
   return (
     <>
-      <main
-        className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen"
-        aria-busy="true"
-        aria-label="Loading invoice editor"
-      >
-        <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 min-[1400px]:max-w-7xl 2xl:max-w-[1480px]">
-          <LoadingHeader />
-
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-            <MobileEditorLoading />
-            <DesktopEditorLoading />
-          </div>
-        </div>
-      </main>
+      <InvoicePageLoadingSkeleton />
       <Footer />
     </>
   );
 }
 
-function LoadingHeader() {
+/**
+ * Displays the loading skeleton for the Invoice Page.
+ * Shows placeholders for the header and invoice editor while content is being loaded.
+ *
+ * The footer is not part of it: on the page it is rendered on the server, below the editor
+ * (see `InvoiceAppPage`), so it is in the prerendered HTML whatever the editor is doing.
+ */
+export function InvoicePageLoadingSkeleton({
+  template,
+}: {
+  /**
+   * The template the route opens with. Picks the page's h1; without it the tagline is not
+   * a heading, see `Loading`.
+   */
+  template?: SupportedTemplates;
+}) {
+  return (
+    <main
+      className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen"
+      aria-busy="true"
+      aria-label="Loading invoice editor"
+    >
+      <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 min-[1400px]:max-w-7xl 2xl:max-w-[1480px]">
+        <LoadingHeader template={template} />
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+          <MobileEditorLoading />
+          <DesktopEditorLoading />
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function LoadingHeader({ template }: { template?: SupportedTemplates }) {
+  const taglineClassName =
+    "text-balance text-[12px] text-slate-700 sm:text-[13px]";
+
   return (
     <div className="lg:mb-0 lg:h-auto">
       <div className="flex w-full flex-row flex-wrap items-center justify-between lg:flex-nowrap">
@@ -42,9 +67,13 @@ function LoadingHeader() {
             <ProjectLogo className="h-8 w-8" />
             <ProjectLogoDescription
               description={
-                <h2 className="text-balance text-[12px] text-slate-700 sm:text-[13px]">
-                  Free &amp; Open-Source Invoice Generator
-                </h2>
+                template ? (
+                  <h1 className={taglineClassName}>
+                    {APP_PAGE_HEADING[template]}
+                  </h1>
+                ) : (
+                  <p className={taglineClassName}>{APP_PAGE_HEADING.default}</p>
+                )
               }
             />
           </div>

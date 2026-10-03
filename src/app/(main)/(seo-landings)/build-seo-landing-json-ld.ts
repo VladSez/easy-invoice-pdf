@@ -103,6 +103,10 @@ export function buildSeoLandingJsonLd(
     mainEntity: {
       "@id": isOpenSourceLanding ? pageSoftwareAppId(pageUrl) : faqUrl,
     },
+    // the same pages the "Related" block under the FAQ links to
+    relatedLink: definition.relatedSlugs.map((slug) => {
+      return `${baseUrl}/${slug}`;
+    }),
   };
 
   const faqPage = {
@@ -111,10 +115,13 @@ export function buildSeoLandingJsonLd(
     mainEntity: faqEntities,
   };
 
-  const breadcrumb = buildBreadcrumbList(pageUrl, [
-    { name: "Start Invoicing", item: `${baseUrl}/` },
-    { name: definition.metadata.title },
-  ]);
+  const breadcrumb = buildBreadcrumbList({
+    pageUrl,
+    items: [
+      { name: "Start Invoicing", item: `${baseUrl}/` },
+      { name: definition.metadata.title },
+    ],
+  });
 
   const heroVideo = definition.hero.heroVideo;
 

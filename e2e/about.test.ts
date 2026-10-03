@@ -83,7 +83,7 @@ test.describe("About page", () => {
       exact: true,
     });
     await expect(goToAppButton).toBeVisible();
-    await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
+    await expect(goToAppButton).toHaveAttribute("href", "/");
 
     // The about page streams behind a `loading.tsx` Suspense boundary. While
     // React reveals the boundary, the streamed copy of the content is still
@@ -189,7 +189,7 @@ test.describe("About page", () => {
     });
 
     await expect(appLink).toBeVisible();
-    await expect(appLink).toHaveAttribute("href", "/?template=default");
+    await expect(appLink).toHaveAttribute("href", "/");
     await expect(appLink).not.toHaveAttribute("target", "_blank");
 
     const featuresLink = footerLinks.getByRole("link", {
@@ -332,7 +332,7 @@ test.describe("About page", () => {
     });
 
     await expect(appLink).toBeVisible();
-    await expect(appLink).toHaveAttribute("href", "/?template=default");
+    await expect(appLink).toHaveAttribute("href", "/");
     await expect(appLink).not.toHaveAttribute("target", "_blank");
 
     const featuresLink = footerLinks.getByRole("link", {
@@ -517,7 +517,7 @@ test.describe("About page", () => {
     });
 
     await headerGoToAppButton.click();
-    await expect(page).toHaveURL("/?template=default");
+    await expect(page).toHaveURL("/");
   });
 
   // we don't show nav links and language switcher in header on mobile
@@ -609,7 +609,7 @@ test.describe("About page", () => {
       exact: true,
     });
     await expect(goToAppButton).toBeVisible();
-    await expect(goToAppButton).toHaveAttribute("href", "/?template=default");
+    await expect(goToAppButton).toHaveAttribute("href", "/");
 
     await expect(
       header.getByRole("link", { name: "About Us", exact: true }),

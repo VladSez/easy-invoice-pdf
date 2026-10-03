@@ -7,11 +7,17 @@
  * - author.name = person name only (no role suffix per Google Article guide).
  */
 
+import { APP_PAGE_TITLE } from "@/app/(main)/(app)/app-page-heading";
+import {
+  SUPPORTED_CURRENCIES,
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
+} from "@/app/schema";
 import {
   FOUNDER_AVATAR_URL,
   GITHUB_URL,
   LINKEDIN_URL,
   PERSONAL_WEBSITE_URL,
+  PRODUCT_TWITTER_URL,
   PROD_WEBSITE_URL,
   STATIC_ASSETS_URL,
   TWITTER_URL,
@@ -19,11 +25,22 @@ import {
 
 import { JSON_LD_BASE, JSON_LD_IDS } from "./json-ld-ids";
 
-export const SITE_NAME =
-  "EasyInvoicePDF | Free & Open-Source Invoice Generator – Live Preview, No Sign-Up";
+/**
+ * The site's name, as Google should print it above a result.
+ *
+ * Google reads site names from `WebSite.name` and expects the name itself, not a title:
+ * a tagline after the brand makes it fall back to a guess from the page title. Other
+ * spellings people use go in `alternateName`.
+ */
+const SITE_NAME = "EasyInvoicePDF";
+
+const SITE_ALTERNATE_NAMES = ["EasyInvoicePDF.com", "Easy Invoice PDF"];
 
 const SITE_DESCRIPTION =
   "Create and download professional invoices instantly with EasyInvoicePDF. Free and open-source. No signup required.";
+
+/** The `<title>` of `/`, also the name of its `WebPage` node. */
+export const HOME_PAGE_TITLE = APP_PAGE_TITLE.default;
 
 export const HOME_PAGE_DESCRIPTION =
   "Create professional PDF invoices online for free. Customize invoice templates, add your logo, download instantly, and send invoices without signup.";
@@ -37,16 +54,20 @@ export const FOUNDER_PAGE_DESCRIPTION =
 
 export const OG_IMAGE_URL = `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`;
 
-const START_INVOICING_URL = `${JSON_LD_BASE}/?template=default`;
+/** Square, 180×180: Google wants an Organization logo of at least 112×112. */
+const ORGANIZATION_LOGO_URL = `${STATIC_ASSETS_URL}/apple-icon.png`;
+
+const START_INVOICING_URL = `${JSON_LD_BASE}/`;
 
 const WEB_APPLICATION_FEATURES = [
   "Live preview as you type",
   "No sign-up needed",
   "No ads",
   "Save seller and buyer details for future reuse",
-  "Flexible tax: VAT, GST, custom options",
-  "Fully customizable invoice templates",
-  "Supports 10+ languages, all major currencies",
+  "Flexible tax: VAT, GST, Sales Tax or a custom label",
+  "Two invoice templates: a classic layout and a Stripe-style one",
+  // derived from the schema, so the counts can't go stale when a language is added
+  `Invoices in ${SUPPORTED_INVOICE_PDF_LANGUAGES.length} languages and ${SUPPORTED_CURRENCIES.length} currencies`,
   "One-click instant PDF download",
   "Browser only, data stays private",
   "Share via link, no attachments",
@@ -68,7 +89,7 @@ export function buildFullWebSite() {
     "@id": JSON_LD_IDS.website,
     url: `${JSON_LD_BASE}/`,
     name: SITE_NAME,
-    alternateName: ["EasyInvoicePDF", "easyinvoicepdf.com"],
+    alternateName: [...SITE_ALTERNATE_NAMES],
     description: SITE_DESCRIPTION,
     inLanguage: "en",
     publisher: {
@@ -87,9 +108,15 @@ export function buildOrganization() {
   return {
     "@type": "Organization" as const,
     "@id": JSON_LD_IDS.organization,
-    name: "EasyInvoicePDF",
+    name: SITE_NAME,
     url: `${JSON_LD_BASE}/`,
-    sameAs: [GITHUB_URL],
+    logo: {
+      "@type": "ImageObject" as const,
+      url: ORGANIZATION_LOGO_URL,
+      width: "180",
+      height: "180",
+    },
+    sameAs: [GITHUB_URL, PRODUCT_TWITTER_URL],
   };
 }
 

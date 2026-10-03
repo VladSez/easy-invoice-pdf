@@ -8,10 +8,17 @@ interface BreadcrumbItem {
   item?: string;
 }
 
-export function buildBreadcrumbList(
-  pageUrl: string,
-  items: BreadcrumbItem[],
-): BreadcrumbList {
+interface BuildBreadcrumbListParams {
+  /** Absolute URL of the page the trail belongs to; its `#breadcrumb` is the node's `@id`. */
+  pageUrl: string;
+  /** The crumbs, from the site root down to the current page. */
+  items: BreadcrumbItem[];
+}
+
+export function buildBreadcrumbList({
+  pageUrl,
+  items,
+}: BuildBreadcrumbListParams): BreadcrumbList {
   return {
     "@type": "BreadcrumbList",
     "@id": pageBreadcrumbId(pageUrl),

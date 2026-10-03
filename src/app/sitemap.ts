@@ -2,6 +2,7 @@ import { type MetadataRoute } from "next";
 
 import { SEO_LANDING_SLUGS } from "@/app/(main)/(seo-landings)/seo-landing-definitions";
 import { APP_URL } from "@/config";
+import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
 
 import { getChangelogEntries } from "./(main)/changelog/utils";
 import { SUPPORTED_I18N_LOCALES } from "./schema";
@@ -21,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     // Stripe invoice template variant of the main app page
     {
-      url: `${APP_URL}/?template=stripe`,
+      url: `${APP_URL}${STRIPE_TEMPLATE_PATHNAME}`,
       lastModified,
       changeFrequency: "daily",
       priority: 1,
