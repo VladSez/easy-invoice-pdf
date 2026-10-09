@@ -167,40 +167,6 @@ export function buildWebApplication() {
   };
 }
 
-export function buildSiteNavigationList() {
-  return {
-    "@type": "ItemList" as const,
-    "@id": JSON_LD_IDS.siteNavigation,
-    name: "Site navigation",
-    itemListElement: [
-      {
-        "@type": "ListItem" as const,
-        position: 1,
-        name: "Start Invoicing",
-        item: START_INVOICING_URL,
-      },
-      {
-        "@type": "ListItem" as const,
-        position: 2,
-        name: "About",
-        item: `${JSON_LD_BASE}/en/about`,
-      },
-      {
-        "@type": "ListItem" as const,
-        position: 3,
-        name: "Changelog",
-        item: `${JSON_LD_BASE}/changelog`,
-      },
-      {
-        "@type": "ListItem" as const,
-        position: 4,
-        name: "Terms of Service",
-        item: `${JSON_LD_BASE}/tos`,
-      },
-    ],
-  };
-}
-
 export function buildSiteWideJsonLdGraph() {
   return {
     "@context": "https://schema.org" as const,

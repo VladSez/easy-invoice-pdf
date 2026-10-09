@@ -11,7 +11,6 @@ import {
   buildFullWebSite,
   buildOrganization,
   buildPerson,
-  buildSiteNavigationList,
   buildSiteWideJsonLdGraph,
   buildSlimWebSite,
   buildWebApplication,
@@ -82,22 +81,6 @@ describe("site-entities", () => {
       name: "Start Invoicing",
       target: "https://easyinvoicepdf.com/",
     });
-  });
-
-  it("should expose primary site navigation links", () => {
-    const navigation = buildSiteNavigationList();
-    expect(navigation.itemListElement).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          name: "Start Invoicing",
-          item: "https://easyinvoicepdf.com/",
-        }),
-        expect.objectContaining({
-          name: "About",
-          item: "https://easyinvoicepdf.com/en/about",
-        }),
-      ]),
-    );
   });
 
   it("should emit only slim WebSite in site-wide graph", () => {

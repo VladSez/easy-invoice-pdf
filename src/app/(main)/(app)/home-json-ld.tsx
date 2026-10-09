@@ -6,7 +6,6 @@ import { JsonLdScript } from "@/lib/seo/render-json-ld";
 import {
   buildFullWebSite,
   buildOrganization,
-  buildSiteNavigationList,
   buildWebApplication,
   HOME_PAGE_DESCRIPTION,
   HOME_PAGE_TITLE,
@@ -44,7 +43,6 @@ export function buildHomeJsonLdGraph(
       buildFullWebSite(),
       buildOrganization(),
       buildWebApplication(),
-      buildSiteNavigationList(),
       {
         "@type": "WebPage",
         "@id": pageWebPageId(webPage.url),
@@ -58,8 +56,6 @@ export function buildHomeJsonLdGraph(
         mainEntity: {
           "@id": JSON_LD_IDS.app,
         },
-        // No `hasPart` pointing at the site-navigation ItemList: `hasPart` only accepts a
-        // CreativeWork and ItemList is an Intangible, so schema.org validators flag it.
       },
     ],
   };

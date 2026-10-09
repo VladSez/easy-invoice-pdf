@@ -11,10 +11,9 @@ import {
 import {
   CHANGELOG_INDEX_DESCRIPTION,
   CHANGELOG_INDEX_TITLE,
+  CHANGELOG_INDEX_URL,
 } from "./build-changelog-json-ld";
 import { ChangelogIndexJsonLd } from "./changelog-index-json-ld";
-
-const CHANGELOG_INDEX_URL = "https://easyinvoicepdf.com/changelog";
 
 export const metadata: Metadata = {
   title: CHANGELOG_INDEX_TITLE,

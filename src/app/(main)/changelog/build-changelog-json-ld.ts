@@ -11,7 +11,7 @@ import { buildOrganization, OG_IMAGE_URL } from "@/lib/seo/site-entities";
 
 import { formatChangelogDate, type ChangelogEntry } from "./utils";
 
-const CHANGELOG_INDEX_URL = `${PROD_WEBSITE_URL}/changelog`;
+export const CHANGELOG_INDEX_URL = `${PROD_WEBSITE_URL}/changelog`;
 
 export const CHANGELOG_INDEX_TITLE =
   "EasyInvoicePDF Changelog - Latest Features & Updates";
