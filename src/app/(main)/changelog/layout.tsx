@@ -11,6 +11,7 @@ import {
 import {
   CHANGELOG_INDEX_DESCRIPTION,
   CHANGELOG_INDEX_TITLE,
+  CHANGELOG_INDEX_URL,
 } from "./build-changelog-json-ld";
 import { ChangelogIndexJsonLd } from "./changelog-index-json-ld";
 
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
   creator: "Vlad Sazonau",
   publisher: "Vlad Sazonau",
   alternates: {
-    canonical: "https://easyinvoicepdf.com/changelog",
+    canonical: CHANGELOG_INDEX_URL,
   },
 
   robots: {
@@ -51,6 +52,7 @@ export const metadata: Metadata = {
     siteName: "EasyInvoicePDF.com | Free Invoice PDF Generator",
     type: "website",
     locale: "en_US",
+    url: CHANGELOG_INDEX_URL,
     images: [
       {
         url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,

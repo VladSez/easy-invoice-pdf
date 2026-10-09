@@ -20,7 +20,6 @@ export const JSON_LD_IDS = {
   personImage: `${JSON_LD_BASE}/#person-image`,
   websiteImage: `${JSON_LD_BASE}/#website-image`,
   app: `${JSON_LD_BASE}/#app`,
-  siteNavigation: `${JSON_LD_BASE}/#site-navigation`,
   blog: `${JSON_LD_BASE}/changelog/#blog`,
 } as const;
 

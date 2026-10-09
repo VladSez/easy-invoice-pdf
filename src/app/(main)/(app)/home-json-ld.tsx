@@ -6,7 +6,6 @@ import { JsonLdScript } from "@/lib/seo/render-json-ld";
 import {
   buildFullWebSite,
   buildOrganization,
-  buildSiteNavigationList,
   buildWebApplication,
   HOME_PAGE_DESCRIPTION,
   HOME_PAGE_TITLE,
@@ -44,7 +43,6 @@ export function buildHomeJsonLdGraph(
       buildFullWebSite(),
       buildOrganization(),
       buildWebApplication(),
-      buildSiteNavigationList(),
       {
         "@type": "WebPage",
         "@id": pageWebPageId(webPage.url),
@@ -57,9 +55,6 @@ export function buildHomeJsonLdGraph(
         },
         mainEntity: {
           "@id": JSON_LD_IDS.app,
-        },
-        hasPart: {
-          "@id": JSON_LD_IDS.siteNavigation,
         },
       },
     ],
