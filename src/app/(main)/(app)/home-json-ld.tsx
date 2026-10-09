@@ -58,9 +58,8 @@ export function buildHomeJsonLdGraph(
         mainEntity: {
           "@id": JSON_LD_IDS.app,
         },
-        hasPart: {
-          "@id": JSON_LD_IDS.siteNavigation,
-        },
+        // No `hasPart` pointing at the site-navigation ItemList: `hasPart` only accepts a
+        // CreativeWork and ItemList is an Intangible, so schema.org validators flag it.
       },
     ],
   };

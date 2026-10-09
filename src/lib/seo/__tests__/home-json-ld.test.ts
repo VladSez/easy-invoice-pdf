@@ -72,8 +72,8 @@ describe("buildHomeJsonLdGraph", () => {
       "@id": "https://easyinvoicepdf.com/#webpage",
       isPartOf: { "@id": JSON_LD_IDS.website },
       mainEntity: { "@id": JSON_LD_IDS.app },
-      hasPart: { "@id": JSON_LD_IDS.siteNavigation },
     });
+    expect(webPage).not.toHaveProperty("hasPart");
   });
 
   it("describes the route it is rendered on in its WebPage node", () => {

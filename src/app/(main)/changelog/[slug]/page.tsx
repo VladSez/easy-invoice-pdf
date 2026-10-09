@@ -51,13 +51,14 @@ export async function generateMetadata({
   }
 
   const formattedDate = formatChangelogDate(entry.metadata.date);
+  const entryUrl = `https://easyinvoicepdf.com/changelog/${slug}`;
 
   return {
     title: entry.metadata.title || `Update ${formattedDate}`,
     description: entry.metadata.description,
     authors: [{ name: "Vlad Sazonau", url: PERSONAL_WEBSITE_URL }],
     alternates: {
-      canonical: `https://easyinvoicepdf.com/changelog/${slug}`,
+      canonical: entryUrl,
     },
     keywords: [
       "changelog",
@@ -76,6 +77,7 @@ export async function generateMetadata({
       publishedTime: entry.metadata.date,
       siteName: "EasyInvoicePDF.com",
       locale: "en_US",
+      url: entryUrl,
       images: [
         {
           url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
