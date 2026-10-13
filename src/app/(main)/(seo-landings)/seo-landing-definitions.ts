@@ -760,7 +760,7 @@ export const SEO_LANDING_DEFINITIONS = {
           },
         ],
       },
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/def-tmp-v2.png`,
+      heroImage: `${STATIC_ASSETS_URL}/seo-content/def-tmp-v2-new.png`,
       heroVideo: {
         embedUrl: VIDEO_DEMO_HERO_YOUTUBE_URL,
         title: "EasyInvoicePDF: Full demo #invoice #oss #freelancelife",
@@ -2185,7 +2185,7 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Create a Freelance Invoice",
       ctaHref: APP_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/def-tmp-v2.png`,
+      heroImage: `${STATIC_ASSETS_URL}/seo-content/def-tmp-v2-new.png`,
     },
     factsTable: {
       heading: "Freelance invoices at a glance",
