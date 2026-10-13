@@ -15,7 +15,10 @@ const SEO_LANDING_CASES = SLUGS.map((slug) => {
     h1: SEO_LANDING_DEFINITIONS[slug].hero.h1,
     subheading: SEO_LANDING_DEFINITIONS[slug].hero.subheading,
     ctaName: SEO_LANDING_DEFINITIONS[slug].hero.ctaLabel,
-    heroImageSrc: SEO_LANDING_DEFINITIONS[slug].hero.heroImage,
+    heroImage:
+      "heroImage" in SEO_LANDING_DEFINITIONS[slug].hero
+        ? SEO_LANDING_DEFINITIONS[slug].hero.heroImage
+        : undefined,
     heroVideo:
       "heroVideo" in SEO_LANDING_DEFINITIONS[slug].hero
         ? SEO_LANDING_DEFINITIONS[slug].hero.heroVideo
@@ -25,14 +28,7 @@ const SEO_LANDING_CASES = SLUGS.map((slug) => {
 });
 
 test.describe("SEO landing pages", () => {
-  for (const {
-    path,
-    h1,
-    subheading,
-    ctaName,
-    heroImageSrc,
-    ctaHref,
-  } of SEO_LANDING_CASES) {
+  for (const { path, h1, subheading, ctaName, ctaHref } of SEO_LANDING_CASES) {
     test(`should render ${path}`, async ({ page }) => {
       await page.goto(path);
 
@@ -56,18 +52,6 @@ test.describe("SEO landing pages", () => {
 
       // the hero opener is a paragraph, so that the section titles are the page's h2s
       await expect(page.getByText(subheading, { exact: true })).toBeVisible();
-
-      /** Check that hero image exists and loads  */
-      const imageRes = await fetch(heroImageSrc);
-
-      const imageOk = imageRes.ok;
-      expect(imageOk).toBe(true);
-
-      const imageStatus = imageRes.status;
-      expect(imageStatus).toBe(200);
-
-      const imageHeaders = imageRes.headers;
-      expect(imageHeaders.get("content-type")).toContain("image/png");
 
       const primaryCtas = page.getByRole("link", {
         name: ctaName,
@@ -158,23 +142,44 @@ test.describe("SEO landing pages", () => {
  * two shapes are asserted by separate tests rather than a branch inside one -- a
  * conditional `expect` passes just as happily when neither arm runs.
  */
-const IMAGE_HERO_CASES = SEO_LANDING_CASES.filter((landingCase) => {
-  return !landingCase.heroVideo;
-});
+const IMAGE_HERO_CASES = SEO_LANDING_CASES.filter(
+  (landingCase): landingCase is SeoLandingCaseWith<"heroImage"> => {
+    return landingCase.heroImage !== undefined;
+  },
+);
 
-const VIDEO_HERO_CASES = SEO_LANDING_CASES.filter((landingCase) => {
-  return Boolean(landingCase.heroVideo);
-});
+const VIDEO_HERO_CASES = SEO_LANDING_CASES.filter(
+  (landingCase): landingCase is SeoLandingCaseWith<"heroVideo"> => {
+    return landingCase.heroVideo !== undefined;
+  },
+);
 
 test.describe("SEO landing hero art", () => {
-  for (const { path, h1, heroImageSrc } of IMAGE_HERO_CASES) {
+  for (const { path, h1, heroImage } of IMAGE_HERO_CASES) {
     test(`shows the hero image on ${path}`, async ({ page }) => {
       await page.goto(path);
 
       const img = page.getByRole("img", { name: h1 });
 
       await expect(img).toBeVisible();
-      await expect(img).toHaveAttribute("src", heroImageSrc);
+      await expect(img).toHaveAttribute("src", heroImage.src);
+
+      // the declared size reserves the hero's box before the file loads, so it has to
+      // match the file itself or the page shifts when the image arrives
+      await expect
+        .poll(() => {
+          return img.evaluate((el: HTMLImageElement) => {
+            return { width: el.naturalWidth, height: el.naturalHeight };
+          });
+        })
+        .toEqual({ width: heroImage.width, height: heroImage.height });
+
+      /** Check that hero image exists and loads  */
+      const imageRes = await fetch(heroImage.src);
+
+      expect(imageRes.ok).toBe(true);
+      expect(imageRes.status).toBe(200);
+      expect(imageRes.headers.get("content-type")).toContain("image/png");
     });
   }
 
@@ -185,11 +190,11 @@ test.describe("SEO landing hero art", () => {
       const video = page.getByTestId("seo-landing-hero-video");
 
       await expect(video).toBeVisible();
-      await expect(video).toHaveAttribute("title", heroVideo?.title ?? "");
+      await expect(video).toHaveAttribute("title", heroVideo.title);
 
       await expectYouTubeEmbedToShow({
         embed: video,
-        embedUrl: heroVideo?.embedUrl ?? "",
+        embedUrl: heroVideo.embedUrl,
       });
 
       // the hero waits to be pressed; nothing on a landing page starts by itself
@@ -204,9 +209,16 @@ test.describe("SEO landing hero art", () => {
         .first()
         .textContent();
 
-      expect(jsonLd).toContain(heroVideo?.uploadDate);
-      expect(jsonLd).toContain(heroVideo?.thumbnailUrl);
+      expect(jsonLd).toContain(heroVideo.uploadDate);
+      expect(jsonLd).toContain(heroVideo.thumbnailUrl);
       expect(jsonLd).toContain("VideoObject");
     });
   }
 });
+
+type SeoLandingCase = (typeof SEO_LANDING_CASES)[number];
+
+/** A landing case whose `key` is known to be set, which `.filter` can't infer by itself. */
+type SeoLandingCaseWith<Key extends keyof SeoLandingCase> = SeoLandingCase & {
+  [K in Key]-?: NonNullable<SeoLandingCase[K]>;
+};

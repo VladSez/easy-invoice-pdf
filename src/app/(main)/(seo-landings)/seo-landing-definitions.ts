@@ -96,37 +96,7 @@ export interface SeoLandingDefinition {
       label: string;
       files: { label: string; href: string }[];
     };
-    /**
-     * Shown in the hero, and used as the poster frame when {@link heroVideo} is set.
-     */
-    heroImage: string;
-    /**
-     * An optional demo to show in the hero instead of the still image.
-     *
-     * Every field is here because Google's video rich results need it: the landing's
-     * JSON-LD graph turns this into a `VideoObject`, and a clip embedded in an iframe is
-     * otherwise invisible to both search engines and answer engines.
-     */
-    heroVideo?: {
-      /**
-       * `https://www.youtube.com/embed/<id>`, what the iframe loads and what the
-       * `VideoObject` declares. There is no `contentUrl` alongside it: that property is
-       * for the video file's own bytes, which YouTube never hands out.
-       */
-      embedUrl: string;
-      /** The video's own title, as published. */
-      title: string;
-      /** One sentence on what the clip shows. */
-      description: string;
-      /** Publication timestamp, ISO 8601. Required for video rich results. */
-      uploadDate: string;
-      /**
-       * Poster frame, e.g. `https://i.ytimg.com/vi/<id>/maxresdefault.jpg`. Spelled out
-       * rather than derived from {@link embedUrl}: it must name the same video id.
-       */
-      thumbnailUrl: string;
-    };
-  };
+  } & SeoLandingHeroMedia;
   sections: SeoSection[];
   /**
    * A short table of plain facts, shown directly under the hero.
@@ -149,6 +119,78 @@ export interface SeoLandingDefinition {
    */
   relatedSlugs: readonly SeoLandingSlug[];
 }
+
+/**
+ * What fills the hero under the CTA: a still image or a demo clip, never both. The shell
+ * renders one or the other, so a definition that set both would carry an image nobody sees.
+ */
+type SeoLandingHeroMedia =
+  | {
+      /** Screenshot of the generator, linked to the CTA. */
+      heroImage: SeoLandingHeroImage;
+      heroVideo?: never;
+    }
+  | {
+      heroImage?: never;
+      heroVideo: SeoLandingHeroVideo;
+    };
+
+/**
+ * A hero screenshot with its intrinsic size. The `<img>` gets these as `width`/`height`,
+ * so the browser reserves a box of the right shape before the file arrives; a size that
+ * doesn't match the file shifts the page when it loads.
+ */
+interface SeoLandingHeroImage {
+  src: string;
+  width: number;
+  height: number;
+}
+
+/**
+ * A demo shown in the hero instead of a still image.
+ *
+ * Every field is here because Google's video rich results need it: the landing's
+ * JSON-LD graph turns this into a `VideoObject`, and a clip embedded in an iframe is
+ * otherwise invisible to both search engines and answer engines.
+ */
+export interface SeoLandingHeroVideo {
+  /**
+   * `https://www.youtube.com/embed/<id>`, what the iframe loads and what the
+   * `VideoObject` declares. There is no `contentUrl` alongside it: that property is
+   * for the video file's own bytes, which YouTube never hands out.
+   */
+  embedUrl: string;
+  /** The video's own title, as published. */
+  title: string;
+  /** One sentence on what the clip shows. */
+  description: string;
+  /** Publication timestamp, ISO 8601. Required for video rich results. */
+  uploadDate: string;
+  /**
+   * Poster frame, e.g. `https://i.ytimg.com/vi/<id>/maxresdefault.jpg`. Spelled out
+   * rather than derived from {@link SeoLandingHeroVideo.embedUrl}: it must name the same
+   * video id.
+   */
+  thumbnailUrl: string;
+}
+
+const DEFAULT_TEMPLATE_HERO_IMAGE = {
+  src: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
+  width: 1920,
+  height: 1536,
+} as const satisfies SeoLandingHeroImage;
+
+const STRIPE_TEMPLATE_HERO_IMAGE = {
+  src: `${STATIC_ASSETS_URL}/seo-content/stripe-template-v1.png`,
+  width: 1920,
+  height: 1536,
+} as const satisfies SeoLandingHeroImage;
+
+const FREELANCE_HERO_IMAGE = {
+  src: `${STATIC_ASSETS_URL}/seo-content/def-tmp-v2-new.png`,
+  width: 2400,
+  height: 1350,
+} as const satisfies SeoLandingHeroImage;
 
 /** The invoice app, opened on the visitor's last used template (default for new visitors). */
 const APP_HREF = "/";
@@ -191,7 +233,6 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Create and Download a PDF",
       ctaHref: APP_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_DEMO_HERO_YOUTUBE_URL,
         title: "EasyInvoicePDF: Full demo #invoice #oss #freelancelife",
@@ -392,7 +433,6 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Create and Download a PDF",
       ctaHref: APP_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/str-tmp-v2.png`,
       heroVideo: {
         embedUrl: VIDEO_LIVE_PREVIEW_YOUTUBE_URL,
         title: "EasyInvoicePDF: Live PDF Preview #invoice #oss #freelancelife",
@@ -572,7 +612,7 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Create a Stripe-Style Invoice",
       ctaHref: STRIPE_TEMPLATE_PATHNAME,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/stripe-template-v1.png`,
+      heroImage: STRIPE_TEMPLATE_HERO_IMAGE,
     },
     factsTable: {
       heading: "What you get, and what you do not",
@@ -760,7 +800,6 @@ export const SEO_LANDING_DEFINITIONS = {
           },
         ],
       },
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/def-tmp-v2-new.png`,
       heroVideo: {
         embedUrl: VIDEO_DEMO_HERO_YOUTUBE_URL,
         title: "EasyInvoicePDF: Full demo #invoice #oss #freelancelife",
@@ -989,7 +1028,6 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Invoice in Your Language",
       ctaHref: APP_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_MULTI_LANGUAGE_YOUTUBE_URL,
         title:
@@ -1206,7 +1244,6 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Create a Swedish Invoice",
       ctaHref: APP_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_NORDIC_INVOICE_YOUTUBE_URL,
         title: "EasyInvoicePDF: Swedish and Norwegian Invoice Generator",
@@ -1417,7 +1454,6 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Create a Norwegian Invoice",
       ctaHref: APP_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_NORDIC_INVOICE_YOUTUBE_URL,
         title: "EasyInvoicePDF: Swedish and Norwegian Invoice Generator",
@@ -1627,7 +1663,6 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Create a Spanish Invoice",
       ctaHref: APP_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_MULTI_LANGUAGE_YOUTUBE_URL,
         title:
@@ -1816,7 +1851,6 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Create a German Invoice",
       ctaHref: APP_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
       heroVideo: {
         embedUrl: VIDEO_MULTI_LANGUAGE_YOUTUBE_URL,
         title:
@@ -2011,7 +2045,7 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Create a Contractor Invoice",
       ctaHref: APP_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
+      heroImage: DEFAULT_TEMPLATE_HERO_IMAGE,
     },
     factsTable: {
       heading: "A US contractor invoice at a glance",
@@ -2185,7 +2219,7 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Create a Freelance Invoice",
       ctaHref: APP_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/def-tmp-v2-new.png`,
+      heroImage: FREELANCE_HERO_IMAGE,
     },
     factsTable: {
       heading: "Freelance invoices at a glance",
@@ -2341,7 +2375,7 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Create a Proforma Invoice",
       ctaHref: STRIPE_TEMPLATE_PATHNAME,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/stripe-template-v1.png`,
+      heroImage: STRIPE_TEMPLATE_HERO_IMAGE,
     },
     factsTable: {
       heading: "Proforma invoices at a glance",
@@ -2504,7 +2538,7 @@ export const SEO_LANDING_DEFINITIONS = {
       ],
       ctaLabel: "Create an Export Invoice",
       ctaHref: APP_HREF,
-      heroImage: `${STATIC_ASSETS_URL}/seo-content/default-template-v1.png`,
+      heroImage: DEFAULT_TEMPLATE_HERO_IMAGE,
     },
     factsTable: {
       heading: "An export of services invoice at a glance",

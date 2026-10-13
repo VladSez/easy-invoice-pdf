@@ -8,6 +8,14 @@ import {
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
 
+import {
+  SeoContentHeading,
+  SeoContentLead,
+  SeoContentList,
+  SeoContentOrderedList,
+  SeoContentParagraph,
+} from "./seo-content-text";
+
 /**
  * Plain, server-rendered copy below the invoice editor on `/`.
  *
@@ -28,13 +36,10 @@ export function HomeSeoContent() {
     >
       <div className="mx-auto max-w-3xl space-y-10 text-slate-800">
         <div>
-          <h2
-            id="home-seo-content-heading"
-            className="text-balance text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl md:text-3xl"
-          >
+          <SeoContentHeading id="home-seo-content-heading">
             A free invoice generator that runs in your browser
-          </h2>
-          <p className="mt-4 text-pretty text-base leading-relaxed md:text-lg">
+          </SeoContentHeading>
+          <SeoContentLead>
             EasyInvoicePDF turns a short form into a PDF invoice. Type your
             details, your client&apos;s and the line items, and the preview
             redraws as you go. Download the PDF when it looks right. There is{" "}
@@ -46,8 +51,8 @@ export function HomeSeoContent() {
             </Link>
             , and the invoice is built on your own machine, so nothing you type
             is uploaded.
-          </p>
-          <p className="mt-4 text-pretty text-base leading-relaxed md:text-lg">
+          </SeoContentLead>
+          <SeoContentLead>
             It is free, has no ads, and the{" "}
             <Link
               href="/open-source-invoice-generator"
@@ -56,14 +61,12 @@ export function HomeSeoContent() {
               source code is open
             </Link>{" "}
             under AGPL-3.0, so you can read it or host your own copy.
-          </p>
+          </SeoContentLead>
         </div>
 
         <div>
-          <h2 className="text-balance text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl md:text-3xl">
-            How to create an invoice
-          </h2>
-          <ol className="mt-4 list-decimal space-y-2 pl-6 text-sm md:text-base">
+          <SeoContentHeading>How to create an invoice</SeoContentHeading>
+          <SeoContentOrderedList>
             {HOW_TO_STEPS.map((step) => {
               return (
                 <li key={step} className="text-pretty">
@@ -71,14 +74,12 @@ export function HomeSeoContent() {
                 </li>
               );
             })}
-          </ol>
+          </SeoContentOrderedList>
         </div>
 
         <div>
-          <h2 className="text-balance text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl md:text-3xl">
-            What goes on the invoice
-          </h2>
-          <ul className="mt-4 list-disc space-y-2 pl-6 text-sm md:text-base">
+          <SeoContentHeading>What goes on the invoice</SeoContentHeading>
+          <SeoContentList>
             <li className="text-pretty">
               Labels in{" "}
               <Link
@@ -115,18 +116,16 @@ export function HomeSeoContent() {
                 Stripe-style invoice template
               </a>
             </li>
-          </ul>
-          <p className="mt-4 text-pretty text-sm leading-relaxed md:text-base">
+          </SeoContentList>
+          <SeoContentParagraph>
             Your details stay saved in your browser, so the next invoice starts
             filled in. To send it, download the PDF or share a link that opens
             the same invoice.
-          </p>
+          </SeoContentParagraph>
         </div>
 
         <div>
-          <h2 className="mb-3 text-balance text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl md:text-3xl">
-            FAQ
-          </h2>
+          <SeoContentHeading className="mb-3">FAQ</SeoContentHeading>
           <FaqAccordion>
             {FAQ.map((item) => {
               return (
@@ -139,10 +138,8 @@ export function HomeSeoContent() {
         </div>
 
         <div>
-          <h2 className="text-balance text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl md:text-3xl">
-            Invoices for every kind of work
-          </h2>
-          <ul className="mt-4 grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2 md:text-base">
+          <SeoContentHeading>Invoices for every kind of work</SeoContentHeading>
+          <ul className="mt-4 grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2 sm:text-base">
             {USE_CASE_LINKS.map(({ href, label }) => {
               return (
                 <li key={href}>

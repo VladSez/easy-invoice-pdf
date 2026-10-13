@@ -79,3 +79,13 @@ export const useIsDesktop = () => {
 export const useIsXlUp = () => {
   return useMediaQuery("(min-width: 1280px)");
 };
+
+/**
+ * The device's Reduced Motion setting, kept live as it changes.
+ *
+ * In place of motion's `useReducedMotion`, which reads the setting once and logs a
+ * "You have Reduced Motion enabled" warning on every dev load where it is on.
+ */
+export const usePrefersReducedMotion = () => {
+  return useMediaQuery("(prefers-reduced-motion: reduce)");
+};

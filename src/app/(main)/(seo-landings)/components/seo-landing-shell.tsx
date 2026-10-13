@@ -151,13 +151,13 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                 <div className="mt-8">
                   <a href={definition.hero.ctaHref}>
                     <img
-                      src={definition.hero.heroImage}
+                      src={definition.hero.heroImage.src}
                       alt={definition.hero.h1}
                       className="h-auto w-full rounded-lg bg-slate-100/80 shadow-sm"
                       loading="eager"
                       fetchPriority="high"
-                      width={1920}
-                      height={1536}
+                      width={definition.hero.heroImage.width}
+                      height={definition.hero.heroImage.height}
                     />
                   </a>
                 </div>
