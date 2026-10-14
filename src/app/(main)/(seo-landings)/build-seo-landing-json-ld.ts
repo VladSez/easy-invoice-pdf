@@ -10,12 +10,22 @@ import {
   pageWebPageId,
 } from "@/lib/seo/json-ld-ids";
 
-import type { SeoLandingDefinition } from "./seo-landing-definitions";
+import type {
+  SeoLandingDefinition,
+  SeoLandingHeroVideo,
+} from "./seo-landing-definitions";
 
-function buildLandingSoftwareApplication(
-  pageUrl: string,
-  definition: SeoLandingDefinition,
-) {
+interface BuildLandingSoftwareApplicationParams {
+  /** The landing's absolute URL, which also scopes the app's `@id`. */
+  pageUrl: string;
+  /** The landing whose title and description describe the app. */
+  definition: SeoLandingDefinition;
+}
+
+function buildLandingSoftwareApplication({
+  pageUrl,
+  definition,
+}: BuildLandingSoftwareApplicationParams) {
   return {
     "@type": "SoftwareApplication" as const,
     "@id": pageSoftwareAppId(pageUrl),
@@ -36,6 +46,13 @@ function buildLandingSoftwareApplication(
   };
 }
 
+interface BuildLandingVideoParams {
+  /** The landing's absolute URL; the video is declared part of its `WebPage`. */
+  pageUrl: string;
+  /** The clip shown in the landing's hero. */
+  heroVideo: SeoLandingHeroVideo;
+}
+
 /**
  * The hero demo as a `VideoObject`.
  *
@@ -50,10 +67,7 @@ function buildLandingSoftwareApplication(
  *
  * @see https://developers.google.com/search/docs/appearance/structured-data/video
  */
-function buildLandingVideo(
-  pageUrl: string,
-  heroVideo: NonNullable<SeoLandingDefinition["hero"]["heroVideo"]>,
-) {
+function buildLandingVideo({ pageUrl, heroVideo }: BuildLandingVideoParams) {
   return {
     "@type": "VideoObject" as const,
     name: heroVideo.title,
@@ -128,10 +142,10 @@ export function buildSeoLandingJsonLd(
   const graph = [
     webPage,
     ...(isOpenSourceLanding
-      ? [buildLandingSoftwareApplication(pageUrl, definition)]
+      ? [buildLandingSoftwareApplication({ pageUrl, definition })]
       : []),
     faqPage,
-    ...(heroVideo ? [buildLandingVideo(pageUrl, heroVideo)] : []),
+    ...(heroVideo ? [buildLandingVideo({ pageUrl, heroVideo })] : []),
     breadcrumb,
   ];
 

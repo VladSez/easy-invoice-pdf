@@ -9,7 +9,8 @@ import {
 
 /**
  * The "switch template" sentence in `StripeTemplateSeoContent`, the one line of that block
- * that depends on the template in use.
+ * that depends on the template in use. Only the words are client-rendered: the paragraph
+ * around them is the server-rendered `SeoContentParagraph` in `StripeTemplateSeoContent`.
  *
  * A template switch rewrites the address bar with `history.replaceState` and leaves the
  * server-rendered copy alone, so after switching to the classic template a static "switch
@@ -24,7 +25,7 @@ export function StripeTemplateSwitchSentence() {
   const pathname = usePathname();
 
   return getRouteTemplate(pathname) === "stripe" ? (
-    <p className="mt-4 text-pretty text-base leading-relaxed">
+    <>
       Prefer a plainer A4 layout? Switch to the{" "}
       {/* an explicit template: a bare `/` sends a visitor whose saved invoice uses this
           template straight back here */}
@@ -36,9 +37,9 @@ export function StripeTemplateSwitchSentence() {
         classic invoice template
       </a>
       . Your details carry over.
-    </p>
+    </>
   ) : (
-    <p className="mt-4 text-pretty text-base leading-relaxed">
+    <>
       Want the Stripe layout back? Switch to the{" "}
       <a
         href={STRIPE_TEMPLATE_PATHNAME}
@@ -47,6 +48,6 @@ export function StripeTemplateSwitchSentence() {
         Stripe invoice template
       </a>
       . Your details carry over.
-    </p>
+    </>
   );
 }

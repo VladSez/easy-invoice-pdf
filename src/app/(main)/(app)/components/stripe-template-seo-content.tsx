@@ -3,6 +3,13 @@ import Link from "next/link";
 import { SUPPORTED_INVOICE_PDF_LANGUAGES } from "@/app/schema";
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 
+import {
+  SeoContentHeading,
+  SeoContentLead,
+  SeoContentList,
+  SeoContentOrderedList,
+  SeoContentParagraph,
+} from "./seo-content-text";
 import { StripeTemplateSwitchSentence } from "./stripe-template-switch-sentence";
 
 /**
@@ -27,20 +34,17 @@ export function StripeTemplateSeoContent() {
     >
       <div className="mx-auto max-w-3xl space-y-10 text-slate-800">
         <div>
-          <h2
-            id="stripe-template-seo-content-heading"
-            className="text-balance text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl"
-          >
+          <SeoContentHeading id="stripe-template-seo-content-heading">
             A free Stripe-style invoice template
-          </h2>
-          <p className="mt-4 text-pretty text-lg leading-relaxed">
+          </SeoContentHeading>
+          <SeoContentLead>
             The Stripe invoice template follows the layout of the invoices
             Stripe sends. The amount due and its due date sit in bold above a
             single table of line items, with a short summary of totals below.
             Fill in the form and the preview redraws as you type, then download
             the PDF.
-          </p>
-          <p className="mt-4 text-pretty text-lg leading-relaxed">
+          </SeoContentLead>
+          <SeoContentLead>
             You don&apos;t need a Stripe account. It is a layout you fill in,
             not a payments service: no products to set up and no dashboard. The
             invoice is built in your browser, and{" "}
@@ -51,14 +55,12 @@ export function StripeTemplateSeoContent() {
               there is no signup
             </Link>
             .
-          </p>
+          </SeoContentLead>
         </div>
 
         <div>
-          <h2 className="text-balance text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
-            What&apos;s on the template
-          </h2>
-          <ul className="mt-4 list-disc space-y-2 pl-6 text-base">
+          <SeoContentHeading>What&apos;s on the template</SeoContentHeading>
+          <SeoContentList>
             {TEMPLATE_PARTS.map((part) => {
               return (
                 <li key={part} className="text-pretty">
@@ -76,14 +78,14 @@ export function StripeTemplateSeoContent() {
               </Link>
               , with your own tax label such as VAT, GST or Sales Tax
             </li>
-          </ul>
+          </SeoContentList>
         </div>
 
         <div>
-          <h2 className="text-balance text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
+          <SeoContentHeading>
             How to fill in the Stripe invoice template
-          </h2>
-          <ol className="mt-4 list-decimal space-y-2 pl-6 text-base">
+          </SeoContentHeading>
+          <SeoContentOrderedList>
             {HOW_TO_STEPS.map((step) => {
               return (
                 <li key={step} className="text-pretty">
@@ -91,14 +93,14 @@ export function StripeTemplateSeoContent() {
                 </li>
               );
             })}
-          </ol>
-          <StripeTemplateSwitchSentence />
+          </SeoContentOrderedList>
+          <SeoContentParagraph>
+            <StripeTemplateSwitchSentence />
+          </SeoContentParagraph>
         </div>
 
         <div>
-          <h2 className="mb-3 text-balance text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
-            FAQ
-          </h2>
+          <SeoContentHeading className="mb-3">FAQ</SeoContentHeading>
           <FaqAccordion>
             {FAQ.map((item) => {
               return (
@@ -108,7 +110,7 @@ export function StripeTemplateSeoContent() {
               );
             })}
           </FaqAccordion>
-          <p className="mt-6 text-pretty text-base leading-relaxed">
+          <SeoContentParagraph className="mt-6">
             Comparing it with billing through Stripe itself? See the{" "}
             <Link
               href="/stripe-invoice-alternative"
@@ -117,7 +119,7 @@ export function StripeTemplateSeoContent() {
               Stripe invoice generator
             </Link>{" "}
             page.
-          </p>
+          </SeoContentParagraph>
         </div>
       </div>
     </section>

@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion, type Transition } from "motion/react";
+import { motion, type Transition } from "motion/react";
 
+import { usePrefersReducedMotion } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 
 const lineTransition = {
@@ -38,7 +39,7 @@ export function MorphingMenuIcon({
   className,
   "aria-hidden": ariaHidden = true,
 }: MorphingMenuIconProps) {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const transition = prefersReducedMotion ? { duration: 0 } : lineTransition;
 
