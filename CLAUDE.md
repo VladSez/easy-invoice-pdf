@@ -52,6 +52,8 @@ pnpm e2e e2e/invoice-form.test.ts --project="Desktop Chrome" -g "adds an item"
 
 The pre-commit hook (`lint-staged.config.js`) runs `type-check:fast`, `lint`, `zizmor`, `knip`, `vitest --run` and `format` on _any_ staged change, so keep all of those green.
 
+Env vars come from `.env.local`, which may be encrypted with [dotenvx](https://dotenvx.com/) (check for `encrypted:` values; the private key then lives in the OS keychain or a gitignored `.env.keys`). The `dev`, `build`, `start`, `type-check` and `lint` scripts decrypt it through `pnpm with-env <cmd>` (`dotenvx run --strict`, which stops on a decryption failure), so use those and never bare `next ...`, which would read the raw `encrypted:` strings. If the file is encrypted, change values with `pnpm exec dotenvx set KEY value -f .env.local` rather than editing it, then restart `pnpm dev` — Next's env hot-reload re-reads the encrypted file, so new keys arrive as ciphertext and changed ones stay stale until restart. Don't put `NODE_ENV` in it — `dotenvx run` would inject it into `next dev`/`next start`.
+
 `SKIP_ENV_VALIDATION=true` is only for `type-check`/`lint` in CI — never set it for `next dev` or `next build`; `next.config.mjs` imports `src/env.ts` on purpose so a missing env var fails the build.
 
 ## Architecture
