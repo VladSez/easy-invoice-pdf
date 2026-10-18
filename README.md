@@ -250,7 +250,10 @@ EasyInvoicePDF is [AGPL v3](#license); self-host your own instance locally or on
 - Run `corepack install`
 - Run `pnpm install`
 - Copy `.env.example to .env.local` (`cp .env.example .env.local`)
+- (Optional) Encrypt it with [dotenvx](https://dotenvx.com/): `pnpm exec dotenvx encrypt -f .env.local`
 - Run `pnpm run dev`
+
+Scripts load `.env.local` through `dotenvx run` (the `with-env` script), so it works plaintext or encrypted. Edit an encrypted file with `pnpm exec dotenvx set KEY value -f .env.local`, read a value back with `pnpm exec dotenvx get KEY -f .env.local`, and restart `pnpm dev` afterwards: Next.js reloads `.env.local` on its own, and from an encrypted file it gets the raw `encrypted:...` strings. If the private key is missing (new machine, locked keychain), scripts stop with `DECRYPTION_FAILED` instead of running.
 
 For the full app experience, you’ll need to obtain and set values from the following services:
 
