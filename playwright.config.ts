@@ -1,11 +1,11 @@
 import path from "node:path";
 
+import { config as loadEnvFile } from "@dotenvx/dotenvx";
 import {
   defineConfig,
   devices,
   type PlaywrightTestOptions,
 } from "@playwright/test";
-import dotenv from "dotenv";
 
 import { getLatestChangelogSlug } from "./e2e/utils/latest-changelog-slug";
 import {
@@ -16,10 +16,19 @@ import {
 import { SENTRY_E2E_DISABLED_STORAGE_KEY } from "./src/lib/sentry/sentry-e2e-flags";
 
 /**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
+ * Read (and decrypt) environment variables from file.
+ * https://dotenvx.com/docs
+ * Workers inherit the runner's env, so only the runner reads the file (one Keychain lookup).
  */
-dotenv.config({ path: path.resolve(__dirname, ".env.local"), quiet: true });
+if (!process.env.TEST_WORKER_INDEX) {
+  loadEnvFile({
+    path: path.resolve(__dirname, ".env.local"),
+    ignore: ["MISSING_ENV_FILE"],
+    quiet: true,
+    // Throw on a decryption failure instead of running every test against `encrypted:...` values
+    strict: true,
+  });
+}
 
 // Use process.env.PORT by default and fallback to port 3000
 const PORT = process.env.PORT ?? 3000;
@@ -27,8 +36,8 @@ const PORT = process.env.PORT ?? 3000;
 // Set webServer.url and use.baseURL with the location of the WebServer respecting the correct set port
 const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
 
-// @ts-expect-error - NODE_ENV is not defined in the environment variables
-const isLocal = process.env.NODE_ENV === "local";
+// Local machine against the local dev server; a remote BASE_URL (Vercel preview) gets the CI timeouts
+const isLocal = !process.env.CI && !process.env.BASE_URL;
 
 /**
  * Analytics and error reporting are switched off for every project, and both of the app's
