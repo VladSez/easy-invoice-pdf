@@ -15,14 +15,16 @@ import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
 import { formatDateWithLocale } from "@/app/(main)/(app)/utils/format-date-with-locale";
 import { updateAppMetadata } from "@/app/(main)/(app)/utils/get-app-metadata";
 import {
-  ACCORDION_STATE_LOCAL_STORAGE_KEY,
   accordionSchema,
   invoiceSchema,
-  PDF_DATA_LOCAL_STORAGE_KEY,
   resolveNumberFormatLocale,
   type AccordionState,
   type InvoiceData,
 } from "@/app/schema";
+import {
+  ACCORDION_STATE_LOCAL_STORAGE_KEY,
+  PDF_DATA_LOCAL_STORAGE_KEY,
+} from "@/app/schema/local-storage-keys";
 import { Legend } from "@/components/legend";
 import {
   Accordion,

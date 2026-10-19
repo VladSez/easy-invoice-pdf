@@ -4,7 +4,7 @@ import {
   getAppStorageItem,
   setAppStorageItem,
 } from "@/app/(main)/(app)/utils/app-local-storage";
-import { CHANGELOG_SEEN_STORAGE_KEY } from "@/app/schema";
+import { CHANGELOG_SEEN_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 
 /**
  * Retrieves the last seen changelog slug from localStorage.

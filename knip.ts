@@ -2,13 +2,23 @@ import type { KnipConfig } from "knip";
 
 // https://knip.dev/reference/configuration#_top
 const config: KnipConfig = {
-  // Trigger.dev entry points (https://trigger.dev/docs/config/config-file)
-  entry: [
-    "trigger.config.ts",
-    "src/trigger/monthly-recurring-invoice.ts",
-    // spawned as a child process by e2e/server-render-pdf/server-render-pdf.test.ts
-    "e2e/server-render-pdf/render-server-pdf.mjs",
-  ],
+  workspaces: {
+    ".": {
+      // Trigger.dev entry points (https://trigger.dev/docs/config/config-file)
+      entry: [
+        "trigger.config.ts",
+        "src/trigger/monthly-recurring-invoice.ts",
+        // spawned as a child process by e2e/server-render-pdf/server-render-pdf.test.ts
+        "e2e/server-render-pdf/render-server-pdf.mjs",
+      ],
+    },
+    // Entries come from the package's `exports` field.
+    "packages/invoice-core": {
+      // The package's exports are its public API, and some are only used by the
+      // private backend repo, so unused entry exports are expected here.
+      includeEntryExports: false,
+    },
+  },
   ignoreDependencies: [
     "shadcn",
     "@radix-ui/react-separator",
@@ -31,7 +41,6 @@ const config: KnipConfig = {
     // `*` instead of the literal route-group names: parentheses are glob syntax
     // loaded with a dynamic `import(\`./content/${filename}\`)` in changelog/utils.ts
     "src/app/*/changelog/content/**/*",
-    "src/app/*/*/pdf-i18n-translations/pdf-translations-schema.ts",
   ],
   includeEntryExports: true,
   // ignore tags

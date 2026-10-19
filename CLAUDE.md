@@ -34,14 +34,14 @@ pnpm type-check:fast          # oxlint --type-check (faster, tsgolint)
 pnpm lint                     # oxlint --type-aware (replaces eslint)
 pnpm format                   # oxfmt (replaces prettier)
 pnpm knip                     # unused files/exports/deps
-pnpm vitest --run             # unit tests, dir is ./src
+pnpm vitest --run             # unit tests in src/ and packages/*/src
 pnpm e2e                      # Playwright, needs a server on BASE_URL (default localhost:3000)
 ```
 
 Single tests:
 
 ```bash
-pnpm vitest --run src/utils/__tests__/url-compression.test.ts -t "round trips"
+pnpm vitest --run packages/invoice-core/src/url-compression/__tests__/url-compression.test.ts -t "nested seller data"
 ```
 
 ```bash
@@ -60,21 +60,33 @@ Env vars come from `.env.local`, which may be encrypted with [dotenvx](https://d
 
 ### Invoice data flow
 
-`src/app/schema/index.ts` (~1450 lines) is the single source of truth: zod schemas plus every supported currency, language, date format and template, and the `localStorage` key constants. Everything downstream (form, PDF templates, share links, API route) derives its types from it.
+`packages/invoice-core/src/schema/index.ts` (~1650 lines) is the single source of truth: zod schemas plus every supported currency, language, date format and template. Everything downstream (form, PDF templates, share links, API route) derives its types from it. `src/app/schema/index.ts` holds only the web app's own state (site locales, app metadata, accordion and mobile-tab state) and, for now, re-exports the core schema; the `localStorage` keys are in `src/app/schema/local-storage-keys.ts`.
 
 1. `src/app/(main)/(app)/page.client.tsx` owns `invoiceDataState`. On mount it hydrates from `?data=` (shared link) or `localStorage`, validating with `invoiceSchema`.
 2. `src/app/(main)/(app)/components/invoice-form/` is a `react-hook-form` form resolved against `invoiceSchema`. Changes are debounced (`DEBOUNCE_TIMEOUT = 500ms`) before being pushed up and written to `localStorage` — e2e helpers wait on this debounce.
-3. `InvoicePdfInstanceProvider` (`src/app/(main)/(app)/contexts/invoice-pdf-instance-context.tsx`) renders the PDF **once** via `usePDF` and shares the blob/URL with the desktop preview, the mobile viewer and the download link. Do not add a second `usePDF`/`<PDFViewer>`/`<BlobProvider>` on the page — react-pdf's module-level listener registry makes every instance re-render on any commit (flicker + duplicate work).
-4. Sharing: `src/utils/url-compression.ts` remaps long JSON keys to one-character keys, then `lz-string` encodes it into `?data=`. Adding a schema field means adding it to `INVOICE_KEY_COMPRESSION_MAP` (the map is type-checked against the schema keys).
+3. `InvoicePdfInstanceProvider` (`packages/invoice-core/src/pdf/invoice-pdf-instance-context.tsx`, exported from `@easyinvoicepdf/invoice-core/pdf`) renders the PDF **once** via `usePDF` and shares the blob/URL with the desktop preview, the mobile viewer and the download link. Do not add a second `usePDF`/`<PDFViewer>`/`<BlobProvider>` on the page — react-pdf's module-level listener registry makes every instance re-render on any commit (flicker + duplicate work).
+4. Sharing: `packages/invoice-core/src/url-compression/url-compression.ts` remaps long JSON keys to one-character keys, then `lz-string` encodes it into `?data=`. Adding a schema field means adding it to `INVOICE_KEY_COMPRESSION_MAP` (the map is type-checked against the schema keys).
 
 Use `zodResolverForOutput` (`src/lib/zod-resolver-for-output.ts`) instead of `zodResolver` — form state is typed on the schema's _output_ type.
 
+### `packages/invoice-core` (shared with the private backend)
+
+A pnpm workspace package (`@easyinvoicepdf/invoice-core`) holding the invoice engine: the schema, totals (`calculateItemTotals` / `calculateInvoiceTotal`), formatting, amount-in-words, the PDF translation catalog and URL compression. The private backend and dashboard repo consumes it as a git dependency, so it must work outside this app:
+
+- **No app imports.** No `@/` aliases, `@/env`, `process`, `next/*`, `@sentry/*` or `sonner`; relative imports only. oxlint enforces this for `packages/invoice-core/**`.
+- **Side effects come in as callbacks** (e.g. `onError`), so each app wires its own toasts, analytics and Sentry. Pure helpers that hit an unexpected error log with `console.error` and return a fallback.
+- **`react`, `zod` and `@react-pdf/renderer` are peer dependencies**; anything else is an exact-version dependency of the package.
+- **It ships TypeScript source** (`exports` point at `.ts`), compiled by `transpilePackages` in `next.config.mjs`.
+- **Old app paths are temporary re-exports.** Files such as `src/utils/url-compression.ts` and the format helpers in `src/app/(main)/(app)/utils/` only re-export from the package until the imports are rewritten (openspec change `backend-split`, task 6.1). New code imports from `@easyinvoicepdf/invoice-core` directly.
+- Test fixtures live in `packages/invoice-core/src/__tests__/fixtures/`; app tests reach them through `src/utils/__tests__/data.ts`.
+
 ### PDF templates
 
-Two templates under `src/app/(main)/(app)/components/invoice-templates/`: `invoice-pdf-default-template/` and `invoice-pdf-stripe-template/`, selected by `invoiceData.template`. A change to one usually needs the mirrored change in the other, plus new snapshots.
+Two templates under `packages/invoice-core/src/templates/`: `invoice-pdf-default-template/` and `invoice-pdf-stripe-template/`. `InvoicePdfDocument` picks one from `invoiceData.template`; the browser preview and `renderInvoicePdfToBuffer` (`@easyinvoicepdf/invoice-core/server`) both render through it. A change to one usually needs the mirrored change in the other, plus new snapshots.
 
-- Always import from `@react-pdf/renderer/lib/react-pdf.browser`, never `@react-pdf/renderer` (lint-enforced).
-- Fonts are self-hosted and registered per template via `INVOICE_PDF_FONTS` in `src/config.ts`; `src` must stay an absolute URL.
+- Always import from `@react-pdf/renderer/lib/react-pdf.browser`, never `@react-pdf/renderer` (lint-enforced); only `packages/invoice-core/src/server/` may use the Node entry.
+- Fonts are bundled in `packages/invoice-core/fonts/` and registered by `registerInvoiceFonts` (`packages/invoice-core/src/fonts/`): in the browser as same-origin hashed asset URLs (`new URL("…ttf", import.meta.url)`), on the server as file paths. A browser `src` must stay an absolute URL — `@react-pdf/font` reads anything without a protocol and host as a file path.
+- Format dates with a per-call locale (`formatDateWithLocale`, `dayjs(date).locale(language)`), never `dayjs.locale(...)`: the global locale would leak between concurrent server renders.
 - `@react-pdf/renderer` and `react-pdf` versions are pinned deliberately — see the memory notes and `pnpm-workspace.yaml` before touching them.
 
 ### fontkit patch (do not remove)
@@ -84,7 +96,7 @@ Two templates under `src/app/(main)/(app)/components/invoice-templates/`: `invoi
 ### i18n — two separate systems
 
 - **UI/marketing copy**: `next-intl`, messages in `messages/*.json`, locale-prefixed routes under `src/app/[locale]/` (`src/proxy.ts`, the Next 16 `proxy` convention, matches only those). The locale matcher is a static literal — keep it in sync with `SUPPORTED_I18N_LOCALES` (the languages the site is translated into, a subset of `SUPPORTED_INVOICE_PDF_LANGUAGES`, which is the PDF's own list).
-- **PDF content**: a hand-rolled catalog, `src/app/(main)/(app)/pdf-i18n-translations/pdf-translations.ts`, validated against `pdf-translations-schema.ts`. Some entries are functions (e.g. `vatAmount({ customTaxLabel })`) so tax labels can be customized per invoice.
+- **PDF content**: a hand-rolled catalog, `packages/invoice-core/src/pdf-translations/pdf-translations.ts`, validated against `pdf-translations-schema.ts` next to it. Some entries are functions (e.g. `vatAmount({ customTaxLabel })`) so tax labels can be customized per invoice.
 
 `next.config.mjs` validates both — every `messages/*.json` against `src/app/schema/i18n-schema.ts` and the PDF catalog against its schema — and `process.exit(1)`s on failure, so a missing translation key breaks `dev` and `build`.
 
@@ -98,7 +110,7 @@ There are **two root layouts**, both rendering the shared `<html>`/`<body>` shel
 
 ## Testing
 
-- Unit tests (vitest) live in `__tests__/` folders next to the code, `dir: ./src`. Node is the default environment; DOM tests opt in with a `// @vitest-environment happy-dom` first line.
+- Unit tests (vitest) live in `__tests__/` folders next to the code, in `src/` and `packages/*/src/`. Node is the default environment; DOM tests opt in with a `// @vitest-environment happy-dom` first line.
 - E2E (Playwright) is in `e2e/`. There is **no `webServer`** — start `pnpm dev` (or point `BASE_URL` at a deployment) first.
 - PDF assertions download the file and rasterize it with `pdfjs-dist` (`e2e/utils/render-pdf-on-canvas.ts`, `e2e/utils/pdf-download.ts`); snapshots are compared only on the Desktop Chrome project and were generated on macOS, which is why CI uses `macos-14`. Timezone is forced to `Europe/Warsaw` everywhere.
 - Import `test` from `e2e/utils/extended-playwright-test.ts` (gives a per-test `downloadDir` fixture); it must stay exported under the name `test` for the Playwright lint plugin.
@@ -127,4 +139,4 @@ Beyond `.cursor/rules/`:
   formatDateWithLocale(date, selectedDateFormat, language);
   ```
 
-  Call sites say what each value means without opening the signature, two same-typed parameters can't be swapped by accident, and adding a parameter doesn't touch every caller. Type the object as a named `interface` above the function and document each field with a doc comment on the property rather than `@param` tags — see `src/app/(main)/(app)/utils/format-date-with-locale.ts`. One-parameter functions stay positional.
+  Call sites say what each value means without opening the signature, two same-typed parameters can't be swapped by accident, and adding a parameter doesn't touch every caller. Type the object as a named `interface` above the function and document each field with a doc comment on the property rather than `@param` tags — see `packages/invoice-core/src/format/format-date-with-locale.ts`. One-parameter functions stay positional.

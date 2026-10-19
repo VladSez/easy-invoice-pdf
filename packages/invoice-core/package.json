@@ -1,0 +1,21 @@
+{
+  "name": "@easyinvoicepdf/invoice-core",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Invoice schema, totals, translations and PDF templates shared by EasyInvoicePDF apps.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./pdf": "./src/pdf/index.ts",
+    "./server": "./src/server/index.ts"
+  },
+  "dependencies": {
+    "dayjs": "1.11.13"
+  },
+  "peerDependencies": {
+    "@react-pdf/renderer": "4.6.1",
+    "react": "^19.2.0",
+    "zod": "^4.5.0"
+  }
+}

@@ -1,6 +1,6 @@
-import type { InvoiceItemData } from "@/app/schema";
+import { calculateItemTotals } from "@easyinvoicepdf/invoice-core";
 
-import { calculateItemTotals } from "./calculate-item-totals";
+import type { InvoiceItemData } from "@/app/schema";
 
 /**
  * Check if calculated item totals (netAmount, vatAmount, preTaxAmount)

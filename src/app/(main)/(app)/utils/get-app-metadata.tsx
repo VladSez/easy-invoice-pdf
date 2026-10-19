@@ -8,13 +8,13 @@ import {
   setAppStorageItem,
 } from "@/app/(main)/(app)/utils/app-local-storage";
 import {
-  METADATA_LOCAL_STORAGE_KEY,
   metadataSchema,
   SCHEMA_VERSION,
   APP_VERSION,
   type Metadata,
   DEFAULT_MOBILE_TAB,
 } from "@/app/schema";
+import { METADATA_LOCAL_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 
 export const DEFAULT_METADATA = {
   appVersion: APP_VERSION,

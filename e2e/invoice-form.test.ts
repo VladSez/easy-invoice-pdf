@@ -3,19 +3,21 @@ import dayjs from "dayjs";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import {
-  ACCORDION_STATE_LOCAL_STORAGE_KEY,
   CURRENCY_SYMBOLS,
   CURRENCY_TO_LABEL,
   DEFAULT_DATE_FORMAT,
   getDateFormatsForLanguage,
   LANGUAGE_TO_LABEL_WITH_REGION,
-  PDF_DATA_LOCAL_STORAGE_KEY,
   SUPPORTED_CURRENCIES,
   SUPPORTED_DATE_FORMATS,
   SUPPORTED_INVOICE_PDF_LANGUAGES,
   type AccordionState,
   type InvoiceData,
 } from "@/app/schema";
+import {
+  ACCORDION_STATE_LOCAL_STORAGE_KEY,
+  PDF_DATA_LOCAL_STORAGE_KEY,
+} from "@/app/schema/local-storage-keys";
 import {
   DISCORD_COMMUNITY_URL,
   GITHUB_URL,

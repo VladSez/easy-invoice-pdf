@@ -1,8 +1,8 @@
+import { useInvoicePdfInstance } from "@easyinvoicepdf/invoice-core/pdf";
 import * as Sentry from "@sentry/nextjs";
 import { useState } from "react";
 import { Document, Page } from "react-pdf";
 
-import { useInvoicePdfInstance } from "@/app/(main)/(app)/contexts/invoice-pdf-instance-context";
 import { BUG_REPORT_URL } from "@/config";
 
 // This import registers the PDF.js worker globally so that react-pdf can render PDFs in the browser.

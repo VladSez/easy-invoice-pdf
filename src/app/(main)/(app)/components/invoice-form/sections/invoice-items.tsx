@@ -38,7 +38,7 @@ import { cn } from "@/lib/utils";
 import {
   getAmountInWords,
   getNumberFractionalPart,
-} from "@/utils/invoice.utils";
+} from "@/utils/amount-in-words";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;

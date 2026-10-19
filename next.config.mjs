@@ -21,11 +21,11 @@ async function validatei18nAndInvoicePDFTranslationFiles() {
     // Import the translations schema and catalog using jiti
     // @ts-ignore
     const { invoicePDFTranslationsSchema } = await loadTsFileViaJiti.import(
-      "./src/app/(main)/(app)/pdf-i18n-translations/pdf-translations-schema.ts",
+      "./packages/invoice-core/src/pdf-translations/pdf-translations-schema.ts",
     );
     // @ts-ignore
     const { INVOICE_PDF_TRANSLATIONS } = await loadTsFileViaJiti.import(
-      "./src/app/(main)/(app)/pdf-i18n-translations/pdf-translations.ts",
+      "./packages/invoice-core/src/pdf-translations/pdf-translations.ts",
     );
 
     const result = invoicePDFTranslationsSchema.safeParse(
@@ -145,7 +145,10 @@ const nextConfig = {
   // Those targets come from `.browserslistrc`, which pins the Next 15 list --
   // Next 16's built-in default is `safari 16.4`, under which there would be
   // nothing left for this entry to lower.
-  transpilePackages: ["pdfjs-dist"],
+  //
+  // `@easyinvoicepdf/invoice-core` is the workspace package in `packages/`. It ships
+  // TypeScript source, so Next has to compile it like app code.
+  transpilePackages: ["pdfjs-dist", "@easyinvoicepdf/invoice-core"],
   // Configure the file extensions that Next.js should handle
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
   compiler: {

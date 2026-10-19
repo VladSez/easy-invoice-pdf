@@ -2,14 +2,16 @@ import type { z } from "zod";
 
 import { DEFAULT_BUYER_DATA, DEFAULT_SELLER_DATA } from "@/app/constants";
 import {
-  BUYERS_LOCAL_STORAGE_KEY,
-  SELLERS_LOCAL_STORAGE_KEY,
   buyerSchema,
   sellerSchema,
   type BuyerData,
-  type LocalStorageKey,
   type SellerData,
 } from "@/app/schema";
+import {
+  BUYERS_LOCAL_STORAGE_KEY,
+  SELLERS_LOCAL_STORAGE_KEY,
+  type LocalStorageKey,
+} from "@/app/schema/local-storage-keys";
 
 /**
  * The two sides of an invoice. Sellers and buyers are saved, listed, edited and deleted

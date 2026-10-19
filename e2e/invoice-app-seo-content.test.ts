@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
-import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema";
+import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
 
 /**

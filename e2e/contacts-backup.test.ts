@@ -3,12 +3,11 @@ import path from "node:path";
 
 import { type Page } from "@playwright/test";
 
+import { type BuyerData, type SellerData } from "@/app/schema";
 import {
   BUYERS_LOCAL_STORAGE_KEY,
   SELLERS_LOCAL_STORAGE_KEY,
-  type BuyerData,
-  type SellerData,
-} from "@/app/schema";
+} from "@/app/schema/local-storage-keys";
 
 import { expect, test } from "./utils/extended-playwright-test";
 

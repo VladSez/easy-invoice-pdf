@@ -8,11 +8,8 @@ import {
   getAppStorageItem,
   setAppStorageItem,
 } from "@/app/(main)/(app)/utils/app-local-storage";
-import {
-  SELLERS_LOCAL_STORAGE_KEY,
-  sellerSchema,
-  type SellerData,
-} from "@/app/schema";
+import { sellerSchema, type SellerData } from "@/app/schema";
+import { SELLERS_LOCAL_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

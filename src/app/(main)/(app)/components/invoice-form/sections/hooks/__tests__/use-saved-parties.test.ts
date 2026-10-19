@@ -6,12 +6,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SAVED_CONTACTS_IMPORTED_EVENT } from "@/app/(main)/(app)/components/invoice-form/sections/components/contacts-backup-menu";
 import { useSavedParties } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-saved-parties";
+import { buyerSchema, sellerSchema } from "@/app/schema";
 import {
   BUYERS_LOCAL_STORAGE_KEY,
   SELLERS_LOCAL_STORAGE_KEY,
-  buyerSchema,
-  sellerSchema,
-} from "@/app/schema";
+} from "@/app/schema/local-storage-keys";
 
 vi.mock("@sentry/nextjs", () => {
   return { captureException: vi.fn() };

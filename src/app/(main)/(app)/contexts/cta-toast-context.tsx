@@ -6,7 +6,7 @@ import {
   getAppStorageItem,
   setAppStorageItem,
 } from "@/app/(main)/(app)/utils/app-local-storage";
-import { CTA_TOAST_STORAGE_KEY } from "@/app/schema";
+import { CTA_TOAST_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 
 const CTA_TOAST_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 1 day
 

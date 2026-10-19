@@ -268,7 +268,107 @@
       "rules": { "react/display-name": "off" }
     },
     {
-      "files": ["src/**/*.ts", "src/**/*.tsx"],
+      // `packages/invoice-core` is shared with the private backend and dashboard, so it
+      // must not reach into the web app or its runtime: no `@/` aliases (other repos
+      // can't resolve them), no env, no Next.js, Sentry or toasts. Side effects go
+      // through callbacks the app passes in. Repeats the root `paths`, because an
+      // override replaces the rule's options instead of merging them.
+      "files": ["packages/invoice-core/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@react-pdf/renderer",
+                "message": "Please use **@react-pdf/renderer/lib/react-pdf.browser** instead. Only `src/server/` may import the Node entry."
+              },
+              {
+                "name": "node:process",
+                "message": "invoice-core takes configuration as arguments, it does not read the environment."
+              },
+              {
+                "name": "process",
+                "message": "invoice-core takes configuration as arguments, it does not read the environment."
+              },
+              {
+                "name": "next",
+                "message": "invoice-core must not depend on Next.js."
+              },
+              {
+                "name": "sonner",
+                "message": "invoice-core must not show UI side effects - take an `onError` callback instead."
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["@/*", "@/**"],
+                "message": "invoice-core is consumed by other repos that can't resolve the web app's `@/` alias - use a relative import, or keep the code in the app."
+              },
+              {
+                "group": ["next/*", "next/**"],
+                "message": "invoice-core must not depend on Next.js."
+              },
+              {
+                "group": ["@sentry/*", "@sentry/**"],
+                "message": "invoice-core must not report errors itself - take an `onError` callback instead."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      // The server entry renders with Node's `renderToBuffer`, so it is the one place
+      // in the package allowed to import the bare `@react-pdf/renderer`.
+      "files": ["packages/invoice-core/src/server/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "node:process",
+                "message": "invoice-core takes configuration as arguments, it does not read the environment."
+              },
+              {
+                "name": "process",
+                "message": "invoice-core takes configuration as arguments, it does not read the environment."
+              },
+              {
+                "name": "next",
+                "message": "invoice-core must not depend on Next.js."
+              },
+              {
+                "name": "sonner",
+                "message": "invoice-core must not show UI side effects - take an `onError` callback instead."
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["@/*", "@/**"],
+                "message": "invoice-core is consumed by other repos that can't resolve the web app's `@/` alias - use a relative import, or keep the code in the app."
+              },
+              {
+                "group": ["next/*", "next/**"],
+                "message": "invoice-core must not depend on Next.js."
+              },
+              {
+                "group": ["@sentry/*", "@sentry/**"],
+                "message": "invoice-core must not report errors itself - take an `onError` callback instead."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "packages/*/src/**/*.ts",
+        "packages/*/src/**/*.tsx"
+      ],
       "jsPlugins": ["eslint-plugin-react-you-might-not-need-an-effect"],
       // JS plugin rules have to be listed one by one - oxlint cannot read an
       // eslint plugin's own `recommended` config. This is the plugin's full set.

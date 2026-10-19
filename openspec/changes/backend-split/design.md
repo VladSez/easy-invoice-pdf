@@ -73,7 +73,7 @@ _Alternative_: `apps/web`. That's a much larger diff with no benefit while there
 - `exports` point at `.ts`/`.tsx` source. Next consumers use `transpilePackages`. The API bundles core with a bundler (tsdown or esbuild), because Node won't strip types or compile JSX under `node_modules`.
 - `react`, `zod` and `@react-pdf/renderer` are **peer** dependencies. A second zod copy would break schema composition and `z.toJSONSchema`. The react-pdf pins only apply to the consumer's copy.
 - No `@/` aliases, `@/env`, `process.env`, `next/*`, `@sentry/*`, `sonner` or analytics imports inside core. oxlint enforces this with `no-restricted-imports` scoped to `packages/invoice-core/**`.
-- Side effects go through callbacks: `InvoicePdfInstanceProvider({ onError, onRendered })`, and the format helpers take an optional `onError`. Each app plugs in its own Sentry, toasts and Umami.
+- Side effects go through callbacks: `InvoicePdfInstanceProvider({ onError })`, and each app plugs in its own Sentry, toasts and Umami. The format helpers are the exception: when `Intl` rejects an amount they log with `console.error` and print the fallback. Most of their callers are templates, and a callback would have to be threaded through every one of them.
 - `localStorage` keys and the site-UI `i18n-schema.ts` stay in the free app.
 
 _Alternative_: a build step (tsup) with `dist/`. Rejected for now: there would be two artifacts to keep in sync and no npm consumer needs them.
@@ -81,6 +81,8 @@ _Alternative_: a build step (tsup) with `dist/`. Rejected for now: there would b
 ### D4. One isomorphic `InvoicePdfDocument`
 
 Core exports `InvoicePdfDocument({ invoiceData })`, which picks the template from `invoiceData.template` and renders `<Document><Page>…`. The browser provider and `renderInvoicePdfToBuffer` both use it, and the duplicated server wrapper is deleted. Templates keep importing primitives from `@react-pdf/renderer/lib/react-pdf.browser`; that already works with Node's `renderToBuffer` in production today. Fonts are registered on the `Font` object of whichever entry point does the rendering.
+
+Templates format dates with a per-call locale (`dayjs(date).locale(language)`), never `dayjs.locale(...)`. The global locale is process-wide state: on a server that renders invoices in several languages at once, it would leak between requests, because `renderToBuffer` awaits font loading before laying out the pages.
 
 ### D5. Fonts are files in the package, resolved per environment
 

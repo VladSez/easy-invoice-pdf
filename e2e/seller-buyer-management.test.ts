@@ -1,12 +1,11 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 import { DEFAULT_BUYER_DATA, DEFAULT_SELLER_DATA } from "@/app/constants";
+import { type BuyerData, type SellerData } from "@/app/schema";
 import {
   BUYERS_LOCAL_STORAGE_KEY,
   SELLERS_LOCAL_STORAGE_KEY,
-  type BuyerData,
-  type SellerData,
-} from "@/app/schema";
+} from "@/app/schema/local-storage-keys";
 
 /**
  * Sellers and buyers are managed through the same UI: a "New <party>" dialog, a

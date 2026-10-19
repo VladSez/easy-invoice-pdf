@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-import { PDF_DATA_LOCAL_STORAGE_KEY, type InvoiceData } from "@/app/schema";
+import { type InvoiceData } from "@/app/schema";
+import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 
 import { waitForPdfRegeneration } from "../utils/pdf-download";
 import { uploadLogoFile } from "./utils";

@@ -1,6 +1,7 @@
 "use client";
 
-import { useInvoicePdfInstance } from "@/app/(main)/(app)/contexts/invoice-pdf-instance-context";
+import { useInvoicePdfInstance } from "@easyinvoicepdf/invoice-core/pdf";
+
 import { BUG_REPORT_URL } from "@/config";
 
 export function DesktopInvoicePDFViewer() {

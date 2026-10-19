@@ -21,13 +21,12 @@ import {
   parseContactsBackup,
   serializeContactsBackup,
 } from "@/app/(main)/(app)/utils/contacts-backup";
+import { buyerSchema, sellerSchema } from "@/app/schema";
 import {
   BUYERS_LOCAL_STORAGE_KEY,
   SELLERS_LOCAL_STORAGE_KEY,
-  buyerSchema,
-  sellerSchema,
   type LocalStorageKey,
-} from "@/app/schema";
+} from "@/app/schema/local-storage-keys";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

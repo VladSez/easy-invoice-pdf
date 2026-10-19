@@ -7,7 +7,8 @@ export default defineConfig({
     jsx: "automatic",
   },
   test: {
-    dir: "./src",
+    // `src/` is the app; `packages/*/src` holds the workspace packages (invoice-core).
+    include: ["src/**/*.test.{ts,tsx}", "packages/*/src/**/*.test.{ts,tsx}"],
     exclude: ["**/e2e/**"],
     silent: true, // suppress console.log output in test output
   },

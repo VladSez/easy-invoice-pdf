@@ -1,6 +1,6 @@
 "use client";
 
-import type { LocalStorageKey } from "@/app/schema";
+import type { LocalStorageKey } from "@/app/schema/local-storage-keys";
 import {
   safeLocalStorageGetItem,
   safeLocalStorageSetItem,

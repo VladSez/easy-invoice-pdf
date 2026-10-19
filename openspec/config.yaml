@@ -30,3 +30,20 @@ schema: spec-driven
 #     archive:
 #       guidance:
 #         - Summarize the archive outcome before finishing
+
+operations:
+  apply:
+    guidance:
+      - >-
+        After every task that changes UI or PDF code, verify the app in the
+        browser before marking it done: run `pnpm dev` and use the built-in
+        browser pane to check that `/` and `/stripe-template` load, the form
+        works, editing a field updates the PDF preview, the PDF downloads
+        and opens, and the console shows no new errors or warnings.
+      - >-
+        If the task touched the PDF, the preview or the layout, also check
+        the mobile viewport (the mobile PDF viewer).
+      - >-
+        Record any browser-check failure as a finding and fix it before
+        moving to the next task. Tasks with no browser-observable effect
+        (docs, legal, tooling only) skip the check and say so.

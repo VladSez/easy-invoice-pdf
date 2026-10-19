@@ -1,3 +1,4 @@
+import { parseValidatedInvoiceItems } from "@easyinvoicepdf/invoice-core";
 import { describe, it, expect } from "vitest";
 
 import type { InvoiceItemData } from "@/app/schema";
@@ -7,7 +8,6 @@ import {
   hasAnyItemTotalsChanged,
   hasItemTotalsChanged,
 } from "../has-item-totals-changed";
-import { parseValidatedInvoiceItems } from "../validated-invoice-items";
 
 function createItem(overrides: Partial<InvoiceItemData> = {}) {
   return {
