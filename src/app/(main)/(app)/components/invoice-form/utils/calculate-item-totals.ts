@@ -1,8 +1,11 @@
-import type { InvoiceItemData } from "@/app/schema";
+import { type InvoiceItemData, parseDiscountValue } from "@/app/schema";
 
 /**
- * Calculates netAmount, vatAmount, and preTaxAmount for invoice item.
+ * Calculates discountAmount, netAmount, vatAmount, and preTaxAmount for invoice item.
  *
+ * - The discount comes off the line (amount * netPrice) before tax: a percentage of the
+ *   line, or a fixed amount capped at the line, so netAmount never goes below 0.
+ * - netAmount is the line after the discount, and VAT is calculated on it.
  * - If item.vat is numeric (e.g. "23"), computes VAT as (netAmount * vat / 100).
  * - If item.vat is not a number (e.g. "NP", "OO"), sets vatAmount to 0.
  * - Rounds all computed amounts to two decimal places.
@@ -19,8 +22,12 @@ export function calculateItemTotals(
   const amount = Number(item.amount) || 0;
   // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- same as above
   const netPrice = Number(item.netPrice) || 0;
-  const calculatedNetAmount = amount * netPrice;
-  const formattedNetAmount = Number(calculatedNetAmount.toFixed(2));
+  const lineAmount = Number((amount * netPrice).toFixed(2));
+  const discountAmount = calculateDiscountAmount({
+    item,
+    lineAmount,
+  });
+  const formattedNetAmount = Number((lineAmount - discountAmount).toFixed(2));
 
   let vatAmount = 0;
 
@@ -49,8 +56,38 @@ export function calculateItemTotals(
 
   return {
     ...item,
+    discountAmount,
     netAmount: formattedNetAmount,
     vatAmount: formattedVatAmount,
     preTaxAmount: formattedPreTaxAmount,
   };
+}
+
+interface CalculateDiscountAmountParams {
+  /** The item whose `discountType` and `discountValue` say what to take off. */
+  item: InvoiceItemData;
+  /** The line before the discount (amount * netPrice), rounded to two decimals. */
+  lineAmount: number;
+}
+
+/**
+ * The money an item's discount takes off its line, rounded to two decimal places and never
+ * more than the line itself.
+ */
+function calculateDiscountAmount({
+  item,
+  lineAmount,
+}: CalculateDiscountAmountParams) {
+  // read the same way the schema reads it; an invalid value never gets this far, since the
+  // totals only run on items that pass validation, but it counts as no discount
+  const discountValue = parseDiscountValue(item.discountValue) || 0;
+
+  if (discountValue <= 0 || lineAmount <= 0) return 0;
+
+  const discountAmount =
+    item.discountType === "amount"
+      ? discountValue
+      : (lineAmount * discountValue) / 100;
+
+  return Number(Math.min(discountAmount, lineAmount).toFixed(2));
 }

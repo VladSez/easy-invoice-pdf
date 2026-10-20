@@ -1017,165 +1017,243 @@ export const APP_VERSION = "1.0.0";
  */
 export const SCHEMA_VERSION = "1.0.0";
 
-export const invoiceItemSchema = z.object({
-  // Show/hide Number column on PDF
-  invoiceItemNumberIsVisible: z.boolean().default(true),
+/**
+ * How an item's discount is entered: a percentage of the line (`10` -> 10% off), or a fixed
+ * amount taken off the whole line (`50` -> 50.00 off, whatever the quantity).
+ */
+export const ITEM_DISCOUNT_TYPES = ["percentage", "amount"] as const;
+export type ItemDiscountType = (typeof ITEM_DISCOUNT_TYPES)[number];
 
-  name: z
-    .string()
-    .max(500, "Item name must not exceed 500 characters")
-    .trim()
-    .optional(),
-  nameFieldIsVisible: z.boolean().default(true),
+/**
+ * Reads a discount value as the form holds it: a number, or the string a number input gives
+ * back. Empty means no discount (0), and anything that is not a number comes back as `NaN`
+ * for the schema to reject.
+ *
+ * The schema and `calculateItemTotals` both read discounts through this, so a value the form
+ * accepts is always the value the totals apply.
+ */
+export function parseDiscountValue(raw: unknown) {
+  if (raw === null || raw === undefined) return 0;
+  if (typeof raw === "string" && raw.trim() === "") return 0;
 
-  typeOfGTU: z
-    .string()
-    .max(50, "Type of GTU must not exceed 50 characters")
-    .trim()
-    .optional()
-    .default(""),
-  typeOfGTUFieldIsVisible: z.boolean().default(true),
+  return Number(raw);
+}
 
-  amount: z
-    .any()
-    .refine(
-      (val) => {
-        return val !== "";
-      },
-      {
-        message: "Amount is required",
-      },
-    )
-    .transform(Number)
-    .refine(
-      (val) => {
-        return val >= 0;
-      },
-      {
-        message: "Amount must be >= 0",
-      },
-    )
-    .refine(
-      (val) => {
-        return val <= 999_999.99;
-      },
-      {
-        message: "Amount must not exceed 999 999.99",
-      },
-    ),
-  amountFieldIsVisible: z.boolean().default(true),
+/** Longest custom discount label, e.g. "Charitable donation". */
+export const MAX_ITEM_DISCOUNT_LABEL_LENGTH = 100;
 
-  unit: z.string().trim().optional(),
-  unitFieldIsVisible: z.boolean().default(true),
+export const invoiceItemSchema = z
+  .object({
+    // Show/hide Number column on PDF
+    invoiceItemNumberIsVisible: z.boolean().default(true),
 
-  netPrice: z
-    .any()
-    .refine(
-      (val) => {
-        return val !== "";
-      },
-      {
-        message: "Net price is required",
-      },
-    )
-    .transform(Number)
-    .refine(
-      (val) => {
-        return val >= 0;
-      },
-      {
-        message: "Net price must be >= 0",
-      },
-    )
-    .refine(
-      (val) => {
-        return val <= 1_000_000_000;
-      },
-      {
-        message: "Net price must not exceed 1 billion",
-      },
-    ),
-  netPriceFieldIsVisible: z.boolean().default(true),
+    name: z
+      .string()
+      .max(500, "Item name must not exceed 500 characters")
+      .trim()
+      .optional(),
+    nameFieldIsVisible: z.boolean().default(true),
 
-  // Tax rate. Accepts numbers 0-100 or any text string (i.e. NP, OO, etc)
-  // Valid inputs and their outputs:
-  // - "23" -> 23 (number)
-  // - "100" -> 100 (number)
-  // - "NP" -> "NP" (string)
-  vat: z
-    .preprocess(
-      // z.preprocess runs before Zod does any validation, parsing, or type checking on the schema it wraps.
-      (raw) => {
-        // Handle null/undefined by returning empty string for validation
-        if (raw === null || raw === undefined) return "";
+    typeOfGTU: z
+      .string()
+      .max(50, "Type of GTU must not exceed 50 characters")
+      .trim()
+      .optional()
+      .default(""),
+    typeOfGTUFieldIsVisible: z.boolean().default(true),
 
-        // Trim whitespace from string inputs, pass through other types as-is
-        const val = typeof raw === "string" ? raw.trim() : raw;
-
-        // Empty strings should fail the required validation
-        if (val === "") return "";
-
-        // Attempt to convert to number
-        const num = Number(val);
-
-        // If conversion succeeds, return as number (for 0-100 validation)
-        // Otherwise, return as string (for text values like "NP", "OO", etc)
-        return Number.isNaN(num) ? val : num;
-      },
-      z.union(
-        [
-          z
-            .number()
-            .min(
-              0,
-              `Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
-            )
-            .max(
-              100,
-              `Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
-            ),
-          z
-            .string()
-            .min(
-              1,
-              `Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).`,
-            ),
-        ],
+    amount: z
+      .any()
+      .refine(
+        (val) => {
+          return val !== "";
+        },
         {
-          // zod v4 replaced `errorMap` with `error`, which returns the message
-          // string directly instead of a `{ message }` object.
-          error: () => {
-            return "Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).";
-          },
+          message: "Amount is required",
+        },
+      )
+      .transform(Number)
+      .refine(
+        (val) => {
+          return val >= 0;
+        },
+        {
+          message: "Amount must be >= 0",
+        },
+      )
+      .refine(
+        (val) => {
+          return val <= 999_999.99;
+        },
+        {
+          message: "Amount must not exceed 999 999.99",
         },
       ),
-    )
-    .describe(
-      "Tax rate. Accepts numbers 0-100 or any text (i.e. NP, OO, etc).",
+    amountFieldIsVisible: z.boolean().default(true),
+
+    unit: z.string().trim().optional(),
+    unitFieldIsVisible: z.boolean().default(true),
+
+    netPrice: z
+      .any()
+      .refine(
+        (val) => {
+          return val !== "";
+        },
+        {
+          message: "Net price is required",
+        },
+      )
+      .transform(Number)
+      .refine(
+        (val) => {
+          return val >= 0;
+        },
+        {
+          message: "Net price must be >= 0",
+        },
+      )
+      .refine(
+        (val) => {
+          return val <= 1_000_000_000;
+        },
+        {
+          message: "Net price must not exceed 1 billion",
+        },
+      ),
+    netPriceFieldIsVisible: z.boolean().default(true),
+
+    // Tax rate. Accepts numbers 0-100 or any text string (i.e. NP, OO, etc)
+    // Valid inputs and their outputs:
+    // - "23" -> 23 (number)
+    // - "100" -> 100 (number)
+    // - "NP" -> "NP" (string)
+    vat: z
+      .preprocess(
+        // z.preprocess runs before Zod does any validation, parsing, or type checking on the schema it wraps.
+        (raw) => {
+          // Handle null/undefined by returning empty string for validation
+          if (raw === null || raw === undefined) return "";
+
+          // Trim whitespace from string inputs, pass through other types as-is
+          const val = typeof raw === "string" ? raw.trim() : raw;
+
+          // Empty strings should fail the required validation
+          if (val === "") return "";
+
+          // Attempt to convert to number
+          const num = Number(val);
+
+          // If conversion succeeds, return as number (for 0-100 validation)
+          // Otherwise, return as string (for text values like "NP", "OO", etc)
+          return Number.isNaN(num) ? val : num;
+        },
+        z.union(
+          [
+            z
+              .number()
+              .min(
+                0,
+                `Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
+              )
+              .max(
+                100,
+                `Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).`,
+              ),
+            z
+              .string()
+              .min(
+                1,
+                `Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).`,
+              ),
+          ],
+          {
+            // zod v4 replaced `errorMap` with `error`, which returns the message
+            // string directly instead of a `{ message }` object.
+            error: () => {
+              return "Tax rate is required. Enter a number (0-100) or any text (i.e. NP, OO, etc).";
+            },
+          },
+        ),
+      )
+      .describe(
+        "Tax rate. Accepts numbers 0-100 or any text (i.e. NP, OO, etc).",
+      ),
+
+    vatFieldIsVisible: z.boolean().default(true),
+
+    /**
+     * Net Amount (**calculated automatically** - read only field in the UI)
+     */
+    netAmount: z.coerce.number().nonnegative("Net amount must be non-negative"),
+    netAmountFieldIsVisible: z.boolean().default(true),
+
+    /**
+     * VAT Amount (**calculated automatically** - read only field in the UI)
+     */
+    vatAmount: z.coerce.number().nonnegative("VAT amount must be non-negative"),
+    vatAmountFieldIsVisible: z.boolean().default(true),
+
+    /**
+     * Pre-tax Amount (**calculated automatically** - read only field in the UI)
+     */
+    preTaxAmount: z.coerce
+      .number()
+      .nonnegative("Pre-tax amount must be non-negative"),
+    preTaxAmountFieldIsVisible: z.boolean().default(true),
+
+    discountType: z.enum(ITEM_DISCOUNT_TYPES).default("percentage"),
+
+    // Discount value, read according to `discountType`. An empty input means no discount.
+    // Its upper bound depends on the type and the line amount, see the `superRefine` below:
+    // at most 100 for a percentage, at most Amount × Net Price for a fixed amount.
+    discountValue: z.preprocess(
+      parseDiscountValue,
+      z
+        .number({ error: "Discount must be a number" })
+        .min(0, "Discount must be >= 0"),
     ),
 
-  vatFieldIsVisible: z.boolean().default(true),
+    // Optional text shown next to the discount in the PDF, e.g. "Charitable donation".
+    // Empty falls back to the translated "Discount".
+    discountLabel: z
+      .string()
+      .max(
+        MAX_ITEM_DISCOUNT_LABEL_LENGTH,
+        `Discount label must not exceed ${MAX_ITEM_DISCOUNT_LABEL_LENGTH} characters`,
+      )
+      .trim()
+      .optional()
+      .default(""),
 
-  /**
-   * Net Amount (**calculated automatically** - read only field in the UI)
-   */
-  netAmount: z.coerce.number().nonnegative("Net amount must be non-negative"),
-  netAmountFieldIsVisible: z.boolean().default(true),
+    /**
+     * Discount Amount, the money taken off the line (**calculated automatically** - read only field in the UI)
+     */
+    discountAmount: z.coerce
+      .number()
+      .nonnegative("Discount amount must be non-negative")
+      .default(0),
+  })
+  .superRefine((item, ctx) => {
+    if (item.discountType === "percentage" && item.discountValue > 100) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["discountValue"],
+        message: "Discount must be between 0 and 100%",
+      });
+    }
 
-  /**
-   * VAT Amount (**calculated automatically** - read only field in the UI)
-   */
-  vatAmount: z.coerce.number().nonnegative("VAT amount must be non-negative"),
-  vatAmountFieldIsVisible: z.boolean().default(true),
+    const lineAmount = Number((item.amount * item.netPrice).toFixed(2));
 
-  /**
-   * Pre-tax Amount (**calculated automatically** - read only field in the UI)
-   */
-  preTaxAmount: z.coerce
-    .number()
-    .nonnegative("Pre-tax amount must be non-negative"),
-  preTaxAmountFieldIsVisible: z.boolean().default(true),
-});
+    if (item.discountType === "amount" && item.discountValue > lineAmount) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["discountValue"],
+        message:
+          "Discount must not exceed the line amount (Amount × Net Price)",
+      });
+    }
+  });
 
 export type InvoiceItemData = z.infer<typeof invoiceItemSchema>;
 

@@ -80,6 +80,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Pre-tax amount `;
       },
       sum: "SUM",
+      discount: "Discount",
     },
     paymentInfo: {
       paymentMethod: "Payment method",
@@ -149,6 +150,9 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Amount Due",
       page: "Page",
       of: "of",
+      discount: "Discount",
+      taxOn: "on",
+      discountOff: "off",
     },
   },
   pl: {
@@ -189,6 +193,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Kwota\n brutto`;
       },
       sum: "SUMA",
+      discount: "Rabat",
     },
     paymentInfo: {
       paymentMethod: "Sposób wpłaty",
@@ -237,6 +242,9 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Kwota do zapłaty",
       page: "Strona",
       of: "z",
+      discount: "Rabat",
+      taxOn: "od",
+      discountOff: "rabatu",
     },
   },
   de: {
@@ -277,6 +285,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Bruttobetrag`;
       },
       sum: "SUMME",
+      discount: "Rabatt",
     },
     paymentInfo: {
       paymentMethod: "Zahlungsart",
@@ -325,6 +334,9 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Zu zahlender Betrag",
       page: "Seite",
       of: "von",
+      discount: "Rabatt",
+      taxOn: "auf",
+      discountOff: "Rabatt",
     },
   },
   es: {
@@ -365,6 +377,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Importe bruto`;
       },
       sum: "TOTAL",
+      discount: "Descuento",
     },
     paymentInfo: {
       paymentMethod: "Forma de pago",
@@ -413,6 +426,9 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Monto a pagar",
       page: "Página",
       of: "de",
+      discount: "Descuento",
+      taxOn: "sobre",
+      discountOff: "de descuento",
     },
   },
   pt: {
@@ -453,6 +469,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Valor bruto`;
       },
       sum: "TOTAL",
+      discount: "Desconto",
     },
     paymentInfo: {
       paymentMethod: "Forma de pagamento",
@@ -501,6 +518,9 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Valor a pagar",
       page: "Página",
       of: "de",
+      discount: "Desconto",
+      taxOn: "sobre",
+      discountOff: "de desconto",
     },
   },
   /**
@@ -548,6 +568,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Valor bruto`;
       },
       sum: "TOTAL",
+      discount: "Desconto",
     },
     paymentInfo: {
       paymentMethod: "Forma de pagamento",
@@ -596,6 +617,9 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Valor a pagar",
       page: "Página",
       of: "de",
+      discount: "Desconto",
+      taxOn: "sobre",
+      discountOff: "de desconto",
     },
   },
   ru: {
@@ -636,6 +660,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Сумма с ${customTaxLabel || "НДС"}`;
       },
       sum: "ИТОГО",
+      discount: "Скидка",
     },
     paymentInfo: {
       paymentMethod: "Способ оплаты",
@@ -684,6 +709,9 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Сумма к оплате",
       page: "Страница",
       of: "из",
+      discount: "Скидка",
+      taxOn: "от",
+      discountOff: "скидка",
     },
   },
   uk: {
@@ -724,6 +752,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Сума з ${customTaxLabel || "ПДВ"}`;
       },
       sum: "РАЗОМ",
+      discount: "Знижка",
     },
     paymentInfo: {
       paymentMethod: "Спосіб оплати",
@@ -772,6 +801,9 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Сума до сплати",
       page: "Сторінка",
       of: "з",
+      discount: "Знижка",
+      taxOn: "від",
+      discountOff: "знижка",
     },
   },
   fr: {
@@ -812,6 +844,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Total TTC`;
       },
       sum: "TOTAL",
+      discount: "Remise",
     },
     paymentInfo: {
       paymentMethod: "Mode de paiement",
@@ -860,6 +893,9 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Montant dû",
       page: "Page",
       of: "de",
+      discount: "Remise",
+      taxOn: "sur",
+      discountOff: "de remise",
     },
   },
   it: {
@@ -900,6 +936,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Importo lordo`;
       },
       sum: "TOTALE",
+      discount: "Sconto",
     },
     paymentInfo: {
       paymentMethod: "Metodo di pagamento",
@@ -948,6 +985,9 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Importo da pagare",
       page: "Pagina",
       of: "di",
+      discount: "Sconto",
+      taxOn: "su",
+      discountOff: "di sconto",
     },
   },
   nl: {
@@ -988,6 +1028,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Brutobedrag`;
       },
       sum: "TOTAAL",
+      discount: "Korting",
     },
     paymentInfo: {
       paymentMethod: "Betaalmethode",
@@ -1036,6 +1077,9 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Te betalen bedrag",
       page: "Pagina",
       of: "van",
+      discount: "Korting",
+      taxOn: "over",
+      discountOff: "korting",
     },
   },
   sv: {
@@ -1081,6 +1125,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Brutto\n belopp`;
       },
       sum: "SUMMA",
+      discount: "Rabatt",
     },
     paymentInfo: {
       paymentMethod: "Betalningsmetod",
@@ -1129,6 +1174,9 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Att betala",
       page: "Sida",
       of: "av",
+      discount: "Rabatt",
+      taxOn: "på",
+      discountOff: "rabatt",
     },
   },
   nb: {
@@ -1177,6 +1225,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Brutto\n beløp`;
       },
       sum: "SUM",
+      discount: "Rabatt",
     },
     paymentInfo: {
       paymentMethod: "Betalingsmåte",
@@ -1225,6 +1274,9 @@ export const INVOICE_PDF_TRANSLATIONS = {
       amountDue: "Å betale",
       page: "Side",
       of: "av",
+      discount: "Rabatt",
+      taxOn: "av",
+      discountOff: "rabatt",
     },
   },
 } as const satisfies Record<SupportedLanguages, TranslationSchema>;

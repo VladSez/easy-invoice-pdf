@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { memo, useRef, useState } from "react";
 import {
   type Control,
@@ -7,13 +7,16 @@ import {
   type FieldErrors,
   type UseFieldArrayAppend,
   type UseFormGetValues,
+  type UseFormSetValue,
 } from "react-hook-form";
 
 import { inputErrorClassName } from "@/app/(main)/(app)/components/invoice-form/common";
+import { DeleteIconButton } from "@/app/(main)/(app)/components/invoice-form/sections/components/delete-icon-button";
 import {
   DeleteInvoiceItemDialog,
   type ItemPendingDeletion,
 } from "@/app/(main)/(app)/components/invoice-form/sections/components/delete-invoice-item-dialog";
+import { ItemDiscountFields } from "@/app/(main)/(app)/components/invoice-form/sections/components/item-discount-fields";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
 import { formatMoneyForTemplate } from "@/app/(main)/(app)/utils/format-money-for-template";
@@ -57,6 +60,7 @@ interface InvoiceItemsSettingsProps {
   /** The invoice's number format, already resolved against its language. */
   numberFormatLocale: SupportedNumberFormatLocale;
   getValues: UseFormGetValues<InvoiceData>;
+  setValue: UseFormSetValue<InvoiceData>;
 }
 
 export const InvoiceItems = memo(function InvoiceItems({
@@ -71,6 +75,7 @@ export const InvoiceItems = memo(function InvoiceItems({
   taxLabelText,
   numberFormatLocale,
   getValues,
+  setValue,
 }: InvoiceItemsSettingsProps) {
   const [itemPendingDeletion, setItemPendingDeletion] =
     useState<ItemPendingDeletion | null>(null);
@@ -92,41 +97,20 @@ export const InvoiceItems = memo(function InvoiceItems({
             {/* Delete invoice item button */}
             {isNotFirstItem ? (
               <div className="absolute -right-3 -top-10">
-                <CustomTooltip
-                  trigger={
-                    <button
-                      type="button"
-                      // Safari does not focus a button on mousedown, so focus leaves the
-                      // field the user was editing and lands on the nearest focusable
-                      // ancestor -- on mobile that is Radix's tab panel, which Safari then
-                      // scrolls into view (smoothly, see `globals.css`). The button drifts
-                      // out from under the finger between mousedown and mouseup, and the
-                      // browser dispatches the `click` on the common ancestor instead: the
-                      // tap does nothing. Keeping focus where it is avoids the scroll.
-                      onMouseDown={(event) => {
-                        event.preventDefault();
-                      }}
-                      onClick={(event) => {
-                        // Radix returns focus to its `Trigger` on close, and this dialog is
-                        // controlled rather than triggered, so remember the button ourselves.
-                        deleteTriggerRef.current = event.currentTarget;
+                <DeleteIconButton
+                  label={`Delete Invoice Item ${index + 1}`}
+                  onClick={(event) => {
+                    // Radix returns focus to its `Trigger` on close, and this dialog is
+                    // controlled rather than triggered, so remember the button ourselves.
+                    deleteTriggerRef.current = event.currentTarget;
 
-                        // Read the name from the form rather than from the parent's debounced
-                        // copy of it, so the dialog names what the user is actually looking at.
-                        return setItemPendingDeletion({
-                          index,
-                          name: getValues(`items.${index}.name`),
-                        });
-                      }}
-                      className="flex items-center justify-center rounded-full bg-red-600 p-2 transition-colors hover:bg-red-700 active:scale-[98%] active:transition-transform"
-                    >
-                      <span className="sr-only">
-                        Delete Invoice Item {index + 1}
-                      </span>
-                      <Trash2 className="h-4 w-4 text-white" />
-                    </button>
-                  }
-                  content={`Delete Invoice Item ${index + 1}`}
+                    // Read the name from the form rather than from the parent's debounced
+                    // copy of it, so the dialog names what the user is actually looking at.
+                    setItemPendingDeletion({
+                      index,
+                      name: getValues(`items.${index}.name`),
+                    });
+                  }}
                 />
               </div>
             ) : null}
@@ -505,6 +489,18 @@ export const InvoiceItems = memo(function InvoiceItems({
                 ) : null}
               </div>
 
+              {/* Invoice Item Discount */}
+              <ItemDiscountFields
+                control={control}
+                index={index}
+                errors={errors}
+                currency={currency}
+                template={template}
+                numberFormatLocale={numberFormatLocale}
+                getValues={getValues}
+                setValue={setValue}
+              />
+
               {/* Invoice Item Tax Settings */}
               <fieldset className="rounded-md border px-4 pb-4">
                 <legend className="text-base font-semibold lg:text-lg">
@@ -678,7 +674,8 @@ export const InvoiceItems = memo(function InvoiceItems({
                   </ErrorMessage>
                 ) : (
                   <InputHelperMessage>
-                    Calculated automatically based on Amount and Net Price
+                    Calculated automatically based on Amount, Net Price and
+                    Discount
                   </InputHelperMessage>
                 )}
               </div>
@@ -859,6 +856,10 @@ export const InvoiceItems = memo(function InvoiceItems({
                 vatAmountFieldIsVisible: true,
                 preTaxAmount: 0,
                 preTaxAmountFieldIsVisible: true,
+                discountType: "percentage",
+                discountValue: 0,
+                discountLabel: "",
+                discountAmount: 0,
                 typeOfGTU: "",
                 typeOfGTUFieldIsVisible: true,
               });

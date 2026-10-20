@@ -178,7 +178,25 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
   },
   colUnitPrice: { flex: 1.2, textAlign: "right" },
   colTax: { flex: 0.8, textAlign: "right" },
+  // as wide as the unit price, so "10% (on" sits over a whole "€4,000.00)" on invoices
+  // whose tax cells name the discounted base
+  colTaxWithDiscount: { flex: 1.2, textAlign: "right" },
   colAmount: { flex: 1.3, textAlign: "right" },
+  // The row under a discounted item, set off by hairlines above it and above the item
+  // that follows: its label indented under the item's name, its negative amount in the
+  // amount column
+  discountRow: {
+    marginTop: 4,
+    paddingVertical: 8,
+    borderTopWidth: 0.5,
+    borderTopColor: "#e5e7eb",
+  },
+  discountLabel: { paddingLeft: 8 },
+  rowAfterDiscount: {
+    paddingTop: 8,
+    borderTopWidth: 0.5,
+    borderTopColor: "#e5e7eb",
+  },
   // Due amount highlight
   dueAmountBox: {
     backgroundColor: "#f9fafb",

@@ -171,6 +171,11 @@ export const INITIAL_INVOICE_DATA = {
 
       preTaxAmount: 0,
       preTaxAmountFieldIsVisible: true,
+
+      discountType: "percentage",
+      discountValue: 0,
+      discountLabel: "",
+      discountAmount: 0,
     },
   ],
   total: 0,

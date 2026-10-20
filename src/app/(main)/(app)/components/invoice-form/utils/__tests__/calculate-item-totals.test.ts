@@ -279,6 +279,104 @@ describe("calculateItemTotals", () => {
     });
   });
 
+  describe("discount", () => {
+    it("takes a percentage off the line and calculates VAT on what is left", () => {
+      const result = calculateItemTotals(
+        createItem({
+          amount: 1,
+          netPrice: 10_000,
+          vat: 23,
+          discountType: "percentage",
+          discountValue: 10,
+        }),
+      );
+
+      expect(result?.discountAmount).toBe(1000);
+      expect(result?.netAmount).toBe(9000);
+      expect(result?.vatAmount).toBe(2070);
+      expect(result?.preTaxAmount).toBe(11_070);
+    });
+
+    it("takes a fixed amount off the whole line, not off each unit", () => {
+      const result = calculateItemTotals(
+        createItem({
+          amount: 5,
+          netPrice: 100,
+          vat: 10,
+          discountType: "amount",
+          discountValue: 50,
+        }),
+      );
+
+      expect(result?.discountAmount).toBe(50);
+      expect(result?.netAmount).toBe(450);
+      expect(result?.vatAmount).toBe(45);
+      expect(result?.preTaxAmount).toBe(495);
+    });
+
+    it("rounds a percentage discount to two decimals", () => {
+      const result = calculateItemTotals(
+        createItem({
+          amount: 3,
+          netPrice: 33.33,
+          vat: 0,
+          discountType: "percentage",
+          discountValue: 12.5,
+        }),
+      );
+
+      // 99.99 * 12.5% = 12.49875
+      expect(result?.discountAmount).toBe(12.5);
+      expect(result?.netAmount).toBe(87.49);
+    });
+
+    it("never takes more than the line", () => {
+      const result = calculateItemTotals(
+        createItem({
+          amount: 1,
+          netPrice: 100,
+          vat: 23,
+          discountType: "amount",
+          discountValue: 500,
+        }),
+      );
+
+      expect(result?.discountAmount).toBe(100);
+      expect(result?.netAmount).toBe(0);
+      expect(result?.vatAmount).toBe(0);
+      expect(result?.preTaxAmount).toBe(0);
+    });
+
+    it("treats an empty or invalid discount value as no discount", () => {
+      for (const discountValue of ["", "abc", undefined]) {
+        const result = calculateItemTotals(
+          createItem({
+            discountType: "amount",
+            discountValue: discountValue as unknown as number,
+          }),
+        );
+
+        expect(result?.discountAmount).toBe(0);
+        expect(result?.netAmount).toBe(201);
+      }
+    });
+
+    it("coerces a string discount value", () => {
+      const result = calculateItemTotals(
+        createItem({
+          amount: 1,
+          netPrice: 200,
+          vat: 0,
+          discountType: "percentage",
+          discountValue: "25" as unknown as number,
+        }),
+      );
+
+      expect(result?.discountAmount).toBe(50);
+      expect(result?.netAmount).toBe(150);
+    });
+  });
+
   describe("integration-style case", () => {
     it("matches MOCK_INVOICE_ITEM_DATA expected totals", () => {
       const result = calculateItemTotals(createItem());
@@ -294,6 +392,7 @@ describe("calculateItemTotals", () => {
 
       expect(result).toEqual({
         ...item,
+        discountAmount: 0,
         netAmount: 201,
         vatAmount: 46.23,
         preTaxAmount: 247.23,

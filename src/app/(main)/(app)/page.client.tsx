@@ -273,7 +273,7 @@ export function AppPageClient({
       setInvoiceDataState(getInitialInvoiceData(urlTemplate ?? undefined));
 
       toast.error(
-        "Unable to load your saved invoice data. For your convenience, we've reset the form to default values. Please try creating a new invoice.",
+        "Your saved invoice couldn't be loaded, so you're starting with a new one.",
         {
           id: "unable-to-load-saved-invoice-data-error-toast",
           duration: Infinity,

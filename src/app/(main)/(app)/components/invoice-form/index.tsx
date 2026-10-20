@@ -493,6 +493,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               taxLabelText={taxLabelText}
               numberFormatLocale={numberFormatLocale}
               getValues={getValues}
+              setValue={setValue}
             />
           </AccordionContent>
         </AccordionItem>
