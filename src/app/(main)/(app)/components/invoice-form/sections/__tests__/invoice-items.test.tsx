@@ -699,6 +699,45 @@ describe("InvoiceItems discount", () => {
     expect(screen.getByLabelText("Discount value")).toHaveValue(50);
   });
 
+  it("explains a percentage and a fixed amount before a value is entered", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1 });
+
+    await user.click(screen.getByRole("button", { name: "Add discount" }));
+
+    expect(
+      screen.getByText(
+        "Enter a percentage from 0 to 100. It applies to the line total, before tax.",
+      ),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("radio", { name: "Fixed amount" }));
+
+    expect(
+      screen.getByText(
+        "Enter an amount up to the line total. It applies once to the whole line, not per unit.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("says there is nothing to discount while the line total is 0", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1, itemOverrides: { netPrice: 0 } });
+
+    await user.click(screen.getByRole("button", { name: "Add discount" }));
+
+    expect(
+      screen.getByText(
+        "The line total (Amount × Net Price) is 0, so there's nothing to discount yet.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Enter a percentage from 0 to 100/),
+    ).not.toBeInTheDocument();
+  });
+
   it("starts open for an item that already has a discount", () => {
     renderInvoiceItems({
       itemCount: 1,

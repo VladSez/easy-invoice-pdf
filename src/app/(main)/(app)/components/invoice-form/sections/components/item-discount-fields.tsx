@@ -145,6 +145,15 @@ function OpenItemDiscountFields({
     name: `items.${index}.discountAmount`,
   });
   const netAmount = useWatch({ control, name: `items.${index}.netAmount` });
+  const amount = useWatch({ control, name: `items.${index}.amount` });
+  const netPrice = useWatch({ control, name: `items.${index}.netPrice` });
+
+  // Read from the fields rather than the calculated amounts, which only catch up after
+  // the totals effect runs, so the message does not flash while typing
+  const isLineTotalZero =
+    // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- `<Input type="number">` gives back strings at runtime, the schema types say number
+    (Number(amount) || 0) * (Number(netPrice) || 0) === 0;
+
   const itemErrors = errors.items?.[index];
 
   const formatMoney = (amount: number) => {
@@ -321,10 +330,12 @@ function OpenItemDiscountFields({
                   <br />
                   Tax is calculated after the discount.
                 </>
+              ) : isLineTotalZero ? (
+                "The line total (Amount × Net Price) is 0, so there's nothing to discount yet."
               ) : discountType === "amount" ? (
-                "A fixed amount taken off the whole line (Amount × Net Price)."
+                "Enter an amount up to the line total. It applies once to the whole line, not per unit."
               ) : (
-                "A percentage taken off the whole line (Amount × Net Price)."
+                "Enter a percentage from 0 to 100. It applies to the line total, before tax."
               )}
             </InputHelperMessage>
           )}
