@@ -260,6 +260,7 @@ describe("InvoicePDFDownloadLink", () => {
     expect(umamiTrackEvent).toHaveBeenCalledWith("download_invoice", {
       data: {
         invoice_template: "default",
+        has_item_discount: false,
       },
     });
     expect(updateAppMetadata).toHaveBeenCalledTimes(1);
@@ -268,6 +269,28 @@ describe("InvoicePDFDownloadLink", () => {
     await vi.advanceTimersByTimeAsync(CTA_TOAST_TIMEOUT);
 
     expect(showCTAToast).toHaveBeenCalledTimes(1);
+  });
+
+  it("should report has_item_discount when an item has a discount", () => {
+    const initialInvoiceData = getInitialInvoiceData();
+    const invoiceData = {
+      ...initialInvoiceData,
+      items: [
+        ...initialInvoiceData.items,
+        { ...initialInvoiceData.items[0], discountAmount: 10 },
+      ],
+    };
+
+    renderInvoicePDFDownloadLink({ invoiceData });
+
+    fireEvent.click(getDownloadLink());
+
+    expect(umamiTrackEvent).toHaveBeenCalledWith("download_invoice", {
+      data: {
+        invoice_template: "default",
+        has_item_discount: true,
+      },
+    });
   });
 
   it("should not show the CTA toast again while the cooldown is active", async () => {
@@ -284,6 +307,7 @@ describe("InvoicePDFDownloadLink", () => {
     expect(umamiTrackEvent).toHaveBeenCalledWith("download_invoice", {
       data: {
         invoice_template: "default",
+        has_item_discount: false,
       },
     });
 
