@@ -595,6 +595,10 @@ describe("InvoiceItems read-only amounts", () => {
 });
 
 describe("InvoiceItems discount", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   afterEach(() => {
     cleanup();
   });
@@ -618,6 +622,9 @@ describe("InvoiceItems discount", () => {
     expect(screen.getByLabelText("Discount value")).toHaveFocus();
     expect(screen.getByRole("radio", { name: "Percentage" })).toBeChecked();
     expect(screen.getByLabelText(/^Label/)).toHaveValue("");
+    expect(umamiTrackEvent).toHaveBeenCalledExactlyOnceWith(
+      "add_item_discount",
+    );
   });
 
   it("switches between a percentage and a fixed amount", async () => {
@@ -630,6 +637,9 @@ describe("InvoiceItems discount", () => {
 
     expect(screen.getByRole("radio", { name: "Fixed amount" })).toBeChecked();
     expect(screen.getByRole("radio", { name: "Percentage" })).not.toBeChecked();
+    expect(umamiTrackEvent).toHaveBeenCalledWith("change_item_discount_type", {
+      data: { discount_type: "amount" },
+    });
   });
 
   it("moves between discount types with the arrow keys, as one tab stop", async () => {
@@ -697,6 +707,8 @@ describe("InvoiceItems discount", () => {
     await user.click(screen.getByRole("radio", { name: "Fixed amount" }));
 
     expect(screen.getByLabelText("Discount value")).toHaveValue(50);
+    // re-picking the selected type is not a change
+    expect(umamiTrackEvent).toHaveBeenCalledTimes(2);
   });
 
   it("explains a percentage and a fixed amount before a value is entered", async () => {
@@ -770,6 +782,9 @@ describe("InvoiceItems discount", () => {
     await vi.waitFor(() => {
       expect(addButton).toHaveFocus();
     });
+    expect(umamiTrackEvent).toHaveBeenCalledExactlyOnceWith(
+      "remove_item_discount",
+    );
 
     // reopening shows the cleared fields, not the removed discount
     await user.click(addButton);
