@@ -56,6 +56,10 @@ export const MOCK_INVOICE_ITEM_DATA = {
   vatAmountFieldIsVisible: true,
   preTaxAmount: 247.23,
   preTaxAmountFieldIsVisible: true,
+  discountType: "percentage",
+  discountValue: 0,
+  discountLabel: "",
+  discountAmount: 0,
 } as const satisfies InvoiceItemData;
 
 export const MOCK_INVOICE_DATA = {

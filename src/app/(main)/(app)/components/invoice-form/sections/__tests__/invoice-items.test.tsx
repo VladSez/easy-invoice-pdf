@@ -13,7 +13,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getInitialInvoiceData } from "@/app/constants";
 import type * as InvoiceSchema from "@/app/schema";
-import type { InvoiceData, SupportedNumberFormatLocale } from "@/app/schema";
+import type {
+  InvoiceData,
+  InvoiceItemData,
+  SupportedNumberFormatLocale,
+} from "@/app/schema";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { MOCK_INVOICE_ITEM_DATA } from "@/utils/__tests__/data";
 import "@testing-library/jest-dom/vitest";
@@ -61,6 +65,8 @@ interface InvoiceItemsTestHarnessProps {
   numberFormatLocale?: SupportedNumberFormatLocale;
   /** The invoice's template, `default` unless a test picks another one. */
   template?: InvoiceData["template"];
+  /** Overrides applied to every item, e.g. to start with a discount. */
+  itemOverrides?: Partial<InvoiceItemData>;
 }
 
 function InvoiceItemsTestHarness({
@@ -70,6 +76,7 @@ function InvoiceItemsTestHarness({
   itemNames,
   numberFormatLocale = "en",
   template = "default",
+  itemOverrides,
 }: InvoiceItemsTestHarnessProps) {
   const invoiceData = useMemo(() => {
     return {
@@ -77,13 +84,14 @@ function InvoiceItemsTestHarness({
       items: Array.from({ length: itemCount }, (_, index) => {
         return {
           ...MOCK_INVOICE_ITEM_DATA,
+          ...itemOverrides,
           name: itemNames?.[index] ?? MOCK_INVOICE_ITEM_DATA.name,
         };
       }),
     };
-  }, [itemCount, itemNames]);
+  }, [itemCount, itemNames, itemOverrides]);
 
-  const { control, getValues } = useForm<InvoiceData>({
+  const { control, getValues, setValue } = useForm<InvoiceData>({
     defaultValues: invoiceData,
   });
 
@@ -112,6 +120,7 @@ function InvoiceItemsTestHarness({
         taxLabelText="VAT"
         numberFormatLocale={numberFormatLocale}
         getValues={getValues}
+        setValue={setValue}
       />
     </TooltipProvider>
   );
@@ -190,6 +199,10 @@ describe("InvoiceItems max invoice items", () => {
       vatAmountFieldIsVisible: true,
       preTaxAmount: 0,
       preTaxAmountFieldIsVisible: true,
+      discountType: "percentage",
+      discountValue: 0,
+      discountLabel: "",
+      discountAmount: 0,
       typeOfGTU: "",
       typeOfGTUFieldIsVisible: true,
     });
@@ -579,4 +592,151 @@ describe("InvoiceItems read-only amounts", () => {
       ).toHaveValue(expectedAmounts.preTaxAmount);
     },
   );
+});
+
+describe("InvoiceItems discount", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("keeps the discount collapsed behind a button when the item has none", () => {
+    renderInvoiceItems({ itemCount: 1 });
+
+    expect(
+      screen.getByRole("button", { name: "Add discount" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText("Discount value")).not.toBeInTheDocument();
+  });
+
+  it("opens the discount fields and focuses the value", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1 });
+
+    await user.click(screen.getByRole("button", { name: "Add discount" }));
+
+    expect(screen.getByLabelText("Discount value")).toHaveFocus();
+    expect(screen.getByRole("radio", { name: "Percentage" })).toBeChecked();
+    expect(screen.getByLabelText(/^Label/)).toHaveValue("");
+  });
+
+  it("switches between a percentage and a fixed amount", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1 });
+
+    await user.click(screen.getByRole("button", { name: "Add discount" }));
+    await user.click(screen.getByRole("radio", { name: "Fixed amount" }));
+
+    expect(screen.getByRole("radio", { name: "Fixed amount" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Percentage" })).not.toBeChecked();
+  });
+
+  it("moves between discount types with the arrow keys, as one tab stop", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1 });
+
+    await user.click(screen.getByRole("button", { name: "Add discount" }));
+
+    const percentage = screen.getByRole("radio", { name: "Percentage" });
+    const fixedAmount = screen.getByRole("radio", { name: "Fixed amount" });
+
+    expect(percentage).toHaveAttribute("tabindex", "0");
+    expect(fixedAmount).toHaveAttribute("tabindex", "-1");
+
+    percentage.focus();
+    await user.keyboard("{ArrowRight}");
+
+    expect(fixedAmount).toBeChecked();
+    expect(fixedAmount).toHaveFocus();
+
+    // wraps around
+    await user.keyboard("{ArrowRight}");
+
+    expect(percentage).toBeChecked();
+    expect(percentage).toHaveFocus();
+  });
+
+  it("takes both a percentage and a fixed amount as numbers", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1 });
+
+    await user.click(screen.getByRole("button", { name: "Add discount" }));
+
+    expect(screen.getByLabelText("Discount value")).toHaveAttribute(
+      "type",
+      "number",
+    );
+
+    await user.click(screen.getByRole("radio", { name: "Fixed amount" }));
+
+    expect(screen.getByLabelText("Discount value")).toHaveAttribute(
+      "type",
+      "number",
+    );
+  });
+
+  it("clears the value when switching between a percentage and a fixed amount", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1 });
+
+    await user.click(screen.getByRole("button", { name: "Add discount" }));
+    await user.type(screen.getByLabelText("Discount value"), "10");
+
+    expect(screen.getByLabelText("Discount value")).toHaveValue(10);
+
+    await user.click(screen.getByRole("radio", { name: "Fixed amount" }));
+
+    expect(screen.getByLabelText("Discount value")).toHaveValue(null);
+
+    // picking the type that is already selected keeps the value
+    await user.type(screen.getByLabelText("Discount value"), "50");
+    await user.click(screen.getByRole("radio", { name: "Fixed amount" }));
+
+    expect(screen.getByLabelText("Discount value")).toHaveValue(50);
+  });
+
+  it("starts open for an item that already has a discount", () => {
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: {
+        discountType: "amount",
+        discountValue: 50,
+        discountLabel: "Charitable donation",
+      },
+    });
+
+    expect(screen.getByLabelText("Discount value")).toHaveValue(50);
+    expect(screen.getByLabelText("Discount value")).not.toHaveFocus();
+    expect(screen.getByLabelText(/^Label/)).toHaveValue("Charitable donation");
+    expect(screen.getByRole("radio", { name: "Fixed amount" })).toBeChecked();
+  });
+
+  it("clears the discount on remove and hands focus back to the add button", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: { discountValue: 10, discountLabel: "Loyalty" },
+    });
+
+    await user.click(screen.getByRole("button", { name: "Remove discount" }));
+
+    const addButton = await screen.findByRole("button", {
+      name: "Add discount",
+    });
+    await vi.waitFor(() => {
+      expect(addButton).toHaveFocus();
+    });
+
+    // reopening shows the cleared fields, not the removed discount
+    await user.click(addButton);
+
+    // the cleared zero shows as the empty placeholder
+    expect(screen.getByLabelText("Discount value")).toHaveValue(null);
+    expect(screen.getByLabelText(/^Label/)).toHaveValue("");
+  });
 });

@@ -186,6 +186,10 @@ describe("URL Compression Utilities", () => {
             vatAmountFieldIsVisible: true,
             preTaxAmount: 100,
             preTaxAmountFieldIsVisible: true,
+            discountType: "percentage",
+            discountValue: 0,
+            discountLabel: "",
+            discountAmount: 0,
           },
         ],
         invoiceTypeFieldIsVisible: true,
@@ -603,6 +607,68 @@ describe("URL Compression Utilities", () => {
 
         expect(missingKeys).toStrictEqual([]);
       });
+    });
+  });
+
+  describe("item discounts", () => {
+    it("leaves the discount fields out of items without a discount", () => {
+      const compressed = compressInvoiceData(MOCK_INVOICE_DATA);
+      const compressedItem = (compressed.m as Record<string, unknown>[])[0];
+
+      for (const key of [
+        "discountType",
+        "discountValue",
+        "discountLabel",
+        "discountAmount",
+      ] as const) {
+        expect(compressedItem).not.toHaveProperty(
+          INVOICE_KEY_COMPRESSION_MAP[key],
+        );
+      }
+
+      // and puts them back on the way out
+      expect(decompressInvoiceData(compressed)).toEqual(MOCK_INVOICE_DATA);
+    });
+
+    it("keeps the discount fields of a discounted item", () => {
+      const invoiceData = {
+        ...MOCK_INVOICE_DATA,
+        items: [
+          {
+            ...MOCK_INVOICE_DATA.items[0],
+            discountType: "amount",
+            discountValue: 50,
+            discountLabel: "Loyalty",
+            discountAmount: 50,
+          },
+        ],
+      } satisfies InvoiceData;
+
+      const compressed = compressInvoiceData(invoiceData);
+
+      expect(decompressInvoiceData(compressed)).toEqual(invoiceData);
+    });
+
+    it("gives items from links made before discounts existed no discount", () => {
+      const {
+        discountType,
+        discountValue,
+        discountLabel,
+        discountAmount,
+        ...legacyItem
+      } = MOCK_INVOICE_DATA.items[0];
+      const compressed = compressInvoiceData({
+        ...MOCK_INVOICE_DATA,
+        items: [legacyItem as InvoiceData["items"][number]],
+      });
+
+      expect(decompressInvoiceData(compressed)).toEqual(MOCK_INVOICE_DATA);
+      expect([
+        discountType,
+        discountValue,
+        discountLabel,
+        discountAmount,
+      ]).toEqual(["percentage", 0, "", 0]);
     });
   });
 

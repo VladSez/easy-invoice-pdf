@@ -3,7 +3,7 @@ import type { InvoiceItemData } from "@/app/schema";
 import { calculateItemTotals } from "./calculate-item-totals";
 
 /**
- * Check if calculated item totals (netAmount, vatAmount, preTaxAmount)
+ * Check if calculated item totals (discountAmount, netAmount, vatAmount, preTaxAmount)
  * differ from existing item's values.
  *
  * @param item InvoiceItemData to check for changes
@@ -13,6 +13,7 @@ export function hasItemTotalsChanged(item: InvoiceItemData): boolean {
   const calculated = calculateItemTotals(item);
 
   return (
+    calculated?.discountAmount !== item.discountAmount ||
     calculated?.netAmount !== item.netAmount ||
     calculated?.vatAmount !== item.vatAmount ||
     calculated?.preTaxAmount !== item.preTaxAmount

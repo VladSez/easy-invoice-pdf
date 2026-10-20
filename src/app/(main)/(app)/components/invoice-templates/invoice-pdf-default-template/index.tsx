@@ -130,10 +130,13 @@ export const PDF_DEFAULT_TEMPLATE_STYLES = StyleSheet.create({
   // styles for specific column widths for invoice items table
   colNo: { flex: 0.45 }, // smallest width for numbers
   colName: { flex: 4.8 }, // larger width for text
+  colNameWithDiscount: { flex: 3.2 }, // gives up exactly the discount column's width, so no other column narrows
   colGTU: { flex: 0.9 }, // small width for codes
   colAmount: { flex: 1.2 }, // medium width for numbers
   colUnit: { flex: 1 }, // medium width for text
   colNetPrice: { flex: 1.5 }, // medium-large for prices
+  // wide enough that react-pdf does not hyphenate the bold header ("Dis-count", "Des-cuento")
+  colDiscount: { flex: 1.6 }, // percentage or amount
   colVAT: { flex: 0.8 }, // small width for percentages
   colNetAmount: { flex: 1.5 }, // medium-large for amounts
   colVATAmount: { flex: 1.5 }, // medium-large for amounts

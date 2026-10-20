@@ -59,4 +59,84 @@ describe("parseValidatedInvoiceItems", () => {
 
     expect(result.success).toBe(false);
   });
+
+  describe("discount", () => {
+    it("accepts a percentage discount up to 100%", () => {
+      const result = parseValidatedInvoiceItems([
+        createItem({ discountType: "percentage", discountValue: 100 }),
+      ]);
+
+      expect(result.success).toBe(true);
+    });
+
+    it("rejects a percentage discount above 100%", () => {
+      const result = parseValidatedInvoiceItems([
+        createItem({ discountType: "percentage", discountValue: 101 }),
+      ]);
+
+      assert(!result.success);
+
+      expect(result.error.issues[0].path).toEqual([0, "discountValue"]);
+    });
+
+    it("rejects a fixed discount larger than the line", () => {
+      // MOCK_INVOICE_ITEM_DATA: 2 x 100.50 = 201.00
+      const result = parseValidatedInvoiceItems([
+        createItem({ discountType: "amount", discountValue: 201.01 }),
+      ]);
+
+      assert(!result.success);
+
+      expect(result.error.issues[0]).toMatchObject({
+        path: [0, "discountValue"],
+        message:
+          "Discount must not exceed the line amount (Amount × Net Price)",
+      });
+    });
+
+    it("accepts a fixed discount equal to the line", () => {
+      const result = parseValidatedInvoiceItems([
+        createItem({ discountType: "amount", discountValue: 201 }),
+      ]);
+
+      expect(result.success).toBe(true);
+    });
+
+    it("rejects a negative discount", () => {
+      const result = parseValidatedInvoiceItems([
+        createItem({ discountValue: -5 }),
+      ]);
+
+      expect(result.success).toBe(false);
+    });
+
+    it("reads a cleared discount input as no discount", () => {
+      const result = parseValidatedInvoiceItems([
+        createItem({ discountValue: "" as unknown as number }),
+      ]);
+
+      assert(result.success);
+
+      expect(result.data[0].discountValue).toBe(0);
+    });
+
+    it("fills in the discount fields for items saved before discounts existed", () => {
+      const legacyItem = Object.fromEntries(
+        Object.entries(createItem()).filter(([key]) => {
+          return !key.startsWith("discount");
+        }),
+      );
+
+      const result = parseValidatedInvoiceItems([legacyItem]);
+
+      assert(result.success);
+
+      expect(result.data[0]).toMatchObject({
+        discountType: "percentage",
+        discountValue: 0,
+        discountLabel: "",
+        discountAmount: 0,
+      });
+    });
+  });
 });

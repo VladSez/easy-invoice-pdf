@@ -79,6 +79,8 @@ const invoiceItemsTableTranslationSchema = z
      */
     preTaxAmount: functionCustomTaxLabelInputSchema,
     sum: z.string(),
+    /** Discount column header. */
+    discount: z.string(),
   })
   .strict();
 
@@ -155,6 +157,12 @@ const stripeTranslationSchema = z
     amountDue: z.string(),
     page: z.string(),
     of: z.string(),
+    /** Fallback label of the row under a discounted item. */
+    discount: z.string(),
+    /** Joins a tax rate to the amount it applies to, e.g. "23% (on €9,000.00)". */
+    taxOn: z.string(),
+    /** Follows the size of a discount in its row, e.g. "(10% off)", "(€50.00 off)". */
+    discountOff: z.string(),
   })
   .strict();
 
