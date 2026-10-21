@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 
+import type { InvoiceData } from "@easyinvoicepdf/invoice-core";
 import { InvoicePdfInstanceProvider } from "@easyinvoicepdf/invoice-core/pdf";
 import {
   cleanup,
@@ -19,7 +20,6 @@ import {
 import { CTAToastProvider } from "@/app/(main)/(app)/contexts/cta-toast-context";
 import { updateAppMetadata } from "@/app/(main)/(app)/utils/get-app-metadata";
 import { getInitialInvoiceData } from "@/app/constants";
-import { type InvoiceData } from "@/app/schema";
 import { CTA_TOAST_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DeviceContextProvider } from "@/contexts/device-context";

@@ -3,9 +3,8 @@ import dayjs from "dayjs";
 import { z } from "zod";
 
 // The invoice schema itself lives in `@easyinvoicepdf/invoice-core`, which the backend
-// shares. It is re-exported here only while the app's imports move over (openspec change
-// `backend-split`, task 6.1). What follows is web-app-only.
-export * from "@easyinvoicepdf/invoice-core";
+// shares. This file holds only the web app's own state: site locales, app metadata,
+// accordion and mobile-tab state.
 
 /**
  * The languages the *interface* is translated into.

@@ -1,6 +1,6 @@
+import type { InvoiceData } from "@easyinvoicepdf/invoice-core";
 import { expect, test } from "@playwright/test";
 
-import { type InvoiceData } from "@/app/schema";
 import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 
 import { waitForPdfRegeneration } from "../utils/pdf-download";

@@ -1,3 +1,4 @@
+import type { BuyerData, SellerData } from "@easyinvoicepdf/invoice-core";
 import { ChevronDown, FileUp, FileWarning } from "lucide-react";
 import { useEffect, useEffectEvent, useState } from "react";
 
@@ -7,7 +8,6 @@ import {
   type InvalidContactEntry,
   type MergeImportedContactsResult,
 } from "@/app/(main)/(app)/utils/contacts-backup";
-import type { BuyerData, SellerData } from "@/app/schema";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Dialog,

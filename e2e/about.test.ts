@@ -1,9 +1,10 @@
 /* eslint-disable playwright/no-conditional-expect */
 /* eslint-disable playwright/no-conditional-in-test */
 
+import { LANGUAGE_TO_NATIVE_LABEL } from "@easyinvoicepdf/invoice-core";
 import { expect, test } from "@playwright/test";
 
-import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_I18N_LOCALES } from "@/app/schema";
+import { SUPPORTED_I18N_LOCALES } from "@/app/schema";
 import { GITHUB_URL, TWITTER_URL, VIDEO_DEMO_FALLBACK_IMG } from "@/config";
 
 test.describe("About page", () => {

@@ -1,8 +1,7 @@
 // @vitest-environment node
 
+import { INVOICE_PDF_TRANSLATIONS } from "@easyinvoicepdf/invoice-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 
 import { nowInTimeZone } from "../invoice-time-zone";
 import {

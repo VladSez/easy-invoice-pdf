@@ -1,3 +1,4 @@
+import type { SupportedTemplates } from "@easyinvoicepdf/invoice-core";
 import * as Sentry from "@sentry/nextjs";
 import type { Metadata } from "next";
 import { type ReactNode, Suspense } from "react";
@@ -5,7 +6,6 @@ import { type ReactNode, Suspense } from "react";
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { Footer } from "@/app/(components)/footer";
 import { getLatestChangelogSummary } from "@/app/(main)/changelog/utils";
-import type { SupportedTemplates } from "@/app/schema";
 import {
   APP_URL,
   PROD_WEBSITE_URL,

@@ -1,5 +1,9 @@
 // @vitest-environment happy-dom
 
+import type {
+  InvoiceData,
+  InvoiceItemData,
+} from "@easyinvoicepdf/invoice-core";
 import { act, cleanup, render } from "@testing-library/react";
 import { useCallback, useEffect, type RefObject } from "react";
 import {
@@ -10,7 +14,6 @@ import {
 import { afterEach, describe, expect, it, vi, type Mock } from "vitest";
 
 import { getInitialInvoiceData } from "@/app/constants";
-import type { InvoiceData, InvoiceItemData } from "@/app/schema";
 import { MOCK_INVOICE_ITEM_DATA } from "@/utils/__tests__/data";
 import "@testing-library/jest-dom/vitest";
 

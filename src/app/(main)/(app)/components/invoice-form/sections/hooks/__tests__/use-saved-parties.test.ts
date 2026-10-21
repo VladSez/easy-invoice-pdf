@@ -1,12 +1,12 @@
 // @vitest-environment happy-dom
 
+import { buyerSchema, sellerSchema } from "@easyinvoicepdf/invoice-core";
 import * as Sentry from "@sentry/nextjs";
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SAVED_CONTACTS_IMPORTED_EVENT } from "@/app/(main)/(app)/components/invoice-form/sections/components/contacts-backup-menu";
 import { useSavedParties } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-saved-parties";
-import { buyerSchema, sellerSchema } from "@/app/schema";
 import {
   BUYERS_LOCAL_STORAGE_KEY,
   SELLERS_LOCAL_STORAGE_KEY,

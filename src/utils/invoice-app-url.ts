@@ -1,4 +1,7 @@
-import { SUPPORTED_TEMPLATES, type SupportedTemplates } from "@/app/schema";
+import {
+  SUPPORTED_TEMPLATES,
+  type SupportedTemplates,
+} from "@easyinvoicepdf/invoice-core";
 
 /**
  * The Stripe template has its own route, so it is prerendered with its own title,

@@ -1,3 +1,4 @@
+import type { InvoiceData } from "@easyinvoicepdf/invoice-core";
 import dayjs from "dayjs";
 import { FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -5,7 +6,6 @@ import Link from "next/link";
 import { useRef, useState, type ReactNode, type RefObject } from "react";
 
 import {
-  type InvoiceData,
   type MobileTabsValues,
   DEFAULT_MOBILE_TAB,
   MOBILE_TABS_VALUES,

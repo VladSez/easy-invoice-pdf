@@ -1,6 +1,5 @@
+import type { BuyerData, SellerData } from "@easyinvoicepdf/invoice-core";
 import { expect, test } from "@playwright/test";
-
-import type { BuyerData, SellerData } from "@/app/schema";
 
 const TEST_SELLER_DATA = {
   name: "TEST SELLER COMPANY",

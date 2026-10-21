@@ -1,11 +1,11 @@
-import * as React from "react";
-
 import {
   CURRENCY_SYMBOLS,
-  SUPPORTED_CURRENCIES,
   type CurrencySymbols,
   type InvoiceData,
-} from "@/app/schema";
+  SUPPORTED_CURRENCIES,
+} from "@easyinvoicepdf/invoice-core";
+import * as React from "react";
+
 import { cn } from "@/lib/utils";
 
 import { Input } from "./input";

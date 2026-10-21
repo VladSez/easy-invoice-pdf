@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  formatAmount,
+  formatDateWithLocale,
+  type InvoiceData,
+  invoiceSchema,
+  resolveNumberFormatLocale,
+} from "@easyinvoicepdf/invoice-core";
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
 import { memo, useCallback, useEffect, useState, type RefObject } from "react";
@@ -11,16 +18,8 @@ import {
   getAppStorageItem,
   setAppStorageItem,
 } from "@/app/(main)/(app)/utils/app-local-storage";
-import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
-import { formatDateWithLocale } from "@/app/(main)/(app)/utils/format-date-with-locale";
 import { updateAppMetadata } from "@/app/(main)/(app)/utils/get-app-metadata";
-import {
-  accordionSchema,
-  invoiceSchema,
-  resolveNumberFormatLocale,
-  type AccordionState,
-  type InvoiceData,
-} from "@/app/schema";
+import { accordionSchema, type AccordionState } from "@/app/schema";
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   PDF_DATA_LOCAL_STORAGE_KEY,

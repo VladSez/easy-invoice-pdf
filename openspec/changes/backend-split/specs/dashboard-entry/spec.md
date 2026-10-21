@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Defines how the free app hands users off to the paid dashboard on its own subdomain, while the free app itself stays account-free and runs as before for users, forks and self-hosters.
+Defines how the free app sends users to the paid dashboard on its own subdomain, while the free app itself stays account-free and runs as before for users, forks and self-hosters.
 
 ## ADDED Requirements
 
@@ -25,23 +25,14 @@ When a dashboard URL is configured, requests to `/dashboard` and any path below 
 - **WHEN** a user requests `/dashboard`
 - **THEN** the redirect is returned and no localized page or not-found page is rendered for it
 
-### Requirement: Free app links to the dashboard
-
-When a dashboard URL is configured, the free app SHALL show a link to the dashboard that navigates to the dashboard origin.
-
-#### Scenario: Link is visible
-
-- **WHEN** the free app is built with a dashboard URL configured
-- **THEN** a "Dashboard" link pointing at that URL appears in the app
-
 ### Requirement: Free app works without a dashboard
 
-When no dashboard URL is configured, the free app SHALL build and run with no dashboard link and no `/dashboard` redirect, and SHALL behave exactly as it does today.
+When no dashboard URL is configured, the free app SHALL build and run with no `/dashboard` redirect, and SHALL behave exactly as it does today.
 
 #### Scenario: Fork without configuration
 
 - **WHEN** the free app is built and run with no dashboard URL configured
-- **THEN** the build succeeds, no dashboard link is shown, and `/dashboard` is handled like any other unknown path
+- **THEN** the build succeeds and `/dashboard` is handled like any other unknown path
 
 ### Requirement: Free app holds no account state
 

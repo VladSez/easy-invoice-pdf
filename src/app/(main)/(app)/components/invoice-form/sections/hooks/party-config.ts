@@ -1,12 +1,12 @@
+import {
+  type BuyerData,
+  buyerSchema,
+  type SellerData,
+  sellerSchema,
+} from "@easyinvoicepdf/invoice-core";
 import type { z } from "zod";
 
 import { DEFAULT_BUYER_DATA, DEFAULT_SELLER_DATA } from "@/app/constants";
-import {
-  buyerSchema,
-  sellerSchema,
-  type BuyerData,
-  type SellerData,
-} from "@/app/schema";
 import {
   BUYERS_LOCAL_STORAGE_KEY,
   SELLERS_LOCAL_STORAGE_KEY,

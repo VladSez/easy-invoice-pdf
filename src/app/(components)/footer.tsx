@@ -1,3 +1,4 @@
+import { LANGUAGE_TO_NATIVE_LABEL } from "@easyinvoicepdf/invoice-core";
 import Link from "next/link";
 
 /* eslint-disable @next/next/no-html-link-for-pages */
@@ -7,7 +8,7 @@ import {
   APP_FOOTER_SOLUTION_LINKS,
   SEO_FOOTER_SOLUTION_LINKS,
 } from "@/app/(main)/(seo-landings)/seo-landing-footer-links";
-import { LANGUAGE_TO_NATIVE_LABEL, SUPPORTED_I18N_LOCALES } from "@/app/schema";
+import { SUPPORTED_I18N_LOCALES } from "@/app/schema";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import {
   DISCORD_COMMUNITY_URL,

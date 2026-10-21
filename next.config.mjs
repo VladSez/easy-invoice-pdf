@@ -12,7 +12,13 @@ const loadTsFileViaJiti = createJiti(import.meta.filename);
 
 // Import ENV file here to validate during build. jiti lets us import .ts files :)
 // (jiti v2 deprecated the callable form in favour of `.import()`)
-await loadTsFileViaJiti.import("./src/env");
+// @ts-ignore
+const { env } = await loadTsFileViaJiti.import("./src/env");
+
+// @ts-ignore
+const { getDashboardRedirects } = await loadTsFileViaJiti.import(
+  "./src/lib/dashboard-redirects.ts",
+);
 
 // Validate all i18n files, that are used to translate the /about page
 async function validatei18nAndInvoicePDFTranslationFiles() {
@@ -221,6 +227,9 @@ const nextConfig = {
         destination: "/stripe-template",
         permanent: true,
       },
+      // `/dashboard/*` -> the paid dashboard's own origin, only when one is configured.
+      // Redirects run before any route, so the `[locale]` catch-all never sees `/dashboard`.
+      ...getDashboardRedirects(env.NEXT_PUBLIC_DASHBOARD_URL),
     ];
   },
 };

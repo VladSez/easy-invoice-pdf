@@ -14,7 +14,7 @@ The free app's PDF engine (schema, templates, translations, totals) is also tang
 - Make PDF rendering isomorphic: one `InvoicePdfDocument` renders both templates identically in the browser and in Node. This replaces the duplicated server-only wrapper, which supports the default template only.
 - Bundle the five PDF fonts as files inside `invoice-core` instead of fetching them from `static.easyinvoicepdf.com`.
 - Move the totals calculations out of the form into `invoice-core`, so every editor and every backend write path computes totals the same way.
-- Add a "Dashboard" link and an `easyinvoicepdf.com/dashboard` redirect to `app.easyinvoicepdf.com`. No auth, sync or account code goes into the public repo.
+- Add an `easyinvoicepdf.com/dashboard` redirect to `app.easyinvoicepdf.com`, active only when a dashboard URL is configured. A visible "Dashboard" link waits for the dashboard launch and a later change. No auth, sync or account code goes into the public repo.
 - Add a CLA before the first outside contribution.
 - Later, remove the author's personal monthly-invoice route, Trigger.dev task, Telegram webhook and their secrets. These move to the private repo as the "recurring invoices" feature. **BREAKING** for anyone who calls `/api/generate-invoice` (author-only today).
 
@@ -34,7 +34,7 @@ The free app's PDF engine (schema, templates, translations, totals) is also tang
 
 - `invoice-pdf-rendering`: the same invoice data produces the same PDF, for both templates, in the browser and on a Node server. Fonts load from bundled files, never over the network.
 - `invoice-totals`: item amounts (net, VAT, pre-tax) and the invoice total are derived from the line items by one shared calculation, not taken from the caller.
-- `dashboard-entry`: the free app links to the paid dashboard on `app.easyinvoicepdf.com` and redirects `/dashboard` there, without loading any account code itself.
+- `dashboard-entry`: the free app redirects `/dashboard` to the paid dashboard on `app.easyinvoicepdf.com`, without loading any account code itself.
 
 The backend capabilities (accounts, the REST API, MCP, billing, stored invoices) are implemented and specified in the private repo's own OpenSpec. This change records only the architecture and the public-repo contract they depend on.
 

@@ -1,9 +1,8 @@
-import { describe, expect, it } from "vitest";
-
 import {
   SUPPORTED_CURRENCIES,
   SUPPORTED_INVOICE_PDF_LANGUAGES,
-} from "@/app/schema";
+} from "@easyinvoicepdf/invoice-core";
+import { describe, expect, it } from "vitest";
 
 import { buildBreadcrumbList } from "../breadcrumb";
 import { JSON_LD_IDS } from "../json-ld-ids";

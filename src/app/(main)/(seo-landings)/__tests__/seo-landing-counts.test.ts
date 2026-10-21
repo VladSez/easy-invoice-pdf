@@ -1,9 +1,8 @@
-import { describe, expect, it } from "vitest";
-
 import {
   SUPPORTED_CURRENCIES,
   SUPPORTED_INVOICE_PDF_LANGUAGES,
-} from "@/app/schema";
+} from "@easyinvoicepdf/invoice-core";
+import { describe, expect, it } from "vitest";
 
 import { SEO_LANDING_DEFINITIONS } from "../seo-landing-definitions";
 import {

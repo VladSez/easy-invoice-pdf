@@ -1,3 +1,4 @@
+import type { InvoiceData, SellerData } from "@easyinvoicepdf/invoice-core";
 import { Plus, Trash2, Pencil, AlertCircleIcon } from "lucide-react";
 import { useId, useState, type Dispatch, type SetStateAction } from "react";
 import type { UseFormSetValue } from "react-hook-form";
@@ -7,7 +8,6 @@ import { ContactsBackupMenu } from "@/app/(main)/(app)/components/invoice-form/s
 import { SellerDialog } from "@/app/(main)/(app)/components/invoice-form/sections/components/seller/seller-dialog";
 import { usePartyActions } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-party-actions";
 import { useSavedParties } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-saved-parties";
-import { type InvoiceData, type SellerData } from "@/app/schema";
 import {
   AlertDialog,
   AlertDialogAction,

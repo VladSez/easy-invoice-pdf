@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  compressInvoiceData,
+  decompressInvoiceData,
+  type InvoiceData,
+  invoiceSchema,
+} from "@easyinvoicepdf/invoice-core";
 import { InvoicePdfInstanceProvider } from "@easyinvoicepdf/invoice-core/pdf";
 import * as Sentry from "@sentry/nextjs";
 import {
@@ -20,7 +26,6 @@ import {
 } from "@/app/(main)/(app)/utils/get-app-metadata";
 import type { ChangelogSummary } from "@/app/(main)/changelog/utils";
 import { getInitialInvoiceData } from "@/app/constants";
-import { invoiceSchema, type InvoiceData } from "@/app/schema";
 import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 import { GitHubStarCTA } from "@/components/github-star-cta";
 import { Button } from "@/components/ui/button";
@@ -35,10 +40,6 @@ import {
   getTemplateFromUrl,
   isUrlForTemplate,
 } from "@/utils/invoice-app-url";
-import {
-  compressInvoiceData,
-  decompressInvoiceData,
-} from "@/utils/url-compression";
 
 import { InvoiceClientPage } from "./components";
 import { ChangelogUpdatePopup } from "./components/changelog-update-popup";

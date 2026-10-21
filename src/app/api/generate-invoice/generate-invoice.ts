@@ -1,12 +1,15 @@
+import {
+  compressInvoiceData,
+  type InvoiceData,
+  invoiceSchema,
+} from "@easyinvoicepdf/invoice-core";
 import type dayjs from "dayjs";
 import type { drive_v3 } from "googleapis";
 import { compressToEncodedURIComponent } from "lz-string";
 import type { Attachment, CreateEmailResponse } from "resend";
 
-import { invoiceSchema, type InvoiceData } from "@/app/schema";
 import type { InvoiceFolderResult } from "@/lib/google-drive";
 import { buildInvoiceAppUrl } from "@/utils/invoice-app-url";
-import { compressInvoiceData } from "@/utils/url-compression";
 
 /**
  * Formats milliseconds into a human-readable duration string.

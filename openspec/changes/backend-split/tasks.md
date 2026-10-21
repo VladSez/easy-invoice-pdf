@@ -58,27 +58,27 @@ Each move leaves a temporary re-export at the old path so the 124 `@/app/schema`
 
 ## 6. Remove the temporary re-exports
 
-- [ ] 6.1 Run a codemod that rewrites the remaining `@/app/schema`, old template, translation, format, totals and URL-compression imports to `@easyinvoicepdf/invoice-core` (or `/pdf`), then delete the re-export files; verify `pnpm type-check`, `pnpm lint` and `pnpm knip` pass and `rg "from \"@/app/schema\"" src` matches only web-only modules (storage keys, `i18n-schema`)
-- [ ] 6.2 Run the narrowed integration set on Desktop Chrome: `e2e/invoice-form.test.ts -g "adds an item"`, one default-template and one Stripe-template snapshot test, and `e2e/generate-invoice-link.test.ts`; verify all pass
+- [x] 6.1 Run a codemod that rewrites the remaining `@/app/schema`, old template, translation, format, totals and URL-compression imports to `@easyinvoicepdf/invoice-core` (or `/pdf`), then delete the re-export files; verify `pnpm type-check`, `pnpm lint` and `pnpm knip` pass and `rg "from \"@/app/schema\"" src` matches only web-only modules (storage keys, `i18n-schema`)
+- [x] 6.2 Run the narrowed integration set on Desktop Chrome: `e2e/invoice-form.test.ts` ("can add and remove invoice items and recalculates totals correctly"), one default-template test ("downloads PDF in Polish and verifies content"), one Stripe-template test ("generates PDF with logo and payment URL when using Stripe template"), and `e2e/generate-invoice-link.test.ts`; verify all pass
 
 ## 7. Dashboard entry in the free app
 
-- [ ] 7.1 Add an optional `NEXT_PUBLIC_DASHBOARD_URL` to `src/env.ts` and, when it is set, a permanent `/dashboard/:path*` → `${NEXT_PUBLIC_DASHBOARD_URL}/:path*` redirect in `next.config.mjs` ahead of the locale routes; verify with `curl -I` against `pnpm dev` that `/dashboard` and `/dashboard/invoices?status=draft` return 308 to the right targets, and that without the variable `/dashboard` returns the not-found page
-- [ ] 7.2 Add a "Dashboard" link to the header, shown only when `NEXT_PUBLIC_DASHBOARD_URL` is set, with the label in every `messages/*.json`; verify `pnpm dev` starts (translation validation passes) and the link appears only with the variable set
-- [ ] 7.3 Add a unit or e2e test (Desktop Chrome) for the redirect scenarios and the "no requests to the API origin" scenario from `specs/dashboard-entry`; verify it passes
-- [ ] 7.4 Add a changelog entry for the core extraction and dashboard link (`changelog-maintenance` skill); verify `/changelog` renders it in `pnpm dev`
+- [x] 7.1 Add an optional `NEXT_PUBLIC_DASHBOARD_URL` to `src/env.ts` and, when it is set, a permanent `/dashboard/:path*` → `${NEXT_PUBLIC_DASHBOARD_URL}/:path*` redirect in `next.config.mjs` ahead of the locale routes; verify with `curl -I` against `pnpm dev` that `/dashboard` and `/dashboard/invoices?status=draft` return 308 to the right targets, and that without the variable `/dashboard` returns the not-found page
+- [x] 7.3 Add a unit or e2e test (Desktop Chrome) for the redirect scenarios and the "no requests to the API origin" scenario from `specs/dashboard-entry`; verify it passes
 
 ## 8. Bootstrap the private repo (up to M1)
 
-- [ ] 8.1 Create the private GitHub repo and scaffold the pnpm + Turborepo layout (`apps/api`, `apps/dashboard`, `packages/db`, `packages/domain`, `packages/ui`) with the `.npmrc` copied from this repo; verify `pnpm install` and `turbo run type-check` succeed
+- [x] 8.1 Create the private GitHub repo and scaffold the pnpm + Turborepo layout (`apps/api`, `apps/dashboard`, `packages/db`, `packages/domain`, `packages/ui`) with the `.npmrc` copied from this repo; verify `pnpm install` and `turbo run type-check` succeed
 - [ ] 8.2 Add `@easyinvoicepdf/invoice-core` as a git dependency on `VladSez/pdf-invoice-generator` pinned to a commit with a subdirectory path, under `block-exotic-subdeps=true`; verify that a clean install resolves it, and if pnpm refuses, record the fallback (git submodule + workspace path) in the private repo's design before continuing
-- [ ] 8.3 Copy the PDF safeguards: the react-pdf `overrides` block with its comments, `patchedDependencies` and `patches/fontkit@2.0.4.patch`, and a port of `fontkit-glyph-cache-patch.test.ts`; verify the ported test passes, and fails when the patch entry is removed
+- [x] 8.3 Copy the PDF safeguards: the react-pdf `overrides` block with its comments, `patchedDependencies` and `patches/fontkit@2.0.4.patch`, and a port of `fontkit-glyph-cache-patch.test.ts`; verify the ported test passes, and fails when the patch entry is removed
 - [ ] 8.4 Scaffold `apps/api` (Hono on Node, zod-validated env, `GET /health`) with a bundler that inlines `invoice-core` and copies its `fonts/`; verify `node dist/index.js` serves `/health` and that the fonts are present in the build output
 - [ ] 8.5 Add `POST /v1/render` behind a static token: parse with `invoiceSchema`, recompute totals, enforce the 5 MB body limit and the 500-item cap, and render with `renderInvoicePdfToBuffer`; verify with unit tests for `%PDF` output, a wrong client `total` being ignored, and 413/422 on oversize or invalid input
 - [ ] 8.6 Deploy the API to `api-staging.easyinvoicepdf.com`; verify that rendering the same JSON for both templates and a `pt` sample gives PDFs whose extracted text matches the free app's downloads, and that the deployed function makes no outbound font requests; also open one staging PDF in the browser next to the free app's download of the same JSON and compare them visually
 
 ## Workflow follow-up
 
+- No changelog entry for this change (decided 2026-10-21); cover it in the release notes when the paid tier launches.
+- When the dashboard launches, add a "Dashboard" link to the free app's header (shown only when `NEXT_PUBLIC_DASHBOARD_URL` is set, label in every `messages/*.json`) as its own change, with a `dashboard-entry` requirement for it. Deferred from this change on 2026-10-21.
 - Plan M2–M5 (Better Auth accounts and API keys, stored invoices with numbering and schema versioning, MCP server, dashboard editor at `app.easyinvoicepdf.com`, Polar billing) as changes in the private repo's own OpenSpec, using `design.md` D8–D10 as their starting point.
 - Once recurring invoices ship in the private repo and have run alongside the old route for one cycle, open a separate public-repo change for M6: delete `src/app/api/generate-invoice/`, `src/trigger/`, `trigger.config.ts`, the Telegram webhook and their env vars and dependencies, then rotate those secrets.
 - Archive this change after groups 1–8 are complete and reviewed.

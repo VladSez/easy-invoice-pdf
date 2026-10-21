@@ -1,7 +1,9 @@
+import {
+  INVOICE_PDF_TRANSLATIONS,
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
+} from "@easyinvoicepdf/invoice-core";
 import { z } from "zod";
 
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import { SUPPORTED_INVOICE_PDF_LANGUAGES } from "@/app/schema";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 
 /**

@@ -1,7 +1,9 @@
-import { parseValidatedInvoiceItems } from "@easyinvoicepdf/invoice-core";
+import {
+  type InvoiceItemData,
+  parseValidatedInvoiceItems,
+} from "@easyinvoicepdf/invoice-core";
 import { describe, it, expect } from "vitest";
 
-import type { InvoiceItemData } from "@/app/schema";
 import { MOCK_INVOICE_ITEM_DATA } from "@/utils/__tests__/data";
 
 import {

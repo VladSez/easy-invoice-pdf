@@ -1,7 +1,9 @@
+import {
+  INVOICE_PDF_TRANSLATIONS,
+  type SupportedTemplates,
+} from "@easyinvoicepdf/invoice-core";
 import type { Locator, Page } from "@playwright/test";
 
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import type { SupportedTemplates } from "@/app/schema";
 import { buildInvoiceAppUrl } from "@/utils/invoice-app-url";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test

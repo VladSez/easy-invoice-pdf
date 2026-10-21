@@ -39,11 +39,16 @@ export const env = createEnv({
     NEXT_PUBLIC_SENTRY_DSN: z.string(),
     // Umami website id, used by the analytics script in `root-document.tsx`
     NEXT_PUBLIC_UMAMI_WEBSITE_ID: z.string(),
+    // Origin of the paid dashboard (e.g. https://app.easyinvoicepdf.com). When set,
+    // `/dashboard/*` redirects there (see `src/lib/dashboard-redirects.ts`). Leave it
+    // unset in forks and self-hosted copies.
+    NEXT_PUBLIC_DASHBOARD_URL: z.url().optional(),
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
   runtimeEnv: {
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     NEXT_PUBLIC_UMAMI_WEBSITE_ID: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID,
+    NEXT_PUBLIC_DASHBOARD_URL: process.env.NEXT_PUBLIC_DASHBOARD_URL,
 
     AUTH_TOKEN: process.env.AUTH_TOKEN,
 

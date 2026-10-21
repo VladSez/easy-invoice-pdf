@@ -1,11 +1,10 @@
 // @vitest-environment happy-dom
 
+import type { InvoiceData } from "@easyinvoicepdf/invoice-core";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import type { FieldErrors } from "react-hook-form";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import type { InvoiceData } from "@/app/schema";
 import "@testing-library/jest-dom/vitest";
 
 vi.mock("sonner", () => {

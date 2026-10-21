@@ -1,3 +1,15 @@
+import {
+  formatAmount,
+  formatMoneyForTemplate,
+  getAmountInWords,
+  getNumberFractionalPart,
+  INVOICE_PDF_TRANSLATIONS,
+  type InvoiceData,
+  MAX_INVOICE_ITEMS,
+  type SupportedCurrencies,
+  type SupportedLanguages,
+  type SupportedNumberFormatLocale,
+} from "@easyinvoicepdf/invoice-core";
 import { Plus, Trash2 } from "lucide-react";
 import { memo, useRef, useState } from "react";
 import {
@@ -14,16 +26,6 @@ import {
   DeleteInvoiceItemDialog,
   type ItemPendingDeletion,
 } from "@/app/(main)/(app)/components/invoice-form/sections/components/delete-invoice-item-dialog";
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
-import { formatMoneyForTemplate } from "@/app/(main)/(app)/utils/format-money-for-template";
-import {
-  type InvoiceData,
-  type SupportedCurrencies,
-  type SupportedLanguages,
-  type SupportedNumberFormatLocale,
-  MAX_INVOICE_ITEMS,
-} from "@/app/schema";
 import { Legend } from "@/components/legend";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,10 +37,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
-import {
-  getAmountInWords,
-  getNumberFractionalPart,
-} from "@/utils/amount-in-words";
 
 const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
   return <p className="mt-1 text-xs text-red-600">{children}</p>;

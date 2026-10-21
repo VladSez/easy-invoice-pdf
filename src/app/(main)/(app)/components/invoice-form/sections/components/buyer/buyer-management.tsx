@@ -1,3 +1,4 @@
+import type { BuyerData, InvoiceData } from "@easyinvoicepdf/invoice-core";
 import { Plus, Trash2, Pencil, AlertCircleIcon } from "lucide-react";
 import { useId, useState } from "react";
 import type { UseFormSetValue } from "react-hook-form";
@@ -6,7 +7,6 @@ import { toast } from "sonner";
 import { ContactsBackupMenu } from "@/app/(main)/(app)/components/invoice-form/sections/components/contacts-backup-menu";
 import { usePartyActions } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-party-actions";
 import { useSavedParties } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-saved-parties";
-import { type InvoiceData, type BuyerData } from "@/app/schema";
 import {
   AlertDialog,
   AlertDialogAction,

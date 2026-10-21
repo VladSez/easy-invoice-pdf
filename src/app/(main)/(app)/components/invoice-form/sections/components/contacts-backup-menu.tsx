@@ -1,3 +1,4 @@
+import { buyerSchema, sellerSchema } from "@easyinvoicepdf/invoice-core";
 import * as Sentry from "@sentry/nextjs";
 import { Download, Ellipsis, Upload } from "lucide-react";
 import { useState } from "react";
@@ -21,7 +22,6 @@ import {
   parseContactsBackup,
   serializeContactsBackup,
 } from "@/app/(main)/(app)/utils/contacts-backup";
-import { buyerSchema, sellerSchema } from "@/app/schema";
 import {
   BUYERS_LOCAL_STORAGE_KEY,
   SELLERS_LOCAL_STORAGE_KEY,

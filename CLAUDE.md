@@ -60,7 +60,7 @@ Env vars come from `.env.local`, which may be encrypted with [dotenvx](https://d
 
 ### Invoice data flow
 
-`packages/invoice-core/src/schema/index.ts` (~1650 lines) is the single source of truth: zod schemas plus every supported currency, language, date format and template. Everything downstream (form, PDF templates, share links, API route) derives its types from it. `src/app/schema/index.ts` holds only the web app's own state (site locales, app metadata, accordion and mobile-tab state) and, for now, re-exports the core schema; the `localStorage` keys are in `src/app/schema/local-storage-keys.ts`.
+`packages/invoice-core/src/schema/index.ts` (~1650 lines) is the single source of truth: zod schemas plus every supported currency, language, date format and template. Everything downstream (form, PDF templates, share links, API route) derives its types from it. `src/app/schema/index.ts` holds only the web app's own state (site locales, app metadata, accordion and mobile-tab state); import everything else from `@easyinvoicepdf/invoice-core`. The `localStorage` keys are in `src/app/schema/local-storage-keys.ts`.
 
 1. `src/app/(main)/(app)/page.client.tsx` owns `invoiceDataState`. On mount it hydrates from `?data=` (shared link) or `localStorage`, validating with `invoiceSchema`.
 2. `src/app/(main)/(app)/components/invoice-form/` is a `react-hook-form` form resolved against `invoiceSchema`. Changes are debounced (`DEBOUNCE_TIMEOUT = 500ms`) before being pushed up and written to `localStorage` — e2e helpers wait on this debounce.
@@ -77,7 +77,7 @@ A pnpm workspace package (`@easyinvoicepdf/invoice-core`) holding the invoice en
 - **Side effects come in as callbacks** (e.g. `onError`), so each app wires its own toasts, analytics and Sentry. Pure helpers that hit an unexpected error log with `console.error` and return a fallback.
 - **`react`, `zod` and `@react-pdf/renderer` are peer dependencies**; anything else is an exact-version dependency of the package.
 - **It ships TypeScript source** (`exports` point at `.ts`), compiled by `transpilePackages` in `next.config.mjs`.
-- **Old app paths are temporary re-exports.** Files such as `src/utils/url-compression.ts` and the format helpers in `src/app/(main)/(app)/utils/` only re-export from the package until the imports are rewritten (openspec change `backend-split`, task 6.1). New code imports from `@easyinvoicepdf/invoice-core` directly.
+- **Import it by package name** (`@easyinvoicepdf/invoice-core`, `/pdf`, `/server`), never by path into `packages/` (the test fixtures are the one exception, see below). The app keeps no re-export shims.
 - Test fixtures live in `packages/invoice-core/src/__tests__/fixtures/`; app tests reach them through `src/utils/__tests__/data.ts`.
 
 ### PDF templates

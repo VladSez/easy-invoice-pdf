@@ -1,9 +1,9 @@
-import { getDefaultInvoiceNumberLabel } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import {
-  SUPPORTED_TEMPLATES,
+  getDefaultInvoiceNumberLabel,
   type InvoiceData,
+  SUPPORTED_TEMPLATES,
   type SupportedTemplates,
-} from "@/app/schema";
+} from "@easyinvoicepdf/invoice-core";
 
 /**
  * Selects the invoice template and updates the invoice data accordingly.

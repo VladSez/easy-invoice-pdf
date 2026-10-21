@@ -1,6 +1,12 @@
 // @vitest-environment happy-dom
 
 import {
+  type BuyerData,
+  buyerSchema,
+  type SellerData,
+  sellerSchema,
+} from "@easyinvoicepdf/invoice-core";
+import {
   cleanup,
   createEvent,
   fireEvent,
@@ -15,12 +21,6 @@ import {
   type ImportContactsDialogState,
 } from "@/app/(main)/(app)/components/invoice-form/sections/components/import-contacts-dialog";
 import type { MergeImportedContactsResult } from "@/app/(main)/(app)/utils/contacts-backup";
-import {
-  buyerSchema,
-  sellerSchema,
-  type BuyerData,
-  type SellerData,
-} from "@/app/schema";
 import "@testing-library/jest-dom/vitest";
 
 afterEach(() => {

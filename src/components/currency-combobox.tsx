@@ -1,14 +1,14 @@
 "use client";
 
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-
 import {
   CURRENCY_COMBOBOX_GROUPS,
   CURRENCY_SYMBOLS,
   CURRENCY_TO_LABEL,
   type SupportedCurrencies,
-} from "@/app/schema";
+} from "@easyinvoicepdf/invoice-core";
+import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Command,

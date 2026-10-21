@@ -1,3 +1,4 @@
+import { type SellerData, sellerSchema } from "@easyinvoicepdf/invoice-core";
 import * as Sentry from "@sentry/nextjs";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -8,7 +9,6 @@ import {
   getAppStorageItem,
   setAppStorageItem,
 } from "@/app/(main)/(app)/utils/app-local-storage";
-import { sellerSchema, type SellerData } from "@/app/schema";
 import { SELLERS_LOCAL_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 import { Button } from "@/components/ui/button";
 import {

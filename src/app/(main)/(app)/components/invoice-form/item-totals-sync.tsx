@@ -1,6 +1,8 @@
 import {
   calculateInvoiceTotal,
   calculateItemTotals,
+  type InvoiceData,
+  type InvoiceItemData,
   parseValidatedInvoiceItems,
 } from "@easyinvoicepdf/invoice-core";
 import { useEffect } from "react";
@@ -11,7 +13,6 @@ import {
   useWatch,
 } from "react-hook-form";
 
-import type { InvoiceData, InvoiceItemData } from "@/app/schema";
 import { debugLog } from "@/lib/debug-log";
 
 import { hasAnyItemTotalsChanged } from "./utils/has-item-totals-changed";

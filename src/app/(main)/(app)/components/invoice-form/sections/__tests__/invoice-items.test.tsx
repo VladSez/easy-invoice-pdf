@@ -1,5 +1,10 @@
 // @vitest-environment happy-dom
 
+import type * as InvoiceCore from "@easyinvoicepdf/invoice-core";
+import type {
+  InvoiceData,
+  SupportedNumberFormatLocale,
+} from "@easyinvoicepdf/invoice-core";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useMemo } from "react";
@@ -12,8 +17,6 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getInitialInvoiceData } from "@/app/constants";
-import type * as InvoiceSchema from "@/app/schema";
-import type { InvoiceData, SupportedNumberFormatLocale } from "@/app/schema";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { MOCK_INVOICE_ITEM_DATA } from "@/utils/__tests__/data";
 import "@testing-library/jest-dom/vitest";
@@ -24,8 +27,8 @@ const { MOCK_MAX_INVOICE_ITEMS } = vi.hoisted(() => {
   };
 });
 
-vi.mock("@/app/schema", async (importOriginal) => {
-  const actual = await importOriginal<typeof InvoiceSchema>();
+vi.mock("@easyinvoicepdf/invoice-core", async (importOriginal) => {
+  const actual = await importOriginal<typeof InvoiceCore>();
 
   return {
     ...actual,

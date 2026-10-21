@@ -1,9 +1,12 @@
+import {
+  INVOICE_PDF_TRANSLATIONS,
+  type InvoiceData,
+  type SupportedLanguages,
+} from "@easyinvoicepdf/invoice-core";
 import { renderInvoicePdfToBuffer } from "@easyinvoicepdf/invoice-core/server";
 import type dayjs from "dayjs";
 
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import { getInvoiceDefaultNumberValue } from "@/app/constants";
-import { type InvoiceData, type SupportedLanguages } from "@/app/schema";
 import { env } from "@/env";
 
 import { DEFAULT_INVOICE_TIME_ZONE, nowInTimeZone } from "./invoice-time-zone";
