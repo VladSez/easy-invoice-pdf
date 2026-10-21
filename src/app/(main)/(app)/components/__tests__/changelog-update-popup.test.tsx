@@ -115,15 +115,21 @@ describe("ChangelogUpdatePopup", () => {
       <ChangelogUpdatePopup variant="welcome" isOpen onDismiss={vi.fn()} />,
     );
 
-    const popup = screen.getByTestId("changelog-update-popup");
-
-    expect(popup.querySelector('img[src*="mascot"]')).not.toBeNull();
+    expect(
+      screen
+        .getByTestId("changelog-update-popup")
+        .querySelector('img[src*="mascot"]'),
+    ).not.toBeNull();
 
     rerender(
       <ChangelogUpdatePopup variant="changelog" isOpen onDismiss={vi.fn()} />,
     );
 
-    expect(popup.querySelector('img[src*="mascot"]')).toBeNull();
+    // Queried again, so this checks the What's new popup and not the welcome one
+    const changelogPopup = screen.getByTestId("changelog-update-popup");
+
+    expect(changelogPopup).toHaveTextContent("What's new");
+    expect(changelogPopup.querySelector('img[src*="mascot"]')).toBeNull();
   });
 
   it("keeps the welcome copy for first-time visitors", () => {

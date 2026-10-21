@@ -8,18 +8,16 @@ import {
   TWITTER_CREATOR,
 } from "@/config";
 
+import { HOW_IT_WORKS_PAGE_DESCRIPTION } from "./build-how-it-works-json-ld";
 import { HowItWorksJsonLd } from "./how-it-works-json-ld";
 
 const HOW_IT_WORKS_PAGE_URL = "https://easyinvoicepdf.com/how-it-works";
 
 const PAGE_TITLE = "How EasyInvoicePDF Works | Video Tutorials";
 
-const PAGE_DESCRIPTION =
-  "Watch step-by-step video tutorials on creating invoices, saving seller and buyer details, customizing tax, and generating weekly invoices with EasyInvoicePDF.";
-
 export const metadata: Metadata = {
   title: PAGE_TITLE,
-  description: PAGE_DESCRIPTION,
+  description: HOW_IT_WORKS_PAGE_DESCRIPTION,
   keywords: [
     "how easyinvoicepdf works",
     "invoice generator tutorial",
@@ -29,6 +27,8 @@ export const metadata: Metadata = {
     "custom tax invoice",
     "vat invoice tutorial",
     "weekly invoices",
+    "add discount to invoice",
+    "invoice discount tutorial",
     "easyinvoicepdf demo",
     "pdf invoice generator guide",
   ],
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: PAGE_TITLE,
-    description: PAGE_DESCRIPTION,
+    description: HOW_IT_WORKS_PAGE_DESCRIPTION,
     siteName: "EasyInvoicePDF.com | Free Invoice PDF Generator",
     type: "website",
     locale: "en_US",
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: PAGE_TITLE,
-    description: PAGE_DESCRIPTION,
+    description: HOW_IT_WORKS_PAGE_DESCRIPTION,
     creator: TWITTER_CREATOR,
     images: [
       {

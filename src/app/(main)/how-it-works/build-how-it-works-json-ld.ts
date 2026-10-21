@@ -10,8 +10,9 @@ import {
 
 const PAGE_TITLE = "How EasyInvoicePDF Works | Video Tutorials";
 
-const PAGE_DESCRIPTION =
-  "Watch step-by-step video tutorials on creating invoices, saving seller and buyer details, customizing tax, and generating weekly invoices with EasyInvoicePDF.";
+/** Also the page's meta description, so search results and the JSON-LD say the same. */
+export const HOW_IT_WORKS_PAGE_DESCRIPTION =
+  "Watch short video tutorials on creating invoices, saving seller and buyer details, customizing tax, adding discounts, and weekly invoices with EasyInvoicePDF.";
 
 export function buildHowItWorksJsonLd(baseUrl = PROD_WEBSITE_URL): Graph {
   const pageUrl = `${baseUrl}/how-it-works`;
@@ -48,7 +49,7 @@ export function buildHowItWorksJsonLd(baseUrl = PROD_WEBSITE_URL): Graph {
         "@id": pageWebPageId(pageUrl),
         url: pageUrl,
         name: PAGE_TITLE,
-        description: PAGE_DESCRIPTION,
+        description: HOW_IT_WORKS_PAGE_DESCRIPTION,
         inLanguage: "en",
         isPartOf: {
           "@id": JSON_LD_IDS.website,
