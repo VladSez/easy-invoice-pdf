@@ -62,6 +62,70 @@ describe("ChangelogUpdatePopup", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("previews the release video and links to it on YouTube", () => {
+    render(
+      <ChangelogUpdatePopup
+        variant="changelog"
+        isOpen
+        onDismiss={vi.fn()}
+        releaseVideoId="8lYei_9mo6o"
+      />,
+    );
+
+    const videoLink = screen.getByRole("link", {
+      name: "Watch the release video on YouTube",
+    });
+
+    expect(videoLink).toHaveAttribute(
+      "href",
+      "https://www.youtube.com/watch?v=8lYei_9mo6o",
+    );
+    expect(videoLink).toHaveAttribute("target", "_blank");
+    expect(videoLink.querySelector("img")).toHaveAttribute(
+      "src",
+      "https://i.ytimg.com/vi/8lYei_9mo6o/mqdefault.jpg",
+    );
+  });
+
+  it("has no video preview without a release video or on the welcome popup", () => {
+    const { rerender } = render(
+      <ChangelogUpdatePopup variant="changelog" isOpen onDismiss={vi.fn()} />,
+    );
+
+    expect(
+      screen.queryByTestId("changelog-update-video-link"),
+    ).not.toBeInTheDocument();
+
+    rerender(
+      <ChangelogUpdatePopup
+        variant="welcome"
+        isOpen
+        onDismiss={vi.fn()}
+        releaseVideoId="8lYei_9mo6o"
+      />,
+    );
+
+    expect(
+      screen.queryByTestId("changelog-update-video-link"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows the mascot on the welcome popup but not on What's new", () => {
+    const { rerender } = render(
+      <ChangelogUpdatePopup variant="welcome" isOpen onDismiss={vi.fn()} />,
+    );
+
+    const popup = screen.getByTestId("changelog-update-popup");
+
+    expect(popup.querySelector('img[src*="mascot"]')).not.toBeNull();
+
+    rerender(
+      <ChangelogUpdatePopup variant="changelog" isOpen onDismiss={vi.fn()} />,
+    );
+
+    expect(popup.querySelector('img[src*="mascot"]')).toBeNull();
+  });
+
   it("keeps the welcome copy for first-time visitors", () => {
     render(
       <ChangelogUpdatePopup
@@ -105,6 +169,21 @@ describe("ChangelogUpdatePopup", () => {
       ).not.toBeInTheDocument();
       // the mascot is desktop-only
       expect(popup.querySelector("img")).toBeNull();
+    });
+
+    it("ends the welcome sentence with the How it works link", () => {
+      render(
+        <ChangelogUpdatePopup
+          variant="welcome"
+          isOpen
+          onDismiss={vi.fn()}
+          layout="dock"
+        />,
+      );
+
+      expect(screen.getByTestId("changelog-update-popup")).toHaveTextContent(
+        "Welcome: Create PDF invoices in your browser. New here? See How it works",
+      );
     });
 
     it("opens How it works from the welcome notice and dismisses it", async () => {

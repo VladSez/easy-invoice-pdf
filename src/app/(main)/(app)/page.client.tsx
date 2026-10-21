@@ -175,6 +175,7 @@ export function AppPageClient({
       onDismiss={dismissChangelogPopup}
       releaseSummary={latestChangelog?.popupSummary}
       releaseSlug={latestChangelog?.slug}
+      releaseVideoId={latestChangelog?.youtubeVideoId}
       layout={isMobile ? "dock" : "floating"}
       onHowItWorksClick={() => {
         return setIsHowItWorksDialogOpen(true);
