@@ -148,3 +148,35 @@ describe("fonts never load over the network", () => {
     expect(embeddedFonts(buffer)).toContain("Inter18pt-Regular");
   });
 });
+
+describe("invoice number is optional", () => {
+  it.each([
+    { template: "default", heading: "Invoice No. of:" },
+    { template: "stripe", heading: "Invoice" },
+  ] as const)(
+    "the $template template falls back to its default label, never 'undefined'",
+    async ({ template, heading }) => {
+      const buffer = await renderInvoicePdfToBuffer({
+        invoiceData: invoice({
+          template,
+          language: "en",
+          invoiceNumberObject: undefined,
+        }),
+      });
+      const text = await readText(buffer);
+      const doc = await pdfjs.getDocument({
+        data: new Uint8Array(buffer),
+        useWorkerFetch: false,
+        isEvalSupported: false,
+      }).promise;
+      const { info } = await doc.getMetadata();
+
+      expect(text).toContain(heading);
+      expect(text.join(" ")).not.toContain("undefined");
+      expect(info).toHaveProperty(
+        "Title",
+        `${heading} | Created with https://easyinvoicepdf.com`,
+      );
+    },
+  );
+});

@@ -8,6 +8,7 @@ import {
 import { DEFAULT_TEMPLATE_FONT_FAMILY } from "../../fonts/invoice-pdf-fonts";
 import { type InvoiceData } from "../../schema";
 import "../../fonts/register-browser-fonts";
+import { resolveInvoiceNumber } from "../common/resolve-invoice-number";
 import { InvoiceBody } from "./invoice-body";
 
 // Open sans seems to be working fine with EN and PL
@@ -185,11 +186,10 @@ export function InvoicePdfTemplate({
   invoiceData: InvoiceData;
   qrCodeDataUrl?: string;
 }) {
-  const invoiceNumberLabel = invoiceData?.invoiceNumberObject?.label;
+  const { label: invoiceNumberLabel, value: invoiceNumberValue } =
+    resolveInvoiceNumber(invoiceData);
 
-  const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
-
-  const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`;
+  const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`.trim();
   const invoiceDocTitle =
     `${invoiceNumber} | Created with https://easyinvoicepdf.com` as const;
 

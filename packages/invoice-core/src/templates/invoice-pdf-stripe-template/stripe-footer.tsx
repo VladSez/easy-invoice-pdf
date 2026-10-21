@@ -5,6 +5,7 @@ import { formatDateWithLocale } from "../../format/format-date-with-locale";
 import { INVOICE_PDF_TRANSLATIONS } from "../../pdf-translations/pdf-translations";
 import { type InvoiceData } from "../../schema";
 import { PROD_WEBSITE_URL } from "../common/pdf-template-config";
+import { resolveInvoiceNumber } from "../common/resolve-invoice-number";
 
 export function StripeFooter({
   invoiceData,
@@ -18,8 +19,7 @@ export function StripeFooter({
   const language = invoiceData.language;
   const t = INVOICE_PDF_TRANSLATIONS[language];
 
-  const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
-  const invoiceNumber = `${invoiceNumberValue}`;
+  const { value: invoiceNumber } = resolveInvoiceNumber(invoiceData);
 
   const paymentDueDate = formatDateWithLocale({
     date: invoiceData.paymentDue,

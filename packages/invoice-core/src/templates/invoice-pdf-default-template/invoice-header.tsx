@@ -8,6 +8,7 @@ import {
 } from "../../format/format-service-period";
 import { INVOICE_PDF_TRANSLATIONS } from "../../pdf-translations/pdf-translations";
 import { type InvoiceData } from "../../schema";
+import { resolveInvoiceNumber } from "../common/resolve-invoice-number";
 
 function HeaderDates({
   invoiceData,
@@ -77,11 +78,10 @@ export function InvoiceHeader({
   invoiceData: InvoiceData;
   styles: typeof PDF_DEFAULT_TEMPLATE_STYLES;
 }) {
-  const invoiceNumberLabel = invoiceData?.invoiceNumberObject?.label;
+  const { label: invoiceNumberLabel, value: invoiceNumberValue } =
+    resolveInvoiceNumber(invoiceData);
 
-  const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
-
-  const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`;
+  const invoiceNumber = `${invoiceNumberLabel} ${invoiceNumberValue}`.trim();
 
   const hasLogo = invoiceData.logo && invoiceData.logo.length > 0;
 

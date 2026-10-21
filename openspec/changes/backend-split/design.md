@@ -133,7 +133,7 @@ _Alternatives_: Clerk or WorkOS (faster to set up, but user data lives with a ve
 - Stored invoices are `jsonb` with a `schema_version`. Core exports `INVOICE_SCHEMA_VERSION` and `migrateInvoiceData`. Rows that fail to parse come back with `status: "invalid"` instead of failing the whole list.
 - A per-user invoice-number sequence lets `duplicate_invoice` ("same as last month") assign the next number.
 - The OpenAPI spec is generated from the zod schemas. Errors use one shape: `{ error: { code, message, details? } }`, with 422 for validation errors.
-- Limits: a body limit sized for a 3 MB logo after base64 (5 MB), an item cap (500), a render timeout (15 s), and Upstash rate limits per key, per user and per IP.
+- Limits: a body limit sized for a 3 MB logo after base64 (5 MB), the schema's item cap (`MAX_INVOICE_ITEMS`, 100), a render timeout (15 s), and Upstash rate limits per key, per user and per IP.
 - MCP uses Streamable HTTP, stateless. `render_invoice_pdf` returns a short-lived HMAC-signed URL that re-renders on GET (no file storage). Base64 output is opt-in.
 
 ### D10. Billing with Polar
@@ -167,6 +167,6 @@ _Alternatives_: Stripe Billing (you handle VAT yourself); Lemon Squeezy or Paddl
 
 ## Open Questions
 
-- API host: Vercel (second project, if on Pro) or Railway. Neon is the default for Postgres. Either way it's the same Hono app with a different adapter.
+- API host: Vercel for now (decided 2026-10-21), as a second project rooted at `apps/api`. Vercel's Hono preset deploys `apps/api/server.mjs`, which re-exports the tsdown build, so the fonts ship inside the function. Railway stays the fallback: `node dist/index.mjs` runs the same build unchanged. Neon is the default for Postgres.
 - Pricing tiers and free-tier API limits. These only change Polar product configuration and meter thresholds.
 - Whether to also add `INVOICE_SCHEMA_VERSION` handling to the free app's localStorage. That can follow the existing `invoice-number-breaking-change.ts` pattern later.

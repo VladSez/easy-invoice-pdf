@@ -13,6 +13,7 @@ import { STRIPE_TEMPLATE_FONT_FAMILY } from "../../fonts/invoice-pdf-fonts";
 import { formatCurrencyChunks } from "../../format/format-currency";
 import { type InvoiceData, resolveNumberFormatLocale } from "../../schema";
 import { InvoiceQRCode } from "../common/invoice-qr-code";
+import { resolveInvoiceNumber } from "../common/resolve-invoice-number";
 import "../../fonts/register-browser-fonts";
 import { StripeDueAmount } from "./stripe-due-amount";
 import { StripeFooter } from "./stripe-footer";
@@ -241,11 +242,11 @@ export function StripeInvoicePdfTemplate({
 }) {
   const numberFormatLocale = resolveNumberFormatLocale(invoiceData);
 
-  const invoiceNumberValue = invoiceData?.invoiceNumberObject?.value;
-  const invoiceNumber = `${invoiceNumberValue}`;
+  const { value: invoiceNumberValue } = resolveInvoiceNumber(invoiceData);
+  const invoiceNumber = `Invoice ${invoiceNumberValue}`.trim();
 
   const invoiceDocTitle =
-    `Invoice ${invoiceNumber} | Created with https://easyinvoicepdf.com` as const;
+    `${invoiceNumber} | Created with https://easyinvoicepdf.com` as const;
 
   const invoiceTotalChunks = formatCurrencyChunks({
     amount: invoiceData?.total,

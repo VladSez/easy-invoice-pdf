@@ -1,8 +1,8 @@
 import { Image, Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 
 import type { STRIPE_TEMPLATE_STYLES } from ".";
-import { INVOICE_PDF_TRANSLATIONS } from "../../pdf-translations/pdf-translations";
 import { type InvoiceData } from "../../schema";
+import { resolveInvoiceNumber } from "../common/resolve-invoice-number";
 
 export function StripeInvoiceHeader({
   invoiceData,
@@ -11,12 +11,9 @@ export function StripeInvoiceHeader({
   invoiceData: InvoiceData;
   styles: typeof STRIPE_TEMPLATE_STYLES;
 }) {
-  const language = invoiceData.language;
-  const t = INVOICE_PDF_TRANSLATIONS[language];
   const hasLogo = invoiceData.logo && invoiceData.logo.length > 0;
 
-  const invoiceNumberLabel =
-    invoiceData.invoiceNumberObject?.label ?? t.stripe.invoice;
+  const { label: invoiceNumberLabel } = resolveInvoiceNumber(invoiceData);
 
   return (
     <View style={[hasLogo ? {} : { marginBottom: 16 }]}>
