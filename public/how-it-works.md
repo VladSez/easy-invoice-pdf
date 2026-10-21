@@ -3,7 +3,7 @@
 > Canonical page: https://easyinvoicepdf.com/how-it-works  
 > Invoice editor: https://easyinvoicepdf.com/
 > Language: English  
-> Last updated: 2026-09-17
+> Last updated: 2026-10-21
 
 EasyInvoicePDF lets users create a professional PDF invoice in the browser: enter seller and buyer information, add invoice items and tax settings, customize the document, review the live preview, and download the PDF. No account or sign-up is required.
 
@@ -54,6 +54,13 @@ Shows how to rename the tax label (VAT, GST, Sales Tax, IVA, or any text) and se
 
 - [Watch on the tutorial page](https://easyinvoicepdf.com/how-it-works?video=custom-tax)
 - [Watch on YouTube](https://www.youtube.com/watch?v=F_iJxZ3PHbk)
+
+### Add discounts to invoice items
+
+Shows how to take a percentage or fixed amount off any invoice item, with tax calculated on the discounted price.
+
+- [Watch on the tutorial page](https://easyinvoicepdf.com/how-it-works?video=item-discounts)
+- [Watch on YouTube](https://www.youtube.com/watch?v=8lYei_9mo6o)
 
 ## Data handling
 
