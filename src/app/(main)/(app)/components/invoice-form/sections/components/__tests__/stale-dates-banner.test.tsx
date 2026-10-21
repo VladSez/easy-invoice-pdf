@@ -1,5 +1,9 @@
 // @vitest-environment happy-dom
 
+import type {
+  InvoiceData,
+  SupportedLanguages,
+} from "@easyinvoicepdf/invoice-core";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
@@ -11,8 +15,6 @@ import {
   it,
   vi,
 } from "vitest";
-
-import type { InvoiceData, SupportedLanguages } from "@/app/schema";
 import "@testing-library/jest-dom/vitest";
 
 vi.mock("sonner", () => {

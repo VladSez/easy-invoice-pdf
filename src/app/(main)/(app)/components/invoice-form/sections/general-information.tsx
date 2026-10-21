@@ -1,3 +1,22 @@
+import {
+  DEFAULT_DATE_FORMAT,
+  formatMoneyForTemplate,
+  formatTodayWithLocale,
+  getCurrentMonthAndYear,
+  getDateFormatsForLanguage,
+  getDefaultDateFormat,
+  getDefaultInvoiceNumberLabel,
+  getNumberFormatLocaleAfterLanguageChange,
+  INVOICE_PDF_TRANSLATIONS,
+  type InvoiceData,
+  isServicePeriodStartInCurrentMonth,
+  LANGUAGE_TO_LABEL_WITH_REGION,
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
+  SUPPORTED_NUMBER_FORMAT_LOCALES,
+  SUPPORTED_TEMPLATES,
+  type SupportedNumberFormatLocale,
+  TEMPLATE_TO_LABEL,
+} from "@easyinvoicepdf/invoice-core";
 import dayjs from "dayjs";
 import { InfoIcon, Upload, X } from "lucide-react";
 import { memo, useCallback, useRef } from "react";
@@ -15,29 +34,6 @@ import {
   ErrorMessage,
   inputErrorClassName,
 } from "@/app/(main)/(app)/components/invoice-form/common";
-import {
-  getDefaultInvoiceNumberLabel,
-  INVOICE_PDF_TRANSLATIONS,
-} from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import { formatTodayWithLocale } from "@/app/(main)/(app)/utils/format-date-with-locale";
-import { formatMoneyForTemplate } from "@/app/(main)/(app)/utils/format-money-for-template";
-import {
-  getCurrentMonthAndYear,
-  isServicePeriodStartInCurrentMonth,
-} from "@/app/(main)/(app)/utils/format-service-period";
-import {
-  type InvoiceData,
-  LANGUAGE_TO_LABEL_WITH_REGION,
-  DEFAULT_DATE_FORMAT,
-  getDateFormatsForLanguage,
-  getDefaultDateFormat,
-  getNumberFormatLocaleAfterLanguageChange,
-  type SupportedNumberFormatLocale,
-  SUPPORTED_INVOICE_PDF_LANGUAGES,
-  SUPPORTED_NUMBER_FORMAT_LOCALES,
-  SUPPORTED_TEMPLATES,
-  TEMPLATE_TO_LABEL,
-} from "@/app/schema";
 import { CurrencyCombobox } from "@/components/currency-combobox";
 import { ButtonHelper } from "@/components/ui/button-helper";
 import { Input } from "@/components/ui/input";

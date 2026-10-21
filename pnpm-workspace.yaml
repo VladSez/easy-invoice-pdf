@@ -1,3 +1,6 @@
+packages:
+  - "packages/*"
+
 # fontkit 2.0.4 drops characters from generated PDFs. Rendering an accented
 # letter (ã ç é ó) poisons a cache inside the font object, and because
 # @react-pdf shares that object across every render in a page session, later

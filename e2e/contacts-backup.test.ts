@@ -1,14 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import type { BuyerData, SellerData } from "@easyinvoicepdf/invoice-core";
 import { type Page } from "@playwright/test";
 
 import {
   BUYERS_LOCAL_STORAGE_KEY,
   SELLERS_LOCAL_STORAGE_KEY,
-  type BuyerData,
-  type SellerData,
-} from "@/app/schema";
+} from "@/app/schema/local-storage-keys";
 
 import { expect, test } from "./utils/extended-playwright-test";
 

@@ -1,18 +1,16 @@
-import type { Page } from "@playwright/test";
-
-import {
-  getDefaultInvoiceNumberLabel,
-  INVOICE_PDF_TRANSLATIONS,
-} from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import {
   CURRENCY_SYMBOLS,
   CURRENCY_TO_LABEL,
+  getDefaultInvoiceNumberLabel,
+  INVOICE_PDF_TRANSLATIONS,
   LANGUAGE_TO_LABEL,
   SUPPORTED_INVOICE_PDF_LANGUAGES,
   type SupportedCurrencies,
   type SupportedLanguages,
   type SupportedTemplates,
-} from "@/app/schema";
+} from "@easyinvoicepdf/invoice-core";
+import type { Page } from "@playwright/test";
+
 import { buildInvoiceAppUrl } from "@/utils/invoice-app-url";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test

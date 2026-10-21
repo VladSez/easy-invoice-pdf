@@ -1,6 +1,6 @@
+import { SUPPORTED_INVOICE_PDF_LANGUAGES } from "@easyinvoicepdf/invoice-core";
 import Link from "next/link";
 
-import { SUPPORTED_INVOICE_PDF_LANGUAGES } from "@/app/schema";
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 
 import {

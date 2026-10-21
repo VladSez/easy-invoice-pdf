@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema";
+import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 
 /** Not an invoice the schema accepts, so loading it fails. */
 const UNREADABLE_SAVED_INVOICE = JSON.stringify({ items: "not an array" });

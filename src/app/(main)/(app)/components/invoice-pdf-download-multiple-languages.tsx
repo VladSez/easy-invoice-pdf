@@ -1,18 +1,18 @@
 "use client";
 
+import {
+  type InvoiceData,
+  LANGUAGE_TO_LABEL,
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
+  type SupportedLanguages,
+} from "@easyinvoicepdf/invoice-core";
+import { InvoicePdfTemplate } from "@easyinvoicepdf/invoice-core/pdf";
 import { pdf } from "@react-pdf/renderer/lib/react-pdf.browser";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { InvoicePdfTemplate } from "@/app/(main)/(app)/components/invoice-templates/invoice-pdf-default-template";
-import {
-  LANGUAGE_TO_LABEL,
-  SUPPORTED_INVOICE_PDF_LANGUAGES,
-  type InvoiceData,
-  type SupportedLanguages,
-} from "@/app/schema";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 

@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test";
 
 import {
-  INVOICE_PDF_FONTS,
   MARKETING_FEATURES_CARDS,
   STATIC_ASSETS_URL,
   VIDEO_DEMO_FALLBACK_IMG,
@@ -26,18 +25,6 @@ test.describe("Static assets (fonts, images, videos) should be accessible", () =
     );
 
     /**
-     * Test PDF fonts
-     */
-    for (const [, fonts] of Object.entries(INVOICE_PDF_FONTS)) {
-      for (const [, fontUrl] of Object.entries(fonts)) {
-        const fontResponse = await page.request.get(fontUrl);
-
-        expect(fontResponse.status()).toBe(200);
-        expect(fontResponse.headers()["content-type"]).toContain("font/ttf");
-      }
-    }
-
-    /**
      * Test marketing features cards
      */
     for (const { videoSrc, videoFallbackImg } of MARKETING_FEATURES_CARDS) {
@@ -50,6 +37,34 @@ test.describe("Static assets (fonts, images, videos) should be accessible", () =
 
       expect(fallbackResponse.status()).toBe(200);
       expect(fallbackResponse.headers()["content-type"]).toContain("image/png");
+    }
+  });
+
+  test("PDF fonts are served by the app itself", async ({ page }) => {
+    const fontResponses: { url: string; status: number; type: string }[] = [];
+
+    page.on("response", (res) => {
+      if (new URL(res.url()).pathname.endsWith(".ttf")) {
+        fontResponses.push({
+          url: res.url(),
+          status: res.status(),
+          type: res.headers()["content-type"] ?? "",
+        });
+      }
+    });
+
+    await page.goto("/");
+    // the PDF is generated once its fonts have loaded
+    await expect(page.locator("a[download]")).toHaveAttribute("href", /^blob:/);
+
+    const appOrigin = new URL(page.url()).origin;
+
+    expect(fontResponses.length).toBeGreaterThanOrEqual(2);
+
+    for (const { url, status, type } of fontResponses) {
+      expect(new URL(url).origin).toBe(appOrigin);
+      expect(status).toBe(200);
+      expect(type).toContain("font/ttf");
     }
   });
 

@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 
+import { buyerSchema, sellerSchema } from "@easyinvoicepdf/invoice-core";
 import * as Sentry from "@sentry/nextjs";
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -9,9 +10,7 @@ import { useSavedParties } from "@/app/(main)/(app)/components/invoice-form/sect
 import {
   BUYERS_LOCAL_STORAGE_KEY,
   SELLERS_LOCAL_STORAGE_KEY,
-  buyerSchema,
-  sellerSchema,
-} from "@/app/schema";
+} from "@/app/schema/local-storage-keys";
 
 vi.mock("@sentry/nextjs", () => {
   return { captureException: vi.fn() };

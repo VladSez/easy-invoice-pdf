@@ -1,5 +1,9 @@
 // @vitest-environment happy-dom
 
+import type {
+  InvoiceData,
+  SupportedLanguages,
+} from "@easyinvoicepdf/invoice-core";
 import { cleanup, render, screen } from "@testing-library/react";
 import {
   afterAll,
@@ -12,7 +16,6 @@ import {
 } from "vitest";
 
 import { getInitialInvoiceData } from "@/app/constants";
-import type { InvoiceData, SupportedLanguages } from "@/app/schema";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "@testing-library/jest-dom/vitest";
 

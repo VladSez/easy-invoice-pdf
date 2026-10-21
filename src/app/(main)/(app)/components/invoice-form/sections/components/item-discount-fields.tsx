@@ -1,3 +1,11 @@
+import {
+  formatMoneyForTemplate,
+  type InvoiceData,
+  type ItemDiscountType,
+  MAX_ITEM_DISCOUNT_LABEL_LENGTH,
+  type SupportedCurrencies,
+  type SupportedNumberFormatLocale,
+} from "@easyinvoicepdf/invoice-core";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -14,14 +22,6 @@ import {
   inputErrorClassName,
 } from "@/app/(main)/(app)/components/invoice-form/common";
 import { DeleteIconButton } from "@/app/(main)/(app)/components/invoice-form/sections/components/delete-icon-button";
-import { formatMoneyForTemplate } from "@/app/(main)/(app)/utils/format-money-for-template";
-import {
-  type InvoiceData,
-  type ItemDiscountType,
-  type SupportedCurrencies,
-  type SupportedNumberFormatLocale,
-  MAX_ITEM_DISCOUNT_LABEL_LENGTH,
-} from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";

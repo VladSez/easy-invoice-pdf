@@ -2,7 +2,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { METADATA_LOCAL_STORAGE_KEY } from "@/app/schema";
+import { METADATA_LOCAL_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 
 /**
  * A fresh copy of the module for every test.

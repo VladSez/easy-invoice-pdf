@@ -31,6 +31,9 @@ importers:
       '@dotenvx/dotenvx':
         specifier: 2.34.2
         version: 2.34.2
+      '@easyinvoicepdf/invoice-core':
+        specifier: workspace:*
+        version: link:packages/invoice-core
       '@hookform/resolvers':
         specifier: 5.9.1
         version: 5.9.1(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(arktype@2.1.20)(react-hook-form@7.86.0(react@19.2.8))(zod@4.5.4)
@@ -287,6 +290,21 @@ importers:
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.8.1)(happy-dom@20.10.6)(jiti@2.4.2)(msw@2.11.1(@types/node@22.8.1)(typescript@7.0.2))(terser@5.51.2)(tsx@4.19.4)(yaml@2.9.0)
+
+  packages/invoice-core:
+    dependencies:
+      '@react-pdf/renderer':
+        specifier: 4.6.1
+        version: 4.6.1(react@19.2.8)
+      dayjs:
+        specifier: 1.11.13
+        version: 1.11.13
+      react:
+        specifier: ^19.2.0
+        version: 19.2.8
+      zod:
+        specifier: ^4.5.0
+        version: 4.5.4
 
 packages:
 

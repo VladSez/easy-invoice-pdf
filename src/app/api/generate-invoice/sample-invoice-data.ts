@@ -1,4 +1,4 @@
-import { type InvoiceData } from "@/app/schema";
+import type { InvoiceData } from "@easyinvoicepdf/invoice-core";
 
 /**
  * A fully hardcoded, obviously-fake invoice used by `/api/generate-invoice/preview?sample=true`.

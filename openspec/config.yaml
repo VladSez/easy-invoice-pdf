@@ -1,0 +1,49 @@
+schema: spec-driven
+
+# Project context (optional)
+# Add only constraints that should guide OpenSpec artifacts and workflows.
+# Include constraints an agent cannot infer by reading the code.
+# Keep general project documentation and discoverable codebase facts out.
+# Example:
+#   context: |
+#     Designs and tasks must cover Windows, macOS, and Linux
+#     Write all artifacts in Spanish
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always state what is out of scope
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing
+
+operations:
+  apply:
+    guidance:
+      - >-
+        After every task that changes UI or PDF code, verify the app in the
+        browser before marking it done: run `pnpm dev` and use the built-in
+        browser pane to check that `/` and `/stripe-template` load, the form
+        works, editing a field updates the PDF preview, the PDF downloads
+        and opens, and the console shows no new errors or warnings.
+      - >-
+        If the task touched the PDF, the preview or the layout, also check
+        the mobile viewport (the mobile PDF viewer).
+      - >-
+        Record any browser-check failure as a finding and fix it before
+        moving to the next task. Tasks with no browser-observable effect
+        (docs, legal, tooling only) skip the check and say so.

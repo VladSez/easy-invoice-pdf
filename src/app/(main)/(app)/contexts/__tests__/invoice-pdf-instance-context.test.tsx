@@ -8,7 +8,7 @@ import { getInitialInvoiceData } from "@/app/constants";
 interface MockPdfState {
   loading: boolean;
   url: string | null;
-  error: Error | null;
+  error: string | null;
 }
 
 const { mockPdfStateRef } = vi.hoisted(() => {
@@ -34,36 +34,16 @@ vi.mock("@react-pdf/renderer/lib/react-pdf.browser", async (importOriginal) => {
   };
 });
 
-vi.mock("@/components/ui/toasts/error-generating-pdf-toast", () => {
-  return {
-    ErrorGeneratingPdfToast: vi.fn(),
-  };
-});
+import { InvoicePdfInstanceProvider } from "@easyinvoicepdf/invoice-core/pdf";
 
-vi.mock("@/lib/umami-analytics-track-event", () => {
-  return {
-    umamiTrackEvent: vi.fn(),
-  };
-});
-
-vi.mock("@sentry/nextjs", () => {
-  return {
-    captureException: vi.fn(),
-  };
-});
-
-import * as Sentry from "@sentry/nextjs";
-
-import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
-
-import { InvoicePdfInstanceProvider } from "../invoice-pdf-instance-context";
+const onError = vi.fn<(error: string) => void>();
 
 function renderProvider() {
   return render(
     <InvoicePdfInstanceProvider
       invoiceData={getInitialInvoiceData()}
       qrCodeDataUrl="data:image/png;base64,abc"
+      onError={onError}
     >
       <p>preview</p>
     </InvoicePdfInstanceProvider>,
@@ -85,26 +65,23 @@ describe("InvoicePdfInstanceProvider", () => {
     vi.restoreAllMocks();
   });
 
-  it("should report a failed PDF generation to the user, analytics and Sentry", () => {
-    const pdfError = new Error("PDF generation failed");
-
-    mockPdfStateRef.current = { loading: false, url: null, error: pdfError };
+  it("should hand a failed PDF generation to onError", () => {
+    mockPdfStateRef.current = {
+      loading: false,
+      url: null,
+      error: "PDF generation failed",
+    };
 
     renderProvider();
 
-    expect(ErrorGeneratingPdfToast).toHaveBeenCalledTimes(1);
-    expect(umamiTrackEvent).toHaveBeenCalledWith(
-      "error_generating_document_link",
-      { data: { error: pdfError } },
-    );
-    expect(Sentry.captureException).toHaveBeenCalledWith(pdfError);
+    expect(onError).toHaveBeenCalledExactlyOnceWith("PDF generation failed");
   });
 
   it("should report the same failure only once", () => {
     mockPdfStateRef.current = {
       loading: false,
       url: null,
-      error: new Error("PDF generation failed"),
+      error: "PDF generation failed",
     };
 
     const { rerender } = renderProvider();
@@ -113,18 +90,18 @@ describe("InvoicePdfInstanceProvider", () => {
       <InvoicePdfInstanceProvider
         invoiceData={getInitialInvoiceData()}
         qrCodeDataUrl="data:image/png;base64,abc"
+        onError={onError}
       >
         <p>preview</p>
       </InvoicePdfInstanceProvider>,
     );
 
-    expect(ErrorGeneratingPdfToast).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenCalledTimes(1);
   });
 
   it("should stay quiet when the PDF generates successfully", () => {
     renderProvider();
 
-    expect(ErrorGeneratingPdfToast).not.toHaveBeenCalled();
-    expect(Sentry.captureException).not.toHaveBeenCalled();
+    expect(onError).not.toHaveBeenCalled();
   });
 });

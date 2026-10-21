@@ -1,7 +1,6 @@
+import type { InvoiceData } from "@easyinvoicepdf/invoice-core";
 import type { FieldErrors } from "react-hook-form";
 import { toast } from "sonner";
-
-import type { InvoiceData } from "@/app/schema";
 
 /**
  * Show toast listing form validation errors.

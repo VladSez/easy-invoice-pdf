@@ -1,19 +1,16 @@
-import dayjs from "dayjs";
-
 import {
+  type BuyerData,
+  DEFAULT_DATE_FORMAT,
   getDefaultInvoiceNumberLabel,
   INVOICE_PDF_TRANSLATIONS,
-} from "../(main)/(app)/pdf-i18n-translations/pdf-translations";
-import {
+  type InvoiceData,
+  type SellerData,
   SUPPORTED_CURRENCIES,
   SUPPORTED_INVOICE_PDF_LANGUAGES,
   SUPPORTED_TEMPLATES,
-  DEFAULT_DATE_FORMAT,
-  type InvoiceData,
   type SupportedTemplates,
-  type SellerData,
-  type BuyerData,
-} from "../schema";
+} from "@easyinvoicepdf/invoice-core";
+import dayjs from "dayjs";
 
 /**
  * Current date in YYYY-MM-DD format

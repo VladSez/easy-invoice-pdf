@@ -1,4 +1,5 @@
-import type { InvoiceData } from "@/app/schema";
+import type { InvoiceData } from "@easyinvoicepdf/invoice-core";
+
 import { env } from "@/env";
 import {
   createOrFindInvoiceFolder,

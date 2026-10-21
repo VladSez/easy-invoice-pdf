@@ -7,11 +7,12 @@
  * - author.name = person name only (no role suffix per Google Article guide).
  */
 
-import { APP_PAGE_TITLE } from "@/app/(main)/(app)/app-page-heading";
 import {
   SUPPORTED_CURRENCIES,
   SUPPORTED_INVOICE_PDF_LANGUAGES,
-} from "@/app/schema";
+} from "@easyinvoicepdf/invoice-core";
+
+import { APP_PAGE_TITLE } from "@/app/(main)/(app)/app-page-heading";
 import {
   FOUNDER_AVATAR_URL,
   GITHUB_URL,

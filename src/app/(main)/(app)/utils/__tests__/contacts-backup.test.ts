@@ -1,3 +1,9 @@
+import {
+  type BuyerData,
+  buyerSchema,
+  type SellerData,
+  sellerSchema,
+} from "@easyinvoicepdf/invoice-core";
 import { assert, describe, expect, it } from "vitest";
 
 import {
@@ -7,12 +13,6 @@ import {
   parseContactsBackup,
   serializeContactsBackup,
 } from "@/app/(main)/(app)/utils/contacts-backup";
-import {
-  buyerSchema,
-  sellerSchema,
-  type BuyerData,
-  type SellerData,
-} from "@/app/schema";
 
 const SELLER = sellerSchema.parse({
   id: "1700000000000",

@@ -1,3 +1,4 @@
+import { buyerSchema, sellerSchema } from "@easyinvoicepdf/invoice-core";
 import * as Sentry from "@sentry/nextjs";
 import { Download, Ellipsis, Upload } from "lucide-react";
 import { useState } from "react";
@@ -24,10 +25,8 @@ import {
 import {
   BUYERS_LOCAL_STORAGE_KEY,
   SELLERS_LOCAL_STORAGE_KEY,
-  buyerSchema,
-  sellerSchema,
   type LocalStorageKey,
-} from "@/app/schema";
+} from "@/app/schema/local-storage-keys";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

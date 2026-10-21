@@ -448,7 +448,7 @@ export const SEO_LANDING_DEFINITIONS = {
         { label: "License", value: "AGPL-3.0" },
         {
           label: "Source",
-          value: "Public on GitHub, with issues and pull requests open",
+          value: "Public on GitHub, with issues open for bug reports and ideas",
         },
         { label: "Built with", value: "Next.js, TypeScript, React and Zod" },
         {

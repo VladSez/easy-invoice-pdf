@@ -12,7 +12,13 @@ const loadTsFileViaJiti = createJiti(import.meta.filename);
 
 // Import ENV file here to validate during build. jiti lets us import .ts files :)
 // (jiti v2 deprecated the callable form in favour of `.import()`)
-await loadTsFileViaJiti.import("./src/env");
+// @ts-ignore
+const { env } = await loadTsFileViaJiti.import("./src/env");
+
+// @ts-ignore
+const { getDashboardRedirects } = await loadTsFileViaJiti.import(
+  "./src/lib/dashboard-redirects.ts",
+);
 
 // Validate all i18n files, that are used to translate the /about page
 async function validatei18nAndInvoicePDFTranslationFiles() {
@@ -21,11 +27,11 @@ async function validatei18nAndInvoicePDFTranslationFiles() {
     // Import the translations schema and catalog using jiti
     // @ts-ignore
     const { invoicePDFTranslationsSchema } = await loadTsFileViaJiti.import(
-      "./src/app/(main)/(app)/pdf-i18n-translations/pdf-translations-schema.ts",
+      "./packages/invoice-core/src/pdf-translations/pdf-translations-schema.ts",
     );
     // @ts-ignore
     const { INVOICE_PDF_TRANSLATIONS } = await loadTsFileViaJiti.import(
-      "./src/app/(main)/(app)/pdf-i18n-translations/pdf-translations.ts",
+      "./packages/invoice-core/src/pdf-translations/pdf-translations.ts",
     );
 
     const result = invoicePDFTranslationsSchema.safeParse(
@@ -145,7 +151,10 @@ const nextConfig = {
   // Those targets come from `.browserslistrc`, which pins the Next 15 list --
   // Next 16's built-in default is `safari 16.4`, under which there would be
   // nothing left for this entry to lower.
-  transpilePackages: ["pdfjs-dist"],
+  //
+  // `@easyinvoicepdf/invoice-core` is the workspace package in `packages/`. It ships
+  // TypeScript source, so Next has to compile it like app code.
+  transpilePackages: ["pdfjs-dist", "@easyinvoicepdf/invoice-core"],
   // Configure the file extensions that Next.js should handle
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
   compiler: {
@@ -218,6 +227,9 @@ const nextConfig = {
         destination: "/stripe-template",
         permanent: true,
       },
+      // `/dashboard/*` -> the paid dashboard's own origin, only when one is configured.
+      // Redirects run before any route, so the `[locale]` catch-all never sees `/dashboard`.
+      ...getDashboardRedirects(env.NEXT_PUBLIC_DASHBOARD_URL),
     ];
   },
 };

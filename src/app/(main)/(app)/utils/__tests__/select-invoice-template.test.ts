@@ -1,11 +1,11 @@
-import { describe, it, expect } from "vitest";
-
 import {
   getDefaultInvoiceNumberLabel,
   INVOICE_PDF_TRANSLATIONS,
-} from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
+  type InvoiceData,
+} from "@easyinvoicepdf/invoice-core";
+import { describe, it, expect } from "vitest";
+
 import { getInitialInvoiceData, INITIAL_INVOICE_DATA } from "@/app/constants";
-import type { InvoiceData } from "@/app/schema";
 
 import { selectInvoiceTemplate } from "../select-invoice-template";
 

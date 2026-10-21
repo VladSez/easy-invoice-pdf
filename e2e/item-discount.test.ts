@@ -1,6 +1,7 @@
+import type { InvoiceData } from "@easyinvoicepdf/invoice-core";
 import type { Page } from "@playwright/test";
 
-import { type InvoiceData, PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema";
+import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { test, expect } from "./utils/extended-playwright-test";

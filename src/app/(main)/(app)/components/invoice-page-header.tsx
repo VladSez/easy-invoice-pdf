@@ -1,5 +1,6 @@
 "use client";
 
+import type { InvoiceData } from "@easyinvoicepdf/invoice-core";
 import { LinkIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -8,7 +9,6 @@ import { APP_PAGE_HEADING } from "@/app/(main)/(app)/app-page-heading";
 import { HowItWorksVideoDialog } from "@/app/(main)/(app)/components/how-it-works-video-dialog";
 import { InvoicePDFDownloadLink } from "@/app/(main)/(app)/components/invoice-pdf-download-link";
 import { ShareInvoiceButton } from "@/app/(main)/(app)/components/share-invoice-button";
-import { type InvoiceData } from "@/app/schema";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { CustomTooltip } from "@/components/ui/tooltip";

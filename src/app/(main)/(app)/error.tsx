@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { setAppStorageItem } from "@/app/(main)/(app)/utils/app-local-storage";
 import { resetAppMetadata } from "@/app/(main)/(app)/utils/get-app-metadata";
 import { getInitialInvoiceData } from "@/app/constants";
-import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema";
+import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 import { ErrorMessage } from "@/components/etc/error-message";
 import {
   AlertDialog,

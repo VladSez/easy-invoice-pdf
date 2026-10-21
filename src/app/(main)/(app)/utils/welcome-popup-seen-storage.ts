@@ -7,7 +7,7 @@ import {
 import {
   WELCOME_POPUP_SEEN_STORAGE_KEY,
   WELCOME_POPUP_SEEN_VALUE,
-} from "@/app/schema";
+} from "@/app/schema/local-storage-keys";
 
 export function hasSeenWelcomePopup() {
   return (

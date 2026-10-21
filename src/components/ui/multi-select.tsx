@@ -1,10 +1,13 @@
 // src/components/multi-select.tsx
 
+import {
+  LANGUAGE_TO_LABEL,
+  type SupportedLanguages,
+} from "@easyinvoicepdf/invoice-core";
 import { cva, type VariantProps } from "class-variance-authority";
 import { CheckIcon, XCircle, ChevronDown } from "lucide-react";
 import * as React from "react";
 
-import { LANGUAGE_TO_LABEL, type SupportedLanguages } from "@/app/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {

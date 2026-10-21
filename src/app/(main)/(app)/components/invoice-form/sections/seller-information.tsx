@@ -1,3 +1,4 @@
+import type { InvoiceData, SellerData } from "@easyinvoicepdf/invoice-core";
 import { Info } from "lucide-react";
 import { memo, useState } from "react";
 import {
@@ -9,7 +10,6 @@ import {
 
 import { inputErrorClassName } from "@/app/(main)/(app)/components/invoice-form/common";
 import { SellerManagement } from "@/app/(main)/(app)/components/invoice-form/sections/components/seller/seller-management";
-import { type InvoiceData, type SellerData } from "@/app/schema";
 import { AccordionContent } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";

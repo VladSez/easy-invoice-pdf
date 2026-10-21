@@ -12,7 +12,7 @@ import {
   CHANGELOG_SEEN_STORAGE_KEY,
   WELCOME_POPUP_SEEN_STORAGE_KEY,
   WELCOME_POPUP_SEEN_VALUE,
-} from "./src/app/schema";
+} from "./src/app/schema/local-storage-keys";
 import { SENTRY_E2E_DISABLED_STORAGE_KEY } from "./src/lib/sentry/sentry-e2e-flags";
 
 /**

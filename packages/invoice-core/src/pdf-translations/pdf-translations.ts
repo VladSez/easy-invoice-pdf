@@ -1,0 +1,1298 @@
+import { type SupportedLanguages, type SupportedTemplates } from "../schema";
+import type { TranslationSchema } from "./pdf-translations-schema";
+
+/**
+ * Join a tax label onto the Swedish noun it qualifies.
+ *
+ * "Moms" is an ordinary Swedish word and compounds straight onto the noun ("Momsbelopp");
+ * an abbreviation the user typed instead takes a hyphen ("VAT-belopp"). The templates
+ * always pass a label -- they fall back to "VAT", and the language picker resets it to the
+ * language's own word -- but an empty one reads as the Swedish default rather than
+ * producing a stray hyphen.
+ */
+function swedishTaxCompound({
+  customTaxLabel,
+  noun,
+}: {
+  /** The label shown in the tax column, e.g. "Moms", "VAT", "GST". */
+  customTaxLabel: string;
+  /** The noun it qualifies, e.g. "sats". May start with a line break for narrow columns. */
+  noun: string;
+}) {
+  return !customTaxLabel || customTaxLabel.toLowerCase() === "moms"
+    ? `Moms${noun}`
+    : `${customTaxLabel}-${noun}`;
+}
+
+export const INVOICE_PDF_TRANSLATIONS = {
+  en: {
+    invoiceNumber: "Invoice No. of",
+    dateOfIssue: "Date of issue",
+    dateOfService: "Date of sales/of executing the service",
+    servicePeriod: "Service period",
+    invoiceType: "Invoice Type",
+    seller: {
+      name: "Seller",
+      vatNo: "VAT no",
+      email: "e-mail",
+      accountNumber: "Account Number",
+      swiftBic: "SWIFT/BIC number",
+    },
+    buyer: {
+      name: "Buyer",
+      vatNo: "VAT no",
+      email: "e-mail",
+    },
+    invoiceItemsTable: {
+      no: "No",
+      nameOfGoodsService: "Name of goods/service",
+      typeOfGTU: "Type of GTU",
+      amount: "Amount",
+      unit: "Unit",
+      /**
+       * You can pass a custom text for the net price label. i.e. for i18n
+       * @example
+       * netPrice: ({ customTaxLabel: string }) => {
+       *   return `Цена без ${customTaxLabel || "НДС"}`;
+       * }
+       */
+      netPrice: () => {
+        return `Net price`;
+      },
+      vat: "VAT",
+      netAmount: () => {
+        return `Net\n Amount`;
+      },
+      /**
+       * You can pass a custom text for the VAT amount label. i.e. for i18n
+       * @example
+       * vatAmount: ({ customTaxLabel: string }) => {
+       *   return `${customTaxLabel || "VAT"} Amount`;
+       * }
+       */
+      vatAmount: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "VAT"} Amount`;
+      },
+      preTaxAmount: () => {
+        return `Pre-tax amount `;
+      },
+      sum: "SUM",
+      discount: "Discount",
+    },
+    paymentInfo: {
+      paymentMethod: "Payment method",
+      paymentDate: "Payment date",
+    },
+    vatSummaryTable: {
+      /**
+       * You can pass a custom text for the VAT rate label. i.e. for i18n
+       * @example
+       * vatRate: ({ customTaxLabel: string }) => {
+       *   return `Ставка ${customTaxLabel || "НДС"}`;
+       * }
+       */
+      vatRate: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "VAT"} rate`;
+      },
+      /**
+       * You can pass a custom text for the net label. i.e. for i18n
+       * @example
+       * net: ({ customTaxLabel }) => {
+       *   return `Без ${customTaxLabel || "НДС"}`;
+       * }
+       */
+      net: () => {
+        return `Net`;
+      },
+      vat: "VAT",
+      /**
+       * You can pass a custom text for the pre-tax label. i.e. for i18n
+       * @example
+       * preTax: ({ customTaxLabel: string }) => {
+       *   return `С ${customTaxLabel || "НДС"}`;
+       * }
+       */
+      preTax: () => {
+        return `Pre-tax`;
+      },
+      total: "Total",
+    },
+    paymentTotals: {
+      toPay: "To pay",
+      paid: "Paid",
+      leftToPay: "Left to pay",
+      amountInWords: "Amount in words",
+    },
+    personAuthorizedToReceive: "Person authorized to receive",
+    personAuthorizedToIssue: "Person authorized to issue",
+    createdWith: "Created with",
+    stripe: {
+      invoice: "Invoice",
+      invoiceNumber: "Invoice number",
+      dateOfIssue: "Date of issue",
+      dateDue: "Date due",
+      servicePeriod: "Service period",
+      billTo: "Bill to",
+      due: "due",
+      payOnline: "Pay Online",
+      description: "Description",
+      qty: "Qty",
+      unit: "Unit",
+      unitPrice: "Unit Price",
+      amount: "Amount",
+      tax: "Tax",
+      subtotal: "Subtotal",
+      totalExcludingTax: "Total excluding tax",
+      total: "Total",
+      amountDue: "Amount Due",
+      page: "Page",
+      of: "of",
+      discount: "Discount",
+      taxOn: "on",
+      discountOff: "off",
+    },
+  },
+  pl: {
+    invoiceNumber: "Faktura nr",
+    dateOfIssue: "Data wystawienia",
+    dateOfService: "Data sprzedaży / wykonania usługi",
+    servicePeriod: "Okres realizacji",
+    invoiceType: "Typ faktury",
+    seller: {
+      name: "Sprzedawca",
+      vatNo: "NIP",
+      email: "E-mail",
+      accountNumber: "Nr konta",
+      swiftBic: "Nr SWIFT/BIC",
+    },
+    buyer: {
+      name: "Nabywca",
+      vatNo: "NIP",
+      email: "E-mail",
+    },
+    invoiceItemsTable: {
+      no: "lp.",
+      nameOfGoodsService: "Nazwa towaru/usługi",
+      typeOfGTU: "Typ\n GTU",
+      amount: "Ilość",
+      unit: "Jm",
+      netPrice: () => {
+        return `Cena\n netto`;
+      },
+      vat: "VAT",
+      netAmount: () => {
+        return `Kwota\n netto`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Kwota ${customTaxLabel || "VAT"}`;
+      },
+      preTaxAmount: () => {
+        return `Kwota\n brutto`;
+      },
+      sum: "SUMA",
+      discount: "Rabat",
+    },
+    paymentInfo: {
+      paymentMethod: "Sposób wpłaty",
+      paymentDate: "Termin zapłaty",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return `Stawka ${customTaxLabel || "VAT"}`;
+      },
+      net: () => {
+        return `Netto`;
+      },
+      vat: "VAT",
+      preTax: () => {
+        return `Brutto`;
+      },
+      total: "Razem",
+    },
+    paymentTotals: {
+      toPay: "Razem do zapłaty",
+      paid: "Wpłacono",
+      leftToPay: "Pozostało do zapłaty",
+      amountInWords: "Kwota słownie",
+    },
+    personAuthorizedToReceive: "Osoba upoważniona do odbioru",
+    personAuthorizedToIssue: "Osoba upoważniona do wystawienia",
+    createdWith: "Utworzono za pomocą",
+    stripe: {
+      invoice: "Faktura",
+      invoiceNumber: "Numer faktury",
+      dateOfIssue: "Data wystawienia",
+      dateDue: "Termin płatności",
+      servicePeriod: "Okres realizacji",
+      billTo: "Nabywca",
+      due: "do zapłaty do",
+      payOnline: "Płatność online",
+      description: "Opis",
+      qty: "Ilość",
+      unit: "Jm",
+      unitPrice: "Cena jednostkowa",
+      amount: "Kwota",
+      tax: "Podatek",
+      subtotal: "Podsumowanie",
+      totalExcludingTax: "Suma bez podatku",
+      total: "Razem",
+      amountDue: "Kwota do zapłaty",
+      page: "Strona",
+      of: "z",
+      discount: "Rabat",
+      taxOn: "od",
+      discountOff: "rabatu",
+    },
+  },
+  de: {
+    invoiceNumber: "Rechnungsnummer",
+    dateOfIssue: "Ausstellungsdatum",
+    dateOfService: "Verkaufsdatum/Leistungsdatum",
+    servicePeriod: "Leistungszeitraum",
+    invoiceType: "Rechnungstyp",
+    seller: {
+      name: "Verkäufer",
+      vatNo: "USt-IdNr",
+      email: "E-Mail",
+      accountNumber: "Kontonummer",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Käufer",
+      vatNo: "USt-IdNr",
+      email: "E-Mail",
+    },
+    invoiceItemsTable: {
+      no: "Nr",
+      nameOfGoodsService: "Bezeichnung der Ware/Dienstleistung",
+      typeOfGTU: "GTU-Typ",
+      amount: "Menge",
+      unit: "Einheit",
+      netPrice: () => {
+        return `Nettopreis`;
+      },
+      vat: "MwSt.",
+      netAmount: () => {
+        return `Nettobetrag`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "MwSt."}-Betrag`;
+      },
+      preTaxAmount: () => {
+        return `Bruttobetrag`;
+      },
+      sum: "SUMME",
+      discount: "Rabatt",
+    },
+    paymentInfo: {
+      paymentMethod: "Zahlungsart",
+      paymentDate: "Zahlungsdatum",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "MwSt."}-Satz`;
+      },
+      net: () => {
+        return `Netto`;
+      },
+      vat: "MwSt.",
+      preTax: () => {
+        return `Brutto`;
+      },
+      total: "Gesamt",
+    },
+    paymentTotals: {
+      toPay: "Zu zahlen",
+      paid: "Bezahlt",
+      leftToPay: "Restbetrag",
+      amountInWords: "Betrag in Worten",
+    },
+    personAuthorizedToReceive: "Empfangsberechtigte Person",
+    personAuthorizedToIssue: "Ausstellungsberechtigte Person",
+    createdWith: "Erstellt mit",
+    stripe: {
+      invoice: "Rechnung",
+      invoiceNumber: "Rechnungsnummer",
+      dateOfIssue: "Ausstellungsdatum",
+      dateDue: "Fälligkeitsdatum",
+      servicePeriod: "Leistungszeitraum",
+      billTo: "Rechnung an",
+      due: "zahlbar bis",
+      payOnline: "Online-Zahlung",
+      description: "Beschreibung",
+      qty: "Menge",
+      unit: "Einheit",
+      unitPrice: "Einzelpreis",
+      amount: "Betrag",
+      tax: "Steuer",
+      subtotal: "Zwischensumme",
+      totalExcludingTax: "Gesamtbetrag ohne Steuer",
+      total: "Gesamt",
+      amountDue: "Zu zahlender Betrag",
+      page: "Seite",
+      of: "von",
+      discount: "Rabatt",
+      taxOn: "auf",
+      discountOff: "Rabatt",
+    },
+  },
+  es: {
+    invoiceNumber: "Factura n.º",
+    dateOfIssue: "Fecha de emisión",
+    dateOfService: "Fecha de venta/prestación del servicio",
+    servicePeriod: "Periodo de servicio",
+    invoiceType: "Tipo de factura",
+    seller: {
+      name: "Vendedor",
+      vatNo: "NIF/CIF",
+      email: "Correo electrónico",
+      accountNumber: "Número de cuenta",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Comprador",
+      vatNo: "NIF/CIF",
+      email: "Correo electrónico",
+    },
+    invoiceItemsTable: {
+      no: "N.º",
+      nameOfGoodsService: "Descripción del producto/servicio",
+      typeOfGTU: "Tipo\n GTU",
+      amount: "Cantidad",
+      unit: "Unidad",
+      netPrice: () => {
+        return `Precio neto`;
+      },
+      vat: "IVA",
+      netAmount: () => {
+        return `Importe\n neto`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Importe ${customTaxLabel || "IVA"}`;
+      },
+      preTaxAmount: () => {
+        return `Importe bruto`;
+      },
+      sum: "TOTAL",
+      discount: "Descuento",
+    },
+    paymentInfo: {
+      paymentMethod: "Forma de pago",
+      paymentDate: "Fecha de pago",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return `Tipo ${customTaxLabel || "IVA"}`;
+      },
+      net: () => {
+        return `Neto`;
+      },
+      vat: "IVA",
+      preTax: () => {
+        return `Bruto`;
+      },
+      total: "Total",
+    },
+    paymentTotals: {
+      toPay: "Total a pagar",
+      paid: "Pagado",
+      leftToPay: "Pendiente de pago",
+      amountInWords: "Importe en letras",
+    },
+    personAuthorizedToReceive: "Persona autorizada para recibir",
+    personAuthorizedToIssue: "Persona autorizada para emitir",
+    createdWith: "Creado con",
+    stripe: {
+      invoice: "Factura",
+      invoiceNumber: "Número de factura",
+      dateOfIssue: "Fecha de emisión",
+      dateDue: "Fecha de vencimiento",
+      servicePeriod: "Periodo de servicio",
+      billTo: "Facturar a",
+      due: "con vencimiento el",
+      payOnline: "Pago en línea",
+      description: "Descripción",
+      qty: "Cant.",
+      unit: "Unidad",
+      unitPrice: "Precio unitario",
+      amount: "Monto",
+      tax: "Impuesto",
+      subtotal: "Subtotal",
+      totalExcludingTax: "Total sin impuestos",
+      total: "Total",
+      amountDue: "Monto a pagar",
+      page: "Página",
+      of: "de",
+      discount: "Descuento",
+      taxOn: "sobre",
+      discountOff: "de descuento",
+    },
+  },
+  pt: {
+    invoiceNumber: "Fatura n.º",
+    dateOfIssue: "Data de emissão",
+    dateOfService: "Data de venda/prestação do serviço",
+    servicePeriod: "Período de serviço",
+    invoiceType: "Tipo de fatura",
+    seller: {
+      name: "Vendedor",
+      vatNo: "NIF",
+      email: "E-mail",
+      accountNumber: "Número da conta",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Comprador",
+      vatNo: "NIF",
+      email: "E-mail",
+    },
+    invoiceItemsTable: {
+      no: "N.º",
+      nameOfGoodsService: "Descrição do produto/serviço",
+      typeOfGTU: "Tipo\n GTU",
+      amount: "Quantidade",
+      unit: "Unidade",
+      netPrice: () => {
+        return `Preço\n líquido`;
+      },
+      vat: "IVA",
+      netAmount: () => {
+        return `Valor\n líquido`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Valor ${customTaxLabel || "IVA"}`;
+      },
+      preTaxAmount: () => {
+        return `Valor bruto`;
+      },
+      sum: "TOTAL",
+      discount: "Desconto",
+    },
+    paymentInfo: {
+      paymentMethod: "Forma de pagamento",
+      paymentDate: "Data de pagamento",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return `Taxa ${customTaxLabel || "IVA"}`;
+      },
+      net: () => {
+        return `Líquido`;
+      },
+      vat: "IVA",
+      preTax: () => {
+        return `Bruto`;
+      },
+      total: "Total",
+    },
+    paymentTotals: {
+      toPay: "Total a pagar",
+      paid: "Pago",
+      leftToPay: "Valor em falta",
+      amountInWords: "Valor por extenso",
+    },
+    personAuthorizedToReceive: "Pessoa autorizada a receber",
+    personAuthorizedToIssue: "Pessoa autorizada a emitir",
+    createdWith: "Criado com",
+    stripe: {
+      invoice: "Fatura",
+      invoiceNumber: "Número da fatura",
+      dateOfIssue: "Data de emissão",
+      dateDue: "Data de vencimento",
+      servicePeriod: "Período de serviço",
+      billTo: "Faturar a",
+      due: "a pagar até",
+      payOnline: "Pagar online",
+      description: "Descrição",
+      qty: "Qtd.",
+      unit: "Unidade",
+      unitPrice: "Preço unitário",
+      amount: "Valor",
+      tax: "Imposto",
+      subtotal: "Subtotal",
+      totalExcludingTax: "Total sem impostos",
+      total: "Total",
+      amountDue: "Valor a pagar",
+      page: "Página",
+      of: "de",
+      discount: "Desconto",
+      taxOn: "sobre",
+      discountOff: "de desconto",
+    },
+  },
+  /**
+   * Brazilian Portuguese is a separate invoice rather than a different spelling of the
+   * European one: Brazil has no IVA and no NIF, so the tax number is the "CNPJ/CPF" that
+   * every nota fiscal carries, the tax column is the generic "Imposto" (the user renames it
+   * to ICMS, ISS or whatever applies), its rate is an "Alíquota", and the parties are the
+   * "Emitente" and "Destinatário" of the NF-e layout rather than a seller and a buyer.
+   */
+  "pt-BR": {
+    invoiceNumber: "Fatura nº",
+    dateOfIssue: "Data de emissão",
+    dateOfService: "Data da venda/prestação do serviço",
+    servicePeriod: "Período de serviço",
+    invoiceType: "Tipo de fatura",
+    seller: {
+      name: "Emitente",
+      vatNo: "CNPJ/CPF",
+      email: "E-mail",
+      accountNumber: "Conta bancária",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Destinatário",
+      vatNo: "CNPJ/CPF",
+      email: "E-mail",
+    },
+    invoiceItemsTable: {
+      no: "Nº",
+      nameOfGoodsService: "Descrição do produto/serviço",
+      typeOfGTU: "Tipo\n GTU",
+      amount: "Quantidade",
+      unit: "Unidade",
+      netPrice: () => {
+        return `Preço\n líquido`;
+      },
+      vat: "Imposto",
+      netAmount: () => {
+        return `Valor\n líquido`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Valor do ${customTaxLabel || "imposto"}`;
+      },
+      preTaxAmount: () => {
+        return `Valor bruto`;
+      },
+      sum: "TOTAL",
+      discount: "Desconto",
+    },
+    paymentInfo: {
+      paymentMethod: "Forma de pagamento",
+      paymentDate: "Data do pagamento",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return `Alíquota do ${customTaxLabel || "imposto"}`;
+      },
+      net: () => {
+        return `Líquido`;
+      },
+      vat: "Imposto",
+      preTax: () => {
+        return `Bruto`;
+      },
+      total: "Total",
+    },
+    paymentTotals: {
+      toPay: "Total a pagar",
+      paid: "Valor pago",
+      leftToPay: "Saldo a pagar",
+      amountInWords: "Valor por extenso",
+    },
+    personAuthorizedToReceive: "Pessoa autorizada a receber",
+    personAuthorizedToIssue: "Pessoa autorizada a emitir",
+    createdWith: "Criado com",
+    stripe: {
+      invoice: "Fatura",
+      invoiceNumber: "Número da fatura",
+      dateOfIssue: "Data de emissão",
+      dateDue: "Data de vencimento",
+      servicePeriod: "Período de serviço",
+      billTo: "Faturar para",
+      due: "com vencimento em",
+      payOnline: "Pagar online",
+      description: "Descrição",
+      qty: "Qtd.",
+      unit: "Unidade",
+      unitPrice: "Preço unitário",
+      amount: "Valor",
+      tax: "Imposto",
+      subtotal: "Subtotal",
+      totalExcludingTax: "Total sem impostos",
+      total: "Total",
+      amountDue: "Valor a pagar",
+      page: "Página",
+      of: "de",
+      discount: "Desconto",
+      taxOn: "sobre",
+      discountOff: "de desconto",
+    },
+  },
+  ru: {
+    invoiceNumber: "Инвойс №",
+    dateOfIssue: "Дата выставления",
+    dateOfService: "Дата продажи/оказания услуги",
+    servicePeriod: "Период оказания услуг",
+    invoiceType: "Тип счёта",
+    seller: {
+      name: "Продавец",
+      vatNo: "ИНН",
+      email: "Эл. почта",
+      accountNumber: "Номер счёта",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Покупатель",
+      vatNo: "ИНН",
+      email: "Эл. почта",
+    },
+    invoiceItemsTable: {
+      no: "№",
+      nameOfGoodsService: "Наименование товара/услуги",
+      typeOfGTU: "Тип\n GTU",
+      amount: "Количество",
+      unit: "Ед.\n изм.",
+      netPrice: ({ customTaxLabel }) => {
+        return `Цена без ${customTaxLabel || "НДС"}`;
+      },
+      vat: "НДС",
+      netAmount: ({ customTaxLabel }) => {
+        return `Сумма без ${customTaxLabel || "НДС"}`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Сумма ${customTaxLabel || "НДС"}`;
+      },
+      preTaxAmount: ({ customTaxLabel }) => {
+        return `Сумма с ${customTaxLabel || "НДС"}`;
+      },
+      sum: "ИТОГО",
+      discount: "Скидка",
+    },
+    paymentInfo: {
+      paymentMethod: "Способ оплаты",
+      paymentDate: "Дата оплаты",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return `Ставка ${customTaxLabel || "НДС"}`;
+      },
+      net: ({ customTaxLabel }) => {
+        return `Без ${customTaxLabel || "НДС"}`;
+      },
+      vat: "НДС",
+      preTax: ({ customTaxLabel }) => {
+        return `С ${customTaxLabel || "НДС"}`;
+      },
+      total: "Всего",
+    },
+    paymentTotals: {
+      toPay: "Итого к оплате",
+      paid: "Оплачено",
+      leftToPay: "Осталось оплатить",
+      amountInWords: "Сумма прописью",
+    },
+    personAuthorizedToReceive: "Уполномоченное лицо на получение",
+    personAuthorizedToIssue: "Уполномоченное лицо на выставление",
+    createdWith: "Создано с помощью",
+    stripe: {
+      invoice: "Счет",
+      invoiceNumber: "Номер счета",
+      dateOfIssue: "Дата выставления",
+      dateDue: "Дата оплаты",
+      servicePeriod: "Период оказания услуг",
+      billTo: "Плательщик",
+      due: "оплатить до",
+      payOnline: "Оплатить онлайн",
+      description: "Описание",
+      qty: "Кол-во",
+      unit: "Ед. изм.",
+      unitPrice: "Цена за единицу",
+      amount: "Сумма",
+      tax: "Налог",
+      subtotal: "Промежуточный итог",
+      totalExcludingTax: "Итого без налога",
+      total: "Итого",
+      amountDue: "Сумма к оплате",
+      page: "Страница",
+      of: "из",
+      discount: "Скидка",
+      taxOn: "от",
+      discountOff: "скидка",
+    },
+  },
+  uk: {
+    invoiceNumber: "Рахунок-фактура №",
+    dateOfIssue: "Дата виставлення",
+    dateOfService: "Дата продажу/надання послуги",
+    servicePeriod: "Період надання послуги",
+    invoiceType: "Тип рахунку",
+    seller: {
+      name: "Продавець",
+      vatNo: "ІПН",
+      email: "Ел. пошта",
+      accountNumber: "Номер рахунку",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Покупець",
+      vatNo: "ІПН",
+      email: "Ел. пошта",
+    },
+    invoiceItemsTable: {
+      no: "№",
+      nameOfGoodsService: "Найменування товару/послуги",
+      typeOfGTU: "Тип\n GTU",
+      amount: "Кількість",
+      unit: "Од.\n вим.",
+      netPrice: ({ customTaxLabel }) => {
+        return `Ціна без ${customTaxLabel || "ПДВ"}`;
+      },
+      vat: "ПДВ",
+      netAmount: ({ customTaxLabel }) => {
+        return `Сума без ${customTaxLabel || "ПДВ"}`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Сума ${customTaxLabel || "ПДВ"}`;
+      },
+      preTaxAmount: ({ customTaxLabel }) => {
+        return `Сума з ${customTaxLabel || "ПДВ"}`;
+      },
+      sum: "РАЗОМ",
+      discount: "Знижка",
+    },
+    paymentInfo: {
+      paymentMethod: "Спосіб оплати",
+      paymentDate: "Дата оплати",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return `Ставка ${customTaxLabel || "ПДВ"}`;
+      },
+      net: ({ customTaxLabel }) => {
+        return `Без ${customTaxLabel || "ПДВ"}`;
+      },
+      vat: "ПДВ",
+      preTax: ({ customTaxLabel }) => {
+        return `З ${customTaxLabel || "ПДВ"}`;
+      },
+      total: "Всього",
+    },
+    paymentTotals: {
+      toPay: "Разом до сплати",
+      paid: "Сплачено",
+      leftToPay: "Залишилось сплатити",
+      amountInWords: "Сума прописом",
+    },
+    personAuthorizedToReceive: "Уповноважена особа на отримання",
+    personAuthorizedToIssue: "Уповноважена особа на виставлення",
+    createdWith: "Створено за допомогою",
+    stripe: {
+      invoice: "Рахунок",
+      invoiceNumber: "Номер рахунку",
+      dateOfIssue: "Дата виставлення",
+      dateDue: "Дата оплати",
+      servicePeriod: "Період надання послуги",
+      billTo: "Платник",
+      due: "оплатити до",
+      payOnline: "Оплатити онлайн",
+      description: "Опис",
+      qty: "К-сть",
+      unit: "Од. вим.",
+      unitPrice: "Ціна за одиницю",
+      amount: "Сума",
+      tax: "Податок",
+      subtotal: "Проміжний ітог",
+      totalExcludingTax: "Всього без податку",
+      total: "Всього",
+      amountDue: "Сума до сплати",
+      page: "Сторінка",
+      of: "з",
+      discount: "Знижка",
+      taxOn: "від",
+      discountOff: "знижка",
+    },
+  },
+  fr: {
+    invoiceNumber: "Facture n°",
+    dateOfIssue: "Date d'émission",
+    dateOfService: "Date de vente/prestation de service",
+    servicePeriod: "Période de service",
+    invoiceType: "Type de facture",
+    seller: {
+      name: "Vendeur",
+      vatNo: "N° TVA",
+      email: "E-mail",
+      accountNumber: "Numéro de compte",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Acheteur",
+      vatNo: "N° TVA",
+      email: "E-mail",
+    },
+    invoiceItemsTable: {
+      no: "N°",
+      nameOfGoodsService: "Désignation du produit/service",
+      typeOfGTU: "Type\n GTU",
+      amount: "Quantité",
+      unit: "Unité",
+      netPrice: () => {
+        return `Prix HT`;
+      },
+      vat: "TVA",
+      netAmount: () => {
+        return `Montant\n HT`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Montant de la ${customTaxLabel || "TVA"}`;
+      },
+      preTaxAmount: () => {
+        return `Total TTC`;
+      },
+      sum: "TOTAL",
+      discount: "Remise",
+    },
+    paymentInfo: {
+      paymentMethod: "Mode de paiement",
+      paymentDate: "Date de paiement",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return `Taux ${customTaxLabel || "TVA"}`;
+      },
+      net: () => {
+        return `HT`;
+      },
+      vat: "TVA",
+      preTax: () => {
+        return `TTC`;
+      },
+      total: "Total",
+    },
+    paymentTotals: {
+      toPay: "Total à payer",
+      paid: "Payé",
+      leftToPay: "Reste à payer",
+      amountInWords: "Montant en lettres",
+    },
+    personAuthorizedToReceive: "Personne autorisée à recevoir",
+    personAuthorizedToIssue: "Personne autorisée à émettre",
+    createdWith: "Créé avec",
+    stripe: {
+      invoice: "Facture",
+      invoiceNumber: "Numéro de facture",
+      dateOfIssue: "Date d'émission",
+      dateDue: "Date d'échéance",
+      servicePeriod: "Période de service",
+      billTo: "Facturé à",
+      due: "à payer avant le",
+      payOnline: "Payer en ligne",
+      description: "Description",
+      qty: "Qté",
+      unit: "Unité",
+      unitPrice: "Prix unitaire",
+      amount: "Montant",
+      tax: "Taxe",
+      subtotal: "Sous-total",
+      totalExcludingTax: "Total hors taxe",
+      total: "Total",
+      amountDue: "Montant dû",
+      page: "Page",
+      of: "de",
+      discount: "Remise",
+      taxOn: "sur",
+      discountOff: "de remise",
+    },
+  },
+  it: {
+    invoiceNumber: "Fattura n°",
+    dateOfIssue: "Data di emissione",
+    dateOfService: "Data di vendita/prestazione del servizio",
+    servicePeriod: "Periodo di servizio",
+    invoiceType: "Tipo di fattura",
+    seller: {
+      name: "Venditore",
+      vatNo: "P.IVA",
+      email: "E-mail",
+      accountNumber: "Numero di conto",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Acquirente",
+      vatNo: "P.IVA",
+      email: "E-mail",
+    },
+    invoiceItemsTable: {
+      no: "N°",
+      nameOfGoodsService: "Descrizione del prodotto/servizio",
+      typeOfGTU: "Tipo\n GTU",
+      amount: "Quantità",
+      unit: "Unità",
+      netPrice: () => {
+        return `Prezzo netto`;
+      },
+      vat: "IVA",
+      netAmount: () => {
+        return `Importo\n netto`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `Importo ${customTaxLabel || "IVA"}`;
+      },
+      preTaxAmount: () => {
+        return `Importo lordo`;
+      },
+      sum: "TOTALE",
+      discount: "Sconto",
+    },
+    paymentInfo: {
+      paymentMethod: "Metodo di pagamento",
+      paymentDate: "Data di pagamento",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return `Aliquota ${customTaxLabel || "IVA"}`;
+      },
+      net: () => {
+        return `Netto`;
+      },
+      vat: "IVA",
+      preTax: () => {
+        return `Lordo`;
+      },
+      total: "Totale",
+    },
+    paymentTotals: {
+      toPay: "Totale da pagare",
+      paid: "Pagato",
+      leftToPay: "Rimanente da pagare",
+      amountInWords: "Importo in lettere",
+    },
+    personAuthorizedToReceive: "Persona autorizzata a ricevere",
+    personAuthorizedToIssue: "Persona autorizzata a emettere",
+    createdWith: "Creato con",
+    stripe: {
+      invoice: "Fattura",
+      invoiceNumber: "Numero di fattura",
+      dateOfIssue: "Data di emissione",
+      dateDue: "Data di scadenza",
+      servicePeriod: "Periodo di servizio",
+      billTo: "Fatturare a",
+      due: "da pagare entro il",
+      payOnline: "Pagare online",
+      description: "Descrizione",
+      qty: "Qtà",
+      unit: "Unità",
+      unitPrice: "Prezzo unitario",
+      amount: "Importo",
+      tax: "Imposta",
+      subtotal: "Totale parziale",
+      totalExcludingTax: "Totale escluse imposte",
+      total: "Totale",
+      amountDue: "Importo da pagare",
+      page: "Pagina",
+      of: "di",
+      discount: "Sconto",
+      taxOn: "su",
+      discountOff: "di sconto",
+    },
+  },
+  nl: {
+    invoiceNumber: "Factuurnummer",
+    dateOfIssue: "Uitgiftedatum",
+    dateOfService: "Datum van verkoop/dienstverlening",
+    servicePeriod: "Dienstverleningperiode",
+    invoiceType: "Factuurtype",
+    seller: {
+      name: "Verkoper",
+      vatNo: "BTW-nummer",
+      email: "E-mail",
+      accountNumber: "Rekeningnummer",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Koper",
+      vatNo: "BTW-nummer",
+      email: "E-mail",
+    },
+    invoiceItemsTable: {
+      no: "Nr",
+      nameOfGoodsService: "Omschrijving product/dienst",
+      typeOfGTU: "GTU-type",
+      amount: "Aantal",
+      unit: "Eenheid",
+      netPrice: () => {
+        return `Netto prijs`;
+      },
+      vat: "BTW",
+      netAmount: () => {
+        return `Nettobedrag`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "BTW"}-bedrag`;
+      },
+      preTaxAmount: () => {
+        return `Brutobedrag`;
+      },
+      sum: "TOTAAL",
+      discount: "Korting",
+    },
+    paymentInfo: {
+      paymentMethod: "Betaalmethode",
+      paymentDate: "Betaaldatum",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "BTW"}-tarief`;
+      },
+      net: () => {
+        return `Netto`;
+      },
+      vat: "BTW",
+      preTax: () => {
+        return `Bruto`;
+      },
+      total: "Totaal",
+    },
+    paymentTotals: {
+      toPay: "Te betalen",
+      paid: "Betaald",
+      leftToPay: "Nog te betalen",
+      amountInWords: "Bedrag in woorden",
+    },
+    personAuthorizedToReceive: "Persoon gemachtigd voor ontvangst",
+    personAuthorizedToIssue: "Persoon gemachtigd voor uitgifte",
+    createdWith: "Gemaakt met",
+    stripe: {
+      invoice: "Factuur",
+      invoiceNumber: "Factuurnummer",
+      dateOfIssue: "Uitgiftedatum",
+      dateDue: "Vervaldatum",
+      servicePeriod: "Dienstverleningperiode",
+      billTo: "Factuur aan",
+      due: "te betalen uiterlijk op",
+      payOnline: "Online betalen",
+      description: "Omschrijving",
+      qty: "Aantal",
+      unit: "Eenheid",
+      unitPrice: "Eenheidsprijs",
+      amount: "Bedrag",
+      tax: "Belasting",
+      subtotal: "Subtotaal",
+      totalExcludingTax: "Totaal exclusief belasting",
+      total: "Totaal",
+      amountDue: "Te betalen bedrag",
+      page: "Pagina",
+      of: "van",
+      discount: "Korting",
+      taxOn: "over",
+      discountOff: "korting",
+    },
+  },
+  sv: {
+    invoiceNumber: "Fakturanummer",
+    dateOfIssue: "Fakturadatum",
+    dateOfService: "Datum för försäljning/utförd tjänst",
+    servicePeriod: "Tjänsteperiod",
+    invoiceType: "Fakturatyp",
+    seller: {
+      name: "Säljare",
+      vatNo: "Momsreg.nr",
+      email: "E-post",
+      accountNumber: "Kontonummer",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Köpare",
+      vatNo: "Momsreg.nr",
+      email: "E-post",
+    },
+    invoiceItemsTable: {
+      no: "Nr",
+      nameOfGoodsService: "Benämning vara/tjänst",
+      typeOfGTU: "GTU-typ",
+      amount: "Antal",
+      unit: "Enhet",
+      netPrice: () => {
+        return `Nettopris`;
+      },
+      vat: "Moms",
+      /**
+       * These three are single compound words in Swedish, so the narrow columns would
+       * hyphenate them mid-word ("Moms-be-lopp"). The break is placed at the compound
+       * seam instead, the same way the other languages break their two-word labels.
+       */
+      netAmount: () => {
+        return `Netto\n belopp`;
+      },
+      vatAmount: ({ customTaxLabel }) => {
+        return swedishTaxCompound({ customTaxLabel, noun: `\n belopp` });
+      },
+      preTaxAmount: () => {
+        return `Brutto\n belopp`;
+      },
+      sum: "SUMMA",
+      discount: "Rabatt",
+    },
+    paymentInfo: {
+      paymentMethod: "Betalningsmetod",
+      paymentDate: "Förfallodatum",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return swedishTaxCompound({ customTaxLabel, noun: "sats" });
+      },
+      net: () => {
+        return `Netto`;
+      },
+      vat: "Moms",
+      preTax: () => {
+        return `Brutto`;
+      },
+      total: "Totalt",
+    },
+    paymentTotals: {
+      toPay: "Att betala",
+      paid: "Betalt",
+      leftToPay: "Kvar att betala",
+      amountInWords: "Belopp i ord",
+    },
+    personAuthorizedToReceive: "Person behörig att ta emot",
+    personAuthorizedToIssue: "Person behörig att utfärda",
+    createdWith: "Skapad med",
+    stripe: {
+      invoice: "Faktura",
+      invoiceNumber: "Fakturanummer",
+      dateOfIssue: "Fakturadatum",
+      dateDue: "Förfallodatum",
+      servicePeriod: "Tjänsteperiod",
+      billTo: "Faktureras till",
+      due: "att betala senast den",
+      payOnline: "Betala online",
+      description: "Beskrivning",
+      qty: "Antal",
+      unit: "Enhet",
+      unitPrice: "Styckpris",
+      amount: "Belopp",
+      tax: "Skatt",
+      subtotal: "Delsumma",
+      totalExcludingTax: "Totalt exklusive skatt",
+      total: "Totalt",
+      amountDue: "Att betala",
+      page: "Sida",
+      of: "av",
+      discount: "Rabatt",
+      taxOn: "på",
+      discountOff: "rabatt",
+    },
+  },
+  nb: {
+    invoiceNumber: "Fakturanummer",
+    dateOfIssue: "Fakturadato",
+    dateOfService: "Dato for salg/utført tjeneste",
+    servicePeriod: "Tjenesteperiode",
+    invoiceType: "Fakturatype",
+    seller: {
+      name: "Selger",
+      vatNo: "Org.nr",
+      email: "E-post",
+      accountNumber: "Kontonummer",
+      swiftBic: "SWIFT/BIC",
+    },
+    buyer: {
+      name: "Kjøper",
+      vatNo: "Org.nr",
+      email: "E-post",
+    },
+    invoiceItemsTable: {
+      no: "Nr",
+      nameOfGoodsService: "Beskrivelse vare/tjeneste",
+      typeOfGTU: "GTU-type",
+      amount: "Antall",
+      unit: "Enhet",
+      netPrice: () => {
+        return `Nettopris`;
+      },
+      vat: "MVA",
+      /**
+       * Single compound words, like the Swedish ones, so the narrow columns would
+       * hyphenate them mid-word. The break goes at the compound seam instead.
+       */
+      netAmount: () => {
+        return `Netto\n beløp`;
+      },
+      /**
+       * "MVA" is an abbreviation, and Norwegian hyphenates a compound whose first part is
+       * one -- "MVA-beløp", the same shape German uses for "MwSt.-Betrag".
+       */
+      vatAmount: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "MVA"}-\n beløp`;
+      },
+      preTaxAmount: () => {
+        return `Brutto\n beløp`;
+      },
+      sum: "SUM",
+      discount: "Rabatt",
+    },
+    paymentInfo: {
+      paymentMethod: "Betalingsmåte",
+      paymentDate: "Forfallsdato",
+    },
+    vatSummaryTable: {
+      vatRate: ({ customTaxLabel }) => {
+        return `${customTaxLabel || "MVA"}-sats`;
+      },
+      net: () => {
+        return `Netto`;
+      },
+      vat: "MVA",
+      preTax: () => {
+        return `Brutto`;
+      },
+      total: "Totalt",
+    },
+    paymentTotals: {
+      toPay: "Å betale",
+      paid: "Betalt",
+      leftToPay: "Gjenstår å betale",
+      amountInWords: "Beløp i ord",
+    },
+    personAuthorizedToReceive: "Person autorisert til å motta",
+    personAuthorizedToIssue: "Person autorisert til å utstede",
+    createdWith: "Laget med",
+    stripe: {
+      invoice: "Faktura",
+      invoiceNumber: "Fakturanummer",
+      dateOfIssue: "Fakturadato",
+      dateDue: "Forfallsdato",
+      servicePeriod: "Tjenesteperiode",
+      billTo: "Faktureres til",
+      due: "betales innen",
+      payOnline: "Betal på nett",
+      description: "Beskrivelse",
+      qty: "Antall",
+      unit: "Enhet",
+      unitPrice: "Stykkpris",
+      amount: "Beløp",
+      tax: "Skatt",
+      subtotal: "Delsum",
+      totalExcludingTax: "Totalt eksklusiv skatt",
+      total: "Totalt",
+      amountDue: "Å betale",
+      page: "Side",
+      of: "av",
+      discount: "Rabatt",
+      taxOn: "av",
+      discountOff: "rabatt",
+    },
+  },
+} as const satisfies Record<SupportedLanguages, TranslationSchema>;
+
+/**
+ * Returns the editable invoice label used by the selected PDF template.
+ *
+ * The default template prints a label next to the invoice number, while the
+ * Stripe template uses the same field as its document heading.
+ */
+export function getDefaultInvoiceNumberLabel(
+  language: SupportedLanguages,
+  template: SupportedTemplates,
+) {
+  const translation = INVOICE_PDF_TRANSLATIONS[language];
+
+  if (template === "stripe") {
+    return translation.stripe.invoice;
+  }
+
+  return `${translation.invoiceNumber}:` as const;
+}

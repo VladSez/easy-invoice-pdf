@@ -1,14 +1,15 @@
+import {
+  formatDateWithLocale,
+  getCurrentMonthAndYear,
+  type InvoiceData,
+  isServicePeriodStartInCurrentMonth,
+  type SupportedLanguages,
+} from "@easyinvoicepdf/invoice-core";
 import dayjs from "dayjs";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import type { UseFormSetValue } from "react-hook-form";
 import { toast } from "sonner";
 
-import { formatDateWithLocale } from "@/app/(main)/(app)/utils/format-date-with-locale";
-import {
-  getCurrentMonthAndYear,
-  isServicePeriodStartInCurrentMonth,
-} from "@/app/(main)/(app)/utils/format-service-period";
-import type { InvoiceData, SupportedLanguages } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 
 interface StaleDatesBannerProps {

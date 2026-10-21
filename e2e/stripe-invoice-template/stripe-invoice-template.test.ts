@@ -1,13 +1,13 @@
+import {
+  DEFAULT_DATE_FORMAT,
+  type InvoiceData,
+  STRIPE_DEFAULT_DATE_FORMAT,
+} from "@easyinvoicepdf/invoice-core";
 import type { Page } from "@playwright/test";
 
 import { APP_PAGE_TITLE } from "@/app/(main)/(app)/app-page-heading";
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
-import {
-  DEFAULT_DATE_FORMAT,
-  PDF_DATA_LOCAL_STORAGE_KEY,
-  STRIPE_DEFAULT_DATE_FORMAT,
-  type InvoiceData,
-} from "@/app/schema";
+import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 import { STATIC_ASSETS_URL } from "@/config";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test

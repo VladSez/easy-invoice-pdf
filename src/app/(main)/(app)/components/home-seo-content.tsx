@@ -1,10 +1,10 @@
-import Link from "next/link";
-
 import {
   SUPPORTED_CURRENCIES,
   SUPPORTED_DATE_FORMATS,
   SUPPORTED_INVOICE_PDF_LANGUAGES,
-} from "@/app/schema";
+} from "@easyinvoicepdf/invoice-core";
+import Link from "next/link";
+
 import { FaqAccordion, FaqAccordionItem } from "@/components/ui/faq-accordion";
 import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
 

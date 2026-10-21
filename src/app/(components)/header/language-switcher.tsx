@@ -1,14 +1,11 @@
 "use client";
 
+import { LANGUAGE_TO_NATIVE_LABEL } from "@easyinvoicepdf/invoice-core";
 import { GlobeIcon } from "lucide-react";
 import type { Locale } from "next-intl";
 import { useTransition } from "react";
 
-import {
-  LANGUAGE_TO_NATIVE_LABEL,
-  SUPPORTED_I18N_LOCALES,
-  type SupportedLocale,
-} from "@/app/schema";
+import { SUPPORTED_I18N_LOCALES, type SupportedLocale } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 
+import { sellerSchema } from "@easyinvoicepdf/invoice-core";
 import * as Sentry from "@sentry/nextjs";
 import { act, renderHook } from "@testing-library/react";
 import { toast } from "sonner";
@@ -11,7 +12,6 @@ import type {
 } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/party-config";
 import { usePartyActions } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-party-actions";
 import { DEFAULT_BUYER_DATA, DEFAULT_SELLER_DATA } from "@/app/constants";
-import { sellerSchema } from "@/app/schema";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 
 vi.mock("sonner", () => {

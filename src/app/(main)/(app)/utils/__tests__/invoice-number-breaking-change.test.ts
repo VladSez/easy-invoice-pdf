@@ -1,10 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import {
-  SUPPORTED_INVOICE_PDF_LANGUAGES,
+  INVOICE_PDF_TRANSLATIONS,
   type InvoiceData,
-} from "@/app/schema";
+  SUPPORTED_INVOICE_PDF_LANGUAGES,
+} from "@easyinvoicepdf/invoice-core";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import { handleInvoiceNumberBreakingChange } from "../invoice-number-breaking-change";
 

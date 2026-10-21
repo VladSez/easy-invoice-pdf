@@ -1,3 +1,10 @@
+import {
+  calculateInvoiceTotal,
+  calculateItemTotals,
+  type InvoiceData,
+  type InvoiceItemData,
+  parseValidatedInvoiceItems,
+} from "@easyinvoicepdf/invoice-core";
 import { useEffect } from "react";
 import {
   type Control,
@@ -6,13 +13,9 @@ import {
   useWatch,
 } from "react-hook-form";
 
-import type { InvoiceData, InvoiceItemData } from "@/app/schema";
 import { debugLog } from "@/lib/debug-log";
 
-import { calculateInvoiceTotal } from "./utils/calculate-invoice-total";
-import { calculateItemTotals } from "./utils/calculate-item-totals";
 import { hasAnyItemTotalsChanged } from "./utils/has-item-totals-changed";
-import { parseValidatedInvoiceItems } from "./utils/validated-invoice-items";
 
 interface ItemTotalsSyncProps {
   control: Control<InvoiceData>;

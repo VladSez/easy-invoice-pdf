@@ -5,7 +5,7 @@ export const APP_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
   : `http://localhost:${port}`;
 
 /**
- * STATIC_ASSETS_URL is used to serve static assets for the PDF templates
+ * STATIC_ASSETS_URL serves the marketing demo videos and their fallback images
  */
 export const STATIC_ASSETS_URL = "https://static.easyinvoicepdf.com";
 
@@ -200,7 +200,8 @@ export const HOW_IT_WORKS_VIDEOS = [
   iframeTitle: string;
 }[];
 
-export const PROD_WEBSITE_URL = "https://easyinvoicepdf.com";
+// Defined next to the PDF templates, which print it and can't import this file.
+export { PROD_WEBSITE_URL } from "@easyinvoicepdf/invoice-core";
 
 export const FOUNDER_AVATAR_URL =
   "https://ik.imagekit.io/fl2lbswwo/avatar.jpeg?updatedAt=1757456439459";
@@ -283,21 +284,3 @@ export const MARKETING_FEATURES_CARDS = [
    */
   youtubeVideoId: string;
 }[];
-
-/**
- * Fonts that we use to render invoice pdf templates via `@react-pdf/renderer`
- */
-export const INVOICE_PDF_FONTS = {
-  DEFAULT_TEMPLATE: {
-    OPEN_SANS_REGULAR: `${STATIC_ASSETS_URL}/open-sans-regular.ttf`,
-    OPEN_SANS_700: `${STATIC_ASSETS_URL}/open-sans-700.ttf`,
-  },
-  STRIPE_TEMPLATE: {
-    INTER_REGULAR: `${STATIC_ASSETS_URL}/Inter-Regular.ttf`,
-    INTER_MEDIUM: `${STATIC_ASSETS_URL}/Inter-Medium.ttf`,
-    INTER_SEMIBOLD: `${STATIC_ASSETS_URL}/Inter-SemiBold.ttf`,
-  },
-} as const satisfies Record<
-  "DEFAULT_TEMPLATE" | "STRIPE_TEMPLATE",
-  { [key: string]: string }
->;

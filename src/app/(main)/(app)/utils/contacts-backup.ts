@@ -1,7 +1,6 @@
+import type { BuyerData, SellerData } from "@easyinvoicepdf/invoice-core";
 import dayjs from "dayjs";
 import { z } from "zod";
-
-import type { BuyerData, SellerData } from "@/app/schema";
 
 /**
  * Identifies a file as ours, so importing some unrelated JSON fails with a clear message

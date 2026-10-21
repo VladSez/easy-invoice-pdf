@@ -1,14 +1,14 @@
+import {
+  type InvoiceData,
+  LANGUAGE_TO_LABEL,
+  type SupportedLanguages,
+} from "@easyinvoicepdf/invoice-core";
+import { useInvoicePdfInstance } from "@easyinvoicepdf/invoice-core/pdf";
 import dayjs from "dayjs";
 import { DownloadIcon, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { useInvoicePdfInstance } from "@/app/(main)/(app)/contexts/invoice-pdf-instance-context";
-import {
-  LANGUAGE_TO_LABEL,
-  type InvoiceData,
-  type SupportedLanguages,
-} from "@/app/schema";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { useDeviceContext } from "@/contexts/device-context";
 import { haptic } from "@/lib/haptic";

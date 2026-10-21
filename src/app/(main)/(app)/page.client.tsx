@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  compressInvoiceData,
+  decompressInvoiceData,
+  type InvoiceData,
+  invoiceSchema,
+} from "@easyinvoicepdf/invoice-core";
+import { InvoicePdfInstanceProvider } from "@easyinvoicepdf/invoice-core/pdf";
 import * as Sentry from "@sentry/nextjs";
 import {
   compressToEncodedURIComponent,
@@ -11,7 +18,6 @@ import { toast } from "sonner";
 
 import { APP_PAGE_TITLE } from "@/app/(main)/(app)/app-page-heading";
 import { InvoicePageHeader } from "@/app/(main)/(app)/components/invoice-page-header";
-import { InvoicePdfInstanceProvider } from "@/app/(main)/(app)/contexts/invoice-pdf-instance-context";
 import { InvoicePageLoadingSkeleton } from "@/app/(main)/(app)/loading";
 import { getAppStorageItem } from "@/app/(main)/(app)/utils/app-local-storage";
 import {
@@ -20,11 +26,7 @@ import {
 } from "@/app/(main)/(app)/utils/get-app-metadata";
 import type { ChangelogSummary } from "@/app/(main)/changelog/utils";
 import { getInitialInvoiceData } from "@/app/constants";
-import {
-  invoiceSchema,
-  PDF_DATA_LOCAL_STORAGE_KEY,
-  type InvoiceData,
-} from "@/app/schema";
+import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema/local-storage-keys";
 import { GitHubStarCTA } from "@/components/github-star-cta";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -38,10 +40,6 @@ import {
   getTemplateFromUrl,
   isUrlForTemplate,
 } from "@/utils/invoice-app-url";
-import {
-  compressInvoiceData,
-  decompressInvoiceData,
-} from "@/utils/url-compression";
 
 import { InvoiceClientPage } from "./components";
 import { ChangelogUpdatePopup } from "./components/changelog-update-popup";
@@ -51,6 +49,7 @@ import { useChangelogUpdatePopup } from "./hooks/use-changelog-update-popup";
 import { useInAppBrowserNotice } from "./hooks/use-in-app-browser-notice";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
+import { reportPdfGenerationError } from "./utils/report-pdf-generation-error";
 import { selectInvoiceTemplate } from "./utils/select-invoice-template";
 
 // TODO: enable later when PRO version is released, this is PRO FEATURE =)
@@ -888,6 +887,7 @@ export function AppPageClient({
       <InvoicePdfInstanceProvider
         invoiceData={invoiceDataState}
         qrCodeDataUrl={qrCodeDataUrl}
+        onError={reportPdfGenerationError}
       >
         <main className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
           <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 min-[1400px]:max-w-7xl 2xl:max-w-[1480px]">

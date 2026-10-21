@@ -1,4 +1,4 @@
-import type { SupportedTemplates } from "@/app/schema";
+import type { SupportedTemplates } from "@easyinvoicepdf/invoice-core";
 
 /**
  * The `<h1>` of each invoice app route, shown as the tagline under the EasyInvoicePDF logo.

@@ -1,7 +1,8 @@
+import type { SupportedTemplates } from "@easyinvoicepdf/invoice-core";
+
 import { Footer } from "@/app/(components)/footer";
 import { ProjectLogoDescription } from "@/app/(components)/project-logo-description";
 import { APP_PAGE_HEADING } from "@/app/(main)/(app)/app-page-heading";
-import type { SupportedTemplates } from "@/app/schema";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { Skeleton } from "@/components/ui/skeleton";
 
