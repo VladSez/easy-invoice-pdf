@@ -153,14 +153,14 @@ _Alternatives_: Stripe Billing (you handle VAT yourself); Lemon Squeezy or Paddl
 - [Bundled fonts are missing from the deployed API] → the M1 exit criterion is a render _on the deployed staging API_ with the fonts actually applied, checked by extracted text and font names in the PDF.
 - [A schema change breaks stored invoices] → `INVOICE_SCHEMA_VERSION` plus `migrateInvoiceData`, new fields must be optional or defaulted, and a fixture set of anonymized invoices is parsed in private CI on every core bump.
 - [124 import sites make the core move a large diff] → temporary re-exports from the old paths, moved in small PRs, removed by a codemod at the end.
-- [An outside PR is merged before the CLA exists] → the CLA is the first task.
+- [Outside code reaches the engine the paid product uses] → pull requests are disabled on the public repo (issues only, decided 2026-10-21), so the maintainer stays the only author and no CLA is needed. If PRs are ever reopened, add a CLA first.
 - [PDF rendering is CPU-heavy] → the item cap, timeout and per-key rate limits. Billing renders through Polar meters puts cost on whoever generates the load.
 - [The MCP auth spec and client support are still changing] → stick to the SDK's helpers, test against Claude, ChatGPT and Cursor, and keep API-key bearer tokens as a fallback.
 - [Users see the privacy story change] → the free app stays local-only; the paid tier is a separate product on its own subdomain with explicit sign-up. Privacy policy and ToS are updated before launch.
 
 ## Migration Plan
 
-1. **M0, public repo:** CLA → empty `invoice-core` wiring → remove app coupling in place → move schema, translations, formatting, totals, URL compression, templates, fonts and provider in small PRs, keeping re-exports → codemod away the re-exports. After every step, type-check, lint, knip and vitest stay green and the PDF snapshot e2e (Desktop Chrome) doesn't change. Rollback = revert the PR. Nothing is user-visible.
+1. **M0, public repo:** close outside contributions → empty `invoice-core` wiring → remove app coupling in place → move schema, translations, formatting, totals, URL compression, templates, fonts and provider in small PRs, keeping re-exports → codemod away the re-exports. After every step, type-check, lint, knip and vitest stay green and the PDF snapshot e2e (Desktop Chrome) doesn't change. Rollback = revert the PR. Nothing is user-visible.
 2. **M1, private repo:** scaffold, copy the safeguards, `POST /v1/render` behind a static token, deploy to `api-staging.`
 3. **M2–M5:** accounts and stored invoices → MCP → dashboard → Polar, each to staging first and then promoted.
 4. **M6:** recreate the monthly invoice as a recurring invoice and run it alongside the old one for one cycle. Then delete the public route, Trigger.dev task, Telegram webhook and their env vars, and rotate those secrets.

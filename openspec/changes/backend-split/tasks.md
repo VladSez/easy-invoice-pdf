@@ -15,7 +15,7 @@ Record any failure as a finding before moving to the next task. Group 1 changes 
 
 ## 1. Legal groundwork
 
-- [ ] 1.1 Install the CLA Assistant GitHub app on the public repo, add `CONTRIBUTING.md` with a CLA section, and verify by opening a test PR from a second account (or checking the app's status check) that the CLA check appears
+- [x] 1.1 Close outside contributions on the public repo (issues only, no pull requests; replaces the planned CLA, since the maintainer stays the only author), rewrite `CONTRIBUTING.md` to match, and verify that git history has no other authors
 - [x] 1.2 Draft the privacy policy and ToS wording for the paid tier (the free app stays local-only; the dashboard stores data after sign-up) in a doc for later, and verify it covers storage, deletion, export and the Polar merchant of record
 
 ## 2. Workspace wiring (no files move)
@@ -73,7 +73,7 @@ Each move leaves a temporary re-export at the old path so the 124 `@/app/schema`
 - [x] 8.3 Copy the PDF safeguards: the react-pdf `overrides` block with its comments, `patchedDependencies` and `patches/fontkit@2.0.4.patch`, and a port of `fontkit-glyph-cache-patch.test.ts`; verify the ported test passes, and fails when the patch entry is removed
 - [x] 8.4 Scaffold `apps/api` (Hono on Node, zod-validated env, `GET /health`) with a bundler that inlines `invoice-core` and copies its `fonts/`; verify `node dist/index.mjs` serves `/health` and that the fonts are present in the build output
 - [x] 8.5 Add `POST /v1/render` behind a static token: parse with `invoiceSchema`, recompute totals, enforce the 5 MB body limit and the schema's `MAX_INVOICE_ITEMS` (100) item cap, and render with `renderInvoicePdfToBuffer`; verify with unit tests for `%PDF` output, a wrong client `total` being ignored, and 413/422 on oversize or invalid input
-- [ ] 8.6 Deploy the API to `api-staging.easyinvoicepdf.com`; verify that rendering the same JSON for both templates and a `pt` sample gives PDFs whose extracted text matches the free app's downloads, and that the deployed function makes no outbound font requests; also open one staging PDF in the browser next to the free app's download of the same JSON and compare them visually
+- [x] 8.6 Deploy the API to `api-staging.easyinvoicepdf.com`; verify that rendering the same JSON for both templates and a `pt` sample gives PDFs whose extracted text matches the free app's downloads, and that the deployed function makes no outbound font requests; also open one staging PDF in the browser next to the free app's download of the same JSON and compare them visually
 
 ## Workflow follow-up
 

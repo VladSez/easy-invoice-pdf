@@ -15,7 +15,7 @@ The free app's PDF engine (schema, templates, translations, totals) is also tang
 - Bundle the five PDF fonts as files inside `invoice-core` instead of fetching them from `static.easyinvoicepdf.com`.
 - Move the totals calculations out of the form into `invoice-core`, so every editor and every backend write path computes totals the same way.
 - Add an `easyinvoicepdf.com/dashboard` redirect to `app.easyinvoicepdf.com`, active only when a dashboard URL is configured. A visible "Dashboard" link waits for the dashboard launch and a later change. No auth, sync or account code goes into the public repo.
-- Add a CLA before the first outside contribution.
+- Keep the maintainer the only author: the public repo accepts issues, not pull requests, so no outside code can reach the engine the paid product uses (no CLA needed).
 - Later, remove the author's personal monthly-invoice route, Trigger.dev task, Telegram webhook and their secrets. These move to the private repo as the "recurring invoices" feature. **BREAKING** for anyone who calls `/api/generate-invoice` (author-only today).
 
 **Private repo (new, closed source, pnpm + Turborepo)**
@@ -26,7 +26,7 @@ The free app's PDF engine (schema, templates, translations, totals) is also tang
 - Billing through Polar: merchant of record, the Better Auth plugin, and usage meters for API renders.
 - The private repo consumes `invoice-core` as a git dependency pinned to a commit.
 
-**Milestones**: (M0) CLA and core extraction, (M1) private repo scaffold and the stateless `POST /v1/render`, (M2) accounts and stored invoices, (M3) MCP server, (M4) dashboard editor, (M5) Polar billing, (M6) personal monthly invoice moved to the private repo.
+**Milestones**: (M0) closing outside contributions and core extraction, (M1) private repo scaffold and the stateless `POST /v1/render`, (M2) accounts and stored invoices, (M3) MCP server, (M4) dashboard editor, (M5) Polar billing, (M6) personal monthly invoice moved to the private repo.
 
 ## Capabilities
 
@@ -48,4 +48,4 @@ None. The project has no existing specs.
 - **Tooling**: `pnpm-workspace.yaml` gains `packages`; oxlint, knip, vitest, tsconfig and lint-staged learn about `packages/`. `next.config.mjs` adds `transpilePackages` and a redirect.
 - **Dependencies**: `@react-pdf/renderer` and `zod` become peer dependencies of `invoice-core`. The react-pdf pins and the fontkit patch stay at the root and must be copied into the private repo.
 - **Hosting**: the font files ship with the app bundle; `static.easyinvoicepdf.com` leaves the PDF path. New `app.`, `api.` and staging subdomains.
-- **Legal and copy**: CLA, plus updated privacy policy, ToS and landing copy for the paid tier (the free app's local-only promise stays true).
+- **Legal and copy**: `CONTRIBUTING.md` (issues only), plus updated privacy policy, ToS and landing copy for the paid tier (the free app's local-only promise stays true).

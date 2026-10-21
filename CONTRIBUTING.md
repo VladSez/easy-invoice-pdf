@@ -1,20 +1,16 @@
 # Contributing to EasyInvoicePDF
 
-Thanks for helping out. Bug reports, translations and pull requests are all welcome.
+Thanks for your interest. This repository accepts **issues, not pull requests**: bug reports, translation fixes and feature ideas are all welcome as [issues](https://github.com/VladSez/pdf-invoice-generator/issues).
 
-## Before you open a pull request
+**Why no pull requests:** EasyInvoicePDF is licensed under the AGPL-3.0, and the same invoice engine (the schema, the totals calculation and the PDF templates) also powers a paid, hosted version. Keeping the maintainer the only author keeps that simple. If you have a fix in mind, describe it in an issue, and code snippets there are welcome.
 
-- For anything larger than a small fix, open an issue first so we can agree on the approach.
-- Follow the setup in the [README Quick Start](README.md#self-host).
-- Keep these green: `pnpm type-check`, `pnpm lint`, `pnpm knip` and `pnpm vitest --run`. If you change the invoice form or a PDF template, also run the relevant Playwright test, narrowed to one file and `--project="Desktop Chrome"`.
-- A change to one PDF template usually needs the matching change in the other one.
-- New UI text goes into every file in `messages/`, and new PDF labels go into every language in the PDF translation catalog. A missing key fails the build.
+You're free to fork, self-host and modify the app under the terms of the AGPL-3.0. The [README Quick Start](README.md#self-host) covers the setup.
 
-## Contributor License Agreement (CLA)
+## Reporting a bug
 
-Before your first pull request can be merged, you need to sign the Contributor License Agreement. The CLA Assistant bot comments on your pull request with a link: sign in with GitHub, accept, and the check turns green. You only sign once, and it covers all your future contributions.
-
-**Why we ask:** EasyInvoicePDF is licensed under the AGPL-3.0. The same invoice engine (the schema, the totals calculation and the PDF templates) also powers a paid, hosted version. The CLA lets the maintainer use contributions in both. You keep the copyright to your work, and everything you contribute stays available under the AGPL-3.0 in this repository.
+- Say what you did, what you expected and what happened instead.
+- For a wrong PDF, mention the template, the invoice language and your browser, and attach the PDF or a screenshot if you can.
+- A shared invoice link reproduces the problem best. Remove any personal data from it first.
 
 ## Reporting security issues
 
