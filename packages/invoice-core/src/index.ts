@@ -1,4 +1,5 @@
 export * from "./schema";
+export * from "./schema/migrate-invoice-data";
 export * from "./pdf-translations/pdf-translations";
 export * from "./pdf-translations/pdf-translations-schema";
 export * from "./format/format-amount";
