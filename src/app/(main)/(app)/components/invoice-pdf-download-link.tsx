@@ -119,6 +119,9 @@ export function InvoicePDFDownloadLink({
         umamiTrackEvent("download_invoice", {
           data: {
             invoice_template: invoiceData.template,
+            has_item_discount: invoiceData.items.some((item) => {
+              return item.discountAmount > 0;
+            }),
           },
         });
 
@@ -152,6 +155,7 @@ export function InvoicePDFDownloadLink({
       error,
       isMobile,
       invoiceData.template,
+      invoiceData.items,
       hasTriggeredCTAAction,
       markCTAActionTriggered,
     ],

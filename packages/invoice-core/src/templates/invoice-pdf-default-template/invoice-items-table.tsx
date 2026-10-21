@@ -2,6 +2,11 @@ import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 import { formatAmountChunks } from "../../format/format-amount";
+import {
+  formatDiscountPercent,
+  hasAnyItemDiscount,
+  hasItemDiscount,
+} from "../../format/item-discount";
 import { INVOICE_PDF_TRANSLATIONS } from "../../pdf-translations/pdf-translations";
 import { type InvoiceData, resolveNumberFormatLocale } from "../../schema";
 import { WrappableAmount } from "../common/wrappable-amount";
@@ -32,6 +37,14 @@ export function InvoiceItemsTable({
   const isVATAmountFieldVisible = invoiceData.items[0].vatAmountFieldIsVisible;
   const isPreTaxAmountFieldVisible =
     invoiceData.items[0].preTaxAmountFieldIsVisible;
+  // the discount column only earns its width when some item actually has a discount
+  const hasDiscountColumn = hasAnyItemDiscount(invoiceData.items);
+
+  // the name column has width to spare, so it pays for the discount column, rather than
+  // the narrow numeric columns whose headers would start to hyphenate ("Cantid-ad")
+  const nameColumnStyle = hasDiscountColumn
+    ? styles.colNameWithDiscount
+    : styles.colName;
 
   /**
    * Custom tax label text i.e. "VAT", "Sales Tax", "IVA", "GST", etc.
@@ -70,7 +83,7 @@ export function InvoiceItemsTable({
 
           {/* Name of goods/service column */}
           {isNameFieldVisible ? (
-            <View style={[styles.tableCol, styles.colName, styles.center]}>
+            <View style={[styles.tableCol, nameColumnStyle, styles.center]}>
               <Text style={styles.tableCellBold}>
                 {t.invoiceItemsTable.nameOfGoodsService}
               </Text>
@@ -111,6 +124,15 @@ export function InvoiceItemsTable({
           {isNetPriceFieldVisible ? (
             <View style={[styles.tableCol, styles.colNetPrice, styles.center]}>
               <Text style={styles.tableCellBold}>{netPriceColumnLabel}</Text>
+            </View>
+          ) : null}
+
+          {/* Discount column */}
+          {hasDiscountColumn ? (
+            <View style={[styles.tableCol, styles.colDiscount, styles.center]}>
+              <Text style={styles.tableCellBold}>
+                {t.invoiceItemsTable.discount}
+              </Text>
             </View>
           ) : null}
 
@@ -182,6 +204,27 @@ export function InvoiceItemsTable({
             numberFormatLocale,
           });
 
+          const itemHasDiscount = hasItemDiscount(item);
+
+          const formattedDiscountPercent = formatDiscountPercent({
+            value: item.discountValue,
+            numberFormatLocale,
+          });
+
+          // a percentage reads as itself, a fixed discount as the money it takes off the line
+          const discountChunks =
+            item.discountType === "percentage"
+              ? [formattedDiscountPercent]
+              : formatAmountChunks({
+                  amount: item.discountAmount,
+                  numberFormatLocale,
+                });
+
+          const customDiscountLabel = item.discountLabel?.trim();
+
+          // the column carries the number, the name cell says what the discount is for
+          const discountNote = itemHasDiscount ? customDiscountLabel : null;
+
           const formattedVat = Number.isNaN(Number(item.vat))
             ? item.vat
             : `${Number(item.vat)}%`;
@@ -203,7 +246,7 @@ export function InvoiceItemsTable({
 
               {/* Name of goods/service */}
               {isNameFieldVisible ? (
-                <View style={[styles.tableCol, styles.colName]}>
+                <View style={[styles.tableCol, nameColumnStyle]}>
                   <Text
                     style={[
                       styles.tableCell,
@@ -212,6 +255,23 @@ export function InvoiceItemsTable({
                   >
                     {item.name}
                   </Text>
+                  {discountNote ? (
+                    <Text
+                      style={[
+                        styles.tableCell,
+                        styles.fontSize7,
+                        {
+                          textAlign: "left",
+                          marginLeft: 2,
+                          marginRight: 2,
+                          marginTop: 0,
+                          color: "#555",
+                        },
+                      ]}
+                    >
+                      {discountNote}
+                    </Text>
+                  ) : null}
                 </View>
               ) : null}
 
@@ -254,6 +314,21 @@ export function InvoiceItemsTable({
                       { textAlign: "right", marginRight: 2 },
                     ]}
                   />
+                </View>
+              ) : null}
+
+              {/* Discount */}
+              {hasDiscountColumn ? (
+                <View style={[styles.tableCol, styles.colDiscount]}>
+                  {itemHasDiscount ? (
+                    <WrappableAmount
+                      chunks={discountChunks}
+                      style={[
+                        styles.tableCell,
+                        { textAlign: "right", marginRight: 2 },
+                      ]}
+                    />
+                  ) : null}
                 </View>
               ) : null}
 

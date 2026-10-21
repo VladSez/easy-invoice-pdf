@@ -128,6 +128,32 @@ _**Add payment QR codes** with any invoice-related information (payment links, U
 
 ## 📢 What's New
 
+### EasyInvoicePDF v1.0.6 - Item Discounts (October 20, 2026)
+
+- **Discounts on invoice items** - take a percentage (`10%`) or a fixed amount (`50.00 EUR`) off any line
+- **Your own label** - name the discount, e.g. `Charitable donation`, and it shows on the invoice
+- **Tax on the discounted amount** - VAT, totals and amount in words all use the discounted figures
+- **Both templates** - a **Discount** column in the default template, and a separate discount row in the Stripe template
+
+[![How to add discounts to invoice items](https://i.ytimg.com/vi/8lYei_9mo6o/maxresdefault.jpg)](https://www.youtube.com/watch?v=8lYei_9mo6o)
+
+[Full release notes for v1.0.6](https://easyinvoicepdf.com/changelog/item-discounts)
+
+---
+
+### EasyInvoicePDF v1.0.5 - Number Formats & Brazilian Portuguese (September 24, 2026)
+
+- **Number format setting** - choose how amounts are punctuated, separately from the invoice language, including a new **International** format (`321 200.00`)
+- **Keep format when language changes** - write an invoice in your client's language and keep your own number formatting
+- **Brazilian Portuguese invoices** - a new `Portuguese (Brazil)` PDF language with `CNPJ/CPF` and Brazilian amounts in words
+- **Large amounts fit their columns** - wide amounts wrap at a thousands boundary instead of overlapping the next column
+
+[![How to customize number formatting](https://i.ytimg.com/vi/hZM2DYXo63k/maxresdefault.jpg)](https://www.youtube.com/watch?v=hZM2DYXo63k)
+
+[Full release notes for v1.0.5](https://easyinvoicepdf.com/changelog/number-format-and-brazilian-portuguese)
+
+---
+
 ### EasyInvoicePDF v1.0.4 - Faster PDF Preview & Mobile Polish (September 4, 2026)
 
 - **Faster, flicker-free preview** - the invoice PDF is generated **once** and shared by the desktop preview, the mobile viewer and the download button

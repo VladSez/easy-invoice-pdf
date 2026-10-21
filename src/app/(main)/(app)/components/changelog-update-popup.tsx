@@ -1,6 +1,6 @@
 "use client";
 
-import { XIcon } from "lucide-react";
+import { PlayIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -25,6 +25,11 @@ interface ChangelogUpdatePopupProps {
    * that post follows the message; without it there is no link.
    */
   releaseSlug?: string;
+  /**
+   * YouTube video ID of the latest release. On the "What's new" variant its thumbnail sits
+   * above the buttons and opens the video on YouTube; without it there is no preview.
+   */
+  releaseVideoId?: string;
   /**
    * Where the popup sits. `floating` is the desktop card in the bottom-right corner, with
    * the mascot. `dock` is the compact mobile card, rendered inside the bottom dock and
@@ -67,10 +72,19 @@ function CommunityLinks() {
   );
 }
 
+/**
+ * Temporarily off on the "What's new" popup, which shows without the mascot; the welcome
+ * popup always has it. Flip back to `true` to bring it back to "What's new" too, along
+ * with the right-hand column the card keeps free for it.
+ */
+const SHOW_CHANGELOG_POPUP_MASCOT = false as boolean;
+
 const POPUP_CONTENT = {
   welcome: {
     title: "Welcome",
     bodyPrefix: "Create professional PDF invoices in your browser.",
+    // The dock has no button row: "How it works" is a link that ends this sentence.
+    dockBodyPrefix: "Create PDF invoices in your browser. New here? See",
     continueTestId: "welcome-update-continue",
     secondaryTestId: "welcome-update-how-it-works",
   },
@@ -85,6 +99,11 @@ const POPUP_CONTENT = {
   {
     title: string;
     bodyPrefix: string;
+    /**
+     * The mobile dock's sentence, which runs straight into its action link. Falls back to
+     * `bodyPrefix`.
+     */
+    dockBodyPrefix?: string;
     continueTestId: string;
     secondaryTestId: string;
   }
@@ -97,6 +116,7 @@ export function ChangelogUpdatePopup({
   onHowItWorksClick,
   releaseSummary,
   releaseSlug,
+  releaseVideoId,
   layout = "floating",
 }: ChangelogUpdatePopupProps) {
   useEffect(() => {
@@ -123,13 +143,20 @@ export function ChangelogUpdatePopup({
 
   const content = POPUP_CONTENT[variant];
 
+  const defaultBodyPrefix =
+    layout === "dock" && "dockBodyPrefix" in content
+      ? content.dockBodyPrefix
+      : content.bodyPrefix;
+
   const bodyPrefix =
     variant === "changelog" && releaseSummary
       ? releaseSummary
-      : content.bodyPrefix;
+      : defaultBodyPrefix;
 
   const analyticsPrefix =
     variant === "welcome" ? "welcome-popup" : "changelog-update-popup";
+
+  const showMascot = variant === "welcome" || SHOW_CHANGELOG_POPUP_MASCOT;
 
   if (layout === "dock") {
     return (
@@ -153,7 +180,10 @@ export function ChangelogUpdatePopup({
         aria-atomic="true"
         data-testid="changelog-update-popup"
         className={cn(
-          "pointer-events-auto relative w-[min(27rem,calc(100vw-2rem))] overflow-visible rounded-2xl bg-white px-5 py-5 pr-36 text-slate-950 shadow-[0_18px_50px_rgba(0,0,0,0.16)] ring-1 ring-slate-300 sm:pr-40",
+          "pointer-events-auto relative overflow-visible rounded-2xl bg-white px-5 py-5 text-slate-950 shadow-[0_18px_50px_rgba(0,0,0,0.16)] ring-1 ring-slate-300",
+          showMascot
+            ? "w-[min(27rem,calc(100vw-2rem))] pr-36 sm:pr-40"
+            : "w-[min(21rem,calc(100vw-2rem))]",
           "origin-bottom-right duration-300 ease-out motion-reduce:animate-none",
           "animate-in fade-in zoom-in-95 slide-in-from-bottom-4",
         )}
@@ -177,7 +207,12 @@ export function ChangelogUpdatePopup({
           <p className="text-[18px] font-semibold leading-tight text-slate-950 sm:text-[19px]">
             {content.title}
           </p>
-          <p className="mt-1.5 max-w-[14rem] text-sm leading-snug text-slate-600 sm:max-w-[15.5rem]">
+          <p
+            className={cn(
+              "mt-1.5 text-sm leading-snug text-slate-600",
+              showMascot ? "max-w-[14rem] sm:max-w-[15.5rem]" : null,
+            )}
+          >
             {bodyPrefix}
             {variant === "changelog" && releaseSlug ? (
               <>
@@ -199,6 +234,15 @@ export function ChangelogUpdatePopup({
             <br />
             <CommunityLinks />
           </p>
+          {variant === "changelog" && releaseVideoId ? (
+            <ReleaseVideoPreview
+              videoId={releaseVideoId}
+              className={showMascot ? "w-48" : "w-full"}
+              onClick={() => {
+                umamiTrackEvent(`${analyticsPrefix}-video`);
+              }}
+            />
+          ) : null}
           <div className="mt-5 flex items-center gap-2">
             <Button
               type="button"
@@ -249,21 +293,84 @@ export function ChangelogUpdatePopup({
           </div>
         </div>
 
-        <div
-          aria-hidden="true"
-          title=""
-          className="pointer-events-none absolute bottom-[-1.25rem] flex size-52 shrink-0 items-center justify-center overflow-visible sm:bottom-[-20px] sm:right-[-25px] sm:size-60"
-        >
-          <img
-            alt=""
-            src="/easyinvoice-mascot-popup-1.png"
-            loading="lazy"
-            decoding="async"
-            className="relative z-10 h-full w-full object-contain drop-shadow-[0_16px_28px_rgba(0,0,0,0.18)]"
-          />
-        </div>
+        {showMascot ? (
+          <div
+            aria-hidden="true"
+            title=""
+            className="pointer-events-none absolute bottom-[-1.25rem] flex size-52 shrink-0 items-center justify-center overflow-visible sm:bottom-[-20px] sm:right-[-25px] sm:size-60"
+          >
+            <img
+              alt=""
+              src="/easyinvoice-mascot-popup-1.png"
+              loading="lazy"
+              decoding="async"
+              className="relative z-10 h-full w-full object-contain drop-shadow-[0_16px_28px_rgba(0,0,0,0.18)]"
+            />
+          </div>
+        ) : null}
       </section>
     </div>
+  );
+}
+
+interface ReleaseVideoPreviewProps {
+  videoId: string;
+  /** Sets the width; the height follows at 16:9. */
+  className?: string;
+  onClick: () => void;
+}
+
+/**
+ * The release video's YouTube thumbnail with a play button, opening the video in a new
+ * tab. A link and not an embed: an iframe would load YouTube's player (and its cookies)
+ * for everyone who sees the popup, not just those who want to watch.
+ */
+function ReleaseVideoPreview({
+  videoId,
+  className,
+  onClick,
+}: ReleaseVideoPreviewProps) {
+  return (
+    <a
+      href={`https://www.youtube.com/watch?v=${videoId}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Watch the release video on YouTube"
+      data-testid="changelog-update-video-link"
+      onClick={onClick}
+      className={cn(
+        "group relative mt-4 block aspect-video overflow-hidden rounded-lg bg-slate-900 outline-offset-2",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900",
+        className,
+      )}
+    >
+      {/* mqdefault is 320x180 with no letterbox bars; maxresdefault covers 2x screens. It only
+          exists for 720p+ uploads (otherwise YouTube serves a grey 120x90 placeholder), which
+          every release video is */}
+      <img
+        alt=""
+        src={`https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`}
+        srcSet={`https://i.ytimg.com/vi/${videoId}/mqdefault.jpg 1x, https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg 2x`}
+        width={320}
+        height={180}
+        loading="lazy"
+        decoding="async"
+        className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03] motion-reduce:transition-none"
+      />
+      {/* An inset ring instead of a border, so it sits on the image edge */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-black/10"
+      />
+      <span
+        aria-hidden="true"
+        className="absolute inset-0 flex items-center justify-center"
+      >
+        <span className="flex size-11 items-center justify-center rounded-full bg-red-600 shadow-lg transition-transform duration-150 ease-out group-hover:scale-110 group-active:scale-95 motion-reduce:transition-none">
+          <PlayIcon className="size-5 translate-x-px fill-white stroke-white" />
+        </span>
+      </span>
+    </a>
   );
 }
 

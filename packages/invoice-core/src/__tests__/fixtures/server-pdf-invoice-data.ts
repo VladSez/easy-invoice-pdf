@@ -29,6 +29,10 @@ export const SERVER_PDF_MOCK_INVOICE_DATA = {
       vatAmountFieldIsVisible: true,
       preTaxAmount: 10_000,
       preTaxAmountFieldIsVisible: true,
+      discountType: "percentage",
+      discountValue: 0,
+      discountLabel: "",
+      discountAmount: 0,
     };
   }),
   total: 10_000,

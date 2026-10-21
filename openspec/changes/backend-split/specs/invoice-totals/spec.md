@@ -8,7 +8,7 @@ Defines how an invoice's computed amounts follow from its line items, so every e
 
 ### Requirement: Item amounts are derived from quantity, price and VAT
 
-Each item's net amount SHALL equal quantity times net price; its VAT amount SHALL equal the net amount times the VAT rate divided by 100; its pre-tax amount SHALL equal net plus VAT. Each value SHALL be rounded to two decimal places, and VAT is computed from the rounded net amount.
+Each item's net amount SHALL equal quantity times net price, minus its discount amount; its VAT amount SHALL equal the net amount times the VAT rate divided by 100; its pre-tax amount SHALL equal net plus VAT. Each value SHALL be rounded to two decimal places and computed from the rounded values before it.
 
 #### Scenario: Numeric VAT rate
 
@@ -24,6 +24,30 @@ Each item's net amount SHALL equal quantity times net price; its VAT amount SHAL
 
 - **WHEN** an item's quantity or net price is empty or not a number
 - **THEN** that value counts as 0 and the item's amounts are 0
+
+### Requirement: Item discounts come off the line before tax
+
+An item's discount amount SHALL be a percentage of its line amount (quantity times net price) or a fixed amount taken off the whole line, never more than the line amount. An empty discount value SHALL count as no discount. VAT SHALL be computed on the line after the discount.
+
+#### Scenario: Percentage discount
+
+- **WHEN** an item has quantity 3, net price 10.005, VAT "23" and a 10% discount
+- **THEN** its discount amount is 3, its net amount is 27.02, its VAT amount is 6.21 and its pre-tax amount is 33.23
+
+#### Scenario: Fixed-amount discount
+
+- **WHEN** an item has quantity 3, net price 10.005, VAT "23" and a fixed discount of 5
+- **THEN** its discount amount is 5 (taken off the whole line, not per unit), its net amount is 25.02, its VAT amount is 5.75 and its pre-tax amount is 30.77
+
+#### Scenario: Discount larger than the line
+
+- **WHEN** an item's fixed discount is larger than its line amount, such as 50 off a line of 30.02
+- **THEN** its discount amount is capped at 30.02 and its net, VAT and pre-tax amounts are 0
+
+#### Scenario: Empty discount
+
+- **WHEN** an item's discount value is empty
+- **THEN** its discount amount is 0 and its other amounts are the same as without a discount
 
 ### Requirement: Invoice total is the sum of item pre-tax amounts
 
@@ -41,7 +65,7 @@ The invoice total SHALL equal the sum of every item's pre-tax amount, rounded to
 
 ### Requirement: Stored and rendered totals ignore caller-supplied values
 
-Any server path that creates, updates or renders an invoice SHALL recompute item amounts and the invoice total from the items, and SHALL ignore net, VAT, pre-tax and total values in the request.
+Any server path that creates, updates or renders an invoice SHALL recompute item amounts and the invoice total from the items, and SHALL ignore discount, net, VAT, pre-tax and total amounts in the request (the discount type and value are inputs, the discount amount is computed).
 
 #### Scenario: API request with a wrong total
 

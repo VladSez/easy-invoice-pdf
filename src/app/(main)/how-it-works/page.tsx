@@ -14,6 +14,13 @@ const SURFACE_SHADOW = "shadow-sm ring-1 ring-black/[0.06]";
 
 const SURFACE_SHADOW_HOVER = "hover:shadow-lg hover:ring-black/[0.08]";
 
+/** Length of the whole playlist, rounded to the minute, so the copy follows the catalog. */
+const TOTAL_TUTORIAL_MINUTES = Math.round(
+  HOW_IT_WORKS_VIDEOS.reduce((total, video) => {
+    return total + video.durationSeconds;
+  }, 0) / 60,
+);
+
 const linkClassName =
   "font-medium text-slate-950 underline decoration-slate-400 underline-offset-2 transition-colors hover:text-slate-950/90 hover:decoration-slate-500";
 
@@ -74,7 +81,8 @@ export default function HowItWorksPage() {
             All tutorials
           </h2>
           <p className="mx-auto mt-2 max-w-md text-pretty text-sm text-slate-600">
-            Five minutes of video, start to finish. Pick the one you need.
+            About {TOTAL_TUTORIAL_MINUTES} minutes of video, start to finish.
+            Pick the one you need.
           </p>
         </div>
 

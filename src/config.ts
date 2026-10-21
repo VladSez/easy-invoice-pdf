@@ -57,6 +57,9 @@ const YOUTUBE_VIDEO_HOW_TO_ADD_INVOICE_FOR_ONE_WEEK =
 const YOUTUBE_VIDEO_HOW_TO_CUSTOMIZE_TAX =
   "https://www.youtube.com/embed/F_iJxZ3PHbk";
 
+const YOUTUBE_VIDEO_HOW_TO_ADD_DISCOUNTS =
+  "https://www.youtube.com/embed/8lYei_9mo6o";
+
 const YOUTUBE_VIDEO_HOW_TO_IMPORT_EXPORT_CONTACTS =
   "https://www.youtube.com/embed/Vf2-QN-mB1c";
 
@@ -143,6 +146,19 @@ export const HOW_IT_WORKS_VIDEOS = [
     durationSeconds: 19,
     thumbnailUrl: "https://i.ytimg.com/vi/F_iJxZ3PHbk/maxresdefault.jpg",
     iframeTitle: "How to customize tax on an invoice - EasyInvoicePDF",
+  },
+  {
+    id: "item-discounts",
+    title: "How to add discounts to invoice items",
+    shortTitle: "Add discounts",
+    description:
+      "Take a percentage or fixed amount off any item, with tax calculated on the discounted price.",
+    embedUrl: YOUTUBE_VIDEO_HOW_TO_ADD_DISCOUNTS,
+    watchUrl: "https://www.youtube.com/watch?v=8lYei_9mo6o",
+    uploadDate: "2026-10-20T16:59:50-07:00",
+    durationSeconds: 33,
+    thumbnailUrl: "https://i.ytimg.com/vi/8lYei_9mo6o/maxresdefault.jpg",
+    iframeTitle: "How to add discounts to an invoice - EasyInvoicePDF",
   },
   {
     id: "number-format",

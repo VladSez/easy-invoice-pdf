@@ -13,6 +13,8 @@ export interface ChangelogSummary {
   date: string;
   /** A few words about the release for the "What's new" popup, see `popupSummary` below. */
   popupSummary?: string;
+  /** YouTube video for the release, see `youtubeVideoId` below. */
+  youtubeVideoId?: string;
 }
 
 /** Maps metadata `version` (e.g. "1.0.1") to the GitHub release tag name. */
@@ -50,6 +52,13 @@ interface ChangelogMetadata {
    * sentence; leave it out and the popup falls back to the generic line.
    */
   popupSummary?: string;
+  /**
+   * ID of the release's YouTube video (the `v=` part of its URL). The "What's new" popup
+   * shows its thumbnail, linking to the video; leave it out and the popup has no preview.
+   * Upload at 720p or higher: the popup uses YouTube's `maxresdefault` thumbnail on 2x
+   * screens, which YouTube only makes for HD videos.
+   */
+  youtubeVideoId?: string;
 }
 
 export interface ChangelogEntry {
@@ -66,6 +75,10 @@ const changelogEntryMetadataSchema = z.object({
   version: z.string().optional(),
   type: z.enum(["major", "minor", "patch"]).optional(),
   popupSummary: z.string().min(1).max(80).optional(),
+  youtubeVideoId: z
+    .string()
+    .regex(/^[\w-]{11}$/, "Expected an 11-character YouTube video ID")
+    .optional(),
 });
 
 /**
@@ -87,6 +100,7 @@ export async function getLatestChangelogSummary(): Promise<ChangelogSummary | nu
     version: metadata.version,
     date: metadata.date,
     popupSummary: metadata.popupSummary,
+    youtubeVideoId: metadata.youtubeVideoId,
   };
 }
 

@@ -116,6 +116,10 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   vatAmountFieldIsVisible: "Y",
   preTaxAmount: "Z",
   preTaxAmountFieldIsVisible: "0",
+  discountType: "&",
+  discountValue: "*",
+  discountLabel: "~",
+  discountAmount: "=",
 } as const satisfies Record<AllInvoiceKeys, string>;
 
 /**
@@ -239,7 +243,23 @@ function restoreKeys<T>(
  * ```
  */
 export function compressInvoiceData(invoiceData: InvoiceData) {
-  const res = remapKeys(invoiceData);
+  // guard for callers handing over something that is not an invoice at all; remapKeys
+  // passes those through as they are
+  const hasItems =
+    typeof invoiceData === "object" &&
+    invoiceData !== null &&
+    Array.isArray(invoiceData.items);
+
+  const res = remapKeys(
+    hasItems
+      ? {
+          ...invoiceData,
+          items: invoiceData.items.map((item) => {
+            return omitDefaultDiscount(item);
+          }),
+        }
+      : invoiceData,
+  );
 
   return res;
 }
@@ -257,5 +277,53 @@ export function compressInvoiceData(invoiceData: InvoiceData) {
 export function decompressInvoiceData(compressedData: Record<string, unknown>) {
   const res = restoreKeys(compressedData);
 
+  if (Array.isArray(res.items)) {
+    res.items = res.items.map((item: unknown) => {
+      return withDefaultDiscount(item);
+    });
+  }
+
   return res;
+}
+
+/**
+ * An item without a discount, as the form stores it. Share links leave these fields out of
+ * such items, so every item does not pay for four keys it does not use.
+ */
+const NO_DISCOUNT = {
+  discountType: "percentage",
+  discountValue: 0,
+  discountLabel: "",
+  discountAmount: 0,
+} as const satisfies Partial<InvoiceItemData>;
+
+const NO_DISCOUNT_KEYS = Object.keys(
+  NO_DISCOUNT,
+) as (keyof typeof NO_DISCOUNT)[];
+
+/** Drops the discount fields of an item that has no discount, see {@link NO_DISCOUNT}. */
+function omitDefaultDiscount(item: InvoiceItemData) {
+  const hasNoDiscount = NO_DISCOUNT_KEYS.every((key) => {
+    return item[key] === NO_DISCOUNT[key];
+  });
+
+  if (!hasNoDiscount) return item;
+
+  return Object.fromEntries(
+    Object.entries(item).filter(([key]) => {
+      return !(key in NO_DISCOUNT);
+    }),
+  );
+}
+
+/**
+ * Puts back the discount fields {@link omitDefaultDiscount} left out. Links made before
+ * discounts existed have none either, and get the same "no discount" values.
+ */
+function withDefaultDiscount(item: unknown) {
+  if (item === null || typeof item !== "object" || Array.isArray(item)) {
+    return item;
+  }
+
+  return { ...NO_DISCOUNT, ...item };
 }

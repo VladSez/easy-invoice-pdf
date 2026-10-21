@@ -1,0 +1,59 @@
+export const metadata = {
+  title: "EasyInvoicePDF v1.0.6 - Item Discounts",
+  description:
+    'Give a discount on any invoice item, as a percentage or a fixed amount, with an optional label like "Charitable donation". Tax is calculated on the discounted amount.',
+  date: "2026-10-20",
+  version: "1.0.6",
+  type: "minor",
+  popupSummary:
+    "Add a percentage or fixed-amount discount to any invoice item.",
+  youtubeVideoId: "8lYei_9mo6o",
+};
+
+<iframe
+  src={`https://www.youtube-nocookie.com/embed/${metadata.youtubeVideoId}`}
+  title="EasyInvoicePDF: Add percentage or fixed-amount discounts to invoice items"
+  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerPolicy="strict-origin-when-cross-origin"
+  allowFullScreen
+  loading="lazy"
+  style={{
+    width: "100%",
+    aspectRatio: "16 / 9",
+    border: 0,
+    borderRadius: "8px",
+    marginTop: "1.5rem",
+  }}
+/>
+
+## ✨ Highlights
+
+- **Discounts on invoice items** - click **Add discount** under an item's net price and take a percentage (`10%`) or a fixed amount (`50.00 EUR`) off that line. A fixed amount comes off the whole line, whatever the quantity
+- **Your own label** - name the discount, e.g. `Charitable donation` or `Loyalty discount`, and it shows on the invoice. Leave it empty and the PDF says "Discount" in the invoice language
+- **Tax on the discounted amount** - VAT is calculated after the discount, and the tax summary, totals and amount in words all use the discounted figures. The form shows what comes off and what is left as you type
+- **Default template** - a new **Discount** column appears only when an item has a discount, and the label sits under the item name
+- **Stripe template** - the item keeps its full price, and a row under it takes the discount off, e.g. `Charitable donation (10% off)  -€1,000.00`. The tax column says what the tax applies to: `23% (on €9,000.00)`
+
+---
+
+### Changed
+
+- Invoices saved in your browser or shared by link before this release open with no discount, so nothing about them changes until you add one
+
+---
+
+<div className="rounded-lg border-2 border-blue-200 bg-blue-50 px-8 py-4 dark:border-blue-900 dark:bg-blue-950" data-testid="ready-to-start-invoicing-cta">
+<h2 className="!mt-4">Create your next invoice</h2>
+
+EasyInvoicePDF is free and open source. There's no sign-up, and you can go from blank form to downloaded PDF in under a minute.
+
+<div className="mt-6">
+  <a
+    href="https://easyinvoicepdf.com?ref=changelog"
+    className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-slate-900 px-8 text-lg font-medium no-underline transition-all hover:bg-slate-800 active:scale-[0.98]"
+  >
+    <span className="text-white">Start Invoicing</span>
+  </a>
+</div>
+
+</div>
