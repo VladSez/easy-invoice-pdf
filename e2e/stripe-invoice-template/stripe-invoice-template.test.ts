@@ -47,12 +47,13 @@ test.describe("Stripe Invoice Template", () => {
     await page.goto("/stripe-template");
 
     const generalInfoSection = page.getByTestId("general-information-section");
-    const invoiceNumberFieldset = generalInfoSection.getByRole("group", {
-      name: "Invoice Number",
+    const invoiceDetailsFieldset = generalInfoSection.getByRole("group", {
+      name: "Invoice details",
     });
-    const invoiceNumberLabelInput = invoiceNumberFieldset.getByRole("textbox", {
-      name: "Label",
-    });
+    const invoiceNumberLabelInput = invoiceDetailsFieldset.getByRole(
+      "textbox",
+      { name: "Invoice number label" },
+    );
 
     await expect(invoiceNumberLabelInput).toHaveValue("Invoice");
 
@@ -988,6 +989,60 @@ test.describe("Stripe Invoice Template", () => {
       downloadDir,
       browserName,
       name: "pdf-with-logo-and-payment-url-when-using-stripe-template.png",
+    });
+  });
+
+  test("colors the top line with the picked color and keeps it across a reload", async ({
+    page,
+    browserName,
+    downloadDir,
+  }) => {
+    const generalInfoSection = page.getByTestId("general-information-section");
+
+    // the color only belongs to the Stripe template
+    await expect(generalInfoSection.getByText("Top line color")).toBeHidden();
+
+    await generalInfoSection
+      .getByRole("combobox", { name: "Invoice Template" })
+      .selectOption("stripe");
+
+    await expect(page).toHaveURL("/stripe-template");
+
+    const topLineColor = generalInfoSection.getByTestId(
+      "stripe-top-line-color",
+    );
+
+    await expect(
+      topLineColor.getByRole("button", { name: "Amber (default)" }),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    await waitForPdfRegeneration(page, async () => {
+      await topLineColor.getByRole("button", { name: "Indigo" }).click();
+    });
+
+    await expect(
+      topLineColor.getByRole("button", { name: "Indigo" }),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    const storedData = (await page.evaluate((key) => {
+      return localStorage.getItem(key);
+    }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
+
+    expect((JSON.parse(storedData) as InvoiceData).stripeTopLineColor).toBe(
+      "#635bff",
+    );
+
+    await page.reload();
+    await expect(page).toHaveURL("/stripe-template");
+
+    await expect(
+      topLineColor.getByRole("button", { name: "Indigo" }),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    await expectPdfScreenshot(page, {
+      downloadDir,
+      browserName,
+      name: "pdf-with-indigo-top-line-stripe-template.png",
     });
   });
 

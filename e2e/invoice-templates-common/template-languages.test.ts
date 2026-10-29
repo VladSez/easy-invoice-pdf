@@ -110,8 +110,8 @@ async function expectTranslatedInvoiceNumberLabel(
 ) {
   const invoiceNumberLabelInput = page
     .getByTestId("general-information-section")
-    .getByRole("group", { name: "Invoice Number" })
-    .getByRole("textbox", { name: "Label" });
+    .getByRole("group", { name: "Invoice details" })
+    .getByRole("textbox", { name: "Invoice number label" });
 
   await expect(invoiceNumberLabelInput).toHaveValue(
     getDefaultInvoiceNumberLabel(language, template),

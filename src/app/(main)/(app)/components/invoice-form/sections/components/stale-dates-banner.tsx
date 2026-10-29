@@ -8,6 +8,10 @@ import {
   getCurrentMonthAndYear,
   isServicePeriodStartInCurrentMonth,
 } from "@/app/(main)/(app)/utils/format-service-period";
+import {
+  getPaymentDueForTerm,
+  getPaymentTermDays,
+} from "@/app/(main)/(app)/utils/payment-terms";
 import type { InvoiceData, SupportedLanguages } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 
@@ -69,19 +73,21 @@ export function StaleDatesBanner({
   const isInvoiceNumberStale = extractedMonthYear !== currentMonthAndYear;
 
   /**
-   * Checks if the payment due date is stale (outdated).
-   * A payment due date is considered stale if:
-   * - It's not set (empty/undefined), OR
-   * - It doesn't match the expected date (14 days after the date of issue)
+   * Any due date on or after the date of issue is a payment term of its own ("Due 7 days
+   * after issue"), so the payment due date is only listed when it is not set or falls
+   * before the date of issue. "Update All Dates" still moves it along with the date of
+   * issue, keeping its term.
    */
   const isPaymentDueStale =
-    !paymentDue ||
-    !dayjs(paymentDue).isSame(dayjs(dateOfIssue).add(14, "days"), "day");
+    !paymentDue || dayjs(paymentDue).isBefore(dayjs(dateOfIssue), "day");
+  const paymentTermDays = getPaymentTermDays({ dateOfIssue, paymentDue });
 
   const targetToday = formatDate(dayjs());
   const targetEndOfMonth = formatDate(dayjs().endOf("month"));
   const targetStartOfMonth = formatDate(dayjs().startOf("month"));
-  const targetPaymentDue = formatDate(dayjs().add(14, "days"));
+  const targetPaymentDue = formatDate(
+    getPaymentDueForTerm({ dateOfIssue: dayjs(), paymentTermDays }),
+  );
 
   const targetInvoiceNumber = `1/${currentMonthAndYear}`;
 
@@ -131,7 +137,7 @@ export function StaleDatesBanner({
       label: "Payment due",
       oldValue: paymentDue ? formatDate(paymentDue) : fallbackValue,
       newValue: targetPaymentDue,
-      hint: "date of issue + 14 days",
+      hint: `date of issue + ${paymentTermDays} ${paymentTermDays === 1 ? "day" : "days"}`,
     },
   ];
 
@@ -220,9 +226,10 @@ export function StaleDatesBanner({
           setValue("dateOfIssue", today);
           setValue("invoiceNumberObject.value", targetInvoiceNumber);
 
-          const newPaymentDue = dayjs(today)
-            .add(14, "days")
-            .format("YYYY-MM-DD");
+          const newPaymentDue = getPaymentDueForTerm({
+            dateOfIssue: today,
+            paymentTermDays,
+          });
 
           setValue("paymentDue", newPaymentDue);
 

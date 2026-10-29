@@ -67,6 +67,7 @@ describe("URL Compression Utilities", () => {
         "s",
         "https://checkout.stripe.com/pay/cs_123",
       ); // stripePayOnlineUrl
+      expect(result).toHaveProperty("+", "#635bff"); // stripeTopLineColor
       expect(result).toHaveProperty("t", "Thank you for your business"); // notes
       expect(result).toHaveProperty("u", true); // notesFieldIsVisible
       expect(result).toHaveProperty("v", true); // personAuthorizedToReceiveFieldIsVisible
@@ -250,6 +251,7 @@ describe("URL Compression Utilities", () => {
         "stripePayOnlineUrl",
         "https://checkout.stripe.com/pay/cs_123",
       );
+      expect(result).toHaveProperty("stripeTopLineColor", "#635bff");
       expect(result).toHaveProperty("notes", "Thank you for your business");
       expect(result).toHaveProperty("notesFieldIsVisible", true);
       expect(result).toHaveProperty(

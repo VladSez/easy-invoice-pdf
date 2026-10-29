@@ -67,7 +67,7 @@ async function expectServicePeriodPdfLabels(
   expectedServicePeriodLabel: string,
 ) {
   const servicePeriodLabelInput = servicePeriodFieldset.getByRole("textbox", {
-    name: "Service period PDF label",
+    name: "Service period label",
   });
 
   if (template === "default") {
@@ -80,7 +80,7 @@ async function expectServicePeriodPdfLabels(
   await expect(servicePeriodLabelInput).toBeHidden();
   await expect(
     servicePeriodFieldset.getByRole("textbox", {
-      name: "Date of sales PDF label",
+      name: "Date of sales label",
     }),
   ).toBeHidden();
 }
@@ -99,7 +99,7 @@ async function fillCustomServicePeriodPdfLabel(
   }
 
   const servicePeriodLabelInput = servicePeriodFieldset.getByRole("textbox", {
-    name: "Service period PDF label",
+    name: "Service period label",
   });
 
   await servicePeriodLabelInput.fill(customLabel);
@@ -124,7 +124,7 @@ async function expectCustomServicePeriodPdfLabel(
 
   await expect(
     servicePeriodFieldset.getByRole("textbox", {
-      name: "Service period PDF label",
+      name: "Service period label",
     }),
   ).toHaveValue(customLabel);
 }
@@ -773,9 +773,10 @@ test.describe("Invoice Template shared features", () => {
       await page.goto("/");
       await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
 
-      const numberFormatSelect = page
-        .getByRole("group", { name: "Number Format" })
-        .getByRole("combobox", { name: "Format" });
+      const numberFormatSelect = page.getByRole("combobox", {
+        name: "Number Format",
+        exact: true,
+      });
 
       await waitForPdfRegeneration(page, async () => {
         await numberFormatSelect.selectOption("international");

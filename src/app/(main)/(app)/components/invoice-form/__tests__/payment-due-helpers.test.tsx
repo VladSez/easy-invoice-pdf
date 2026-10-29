@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import {
   afterAll,
   afterEach,
@@ -110,12 +111,22 @@ describe("payment due helper texts", () => {
     ).not.toBeInTheDocument();
   });
 
+  // the 7/14/30 day payment terms cover any other spacing, so only a due date that comes
+  // before the issue date gets a button of its own
+  it("is hidden when the payment due date is after the issue date but not 14 days after it", () => {
+    renderInvoiceForm({ paymentDue: "2026-09-20" });
+
+    expect(
+      screen.queryByRole("button", { name: /set payment due date to/i }),
+    ).not.toBeInTheDocument();
+  });
+
   describe('"Set payment due date to <date>"', () => {
     it("renders the suggested date in English by default", () => {
-      renderInvoiceForm({ language: "en", paymentDue: "2026-09-20" });
+      renderInvoiceForm({ language: "en", paymentDue: "2026-09-01" });
 
       expect(getSetPaymentDueButton()).toHaveTextContent(
-        "Set payment due date to September 29, 2026 (14 days from issue date)",
+        "Use September 29, 2026",
       );
     });
 
@@ -132,10 +143,10 @@ describe("payment due helper texts", () => {
     ] as const)(
       "renders the suggested date in the invoice PDF language (%s)",
       (language, expectedDate) => {
-        renderInvoiceForm({ language, paymentDue: "2026-09-20" });
+        renderInvoiceForm({ language, paymentDue: "2026-09-01" });
 
         expect(getSetPaymentDueButton()).toHaveTextContent(
-          `Set payment due date to ${expectedDate} (14 days from issue date)`,
+          `Use ${expectedDate}`,
         );
       },
     );
@@ -144,37 +155,50 @@ describe("payment due helper texts", () => {
       renderInvoiceForm({
         language: "pl",
         dateFormat: "D MMM YYYY",
-        paymentDue: "2026-09-20",
+        paymentDue: "2026-09-01",
       });
 
-      expect(getSetPaymentDueButton()).toHaveTextContent(
-        "Set payment due date to 29 wrz 2026 (14 days from issue date)",
-      );
+      expect(getSetPaymentDueButton()).toHaveTextContent("Use 29 wrz 2026");
     });
   });
 
-  describe('"Payment due date is before date of issue"', () => {
-    it("renders the date of issue in the invoice PDF language", () => {
-      renderInvoiceForm({ language: "fr", paymentDue: "2026-09-01" });
-
-      expect(
-        screen.getByText(
-          /Payment due date is before date of issue \(septembre 15, 2026\)/,
-        ),
-      ).toBeVisible();
-      expect(getSetPaymentDueButton()).toHaveTextContent(
-        "Set payment due date to septembre 29, 2026 (14 days from issue date)",
-      );
-    });
-
-    it("renders the date of issue in English by default", () => {
+  describe('"Before date of issue"', () => {
+    it("sits under the payment due field", () => {
       renderInvoiceForm({ language: "en", paymentDue: "2026-09-01" });
 
+      const paymentDueField = screen
+        .getByLabelText("Payment due")
+        .closest("div");
+      expect(paymentDueField).not.toBeNull();
       expect(
-        screen.getByText(
-          /Payment due date is before date of issue \(September 15, 2026\)/,
+        within(paymentDueField as HTMLElement).getByText(
+          "Before date of issue",
         ),
       ).toBeVisible();
+      expect(
+        within(paymentDueField as HTMLElement).getByRole("button", {
+          name: "Set payment due date to September 29, 2026 (14 days after issue)",
+        }),
+      ).toBeVisible();
+    });
+
+    it("offers the payment terms in place of a term to name", () => {
+      renderInvoiceForm({ paymentDue: "2026-09-01" });
+
+      expect(screen.getByText("Pick a payment term")).toBeVisible();
+    });
+
+    it("sets the payment due date to 14 days after issue when clicked", async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+      renderInvoiceForm({ paymentDue: "2026-09-01" });
+
+      await user.click(getSetPaymentDueButton());
+
+      expect(screen.getByLabelText("Payment due")).toHaveValue("2026-09-29");
+      expect(
+        screen.queryByText("Before date of issue"),
+      ).not.toBeInTheDocument();
     });
   });
 });

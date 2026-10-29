@@ -34,8 +34,8 @@ const STALE_PROPS = {
   dateOfService: "2026-06-30",
   dateOfServiceStart: "2026-06-01",
   invoiceNumberValue: "1/06-2026",
-  // Not 14 days after the date of issue, so it counts as stale too.
-  paymentDue: "2026-06-20",
+  // Before the date of issue, the one way a payment due date counts as stale.
+  paymentDue: "2026-06-05",
   selectedDateFormat: "MMMM D, YYYY",
   isMobile: false,
 };
@@ -141,17 +141,41 @@ describe("StaleDatesBanner", () => {
       dateOfIssue: "2026-09-15",
       dateOfServiceStart: "2026-09-01",
       dateOfService: "2026-09-30",
-      invoiceNumberValue: "1/09-2026",
-      paymentDue: "2026-06-24",
+      invoiceNumberValue: "1/08-2026",
+      // due 30 days after a current date of issue: a choice, not out of date
+      paymentDue: "2026-10-15",
     });
 
     expect(
       within(getBanner()).getByText("1 field is out of date"),
     ).toBeVisible();
-    expect(getRow("Payment due")).toBeInTheDocument();
+    expect(getRowLabels()).toEqual(["Invoice number"]);
+  });
+
+  it("suggests 14 days after issue for a payment due date before the date of issue", () => {
+    renderBanner();
+
+    const row = getRow("Payment due");
+
+    expect(within(row).getByText("June 5, 2026")).toBeVisible();
+    expect(within(row).getByText("September 29, 2026")).toBeVisible();
+    expect(within(row).getByText("(date of issue + 14 days)")).toBeVisible();
+  });
+
+  it("leaves a payment due date after the date of issue out, but keeps its term on update", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const setValue = vi.fn();
+
+    // due 10 days after the stale date of issue
+    renderBanner({ paymentDue: "2026-06-20", setValue });
+
     expect(
-      within(getBanner()).queryByRole("cell", { name: "Date of issue" }),
+      within(getBanner()).queryByRole("cell", { name: "Payment due" }),
     ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /update all dates/i }));
+
+    expect(setValue).toHaveBeenCalledWith("paymentDue", "2026-09-25");
   });
 
   it("falls back to a placeholder when a date is not set", () => {

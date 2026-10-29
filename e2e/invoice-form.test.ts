@@ -279,8 +279,8 @@ test.describe("Invoice Generator Page", () => {
     const NEW_INVOICE_NUMBER = "QUICK-TAB-SWITCH/2026";
 
     const invoiceNumberValueInput = page
-      .getByRole("group", { name: "Invoice Number" })
-      .getByRole("textbox", { name: "Value" });
+      .getByRole("group", { name: "Invoice details" })
+      .getByRole("textbox", { name: "Invoice number", exact: true });
 
     await expect(invoiceNumberValueInput).toHaveValue(
       INITIAL_INVOICE_DATA.invoiceNumberObject.value,
@@ -354,8 +354,8 @@ test.describe("Invoice Generator Page", () => {
     await page.clock.pauseAt(new Date(pageTime + CLOCK_PAUSE_MARGIN));
 
     const invoiceNumberValueInput = page
-      .getByRole("group", { name: "Invoice Number" })
-      .getByRole("textbox", { name: "Value" });
+      .getByRole("group", { name: "Invoice details" })
+      .getByRole("textbox", { name: "Invoice number", exact: true });
 
     await invoiceNumberValueInput.fill(NEW_INVOICE_NUMBER);
 
@@ -472,16 +472,21 @@ test.describe("Invoice Generator Page", () => {
     }
 
     // Invoice Number
-    const invoiceNumberFieldset = page.getByRole("group", {
-      name: "Invoice Number",
+    const invoiceDetailsFieldset = page.getByRole("group", {
+      name: "Invoice details",
     });
 
     await expect(
-      invoiceNumberFieldset.getByRole("textbox", { name: "Label" }),
+      invoiceDetailsFieldset.getByRole("textbox", {
+        name: "Invoice number label",
+      }),
     ).toHaveValue(INITIAL_INVOICE_DATA.invoiceNumberObject.label);
 
     await expect(
-      invoiceNumberFieldset.getByRole("textbox", { name: "Value" }),
+      invoiceDetailsFieldset.getByRole("textbox", {
+        name: "Invoice number",
+        exact: true,
+      }),
     ).toHaveValue(INITIAL_INVOICE_DATA.invoiceNumberObject.value);
 
     // Date of Issue
@@ -498,13 +503,13 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(
       servicePeriodFieldset.getByRole("textbox", {
-        name: "Service period PDF label",
+        name: "Service period label",
       }),
     ).toHaveValue(INITIAL_INVOICE_DATA.servicePeriodLabelText);
 
     await expect(
       servicePeriodFieldset.getByRole("textbox", {
-        name: "Date of sales PDF label",
+        name: "Date of sales label",
       }),
     ).toHaveValue(INITIAL_INVOICE_DATA.dateOfServiceLabelText);
 
@@ -519,11 +524,6 @@ test.describe("Invoice Generator Page", () => {
         name: "Service period end",
       }),
     ).toHaveValue(INITIAL_INVOICE_DATA.dateOfService);
-
-    // Check that info icon is visible
-    await expect(
-      servicePeriodFieldset.getByTestId("service-period-end-info-icon"),
-    ).toBeVisible();
 
     await expect(
       servicePeriodFieldset.getByRole("switch", {
@@ -546,11 +546,13 @@ test.describe("Invoice Generator Page", () => {
       }),
     ).toBeEditable();
 
+    // with the date of sales hidden, the end date is printed only in the service period,
+    // so the helper that names the date of sales goes away
     await expect(
-      servicePeriodFieldset.getByRole("button", {
-        name: 'Shown on PDF as part of "Service period" and as "Date of sales/of executing the service"',
+      servicePeriodFieldset.getByRole("textbox", {
+        name: "Service period end",
       }),
-    ).toBeVisible();
+    ).toHaveAccessibleDescription("");
 
     // Invoice Type
     await expect(
@@ -832,10 +834,10 @@ test.describe("Invoice Generator Page", () => {
     });
 
     const servicePeriodLabelInput = servicePeriodFieldset.getByRole("textbox", {
-      name: "Service period PDF label",
+      name: "Service period label",
     });
     const dateOfServiceLabelInput = servicePeriodFieldset.getByRole("textbox", {
-      name: "Date of sales PDF label",
+      name: "Date of sales label",
     });
 
     await servicePeriodLabelInput.fill("Custom service period label");
@@ -1150,13 +1152,14 @@ test.describe("Invoice Generator Page", () => {
 
     const dateOfIssue = dayjs().format("YYYY-MM-DD");
 
-    const invoiceNumberFieldset = page.getByRole("group", {
-      name: "Invoice Number",
+    const invoiceDetailsFieldset = page.getByRole("group", {
+      name: "Invoice details",
     });
 
-    const invoiceNumberValueField = invoiceNumberFieldset.getByRole("textbox", {
-      name: "Value",
-    });
+    const invoiceNumberValueField = invoiceDetailsFieldset.getByRole(
+      "textbox",
+      { name: "Invoice number", exact: true },
+    );
 
     await invoiceNumberValueField.fill("1/03-2025");
 
@@ -1205,15 +1208,13 @@ test.describe("Invoice Generator Page", () => {
     },
     async ({ page }) => {
       // Fill in some data
-      const invoiceNumberFieldset = page.getByRole("group", {
-        name: "Invoice Number",
+      const invoiceDetailsFieldset = page.getByRole("group", {
+        name: "Invoice details",
       });
 
-      const invoiceNumberValueField = invoiceNumberFieldset.getByRole(
+      const invoiceNumberValueField = invoiceDetailsFieldset.getByRole(
         "textbox",
-        {
-          name: "Value",
-        },
+        { name: "Invoice number", exact: true },
       );
 
       await invoiceNumberValueField.fill("TEST/2024");
@@ -1253,15 +1254,13 @@ test.describe("Invoice Generator Page", () => {
       await page.reload();
 
       // Check if data persists in UI
-      const invoiceNumberFieldset2 = page.getByRole("group", {
-        name: "Invoice Number",
+      const invoiceDetailsFieldset2 = page.getByRole("group", {
+        name: "Invoice details",
       });
 
-      const invoiceNumberValueField2 = invoiceNumberFieldset2.getByRole(
+      const invoiceNumberValueField2 = invoiceDetailsFieldset2.getByRole(
         "textbox",
-        {
-          name: "Value",
-        },
+        { name: "Invoice number", exact: true },
       );
       await expect(invoiceNumberValueField2).toHaveValue("TEST/2024");
 
@@ -1747,9 +1746,11 @@ test.describe("Invoice Generator Page", () => {
     const dateOfIssueInput = generalInfoSection.getByLabel("Date of Issue");
     await dateOfIssueInput.fill("2024-01-15");
 
-    // Verify per-field "Date of issue is not today" inline helper message
+    // Verify the per-field "Not today" warning and its fix
     await expect(
-      generalInfoSection.getByText("Date of issue is not today"),
+      generalInfoSection.getByRole("button", {
+        name: /Set date of issue to today/,
+      }),
     ).toBeVisible();
 
     // Set service period end to a date that's not the last day of current month
@@ -1764,38 +1765,52 @@ test.describe("Invoice Generator Page", () => {
 
     // Verify per-field service period start helper message
     await expect(
-      generalInfoSection.getByText(
-        "Service period start is not in the current month",
-      ),
+      generalInfoSection.getByRole("button", {
+        name: /Set service period start to/,
+      }),
     ).toBeVisible();
 
     // Verify per-field service period end helper message
     await expect(
-      generalInfoSection.getByText(
-        "Service period end is not the last day of the current month",
-      ),
+      generalInfoSection.getByRole("button", {
+        name: /Set service period end to/,
+      }),
     ).toBeVisible();
 
     // Set invoice number to an old month to trigger stale state
-    const invoiceNumberInput = generalInfoSection.getByLabel("Value");
+    const invoiceNumberInput = generalInfoSection.getByLabel("Invoice number", {
+      exact: true,
+    });
     await invoiceNumberInput.fill("1/01-2024");
 
-    // Verify per-field "Invoice number does not match current month" inline helper message
+    // Verify the per-field "Not current month" warning and its fix
     await expect(
-      generalInfoSection.getByText(
-        "Invoice number does not match current month",
-      ),
+      generalInfoSection.getByRole("button", {
+        name: /Set invoice number to/,
+      }),
     ).toBeVisible();
 
-    // Set payment due to a stale date (date of issue + 1 day instead of + 14 days)
+    // Due 1 day after issue: a payment term of its own, which "Update All Dates" keeps
+    // without listing it
     const paymentDueInput = page.getByLabel("Payment Due");
     await paymentDueInput.fill("2024-01-16");
 
-    const paymentDueBtn = page.getByRole("button", {
-      name: "Set payment due date to 2024-01-29 (14 days from issue date)",
+    // a due date after the issue date gets no fix-it button, only the payment terms,
+    // none of which it matches
+    await expect(
+      generalInfoSection.getByText("Due 1 day after issue"),
+    ).toBeVisible();
+
+    const paymentTerms = generalInfoSection.getByRole("group", {
+      name: "Payment terms",
     });
-    await expect(paymentDueBtn).toBeVisible();
-    await expect(paymentDueBtn).toBeEnabled();
+    await expect(
+      paymentTerms.getByRole("button", { name: "14 days" }),
+    ).toHaveAttribute("aria-pressed", "false");
+
+    await expect(
+      page.getByRole("button", { name: /set payment due date to/i }),
+    ).toBeHidden();
 
     // Verify the OutOfDateDatesHelper component appears with the table-based UI
     const outOfDateHelper = page.getByTestId("out-of-date-dates-helper");
@@ -1803,7 +1818,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Verify the header shows the correct count of stale fields
     await expect(
-      outOfDateHelper.getByText("5 fields are out of date"),
+      outOfDateHelper.getByText("4 fields are out of date"),
     ).toBeVisible();
 
     // Verify each stale field appears as a row in the table
@@ -1819,9 +1834,10 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       outOfDateHelper.getByText("Invoice number", { exact: true }),
     ).toBeVisible();
+    // due after the date of issue, so it is a payment term, not an out-of-date field
     await expect(
       outOfDateHelper.getByText("Payment due", { exact: true }),
-    ).toBeVisible();
+    ).toBeHidden();
 
     // Verify the table shows old → new values per row (avoids strict mode when targets match)
     const dateOfIssueRow = outOfDateHelper
@@ -1850,12 +1866,6 @@ test.describe("Invoice Generator Page", () => {
     await expect(invoiceNumberRow.getByText("1/01-2024")).toBeVisible();
     await expect(invoiceNumberRow.getByText("1/12-2025")).toBeVisible();
 
-    const paymentDueRow = outOfDateHelper
-      .getByRole("row")
-      .filter({ hasText: "Payment due" });
-    await expect(paymentDueRow.getByText("2024-01-16")).toBeVisible();
-    await expect(paymentDueRow.getByText("2025-12-15")).toBeVisible();
-
     // Verify the "Update All Dates" button is visible
     const updateAllDatesButton = outOfDateHelper.getByRole("button", {
       name: "Update All Dates",
@@ -1873,19 +1883,21 @@ test.describe("Invoice Generator Page", () => {
       page.getByText("All dates updated successfully"),
     ).toBeVisible();
 
-    // Verify per-field inline helper messages are gone
+    // Verify the per-field warnings are gone
     await expect(
-      generalInfoSection.getByText("Date of issue is not today"),
+      generalInfoSection.getByRole("button", {
+        name: /Set date of issue to today/,
+      }),
     ).toBeHidden();
     await expect(
-      generalInfoSection.getByText(
-        "Service period end is not the last day of the current month",
-      ),
+      generalInfoSection.getByRole("button", {
+        name: /Set service period end to/,
+      }),
     ).toBeHidden();
     await expect(
-      generalInfoSection.getByText(
-        "Service period start is not in the current month",
-      ),
+      generalInfoSection.getByRole("button", {
+        name: /Set service period start to/,
+      }),
     ).toBeHidden();
 
     // Verify all fields were updated to correct values
@@ -1893,7 +1905,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(dateOfServiceStartInput).toHaveValue("2025-12-01");
     await expect(dateOfServiceInput).toHaveValue("2025-12-31");
     await expect(invoiceNumberInput).toHaveValue("1/12-2025");
-    await expect(paymentDueInput).toHaveValue("2025-12-15");
+    await expect(paymentDueInput).toHaveValue("2025-12-02");
   });
 
   test("allows setting date of issue to today from inline helper", async ({
@@ -1912,7 +1924,9 @@ test.describe("Invoice Generator Page", () => {
     await dateOfIssueInput.fill("2024-01-15");
 
     await expect(
-      generalInfoSection.getByText("Date of issue is not today"),
+      generalInfoSection.getByRole("button", {
+        name: /Set date of issue to today/,
+      }),
     ).toBeVisible();
 
     await generalInfoSection
@@ -1921,7 +1935,9 @@ test.describe("Invoice Generator Page", () => {
 
     await expect(dateOfIssueInput).toHaveValue("2025-12-01");
     await expect(
-      generalInfoSection.getByText("Date of issue is not today"),
+      generalInfoSection.getByRole("button", {
+        name: /Set date of issue to today/,
+      }),
     ).toBeHidden();
     await expect(page.getByLabel("Payment Due")).toHaveValue("2025-12-15");
   });
@@ -1936,7 +1952,7 @@ test.describe("Invoice Generator Page", () => {
       name: "Service period",
     });
     const servicePeriodLabelInput = servicePeriodFieldset.getByRole("textbox", {
-      name: "Service period PDF label",
+      name: "Service period label",
     });
     const defaultLabel = INVOICE_PDF_TRANSLATIONS.en.servicePeriod;
     const resetToDefaultButton = servicePeriodFieldset.getByRole("button", {
@@ -1963,7 +1979,7 @@ test.describe("Invoice Generator Page", () => {
       name: "Service period",
     });
     const dateOfServiceLabelInput = servicePeriodFieldset.getByRole("textbox", {
-      name: "Date of sales PDF label",
+      name: "Date of sales label",
     });
     const defaultLabel = INVOICE_PDF_TRANSLATIONS.en.dateOfService;
     const resetToDefaultButton = servicePeriodFieldset.getByRole("button", {

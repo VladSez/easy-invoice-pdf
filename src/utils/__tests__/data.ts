@@ -90,6 +90,7 @@ export const MOCK_INVOICE_DATA = {
   paymentMethodFieldIsVisible: true,
   paymentDue: "2024-01-29",
   stripePayOnlineUrl: "https://checkout.stripe.com/pay/cs_123",
+  stripeTopLineColor: "#635bff",
   notes: "Thank you for your business",
   notesFieldIsVisible: true,
 
