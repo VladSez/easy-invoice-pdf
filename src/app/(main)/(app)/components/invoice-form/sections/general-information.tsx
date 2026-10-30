@@ -371,7 +371,7 @@ export const GeneralInformation = memo(function GeneralInformation({
           ) : null}
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-4">
           {/* Language PDF Select */}
           <div className="min-w-0">
             <Label htmlFor={`language`} className="mb-1">
