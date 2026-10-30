@@ -18,8 +18,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
+
+import { ContactFields } from "./contact-fields";
 
 /** Longer values are cut short, so one long address does not push the problem off screen. */
 const MAX_VALUE_LENGTH = 120;
@@ -213,15 +216,15 @@ function ChooseFileStep({
       <FilePickerLabel
         onFileSelected={onFileSelected}
         className={cn(
-          "flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 hover:bg-slate-50",
-          isDraggingFile && "border-slate-600 bg-slate-100",
+          "flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-dashed border-slate-400 bg-slate-50 px-4 py-6 text-center transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 hover:border-slate-500 hover:bg-slate-100",
+          isDraggingFile && "border-slate-700 bg-slate-200/70",
         )}
       >
-        <FileUp className="mb-1 size-5 text-slate-500" aria-hidden />
+        <FileUp className="mb-1 size-5 text-slate-700" aria-hidden />
         <span className="text-sm font-medium text-slate-900">
           Drop a .json file here
         </span>
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-slate-700">
           or <span className="underline underline-offset-2">choose a file</span>
         </span>
       </FilePickerLabel>
@@ -337,6 +340,31 @@ function PreviewStep({
         ? "Nothing can be imported"
         : "Nothing new to import";
 
+  const countByTab = {
+    add: addedCount,
+    problems: problemCount,
+    saved: duplicateCount,
+  } satisfies Record<PreviewTabValue, number>;
+
+  // only outcomes the file has get a tab, in the order they matter
+  const tabs = PREVIEW_TABS.filter(({ value }) => {
+    return countByTab[value] > 0;
+  });
+
+  const [selectedTab, setSelectedTab] = useState<PreviewTabValue>("add");
+
+  // a file without the selected outcome (another file picked from here) opens on its first
+  const activeTab = tabs.some(({ value }) => {
+    return value === selectedTab;
+  })
+    ? selectedTab
+    : (tabs[0]?.value ?? "add");
+
+  function selectTab(value: PreviewTabValue) {
+    setSelectedTab(value);
+    umamiTrackEvent("import_contacts_tab_changed", { data: { tab: value } });
+  }
+
   return (
     <>
       <DialogHeader className="text-left">
@@ -344,35 +372,74 @@ function PreviewStep({
         <DialogDescription className="break-all">{fileName}</DialogDescription>
       </DialogHeader>
 
-      <dl className="grid grid-cols-3 gap-2">
-        <PreviewStat label="to add" count={addedCount} />
-        <PreviewStat label="already saved" count={duplicateCount} />
-        <PreviewStat
-          label="can’t import"
-          count={problemCount}
-          isProblem={problemCount > 0}
-        />
-      </dl>
-
-      {problemCount > 0 ? (
-        <p className="text-pretty text-sm text-slate-600">
-          {addedCount > 0
-            ? "Fix the highlighted fields in the file and import it again, or import the rest now."
-            : "Fix the highlighted fields in the file and import it again."}
-          {nameConflictCount > 0
-            ? " For a name that’s already saved, rename it in the file or rename the saved one."
-            : null}
-        </p>
-      ) : null}
-
-      <div className="-mx-6 min-h-0 flex-1 space-y-4 overflow-y-auto px-6">
-        <PartyPreview party="Sellers" result={sellers} />
-        <PartyPreview party="Buyers" result={buyers} />
-      </div>
+      {tabs.length > 1 ? (
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => {
+            selectTab(value as PreviewTabValue);
+          }}
+          className="min-h-0 flex-1 gap-3"
+        >
+          <TabsList className="h-auto w-full justify-start gap-1 rounded-none border-b border-slate-200 bg-transparent p-0">
+            {tabs.map(({ value, label }) => {
+              return (
+                <TabsTrigger
+                  key={value}
+                  value={value}
+                  className="-mb-px gap-1.5 rounded-none border-b-2 border-transparent px-2.5 py-2 font-normal text-slate-500 hover:bg-transparent data-[state=active]:border-slate-900 data-[state=active]:bg-transparent data-[state=active]:font-medium data-[state=active]:text-slate-900 data-[state=active]:shadow-none"
+                >
+                  {label}
+                  <span
+                    className={cn(
+                      "inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-slate-100 px-1.5 text-xs tabular-nums text-slate-600",
+                      value === "problems" && "bg-red-100 text-red-700",
+                    )}
+                  >
+                    {countByTab[value]}
+                  </span>
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+          <TabsContent
+            value={activeTab}
+            className="-mx-6 min-h-0 overflow-y-auto px-6"
+          >
+            <PreviewTabPanel
+              tab={activeTab}
+              sellers={sellers}
+              buyers={buyers}
+              hasAddedEntries={addedCount > 0}
+              hasNameConflicts={nameConflictCount > 0}
+            />
+          </TabsContent>
+        </Tabs>
+      ) : (
+        <div className="-mx-6 min-h-0 flex-1 overflow-y-auto px-6">
+          <PreviewTabPanel
+            tab={activeTab}
+            sellers={sellers}
+            buyers={buyers}
+            hasAddedEntries={addedCount > 0}
+            hasNameConflicts={nameConflictCount > 0}
+          />
+        </div>
+      )}
 
       <DialogFooter>
         {addedCount > 0 ? (
           <>
+            {problemCount > 0 && activeTab !== "problems" ? (
+              <button
+                type="button"
+                className="self-center text-sm text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline sm:mr-auto"
+                onClick={() => {
+                  selectTab("problems");
+                }}
+              >
+                {problemCount} can’t be imported
+              </button>
+            ) : null}
             <DialogClose asChild>
               <Button variant="outline" size="sm">
                 Cancel
@@ -409,94 +476,125 @@ function PreviewStep({
   );
 }
 
-interface PreviewStatProps {
-  label: string;
-  count: number;
-  /** Highlights the count in red. */
-  isProblem?: boolean;
+interface PreviewTabPanelProps {
+  tab: PreviewTabValue;
+  sellers: MergeImportedContactsResult<SellerData>;
+  buyers: MergeImportedContactsResult<BuyerData>;
+  /** Some entries can be imported, so the advice offers to import the rest now. */
+  hasAddedEntries: boolean;
+  hasNameConflicts: boolean;
 }
 
-function PreviewStat({ label, count, isProblem = false }: PreviewStatProps) {
+/**
+ * The entries with one outcome, as a Sellers list and a Buyers list; a party with none is
+ * left out. Problem rows are opened, so what to fix shows straight away.
+ */
+function PreviewTabPanel({
+  tab,
+  sellers,
+  buyers,
+  hasAddedEntries,
+  hasNameConflicts,
+}: PreviewTabPanelProps) {
+  const parties = [
+    { party: "Sellers", result: sellers },
+    { party: "Buyers", result: buyers },
+  ] as const;
+
+  if (tab === "problems") {
+    return (
+      <div className="space-y-4">
+        <p className="text-pretty text-sm text-slate-600">
+          {hasAddedEntries
+            ? "Fix the highlighted fields in the file and import it again, or import the rest now."
+            : "Fix the highlighted fields in the file and import it again."}
+          {hasNameConflicts
+            ? " For a name that’s already saved, rename it in the file or rename the saved one."
+            : null}
+        </p>
+        {parties.map(({ party, result }) => {
+          return (
+            <PartyList
+              key={party}
+              party={party}
+              count={result.invalidEntries.length + result.nameConflicts.length}
+            >
+              {result.invalidEntries.map((invalidEntry, index) => {
+                return (
+                  <ProblemRow
+                    key={`invalid-${index}`}
+                    invalidEntry={invalidEntry}
+                    badge={
+                      invalidEntry.issues.length === 1
+                        ? "1 problem"
+                        : `${invalidEntry.issues.length} problems`
+                    }
+                  />
+                );
+              })}
+              {result.nameConflicts.map((invalidEntry, index) => {
+                return (
+                  <ProblemRow
+                    key={`conflict-${index}`}
+                    invalidEntry={invalidEntry}
+                    badge="Name taken"
+                  />
+                );
+              })}
+            </PartyList>
+          );
+        })}
+      </div>
+    );
+  }
+
+  const isSaved = tab === "saved";
+
   return (
-    <div
-      className={cn(
-        "flex flex-col-reverse rounded-lg bg-slate-50 px-3 py-2",
-        isProblem && "bg-red-50 text-red-700",
-      )}
-    >
-      <dt className={cn("text-xs text-slate-500", isProblem && "text-red-700")}>
-        {label}
-      </dt>
-      <dd className="text-lg font-semibold tabular-nums">{count}</dd>
+    <div className="space-y-4">
+      {parties.map(({ party, result }) => {
+        const contacts = isSaved ? result.duplicates : result.added;
+
+        return (
+          <PartyList key={party} party={party} count={contacts.length}>
+            {contacts.map((contact, index) => {
+              return (
+                <PreviewRow key={index} contact={contact} isMuted={isSaved} />
+              );
+            })}
+          </PartyList>
+        );
+      })}
     </div>
   );
 }
 
-interface PartyPreviewProps {
+interface PartyListProps {
   party: "Sellers" | "Buyers";
-  result: MergeImportedContactsResult<SellerData | BuyerData>;
+  /** How many of the party's entries the list holds; with none, nothing is rendered. */
+  count: number;
+  children: React.ReactNode;
 }
 
-/**
- * One party's entries from the file: the new ones first, then the ones that cannot be
- * imported (opened, so their problems show), then the ones already saved.
- */
-function PartyPreview({ party, result }: PartyPreviewProps) {
-  const { added, duplicates, invalidEntries, nameConflicts } = result;
-
-  if (
-    added.length +
-      duplicates.length +
-      invalidEntries.length +
-      nameConflicts.length ===
-    0
-  ) {
+function PartyList({ party, count, children }: PartyListProps) {
+  if (count === 0) {
     return null;
   }
 
   return (
     <section>
-      <h3 className="mb-1.5 text-xs font-medium text-slate-500">{party}</h3>
+      <h3 className="mb-1.5 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+        {party}
+        {/* the same badge as the tab counts */}
+        <span className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-slate-100 px-1.5 text-xs font-medium normal-case tabular-nums tracking-normal text-slate-600">
+          {count}
+        </span>
+      </h3>
       <ul
         className="divide-y divide-slate-200 overflow-hidden rounded-lg border border-slate-200 text-sm"
         aria-label={party}
       >
-        {added.map((contact, index) => {
-          return (
-            <PreviewRow key={`added-${index}`} contact={contact}>
-              <StatusBadge tone="success">New</StatusBadge>
-            </PreviewRow>
-          );
-        })}
-        {invalidEntries.map((invalidEntry, index) => {
-          return (
-            <ProblemRow
-              key={`invalid-${index}`}
-              invalidEntry={invalidEntry}
-              badge={
-                invalidEntry.issues.length === 1
-                  ? "1 problem"
-                  : `${invalidEntry.issues.length} problems`
-              }
-            />
-          );
-        })}
-        {nameConflicts.map((invalidEntry, index) => {
-          return (
-            <ProblemRow
-              key={`conflict-${index}`}
-              invalidEntry={invalidEntry}
-              badge="Name taken"
-            />
-          );
-        })}
-        {duplicates.map((contact, index) => {
-          return (
-            <PreviewRow key={`duplicate-${index}`} contact={contact} isMuted>
-              <StatusBadge tone="neutral">Already saved</StatusBadge>
-            </PreviewRow>
-          );
-        })}
+        {children}
       </ul>
     </section>
   );
@@ -506,15 +604,13 @@ interface PreviewRowProps {
   contact: SellerData | BuyerData;
   /** For entries that will be skipped. */
   isMuted?: boolean;
-  /** The status badge. */
-  children: React.ReactNode;
 }
 
 /**
  * Collapsed to the name and address by default; expanding it lists every other field the
  * entry has, so the user can check the details before importing.
  */
-function PreviewRow({ contact, isMuted = false, children }: PreviewRowProps) {
+function PreviewRow({ contact, isMuted = false }: PreviewRowProps) {
   return (
     <li className={cn(isMuted && "text-slate-500")}>
       <details
@@ -533,50 +629,15 @@ function PreviewRow({ contact, isMuted = false, children }: PreviewRowProps) {
             <ContactName name={contact.name} />
             <ContactAddress address={contact.address} />
           </div>
-          <span className="flex shrink-0 items-center gap-1.5">
-            {children}
-            <ChevronDown
-              className="size-3.5 text-slate-500 transition-transform group-open:rotate-180"
-              aria-hidden
-            />
-          </span>
+          <ChevronDown
+            className="mt-1 size-3.5 shrink-0 text-slate-500 transition-transform group-open:rotate-180"
+            aria-hidden
+          />
         </summary>
 
         <ContactFields contact={contact} />
       </details>
     </li>
-  );
-}
-
-interface ContactFieldsProps {
-  contact: SellerData | BuyerData;
-}
-
-/** Every filled-in field of the entry, with the ones hidden on the invoice marked so. */
-function ContactFields({ contact }: ContactFieldsProps) {
-  const fields = getContactFields(contact);
-
-  return (
-    <dl className="space-y-1.5 border-t border-slate-200 bg-slate-50/60 px-3 py-2 text-xs">
-      {fields.map(({ field, label, value, isHidden }) => {
-        return (
-          <div
-            key={field}
-            className="grid grid-cols-[7rem_minmax(0,1fr)] gap-2"
-          >
-            <dt className="text-slate-500">{label}</dt>
-            <dd className="whitespace-pre-line break-words text-slate-700">
-              {value}
-              {isHidden ? (
-                <span className="ml-1.5 text-slate-400">
-                  (hidden on invoice)
-                </span>
-              ) : null}
-            </dd>
-          </div>
-        );
-      })}
-    </dl>
   );
 }
 
@@ -628,7 +689,7 @@ function ProblemRow({ invalidEntry, badge }: ProblemRowProps) {
             {address ? <ContactAddress address={address} /> : null}
           </div>
           <span className="flex shrink-0 items-center gap-1.5">
-            <StatusBadge tone="danger">{badge}</StatusBadge>
+            <StatusBadge>{badge}</StatusBadge>
             <ChevronDown
               className="size-3.5 text-slate-500 transition-transform group-open:rotate-180"
               aria-hidden
@@ -653,19 +714,14 @@ function ProblemRow({ invalidEntry, badge }: ProblemRowProps) {
 }
 
 interface StatusBadgeProps {
-  tone: "success" | "neutral" | "danger";
   children: React.ReactNode;
 }
 
-function StatusBadge({ tone, children }: StatusBadgeProps) {
+/** What is wrong with an entry that cannot be imported. */
+function StatusBadge({ children }: StatusBadgeProps) {
   return (
     <span
-      className={cn(
-        "shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium",
-        tone === "success" && "bg-green-200/80 text-green-900",
-        tone === "neutral" && "bg-slate-100 text-slate-600",
-        tone === "danger" && "bg-red-200/80 text-red-900",
-      )}
+      className="shrink-0 whitespace-nowrap rounded-full bg-red-200/80 px-2 py-0.5 text-xs font-medium text-red-900"
       data-testid="import-export-status-badge"
     >
       {children}
@@ -831,83 +887,6 @@ function EntryLine({ field, value, messages }: EntryLineProps) {
   );
 }
 
-interface ContactField {
-  /** The schema key, used as the React key: labels can repeat, as the tax label is user-set. */
-  field: keyof SellerData;
-  label: string;
-  value: string;
-  /** The entry has the value but does not show it on the invoice. */
-  isHidden: boolean;
-}
-
-function getContactFields(contact: SellerData | BuyerData): ContactField[] {
-  const fields: (ContactField | null)[] = [
-    { field: "name", label: "Name", value: contact.name, isHidden: false },
-    {
-      field: "address",
-      label: "Address",
-      value: contact.address,
-      isHidden: false,
-    },
-    optionalField({
-      field: "vatNo",
-      label: contact.vatNoLabelText,
-      value: contact.vatNo,
-      isVisible: contact.vatNoFieldIsVisible,
-    }),
-    optionalField({
-      field: "email",
-      label: "Email",
-      value: contact.email,
-      isVisible: contact.emailFieldIsVisible,
-    }),
-    "accountNumber" in contact
-      ? optionalField({
-          field: "accountNumber",
-          label: "Account Number",
-          value: contact.accountNumber,
-          isVisible: contact.accountNumberFieldIsVisible,
-        })
-      : null,
-    "swiftBic" in contact
-      ? optionalField({
-          field: "swiftBic",
-          label: "SWIFT/BIC",
-          value: contact.swiftBic,
-          isVisible: contact.swiftBicFieldIsVisible,
-        })
-      : null,
-    optionalField({
-      field: "notes",
-      label: "Notes",
-      value: contact.notes,
-      isVisible: contact.notesFieldIsVisible,
-    }),
-  ];
-
-  return fields.filter((field) => {
-    return field !== null;
-  });
-}
-
-interface OptionalFieldOptions {
-  field: ContactField["field"];
-  label: string;
-  /** Left out of the list when empty. */
-  value: string | undefined;
-  /** The entry's `…FieldIsVisible` flag for this field. */
-  isVisible: boolean;
-}
-
-function optionalField({
-  field,
-  label,
-  value,
-  isVisible,
-}: OptionalFieldOptions): ContactField | null {
-  return value ? { field, label, value, isHidden: !isVisible } : null;
-}
-
 function formatValue(value: unknown): string {
   const text = JSON.stringify(value) ?? String(value);
 
@@ -968,3 +947,11 @@ const EXPECTED_FILE_EXAMPLE = `{
     }
   ]
 }`;
+
+type PreviewTabValue = "add" | "problems" | "saved";
+
+const PREVIEW_TABS = [
+  { value: "add", label: "To add" },
+  { value: "problems", label: "Can’t import" },
+  { value: "saved", label: "Already saved" },
+] as const satisfies readonly { value: PreviewTabValue; label: string }[];

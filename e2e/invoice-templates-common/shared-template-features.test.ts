@@ -671,7 +671,7 @@ test.describe("Invoice Template shared features", () => {
         const sellerEmailSwitchInDialog = manageSellerDialog.getByRole(
           "switch",
           {
-            name: "Show Seller Email in PDF",
+            name: "Show the 'Email' field in the PDF",
           },
         );
         await expect(sellerEmailSwitchInDialog).toBeVisible();
@@ -710,7 +710,7 @@ test.describe("Invoice Template shared features", () => {
 
         // Verify email visibility switch is checked by default in dialog
         const buyerEmailSwitchInDialog = manageBuyerDialog.getByRole("switch", {
-          name: "Show Buyer Email in PDF",
+          name: "Show the 'Email' field in the PDF",
         });
         await expect(buyerEmailSwitchInDialog).toBeVisible();
         await expect(buyerEmailSwitchInDialog).toBeChecked();

@@ -47,6 +47,11 @@ function emptyResult<T extends SellerData | BuyerData>(
   };
 }
 
+/** Radix tabs switch on `mousedown`, not `click`. */
+function selectTab(dialog: HTMLElement, name: string) {
+  fireEvent.mouseDown(within(dialog).getByRole("tab", { name }));
+}
+
 function renderDialog(state: ImportContactsDialogState) {
   render(
     <ImportContactsDialog
@@ -88,16 +93,68 @@ describe("ImportContactsDialog preview", () => {
       within(dialog).getByRole("heading", { name: "Review import" }),
     ).toBeVisible();
 
-    const sellers = within(dialog).getByRole("list", { name: "Sellers" });
-
-    expect(sellers).toHaveTextContent("Acme1 MainNew");
-    expect(sellers).toHaveTextContent("InitechElsewhereName taken");
+    // one tab per outcome the file has, opened on what will be added
     expect(
-      within(dialog).getByRole("list", { name: "Buyers" }),
-    ).toHaveTextContent("Globex2 SideAlready saved");
-
+      within(dialog).getByRole("tab", { name: "To add 1", selected: true }),
+    ).toBeVisible();
+    expect(
+      within(dialog).getByRole("list", { name: "Sellers" }),
+    ).toHaveTextContent("Acme1 Main");
+    // no buyers to add, so there is no Buyers list on this tab
+    expect(
+      within(dialog).queryByRole("list", { name: "Buyers" }),
+    ).not.toBeInTheDocument();
     expect(
       within(dialog).getByRole("button", { name: "Import 1 seller" }),
+    ).toBeVisible();
+
+    // the footer link opens the problems
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "1 can’t be imported" }),
+    );
+
+    expect(
+      within(dialog).getByRole("tab", {
+        name: "Can’t import 1",
+        selected: true,
+      }),
+    ).toBeVisible();
+    expect(
+      within(dialog).getByRole("list", { name: "Sellers" }),
+    ).toHaveTextContent("InitechElsewhereName taken");
+    expect(
+      within(dialog).queryByRole("button", { name: "1 can’t be imported" }),
+    ).not.toBeInTheDocument();
+
+    selectTab(dialog, "Already saved 1");
+
+    expect(
+      within(dialog).getByRole("list", { name: "Buyers" }),
+    ).toHaveTextContent("Globex2 Side");
+    expect(
+      within(dialog).queryByRole("list", { name: "Sellers" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows no tabs when every entry has the same outcome", () => {
+    const dialog = renderDialog({
+      step: "preview",
+      fileName: "backup.json",
+      sellers: emptyResult({ added: [ACME] }),
+      buyers: emptyResult({ added: [GLOBEX] }),
+    });
+
+    expect(within(dialog).queryByRole("tablist")).not.toBeInTheDocument();
+    expect(
+      within(dialog).getByRole("list", { name: "Sellers" }),
+    ).toHaveTextContent("Acme1 Main");
+    expect(
+      within(dialog).getByRole("list", { name: "Buyers" }),
+    ).toHaveTextContent("Globex2 Side");
+    expect(
+      within(dialog).getByRole("button", {
+        name: "Import 1 seller and 1 buyer",
+      }),
     ).toBeVisible();
   });
 
@@ -118,7 +175,7 @@ describe("ImportContactsDialog preview", () => {
           }),
         ],
       }),
-      buyers: emptyResult({ duplicates: [GLOBEX] }),
+      buyers: emptyResult({ added: [GLOBEX] }),
     });
 
     const [acme, globex] = within(dialog).getAllByTestId(
@@ -347,7 +404,7 @@ describe("ImportContactsDialog drop", () => {
     const textDrag = { types: ["text/plain"], files: [] };
 
     fireEvent.dragEnter(document.body, { dataTransfer: textDrag });
-    expect(getDropZone()).not.toHaveClass("border-slate-600");
+    expect(getDropZone()).not.toHaveClass("border-slate-700");
 
     const drop = createEvent.drop(document.body, { dataTransfer: textDrag });
     fireEvent(document.body, drop);
@@ -384,17 +441,17 @@ describe("ImportContactsDialog drop", () => {
     );
 
     fireEvent.dragEnter(document.body, { dataTransfer });
-    expect(getDropZone()).toHaveClass("border-slate-600");
+    expect(getDropZone()).toHaveClass("border-slate-700");
 
     // Into a child: WebKit fires the `dragleave` for the element being left with a null
     // `relatedTarget`, which must not read as leaving the window
     fireEvent.dragEnter(rule, { dataTransfer });
     fireEvent.dragLeave(document.body, { dataTransfer });
-    expect(getDropZone()).toHaveClass("border-slate-600");
+    expect(getDropZone()).toHaveClass("border-slate-700");
 
     // Out of the window
     fireEvent.dragLeave(rule, { dataTransfer });
-    expect(getDropZone()).not.toHaveClass("border-slate-600");
+    expect(getDropZone()).not.toHaveClass("border-slate-700");
   });
 
   it("clears the highlight when Firefox enters the same element twice", () => {
@@ -406,7 +463,7 @@ describe("ImportContactsDialog drop", () => {
     fireEvent.dragEnter(document.body, { dataTransfer });
     fireEvent.dragLeave(document.body, { dataTransfer });
 
-    expect(getDropZone()).not.toHaveClass("border-slate-600");
+    expect(getDropZone()).not.toHaveClass("border-slate-700");
   });
 });
 

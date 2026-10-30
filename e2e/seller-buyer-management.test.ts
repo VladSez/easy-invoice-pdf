@@ -145,10 +145,10 @@ async function toggleBankDetailsOff(dialog: Locator, party: Party) {
   }
 
   const accountNumberSwitch = dialog.getByRole("switch", {
-    name: "Show Seller Account Number in PDF",
+    name: "Show the 'Account Number' field in the PDF",
   });
   const swiftBicSwitch = dialog.getByRole("switch", {
-    name: "Show Seller SWIFT/BIC in PDF",
+    name: "Show the 'SWIFT/BIC' field in the PDF",
   });
 
   await expect(accountNumberSwitch).toBeChecked();
@@ -175,41 +175,73 @@ async function expectBankDetailsInDialog(dialog: Locator, party: Party) {
   );
 
   await expect(
-    dialog.getByRole("switch", { name: "Show Seller Account Number in PDF" }),
+    dialog.getByRole("switch", {
+      name: "Show the 'Account Number' field in the PDF",
+    }),
   ).not.toBeChecked();
   await expect(
-    dialog.getByRole("switch", { name: "Show Seller SWIFT/BIC in PDF" }),
+    dialog.getByRole("switch", {
+      name: "Show the 'SWIFT/BIC' field in the PDF",
+    }),
   ).not.toBeChecked();
 }
 
-/**
- * Verifies the seller-only bank details in the (read-only) invoice form section;
- * a no-op for buyers.
- */
-async function expectBankDetailsInForm(form: Locator, party: Party) {
+interface ExpectCardFieldOptions {
+  /** The row label, which for the tax number is the party's own label. */
+  label: string;
+  value: string;
+  /** The field is filled in but left out of the PDF. */
+  isHidden?: boolean;
+}
+
+/** Verifies one row of the saved party card, including its "Hidden on invoice" chip. */
+async function expectCardField(
+  card: Locator,
+  { label, value, isHidden = false }: ExpectCardFieldOptions,
+) {
+  const row = card
+    .locator("dl > div")
+    .filter({ has: card.page().getByText(label, { exact: true }) });
+
+  await expect(row.locator("dd")).toHaveText(
+    isHidden ? `${value}Hidden on invoice` : value,
+  );
+}
+
+interface ExpectCardHeaderOptions {
+  name: string;
+  address: string;
+}
+
+/** Verifies the name and address heading the saved party card, which are not list rows. */
+async function expectCardHeader(
+  card: Locator,
+  { name, address }: ExpectCardHeaderOptions,
+) {
+  const header = card.locator("header");
+
+  await expect(header.getByText(name, { exact: true })).toBeVisible();
+  await expect(header.getByText(address, { exact: true })).toBeVisible();
+}
+
+/** Verifies the seller-only bank details in the saved party card; a no-op for buyers. */
+async function expectBankDetailsInCard(card: Locator, party: Party) {
   const bankDetails = BANK_DETAILS[party];
 
   if (!bankDetails) {
     return;
   }
 
-  await expect(
-    form.getByRole("textbox", { name: "Account Number" }),
-  ).toHaveValue(bankDetails.accountNumber);
-
-  const accountNumberSwitch = form.getByTestId(
-    `${party}AccountNumberFieldIsVisible`,
-  );
-  await expect(accountNumberSwitch).not.toBeChecked();
-  await expect(accountNumberSwitch).toBeDisabled();
-
-  await expect(form.getByRole("textbox", { name: "SWIFT/BIC" })).toHaveValue(
-    bankDetails.swiftBic,
-  );
-
-  const swiftBicSwitch = form.getByTestId(`${party}SwiftBicFieldIsVisible`);
-  await expect(swiftBicSwitch).not.toBeChecked();
-  await expect(swiftBicSwitch).toBeDisabled();
+  await expectCardField(card, {
+    label: "Account Number",
+    value: bankDetails.accountNumber,
+    isHidden: true,
+  });
+  await expectCardField(card, {
+    label: "SWIFT/BIC",
+    value: bankDetails.swiftBic,
+    isHidden: true,
+  });
 }
 
 async function expectStoredBankDetails(
@@ -265,18 +297,16 @@ for (const party of PARTIES) {
 
       const manageDialog = getManagePartyDialog(page, party);
 
-      // Verify "Pre-fill with values from the current invoice form" switch is visible
+      // Verify "Fill in from this invoice" switch is visible
       const prefillSwitch = manageDialog.getByRole("switch", {
-        name: `Pre-fill with values from the current invoice form`,
+        name: `Fill in from this invoice`,
       });
       await expect(prefillSwitch).toBeVisible();
       await expect(prefillSwitch).not.toBeChecked();
 
       // Verify the label is visible
       await expect(
-        manageDialog.getByLabel(
-          "Pre-fill with values from the current invoice form",
-        ),
+        manageDialog.getByLabel("Fill in from this invoice"),
       ).toBeVisible();
 
       /*
@@ -292,7 +322,7 @@ for (const party of PARTIES) {
         .getByRole("textbox", { name: "Address" })
         .fill(testData.address);
 
-      // Fill Tax Number fieldset (Label and Value)
+      // Fill Tax Number fieldset (Label and Number)
       const vatNumberFieldset = manageDialog.getByRole("group", {
         name: `${label} Tax Number`,
       });
@@ -302,7 +332,7 @@ for (const party of PARTIES) {
         .fill(testData.vatNoLabelText);
 
       await vatNumberFieldset
-        .getByRole("textbox", { name: "Value" })
+        .getByRole("textbox", { name: "Number" })
         .fill(testData.vatNo);
 
       await manageDialog
@@ -313,7 +343,7 @@ for (const party of PARTIES) {
       await fillBankDetails(manageDialog, party);
 
       const emailSwitchInDialogForm = manageDialog.getByRole("switch", {
-        name: `Show ${PARTY_CONFIG[party].label} Email in PDF`,
+        name: `Show the 'Email' field in the PDF`,
       });
 
       const taxNumberSwitchInDialogForm = manageDialog.getByRole("switch", {
@@ -349,10 +379,10 @@ for (const party of PARTIES) {
       // Verify notes visibility switch is CHECKED by default
       await expect(notesSwitchInDialogForm).toBeChecked();
 
-      // Verify "Apply to Current Invoice" switch is checked by default
+      // Verify "Use on this invoice" is checked by default
       await expect(
-        manageDialog.getByRole("switch", {
-          name: "Apply to Current Invoice",
+        manageDialog.getByRole("checkbox", {
+          name: "Use on this invoice",
         }),
       ).toBeChecked();
 
@@ -403,68 +433,34 @@ for (const party of PARTIES) {
         testData.name,
       );
 
-      // Verify the locked banner is visible with correct text
-      const lockedBanner = partyForm.getByTestId(`${party}-locked-banner`);
-      await expect(lockedBanner).toBeVisible();
-      await expect(lockedBanner).toContainText(
-        `To modify ${party} details, click the Edit ${party} button (pencil icon) next to the dropdown above.`,
-      );
-
-      // Name
+      // A saved party shows as a read-only card of what the PDF prints, in place of
+      // the form fields
+      const savedCard = partyForm.getByTestId(`${party}-saved-card`);
+      await expect(savedCard).toBeVisible();
       await expect(
         partyForm.getByRole("textbox", { name: "Name (Required)" }),
-      ).toHaveValue(testData.name);
+      ).toBeHidden();
 
-      // Address
-      await expect(
-        partyForm.getByRole("textbox", { name: "Address (Required)" }),
-      ).toHaveValue(testData.address);
-
-      // Tax Number
-      const partyVatFieldset = partyForm.getByRole("group", {
-        name: `${label} Tax Number`,
+      await expectCardHeader(savedCard, {
+        name: testData.name,
+        address: testData.address,
       });
-
-      await expect(
-        partyVatFieldset.getByRole("textbox", { name: "Label" }),
-      ).toHaveValue(testData.vatNoLabelText);
-
-      await expect(
-        partyVatFieldset.getByRole("textbox", { name: "Value" }),
-      ).toHaveValue(testData.vatNo);
-
-      const vatNumberSwitchNotInDialog = partyForm.getByTestId(
-        `${party}VatNoFieldIsVisible`,
-      );
-      // Verify Tax Number switch is not checked as we toggled it off
-      await expect(vatNumberSwitchNotInDialog).not.toBeChecked();
-      await expect(vatNumberSwitchNotInDialog).toBeDisabled();
-
-      // Email
-      await expect(
-        partyForm.getByRole("textbox", { name: "Email" }),
-      ).toHaveValue(testData.email);
-
-      const emailSwitchNotInDialog = partyForm.getByRole("switch", {
-        name: `Show the 'Email' field in the PDF`,
+      // the tax number, email and bank details were hidden from the PDF in the dialog
+      await expectCardField(savedCard, {
+        label: testData.vatNoLabelText,
+        value: testData.vatNo,
+        isHidden: true,
       });
-      // Verify Email switch is not checked as we toggled it off
-      await expect(emailSwitchNotInDialog).not.toBeChecked();
-      await expect(emailSwitchNotInDialog).toBeDisabled();
-
-      // Bank details (sellers only)
-      await expectBankDetailsInForm(partyForm, party);
-
-      // Notes
-      await expect(
-        partyForm.getByRole("textbox", { name: "Notes" }),
-      ).toHaveValue(testData.notes);
-
-      const notesSwitchNotInDialog = partyForm.getByTestId(
-        `${party}NotesInvoiceFormFieldVisibilitySwitch`,
-      );
-      await expect(notesSwitchNotInDialog).toBeChecked();
-      await expect(notesSwitchNotInDialog).toBeDisabled();
+      await expectCardField(savedCard, {
+        label: "Email",
+        value: testData.email,
+        isHidden: true,
+      });
+      await expectBankDetailsInCard(savedCard, party);
+      await expectCardField(savedCard, {
+        label: "Notes",
+        value: testData.notes,
+      });
 
       /*
        * TEST EDIT FUNCTIONALITY IN PARTY MANAGEMENT DIALOG
@@ -489,7 +485,7 @@ for (const party of PARTIES) {
       await expect(
         manageDialog
           .getByRole("group", { name: `${label} Tax Number` })
-          .getByRole("textbox", { name: "Value" }),
+          .getByRole("textbox", { name: "Number" }),
       ).toHaveValue(testData.vatNo);
 
       await expect(
@@ -547,18 +543,24 @@ for (const party of PARTIES) {
        * TEST UPDATED INFORMATION IN INVOICE FORM AFTER UPDATING PARTY IN DIALOG
        */
 
+      // the card follows the edit: new name, email and tax number printed again,
+      // notes now hidden
       await expect(
-        partyForm.getByRole("textbox", { name: "Name" }),
-      ).toHaveValue(updatedName);
-
-      // Verify Email visibility is now enabled
-      await expect(emailSwitchNotInDialog).toBeChecked();
-
-      // Verify Tax Number visibility is now enabled
-      await expect(vatNumberSwitchNotInDialog).toBeChecked();
-
-      // Verify notes visibility switch is unchecked
-      await expect(notesSwitchNotInDialog).not.toBeChecked();
+        savedCard.locator("header").getByText(updatedName, { exact: true }),
+      ).toBeVisible();
+      await expectCardField(savedCard, {
+        label: "Email",
+        value: testData.email,
+      });
+      await expectCardField(savedCard, {
+        label: testData.vatNoLabelText,
+        value: testData.vatNo,
+      });
+      await expectCardField(savedCard, {
+        label: "Notes",
+        value: testData.notes,
+        isHidden: true,
+      });
     });
 
     test(`add ${party} without applying to invoice`, async ({ page }) => {
@@ -578,9 +580,9 @@ for (const party of PARTIES) {
         .getByRole("textbox", { name: "Email" })
         .fill(`unapplied@${party}.com`);
 
-      // Uncheck "Apply to Current Invoice" switch
-      const applyToInvoiceSwitch = manageDialog.getByRole("switch", {
-        name: "Apply to Current Invoice",
+      // Uncheck "Use on this invoice"
+      const applyToInvoiceSwitch = manageDialog.getByRole("checkbox", {
+        name: "Use on this invoice",
       });
 
       await expect(applyToInvoiceSwitch).toBeChecked();
@@ -609,7 +611,7 @@ for (const party of PARTIES) {
     });
 
     test(`switch and restore ${party} via dropdown`, async ({ page }) => {
-      // Add a party with "Apply to Current Invoice" checked (default)
+      // Add a party with "Use on this invoice" checked (default)
       await openNewPartyDialog(page, party);
 
       const manageDialog = getManagePartyDialog(page, party);
@@ -644,10 +646,8 @@ for (const party of PARTIES) {
         dropdownPartyName,
       );
 
-      // Verify locked banner is visible when a party is selected
-      await expect(
-        partyForm.getByTestId(`${party}-locked-banner`),
-      ).toBeVisible();
+      // Verify the saved card is shown when a party is selected
+      await expect(partyForm.getByTestId(`${party}-saved-card`)).toBeVisible();
 
       // Restore to default by selecting the empty option
       await partyDropdown.selectOption("");
@@ -662,10 +662,8 @@ for (const party of PARTIES) {
         `No ${party} selected (default)`,
       );
 
-      // Verify locked banner is hidden after deselecting the party
-      await expect(
-        partyForm.getByTestId(`${party}-locked-banner`),
-      ).toBeHidden();
+      // Verify the card gives way to the form after deselecting the party
+      await expect(partyForm.getByTestId(`${party}-saved-card`)).toBeHidden();
 
       // Verify form reset to default values
       await expectFormResetToDefaults(partyForm, party);
@@ -685,21 +683,17 @@ for (const party of PARTIES) {
         dropdownPartyName,
       );
 
-      // Verify locked banner is visible again after reselecting the party
-      await expect(
-        partyForm.getByTestId(`${party}-locked-banner`),
-      ).toBeVisible();
-
-      // Verify form fields are populated with the party's data
-      await expect(
-        partyForm.getByRole("textbox", { name: "Name" }),
-      ).toHaveValue(dropdownPartyName);
-      await expect(
-        partyForm.getByRole("textbox", { name: "Address" }),
-      ).toHaveValue(dropdownPartyAddress);
-      await expect(
-        partyForm.getByRole("textbox", { name: "Email" }),
-      ).toHaveValue(dropdownPartyEmail);
+      // Verify the card is back, with the party's data
+      const reselectedCard = partyForm.getByTestId(`${party}-saved-card`);
+      await expect(reselectedCard).toBeVisible();
+      await expectCardHeader(reselectedCard, {
+        name: dropdownPartyName,
+        address: dropdownPartyAddress,
+      });
+      await expectCardField(reselectedCard, {
+        label: "Email",
+        value: dropdownPartyEmail,
+      });
     });
 
     test(`delete ${party}`, async ({ page }) => {
@@ -802,18 +796,18 @@ for (const party of PARTIES) {
 
       const manageDialog = getManagePartyDialog(page, party);
       const prefillSwitch = manageDialog.getByRole("switch", {
-        name: "Pre-fill with values from the current invoice form",
+        name: "Fill in from this invoice",
       });
-      const applyToInvoiceSwitch = manageDialog.getByRole("switch", {
-        name: "Apply to Current Invoice",
+      const applyToInvoiceSwitch = manageDialog.getByRole("checkbox", {
+        name: "Use on this invoice",
       });
 
-      // Pre-fill switch defaults to off; toggle it on
+      // "Fill in from this invoice" defaults to off; toggle it on
       await expect(prefillSwitch).not.toBeChecked();
       await prefillSwitch.click();
       await expect(prefillSwitch).toBeChecked();
 
-      // "Apply to Current Invoice" switch defaults to on; toggle it off
+      // "Use on this invoice" defaults to on; turn it off
       await expect(applyToInvoiceSwitch).toBeChecked();
       await applyToInvoiceSwitch.click();
       await expect(applyToInvoiceSwitch).not.toBeChecked();
@@ -979,7 +973,7 @@ for (const party of PARTIES) {
           .fill(`Draft ${label}`);
 
         const prefillSwitch = manageDialog.getByRole("switch", {
-          name: "Pre-fill with values from the current invoice form",
+          name: "Fill in from this invoice",
         });
         await expect(prefillSwitch).not.toBeChecked();
 
@@ -991,7 +985,7 @@ for (const party of PARTIES) {
         // Switch has not changed yet — still OFF while dialog is open
         await expect(
           getManagePartyDialog(page, party).getByRole("switch", {
-            name: "Pre-fill with values from the current invoice form",
+            name: "Fill in from this invoice",
             includeHidden: true, // dialog is still open, but on one level deeper
           }),
         ).not.toBeChecked();
@@ -1014,7 +1008,7 @@ for (const party of PARTIES) {
         await nameInput.fill(`Draft ${label}`);
 
         const prefillSwitch = manageDialog.getByRole("switch", {
-          name: "Pre-fill with values from the current invoice form",
+          name: "Fill in from this invoice",
         });
         await prefillSwitch.click();
 
@@ -1050,7 +1044,7 @@ for (const party of PARTIES) {
         await nameInput.fill(`Draft ${label}`);
 
         const prefillSwitch = manageDialog.getByRole("switch", {
-          name: "Pre-fill with values from the current invoice form",
+          name: "Fill in from this invoice",
         });
         await prefillSwitch.click();
 
@@ -1078,7 +1072,7 @@ for (const party of PARTIES) {
 
         const manageDialog = getManagePartyDialog(page, party);
         const prefillSwitch = manageDialog.getByRole("switch", {
-          name: "Pre-fill with values from the current invoice form",
+          name: "Fill in from this invoice",
         });
 
         // Enable pre-fill while form is clean
@@ -1099,7 +1093,7 @@ for (const party of PARTIES) {
         // Switch remains ON while dialog is open
         await expect(
           getManagePartyDialog(page, party).getByRole("switch", {
-            name: "Pre-fill with values from the current invoice form",
+            name: "Fill in from this invoice",
             includeHidden: true, // dialog is still open, but on one level deeper
           }),
         ).toBeChecked();
@@ -1112,7 +1106,7 @@ for (const party of PARTIES) {
 
         const manageDialog = getManagePartyDialog(page, party);
         const prefillSwitch = manageDialog.getByRole("switch", {
-          name: "Pre-fill with values from the current invoice form",
+          name: "Fill in from this invoice",
         });
         const nameInput = manageDialog.getByRole("textbox", {
           name: "Name",
@@ -1154,7 +1148,7 @@ for (const party of PARTIES) {
 
         const manageDialog = getManagePartyDialog(page, party);
         const prefillSwitch = manageDialog.getByRole("switch", {
-          name: "Pre-fill with values from the current invoice form",
+          name: "Fill in from this invoice",
         });
         const nameInput = manageDialog.getByRole("textbox", {
           name: "Name",
