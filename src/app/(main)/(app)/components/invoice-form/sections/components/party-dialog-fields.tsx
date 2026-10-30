@@ -1,7 +1,7 @@
-import { Eye, EyeOff } from "lucide-react";
 import { useId } from "react";
 
-import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 interface PartyDialogSectionProps {
   title: string;
@@ -47,10 +47,7 @@ interface PdfVisibilityToggleProps {
   "data-testid"?: string;
 }
 
-/**
- * Whether a field is printed, as a pill that says so ("Show in PDF" / "Hidden in PDF"). It is a
- * switch to assistive tech, like the "Show in PDF" switches in the invoice form.
- */
+/** Whether a field is printed: the same small "Show in PDF" switch as the invoice form. */
 export function PdfVisibilityToggle({
   id,
   checked,
@@ -58,30 +55,20 @@ export function PdfVisibilityToggle({
   fieldLabel,
   "data-testid": dataTestId,
 }: PdfVisibilityToggleProps) {
-  const Icon = checked ? Eye : EyeOff;
-
   return (
-    <button
-      type="button"
-      role="switch"
-      id={id}
-      aria-checked={checked}
-      aria-label={`Show the '${fieldLabel}' field in the PDF`}
-      data-testid={dataTestId}
-      title={checked ? "Printed on the invoice" : "Left out of the invoice"}
-      onClick={() => {
-        onCheckedChange(!checked);
-      }}
-      className={cn(
-        "inline-flex h-[22px] shrink-0 items-center gap-1 rounded-full border px-2 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-1",
-        checked
-          ? "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-          : "border-slate-200 bg-slate-100 text-slate-500 hover:bg-slate-200/70",
-      )}
-    >
-      <Icon className="size-3" aria-hidden />
-      {checked ? "Show in PDF" : "Hidden in PDF"}
-    </button>
+    <div className="inline-flex shrink-0 items-center gap-2">
+      <Switch
+        id={id}
+        checked={checked}
+        onCheckedChange={onCheckedChange}
+        size="sm"
+        aria-label={`Show the '${fieldLabel}' field in the PDF`}
+        data-testid={dataTestId}
+      />
+      <Label htmlFor={id} className="cursor-pointer">
+        Show in PDF
+      </Label>
+    </div>
   );
 }
 

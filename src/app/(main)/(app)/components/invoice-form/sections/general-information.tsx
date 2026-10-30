@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import {
   AlertIcon,
   ErrorMessage,
+  FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME,
+  hiddenInPdfClassName,
   inputErrorClassName,
 } from "@/app/(main)/(app)/components/invoice-form/common";
 import {
@@ -147,6 +149,8 @@ export const GeneralInformation = memo(function GeneralInformation({
     control,
     name: "dateOfServiceFieldIsVisible",
   });
+  const isEndDatePrintedAsDateOfSales =
+    template === "default" && isDateOfServiceFieldVisible;
 
   // only the default template prints the end date a second time, as the date of sales,
   // and only while that field is shown; a warning takes the helper's place
@@ -998,7 +1002,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
           {/** Service period PDF label - default template only */}
           {template === "default" ? (
-            <div>
+            <div className={hiddenInPdfClassName(!isServicePeriodFieldVisible)}>
               <Label htmlFor="servicePeriodLabelText">
                 Service period label
               </Label>
@@ -1044,7 +1048,12 @@ export const GeneralInformation = memo(function GeneralInformation({
 
           {/** Service period start and end inputs */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="min-w-0">
+            <div
+              className={cn(
+                "min-w-0",
+                hiddenInPdfClassName(!isServicePeriodFieldVisible),
+              )}
+            >
               <Label htmlFor="dateOfServiceStart" className="mb-1">
                 Service period start
               </Label>
@@ -1083,7 +1092,17 @@ export const GeneralInformation = memo(function GeneralInformation({
               ) : null}
             </div>
 
-            <div className="min-w-0">
+            {/* the end date is also the "Date of sales" on the default template, so it is
+                only left out when neither prints it */}
+            <div
+              className={cn(
+                "min-w-0",
+                hiddenInPdfClassName(
+                  !isServicePeriodFieldVisible &&
+                    !isEndDatePrintedAsDateOfSales,
+                ),
+              )}
+            >
               <Label htmlFor="dateOfService" className="mb-1">
                 Service period end
               </Label>
@@ -1140,7 +1159,7 @@ export const GeneralInformation = memo(function GeneralInformation({
 
           {/** "Date of sales" PDF label - default template only */}
           {template === "default" ? (
-            <div>
+            <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
               <div className="relative mb-2 flex items-center justify-between">
                 <Label htmlFor="dateOfServiceLabelText">
                   Date of sales label
@@ -1233,7 +1252,7 @@ export const GeneralInformation = memo(function GeneralInformation({
       {/* HEADER & BRANDING */}
       <FormGroup title="Header & Branding">
         {/* Header Notes - Purpose is to add a custom text to the header of the invoice */}
-        <div>
+        <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
           <div className="relative mb-2 flex items-center justify-between">
             <Label htmlFor={`invoiceType`} className="">
               Header Notes

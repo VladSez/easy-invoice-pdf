@@ -8,9 +8,13 @@ import {
   type UseFieldArrayAppend,
   type UseFormGetValues,
   type UseFormSetValue,
+  useWatch,
 } from "react-hook-form";
 
-import { inputErrorClassName } from "@/app/(main)/(app)/components/invoice-form/common";
+import {
+  hiddenInPdfClassName,
+  inputErrorClassName,
+} from "@/app/(main)/(app)/components/invoice-form/common";
 import { DeleteIconButton } from "@/app/(main)/(app)/components/invoice-form/sections/components/delete-icon-button";
 import {
   DeleteInvoiceItemDialog,
@@ -83,6 +87,53 @@ export const InvoiceItems = memo(function InvoiceItems({
   const deleteTriggerRef = useRef<HTMLButtonElement | null>(null);
   const hasReachedItemLimit = fields.length >= MAX_INVOICE_ITEMS;
 
+  // the first item's switches show or hide a column for every item, so each item's field
+  // is faded when its column is left out of the PDF
+  const [
+    isNameVisible,
+    isTypeOfGTUVisible,
+    isAmountVisible,
+    isUnitVisible,
+    isNetPriceVisible,
+    isVatVisible,
+    isNetAmountVisible,
+    isVatAmountVisible,
+    isPreTaxAmountVisible,
+  ] = useWatch({
+    control,
+    name: [
+      "items.0.nameFieldIsVisible",
+      "items.0.typeOfGTUFieldIsVisible",
+      "items.0.amountFieldIsVisible",
+      "items.0.unitFieldIsVisible",
+      "items.0.netPriceFieldIsVisible",
+      "items.0.vatFieldIsVisible",
+      "items.0.netAmountFieldIsVisible",
+      "items.0.vatAmountFieldIsVisible",
+      "items.0.preTaxAmountFieldIsVisible",
+    ],
+  });
+  // most column switches exist on the default template only; the Stripe one prints them all
+  const isDefaultTemplate = template === "default";
+
+  const isNameHidden = isDefaultTemplate && !isNameVisible;
+
+  const isTypeOfGTUHidden = isDefaultTemplate && !isTypeOfGTUVisible;
+
+  const isAmountHidden = isDefaultTemplate && !isAmountVisible;
+
+  const isUnitHidden = !isUnitVisible;
+
+  const isNetPriceHidden = isDefaultTemplate && !isNetPriceVisible;
+
+  const isVatHidden = !isVatVisible;
+
+  const isNetAmountHidden = isDefaultTemplate && !isNetAmountVisible;
+
+  const isVatAmountHidden = isDefaultTemplate && !isVatAmountVisible;
+
+  const isPreTaxAmountHidden = isDefaultTemplate && !isPreTaxAmountVisible;
+
   return (
     <>
       {fields.map((field, index) => {
@@ -116,7 +167,7 @@ export const InvoiceItems = memo(function InvoiceItems({
             ) : null}
             <Legend>Item {index + 1}</Legend>
             <div className="relative mb-8 space-y-4">
-              <div>
+              <div className={hiddenInPdfClassName(isNameHidden)}>
                 {/* Invoice Item Name */}
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemName${index}`} className="">
@@ -180,7 +231,7 @@ export const InvoiceItems = memo(function InvoiceItems({
 
               {/* Invoice Item Type of GTU - Only show for default template */}
               {template === "default" ? (
-                <div>
+                <div className={hiddenInPdfClassName(isTypeOfGTUHidden)}>
                   <div className="mb-2 flex items-center justify-between">
                     <Label htmlFor={`itemTypeOfGTU${index}`} className="">
                       Type of GTU
@@ -247,7 +298,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               ) : null}
 
               {/* Invoice Item Amount */}
-              <div>
+              <div className={hiddenInPdfClassName(isAmountHidden)}>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemAmount${index}`} className="">
                     Amount (Quantity)
@@ -327,7 +378,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               </div>
 
               {/* Invoice Item Unit */}
-              <div>
+              <div className={hiddenInPdfClassName(isUnitHidden)}>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemUnit${index}`} className="">
                     Unit
@@ -389,7 +440,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               </div>
 
               {/* Invoice Item Net Price */}
-              <div>
+              <div className={hiddenInPdfClassName(isNetPriceHidden)}>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemNetPrice${index}`} className="">
                     Net Price (Rate or Unit Price)
@@ -502,7 +553,12 @@ export const InvoiceItems = memo(function InvoiceItems({
               />
 
               {/* Invoice Item Tax Settings */}
-              <fieldset className="rounded-md border px-4 pb-4">
+              <fieldset
+                className={cn(
+                  "rounded-md border px-4 pb-4",
+                  hiddenInPdfClassName(isVatHidden),
+                )}
+              >
                 <legend className="text-base font-semibold lg:text-lg">
                   Tax Settings
                 </legend>
@@ -606,7 +662,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               </fieldset>
 
               {/* Invoice Item Net Amount */}
-              <div>
+              <div className={hiddenInPdfClassName(isNetAmountHidden)}>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemNetAmount${index}`} className="">
                     Net Amount
@@ -681,7 +737,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               </div>
 
               {/* Invoice Item Tax Amount (calculated automatically - read only) */}
-              <div>
+              <div className={hiddenInPdfClassName(isVatAmountHidden)}>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemVatAmount${index}`} className="">
                     {taxLabelText} Amount
@@ -756,7 +812,7 @@ export const InvoiceItems = memo(function InvoiceItems({
               </div>
 
               {/* Pre-tax Amount field (calculated automatically - read only) */}
-              <div>
+              <div className={hiddenInPdfClassName(isPreTaxAmountHidden)}>
                 <div className="mb-2 flex items-center justify-between">
                   <Label htmlFor={`itemPreTaxAmount${index}`} className="">
                     Pre-tax Amount

@@ -9,7 +9,10 @@ import {
   useWatch,
 } from "react-hook-form";
 
-import { inputErrorClassName } from "@/app/(main)/(app)/components/invoice-form/common";
+import {
+  FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME,
+  inputErrorClassName,
+} from "@/app/(main)/(app)/components/invoice-form/common";
 import { BuyerManagement } from "@/app/(main)/(app)/components/invoice-form/sections/components/buyer/buyer-management";
 import { SavedContactCard } from "@/app/(main)/(app)/components/invoice-form/sections/components/contact-fields";
 import { type BuyerData, type InvoiceData } from "@/app/schema";
@@ -125,7 +128,7 @@ export const BuyerInformation = memo(function BuyerInformation({
               ) : null}
             </div>
 
-            <div>
+            <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
               <fieldset className="rounded-md border px-4 pb-4">
                 <legend className="text-base font-semibold lg:text-lg">
                   Buyer Tax Number
@@ -225,7 +228,7 @@ export const BuyerInformation = memo(function BuyerInformation({
             </div>
 
             {/* Email */}
-            <div>
+            <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
               <div className="relative mb-2 flex items-center justify-between">
                 <Label htmlFor="buyerEmail">Email</Label>
 
@@ -277,7 +280,7 @@ export const BuyerInformation = memo(function BuyerInformation({
             </div>
 
             {/* Notes */}
-            <div>
+            <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
               <div className="relative mb-2 flex items-center justify-between">
                 <Label htmlFor="buyerNotes">Notes</Label>
 

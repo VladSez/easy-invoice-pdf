@@ -619,22 +619,36 @@ export function BuyerDialog({
           <DialogFooter className="border-border gap-3 border-t px-6 py-4 sm:items-center sm:justify-between">
             {/* where the choice is made: next to Save, rather than at the end of the form */}
             {!isEditMode ? (
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="apply-buyer-to-current-invoice-switch"
-                  checked={shouldApplyNewBuyerToInvoice}
-                  onChange={(event) => {
-                    setShouldApplyNewBuyerToInvoice(event.target.checked);
-                  }}
-                  className="size-4 cursor-pointer accent-slate-900"
-                />
-                <Label
-                  htmlFor="apply-buyer-to-current-invoice-switch"
-                  className="cursor-pointer font-normal"
+              <div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="apply-buyer-to-current-invoice-switch"
+                    checked={shouldApplyNewBuyerToInvoice}
+                    onChange={(event) => {
+                      setShouldApplyNewBuyerToInvoice(event.target.checked);
+                    }}
+                    aria-describedby="apply-buyer-to-current-invoice-description"
+                    className="size-4 cursor-pointer accent-slate-900"
+                  />
+
+                  <Label
+                    htmlFor="apply-buyer-to-current-invoice-switch"
+                    className="cursor-pointer font-normal"
+                  >
+                    Use on this invoice
+                  </Label>
+                </div>
+
+                {/* says what Save will do with the current choice */}
+                <p
+                  id="apply-buyer-to-current-invoice-description"
+                  className="ml-6 mt-0.5 max-w-64 text-pretty text-xs text-slate-500"
                 >
-                  Use on this invoice
-                </Label>
+                  {shouldApplyNewBuyerToInvoice
+                    ? "Replaces the buyer on this invoice with this one."
+                    : "Only saved to your list. This invoice keeps its buyer."}
+                </p>
               </div>
             ) : (
               <span aria-hidden />

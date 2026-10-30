@@ -7,7 +7,10 @@ import {
   useWatch,
 } from "react-hook-form";
 
-import { inputErrorClassName } from "@/app/(main)/(app)/components/invoice-form/common";
+import {
+  FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME,
+  inputErrorClassName,
+} from "@/app/(main)/(app)/components/invoice-form/common";
 import { SavedContactCard } from "@/app/(main)/(app)/components/invoice-form/sections/components/contact-fields";
 import { SellerManagement } from "@/app/(main)/(app)/components/invoice-form/sections/components/seller/seller-management";
 import { type InvoiceData, type SellerData } from "@/app/schema";
@@ -127,7 +130,7 @@ export const SellerInformation = memo(function SellerInformation({
               ) : null}
             </div>
 
-            <div>
+            <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
               <fieldset className="rounded-md border px-4 pb-4">
                 <legend className="text-base font-semibold lg:text-lg">
                   Seller Tax Number
@@ -227,7 +230,7 @@ export const SellerInformation = memo(function SellerInformation({
             </div>
 
             {/* Email */}
-            <div>
+            <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
               <div className="relative mb-2 flex items-center justify-between">
                 <Label htmlFor="sellerEmail">Email</Label>
 
@@ -279,7 +282,7 @@ export const SellerInformation = memo(function SellerInformation({
             </div>
 
             {/* Account Number */}
-            <div>
+            <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
               <div className="relative mb-2 flex items-center justify-between">
                 <Label htmlFor="sellerAccountNumber">Account Number</Label>
 
@@ -335,7 +338,7 @@ export const SellerInformation = memo(function SellerInformation({
             </div>
 
             {/* SWIFT/BIC */}
-            <div>
+            <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
               <div className="relative mb-2 flex items-center justify-between">
                 <Label htmlFor="sellerSwiftBic">SWIFT/BIC</Label>
 
@@ -388,7 +391,7 @@ export const SellerInformation = memo(function SellerInformation({
             </div>
 
             {/* Notes */}
-            <div>
+            <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
               <div className="relative mb-2 flex items-center justify-between">
                 <Label htmlFor="sellerNotes">Notes</Label>
                 <div className="inline-flex items-center gap-2">

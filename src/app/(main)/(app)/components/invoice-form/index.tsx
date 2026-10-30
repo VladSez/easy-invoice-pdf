@@ -37,10 +37,11 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { cn } from "@/lib/utils";
 import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
 import type { NonReadonly, Prettify } from "@/types";
 
-import { ErrorMessage } from "./common";
+import { ErrorMessage, FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME } from "./common";
 import { ItemTotalsSync } from "./item-totals-sync";
 import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
@@ -511,7 +512,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
         {/* Payment Method (Only show for default template) */}
         {template === "default" ? (
-          <div>
+          <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
             <div className="relative mb-2 mt-6 flex items-center justify-between">
               <Label htmlFor={`paymentMethod`} className="">
                 Payment Method
@@ -567,7 +568,7 @@ export const InvoiceForm = memo(function InvoiceForm({
         ) : null}
 
         {/* Notes */}
-        <div className="">
+        <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
           <div className="relative mb-2 flex items-center justify-between">
             <Label htmlFor={`notes`} className="">
               Notes
@@ -619,7 +620,12 @@ export const InvoiceForm = memo(function InvoiceForm({
         </div>
 
         {/* QR Code */}
-        <fieldset className="rounded-md border px-4 pb-4">
+        <fieldset
+          className={cn(
+            "rounded-md border px-4 pb-4",
+            FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME,
+          )}
+        >
           <legend className="text-base font-semibold lg:text-lg">
             QR Code
           </legend>
@@ -716,7 +722,12 @@ export const InvoiceForm = memo(function InvoiceForm({
         */}
         {invoiceData.template === "default" ? (
           <>
-            <fieldset className="rounded-md border px-4 pb-4">
+            <fieldset
+              className={cn(
+                "rounded-md border px-4 pb-4",
+                FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME,
+              )}
+            >
               <legend className="text-base font-semibold lg:text-lg">
                 Person Authorized to Receive
               </legend>
@@ -783,7 +794,12 @@ export const InvoiceForm = memo(function InvoiceForm({
               </div>
             </fieldset>
 
-            <fieldset className="rounded-md border px-4 pb-4">
+            <fieldset
+              className={cn(
+                "rounded-md border px-4 pb-4",
+                FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME,
+              )}
+            >
               <legend className="text-base font-semibold lg:text-lg">
                 Person Authorized to Issue
               </legend>
