@@ -12,7 +12,6 @@ import {
   setAppStorageItem,
 } from "@/app/(main)/(app)/utils/app-local-storage";
 import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
-import { formatDateWithLocale } from "@/app/(main)/(app)/utils/format-date-with-locale";
 import { updateAppMetadata } from "@/app/(main)/(app)/utils/get-app-metadata";
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
@@ -30,7 +29,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ButtonHelper } from "@/components/ui/button-helper";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
 import { Label } from "@/components/ui/label";
@@ -39,10 +37,11 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { cn } from "@/lib/utils";
 import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
 import type { NonReadonly, Prettify } from "@/types";
 
-import { AlertIcon, ErrorMessage } from "./common";
+import { ErrorMessage, FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME } from "./common";
 import { ItemTotalsSync } from "./item-totals-sync";
 import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
@@ -116,32 +115,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   const currency = useWatch({ control, name: "currency" });
 
   const dateOfIssue = useWatch({ control, name: "dateOfIssue" });
-
-  const paymentDue = useWatch({ control, name: "paymentDue" });
   const language = useWatch({ control, name: "language" });
-  const selectedDateFormat = useWatch({ control, name: "dateFormat" });
-
-  const isPaymentDueBeforeDateOfIssue = dayjs(paymentDue).isBefore(
-    dayjs(dateOfIssue),
-  );
-
-  // payment due date is 14 days after the date of issue or the same day
-  const isPaymentDue14DaysFromDateOfIssue =
-    dayjs(paymentDue).isAfter(dayjs(dateOfIssue).add(14, "days")) ||
-    dayjs(paymentDue).isSame(dayjs(dateOfIssue).add(14, "days"));
-
-  // Helper texts quote dates back to the user, so they are formatted the way the
-  // PDF will render them: the invoice's date format AND its language.
-  const formattedDateOfIssue = formatDateWithLocale({
-    date: dateOfIssue,
-    selectedDateFormat,
-    language,
-  });
-  const formattedSuggestedPaymentDue = formatDateWithLocale({
-    date: dayjs(dateOfIssue).add(14, "days"),
-    selectedDateFormat,
-    language,
-  });
 
   const { fields, append } = useFieldArray({
     control,
@@ -538,7 +512,7 @@ export const InvoiceForm = memo(function InvoiceForm({
 
         {/* Payment Method (Only show for default template) */}
         {template === "default" ? (
-          <div>
+          <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
             <div className="relative mb-2 mt-6 flex items-center justify-between">
               <Label htmlFor={`paymentMethod`} className="">
                 Payment Method
@@ -593,82 +567,8 @@ export const InvoiceForm = memo(function InvoiceForm({
           </div>
         ) : null}
 
-        {/* Payment Due */}
-        <div>
-          <div className="mb-6">
-            <Label htmlFor={`paymentDue`} className="mb-1">
-              Payment Due
-            </Label>
-            <Controller
-              name="paymentDue"
-              control={control}
-              render={({ field }) => {
-                return (
-                  <Input
-                    {...field}
-                    id={`paymentDue`}
-                    type="date"
-                    className=""
-                  />
-                );
-              }}
-            />
-            {errors.paymentDue ? (
-              <ErrorMessage>{errors.paymentDue.message}</ErrorMessage>
-            ) : null}
-            {!errors.paymentDue &&
-            isPaymentDueBeforeDateOfIssue &&
-            dateOfIssue ? (
-              <InputHelperMessage>
-                <span className="flex items-center text-balance text-amber-800">
-                  <AlertIcon />
-                  Payment due date is before date of issue (
-                  {formattedDateOfIssue})
-                </span>
-                <ButtonHelper
-                  onClick={() => {
-                    const newPaymentDue = dayjs(dateOfIssue)
-                      .add(14, "days")
-                      .format("YYYY-MM-DD"); // default browser date input format is YYYY-MM-DD
-
-                    setValue("paymentDue", newPaymentDue);
-                  }}
-                >
-                  <span className="text-pretty">
-                    Set payment due date to {formattedSuggestedPaymentDue} (14
-                    days from issue date)
-                  </span>
-                </ButtonHelper>
-              </InputHelperMessage>
-            ) : null}
-            {/* If there are no errors and the payment due date is not before the date of issue and the payment due date is not 14 days after the date of issue, show the button to set the payment due date to 14 days after the date of issue (probably a bit better UX) */}
-            {!errors.paymentDue &&
-            !isPaymentDueBeforeDateOfIssue &&
-            !isPaymentDue14DaysFromDateOfIssue &&
-            dateOfIssue ? (
-              <InputHelperMessage>
-                <ButtonHelper
-                  className="whitespace-normal"
-                  onClick={() => {
-                    const newPaymentDue = dayjs(dateOfIssue)
-                      .add(14, "days")
-                      .format("YYYY-MM-DD");
-
-                    setValue("paymentDue", newPaymentDue);
-                  }}
-                >
-                  <span className="text-pretty">
-                    Set payment due date to {formattedSuggestedPaymentDue} (14
-                    days from issue date)
-                  </span>
-                </ButtonHelper>
-              </InputHelperMessage>
-            ) : null}
-          </div>
-        </div>
-
         {/* Notes */}
-        <div className="">
+        <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
           <div className="relative mb-2 flex items-center justify-between">
             <Label htmlFor={`notes`} className="">
               Notes
@@ -720,7 +620,12 @@ export const InvoiceForm = memo(function InvoiceForm({
         </div>
 
         {/* QR Code */}
-        <fieldset className="rounded-md border px-4 pb-4">
+        <fieldset
+          className={cn(
+            "rounded-md border px-4 pb-4",
+            FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME,
+          )}
+        >
           <legend className="text-base font-semibold lg:text-lg">
             QR Code
           </legend>
@@ -817,7 +722,12 @@ export const InvoiceForm = memo(function InvoiceForm({
         */}
         {invoiceData.template === "default" ? (
           <>
-            <fieldset className="rounded-md border px-4 pb-4">
+            <fieldset
+              className={cn(
+                "rounded-md border px-4 pb-4",
+                FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME,
+              )}
+            >
               <legend className="text-base font-semibold lg:text-lg">
                 Person Authorized to Receive
               </legend>
@@ -884,7 +794,12 @@ export const InvoiceForm = memo(function InvoiceForm({
               </div>
             </fieldset>
 
-            <fieldset className="rounded-md border px-4 pb-4">
+            <fieldset
+              className={cn(
+                "rounded-md border px-4 pb-4",
+                FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME,
+              )}
+            >
               <legend className="text-base font-semibold lg:text-lg">
                 Person Authorized to Issue
               </legend>

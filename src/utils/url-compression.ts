@@ -66,6 +66,7 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   paymentMethodFieldIsVisible: "q",
   paymentDue: "r",
   stripePayOnlineUrl: "s",
+  stripeTopLineColor: "+",
   notes: "t",
   notesFieldIsVisible: "u",
 

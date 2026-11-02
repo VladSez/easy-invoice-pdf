@@ -7,6 +7,7 @@ import { ContactsBackupMenu } from "@/app/(main)/(app)/components/invoice-form/s
 import { SellerDialog } from "@/app/(main)/(app)/components/invoice-form/sections/components/seller/seller-dialog";
 import { usePartyActions } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-party-actions";
 import { useSavedParties } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-saved-parties";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import { type InvoiceData, type SellerData } from "@/app/schema";
 import {
   AlertDialog,
@@ -262,8 +263,9 @@ export function SellerManagement({
       </div>
 
       <SellerDialog
-        // we need to rerender the dialog when the editingSeller changes
-        key={editingSeller?.id}
+        // remount for another seller to edit, and after a language change, so a new
+        // seller starts with that language's tax label (the form only reads its defaults once)
+        key={`${editingSeller?.id ?? "new"}-${invoiceData.language}`}
         isOpen={isSellerDialogOpen}
         onClose={() => {
           setIsSellerDialogOpen(false);
@@ -284,6 +286,9 @@ export function SellerManagement({
         initialData={editingSeller}
         isEditMode={isEditMode}
         formValues={formValues}
+        defaultVatNoLabelText={
+          INVOICE_PDF_TRANSLATIONS[invoiceData.language].seller.vatNo
+        }
       />
 
       {/* Delete alert seller dialog */}

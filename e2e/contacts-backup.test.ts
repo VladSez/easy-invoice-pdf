@@ -154,10 +154,10 @@ test.describe("Sellers & buyers backup", () => {
     ).toBeVisible();
     await expect(
       importDialog.getByRole("list", { name: "Sellers" }),
-    ).toContainText(SELLER.name);
+    ).toContainText(`${SELLER.name}${SELLER.address}`);
     await expect(
       importDialog.getByRole("list", { name: "Buyers" }),
-    ).toContainText(BUYER.name);
+    ).toContainText(`${BUYER.name}${BUYER.address}`);
 
     // Nothing is saved before the user confirms
     await expect(sellerDropdown).toBeHidden();
@@ -209,7 +209,7 @@ test.describe("Sellers & buyers backup", () => {
     ).toBeVisible();
     await expect(
       importDialog.getByRole("list", { name: "Sellers" }),
-    ).toContainText(`${SELLER.name}${SELLER.address}Already saved`);
+    ).toContainText(`${SELLER.name}${SELLER.address}`);
     await expect(
       importDialog.getByRole("button", { name: /^Import/ }),
     ).toBeHidden();

@@ -1,6 +1,12 @@
 // @vitest-environment happy-dom
 
-import { cleanup, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useForm, useWatch } from "react-hook-form";
 import {
@@ -50,6 +56,14 @@ interface HarnessProps {
   /** Left out by default, like an invoice that has never picked a number format. */
   numberFormatLocale?: InvoiceData["numberFormatLocale"];
   preserveNumberFormatOnLanguageChange?: InvoiceData["preserveNumberFormatOnLanguageChange"];
+  template?: InvoiceData["template"];
+  paymentDue?: string;
+  dateOfService?: string;
+  dateOfServiceStart?: string;
+  invoiceNumberValue?: string;
+  servicePeriodFieldIsVisible?: boolean;
+  dateOfServiceFieldIsVisible?: boolean;
+  dateOfServiceLabelText?: string;
 }
 
 function GeneralInformationHarness({
@@ -58,15 +72,41 @@ function GeneralInformationHarness({
   dateOfIssue = STALE_DATE_OF_ISSUE,
   numberFormatLocale,
   preserveNumberFormatOnLanguageChange,
+  template = "default",
+  paymentDue,
+  dateOfService,
+  dateOfServiceStart,
+  invoiceNumberValue,
+  servicePeriodFieldIsVisible = true,
+  dateOfServiceFieldIsVisible = true,
+  dateOfServiceLabelText,
 }: HarnessProps) {
+  const initialInvoiceData = getInitialInvoiceData();
+
   const { control, setValue } = useForm<InvoiceData>({
     defaultValues: {
-      ...getInitialInvoiceData(),
+      ...initialInvoiceData,
       language,
       dateFormat,
       dateOfIssue,
       numberFormatLocale,
       preserveNumberFormatOnLanguageChange,
+      template,
+      // `""` is kept: it is a cleared date input
+      ...(paymentDue === undefined ? {} : { paymentDue }),
+      ...(dateOfService ? { dateOfService } : {}),
+      ...(dateOfServiceStart ? { dateOfServiceStart } : {}),
+      servicePeriodFieldIsVisible,
+      dateOfServiceFieldIsVisible,
+      ...(dateOfServiceLabelText ? { dateOfServiceLabelText } : {}),
+      ...(invoiceNumberValue
+        ? {
+            invoiceNumberObject: {
+              ...initialInvoiceData.invoiceNumberObject,
+              value: invoiceNumberValue,
+            },
+          }
+        : {}),
     },
   });
 
@@ -74,6 +114,7 @@ function GeneralInformationHarness({
   // to `setValue` the same way they do in the app.
   const currentDateOfIssue = useWatch({ control, name: "dateOfIssue" });
   const currentPaymentDue = useWatch({ control, name: "paymentDue" });
+  const currentTopLineColor = useWatch({ control, name: "stripeTopLineColor" });
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -85,6 +126,9 @@ function GeneralInformationHarness({
         isMobile={false}
       />
       <output data-testid="payment-due-readout">{currentPaymentDue}</output>
+      <output data-testid="top-line-color-readout">
+        {currentTopLineColor ?? "unset"}
+      </output>
     </TooltipProvider>
   );
 }
@@ -98,7 +142,7 @@ function getSetDateOfIssueToTodayButton() {
 }
 
 function getNumberFormatSelect() {
-  return screen.getByLabelText("Format");
+  return screen.getByLabelText("Number Format");
 }
 
 function getPreserveNumberFormatSwitch() {
@@ -146,7 +190,7 @@ describe("GeneralInformation date helper texts", () => {
       renderGeneralInformation({ language: "en" });
 
       expect(getSetDateOfIssueToTodayButton()).toHaveTextContent(
-        "Set date of issue to today (September 15, 2026)",
+        "Use September 15, 2026",
       );
     });
 
@@ -166,7 +210,7 @@ describe("GeneralInformation date helper texts", () => {
         renderGeneralInformation({ language });
 
         expect(getSetDateOfIssueToTodayButton()).toHaveTextContent(
-          `Set date of issue to today (${expectedDate})`,
+          `Use ${expectedDate}`,
         );
       },
     );
@@ -175,7 +219,7 @@ describe("GeneralInformation date helper texts", () => {
       renderGeneralInformation({ language: "pl", dateFormat: "D MMM YYYY" });
 
       expect(getSetDateOfIssueToTodayButton()).toHaveTextContent(
-        "Set date of issue to today (15 wrz 2026)",
+        "Use 15 wrz 2026",
       );
     });
 
@@ -183,23 +227,118 @@ describe("GeneralInformation date helper texts", () => {
       renderGeneralInformation({ language: "ru", dateFormat: "YYYY-MM-DD" });
 
       expect(getSetDateOfIssueToTodayButton()).toHaveTextContent(
-        "Set date of issue to today (2026-09-15)",
+        "Use 2026-09-15",
       );
     });
 
-    it("sets the date of issue and the payment due date when clicked", async () => {
+    it("sets the date of issue and keeps the payment term when clicked", async () => {
       const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
-      renderGeneralInformation();
+      // due 7 days after issue
+      renderGeneralInformation({ paymentDue: "2026-06-17" });
 
       await user.click(getSetDateOfIssueToTodayButton());
 
-      expect(screen.getByLabelText("Date of Issue")).toHaveValue("2026-09-15");
+      expect(screen.getByLabelText("Date of issue")).toHaveValue("2026-09-15");
       expect(screen.getByTestId("payment-due-readout")).toHaveTextContent(
-        "2026-09-29",
+        "2026-09-22",
       );
       expect(
         screen.queryByRole("button", { name: /set date of issue to today/i }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe("payment due and the date of issue", () => {
+    it("moves the payment due date along with the date of issue, keeping its term", () => {
+      // due 30 days after issue
+      renderGeneralInformation({ paymentDue: "2026-07-10" });
+
+      // a date picker hands over the whole date at once
+      fireEvent.change(screen.getByLabelText("Date of issue"), {
+        target: { value: "2026-08-01" },
+      });
+
+      expect(screen.getByTestId("payment-due-readout")).toHaveTextContent(
+        "2026-08-31",
+      );
+    });
+
+    it("does not call a payment term other than 14 days out of date", () => {
+      renderGeneralInformation({
+        dateOfIssue: "2026-09-15",
+        // due 7 days after issue
+        paymentDue: "2026-09-22",
+        dateOfServiceStart: "2026-09-01",
+        dateOfService: "2026-09-30",
+        invoiceNumberValue: "1/09-2026",
+      });
+
+      expect(
+        screen.queryByTestId("out-of-date-dates-helper"),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe("out-of-date field warnings", () => {
+    it("offers this month's invoice number and applies it", async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+      renderGeneralInformation({ invoiceNumberValue: "1/10-2025" });
+
+      const fixButton = screen.getByRole("button", {
+        name: "Set invoice number to 1/09-2026",
+      });
+      expect(fixButton).toHaveTextContent("Use 1/09-2026");
+
+      await user.click(fixButton);
+
+      expect(
+        screen.getByRole("textbox", { name: "Invoice number" }),
+      ).toHaveValue("1/09-2026");
+      expect(fixButton).not.toBeInTheDocument();
+    });
+
+    it("keeps the same short message for a date from last year", () => {
+      renderGeneralInformation({ dateOfServiceStart: "2025-09-01" });
+
+      const startField = screen
+        .getByLabelText("Service period start")
+        .closest("div");
+      expect(startField).not.toBeNull();
+      expect(
+        within(startField as HTMLElement).getByText("Not current month"),
+      ).toBeInTheDocument();
+    });
+
+    it("moves the service period to the current month", async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+      renderGeneralInformation({
+        dateOfServiceStart: "2026-08-01",
+        dateOfService: "2026-08-31",
+      });
+
+      await user.click(
+        screen.getByRole("button", {
+          name: "Set service period start to September 1, 2026",
+        }),
+      );
+      await user.click(
+        screen.getByRole("button", {
+          name: "Set service period end to September 30, 2026",
+        }),
+      );
+
+      expect(screen.getByLabelText("Service period start")).toHaveValue(
+        "2026-09-01",
+      );
+      expect(screen.getByLabelText("Service period end")).toHaveValue(
+        "2026-09-30",
+      );
+      expect(screen.queryByText("Not current month")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Not end of current month"),
       ).not.toBeInTheDocument();
     });
   });
@@ -239,36 +378,34 @@ describe("GeneralInformation date helper texts", () => {
     });
   });
 
-  describe('"Keep format when language changes" switch', () => {
+  describe('"Keep number format when changing language" switch', () => {
     it("is off on an invoice that has never turned it on", () => {
       renderGeneralInformation();
 
       expect(getPreserveNumberFormatSwitch()).not.toBeChecked();
     });
 
-    it("says under the switch whether the format follows the language", async () => {
+    it("says under the switch what a language change does to the format", async () => {
       const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
       renderGeneralInformation();
 
       expect(
         screen.getByText(
-          "By default, the number format follows the PDF language",
+          "Changing the PDF language also changes the number format.",
         ),
       ).toBeInTheDocument();
 
       await user.click(getPreserveNumberFormatSwitch());
 
       expect(
-        screen.getByText(
-          "The number format stays as it is when you switch the PDF language",
-        ),
+        screen.getByText("Changing the PDF language keeps the number format."),
       ).toBeInTheDocument();
     });
 
     /**
      * No `aria-label` overriding it, so what a screen reader announces is the text on
-     * screen -- which is what lets someone say "keep format when language changes" to a
+     * screen -- which is what lets someone say "keep number format when changing language" to a
      * voice control tool and have it hit this switch (WCAG 2.5.3).
      */
     it("is named by its visible label", () => {
@@ -276,7 +413,7 @@ describe("GeneralInformation date helper texts", () => {
 
       expect(
         screen.getByRole("switch", {
-          name: "Keep format when language changes",
+          name: "Keep number format when changing language",
         }),
       ).toBe(getPreserveNumberFormatSwitch());
     });
@@ -287,7 +424,9 @@ describe("GeneralInformation date helper texts", () => {
       renderGeneralInformation();
 
       // the label is what a pointer lands on, so `htmlFor` has to reach the switch
-      await user.click(screen.getByText("Keep format when language changes"));
+      await user.click(
+        screen.getByText("Keep number format when changing language"),
+      );
 
       expect(getPreserveNumberFormatSwitch()).toBeChecked();
     });
@@ -345,7 +484,9 @@ describe("GeneralInformation date helper texts", () => {
 
       await selectInvoiceLanguage({ user, language: "pl" });
 
-      expect(screen.getByLabelText("Label")).toHaveValue("Faktura nr:");
+      expect(screen.getByLabelText("Invoice number label")).toHaveValue(
+        "Faktura nr:",
+      );
       expect(getNumberFormatSelect()).toHaveValue("international");
     });
   });
@@ -358,6 +499,157 @@ describe("GeneralInformation date helper texts", () => {
 
       expect(banner).toBeVisible();
       expect(banner).toHaveTextContent("settembre 15, 2026");
+    });
+
+    // every other date is current, so the cleared payment due date is the only trigger
+    it("opens for a payment due date that is not set", () => {
+      renderGeneralInformation({
+        dateOfIssue: "2026-09-15",
+        paymentDue: "",
+        dateOfServiceStart: "2026-09-01",
+        dateOfService: "2026-09-30",
+        invoiceNumberValue: "1/09-2026",
+      });
+
+      expect(screen.getByTestId("out-of-date-dates-helper")).toBeVisible();
+    });
+  });
+
+  describe("payment terms", () => {
+    it("marks the term the payment due date already matches", () => {
+      renderGeneralInformation({
+        dateOfIssue: "2026-09-15",
+        paymentDue: "2026-09-29",
+      });
+
+      const terms = screen.getByRole("group", { name: /payment terms/i });
+
+      expect(
+        within(terms).getByRole("button", { name: "14 days" }),
+      ).toHaveAttribute("aria-pressed", "true");
+      expect(screen.getByText("Due 14 days after issue")).toBeInTheDocument();
+    });
+
+    it("moves the payment due date to the picked term", async () => {
+      const user = userEvent.setup();
+      renderGeneralInformation({
+        dateOfIssue: "2026-09-15",
+        paymentDue: "2026-09-29",
+      });
+
+      await user.click(screen.getByRole("button", { name: "30 days" }));
+
+      expect(screen.getByTestId("payment-due-readout")).toHaveTextContent(
+        "2026-10-15",
+      );
+      expect(screen.getByText("Due 30 days after issue")).toBeInTheDocument();
+    });
+  });
+
+  describe("top line color", () => {
+    it("is not offered on the default template", () => {
+      renderGeneralInformation({ template: "default" });
+
+      expect(screen.queryByText("Top line color")).not.toBeInTheDocument();
+    });
+
+    it("writes the picked color to the form on the Stripe template", async () => {
+      const user = userEvent.setup();
+      renderGeneralInformation({ template: "stripe" });
+
+      expect(screen.getByTestId("top-line-color-readout")).toHaveTextContent(
+        "unset",
+      );
+
+      await user.click(screen.getByRole("button", { name: "Emerald" }));
+
+      expect(screen.getByTestId("top-line-color-readout")).toHaveTextContent(
+        "#10b981",
+      );
+    });
+  });
+
+  describe('"Service period end" helper', () => {
+    // the last day of the frozen month, so the end date carries no warning
+    const END_OF_MONTH = "2026-09-30";
+
+    it("mentions the date of sales on the default template", () => {
+      renderGeneralInformation({
+        template: "default",
+        dateOfService: END_OF_MONTH,
+      });
+
+      expect(
+        screen.getByLabelText("Service period end"),
+      ).toHaveAccessibleDescription(
+        "Also printed as “Date of sales/of executing the service”",
+      );
+    });
+
+    it("quotes the date of sales label the PDF prints", () => {
+      renderGeneralInformation({
+        template: "default",
+        dateOfService: END_OF_MONTH,
+        dateOfServiceLabelText: "Date of delivery",
+      });
+
+      expect(
+        screen.getByLabelText("Service period end"),
+      ).toHaveAccessibleDescription("Also printed as “Date of delivery”");
+    });
+
+    it("says the date is printed only once while the service period is hidden", () => {
+      renderGeneralInformation({
+        template: "default",
+        dateOfService: END_OF_MONTH,
+        servicePeriodFieldIsVisible: false,
+      });
+
+      expect(
+        screen.getByLabelText("Service period end"),
+      ).toHaveAccessibleDescription(
+        "Printed as “Date of sales/of executing the service”",
+      );
+    });
+
+    it("is not shown while the date of sales is hidden from the PDF", () => {
+      renderGeneralInformation({
+        template: "default",
+        dateOfService: END_OF_MONTH,
+        dateOfServiceFieldIsVisible: false,
+      });
+
+      expect(
+        screen.getByLabelText("Service period end"),
+      ).not.toHaveAccessibleDescription();
+    });
+
+    it("gives way to the warning when the end date is not the end of the month", () => {
+      renderGeneralInformation({
+        template: "default",
+        dateOfService: "2026-09-20",
+      });
+
+      expect(
+        screen.getByRole("button", {
+          name: "Set service period end to September 30, 2026",
+        }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByLabelText("Service period end"),
+      ).not.toHaveAccessibleDescription();
+    });
+
+    it("is not shown on the Stripe template, which prints no date of sales", () => {
+      renderGeneralInformation({
+        template: "stripe",
+        dateOfService: END_OF_MONTH,
+      });
+
+      expect(
+        screen.getByLabelText("Service period end"),
+      ).not.toHaveAccessibleDescription();
+      expect(screen.queryByText(/printed as/i)).not.toBeInTheDocument();
     });
   });
 });

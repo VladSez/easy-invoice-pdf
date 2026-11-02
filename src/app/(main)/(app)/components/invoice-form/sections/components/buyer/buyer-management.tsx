@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ContactsBackupMenu } from "@/app/(main)/(app)/components/invoice-form/sections/components/contacts-backup-menu";
 import { usePartyActions } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-party-actions";
 import { useSavedParties } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-saved-parties";
+import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import { type InvoiceData, type BuyerData } from "@/app/schema";
 import {
   AlertDialog,
@@ -262,8 +263,9 @@ export function BuyerManagement({
       </div>
 
       <BuyerDialog
-        // we need to rerender the dialog when the editingBuyer changes
-        key={editingBuyer?.id}
+        // remount for another buyer to edit, and after a language change, so a new
+        // buyer starts with that language's tax label (the form only reads its defaults once)
+        key={`${editingBuyer?.id ?? "new"}-${invoiceData.language}`}
         isOpen={isBuyerDialogOpen}
         onClose={() => {
           setIsBuyerDialogOpen(false);
@@ -284,6 +286,9 @@ export function BuyerManagement({
         initialData={editingBuyer}
         isEditMode={isEditMode}
         formValues={formValues}
+        defaultVatNoLabelText={
+          INVOICE_PDF_TRANSLATIONS[invoiceData.language].buyer.vatNo
+        }
       />
 
       {/* Delete alert buyer dialog */}

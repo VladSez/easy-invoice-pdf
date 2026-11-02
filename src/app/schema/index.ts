@@ -663,6 +663,15 @@ export type TemplateLabels =
   (typeof TEMPLATE_TO_LABEL)[keyof typeof TEMPLATE_TO_LABEL];
 
 /**
+ * The amber bar the Stripe template has always drawn across the top of the page, used
+ * whenever an invoice has not picked a color of its own.
+ */
+export const DEFAULT_STRIPE_TOP_LINE_COLOR = "#fbbf24";
+
+/** A six-digit `#rrggbb` hex color, the only shape the color picker writes. */
+const HEX_COLOR_REGEX = /^#[\da-f]{6}$/i;
+
+/**
  * Every language an invoice can be written in.
  *
  * This order is what the language pickers render, so it is sorted the way a reader scans
@@ -758,8 +767,10 @@ export const LANGUAGE_TO_LABEL = {
  */
 export const LANGUAGE_TO_LABEL_WITH_REGION = {
   ...LANGUAGE_TO_LABEL,
-  pt: "Portuguese (Portugal)",
-  "pt-BR": "Portuguese (Brazil)",
+  // the region as its two-letter code, to keep the names short in the language and number
+  // format pickers
+  pt: "Portuguese (PT)",
+  "pt-BR": "Portuguese (BR)",
 } as const satisfies Record<SupportedLanguages, string>;
 
 /**
@@ -1629,6 +1640,26 @@ export const invoiceObjectSchema = z.object({
     )
     .optional()
     .describe("Stripe template specific field. URL field for payment link"),
+
+  /**
+   * Color of the bar across the top of the Stripe template's page.
+   *
+   * Deliberately not `.default()`ed, like `numberFormatLocale`: an invoice carries it only
+   * once someone picks a color, so share links and `localStorage` entries that predate the
+   * setting stay as they are, and the template falls back to
+   * {@link DEFAULT_STRIPE_TOP_LINE_COLOR}.
+   */
+  stripeTopLineColor: z
+    .string()
+    .trim()
+    // the picker and its presets speak lowercase, so `#FBBF24` from a hand-made link still
+    // reads as the default amber rather than a custom color
+    .toLowerCase()
+    .regex(HEX_COLOR_REGEX, "Color must be a hex value like #fbbf24")
+    .optional()
+    .describe(
+      "Stripe template specific field. Hex color of the line across the top of the page",
+    ),
 
   notes: z
     .string()

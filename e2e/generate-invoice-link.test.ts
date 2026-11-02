@@ -57,15 +57,13 @@ test.describe("Generate Invoice Link (Get link)", () => {
       await expect(page.getByTestId("shared-invoice-badge")).toBeHidden();
 
       // Fill in some test data
-      const invoiceNumberFieldset = page.getByRole("group", {
-        name: "Invoice Number",
+      const invoiceDetailsFieldset = page.getByRole("group", {
+        name: "Invoice details",
       });
 
-      const invoiceNumberValueField = invoiceNumberFieldset.getByRole(
+      const invoiceNumberValueField = invoiceDetailsFieldset.getByRole(
         "textbox",
-        {
-          name: "Value",
-        },
+        { name: "Invoice number", exact: true },
       );
 
       await invoiceNumberValueField.fill("SHARE-TEST-001");
@@ -202,14 +200,17 @@ test.describe("Generate Invoice Link (Get link)", () => {
       await expect(newPage).toHaveURL(/\/\?data=/);
 
       // Get elements from the new page context
-      const newInvoiceNumberFieldset = newPage.getByRole("group", {
-        name: "Invoice Number",
+      const newInvoiceDetailsFieldset = newPage.getByRole("group", {
+        name: "Invoice details",
       });
 
       /* VERIFY DATA IS LOADED IN NEW TAB */
 
       await expect(
-        newInvoiceNumberFieldset.getByRole("textbox", { name: "Value" }),
+        newInvoiceDetailsFieldset.getByRole("textbox", {
+          name: "Invoice number",
+          exact: true,
+        }),
       ).toHaveValue("SHARE-TEST-001");
 
       const newPageFinalSection = newPage.getByTestId(`final-section`);
@@ -515,17 +516,22 @@ test.describe("Generate Invoice Link (Get link)", () => {
     ).toHaveValue("stripe");
 
     // Invoice Number
-    const invoiceNumberFieldset = page.getByRole("group", {
-      name: "Invoice Number",
+    const invoiceDetailsFieldset = page.getByRole("group", {
+      name: "Invoice details",
     });
 
     // Old URLs load without ?template=, so the stored default-template label is kept.
     await expect(
-      invoiceNumberFieldset.getByRole("textbox", { name: "Label" }),
+      invoiceDetailsFieldset.getByRole("textbox", {
+        name: "Invoice number label",
+      }),
     ).toHaveValue("Faktura nr:");
 
     await expect(
-      invoiceNumberFieldset.getByRole("textbox", { name: "Value" }),
+      invoiceDetailsFieldset.getByRole("textbox", {
+        name: "Invoice number",
+        exact: true,
+      }),
     ).toHaveValue("1/08-2025");
 
     // Verify seller information is loaded
@@ -580,17 +586,22 @@ test.describe("Generate Invoice Link (Get link)", () => {
     ).toHaveValue("stripe");
 
     // Invoice Number
-    const newInvoiceNumberFieldset = page.getByRole("group", {
-      name: "Invoice Number",
+    const newInvoiceDetailsFieldset = page.getByRole("group", {
+      name: "Invoice details",
     });
 
     // Compressed URLs include ?template=stripe, so the label migrates to the Stripe default.
     await expect(
-      newInvoiceNumberFieldset.getByRole("textbox", { name: "Label" }),
+      newInvoiceDetailsFieldset.getByRole("textbox", {
+        name: "Invoice number label",
+      }),
     ).toHaveValue("Faktura");
 
     await expect(
-      newInvoiceNumberFieldset.getByRole("textbox", { name: "Value" }),
+      newInvoiceDetailsFieldset.getByRole("textbox", {
+        name: "Invoice number",
+        exact: true,
+      }),
     ).toHaveValue("1/08-2025");
 
     // Verify seller information is loaded
@@ -640,13 +651,14 @@ test.describe("Generate Invoice Link (Get link)", () => {
     };
 
     // Fill in invoice number
-    const invoiceNumberFieldset = page.getByRole("group", {
-      name: "Invoice Number",
+    const invoiceDetailsFieldset = page.getByRole("group", {
+      name: "Invoice details",
     });
 
-    const invoiceNumberValueField = invoiceNumberFieldset.getByRole("textbox", {
-      name: "Value",
-    });
+    const invoiceNumberValueField = invoiceDetailsFieldset.getByRole(
+      "textbox",
+      { name: "Invoice number", exact: true },
+    );
 
     await invoiceNumberValueField.fill(INVOICE_TEST_DATA.invoiceNumber);
 
@@ -713,15 +725,13 @@ test.describe("Generate Invoice Link (Get link)", () => {
     await expect(newPage).toHaveURL(/\/\?data=/);
 
     // Get the invoice number field from the new page
-    const newInvoiceNumberFieldset = newPage.getByRole("group", {
-      name: "Invoice Number",
+    const newInvoiceDetailsFieldset = newPage.getByRole("group", {
+      name: "Invoice details",
     });
 
-    const newInvoiceNumberValueField = newInvoiceNumberFieldset.getByRole(
+    const newInvoiceNumberValueField = newInvoiceDetailsFieldset.getByRole(
       "textbox",
-      {
-        name: "Value",
-      },
+      { name: "Invoice number", exact: true },
     );
 
     /**
@@ -794,12 +804,12 @@ test.describe("Generate Invoice Link (Get link)", () => {
     page,
   }) => {
     // Fill in invoice number
-    const invoiceNumberFieldset = page.getByRole("group", {
-      name: "Invoice Number",
+    const invoiceDetailsFieldset = page.getByRole("group", {
+      name: "Invoice details",
     });
 
-    await invoiceNumberFieldset
-      .getByRole("textbox", { name: "Label" })
+    await invoiceDetailsFieldset
+      .getByRole("textbox", { name: "Invoice number label" })
       .fill("URL-LIMIT-TEST-001");
 
     /**

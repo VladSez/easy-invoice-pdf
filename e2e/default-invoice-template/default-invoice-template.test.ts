@@ -59,8 +59,8 @@ test.describe("Default Invoice Template", () => {
     // the invoice number label follows the selected language
     await expect(
       page
-        .getByRole("group", { name: "Invoice Number" })
-        .getByRole("textbox", { name: "Label" }),
+        .getByRole("group", { name: "Invoice details" })
+        .getByRole("textbox", { name: "Invoice number label" }),
     ).toHaveValue(`${INVOICE_PDF_TRANSLATIONS.pl.invoiceNumber}:`);
 
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
@@ -341,17 +341,19 @@ test.describe("Default Invoice Template", () => {
     // check that value is saved in the hidden input
     await expect(page.locator('input[name="currency"]')).toHaveValue("GBP");
 
-    const invoiceNumberFieldset = page.getByRole("group", {
-      name: "Invoice Number",
+    const invoiceDetailsFieldset = page.getByRole("group", {
+      name: "Invoice details",
     });
 
-    const invoiceNumberLabelInput = invoiceNumberFieldset.getByRole("textbox", {
-      name: "Label",
-    });
+    const invoiceNumberLabelInput = invoiceDetailsFieldset.getByRole(
+      "textbox",
+      { name: "Invoice number label" },
+    );
 
-    const invoiceNumberValueInput = invoiceNumberFieldset.getByRole("textbox", {
-      name: "Value",
-    });
+    const invoiceNumberValueInput = invoiceDetailsFieldset.getByRole(
+      "textbox",
+      { name: "Invoice number", exact: true },
+    );
 
     const INVOICE_NUMBER_LABEL = "INVOICE NUMBER MOBILE TEST:";
 
@@ -516,17 +518,19 @@ test.describe("Default Invoice Template", () => {
   }) => {
     const generalInfoSection = page.getByTestId("general-information-section");
 
-    const invoiceNumberFieldset = generalInfoSection.getByRole("group", {
-      name: "Invoice Number",
+    const invoiceDetailsFieldset = generalInfoSection.getByRole("group", {
+      name: "Invoice details",
     });
 
-    const invoiceNumberLabelInput = invoiceNumberFieldset.getByRole("textbox", {
-      name: "Label",
-    });
+    const invoiceNumberLabelInput = invoiceDetailsFieldset.getByRole(
+      "textbox",
+      { name: "Invoice number label" },
+    );
 
-    const invoiceNumberValueInput = invoiceNumberFieldset.getByRole("textbox", {
-      name: "Value",
-    });
+    const invoiceNumberValueInput = invoiceDetailsFieldset.getByRole(
+      "textbox",
+      { name: "Invoice number", exact: true },
+    );
 
     await expect(invoiceNumberLabelInput).toHaveValue(
       INITIAL_INVOICE_DATA.invoiceNumberObject.label,
@@ -591,11 +595,9 @@ test.describe("Default Invoice Template", () => {
     // Verify that the download PDF button is visible after page reload
     await expect(getDownloadPdfLink(page)).toBeVisible();
 
-    const newInvoiceNumberLabelInput = invoiceNumberFieldset.getByRole(
+    const newInvoiceNumberLabelInput = invoiceDetailsFieldset.getByRole(
       "textbox",
-      {
-        name: "Label",
-      },
+      { name: "Invoice number label" },
     );
 
     // Verify that the invoice number is persisted after page reload
@@ -763,7 +765,7 @@ test.describe("Default Invoice Template", () => {
     await expect(servicePeriodFieldset).toBeVisible();
 
     const dateOfServiceLabelInput = servicePeriodFieldset.getByRole("textbox", {
-      name: "Date of sales PDF label",
+      name: "Date of sales label",
     });
 
     await expect(dateOfServiceLabelInput).toHaveValue(
@@ -811,7 +813,7 @@ test.describe("Default Invoice Template", () => {
     const newDateOfServiceLabelInput = newServicePeriodFieldset.getByRole(
       "textbox",
       {
-        name: "Date of sales PDF label",
+        name: "Date of sales label",
       },
     );
     await expect(newDateOfServiceLabelInput).toHaveValue(

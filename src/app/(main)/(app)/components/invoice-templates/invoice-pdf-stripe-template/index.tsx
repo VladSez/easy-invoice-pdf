@@ -13,7 +13,11 @@ import dayjs from "dayjs";
 
 import { InvoiceQRCode } from "@/app/(main)/(app)/components/invoice-templates/common/invoice-qr-code";
 import { formatCurrencyChunks } from "@/app/(main)/(app)/utils/format-currency";
-import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
+import {
+  DEFAULT_STRIPE_TOP_LINE_COLOR,
+  type InvoiceData,
+  resolveNumberFormatLocale,
+} from "@/app/schema";
 import { INVOICE_PDF_FONTS } from "@/config";
 
 import { StripeDueAmount } from "./stripe-due-amount";
@@ -71,9 +75,8 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
 
     paddingBottom: 30, // to fix overlapping issues with the fixed footer https://github.com/diegomura/react-pdf/issues/774#issuecomment-560069810
   },
-  // Yellow header bar
+  // Header bar, its color comes from the invoice (`stripeTopLineColor`)
   headerBar: {
-    backgroundColor: "#fbbf24", // Yellow color matching screenshot
     height: 4,
     width: "100%",
   },
@@ -336,8 +339,16 @@ export function StripeInvoicePdfTemplate({
   return (
     <Document title={invoiceDocTitle}>
       <Page size={"LETTER"} style={STRIPE_TEMPLATE_STYLES.page}>
-        {/* Yellow header bar */}
-        <View style={STRIPE_TEMPLATE_STYLES.headerBar} />
+        {/* Header bar, amber unless the invoice picked a color of its own */}
+        <View
+          style={[
+            STRIPE_TEMPLATE_STYLES.headerBar,
+            {
+              backgroundColor:
+                invoiceData.stripeTopLineColor ?? DEFAULT_STRIPE_TOP_LINE_COLOR,
+            },
+          ]}
+        />
 
         {/* Main content */}
         <View style={STRIPE_TEMPLATE_STYLES.content}>
