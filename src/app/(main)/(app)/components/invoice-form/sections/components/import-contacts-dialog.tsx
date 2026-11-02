@@ -38,6 +38,8 @@ export type ImportContactsDialogState =
     }
   | {
       step: "preview";
+      /** A new value for each file read, so another file starts a fresh review. */
+      reviewId: string;
       /** The name of the file being imported. */
       fileName: string;
       /** What importing the file would do to the saved sellers. */
@@ -181,6 +183,9 @@ export function ImportContactsDialog({
           />
         ) : (
           <PreviewStep
+            // another file picked from here starts on its first tab, not the one picked
+            // for the previous file
+            key={state.reviewId}
             fileName={state.fileName}
             sellers={state.sellers}
             buyers={state.buyers}
@@ -353,7 +358,7 @@ function PreviewStep({
 
   const [selectedTab, setSelectedTab] = useState<PreviewTabValue>("add");
 
-  // a file without the selected outcome (another file picked from here) opens on its first
+  // a file without the selected outcome opens on its first
   const activeTab = tabs.some(({ value }) => {
     return value === selectedTab;
   })

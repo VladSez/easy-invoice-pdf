@@ -92,7 +92,8 @@ function GeneralInformationHarness({
       numberFormatLocale,
       preserveNumberFormatOnLanguageChange,
       template,
-      ...(paymentDue ? { paymentDue } : {}),
+      // `""` is kept: it is a cleared date input
+      ...(paymentDue === undefined ? {} : { paymentDue }),
       ...(dateOfService ? { dateOfService } : {}),
       ...(dateOfServiceStart ? { dateOfServiceStart } : {}),
       servicePeriodFieldIsVisible,
@@ -498,6 +499,19 @@ describe("GeneralInformation date helper texts", () => {
 
       expect(banner).toBeVisible();
       expect(banner).toHaveTextContent("settembre 15, 2026");
+    });
+
+    // every other date is current, so the cleared payment due date is the only trigger
+    it("opens for a payment due date that is not set", () => {
+      renderGeneralInformation({
+        dateOfIssue: "2026-09-15",
+        paymentDue: "",
+        dateOfServiceStart: "2026-09-01",
+        dateOfService: "2026-09-30",
+        invoiceNumberValue: "1/09-2026",
+      });
+
+      expect(screen.getByTestId("out-of-date-dates-helper")).toBeVisible();
     });
   });
 

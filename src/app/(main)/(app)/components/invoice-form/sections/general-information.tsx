@@ -237,6 +237,9 @@ export const GeneralInformation = memo(function GeneralInformation({
     dayjs(dateOfIssue),
   );
 
+  // a cleared date input; the PDF would otherwise quietly fall back to 14 days from today
+  const isPaymentDueNotSet = !paymentDue;
+
   const paymentTermDays = dayjs(paymentDue).diff(dayjs(dateOfIssue), "day");
 
   // default browser date input format is YYYY-MM-DD
@@ -271,8 +274,8 @@ export const GeneralInformation = memo(function GeneralInformation({
    * Whether to show Stale Dates Banner.
    * Banner appears when any invoice date/number is out of sync with current month.
    * Triggers: service end not end of current month, service start not in current month,
-   * invoice number not for current month, issue date not today, payment due before the date
-   * of issue. Any due date on or after the date of issue is a payment term of its own, and it
+   * invoice number not for current month, issue date not today, payment due not set or before
+   * the date of issue. Any due date on or after the date of issue is a payment term of its own, and it
    * moves along when the date of issue does.
    */
   const canShowStaleDatesBanner =
@@ -280,6 +283,7 @@ export const GeneralInformation = memo(function GeneralInformation({
     isServicePeriodStartOutsideCurrentMonth ||
     !isInvoiceNumberInCurrentMonth ||
     isDateOfIssueNotToday ||
+    isPaymentDueNotSet ||
     (!!dateOfIssue && isPaymentDueBeforeDateOfIssue);
 
   return (
@@ -901,10 +905,12 @@ export const GeneralInformation = memo(function GeneralInformation({
                 <ErrorMessage>{errors.paymentDue.message}</ErrorMessage>
               ) : null}
               {!errors.paymentDue &&
-              isPaymentDueBeforeDateOfIssue &&
+              (isPaymentDueNotSet || isPaymentDueBeforeDateOfIssue) &&
               dateOfIssue ? (
                 <FieldWarning
-                  message="Before date of issue"
+                  message={
+                    isPaymentDueNotSet ? "Not set" : "Before date of issue"
+                  }
                   fixValue={formattedSuggestedPaymentDue}
                   fixLabel={`Set payment due date to ${formattedSuggestedPaymentDue} (14 days after issue)`}
                   onFix={() => {

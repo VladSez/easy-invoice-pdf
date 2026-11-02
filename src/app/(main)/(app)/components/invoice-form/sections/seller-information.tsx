@@ -4,7 +4,6 @@ import {
   Controller,
   type FieldErrors,
   type UseFormSetValue,
-  useWatch,
 } from "react-hook-form";
 
 import {
@@ -45,10 +44,6 @@ export const SellerInformation = memo(function SellerInformation({
   const [selectedSellerId, setSelectedSellerId] = useState("");
   const isSellerSelected = !!selectedSellerId;
 
-  // the form's own value, not `invoiceData`: that one only catches up after the form's
-  // debounce, so the card would show the previous seller for half a second after a pick
-  const savedSeller = useWatch({ control, name: "seller" });
-
   const currentFormValues = {
     name: invoiceData.seller.name,
     address: invoiceData.seller.address,
@@ -80,7 +75,7 @@ export const SellerInformation = memo(function SellerInformation({
       <AccordionContent className="">
         {isSellerSelected ? (
           <div className="mt-5">
-            <SavedContactCard contact={savedSeller} party="seller" />
+            <SavedContactCard control={control} party="seller" />
           </div>
         ) : (
           <fieldset className="mt-5 space-y-4">

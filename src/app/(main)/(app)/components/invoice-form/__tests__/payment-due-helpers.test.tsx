@@ -201,4 +201,30 @@ describe("payment due helper texts", () => {
       ).not.toBeInTheDocument();
     });
   });
+
+  // a cleared date input, which the PDF would otherwise fill with 14 days from today
+  describe('"Not set"', () => {
+    it("sits under the payment due field", () => {
+      renderInvoiceForm({ paymentDue: "" });
+
+      const paymentDueField = screen
+        .getByLabelText("Payment due")
+        .closest("div");
+      expect(paymentDueField).not.toBeNull();
+      expect(
+        within(paymentDueField as HTMLElement).getByText("Not set"),
+      ).toBeVisible();
+    });
+
+    it("sets the payment due date to 14 days after issue when clicked", async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+      renderInvoiceForm({ paymentDue: "" });
+
+      await user.click(getSetPaymentDueButton());
+
+      expect(screen.getByLabelText("Payment due")).toHaveValue("2026-09-29");
+      expect(screen.queryByText("Not set")).not.toBeInTheDocument();
+    });
+  });
 });

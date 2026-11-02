@@ -1,6 +1,7 @@
 import { Check, EyeOff, Info } from "lucide-react";
+import { type Control, useWatch } from "react-hook-form";
 
-import type { BuyerData, SellerData } from "@/app/schema";
+import type { BuyerData, InvoiceData, SellerData } from "@/app/schema";
 import { cn } from "@/lib/utils";
 
 interface ContactFieldsProps {
@@ -113,8 +114,7 @@ function optionalField({
 }
 
 interface SavedContactCardProps {
-  /** The details on the invoice, which are the saved seller's or buyer's. */
-  contact: SellerData | BuyerData;
+  control: Control<InvoiceData>;
   party: "seller" | "buyer";
 }
 
@@ -123,7 +123,13 @@ interface SavedContactCardProps {
  * with the same fields the import preview lists and the ones it leaves out marked as hidden.
  * Changing them goes through the pencil next to the picker, so they are not editable here.
  */
-export function SavedContactCard({ contact, party }: SavedContactCardProps) {
+export function SavedContactCard({ control, party }: SavedContactCardProps) {
+  // the details on the invoice, which are the saved seller's or buyer's. The form's own
+  // value, not `invoiceData`: that one only catches up after the form's debounce, so the
+  // card would show the previous party for half a second after a pick. Watched here rather
+  // than in the section, so typing in the section's own fields does not re-render it
+  const contact = useWatch({ control, name: party });
+
   // the name and address head the card, so the list starts after them
   const fields = getContactFields(contact).filter(({ field }) => {
     return field !== "name" && field !== "address";

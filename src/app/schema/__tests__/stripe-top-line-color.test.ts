@@ -14,14 +14,19 @@ describe("invoiceSchema stripeTopLineColor", () => {
     expect(result.data.stripeTopLineColor).toBeUndefined();
   });
 
-  it.each(["#635bff", "#E11D48"])("accepts the hex color %s", (color) => {
+  it.each([
+    ["#635bff", "#635bff"],
+    ["#E11D48", "#e11d48"],
+    // the default, spelled in uppercase, still matches the picker's amber preset
+    ["#FBBF24", "#fbbf24"],
+  ])("accepts the hex color %s as %s", (color, expectedColor) => {
     const result = invoiceSchema.safeParse({
       ...MOCK_INVOICE_DATA,
       stripeTopLineColor: color,
     });
 
     assert(result.success);
-    expect(result.data.stripeTopLineColor).toBe(color);
+    expect(result.data.stripeTopLineColor).toBe(expectedColor);
   });
 
   it.each(["#fa0", "635bff", "red", "#12345g", "rgb(0, 0, 0)"])(

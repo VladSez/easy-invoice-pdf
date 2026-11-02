@@ -767,7 +767,8 @@ export const LANGUAGE_TO_LABEL = {
  */
 export const LANGUAGE_TO_LABEL_WITH_REGION = {
   ...LANGUAGE_TO_LABEL,
-  // the region as its two-letter code, so the name still fits the half-width pickers
+  // the region as its two-letter code, to keep the names short in the language and number
+  // format pickers
   pt: "Portuguese (PT)",
   "pt-BR": "Portuguese (BR)",
 } as const satisfies Record<SupportedLanguages, string>;
@@ -1651,6 +1652,9 @@ export const invoiceObjectSchema = z.object({
   stripeTopLineColor: z
     .string()
     .trim()
+    // the picker and its presets speak lowercase, so `#FBBF24` from a hand-made link still
+    // reads as the default amber rather than a custom color
+    .toLowerCase()
     .regex(HEX_COLOR_REGEX, "Color must be a hex value like #fbbf24")
     .optional()
     .describe(

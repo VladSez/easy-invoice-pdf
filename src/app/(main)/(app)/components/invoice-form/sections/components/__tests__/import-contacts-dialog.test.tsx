@@ -70,6 +70,7 @@ describe("ImportContactsDialog preview", () => {
   it("lists what will be added, skipped and cannot be imported", () => {
     const dialog = renderDialog({
       step: "preview",
+      reviewId: "1",
       fileName: "backup.json",
       sellers: emptyResult({
         added: [ACME],
@@ -136,9 +137,49 @@ describe("ImportContactsDialog preview", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("opens another file on its first tab, not the one picked for the last file", () => {
+    function previewState(reviewId: string): ImportContactsDialogState {
+      return {
+        step: "preview",
+        reviewId,
+        fileName: "backup.json",
+        sellers: emptyResult({ added: [ACME] }),
+        buyers: emptyResult({ duplicates: [GLOBEX] }),
+      };
+    }
+
+    const props = {
+      isOpen: true,
+      onOpenChange: vi.fn(),
+      onFileSelected: vi.fn(),
+      onConfirm: vi.fn(),
+    };
+    const { rerender } = render(
+      <ImportContactsDialog {...props} state={previewState("1")} />,
+    );
+    const dialog = screen.getByTestId("import-contacts-dialog");
+
+    selectTab(dialog, "Already saved 1");
+
+    expect(
+      within(dialog).getByRole("tab", {
+        name: "Already saved 1",
+        selected: true,
+      }),
+    ).toBeVisible();
+
+    // the same outcomes again, from a newly picked file
+    rerender(<ImportContactsDialog {...props} state={previewState("2")} />);
+
+    expect(
+      within(dialog).getByRole("tab", { name: "To add 1", selected: true }),
+    ).toBeVisible();
+  });
+
   it("shows no tabs when every entry has the same outcome", () => {
     const dialog = renderDialog({
       step: "preview",
+      reviewId: "1",
       fileName: "backup.json",
       sellers: emptyResult({ added: [ACME] }),
       buyers: emptyResult({ added: [GLOBEX] }),
@@ -161,6 +202,7 @@ describe("ImportContactsDialog preview", () => {
   it("lists every filled-in field of a new or saved entry in a collapsed row", () => {
     const dialog = renderDialog({
       step: "preview",
+      reviewId: "1",
       fileName: "backup.json",
       sellers: emptyResult({
         added: [
@@ -203,6 +245,7 @@ describe("ImportContactsDialog preview", () => {
 
     const dialog = renderDialog({
       step: "preview",
+      reviewId: "1",
       fileName: "backup.json",
       sellers: emptyResult({
         added: [
@@ -230,6 +273,7 @@ describe("ImportContactsDialog preview", () => {
   it("shows the entry as written in the file with the failing field highlighted", () => {
     const dialog = renderDialog({
       step: "preview",
+      reviewId: "1",
       fileName: "backup.json",
       sellers: emptyResult({
         invalidEntries: [
@@ -270,6 +314,7 @@ describe("ImportContactsDialog preview", () => {
   it("adds a line for a required field the entry does not have", () => {
     const dialog = renderDialog({
       step: "preview",
+      reviewId: "1",
       fileName: "backup.json",
       sellers: emptyResult(),
       buyers: emptyResult({
@@ -291,6 +336,7 @@ describe("ImportContactsDialog preview", () => {
   it("shows a problem with the entry as a whole above its value", () => {
     const dialog = renderDialog({
       step: "preview",
+      reviewId: "1",
       fileName: "backup.json",
       sellers: emptyResult({
         invalidEntries: [
@@ -372,6 +418,7 @@ describe("ImportContactsDialog drop", () => {
     const states: ImportContactsDialogState[] = [
       {
         step: "preview",
+        reviewId: "1",
         fileName: "backup.json",
         sellers: emptyResult({ added: [ACME] }),
         buyers: emptyResult(),

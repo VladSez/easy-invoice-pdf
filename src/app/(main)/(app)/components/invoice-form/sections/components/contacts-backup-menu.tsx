@@ -174,6 +174,7 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
 
       setImportState({
         step: "preview",
+        reviewId: String(Date.now()),
         fileName: file.name,
         sellers,
         buyers,
