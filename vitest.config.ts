@@ -10,6 +10,14 @@ export default defineConfig({
     dir: "./src",
     exclude: ["**/e2e/**"],
     silent: true, // suppress console.log output in test output
+    poolOptions: {
+      forks: {
+        // Node 25+ enables Web Storage by default. Without `--localstorage-file`
+        // its global `localStorage` is `undefined`, and it shadows happy-dom's,
+        // so every DOM test that touches storage fails.
+        execArgv: ["--no-experimental-webstorage"],
+      },
+    },
   },
   resolve: {
     alias: {
