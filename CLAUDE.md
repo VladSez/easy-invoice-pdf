@@ -48,7 +48,7 @@ pnpm vitest --run src/utils/__tests__/url-compression.test.ts -t "round trips"
 pnpm e2e e2e/invoice-form.test.ts --project="Desktop Chrome" -g "adds an item"
 ```
 
-**Run as few e2e tests as possible.** The full suite is slow (CI budgets 50 minutes across four browser projects) and most of that time is spent generating and rasterizing PDFs. Always narrow to the file you touched, and add `--project="Desktop Chrome"` plus `-g "<test name>"` on top of it. Run the whole suite only when a change is broad enough to warrant it, or when the user asks.
+**Run as few e2e tests as possible.** The full suite is slow (CI budgets 65 minutes across four browser projects) and most of that time is spent generating and rasterizing PDFs. Always narrow to the file you touched, and add `--project="Desktop Chrome"` plus `-g "<test name>"` on top of it. Run the whole suite only when a change is broad enough to warrant it, or when the user asks.
 
 The pre-commit hook (`lint-staged.config.js`) runs `type-check:fast`, `lint`, `zizmor`, `knip`, `vitest --run` and `format` on _any_ staged change, so keep all of those green.
 
