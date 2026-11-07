@@ -22,8 +22,8 @@ import { getInitialInvoiceData } from "@/app/constants";
 import { CTA_TOAST_STORAGE_KEY, type InvoiceData } from "@/app/schema";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DeviceContextProvider } from "@/contexts/device-context";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { haptic } from "@/lib/haptic";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
 
 import {
@@ -67,9 +67,9 @@ vi.mock("@react-pdf/renderer/lib/react-pdf.browser", async (importOriginal) => {
   };
 });
 
-vi.mock("@/lib/umami-analytics-track-event", () => {
+vi.mock("@/lib/analytics/track-event", () => {
   return {
-    umamiTrackEvent: vi.fn(),
+    trackEvent: vi.fn(),
   };
 });
 
@@ -257,7 +257,8 @@ describe("InvoicePDFDownloadLink", () => {
     fireEvent.click(getDownloadLink());
 
     expect(haptic).toHaveBeenCalledTimes(1);
-    expect(umamiTrackEvent).toHaveBeenCalledWith("download_invoice", {
+    expect(trackEvent).toHaveBeenCalledWith({
+      event: "download_invoice",
       data: {
         invoice_template: "default",
         has_item_discount: false,
@@ -285,7 +286,8 @@ describe("InvoicePDFDownloadLink", () => {
 
     fireEvent.click(getDownloadLink());
 
-    expect(umamiTrackEvent).toHaveBeenCalledWith("download_invoice", {
+    expect(trackEvent).toHaveBeenCalledWith({
+      event: "download_invoice",
       data: {
         invoice_template: "default",
         has_item_discount: true,
@@ -304,7 +306,8 @@ describe("InvoicePDFDownloadLink", () => {
     fireEvent.click(getDownloadLink());
 
     // the download itself still goes through
-    expect(umamiTrackEvent).toHaveBeenCalledWith("download_invoice", {
+    expect(trackEvent).toHaveBeenCalledWith({
+      event: "download_invoice",
       data: {
         invoice_template: "default",
         has_item_discount: false,
@@ -354,9 +357,8 @@ describe("InvoicePDFDownloadLink", () => {
       }),
     );
     // the provider reports the failed render itself; the click must not count a download
-    expect(umamiTrackEvent).not.toHaveBeenCalledWith(
-      "download_invoice",
-      expect.anything(),
+    expect(trackEvent).not.toHaveBeenCalledWith(
+      expect.objectContaining({ event: "download_invoice" }),
     );
   });
 
@@ -375,7 +377,7 @@ describe("InvoicePDFDownloadLink", () => {
         id: "downloads-blocked-inside-app-toast",
       }),
     );
-    expect(umamiTrackEvent).not.toHaveBeenCalled();
+    expect(trackEvent).not.toHaveBeenCalled();
   });
 
   it("should block download inside Telegram preview browser", async () => {
@@ -393,7 +395,7 @@ describe("InvoicePDFDownloadLink", () => {
         id: "downloads-blocked-inside-telegram-toast",
       }),
     );
-    expect(umamiTrackEvent).not.toHaveBeenCalled();
+    expect(trackEvent).not.toHaveBeenCalled();
   });
 
   it("should not track a download when the PDF failed to generate", async () => {
@@ -411,9 +413,8 @@ describe("InvoicePDFDownloadLink", () => {
 
     // the provider reports the failure itself, the button just must not count it
     // as a download
-    expect(umamiTrackEvent).not.toHaveBeenCalledWith(
-      "download_invoice",
-      expect.anything(),
+    expect(trackEvent).not.toHaveBeenCalledWith(
+      expect.objectContaining({ event: "download_invoice" }),
     );
     expect(haptic).not.toHaveBeenCalled();
   });

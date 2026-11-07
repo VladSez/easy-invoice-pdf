@@ -36,7 +36,7 @@ import { ReadOnlyMoneyInput } from "@/components/ui/money-input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { cn } from "@/lib/utils";
 import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
 import type { NonReadonly, Prettify } from "@/types";
@@ -284,7 +284,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       });
 
       // analytics track event
-      umamiTrackEvent("remove_invoice_item");
+      trackEvent({ event: "remove_invoice_item" });
     },
     [getValues, setValue, isMobile],
   );

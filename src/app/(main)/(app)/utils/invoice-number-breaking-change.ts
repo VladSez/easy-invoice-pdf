@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import { SUPPORTED_INVOICE_PDF_LANGUAGES } from "@/app/schema";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 
 /**
  * This function handles the breaking change of the invoice number field.
@@ -24,7 +24,7 @@ export function handleInvoiceNumberBreakingChange(json: unknown) {
     typeof json.invoiceNumber === "string" &&
     "language" in json
   ) {
-    umamiTrackEvent("breaking_change_detected");
+    trackEvent({ event: "breaking_change_detected" });
 
     let lang: keyof typeof INVOICE_PDF_TRANSLATIONS;
 

@@ -30,4 +30,5 @@ export const TEST_ENV = {
   GITHUB_TOKEN: "github-token",
   NEXT_PUBLIC_SENTRY_DSN: "https://sentry.test",
   NEXT_PUBLIC_UMAMI_WEBSITE_ID: "umami-website-id",
+  NEXT_PUBLIC_POSTHOG_KEY: "posthog-key",
 } as const;

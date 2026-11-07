@@ -6,7 +6,7 @@ import {
   SUPPORTED_INVOICE_PDF_LANGUAGES,
   type SupportedLanguages,
 } from "@/app/schema";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { numberToWords } from "@/utils/number-to-words";
 
 /**
@@ -81,7 +81,8 @@ export function getAmountInWords({
     });
 
     if (error instanceof Error) {
-      umamiTrackEvent("error_converting_number_to_words", {
+      trackEvent({
+        event: "error_converting_number_to_words",
         data: {
           error: error?.message ?? "Unknown error",
         },

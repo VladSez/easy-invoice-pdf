@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { BUG_REPORT_URL } from "@/config";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 
 export default function Error({
   error,
@@ -70,7 +70,7 @@ export default function Error({
             () => {
               reset();
 
-              umamiTrackEvent("error_button_try_again_clicked");
+              trackEvent({ event: "error_button_try_again_clicked" });
             }
           }
           variant="outline"
@@ -112,7 +112,9 @@ export default function Error({
                       richColors: true,
                     });
 
-                    umamiTrackEvent("error_button_start_from_scratch_clicked");
+                    trackEvent({
+                      event: "error_button_start_from_scratch_clicked",
+                    });
                   } catch (error) {
                     console.error(error);
 

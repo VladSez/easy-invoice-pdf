@@ -57,7 +57,7 @@ import { SelectNative } from "@/components/ui/select-native";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { cn } from "@/lib/utils";
 
 import { convertFileToBase64, validateImageSize } from "../utils/logo-upload";
@@ -314,7 +314,8 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                     // `invoice_template` is the key `download_invoice` already reports the
                     // template under, so the two read together in the dashboard.
-                    umamiTrackEvent("invoice_template_changed", {
+                    trackEvent({
+                      event: "invoice_template_changed",
                       data: {
                         invoice_template: newTemplate,
                         previous_invoice_template: template,
@@ -402,7 +403,8 @@ export const GeneralInformation = memo(function GeneralInformation({
                       const newLanguage = e.target
                         .value as keyof typeof INVOICE_PDF_TRANSLATIONS;
 
-                      umamiTrackEvent("invoice_language_changed", {
+                      trackEvent({
+                        event: "invoice_language_changed",
                         data: {
                           language: newLanguage,
                           previous_language: language,
@@ -608,7 +610,8 @@ export const GeneralInformation = memo(function GeneralInformation({
                         // the previous value falls back the same way the rendered
                         // value does, so the event reports the format that was on
                         // screen rather than an empty one
-                        umamiTrackEvent("invoice_number_format_changed", {
+                        trackEvent({
+                          event: "invoice_number_format_changed",
                           data: {
                             number_format_locale: e.target
                               .value as SupportedNumberFormatLocale,
@@ -681,18 +684,16 @@ export const GeneralInformation = memo(function GeneralInformation({
                       onCheckedChange={(checked) => {
                         onChange(checked);
 
-                        umamiTrackEvent(
-                          "invoice_number_format_preserve_toggled",
-                          {
-                            data: {
-                              preserve_number_format: checked,
-                              number_format_locale:
-                                numberFormatLocale ?? language,
-                              invoice_language: language,
-                              invoice_template: template,
-                            },
+                        trackEvent({
+                          event: "invoice_number_format_preserve_toggled",
+                          data: {
+                            preserve_number_format: checked,
+                            number_format_locale:
+                              numberFormatLocale ?? language,
+                            invoice_language: language,
+                            invoice_template: template,
                           },
-                        );
+                        });
                       }}
                       size="sm"
                     />

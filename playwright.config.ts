@@ -13,6 +13,7 @@ import {
   WELCOME_POPUP_SEEN_STORAGE_KEY,
   WELCOME_POPUP_SEEN_VALUE,
 } from "./src/app/schema";
+import { POSTHOG_E2E_DISABLED_STORAGE_KEY } from "./src/lib/analytics/posthog-e2e-flags";
 import { SENTRY_E2E_DISABLED_STORAGE_KEY } from "./src/lib/sentry/sentry-e2e-flags";
 
 /**
@@ -60,6 +61,10 @@ const STORAGE_STATE = {
         },
         {
           name: SENTRY_E2E_DISABLED_STORAGE_KEY,
+          value: "1",
+        },
+        {
+          name: POSTHOG_E2E_DISABLED_STORAGE_KEY,
           value: "1",
         },
         // The popups appear 1.5s after load, mid-test. On mobile they sit inside the

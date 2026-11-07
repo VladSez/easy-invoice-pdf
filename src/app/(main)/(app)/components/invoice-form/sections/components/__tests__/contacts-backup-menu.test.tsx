@@ -9,7 +9,7 @@ import {
   BUYERS_LOCAL_STORAGE_KEY,
   SELLERS_LOCAL_STORAGE_KEY,
 } from "@/app/schema";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 import "@testing-library/jest-dom/vitest";
 
 vi.mock("sonner", () => {
@@ -26,8 +26,8 @@ vi.mock("@sentry/nextjs", () => {
   return { captureException: vi.fn() };
 });
 
-vi.mock("@/lib/umami-analytics-track-event", () => {
-  return { umamiTrackEvent: vi.fn() };
+vi.mock("@/lib/analytics/track-event", () => {
+  return { trackEvent: vi.fn() };
 });
 
 beforeEach(() => {
@@ -187,11 +187,11 @@ describe("ContactsBackupMenu import", () => {
       buyers: [{ name: "Globex" }],
     });
 
-    const trackedEvents = vi.mocked(umamiTrackEvent).mock.calls;
+    const trackedEvents = vi.mocked(trackEvent).mock.calls;
 
     expect(
-      trackedEvents.map(([eventName]) => {
-        return eventName;
+      trackedEvents.map(([{ event }]) => {
+        return event;
       }),
     ).toEqual([
       "contacts_backup_menu_opened",
@@ -200,7 +200,8 @@ describe("ContactsBackupMenu import", () => {
       "import_contacts_preview_shown",
       "import_contacts_success",
     ]);
-    expect(trackedEvents[3]?.[1]).toEqual({
+    expect(trackedEvents[3]?.[0]).toEqual({
+      event: "import_contacts_preview_shown",
       data: {
         sellersToAdd: 1,
         buyersToAdd: 0,

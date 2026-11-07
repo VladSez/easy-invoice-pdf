@@ -29,9 +29,9 @@ import { GitHubStarCTA } from "@/components/github-star-cta";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useDeviceContext } from "@/contexts/device-context";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { debugLog } from "@/lib/debug-log";
 import { haptic } from "@/lib/haptic";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import {
   buildInvoiceAppUrl,
   getRouteTemplate,
@@ -792,7 +792,7 @@ export function AppPageClient({
                 url: newGeneratedLinkFullUrl,
               })
               .then(() => {
-                umamiTrackEvent("share_invoice_link_mobile");
+                trackEvent({ event: "share_invoice_link_mobile" });
 
                 updateAppMetadata((current) => {
                   return {
@@ -853,7 +853,7 @@ export function AppPageClient({
                 duration: 5000,
               });
 
-              umamiTrackEvent("share_invoice_link");
+              trackEvent({ event: "share_invoice_link" });
 
               updateAppMetadata((current) => {
                 return {
