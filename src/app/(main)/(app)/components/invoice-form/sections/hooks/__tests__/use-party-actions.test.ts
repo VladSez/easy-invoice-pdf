@@ -12,7 +12,7 @@ import type {
 import { usePartyActions } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-party-actions";
 import { DEFAULT_BUYER_DATA, DEFAULT_SELLER_DATA } from "@/app/constants";
 import { sellerSchema } from "@/app/schema";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 
 vi.mock("sonner", () => {
   return { toast: { success: vi.fn(), error: vi.fn() } };
@@ -22,8 +22,8 @@ vi.mock("@sentry/nextjs", () => {
   return { captureException: vi.fn() };
 });
 
-vi.mock("@/lib/umami-analytics-track-event", () => {
-  return { umamiTrackEvent: vi.fn() };
+vi.mock("@/lib/analytics/track-event", () => {
+  return { trackEvent: vi.fn() };
 });
 
 const ACME = sellerSchema.parse({
@@ -120,7 +120,7 @@ describe("usePartyActions", () => {
         "Seller added and applied to invoice",
         expect.objectContaining({ id: "add_seller_success_toast" }),
       );
-      expect(umamiTrackEvent).toHaveBeenCalledWith("add_seller_success");
+      expect(trackEvent).toHaveBeenCalledWith({ event: "add_seller_success" });
     });
 
     it("only saves the new party when not asked to apply it", () => {
@@ -164,7 +164,7 @@ describe("usePartyActions", () => {
       );
       // A full or disabled store is not a bug in the app
       expect(Sentry.captureException).not.toHaveBeenCalled();
-      expect(umamiTrackEvent).not.toHaveBeenCalled();
+      expect(trackEvent).not.toHaveBeenCalled();
     });
 
     it("reports an unexpected error and tells the user", () => {
@@ -210,7 +210,7 @@ describe("usePartyActions", () => {
         "Seller updated successfully",
         expect.anything(),
       );
-      expect(umamiTrackEvent).toHaveBeenCalledWith("edit_seller_success");
+      expect(trackEvent).toHaveBeenCalledWith({ event: "edit_seller_success" });
     });
 
     it("keeps the invoice as it is when storage rejects the write", () => {
@@ -252,7 +252,9 @@ describe("usePartyActions", () => {
         "Seller deleted successfully",
         expect.anything(),
       );
-      expect(umamiTrackEvent).toHaveBeenCalledWith("delete_seller_success");
+      expect(trackEvent).toHaveBeenCalledWith({
+        event: "delete_seller_success",
+      });
     });
 
     it("keeps the selection when storage rejects the write", () => {
@@ -288,7 +290,7 @@ describe("usePartyActions", () => {
         'Seller "Initech" applied to invoice',
         expect.anything(),
       );
-      expect(umamiTrackEvent).toHaveBeenCalledWith("change_seller");
+      expect(trackEvent).toHaveBeenCalledWith({ event: "change_seller" });
       // Picking a party does not change the saved list
       expect(saveParties).not.toHaveBeenCalled();
     });
@@ -327,6 +329,6 @@ describe("usePartyActions", () => {
       "Buyer restored to default",
       expect.objectContaining({ id: "reset_buyer_success_toast" }),
     );
-    expect(umamiTrackEvent).toHaveBeenCalledWith("change_buyer");
+    expect(trackEvent).toHaveBeenCalledWith({ event: "change_buyer" });
   });
 });

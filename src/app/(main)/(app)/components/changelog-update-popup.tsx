@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import type { AppUpdatePopupVariant } from "@/app/(main)/(app)/hooks/use-changelog-update-popup";
 import { Button } from "@/components/ui/button";
 import { DISCORD_COMMUNITY_URL, REDDIT_COMMUNITY_URL } from "@/config";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { cn } from "@/lib/utils";
 
 interface ChangelogUpdatePopupProps {
@@ -46,7 +46,7 @@ function CommunityLinks() {
       Join our{" "}
       <a
         onClick={() => {
-          umamiTrackEvent("popup-discord-community-link-clicked");
+          trackEvent({ event: "popup-discord-community-link-clicked" });
         }}
         href={DISCORD_COMMUNITY_URL}
         target="_blank"
@@ -58,7 +58,7 @@ function CommunityLinks() {
       or{" "}
       <a
         onClick={() => {
-          umamiTrackEvent("popup-reddit-community-link-clicked");
+          trackEvent({ event: "popup-reddit-community-link-clicked" });
         }}
         href={REDDIT_COMMUNITY_URL}
         target="_blank"
@@ -193,7 +193,7 @@ export function ChangelogUpdatePopup({
           aria-label="Close"
           data-testid="changelog-update-close"
           onClick={() => {
-            umamiTrackEvent(`${analyticsPrefix}-dismissed`);
+            trackEvent({ event: `${analyticsPrefix}-dismissed` });
             onDismiss();
           }}
           variant="ghost"
@@ -222,7 +222,9 @@ export function ChangelogUpdatePopup({
                   data-testid="changelog-update-latest-post-link"
                   className="whitespace-nowrap font-bold text-slate-800 underline decoration-slate-500 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-800"
                   onClick={() => {
-                    umamiTrackEvent(`${analyticsPrefix}-latest-post-link`);
+                    trackEvent({
+                      event: `${analyticsPrefix}-latest-post-link`,
+                    });
                     onDismiss();
                   }}
                 >
@@ -239,7 +241,7 @@ export function ChangelogUpdatePopup({
               videoId={releaseVideoId}
               className={showMascot ? "w-48" : "w-full"}
               onClick={() => {
-                umamiTrackEvent(`${analyticsPrefix}-video`);
+                trackEvent({ event: `${analyticsPrefix}-video` });
               }}
             />
           ) : null}
@@ -250,7 +252,7 @@ export function ChangelogUpdatePopup({
               className="h-8 rounded-md px-3 text-sm"
               data-testid={content.continueTestId}
               onClick={() => {
-                umamiTrackEvent(`${analyticsPrefix}-continue`);
+                trackEvent({ event: `${analyticsPrefix}-continue` });
                 onDismiss();
               }}
             >
@@ -264,7 +266,7 @@ export function ChangelogUpdatePopup({
                 className="h-8 rounded-md px-2.5 text-sm font-medium text-slate-600 hover:text-slate-950"
                 data-testid={content.secondaryTestId}
                 onClick={() => {
-                  umamiTrackEvent(`${analyticsPrefix}-how-it-works`);
+                  trackEvent({ event: `${analyticsPrefix}-how-it-works` });
                   onDismiss();
                   onHowItWorksClick?.();
                 }}
@@ -282,7 +284,7 @@ export function ChangelogUpdatePopup({
                 <Link
                   href="/changelog"
                   onClick={() => {
-                    umamiTrackEvent(`${analyticsPrefix}-link`);
+                    trackEvent({ event: `${analyticsPrefix}-link` });
                     onDismiss();
                   }}
                 >
@@ -422,7 +424,7 @@ function DockNotice({
             data-testid={secondaryTestId}
             className={actionClassName}
             onClick={() => {
-              umamiTrackEvent(`${analyticsPrefix}-how-it-works`);
+              trackEvent({ event: `${analyticsPrefix}-how-it-works` });
               onDismiss();
               onHowItWorksClick?.();
             }}
@@ -435,7 +437,7 @@ function DockNotice({
             data-testid={secondaryTestId}
             className={actionClassName}
             onClick={() => {
-              umamiTrackEvent(`${analyticsPrefix}-link`);
+              trackEvent({ event: `${analyticsPrefix}-link` });
               onDismiss();
             }}
           >
@@ -449,7 +451,7 @@ function DockNotice({
         aria-label="Close"
         data-testid="changelog-update-close"
         onClick={() => {
-          umamiTrackEvent(`${analyticsPrefix}-dismissed`);
+          trackEvent({ event: `${analyticsPrefix}-dismissed` });
           onDismiss();
         }}
         variant="ghost"

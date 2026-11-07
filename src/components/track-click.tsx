@@ -1,9 +1,9 @@
 "use client";
 
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 
 /**
- * Sends an Umami event when anything inside it is clicked, leaving the click itself alone.
+ * Sends an analytics event (Umami and PostHog) when anything inside it is clicked, leaving the click itself alone.
  *
  * For server components, which cannot pass an `onClick`: wrap a link in it, and the
  * click bubbles up here after the link has done its job. Unlike Umami's `data-umami-event`
@@ -19,7 +19,7 @@ export function TrackClick({
   data,
   children,
 }: {
-  /** Event name as it appears in the Umami dashboard, snake_case like the others. */
+  /** Event name as it appears in the Umami and PostHog dashboards, snake_case like the others. */
   event: string;
   /** Event properties sent with it. */
   data?: Record<string, string>;
@@ -30,7 +30,7 @@ export function TrackClick({
     <span
       className="contents"
       onClick={() => {
-        umamiTrackEvent(event, { data });
+        trackEvent({ event, data });
       }}
     >
       {children}

@@ -3,7 +3,7 @@
 import { Star } from "lucide-react";
 
 import { GITHUB_URL } from "@/config";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { cn } from "@/lib/utils";
 import { githubStarCountFormatter } from "@/utils/number-formatter";
 
@@ -11,7 +11,7 @@ import { GithubIcon } from "./etc/github-logo";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const handleStarClick = () => {
-  umamiTrackEvent("github_star_cta_clicked");
+  trackEvent({ event: "github_star_cta_clicked" });
 };
 
 export function GitHubStarCTA({

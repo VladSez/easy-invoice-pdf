@@ -37,9 +37,9 @@ vi.mock("@/app/schema", async (importOriginal) => {
   };
 });
 
-vi.mock("@/lib/umami-analytics-track-event", () => {
+vi.mock("@/lib/analytics/track-event", () => {
   return {
-    umamiTrackEvent: vi.fn(),
+    trackEvent: vi.fn(),
   };
 });
 
@@ -51,7 +51,7 @@ vi.mock("@/hooks/use-media-query", () => {
   };
 });
 
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 
 import { InvoiceItems } from "../invoice-items";
 
@@ -206,7 +206,7 @@ describe("InvoiceItems max invoice items", () => {
       typeOfGTU: "",
       typeOfGTUFieldIsVisible: true,
     });
-    expect(umamiTrackEvent).toHaveBeenCalledWith("add_invoice_item");
+    expect(trackEvent).toHaveBeenCalledWith({ event: "add_invoice_item" });
   });
 
   it("does not append when the item limit is reached", async () => {
@@ -221,7 +221,7 @@ describe("InvoiceItems max invoice items", () => {
     await user.click(getAddInvoiceItemButton());
 
     expect(append).not.toHaveBeenCalled();
-    expect(umamiTrackEvent).not.toHaveBeenCalled();
+    expect(trackEvent).not.toHaveBeenCalled();
   });
 
   it("shows the max items tooltip when the limit is reached", async () => {
@@ -622,9 +622,9 @@ describe("InvoiceItems discount", () => {
     expect(screen.getByLabelText("Discount value")).toHaveFocus();
     expect(screen.getByRole("radio", { name: "Percentage" })).toBeChecked();
     expect(screen.getByLabelText(/^Label/)).toHaveValue("");
-    expect(umamiTrackEvent).toHaveBeenCalledExactlyOnceWith(
-      "add_item_discount",
-    );
+    expect(trackEvent).toHaveBeenCalledExactlyOnceWith({
+      event: "add_item_discount",
+    });
   });
 
   it("switches between a percentage and a fixed amount", async () => {
@@ -637,7 +637,8 @@ describe("InvoiceItems discount", () => {
 
     expect(screen.getByRole("radio", { name: "Fixed amount" })).toBeChecked();
     expect(screen.getByRole("radio", { name: "Percentage" })).not.toBeChecked();
-    expect(umamiTrackEvent).toHaveBeenCalledWith("change_item_discount_type", {
+    expect(trackEvent).toHaveBeenCalledWith({
+      event: "change_item_discount_type",
       data: { discount_type: "amount" },
     });
   });
@@ -708,7 +709,7 @@ describe("InvoiceItems discount", () => {
 
     expect(screen.getByLabelText("Discount value")).toHaveValue(50);
     // re-picking the selected type is not a change
-    expect(umamiTrackEvent).toHaveBeenCalledTimes(2);
+    expect(trackEvent).toHaveBeenCalledTimes(2);
   });
 
   it("explains a percentage and a fixed amount before a value is entered", async () => {
@@ -782,9 +783,9 @@ describe("InvoiceItems discount", () => {
     await vi.waitFor(() => {
       expect(addButton).toHaveFocus();
     });
-    expect(umamiTrackEvent).toHaveBeenCalledExactlyOnceWith(
-      "remove_item_discount",
-    );
+    expect(trackEvent).toHaveBeenCalledExactlyOnceWith({
+      event: "remove_item_discount",
+    });
 
     // reopening shows the cleared fields, not the removed discount
     await user.click(addButton);

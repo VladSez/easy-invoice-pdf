@@ -13,7 +13,7 @@ import { GithubIcon } from "@/components/etc/github-logo";
 import { ProjectLogo } from "@/components/etc/project-logo";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { DISCORD_COMMUNITY_URL, GITHUB_URL } from "@/config";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 
 /**
  * Header component for the invoice page.
@@ -126,7 +126,7 @@ function ProjectInfoLinks() {
 
   const handleWatchDemoClick = () => {
     setIsVideoDialogOpen(true);
-    umamiTrackEvent("watch_demo_button_clicked");
+    trackEvent({ event: "watch_demo_button_clicked" });
   };
 
   return (

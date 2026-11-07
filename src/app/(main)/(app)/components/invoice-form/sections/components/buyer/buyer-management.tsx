@@ -105,7 +105,8 @@ export function BuyerManagement({
     <>
       <div
         className={cn(
-          "flex w-full flex-col gap-2",
+          // ph-no-capture: keeps saved contact names out of PostHog autocapture
+          "ph-no-capture flex w-full flex-col gap-2",
           hasBuyers
             ? "rounded-md border p-4 shadow shadow-slate-400/10"
             : "mt-3",
@@ -296,7 +297,8 @@ export function BuyerManagement({
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
       >
-        <AlertDialogContent>
+        {/* rendered in a portal, outside the ph-no-capture picker above */}
+        <AlertDialogContent className="ph-no-capture">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Buyer</AlertDialogTitle>
             <AlertDialogDescription>

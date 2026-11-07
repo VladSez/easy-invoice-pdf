@@ -30,8 +30,8 @@ vi.mock("@sentry/nextjs", () => {
   return { captureException: vi.fn() };
 });
 
-vi.mock("@/lib/umami-analytics-track-event", () => {
-  return { umamiTrackEvent: vi.fn() };
+vi.mock("@/lib/analytics/track-event", () => {
+  return { trackEvent: vi.fn() };
 });
 
 vi.mock("@/hooks/use-media-query", () => {

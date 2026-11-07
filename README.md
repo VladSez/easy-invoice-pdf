@@ -253,7 +253,7 @@ pnpm exec dotenvx encrypt -f .env.local
 
 Other tools used to build and run the project:
 
-- [Umami](https://umami.is/) for privacy-friendly analytics
+- [Umami](https://umami.is/) and [PostHog](https://posthog.com/) (cookieless) for privacy-friendly analytics
 - [zizmor](https://docs.zizmor.sh/) for static analysis of GitHub Actions
 - [typescript-plugin-directives](https://www.npmjs.com/package/typescript-plugin-directives)
 - [og.new](https://og.new) for Open Graph images and [shots.so](https://shots.so/) for mockups

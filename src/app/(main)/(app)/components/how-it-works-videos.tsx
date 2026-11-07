@@ -10,7 +10,7 @@ import {
   HOW_IT_WORKS_VIDEOS,
   REDDIT_COMMUNITY_URL,
 } from "@/config";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { cn } from "@/lib/utils";
 
 type HowItWorksVideoId = (typeof HOW_IT_WORKS_VIDEOS)[number]["id"];
@@ -91,7 +91,7 @@ export function HowItWorksVideos({
   function handleVideoChange(videoId: HowItWorksVideoId) {
     setSelectedVideoId(videoId);
     // The event keeps its "tab" name so the analytics series stays continuous.
-    umamiTrackEvent(`how-it-works-video-tab-${videoId}`);
+    trackEvent({ event: `how-it-works-video-tab-${videoId}` });
     onVideoChange?.(videoId);
   }
 
@@ -210,7 +210,7 @@ export function HowItWorksVideos({
           className="font-semibold text-slate-800 underline decoration-slate-400 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-500"
           data-testid="how-it-works-discord"
           onClick={() => {
-            return umamiTrackEvent("how-it-works-discord-click");
+            return trackEvent({ event: "how-it-works-discord-click" });
           }}
         >
           Discord
@@ -223,7 +223,7 @@ export function HowItWorksVideos({
           className="font-semibold text-slate-800 underline decoration-slate-400 underline-offset-2 transition-colors hover:text-slate-950 hover:decoration-slate-500"
           data-testid="how-it-works-reddit"
           onClick={() => {
-            return umamiTrackEvent("how-it-works-reddit-click");
+            return trackEvent({ event: "how-it-works-reddit-click" });
           }}
         >
           Reddit

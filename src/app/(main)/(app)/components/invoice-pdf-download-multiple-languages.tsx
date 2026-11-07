@@ -14,7 +14,7 @@ import {
   type SupportedLanguages,
 } from "@/app/schema";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 
 const SUPPORTED_LANGUAGES_OPTIONS = SUPPORTED_INVOICE_PDF_LANGUAGES.map(
   (language) => {
@@ -72,7 +72,7 @@ export function InvoicePDFDownloadMultipleLanguages({
       const pdfBlobs = await Promise.all(pdfPromises);
 
       // Track analytics
-      umamiTrackEvent("generate_multiple_pdfs_zip");
+      trackEvent({ event: "generate_multiple_pdfs_zip" });
 
       const invoiceNumber = `${invoiceData?.invoiceNumberObject?.label} ${invoiceData?.invoiceNumberObject?.value}`;
 

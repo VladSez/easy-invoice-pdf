@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { cn } from "@/lib/utils";
 
 import { SEO_HERO_CTA_SELECTOR } from "./seo-cta-marker";
@@ -100,7 +100,8 @@ export function StickySeoCta({
             href={href}
             data-testid="seo-sticky-cta"
             onClick={() => {
-              umamiTrackEvent("seo_sticky_cta_clicked", {
+              trackEvent({
+                event: "seo_sticky_cta_clicked",
                 data: { slug, label },
               });
             }}

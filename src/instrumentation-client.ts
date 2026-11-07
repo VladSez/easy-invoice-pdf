@@ -4,7 +4,10 @@
 // https://nextjs.org/docs/app/api-reference/file-conventions/instrumentation-client
 
 import * as Sentry from "@sentry/nextjs";
+import { posthog } from "posthog-js";
 
+import { env } from "@/env";
+import { POSTHOG_E2E_DISABLED_STORAGE_KEY } from "@/lib/analytics/posthog-e2e-flags";
 import { safeLocalStorageGetItem } from "@/lib/safe-local-storage";
 import { SENTRY_E2E_DISABLED_STORAGE_KEY } from "@/lib/sentry/sentry-e2e-flags";
 import {
@@ -32,6 +35,29 @@ if (
   });
 
   logSentryEnabledLocally("browser");
+}
+
+// Production only, like the Umami script in `root-document.tsx`.
+if (
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "production" &&
+  safeLocalStorageGetItem(POSTHOG_E2E_DISABLED_STORAGE_KEY) !== "1"
+) {
+  posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
+    // same-origin proxy, see the `/relay` rewrites in next.config.mjs
+    api_host: "/relay",
+    ui_host: "https://eu.posthog.com",
+    defaults: "2026-08-30",
+    // No cookies or storage: PostHog derives the visitor id server-side, so there is no
+    // consent banner, as with Umami. Requires cookieless mode on in the project settings,
+    // or PostHog drops every event.
+    cookieless_mode: "always",
+    disable_session_recording: true,
+    // PostHog won't show surveys in cookieless mode without consent; turning them on
+    // means a consent banner and `cookieless_mode: "on_reject"`.
+    disable_surveys: true,
+    // overrides the project setting, so heatmaps stay on regardless of what it says
+    capture_heatmaps: true,
+  });
 }
 
 // Required by Sentry to instrument client-side router navigations (App Router).

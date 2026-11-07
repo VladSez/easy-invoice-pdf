@@ -10,13 +10,13 @@ import { GITHUB_URL } from "@/config";
 import { GitHubStarCTA } from "../github-star-cta";
 import { TooltipProvider } from "../ui/tooltip";
 
-vi.mock("@/lib/umami-analytics-track-event", () => {
+vi.mock("@/lib/analytics/track-event", () => {
   return {
-    umamiTrackEvent: vi.fn(),
+    trackEvent: vi.fn(),
   };
 });
 
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 
 function renderGitHubStarCTA(githubStarsCount: number) {
   return render(
@@ -116,8 +116,10 @@ describe("GitHubStarCTA", () => {
 
     await user.click(screen.getByTestId("github-star-cta-button"));
 
-    expect(umamiTrackEvent).toHaveBeenCalledWith("github_star_cta_clicked");
-    expect(umamiTrackEvent).toHaveBeenCalledTimes(1);
+    expect(trackEvent).toHaveBeenCalledWith({
+      event: "github_star_cta_clicked",
+    });
+    expect(trackEvent).toHaveBeenCalledTimes(1);
   });
 
   it("should show Star on GitHub tooltip on hover", async () => {

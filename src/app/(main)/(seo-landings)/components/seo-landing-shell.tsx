@@ -397,7 +397,7 @@ function MarkedHeading({
 const H1_MARK_DELAY_MS = 300;
 
 /**
- * The Umami event for a click on one of the landing's in-page CTAs, which open the app.
+ * The analytics event for a click on one of the landing's in-page CTAs, which open the app.
  *
  * `seo_sticky_cta_clicked` covers the sticky bar; together they show how many readers of a
  * landing go on to the generator, to set against `seo_landing_file_downloaded` on pages
