@@ -40,9 +40,9 @@ vi.mock("@/components/ui/toasts/error-generating-pdf-toast", () => {
   };
 });
 
-vi.mock("@/lib/umami-analytics-track-event", () => {
+vi.mock("@/lib/analytics/track-event", () => {
   return {
-    umamiTrackEvent: vi.fn(),
+    trackEvent: vi.fn(),
   };
 });
 
@@ -55,7 +55,7 @@ vi.mock("@sentry/nextjs", () => {
 import * as Sentry from "@sentry/nextjs";
 
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 
 import { InvoicePdfInstanceProvider } from "../invoice-pdf-instance-context";
 
@@ -93,10 +93,10 @@ describe("InvoicePdfInstanceProvider", () => {
     renderProvider();
 
     expect(ErrorGeneratingPdfToast).toHaveBeenCalledTimes(1);
-    expect(umamiTrackEvent).toHaveBeenCalledWith(
-      "error_generating_document_link",
-      { data: { error: pdfError } },
-    );
+    expect(trackEvent).toHaveBeenCalledWith({
+      event: "error_generating_document_link",
+      data: { error: pdfError },
+    });
     expect(Sentry.captureException).toHaveBeenCalledWith(pdfError);
   });
 

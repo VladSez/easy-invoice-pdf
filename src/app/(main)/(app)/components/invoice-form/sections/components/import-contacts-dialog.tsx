@@ -19,7 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { cn } from "@/lib/utils";
 
 import { ContactFields } from "./contact-fields";
@@ -143,7 +143,7 @@ export function ImportContactsDialog({
       const file = event.dataTransfer?.files[0];
 
       if (isChoosingFile && file) {
-        umamiTrackEvent("import_contacts_file_dropped");
+        trackEvent({ event: "import_contacts_file_dropped" });
         handleDroppedFile(file);
       }
     };
@@ -166,8 +166,9 @@ export function ImportContactsDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
         // `dvh` is missing before Safari 15.4; without the `vh` fallback the dialog would
-        // have no height limit there, pushing its title and buttons off screen
-        className="flex max-h-[calc(100vh-2rem)] flex-col gap-4 supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] sm:max-w-[520px]"
+        // have no height limit there, pushing its title and buttons off screen.
+        // ph-no-capture keeps the imported contact names out of PostHog autocapture.
+        className="ph-no-capture flex max-h-[calc(100vh-2rem)] flex-col gap-4 supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] sm:max-w-[520px]"
         data-testid="import-contacts-dialog"
       >
         {state.step === "choose" ? (
@@ -367,7 +368,7 @@ function PreviewStep({
 
   function selectTab(value: PreviewTabValue) {
     setSelectedTab(value);
-    umamiTrackEvent("import_contacts_tab_changed", { data: { tab: value } });
+    trackEvent({ event: "import_contacts_tab_changed", data: { tab: value } });
   }
 
   return (
@@ -623,7 +624,8 @@ function PreviewRow({ contact, isMuted = false }: PreviewRowProps) {
         data-testid="import-preview-entry"
         onToggle={(event) => {
           if (event.currentTarget.open) {
-            umamiTrackEvent("import_contacts_entry_expanded", {
+            trackEvent({
+              event: "import_contacts_entry_expanded",
               data: { status: isMuted ? "already_saved" : "new" },
             });
           }
@@ -769,7 +771,7 @@ function FilePickerLabel({
           input.value = "";
 
           if (file) {
-            umamiTrackEvent("import_contacts_file_picked");
+            trackEvent({ event: "import_contacts_file_picked" });
             onFileSelected(file);
           }
         }}

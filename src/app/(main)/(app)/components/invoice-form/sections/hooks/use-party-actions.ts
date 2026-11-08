@@ -6,7 +6,7 @@ import {
   type Party,
   type PartyData,
 } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/party-config";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 
 interface UsePartyActionsOptions<P extends Party> {
   /** Which list the actions work on: the saved sellers or the saved buyers. */
@@ -78,7 +78,7 @@ export function usePartyActions<P extends Party>({
       }
 
       onSaved();
-      umamiTrackEvent(`${action}_${party}_success`);
+      trackEvent({ event: `${action}_${party}_success` });
 
       return true;
     } catch (error) {
@@ -162,7 +162,7 @@ export function usePartyActions<P extends Party>({
 
   /** Picks a saved party for the invoice; `""` goes back to the default details. */
   const selectParty = (id: string) => {
-    umamiTrackEvent(`change_${party}`);
+    trackEvent({ event: `change_${party}` });
 
     if (!id) {
       setSelectedId("");

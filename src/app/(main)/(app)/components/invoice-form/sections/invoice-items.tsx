@@ -40,7 +40,7 @@ import { MoneyInput, ReadOnlyMoneyInput } from "@/components/ui/money-input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { cn } from "@/lib/utils";
 import {
   getAmountInWords,
@@ -920,7 +920,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                 typeOfGTUFieldIsVisible: true,
               });
 
-              umamiTrackEvent("add_invoice_item");
+              trackEvent({ event: "add_invoice_item" });
             }}
             variant="default"
             disabled={hasReachedItemLimit}

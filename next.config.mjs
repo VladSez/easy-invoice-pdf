@@ -136,6 +136,12 @@ const withMDX = createMDX({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // PostHog (`instrumentation-client.ts`) only starts on the production deployment, like
+  // the Umami script. Vercel sets `VERCEL_ENV` for the build; inlining it is what lets
+  // client code read it.
+  env: {
+    NEXT_PUBLIC_VERCEL_ENV: process.env.VERCEL_ENV ?? "",
+  },
   // pdfjs-dist ships untranspiled ES2022 (static init blocks, private static
   // methods). Next does not compile node_modules, so the chunk reaches the
   // browser as-is and any Safari < 16.4 dies parsing it with
@@ -183,6 +189,21 @@ const nextConfig = {
         // proxy umami analytics https://umami.is/docs/guides/running-on-vercel
         source: "/stats/:match*",
         destination: "https://cloud.umami.is/:match*",
+      },
+      // proxy PostHog (EU Cloud) through our own origin so ad blockers let it through,
+      // https://posthog.com/docs/advanced/proxy/nextjs. Keep `api_host` in
+      // `instrumentation-client.ts` in sync. Order matters: the assets rules come first.
+      {
+        source: "/relay/static/:path*",
+        destination: "https://eu-assets.i.posthog.com/static/:path*",
+      },
+      {
+        source: "/relay/array/:path*",
+        destination: "https://eu-assets.i.posthog.com/array/:path*",
+      },
+      {
+        source: "/relay/:path*",
+        destination: "https://eu.i.posthog.com/:path*",
       },
     ];
   },

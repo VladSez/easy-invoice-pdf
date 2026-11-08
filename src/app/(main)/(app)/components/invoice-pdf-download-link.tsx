@@ -11,8 +11,8 @@ import {
 } from "@/app/schema";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { useDeviceContext } from "@/contexts/device-context";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { haptic } from "@/lib/haptic";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
 import { cn } from "@/lib/utils";
 import { isTelegramInAppBrowser } from "@/utils/is-telegram-in-app-browser";
 
@@ -116,7 +116,8 @@ export function InvoicePDFDownloadLink({
         haptic();
 
         // track download event
-        umamiTrackEvent("download_invoice", {
+        trackEvent({
+          event: "download_invoice",
           data: {
             invoice_template: invoiceData.template,
             has_item_discount: invoiceData.items.some((item) => {

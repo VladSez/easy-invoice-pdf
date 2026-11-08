@@ -4,7 +4,7 @@ import { toast as sonnerToast } from "sonner";
 import { GithubIcon } from "@/components/etc/github-logo";
 import { Button } from "@/components/ui/button";
 import { DISCORD_FEEDBACK_URL, GITHUB_URL } from "@/config";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 
 interface ToastProps {
   id: string | number;
@@ -74,7 +74,9 @@ function PremiumDonationToast(props: ToastProps) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
-                umamiTrackEvent("gh_star_btn_click_download_pdf_toast_premium");
+                trackEvent({
+                  event: "gh_star_btn_click_download_pdf_toast_premium",
+                });
 
                 sonnerToast.dismiss(id);
               }}
@@ -95,9 +97,9 @@ function PremiumDonationToast(props: ToastProps) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
-                umamiTrackEvent(
-                  "feedback_btn_click_download_pdf_toast_premium",
-                );
+                trackEvent({
+                  event: "feedback_btn_click_download_pdf_toast_premium",
+                });
 
                 sonnerToast.dismiss(id);
               }}

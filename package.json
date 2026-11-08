@@ -95,6 +95,7 @@
     "next": "16.4.3",
     "next-intl": "4.13.7",
     "pdfjs-dist": "5.4.296",
+    "posthog-js": "1.444.0",
     "qrcode": "1.5.4",
     "react": "19.2.8",
     "react-colorful": "5.6.1",

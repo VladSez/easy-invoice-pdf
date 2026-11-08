@@ -35,7 +35,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { useIsLocalStorageAvailable } from "@/lib/use-is-local-storage-available";
 
 /**
@@ -102,7 +102,7 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
         position: toastPosition,
       });
 
-      umamiTrackEvent("export_contacts_success");
+      trackEvent({ event: "export_contacts_success" });
     } catch (error) {
       console.error("Failed to export sellers & buyers:", error);
 
@@ -115,7 +115,7 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
 
       Sentry.captureException(error);
 
-      umamiTrackEvent("export_contacts_error");
+      trackEvent({ event: "export_contacts_error" });
     }
   };
 
@@ -127,7 +127,7 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
     const showFileError = ({ error, reason }: ShowFileErrorOptions) => {
       setImportState({ step: "error", fileName: file.name, error });
 
-      umamiTrackEvent("import_contacts_file_error", { data: { reason } });
+      trackEvent({ event: "import_contacts_file_error", data: { reason } });
     };
 
     if (file.size > MAX_CONTACTS_BACKUP_FILE_BYTES) {
@@ -180,7 +180,8 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
         buyers,
       });
 
-      umamiTrackEvent("import_contacts_preview_shown", {
+      trackEvent({
+        event: "import_contacts_preview_shown",
         data: {
           sellersToAdd: sellers.added.length,
           buyersToAdd: buyers.added.length,
@@ -213,7 +214,7 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
       description,
       reason,
     }: ShowImportErrorOptions) => {
-      umamiTrackEvent("import_contacts_error", { data: { reason } });
+      trackEvent({ event: "import_contacts_error", data: { reason } });
 
       toast.error("Could not import sellers & buyers", {
         id: "import_contacts_error_toast",
@@ -271,7 +272,8 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
         },
       );
 
-      umamiTrackEvent("import_contacts_success", {
+      trackEvent({
+        event: "import_contacts_success",
         data: {
           sellersAdded: sellers.added.length,
           buyersAdded: buyers.added.length,
@@ -302,7 +304,7 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
             return;
           }
 
-          umamiTrackEvent("contacts_backup_menu_opened");
+          trackEvent({ event: "contacts_backup_menu_opened" });
 
           // dismiss any existing toast for better UX
           toast.dismiss();
@@ -345,7 +347,7 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
               setImportState({ step: "choose" });
               setIsImportDialogOpen(true);
 
-              umamiTrackEvent("import_contacts_dialog_opened");
+              trackEvent({ event: "import_contacts_dialog_opened" });
             }}
           >
             <Upload className="size-3.5" />
@@ -361,7 +363,8 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
 
           // A confirmed import closes the dialog itself, so this is only a dismissal
           if (!isOpen) {
-            umamiTrackEvent("import_contacts_dialog_dismissed", {
+            trackEvent({
+              event: "import_contacts_dialog_dismissed",
               data: { step: importState.step },
             });
           }

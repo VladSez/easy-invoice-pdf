@@ -33,9 +33,9 @@ vi.mock("@sentry/nextjs", () => {
   };
 });
 
-vi.mock("@/lib/umami-analytics-track-event", () => {
+vi.mock("@/lib/analytics/track-event", () => {
   return {
-    umamiTrackEvent: vi.fn(),
+    trackEvent: vi.fn(),
   };
 });
 

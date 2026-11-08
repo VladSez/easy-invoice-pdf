@@ -8,7 +8,7 @@ import { InvoicePdfTemplate } from "@/app/(main)/(app)/components/invoice-templa
 import { StripeInvoicePdfTemplate } from "@/app/(main)/(app)/components/invoice-templates/invoice-pdf-stripe-template";
 import type { InvoiceData } from "@/app/schema";
 import { ErrorGeneratingPdfToast } from "@/components/ui/toasts/error-generating-pdf-toast";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 
 /** The state of the single PDF render that every consumer on the page shares */
 interface InvoicePdfInstance {
@@ -99,7 +99,7 @@ export function InvoicePdfInstanceProvider({
 
     ErrorGeneratingPdfToast();
 
-    umamiTrackEvent("error_generating_document_link", { data: { error } });
+    trackEvent({ event: "error_generating_document_link", data: { error } });
 
     Sentry.captureException(error);
   }, [error]);

@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
 import { Label } from "@/components/ui/label";
 import { MoneyInput } from "@/components/ui/money-input";
-import { umamiTrackEvent } from "@/lib/umami-analytics-track-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { cn } from "@/lib/utils";
 
 /**
@@ -66,7 +66,7 @@ export function ItemDiscountFields({
         onClick={() => {
           setIsOpen(true);
           setShouldFocusValue(true);
-          umamiTrackEvent("add_item_discount");
+          trackEvent({ event: "add_item_discount" });
         }}
         data-testid={`addItemDiscount${index}`}
       >
@@ -95,7 +95,7 @@ export function ItemDiscountFields({
         setValue(`items.${index}.discountLabel`, "");
         setValue(`items.${index}.discountType`, "percentage");
         setIsOpen(false);
-        umamiTrackEvent("remove_item_discount");
+        trackEvent({ event: "remove_item_discount" });
 
         // the section unmounts with the focused button in it, so hand focus to the
         // "Add discount" button that takes its place
@@ -201,7 +201,8 @@ function OpenItemDiscountFields({
 
                   field.onChange(nextType);
 
-                  umamiTrackEvent("change_item_discount_type", {
+                  trackEvent({
+                    event: "change_item_discount_type",
                     data: { discount_type: nextType },
                   });
                   // Validate only to clear an error the old value left behind. A
