@@ -24,6 +24,8 @@ declare global {
 // Umami rejects longer names: https://umami.is/docs/track-events
 const eventNameSchema = z.string().min(1).max(50);
 
+const UMAMI_ERROR_EVENT = "error_tracking_umami_event";
+
 /**
  * Sends a custom event to both Umami and PostHog while the two run side by side.
  *
@@ -48,9 +50,10 @@ export function trackEvent({ event, data }: TrackEventOptions) {
     console.error("Failed to track Umami event:", error);
     Sentry.captureException(error);
 
-    if (error instanceof Error) {
+    // A failing Umami would fail this report too, so it is sent at most once.
+    if (error instanceof Error && event !== UMAMI_ERROR_EVENT) {
       trackEvent({
-        event: "error_tracking_umami_event",
+        event: UMAMI_ERROR_EVENT,
         data: { error: error.message },
       });
     }

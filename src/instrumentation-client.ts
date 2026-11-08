@@ -8,7 +8,9 @@ import { posthog } from "posthog-js";
 
 import { env } from "@/env";
 import { POSTHOG_E2E_DISABLED_STORAGE_KEY } from "@/lib/analytics/posthog-e2e-flags";
+import { scrubPostHogEvent } from "@/lib/analytics/scrub-posthog-event";
 import { safeLocalStorageGetItem } from "@/lib/safe-local-storage";
+import { SENSITIVE_QUERY_PARAMS } from "@/lib/sentry/scrub-sensitive-url-params";
 import { SENTRY_E2E_DISABLED_STORAGE_KEY } from "@/lib/sentry/sentry-e2e-flags";
 import {
   isSentryEnabled,
@@ -57,6 +59,12 @@ if (
     disable_surveys: true,
     // overrides the project setting, so heatmaps stay on regardless of what it says
     capture_heatmaps: true,
+    // `?data=` holds the whole invoice of a shared link. Masking it at the source covers
+    // what `before_send` never sees, such as the person properties on `/flags` requests;
+    // `before_send` covers what masking misses, such as heatmap data keyed by page URL.
+    mask_personal_data_properties: true,
+    custom_personal_data_properties: [...SENSITIVE_QUERY_PARAMS],
+    before_send: scrubPostHogEvent,
   });
 }
 

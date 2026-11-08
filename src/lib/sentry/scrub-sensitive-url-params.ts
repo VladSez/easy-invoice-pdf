@@ -6,14 +6,14 @@ import type { Breadcrumb, Event } from "@sentry/nextjs";
  * `data` holds the compressed invoice (seller/buyer details, addresses, VAT ids,
  * line items), see `src/utils/url-compression.ts`.
  */
-const SENSITIVE_QUERY_PARAMS = ["data"] as const;
+export const SENSITIVE_QUERY_PARAMS = ["data"] as const;
 
 /**
  * Replaces the value of a sensitive param, so the event still tells us an invoice
  * URL was involved without carrying the invoice itself. Matches what Sentry's own
  * server-side scrubbing uses.
  */
-const REDACTED_VALUE = "[Filtered]";
+export const REDACTED_VALUE = "[Filtered]";
 
 /** `URLSearchParams` percent-encodes the brackets, undo that so it stays readable in Sentry. */
 const ENCODED_REDACTED_VALUE = encodeURIComponent(REDACTED_VALUE);
