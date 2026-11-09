@@ -201,6 +201,16 @@ export const GeneralInformation = memo(function GeneralInformation({
       try {
         const base64 = await convertFileToBase64(file);
         setValue("logo", base64);
+
+        trackEvent({
+          event: "logo_attached",
+          data: {
+            invoice_template: template,
+            logo_file_type: file.type,
+            logo_size_kb: Math.round(file.size / 1024),
+          },
+        });
+
         toast.success("Logo uploaded successfully!", {
           id: "logo-uploaded-success-toast",
           closeButton: true,
@@ -217,7 +227,7 @@ export const GeneralInformation = memo(function GeneralInformation({
         });
       }
     },
-    [isMobile, setValue],
+    [isMobile, setValue, template],
   );
 
   const handleLogoRemove = useCallback(() => {
