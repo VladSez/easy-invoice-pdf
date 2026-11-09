@@ -24,20 +24,9 @@ if (!fs.existsSync(path.join(OUTPUT_DIR, "index.html"))) {
 }
 
 const server = http.createServer((request, response) => {
-  const urlPath = decodeURIComponent(
-    new URL(request.url ?? "/", "http://localhost").pathname,
-  );
-  const filePath = path.join(
-    OUTPUT_DIR,
-    urlPath === "/" ? "index.html" : urlPath,
-  );
+  const filePath = resolveFilePath(request.url ?? "/");
 
-  // keep requests inside output/
-  if (
-    !filePath.startsWith(OUTPUT_DIR) ||
-    !fs.existsSync(filePath) ||
-    !fs.statSync(filePath).isFile()
-  ) {
+  if (!filePath) {
     response.writeHead(404).end("Not found");
 
     return;
@@ -48,7 +37,12 @@ const server = http.createServer((request, response) => {
       CONTENT_TYPES[path.extname(filePath)] ?? "application/octet-stream",
     "Cache-Control": "no-store",
   });
-  fs.createReadStream(filePath).pipe(response);
+  fs.createReadStream(filePath)
+    .on("error", () => {
+      // the file vanished mid-request (a capture rewriting output/)
+      response.destroy();
+    })
+    .pipe(response);
 });
 
 server.listen(PORT, "127.0.0.1", () => {
@@ -67,3 +61,41 @@ server.listen(PORT, "127.0.0.1", () => {
     // no browser to open (CI, SSH): the URL above is enough
   });
 });
+
+/**
+ * Maps a request URL to a file inside `output/`, or `null` when there is none: a
+ * malformed escape (`/%E0`), a path that leaves `output/` (`/../package.json`, or a
+ * sibling such as `output-old/`), a directory, or a missing file.
+ */
+function resolveFilePath(requestUrl: string) {
+  let urlPath: string;
+
+  try {
+    urlPath = decodeURIComponent(
+      new URL(requestUrl, "http://localhost").pathname,
+    );
+  } catch {
+    return null;
+  }
+
+  const filePath = path.join(
+    OUTPUT_DIR,
+    urlPath === "/" ? "index.html" : urlPath,
+  );
+  // compares whole path segments, unlike a string prefix check
+  const relativePath = path.relative(OUTPUT_DIR, filePath);
+
+  if (
+    relativePath === "" ||
+    relativePath.startsWith("..") ||
+    path.isAbsolute(relativePath)
+  ) {
+    return null;
+  }
+
+  try {
+    return fs.statSync(filePath).isFile() ? filePath : null;
+  } catch {
+    return null;
+  }
+}
