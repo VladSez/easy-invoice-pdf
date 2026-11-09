@@ -48,6 +48,7 @@ node_modules/
 /playwright/.cache/
 /playwright-output/
 /playwright-test-downloads/
+/scripts/page-atlas/output/
 
 .playwright-mcp
 
