@@ -98,9 +98,14 @@ jobs:
 
       # `deployment_status` has no PR in its payload, and `github.ref_name` is empty
       # for this event, so we look the PR up by the deployed commit SHA instead.
+      #
+      # Skipped for Production (`main`) deploys: a merged PR's commit still maps back
+      # to that PR, which would label a `main` run as the PR. With no outputs, the
+      # email subject and body both fall back to the repository name.
+      # Vercel sets `deployment.ref` to the SHA, so `environment` is the branch signal.
       - name: 🔍 Get PR details
         id: pr
-        if: always()
+        if: ${{ always() && github.event.deployment.environment != 'Production' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPOSITORY: ${{ github.repository }}
