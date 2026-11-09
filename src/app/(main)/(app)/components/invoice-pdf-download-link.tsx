@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useInvoicePdfInstance } from "@/app/(main)/(app)/contexts/invoice-pdf-instance-context";
 import {
   LANGUAGE_TO_LABEL,
+  resolveNumberFormatLocale,
   type InvoiceData,
   type SupportedLanguages,
 } from "@/app/schema";
@@ -118,12 +119,7 @@ export function InvoicePDFDownloadLink({
         // track download event
         trackEvent({
           event: "download_invoice",
-          data: {
-            invoice_template: invoiceData.template,
-            has_item_discount: invoiceData.items.some((item) => {
-              return item.discountAmount > 0;
-            }),
-          },
+          data: getDownloadInvoiceEventData(invoiceData),
         });
 
         updateAppMetadata((current) => {
@@ -155,8 +151,7 @@ export function InvoicePDFDownloadLink({
       isLoading,
       error,
       isMobile,
-      invoiceData.template,
-      invoiceData.items,
+      invoiceData,
       hasTriggeredCTAAction,
       markCTAActionTriggered,
     ],
@@ -245,4 +240,27 @@ export function InvoicePDFDownloadLink({
       }
     />
   );
+}
+
+/**
+ * Properties of the `download_invoice` event: how the invoice is set up, never what it says.
+ * Keys are snake_case to match the rest of the event properties in Umami and PostHog.
+ */
+function getDownloadInvoiceEventData(invoiceData: InvoiceData) {
+  return {
+    invoice_template: invoiceData.template,
+    invoice_language: invoiceData.language,
+    invoice_currency: invoiceData.currency,
+    invoice_date_format: invoiceData.dateFormat,
+    invoice_number_format_locale: resolveNumberFormatLocale({
+      language: invoiceData.language,
+      numberFormatLocale: invoiceData.numberFormatLocale,
+    }),
+    invoice_item_count: invoiceData.items.length,
+    has_item_discount: invoiceData.items.some((item) => {
+      return item.discountAmount > 0;
+    }),
+    has_logo: Boolean(invoiceData.logo),
+    has_qr_code: invoiceData.qrCodeIsVisible && Boolean(invoiceData.qrCodeData),
+  };
 }

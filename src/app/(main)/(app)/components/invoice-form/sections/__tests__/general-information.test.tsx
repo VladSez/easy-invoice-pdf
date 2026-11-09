@@ -5,10 +5,12 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 import {
   afterAll,
   afterEach,
@@ -22,6 +24,7 @@ import {
 import { getInitialInvoiceData } from "@/app/constants";
 import type { InvoiceData, SupportedLanguages } from "@/app/schema";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { trackEvent } from "@/lib/analytics/track-event";
 import "@testing-library/jest-dom/vitest";
 
 vi.mock("sonner", () => {
@@ -30,6 +33,12 @@ vi.mock("sonner", () => {
       success: vi.fn(),
       error: vi.fn(),
     },
+  };
+});
+
+vi.mock("@/lib/analytics/track-event", () => {
+  return {
+    trackEvent: vi.fn(),
   };
 });
 
@@ -566,6 +575,93 @@ describe("GeneralInformation date helper texts", () => {
       expect(screen.getByTestId("top-line-color-readout")).toHaveTextContent(
         "#10b981",
       );
+    });
+
+    it("tracks stripe_top_line_color_changed for a preset", async () => {
+      const user = userEvent.setup();
+      renderGeneralInformation({ template: "stripe" });
+
+      await user.click(screen.getByRole("button", { name: "Emerald" }));
+
+      expect(trackEvent).toHaveBeenCalledWith({
+        event: "stripe_top_line_color_changed",
+        data: {
+          color: "#10b981",
+          previous_color: "#fbbf24",
+          is_preset: true,
+        },
+      });
+    });
+
+    it("tracks a reset as a change back to the default color", async () => {
+      const user = userEvent.setup();
+      renderGeneralInformation({ template: "stripe" });
+
+      await user.click(screen.getByRole("button", { name: "Emerald" }));
+      await user.click(
+        screen.getByRole("button", { name: "Reset to default" }),
+      );
+
+      expect(trackEvent).toHaveBeenLastCalledWith({
+        event: "stripe_top_line_color_changed",
+        data: {
+          color: "#fbbf24",
+          previous_color: "#10b981",
+          is_preset: true,
+        },
+      });
+    });
+
+    it("does not track a click on the swatch that is already selected", async () => {
+      const user = userEvent.setup();
+      renderGeneralInformation({ template: "stripe" });
+
+      await user.click(screen.getByRole("button", { name: "Amber (default)" }));
+
+      expect(trackEvent).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("logo upload", () => {
+    it("tracks logo_attached once the logo is stored", async () => {
+      renderGeneralInformation({ template: "stripe" });
+
+      const file = new File([new Uint8Array(2048)], "logo.png", {
+        type: "image/png",
+      });
+
+      fireEvent.change(screen.getByLabelText("Company Logo"), {
+        target: { files: [file] },
+      });
+
+      await waitFor(() => {
+        expect(trackEvent).toHaveBeenCalledWith({
+          event: "logo_attached",
+          data: {
+            invoice_template: "stripe",
+            logo_file_type: "image/png",
+            logo_size_kb: 2,
+          },
+        });
+      });
+    });
+
+    it("does not track a rejected file type", async () => {
+      renderGeneralInformation();
+
+      const file = new File(["gif"], "logo.gif", { type: "image/gif" });
+
+      fireEvent.change(screen.getByLabelText("Company Logo"), {
+        target: { files: [file] },
+      });
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          "Please select a valid image file (JPEG, PNG or WebP)",
+        );
+      });
+
+      expect(trackEvent).not.toHaveBeenCalled();
     });
   });
 
