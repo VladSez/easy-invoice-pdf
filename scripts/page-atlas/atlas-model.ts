@@ -267,7 +267,7 @@ export const FLOWS = [
             next: [
               {
                 state: "editor/edited",
-                via: "Edit the notes",
+                via: "Edit the seller name",
                 next: [{ state: "editor/cta-toast", via: "Download PDF" }],
               },
             ],
@@ -489,7 +489,7 @@ export const FLOWS = [
           { state: "editor/share-blocked-logo", via: "Get link with a logo" },
           {
             state: "editor/share-too-large",
-            via: "Get link with 16 long items",
+            via: "Get link with 24 long items",
           },
         ],
       },
