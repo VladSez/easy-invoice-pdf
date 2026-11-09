@@ -576,6 +576,50 @@ describe("GeneralInformation date helper texts", () => {
         "#10b981",
       );
     });
+
+    it("tracks stripe_top_line_color_changed for a preset", async () => {
+      const user = userEvent.setup();
+      renderGeneralInformation({ template: "stripe" });
+
+      await user.click(screen.getByRole("button", { name: "Emerald" }));
+
+      expect(trackEvent).toHaveBeenCalledWith({
+        event: "stripe_top_line_color_changed",
+        data: {
+          color: "#10b981",
+          previous_color: "#fbbf24",
+          is_preset: true,
+        },
+      });
+    });
+
+    it("tracks a reset as a change back to the default color", async () => {
+      const user = userEvent.setup();
+      renderGeneralInformation({ template: "stripe" });
+
+      await user.click(screen.getByRole("button", { name: "Emerald" }));
+      await user.click(
+        screen.getByRole("button", { name: "Reset to default" }),
+      );
+
+      expect(trackEvent).toHaveBeenLastCalledWith({
+        event: "stripe_top_line_color_changed",
+        data: {
+          color: "#fbbf24",
+          previous_color: "#10b981",
+          is_preset: true,
+        },
+      });
+    });
+
+    it("does not track a click on the swatch that is already selected", async () => {
+      const user = userEvent.setup();
+      renderGeneralInformation({ template: "stripe" });
+
+      await user.click(screen.getByRole("button", { name: "Amber (default)" }));
+
+      expect(trackEvent).not.toHaveBeenCalled();
+    });
   });
 
   describe("logo upload", () => {

@@ -279,6 +279,13 @@ function normalizeHexColor(color: string) {
   return null;
 }
 
+/** Whether `color` is one of the swatches, rather than a custom pick. */
+export function isPresetTopLineColor(color: string) {
+  return PRESET_COLORS.some((presetColor) => {
+    return presetColor.hex === color;
+  });
+}
+
 /** How long the picker waits after the last drag or keystroke before writing to the form. */
 const COLOR_PICKER_DEBOUNCE_MS = 250;
 

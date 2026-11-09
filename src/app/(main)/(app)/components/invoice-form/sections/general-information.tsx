@@ -39,6 +39,7 @@ import {
   type InvoiceData,
   LANGUAGE_TO_LABEL_WITH_REGION,
   DEFAULT_DATE_FORMAT,
+  DEFAULT_STRIPE_TOP_LINE_COLOR,
   getDateFormatsForLanguage,
   getDefaultDateFormat,
   getNumberFormatLocaleAfterLanguageChange,
@@ -62,7 +63,10 @@ import { cn } from "@/lib/utils";
 
 import { convertFileToBase64, validateImageSize } from "../utils/logo-upload";
 import { StaleDatesBanner } from "./components/stale-dates-banner";
-import { StripeTopLineColorPicker } from "./components/stripe-top-line-color-picker";
+import {
+  isPresetTopLineColor,
+  StripeTopLineColorPicker,
+} from "./components/stripe-top-line-color-picker";
 
 interface GeneralInformationProps {
   control: Control<InvoiceData>;
@@ -1393,7 +1397,27 @@ export const GeneralInformation = memo(function GeneralInformation({
                 return (
                   <StripeTopLineColorPicker
                     value={field.value}
-                    onChange={field.onChange}
+                    onChange={(newColor) => {
+                      field.onChange(newColor);
+
+                      const color = newColor ?? DEFAULT_STRIPE_TOP_LINE_COLOR;
+                      const previousColor =
+                        field.value ?? DEFAULT_STRIPE_TOP_LINE_COLOR;
+
+                      // a click on the swatch that is already selected changes nothing
+                      if (color === previousColor) return;
+
+                      // the picker debounces drags and typing, so this fires once per
+                      // color that reaches the form, not on every move
+                      trackEvent({
+                        event: "stripe_top_line_color_changed",
+                        data: {
+                          color,
+                          previous_color: previousColor,
+                          is_preset: isPresetTopLineColor(color),
+                        },
+                      });
+                    }}
                     hasError={!!errors.stripeTopLineColor}
                   />
                 );
