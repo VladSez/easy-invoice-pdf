@@ -261,7 +261,14 @@ describe("InvoicePDFDownloadLink", () => {
       event: "download_invoice",
       data: {
         invoice_template: "default",
+        invoice_language: "en",
+        invoice_currency: "EUR",
+        invoice_date_format: "YYYY-MM-DD",
+        invoice_number_format_locale: "en",
+        invoice_item_count: 1,
         has_item_discount: false,
+        has_logo: false,
+        has_qr_code: false,
       },
     });
     expect(updateAppMetadata).toHaveBeenCalledTimes(1);
@@ -286,11 +293,42 @@ describe("InvoicePDFDownloadLink", () => {
 
     fireEvent.click(getDownloadLink());
 
-    expect(trackEvent).toHaveBeenCalledWith({
+    expect(vi.mocked(trackEvent).mock.lastCall?.[0]).toMatchObject({
       event: "download_invoice",
       data: {
         invoice_template: "default",
         has_item_discount: true,
+      },
+    });
+  });
+
+  it("should report the invoice language, currency and formats", () => {
+    const invoiceData: InvoiceData = {
+      ...getInitialInvoiceData(),
+      template: "stripe",
+      language: "pl",
+      currency: "PLN",
+      dateFormat: "DD.MM.YYYY",
+      numberFormatLocale: "de",
+      logo: "data:image/png;base64,abc",
+      qrCodeData: "https://example.com/pay",
+      qrCodeIsVisible: true,
+    };
+
+    renderInvoicePDFDownloadLink({ invoiceData });
+
+    fireEvent.click(getDownloadLink());
+
+    expect(vi.mocked(trackEvent).mock.lastCall?.[0]).toMatchObject({
+      event: "download_invoice",
+      data: {
+        invoice_template: "stripe",
+        invoice_language: "pl",
+        invoice_currency: "PLN",
+        invoice_date_format: "DD.MM.YYYY",
+        invoice_number_format_locale: "de",
+        has_logo: true,
+        has_qr_code: true,
       },
     });
   });
@@ -306,7 +344,7 @@ describe("InvoicePDFDownloadLink", () => {
     fireEvent.click(getDownloadLink());
 
     // the download itself still goes through
-    expect(trackEvent).toHaveBeenCalledWith({
+    expect(vi.mocked(trackEvent).mock.lastCall?.[0]).toMatchObject({
       event: "download_invoice",
       data: {
         invoice_template: "default",
