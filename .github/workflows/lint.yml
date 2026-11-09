@@ -66,9 +66,11 @@ jobs:
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "❌ ${{ steps.lint.outcome == 'failure' && (steps.format.outcome == 'failure' && 'Linting and formatting failed' || 'Linting failed') || 'Formatting failed' }} for ${{ github.repository }}"
+          subject: "❌ ${{ steps.lint.outcome == 'failure' && (steps.format.outcome == 'failure' && 'Linting and formatting failed' || 'Linting failed') || 'Formatting failed' }}${{ github.event.pull_request && format(' · #{0} {1}', github.event.pull_request.number, github.event.pull_request.title) || format(' for {0}', github.repository) }}"
           body: |
             Linting or formatting for ${{ github.repository }} has failed.
+
+            ${{ github.event.pull_request && format('Pull Request: #{0} {1}', github.event.pull_request.number, github.event.pull_request.title) }}
 
             - 🔎 Lint (oxlint): ${{ steps.lint.outcome == 'failure' && '❌ failed' || '✅ passed' }}
             - 💅 Format (oxfmt): ${{ steps.format.outcome == 'failure' && '❌ failed' || '✅ passed' }}
