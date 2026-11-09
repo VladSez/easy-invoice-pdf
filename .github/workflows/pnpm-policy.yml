@@ -79,7 +79,7 @@ jobs:
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: ❌ pnpm Supply-Chain Policy Failed${{ github.event.pull_request && format(' · #{0} {1}', github.event.pull_request.number, github.event.pull_request.title) || format(' for {0}', github.repository) }}
+          subject: "❌ pnpm Supply-Chain Policy Failed${{ github.event.pull_request && format(' · #{0} {1}', github.event.pull_request.number, github.event.pull_request.title) || format(' for {0}', github.repository) }}"
           body: |
             pnpm supply-chain policy verification for ${{ github.repository }} has failed.
 

@@ -130,7 +130,7 @@ jobs:
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: ${{ job.status == 'cancelled' && '⚠️ E2E Tests Cancelled' || (steps.playwright.outcome == 'success' && '✅ E2E Tests Passed' || '❌ E2E Tests Failed') }}${{ steps.pr.outputs.pr_number && format(' · #{0} {1}', steps.pr.outputs.pr_number, steps.pr.outputs.pr_title) || format(' for {0}', github.repository) }}
+          subject: "${{ job.status == 'cancelled' && '⚠️ E2E Tests Cancelled' || (steps.playwright.outcome == 'success' && '✅ E2E Tests Passed' || '❌ E2E Tests Failed') }}${{ steps.pr.outputs.pr_number && format(' · #{0} {1}', steps.pr.outputs.pr_number, steps.pr.outputs.pr_title) || format(' for {0}', github.repository) }}"
           body: |
             E2E tests for ${{ github.repository }} have completed.
 
