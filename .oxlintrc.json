@@ -285,7 +285,7 @@
       }
     },
     {
-      "files": ["e2e/**"],
+      "files": ["e2e/**", "scripts/page-atlas/**"],
       "jsPlugins": ["eslint-plugin-playwright"],
       // `playwright/flat-recommended`, expanded (see the note above).
       "rules": {

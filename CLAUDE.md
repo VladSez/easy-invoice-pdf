@@ -105,6 +105,12 @@ There are **two root layouts**, both rendering the shared `<html>`/`<body>` shel
 - If e2e is flaky locally, use `pnpm e2e:not-flaky` (2 workers).
 - Prefer a unit test over an e2e test whenever the behaviour can be covered in `src/` — e2e runs are expensive, see [Commands](#commands).
 
+## Screen atlas
+
+`scripts/page-atlas/` captures every screen, state and user flow of `/`, `/stripe-template` and `/[locale]/about` at desktop and phone width with Playwright. It is local-first: `pnpm atlas` captures (starting `pnpm dev` if needed) and `pnpm atlas:view` opens the result on http://localhost:6007. A shared copy is published as a private artifact, https://claude.ai/artifact/3RSwfQhmcoDq7aZVSreHak.
+
+**Keep it current.** When a task changes what those routes show (layout, copy, a dialog, a toast, a state added or removed), run the `update-screen-atlas` skill as the task's last step: update `scripts/page-atlas/atlas-model.ts` for new or removed states, recapture the affected flows, and republish the shared copy. Skip it for changes nobody can see (types, tests, server-only code, the PDF templates' internals with no visible effect).
+
 ## Conventions
 
 From `.cursor/rules/` (all apply here):

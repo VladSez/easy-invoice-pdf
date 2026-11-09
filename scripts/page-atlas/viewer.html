@@ -1,0 +1,1358 @@
+<title>EasyInvoicePDF Screen Atlas</title>
+<meta name="claude:viewport-fit-sides" content="cover" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600&display=swap"
+/>
+<style>
+  /* Layout: sticky toolbar over either a wrapping gallery of pages or a pan-and-zoom canvas of flow trees. */
+  :root {
+    --bg: #f3f5f7;
+    --surface: #ffffff;
+    --canvas: #eceff3;
+    --ink: #17202b;
+    --muted: #5b6676;
+    --faint: #8a94a3;
+    --line: #d5dbe3;
+    --edge: #9aa5b4;
+    --accent: #1d5f8a;
+    --accent-soft: #e2eef6;
+    --ok: #3f9a5c;
+    --warn: #b7791f;
+    --shadow: 0 1px 2px rgb(23 32 43 / 0.06), 0 4px 14px rgb(23 32 43 / 0.06);
+    --font-display:
+      "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+    --font-body:
+      "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11161c;
+      --surface: #19212a;
+      --canvas: #0d1217;
+      --ink: #e6ebf1;
+      --muted: #9aa6b5;
+      --faint: #6d7988;
+      --line: #2a3440;
+      --edge: #5b6878;
+      --accent: #6fb3e0;
+      --accent-soft: #1c2f3e;
+      --ok: #5cbf7c;
+      --warn: #e0a548;
+      --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 14px rgb(0 0 0 / 0.3);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11161c;
+    --surface: #19212a;
+    --canvas: #0d1217;
+    --ink: #e6ebf1;
+    --muted: #9aa6b5;
+    --faint: #6d7988;
+    --line: #2a3440;
+    --edge: #5b6878;
+    --accent: #6fb3e0;
+    --accent-soft: #1c2f3e;
+    --ok: #5cbf7c;
+    --warn: #e0a548;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 14px rgb(0 0 0 / 0.3);
+    color-scheme: dark;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  html,
+  body {
+    height: 100%;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 14px/1.45 var(--font-body);
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    z-index: 10;
+    background: var(--surface);
+  }
+  button,
+  select,
+  input {
+    font: inherit;
+    color: inherit;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .gutter {
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+
+  header.top {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 5;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 20px;
+    padding-block: 12px;
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0;
+  }
+  .brand b {
+    font: 600 20px/1 var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  .brand span {
+    font: 500 11px/1 var(--font-mono);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  nav.tabs {
+    display: flex;
+    gap: 4px;
+  }
+  nav.tabs a {
+    color: var(--muted);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 4px 2px;
+    border-bottom: 2px solid transparent;
+  }
+  nav.tabs a + a {
+    margin-left: 14px;
+  }
+  nav.tabs a[aria-current="page"] {
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+  .stats {
+    color: var(--muted);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    min-width: 0;
+  }
+  .stats code {
+    font: 12px var(--font-mono);
+  }
+  .stats .warn {
+    color: var(--warn);
+  }
+  .seg {
+    margin-left: auto;
+    display: inline-flex;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 2px;
+    background: var(--bg);
+  }
+  .seg button {
+    border: 0;
+    background: none;
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 13px;
+  }
+  .seg button[aria-pressed="true"] {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+  }
+
+  .tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    padding-block: 10px;
+    border-top: 1px solid var(--line);
+  }
+  .tools select,
+  .tools input {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 10px;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .tools input {
+    width: 220px;
+  }
+  .tools .hint {
+    color: var(--faint);
+    font-size: 13px;
+  }
+  .zoom {
+    margin-left: auto;
+    display: inline-flex;
+    gap: 4px;
+  }
+  .zoom button {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 8px;
+    min-width: 32px;
+    height: 32px;
+    cursor: pointer;
+    padding: 0 10px;
+  }
+  .zoom output {
+    align-self: center;
+    min-width: 44px;
+    text-align: center;
+    font: 12px var(--font-mono);
+    color: var(--muted);
+  }
+
+  main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---------- Pages ---------- */
+  #pages-view {
+    overflow: auto;
+    padding-block: 20px 48px;
+  }
+  .page-block {
+    max-width: 1400px;
+    margin: 0 auto 28px;
+  }
+  .page-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+    margin-bottom: 10px;
+  }
+  .page-head h2 {
+    font: 600 18px/1.2 var(--font-display);
+    margin: 0;
+    text-wrap: balance;
+  }
+  .page-head code {
+    font: 12px var(--font-mono);
+    color: var(--muted);
+  }
+  .chip {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+  .page-head .count {
+    color: var(--faint);
+    font-size: 13px;
+  }
+  .grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+  body[data-viewport="phone"] .grid {
+    grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: none;
+    border: 0;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+    min-width: 0;
+  }
+  .shot {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 1440 / 900;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1.5px solid var(--ok);
+    border-radius: 6px;
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease;
+  }
+  body[data-viewport="phone"] .shot {
+    aspect-ratio: 390 / 844;
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+  .shot.missing,
+  .shot.absent {
+    border-style: dashed;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 8px;
+    font-size: 12px;
+  }
+  .shot.missing {
+    border-color: var(--warn);
+    color: var(--warn);
+    background: repeating-linear-gradient(
+      135deg,
+      transparent 0 8px,
+      var(--bg) 8px 16px
+    );
+  }
+  .shot.absent {
+    border-color: var(--line);
+    color: var(--faint);
+  }
+  /* a state that only exists in the other layout: its own screenshot, letterboxed */
+  .shot.cross {
+    background: var(--canvas);
+    border-color: var(--line);
+  }
+  .shot.cross img {
+    object-fit: contain;
+    object-position: center;
+  }
+  .badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    background: var(--ink);
+    color: var(--surface);
+    font: 500 10.5px/1.2 var(--font-body);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .card:hover .shot,
+  .card:focus-visible .shot {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  .card:focus-visible {
+    outline: none;
+  }
+  .card:focus-visible .shot {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .card .t {
+    font-weight: 500;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .card .id {
+    font: 11px var(--font-mono);
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+  .empty {
+    color: var(--muted);
+    text-align: center;
+    padding: 60px 0;
+  }
+
+  /* ---------- Flows ---------- */
+  #flows-view {
+    position: relative;
+    flex: 1;
+    min-height: 360px;
+    overflow: hidden;
+    background: var(--canvas);
+    cursor: grab;
+    touch-action: none;
+    /* panning must not select labels or drag screenshots */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #flows-view img {
+    -webkit-user-drag: none;
+  }
+  /* ...but text stays selectable: a drag that starts on it selects instead of panning */
+  #flows-view :is(.t, .id, .label span, .flow-title h3, .flow-title p) {
+    user-select: text;
+    -webkit-user-select: text;
+    cursor: text;
+  }
+  #flows-view.dragging {
+    cursor: grabbing;
+  }
+  #world {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: 0 0;
+  }
+  #world svg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .edge {
+    fill: none;
+    stroke: var(--edge);
+    stroke-width: 1.25;
+  }
+  .arrow {
+    fill: var(--edge);
+  }
+  .entry-dot {
+    fill: var(--edge);
+  }
+  .flow-title {
+    position: absolute;
+  }
+  .flow-title h3 {
+    margin: 0;
+    font: 600 20px/1.2 var(--font-display);
+    white-space: nowrap;
+  }
+  .flow-title p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    max-width: 900px;
+  }
+  .flow-title p b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: 0;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+  }
+  .node .shot {
+    border-radius: 4px;
+  }
+  .node .t {
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .node .id {
+    font: 10px var(--font-mono);
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .node:hover .shot {
+    box-shadow: var(--shadow);
+  }
+  .label {
+    position: absolute;
+    font-size: 11.5px;
+    line-height: 1.25;
+    color: var(--muted);
+    text-align: center;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .label span {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  /* ---------- State dialog ---------- */
+  dialog#state {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 0;
+    background: var(--surface);
+    color: var(--ink);
+    width: min(1180px, calc(100vw - 32px));
+    max-height: calc(100dvh - 32px);
+    box-shadow: var(--shadow);
+  }
+  dialog#state::backdrop {
+    background: rgb(10 14 20 / 0.55);
+  }
+  .dlg {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    max-height: calc(100dvh - 34px);
+  }
+  .dlg-img {
+    background: var(--canvas);
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    overflow: auto;
+    min-height: 240px;
+  }
+  .dlg-img img {
+    max-height: calc(100dvh - 80px);
+    width: auto;
+    max-width: 100%;
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+  }
+  .dlg-img .shot {
+    width: min(560px, 100%);
+  }
+  .dlg-side {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: auto;
+    border-left: 1px solid var(--line);
+  }
+  .dlg-side h2 {
+    margin: 0;
+    font: 600 20px/1.2 var(--font-display);
+    text-wrap: balance;
+  }
+  .dlg-side dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 12px;
+    font-size: 13px;
+  }
+  .dlg-side dt {
+    color: var(--faint);
+  }
+  .dlg-side dd {
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .dlg-side code {
+    font: 12px var(--font-mono);
+  }
+  .dlg-side h3 {
+    margin: 0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    font-weight: 500;
+  }
+  .dlg-side ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .dlg-side a {
+    color: var(--accent);
+  }
+  .dlg-nav {
+    display: flex;
+    gap: 6px;
+    margin-top: auto;
+  }
+  .dlg-nav button {
+    flex: 1;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 6px 8px;
+    cursor: pointer;
+  }
+  .dlg-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+  }
+
+  @media (max-width: 760px) {
+    .dlg {
+      grid-template-columns: 1fr;
+    }
+    .dlg-side {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+    .seg {
+      margin-left: 0;
+    }
+    .zoom {
+      margin-left: 0;
+    }
+    .tools .hint {
+      display: none;
+    }
+    .tools input {
+      width: 100%;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+    }
+  }
+</style>
+
+<header class="top">
+  <div class="bar gutter">
+    <h1 class="brand"><b>Screen Atlas</b><span>EasyInvoicePDF</span></h1>
+    <nav class="tabs" aria-label="Views">
+      <a href="#pages" id="tab-pages">Pages</a>
+      <a href="#flows" id="tab-flows">Flows</a>
+    </nav>
+    <div class="stats" id="stats"></div>
+    <div class="seg" role="group" aria-label="Viewport">
+      <button type="button" id="vp-desktop" data-vp="desktop">Desktop</button>
+      <button type="button" id="vp-phone" data-vp="phone">Phone</button>
+    </div>
+  </div>
+  <div class="tools gutter">
+    <select id="flow-select" aria-label="Flow"></select>
+    <select id="area-select" aria-label="Area"></select>
+    <input
+      id="search"
+      type="search"
+      placeholder="Filter states"
+      aria-label="Filter states"
+    />
+    <span class="hint" id="hint"></span>
+    <div class="zoom" id="zoom">
+      <button type="button" id="zoom-out" aria-label="Zoom out">−</button>
+      <output id="zoom-level">100%</output>
+      <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
+      <button type="button" id="zoom-fit">Fit</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="pages-view" class="gutter" aria-label="Pages"></section>
+  <section id="flows-view" aria-label="Flows" hidden>
+    <div id="world"></div>
+  </section>
+</main>
+
+<dialog id="state" aria-labelledby="state-title">
+  <div class="dlg">
+    <div class="dlg-img" id="state-img"></div>
+    <div class="dlg-side">
+      <h2 id="state-title"></h2>
+      <div
+        class="seg"
+        role="group"
+        aria-label="Viewport"
+        id="state-vp"
+        style="margin-left: 0; align-self: flex-start"
+      >
+        <button type="button" data-vp="desktop">Desktop</button>
+        <button type="button" data-vp="phone">Phone</button>
+      </div>
+      <dl id="state-meta"></dl>
+      <h3>Appears in</h3>
+      <ul id="state-flows"></ul>
+      <div class="dlg-nav">
+        <button type="button" id="state-prev">← Previous</button>
+        <button type="button" id="state-next">Next →</button>
+      </div>
+    </div>
+  </div>
+  <button type="button" class="dlg-close" id="state-close" aria-label="Close">
+    ✕
+  </button>
+</dialog>
+
+<script id="atlas-data" type="application/json">
+  /*__ATLAS_DATA__*/ null
+</script>
+<script>
+  (() => {
+    const DATA = JSON.parse(document.getElementById("atlas-data").textContent);
+    const $ = (id) => document.getElementById(id);
+    const store = {
+      get(key) {
+        try {
+          return localStorage.getItem(key);
+        } catch {
+          return null;
+        }
+      },
+      set(key, value) {
+        try {
+          localStorage.setItem(key, value);
+        } catch {}
+      },
+    };
+
+    if (!DATA) {
+      document.querySelector("main").innerHTML =
+        '<p class="empty">No capture data. Run <code>pnpm atlas</code> with <code>pnpm dev</code> running.</p>';
+      return;
+    }
+
+    const statesById = new Map(DATA.states.map((s) => [s.id, s]));
+    const flowsByState = new Map();
+    for (const flow of DATA.flows) {
+      walk(flow.roots, (step) => {
+        const list = flowsByState.get(step.state) ?? [];
+        if (!list.includes(flow)) list.push(flow);
+        flowsByState.set(step.state, list);
+      });
+    }
+
+    const ui = {
+      view: "pages",
+      viewport: store.get("atlas.viewport") === "phone" ? "phone" : "desktop",
+      flow: "all",
+      area: "all",
+      query: "",
+    };
+
+    function walk(steps, fn) {
+      for (const step of steps) {
+        fn(step);
+        if (step.next) walk(step.next, fn);
+      }
+    }
+    function esc(text) {
+      return String(text).replace(
+        /[&<>"]/g,
+        (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+      );
+    }
+    function existsIn(state, viewport) {
+      return !state.only || state.only === viewport;
+    }
+    function flowExistsIn(flow, viewport) {
+      return !flow.only || flow.only === viewport;
+    }
+
+    /* ---------- header ---------- */
+    function renderStats() {
+      const wanted = DATA.states.flatMap((s) =>
+        ["desktop", "phone"]
+          .filter((v) => existsIn(s, v))
+          .map((v) => s.shots[v]),
+      );
+      const captured = wanted.filter(Boolean).length;
+      const missing = wanted.length - captured;
+      const builtAt = new Date(DATA.builtAt);
+      const date = builtAt.toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+      const commit = DATA.commit
+        ? ` · <code>${esc(DATA.commit.sha)}</code>${DATA.commit.isDirty ? " + local changes" : ""}`
+        : "";
+      $("stats").innerHTML =
+        `${Object.keys(DATA.pages).length} pages · ${DATA.states.length} states · ${DATA.flows.length} flows · ` +
+        (missing
+          ? `<span class="warn">${captured} of ${wanted.length} shots captured</span>`
+          : `${captured} shots`) +
+        ` · captured ${esc(date)}${commit}`;
+    }
+
+    function renderSelects() {
+      const flows = DATA.flows.filter(
+        (f) => ui.area === "all" || f.area === ui.area,
+      );
+      $("flow-select").innerHTML =
+        `<option value="all">All flows (${flows.length})</option>` +
+        flows
+          .map(
+            (f) =>
+              `<option value="${esc(f.id)}"${flowExistsIn(f, ui.viewport) ? "" : " disabled"}>${esc(f.title)}${f.only ? ` (${f.only} only)` : ""}</option>`,
+          )
+          .join("");
+      if (ui.flow !== "all" && !flows.some((f) => f.id === ui.flow))
+        ui.flow = "all";
+      $("flow-select").value = ui.flow;
+      $("area-select").innerHTML =
+        `<option value="all">All areas</option>` +
+        Object.entries(DATA.areas)
+          .map(
+            ([id, title]) =>
+              `<option value="${esc(id)}">${esc(title)}</option>`,
+          )
+          .join("");
+      $("area-select").value = ui.area;
+    }
+
+    function syncChrome() {
+      document.body.dataset.viewport = ui.viewport;
+      for (const id of ["pages", "flows"]) {
+        const tab = $(`tab-${id}`);
+        if (ui.view === id) tab.setAttribute("aria-current", "page");
+        else tab.removeAttribute("aria-current");
+      }
+      for (const btn of document.querySelectorAll(".bar .seg button"))
+        btn.setAttribute(
+          "aria-pressed",
+          String(btn.dataset.vp === ui.viewport),
+        );
+      $("pages-view").hidden = ui.view !== "pages";
+      $("flows-view").hidden = ui.view !== "flows";
+      $("flow-select").hidden = ui.view !== "flows";
+      $("search").hidden = ui.view !== "pages";
+      $("zoom").hidden = ui.view !== "flows";
+      $("hint").textContent =
+        ui.view === "flows"
+          ? "Drag or scroll to pan, pinch or ctrl+scroll to zoom, click a step to open it"
+          : "Click a state to open it full size";
+    }
+
+    /* ---------- thumbnails ---------- */
+    const ONLY_LABELS = {
+      desktop: {
+        badge: "Desktop only",
+        why: "Only appears in the desktop layout",
+      },
+      phone: { badge: "Phone only", why: "Only appears in the phone layout" },
+    };
+
+    function imgHtml(shot, eager) {
+      return `<img src="${esc(shot.src)}" alt="" loading="${eager ? "eager" : "lazy"}" decoding="async">`;
+    }
+
+    function shotHtml(state, viewport, eager) {
+      if (!existsIn(state, viewport)) {
+        // show the layout the state does exist in, marked as such
+        const label = ONLY_LABELS[state.only];
+        const own = state.shots[state.only];
+        return own
+          ? `<div class="shot cross" title="${esc(label.why)}">${imgHtml(own, eager)}<span class="badge">${esc(label.badge)}</span></div>`
+          : `<div class="shot absent">${esc(label.badge)}, not captured</div>`;
+      }
+      const shot = state.shots[viewport];
+      if (!shot) return `<div class="shot missing">Not captured</div>`;
+      return `<div class="shot">${imgHtml(shot, eager)}</div>`;
+    }
+
+    /* ---------- pages view ---------- */
+    function renderPages() {
+      const q = ui.query.trim().toLowerCase();
+      const blocks = Object.entries(DATA.pages)
+        .filter(([, page]) => ui.area === "all" || page.area === ui.area)
+        .map(([pageId, page]) => {
+          const states = DATA.states.filter(
+            (s) =>
+              s.page === pageId &&
+              (!q ||
+                `${s.title} ${s.id} ${page.title}`.toLowerCase().includes(q)),
+          );
+          if (!states.length) return "";
+          return `<article class="page-block">
+        <div class="page-head"><h2>${esc(page.title)}</h2><code>${esc(page.route)}</code>
+          <span class="chip">${esc(DATA.areas[page.area])}</span><span class="count">${states.length} state${states.length === 1 ? "" : "s"}</span></div>
+        <div class="grid">${states
+          .map(
+            (
+              s,
+            ) => `<button type="button" class="card" data-state="${esc(s.id)}">
+          ${shotHtml(s, ui.viewport)}<span class="t">${esc(s.title)}</span><span class="id">${esc(s.id)}</span></button>`,
+          )
+          .join("")}</div>
+      </article>`;
+        })
+        .join("");
+      $("pages-view").innerHTML =
+        blocks || `<p class="empty">No states match “${esc(ui.query)}”.</p>`;
+    }
+
+    /* ---------- flows view: layout ---------- */
+    const GAP_X = 150,
+      GAP_Y = 30,
+      ENTRY_W = 140,
+      TITLE_H = 64,
+      FLOW_GAP = 72,
+      LABEL_H = 40;
+
+    function nodeSize() {
+      return ui.viewport === "phone"
+        ? { w: 104, h: Math.round((104 * 844) / 390) }
+        : { w: 200, h: 125 };
+    }
+
+    function layoutFlow(flow, top) {
+      const { w, h } = nodeSize();
+      const rowH = h + LABEL_H + GAP_Y;
+      const hasEntry = flow.roots.some((r) => r.via);
+      const x0 = hasEntry ? ENTRY_W : 0;
+      const nodes = [],
+        edges = [],
+        entries = [];
+      let cursor = top + TITLE_H,
+        maxX = 0;
+
+      function place(step, depth) {
+        const x = x0 + depth * (w + GAP_X);
+        maxX = Math.max(maxX, x + w);
+        let y;
+        if (step.next && step.next.length) {
+          const children = step.next.map((child) => place(child, depth + 1));
+          y = children[0].y;
+          for (const child of children)
+            edges.push({ from: { x, y }, to: child, label: child.step.via });
+        } else {
+          y = cursor;
+          cursor += rowH;
+        }
+        const node = { step, x, y };
+        nodes.push(node);
+        return node;
+      }
+
+      for (const root of flow.roots) {
+        const node = place(root, 0);
+        if (root.via) entries.push({ node, label: root.via });
+      }
+      return {
+        flow,
+        top,
+        nodes,
+        edges,
+        entries,
+        bottom: cursor - GAP_Y,
+        width: maxX,
+      };
+    }
+
+    function renderFlows() {
+      const { w, h } = nodeSize();
+      const flows = DATA.flows.filter(
+        (f) =>
+          (ui.area === "all" || f.area === ui.area) &&
+          (ui.flow === "all" || f.id === ui.flow) &&
+          flowExistsIn(f, ui.viewport),
+      );
+
+      let top = 0,
+        width = 0;
+      const layouts = flows.map((flow) => {
+        const layout = layoutFlow(flow, top);
+        top = layout.bottom + FLOW_GAP;
+        width = Math.max(width, layout.width);
+        return layout;
+      });
+      const height = Math.max(top - FLOW_GAP, 0);
+      const mid = h / 2;
+      let html = "",
+        paths = "";
+
+      for (const { flow, top: t, nodes, edges, entries } of layouts) {
+        const steps = nodes.length;
+        html += `<div class="flow-title" style="left:0;top:${t}px;width:${Math.max(width, 600)}px">
+        <h3>${esc(flow.title)}</h3><p><b>${esc(DATA.areas[flow.area])}</b> · ${steps} steps${flow.only ? ` · ${flow.only} only` : ""} · ${esc(flow.summary)}</p></div>`;
+
+        for (const { step, x, y } of nodes) {
+          const state = statesById.get(step.state);
+          // a div, not a button: browsers do not let you select text inside a button
+          html += `<div role="button" tabindex="0" class="node" data-state="${esc(state.id)}" style="left:${x}px;top:${y}px;width:${w}px">
+          <div style="width:${w}px;height:${h}px">${shotHtml(state, ui.viewport)}</div>
+          <span class="t">${esc(state.title)}</span><span class="id">${esc(state.id)}</span></div>`;
+        }
+
+        for (const { from, to, label } of edges) {
+          const sx = from.x + w,
+            sy = from.y + mid,
+            trunk = sx + 22,
+            ex = to.x - 2,
+            ey = to.y + mid;
+          const r = Math.min(8, Math.abs(ey - sy) / 2);
+          paths +=
+            ey === sy
+              ? `<path class="edge" d="M${sx} ${sy} H${ex - 6}"/>`
+              : `<path class="edge" d="M${sx} ${sy} H${trunk - r} Q${trunk} ${sy} ${trunk} ${sy + r} V${ey - r} Q${trunk} ${ey} ${trunk + r} ${ey} H${ex - 6}"/>`;
+          paths += `<path class="arrow" d="M${ex} ${ey} l-7 -4 v8 z"/>`;
+          if (label) {
+            html += `<div class="label" style="left:${trunk + 6}px;top:${ey - 36}px;width:${ex - trunk - 18}px;height:32px"><span>${esc(label)}</span></div>`;
+          }
+        }
+
+        for (const { node, label } of entries) {
+          const ey = node.y + mid,
+            ex = node.x - 2;
+          paths += `<circle class="entry-dot" cx="6" cy="${ey}" r="4"/><path class="edge" d="M10 ${ey} H${ex - 6}"/><path class="arrow" d="M${ex} ${ey} l-7 -4 v8 z"/>`;
+          html += `<div class="label" style="left:0;top:${ey - 36}px;width:${ex - 14}px;height:32px;justify-content:flex-start;text-align:left"><span>${esc(label)}</span></div>`;
+        }
+      }
+
+      const world = $("world");
+      world.style.width = `${width}px`;
+      world.style.height = `${height}px`;
+      world.innerHTML =
+        `<svg width="${width}" height="${height}" aria-hidden="true">${paths}</svg>${html}` +
+        (flows.length
+          ? ""
+          : `<p class="empty" style="width:600px">No flows for this viewport and area.</p>`);
+      camera.world = {
+        width: Math.max(width, 600),
+        height: Math.max(height, 100),
+      };
+      fit();
+    }
+
+    /* ---------- flows view: camera ---------- */
+    const camera = { x: 24, y: 24, k: 1, world: { width: 1, height: 1 } };
+    const MIN_K = 0.08,
+      MAX_K = 5;
+
+    function applyCamera() {
+      $("world").style.transform =
+        `translate(${camera.x}px, ${camera.y}px) scale(${camera.k})`;
+      $("zoom-level").textContent = `${Math.round(camera.k * 100)}%`;
+    }
+    function fit() {
+      const box = $("flows-view").getBoundingClientRect();
+      if (!box.width) return;
+      const pad = 32;
+      const byWidth = (box.width - pad * 2) / camera.world.width;
+      const single = ui.flow !== "all";
+      const k = single
+        ? Math.min(byWidth, (box.height - pad * 2) / camera.world.height)
+        : byWidth;
+      camera.k = Math.min(1, Math.max(MIN_K, k));
+      camera.x = pad;
+      camera.y = pad;
+      applyCamera();
+    }
+    function zoomAt(factor, px, py) {
+      const k = Math.min(MAX_K, Math.max(MIN_K, camera.k * factor));
+      camera.x = px - (px - camera.x) * (k / camera.k);
+      camera.y = py - (py - camera.y) * (k / camera.k);
+      camera.k = k;
+      applyCamera();
+    }
+    function zoomCenter(factor) {
+      const box = $("flows-view").getBoundingClientRect();
+      zoomAt(factor, box.width / 2, box.height / 2);
+    }
+
+    const canvas = $("flows-view");
+    const pointers = new Map();
+    let drag = null;
+
+    canvas.addEventListener(
+      "wheel",
+      (event) => {
+        event.preventDefault();
+        const box = canvas.getBoundingClientRect();
+        if (event.ctrlKey || event.metaKey) {
+          zoomAt(
+            Math.exp(-event.deltaY * 0.01),
+            event.clientX - box.left,
+            event.clientY - box.top,
+          );
+        } else {
+          camera.x -= event.deltaX;
+          camera.y -= event.deltaY;
+          applyCamera();
+        }
+      },
+      { passive: false },
+    );
+
+    // Firefox ignores -webkit-user-drag, so cancel native image drags here too
+    canvas.addEventListener("dragstart", (event) => event.preventDefault());
+
+    const SELECTABLE_TEXT =
+      ".t, .id, .label span, .flow-title h3, .flow-title p";
+
+    canvas.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse") {
+        // pressing on text starts a selection, everywhere else starts a pan
+        if (event.target.closest(SELECTABLE_TEXT)) {
+          drag = null;
+          return;
+        }
+        event.preventDefault();
+        window.getSelection()?.removeAllRanges();
+      }
+      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      drag = {
+        x: event.clientX,
+        y: event.clientY,
+        cx: camera.x,
+        cy: camera.y,
+        moved: false,
+        pinch: null,
+      };
+      if (pointers.size === 2) {
+        const [a, b] = [...pointers.values()];
+        drag.pinch = { dist: Math.hypot(a.x - b.x, a.y - b.y), k: camera.k };
+      }
+    });
+    canvas.addEventListener("pointermove", (event) => {
+      if (!drag || !pointers.has(event.pointerId)) return;
+      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (pointers.size === 2 && drag.pinch) {
+        const [a, b] = [...pointers.values()];
+        const box = canvas.getBoundingClientRect();
+        const dist = Math.hypot(a.x - b.x, a.y - b.y);
+        zoomAt(
+          (drag.pinch.k * dist) / drag.pinch.dist / camera.k,
+          (a.x + b.x) / 2 - box.left,
+          (a.y + b.y) / 2 - box.top,
+        );
+        drag.moved = true;
+        return;
+      }
+      const dx = event.clientX - drag.x,
+        dy = event.clientY - drag.y;
+      if (!drag.moved && Math.hypot(dx, dy) < 4) return;
+      if (!drag.moved) {
+        drag.moved = true;
+        canvas.setPointerCapture(event.pointerId);
+        canvas.classList.add("dragging");
+      }
+      camera.x = drag.cx + dx;
+      camera.y = drag.cy + dy;
+      applyCamera();
+    });
+    function endPointer(event) {
+      pointers.delete(event.pointerId);
+      canvas.classList.remove("dragging");
+      if (pointers.size === 0)
+        setTimeout(() => {
+          drag = null;
+        }, 0);
+    }
+    canvas.addEventListener("pointerup", endPointer);
+    canvas.addEventListener("pointercancel", endPointer);
+    canvas.addEventListener(
+      "click",
+      (event) => {
+        if (drag && drag.moved) {
+          event.stopPropagation();
+          return;
+        }
+        // finishing a text selection on a step should not open it
+        if (String(window.getSelection() ?? "") !== "") return;
+        const node = event.target.closest("[data-state]");
+        if (node) openState(node.dataset.state);
+      },
+      true,
+    );
+    canvas.addEventListener("keydown", (event) => {
+      const node = event.target.closest(".node[data-state]");
+      if (!node || (event.key !== "Enter" && event.key !== " ")) return;
+      event.preventDefault();
+      openState(node.dataset.state);
+    });
+
+    $("zoom-in").addEventListener("click", () => zoomCenter(1.25));
+    $("zoom-out").addEventListener("click", () => zoomCenter(0.8));
+    $("zoom-fit").addEventListener("click", fit);
+    window.addEventListener("resize", () => {
+      if (ui.view === "flows") fit();
+    });
+
+    /* ---------- state dialog ---------- */
+    const dialog = $("state");
+    let current = { id: null, viewport: "desktop", siblings: [] };
+
+    function openState(id) {
+      const state = statesById.get(id);
+      const siblings = DATA.states
+        .filter((s) => s.page === state.page)
+        .map((s) => s.id);
+      const viewport = existsIn(state, ui.viewport) ? ui.viewport : state.only;
+      current = { id, viewport, siblings };
+      renderState();
+      if (!dialog.open) dialog.showModal();
+    }
+
+    function renderState() {
+      const state = statesById.get(current.id);
+      const page = DATA.pages[state.page];
+      const shot = state.shots[current.viewport];
+      $("state-title").textContent = state.title;
+      $("state-img").innerHTML = shot
+        ? `<img src="${esc(shot.src)}" alt="${esc(state.title)}, ${current.viewport}">`
+        : shotHtml(state, current.viewport, true);
+      for (const btn of $("state-vp").querySelectorAll("button")) {
+        btn.setAttribute(
+          "aria-pressed",
+          String(btn.dataset.vp === current.viewport),
+        );
+        btn.disabled = !existsIn(state, btn.dataset.vp);
+      }
+      const captured = shot
+        ? new Date(shot.capturedAt).toLocaleString(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short",
+          })
+        : "Not captured";
+      $("state-meta").innerHTML =
+        `<dt>State</dt><dd><code>${esc(state.id)}</code></dd>` +
+        `<dt>Page</dt><dd>${esc(page.title)}</dd>` +
+        `<dt>Route</dt><dd><code>${esc(page.route)}</code></dd>` +
+        `<dt>Area</dt><dd>${esc(DATA.areas[page.area])}</dd>` +
+        `<dt>Layouts</dt><dd>${state.only ? esc(ONLY_LABELS[state.only].why) : "Desktop and phone"}</dd>` +
+        `<dt>Captured</dt><dd>${esc(captured)}</dd>`;
+      const flows = flowsByState.get(state.id) ?? [];
+      $("state-flows").innerHTML = flows.length
+        ? flows
+            .map(
+              (f) =>
+                `<li><a href="#flow-${esc(f.id)}">${esc(f.title)}</a></li>`,
+            )
+            .join("")
+        : `<li style="color:var(--faint)">No flow, Pages only</li>`;
+      const index = current.siblings.indexOf(state.id);
+      $("state-prev").disabled = index <= 0;
+      $("state-next").disabled = index >= current.siblings.length - 1;
+    }
+
+    function step(delta) {
+      const index = current.siblings.indexOf(current.id) + delta;
+      if (index < 0 || index >= current.siblings.length) return;
+      openState(current.siblings[index]);
+    }
+
+    $("state-prev").addEventListener("click", () => step(-1));
+    $("state-next").addEventListener("click", () => step(1));
+    $("state-close").addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") step(-1);
+      if (event.key === "ArrowRight") step(1);
+    });
+    $("state-vp").addEventListener("click", (event) => {
+      const btn = event.target.closest("button[data-vp]");
+      if (!btn || btn.disabled) return;
+      current.viewport = btn.dataset.vp;
+      renderState();
+    });
+    $("state-flows").addEventListener("click", (event) => {
+      if (event.target.closest("a")) dialog.close();
+    });
+
+    /* ---------- wiring ---------- */
+    $("pages-view").addEventListener("click", (event) => {
+      const card = event.target.closest("[data-state]");
+      if (card) openState(card.dataset.state);
+    });
+
+    for (const btn of document.querySelectorAll(".bar .seg button")) {
+      btn.addEventListener("click", () => {
+        ui.viewport = btn.dataset.vp;
+        store.set("atlas.viewport", ui.viewport);
+        render();
+      });
+    }
+    $("flow-select").addEventListener("change", (event) => {
+      location.hash =
+        event.target.value === "all" ? "flows" : `flow-${event.target.value}`;
+    });
+    $("area-select").addEventListener("change", (event) => {
+      ui.area = event.target.value;
+      render();
+    });
+    $("search").addEventListener("input", (event) => {
+      ui.query = event.target.value;
+      renderPages();
+    });
+
+    function readHash() {
+      const hash = location.hash.slice(1);
+      if (
+        hash.startsWith("flow-") &&
+        DATA.flows.some((f) => f.id === hash.slice(5))
+      ) {
+        ui.view = "flows";
+        ui.flow = hash.slice(5);
+        const flow = DATA.flows.find((f) => f.id === ui.flow);
+        if (ui.area !== "all" && flow.area !== ui.area) ui.area = "all";
+        if (!flowExistsIn(flow, ui.viewport)) ui.viewport = flow.only;
+      } else if (hash === "flows") {
+        ui.view = "flows";
+        ui.flow = "all";
+      } else {
+        ui.view = "pages";
+      }
+    }
+
+    function render() {
+      renderStats();
+      renderSelects();
+      syncChrome();
+      if (ui.view === "pages") renderPages();
+      else renderFlows();
+    }
+
+    window.addEventListener("hashchange", () => {
+      readHash();
+      render();
+    });
+    readHash();
+    render();
+  })();
+</script>

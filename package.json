@@ -36,6 +36,8 @@
     "e2e:ui": "pnpm exec playwright test --ui",
     "e2e:not-flaky": "pnpm e2e --workers=2",
     "e2e:update-snapshots": "pnpm e2e --update-snapshots",
+    "atlas": "pnpm exec playwright test -c scripts/page-atlas/playwright.config.ts",
+    "atlas:view": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/page-atlas/view-atlas.ts",
     "dedupe": "pnpm dedupe",
     "lint-stage": "pnpm lint-staged --verbose",
     "dev:email": "email dev --dir src/emails",

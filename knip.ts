@@ -8,6 +8,10 @@ const config: KnipConfig = {
     "src/trigger/monthly-recurring-invoice.ts",
     // spawned as a child process by e2e/server-render-pdf/server-render-pdf.test.ts
     "e2e/server-render-pdf/render-server-pdf.mjs",
+    // the screen atlas, run by `pnpm atlas` (see scripts/page-atlas/README.md)
+    "scripts/page-atlas/capture/*.atlas.ts",
+    // Playwright global teardown, which knip's playwright plugin does not follow
+    "scripts/page-atlas/build-atlas.ts",
   ],
   ignoreDependencies: [
     "shadcn",
