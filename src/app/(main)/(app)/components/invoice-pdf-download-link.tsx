@@ -260,8 +260,7 @@ function getDownloadInvoiceEventData(invoiceData: InvoiceData) {
     has_item_discount: invoiceData.items.some((item) => {
       return item.discountAmount > 0;
     }),
-    // only the Stripe template renders the logo
-    has_logo: invoiceData.template === "stripe" && Boolean(invoiceData.logo),
+    has_logo: Boolean(invoiceData.logo),
     has_qr_code: invoiceData.qrCodeIsVisible && Boolean(invoiceData.qrCodeData),
   };
 }

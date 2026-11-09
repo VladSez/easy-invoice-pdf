@@ -333,6 +333,23 @@ describe("InvoicePDFDownloadLink", () => {
     });
   });
 
+  it("should report has_logo on the default template too", () => {
+    const invoiceData: InvoiceData = {
+      ...getInitialInvoiceData(),
+      template: "default",
+      logo: "data:image/png;base64,abc",
+    };
+
+    renderInvoicePDFDownloadLink({ invoiceData });
+
+    fireEvent.click(getDownloadLink());
+
+    expect(vi.mocked(trackEvent).mock.lastCall?.[0]).toMatchObject({
+      event: "download_invoice",
+      data: { invoice_template: "default", has_logo: true },
+    });
+  });
+
   it("should not show the CTA toast again while the cooldown is active", async () => {
     vi.useFakeTimers();
 
