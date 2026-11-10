@@ -98,20 +98,30 @@ jobs:
 
       # `deployment_status` has no PR in its payload, and `github.ref_name` is empty
       # for this event, so we look the PR up by the deployed commit SHA instead.
-      - name: 🔍 Get PR URL
-        id: pr-url
-        if: always()
+      #
+      # Skipped for Production (`main`) deploys: a merged PR's commit still maps back
+      # to that PR, which would label a `main` run as the PR. With no outputs, the
+      # email subject and body both fall back to the repository name.
+      # Vercel sets `deployment.ref` to the SHA, so `environment` is the branch signal.
+      - name: 🔍 Get PR details
+        id: pr
+        if: ${{ always() && github.event.deployment.environment != 'Production' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPOSITORY: ${{ github.repository }}
           GH_SHA: ${{ github.event.deployment.sha }}
         run: |
-          PR_URL=$(curl -sf \
+          PR_JSON=$(curl -sf \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/$GH_REPOSITORY/commits/$GH_SHA/pulls" \
-            | jq -r '.[0].html_url // empty' || true)
-          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+            | jq -c '.[0] // empty' || true)
+          # The title is user-controlled: newlines are stripped so it cannot inject extra outputs.
+          {
+            echo "pr_url=$(jq -r '.html_url // empty' <<<"$PR_JSON")"
+            echo "pr_number=$(jq -r '.number // empty' <<<"$PR_JSON")"
+            echo "pr_title=$(jq -r '.title // empty | gsub("[\\r\\n]"; " ")' <<<"$PR_JSON")"
+          } >> "$GITHUB_OUTPUT"
 
       - name: 📧 Send email
         ## always notify; subject/body reflect cancellation vs pass/fail
@@ -125,15 +135,16 @@ jobs:
           to: ${{ secrets.EMAIL_USERNAME }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: ${{ job.status == 'cancelled' && '⚠️ E2E Tests Cancelled' || (steps.playwright.outcome == 'success' && '✅ E2E Tests Passed' || '❌ E2E Tests Failed') }} for ${{ github.repository }}
+          subject: "${{ job.status == 'cancelled' && '⚠️ E2E Tests Cancelled' || (steps.playwright.outcome == 'success' && '✅ E2E Tests Passed' || '❌ E2E Tests Failed') }}${{ steps.pr.outputs.pr_number && format(' · #{0} {1}', steps.pr.outputs.pr_number, steps.pr.outputs.pr_title) || format(' for {0}', github.repository) }}"
           body: |
             E2E tests for ${{ github.repository }} have completed.
 
+            ${{ steps.pr.outputs.pr_number && format('Pull Request: #{0} {1}', steps.pr.outputs.pr_number, steps.pr.outputs.pr_title) }}
             Result: ${{ job.status == 'cancelled' && '⚠️ Cancelled' || (steps.playwright.outcome == 'success' && '✅ Passed' || '❌ Failed') }}
 
             For more details, please check:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            ${{ steps.pr-url.outputs.pr_url && format('- Pull Request: {0}', steps.pr-url.outputs.pr_url) }}
+            ${{ steps.pr.outputs.pr_url && format('- Pull Request: {0}', steps.pr.outputs.pr_url) }}
             - Vercel deployment: ${{ github.event.deployment_status.environment_url }}
           attachments: ${{ job.status != 'cancelled' && 'playwright-output/report/index.html' || '' }}
 
