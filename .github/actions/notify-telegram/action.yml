@@ -31,8 +31,9 @@ runs:
     - name: 📣 Send Telegram message
       shell: bash
       # Every value goes through env, never inlined into the script, so a PR
-      # title can't inject shell. Messages are plain text (no parse_mode), so
-      # titles with `_` or `*` need no escaping.
+      # title can't inject shell. The message is sent as HTML with the whole
+      # subject and body escaped, so a PR title can't inject markup or links;
+      # the only formatting is the <b> this script adds around the subject.
       env:
         BOT_TOKEN: ${{ inputs.bot-token }}
         CHAT_ID: ${{ inputs.chat-id }}
@@ -63,9 +64,24 @@ runs:
           fi
         }
 
+        # Telegram's HTML mode needs only &, < and > escaped (& first). The
+        # replacements are quoted because bash 5.2+ (ubuntu-latest) otherwise
+        # reads an unquoted & in them as "the matched text" (patsub_replacement).
+        escape_html() {
+          local text=$1
+
+          text=${text//&/"&amp;"}
+          text=${text//</"&lt;"}
+          text=${text//>/"&gt;"}
+          printf '%s' "${text}"
+        }
+
+        message="<b>$(escape_html "${SUBJECT}")</b>"$'\n\n'"$(escape_html "${BODY}")"
+
         telegram \
           --data-urlencode "chat_id=${CHAT_ID}" \
-          --data-urlencode "text=${SUBJECT}"$'\n\n'"${BODY}" \
+          --data-urlencode "text=${message}" \
+          --data-urlencode "parse_mode=HTML" \
           --data-urlencode 'link_preview_options={"is_disabled":true}' \
           "${api}/sendMessage"
 
