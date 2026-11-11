@@ -123,18 +123,13 @@ jobs:
             echo "pr_title=$(jq -r '.title // empty | gsub("[\\r\\n]"; " ")' <<<"$PR_JSON")"
           } >> "$GITHUB_OUTPUT"
 
-      - name: 📧 Send email
+      - name: 📣 Notify via Telegram
         ## always notify; subject/body reflect cancellation vs pass/fail
         if: always()
-        # https://github.com/dawidd6/action-send-mail
-        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
+        uses: ./.github/actions/notify-telegram
         with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          from: "GitHub Actions (no-reply) <${{ secrets.EMAIL_USERNAME }}>"
-          to: ${{ secrets.EMAIL_USERNAME }}
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
+          bot-token: ${{ secrets.CI_TELEGRAM_BOT_TOKEN }}
+          chat-id: ${{ secrets.CI_TELEGRAM_CHAT_ID }}
           subject: "${{ job.status == 'cancelled' && '⚠️ E2E Tests Cancelled' || (steps.playwright.outcome == 'success' && '✅ E2E Tests Passed' || '❌ E2E Tests Failed') }}${{ steps.pr.outputs.pr_number && format(' · #{0} {1}', steps.pr.outputs.pr_number, steps.pr.outputs.pr_title) || format(' for {0}', github.repository) }}"
           body: |
             E2E tests for ${{ github.repository }} have completed.
@@ -146,7 +141,7 @@ jobs:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             ${{ steps.pr.outputs.pr_url && format('- Pull Request: {0}', steps.pr.outputs.pr_url) }}
             - Vercel deployment: ${{ github.event.deployment_status.environment_url }}
-          attachments: ${{ job.status != 'cancelled' && 'playwright-output/report/index.html' || '' }}
+          attachment: ${{ job.status != 'cancelled' && 'playwright-output/report/index.html' || '' }}
 
       - name: ❌ Mark workflow failed on E2E Tests failure
         if: steps.playwright.outcome == 'failure'

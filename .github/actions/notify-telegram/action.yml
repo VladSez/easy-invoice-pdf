@@ -1,0 +1,76 @@
+name: 📣 Notify via Telegram
+description: Send a CI notification to a Telegram chat through the Bot API (https://core.telegram.org/bots/api).
+
+# Composite actions can't read secrets, so the caller passes the bot token and
+# chat ID in as inputs. The caller must run actions/checkout first: a local
+# action is loaded from the checked-out workspace.
+#
+# Use a bot dedicated to CI, not the invoice bot: whoever holds a token can
+# re-point that bot's webhook.
+inputs:
+  bot-token:
+    description: Telegram bot token (pass secrets.CI_TELEGRAM_BOT_TOKEN).
+    required: true
+  chat-id:
+    description: Chat to post to (pass secrets.CI_TELEGRAM_CHAT_ID).
+    required: true
+  subject:
+    description: First line of the message.
+    required: true
+  body:
+    description: Rest of the message, plain text.
+    required: true
+  attachment:
+    description: Path of a file to send after the message (optional, max 50 MB).
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: 📣 Send Telegram message
+      shell: bash
+      # Every value goes through env, never inlined into the script, so a PR
+      # title can't inject shell. Messages are plain text (no parse_mode), so
+      # titles with `_` or `*` need no escaping.
+      env:
+        BOT_TOKEN: ${{ inputs.bot-token }}
+        CHAT_ID: ${{ inputs.chat-id }}
+        SUBJECT: ${{ inputs.subject }}
+        BODY: ${{ inputs.body }}
+        ATTACHMENT: ${{ inputs.attachment }}
+      run: |
+        set -euo pipefail
+
+        api="https://api.telegram.org/bot${BOT_TOKEN}"
+
+        # Print the API's reply only on failure: a successful reply echoes the
+        # chat's name and username, which shouldn't land in public CI logs.
+        telegram() {
+          local response
+
+          if ! response=$(curl --fail-with-body --silent --show-error --retry 3 "$@"); then
+            echo "::error::Telegram API request failed: ${response}"
+            return 1
+          fi
+        }
+
+        telegram \
+          --data-urlencode "chat_id=${CHAT_ID}" \
+          --data-urlencode "text=${SUBJECT}"$'\n\n'"${BODY}" \
+          --data-urlencode 'link_preview_options={"is_disabled":true}' \
+          "${api}/sendMessage"
+
+        if [[ -z "${ATTACHMENT}" ]]; then
+          exit 0
+        fi
+
+        if [[ ! -f "${ATTACHMENT}" ]]; then
+          echo "::warning::Attachment ${ATTACHMENT} not found, skipping it"
+          exit 0
+        fi
+
+        telegram \
+          --form-string "chat_id=${CHAT_ID}" \
+          --form "document=@${ATTACHMENT}" \
+          "${api}/sendDocument"
