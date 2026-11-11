@@ -8,6 +8,9 @@ inputs:
   api-key:
     description: Resend API key with sending access only (pass secrets.CI_RESEND_API_KEY).
     required: true
+  from:
+    description: Sender, e.g. "Name <address>" on a domain verified in Resend (pass secrets.CI_EMAIL_FROM).
+    required: true
   to:
     description: Recipient address (pass secrets.CI_EMAIL_TO).
     required: true
@@ -32,7 +35,7 @@ runs:
         server_port: 587
         username: resend
         password: ${{ inputs.api-key }}
-        from: "GitHub Actions <ci@updates.easyinvoicepdf.com>"
+        from: ${{ inputs.from }}
         to: ${{ inputs.to }}
         subject: ${{ inputs.subject }}
         body: ${{ inputs.body }}

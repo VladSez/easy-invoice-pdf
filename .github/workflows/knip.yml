@@ -49,6 +49,7 @@ jobs:
         uses: ./.github/actions/send-email
         with:
           api-key: ${{ secrets.CI_RESEND_API_KEY }}
+          from: ${{ secrets.CI_EMAIL_FROM }}
           to: ${{ secrets.CI_EMAIL_TO }}
           subject: "❌ Knip Failed${{ github.event.pull_request && format(' · #{0} {1}', github.event.pull_request.number, github.event.pull_request.title) || format(' for {0}', github.repository) }}"
           body: |

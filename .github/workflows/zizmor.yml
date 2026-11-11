@@ -36,6 +36,7 @@ jobs:
         uses: ./.github/actions/send-email
         with:
           api-key: ${{ secrets.CI_RESEND_API_KEY }}
+          from: ${{ secrets.CI_EMAIL_FROM }}
           to: ${{ secrets.CI_EMAIL_TO }}
           subject: ❌ zizmor Failed for ${{ github.repository }}
           body: |

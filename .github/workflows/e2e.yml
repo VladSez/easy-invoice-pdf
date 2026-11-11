@@ -129,6 +129,7 @@ jobs:
         uses: ./.github/actions/send-email
         with:
           api-key: ${{ secrets.CI_RESEND_API_KEY }}
+          from: ${{ secrets.CI_EMAIL_FROM }}
           to: ${{ secrets.CI_EMAIL_TO }}
           subject: "${{ job.status == 'cancelled' && '⚠️ E2E Tests Cancelled' || (steps.playwright.outcome == 'success' && '✅ E2E Tests Passed' || '❌ E2E Tests Failed') }}${{ steps.pr.outputs.pr_number && format(' · #{0} {1}', steps.pr.outputs.pr_number, steps.pr.outputs.pr_title) || format(' for {0}', github.repository) }}"
           body: |
