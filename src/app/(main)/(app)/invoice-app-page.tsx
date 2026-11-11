@@ -8,8 +8,10 @@ import { getLatestChangelogSummary } from "@/app/(main)/changelog/utils";
 import type { SupportedTemplates } from "@/app/schema";
 import {
   APP_URL,
+  OG_VIDEO,
   PROD_WEBSITE_URL,
   STATIC_ASSETS_URL,
+  STRIPE_OG_VIDEO,
   TWITTER_CREATOR,
 } from "@/config";
 import { getIsIndexableEnvironment } from "@/lib/seo/indexing-utils";
@@ -96,7 +98,8 @@ export async function InvoiceAppPage({
 export function buildInvoiceAppMetadata(
   template: SupportedTemplates,
 ): Metadata {
-  const { title, description, canonical, images } = TEMPLATE_META[template];
+  const { title, description, canonical, images, videos } =
+    TEMPLATE_META[template];
 
   return {
     title,
@@ -116,6 +119,7 @@ export function buildInvoiceAppMetadata(
       type: "website",
       url: canonical,
       images: [...images],
+      videos: [...videos],
     },
     twitter: {
       card: "summary_large_image",
@@ -164,6 +168,7 @@ const TEMPLATE_META = {
         alt: "Default Invoice Template - EasyInvoicePDF.com",
       },
     ],
+    videos: [OG_VIDEO],
   },
   stripe: {
     title: APP_PAGE_TITLE.stripe,
@@ -180,6 +185,7 @@ const TEMPLATE_META = {
         alt: "Stripe Invoice Template - EasyInvoicePDF.com",
       },
     ],
+    videos: [STRIPE_OG_VIDEO],
   },
 } as const satisfies Record<
   SupportedTemplates,
@@ -188,6 +194,7 @@ const TEMPLATE_META = {
     description: string;
     canonical: string;
     images: NonNullable<Metadata["openGraph"]>["images"];
+    videos: NonNullable<Metadata["openGraph"]>["videos"];
   }
 >;
 

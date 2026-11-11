@@ -49,6 +49,7 @@ node_modules/
 /playwright-output/
 /playwright-test-downloads/
 /scripts/page-atlas/output/
+/scripts/og-video/output/
 
 .playwright-mcp
 

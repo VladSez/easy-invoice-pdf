@@ -1,0 +1,536 @@
+<!doctype html>
+<!--
+  Source of the `/stripe-template` og:video (variant S2 of the design canvas: the
+  Stripe invoice builds itself on the Stripe OG gradient). An 8-second loop at
+  1200×630; `render-og-video.ts` seeks it frame by frame and encodes the MP4.
+  Same rules as default-og-video.html: every keyframe is a percentage of one shared
+  8s clock and nothing uses animation-delay.
+  The logo slot is filled from src/components/etc/final-project-logo.tsx at render time.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>EasyInvoicePDF Stripe og:video</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+      }
+
+      .stage {
+        width: 1200px;
+        height: 630px;
+        position: relative;
+        overflow: hidden;
+        box-sizing: border-box;
+        /* the gradient of the Stripe og:image */
+        background: linear-gradient(
+          30deg,
+          #c9a2f2 0%,
+          #e8b6a6 48%,
+          #f5cf3e 100%
+        );
+        font-family: Inter, system-ui, sans-serif;
+        color: #0b0b0f;
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        padding: 0 64px 0 72px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .copy {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+
+      .brand {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .brand svg {
+        width: 40px;
+        height: 42px;
+        color: #0b0b0f;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 68px;
+        line-height: 1.04;
+        font-weight: 800;
+        letter-spacing: -0.035em;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .chip {
+        background: rgba(255, 255, 255, 0.75);
+        border-radius: 999px;
+        padding: 9px 16px;
+      }
+
+      .chip.strong {
+        background: #0b0b0f;
+        color: #ffffff;
+      }
+
+      .doc-area {
+        width: 440px;
+        height: 630px;
+        position: relative;
+        flex-shrink: 0;
+      }
+
+      .doc {
+        position: absolute;
+        left: 10px;
+        top: 48px;
+        width: 420px;
+        height: 540px;
+        background: #ffffff;
+        border-radius: 6px;
+        box-shadow: 0 30px 80px rgba(60, 20, 90, 0.28);
+        overflow: hidden;
+        font-size: 13px;
+        color: #111827;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .top-line {
+        height: 8px;
+      }
+
+      .doc-body {
+        padding: 30px 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .doc-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .doc-title {
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .client-logo {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 16px;
+        font-weight: 700;
+        color: #4c1d95;
+      }
+
+      .info {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        row-gap: 4px;
+      }
+
+      .parties {
+        display: flex;
+        gap: 28px;
+      }
+
+      .party {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .party span {
+        color: #6b7280;
+      }
+
+      .due {
+        font-size: 19px;
+        font-weight: 700;
+      }
+
+      .pay-slot {
+        align-self: flex-start;
+      }
+
+      .pay {
+        display: inline-block;
+        background: #635bff;
+        color: #ffffff;
+        border-radius: 6px;
+        padding: 8px 14px;
+        font-weight: 600;
+      }
+
+      .items {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 6px;
+      }
+
+      .item {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .items-head {
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 6px;
+        color: #6b7280;
+      }
+
+      .cursor {
+        position: absolute;
+        left: 104px;
+        top: 312px;
+      }
+
+      /*
+        Motion, as % of the 8s clock: headline and invoice in 0–0.8s, the invoice
+        fills in 1.1–2.5s, the cursor clicks Pay online at 3.6s, the top line
+        recolours yellow → purple → teal → yellow from 3.2s to 6.6s, then everything
+        fades out by 7.7s so the last frame matches the first.
+      */
+
+      .headline {
+        animation: headline 8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+
+      @keyframes headline {
+        0% {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        8%,
+        90% {
+          opacity: 1;
+          transform: none;
+        }
+        96%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .chips {
+        animation: chips 8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+
+      @keyframes chips {
+        0%,
+        12% {
+          opacity: 0;
+          transform: translateX(-14px);
+        }
+        19%,
+        90% {
+          opacity: 1;
+          transform: none;
+        }
+        96%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .doc {
+        animation: doc 8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+
+      @keyframes doc {
+        0% {
+          opacity: 0;
+          transform: translateY(50px) rotate(-2deg);
+        }
+        10%,
+        90% {
+          opacity: 1;
+          transform: rotate(-2deg);
+        }
+        96%,
+        100% {
+          opacity: 0;
+          transform: rotate(-2deg);
+        }
+      }
+
+      .top-line {
+        animation: top-line 8s infinite;
+      }
+
+      @keyframes top-line {
+        0%,
+        40% {
+          background: #f5c518;
+        }
+        46%,
+        58% {
+          background: #7c3aed;
+        }
+        64%,
+        76% {
+          background: #0d9488;
+        }
+        82%,
+        100% {
+          background: #f5c518;
+        }
+      }
+
+      .client-logo {
+        opacity: 0;
+        animation: client-logo 8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+
+      @keyframes client-logo {
+        0%,
+        12% {
+          opacity: 0;
+          transform: scale(0.6);
+        }
+        17%,
+        100% {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .info,
+      .parties,
+      .due,
+      .items {
+        opacity: 0;
+        animation: 8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+
+      .info {
+        animation-name: fill-1;
+      }
+
+      .parties {
+        animation-name: fill-2;
+      }
+
+      .due {
+        animation-name: fill-3;
+      }
+
+      .items {
+        animation-name: fill-4;
+      }
+
+      @keyframes fill-1 {
+        0%,
+        14% {
+          opacity: 0;
+          transform: translateX(-14px);
+        }
+        19%,
+        100% {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @keyframes fill-2 {
+        0%,
+        18% {
+          opacity: 0;
+          transform: translateX(-14px);
+        }
+        23%,
+        100% {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @keyframes fill-3 {
+        0%,
+        22% {
+          opacity: 0;
+          transform: translateX(-14px);
+        }
+        27%,
+        100% {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @keyframes fill-4 {
+        0%,
+        26% {
+          opacity: 0;
+          transform: translateX(-14px);
+        }
+        31%,
+        100% {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .pay-slot {
+        opacity: 0;
+        animation: pay-slot 8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+
+      @keyframes pay-slot {
+        0%,
+        30% {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        35%,
+        100% {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .pay {
+        animation: press 8s infinite;
+      }
+
+      @keyframes press {
+        0%,
+        44% {
+          transform: scale(1);
+        }
+        46% {
+          transform: scale(0.94);
+        }
+        49%,
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .cursor {
+        animation: cursor 8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+      }
+
+      @keyframes cursor {
+        0%,
+        32% {
+          opacity: 0;
+          transform: translate(120px, 60px);
+        }
+        36% {
+          opacity: 1;
+          transform: translate(120px, 60px);
+        }
+        44%,
+        84% {
+          opacity: 1;
+          transform: none;
+        }
+        88%,
+        100% {
+          opacity: 0;
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="copy">
+        <div class="brand"><!-- LOGO -->EasyInvoicePDF.com</div>
+        <h1 class="headline">Free Stripe Invoice Template</h1>
+        <div class="chips">
+          <span class="chip">Your logo</span>
+          <span class="chip">Pay online link</span>
+          <span class="chip strong">No Stripe account, no sign-up</span>
+        </div>
+      </div>
+      <div class="doc-area">
+        <div class="doc">
+          <div class="top-line"></div>
+          <div class="doc-body">
+            <div class="doc-header">
+              <span class="doc-title">Invoice</span>
+              <span class="client-logo"
+                ><svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12 2l2.6 6.4L21 11l-6.4 2.6L12 20l-2.6-6.4L3 11l6.4-2.6z"
+                    fill="#7C3AED"
+                  /></svg
+                >Acme Studio</span
+              >
+            </div>
+            <div class="info">
+              <b>Invoice number</b><span>1/11-2026</span><b>Date of issue</b
+              ><span>November 11, 2026</span><b>Date due</b
+              ><span>November 25, 2026</span>
+            </div>
+            <div class="parties">
+              <div class="party">
+                <b>John Doe</b><span>San Francisco, CA</span>
+              </div>
+              <div class="party">
+                <b>Bill to</b><span>Acme Ltd, Berlin</span>
+              </div>
+            </div>
+            <div class="due">€5,040.00 due November 25, 2026</div>
+            <span class="pay-slot"><span class="pay">Pay online</span></span>
+            <div class="items">
+              <div class="item items-head">
+                <span>Description</span><span>Amount</span>
+              </div>
+              <div class="item">
+                <span>Website redesign</span><span>€4,800.00</span>
+              </div>
+              <div class="item">
+                <span>Hosting, 12 months</span><span>€240.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <svg
+          class="cursor"
+          width="22"
+          height="28"
+          viewBox="0 0 22 28"
+          aria-hidden="true"
+        >
+          <path
+            d="M2 2l17 12-8 1.5L7 25z"
+            fill="#0B0B0F"
+            stroke="#FFFFFF"
+            stroke-width="2"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+    </div>
+  </body>
+</html>
