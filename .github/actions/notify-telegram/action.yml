@@ -46,10 +46,18 @@ runs:
 
         # Print the API's reply only on failure: a successful reply echoes the
         # chat's name and username, which shouldn't land in public CI logs.
+        #
+        # curl has no overall time limit by default, so a stalled connection
+        # would hang until the job's timeout and fail a run whose checks passed.
+        # --max-time bounds each attempt (60s leaves room to upload the e2e
+        # report), --retry-max-time bounds the retries.
         telegram() {
           local response
 
-          if ! response=$(curl --fail-with-body --silent --show-error --retry 3 "$@"); then
+          if ! response=$(curl --fail-with-body --silent --show-error \
+            --connect-timeout 10 --max-time 60 \
+            --retry 3 --retry-max-time 120 \
+            "$@"); then
             echo "::error::Telegram API request failed: ${response}"
             return 1
           fi
