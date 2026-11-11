@@ -31,12 +31,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 📣 Notify via Telegram
+      - name: 📧 Send email
         if: steps.zizmor.outcome == 'failure'
-        uses: ./.github/actions/notify-telegram
+        uses: ./.github/actions/send-email
         with:
-          bot-token: ${{ secrets.CI_TELEGRAM_BOT_TOKEN }}
-          chat-id: ${{ secrets.CI_TELEGRAM_CHAT_ID }}
+          api-key: ${{ secrets.CI_RESEND_API_KEY }}
+          to: ${{ secrets.CI_EMAIL_TO }}
           subject: ❌ zizmor Failed for ${{ github.repository }}
           body: |
             zizmor security analysis for ${{ github.repository }} has failed.

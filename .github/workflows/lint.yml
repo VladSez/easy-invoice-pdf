@@ -55,12 +55,12 @@ jobs:
         continue-on-error: true
         run: pnpm format:check
 
-      - name: 📣 Notify via Telegram
+      - name: 📧 Send email
         if: steps.lint.outcome == 'failure' || steps.format.outcome == 'failure'
-        uses: ./.github/actions/notify-telegram
+        uses: ./.github/actions/send-email
         with:
-          bot-token: ${{ secrets.CI_TELEGRAM_BOT_TOKEN }}
-          chat-id: ${{ secrets.CI_TELEGRAM_CHAT_ID }}
+          api-key: ${{ secrets.CI_RESEND_API_KEY }}
+          to: ${{ secrets.CI_EMAIL_TO }}
           subject: "❌ ${{ steps.lint.outcome == 'failure' && (steps.format.outcome == 'failure' && 'Linting and formatting failed' || 'Linting failed') || 'Formatting failed' }}${{ github.event.pull_request && format(' · #{0} {1}', github.event.pull_request.number, github.event.pull_request.title) || format(' for {0}', github.repository) }}"
           body: |
             Linting or formatting for ${{ github.repository }} has failed.

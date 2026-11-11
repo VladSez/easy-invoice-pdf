@@ -123,13 +123,13 @@ jobs:
             echo "pr_title=$(jq -r '.title // empty | gsub("[\\r\\n]"; " ")' <<<"$PR_JSON")"
           } >> "$GITHUB_OUTPUT"
 
-      - name: 📣 Notify via Telegram
+      - name: 📧 Send email
         ## always notify; subject/body reflect cancellation vs pass/fail
         if: always()
-        uses: ./.github/actions/notify-telegram
+        uses: ./.github/actions/send-email
         with:
-          bot-token: ${{ secrets.CI_TELEGRAM_BOT_TOKEN }}
-          chat-id: ${{ secrets.CI_TELEGRAM_CHAT_ID }}
+          api-key: ${{ secrets.CI_RESEND_API_KEY }}
+          to: ${{ secrets.CI_EMAIL_TO }}
           subject: "${{ job.status == 'cancelled' && '⚠️ E2E Tests Cancelled' || (steps.playwright.outcome == 'success' && '✅ E2E Tests Passed' || '❌ E2E Tests Failed') }}${{ steps.pr.outputs.pr_number && format(' · #{0} {1}', steps.pr.outputs.pr_number, steps.pr.outputs.pr_title) || format(' for {0}', github.repository) }}"
           body: |
             E2E tests for ${{ github.repository }} have completed.
@@ -141,7 +141,7 @@ jobs:
             - GitHub Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             ${{ steps.pr.outputs.pr_url && format('- Pull Request: {0}', steps.pr.outputs.pr_url) }}
             - Vercel deployment: ${{ github.event.deployment_status.environment_url }}
-          attachment: ${{ job.status != 'cancelled' && 'playwright-output/report/index.html' || '' }}
+          attachments: ${{ job.status != 'cancelled' && 'playwright-output/report/index.html' || '' }}
 
       - name: ❌ Mark workflow failed on E2E Tests failure
         if: steps.playwright.outcome == 'failure'

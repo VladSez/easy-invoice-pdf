@@ -1,0 +1,39 @@
+name: 📧 Send email
+description: Send a CI notification email through Resend's SMTP relay (https://resend.com/docs/send-with-smtp).
+
+# Composite actions can't read secrets, so the caller passes the API key and
+# recipient in as inputs. The caller must run actions/checkout first: a local
+# action is loaded from the checked-out workspace.
+inputs:
+  api-key:
+    description: Resend API key with sending access only (pass secrets.CI_RESEND_API_KEY).
+    required: true
+  to:
+    description: Recipient address (pass secrets.CI_EMAIL_TO).
+    required: true
+  subject:
+    description: Email subject.
+    required: true
+  body:
+    description: Plain-text email body.
+    required: true
+  attachments:
+    description: Comma-separated file paths to attach (optional).
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    # https://github.com/dawidd6/action-send-mail
+    - uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
+      with:
+        server_address: smtp.resend.com
+        server_port: 587
+        username: resend
+        password: ${{ inputs.api-key }}
+        from: "GitHub Actions <ci@updates.easyinvoicepdf.com>"
+        to: ${{ inputs.to }}
+        subject: ${{ inputs.subject }}
+        body: ${{ inputs.body }}
+        attachments: ${{ inputs.attachments }}

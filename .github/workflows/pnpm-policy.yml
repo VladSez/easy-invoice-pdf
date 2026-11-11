@@ -68,12 +68,12 @@ jobs:
           verify_config minimum-release-age 7200
           verify_config block-exotic-subdeps true
 
-      - name: 📣 Notify via Telegram
+      - name: 📧 Send email
         if: steps.pnpm-policy.outcome == 'failure'
-        uses: ./.github/actions/notify-telegram
+        uses: ./.github/actions/send-email
         with:
-          bot-token: ${{ secrets.CI_TELEGRAM_BOT_TOKEN }}
-          chat-id: ${{ secrets.CI_TELEGRAM_CHAT_ID }}
+          api-key: ${{ secrets.CI_RESEND_API_KEY }}
+          to: ${{ secrets.CI_EMAIL_TO }}
           subject: "❌ pnpm Supply-Chain Policy Failed${{ github.event.pull_request && format(' · #{0} {1}', github.event.pull_request.number, github.event.pull_request.title) || format(' for {0}', github.repository) }}"
           body: |
             pnpm supply-chain policy verification for ${{ github.repository }} has failed.
