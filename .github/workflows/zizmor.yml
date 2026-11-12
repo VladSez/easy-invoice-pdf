@@ -33,15 +33,11 @@ jobs:
 
       - name: 📧 Send email
         if: steps.zizmor.outcome == 'failure'
-        # https://github.com/dawidd6/action-send-mail
-        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
+        uses: ./.github/actions/send-email
         with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          from: "GitHub Actions (no-reply) <${{ secrets.EMAIL_USERNAME }}>"
-          to: ${{ secrets.EMAIL_USERNAME }}
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
+          api-key: ${{ secrets.CI_RESEND_API_KEY }}
+          from: ${{ secrets.CI_EMAIL_FROM }}
+          to: ${{ secrets.CI_EMAIL_TO }}
           subject: ❌ zizmor Failed for ${{ github.repository }}
           body: |
             zizmor security analysis for ${{ github.repository }} has failed.

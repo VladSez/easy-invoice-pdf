@@ -126,15 +126,11 @@ jobs:
       - name: 📧 Send email
         ## always notify; subject/body reflect cancellation vs pass/fail
         if: always()
-        # https://github.com/dawidd6/action-send-mail
-        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
+        uses: ./.github/actions/send-email
         with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          from: "GitHub Actions (no-reply) <${{ secrets.EMAIL_USERNAME }}>"
-          to: ${{ secrets.EMAIL_USERNAME }}
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
+          api-key: ${{ secrets.CI_RESEND_API_KEY }}
+          from: ${{ secrets.CI_EMAIL_FROM }}
+          to: ${{ secrets.CI_EMAIL_TO }}
           subject: "${{ job.status == 'cancelled' && '⚠️ E2E Tests Cancelled' || (steps.playwright.outcome == 'success' && '✅ E2E Tests Passed' || '❌ E2E Tests Failed') }}${{ steps.pr.outputs.pr_number && format(' · #{0} {1}', steps.pr.outputs.pr_number, steps.pr.outputs.pr_title) || format(' for {0}', github.repository) }}"
           body: |
             E2E tests for ${{ github.repository }} have completed.

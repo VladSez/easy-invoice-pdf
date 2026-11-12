@@ -1,0 +1,45 @@
+name: 📧 Send email
+description: Send a CI notification email through Resend's SMTP relay (https://resend.com/docs/send-with-smtp).
+
+# Composite actions can't read secrets, so the caller passes the API key and
+# recipient in as inputs. The caller must run actions/checkout first: a local
+# action is loaded from the checked-out workspace.
+inputs:
+  api-key:
+    description: Resend API key with sending access only (pass secrets.CI_RESEND_API_KEY).
+    required: true
+  from:
+    description: Sender, e.g. "Name <address>" on a domain verified in Resend (pass secrets.CI_EMAIL_FROM).
+    required: true
+  to:
+    description: Recipient address (pass secrets.CI_EMAIL_TO).
+    required: true
+  subject:
+    description: Email subject.
+    required: true
+  body:
+    description: Plain-text email body.
+    required: true
+  attachments:
+    description: Comma-separated file paths to attach (optional).
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    # https://github.com/dawidd6/action-send-mail
+    - uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
+      with:
+        server_address: smtp.resend.com
+        # Implicit TLS: the action sets `secure: true` for 465. On 587 it relies
+        # on opportunistic STARTTLS without `requireTLS`, so a network attacker
+        # could strip STARTTLS and read the API key sent as the SMTP password.
+        server_port: 465
+        username: resend
+        password: ${{ inputs.api-key }}
+        from: ${{ inputs.from }}
+        to: ${{ inputs.to }}
+        subject: ${{ inputs.subject }}
+        body: ${{ inputs.body }}
+        attachments: ${{ inputs.attachments }}
