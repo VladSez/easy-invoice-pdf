@@ -3,7 +3,12 @@ import { hasLocale, type Locale } from "next-intl";
 import { notFound } from "next/navigation";
 import { locale as rootLocale } from "next/root-params";
 
-import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
+import {
+  APP_URL,
+  OG_VIDEO,
+  STATIC_ASSETS_URL,
+  TWITTER_CREATOR,
+} from "@/config";
 import { routing } from "@/i18n/routing";
 import {
   buildHreflangAlternates,
@@ -53,6 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
             alt: "EasyInvoicePDF.com - Free Invoice PDF Generator",
           },
         ],
+        videos: [OG_VIDEO],
       },
       twitter: {
         card: "summary_large_image",

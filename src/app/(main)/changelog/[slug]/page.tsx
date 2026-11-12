@@ -13,6 +13,7 @@ import {
 } from "@/app/(main)/changelog/utils";
 import {
   APP_URL,
+  OG_VIDEO,
   PERSONAL_WEBSITE_URL,
   STATIC_ASSETS_URL,
   TWITTER_CREATOR,
@@ -87,6 +88,7 @@ export async function generateMetadata({
           alt: "EasyInvoicePDF.com - Free Invoice PDF Generator",
         },
       ],
+      videos: [OG_VIDEO],
     },
     twitter: {
       card: "summary_large_image",
