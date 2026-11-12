@@ -32,7 +32,10 @@ runs:
     - uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f # v16
       with:
         server_address: smtp.resend.com
-        server_port: 587
+        # Implicit TLS: the action sets `secure: true` for 465. On 587 it relies
+        # on opportunistic STARTTLS without `requireTLS`, so a network attacker
+        # could strip STARTTLS and read the API key sent as the SMTP password.
+        server_port: 465
         username: resend
         password: ${{ inputs.api-key }}
         from: ${{ inputs.from }}
