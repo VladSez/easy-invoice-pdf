@@ -12,6 +12,8 @@ const config: KnipConfig = {
     "scripts/page-atlas/capture/*.atlas.ts",
     // Playwright global teardown, which knip's playwright plugin does not follow
     "scripts/page-atlas/build-atlas.ts",
+    // run by hand from the pr-description skill (see its SKILL.md)
+    ".claude/skills/pr-description/scripts/capture.mjs",
   ],
   ignoreDependencies: [
     "shadcn",
@@ -41,7 +43,7 @@ const config: KnipConfig = {
   // ignore tags
   // https://knip.dev/reference/configuration#tags
   tags: ["-@lintignore"],
-  ignoreBinaries: ["act", "zizmor", "cloudflared"],
+  ignoreBinaries: ["act", "zizmor", "cloudflared", "ffmpeg"],
 };
 
 export default config;
