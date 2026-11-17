@@ -7,12 +7,6 @@ import {
   type PlaywrightTestOptions,
 } from "@playwright/test";
 
-import { getLatestChangelogSlug } from "./e2e/utils/latest-changelog-slug";
-import {
-  CHANGELOG_SEEN_STORAGE_KEY,
-  WELCOME_POPUP_SEEN_STORAGE_KEY,
-  WELCOME_POPUP_SEEN_VALUE,
-} from "./src/app/schema";
 import { POSTHOG_E2E_DISABLED_STORAGE_KEY } from "./src/lib/analytics/posthog-e2e-flags";
 import { SENTRY_E2E_DISABLED_STORAGE_KEY } from "./src/lib/sentry/sentry-e2e-flags";
 
@@ -41,8 +35,7 @@ const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
 const isLocal = !process.env.CI && !process.env.BASE_URL;
 
 /**
- * Analytics and error reporting are switched off for every project, and both of the app's
- * popups (welcome and "What's new") are marked as seen.
+ * Analytics and error reporting are switched off for every project.
  *
  * The suite runs against a real preview deployment, which has Sentry enabled like
  * production does, so an env var on the CI job cannot tell e2e traffic apart from a
@@ -66,17 +59,6 @@ const STORAGE_STATE = {
         {
           name: POSTHOG_E2E_DISABLED_STORAGE_KEY,
           value: "1",
-        },
-        // The popups appear 1.5s after load, mid-test. On mobile they sit inside the
-        // bottom dock, which grows and pushes the dock's buttons down under whatever the
-        // test is doing -- and no test is about them; their behaviour is unit-tested.
-        {
-          name: WELCOME_POPUP_SEEN_STORAGE_KEY,
-          value: WELCOME_POPUP_SEEN_VALUE,
-        },
-        {
-          name: CHANGELOG_SEEN_STORAGE_KEY,
-          value: getLatestChangelogSlug(),
         },
       ],
     },

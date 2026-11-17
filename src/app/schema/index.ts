@@ -1805,22 +1805,6 @@ export const METADATA_LOCAL_STORAGE_KEY = "EASY_INVOICE_METADATA";
 // Local storage keys
 // __________________________________________________________
 
-/**
- * Remembers that the user has already seen the welcome popup. The value is a version
- * marker, so bumping it shows the popup again.
- */
-export const WELCOME_POPUP_SEEN_STORAGE_KEY = "EASY_INVOICE_WELCOME_POPUP_SEEN";
-
-/**
- * The value {@link WELCOME_POPUP_SEEN_STORAGE_KEY} holds once the welcome popup has been
- * seen. Exported for `playwright.config.ts`, which marks it seen for every e2e run.
- */
-export const WELCOME_POPUP_SEEN_VALUE = "v1";
-
-/** The slug of the newest changelog entry the user has seen. */
-export const CHANGELOG_SEEN_STORAGE_KEY =
-  "EASY_INVOICE_LAST_SEEN_CHANGELOG_SLUG";
-
 /** When the CTA toast was last shown, as an epoch-milliseconds string. */
 export const CTA_TOAST_STORAGE_KEY = "EASY_INVOICE_CTA_LAST_SHOWN_AT";
 
@@ -1839,8 +1823,6 @@ export const LOCAL_STORAGE_KEYS = [
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
   SELLERS_LOCAL_STORAGE_KEY,
   BUYERS_LOCAL_STORAGE_KEY,
-  WELCOME_POPUP_SEEN_STORAGE_KEY,
-  CHANGELOG_SEEN_STORAGE_KEY,
   CTA_TOAST_STORAGE_KEY,
 ] as const;
 

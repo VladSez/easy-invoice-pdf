@@ -43,11 +43,6 @@ export const PAGES = {
     route: "/ (dialog)",
     area: "onboarding",
   },
-  "changelog-post": {
-    title: "Changelog post",
-    route: "/changelog/[slug]",
-    area: "onboarding",
-  },
   "seller-dialog": {
     title: "Seller dialog",
     route: "/ (dialog)",
@@ -110,11 +105,6 @@ interface StateDefinition {
 const APP_STATES = {
   "editor/loading": { title: "PDF still generating" },
   "editor/default": { title: "Default invoice" },
-  "editor/welcome-popup": { title: "Welcome popup, first visit" },
-  "editor/whats-new-popup": {
-    title: "What's new popup after a release",
-    only: "desktop",
-  },
   "editor/edited": { title: "Edited invoice, PDF regenerated" },
   "editor/cta-toast": { title: "Support toast after a download" },
   "editor/mobile-preview": { title: "Preview PDF tab", only: "phone" },
@@ -156,7 +146,6 @@ const APP_STATES = {
   "stripe/default": { title: "Stripe template" },
   "stripe/indigo": { title: "Indigo top line" },
   "how-it-works/default": { title: "Video dialog" },
-  "changelog-post/default": { title: "Latest post", only: "desktop" },
   "seller-dialog/empty": { title: "New seller, empty" },
   "seller-dialog/filled": { title: "New seller, filled in" },
   "seller-dialog/discard-confirm": { title: "Discard unsaved changes?" },
@@ -212,41 +201,15 @@ interface FlowDefinition {
 
 export const FLOWS = [
   {
-    id: "first-visit",
-    title: "First visit",
+    id: "how-it-works",
+    title: "How it works",
     area: "onboarding",
-    summary:
-      "A new visitor gets the welcome popup 1.5s after load. It shows once per browser; on a phone it sits in the bottom dock.",
+    summary: "The header's How it works button opens the walkthrough videos.",
     roots: [
       {
-        state: "editor/welcome-popup",
-        via: "Open / for the first time",
-        next: [
-          { state: "editor/default", via: "Continue" },
-          {
-            state: "how-it-works/default",
-            via: "How it works",
-            next: [{ state: "editor/default", via: "Close" }],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: "whats-new",
-    title: "Return after a release",
-    area: "onboarding",
-    summary:
-      "A returning desktop visitor who has not seen the newest changelog post gets the What's new popup instead.",
-    only: "desktop",
-    roots: [
-      {
-        state: "editor/whats-new-popup",
-        via: "Open / after a release",
-        next: [
-          { state: "editor/default", via: "Continue" },
-          { state: "changelog-post/default", via: "Read more" },
-        ],
+        state: "how-it-works/default",
+        via: "How it works in the header",
+        next: [{ state: "editor/default", via: "Close" }],
       },
     ],
   },

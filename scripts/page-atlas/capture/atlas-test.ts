@@ -9,16 +9,10 @@ import {
   type Page,
 } from "@playwright/test";
 
-import {
-  CHANGELOG_SEEN_STORAGE_KEY,
-  CTA_TOAST_STORAGE_KEY,
-  WELCOME_POPUP_SEEN_STORAGE_KEY,
-  WELCOME_POPUP_SEEN_VALUE,
-} from "@/app/schema";
+import { CTA_TOAST_STORAGE_KEY } from "@/app/schema";
 import { POSTHOG_E2E_DISABLED_STORAGE_KEY } from "@/lib/analytics/posthog-e2e-flags";
 import { SENTRY_E2E_DISABLED_STORAGE_KEY } from "@/lib/sentry/sentry-e2e-flags";
 
-import { getLatestChangelogSlug } from "../../../e2e/utils/latest-changelog-slug";
 import {
   getShotFileName,
   STATES,
@@ -40,43 +34,20 @@ const DOWNLOAD_PDF_LINK_NAME = /^(Download PDF|Download PDF in .+)$/;
 const DEBOUNCE_WAIT_MS = 700;
 
 interface StorageStateOptions {
-  /** Leave the welcome popup unseen, as on a first visit. */
-  isFirstVisit?: boolean;
-  /** Leave the newest changelog post unseen, so the What's new popup shows. */
-  hasUnseenRelease?: boolean;
   /** Let the support toast show after the next download. */
   isSupportToastDue?: boolean;
 }
 
 /**
- * The browser state every capture starts from: analytics off, both popups seen and the
- * support toast already shown today, unless a flow asks otherwise.
+ * The browser state every capture starts from: analytics off and the support toast already shown today, unless a flow asks otherwise.
  */
 export function atlasStorageState({
-  isFirstVisit = false,
-  hasUnseenRelease = false,
   isSupportToastDue = false,
 }: StorageStateOptions = {}) {
   const localStorage = [
     { name: "umami.disabled", value: "1" },
     { name: SENTRY_E2E_DISABLED_STORAGE_KEY, value: "1" },
     { name: POSTHOG_E2E_DISABLED_STORAGE_KEY, value: "1" },
-    ...(isFirstVisit
-      ? []
-      : [
-          {
-            name: WELCOME_POPUP_SEEN_STORAGE_KEY,
-            value: WELCOME_POPUP_SEEN_VALUE,
-          },
-        ]),
-    ...(hasUnseenRelease
-      ? []
-      : [
-          {
-            name: CHANGELOG_SEEN_STORAGE_KEY,
-            value: getLatestChangelogSlug(),
-          },
-        ]),
     ...(isSupportToastDue
       ? []
       : [{ name: CTA_TOAST_STORAGE_KEY, value: String(FIXED_NOW.getTime()) }]),

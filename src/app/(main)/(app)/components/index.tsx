@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import { FileTextIcon, PencilIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useRef, useState, type ReactNode, type RefObject } from "react";
+import { useRef, useState, type RefObject } from "react";
 
 import {
   type InvoiceData,
@@ -153,8 +153,6 @@ export function InvoiceClientPage({
   canShareInvoice,
   currentInvoiceFormDataRef,
   isUnmodifiedInvoiceFromLink,
-  mobileDockNotice,
-  onMobileTabChange,
 }: {
   invoiceDataState: InvoiceData;
   handleInvoiceDataChange: (invoiceData: InvoiceData) => void;
@@ -167,13 +165,6 @@ export function InvoiceClientPage({
    * hidden then: it comes from this browser's metadata and says nothing about that invoice.
    */
   isUnmodifiedInvoiceFromLink: boolean;
-  /**
-   * Rendered inside the mobile dock, which it positions itself against to float just above
-   * it -- the welcome popup on phones. Ignored on desktop, where the popup floats instead.
-   */
-  mobileDockNotice?: ReactNode;
-  /** Called when the user switches between the Edit/Preview tabs on mobile */
-  onMobileTabChange?: () => void;
 }) {
   const appMetadata = useAppMetadata();
 
@@ -240,7 +231,6 @@ export function InvoiceClientPage({
               flushPendingFormChangesRef.current?.();
 
               setActiveMobileTab(newValue);
-              onMobileTabChange?.();
 
               setOpenedMobileTabs((current) => {
                 return current.includes(newValue)
@@ -284,7 +274,6 @@ export function InvoiceClientPage({
               </div>
             </TabsContent>
             <div className="sticky bottom-0 z-50 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
-              {mobileDockNotice}
               {/*
                 The switch lives in the dock rather than at the top of the page, so it sits
                 in the same thumb zone as the two buttons it belongs with.
