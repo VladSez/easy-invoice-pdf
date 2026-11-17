@@ -5,18 +5,6 @@ import { z } from "zod";
 
 import { GITHUB_URL } from "@/config";
 
-export interface ChangelogSummary {
-  slug: string;
-  title: string;
-  description: string;
-  version?: string;
-  date: string;
-  /** A few words about the release for the "What's new" popup, see `popupSummary` below. */
-  popupSummary?: string;
-  /** YouTube video for the release, see `youtubeVideoId` below. */
-  youtubeVideoId?: string;
-}
-
 /** Maps metadata `version` (e.g. "1.0.1") to the GitHub release tag name. */
 const changelogVersionToReleaseTag: Record<string, string> = {
   "1.0.0": "EasyInvoicePDF-v1.0.0",
@@ -47,16 +35,8 @@ interface ChangelogMetadata {
   type?: "major" | "minor" | "patch";
   slug?: string;
   /**
-   * A few words about the release, shown in the "What's new" popup in place of its generic
-   * line. The popup is small and shares its space with the mascot, so keep it to a short
-   * sentence; leave it out and the popup falls back to the generic line.
-   */
-  popupSummary?: string;
-  /**
-   * ID of the release's YouTube video (the `v=` part of its URL). The "What's new" popup
-   * shows its thumbnail, linking to the video; leave it out and the popup has no preview.
-   * Upload at 720p or higher: the popup uses YouTube's `maxresdefault` thumbnail on 2x
-   * screens, which YouTube only makes for HD videos.
+   * ID of the release's YouTube video (the `v=` part of its URL), embedded by the post
+   * itself.
    */
   youtubeVideoId?: string;
 }
@@ -74,35 +54,11 @@ const changelogEntryMetadataSchema = z.object({
   date: z.iso.date(),
   version: z.string().optional(),
   type: z.enum(["major", "minor", "patch"]).optional(),
-  popupSummary: z.string().min(1).max(80).optional(),
   youtubeVideoId: z
     .string()
     .regex(/^[\w-]{11}$/, "Expected an 11-character YouTube video ID")
     .optional(),
 });
-
-/**
- * Returns the newest changelog entry metadata without the MDX component.
- */
-export async function getLatestChangelogSummary(): Promise<ChangelogSummary | null> {
-  const [latest] = await getChangelogEntries();
-
-  if (!latest) {
-    return null;
-  }
-
-  const { slug, metadata } = latest;
-
-  return {
-    slug,
-    title: metadata.title,
-    description: metadata.description,
-    version: metadata.version,
-    date: metadata.date,
-    popupSummary: metadata.popupSummary,
-    youtubeVideoId: metadata.youtubeVideoId,
-  };
-}
 
 /**
  * Gets all MDX files from the content/changelog directory

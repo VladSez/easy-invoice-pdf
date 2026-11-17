@@ -10,19 +10,9 @@ import {
  * a second time (back to the default editor, say) only walk past it.
  */
 
-test.describe("first visit", () => {
-  test.use({ storageState: atlasStorageState({ isFirstVisit: true }) });
-
-  test("welcome popup and the how it works dialog", async ({ page, atlas }) => {
+test.describe("how it works", () => {
+  test("how it works dialog", async ({ page, atlas }) => {
     await atlas.openEditor();
-
-    const popup = page.getByTestId("changelog-update-popup");
-
-    await expect(popup).toBeVisible();
-    await atlas.snap("editor/welcome-popup");
-
-    await page.getByTestId("changelog-update-close").click();
-    await expect(popup).toBeHidden();
 
     await page
       .getByTestId("header")
@@ -32,25 +22,6 @@ test.describe("first visit", () => {
       page.getByTestId("how-it-works-videos-dialog-content"),
     ).toBeVisible();
     await atlas.snap("how-it-works/default");
-  });
-});
-
-test.describe("return after a release", () => {
-  test.use({ storageState: atlasStorageState({ hasUnseenRelease: true }) });
-
-  test("what's new popup", async ({ page, atlas }) => {
-    test.skip(atlas.isPhone, "The What's new popup is desktop only");
-
-    await atlas.openEditor();
-
-    const popup = page.getByTestId("changelog-update-popup");
-
-    await expect(popup).toBeVisible();
-    await atlas.snap("editor/whats-new-popup");
-
-    await page.getByTestId("changelog-update-latest-post-link").click();
-    await page.waitForURL(/\/changelog\/.+/);
-    await atlas.snap("changelog-post/default");
   });
 });
 

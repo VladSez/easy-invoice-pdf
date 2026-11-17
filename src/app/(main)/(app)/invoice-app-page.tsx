@@ -1,10 +1,8 @@
-import * as Sentry from "@sentry/nextjs";
 import type { Metadata } from "next";
 import { type ReactNode, Suspense } from "react";
 
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { Footer } from "@/app/(components)/footer";
-import { getLatestChangelogSummary } from "@/app/(main)/changelog/utils";
 import type { SupportedTemplates } from "@/app/schema";
 import {
   APP_URL,
@@ -47,21 +45,7 @@ export async function InvoiceAppPage({
 }) {
   const isIndexableEnvironment = getIsIndexableEnvironment();
 
-  const [githubStarsCount, latestChangelog] = await Promise.all([
-    fetchGithubStars(),
-    getLatestChangelogSummary().catch((error) => {
-      // don't fail the page if we can't load the latest changelog summary
-      console.error("[AppPage] Failed to load latest changelog summary", error);
-
-      Sentry.captureException(
-        new Error(
-          `[AppPage] Failed to load latest changelog summary: ${error}`,
-        ),
-      );
-
-      return null;
-    }),
-  ]);
+  const githubStarsCount = await fetchGithubStars();
 
   return (
     <CTAToastProvider>
@@ -75,10 +59,7 @@ export async function InvoiceAppPage({
           HTML. The editor is client-only anyway (the invoice lives in localStorage or
           `?data=`), and the fallback is the skeleton `loading.tsx` renders. */}
       <Suspense fallback={<InvoicePageLoadingSkeleton template={template} />}>
-        <AppPageClient
-          githubStarsCount={githubStarsCount}
-          latestChangelog={latestChangelog}
-        />
+        <AppPageClient githubStarsCount={githubStarsCount} />
       </Suspense>
       {TEMPLATE_SEO_CONTENT[template]}
       <Footer />

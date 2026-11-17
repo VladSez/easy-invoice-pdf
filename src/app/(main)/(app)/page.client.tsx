@@ -18,7 +18,6 @@ import {
   ensureAppMetadata,
   updateAppMetadata,
 } from "@/app/(main)/(app)/utils/get-app-metadata";
-import type { ChangelogSummary } from "@/app/(main)/changelog/utils";
 import { getInitialInvoiceData } from "@/app/constants";
 import {
   invoiceSchema,
@@ -44,10 +43,7 @@ import {
 } from "@/utils/url-compression";
 
 import { InvoiceClientPage } from "./components";
-import { ChangelogUpdatePopup } from "./components/changelog-update-popup";
-import { HowItWorksVideoDialog } from "./components/how-it-works-video-dialog";
 import { CANNOT_SHARE_INVOICE_DESCRIPTION } from "./components/share-invoice-button";
-import { useChangelogUpdatePopup } from "./hooks/use-changelog-update-popup";
 import { useInAppBrowserNotice } from "./hooks/use-in-app-browser-notice";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
@@ -100,10 +96,8 @@ function replaceUrlQuery(params: URLSearchParams) {
  */
 export function AppPageClient({
   githubStarsCount,
-  latestChangelog,
 }: {
   githubStarsCount: number;
-  latestChangelog: ChangelogSummary | null;
 }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -153,35 +147,6 @@ export function AppPageClient({
    */
   const [isUnmodifiedInvoiceFromLink, setIsUnmodifiedInvoiceFromLink] =
     useState(false);
-
-  const {
-    isOpen: isChangelogPopupOpen,
-    dismiss: dismissChangelogPopup,
-    variant: changelogPopupVariant,
-  } = useChangelogUpdatePopup({
-    latestChangelog,
-    isViewingSharedInvoice,
-    canShowChangelog: !isMobile,
-  });
-
-  const [isHowItWorksDialogOpen, setIsHowItWorksDialogOpen] = useState(false);
-
-  // One popup, placed by viewport: a floating card on desktop, a notice inside the bottom
-  // dock on mobile, where a floating card would cover the dock's buttons
-  const changelogPopup = changelogPopupVariant ? (
-    <ChangelogUpdatePopup
-      variant={changelogPopupVariant}
-      isOpen={isChangelogPopupOpen}
-      onDismiss={dismissChangelogPopup}
-      releaseSummary={latestChangelog?.popupSummary}
-      releaseSlug={latestChangelog?.slug}
-      releaseVideoId={latestChangelog?.youtubeVideoId}
-      layout={isMobile ? "dock" : "floating"}
-      onHowItWorksClick={() => {
-        return setIsHowItWorksDialogOpen(true);
-      }}
-    />
-  ) : null;
 
   /**
    * Reads the invoice form at click time: its current values, or `null` when it has
@@ -908,20 +873,11 @@ export function AppPageClient({
                 canShareInvoice={canShareInvoice}
                 currentInvoiceFormDataRef={currentInvoiceFormDataRef}
                 isUnmodifiedInvoiceFromLink={isUnmodifiedInvoiceFromLink}
-                mobileDockNotice={isMobile ? changelogPopup : null}
-                // switching tabs means the user found their way around, so the welcome
-                // notice has done its job
-                onMobileTabChange={dismissChangelogPopup}
               />
             </div>
           </div>
         </main>
       </InvoicePdfInstanceProvider>
-      {isMobile ? null : changelogPopup}
-      <HowItWorksVideoDialog
-        open={isHowItWorksDialogOpen}
-        onOpenChange={setIsHowItWorksDialogOpen}
-      />
       <div className="fixed right-1.5 top-1.5 z-50 duration-500 animate-in fade-in slide-in-from-top-4">
         <GitHubStarCTA githubStarsCount={githubStarsCount} />
       </div>
