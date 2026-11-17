@@ -130,9 +130,7 @@ test("out-of-date dates", async ({ page, atlas }) => {
 test("stripe template", async ({ page, atlas }) => {
   await atlas.openEditor();
 
-  await page
-    .getByRole("combobox", { name: "Invoice Template" })
-    .selectOption("stripe");
+  await page.getByRole("combobox", { name: "Template" }).selectOption("stripe");
   await page.waitForURL(/\/stripe-template/);
   await atlas.waitForPdf();
   await atlas.snap("stripe/default");

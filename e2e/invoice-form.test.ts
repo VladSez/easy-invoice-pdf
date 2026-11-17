@@ -54,7 +54,7 @@ test.describe("Invoice Generator Page", () => {
     await expect(page).toHaveURL("/");
 
     const templateCombobox = page.getByRole("combobox", {
-      name: "Invoice Template",
+      name: "Template",
     });
     await expect(templateCombobox).toHaveValue("default");
 
@@ -377,7 +377,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Check all supported languages are available as options with correct labels
     const languageSelect = generalInfoSection.getByRole("combobox", {
-      name: "Invoice PDF Language",
+      name: "PDF language",
     });
 
     // Language selection
@@ -844,7 +844,7 @@ test.describe("Invoice Generator Page", () => {
     await dateOfServiceLabelInput.fill("Custom date of sales label");
 
     const languageSelect = generalInfoSection.getByRole("combobox", {
-      name: "Invoice PDF Language",
+      name: "PDF language",
     });
     await languageSelect.selectOption("pl");
 

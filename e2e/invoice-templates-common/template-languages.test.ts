@@ -91,7 +91,7 @@ function expectedTotal(language: SupportedLanguages) {
 async function selectTemplate(page: Page, template: Template) {
   if (template !== "default") {
     await page
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption(template);
   }
 
@@ -162,7 +162,7 @@ test.describe("Invoice Template PDF languages", () => {
         /** SWITCH PDF LANGUAGE */
 
         const languageSelect = generalInfoSection.getByRole("combobox", {
-          name: "Invoice PDF Language",
+          name: "PDF language",
         });
 
         await languageSelect.selectOption(language);

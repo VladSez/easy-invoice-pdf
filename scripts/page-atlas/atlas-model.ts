@@ -512,7 +512,7 @@ export const FLOWS = [
         next: [
           {
             state: "stripe/default",
-            via: "Invoice Template: Stripe",
+            via: "Template: Stripe",
             next: [{ state: "stripe/indigo", via: "Top line color: Indigo" }],
           },
           {

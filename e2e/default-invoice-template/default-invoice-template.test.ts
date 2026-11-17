@@ -50,7 +50,7 @@ test.describe("Default Invoice Template", () => {
   }, testInfo) => {
     // Switch to Polish
     const languageSelect = page.getByRole("combobox", {
-      name: "Invoice PDF Language",
+      name: "PDF language",
     });
 
     await languageSelect.selectOption("pl");
@@ -323,7 +323,7 @@ test.describe("Default Invoice Template", () => {
 
     // Switch to French
     const languageSelect = page.getByRole("combobox", {
-      name: "Invoice PDF Language",
+      name: "PDF language",
     });
 
     await languageSelect.selectOption("fr");
@@ -540,7 +540,7 @@ test.describe("Default Invoice Template", () => {
     await expect(invoiceNumberValueInput).toHaveValue("1/12-2025");
 
     const languageSelect = page.getByRole("combobox", {
-      name: "Invoice PDF Language",
+      name: "PDF language",
     });
 
     await languageSelect.selectOption("pl");
@@ -604,7 +604,7 @@ test.describe("Default Invoice Template", () => {
     await expect(newInvoiceNumberLabelInput).toHaveValue("Faktura TEST:");
 
     const newLanguageSelect = page.getByRole("combobox", {
-      name: "Invoice PDF Language",
+      name: "PDF language",
     });
 
     // Verify that the language is persisted after page reload
@@ -640,14 +640,14 @@ test.describe("Default Invoice Template", () => {
      * follows the template specific translations
      */
     await page
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption("stripe");
 
     await page.waitForURL("/stripe-template");
 
     // Verify that the Stripe template is selected
     const templateSelect = page.getByRole("combobox", {
-      name: "Invoice Template",
+      name: "Template",
     });
     await expect(templateSelect).toHaveValue("stripe");
 
@@ -730,7 +730,7 @@ test.describe("Default Invoice Template", () => {
 
     // Switch to Stripe template
     await page
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption("stripe");
 
     await page.waitForURL("/stripe-template");

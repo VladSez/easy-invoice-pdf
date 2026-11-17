@@ -119,9 +119,9 @@ test.describe("Invoice app SEO content", () => {
       .dispatchEvent("click");
 
     await expect(page).toHaveURL("/");
-    await expect(
-      page.getByRole("combobox", { name: "Invoice Template" }),
-    ).toHaveValue("default");
+    await expect(page.getByRole("combobox", { name: "Template" })).toHaveValue(
+      "default",
+    );
     await expect(page.getByTestId("home-seo-content")).toBeVisible();
   });
 
@@ -138,7 +138,7 @@ test.describe("Invoice app SEO content", () => {
     ).toBeVisible();
 
     await page
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption("default");
     await expect(page).toHaveURL("/");
 
@@ -161,8 +161,8 @@ test.describe("Invoice app SEO content", () => {
     await stripeTemplateLink.dispatchEvent("click");
 
     await expect(page).toHaveURL(STRIPE_TEMPLATE_PATHNAME);
-    await expect(
-      page.getByRole("combobox", { name: "Invoice Template" }),
-    ).toHaveValue("stripe");
+    await expect(page.getByRole("combobox", { name: "Template" })).toHaveValue(
+      "stripe",
+    );
   });
 });

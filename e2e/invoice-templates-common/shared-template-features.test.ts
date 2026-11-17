@@ -34,7 +34,7 @@ type Template = (typeof TEMPLATES)[number];
 async function selectTemplate(page: Page, template: Template) {
   if (template !== "default") {
     await page
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption(template);
   }
 

@@ -506,14 +506,14 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
     await expect(
       generalInfoSection.getByRole("combobox", {
-        name: "Invoice PDF Language",
+        name: "PDF language",
       }),
     ).toHaveValue("pl");
 
     // Verify the Stripe template is selected
-    await expect(
-      page.getByRole("combobox", { name: "Invoice Template" }),
-    ).toHaveValue("stripe");
+    await expect(page.getByRole("combobox", { name: "Template" })).toHaveValue(
+      "stripe",
+    );
 
     // Invoice Number
     const invoiceDetailsFieldset = page.getByRole("group", {
@@ -576,14 +576,14 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
     await expect(
       newGeneralInfoSection.getByRole("combobox", {
-        name: "Invoice PDF Language",
+        name: "PDF language",
       }),
     ).toHaveValue("pl");
 
     // Verify the Stripe template is selected
-    await expect(
-      page.getByRole("combobox", { name: "Invoice Template" }),
-    ).toHaveValue("stripe");
+    await expect(page.getByRole("combobox", { name: "Template" })).toHaveValue(
+      "stripe",
+    );
 
     // Invoice Number
     const newInvoiceDetailsFieldset = page.getByRole("group", {
