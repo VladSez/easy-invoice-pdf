@@ -10,7 +10,15 @@ Package manager is **pnpm** (pinned via corepack). `save-exact=true` and a 5-day
 
 ## Working agreements
 
-**Never commit and never stage.** Do not run `git commit`, `git add`, or `git stage` — not even when the task is finished and every check is green. Leave the work in the working tree and report what changed; the user reviews and shapes their own commits. Committing also fires the heavy husky pre-commit hook, which rewrites files via `oxfmt`.
+**You may commit, open PRs and merge them.** Work on a branch, never directly on `main`:
+
+- Stage only the files the task changed (no `git add -A` over a tree that holds someone else's work), and write Conventional Commit messages.
+- Commits fire the husky pre-commit hook (see [Commands](#commands)), which can take a minute and rewrites files via `oxfmt`. Let it run; never skip it with `--no-verify`.
+- Open the PR with `gh pr create` against `main`, with a body that says why, what changed and how it was tested.
+- Merge only when every check is green, with a squash merge (the only method the repo allows). Never force-push and never rewrite pushed history.
+- Leave staging you did not cause alone: don't `git reset` or unstage files to tidy up.
+
+**Clean up after a merge.** Once a PR opened from a worktree session is merged, delete that worktree and archive the session. Stop any dev server the session started first, and land any lasting change (like this file) through a commit, because the worktree goes with the session.
 
 **Follow the repo's own guidelines and skills.** Before writing code, load what applies:
 
