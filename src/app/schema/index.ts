@@ -655,8 +655,8 @@ export const SUPPORTED_TEMPLATES = ["default", "stripe"] as const;
 export type SupportedTemplates = (typeof SUPPORTED_TEMPLATES)[number];
 
 export const TEMPLATE_TO_LABEL = {
-  default: "Default Template",
-  stripe: "Stripe Template",
+  default: "Default",
+  stripe: "Stripe",
 } as const satisfies Record<SupportedTemplates, string>;
 
 export type TemplateLabels =

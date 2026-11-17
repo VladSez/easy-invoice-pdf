@@ -18,7 +18,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Switch to Stripe template
     await page
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption("stripe");
 
     // Wait for URL to be updated
@@ -117,7 +117,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Switch to Stripe template
     await page
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption("stripe");
 
     // Upload logo
@@ -156,7 +156,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Switch to Stripe template and upload logo
     await page
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption("stripe");
 
     // Upload logo
@@ -231,7 +231,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Switch to Stripe template
     await page
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption("stripe");
 
     // Upload logo
@@ -242,7 +242,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Switch back to default template
     await page
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption("default");
 
     // Logo persists across template switches, so share button stays disabled
@@ -266,7 +266,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     const shareButton = page.getByRole("button", { name: "Get link" });
     const templateSelect = page.getByRole("combobox", {
-      name: "Invoice Template",
+      name: "Template",
     });
 
     // The toast actually on screen. The app shows one at a time (`visibleToasts={1}`); the
@@ -330,7 +330,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Switch to Stripe template and upload logo
     await page
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption("stripe");
 
     await page.waitForURL("/stripe-template");
@@ -370,9 +370,9 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await page.waitForURL("/stripe-template");
 
     // Verify state persists after reload
-    await expect(
-      page.getByRole("combobox", { name: "Invoice Template" }),
-    ).toHaveValue("stripe");
+    await expect(page.getByRole("combobox", { name: "Template" })).toHaveValue(
+      "stripe",
+    );
     await expect(
       generalInfoSection.getByAltText("Company logo preview"),
     ).toBeVisible();
@@ -404,7 +404,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Switch to Stripe template
     await page
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption("stripe");
 
     // Upload logo
@@ -444,7 +444,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
 
     // Switch to Stripe template
     await page
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption("stripe");
 
     await expect(page).toHaveURL("/stripe-template");

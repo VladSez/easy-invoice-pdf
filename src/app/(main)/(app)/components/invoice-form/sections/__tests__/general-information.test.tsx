@@ -165,10 +165,7 @@ async function selectInvoiceLanguage({
   user: ReturnType<typeof userEvent.setup>;
   language: SupportedLanguages;
 }) {
-  await user.selectOptions(
-    screen.getByLabelText("Invoice PDF Language"),
-    language,
-  );
+  await user.selectOptions(screen.getByLabelText("PDF language"), language);
 }
 
 describe("GeneralInformation date helper texts", () => {

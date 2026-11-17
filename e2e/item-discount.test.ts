@@ -136,7 +136,7 @@ test.describe("Item discounts", () => {
   }) => {
     await page
       .getByTestId("general-information-section")
-      .getByRole("combobox", { name: "Invoice Template" })
+      .getByRole("combobox", { name: "Template" })
       .selectOption("stripe");
 
     await expect(page).toHaveURL("/stripe-template");

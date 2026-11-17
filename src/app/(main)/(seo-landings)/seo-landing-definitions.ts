@@ -1331,7 +1331,7 @@ export const SEO_LANDING_DEFINITIONS = {
         title: "Create a Swedish invoice",
         lead: "Four steps, and nothing to download:",
         bullets: [
-          "Open the generator and set Invoice PDF Language to Swedish",
+          "Open the generator and set PDF language to Swedish",
           "Set the currency to SEK",
           "Fill in your details and line items, watching the preview update",
           "Download the PDF, or send your client a link to it",
@@ -1542,7 +1542,7 @@ export const SEO_LANDING_DEFINITIONS = {
         title: "Create a Norwegian invoice",
         lead: "Four steps, and nothing to download:",
         bullets: [
-          "Open the generator and set Invoice PDF Language to Norwegian",
+          "Open the generator and set PDF language to Norwegian",
           "Set the currency to NOK",
           "Fill in your details and line items, watching the preview update",
           "Download the PDF, or send your client a link to it",
@@ -1745,7 +1745,7 @@ export const SEO_LANDING_DEFINITIONS = {
         title: "Create a Spanish invoice",
         lead: "Four steps, and nothing to download:",
         bullets: [
-          "Open the generator and set Invoice PDF Language to Spanish",
+          "Open the generator and set PDF language to Spanish",
           "Pick the currency your client pays in",
           "Fill in your details and line items, watching the preview update",
           "Download the PDF, or send your client a link to it",
@@ -1938,7 +1938,7 @@ export const SEO_LANDING_DEFINITIONS = {
         title: "Create a German invoice",
         lead: "Four steps, and nothing to download:",
         bullets: [
-          "Open the generator and set Invoice PDF Language to German",
+          "Open the generator and set PDF language to German",
           "Set the currency, EUR for most German clients",
           "Fill in your details and line items, watching the preview update",
           "Download the PDF, or send your client a link to it",

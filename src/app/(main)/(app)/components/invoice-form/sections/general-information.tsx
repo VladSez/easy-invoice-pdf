@@ -304,97 +304,107 @@ export const GeneralInformation = memo(function GeneralInformation({
     <div className="space-y-5">
       {/* PDF SETTINGS */}
       <FormGroup title="PDF settings">
-        <div>
-          <Label htmlFor={`template`} className="mb-1">
-            Invoice Template
-          </Label>
-          <Controller
-            name="template"
-            control={control}
-            render={({ field }) => {
-              return (
-                <SelectNative
-                  {...field}
-                  id={`template`}
-                  className={cn(
-                    "block",
-                    inputErrorClassName(!!errors.template),
-                  )}
-                  onChange={(e) => {
-                    const newTemplate =
-                      e.target.value === "stripe" ? "stripe" : "default";
+        {/* The two selects split the row evenly, but neither drops below the width its
+        longest option needs: 87px for "Default", 147px for "Portuguese (PT)" (145px plus
+        2px so the text doesn't touch the chevron on a 375px phone). The desktop
+        sidebar is narrower than a phone (~243px with a classic scrollbar), which is why
+        both selects also trade 4px of the room reserved for the chevron (`pe-7`). Where
+        even that does not fit (a 1024-1038px window with a classic scrollbar), the
+        language select wraps onto its own line rather than clipping either label. */}
+        <div className="flex flex-wrap gap-x-2 gap-y-4">
+          <div className="min-w-[87px] flex-1">
+            <Label htmlFor={`template`} className="mb-1">
+              Template
+            </Label>
+            <Controller
+              name="template"
+              control={control}
+              render={({ field }) => {
+                return (
+                  <SelectNative
+                    {...field}
+                    id={`template`}
+                    className={cn(
+                      "block pe-7",
+                      inputErrorClassName(!!errors.template),
+                    )}
+                    onChange={(e) => {
+                      const newTemplate =
+                        e.target.value === "stripe" ? "stripe" : "default";
 
-                    field.onChange(e);
+                      field.onChange(e);
 
-                    // `invoice_template` is the key `download_invoice` already reports the
-                    // template under, so the two read together in the dashboard.
-                    trackEvent({
-                      event: "invoice_template_changed",
-                      data: {
-                        invoice_template: newTemplate,
-                        previous_invoice_template: template,
-                      },
-                    });
+                      // `invoice_template` is the key `download_invoice` already reports the
+                      // template under, so the two read together in the dashboard.
+                      trackEvent({
+                        event: "invoice_template_changed",
+                        data: {
+                          invoice_template: newTemplate,
+                          previous_invoice_template: template,
+                        },
+                      });
 
-                    // When the user changes the invoice template, automatically update the invoice number label
-                    // so it matches the default convention for the selected template and current language.
-                    setValue(
-                      "invoiceNumberObject.label",
-                      getDefaultInvoiceNumberLabel(language, newTemplate),
-                    );
+                      // When the user changes the invoice template, automatically update the invoice number label
+                      // so it matches the default convention for the selected template and current language.
+                      setValue(
+                        "invoiceNumberObject.label",
+                        getDefaultInvoiceNumberLabel(language, newTemplate),
+                      );
 
-                    // Handles template-specific form updates for better UX
+                      // Handles template-specific form updates for better UX
 
-                    // The template decides whether the month is spelled out, the language
-                    // decides how that month is written.
-                    setValue(
-                      "dateFormat",
-                      getDefaultDateFormat({ language, template: newTemplate }),
-                    );
+                      // The template decides whether the month is spelled out, the language
+                      // decides how that month is written.
+                      setValue(
+                        "dateFormat",
+                        getDefaultDateFormat({
+                          language,
+                          template: newTemplate,
+                        }),
+                      );
 
-                    if (newTemplate === "stripe") {
-                      // Set unit field to be HIDDEN by default for Stripe template (matches stripe template behaviour)
-                      setValue("items.0.unitFieldIsVisible", false);
+                      if (newTemplate === "stripe") {
+                        // Set unit field to be HIDDEN by default for Stripe template (matches stripe template behaviour)
+                        setValue("items.0.unitFieldIsVisible", false);
 
-                      // Set service period field to be VISIBLE for Stripe template (for backwards compatibility)
-                      setValue("servicePeriodFieldIsVisible", true);
-                    } else if (newTemplate === "default") {
-                      // Clear Stripe-specific fields when not using Stripe template
-                      if (errors.stripePayOnlineUrl) {
-                        setValue("stripePayOnlineUrl", "");
+                        // Set service period field to be VISIBLE for Stripe template (for backwards compatibility)
+                        setValue("servicePeriodFieldIsVisible", true);
+                      } else if (newTemplate === "default") {
+                        // Clear Stripe-specific fields when not using Stripe template
+                        if (errors.stripePayOnlineUrl) {
+                          setValue("stripePayOnlineUrl", "");
+                        }
+
+                        // Set unit field to be VISIBLE for default template
+                        setValue("items.0.unitFieldIsVisible", true);
+
+                        // Set service period field to be HIDDEN for default template (matches the default template behaviour)
+                        setValue("servicePeriodFieldIsVisible", false);
                       }
+                    }}
+                  >
+                    {SUPPORTED_TEMPLATES.map((template) => {
+                      const templateLabel = TEMPLATE_TO_LABEL[template];
 
-                      // Set unit field to be VISIBLE for default template
-                      setValue("items.0.unitFieldIsVisible", true);
+                      return (
+                        <option key={template} value={template}>
+                          {templateLabel}
+                        </option>
+                      );
+                    })}
+                  </SelectNative>
+                );
+              }}
+            />
+            {errors.template ? (
+              <ErrorMessage>{errors.template.message}</ErrorMessage>
+            ) : null}
+          </div>
 
-                      // Set service period field to be HIDDEN for default template (matches the default template behaviour)
-                      setValue("servicePeriodFieldIsVisible", false);
-                    }
-                  }}
-                >
-                  {SUPPORTED_TEMPLATES.map((template) => {
-                    const templateLabel = TEMPLATE_TO_LABEL[template];
-
-                    return (
-                      <option key={template} value={template}>
-                        {templateLabel}
-                      </option>
-                    );
-                  })}
-                </SelectNative>
-              );
-            }}
-          />
-          {errors.template ? (
-            <ErrorMessage>{errors.template.message}</ErrorMessage>
-          ) : null}
-        </div>
-
-        <div className="space-y-4">
           {/* Language PDF Select */}
-          <div className="min-w-0">
+          <div className="min-w-[147px] flex-1">
             <Label htmlFor={`language`} className="mb-1">
-              Invoice PDF Language
+              PDF language
             </Label>
             <Controller
               name="language"
@@ -405,7 +415,7 @@ export const GeneralInformation = memo(function GeneralInformation({
                     {...field}
                     id={`language`}
                     className={cn(
-                      "block",
+                      "block pe-7",
                       inputErrorClassName(!!errors.language),
                     )}
                     onChange={(e) => {
@@ -518,30 +528,30 @@ export const GeneralInformation = memo(function GeneralInformation({
               <ErrorMessage>{errors.language.message}</ErrorMessage>
             ) : null}
           </div>
+        </div>
 
-          {/* Currency Select */}
-          <div className="min-w-0">
-            <Label htmlFor={`currency`} className="mb-1">
-              Currency
-            </Label>
-            <Controller
-              name="currency"
-              control={control}
-              render={({ field }) => {
-                return (
-                  <CurrencyCombobox
-                    id={`currency`}
-                    value={field.value}
-                    onChange={field.onChange}
-                    hasError={!!errors.currency}
-                  />
-                );
-              }}
-            />
-            {errors.currency ? (
-              <ErrorMessage>{errors.currency.message}</ErrorMessage>
-            ) : null}
-          </div>
+        {/* Currency Select */}
+        <div className="min-w-0">
+          <Label htmlFor={`currency`} className="mb-1">
+            Currency
+          </Label>
+          <Controller
+            name="currency"
+            control={control}
+            render={({ field }) => {
+              return (
+                <CurrencyCombobox
+                  id={`currency`}
+                  value={field.value}
+                  onChange={field.onChange}
+                  hasError={!!errors.currency}
+                />
+              );
+            }}
+          />
+          {errors.currency ? (
+            <ErrorMessage>{errors.currency.message}</ErrorMessage>
+          ) : null}
         </div>
 
         {/* FORMATTING */}
