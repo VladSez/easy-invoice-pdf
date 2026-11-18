@@ -495,11 +495,8 @@ test.describe("Default Invoice Template", () => {
       invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/),
     ).toContainText("150,00");
     await expect(
-      invoiceItemsSection.getByRole("textbox", {
-        name: "TVA Amount",
-        exact: true,
-      }),
-    ).toHaveValue("34,50");
+      invoiceItemsSection.getByTestId(/^itemVatAmount\d+$/),
+    ).toContainText("34,50");
     await expect(
       invoiceItemsSection.getByTestId(/^itemPreTaxAmount\d+$/),
     ).toContainText("184,50");
