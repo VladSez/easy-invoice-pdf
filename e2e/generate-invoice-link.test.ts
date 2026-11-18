@@ -128,12 +128,12 @@ test.describe("Generate Invoice Link (Get link)", () => {
       const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
       await invoiceItemsSection
-        .getByRole("spinbutton", { name: "Amount (Quantity)" })
+        .getByRole("spinbutton", { name: "Qty" })
         .fill("5");
 
       await invoiceItemsSection
         .getByRole("spinbutton", {
-          name: "Net Price (Rate or Unit Price)",
+          name: "Unit price",
         })
         .fill("100");
 
@@ -147,7 +147,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
         .fill("Custom VAT");
 
       await taxSettingsFieldset
-        .getByRole("textbox", { name: "VAT Rate" })
+        .getByRole("textbox", { name: "VAT rate" })
         .fill("23");
 
       // check total
@@ -287,12 +287,12 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
       await expect(
         newInvoiceItemsSection.getByRole("spinbutton", {
-          name: "Amount (Quantity)",
+          name: "Qty",
         }),
       ).toHaveValue("5");
       await expect(
         newInvoiceItemsSection.getByRole("spinbutton", {
-          name: "Net Price (Rate or Unit Price)",
+          name: "Unit price",
         }),
       ).toHaveValue("100");
 
@@ -305,7 +305,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
       await expect(
         newTaxSettingsFieldset.getByRole("textbox", {
-          name: "Custom VAT Rate",
+          name: "Custom VAT rate",
         }),
       ).toHaveValue("23");
 
@@ -549,7 +549,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     // Verify invoice items are loaded
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
     const itemAmountField = invoiceItemsSection.getByRole("spinbutton", {
-      name: "Net Price (Rate or Unit Price)",
+      name: "Unit price",
     });
     await expect(itemAmountField).toHaveValue("15000");
 
@@ -621,7 +621,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     // Verify invoice items are loaded
     const newInvoiceItemsSection = page.getByTestId("invoice-items-section");
     const newItemAmountField = newInvoiceItemsSection.getByRole("spinbutton", {
-      name: "Net Price (Rate or Unit Price)",
+      name: "Unit price",
     });
     await expect(newItemAmountField).toHaveValue("15000");
 
@@ -678,12 +678,12 @@ test.describe("Generate Invoice Link (Get link)", () => {
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)" })
+      .getByRole("spinbutton", { name: "Qty" })
       .fill(INVOICE_TEST_DATA.invoiceItemQuantity);
 
     await invoiceItemsSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       })
       .fill(INVOICE_TEST_DATA.invoiceItemAmount);
 
@@ -760,13 +760,13 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
     await expect(
       newInvoiceItemsSection.getByRole("spinbutton", {
-        name: "Amount (Quantity)",
+        name: "Qty",
       }),
     ).toHaveValue(INVOICE_TEST_DATA.invoiceItemQuantity);
 
     await expect(
       newInvoiceItemsSection.getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       }),
     ).toHaveValue(INVOICE_TEST_DATA.invoiceItemAmount);
 
@@ -917,12 +917,12 @@ test.describe("Generate Invoice Link (Get link)", () => {
       );
 
     await firstItemTaxSettingsFieldset
-      .getByRole("textbox", { name: "Sales Tax Rate", exact: true })
+      .getByRole("textbox", { name: "Sales Tax rate", exact: true })
       .fill("20");
 
     await firstItemFieldset
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       })
       .fill("5000");
 
@@ -944,7 +944,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
       await itemFieldset
         .getByRole("spinbutton", {
-          name: "Net Price (Rate or Unit Price)",
+          name: "Unit price",
         })
         .fill(`${1000 * (i + 1)}`);
     }

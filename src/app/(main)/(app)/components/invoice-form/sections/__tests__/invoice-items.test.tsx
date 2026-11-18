@@ -100,6 +100,7 @@ function InvoiceItemsTestHarness({
   const {
     fields,
     append: appendField,
+    insert,
     remove,
   } = useFieldArray({ control, name: "items" });
 
@@ -113,9 +114,9 @@ function InvoiceItemsTestHarness({
           remove(index);
         }}
         append={append ?? appendField}
+        insert={insert}
         errors={{}}
         currency="EUR"
-        language="en"
         template={template}
         taxLabelText="VAT"
         numberFormatLocale={numberFormatLocale}
@@ -278,13 +279,24 @@ describe("InvoiceItems delete confirmation dialog", () => {
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
   });
 
-  it("has no delete button for the first item, which cannot be removed", () => {
-    renderInvoiceItems({ itemCount: 2 });
+  it("offers no delete button while the invoice has a single item", () => {
+    renderInvoiceItems({ itemCount: 1 });
 
     expect(
       screen.queryByRole("button", { name: "Delete Invoice Item 1" }),
     ).not.toBeInTheDocument();
-    expect(getDeleteItemButton(2)).toBeInTheDocument();
+  });
+
+  it("lets the first item be deleted once there is another one", async () => {
+    const user = userEvent.setup();
+    const onRemove = vi.fn();
+
+    renderInvoiceItems({ itemCount: 2, onRemove });
+
+    await user.click(getDeleteItemButton(1));
+    await user.click(screen.getByRole("button", { name: "Delete Item 1" }));
+
+    expect(onRemove).toHaveBeenCalledExactlyOnceWith(0);
   });
 
   it("names the item the user is deleting, reading the name from the form", async () => {
@@ -349,15 +361,12 @@ describe("InvoiceItems with several invoice items", () => {
     cleanup();
   });
 
-  it("gives every item but the first its own delete button", () => {
+  it("gives every item its own delete button", () => {
     renderInvoiceItems({ itemCount: ITEM_COUNT, itemNames: ITEM_NAMES });
 
     expect(getItemFieldsets()).toHaveLength(ITEM_COUNT);
-    expect(
-      screen.queryByRole("button", { name: "Delete Invoice Item 1" }),
-    ).not.toBeInTheDocument();
 
-    for (const itemNumber of [2, 3, 4]) {
+    for (const itemNumber of [1, 2, 3, 4]) {
       expect(getDeleteItemButton(itemNumber)).toBeInTheDocument();
     }
   });
@@ -482,8 +491,14 @@ describe("InvoiceItems with several invoice items", () => {
     expect(getDialog()).toHaveTextContent('"Docs work"');
   });
 
+  // Type of GTU is the exception: its card can be open on any item, so each open card
+  // carries the (shared) column switch. These items have no code, so their cards are shut.
   it("only offers the 'Show in PDF' column switches on the first item", () => {
-    renderInvoiceItems({ itemCount: ITEM_COUNT, itemNames: ITEM_NAMES });
+    renderInvoiceItems({
+      itemCount: ITEM_COUNT,
+      itemNames: ITEM_NAMES,
+      itemOverrides: { typeOfGTU: "" },
+    });
 
     const fieldsets = getItemFieldsets();
 
@@ -501,97 +516,389 @@ describe("InvoiceItems with several invoice items", () => {
   });
 });
 
-/** Previews print grouping spaces as no-break ones, so compare with plain spaces. */
-function getPreviewText(pattern: RegExp) {
-  return screen.getByText(pattern).textContent?.replaceAll("\u00A0", " ");
+/** Money is written with no-break grouping spaces, so compare with plain spaces. */
+function getAmountText(testId: string) {
+  return screen.getByTestId(testId).textContent?.replaceAll("\u00A0", " ");
 }
 
-describe("InvoiceItems net price preview", () => {
+describe("InvoiceItems duplicate", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("puts a copy of the item right after it", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({
+      itemCount: 2,
+      itemNames: { 0: "Design work", 1: "Backend work" },
+    });
+
+    await user.click(
+      screen.getByRole("button", { name: "Duplicate Invoice Item 1" }),
+    );
+
+    const names = screen
+      .getAllByRole("textbox", { name: "Name" })
+      .map((input) => {
+        return (input as HTMLTextAreaElement).value;
+      });
+
+    expect(names).toEqual(["Design work", "Design work", "Backend work"]);
+    expect(trackEvent).toHaveBeenCalledWith({
+      event: "duplicate_invoice_item",
+    });
+  });
+
+  it("cannot duplicate once the item limit is reached", () => {
+    renderInvoiceItems({ itemCount: MOCK_MAX_INVOICE_ITEMS });
+
+    expect(
+      screen.getByRole("button", { name: "Duplicate Invoice Item 1" }),
+    ).toBeDisabled();
+  });
+});
+
+describe("InvoiceItems quantity and unit", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("steps the quantity by one and keeps a typed fraction", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1 });
+
+    const quantity = screen.getByRole("spinbutton", { name: "Qty" });
+
+    await user.click(
+      screen.getByRole("button", { name: "Increase quantity of item 1" }),
+    );
+    expect(quantity).toHaveValue(3);
+
+    await user.clear(quantity);
+    await user.type(quantity, "1.5");
+    await user.click(
+      screen.getByRole("button", { name: "Increase quantity of item 1" }),
+    );
+    expect(quantity).toHaveValue(2.5);
+  });
+
+  it("does not step the quantity below zero", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1, itemOverrides: { amount: 1 } });
+
+    const decrease = screen.getByRole("button", {
+      name: "Decrease quantity of item 1",
+    });
+
+    await user.click(decrease);
+
+    expect(screen.getByRole("spinbutton", { name: "Qty" })).toHaveValue(0);
+    expect(decrease).toBeDisabled();
+  });
+
+  it("fills in the unit from a chip and marks the chip picked", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1 });
+
+    expect(screen.getByRole("button", { name: "pcs" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+
+    await user.click(screen.getByRole("button", { name: "days" }));
+
+    expect(screen.getByRole("textbox", { name: "Unit" })).toHaveValue("days");
+    expect(screen.getByRole("button", { name: "days" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "pcs" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+  });
+
+  it("shows a % suffix only while the tax rate is a number", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1 });
+
+    const rate = screen.getByRole("textbox", { name: "VAT rate" });
+
+    expect(within(screen.getByTestId("itemVat0")).getByText("%")).toBeVisible();
+
+    await user.clear(rate);
+    await user.type(rate, "NP");
+
+    expect(
+      within(screen.getByTestId("itemVat0")).queryByText("%"),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("InvoiceItems tax settings", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("shows the shared label on the first item only, and names the tax on later rates", () => {
+    renderInvoiceItems({ itemCount: 2 });
+
+    const [first, second] = getItemFieldsets();
+
+    expect(
+      within(first).getByRole("group", { name: "Tax settings" }),
+    ).toBeInTheDocument();
+    expect(
+      within(first).getByRole("textbox", { name: "Tax label" }),
+    ).toHaveValue("VAT");
+    expect(within(first).getByText("Rate")).toBeInTheDocument();
+
+    expect(
+      within(second).queryByRole("textbox", { name: "Tax label" }),
+    ).not.toBeInTheDocument();
+    expect(within(second).getByText("VAT rate")).toBeInTheDocument();
+    expect(
+      within(second).getByRole("textbox", { name: "VAT rate" }),
+    ).toBeInTheDocument();
+  });
+
+  it("sets the rate from a chip and marks the chip that matches the value", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1 });
+
+    const rate = screen.getByRole("textbox", { name: "VAT rate" });
+
+    // the mock item's rate is 23
+    expect(screen.getByRole("button", { name: "23%" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+
+    await user.click(screen.getByRole("button", { name: "NP" }));
+
+    expect(rate).toHaveValue("NP");
+    expect(screen.getByRole("button", { name: "NP" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "23%" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+
+    await user.click(screen.getByRole("button", { name: "8%" }));
+
+    expect(rate).toHaveValue("8");
+  });
+
+  it("marks a chip for a typed rate too, and none for a rate without a chip", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1 });
+
+    const rate = screen.getByRole("textbox", { name: "VAT rate" });
+
+    await user.clear(rate);
+    await user.type(rate, "5");
+
+    expect(screen.getByRole("button", { name: "5%" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+
+    await user.type(rate, "0");
+
+    const chips = within(
+      screen.getByRole("group", { name: "Common rates for item 1" }),
+    ).getAllByRole("button");
+
+    for (const chip of chips) {
+      expect(chip).toHaveAttribute("aria-pressed", "false");
+    }
+  });
+});
+
+describe("InvoiceItems calculated amounts", () => {
   afterEach(() => {
     cleanup();
   });
 
   it.each([
-    ["en", "default", "12,345.67 EUR"],
-    ["de", "default", "12.345,67 EUR"],
-    ["pl", "default", "12 345,67 EUR"],
-    ["international", "default", "12 345.67 EUR"],
-    ["en", "stripe", "€12,345.67"],
-    ["de", "stripe", "12.345,67 €"],
+    [
+      "en",
+      "default",
+      { net: "201.00 EUR", vat: "46.23 EUR", preTax: "247.23 EUR" },
+    ],
+    [
+      "de",
+      "default",
+      { net: "201,00 EUR", vat: "46,23 EUR", preTax: "247,23 EUR" },
+    ],
+    ["en", "stripe", { net: "€201.00", vat: "€46.23", preTax: "€247.23" }],
   ] as const)(
-    "writes the preview in the '%s' number format for the '%s' template",
-    async (numberFormatLocale, template, expectedPreview) => {
-      const user = userEvent.setup();
-
+    "writes them in the '%s' number format for the '%s' template",
+    (numberFormatLocale, template, expected) => {
       renderInvoiceItems({ itemCount: 1, numberFormatLocale, template });
 
-      const netPriceInput = screen.getByRole("spinbutton", {
-        name: /^Net Price/,
-      });
-      await user.clear(netPriceInput);
-      await user.type(netPriceInput, "12345.67");
-
-      expect(getPreviewText(/^Preview: .*12/)).toContain(
-        `Preview: ${expectedPreview} (`,
-      );
+      expect(getAmountText("itemNetAmount0")).toBe(expected.net);
+      expect(getAmountText("itemVatAmount0")).toBe(expected.vat);
+      expect(getAmountText("itemPreTaxAmount0")).toBe(expected.preTax);
     },
   );
+
+  it("adds a discount line only when the discount takes something off", () => {
+    renderInvoiceItems({
+      itemCount: 2,
+      itemNames: { 0: "No discount", 1: "Discounted" },
+    });
+
+    expect(
+      screen.queryByTestId("itemDiscountSummary0"),
+    ).not.toBeInTheDocument();
+    cleanup();
+
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: { discountValue: 10, discountAmount: 20.1 },
+    });
+
+    expect(getAmountText("itemDiscountSummary0")).toBe(
+      "Subtotal 201.00 EUR · Discount 10%−20.10 EUR",
+    );
+  });
+
+  it("writes a fixed-amount discount as money", () => {
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: {
+        discountType: "amount",
+        discountValue: 25,
+        discountAmount: 25,
+      },
+    });
+
+    expect(getAmountText("itemDiscountSummary0")).toBe(
+      "Subtotal 201.00 EUR · Discount 25.00 EUR−25.00 EUR",
+    );
+  });
 });
 
-describe("InvoiceItems amount preview", () => {
+function getGtuPill() {
+  return screen.getByRole("button", { name: "Type of GTU" });
+}
+
+describe("InvoiceItems type of GTU", () => {
+  const GTU_SWITCH_NAME = "Show the 'Type of GTU' Column in the PDF for item 1";
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   afterEach(() => {
     cleanup();
   });
 
-  it.each([
-    ["en", "1,234.5"],
-    ["de", "1.234,5"],
-    ["pl", "1 234,5"],
-    ["international", "1 234.5"],
-  ] as const)(
-    "writes the preview in the '%s' number format",
-    async (numberFormatLocale, expectedPreview) => {
-      const user = userEvent.setup();
+  it("keeps the field behind a pill while the item has no code", () => {
+    renderInvoiceItems({ itemCount: 1, itemOverrides: { typeOfGTU: "" } });
 
-      renderInvoiceItems({ itemCount: 1, numberFormatLocale });
-
-      const amountInput = screen.getByRole("spinbutton", {
-        name: /^Amount/,
-      });
-      await user.clear(amountInput);
-      await user.type(amountInput, "1234.5");
-
-      expect(getPreviewText(/^Preview: 1\D234/)).toBe(
-        `Preview: ${expectedPreview}`,
-      );
-    },
-  );
-});
-
-describe("InvoiceItems read-only amounts", () => {
-  afterEach(() => {
-    cleanup();
+    expect(getGtuPill()).toBeInTheDocument();
+    expect(
+      screen.queryByRole("textbox", { name: "Type of GTU" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("switch", { name: GTU_SWITCH_NAME }),
+    ).not.toBeInTheDocument();
   });
 
-  it.each([
-    ["en", { netAmount: "201.00", vatAmount: "46.23", preTaxAmount: "247.23" }],
-    ["de", { netAmount: "201,00", vatAmount: "46,23", preTaxAmount: "247,23" }],
-  ] as const)(
-    "writes the calculated amounts in the '%s' number format",
-    (numberFormatLocale, expectedAmounts) => {
-      renderInvoiceItems({ itemCount: 1, numberFormatLocale });
+  it("opens the field, focuses it and turns the GTU column on", async () => {
+    const user = userEvent.setup();
 
-      expect(screen.getByRole("textbox", { name: "Net Amount" })).toHaveValue(
-        expectedAmounts.netAmount,
-      );
-      expect(screen.getByRole("textbox", { name: "VAT Amount" })).toHaveValue(
-        expectedAmounts.vatAmount,
-      );
-      expect(
-        screen.getByRole("textbox", { name: "Pre-tax Amount" }),
-      ).toHaveValue(expectedAmounts.preTaxAmount);
-    },
-  );
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: { typeOfGTU: "", typeOfGTUFieldIsVisible: false },
+    });
+
+    await user.click(getGtuPill());
+
+    expect(screen.getByRole("textbox", { name: "Type of GTU" })).toHaveFocus();
+    expect(screen.getByRole("switch", { name: GTU_SWITCH_NAME })).toBeChecked();
+    expect(trackEvent).toHaveBeenCalledWith({ event: "add_item_gtu" });
+  });
+
+  it("starts open for an item that already has a code", () => {
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: { typeOfGTU: "GTU_01" },
+    });
+
+    expect(screen.getByRole("textbox", { name: "Type of GTU" })).toHaveValue(
+      "GTU_01",
+    );
+    expect(
+      screen.queryByRole("button", { name: "Type of GTU" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("clears the code on remove and hands focus back to the pill", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: { typeOfGTU: "GTU_01" },
+    });
+
+    await user.click(
+      screen.getByRole("button", { name: "Remove Type of GTU from item 1" }),
+    );
+
+    await vi.waitFor(() => {
+      expect(getGtuPill()).toHaveFocus();
+    });
+    expect(trackEvent).toHaveBeenCalledWith({ event: "remove_item_gtu" });
+
+    await user.click(getGtuPill());
+
+    expect(screen.getByRole("textbox", { name: "Type of GTU" })).toHaveValue(
+      "",
+    );
+  });
+
+  it("keeps the GTU column on while another item still has a code", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({
+      itemCount: 2,
+      itemOverrides: { typeOfGTU: "GTU_01", typeOfGTUFieldIsVisible: true },
+    });
+
+    await user.click(
+      screen.getByRole("button", { name: "Remove Type of GTU from item 2" }),
+    );
+
+    expect(screen.getByRole("switch", { name: GTU_SWITCH_NAME })).toBeChecked();
+  });
+
+  it("has no GTU pill on the Stripe template, which prints no GTU column", () => {
+    renderInvoiceItems({
+      itemCount: 1,
+      template: "stripe",
+      itemOverrides: { typeOfGTU: "" },
+    });
+
+    expect(
+      screen.queryByRole("button", { name: "Type of GTU" }),
+    ).not.toBeInTheDocument();
+  });
 });
 
 describe("InvoiceItems discount", () => {
@@ -621,7 +928,7 @@ describe("InvoiceItems discount", () => {
 
     expect(screen.getByLabelText("Discount value")).toHaveFocus();
     expect(screen.getByRole("radio", { name: "Percentage" })).toBeChecked();
-    expect(screen.getByLabelText(/^Label/)).toHaveValue("");
+    expect(screen.getByLabelText(/^Label in PDF/)).toHaveValue("");
     expect(trackEvent).toHaveBeenCalledExactlyOnceWith({
       event: "add_item_discount",
     });
@@ -743,7 +1050,7 @@ describe("InvoiceItems discount", () => {
 
     expect(
       screen.getByText(
-        "The line total (Amount × Net Price) is 0, so there's nothing to discount yet.",
+        "The line total (Qty × Unit price) is 0, so there's nothing to discount yet.",
       ),
     ).toBeInTheDocument();
     expect(
@@ -763,7 +1070,9 @@ describe("InvoiceItems discount", () => {
 
     expect(screen.getByLabelText("Discount value")).toHaveValue(50);
     expect(screen.getByLabelText("Discount value")).not.toHaveFocus();
-    expect(screen.getByLabelText(/^Label/)).toHaveValue("Charitable donation");
+    expect(screen.getByLabelText(/^Label in PDF/)).toHaveValue(
+      "Charitable donation",
+    );
     expect(screen.getByRole("radio", { name: "Fixed amount" })).toBeChecked();
   });
 
@@ -792,6 +1101,6 @@ describe("InvoiceItems discount", () => {
 
     // the cleared zero shows as the empty placeholder
     expect(screen.getByLabelText("Discount value")).toHaveValue(null);
-    expect(screen.getByLabelText(/^Label/)).toHaveValue("");
+    expect(screen.getByLabelText(/^Label in PDF/)).toHaveValue("");
   });
 });

@@ -48,6 +48,7 @@ import { GeneralInformation } from "./sections/general-information";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
 import { formErrorsToToast } from "./utils/form-errors-to-toast";
+import { removeInvoiceItem } from "./utils/remove-invoice-item";
 
 /**
  * Time in milliseconds to debounce updates in the invoice form,
@@ -117,7 +118,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   const dateOfIssue = useWatch({ control, name: "dateOfIssue" });
   const language = useWatch({ control, name: "language" });
 
-  const { fields, append } = useFieldArray({
+  const { fields, append, insert } = useFieldArray({
     control,
     name: "items",
   });
@@ -266,9 +267,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       // read at click time rather than watched, so item edits don't re-render the form
       setValue(
         "items",
-        getValues("items").filter((_, i) => {
-          return i !== index;
-        }),
+        removeInvoiceItem({ items: getValues("items"), index }),
         {
           shouldValidate: true,
           shouldTouch: true,
@@ -461,8 +460,8 @@ export const InvoiceForm = memo(function InvoiceForm({
               handleRemoveInvoiceItem={handleRemoveInvoiceItem}
               errors={errors}
               currency={currency}
-              language={language}
               append={append}
+              insert={insert}
               template={template}
               taxLabelText={taxLabelText}
               numberFormatLocale={numberFormatLocale}

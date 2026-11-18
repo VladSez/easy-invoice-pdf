@@ -27,37 +27,25 @@ test.describe("Item discounts", () => {
 
     // Item 1: 10,000.00 - 10% = 9,000.00, VAT 23% on it = 2,070.00
     await expect(
-      invoiceItemsSection.getByText(
-        "−1,000.00 EUR off. Net after discount: 9,000.00 EUR.",
-      ),
-    ).toBeVisible();
+      invoiceItemsSection.getByTestId("itemDiscountSummary0"),
+    ).toHaveText("Subtotal 10,000.00 EUR · Discount 10%−1,000.00 EUR");
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "Net Amount", exact: true })
-        .nth(0),
-    ).toHaveValue("9,000.00");
+      invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/).nth(0),
+    ).toContainText("9,000.00");
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "VAT Amount", exact: true })
-        .nth(0),
-    ).toHaveValue("2,070.00");
+      invoiceItemsSection.getByTestId(/^itemVatAmount\d+$/).nth(0),
+    ).toContainText("2,070.00");
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "Pre-tax Amount", exact: true })
-        .nth(0),
-    ).toHaveValue("11,070.00");
+      invoiceItemsSection.getByTestId(/^itemPreTaxAmount\d+$/).nth(0),
+    ).toContainText("11,070.00");
 
     // Item 2: 4 x 1,250.00 = 5,000.00, minus a fixed 1,000.00 off the whole line = 4,000.00
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "Net Amount", exact: true })
-        .nth(1),
-    ).toHaveValue("4,000.00");
+      invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/).nth(1),
+    ).toContainText("4,000.00");
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "VAT Amount", exact: true })
-        .nth(1),
-    ).toHaveValue("400.00");
+      invoiceItemsSection.getByTestId(/^itemVatAmount\d+$/).nth(1),
+    ).toContainText("400.00");
 
     // 11,070.00 + 4,400.00
     await expect(
@@ -105,10 +93,8 @@ test.describe("Item discounts", () => {
       .click();
 
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "Net Amount", exact: true })
-        .nth(0),
-    ).toHaveValue("10,000.00");
+      invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/).nth(0),
+    ).toContainText("10,000.00");
   });
 
   test("shows a discount column in the default template PDF", async ({
@@ -165,13 +151,13 @@ async function fillDiscountedItems(page: Page) {
     .fill("Frontend engineering");
   await invoiceItemsSection
     .getByRole("spinbutton", {
-      name: "Net Price (Rate or Unit Price)",
+      name: "Unit price",
       exact: true,
     })
     .nth(0)
     .fill("10000");
   await invoiceItemsSection
-    .getByRole("textbox", { name: "VAT Rate", exact: true })
+    .getByRole("textbox", { name: "VAT rate", exact: true })
     .nth(0)
     .fill("23");
 
@@ -184,7 +170,7 @@ async function fillDiscountedItems(page: Page) {
     .nth(0)
     .fill("10");
   await invoiceItemsSection
-    .getByRole("textbox", { name: "Label (optional)", exact: true })
+    .getByRole("textbox", { name: "Label in PDF (optional)", exact: true })
     .nth(0)
     .fill("Charitable donation");
 
@@ -200,18 +186,18 @@ async function fillDiscountedItems(page: Page) {
     .nth(1)
     .fill("Backend engineering");
   await invoiceItemsSection
-    .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
+    .getByRole("spinbutton", { name: "Qty", exact: true })
     .nth(1)
     .fill("4");
   await invoiceItemsSection
     .getByRole("spinbutton", {
-      name: "Net Price (Rate or Unit Price)",
+      name: "Unit price",
       exact: true,
     })
     .nth(1)
     .fill("1250");
   await invoiceItemsSection
-    .getByRole("textbox", { name: "VAT Rate", exact: true })
+    .getByRole("textbox", { name: "VAT rate", exact: true })
     .nth(1)
     .fill("10");
 

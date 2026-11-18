@@ -158,7 +158,7 @@ async function fillFirstItemTaxLabel(
 const MULTI_PAGE_ITEMS = {
   default: {
     taxLabel: "Sales Tax",
-    taxRateFieldName: "Sales Tax Rate",
+    taxRateFieldName: "Sales Tax rate",
     itemName: (itemNumber: number) => {
       return `Item ${itemNumber}. Some long item name that should be wrapped to the next line. Some long item name that should be wrapped to the next line. Some long item name that should be wrapped to the next line.`;
     },
@@ -168,7 +168,7 @@ const MULTI_PAGE_ITEMS = {
   },
   stripe: {
     taxLabel: null,
-    taxRateFieldName: "VAT Rate",
+    taxRateFieldName: "VAT rate",
     // Add longer descriptions only to odd-numbered items to test mixed content layout
     // This verifies that the PDF template handles varying text lengths correctly
     // and maintains proper spacing between short and long item descriptions
@@ -243,16 +243,16 @@ async function fillLargeFirstItem({
   quantity,
 }: FillLargeFirstItemArgs) {
   await invoiceItemsSection
-    .getByRole("spinbutton", { name: "Amount (Quantity)" })
+    .getByRole("spinbutton", { name: "Qty" })
     .fill(quantity);
 
   await invoiceItemsSection
-    .getByRole("spinbutton", { name: "Net Price (Rate or Unit Price)" })
+    .getByRole("spinbutton", { name: "Unit price" })
     .fill(LARGE_NET_PRICE);
 
   await invoiceItemsSection
     .getByRole("group", { name: "Tax Settings" })
-    .getByRole("textbox", { name: "VAT Rate", exact: true })
+    .getByRole("textbox", { name: "VAT rate", exact: true })
     .fill(LARGE_AMOUNTS_TAX_RATE);
 }
 
@@ -558,7 +558,7 @@ test.describe("Invoice Template shared features", () => {
 
         await itemFieldset
           .getByRole("spinbutton", {
-            name: "Net Price (Rate or Unit Price)",
+            name: "Unit price",
           })
           .fill(itemsConfig.netPrice(itemNumber));
       }

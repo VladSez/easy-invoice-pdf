@@ -72,12 +72,12 @@ test.describe("Default Invoice Template", () => {
 
     // update price and quantity for the first invoice item
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)" })
+      .getByRole("spinbutton", { name: "Qty" })
       .fill("3");
 
     await invoiceItemsSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       })
       .fill("1000");
 
@@ -86,7 +86,7 @@ test.describe("Default Invoice Template", () => {
       name: "Tax Settings",
     });
     await taxSettingsFieldset
-      .getByRole("textbox", { name: "VAT Rate" })
+      .getByRole("textbox", { name: "VAT rate" })
       .fill("10");
 
     await taxSettingsFieldset
@@ -273,20 +273,18 @@ test.describe("Default Invoice Template", () => {
     const invoiceSection = page.getByTestId(`invoice-items-section`);
 
     // Amount field
-    await invoiceSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)" })
-      .fill("3");
+    await invoiceSection.getByRole("spinbutton", { name: "Qty" }).fill("3");
 
     // Net price field
     await invoiceSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       })
       .fill("1000");
 
     // Toggle VAT Table Summary visibility off
     const vatTableSummarySwitch = page.getByRole("switch", {
-      name: `Show "VAT Table Summary" in the PDF`,
+      name: "VAT summary table",
     });
 
     await expect(vatTableSummarySwitch).toBeChecked();
@@ -372,11 +370,11 @@ test.describe("Default Invoice Template", () => {
     // Fill in an invoice item
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)" })
+      .getByRole("spinbutton", { name: "Qty" })
       .fill("3");
     await invoiceItemsSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       })
       .fill("50");
 
@@ -387,7 +385,7 @@ test.describe("Default Invoice Template", () => {
     // the VAT field is labelled "TVA" in French, so finding it proves the form
     // switched language
     await taxSettingsFieldset
-      .getByRole("textbox", { name: "TVA Rate", exact: true })
+      .getByRole("textbox", { name: "TVA rate", exact: true })
       .fill("23");
 
     const MOBILE_FLOW_NOTES = `Test: completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French (${testInfo.project.name})`;
@@ -476,29 +474,26 @@ test.describe("Default Invoice Template", () => {
     // Verify invoice item persists
     await expect(
       invoiceItemsSection.getByRole("spinbutton", {
-        name: "Amount (Quantity)",
+        name: "Qty",
       }),
     ).toHaveValue("3");
     await expect(
       invoiceItemsSection.getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       }),
     ).toHaveValue("50");
 
     await expect(
       taxSettingsFieldset.getByRole("textbox", {
-        name: "TVA Rate",
+        name: "TVA rate",
         exact: true,
       }),
     ).toHaveValue("23");
 
     // Verify calculations are correct, written in the French number format
     await expect(
-      invoiceItemsSection.getByRole("textbox", {
-        name: "Net Amount",
-        exact: true,
-      }),
-    ).toHaveValue("150,00");
+      invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/),
+    ).toContainText("150,00");
     await expect(
       invoiceItemsSection.getByRole("textbox", {
         name: "TVA Amount",
@@ -506,11 +501,8 @@ test.describe("Default Invoice Template", () => {
       }),
     ).toHaveValue("34,50");
     await expect(
-      invoiceItemsSection.getByRole("textbox", {
-        name: "Pre-tax Amount",
-        exact: true,
-      }),
-    ).toHaveValue("184,50");
+      invoiceItemsSection.getByTestId(/^itemPreTaxAmount\d+$/),
+    ).toContainText("184,50");
   });
 
   test("should display and persist invoice number in different languages", async ({

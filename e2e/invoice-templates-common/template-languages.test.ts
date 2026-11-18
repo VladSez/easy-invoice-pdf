@@ -200,12 +200,12 @@ test.describe("Invoice Template PDF languages", () => {
           .fill(INVOICE_ITEM.name);
 
         await invoiceItemsSection
-          .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
+          .getByRole("spinbutton", { name: "Qty", exact: true })
           .fill(INVOICE_ITEM.quantity);
 
         await invoiceItemsSection
           .getByRole("spinbutton", {
-            name: "Net Price (Rate or Unit Price)",
+            name: "Unit price",
             exact: true,
           })
           .fill(INVOICE_ITEM.netPrice);

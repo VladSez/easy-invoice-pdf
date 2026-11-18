@@ -43,7 +43,7 @@ test("items and discounts", async ({ page, atlas }) => {
   await atlas.editAndWait(async () => {
     await discountValue.fill("10");
     await section
-      .getByRole("textbox", { name: "Label (optional)", exact: true })
+      .getByRole("textbox", { name: "Label in PDF (optional)", exact: true })
       .first()
       .fill("Returning client");
   });

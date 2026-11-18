@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   type Control,
   Controller,
@@ -13,20 +13,17 @@ import {
   ErrorMessage,
   inputErrorClassName,
 } from "@/app/(main)/(app)/components/invoice-form/common";
-import { DeleteIconButton } from "@/app/(main)/(app)/components/invoice-form/sections/components/delete-icon-button";
-import { formatMoneyForTemplate } from "@/app/(main)/(app)/utils/format-money-for-template";
 import {
   type InvoiceData,
   type ItemDiscountType,
   type SupportedCurrencies,
-  type SupportedNumberFormatLocale,
+  CURRENCY_SYMBOLS,
   MAX_ITEM_DISCOUNT_LABEL_LENGTH,
 } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
 import { Label } from "@/components/ui/label";
-import { MoneyInput } from "@/components/ui/money-input";
 import { trackEvent } from "@/lib/analytics/track-event";
 import { cn } from "@/lib/utils";
 
@@ -40,8 +37,6 @@ export function ItemDiscountFields({
   index,
   errors,
   currency,
-  template,
-  numberFormatLocale,
   getValues,
   setValue,
 }: ItemDiscountFieldsProps) {
@@ -60,9 +55,9 @@ export function ItemDiscountFields({
     return (
       <Button
         ref={addButtonRef}
-        variant="default"
+        variant="outline"
         size="sm"
-        className="gap-1.5"
+        className="h-[34px] self-start rounded-full border-dashed border-slate-300 px-3 text-[13px] font-normal text-slate-600 shadow-none hover:border-slate-400 hover:bg-white hover:text-slate-950 max-md:h-10"
         onClick={() => {
           setIsOpen(true);
           setShouldFocusValue(true);
@@ -70,7 +65,7 @@ export function ItemDiscountFields({
         }}
         data-testid={`addItemDiscount${index}`}
       >
-        <Plus className="size-3.5" />
+        <Plus className="size-3.5" strokeWidth={2.25} />
         Add discount
       </Button>
     );
@@ -82,8 +77,6 @@ export function ItemDiscountFields({
       index={index}
       errors={errors}
       currency={currency}
-      template={template}
-      numberFormatLocale={numberFormatLocale}
       shouldFocusValue={shouldFocusValue}
       setValue={setValue}
       onRemove={() => {
@@ -108,24 +101,22 @@ export function ItemDiscountFields({
 }
 
 /**
- * The open discount section. Its own component so that only an item whose discount is
- * open subscribes to the discount type and the calculated amounts: a collapsed item would
- * otherwise re-render on every keystroke in its net price just to show the same button.
+ * The open discount card. Its own component so that only an item whose discount is open
+ * subscribes to the discount type and the calculated amount: a collapsed item would
+ * otherwise re-render on every keystroke in its unit price just to show the same button.
+ * What the discount takes off shows in the item's amounts card underneath.
  */
 function OpenItemDiscountFields({
   control,
   index,
   errors,
   currency,
-  template,
-  numberFormatLocale,
   shouldFocusValue,
   setValue,
   onRemove,
 }: OpenItemDiscountFieldsProps) {
-  // Focus the value once, as the section opens. Not `autoFocus`: switching the type swaps
-  // the value input for another one, which would take focus off the type switch. The ref
-  // holds what was true at mount, so moving the item (a new `index`) does not refocus it.
+  // Focus the value once, as the section opens, and only then: the ref holds what was true
+  // at mount, so moving the item (a new `index`) does not refocus it.
   const focusOnMountRef = useRef({ shouldFocusValue, index });
 
   useEffect(() => {
@@ -147,7 +138,6 @@ function OpenItemDiscountFields({
     control,
     name: `items.${index}.discountAmount`,
   });
-  const netAmount = useWatch({ control, name: `items.${index}.netAmount` });
   const amount = useWatch({ control, name: `items.${index}.amount` });
   const netPrice = useWatch({ control, name: `items.${index}.netPrice` });
 
@@ -159,200 +149,180 @@ function OpenItemDiscountFields({
 
   const itemErrors = errors.items?.[index];
 
-  const formatMoney = (amount: number) => {
-    return formatMoneyForTemplate({
-      amount,
-      currency,
-      numberFormatLocale,
-      template,
-    });
-  };
+  const typeLabelId = useId();
 
   return (
-    <fieldset
-      className="relative rounded-md border px-4 pb-4"
+    <div
+      role="group"
+      aria-labelledby={`itemDiscountHeading${index}`}
+      className="flex w-full flex-col gap-2.5 rounded-lg border border-gray-200 bg-white p-3"
       data-testid={`itemDiscount${index}`}
     >
-      <legend className="text-base font-semibold lg:text-lg">Discount</legend>
-
-      {/* Remove discount button, the same one that deletes an invoice item */}
-      <div className="absolute -right-3 -top-8">
-        <DeleteIconButton
-          label="Remove discount"
-          tooltip={`Remove discount from Invoice Item ${index + 1}`}
+      <div className="-my-1 -me-1.5 flex items-center justify-between">
+        <span id={`itemDiscountHeading${index}`} className="font-semibold">
+          Discount
+        </span>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-[13px] font-normal text-slate-500 max-md:h-11"
+          aria-label="Remove discount"
           onClick={onRemove}
-        />
+        >
+          Remove
+        </Button>
       </div>
 
-      <div className="space-y-4">
-        <div className="mt-4">
-          <Label htmlFor={`itemDiscountValue${index}`}>Discount value</Label>
+      <div className="flex flex-wrap items-end gap-2.5">
+        <div className="shrink-0">
+          <span
+            id={typeLabelId}
+            className="mb-1 block text-xs font-medium text-slate-700"
+          >
+            Type
+          </span>
+          {/* Discount type: percentage or fixed amount */}
+          <Controller
+            name={`items.${index}.discountType`}
+            control={control}
+            render={({ field }) => {
+              // a value means something else under the other type (10% is not 10.00),
+              // so switching starts the value over rather than reinterpreting it
+              const selectDiscountType = (nextType: ItemDiscountType) => {
+                if (nextType === field.value) return;
 
-          <div className="mt-1 flex items-start gap-2">
-            {/* Discount type: percentage or fixed amount */}
-            <Controller
-              name={`items.${index}.discountType`}
-              control={control}
-              render={({ field }) => {
-                // a value means something else under the other type (10% is not 10.00),
-                // so switching starts the value over rather than reinterpreting it
-                const selectDiscountType = (nextType: ItemDiscountType) => {
-                  if (nextType === field.value) return;
+                field.onChange(nextType);
 
-                  field.onChange(nextType);
+                trackEvent({
+                  event: "change_item_discount_type",
+                  data: { discount_type: nextType },
+                });
+                // Validate only to clear an error the old value left behind. A
+                // validating `setValue` publishes new form errors, which re-renders the
+                // whole form in the same task as the click and makes the switch flicker.
+                setValue(`items.${index}.discountValue`, 0, {
+                  shouldValidate: !!itemErrors?.discountValue,
+                });
+              };
 
-                  trackEvent({
-                    event: "change_item_discount_type",
-                    data: { discount_type: nextType },
-                  });
-                  // Validate only to clear an error the old value left behind. A
-                  // validating `setValue` publishes new form errors, which re-renders the
-                  // whole form in the same task as the click and makes the switch flicker.
-                  setValue(`items.${index}.discountValue`, 0, {
-                    shouldValidate: !!itemErrors?.discountValue,
-                  });
-                };
+              return (
+                <div
+                  role="radiogroup"
+                  aria-labelledby={typeLabelId}
+                  className="inline-flex h-[34px] shrink-0 overflow-hidden rounded-lg border border-gray-300 bg-white max-md:h-11"
+                >
+                  {DISCOUNT_TYPE_OPTIONS.map((option, optionIndex) => {
+                    const isSelected = field.value === option.value;
 
-                return (
-                  <div
-                    role="radiogroup"
-                    aria-label={`Discount type for item ${index + 1}`}
-                    className="inline-flex h-9 shrink-0 items-center gap-0.5 rounded-lg border border-gray-300 bg-slate-100 p-1"
-                  >
-                    {DISCOUNT_TYPE_OPTIONS.map((option, optionIndex) => {
-                      const isSelected = field.value === option.value;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        role="radio"
+                        aria-checked={isSelected}
+                        aria-label={option.ariaLabel}
+                        // one tab stop for the group, arrows move between the options,
+                        // as in a native radio group
+                        tabIndex={isSelected ? 0 : -1}
+                        onClick={() => {
+                          selectDiscountType(option.value);
+                        }}
+                        onKeyDown={(event) => {
+                          const step = ARROW_KEY_STEPS[event.key];
 
-                      return (
-                        <button
-                          key={option.value}
-                          type="button"
-                          role="radio"
-                          aria-checked={isSelected}
-                          aria-label={option.ariaLabel}
-                          // one tab stop for the group, arrows move between the options,
-                          // as in a native radio group
-                          tabIndex={isSelected ? 0 : -1}
-                          onClick={() => {
-                            selectDiscountType(option.value);
-                          }}
-                          onKeyDown={(event) => {
-                            const step = ARROW_KEY_STEPS[event.key];
+                          if (!step) return;
 
-                            if (!step) return;
+                          event.preventDefault();
 
-                            event.preventDefault();
+                          const nextIndex =
+                            (optionIndex +
+                              step +
+                              DISCOUNT_TYPE_OPTIONS.length) %
+                            DISCOUNT_TYPE_OPTIONS.length;
 
-                            const nextIndex =
-                              (optionIndex +
-                                step +
-                                DISCOUNT_TYPE_OPTIONS.length) %
-                              DISCOUNT_TYPE_OPTIONS.length;
-
-                            selectDiscountType(
-                              DISCOUNT_TYPE_OPTIONS[nextIndex].value,
+                          selectDiscountType(
+                            DISCOUNT_TYPE_OPTIONS[nextIndex].value,
+                          );
+                          const radios =
+                            event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
+                              '[role="radio"]',
                             );
-                            const radios =
-                              event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
-                                '[role="radio"]',
-                              );
 
-                            radios?.[nextIndex]?.focus();
-                          }}
-                          className={cn(
-                            // no transition: a fading background under a shadow that moves at once
-                            // reads as a flicker, and a segmented control should switch instantly
-                            "h-full min-w-7 rounded-md px-1.5 text-xs font-medium tabular-nums",
-                            isSelected
-                              ? "bg-white text-slate-950 shadow-sm"
-                              : "text-slate-600 hover:text-slate-950",
-                          )}
-                        >
-                          {option.value === "amount" ? currency : option.text}
-                        </button>
-                      );
-                    })}
-                  </div>
-                );
-              }}
-            />
-
-            {/* Discount value */}
-            <Controller
-              name={`items.${index}.discountValue`}
-              control={control}
-              render={({ field }) => {
-                const inputProps = {
-                  ...field,
-                  // the stored zero of an item without a discount shows as the empty
-                  // placeholder, so typing "10" gives 10 rather than "010". Only the number
-                  // 0: a typed "0" or "0." is a string and stays, and the schema reads ""
-                  // back as 0
-                  value: field.value === 0 ? "" : field.value,
-                  id: `itemDiscountValue${index}`,
-                  className: cn(
-                    "w-full",
-                    inputErrorClassName(!!itemErrors?.discountValue),
-                  ),
-                } as const;
-
-                return discountType === "amount" ? (
-                  <div className="w-full">
-                    <MoneyInput
-                      {...inputProps}
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      currency={currency}
-                      dataTestId={`itemDiscountValue${index}`}
-                    />
-                  </div>
-                ) : (
-                  <div className="relative w-full">
-                    <Input
-                      {...inputProps}
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      max="100"
-                      placeholder="0"
-                      className={cn(inputProps.className, "pe-8")}
-                      data-testid={`itemDiscountValue${index}`}
-                    />
-                    <span className="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-3 text-sm text-slate-600">
-                      %
-                    </span>
-                  </div>
-                );
-              }}
-            />
-          </div>
-
-          {itemErrors?.discountValue ? (
-            <ErrorMessage>{itemErrors.discountValue.message}</ErrorMessage>
-          ) : (
-            <InputHelperMessage>
-              {discountAmount > 0 ? (
-                <>
-                  −{formatMoney(discountAmount)} off. Net after discount:{" "}
-                  {formatMoney(netAmount)}.
-                  <br />
-                  Tax is calculated after the discount.
-                </>
-              ) : isLineTotalZero ? (
-                "The line total (Amount × Net Price) is 0, so there's nothing to discount yet."
-              ) : discountType === "amount" ? (
-                "Enter an amount up to the line total. It applies once to the whole line, not per unit."
-              ) : (
-                "Enter a percentage from 0 to 100. It applies to the line total, before tax."
-              )}
-            </InputHelperMessage>
-          )}
+                          radios?.[nextIndex]?.focus();
+                        }}
+                        className={cn(
+                          // no transition: a segmented control should switch instantly
+                          "h-full whitespace-nowrap px-2.5 text-[13px]",
+                          optionIndex > 0 && "border-l border-gray-200",
+                          isSelected
+                            ? "bg-slate-900 text-white"
+                            : "text-slate-700 hover:bg-slate-50 hover:text-slate-950",
+                        )}
+                      >
+                        {option.value === "amount"
+                          ? `${CURRENCY_SYMBOLS[currency] || currency} Amount`
+                          : option.text}
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            }}
+          />
         </div>
 
-        {/* Discount label */}
-        <div>
-          <Label htmlFor={`itemDiscountLabel${index}`}>
-            Label <span className="font-normal text-slate-500">(optional)</span>
+        <div className="w-24 shrink-0">
+          <Label
+            htmlFor={`itemDiscountValue${index}`}
+            className="mb-1 block text-xs text-slate-700"
+          >
+            Value
+          </Label>
+          {/* Discount value */}
+          <Controller
+            name={`items.${index}.discountValue`}
+            control={control}
+            render={({ field }) => {
+              return (
+                <div className="relative">
+                  <Input
+                    {...field}
+                    // the stored zero of an item without a discount shows as the empty
+                    // placeholder, so typing "10" gives 10 rather than "010". Only the
+                    // number 0: a typed "0" or "0." is a string and stays, and the schema
+                    // reads "" back as 0
+                    value={field.value === 0 ? "" : field.value}
+                    id={`itemDiscountValue${index}`}
+                    aria-label="Discount value"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max={discountType === "percentage" ? "100" : undefined}
+                    placeholder="0"
+                    className={cn(
+                      "h-[34px] pe-8 tabular-nums max-md:h-11 max-md:text-base",
+                      inputErrorClassName(!!itemErrors?.discountValue),
+                    )}
+                    data-testid={`itemDiscountValue${index}`}
+                  />
+                  <span className="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-2.5 text-sm text-slate-500">
+                    {discountType === "amount"
+                      ? CURRENCY_SYMBOLS[currency] || currency
+                      : "%"}
+                  </span>
+                </div>
+              );
+            }}
+          />
+        </div>
+
+        <div className="min-w-[150px] flex-1">
+          <Label
+            htmlFor={`itemDiscountLabel${index}`}
+            className="mb-1 block text-xs text-slate-700"
+          >
+            Label in PDF{" "}
+            <span className="font-normal text-slate-500">(optional)</span>
           </Label>
           <Controller
             name={`items.${index}.discountLabel`}
@@ -364,31 +334,38 @@ function OpenItemDiscountFields({
                   id={`itemDiscountLabel${index}`}
                   type="text"
                   maxLength={MAX_ITEM_DISCOUNT_LABEL_LENGTH}
-                  placeholder="e.g. Charitable donation"
+                  placeholder="e.g. Loyalty discount"
                   className={cn(
-                    "mt-1",
+                    "h-[34px] max-md:h-11 max-md:text-base",
                     inputErrorClassName(!!itemErrors?.discountLabel),
                   )}
                 />
               );
             }}
           />
-          {itemErrors?.discountLabel ? (
-            <ErrorMessage>{itemErrors.discountLabel.message}</ErrorMessage>
-          ) : (
-            <InputHelperMessage>
-              Shown next to the discount in the PDF. Leave empty to show
-              &quot;Discount&quot; in the invoice language.
-            </InputHelperMessage>
-          )}
         </div>
       </div>
-    </fieldset>
+
+      {itemErrors?.discountValue ? (
+        <ErrorMessage>{itemErrors.discountValue.message}</ErrorMessage>
+      ) : discountAmount > 0 ? null : (
+        <InputHelperMessage>
+          {isLineTotalZero
+            ? "The line total (Qty × Unit price) is 0, so there's nothing to discount yet."
+            : discountType === "amount"
+              ? "Enter an amount up to the line total. It applies once to the whole line, not per unit."
+              : "Enter a percentage from 0 to 100. It applies to the line total, before tax."}
+        </InputHelperMessage>
+      )}
+      {itemErrors?.discountLabel ? (
+        <ErrorMessage>{itemErrors.discountLabel.message}</ErrorMessage>
+      ) : null}
+    </div>
   );
 }
 
 const DISCOUNT_TYPE_OPTIONS = [
-  { value: "percentage", text: "%", ariaLabel: "Percentage" },
+  { value: "percentage", text: "% Percent", ariaLabel: "Percentage" },
   { value: "amount", text: "", ariaLabel: "Fixed amount" },
 ] as const satisfies ReadonlyArray<{
   value: ItemDiscountType;
@@ -410,9 +387,6 @@ interface ItemDiscountFieldsProps {
   index: number;
   errors: FieldErrors<InvoiceData>;
   currency: SupportedCurrencies;
-  template: InvoiceData["template"];
-  /** The invoice's number format, already resolved against its language. */
-  numberFormatLocale: SupportedNumberFormatLocale;
   getValues: UseFormGetValues<InvoiceData>;
   setValue: UseFormSetValue<InvoiceData>;
 }

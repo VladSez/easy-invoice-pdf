@@ -539,7 +539,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // 1. Show Number Column switch
     const showNumberColumnSwitch = invoiceItemsSection.getByRole("switch", {
-      name: 'Show "Number" Column in the Items and pricing table',
+      name: "Number column",
     });
 
     await expect(showNumberColumnSwitch).toBeVisible();
@@ -548,7 +548,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // 2. Show VAT Table Summary switch
     const showVatTableSummarySwitch = invoiceItemsSection.getByRole("switch", {
-      name: 'Show "VAT Table Summary" in the PDF',
+      name: "VAT summary table",
     });
 
     await expect(showVatTableSummarySwitch).toBeVisible();
@@ -589,7 +589,6 @@ test.describe("Stripe Invoice Template", () => {
     // Verify all field switches are visible and enabled
     const fieldSwitches = [
       nameFieldSwitch,
-      typeOfGTUFieldSwitch,
       amountFieldSwitch,
       unitFieldSwitch,
       netPriceFieldSwitch,
@@ -606,7 +605,8 @@ test.describe("Stripe Invoice Template", () => {
 
     // Check initial states (some switches should be checked by default, some not)
     await expect(nameFieldSwitch).toBeChecked();
-    await expect(typeOfGTUFieldSwitch).not.toBeChecked(); // Type of GTU is not shown by default
+    // Type of GTU starts collapsed behind a pill, so its switch is not there yet
+    await expect(typeOfGTUFieldSwitch).toBeHidden();
     await expect(amountFieldSwitch).toBeChecked();
     await expect(unitFieldSwitch).toBeChecked();
     await expect(netPriceFieldSwitch).toBeChecked();
@@ -617,11 +617,20 @@ test.describe("Stripe Invoice Template", () => {
 
     // =============== TYPE OF GTU FIELD TESTING ===============
 
-    // Type of GTU field should be visible
     const typeOfGTUField = invoiceItemsSection.getByRole("textbox", {
       name: "Type of GTU",
     });
-    await expect(typeOfGTUField).toBeVisible();
+    const addTypeOfGTUPill = invoiceItemsSection.getByRole("button", {
+      name: "Type of GTU",
+      exact: true,
+    });
+    await expect(typeOfGTUField).toBeHidden();
+
+    // opening the pill shows the field and turns the GTU column on
+    await addTypeOfGTUPill.click();
+    await expect(typeOfGTUField).toBeFocused();
+    await expect(typeOfGTUFieldSwitch).toBeChecked();
+    await typeOfGTUField.fill("GTU_12");
 
     // =============== TOGGLE TESTING ===============
 
@@ -638,9 +647,9 @@ test.describe("Stripe Invoice Template", () => {
 
     // Test toggling some field switches
     await typeOfGTUFieldSwitch.click();
-    await expect(typeOfGTUFieldSwitch).toBeChecked();
-    await typeOfGTUFieldSwitch.click();
     await expect(typeOfGTUFieldSwitch).not.toBeChecked();
+    await typeOfGTUFieldSwitch.click();
+    await expect(typeOfGTUFieldSwitch).toBeChecked();
 
     await nameFieldSwitch.click();
     await expect(nameFieldSwitch).not.toBeChecked();
@@ -661,6 +670,7 @@ test.describe("Stripe Invoice Template", () => {
     await expect(showNumberColumnSwitch).toBeHidden();
     await expect(showVatTableSummarySwitch).toBeHidden();
     await expect(typeOfGTUField).toBeHidden();
+    await expect(addTypeOfGTUPill).toBeHidden();
 
     await expect(nameFieldSwitch).toBeHidden();
     await expect(typeOfGTUFieldSwitch).toBeHidden();
@@ -686,10 +696,12 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Template" })
       .selectOption("default");
 
-    // All switches and Type of GTU field should be visible again
+    // All switches and Type of GTU field should be visible again: the item has a code,
+    // so its GTU card opens on its own
     await expect(showNumberColumnSwitch).toBeVisible();
     await expect(showVatTableSummarySwitch).toBeVisible();
-    await expect(typeOfGTUField).toBeVisible();
+    await expect(typeOfGTUField).toHaveValue("GTU_12");
+    await expect(typeOfGTUFieldSwitch).toBeVisible();
 
     for (const switchElement of fieldSwitches) {
       await expect(switchElement).toBeVisible();
@@ -699,7 +711,7 @@ test.describe("Stripe Invoice Template", () => {
     await expect(showNumberColumnSwitch).toBeChecked();
     await expect(showVatTableSummarySwitch).toBeChecked();
     await expect(nameFieldSwitch).toBeChecked();
-    await expect(typeOfGTUFieldSwitch).not.toBeChecked();
+    await expect(typeOfGTUFieldSwitch).toBeChecked();
   });
 
   test("Payment Method field only appears for default template", async ({
@@ -837,7 +849,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Set VAT to a numeric value to make Tax column  visible in Stripe
     const vatInput = invoiceItemsSection.getByRole("textbox", {
-      name: "VAT Rate",
+      name: "VAT rate",
       exact: true,
     });
     await waitForPdfRegeneration(page, async () => {
@@ -909,7 +921,7 @@ test.describe("Stripe Invoice Template", () => {
     await page.waitForURL("/");
 
     const newVatInput = page.getByRole("textbox", {
-      name: "VAT Rate",
+      name: "VAT rate",
       exact: true,
     });
 

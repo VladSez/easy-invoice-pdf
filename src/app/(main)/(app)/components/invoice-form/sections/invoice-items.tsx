@@ -1,33 +1,34 @@
-import { Plus } from "lucide-react";
-import { memo, useRef, useState } from "react";
+import { Copy, Minus, Plus, Trash2 } from "lucide-react";
+import { memo, useId, useRef, useState } from "react";
 import {
   type Control,
   Controller,
   type FieldArrayWithId,
   type FieldErrors,
   type UseFieldArrayAppend,
+  type UseFieldArrayInsert,
   type UseFormGetValues,
   type UseFormSetValue,
   useWatch,
 } from "react-hook-form";
 
 import {
+  ErrorMessage,
   hiddenInPdfClassName,
   inputErrorClassName,
 } from "@/app/(main)/(app)/components/invoice-form/common";
-import { DeleteIconButton } from "@/app/(main)/(app)/components/invoice-form/sections/components/delete-icon-button";
 import {
   DeleteInvoiceItemDialog,
   type ItemPendingDeletion,
 } from "@/app/(main)/(app)/components/invoice-form/sections/components/delete-invoice-item-dialog";
+import { ItemAmountsCard } from "@/app/(main)/(app)/components/invoice-form/sections/components/item-amounts-card";
 import { ItemDiscountFields } from "@/app/(main)/(app)/components/invoice-form/sections/components/item-discount-fields";
-import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
-import { formatMoneyForTemplate } from "@/app/(main)/(app)/utils/format-money-for-template";
+import { ItemGtuField } from "@/app/(main)/(app)/components/invoice-form/sections/components/item-gtu-field";
+import { PdfColumnSwitch } from "@/app/(main)/(app)/components/invoice-form/sections/components/pdf-column-switch";
 import {
   type InvoiceData,
+  type InvoiceItemData,
   type SupportedCurrencies,
-  type SupportedLanguages,
   type SupportedNumberFormatLocale,
   MAX_INVOICE_ITEMS,
 } from "@/app/schema";
@@ -36,36 +37,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InputHelperMessage } from "@/components/ui/input-helper-message";
 import { Label } from "@/components/ui/label";
-import { MoneyInput, ReadOnlyMoneyInput } from "@/components/ui/money-input";
+import { MoneyInput } from "@/components/ui/money-input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { trackEvent } from "@/lib/analytics/track-event";
 import { cn } from "@/lib/utils";
-import {
-  getAmountInWords,
-  getNumberFractionalPart,
-} from "@/utils/invoice.utils";
-
-const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
-  return <p className="mt-1 text-xs text-red-600">{children}</p>;
-};
-
-interface InvoiceItemsSettingsProps {
-  control: Control<InvoiceData>;
-  fields: FieldArrayWithId<InvoiceData, "items">[];
-  handleRemoveInvoiceItem: (index: number) => void;
-  append: UseFieldArrayAppend<InvoiceData, "items">;
-  errors: FieldErrors<InvoiceData>;
-  currency: SupportedCurrencies;
-  language: SupportedLanguages;
-  template: InvoiceData["template"];
-  taxLabelText: string;
-  /** The invoice's number format, already resolved against its language. */
-  numberFormatLocale: SupportedNumberFormatLocale;
-  getValues: UseFormGetValues<InvoiceData>;
-  setValue: UseFormSetValue<InvoiceData>;
-}
 
 export const InvoiceItems = memo(function InvoiceItems({
   control,
@@ -73,8 +50,8 @@ export const InvoiceItems = memo(function InvoiceItems({
   handleRemoveInvoiceItem,
   errors,
   currency,
-  language,
   append,
+  insert,
   template,
   taxLabelText,
   numberFormatLocale,
@@ -86,12 +63,12 @@ export const InvoiceItems = memo(function InvoiceItems({
   const addItemButtonRef = useRef<HTMLButtonElement>(null);
   const deleteTriggerRef = useRef<HTMLButtonElement | null>(null);
   const hasReachedItemLimit = fields.length >= MAX_INVOICE_ITEMS;
+  const canDeleteItems = fields.length > 1;
 
   // the first item's switches show or hide a column for every item, so each item's field
   // is faded when its column is left out of the PDF
   const [
     isNameVisible,
-    isTypeOfGTUVisible,
     isAmountVisible,
     isUnitVisible,
     isNetPriceVisible,
@@ -103,7 +80,6 @@ export const InvoiceItems = memo(function InvoiceItems({
     control,
     name: [
       "items.0.nameFieldIsVisible",
-      "items.0.typeOfGTUFieldIsVisible",
       "items.0.amountFieldIsVisible",
       "items.0.unitFieldIsVisible",
       "items.0.netPriceFieldIsVisible",
@@ -118,8 +94,6 @@ export const InvoiceItems = memo(function InvoiceItems({
 
   const isNameHidden = isDefaultTemplate && !isNameVisible;
 
-  const isTypeOfGTUHidden = isDefaultTemplate && !isTypeOfGTUVisible;
-
   const isAmountHidden = isDefaultTemplate && !isAmountVisible;
 
   const isUnitHidden = !isUnitVisible;
@@ -128,28 +102,54 @@ export const InvoiceItems = memo(function InvoiceItems({
 
   const isVatHidden = !isVatVisible;
 
-  const isNetAmountHidden = isDefaultTemplate && !isNetAmountVisible;
-
-  const isVatAmountHidden = isDefaultTemplate && !isVatAmountVisible;
-
-  const isPreTaxAmountHidden = isDefaultTemplate && !isPreTaxAmountVisible;
+  const hiddenAmountColumns = {
+    netAmount: isDefaultTemplate && !isNetAmountVisible,
+    vatAmount: isDefaultTemplate && !isVatAmountVisible,
+    preTaxAmount: isDefaultTemplate && !isPreTaxAmountVisible,
+  };
 
   return (
     <>
       {fields.map((field, index) => {
-        const isNotFirstItem = index > 0;
         const isFirstItem = index === 0;
+        const itemNumber = index + 1;
+        const itemErrors = errors.items?.[index];
+
+        // every template prints the unit and tax columns, so their switches show on both
+        const showColumnSwitches = isFirstItem;
+        const showDefaultTemplateColumnSwitches =
+          isFirstItem && isDefaultTemplate;
 
         return (
           <fieldset
             key={field.id}
-            className="relative mb-4 rounded-lg border p-4 shadow"
+            className="mb-4 flex flex-col gap-5 rounded-xl border px-4 pb-4 pt-1 shadow-sm"
           >
-            {/* Delete invoice item button */}
-            {isNotFirstItem ? (
-              <div className="absolute -right-3 -top-10">
-                <DeleteIconButton
-                  label={`Delete Invoice Item ${index + 1}`}
+            <Legend className="px-1 text-base font-semibold text-gray-900">
+              Item {itemNumber}
+            </Legend>
+
+            <div className="-mt-1 mb-1.5 flex justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1.5 border-gray-300 px-2.5 text-[13px] font-normal text-slate-700 shadow-none max-md:h-7 max-md:px-2 max-md:text-xs"
+                disabled={hasReachedItemLimit}
+                aria-label={`Duplicate Invoice Item ${itemNumber}`}
+                onClick={() => {
+                  insert(index + 1, getValues(`items.${index}`));
+                  trackEvent({ event: "duplicate_invoice_item" });
+                }}
+              >
+                <Copy className="size-3.5" />
+                Duplicate
+              </Button>
+              {canDeleteItems ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1.5 border-red-200 px-2.5 text-[13px] font-normal text-red-700 shadow-none hover:border-red-300 hover:bg-red-50 hover:text-red-700 max-md:h-7 max-md:px-2 max-md:text-xs"
+                  aria-label={`Delete Invoice Item ${itemNumber}`}
                   onClick={(event) => {
                     // Radix returns focus to its `Trigger` on close, and this dialog is
                     // controlled rather than triggered, so remember the button ourselves.
@@ -162,260 +162,91 @@ export const InvoiceItems = memo(function InvoiceItems({
                       name: getValues(`items.${index}.name`),
                     });
                   }}
-                />
-              </div>
-            ) : null}
-            <Legend>Item {index + 1}</Legend>
-            <div className="relative mb-8 space-y-4">
-              <div className={hiddenInPdfClassName(isNameHidden)}>
-                {/* Invoice Item Name */}
-                <div className="mb-2 flex items-center justify-between">
-                  <Label htmlFor={`itemName${index}`} className="">
-                    Name
-                  </Label>
-
-                  {/* Show Name field in PDF switch (Only show for default template) */}
-                  {isFirstItem && template === "default" ? (
-                    <div className="inline-flex items-center gap-2">
-                      <Controller
-                        name={`items.${index}.nameFieldIsVisible`}
-                        control={control}
-                        render={({ field: { value, onChange, ...field } }) => {
-                          return (
-                            <Switch
-                              {...field}
-                              id={`itemNameFieldIsVisible${index}`}
-                              checked={value}
-                              onCheckedChange={onChange}
-                              size="sm"
-                              aria-label={`Show the 'Name of Goods/Service' Column in the PDF for item ${index + 1}`}
-                            />
-                          );
-                        }}
-                      />
-                      <CustomTooltip
-                        trigger={
-                          <Label htmlFor={`itemNameFieldIsVisible${index}`}>
-                            Show in PDF
-                          </Label>
-                        }
-                        content="Show the 'Name of Goods/Service' Column in the PDF"
-                      />
-                    </div>
-                  ) : null}
-                </div>
-
-                {/* Name input */}
-                <Controller
-                  name={`items.${index}.name`}
-                  control={control}
-                  render={({ field }) => {
-                    return (
-                      <Textarea
-                        {...field}
-                        rows={4}
-                        id={`itemName${index}`}
-                        className={inputErrorClassName(
-                          !!errors.items?.[index]?.name,
-                        )}
-                      />
-                    );
-                  }}
-                />
-                {errors.items?.[index]?.name ? (
-                  <ErrorMessage>
-                    {errors.items[index]?.name?.message}
-                  </ErrorMessage>
-                ) : null}
-              </div>
-
-              {/* Invoice Item Type of GTU - Only show for default template */}
-              {template === "default" ? (
-                <div className={hiddenInPdfClassName(isTypeOfGTUHidden)}>
-                  <div className="mb-2 flex items-center justify-between">
-                    <Label htmlFor={`itemTypeOfGTU${index}`} className="">
-                      Type of GTU
-                    </Label>
-
-                    {/* Show Type of GTU field in PDF switch */}
-                    {isFirstItem ? (
-                      <div className="inline-flex items-center gap-2">
-                        <Controller
-                          name={`items.${index}.typeOfGTUFieldIsVisible`}
-                          control={control}
-                          render={({
-                            field: { value, onChange, ...field },
-                          }) => {
-                            return (
-                              <Switch
-                                {...field}
-                                id={`itemTypeOfGTUFieldIsVisible${index}`}
-                                checked={value}
-                                onCheckedChange={onChange}
-                                size="sm"
-                                aria-label={`Show the 'Type of GTU' Column in the PDF for item ${index + 1}`}
-                              />
-                            );
-                          }}
-                        />
-                        <CustomTooltip
-                          trigger={
-                            <Label
-                              htmlFor={`itemTypeOfGTUFieldIsVisible${index}`}
-                            >
-                              Show in PDF
-                            </Label>
-                          }
-                          content='Show the "Type of GTU" Column in the PDF'
-                        />
-                      </div>
-                    ) : null}
-                  </div>
-
-                  {/* Type of GTU input */}
-                  <Controller
-                    name={`items.${index}.typeOfGTU`}
-                    control={control}
-                    render={({ field }) => {
-                      return (
-                        <Input
-                          {...field}
-                          id={`itemTypeOfGTU${index}`}
-                          className={inputErrorClassName(
-                            !!errors.items?.[index]?.typeOfGTU,
-                          )}
-                          type="text"
-                        />
-                      );
-                    }}
-                  />
-                  {errors.items?.[index]?.typeOfGTU ? (
-                    <ErrorMessage>
-                      {errors.items[index]?.typeOfGTU?.message}
-                    </ErrorMessage>
-                  ) : null}
-                </div>
+                >
+                  <Trash2 className="size-3.5" />
+                  Delete
+                </Button>
               ) : null}
+            </div>
 
-              {/* Invoice Item Amount */}
-              <div className={hiddenInPdfClassName(isAmountHidden)}>
-                <div className="mb-2 flex items-center justify-between">
-                  <Label htmlFor={`itemAmount${index}`} className="">
-                    Amount (Quantity)
-                  </Label>
+            {/* Name */}
+            <div className={hiddenInPdfClassName(isNameHidden)}>
+              <FieldHeader
+                htmlFor={`itemName${index}`}
+                label="Name"
+                columnSwitch={
+                  showDefaultTemplateColumnSwitches ? (
+                    <PdfColumnSwitch
+                      control={control}
+                      column="nameFieldIsVisible"
+                      ariaLabel={`Show the 'Name of Goods/Service' Column in the PDF for item ${itemNumber}`}
+                      tooltip="Show the 'Name of Goods/Service' Column in the PDF"
+                    />
+                  ) : null
+                }
+              />
+              <Controller
+                name={`items.${index}.name`}
+                control={control}
+                render={({ field }) => {
+                  return (
+                    <Textarea
+                      {...field}
+                      rows={2}
+                      id={`itemName${index}`}
+                      className={inputErrorClassName(!!itemErrors?.name)}
+                    />
+                  );
+                }}
+              />
+              {itemErrors?.name ? (
+                <ErrorMessage>{itemErrors.name.message}</ErrorMessage>
+              ) : null}
+            </div>
 
-                  {/* Show Amount field in PDF switch (Only show for default template) */}
-                  {isFirstItem && template === "default" ? (
-                    <div className="inline-flex items-center gap-2">
-                      <Controller
-                        name={`items.${index}.amountFieldIsVisible`}
-                        control={control}
-                        render={({ field: { value, onChange, ...field } }) => {
-                          return (
-                            <Switch
-                              {...field}
-                              id={`itemAmountFieldIsVisible${index}`}
-                              checked={value}
-                              onCheckedChange={onChange}
-                              size="sm"
-                              aria-label={`Show the 'Amount' Column in the PDF for item ${index + 1}`}
-                            />
-                          );
-                        }}
-                      />
-                      <CustomTooltip
-                        trigger={
-                          <Label htmlFor={`itemAmountFieldIsVisible${index}`}>
-                            Show in PDF
-                          </Label>
-                        }
-                        content='Show the "Amount" Column in the PDF'
-                      />
-                    </div>
-                  ) : null}
-                </div>
+            {/* Quantity */}
+            <div className={hiddenInPdfClassName(isAmountHidden)}>
+              <FieldHeader
+                htmlFor={`itemAmount${index}`}
+                label="Qty"
+                columnSwitch={
+                  showDefaultTemplateColumnSwitches ? (
+                    <PdfColumnSwitch
+                      control={control}
+                      column="amountFieldIsVisible"
+                      ariaLabel={`Show the 'Amount' Column in the PDF for item ${itemNumber}`}
+                      tooltip='Show the "Amount" Column in the PDF'
+                    />
+                  ) : null
+                }
+              />
+              <QuantityStepper
+                control={control}
+                index={index}
+                hasError={!!itemErrors?.amount}
+              />
+              {itemErrors?.amount ? (
+                <ErrorMessage>{itemErrors.amount.message}</ErrorMessage>
+              ) : null}
+            </div>
 
-                {/* Amount input */}
-                <Controller
-                  name={`items.${index}.amount`}
-                  control={control}
-                  render={({ field }) => {
-                    // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- `<Input type="number">` gives back a string at runtime, the schema type says number
-                    const fieldValueNumber = Number(field.value) || 0;
-                    const previewFormattedValue = formatAmount({
-                      amount: fieldValueNumber,
-                      numberFormatLocale,
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 3,
-                    });
-
-                    return (
-                      <>
-                        <Input
-                          {...field}
-                          id={`itemAmount${index}`}
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          className={inputErrorClassName(
-                            !!errors.items?.[index]?.amount,
-                          )}
-                        />
-                        {!errors.items?.[index]?.amount ? (
-                          <InputHelperMessage>
-                            Preview: {previewFormattedValue}
-                          </InputHelperMessage>
-                        ) : null}
-                      </>
-                    );
-                  }}
-                />
-                {errors.items?.[index]?.amount ? (
-                  <ErrorMessage>
-                    {errors.items[index].amount.message}
-                  </ErrorMessage>
-                ) : null}
-              </div>
-
-              {/* Invoice Item Unit */}
+            {/* Unit, with one-tap common units under it */}
+            <div className="flex flex-col gap-2">
               <div className={hiddenInPdfClassName(isUnitHidden)}>
-                <div className="mb-2 flex items-center justify-between">
-                  <Label htmlFor={`itemUnit${index}`} className="">
-                    Unit
-                  </Label>
-
-                  {/* Show Unit field in PDF switch */}
-                  {isFirstItem ? (
-                    <div className="inline-flex items-center gap-2">
-                      <Controller
-                        name={`items.${index}.unitFieldIsVisible`}
+                <FieldHeader
+                  htmlFor={`itemUnit${index}`}
+                  label="Unit"
+                  columnSwitch={
+                    showColumnSwitches ? (
+                      <PdfColumnSwitch
                         control={control}
-                        render={({ field: { value, onChange, ...field } }) => {
-                          return (
-                            <Switch
-                              {...field}
-                              id={`itemUnitFieldIsVisible${index}`}
-                              checked={value}
-                              onCheckedChange={onChange}
-                              size="sm"
-                              aria-label={`Show the 'Unit' Column in the PDF for item ${index + 1}`}
-                            />
-                          );
-                        }}
+                        column="unitFieldIsVisible"
+                        ariaLabel={`Show the 'Unit' Column in the PDF for item ${itemNumber}`}
+                        tooltip='Show the "Unit" Column in the PDF'
                       />
-                      <CustomTooltip
-                        trigger={
-                          <Label htmlFor={`itemUnitFieldIsVisible${index}`}>
-                            Show in PDF
-                          </Label>
-                        }
-                        content='Show the "Unit" Column in the PDF'
-                      />
-                    </div>
-                  ) : null}
-                </div>
-
-                {/* Unit input */}
+                    ) : null
+                  }
+                />
                 <Controller
                   name={`items.${index}.unit`}
                   control={control}
@@ -425,176 +256,90 @@ export const InvoiceItems = memo(function InvoiceItems({
                         {...field}
                         id={`itemUnit${index}`}
                         type="text"
-                        className={inputErrorClassName(
-                          !!errors.items?.[index]?.unit,
+                        placeholder="e.g. hours"
+                        className={cn(
+                          "h-9 max-md:text-base",
+                          inputErrorClassName(!!itemErrors?.unit),
                         )}
                       />
                     );
                   }}
                 />
-                {errors.items?.[index]?.unit ? (
-                  <ErrorMessage>
-                    {errors.items[index].unit.message}
-                  </ErrorMessage>
+                {itemErrors?.unit ? (
+                  <ErrorMessage>{itemErrors.unit.message}</ErrorMessage>
                 ) : null}
               </div>
 
-              {/* Invoice Item Net Price */}
-              <div className={hiddenInPdfClassName(isNetPriceHidden)}>
-                <div className="mb-2 flex items-center justify-between">
-                  <Label htmlFor={`itemNetPrice${index}`} className="">
-                    Net Price (Rate or Unit Price)
-                  </Label>
-
-                  {/* Show Net Price field in PDF switch (Only show for default template) */}
-                  {isFirstItem && template === "default" ? (
-                    <div className="inline-flex items-center gap-2">
-                      <Controller
-                        name={`items.${index}.netPriceFieldIsVisible`}
-                        control={control}
-                        render={({ field: { value, onChange, ...field } }) => {
-                          return (
-                            <Switch
-                              {...field}
-                              id={`itemNetPriceFieldIsVisible${index}`}
-                              checked={value}
-                              onCheckedChange={onChange}
-                              size="sm"
-                              aria-label={`Show the 'Net Price' Column in the PDF for item ${index + 1}`}
-                            />
-                          );
-                        }}
-                      />
-                      <CustomTooltip
-                        trigger={
-                          <Label htmlFor={`itemNetPriceFieldIsVisible${index}`}>
-                            Show in PDF
-                          </Label>
-                        }
-                        content='Show the "Net Price" Column in the PDF'
-                      />
-                    </div>
-                  ) : null}
-                </div>
-
-                {/* Net price input */}
-                <div className="flex items-center gap-2">
-                  <Controller
-                    name={`items.${index}.netPrice`}
-                    control={control}
-                    render={({ field }) => {
-                      // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- `<Input type="number">` gives back a string at runtime, the schema type says number
-                      const fieldValueNumber = Number(field.value) || 0;
-
-                      // written in the invoice's number format and the way its template
-                      // shows the currency, so the preview matches the PDF
-                      const previewFormattedValue = formatMoneyForTemplate({
-                        amount: fieldValueNumber,
-                        currency,
-                        numberFormatLocale,
-                        template,
-                      });
-
-                      const previewAmountInWords = getAmountInWords({
-                        amount: fieldValueNumber,
-                        language,
-                      });
-
-                      const previewNumberFractionalPart =
-                        getNumberFractionalPart(fieldValueNumber);
-
-                      return (
-                        <div className="flex w-full flex-col">
-                          <MoneyInput
-                            {...field}
-                            id={`itemNetPrice${index}`}
-                            currency={currency}
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            className={cn(
-                              "w-full",
-                              inputErrorClassName(
-                                !!errors.items?.[index]?.netPrice,
-                              ),
-                            )}
-                            dataTestId={`itemNetPrice${index}`}
-                          />
-                          {!errors.items?.[index]?.netPrice ? (
-                            <InputHelperMessage>
-                              Preview: {previewFormattedValue} (
-                              {previewAmountInWords} {currency}{" "}
-                              {previewNumberFractionalPart}/100)
-                            </InputHelperMessage>
-                          ) : null}
-                        </div>
-                      );
-                    }}
-                  />
-                </div>
-
-                {errors.items?.[index]?.netPrice ? (
-                  <ErrorMessage>
-                    {errors.items[index].netPrice.message}
-                  </ErrorMessage>
-                ) : null}
-              </div>
-
-              {/* Invoice Item Discount */}
-              <ItemDiscountFields
+              <UnitChips
                 control={control}
                 index={index}
-                errors={errors}
-                currency={currency}
-                template={template}
-                numberFormatLocale={numberFormatLocale}
-                getValues={getValues}
                 setValue={setValue}
+                hasError={!!itemErrors?.unit}
               />
+            </div>
 
-              {/* Invoice Item Tax Settings */}
-              <fieldset
-                className={cn(
-                  "rounded-md border px-4 pb-4",
-                  hiddenInPdfClassName(isVatHidden),
-                )}
+            {/* Unit price */}
+            <div className={hiddenInPdfClassName(isNetPriceHidden)}>
+              <FieldHeader
+                htmlFor={`itemNetPrice${index}`}
+                label="Unit price"
+                columnSwitch={
+                  showDefaultTemplateColumnSwitches ? (
+                    <PdfColumnSwitch
+                      control={control}
+                      column="netPriceFieldIsVisible"
+                      ariaLabel={`Show the 'Net Price' Column in the PDF for item ${itemNumber}`}
+                      tooltip='Show the "Net Price" Column in the PDF'
+                    />
+                  ) : null
+                }
+              />
+              <Controller
+                name={`items.${index}.netPrice`}
+                control={control}
+                render={({ field }) => {
+                  return (
+                    <MoneyInput
+                      {...field}
+                      id={`itemNetPrice${index}`}
+                      currency={currency}
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      className={cn(
+                        "h-9 w-full max-md:text-base",
+                        inputErrorClassName(!!itemErrors?.netPrice),
+                      )}
+                      dataTestId={`itemNetPrice${index}`}
+                    />
+                  );
+                }}
+              />
+              {itemErrors?.netPrice ? (
+                <ErrorMessage>{itemErrors.netPrice.message}</ErrorMessage>
+              ) : null}
+            </div>
+
+            {/* Tax settings: the shared label on the first item, then this item's rate.
+                One field per row under fixed labels, so a long tax name can't push
+                the fields out of line */}
+            <div
+              role="group"
+              aria-labelledby={`itemTaxSettings${index}`}
+              className="flex flex-col gap-3"
+            >
+              <span
+                id={`itemTaxSettings${index}`}
+                className="text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500"
               >
-                <legend className="text-base font-semibold lg:text-lg">
-                  Tax Settings
-                </legend>
-                <div className="mb-2 flex items-center justify-end">
-                  {isFirstItem ? (
-                    <div className="inline-flex items-center gap-2">
-                      <Controller
-                        name={`items.${index}.vatFieldIsVisible`}
-                        control={control}
-                        render={({ field: { value, onChange, ...field } }) => {
-                          return (
-                            <Switch
-                              {...field}
-                              id={`itemVatFieldIsVisible${index}`}
-                              checked={value}
-                              onCheckedChange={onChange}
-                              size="sm"
-                              aria-label={`Show the '${taxLabelText}' Column in the PDF for item ${index + 1}`}
-                            />
-                          );
-                        }}
-                      />
-                      <CustomTooltip
-                        trigger={
-                          <Label htmlFor={`itemVatFieldIsVisible${index}`}>
-                            Show in PDF
-                          </Label>
-                        }
-                        content={`Show the "${taxLabelText}" Column in the PDF`}
-                      />
-                    </div>
-                  ) : null}
-                </div>
+                Tax settings
+              </span>
 
+              {isFirstItem ? (
                 <div>
-                  <Label htmlFor="taxLabelText">Tax Label</Label>
+                  <Label htmlFor="taxLabelText" className="mb-1.5 block">
+                    Label
+                  </Label>
                   <Controller
                     name="taxLabelText"
                     control={control}
@@ -604,9 +349,11 @@ export const InvoiceItems = memo(function InvoiceItems({
                           {...field}
                           type="text"
                           id="taxLabelText"
-                          placeholder="Enter tax label (e.g., VAT, Tax, GST, Sales Tax)"
+                          // the visible "Label" means little out of context
+                          aria-label="Tax label"
+                          placeholder="e.g. VAT, GST, Sales Tax"
                           className={cn(
-                            "mt-1 block w-full",
+                            "h-9 max-md:text-base",
                             inputErrorClassName(!!errors.taxLabelText),
                           )}
                         />
@@ -616,275 +363,92 @@ export const InvoiceItems = memo(function InvoiceItems({
                   {errors.taxLabelText ? (
                     <ErrorMessage>{errors.taxLabelText.message}</ErrorMessage>
                   ) : null}
-                  {!errors.taxLabelText ? (
-                    <InputHelperMessage>
-                      Customize the tax label on your invoice (e.g., VAT, Sales
-                      Tax, IVA). Default:{" "}
-                      {INVOICE_PDF_TRANSLATIONS[language].invoiceItemsTable.vat}
-                    </InputHelperMessage>
-                  ) : null}
                 </div>
-                <div data-testid={`itemVat${index}`} className="mt-4">
-                  <div className="mb-2 flex items-center justify-between">
-                    <Label htmlFor={`itemVat${index}`} className="">
-                      {taxLabelText} Rate
-                    </Label>
-                  </div>
+              ) : null}
 
-                  {/* Tax input */}
-                  <Controller
-                    name={`items.${index}.vat`}
-                    control={control}
-                    render={({ field }) => {
-                      return (
-                        <Input
-                          {...field}
-                          id={`itemVat${index}`}
-                          type="text"
-                          className={inputErrorClassName(
-                            !!errors.items?.[index]?.vat,
-                          )}
+              <div
+                className={cn(
+                  "flex flex-col gap-2",
+                  hiddenInPdfClassName(isVatHidden),
+                )}
+                data-testid={`itemVat${index}`}
+              >
+                <div>
+                  {/* The switch hides only the rate column, so it sits on the rate: the
+                      label still names the amount column and the summary table. Later items
+                      have no label field above, so their rate names the tax. */}
+                  <FieldHeader
+                    htmlFor={`itemVat${index}`}
+                    label={isFirstItem ? "Rate" : `${taxLabelText} rate`}
+                    columnSwitch={
+                      showColumnSwitches ? (
+                        <PdfColumnSwitch
+                          control={control}
+                          column="vatFieldIsVisible"
+                          ariaLabel={`Show the '${taxLabelText}' Column in the PDF for item ${itemNumber}`}
+                          tooltip={`Show the "${taxLabelText}" rate column in the PDF`}
                         />
-                      );
-                    }}
+                      ) : null
+                    }
                   />
-
-                  {errors.items?.[index]?.vat ? (
-                    <ErrorMessage>
-                      {errors.items[index].vat.message}
-                    </ErrorMessage>
-                  ) : (
-                    <InputHelperMessage>
-                      Enter a number (0-100) or text (e.g., NP, OO, etc).
-                    </InputHelperMessage>
-                  )}
+                  <TaxRateInput
+                    control={control}
+                    index={index}
+                    taxLabelText={taxLabelText}
+                    hasError={!!itemErrors?.vat}
+                  />
                 </div>
-              </fieldset>
-
-              {/* Invoice Item Net Amount */}
-              <div className={hiddenInPdfClassName(isNetAmountHidden)}>
-                <div className="mb-2 flex items-center justify-between">
-                  <Label htmlFor={`itemNetAmount${index}`} className="">
-                    Net Amount
-                  </Label>
-
-                  {/* Show Net Amount field in PDF switch (Only show for default template) */}
-                  {isFirstItem && template === "default" ? (
-                    <div className="inline-flex items-center gap-2">
-                      <Controller
-                        name={`items.${index}.netAmountFieldIsVisible`}
-                        control={control}
-                        render={({ field: { value, onChange, ...field } }) => {
-                          return (
-                            <Switch
-                              {...field}
-                              id={`itemNetAmountFieldIsVisible${index}`}
-                              checked={value}
-                              onCheckedChange={onChange}
-                              size="sm"
-                              aria-label={`Show the 'Net Amount' Column in the PDF for item ${index + 1}`}
-                            />
-                          );
-                        }}
-                      />
-                      <CustomTooltip
-                        trigger={
-                          <Label
-                            htmlFor={`itemNetAmountFieldIsVisible${index}`}
-                          >
-                            Show in PDF
-                          </Label>
-                        }
-                        content='Show the "Net Amount" Column in the PDF'
-                      />
-                    </div>
-                  ) : null}
-                </div>
-
-                {/* Invoice Item Net Amount (calculated automatically - read only) */}
-                <Controller
-                  name={`items.${index}.netAmount`}
+                <TaxRateChips
                   control={control}
-                  render={({ field }) => {
-                    return (
-                      <ReadOnlyMoneyInput
-                        {...field}
-                        id={`itemNetAmount${index}`}
-                        currency={currency}
-                        value={formatAmount({
-                          amount: field.value,
-                          numberFormatLocale,
-                        })}
-                        className={inputErrorClassName(
-                          !!errors.items?.[index]?.netAmount,
-                        )}
-                        dataTestId={`itemNetAmount${index}`}
-                      />
-                    );
-                  }}
+                  index={index}
+                  setValue={setValue}
+                  hasError={!!itemErrors?.vat}
                 />
-
-                {errors.items?.[index]?.netAmount ? (
-                  <ErrorMessage>
-                    {errors.items[index].netAmount.message}
-                  </ErrorMessage>
-                ) : (
-                  <InputHelperMessage>
-                    Calculated automatically based on Amount, Net Price and
-                    Discount
-                  </InputHelperMessage>
-                )}
+                {itemErrors?.vat ? (
+                  <ErrorMessage>{itemErrors.vat.message}</ErrorMessage>
+                ) : null}
               </div>
 
-              {/* Invoice Item Tax Amount (calculated automatically - read only) */}
-              <div className={hiddenInPdfClassName(isVatAmountHidden)}>
-                <div className="mb-2 flex items-center justify-between">
-                  <Label htmlFor={`itemVatAmount${index}`} className="">
-                    {taxLabelText} Amount
-                  </Label>
-
-                  {/* Show Tax Amount field in PDF switch (Only show for default template) */}
-                  {isFirstItem && template === "default" ? (
-                    <div className="inline-flex items-center gap-2">
-                      <Controller
-                        name={`items.${index}.vatAmountFieldIsVisible`}
-                        control={control}
-                        render={({ field: { value, onChange, ...field } }) => {
-                          return (
-                            <Switch
-                              {...field}
-                              id={`itemVatAmountFieldIsVisible${index}`}
-                              checked={value}
-                              onCheckedChange={onChange}
-                              size="sm"
-                              aria-label={`Show the '${taxLabelText} Amount' Column in the PDF for item ${index + 1}`}
-                            />
-                          );
-                        }}
-                      />
-                      <CustomTooltip
-                        trigger={
-                          <Label
-                            htmlFor={`itemVatAmountFieldIsVisible${index}`}
-                          >
-                            Show in PDF
-                          </Label>
-                        }
-                        content={`Show the "${taxLabelText} Amount" Column in the PDF`}
-                      />
-                    </div>
-                  ) : null}
-                </div>
-
-                {/* Tax amount input */}
-                <Controller
-                  name={`items.${index}.vatAmount`}
-                  control={control}
-                  render={({ field }) => {
-                    return (
-                      <ReadOnlyMoneyInput
-                        {...field}
-                        id={`itemVatAmount${index}`}
-                        currency={currency}
-                        value={formatAmount({
-                          amount: field.value,
-                          numberFormatLocale,
-                        })}
-                        className={inputErrorClassName(
-                          !!errors.items?.[index]?.vatAmount,
-                        )}
-                        data-testid="vat-amount"
-                      />
-                    );
-                  }}
-                />
-
-                {errors.items?.[index]?.vatAmount ? (
-                  <ErrorMessage>
-                    {errors.items[index].vatAmount.message}
-                  </ErrorMessage>
-                ) : (
-                  <InputHelperMessage>
-                    Calculated automatically based on Net Amount and{" "}
-                    {taxLabelText}
-                  </InputHelperMessage>
-                )}
-              </div>
-
-              {/* Pre-tax Amount field (calculated automatically - read only) */}
-              <div className={hiddenInPdfClassName(isPreTaxAmountHidden)}>
-                <div className="mb-2 flex items-center justify-between">
-                  <Label htmlFor={`itemPreTaxAmount${index}`} className="">
-                    Pre-tax Amount
-                  </Label>
-
-                  {/* Show Pre-tax Amount field in PDF switch (Only show for default template) */}
-                  {isFirstItem && template === "default" ? (
-                    <div className="inline-flex items-center gap-2">
-                      <Controller
-                        name={`items.${index}.preTaxAmountFieldIsVisible`}
-                        control={control}
-                        render={({ field: { value, onChange, ...field } }) => {
-                          return (
-                            <Switch
-                              {...field}
-                              id={`itemPreTaxAmountFieldIsVisible${index}`}
-                              checked={value}
-                              onCheckedChange={onChange}
-                              size="sm"
-                              aria-label={`Show the 'Pre-tax Amount' Column in the PDF for item ${index + 1}`}
-                            />
-                          );
-                        }}
-                      />
-                      <CustomTooltip
-                        trigger={
-                          <Label
-                            htmlFor={`itemPreTaxAmountFieldIsVisible${index}`}
-                          >
-                            Show in PDF
-                          </Label>
-                        }
-                        content='Show the "Pre-tax Amount" Column in the PDF'
-                      />
-                    </div>
-                  ) : null}
-                </div>
-
-                {/* Pre-tax amount input */}
-                <Controller
-                  name={`items.${index}.preTaxAmount`}
-                  control={control}
-                  render={({ field }) => {
-                    return (
-                      <ReadOnlyMoneyInput
-                        {...field}
-                        id={`itemPreTaxAmount${index}`}
-                        currency={currency}
-                        value={formatAmount({
-                          amount: field.value,
-                          numberFormatLocale,
-                        })}
-                        className={inputErrorClassName(
-                          !!errors.items?.[index]?.preTaxAmount,
-                        )}
-                      />
-                    );
-                  }}
-                />
-
-                {errors.items?.[index]?.preTaxAmount ? (
-                  <ErrorMessage>
-                    {errors.items[index].preTaxAmount.message}
-                  </ErrorMessage>
-                ) : (
-                  <InputHelperMessage>
-                    Calculated automatically based on Net Amount and{" "}
-                    {taxLabelText}
-                  </InputHelperMessage>
-                )}
-              </div>
+              {isFirstItem && !itemErrors?.vat && !errors.taxLabelText ? (
+                <InputHelperMessage>
+                  The label is shared by every item, the amount columns and the
+                  summary table. The rate takes 0–100 or text such as NP.
+                </InputHelperMessage>
+              ) : null}
             </div>
+
+            {/* optional extras: pills that share a row while closed, cards once open */}
+            <div className="flex flex-wrap gap-2">
+              <ItemDiscountFields
+                control={control}
+                index={index}
+                errors={errors}
+                currency={currency}
+                getValues={getValues}
+                setValue={setValue}
+              />
+              {/* the default template is the only one that prints a GTU column */}
+              {isDefaultTemplate ? (
+                <ItemGtuField
+                  control={control}
+                  index={index}
+                  errors={errors}
+                  getValues={getValues}
+                  setValue={setValue}
+                />
+              ) : null}
+            </div>
+
+            <ItemAmountsCard
+              control={control}
+              index={index}
+              currency={currency}
+              template={template}
+              numberFormatLocale={numberFormatLocale}
+              taxLabelText={taxLabelText}
+              showColumnSwitches={showDefaultTemplateColumnSwitches}
+              hiddenColumns={hiddenAmountColumns}
+            />
           </fieldset>
         );
       })}
@@ -894,31 +458,7 @@ export const InvoiceItems = memo(function InvoiceItems({
           <Button
             ref={addItemButtonRef}
             onClick={() => {
-              append({
-                invoiceItemNumberIsVisible: true,
-                name: "",
-                nameFieldIsVisible: true,
-                amount: 1,
-                amountFieldIsVisible: true,
-                unit: "",
-                unitFieldIsVisible: true,
-                netPrice: 0,
-                netPriceFieldIsVisible: true,
-                vat: "NP",
-                vatFieldIsVisible: true,
-                netAmount: 0,
-                netAmountFieldIsVisible: true,
-                vatAmount: 0,
-                vatAmountFieldIsVisible: true,
-                preTaxAmount: 0,
-                preTaxAmountFieldIsVisible: true,
-                discountType: "percentage",
-                discountValue: 0,
-                discountLabel: "",
-                discountAmount: 0,
-                typeOfGTU: "",
-                typeOfGTUFieldIsVisible: true,
-              });
+              append(NEW_INVOICE_ITEM);
 
               trackEvent({ event: "add_invoice_item" });
             }}
@@ -939,61 +479,9 @@ export const InvoiceItems = memo(function InvoiceItems({
         showArrow
       />
 
-      {/** we only want to show "Show Number Column" and "Show Tax Table Summary" settings for default template */}
-      {template === "default" ? (
-        <div className="mt-6 space-y-4 rounded-md border p-4">
-          {/* Show Number column on PDF switch */}
-          <div className="relative flex items-center justify-between gap-2">
-            <Label
-              htmlFor={`itemInvoiceItemNumberIsVisible0`}
-              className="text-balance font-medium"
-            >
-              Show &quot;Number&quot; Column in the Items and pricing table
-            </Label>
-
-            <Controller
-              name={`items.0.invoiceItemNumberIsVisible`}
-              control={control}
-              render={({ field: { value, onChange, ...field } }) => {
-                return (
-                  <Switch
-                    {...field}
-                    id={`itemInvoiceItemNumberIsVisible0`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    size="sm"
-                  />
-                );
-              }}
-            />
-          </div>
-
-          {/* Show Tax Table Summary in PDF switch */}
-          <div className="relative flex items-center justify-between gap-2">
-            <Label
-              htmlFor={`vatTableSummaryIsVisible`}
-              className="text-balance"
-            >
-              Show &quot;{taxLabelText} Table Summary&quot; in the PDF
-            </Label>
-
-            <Controller
-              name={`vatTableSummaryIsVisible`}
-              control={control}
-              render={({ field: { value, onChange, ...field } }) => {
-                return (
-                  <Switch
-                    {...field}
-                    id={`vatTableSummaryIsVisible`}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    size="sm"
-                  />
-                );
-              }}
-            />
-          </div>
-        </div>
+      {/* the Stripe template prints neither a number column nor a summary table */}
+      {isDefaultTemplate ? (
+        <PdfOptionsCard control={control} taxLabelText={taxLabelText} />
       ) : null}
 
       <DeleteInvoiceItemDialog
@@ -1008,3 +496,416 @@ export const InvoiceItems = memo(function InvoiceItems({
     </>
   );
 });
+
+/** A field's label, with its "In PDF" switch on the right when it has one. */
+function FieldHeader({ htmlFor, label, columnSwitch }: FieldHeaderProps) {
+  return (
+    <div className="mb-1.5 flex min-h-5 items-center justify-between gap-2">
+      {/* a header that runs out of room truncates rather than wrapping under its
+          switch and pushing the input out of line with its neighbour */}
+      <Label htmlFor={htmlFor} className="min-w-0 truncate">
+        {label}
+      </Label>
+      {columnSwitch}
+    </div>
+  );
+}
+
+/**
+ * The quantity, with − and + joined to either end. Standard buttons and a standard
+ * input rather than one clipped box, so the buttons press like every other button and
+ * the field focuses like every other field. They step by one and keep any fraction the user typed (1.5 becomes 2.5), never
+ * going below zero.
+ */
+function QuantityStepper({ control, index, hasError }: QuantityStepperProps) {
+  return (
+    <Controller
+      name={`items.${index}.amount`}
+      control={control}
+      render={({ field }) => {
+        // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- `<Input type="number">` gives back a string at runtime, the schema type says number
+        const quantity = Number(field.value) || 0;
+
+        const stepBy = (delta: number) => {
+          // rounded so 0.1 + 1 stays 1.1 rather than picking up float noise
+          field.onChange(
+            Math.max(0, Math.round((quantity + delta) * 1000) / 1000),
+          );
+        };
+
+        return (
+          // one joined control: the buttons overlap the field's border by 1px, so no
+          // double lines, and whichever piece has focus rises above its neighbours
+          <div className="flex">
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label={`Decrease quantity of item ${index + 1}`}
+              disabled={quantity <= 0}
+              onClick={() => {
+                stepBy(-1);
+              }}
+              className={cn(STEP_BUTTON_CLASS_NAME, "rounded-e-none")}
+            >
+              <Minus className="size-4" />
+            </Button>
+            <Input
+              {...field}
+              id={`itemAmount${index}`}
+              type="number"
+              step="0.01"
+              min="0"
+              inputMode="decimal"
+              className={cn(
+                "relative -mx-px h-9 rounded-none text-center tabular-nums [appearance:textfield] focus-visible:z-10 max-md:text-base [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+                inputErrorClassName(hasError),
+              )}
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label={`Increase quantity of item ${index + 1}`}
+              onClick={() => {
+                stepBy(1);
+              }}
+              className={cn(STEP_BUTTON_CLASS_NAME, "rounded-s-none")}
+            >
+              <Plus className="size-4" />
+            </Button>
+          </div>
+        );
+      }}
+    />
+  );
+}
+
+/** One-tap units under the unit field; picking one fills it in. */
+function UnitChips({ control, index, setValue, hasError }: UnitChipsProps) {
+  const unit = useWatch({ control, name: `items.${index}.unit` });
+
+  return (
+    <div
+      role="group"
+      aria-label={`Common units for item ${index + 1}`}
+      className="flex flex-wrap items-center gap-1.5"
+    >
+      {COMMON_UNITS.map((commonUnit) => {
+        const isSelected = unit === commonUnit;
+
+        return (
+          <button
+            key={commonUnit}
+            type="button"
+            aria-pressed={isSelected}
+            onClick={() => {
+              setValue(`items.${index}.unit`, commonUnit, {
+                shouldDirty: true,
+                // validate only to clear an error the old value left behind
+                shouldValidate: hasError,
+              });
+            }}
+            className={cn(
+              "h-[26px] rounded-full border px-2.5 text-xs transition-[border-color,transform] duration-150 ease-out active:scale-[0.97] max-md:h-9 max-md:px-2.5 max-md:text-sm",
+              isSelected
+                ? "border-blue-600 bg-blue-50 text-blue-700"
+                : "border-gray-200 bg-white text-slate-700 [@media(hover:hover)_and_(pointer:fine)]:hover:border-slate-400",
+            )}
+          >
+            {commonUnit}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * The item's tax rate. It also takes text (NP, OO), so the % suffix shows only while the
+ * value reads as a number.
+ */
+function TaxRateInput({
+  control,
+  index,
+  taxLabelText,
+  hasError,
+}: TaxRateInputProps) {
+  return (
+    <Controller
+      name={`items.${index}.vat`}
+      control={control}
+      render={({ field }) => {
+        const value = String(field.value ?? "").trim();
+
+        const isNumeric = value !== "" && !Number.isNaN(Number(value));
+
+        return (
+          <div className="relative">
+            <Input
+              {...field}
+              id={`itemVat${index}`}
+              // names the tax even where the visible label just says "Rate"
+              aria-label={`${taxLabelText} rate`}
+              type="text"
+              inputMode="decimal"
+              placeholder="e.g. 23 or NP"
+              className={cn(
+                "h-9 tabular-nums max-md:text-base",
+                isNumeric && "pe-8",
+                inputErrorClassName(hasError),
+              )}
+            />
+            {isNumeric ? (
+              <span className="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-3 text-sm text-slate-500">
+                %
+              </span>
+            ) : null}
+          </div>
+        );
+      }}
+    />
+  );
+}
+
+/**
+ * One-tap common rates under the rate field. Typing still takes any value, and a chip
+ * shows as picked whenever the field holds its value, typed or tapped.
+ */
+function TaxRateChips({
+  control,
+  index,
+  setValue,
+  hasError,
+}: TaxRateChipsProps) {
+  const rate = useWatch({ control, name: `items.${index}.vat` });
+
+  const current = String(rate ?? "")
+    .trim()
+    .toUpperCase();
+
+  return (
+    <div
+      role="group"
+      aria-label={`Common rates for item ${index + 1}`}
+      className="flex flex-wrap items-center gap-1.5"
+    >
+      {COMMON_TAX_RATES.map((commonRate) => {
+        const isSelected =
+          typeof commonRate.value === "number"
+            ? current !== "" && Number(current) === commonRate.value
+            : current === commonRate.value;
+
+        return (
+          <button
+            key={commonRate.label}
+            type="button"
+            aria-pressed={isSelected}
+            onClick={() => {
+              setValue(`items.${index}.vat`, commonRate.value, {
+                shouldDirty: true,
+                // validate only to clear an error the old value left behind
+                shouldValidate: hasError,
+              });
+            }}
+            className={cn(
+              "h-[26px] rounded-full border px-2.5 text-xs tabular-nums transition-[border-color,transform] duration-150 ease-out active:scale-[0.97] max-md:h-9 max-md:px-2.5 max-md:text-sm",
+              isSelected
+                ? "border-blue-600 bg-blue-50 text-blue-700"
+                : "border-gray-200 bg-white text-slate-700 [@media(hover:hover)_and_(pointer:fine)]:hover:border-slate-400",
+            )}
+          >
+            {commonRate.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** The invoice-wide switches for the items table, grouped under "Show in PDF". */
+function PdfOptionsCard({ control, taxLabelText }: PdfOptionsCardProps) {
+  const headingId = useId();
+
+  return (
+    <section
+      aria-labelledby={headingId}
+      className="mt-4 flex flex-col rounded-lg border px-4 pb-1 pt-3"
+    >
+      <h3
+        id={headingId}
+        className="mb-1 text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500"
+      >
+        Show in PDF
+      </h3>
+      <PdfOptionRow
+        control={control}
+        name="items.0.invoiceItemNumberIsVisible"
+        label="Number column"
+        description="Numbers each item 1, 2, 3…"
+      />
+      <PdfOptionRow
+        control={control}
+        name="vatTableSummaryIsVisible"
+        label={`${taxLabelText} summary table`}
+        description={`Net, ${taxLabelText} and total per rate, under the items`}
+        isLast
+      />
+    </section>
+  );
+}
+
+/** A whole-row switch: on a phone the row is the tap target, not just the small track. */
+function PdfOptionRow({
+  control,
+  name,
+  label,
+  description,
+  isLast = false,
+}: PdfOptionRowProps) {
+  const id = useId();
+
+  return (
+    <div
+      className={cn(
+        "flex items-center justify-between gap-3 py-2 max-md:min-h-[60px]",
+        !isLast && "border-b border-slate-100",
+      )}
+    >
+      <Label htmlFor={id} className="flex cursor-pointer flex-col gap-0.5">
+        <span className="font-medium">{label}</span>
+        <span className="text-xs font-normal text-slate-500">
+          {description}
+        </span>
+      </Label>
+      <Controller
+        name={name}
+        control={control}
+        render={({ field: { value, onChange, ...field } }) => {
+          return (
+            <Switch
+              {...field}
+              id={id}
+              checked={value}
+              onCheckedChange={onChange}
+              size="sm"
+            />
+          );
+        }}
+      />
+    </div>
+  );
+}
+
+/** The − and + at either end of the quantity: as tall as the field, bordered like it. */
+const STEP_BUTTON_CLASS_NAME =
+  "relative size-9 shrink-0 border-gray-300 bg-slate-50 text-slate-700 shadow-sm shadow-black/5 hover:bg-slate-100 focus-visible:z-10";
+
+const COMMON_TAX_RATES = [
+  { label: "NP", value: "NP" },
+  { label: "0%", value: 0 },
+  { label: "5%", value: 5 },
+  { label: "8%", value: 8 },
+  { label: "23%", value: 23 },
+] as const satisfies ReadonlyArray<{
+  label: string;
+  value: InvoiceItemData["vat"];
+}>;
+
+const COMMON_UNITS = ["service", "hours", "days", "pcs"] as const;
+
+const NEW_INVOICE_ITEM = {
+  invoiceItemNumberIsVisible: true,
+  name: "",
+  nameFieldIsVisible: true,
+  amount: 1,
+  amountFieldIsVisible: true,
+  unit: "",
+  unitFieldIsVisible: true,
+  netPrice: 0,
+  netPriceFieldIsVisible: true,
+  vat: "NP",
+  vatFieldIsVisible: true,
+  netAmount: 0,
+  netAmountFieldIsVisible: true,
+  vatAmount: 0,
+  vatAmountFieldIsVisible: true,
+  preTaxAmount: 0,
+  preTaxAmountFieldIsVisible: true,
+  discountType: "percentage",
+  discountValue: 0,
+  discountLabel: "",
+  discountAmount: 0,
+  typeOfGTU: "",
+  typeOfGTUFieldIsVisible: true,
+} as const satisfies InvoiceItemData;
+
+interface InvoiceItemsSettingsProps {
+  control: Control<InvoiceData>;
+  fields: FieldArrayWithId<InvoiceData, "items">[];
+  handleRemoveInvoiceItem: (index: number) => void;
+  append: UseFieldArrayAppend<InvoiceData, "items">;
+  /** Places a copy right after the item it was made from, for Duplicate. */
+  insert: UseFieldArrayInsert<InvoiceData, "items">;
+  errors: FieldErrors<InvoiceData>;
+  currency: SupportedCurrencies;
+  template: InvoiceData["template"];
+  taxLabelText: string;
+  /** The invoice's number format, already resolved against its language. */
+  numberFormatLocale: SupportedNumberFormatLocale;
+  getValues: UseFormGetValues<InvoiceData>;
+  setValue: UseFormSetValue<InvoiceData>;
+}
+
+interface FieldHeaderProps {
+  htmlFor: string;
+  label: string;
+  /** The field's "In PDF" switch, on the first item only. */
+  columnSwitch?: React.ReactNode;
+}
+
+interface QuantityStepperProps {
+  control: Control<InvoiceData>;
+  /** Position of the item in the `items` field array. */
+  index: number;
+  hasError: boolean;
+}
+
+interface UnitChipsProps {
+  control: Control<InvoiceData>;
+  /** Position of the item in the `items` field array. */
+  index: number;
+  setValue: UseFormSetValue<InvoiceData>;
+  /** The unit field shows an error, which picking a chip should clear. */
+  hasError: boolean;
+}
+
+interface TaxRateInputProps {
+  control: Control<InvoiceData>;
+  /** Position of the item in the `items` field array. */
+  index: number;
+  /** The invoice's tax name, for the field's accessible name ("VAT rate"). */
+  taxLabelText: string;
+  hasError: boolean;
+}
+
+interface TaxRateChipsProps {
+  control: Control<InvoiceData>;
+  /** Position of the item in the `items` field array. */
+  index: number;
+  setValue: UseFormSetValue<InvoiceData>;
+  /** The rate field shows an error, which picking a chip should clear. */
+  hasError: boolean;
+}
+
+interface PdfOptionsCardProps {
+  control: Control<InvoiceData>;
+  taxLabelText: string;
+}
+
+interface PdfOptionRowProps {
+  control: Control<InvoiceData>;
+  name: "items.0.invoiceItemNumberIsVisible" | "vatTableSummaryIsVisible";
+  label: string;
+  description: string;
+  /** Drops the divider under the last row. */
+  isLast?: boolean;
+}
