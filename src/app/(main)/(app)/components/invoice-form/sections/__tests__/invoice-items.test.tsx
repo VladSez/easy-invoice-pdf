@@ -773,7 +773,22 @@ describe("InvoiceItems calculated amounts", () => {
     });
 
     expect(getAmountText("itemDiscountSummary0")).toBe(
-      "Subtotal 201.00 EUR · Discount 10%−20.10 EUR",
+      "Discount 10%of 201.00 EUR subtotal−20.10 EUR",
+    );
+  });
+
+  it("names the discount with its PDF label when it has one", () => {
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: {
+        discountValue: 10,
+        discountAmount: 20.1,
+        discountLabel: "Loyalty discount",
+      },
+    });
+
+    expect(getAmountText("itemDiscountSummary0")).toBe(
+      "Loyalty discount 10%of 201.00 EUR subtotal−20.10 EUR",
     );
   });
 
@@ -788,7 +803,7 @@ describe("InvoiceItems calculated amounts", () => {
     });
 
     expect(getAmountText("itemDiscountSummary0")).toBe(
-      "Subtotal 201.00 EUR · Discount 25.00 EUR−25.00 EUR",
+      "Discountof 201.00 EUR subtotal−25.00 EUR",
     );
   });
 });

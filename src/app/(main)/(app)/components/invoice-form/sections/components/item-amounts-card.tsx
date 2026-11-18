@@ -32,6 +32,7 @@ export function ItemAmountsCard({
     discountType,
     discountValue,
     discountAmount,
+    discountLabel,
     netAmount,
     vatAmount,
     preTaxAmount,
@@ -43,6 +44,7 @@ export function ItemAmountsCard({
       `items.${index}.discountType`,
       `items.${index}.discountValue`,
       `items.${index}.discountAmount`,
+      `items.${index}.discountLabel`,
       `items.${index}.netAmount`,
       `items.${index}.vatAmount`,
       `items.${index}.preTaxAmount`,
@@ -64,10 +66,14 @@ export function ItemAmountsCard({
   // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- see above
   const discountNumber = Number(discountValue) || 0;
 
-  const discountText =
+  // named as the PDF names it: the item's own label, or "Discount", plus the rate when
+  // it is a percentage. A fixed discount's amount is already on the right.
+  const discountName = discountLabel?.trim() || "Discount";
+
+  const discountTitle =
     discountType === "percentage"
-      ? `${formatAmount({ amount: discountNumber, numberFormatLocale, minimumFractionDigits: 0, maximumFractionDigits: 2 })}%`
-      : formatMoney(discountNumber);
+      ? `${discountName} ${formatAmount({ amount: discountNumber, numberFormatLocale, minimumFractionDigits: 0, maximumFractionDigits: 2 })}%`
+      : discountName;
 
   const columns = [
     {
@@ -112,16 +118,23 @@ export function ItemAmountsCard({
   }>;
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 tabular-nums">
+    <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50 tabular-nums">
+      {/* tinted in the discount's green, so it reads as an adjustment to the line
+          rather than one more total */}
       {discountAmount > 0 ? (
         <div
-          className="flex flex-wrap justify-between gap-x-3 gap-y-1 border-b border-slate-200 px-3 py-2.5 text-[13px]"
+          className="flex items-center justify-between gap-3 border-b border-emerald-100 bg-emerald-50 px-3 py-2"
           data-testid={`itemDiscountSummary${index}`}
         >
-          <span className="text-slate-500">
-            Subtotal {formatMoney(subtotal)} · Discount {discountText}
+          <span className="flex min-w-0 flex-col gap-0.5">
+            <span className="break-words text-[13px] font-semibold text-emerald-800">
+              {discountTitle}
+            </span>
+            <span className="text-xs text-emerald-700">
+              of {formatMoney(subtotal)} subtotal
+            </span>
           </span>
-          <span className="font-medium text-emerald-700">
+          <span className="shrink-0 whitespace-nowrap text-[15px] font-semibold text-emerald-700">
             −{formatMoney(discountAmount)}
           </span>
         </div>
@@ -141,7 +154,7 @@ export function ItemAmountsCard({
               <dt className="text-[13px] text-slate-500">{column.label}</dt>
               <dd
                 className={cn(
-                  "break-words text-[15px] transition-colors",
+                  "col-start-1 break-words text-[15px] transition-colors",
                   column.key === "preTax" && "font-semibold",
                   column.isHidden ? "text-slate-500" : "text-slate-950",
                 )}

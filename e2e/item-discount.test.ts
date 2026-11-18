@@ -28,7 +28,9 @@ test.describe("Item discounts", () => {
     // Item 1: 10,000.00 - 10% = 9,000.00, VAT 23% on it = 2,070.00
     await expect(
       invoiceItemsSection.getByTestId("itemDiscountSummary0"),
-    ).toHaveText("Subtotal 10,000.00 EUR · Discount 10%−1,000.00 EUR");
+    ).toHaveText(
+      "Charitable donation 10%of 10,000.00 EUR subtotal−1,000.00 EUR",
+    );
     await expect(
       invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/).nth(0),
     ).toContainText("9,000.00");
