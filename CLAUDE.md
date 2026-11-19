@@ -18,6 +18,8 @@ Package manager is **pnpm** (pinned via corepack). `save-exact=true` and a 5-day
 - Merge only when every check is green, with a squash merge (the only method the repo allows). Never force-push and never rewrite pushed history.
 - Leave staging you did not cause alone: don't `git reset` or unstage files to tidy up.
 
+**Summarize what you did in simple terms.** When you finish a feature or fix a bug (anything beyond a minor tweak), end with a short plain-language summary: what changed from the user's point of view, and why. Skip the jargon and file-by-file detail; those can follow the summary if they matter.
+
 **Clean up after a merge.** Once a PR opened from a worktree session is merged, delete that worktree and archive the session. Stop any dev server the session started first, and land any lasting change (like this file) through a commit, because the worktree goes with the session.
 
 **Follow the repo's own guidelines and skills.** Before writing code, load what applies:
