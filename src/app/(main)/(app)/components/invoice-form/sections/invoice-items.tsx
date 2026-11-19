@@ -22,8 +22,8 @@ import {
   type ItemPendingDeletion,
 } from "@/app/(main)/(app)/components/invoice-form/sections/components/delete-invoice-item-dialog";
 import { ItemAmountsCard } from "@/app/(main)/(app)/components/invoice-form/sections/components/item-amounts-card";
+import { ItemCustomColumnField } from "@/app/(main)/(app)/components/invoice-form/sections/components/item-custom-column-field";
 import { ItemDiscountFields } from "@/app/(main)/(app)/components/invoice-form/sections/components/item-discount-fields";
-import { ItemGtuField } from "@/app/(main)/(app)/components/invoice-form/sections/components/item-gtu-field";
 import { PdfColumnSwitch } from "@/app/(main)/(app)/components/invoice-form/sections/components/pdf-column-switch";
 import { formatMoneyForTemplate } from "@/app/(main)/(app)/utils/format-money-for-template";
 import {
@@ -458,16 +458,13 @@ export const InvoiceItems = memo(function InvoiceItems({
                   getValues={getValues}
                   setValue={setValue}
                 />
-                {/* the default template is the only one that prints a GTU column */}
-                {isDefaultTemplate ? (
-                  <ItemGtuField
-                    control={control}
-                    index={index}
-                    errors={errors}
-                    getValues={getValues}
-                    setValue={setValue}
-                  />
-                ) : null}
+                <ItemCustomColumnField
+                  control={control}
+                  index={index}
+                  errors={errors}
+                  getValues={getValues}
+                  setValue={setValue}
+                />
               </div>
 
               <ItemAmountsCard

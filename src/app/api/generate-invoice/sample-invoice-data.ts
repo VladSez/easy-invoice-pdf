@@ -115,4 +115,5 @@ export const SAMPLE_INVOICE_DATA = {
 
   template: "default",
   taxLabelText: "VAT",
+  customColumnLabel: "",
 } as const satisfies InvoiceData;

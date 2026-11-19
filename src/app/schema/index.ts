@@ -1065,12 +1065,18 @@ export const invoiceItemSchema = z
       .optional(),
     nameFieldIsVisible: z.boolean().default(true),
 
+    /**
+     * The item's value in the custom column, named by the invoice's `customColumnLabel`.
+     * Still called `typeOfGTU` because the column started out as the Polish Type of GTU,
+     * and saved invoices, share links and the API all use this name.
+     */
     typeOfGTU: z
       .string()
-      .max(50, "Type of GTU must not exceed 50 characters")
+      .max(50, "Value must not exceed 50 characters")
       .trim()
       .optional()
       .default(""),
+    /** The custom column's "In PDF" switch, read from the first item. */
     typeOfGTUFieldIsVisible: z.boolean().default(true),
 
     amount: z
@@ -1504,6 +1510,18 @@ export const invoiceObjectSchema = z.object({
     .describe(
       "Customizable tax label. Defaults to ‘VAT’, but you can change it to any text (e.g. Sales Tax, GST, IVA, etc.)",
     ),
+
+  /**
+   * The name of the items table's custom column, printed as its header; each item's value
+   * is its `typeOfGTU`. Empty prints the PDF language's "Type of GTU", which is what the
+   * column was before it could be named, so older invoices keep their header.
+   */
+  customColumnLabel: z
+    .string()
+    .max(30, "Column name must not exceed 30 characters")
+    .trim()
+    .optional()
+    .default(""),
 
   dateOfIssue: z
     .string()

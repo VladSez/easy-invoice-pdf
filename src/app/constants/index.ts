@@ -201,6 +201,8 @@ export const INITIAL_INVOICE_DATA = {
   personAuthorizedToIssueSignature: "",
 
   taxLabelText: "VAT",
+
+  customColumnLabel: "",
 } as const satisfies InvoiceData;
 
 /**

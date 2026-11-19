@@ -89,6 +89,7 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   personAuthorizedToIssueName: "7",
   personAuthorizedToIssueFieldIsVisible: "w",
   taxLabelText: "1",
+  customColumnLabel: "-",
 
   // Invoice number object properties
   label: "x",

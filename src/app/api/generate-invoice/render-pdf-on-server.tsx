@@ -214,6 +214,7 @@ const ENGLISH_INVOICE_PROD_DATA_BASE = {
 
   template: "default",
   taxLabelText: "VAT",
+  customColumnLabel: "",
 } satisfies Omit<
   InvoiceData,
   | "dateOfIssue"

@@ -555,8 +555,8 @@ test.describe("Stripe Invoice Template", () => {
     const nameFieldSwitch = invoiceItemsSection.getByRole("switch", {
       name: "Show the 'Name of Goods/Service' Column in the PDF for item 1",
     });
-    const typeOfGTUFieldSwitch = invoiceItemsSection.getByRole("switch", {
-      name: "Show the 'Type of GTU' Column in the PDF for item 1",
+    const customColumnSwitch = invoiceItemsSection.getByRole("switch", {
+      name: "Show the custom column in the PDF for item 1",
     });
     const amountFieldSwitch = invoiceItemsSection.getByRole("switch", {
       name: "Show the 'Amount' Column in the PDF for item 1",
@@ -598,8 +598,8 @@ test.describe("Stripe Invoice Template", () => {
 
     // Check initial states (some switches should be checked by default, some not)
     await expect(nameFieldSwitch).toBeChecked();
-    // Type of GTU starts collapsed behind a pill, so its switch is not there yet
-    await expect(typeOfGTUFieldSwitch).toBeHidden();
+    // the custom column starts collapsed behind a pill, so its switch is not there yet
+    await expect(customColumnSwitch).toBeHidden();
     await expect(amountFieldSwitch).toBeChecked();
     await expect(unitFieldSwitch).toBeChecked();
     await expect(netPriceFieldSwitch).toBeChecked();
@@ -608,22 +608,27 @@ test.describe("Stripe Invoice Template", () => {
     await expect(vatAmountFieldSwitch).toBeChecked();
     await expect(preTaxAmountFieldSwitch).toBeChecked();
 
-    // =============== TYPE OF GTU FIELD TESTING ===============
+    // =============== CUSTOM COLUMN TESTING ===============
 
-    const typeOfGTUField = invoiceItemsSection.getByRole("textbox", {
-      name: "Type of GTU",
+    const customColumnNameField = invoiceItemsSection.getByRole("textbox", {
+      name: "Column name",
     });
-    const addTypeOfGTUPill = invoiceItemsSection.getByRole("button", {
-      name: "Type of GTU",
+    const customColumnValueField = invoiceItemsSection.getByRole("textbox", {
+      name: "Value",
       exact: true,
     });
-    await expect(typeOfGTUField).toBeHidden();
+    const addCustomColumnPill = invoiceItemsSection.getByRole("button", {
+      name: "Custom column",
+      exact: true,
+    });
+    await expect(customColumnNameField).toBeHidden();
 
-    // opening the pill shows the field and turns the GTU column on
-    await addTypeOfGTUPill.click();
-    await expect(typeOfGTUField).toBeFocused();
-    await expect(typeOfGTUFieldSwitch).toBeChecked();
-    await typeOfGTUField.fill("GTU_12");
+    // opening the pill asks for the column's name and turns the column on
+    await addCustomColumnPill.click();
+    await expect(customColumnNameField).toBeFocused();
+    await expect(customColumnSwitch).toBeChecked();
+    await customColumnNameField.fill("Project code");
+    await customColumnValueField.fill("ACME-24");
 
     // =============== TOGGLE TESTING ===============
 
@@ -639,10 +644,10 @@ test.describe("Stripe Invoice Template", () => {
     await expect(showVatTableSummarySwitch).toBeChecked();
 
     // Test toggling some field switches
-    await typeOfGTUFieldSwitch.click();
-    await expect(typeOfGTUFieldSwitch).not.toBeChecked();
-    await typeOfGTUFieldSwitch.click();
-    await expect(typeOfGTUFieldSwitch).toBeChecked();
+    await customColumnSwitch.click();
+    await expect(customColumnSwitch).not.toBeChecked();
+    await customColumnSwitch.click();
+    await expect(customColumnSwitch).toBeChecked();
 
     await nameFieldSwitch.click();
     await expect(nameFieldSwitch).not.toBeChecked();
@@ -659,14 +664,14 @@ test.describe("Stripe Invoice Template", () => {
     // Wait for URL to be updated
     await page.waitForURL("/stripe-template");
 
-    // All switches and Type of GTU field should now be hidden
+    // The column switches are hidden on the Stripe template, but the custom column is
+    // offered there too: the item has a value, so its card stays open with its switch
     await expect(showNumberColumnSwitch).toBeHidden();
     await expect(showVatTableSummarySwitch).toBeHidden();
-    await expect(typeOfGTUField).toBeHidden();
-    await expect(addTypeOfGTUPill).toBeHidden();
+    await expect(customColumnValueField).toHaveValue("ACME-24");
+    await expect(customColumnSwitch).toBeVisible();
 
     await expect(nameFieldSwitch).toBeHidden();
-    await expect(typeOfGTUFieldSwitch).toBeHidden();
     await expect(amountFieldSwitch).toBeHidden();
 
     // NOTE: Unit field switch is visible in stripe template
@@ -689,12 +694,12 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Template" })
       .selectOption("default");
 
-    // All switches and Type of GTU field should be visible again: the item has a code,
-    // so its GTU card opens on its own
+    // All switches are visible again, and the custom column keeps its name and value
     await expect(showNumberColumnSwitch).toBeVisible();
     await expect(showVatTableSummarySwitch).toBeVisible();
-    await expect(typeOfGTUField).toHaveValue("GTU_12");
-    await expect(typeOfGTUFieldSwitch).toBeVisible();
+    await expect(customColumnNameField).toHaveValue("Project code");
+    await expect(customColumnValueField).toHaveValue("ACME-24");
+    await expect(customColumnSwitch).toBeVisible();
 
     for (const switchElement of fieldSwitches) {
       await expect(switchElement).toBeVisible();
@@ -704,7 +709,7 @@ test.describe("Stripe Invoice Template", () => {
     await expect(showNumberColumnSwitch).toBeChecked();
     await expect(showVatTableSummarySwitch).toBeChecked();
     await expect(nameFieldSwitch).toBeChecked();
-    await expect(typeOfGTUFieldSwitch).toBeChecked();
+    await expect(customColumnSwitch).toBeChecked();
   });
 
   test("Payment Method field only appears for default template", async ({

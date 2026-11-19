@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 /**
  * The dashed "+ something" pill that stands in for an optional part of the form until the
- * user adds it (a discount, a GTU code, a QR code...).
+ * user adds it (a discount, a custom column, a QR code...).
  */
 export const AddPillButton = forwardRef<HTMLButtonElement, AddPillButtonProps>(
   function AddPillButton({ children, onClick, testId }, ref) {

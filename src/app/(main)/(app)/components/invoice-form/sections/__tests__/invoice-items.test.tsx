@@ -834,13 +834,19 @@ describe("InvoiceItems calculated amounts", () => {
   });
 });
 
-function getGtuPill() {
-  return screen.getByRole("button", { name: "Type of GTU" });
+/** The custom column's pill on an item: "Custom column" until the column has a name. */
+function getCustomColumnPill(name = "Custom column") {
+  return screen.getByRole("button", { name });
 }
 
-describe("InvoiceItems type of GTU", () => {
-  const GTU_SWITCH_NAME = "Show the 'Type of GTU' Column in the PDF for item 1";
+/** The column's shared "In PDF" switch, as an open card on item `itemNumber` shows it. */
+function getCustomColumnSwitch(itemNumber = 1) {
+  return screen.getByRole("switch", {
+    name: `Show the custom column in the PDF for item ${itemNumber}`,
+  });
+}
 
+describe("InvoiceItems custom column", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -849,19 +855,16 @@ describe("InvoiceItems type of GTU", () => {
     cleanup();
   });
 
-  it("keeps the field behind a pill while the item has no code", () => {
+  it("keeps the column behind a pill while the item has no value", () => {
     renderInvoiceItems({ itemCount: 1, itemOverrides: { typeOfGTU: "" } });
 
-    expect(getGtuPill()).toBeInTheDocument();
+    expect(getCustomColumnPill()).toBeInTheDocument();
     expect(
-      screen.queryByRole("textbox", { name: "Type of GTU" }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("switch", { name: GTU_SWITCH_NAME }),
+      screen.queryByRole("textbox", { name: "Column name" }),
     ).not.toBeInTheDocument();
   });
 
-  it("opens the field, focuses it and turns the GTU column on", async () => {
+  it("asks for the column's name, focuses it and turns the column on", async () => {
     const user = userEvent.setup();
 
     renderInvoiceItems({
@@ -869,52 +872,96 @@ describe("InvoiceItems type of GTU", () => {
       itemOverrides: { typeOfGTU: "", typeOfGTUFieldIsVisible: false },
     });
 
-    await user.click(getGtuPill());
+    await user.click(getCustomColumnPill());
 
-    expect(screen.getByRole("textbox", { name: "Type of GTU" })).toHaveFocus();
-    expect(screen.getByRole("switch", { name: GTU_SWITCH_NAME })).toBeChecked();
-    expect(trackEvent).toHaveBeenCalledWith({ event: "add_item_gtu" });
-  });
-
-  it("starts open for an item that already has a code", () => {
-    renderInvoiceItems({
-      itemCount: 1,
-      itemOverrides: { typeOfGTU: "GTU_01" },
+    await vi.waitFor(() => {
+      expect(
+        screen.getByRole("textbox", { name: "Column name" }),
+      ).toHaveFocus();
     });
-
-    expect(screen.getByRole("textbox", { name: "Type of GTU" })).toHaveValue(
-      "GTU_01",
-    );
-    expect(
-      screen.queryByRole("button", { name: "Type of GTU" }),
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Value" })).toBeInTheDocument();
+    expect(getCustomColumnSwitch()).toBeChecked();
+    expect(trackEvent).toHaveBeenCalledWith({
+      event: "add_item_custom_column",
+    });
   });
 
-  it("clears the code on remove and hands focus back to the pill", async () => {
+  it("names the other items' pills after the column, and asks them only for a value", async () => {
     const user = userEvent.setup();
 
+    renderInvoiceItems({ itemCount: 2, itemOverrides: { typeOfGTU: "" } });
+
+    const [firstPill] = screen.getAllByRole("button", {
+      name: "Custom column",
+    });
+
+    await user.click(firstPill);
+    await user.type(
+      screen.getByRole("textbox", { name: "Column name" }),
+      "Project code",
+    );
+
+    // item 2's pill now names the column; its card asks only for the value
+    await user.click(getCustomColumnPill("Project code"));
+
+    expect(
+      screen.getAllByRole("textbox", { name: "Column name" }),
+    ).toHaveLength(1);
+    await vi.waitFor(() => {
+      expect(
+        screen.getByRole("textbox", { name: "Project code" }),
+      ).toHaveFocus();
+    });
+  });
+
+  it('opens an item that already has a value, and keeps "Type of GTU" while the column has no name', () => {
     renderInvoiceItems({
       itemCount: 1,
       itemOverrides: { typeOfGTU: "GTU_01" },
     });
 
+    expect(screen.getByRole("textbox", { name: "Value" })).toHaveValue(
+      "GTU_01",
+    );
+    // an invoice from before columns had names still prints its old header
+    expect(
+      screen.getByText(/Left empty, it prints .Type of GTU./),
+    ).toBeVisible();
+  });
+
+  it("removes the last value: the column leaves the PDF and its name is forgotten", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1, itemOverrides: { typeOfGTU: "" } });
+
+    await user.click(getCustomColumnPill());
+    await user.type(
+      screen.getByRole("textbox", { name: "Column name" }),
+      "SKU",
+    );
+    await user.type(screen.getByRole("textbox", { name: "Value" }), "A-1");
     await user.click(
-      screen.getByRole("button", { name: "Remove Type of GTU from item 1" }),
+      screen.getByRole("button", {
+        name: "Remove the custom column value from item 1",
+      }),
     );
 
     await vi.waitFor(() => {
-      expect(getGtuPill()).toHaveFocus();
+      expect(getCustomColumnPill()).toHaveFocus();
     });
-    expect(trackEvent).toHaveBeenCalledWith({ event: "remove_item_gtu" });
+    expect(trackEvent).toHaveBeenCalledWith({
+      event: "remove_item_custom_column",
+    });
 
-    await user.click(getGtuPill());
+    await user.click(getCustomColumnPill());
 
-    expect(screen.getByRole("textbox", { name: "Type of GTU" })).toHaveValue(
+    expect(screen.getByRole("textbox", { name: "Column name" })).toHaveValue(
       "",
     );
+    expect(screen.getByRole("textbox", { name: "Value" })).toHaveValue("");
   });
 
-  it("keeps the GTU column on while another item still has a code", async () => {
+  it("keeps the column on while another item still has a value", async () => {
     const user = userEvent.setup();
 
     renderInvoiceItems({
@@ -923,22 +970,22 @@ describe("InvoiceItems type of GTU", () => {
     });
 
     await user.click(
-      screen.getByRole("button", { name: "Remove Type of GTU from item 2" }),
+      screen.getByRole("button", {
+        name: "Remove the custom column value from item 2",
+      }),
     );
 
-    expect(screen.getByRole("switch", { name: GTU_SWITCH_NAME })).toBeChecked();
+    expect(getCustomColumnSwitch()).toBeChecked();
   });
 
-  it("has no GTU pill on the Stripe template, which prints no GTU column", () => {
+  it("offers the custom column on the Stripe template too", () => {
     renderInvoiceItems({
       itemCount: 1,
       template: "stripe",
       itemOverrides: { typeOfGTU: "" },
     });
 
-    expect(
-      screen.queryByRole("button", { name: "Type of GTU" }),
-    ).not.toBeInTheDocument();
+    expect(getCustomColumnPill()).toBeInTheDocument();
   });
 });
 

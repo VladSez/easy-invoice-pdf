@@ -702,15 +702,15 @@ test.describe("Invoice Generator Page", () => {
       }),
     ).toBeChecked();
 
-    // Type of GTU starts collapsed behind a pill: no field and no switch until it is added
+    // the custom column starts collapsed behind a pill: no fields and no switch until added
     await expect(
       invoiceItemsSection.getByRole("button", {
-        name: "Type of GTU",
+        name: "Custom column",
         exact: true,
       }),
     ).toBeVisible();
     await expect(
-      invoiceItemsSection.getByRole("textbox", { name: "Type of GTU" }),
+      invoiceItemsSection.getByRole("textbox", { name: "Column name" }),
     ).toBeHidden();
 
     // Amount field and visibility toggle
