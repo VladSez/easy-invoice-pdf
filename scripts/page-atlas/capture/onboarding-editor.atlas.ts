@@ -2,6 +2,7 @@ import {
   atlasStorageState,
   expect,
   getDownloadPdfLink,
+  getToasts,
   test,
 } from "./atlas-test";
 
@@ -81,6 +82,10 @@ test("validation errors", async ({ page, atlas }) => {
   await nameInput.clear();
   await expect(
     sellerSection.getByText("Seller name is required", { exact: true }),
+  ).toBeVisible();
+  // the toast that lists every error follows the form's debounce
+  await expect(
+    getToasts(page).getByText("Please fix the following errors:"),
   ).toBeVisible();
   await atlas.snap("editor/validation-error", { scrollTo: sellerSection });
 
