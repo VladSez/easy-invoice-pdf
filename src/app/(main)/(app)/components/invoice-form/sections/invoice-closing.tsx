@@ -256,13 +256,7 @@ export const InvoiceClosing = memo(function InvoiceClosing({
   };
 
   return (
-    // On phones the form scrolls in its own box, and the sticky dock (about 160px) can sit
-    // over the box's bottom when the browser's bars change the screen height: room at least
-    // that tall lets the last part, and the "+ QR code" pill, scroll clear of it
-    <div
-      className="flex flex-col gap-5 max-lg:pb-44"
-      data-testid="final-section"
-    >
+    <div className="flex flex-col gap-5" data-testid="final-section">
       <TotalsCard
         control={control}
         currency={currency}
