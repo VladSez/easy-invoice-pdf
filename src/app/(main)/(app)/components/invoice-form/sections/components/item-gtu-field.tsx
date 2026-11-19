@@ -1,4 +1,3 @@
-import { Plus } from "lucide-react";
 import { useId, useRef, useState } from "react";
 import {
   type Control,
@@ -14,6 +13,7 @@ import {
   hiddenInPdfClassName,
   inputErrorClassName,
 } from "@/app/(main)/(app)/components/invoice-form/common";
+import { AddPillButton } from "@/app/(main)/(app)/components/invoice-form/sections/components/add-pill-button";
 import type { InvoiceData } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,11 +43,9 @@ export function ItemGtuField({
 
   if (!isOpen) {
     return (
-      <Button
+      <AddPillButton
         ref={pillRef}
-        variant="outline"
-        size="sm"
-        className="h-[34px] rounded-full border-dashed border-slate-300 px-3 text-[13px] font-normal text-slate-600 shadow-none hover:border-slate-400 hover:bg-white hover:text-slate-950 max-md:h-10"
+        testId={`addItemGtu${index}`}
         onClick={() => {
           setIsOpen(true);
           setValue("items.0.typeOfGTUFieldIsVisible", true, {
@@ -60,11 +58,9 @@ export function ItemGtuField({
             document.querySelector<HTMLElement>(`#${inputId}`)?.focus();
           });
         }}
-        data-testid={`addItemGtu${index}`}
       >
-        <Plus className="size-3.5" strokeWidth={2.25} />
         Type of GTU
-      </Button>
+      </AddPillButton>
     );
   }
 

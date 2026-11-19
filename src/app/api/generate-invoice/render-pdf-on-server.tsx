@@ -207,8 +207,10 @@ const ENGLISH_INVOICE_PROD_DATA_BASE = {
 
   personAuthorizedToReceiveName: "",
   personAuthorizedToReceiveFieldIsVisible: true,
+  personAuthorizedToReceiveSignature: "",
   personAuthorizedToIssueName: "",
   personAuthorizedToIssueFieldIsVisible: true,
+  personAuthorizedToIssueSignature: "",
 
   template: "default",
   taxLabelText: "VAT",

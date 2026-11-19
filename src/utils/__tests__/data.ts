@@ -100,7 +100,9 @@ export const MOCK_INVOICE_DATA = {
 
   personAuthorizedToReceiveName: "",
   personAuthorizedToReceiveFieldIsVisible: true,
+  personAuthorizedToReceiveSignature: "",
   personAuthorizedToIssueName: "",
   personAuthorizedToIssueFieldIsVisible: true,
+  personAuthorizedToIssueSignature: "",
   taxLabelText: "VAT",
 } as const satisfies InvoiceData;

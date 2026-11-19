@@ -1399,6 +1399,21 @@ export const BUYERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_BUYERS";
  *
  * Exported for tests that need access to `.shape` (e.g. URL compression key map).
  */
+/**
+ * A signature drawn on the form's signature pad, stored as a PNG data URL. It lives only in
+ * this browser: share links leave it out (see `compressInvoiceData`), since a link can't
+ * hold an image and a signature shouldn't travel in a URL.
+ */
+const drawnSignatureSchema = z
+  .string()
+  .trim()
+  .max(300_000, "Signature image is too large")
+  .refine((val) => {
+    return !val || val.startsWith("data:image/png;base64,");
+  }, "Signature must be a PNG image in base64 format")
+  .optional()
+  .default("");
+
 export const invoiceObjectSchema = z.object({
   language: z.enum(SUPPORTED_INVOICE_PDF_LANGUAGES).default("en"),
   dateFormat: z.enum(SUPPORTED_DATE_FORMATS).default("YYYY-MM-DD"),
@@ -1700,6 +1715,7 @@ export const invoiceObjectSchema = z.object({
     .optional()
     .default(""),
   personAuthorizedToReceiveFieldIsVisible: z.boolean().default(true),
+  personAuthorizedToReceiveSignature: drawnSignatureSchema,
 
   personAuthorizedToIssueName: z
     .string()
@@ -1708,6 +1724,7 @@ export const invoiceObjectSchema = z.object({
     .optional()
     .default(""),
   personAuthorizedToIssueFieldIsVisible: z.boolean().default(true),
+  personAuthorizedToIssueSignature: drawnSignatureSchema,
 });
 
 /**

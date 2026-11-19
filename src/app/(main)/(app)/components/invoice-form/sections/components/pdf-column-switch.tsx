@@ -1,5 +1,9 @@
 import { useId } from "react";
-import { type Control, Controller } from "react-hook-form";
+import {
+  type Control,
+  Controller,
+  type FieldPathByValue,
+} from "react-hook-form";
 
 import type { InvoiceData, InvoiceItemData } from "@/app/schema";
 import { Label } from "@/components/ui/label";
@@ -16,12 +20,30 @@ export function PdfColumnSwitch({
   ariaLabel,
   tooltip,
 }: PdfColumnSwitchProps) {
+  return (
+    <InPdfSwitch
+      control={control}
+      name={`items.0.${column}`}
+      ariaLabel={ariaLabel}
+      tooltip={tooltip}
+    />
+  );
+}
+
+/** A compact "In PDF" switch for any boolean field that shows or hides part of the PDF. */
+export function InPdfSwitch({
+  control,
+  name,
+  ariaLabel,
+  tooltip,
+  testId,
+}: InPdfSwitchProps) {
   const id = useId();
 
   return (
     <div className="inline-flex shrink-0 items-center gap-1.5">
       <Controller
-        name={`items.0.${column}`}
+        name={name}
         control={control}
         render={({ field: { value, onChange, ...field } }) => {
           return (
@@ -32,6 +54,7 @@ export function PdfColumnSwitch({
               onCheckedChange={onChange}
               size="sm"
               aria-label={ariaLabel}
+              data-testid={testId}
             />
           );
         }}
@@ -59,4 +82,15 @@ interface PdfColumnSwitchProps {
   ariaLabel: string;
   /** Explains which column the switch controls. */
   tooltip: string;
+}
+
+interface InPdfSwitchProps {
+  control: Control<InvoiceData>;
+  /** The boolean field the switch toggles. */
+  name: FieldPathByValue<InvoiceData, boolean>;
+  /** Names the switch for assistive tech and tests, since every one reads "In PDF". */
+  ariaLabel: string;
+  /** Explains what the switch shows or hides. */
+  tooltip: string;
+  testId?: string;
 }

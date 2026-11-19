@@ -1,4 +1,3 @@
-import { Plus } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import {
   type Control,
@@ -13,6 +12,7 @@ import {
   ErrorMessage,
   inputErrorClassName,
 } from "@/app/(main)/(app)/components/invoice-form/common";
+import { AddPillButton } from "@/app/(main)/(app)/components/invoice-form/sections/components/add-pill-button";
 import {
   type InvoiceData,
   type ItemDiscountType,
@@ -53,21 +53,17 @@ export function ItemDiscountFields({
 
   if (!isOpen) {
     return (
-      <Button
+      <AddPillButton
         ref={addButtonRef}
-        variant="outline"
-        size="sm"
-        className="h-[34px] self-start rounded-full border-dashed border-slate-300 px-3 text-[13px] font-normal text-slate-600 shadow-none hover:border-slate-400 hover:bg-white hover:text-slate-950 max-md:h-10"
+        testId={`addItemDiscount${index}`}
         onClick={() => {
           setIsOpen(true);
           setShouldFocusValue(true);
           trackEvent({ event: "add_item_discount" });
         }}
-        data-testid={`addItemDiscount${index}`}
       >
-        <Plus className="size-3.5" strokeWidth={2.25} />
         Add discount
-      </Button>
+      </AddPillButton>
     );
   }
 

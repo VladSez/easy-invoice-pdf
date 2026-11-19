@@ -150,7 +150,7 @@ export function InvoiceClientPage({
   handleInvoiceDataChange,
   handleShareInvoice,
   isMobile,
-  canShareInvoice,
+  cannotShareReason,
   currentInvoiceFormDataRef,
   isUnmodifiedInvoiceFromLink,
 }: {
@@ -158,7 +158,8 @@ export function InvoiceClientPage({
   handleInvoiceDataChange: (invoiceData: InvoiceData) => void;
   handleShareInvoice: () => void;
   isMobile: boolean;
-  canShareInvoice: boolean;
+  /** Why the invoice can't be shared, or `null` when it can. */
+  cannotShareReason: string | null;
   currentInvoiceFormDataRef: RefObject<(() => InvoiceData | null) | null>;
   /**
    * The invoice is still the one opened from a shared link. "Invoice last updated" is
@@ -340,7 +341,7 @@ export function InvoiceClientPage({
                 </TabsTrigger>
               </TabsList>
               <ShareInvoiceButton
-                canShareInvoice={canShareInvoice}
+                cannotShareReason={cannotShareReason}
                 handleShareInvoice={handleShareInvoice}
                 className="mx-2 w-full"
               />

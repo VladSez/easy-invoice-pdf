@@ -43,7 +43,7 @@ import {
 } from "@/utils/url-compression";
 
 import { InvoiceClientPage } from "./components";
-import { CANNOT_SHARE_INVOICE_DESCRIPTION } from "./components/share-invoice-button";
+import { getCannotShareInvoiceReason } from "./components/share-invoice-button";
 import { useInAppBrowserNotice } from "./hooks/use-in-app-browser-notice";
 import { generateQrCodeDataUrl } from "./utils/generate-qr-code-data-url";
 import { handleInvoiceNumberBreakingChange } from "./utils/invoice-number-breaking-change";
@@ -128,7 +128,7 @@ export function AppPageClient({
     null,
   );
 
-  const canShareInvoice = !invoiceDataState?.logo;
+  const cannotShareReason = getCannotShareInvoiceReason(invoiceDataState);
 
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
 
@@ -634,13 +634,13 @@ export function AppPageClient({
 
   /** Generate a shareable invoice link */
   const handleShareInvoice = useCallback(async () => {
-    if (!canShareInvoice) {
+    if (cannotShareReason) {
       toast.error("Unable to Share Invoice", {
         id: "unable-to-share-invoice-error-toast",
         duration: 10_000,
         description: (
           <p className="text-pretty text-xs leading-relaxed text-red-700">
-            {CANNOT_SHARE_INVOICE_DESCRIPTION}
+            {cannotShareReason}
           </p>
         ),
       });
@@ -840,7 +840,13 @@ export function AppPageClient({
         Sentry.captureException(error);
       }
     }
-  }, [canShareInvoice, invoiceDataState, isMobile, isUADesktop, searchParams]);
+  }, [
+    cannotShareReason,
+    invoiceDataState,
+    isMobile,
+    isUADesktop,
+    searchParams,
+  ]);
 
   // we only want to render the page on client side
   if (!invoiceDataState) {
@@ -857,7 +863,7 @@ export function AppPageClient({
         <main className="flex flex-col items-center justify-start bg-gray-100 pb-4 sm:p-4 md:justify-center lg:min-h-screen">
           <div className="w-full max-w-[62rem] bg-white p-3 shadow-lg sm:mb-0 sm:rounded-lg sm:p-6 sm:pb-1 min-[1400px]:max-w-7xl 2xl:max-w-[1480px]">
             <InvoicePageHeader
-              canShareInvoice={canShareInvoice}
+              cannotShareReason={cannotShareReason}
               handleShareInvoice={handleShareInvoice}
               isDesktop={isDesktop}
               invoiceDataState={invoiceDataState}
@@ -870,7 +876,7 @@ export function AppPageClient({
                 handleInvoiceDataChange={handleInvoiceDataChange}
                 handleShareInvoice={handleShareInvoice}
                 isMobile={isMobile}
-                canShareInvoice={canShareInvoice}
+                cannotShareReason={cannotShareReason}
                 currentInvoiceFormDataRef={currentInvoiceFormDataRef}
                 isUnmodifiedInvoiceFromLink={isUnmodifiedInvoiceFromLink}
               />

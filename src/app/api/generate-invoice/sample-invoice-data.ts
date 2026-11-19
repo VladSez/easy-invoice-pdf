@@ -108,8 +108,10 @@ export const SAMPLE_INVOICE_DATA = {
 
   personAuthorizedToReceiveName: "",
   personAuthorizedToReceiveFieldIsVisible: true,
+  personAuthorizedToReceiveSignature: "",
   personAuthorizedToIssueName: "",
   personAuthorizedToIssueFieldIsVisible: true,
+  personAuthorizedToIssueSignature: "",
 
   template: "default",
   taxLabelText: "VAT",
