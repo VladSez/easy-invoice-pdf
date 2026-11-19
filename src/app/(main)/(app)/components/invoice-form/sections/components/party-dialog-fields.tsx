@@ -66,7 +66,7 @@ export function PdfVisibilityToggle({
         data-testid={dataTestId}
       />
       <Label htmlFor={id} className="cursor-pointer">
-        Show in PDF
+        In PDF
       </Label>
     </div>
   );

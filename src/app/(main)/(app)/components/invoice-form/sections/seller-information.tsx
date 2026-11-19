@@ -153,7 +153,7 @@ export const SellerInformation = memo(function SellerInformation({
                     <CustomTooltip
                       trigger={
                         <Label htmlFor="sellerVatNoFieldIsVisible">
-                          Show in PDF
+                          In PDF
                         </Label>
                       }
                       content={"Show the 'Seller Tax Number' Field in the PDF"}
@@ -250,7 +250,7 @@ export const SellerInformation = memo(function SellerInformation({
                   <CustomTooltip
                     trigger={
                       <Label htmlFor="sellerEmailFieldIsVisible">
-                        Show in PDF
+                        In PDF
                       </Label>
                     }
                     content={"Show the 'Email' field in the PDF"}
@@ -302,7 +302,7 @@ export const SellerInformation = memo(function SellerInformation({
                   <CustomTooltip
                     trigger={
                       <Label htmlFor="sellerAccountNumberFieldIsVisible">
-                        Show in PDF
+                        In PDF
                       </Label>
                     }
                     content={"Show the 'Account Number' Field in the PDF"}
@@ -358,7 +358,7 @@ export const SellerInformation = memo(function SellerInformation({
                   <CustomTooltip
                     trigger={
                       <Label htmlFor="sellerSwiftBicFieldIsVisible">
-                        Show in PDF
+                        In PDF
                       </Label>
                     }
                     content={"Show the 'SWIFT/BIC' Field in the PDF"}
@@ -410,7 +410,7 @@ export const SellerInformation = memo(function SellerInformation({
                   <CustomTooltip
                     trigger={
                       <Label htmlFor="sellerNotesFieldIsVisible">
-                        Show in PDF
+                        In PDF
                       </Label>
                     }
                     content={"Show the 'Notes' field in the PDF"}

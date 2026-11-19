@@ -151,7 +151,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                     <CustomTooltip
                       trigger={
                         <Label htmlFor="buyerVatNoFieldIsVisible">
-                          Show in PDF
+                          In PDF
                         </Label>
                       }
                       content={"Show the 'Buyer Tax Number' Field in the PDF"}
@@ -248,7 +248,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                   <CustomTooltip
                     trigger={
                       <Label htmlFor="buyerEmailFieldIsVisible">
-                        Show in PDF
+                        In PDF
                       </Label>
                     }
                     content={"Show the 'Email' field in the PDF"}
@@ -300,7 +300,7 @@ export const BuyerInformation = memo(function BuyerInformation({
                   <CustomTooltip
                     trigger={
                       <Label htmlFor="buyerNotesFieldIsVisible">
-                        Show in PDF
+                        In PDF
                       </Label>
                     }
                     content={"Show the 'Notes' field in the PDF"}
