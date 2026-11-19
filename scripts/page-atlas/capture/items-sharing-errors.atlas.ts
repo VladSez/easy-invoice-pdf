@@ -58,6 +58,42 @@ test("items and discounts", async ({ page, atlas }) => {
   await atlas.snap("editor/item-discount-error", { scrollTo: discountValue });
 });
 
+test("custom column", async ({ page, atlas }) => {
+  await atlas.openEditor();
+
+  const section = page.getByTestId("invoice-items-section");
+
+  await atlas.editAndWait(async () => {
+    await section.getByTestId("addItemCustomColumn0").click();
+    await section.locator("#itemCustomColumnName0").fill("Project code");
+    await section.locator("#itemTypeOfGTU0").fill("ACME-24");
+  });
+
+  const firstCard = section.getByTestId("itemCustomColumn0");
+
+  await expect(firstCard).toBeVisible();
+  await atlas.snap("editor/custom-column", { scrollTo: firstCard });
+
+  await atlas.editAndWait(async () => {
+    await section.getByRole("button", { name: "Add invoice item" }).click();
+    // item 2's pill is named after the column
+    await section.getByTestId("addItemCustomColumn1").click();
+    await section.locator("#itemTypeOfGTU1").fill("ACME-OPS");
+  });
+
+  const secondCard = section.getByTestId("itemCustomColumn1");
+
+  await expect(secondCard).toBeVisible();
+  await atlas.snap("editor/custom-column-second", { scrollTo: secondCard });
+
+  await page.getByRole("combobox", { name: "Template" }).selectOption("stripe");
+  await page.waitForURL(/\/stripe-template/);
+  await atlas.waitForPdf();
+  await atlas.snap("stripe/custom-column", {
+    scrollTo: page.getByTestId("itemCustomColumn0"),
+  });
+});
+
 test("below the items", async ({ page, atlas }) => {
   await atlas.openEditor();
 

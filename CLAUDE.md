@@ -121,6 +121,8 @@ There are **two root layouts**, both rendering the shared `<html>`/`<body>` shel
 
 **Keep it current.** When a task changes what those routes show (layout, copy, a dialog, a toast, a state added or removed), run the `update-screen-atlas` skill as the task's last step: update `scripts/page-atlas/atlas-model.ts` for new or removed states, recapture the affected flows, and republish the shared copy. Skip it for changes nobody can see (types, tests, server-only code, the PDF templates' internals with no visible effect).
 
+**New UI gets its own states and flow.** Recapturing the existing flows only refreshes screens the atlas already has. When a change adds something a user can reach (a card, a pill that opens a form, a dialog, a mode such as tap-to-sign, a new column in the PDF), add its states to `APP_STATES`, add a flow for how they're reached (or a branch in an existing one), and capture them in a spec. Ask "which new screens does this add?" before recapturing, not after.
+
 ## Conventions
 
 From `.cursor/rules/` (all apply here):

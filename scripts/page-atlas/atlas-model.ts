@@ -122,6 +122,10 @@ const APP_STATES = {
   "editor/item-discount": { title: "Item with a discount" },
   "editor/item-discount-error": { title: "Discount above 100%" },
   "editor/item-deleted": { title: "Item removed" },
+  "editor/custom-column": { title: "Custom column named on item 1" },
+  "editor/custom-column-second": {
+    title: "Custom column value on item 2",
+  },
   "editor/closing": { title: "Totals, notes, payment and signatures" },
   "editor/closing-qr": { title: "QR code added" },
   "editor/signature-drawn": { title: "Signature drawn" },
@@ -151,6 +155,7 @@ const APP_STATES = {
   "editor/contacts-imported": { title: "Sellers & buyers imported" },
   "stripe/default": { title: "Stripe template" },
   "stripe/indigo": { title: "Indigo top line" },
+  "stripe/custom-column": { title: "Custom column on the Stripe template" },
   "how-it-works/default": { title: "Video dialog" },
   "seller-dialog/empty": { title: "New seller, empty" },
   "seller-dialog/filled": { title: "New seller, filled in" },
@@ -404,6 +409,33 @@ export const FLOWS = [
                 state: "item-delete/confirm",
                 via: "Delete Invoice Item 2",
                 next: [{ state: "editor/item-deleted", via: "Delete Item 2" }],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "custom-column",
+    title: "Custom column",
+    area: "items",
+    summary:
+      'A column the user names (a project code, a SKU) in place of Type of GTU: named once on the first card, then a value per item. Both templates print it; unnamed, it prints "Type of GTU".',
+    roots: [
+      {
+        state: "editor/items",
+        next: [
+          {
+            state: "editor/custom-column",
+            via: "Add custom column, name it Project code",
+            next: [
+              {
+                state: "editor/custom-column-second",
+                via: "Add item 2, then + Project code",
+                next: [
+                  { state: "stripe/custom-column", via: "Template: Stripe" },
+                ],
               },
             ],
           },
