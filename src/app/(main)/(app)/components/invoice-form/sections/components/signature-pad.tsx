@@ -1,6 +1,6 @@
 import { PenLine } from "lucide-react";
 import { getStroke, type StrokeOptions } from "perfect-freehand";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -40,6 +40,37 @@ export function SignaturePad({
 
   const [isDrawing, setIsDrawing] = useState(false);
   const hasInk = Boolean(value) || isDrawing;
+
+  // On a touch screen a finger also scrolls, so the pad stays out of the way until it's
+  // tapped: unarmed, a swipe across it scrolls the page; armed, it draws. A tap anywhere
+  // else disarms it. Mouse, trackpad and pen can't scroll by dragging, so they draw at once.
+  const isTouchScreen = useIsTouchScreen();
+  const [isArmed, setIsArmed] = useState(false);
+  const isArmedRef = useRef(false);
+  const padRef = useRef<HTMLDivElement>(null);
+  const lastPointerTypeRef = useRef("");
+
+  const setArmed = (armed: boolean) => {
+    isArmedRef.current = armed;
+    setIsArmed(armed);
+  };
+
+  useEffect(() => {
+    if (!isArmed) return;
+
+    const disarmOnTapElsewhere = (event: PointerEvent) => {
+      if (padRef.current?.contains(event.target as Node)) return;
+
+      isArmedRef.current = false;
+      setIsArmed(false);
+    };
+
+    document.addEventListener("pointerdown", disarmOnTapElsewhere, true);
+
+    return () => {
+      document.removeEventListener("pointerdown", disarmOnTapElsewhere, true);
+    };
+  }, [isArmed]);
 
   // Size the bitmap to the pad, and redraw the saved signature whenever that size changes or
   // the value changes from outside (a restored invoice, Remove, Clear).
@@ -87,16 +118,17 @@ export function SignaturePad({
     };
   }, [value]);
 
-  // iOS treats a touch on the pad as a page gesture too: a double tap zooms, a long press
-  // selects and opens the loupe, a pinch zooms. React's touch listeners are passive and
-  // can't stop that, so cancel those gestures with native, non-passive listeners.
+  // While armed, iOS would still treat a touch on the pad as a page gesture too: a double
+  // tap zooms, a long press selects and opens the loupe, a pinch zooms. React's touch
+  // listeners are passive and can't stop that, so cancel those gestures with native,
+  // non-passive listeners. Unarmed, touches are left alone, so the page scrolls.
   useEffect(() => {
     const canvas = canvasRef.current;
 
     if (!canvas) return;
 
     const preventPageGesture = (event: Event) => {
-      if (event.cancelable) event.preventDefault();
+      if (isArmedRef.current && event.cancelable) event.preventDefault();
     };
     const events = ["touchstart", "touchmove", "touchend", "gesturestart"];
 
@@ -159,12 +191,14 @@ export function SignaturePad({
 
   return (
     <div
+      ref={padRef}
       className={cn(
         // never selectable or long-pressable, so drawing can't pick up a selection or callout
         "relative h-[140px] select-none overflow-hidden rounded-lg border bg-white [-webkit-touch-callout:none] max-md:h-[180px]",
         hasInk
           ? "border-gray-300"
           : "border-dashed border-slate-300 bg-slate-50",
+        isArmed && "border-solid border-indigo-500 ring ring-indigo-200",
       )}
     >
       <canvas
@@ -172,9 +206,24 @@ export function SignaturePad({
         role="img"
         aria-label={`${label} signature pad`}
         data-testid={testId}
-        className="absolute inset-0 size-full cursor-crosshair touch-none"
+        className={cn(
+          "absolute inset-0 size-full cursor-crosshair",
+          // unarmed, a finger on the pad still scrolls the page
+          isArmed || !isTouchScreen ? "touch-none" : "touch-manipulation",
+        )}
+        onClick={() => {
+          // a tap, never the end of a scroll: browsers send no click after one
+          if (lastPointerTypeRef.current === "touch" && !isArmedRef.current) {
+            setArmed(true);
+          }
+        }}
         onPointerDown={(event) => {
+          lastPointerTypeRef.current = event.pointerType;
+
           if (event.button !== 0 || !inkLayerRef.current) return;
+
+          // an unarmed pad ignores a finger, which may be scrolling past
+          if (event.pointerType === "touch" && !isArmedRef.current) return;
 
           // a drag that starts here draws; it must not start a text selection
           event.preventDefault();
@@ -223,9 +272,15 @@ export function SignaturePad({
       {hasInk ? null : (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-[13px] text-slate-500">
           <PenLine className="size-[18px]" aria-hidden="true" />
-          Draw signature
+          {isTouchScreen && !isArmed ? "Tap to sign" : "Draw signature"}
         </div>
       )}
+
+      {isArmed ? (
+        <span className="pointer-events-none absolute bottom-1.5 left-2.5 text-xs text-indigo-600">
+          Tap outside when done
+        </span>
+      ) : null}
 
       {value ? (
         <Button
@@ -243,6 +298,32 @@ export function SignaturePad({
     </div>
   );
 }
+
+/** Whether the main pointer is a finger, whose drag scrolls the page. */
+function useIsTouchScreen() {
+  return useSyncExternalStore(
+    subscribeToPointerQuery,
+    () => {
+      return window.matchMedia(COARSE_POINTER_QUERY).matches;
+    },
+    // the server can't know; the client corrects it right after hydration
+    () => {
+      return false;
+    },
+  );
+}
+
+function subscribeToPointerQuery(onChange: () => void) {
+  const query = window.matchMedia(COARSE_POINTER_QUERY);
+
+  query.addEventListener("change", onChange);
+
+  return () => {
+    query.removeEventListener("change", onChange);
+  };
+}
+
+const COARSE_POINTER_QUERY = "(pointer: coarse)";
 
 const INK_COLOR = "#000000";
 
