@@ -110,9 +110,11 @@ export const InvoiceClosing = memo(function InvoiceClosing({
   };
 
   return (
-    // on phones, room under the last part so it can be scrolled clear of the bottom dock
+    // On phones the form scrolls in its own box, and the sticky dock (about 160px) can sit
+    // over the box's bottom when the browser's bars change the screen height: room at least
+    // that tall lets the last part, and the "+ QR code" pill, scroll clear of it
     <div
-      className="flex flex-col gap-5 max-lg:pb-16"
+      className="flex flex-col gap-5 max-lg:pb-44"
       data-testid="final-section"
     >
       <TotalsCard

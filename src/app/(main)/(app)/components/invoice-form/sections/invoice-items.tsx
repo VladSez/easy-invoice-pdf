@@ -129,7 +129,10 @@ export const InvoiceItems = memo(function InvoiceItems({
               Item {itemNumber}
             </Legend>
 
-            <div className="-mt-1 mb-1.5 flex justify-end gap-2">
+            <div
+              className="-mt-1 mb-1.5 flex justify-end gap-2"
+              data-item-header={index}
+            >
               <Button
                 variant="outline"
                 size="sm"
@@ -137,8 +140,23 @@ export const InvoiceItems = memo(function InvoiceItems({
                 disabled={hasReachedItemLimit}
                 aria-label={`Duplicate Invoice Item ${itemNumber}`}
                 onClick={() => {
-                  insert(index + 1, getValues(`items.${index}`));
+                  // no focus: focusing the copy's first field scrolls to it and, on a
+                  // phone, opens the keyboard, which pushed the page far past the copy
+                  insert(index + 1, getValues(`items.${index}`), {
+                    shouldFocus: false,
+                  });
                   trackEvent({ event: "duplicate_invoice_item" });
+
+                  // show the copy's header just below the original, scrolling no more
+                  // than that takes
+                  requestAnimationFrame(() => {
+                    document
+                      .querySelector(`[data-item-header="${index + 1}"]`)
+                      ?.scrollIntoView({
+                        block: "nearest",
+                        behavior: "smooth",
+                      });
+                  });
                 }}
               >
                 <Copy className="size-3.5" />
