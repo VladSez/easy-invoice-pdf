@@ -1022,9 +1022,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               />
               <CustomTooltip
                 trigger={
-                  <Label htmlFor="servicePeriodFieldIsVisible">
-                    In PDF
-                  </Label>
+                  <Label htmlFor="servicePeriodFieldIsVisible">In PDF</Label>
                 }
                 content='Show the "Service period" (Service period start and end) field in the PDF'
               />
@@ -1309,9 +1307,7 @@ export const GeneralInformation = memo(function GeneralInformation({
               />
               <CustomTooltip
                 trigger={
-                  <Label htmlFor={`invoiceTypeFieldIsVisible`}>
-                    In PDF
-                  </Label>
+                  <Label htmlFor={`invoiceTypeFieldIsVisible`}>In PDF</Label>
                 }
                 content='Show the "Header Notes" Field in the PDF'
               />
