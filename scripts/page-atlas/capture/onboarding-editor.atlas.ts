@@ -65,7 +65,10 @@ test("preview tab on a phone", async ({ page, atlas }) => {
 
   await atlas.openEditor();
   await page.getByRole("tab", { name: "Preview PDF" }).click();
-  await expect(page.locator("canvas").first()).toBeVisible();
+  // the PDF's canvas, in the open tab: the form's signature pads are canvases too
+  await expect(
+    page.getByRole("tabpanel").locator("canvas").first(),
+  ).toBeVisible();
   await atlas.snap("editor/mobile-preview");
 });
 

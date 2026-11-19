@@ -122,12 +122,18 @@ const APP_STATES = {
   "editor/item-discount": { title: "Item with a discount" },
   "editor/item-discount-error": { title: "Discount above 100%" },
   "editor/item-deleted": { title: "Item removed" },
+  "editor/closing": { title: "Totals, notes, payment and signatures" },
+  "editor/closing-qr": { title: "QR code added" },
+  "editor/signature-drawn": { title: "Signature drawn" },
   "editor/validation-error": { title: "Seller name missing" },
   "editor/validation-fixed": { title: "Seller name filled in again" },
   "editor/link-copied": { title: "Share link copied" },
   "editor/shared": { title: "Opened from a share link" },
   "editor/shared-edited": { title: "Shared invoice edited" },
   "editor/share-blocked-logo": { title: "Sharing blocked by a logo" },
+  "editor/share-blocked-signature": {
+    title: "Sharing blocked by a drawn signature",
+  },
   "editor/share-too-large": { title: "Invoice too large to share" },
   "editor/corrupt-link": { title: "Corrupted share link" },
   "editor/corrupt-link-cleared": { title: "Corrupted link cleared by an edit" },
@@ -406,6 +412,25 @@ export const FLOWS = [
     ],
   },
   {
+    id: "closing",
+    title: "Below the items",
+    area: "items",
+    summary:
+      "The totals, the notes, then the PDF's optional footer parts: payment method, QR code and signatures, each behind a pill until added.",
+    roots: [
+      {
+        state: "editor/closing",
+        next: [
+          { state: "editor/closing-qr", via: "Add QR code" },
+          {
+            state: "editor/signature-drawn",
+            via: "Draw an Issued by signature",
+          },
+        ],
+      },
+    ],
+  },
+  {
     id: "validation",
     title: "Validation errors",
     area: "editor",
@@ -431,7 +456,7 @@ export const FLOWS = [
     title: "Share a link",
     area: "sharing",
     summary:
-      "Get link compresses the invoice into ?data=. Logos never fit in a URL, and URLs over 4096 characters are refused.",
+      "Get link compresses the invoice into ?data=. Logos and drawn signatures never fit in a URL, and URLs over 4096 characters are refused.",
     roots: [
       {
         state: "editor/default",
@@ -450,6 +475,10 @@ export const FLOWS = [
             ],
           },
           { state: "editor/share-blocked-logo", via: "Get link with a logo" },
+          {
+            state: "editor/share-blocked-signature",
+            via: "Get link with a drawn signature",
+          },
           {
             state: "editor/share-too-large",
             via: "Get link with 24 long items",
