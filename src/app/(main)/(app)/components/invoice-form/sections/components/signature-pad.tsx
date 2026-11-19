@@ -87,6 +87,30 @@ export function SignaturePad({
     };
   }, [value]);
 
+  // iOS treats a touch on the pad as a page gesture too: a double tap zooms, a long press
+  // selects and opens the loupe, a pinch zooms. React's touch listeners are passive and
+  // can't stop that, so cancel those gestures with native, non-passive listeners.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+
+    if (!canvas) return;
+
+    const preventPageGesture = (event: Event) => {
+      if (event.cancelable) event.preventDefault();
+    };
+    const events = ["touchstart", "touchmove", "touchend", "gesturestart"];
+
+    for (const type of events) {
+      canvas.addEventListener(type, preventPageGesture, { passive: false });
+    }
+
+    return () => {
+      for (const type of events) {
+        canvas.removeEventListener(type, preventPageGesture);
+      }
+    };
+  }, []);
+
   function addPoints(event: React.PointerEvent<HTMLCanvasElement>) {
     const canvas = event.currentTarget;
     const stroke = strokeRef.current;
@@ -136,7 +160,8 @@ export function SignaturePad({
   return (
     <div
       className={cn(
-        "relative h-[120px] overflow-hidden rounded-lg border bg-white",
+        // never selectable or long-pressable, so drawing can't pick up a selection or callout
+        "relative h-[140px] select-none overflow-hidden rounded-lg border bg-white [-webkit-touch-callout:none] max-md:h-[180px]",
         hasInk
           ? "border-gray-300"
           : "border-dashed border-slate-300 bg-slate-50",
@@ -151,8 +176,18 @@ export function SignaturePad({
         onPointerDown={(event) => {
           if (event.button !== 0 || !inkLayerRef.current) return;
 
+          // a drag that starts here draws; it must not start a text selection
+          event.preventDefault();
+
           const canvas = event.currentTarget;
-          canvas.setPointerCapture(event.pointerId);
+
+          // keeps the stroke going past the pad's edge; a pointer already gone (iOS can
+          // cancel a touch mid-gesture) can't be captured, and the stroke still draws
+          try {
+            canvas.setPointerCapture(event.pointerId);
+          } catch {
+            // nothing to capture
+          }
 
           strokeRef.current = [];
           simulatePressureRef.current = event.pointerType !== "pen";

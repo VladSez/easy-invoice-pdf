@@ -110,7 +110,11 @@ export const InvoiceClosing = memo(function InvoiceClosing({
   };
 
   return (
-    <div className="flex flex-col gap-5" data-testid="final-section">
+    // on phones, room under the last part so it can be scrolled clear of the bottom dock
+    <div
+      className="flex flex-col gap-5 max-lg:pb-16"
+      data-testid="final-section"
+    >
       <TotalsCard
         control={control}
         currency={currency}
