@@ -456,21 +456,19 @@ test.describe("Stripe Invoice Template", () => {
     const finalSection = page.getByTestId("final-section");
 
     /** TEST PERSON AUTHORIZED TO RECEIVE FIELD TO BE VISIBLE */
-    const personAuthorizedToReceiveFieldset = finalSection.getByRole("group", {
-      name: "Person Authorized to Receive",
+    const personAuthorizedToReceiveGroup = finalSection.getByRole("group", {
+      name: "Received by",
     });
 
-    await expect(personAuthorizedToReceiveFieldset).toBeVisible();
+    await expect(personAuthorizedToReceiveGroup).toBeVisible();
 
     const personAuthorizedToReceiveNameInput =
-      personAuthorizedToReceiveFieldset.getByRole("textbox", {
-        name: "Name",
-      });
+      personAuthorizedToReceiveGroup.getByRole("textbox");
 
     await expect(personAuthorizedToReceiveNameInput).toBeVisible();
 
     const personAuthorizedToReceiveSwitch =
-      personAuthorizedToReceiveFieldset.getByRole("switch", {
+      personAuthorizedToReceiveGroup.getByRole("switch", {
         name: "Show Person Authorized to Receive in PDF",
       });
 
@@ -479,21 +477,19 @@ test.describe("Stripe Invoice Template", () => {
     await expect(personAuthorizedToReceiveSwitch).toBeChecked();
 
     /** TEST PERSON AUTHORIZED TO ISSUE FIELD TO BE VISIBLE */
-    const personAuthorizedToIssueFieldset = finalSection.getByRole("group", {
-      name: "Person Authorized to Issue",
+    const personAuthorizedToIssueGroup = finalSection.getByRole("group", {
+      name: "Issued by",
     });
 
-    await expect(personAuthorizedToIssueFieldset).toBeVisible();
+    await expect(personAuthorizedToIssueGroup).toBeVisible();
 
     const personAuthorizedToIssueNameInput =
-      personAuthorizedToIssueFieldset.getByRole("textbox", {
-        name: "Name",
-      });
+      personAuthorizedToIssueGroup.getByRole("textbox");
 
     await expect(personAuthorizedToIssueNameInput).toBeVisible();
 
     const personAuthorizedToIssueSwitch =
-      personAuthorizedToIssueFieldset.getByRole("switch", {
+      personAuthorizedToIssueGroup.getByRole("switch", {
         name: "Show Person Authorized to Issue in PDF",
       });
 
@@ -510,21 +506,18 @@ test.describe("Stripe Invoice Template", () => {
 
     /** VERIFY SIGNATURE FIELDS ARE NOW HIDDEN */
 
-    const newPersonAuthorizedToReceiveFieldset = finalSection.getByRole(
-      "group",
-      {
-        name: "Person Authorized to Receive",
-      },
-    );
-
-    await expect(newPersonAuthorizedToReceiveFieldset).toBeHidden();
-
-    /** VERIFY PERSON AUTHORIZED TO ISSUE FIELD TO BE HIDDEN */
-    const newPersonAuthorizedToIssueFieldset = finalSection.getByRole("group", {
-      name: "Person Authorized to Issue",
+    const newPersonAuthorizedToReceiveGroup = finalSection.getByRole("group", {
+      name: "Received by",
     });
 
-    await expect(newPersonAuthorizedToIssueFieldset).toBeHidden();
+    await expect(newPersonAuthorizedToReceiveGroup).toBeHidden();
+
+    /** VERIFY PERSON AUTHORIZED TO ISSUE FIELD TO BE HIDDEN */
+    const newPersonAuthorizedToIssueGroup = finalSection.getByRole("group", {
+      name: "Issued by",
+    });
+
+    await expect(newPersonAuthorizedToIssueGroup).toBeHidden();
   });
 
   test("Items and pricing fields and switches only appear for default template (except for Tax Settings field)", async ({

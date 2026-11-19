@@ -112,17 +112,17 @@ test.describe("Default Invoice Template", () => {
 
     // Check that the total is correct, written in the Polish number format the language
     // switch selected (the grouping space is a no-break one, which `\s` matches)
-    const totalTextbox = page.getByRole("textbox", { name: "Total" });
-    await expect(totalTextbox).toHaveValue(/^3\s300,00$/);
+    const totalText = finalSection.getByTestId("total");
+    await expect(totalText).toHaveText(/^3\s300,00\D*$/);
 
     /** TEST PERSON AUTHORIZED TO RECEIVE FIELD */
-    const personAuthorizedToReceiveFieldset = finalSection.getByRole("group", {
-      name: "Person Authorized to Receive",
+    const personAuthorizedToReceiveGroup = finalSection.getByRole("group", {
+      name: "Received by",
     });
 
     // Verify that "Show Person Authorized to Receive in PDF" switch is on by default
     const showPersonAuthorizedToReceiveSwitch =
-      personAuthorizedToReceiveFieldset.getByRole("switch", {
+      personAuthorizedToReceiveGroup.getByRole("switch", {
         name: "Show Person Authorized to Receive in PDF",
       });
     await expect(showPersonAuthorizedToReceiveSwitch).toBeVisible();
@@ -130,19 +130,17 @@ test.describe("Default Invoice Template", () => {
     await expect(showPersonAuthorizedToReceiveSwitch).toBeChecked();
 
     const personAuthorizedToReceiveNameInput =
-      personAuthorizedToReceiveFieldset.getByRole("textbox", {
-        name: "Name",
-      });
+      personAuthorizedToReceiveGroup.getByRole("textbox");
 
     await personAuthorizedToReceiveNameInput.fill("John Doe");
 
     /** TEST PERSON AUTHORIZED TO ISSUE FIELD */
-    const personAuthorizedToIssueFieldset = finalSection.getByRole("group", {
-      name: "Person Authorized to Issue",
+    const personAuthorizedToIssueGroup = finalSection.getByRole("group", {
+      name: "Issued by",
     });
 
     const showPersonAuthorizedToIssueSwitch =
-      personAuthorizedToIssueFieldset.getByRole("switch", {
+      personAuthorizedToIssueGroup.getByRole("switch", {
         name: "Show Person Authorized to Issue in PDF",
       });
     await expect(showPersonAuthorizedToIssueSwitch).toBeVisible();
@@ -150,9 +148,7 @@ test.describe("Default Invoice Template", () => {
     await expect(showPersonAuthorizedToIssueSwitch).toBeChecked();
 
     const personAuthorizedToIssueNameInput =
-      personAuthorizedToIssueFieldset.getByRole("textbox", {
-        name: "Name",
-      });
+      personAuthorizedToIssueGroup.getByRole("textbox");
     await personAuthorizedToIssueNameInput.fill("Adam Smith");
 
     await expectPdfScreenshot(page, {

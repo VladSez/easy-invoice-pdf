@@ -4,6 +4,7 @@ import { type InvoiceData, PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { test, expect } from "./utils/extended-playwright-test";
+import { invoiceTotalText } from "./utils/invoice-total";
 import {
   expectPdfScreenshot,
   waitForPdfRegeneration,
@@ -51,10 +52,8 @@ test.describe("Item discounts", () => {
 
     // 11,070.00 + 4,400.00
     await expect(
-      page
-        .getByTestId("final-section")
-        .getByRole("textbox", { name: "Total", exact: true }),
-    ).toHaveValue("15,470.00");
+      page.getByTestId("final-section").getByTestId("total"),
+    ).toHaveText(invoiceTotalText("15,470.00"));
 
     const storedData = (await page.evaluate((key) => {
       return localStorage.getItem(key);

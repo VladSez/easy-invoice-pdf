@@ -2,6 +2,8 @@ import { expect, test } from "@playwright/test";
 
 import type { BuyerData, SellerData } from "@/app/schema";
 
+import { invoiceTotalText } from "./utils/invoice-total";
+
 const TEST_SELLER_DATA = {
   name: "TEST SELLER COMPANY",
   address: "123 Test St",
@@ -151,27 +153,25 @@ test.describe("Generate Invoice Link (Get link)", () => {
         .fill("23");
 
       // check total
-      const totalField = finalSection.getByRole("textbox", {
-        name: "Total",
-        exact: true,
-      });
-      await expect(totalField).toHaveValue("615.00");
+      const totalField = finalSection.getByTestId("total");
+      await expect(totalField).toHaveText(invoiceTotalText("615.00"));
 
-      // check QR code data field
-      const qrCodeFieldset = finalSection.getByRole("group", {
-        name: "QR Code",
+      // a new invoice keeps the QR code behind its pill
+      await finalSection.getByRole("button", { name: "QR code" }).click();
+      const qrCodeFieldset = finalSection.getByRole("region", {
+        name: "QR code",
       });
 
       // check QR code data field
       const qrCodeDataField = qrCodeFieldset.getByRole("textbox", {
-        name: "Data",
+        name: "QR code link or text",
       });
 
       await qrCodeDataField.fill("https://easyinvoicepdf.com");
 
       // check QR code description field
       const qrCodeDescriptionField = qrCodeFieldset.getByRole("textbox", {
-        name: "Description (optional)",
+        name: "QR code caption",
       });
 
       await qrCodeDescriptionField.fill("QR Code TEST Description");
@@ -311,16 +311,13 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
       const newFinalSection = newPage.getByTestId(`final-section`);
 
-      await expect(
-        newFinalSection.getByRole("textbox", {
-          name: "Total",
-          exact: true,
-        }),
-      ).toHaveValue("615.00");
+      await expect(newFinalSection.getByTestId("total")).toHaveText(
+        invoiceTotalText("615.00"),
+      );
 
       // Verify QR code data field
       const newQrCodeDataField = newPageFinalSection.getByRole("textbox", {
-        name: "Data",
+        name: "QR code link or text",
       });
       await expect(newQrCodeDataField).toHaveValue(
         "https://easyinvoicepdf.com",
@@ -330,7 +327,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
       const newQrCodeDescriptionField = newPageFinalSection.getByRole(
         "textbox",
         {
-          name: "Description (optional)",
+          name: "QR code caption",
         },
       );
 
@@ -951,13 +948,14 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
     const finalSection = page.getByTestId("final-section");
 
-    // Add QR code data to increase data size
-    const qrCodeFieldset = finalSection.getByRole("group", {
-      name: "QR Code",
+    // Add QR code data to increase data size (a new invoice keeps it behind its pill)
+    await finalSection.getByRole("button", { name: "QR code" }).click();
+    const qrCodeFieldset = finalSection.getByRole("region", {
+      name: "QR code",
     });
 
     const qrCodeDataField = qrCodeFieldset.getByRole("textbox", {
-      name: "Data",
+      name: "QR code link or text",
     });
 
     await qrCodeDataField.fill(
@@ -965,7 +963,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     );
 
     const qrCodeDescriptionField = qrCodeFieldset.getByRole("textbox", {
-      name: "Description (optional)",
+      name: "QR code caption",
     });
 
     await qrCodeDescriptionField.fill(

@@ -17,6 +17,7 @@ import { buildInvoiceAppUrl } from "@/utils/invoice-app-url";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { expect, test } from "../utils/extended-playwright-test";
+import { invoiceTotalText } from "../utils/invoice-total";
 import { expectPdfScreenshot } from "../utils/pdf-download";
 
 const TEMPLATES = [
@@ -211,9 +212,9 @@ test.describe("Invoice Template PDF languages", () => {
           .fill(INVOICE_ITEM.netPrice);
 
         // Check that the total is correct, written in the selected language's number format
-        await expect(page.getByRole("textbox", { name: "Total" })).toHaveValue(
-          expectedTotal(language),
-        );
+        await expect(
+          page.getByTestId("final-section").getByTestId("total"),
+        ).toHaveText(invoiceTotalText(expectedTotal(language)));
 
         const { suggestedFilename } = await expectPdfScreenshot(page, {
           downloadDir,

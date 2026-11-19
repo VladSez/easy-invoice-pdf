@@ -424,7 +424,11 @@ function SignerField({ control, signer, error }: SignerFieldProps) {
   const isVisible = useWatch({ control, name: signer.visibilityField });
 
   return (
-    <div className={cn("min-w-0", hiddenInPdfClassName(!isVisible))}>
+    <div
+      role="group"
+      aria-label={signer.label}
+      className={cn("min-w-0", hiddenInPdfClassName(!isVisible))}
+    >
       <div className="mb-2.5 flex min-h-5 items-center justify-between gap-2">
         <Label htmlFor={signer.nameField} className="min-w-0 truncate">
           {signer.label}

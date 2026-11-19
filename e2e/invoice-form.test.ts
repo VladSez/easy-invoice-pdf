@@ -26,6 +26,7 @@ import {
 } from "@/config";
 
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
+import { invoiceTotalText } from "./utils/invoice-total";
 import { expectYouTubeEmbedToShow } from "./utils/youtube-embed";
 
 test.describe("Invoice Generator Page", () => {
@@ -898,9 +899,9 @@ test.describe("Invoice Generator Page", () => {
       .fill("5000");
 
     // Verify total reflects Item 1 only (1 * 5000 = 5000, vat is "NP")
-    await expect(
-      finalSection.getByRole("textbox", { name: "Total", exact: true }),
-    ).toHaveValue("5,000.00");
+    await expect(finalSection.getByTestId("total")).toHaveText(
+      invoiceTotalText("5,000.00"),
+    );
 
     // Fill in amount and net price for Item 2 (3 * 10000 = 30000)
     await invoiceItemsSection
@@ -916,9 +917,9 @@ test.describe("Invoice Generator Page", () => {
       .fill("10000");
 
     // Verify total is updated (5000 + 3*10000 = 35000, vat is "NP" so no tax)
-    await expect(
-      finalSection.getByRole("textbox", { name: "Total", exact: true }),
-    ).toHaveValue("35,000.00");
+    await expect(finalSection.getByTestId("total")).toHaveText(
+      invoiceTotalText("35,000.00"),
+    );
 
     // Click delete button to open confirmation dialog
     await invoiceItemsSection
@@ -997,9 +998,9 @@ test.describe("Invoice Generator Page", () => {
     ).toBeHidden();
 
     // Verify total reverts to Item 1 only after deletion (5000)
-    await expect(
-      finalSection.getByRole("textbox", { name: "Total", exact: true }),
-    ).toHaveValue("5,000.00");
+    await expect(finalSection.getByTestId("total")).toHaveText(
+      invoiceTotalText("5,000.00"),
+    );
   });
 
   test("calculates totals correctly", async ({ page }) => {
@@ -1085,12 +1086,9 @@ test.describe("Invoice Generator Page", () => {
     ).toContainText("1,000.00");
 
     // Grand total = 1230 + 5000 + 11000 = 17,230.00
-    await expect(
-      finalSection.getByRole("textbox", {
-        name: "Total",
-        exact: true,
-      }),
-    ).toHaveValue("17,230.00");
+    await expect(finalSection.getByTestId("total")).toHaveText(
+      invoiceTotalText("17,230.00"),
+    );
   });
 
   test("handles form validation", async ({ page }) => {
@@ -1289,12 +1287,9 @@ test.describe("Invoice Generator Page", () => {
     await expect(netAmountFormElement).toHaveText("201.50 USD");
 
     const finalSection = page.getByTestId(`final-section`);
-    await expect(
-      finalSection.getByRole("textbox", {
-        name: "Total",
-        exact: true,
-      }),
-    ).toHaveValue("201.50");
+    await expect(finalSection.getByTestId("total")).toHaveText(
+      invoiceTotalText("201.50"),
+    );
   });
 
   test("accordion items are visible, collapsible and saved in the local storage", async ({
@@ -1680,12 +1675,9 @@ test.describe("Invoice Generator Page", () => {
         invoiceItemsSection.getByTestId(/^itemPreTaxAmount\d+$/),
       ).toContainText(testCase.expected.total);
 
-      await expect(
-        page.getByRole("textbox", {
-          name: "Total",
-          exact: true,
-        }),
-      ).toHaveValue(testCase.expected.total);
+      await expect(page.getByTestId("total")).toHaveText(
+        invoiceTotalText(testCase.expected.total),
+      );
     }
   });
 
