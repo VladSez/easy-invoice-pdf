@@ -178,8 +178,9 @@ function OpenItemDiscountFields({
         </Button>
       </div>
 
+      {/* side by side on wider screens; on phones each takes the card's full width */}
       <div className="flex flex-wrap items-end gap-2.5">
-        <div className="shrink-0">
+        <div className="shrink-0 max-md:w-full">
           <span
             id={typeLabelId}
             className="mb-1 block text-xs font-medium text-slate-700"
@@ -214,7 +215,7 @@ function OpenItemDiscountFields({
                 <div
                   role="radiogroup"
                   aria-labelledby={typeLabelId}
-                  className="inline-flex h-[34px] shrink-0 overflow-hidden rounded-lg border border-gray-300 bg-white max-md:h-11"
+                  className="inline-flex h-[34px] shrink-0 overflow-hidden rounded-lg border border-gray-300 bg-white max-md:flex max-md:h-11 max-md:w-full"
                 >
                   {DISCOUNT_TYPE_OPTIONS.map((option, optionIndex) => {
                     const isSelected = field.value === option.value;
@@ -257,7 +258,7 @@ function OpenItemDiscountFields({
                         }}
                         className={cn(
                           // no transition: a segmented control should switch instantly
-                          "h-full whitespace-nowrap px-2.5 text-[13px]",
+                          "h-full whitespace-nowrap px-2.5 text-[13px] max-md:flex-1",
                           optionIndex > 0 && "border-l border-gray-200",
                           isSelected
                             ? "bg-slate-900 text-white"
@@ -276,7 +277,7 @@ function OpenItemDiscountFields({
           />
         </div>
 
-        <div className="w-24 shrink-0">
+        <div className="w-24 shrink-0 max-md:w-full">
           <Label
             htmlFor={`itemDiscountValue${index}`}
             className="mb-1 block text-xs text-slate-700"

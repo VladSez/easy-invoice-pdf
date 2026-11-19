@@ -178,7 +178,8 @@ function OpenItemCustomColumnField({
       data-testid={`itemCustomColumn${index}`}
     >
       <div className="-my-1 -me-1.5 flex items-center justify-between gap-2">
-        <span id={headingId} className="min-w-0 truncate font-semibold">
+        {/* wraps rather than cutting off: the switch and Remove leave it little room on phones */}
+        <span id={headingId} className="min-w-0 break-words font-semibold">
           {title}
         </span>
         <div className="flex items-center gap-1">
