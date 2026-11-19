@@ -8,23 +8,24 @@ import { InvoiceBody } from "@/app/(main)/(app)/components/invoice-templates/inv
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
 import { getInvoiceDefaultNumberValue } from "@/app/constants";
 import { type InvoiceData, type SupportedLanguages } from "@/app/schema";
-import { INVOICE_PDF_FONTS } from "@/config";
 import { env } from "@/env";
 
 import { DEFAULT_INVOICE_TIME_ZONE, nowInTimeZone } from "./invoice-time-zone";
+import { SERVER_INVOICE_PDF_FONTS } from "./server-invoice-pdf-fonts";
 
 // Open sans seems to be working fine with EN and PL
 const fontFamily = "Open Sans";
 
-// we need to duplicate font registration from /invoice-pdf-template/index.tsx due to some technical limitations, otherwise fonts are not applied in the PDF
+// we need to duplicate font registration from /invoice-pdf-template/index.tsx due to some technical limitations, otherwise fonts are not applied in the PDF.
+// Registered by file path, not URL, so a cold start reads them from disk instead of the network.
 Font.register({
   family: fontFamily,
   fonts: [
     {
-      src: INVOICE_PDF_FONTS.DEFAULT_TEMPLATE.OPEN_SANS_REGULAR,
+      src: SERVER_INVOICE_PDF_FONTS.DEFAULT_TEMPLATE.OPEN_SANS_REGULAR,
     },
     {
-      src: INVOICE_PDF_FONTS.DEFAULT_TEMPLATE.OPEN_SANS_700,
+      src: SERVER_INVOICE_PDF_FONTS.DEFAULT_TEMPLATE.OPEN_SANS_700,
       fontWeight: 700,
     },
   ],

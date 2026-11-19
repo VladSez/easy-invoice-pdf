@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { type ReactNode, Suspense } from "react";
+import { preconnect } from "react-dom";
 
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { Footer } from "@/app/(components)/footer";
@@ -43,6 +44,12 @@ export async function InvoiceAppPage({
   /** The template the route opens with. */
   template: SupportedTemplates;
 }) {
+  // The PDF fonts (`INVOICE_PDF_FONTS`) load from the static domain on the first PDF render.
+  // Opening that connection while the page is still loading takes the DNS lookup and TLS
+  // handshake off that render. `crossOrigin` because react-pdf fetches them with CORS, and
+  // a preconnect is only reused by requests in the same credentials mode.
+  preconnect(STATIC_ASSETS_URL, { crossOrigin: "anonymous" });
+
   const isIndexableEnvironment = getIsIndexableEnvironment();
 
   const githubStarsCount = await fetchGithubStars();
