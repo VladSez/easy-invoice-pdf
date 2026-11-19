@@ -123,16 +123,14 @@ export const InvoiceItems = memo(function InvoiceItems({
         return (
           <fieldset
             key={field.id}
+            data-item-card={index}
             className="mb-4 flex flex-col gap-5 rounded-xl border px-4 pb-4 pt-1 shadow-sm"
           >
             <Legend className="px-1 text-base font-semibold text-gray-900">
               Item {itemNumber}
             </Legend>
 
-            <div
-              className="-mt-1 mb-1.5 flex justify-end gap-2"
-              data-item-header={index}
-            >
+            <div className="-mt-1 mb-1.5 flex justify-end gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -147,15 +145,9 @@ export const InvoiceItems = memo(function InvoiceItems({
                   });
                   trackEvent({ event: "duplicate_invoice_item" });
 
-                  // show the copy's header just below the original, scrolling no more
-                  // than that takes
+                  // bring the copy to the top of the form's scroll box, so it's in view
                   requestAnimationFrame(() => {
-                    document
-                      .querySelector(`[data-item-header="${index + 1}"]`)
-                      ?.scrollIntoView({
-                        block: "nearest",
-                        behavior: "smooth",
-                      });
+                    scrollItemCardIntoView(index + 1);
                   });
                 }}
               >
@@ -855,6 +847,56 @@ const NEW_INVOICE_ITEM = {
   typeOfGTU: "",
   typeOfGTUFieldIsVisible: true,
 } as const satisfies InvoiceItemData;
+
+/** Space kept above an item card scrolled to the top, for the legend on its border. */
+const ITEM_CARD_SCROLL_GAP = 12;
+
+/**
+ * Scrolls an item card to just below the top of whatever scrolls it: the form's own box
+ * on phones, its column on desktop. Only that box moves, so the page header and the phone
+ * dock stay where they are.
+ */
+function scrollItemCardIntoView(index: number) {
+  const card = document.querySelector<HTMLElement>(
+    `[data-item-card="${index}"]`,
+  );
+
+  if (!card) return;
+
+  const scroller = getScrollParent(card);
+  const isPage = scroller === document.scrollingElement;
+  const scrollerTop = isPage ? 0 : scroller.getBoundingClientRect().top;
+  const top =
+    card.getBoundingClientRect().top -
+    scrollerTop +
+    scroller.scrollTop -
+    ITEM_CARD_SCROLL_GAP;
+
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
+  scroller.scrollTo({
+    top: Math.max(0, top),
+    behavior: prefersReducedMotion ? "auto" : "smooth",
+  });
+}
+
+/** The nearest ancestor that scrolls vertically, or the page. */
+function getScrollParent(element: HTMLElement): Element {
+  for (let node = element.parentElement; node; node = node.parentElement) {
+    const { overflowY } = getComputedStyle(node);
+
+    if (
+      (overflowY === "auto" || overflowY === "scroll") &&
+      node.scrollHeight > node.clientHeight
+    ) {
+      return node;
+    }
+  }
+
+  return document.scrollingElement ?? document.documentElement;
+}
 
 interface InvoiceItemsSettingsProps {
   control: Control<InvoiceData>;
