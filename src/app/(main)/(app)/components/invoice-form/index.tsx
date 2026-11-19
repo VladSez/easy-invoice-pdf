@@ -456,6 +456,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               template={template}
               taxLabelText={taxLabelText}
               numberFormatLocale={numberFormatLocale}
+              language={language}
               getValues={getValues}
               setValue={setValue}
             />

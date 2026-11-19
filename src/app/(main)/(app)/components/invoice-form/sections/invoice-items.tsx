@@ -25,10 +25,12 @@ import { ItemAmountsCard } from "@/app/(main)/(app)/components/invoice-form/sect
 import { ItemDiscountFields } from "@/app/(main)/(app)/components/invoice-form/sections/components/item-discount-fields";
 import { ItemGtuField } from "@/app/(main)/(app)/components/invoice-form/sections/components/item-gtu-field";
 import { PdfColumnSwitch } from "@/app/(main)/(app)/components/invoice-form/sections/components/pdf-column-switch";
+import { formatMoneyForTemplate } from "@/app/(main)/(app)/utils/format-money-for-template";
 import {
   type InvoiceData,
   type InvoiceItemData,
   type SupportedCurrencies,
+  type SupportedLanguages,
   type SupportedNumberFormatLocale,
   MAX_INVOICE_ITEMS,
 } from "@/app/schema";
@@ -43,6 +45,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { trackEvent } from "@/lib/analytics/track-event";
 import { cn } from "@/lib/utils";
+import {
+  getAmountInWords,
+  getNumberFractionalPart,
+} from "@/utils/invoice.utils";
 
 export const InvoiceItems = memo(function InvoiceItems({
   control,
@@ -55,6 +61,7 @@ export const InvoiceItems = memo(function InvoiceItems({
   template,
   taxLabelText,
   numberFormatLocale,
+  language,
   getValues,
   setValue,
 }: InvoiceItemsSettingsProps) {
@@ -312,19 +319,30 @@ export const InvoiceItems = memo(function InvoiceItems({
                   control={control}
                   render={({ field }) => {
                     return (
-                      <MoneyInput
-                        {...field}
-                        id={`itemNetPrice${index}`}
-                        currency={currency}
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        className={cn(
-                          "h-9 w-full max-md:text-base",
-                          inputErrorClassName(!!itemErrors?.netPrice),
+                      <>
+                        <MoneyInput
+                          {...field}
+                          id={`itemNetPrice${index}`}
+                          currency={currency}
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          className={cn(
+                            "h-9 w-full max-md:text-base",
+                            inputErrorClassName(!!itemErrors?.netPrice),
+                          )}
+                          dataTestId={`itemNetPrice${index}`}
+                        />
+                        {itemErrors?.netPrice ? null : (
+                          <UnitPricePreview
+                            value={field.value}
+                            currency={currency}
+                            numberFormatLocale={numberFormatLocale}
+                            template={template}
+                            language={language}
+                          />
                         )}
-                        dataTestId={`itemNetPrice${index}`}
-                      />
+                      </>
                     );
                   }}
                 />
@@ -852,6 +870,35 @@ const NEW_INVOICE_ITEM = {
   typeOfGTUFieldIsVisible: true,
 } as const satisfies InvoiceItemData;
 
+/**
+ * The unit price as the PDF writes it, and in words, under the field (as on `main`): a
+ * number input shows long prices ungrouped, so this is where they're easy to check.
+ */
+function UnitPricePreview({
+  value,
+  currency,
+  numberFormatLocale,
+  template,
+  language,
+}: UnitPricePreviewProps) {
+  // a number input gives back a string while typing
+  const amount = Number(value) || 0;
+
+  return (
+    <InputHelperMessage>
+      Preview:{" "}
+      {formatMoneyForTemplate({
+        amount,
+        currency,
+        numberFormatLocale,
+        template,
+      })}{" "}
+      ({getAmountInWords({ amount, language })} {currency}{" "}
+      {getNumberFractionalPart(amount)}/100)
+    </InputHelperMessage>
+  );
+}
+
 /** Space kept above an item card scrolled to the top, for the legend on its border. */
 const ITEM_CARD_SCROLL_GAP = 12;
 
@@ -915,8 +962,19 @@ interface InvoiceItemsSettingsProps {
   taxLabelText: string;
   /** The invoice's number format, already resolved against its language. */
   numberFormatLocale: SupportedNumberFormatLocale;
+  /** The PDF's language, for the unit price written out in words. */
+  language: SupportedLanguages;
   getValues: UseFormGetValues<InvoiceData>;
   setValue: UseFormSetValue<InvoiceData>;
+}
+
+interface UnitPricePreviewProps {
+  /** The field's value: a number, or the string a number input gives back. */
+  value: unknown;
+  currency: SupportedCurrencies;
+  numberFormatLocale: SupportedNumberFormatLocale;
+  template: InvoiceData["template"];
+  language: SupportedLanguages;
 }
 
 interface FieldHeaderProps {

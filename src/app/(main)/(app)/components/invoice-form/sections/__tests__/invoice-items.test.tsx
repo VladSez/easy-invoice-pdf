@@ -120,6 +120,7 @@ function InvoiceItemsTestHarness({
         template={template}
         taxLabelText="VAT"
         numberFormatLocale={numberFormatLocale}
+        language="en"
         getValues={getValues}
         setValue={setValue}
       />
@@ -520,6 +521,31 @@ describe("InvoiceItems with several invoice items", () => {
 function getAmountText(testId: string) {
   return screen.getByTestId(testId).textContent?.replaceAll("\u00A0", " ");
 }
+
+describe("InvoiceItems unit price preview", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("writes the price as the PDF does, and in words, under the field", () => {
+    renderInvoiceItems({ itemCount: 1, itemOverrides: { netPrice: 12_345.5 } });
+
+    const preview = screen.getByText(/^Preview:/);
+
+    expect(preview).toHaveTextContent(/12,345\.50 EUR/);
+    expect(preview).toHaveTextContent(/EUR 50\/100\)$/);
+  });
+
+  it("follows the invoice's number format", () => {
+    renderInvoiceItems({
+      itemCount: 1,
+      numberFormatLocale: "de",
+      itemOverrides: { netPrice: 12_345.5 },
+    });
+
+    expect(screen.getByText(/^Preview:/)).toHaveTextContent(/12\.345,50 EUR/);
+  });
+});
 
 describe("InvoiceItems duplicate", () => {
   beforeEach(() => {
