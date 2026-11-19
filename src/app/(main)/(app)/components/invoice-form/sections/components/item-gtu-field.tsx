@@ -13,7 +13,10 @@ import {
   hiddenInPdfClassName,
   inputErrorClassName,
 } from "@/app/(main)/(app)/components/invoice-form/common";
-import { AddPillButton } from "@/app/(main)/(app)/components/invoice-form/sections/components/add-pill-button";
+import {
+  AddPillButton,
+  takeOpenOrder,
+} from "@/app/(main)/(app)/components/invoice-form/sections/components/add-pill-button";
 import type { InvoiceData } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +41,8 @@ export function ItemGtuField({
   const [isOpen, setIsOpen] = useState(() => {
     return Boolean(getValues(`items.${index}.typeOfGTU`));
   });
+  // where the card sits among the item's open cards, see `takeOpenOrder`
+  const [openOrder, setOpenOrder] = useState(0);
   const pillRef = useRef<HTMLButtonElement>(null);
   const inputId = `itemTypeOfGTU${index}`;
 
@@ -48,6 +53,7 @@ export function ItemGtuField({
         testId={`addItemGtu${index}`}
         onClick={() => {
           setIsOpen(true);
+          setOpenOrder(takeOpenOrder());
           setValue("items.0.typeOfGTUFieldIsVisible", true, {
             shouldDirty: true,
           });
@@ -71,6 +77,7 @@ export function ItemGtuField({
       errors={errors}
       setValue={setValue}
       inputId={inputId}
+      openOrder={openOrder}
       onRemove={() => {
         setValue(`items.${index}.typeOfGTU`, "", {
           shouldDirty: true,
@@ -109,6 +116,7 @@ function OpenItemGtuField({
   errors,
   setValue,
   inputId,
+  openOrder,
   onRemove,
 }: OpenItemGtuFieldProps) {
   const switchId = useId();
@@ -130,6 +138,7 @@ function OpenItemGtuField({
         "flex w-full flex-col gap-2.5 rounded-lg border border-gray-200 bg-white p-3",
         hiddenInPdfClassName(!isColumnVisible),
       )}
+      style={{ order: openOrder }}
       data-testid={`itemGtu${index}`}
     >
       <div className="-my-1 -me-1.5 flex items-center justify-between gap-2">
@@ -208,6 +217,8 @@ interface ItemGtuFieldProps {
 interface OpenItemGtuFieldProps extends Omit<ItemGtuFieldProps, "getValues"> {
   /** The code input's id, focused when the card opens. */
   inputId: string;
+  /** The card's CSS `order` among the item's open cards, from `takeOpenOrder`. */
+  openOrder: number;
   /** Clears the code and collapses the card. */
   onRemove: () => void;
 }

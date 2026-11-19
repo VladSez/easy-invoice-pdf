@@ -157,6 +157,20 @@ describe("InvoiceClosing", () => {
     });
   });
 
+  it("adds a part after the ones already open, where its pill was", async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+
+    await user.click(getPill("QR code"));
+
+    const order = screen.getAllByRole("region").map((region) => {
+      return region.getAttribute("aria-label");
+    });
+
+    // a new invoice opens payment and signatures in PDF order; the QR code comes last
+    expect(order).toEqual(["Payment method", "Signatures", "QR code"]);
+  });
+
   it("removes the payment method: clears it, hides it and brings back its pill", async () => {
     const user = userEvent.setup();
     render(<Harness />);

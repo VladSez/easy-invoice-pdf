@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { Fragment, memo, useState } from "react";
 import {
   type Control,
   Controller,
@@ -47,38 +47,41 @@ export const InvoiceClosing = memo(function InvoiceClosing({
 
   // A part starts open when the PDF already prints it, so a saved invoice looks the same
   // here as in its PDF: the payment method and signature lines print by default, a QR
-  // code only once it has data.
-  const [openParts, setOpenParts] = useState<Record<ClosingPart, boolean>>(
-    () => {
-      const data = getValues();
+  // code only once it has data. Those start in PDF order; a part added later goes after
+  // the ones already open, so it appears below them, where the pill was.
+  const [openOrder, setOpenOrder] = useState<ClosingPart[]>(() => {
+    const data = getValues();
+    const startsOpen: Record<ClosingPart, boolean> = {
+      payment: data.paymentMethodFieldIsVisible || Boolean(data.paymentMethod),
+      qr: Boolean(data.qrCodeData),
+      signatures:
+        data.personAuthorizedToReceiveFieldIsVisible ||
+        data.personAuthorizedToIssueFieldIsVisible ||
+        Boolean(data.personAuthorizedToReceiveName) ||
+        Boolean(data.personAuthorizedToIssueName) ||
+        Boolean(data.personAuthorizedToReceiveSignature) ||
+        Boolean(data.personAuthorizedToIssueSignature),
+    };
 
-      return {
-        payment:
-          data.paymentMethodFieldIsVisible || Boolean(data.paymentMethod),
-        qr: Boolean(data.qrCodeData),
-        signatures:
-          data.personAuthorizedToReceiveFieldIsVisible ||
-          data.personAuthorizedToIssueFieldIsVisible ||
-          Boolean(data.personAuthorizedToReceiveName) ||
-          Boolean(data.personAuthorizedToIssueName) ||
-          Boolean(data.personAuthorizedToReceiveSignature) ||
-          Boolean(data.personAuthorizedToIssueSignature),
-      };
-    },
-  );
-
-  // the Stripe template prints no payment method and no signature lines
-  const availableParts = CLOSING_PARTS.filter((part) => {
-    return isDefaultTemplate || part.key === "qr";
+    return CLOSING_PARTS.map((part) => {
+      return part.key;
+    }).filter((part) => {
+      return startsOpen[part];
+    });
   });
 
-  const closedParts = availableParts.filter((part) => {
-    return !openParts[part.key];
+  // the Stripe template prints no payment method and no signature lines
+  const isAvailable = (part: ClosingPart) => {
+    return isDefaultTemplate || part === "qr";
+  };
+
+  const closedParts = CLOSING_PARTS.filter((part) => {
+    return isAvailable(part.key) && !openOrder.includes(part.key);
   });
 
   const openPart = (part: ClosingPart) => {
-    setOpenParts((current) => {
-      return { ...current, [part]: true };
+    setOpenOrder((current) => {
+      return current.includes(part) ? current : [...current, part];
     });
 
     PART_ON_ADD[part](setValue);
@@ -93,8 +96,10 @@ export const InvoiceClosing = memo(function InvoiceClosing({
   };
 
   const removePart = (part: ClosingPart) => {
-    setOpenParts((current) => {
-      return { ...current, [part]: false };
+    setOpenOrder((current) => {
+      return current.filter((openPart) => {
+        return openPart !== part;
+      });
     });
 
     PART_ON_REMOVE[part](setValue);
@@ -109,26 +114,10 @@ export const InvoiceClosing = memo(function InvoiceClosing({
     });
   };
 
-  return (
-    // On phones the form scrolls in its own box, and the sticky dock (about 160px) can sit
-    // over the box's bottom when the browser's bars change the screen height: room at least
-    // that tall lets the last part, and the "+ QR code" pill, scroll clear of it
-    <div
-      className="flex flex-col gap-5 max-lg:pb-44"
-      data-testid="final-section"
-    >
-      <TotalsCard
-        control={control}
-        currency={currency}
-        template={template}
-        numberFormatLocale={numberFormatLocale}
-        taxLabelText={taxLabelText}
-        totalError={errors.total?.message}
-      />
-
-      <NotesField control={control} error={errors.notes?.message} />
-
-      {isDefaultTemplate && openParts.payment ? (
+  // each part's card, keyed so the open ones can render in the order they were added
+  const partCards: Record<ClosingPart, () => React.ReactNode> = {
+    payment: () => {
+      return (
         <PartCard
           part="payment"
           title="Payment method"
@@ -167,9 +156,10 @@ export const InvoiceClosing = memo(function InvoiceClosing({
             <ErrorMessage>{errors.paymentMethod.message}</ErrorMessage>
           ) : null}
         </PartCard>
-      ) : null}
-
-      {openParts.qr ? (
+      );
+    },
+    qr: () => {
+      return (
         <PartCard
           part="qr"
           title="QR code"
@@ -231,9 +221,10 @@ export const InvoiceClosing = memo(function InvoiceClosing({
             Printed at the bottom of the PDF.
           </p>
         </PartCard>
-      ) : null}
-
-      {isDefaultTemplate && openParts.signatures ? (
+      );
+    },
+    signatures: () => {
+      return (
         <PartCard
           part="signatures"
           title="Signatures"
@@ -260,7 +251,36 @@ export const InvoiceClosing = memo(function InvoiceClosing({
             for a blank line to sign on paper.
           </p>
         </PartCard>
-      ) : null}
+      );
+    },
+  };
+
+  return (
+    // On phones the form scrolls in its own box, and the sticky dock (about 160px) can sit
+    // over the box's bottom when the browser's bars change the screen height: room at least
+    // that tall lets the last part, and the "+ QR code" pill, scroll clear of it
+    <div
+      className="flex flex-col gap-5 max-lg:pb-44"
+      data-testid="final-section"
+    >
+      <TotalsCard
+        control={control}
+        currency={currency}
+        template={template}
+        numberFormatLocale={numberFormatLocale}
+        taxLabelText={taxLabelText}
+        totalError={errors.total?.message}
+      />
+
+      <NotesField control={control} error={errors.notes?.message} />
+
+      {openOrder
+        .filter((part) => {
+          return isAvailable(part);
+        })
+        .map((part) => {
+          return <Fragment key={part}>{partCards[part]()}</Fragment>;
+        })}
 
       {closedParts.length > 0 ? (
         <div className="flex flex-wrap gap-2">

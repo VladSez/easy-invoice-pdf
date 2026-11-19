@@ -12,7 +12,10 @@ import {
   ErrorMessage,
   inputErrorClassName,
 } from "@/app/(main)/(app)/components/invoice-form/common";
-import { AddPillButton } from "@/app/(main)/(app)/components/invoice-form/sections/components/add-pill-button";
+import {
+  AddPillButton,
+  takeOpenOrder,
+} from "@/app/(main)/(app)/components/invoice-form/sections/components/add-pill-button";
 import {
   type InvoiceData,
   type ItemDiscountType,
@@ -49,6 +52,8 @@ export function ItemDiscountFields({
   // focus the value input only when the user opens the section, not when it mounts open
   // for an item that already has a discount (a restored invoice, a shared link)
   const [shouldFocusValue, setShouldFocusValue] = useState(false);
+  // where the card sits among the item's open cards, see `takeOpenOrder`
+  const [openOrder, setOpenOrder] = useState(0);
   const addButtonRef = useRef<HTMLButtonElement>(null);
 
   if (!isOpen) {
@@ -58,6 +63,7 @@ export function ItemDiscountFields({
         testId={`addItemDiscount${index}`}
         onClick={() => {
           setIsOpen(true);
+          setOpenOrder(takeOpenOrder());
           setShouldFocusValue(true);
           trackEvent({ event: "add_item_discount" });
         }}
@@ -74,6 +80,7 @@ export function ItemDiscountFields({
       errors={errors}
       currency={currency}
       shouldFocusValue={shouldFocusValue}
+      openOrder={openOrder}
       setValue={setValue}
       onRemove={() => {
         // validate only to clear an error: a validating `setValue` re-renders the whole
@@ -108,6 +115,7 @@ function OpenItemDiscountFields({
   errors,
   currency,
   shouldFocusValue,
+  openOrder,
   setValue,
   onRemove,
 }: OpenItemDiscountFieldsProps) {
@@ -152,6 +160,7 @@ function OpenItemDiscountFields({
       role="group"
       aria-labelledby={`itemDiscountHeading${index}`}
       className="flex w-full flex-col gap-2.5 rounded-lg border border-gray-200 bg-white p-3"
+      style={{ order: openOrder }}
       data-testid={`itemDiscount${index}`}
     >
       <div className="-my-1 -me-1.5 flex items-center justify-between">
@@ -393,6 +402,8 @@ interface OpenItemDiscountFieldsProps extends Omit<
 > {
   /** Focus the value input on mount: the user just opened the section. */
   shouldFocusValue: boolean;
+  /** The card's CSS `order` among the item's open cards, from `takeOpenOrder`. */
+  openOrder: number;
   /** Clears the discount and collapses the section. */
   onRemove: () => void;
 }
