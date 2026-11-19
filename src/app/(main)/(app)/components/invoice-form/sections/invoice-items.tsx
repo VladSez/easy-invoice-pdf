@@ -124,341 +124,345 @@ export const InvoiceItems = memo(function InvoiceItems({
           <fieldset
             key={field.id}
             data-item-card={index}
-            className="mb-4 flex flex-col gap-5 rounded-xl border px-4 pb-4 pt-1 shadow-sm"
+            // a plain block: WebKit (Safari, and Chrome on iOS) lays out a flex fieldset's
+            // legend wrong and breaks the top border around it, so the layout is inside
+            className="mb-4 rounded-xl border px-4 pb-4 pt-1 shadow-sm"
           >
             <Legend className="px-1 text-base font-semibold text-gray-900">
               Item {itemNumber}
             </Legend>
 
-            <div className="-mt-1 mb-1.5 flex justify-end gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 gap-1.5 border-gray-300 px-2.5 text-[13px] font-normal text-slate-700 shadow-none max-md:h-7 max-md:px-2 max-md:text-xs"
-                disabled={hasReachedItemLimit}
-                aria-label={`Duplicate Invoice Item ${itemNumber}`}
-                onClick={() => {
-                  // no focus: focusing the copy's first field scrolls to it and, on a
-                  // phone, opens the keyboard, which pushed the page far past the copy
-                  insert(index + 1, getValues(`items.${index}`), {
-                    shouldFocus: false,
-                  });
-                  trackEvent({ event: "duplicate_invoice_item" });
-
-                  // bring the copy to the top of the form's scroll box, so it's in view
-                  requestAnimationFrame(() => {
-                    scrollItemCardIntoView(index + 1);
-                  });
-                }}
-              >
-                <Copy className="size-3.5" />
-                Duplicate
-              </Button>
-              {canDeleteItems ? (
+            <div className="flex flex-col gap-5">
+              <div className="-mt-1 mb-1.5 flex justify-end gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-8 gap-1.5 border-red-200 px-2.5 text-[13px] font-normal text-red-700 shadow-none hover:border-red-300 hover:bg-red-50 hover:text-red-700 max-md:h-7 max-md:px-2 max-md:text-xs"
-                  aria-label={`Delete Invoice Item ${itemNumber}`}
-                  onClick={(event) => {
-                    // Radix returns focus to its `Trigger` on close, and this dialog is
-                    // controlled rather than triggered, so remember the button ourselves.
-                    deleteTriggerRef.current = event.currentTarget;
+                  className="h-8 gap-1.5 border-gray-300 px-2.5 text-[13px] font-normal text-slate-700 shadow-none max-md:h-7 max-md:px-2 max-md:text-xs"
+                  disabled={hasReachedItemLimit}
+                  aria-label={`Duplicate Invoice Item ${itemNumber}`}
+                  onClick={() => {
+                    // no focus: focusing the copy's first field scrolls to it and, on a
+                    // phone, opens the keyboard, which pushed the page far past the copy
+                    insert(index + 1, getValues(`items.${index}`), {
+                      shouldFocus: false,
+                    });
+                    trackEvent({ event: "duplicate_invoice_item" });
 
-                    // Read the name from the form rather than from the parent's debounced
-                    // copy of it, so the dialog names what the user is actually looking at.
-                    setItemPendingDeletion({
-                      index,
-                      name: getValues(`items.${index}.name`),
+                    // bring the copy to the top of the form's scroll box, so it's in view
+                    requestAnimationFrame(() => {
+                      scrollItemCardIntoView(index + 1);
                     });
                   }}
                 >
-                  <Trash2 className="size-3.5" />
-                  Delete
+                  <Copy className="size-3.5" />
+                  Duplicate
                 </Button>
-              ) : null}
-            </div>
+                {canDeleteItems ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 gap-1.5 border-red-200 px-2.5 text-[13px] font-normal text-red-700 shadow-none hover:border-red-300 hover:bg-red-50 hover:text-red-700 max-md:h-7 max-md:px-2 max-md:text-xs"
+                    aria-label={`Delete Invoice Item ${itemNumber}`}
+                    onClick={(event) => {
+                      // Radix returns focus to its `Trigger` on close, and this dialog is
+                      // controlled rather than triggered, so remember the button ourselves.
+                      deleteTriggerRef.current = event.currentTarget;
 
-            {/* Name */}
-            <div className={hiddenInPdfClassName(isNameHidden)}>
-              <FieldHeader
-                htmlFor={`itemName${index}`}
-                label="Name"
-                columnSwitch={
-                  showDefaultTemplateColumnSwitches ? (
-                    <PdfColumnSwitch
-                      control={control}
-                      column="nameFieldIsVisible"
-                      ariaLabel={`Show the 'Name of Goods/Service' Column in the PDF for item ${itemNumber}`}
-                      tooltip="Show the 'Name of Goods/Service' Column in the PDF"
-                    />
-                  ) : null
-                }
-              />
-              <Controller
-                name={`items.${index}.name`}
-                control={control}
-                render={({ field }) => {
-                  return (
-                    <Textarea
-                      {...field}
-                      rows={2}
-                      id={`itemName${index}`}
-                      className={inputErrorClassName(!!itemErrors?.name)}
-                    />
-                  );
-                }}
-              />
-              {itemErrors?.name ? (
-                <ErrorMessage>{itemErrors.name.message}</ErrorMessage>
-              ) : null}
-            </div>
+                      // Read the name from the form rather than from the parent's debounced
+                      // copy of it, so the dialog names what the user is actually looking at.
+                      setItemPendingDeletion({
+                        index,
+                        name: getValues(`items.${index}.name`),
+                      });
+                    }}
+                  >
+                    <Trash2 className="size-3.5" />
+                    Delete
+                  </Button>
+                ) : null}
+              </div>
 
-            {/* Quantity */}
-            <div className={hiddenInPdfClassName(isAmountHidden)}>
-              <FieldHeader
-                htmlFor={`itemAmount${index}`}
-                label="Qty"
-                columnSwitch={
-                  showDefaultTemplateColumnSwitches ? (
-                    <PdfColumnSwitch
-                      control={control}
-                      column="amountFieldIsVisible"
-                      ariaLabel={`Show the 'Amount' Column in the PDF for item ${itemNumber}`}
-                      tooltip='Show the "Amount" Column in the PDF'
-                    />
-                  ) : null
-                }
-              />
-              <QuantityStepper
-                control={control}
-                index={index}
-                hasError={!!itemErrors?.amount}
-              />
-              {itemErrors?.amount ? (
-                <ErrorMessage>{itemErrors.amount.message}</ErrorMessage>
-              ) : null}
-            </div>
-
-            {/* Unit, with one-tap common units under it */}
-            <div className="flex flex-col gap-2">
-              <div className={hiddenInPdfClassName(isUnitHidden)}>
+              {/* Name */}
+              <div className={hiddenInPdfClassName(isNameHidden)}>
                 <FieldHeader
-                  htmlFor={`itemUnit${index}`}
-                  label="Unit"
+                  htmlFor={`itemName${index}`}
+                  label="Name"
                   columnSwitch={
-                    showColumnSwitches ? (
+                    showDefaultTemplateColumnSwitches ? (
                       <PdfColumnSwitch
                         control={control}
-                        column="unitFieldIsVisible"
-                        ariaLabel={`Show the 'Unit' Column in the PDF for item ${itemNumber}`}
-                        tooltip='Show the "Unit" Column in the PDF'
+                        column="nameFieldIsVisible"
+                        ariaLabel={`Show the 'Name of Goods/Service' Column in the PDF for item ${itemNumber}`}
+                        tooltip="Show the 'Name of Goods/Service' Column in the PDF"
                       />
                     ) : null
                   }
                 />
                 <Controller
-                  name={`items.${index}.unit`}
+                  name={`items.${index}.name`}
                   control={control}
                   render={({ field }) => {
                     return (
-                      <Input
+                      <Textarea
                         {...field}
-                        id={`itemUnit${index}`}
-                        type="text"
-                        placeholder="e.g. hours"
-                        className={cn(
-                          "h-9 max-md:text-base",
-                          inputErrorClassName(!!itemErrors?.unit),
-                        )}
+                        rows={2}
+                        id={`itemName${index}`}
+                        className={inputErrorClassName(!!itemErrors?.name)}
                       />
                     );
                   }}
                 />
-                {itemErrors?.unit ? (
-                  <ErrorMessage>{itemErrors.unit.message}</ErrorMessage>
+                {itemErrors?.name ? (
+                  <ErrorMessage>{itemErrors.name.message}</ErrorMessage>
                 ) : null}
               </div>
 
-              <UnitChips
-                control={control}
-                index={index}
-                setValue={setValue}
-                hasError={!!itemErrors?.unit}
-              />
-            </div>
+              {/* Quantity */}
+              <div className={hiddenInPdfClassName(isAmountHidden)}>
+                <FieldHeader
+                  htmlFor={`itemAmount${index}`}
+                  label="Qty"
+                  columnSwitch={
+                    showDefaultTemplateColumnSwitches ? (
+                      <PdfColumnSwitch
+                        control={control}
+                        column="amountFieldIsVisible"
+                        ariaLabel={`Show the 'Amount' Column in the PDF for item ${itemNumber}`}
+                        tooltip='Show the "Amount" Column in the PDF'
+                      />
+                    ) : null
+                  }
+                />
+                <QuantityStepper
+                  control={control}
+                  index={index}
+                  hasError={!!itemErrors?.amount}
+                />
+                {itemErrors?.amount ? (
+                  <ErrorMessage>{itemErrors.amount.message}</ErrorMessage>
+                ) : null}
+              </div>
 
-            {/* Unit price */}
-            <div className={hiddenInPdfClassName(isNetPriceHidden)}>
-              <FieldHeader
-                htmlFor={`itemNetPrice${index}`}
-                label="Unit price"
-                columnSwitch={
-                  showDefaultTemplateColumnSwitches ? (
-                    <PdfColumnSwitch
-                      control={control}
-                      column="netPriceFieldIsVisible"
-                      ariaLabel={`Show the 'Net Price' Column in the PDF for item ${itemNumber}`}
-                      tooltip='Show the "Net Price" Column in the PDF'
-                    />
-                  ) : null
-                }
-              />
-              <Controller
-                name={`items.${index}.netPrice`}
-                control={control}
-                render={({ field }) => {
-                  return (
-                    <MoneyInput
-                      {...field}
-                      id={`itemNetPrice${index}`}
-                      currency={currency}
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      className={cn(
-                        "h-9 w-full max-md:text-base",
-                        inputErrorClassName(!!itemErrors?.netPrice),
-                      )}
-                      dataTestId={`itemNetPrice${index}`}
-                    />
-                  );
-                }}
-              />
-              {itemErrors?.netPrice ? (
-                <ErrorMessage>{itemErrors.netPrice.message}</ErrorMessage>
-              ) : null}
-            </div>
-
-            {/* Tax settings: the shared label on the first item, then this item's rate.
-                One field per row under fixed labels, so a long tax name can't push
-                the fields out of line */}
-            <div
-              role="group"
-              aria-labelledby={`itemTaxSettings${index}`}
-              className="flex flex-col gap-3"
-            >
-              <span
-                id={`itemTaxSettings${index}`}
-                className="text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500"
-              >
-                Tax settings
-              </span>
-
-              {isFirstItem ? (
-                <div>
-                  <Label htmlFor="taxLabelText" className="mb-1.5 block">
-                    Label
-                  </Label>
+              {/* Unit, with one-tap common units under it */}
+              <div className="flex flex-col gap-2">
+                <div className={hiddenInPdfClassName(isUnitHidden)}>
+                  <FieldHeader
+                    htmlFor={`itemUnit${index}`}
+                    label="Unit"
+                    columnSwitch={
+                      showColumnSwitches ? (
+                        <PdfColumnSwitch
+                          control={control}
+                          column="unitFieldIsVisible"
+                          ariaLabel={`Show the 'Unit' Column in the PDF for item ${itemNumber}`}
+                          tooltip='Show the "Unit" Column in the PDF'
+                        />
+                      ) : null
+                    }
+                  />
                   <Controller
-                    name="taxLabelText"
+                    name={`items.${index}.unit`}
                     control={control}
                     render={({ field }) => {
                       return (
                         <Input
                           {...field}
+                          id={`itemUnit${index}`}
                           type="text"
-                          id="taxLabelText"
-                          // the visible "Label" means little out of context
-                          aria-label="Tax label"
-                          placeholder="e.g. VAT, GST, Sales Tax"
+                          placeholder="e.g. hours"
                           className={cn(
                             "h-9 max-md:text-base",
-                            inputErrorClassName(!!errors.taxLabelText),
+                            inputErrorClassName(!!itemErrors?.unit),
                           )}
                         />
                       );
                     }}
                   />
-                  {errors.taxLabelText ? (
-                    <ErrorMessage>{errors.taxLabelText.message}</ErrorMessage>
+                  {itemErrors?.unit ? (
+                    <ErrorMessage>{itemErrors.unit.message}</ErrorMessage>
                   ) : null}
                 </div>
-              ) : null}
 
-              <div
-                className={cn(
-                  "flex flex-col gap-2",
-                  hiddenInPdfClassName(isVatHidden),
-                )}
-                data-testid={`itemVat${index}`}
-              >
-                <div>
-                  {/* The switch hides only the rate column, so it sits on the rate: the
-                      label still names the amount column and the summary table. Later items
-                      have no label field above, so their rate names the tax. */}
-                  <FieldHeader
-                    htmlFor={`itemVat${index}`}
-                    label={isFirstItem ? "Rate" : `${taxLabelText} rate`}
-                    columnSwitch={
-                      showColumnSwitches ? (
-                        <PdfColumnSwitch
-                          control={control}
-                          column="vatFieldIsVisible"
-                          ariaLabel={`Show the '${taxLabelText}' Column in the PDF for item ${itemNumber}`}
-                          tooltip={`Show the "${taxLabelText}" rate column in the PDF`}
-                        />
-                      ) : null
-                    }
-                  />
-                  <TaxRateInput
-                    control={control}
-                    index={index}
-                    taxLabelText={taxLabelText}
-                    hasError={!!itemErrors?.vat}
-                  />
-                </div>
-                <TaxRateChips
+                <UnitChips
                   control={control}
                   index={index}
                   setValue={setValue}
-                  hasError={!!itemErrors?.vat}
+                  hasError={!!itemErrors?.unit}
                 />
-                {itemErrors?.vat ? (
-                  <ErrorMessage>{itemErrors.vat.message}</ErrorMessage>
+              </div>
+
+              {/* Unit price */}
+              <div className={hiddenInPdfClassName(isNetPriceHidden)}>
+                <FieldHeader
+                  htmlFor={`itemNetPrice${index}`}
+                  label="Unit price"
+                  columnSwitch={
+                    showDefaultTemplateColumnSwitches ? (
+                      <PdfColumnSwitch
+                        control={control}
+                        column="netPriceFieldIsVisible"
+                        ariaLabel={`Show the 'Net Price' Column in the PDF for item ${itemNumber}`}
+                        tooltip='Show the "Net Price" Column in the PDF'
+                      />
+                    ) : null
+                  }
+                />
+                <Controller
+                  name={`items.${index}.netPrice`}
+                  control={control}
+                  render={({ field }) => {
+                    return (
+                      <MoneyInput
+                        {...field}
+                        id={`itemNetPrice${index}`}
+                        currency={currency}
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        className={cn(
+                          "h-9 w-full max-md:text-base",
+                          inputErrorClassName(!!itemErrors?.netPrice),
+                        )}
+                        dataTestId={`itemNetPrice${index}`}
+                      />
+                    );
+                  }}
+                />
+                {itemErrors?.netPrice ? (
+                  <ErrorMessage>{itemErrors.netPrice.message}</ErrorMessage>
                 ) : null}
               </div>
 
-              {isFirstItem && !itemErrors?.vat && !errors.taxLabelText ? (
-                <InputHelperMessage>
-                  The label is shared by every item, the amount columns and the
-                  summary table. The rate takes 0–100 or text such as NP.
-                </InputHelperMessage>
-              ) : null}
-            </div>
+              {/* Tax settings: the shared label on the first item, then this item's rate.
+                One field per row under fixed labels, so a long tax name can't push
+                the fields out of line */}
+              <div
+                role="group"
+                aria-labelledby={`itemTaxSettings${index}`}
+                className="flex flex-col gap-3"
+              >
+                <span
+                  id={`itemTaxSettings${index}`}
+                  className="text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500"
+                >
+                  Tax settings
+                </span>
 
-            {/* optional extras: pills that share a row while closed, cards once open */}
-            <div className="flex flex-wrap gap-2">
-              <ItemDiscountFields
-                control={control}
-                index={index}
-                errors={errors}
-                currency={currency}
-                getValues={getValues}
-                setValue={setValue}
-              />
-              {/* the default template is the only one that prints a GTU column */}
-              {isDefaultTemplate ? (
-                <ItemGtuField
+                {isFirstItem ? (
+                  <div>
+                    <Label htmlFor="taxLabelText" className="mb-1.5 block">
+                      Label
+                    </Label>
+                    <Controller
+                      name="taxLabelText"
+                      control={control}
+                      render={({ field }) => {
+                        return (
+                          <Input
+                            {...field}
+                            type="text"
+                            id="taxLabelText"
+                            // the visible "Label" means little out of context
+                            aria-label="Tax label"
+                            placeholder="e.g. VAT, GST, Sales Tax"
+                            className={cn(
+                              "h-9 max-md:text-base",
+                              inputErrorClassName(!!errors.taxLabelText),
+                            )}
+                          />
+                        );
+                      }}
+                    />
+                    {errors.taxLabelText ? (
+                      <ErrorMessage>{errors.taxLabelText.message}</ErrorMessage>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                <div
+                  className={cn(
+                    "flex flex-col gap-2",
+                    hiddenInPdfClassName(isVatHidden),
+                  )}
+                  data-testid={`itemVat${index}`}
+                >
+                  <div>
+                    {/* The switch hides only the rate column, so it sits on the rate: the
+                      label still names the amount column and the summary table. Later items
+                      have no label field above, so their rate names the tax. */}
+                    <FieldHeader
+                      htmlFor={`itemVat${index}`}
+                      label={isFirstItem ? "Rate" : `${taxLabelText} rate`}
+                      columnSwitch={
+                        showColumnSwitches ? (
+                          <PdfColumnSwitch
+                            control={control}
+                            column="vatFieldIsVisible"
+                            ariaLabel={`Show the '${taxLabelText}' Column in the PDF for item ${itemNumber}`}
+                            tooltip={`Show the "${taxLabelText}" rate column in the PDF`}
+                          />
+                        ) : null
+                      }
+                    />
+                    <TaxRateInput
+                      control={control}
+                      index={index}
+                      taxLabelText={taxLabelText}
+                      hasError={!!itemErrors?.vat}
+                    />
+                  </div>
+                  <TaxRateChips
+                    control={control}
+                    index={index}
+                    setValue={setValue}
+                    hasError={!!itemErrors?.vat}
+                  />
+                  {itemErrors?.vat ? (
+                    <ErrorMessage>{itemErrors.vat.message}</ErrorMessage>
+                  ) : null}
+                </div>
+
+                {isFirstItem && !itemErrors?.vat && !errors.taxLabelText ? (
+                  <InputHelperMessage>
+                    The label is shared by every item, the amount columns and
+                    the summary table. The rate takes 0–100 or text such as NP.
+                  </InputHelperMessage>
+                ) : null}
+              </div>
+
+              {/* optional extras: pills that share a row while closed, cards once open */}
+              <div className="flex flex-wrap gap-2">
+                <ItemDiscountFields
                   control={control}
                   index={index}
                   errors={errors}
+                  currency={currency}
                   getValues={getValues}
                   setValue={setValue}
                 />
-              ) : null}
-            </div>
+                {/* the default template is the only one that prints a GTU column */}
+                {isDefaultTemplate ? (
+                  <ItemGtuField
+                    control={control}
+                    index={index}
+                    errors={errors}
+                    getValues={getValues}
+                    setValue={setValue}
+                  />
+                ) : null}
+              </div>
 
-            <ItemAmountsCard
-              control={control}
-              index={index}
-              currency={currency}
-              template={template}
-              numberFormatLocale={numberFormatLocale}
-              taxLabelText={taxLabelText}
-              showColumnSwitches={showDefaultTemplateColumnSwitches}
-              hiddenColumns={hiddenAmountColumns}
-            />
+              <ItemAmountsCard
+                control={control}
+                index={index}
+                currency={currency}
+                template={template}
+                numberFormatLocale={numberFormatLocale}
+                taxLabelText={taxLabelText}
+                showColumnSwitches={showDefaultTemplateColumnSwitches}
+                hiddenColumns={hiddenAmountColumns}
+              />
+            </div>
           </fieldset>
         );
       })}
