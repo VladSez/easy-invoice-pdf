@@ -12,8 +12,8 @@ import {
   SERVER_PDF_MOCK_INVOICE_DATA,
 } from "@/app/api/generate-invoice/__tests__/pdf-test-utils";
 import { renderInvoicePdfBuffer } from "@/app/api/generate-invoice/render-pdf-on-server";
+import { SERVER_INVOICE_PDF_FONTS } from "@/app/api/generate-invoice/server-invoice-pdf-fonts";
 import type { InvoiceData, InvoiceItemData } from "@/app/schema";
-import { INVOICE_PDF_FONTS } from "@/config";
 
 import { StripeInvoicePdfTemplate } from "../invoice-pdf-stripe-template";
 
@@ -33,9 +33,18 @@ vi.mock("@/env", async () => {
 Font.register({
   family: "Inter",
   fonts: [
-    { src: INVOICE_PDF_FONTS.STRIPE_TEMPLATE.INTER_REGULAR, fontWeight: 400 },
-    { src: INVOICE_PDF_FONTS.STRIPE_TEMPLATE.INTER_MEDIUM, fontWeight: 500 },
-    { src: INVOICE_PDF_FONTS.STRIPE_TEMPLATE.INTER_SEMIBOLD, fontWeight: 600 },
+    {
+      src: SERVER_INVOICE_PDF_FONTS.STRIPE_TEMPLATE.INTER_REGULAR,
+      fontWeight: 400,
+    },
+    {
+      src: SERVER_INVOICE_PDF_FONTS.STRIPE_TEMPLATE.INTER_MEDIUM,
+      fontWeight: 500,
+    },
+    {
+      src: SERVER_INVOICE_PDF_FONTS.STRIPE_TEMPLATE.INTER_SEMIBOLD,
+      fontWeight: 600,
+    },
   ],
 });
 
