@@ -405,7 +405,6 @@ export const InvoiceForm = memo(function InvoiceForm({
           <div className="px-4 pb-4">
             <SellerInformation
               control={control}
-              errors={errors}
               setValue={setValue}
               invoiceData={invoiceData}
               isMobile={isMobile}
@@ -427,7 +426,6 @@ export const InvoiceForm = memo(function InvoiceForm({
           <div className="px-4 pb-4">
             <BuyerInformation
               control={control}
-              errors={errors}
               setValue={setValue}
               invoiceData={invoiceData}
               isMobile={isMobile}

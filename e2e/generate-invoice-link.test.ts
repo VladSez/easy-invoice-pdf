@@ -98,7 +98,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
         .fill(TEST_SELLER_DATA.vatNoLabelText);
 
       await sellerVatNumberFieldset
-        .getByRole("textbox", { name: "Value" })
+        .getByRole("textbox", { name: "Number" })
         .fill(TEST_SELLER_DATA.vatNo);
 
       // Fill in buyer information
@@ -123,7 +123,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
         .fill(TEST_BUYER_DATA.vatNoLabelText);
 
       await buyerVatNumberFieldset
-        .getByRole("textbox", { name: "Value" })
+        .getByRole("textbox", { name: "Number" })
         .fill(TEST_BUYER_DATA.vatNo);
 
       // Fill in an invoice item
@@ -249,7 +249,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
       ).toHaveValue(TEST_SELLER_DATA.vatNoLabelText);
 
       await expect(
-        newSellerVatNumberFieldset.getByRole("textbox", { name: "Value" }),
+        newSellerVatNumberFieldset.getByRole("textbox", { name: "Number" }),
       ).toHaveValue(TEST_SELLER_DATA.vatNo);
 
       // Verify buyer information
@@ -277,7 +277,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
       ).toHaveValue(TEST_BUYER_DATA.vatNoLabelText);
 
       await expect(
-        newBuyerVatNumberFieldset.getByRole("textbox", { name: "Value" }),
+        newBuyerVatNumberFieldset.getByRole("textbox", { name: "Number" }),
       ).toHaveValue(TEST_BUYER_DATA.vatNo);
 
       // Verify invoice item
@@ -840,7 +840,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
       .fill("Seller Tax Identification Number");
 
     await sellerVatNumberFieldset
-      .getByRole("textbox", { name: "Value" })
+      .getByRole("textbox", { name: "Number" })
       .fill("SELLER-TAX-123456789-LONG-FORMAT");
 
     // Fill in seller account number
@@ -887,7 +887,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
       .fill("Buyer Tax Identification Number");
 
     await buyerVatNumberFieldset
-      .getByRole("textbox", { name: "Value" })
+      .getByRole("textbox", { name: "Number" })
       .fill("BUYER-TAX-987654321-LONG-FORMAT");
 
     // Generate many invoice items with long descriptions

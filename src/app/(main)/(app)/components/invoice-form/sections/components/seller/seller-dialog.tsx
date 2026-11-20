@@ -1,13 +1,9 @@
 import * as Sentry from "@sentry/nextjs";
 import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import {
-  getPartyFieldClassName,
-  PartyDialogSection,
-  PdfVisibilityToggle,
-} from "@/app/(main)/(app)/components/invoice-form/sections/components/party-dialog-fields";
+import { PartyFields } from "@/app/(main)/(app)/components/invoice-form/sections/components/party-fields";
 import { useConfirmDiscard } from "@/app/(main)/(app)/components/invoice-form/sections/hooks/use-confirm-discard";
 import {
   getAppStorageItem,
@@ -27,18 +23,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
 
 import { ConfirmDiscardDialog } from "../confirm-discard-dialog";
@@ -128,24 +115,6 @@ export function SellerDialog({
   });
 
   const { isDirty, dirtyFields } = form.formState;
-
-  // hidden fields are faded in the dialog, as they will be missing from the PDF
-  const [
-    isVatNoVisible,
-    isEmailVisible,
-    isAccountNumberVisible,
-    isSwiftBicVisible,
-    isNotesVisible,
-  ] = useWatch({
-    control: form.control,
-    name: [
-      "vatNoFieldIsVisible",
-      "emailFieldIsVisible",
-      "accountNumberFieldIsVisible",
-      "swiftBicFieldIsVisible",
-      "notesFieldIsVisible",
-    ],
-  });
 
   const { isConfirmDiscardDialogOpen, setIsConfirmDiscardDialogOpen } =
     useConfirmDiscard();
@@ -411,320 +380,31 @@ export function SellerDialog({
             ) : null}
 
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-5"
-                id={SELLER_FORM_ID}
-              >
-                <PartyDialogSection title="Business">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <FormLabel>Name (Required)</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              rows={2}
-                              placeholder="Enter seller name"
-                              className={getPartyFieldClassName({
-                                isPrefilled: isPrefilled({
-                                  name: "name",
-                                  value: field.value,
-                                }),
-                              })}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      );
-                    }}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="address"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <FormLabel>Address (Required)</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              rows={2}
-                              placeholder="Enter seller address"
-                              className={getPartyFieldClassName({
-                                isPrefilled: isPrefilled({
-                                  name: "address",
-                                  value: field.value,
-                                }),
-                              })}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      );
-                    }}
-                  />
-                </PartyDialogSection>
-
-                <PartyDialogSection
-                  title="Tax number"
-                  action={
-                    <FormField
-                      control={form.control}
-                      name="vatNoFieldIsVisible"
-                      render={({ field }) => {
-                        return (
-                          <PdfVisibilityToggle
-                            id="vatNoFieldIsVisible"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            fieldLabel="Tax Number"
-                          />
-                        );
-                      }}
-                    />
-                  }
-                >
-                  {/* a label of its own, so the PDF can say "VAT no", "Tax ID", ... */}
-                  <fieldset
-                    aria-label="Seller tax number"
-                    className="grid min-w-0 grid-cols-[7rem_minmax(0,1fr)] gap-3"
-                  >
-                    <FormField
-                      control={form.control}
-                      name="vatNoLabelText"
-                      render={({ field }) => {
-                        return (
-                          <FormItem>
-                            <FormLabel>Label</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                placeholder="e.g. VAT no"
-                                className={getPartyFieldClassName({
-                                  isHidden: !isVatNoVisible,
-                                  isPrefilled: isPrefilled({
-                                    name: "vatNoLabelText",
-                                    value: field.value,
-                                  }),
-                                })}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        );
-                      }}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="vatNo"
-                      render={({ field }) => {
-                        return (
-                          <FormItem>
-                            <FormLabel>Number</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                placeholder="e.g. PL1234567890"
-                                className={getPartyFieldClassName({
-                                  isHidden: !isVatNoVisible,
-                                  isPrefilled: isPrefilled({
-                                    name: "vatNo",
-                                    value: field.value,
-                                  }),
-                                })}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  </fieldset>
-                </PartyDialogSection>
-
-                <PartyDialogSection title="Contact &amp; payment">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <div className="flex items-center justify-between gap-2">
-                            <FormLabel>Email</FormLabel>
-                            <FormField
-                              control={form.control}
-                              name="emailFieldIsVisible"
-                              render={({ field: visibilityField }) => {
-                                return (
-                                  <PdfVisibilityToggle
-                                    id="emailFieldIsVisible"
-                                    checked={visibilityField.value}
-                                    onCheckedChange={visibilityField.onChange}
-                                    fieldLabel="Email"
-                                    data-testid="sellerEmailDialogFieldVisibilitySwitch"
-                                  />
-                                );
-                              }}
-                            />
-                          </div>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="email"
-                              placeholder="seller@email.com"
-                              className={getPartyFieldClassName({
-                                isHidden: !isEmailVisible,
-                                isPrefilled: isPrefilled({
-                                  name: "email",
-                                  value: field.value,
-                                }),
-                              })}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      );
-                    }}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="accountNumber"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <div className="flex items-center justify-between gap-2">
-                            <FormLabel>Account Number</FormLabel>
-                            <FormField
-                              control={form.control}
-                              name="accountNumberFieldIsVisible"
-                              render={({ field: visibilityField }) => {
-                                return (
-                                  <PdfVisibilityToggle
-                                    id="accountNumberFieldIsVisible"
-                                    checked={visibilityField.value}
-                                    onCheckedChange={visibilityField.onChange}
-                                    fieldLabel="Account Number"
-                                  />
-                                );
-                              }}
-                            />
-                          </div>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              rows={2}
-                              placeholder="Enter account number"
-                              className={getPartyFieldClassName({
-                                isHidden: !isAccountNumberVisible,
-                                isPrefilled: isPrefilled({
-                                  name: "accountNumber",
-                                  value: field.value,
-                                }),
-                              })}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      );
-                    }}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="swiftBic"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <div className="flex items-center justify-between gap-2">
-                            <FormLabel>SWIFT/BIC</FormLabel>
-                            <FormField
-                              control={form.control}
-                              name="swiftBicFieldIsVisible"
-                              render={({ field: visibilityField }) => {
-                                return (
-                                  <PdfVisibilityToggle
-                                    id="swiftBicFieldIsVisible"
-                                    checked={visibilityField.value}
-                                    onCheckedChange={visibilityField.onChange}
-                                    fieldLabel="SWIFT/BIC"
-                                  />
-                                );
-                              }}
-                            />
-                          </div>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              rows={2}
-                              placeholder="Enter SWIFT/BIC code"
-                              className={getPartyFieldClassName({
-                                isHidden: !isSwiftBicVisible,
-                                isPrefilled: isPrefilled({
-                                  name: "swiftBic",
-                                  value: field.value,
-                                }),
-                              })}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      );
-                    }}
-                  />
-                </PartyDialogSection>
-
-                <PartyDialogSection
-                  title="Notes"
-                  action={
-                    <FormField
-                      control={form.control}
-                      name="notesFieldIsVisible"
-                      render={({ field }) => {
-                        return (
-                          <PdfVisibilityToggle
-                            id="notes-field-visibility"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            fieldLabel="Notes"
-                            data-testid="sellerNotesDialogFieldVisibilitySwitch"
-                          />
-                        );
-                      }}
-                    />
-                  }
-                >
-                  <FormField
-                    control={form.control}
-                    name="notes"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          {/* the section heading says it already */}
-                          <FormLabel className="sr-only">Notes</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              rows={2}
-                              placeholder="Enter notes (max 750 characters)"
-                              maxLength={750}
-                              className={getPartyFieldClassName({
-                                isHidden: !isNotesVisible,
-                                isPrefilled: isPrefilled({
-                                  name: "notes",
-                                  value: field.value,
-                                }),
-                              })}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      );
-                    }}
-                  />
-                </PartyDialogSection>
+              <form onSubmit={form.handleSubmit(onSubmit)} id={SELLER_FORM_ID}>
+                <PartyFields
+                  party="seller"
+                  placement="dialog"
+                  control={form.control}
+                  names={{
+                    name: "name",
+                    address: "address",
+                    vatNoLabelText: "vatNoLabelText",
+                    vatNo: "vatNo",
+                    vatNoFieldIsVisible: "vatNoFieldIsVisible",
+                    email: "email",
+                    emailFieldIsVisible: "emailFieldIsVisible",
+                    bank: {
+                      accountNumber: "accountNumber",
+                      accountNumberFieldIsVisible:
+                        "accountNumberFieldIsVisible",
+                      swiftBic: "swiftBic",
+                      swiftBicFieldIsVisible: "swiftBicFieldIsVisible",
+                    },
+                    notes: "notes",
+                    notesFieldIsVisible: "notesFieldIsVisible",
+                  }}
+                  isPrefilled={isPrefilled}
+                />
               </form>
             </Form>
           </div>

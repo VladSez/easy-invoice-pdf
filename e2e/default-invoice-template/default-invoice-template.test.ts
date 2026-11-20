@@ -205,7 +205,7 @@ test.describe("Default Invoice Template", () => {
     // left out of the generated PDF
     const sellerHiddenFieldSwitches = [
       sellerSection.getByRole("switch", {
-        name: `Show the 'Seller Tax Number' Field in the PDF`,
+        name: `Show the 'Tax Number' field in the PDF`,
       }),
       sellerSection.getByRole("switch", {
         name: `Show the 'Account Number' Field in the PDF`,

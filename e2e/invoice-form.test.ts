@@ -588,12 +588,12 @@ test.describe("Invoice Generator Page", () => {
       name: "Tax Number",
     });
     await expect(
-      sellerVatFieldset.getByRole("textbox", { name: "Value" }),
+      sellerVatFieldset.getByRole("textbox", { name: "Number" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.vatNo);
 
     await expect(
       sellerSection.getByRole("switch", {
-        name: `Show the 'Seller Tax Number' Field in the PDF`,
+        name: `Show the 'Tax Number' field in the PDF`,
       }),
     ).toBeChecked();
 
@@ -650,7 +650,7 @@ test.describe("Invoice Generator Page", () => {
       name: "Tax Number",
     });
     await expect(
-      buyerVatFieldset.getByRole("textbox", { name: "Value" }),
+      buyerVatFieldset.getByRole("textbox", { name: "Number" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.buyer.vatNo);
 
     const buyerVatNoFieldIsVisibleSwitch = buyerSection.getByTestId(
