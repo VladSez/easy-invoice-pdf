@@ -26,6 +26,7 @@ export function ItemAmountsCard({
   taxLabelText,
   showColumnSwitches,
   hiddenColumns,
+  isDiscountValueInvalid,
 }: ItemAmountsCardProps) {
   const [
     discountType,
@@ -69,8 +70,10 @@ export function ItemAmountsCard({
   // it is a percentage. A fixed discount's amount is already on the right.
   const discountName = discountLabel?.trim() || "Discount";
 
+  // the rate as typed, unless the field rejects it (500%): the amounts below come from the
+  // last valid calculation, so an invalid rate beside them would contradict them
   const discountTitle =
-    discountType === "percentage"
+    discountType === "percentage" && !isDiscountValueInvalid
       ? `${discountName} ${formatAmount({ amount: discountNumber, numberFormatLocale, minimumFractionDigits: 0, maximumFractionDigits: 2 })}%`
       : discountName;
 
@@ -198,6 +201,8 @@ interface ItemAmountsCardProps {
   taxLabelText: string;
   /** Show the "In PDF" switches: on the first item, for the default template. */
   showColumnSwitches: boolean;
+  /** The discount value field shows an error, so its rate isn't the one in the amounts. */
+  isDiscountValueInvalid: boolean;
   /** Which amount columns the PDF leaves out, so their values grey. */
   hiddenColumns: {
     netAmount: boolean;

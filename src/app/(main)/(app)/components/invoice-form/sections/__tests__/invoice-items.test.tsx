@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { useMemo } from "react";
 import {
   type Control,
+  type FieldErrors,
   type UseFieldArrayAppend,
   useFieldArray,
   useForm,
@@ -67,6 +68,8 @@ interface InvoiceItemsTestHarnessProps {
   template?: InvoiceData["template"];
   /** Overrides applied to every item, e.g. to start with a discount. */
   itemOverrides?: Partial<InvoiceItemData>;
+  /** Validation errors to show, as the form would pass them down. */
+  errors?: FieldErrors<InvoiceData>;
 }
 
 function InvoiceItemsTestHarness({
@@ -77,6 +80,7 @@ function InvoiceItemsTestHarness({
   numberFormatLocale = "en",
   template = "default",
   itemOverrides,
+  errors = {},
 }: InvoiceItemsTestHarnessProps) {
   const invoiceData = useMemo(() => {
     return {
@@ -115,7 +119,7 @@ function InvoiceItemsTestHarness({
         }}
         append={append ?? appendField}
         insert={insert}
-        errors={{}}
+        errors={errors}
         currency="EUR"
         template={template}
         taxLabelText="VAT"
@@ -863,6 +867,39 @@ describe("InvoiceItems calculated amounts", () => {
 
     expect(getAmountText("itemDiscountSummary0")).toBe(
       "Discountof 201.00 EUR subtotal−25.00 EUR",
+    );
+  });
+
+  it("leaves an invalid rate out of the discount line, and marks the field invalid", () => {
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: {
+        discountValue: 500,
+        discountAmount: 20.1,
+        netAmount: 180.9,
+      },
+      errors: {
+        items: [
+          {
+            discountValue: {
+              type: "custom",
+              message: "Discount must be between 0 and 100%",
+            },
+          },
+        ],
+      },
+    });
+
+    // the savings are still the last valid calculation's, so no "500%" beside them
+    expect(getAmountText("itemDiscountSummary0")).toBe(
+      "Discountof 201.00 EUR subtotal−20.10 EUR",
+    );
+
+    const value = screen.getByRole("spinbutton", { name: "Discount value" });
+
+    expect(value).toHaveAttribute("aria-invalid", "true");
+    expect(value).toHaveAccessibleDescription(
+      "Discount must be between 0 and 100%",
     );
   });
 

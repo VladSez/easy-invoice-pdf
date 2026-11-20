@@ -300,6 +300,12 @@ function OpenItemDiscountFields({
                     value={field.value === 0 ? "" : field.value}
                     id={`itemDiscountValue${index}`}
                     aria-label="Discount value"
+                    aria-invalid={itemErrors?.discountValue ? true : undefined}
+                    aria-describedby={
+                      itemErrors?.discountValue
+                        ? `itemDiscountValueError${index}`
+                        : undefined
+                    }
                     type="number"
                     step="0.01"
                     min="0"
@@ -353,7 +359,9 @@ function OpenItemDiscountFields({
       </div>
 
       {itemErrors?.discountValue ? (
-        <ErrorMessage>{itemErrors.discountValue.message}</ErrorMessage>
+        <ErrorMessage id={`itemDiscountValueError${index}`}>
+          {itemErrors.discountValue.message}
+        </ErrorMessage>
       ) : discountAmount > 0 ? null : (
         <InputHelperMessage>
           {isLineTotalZero

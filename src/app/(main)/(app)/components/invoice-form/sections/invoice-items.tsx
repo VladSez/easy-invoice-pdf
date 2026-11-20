@@ -477,6 +477,7 @@ export const InvoiceItems = memo(function InvoiceItems({
                 taxLabelText={taxLabelText}
                 showColumnSwitches={showDefaultTemplateColumnSwitches}
                 hiddenColumns={hiddenAmountColumns}
+                isDiscountValueInvalid={!!itemErrors?.discountValue}
               />
             </div>
           </fieldset>
