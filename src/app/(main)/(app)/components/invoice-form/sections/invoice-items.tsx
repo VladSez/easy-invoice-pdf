@@ -675,7 +675,10 @@ function TaxRateInput({
               // names the tax even where the visible label just says "Rate"
               aria-label={`${taxLabelText} rate`}
               type="text"
-              inputMode="decimal"
+              // a full keyboard, not a decimal pad: the rate can be any text (NP, OO, ...),
+              // and iOS's decimal pad has no letters. The chips below cover the common
+              // numbers in one tap.
+              inputMode="text"
               placeholder="e.g. 23 or NP"
               className={cn(
                 "h-9 tabular-nums max-md:text-base",

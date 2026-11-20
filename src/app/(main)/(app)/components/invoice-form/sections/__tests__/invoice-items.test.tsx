@@ -668,6 +668,17 @@ describe("InvoiceItems quantity and unit", () => {
       within(screen.getByTestId("itemVat0")).queryByText("%"),
     ).not.toBeInTheDocument();
   });
+
+  // a decimal or numeric keypad has no letters on iOS, so a touch-only user couldn't type
+  // a text rate such as OO, which the schema accepts
+  it("asks touch devices for a keyboard with letters on the tax rate", () => {
+    renderInvoiceItems({ itemCount: 1 });
+
+    expect(screen.getByRole("textbox", { name: "VAT rate" })).toHaveAttribute(
+      "inputmode",
+      "text",
+    );
+  });
 });
 
 describe("InvoiceItems tax settings", () => {
