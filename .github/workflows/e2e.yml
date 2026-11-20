@@ -11,8 +11,8 @@ jobs:
   # the commit SHA and an empty payload, so `github.ref` and `github.ref_name` are empty.
   # A workflow-level `concurrency: e2e-${{ github.ref }}` therefore put every run in one
   # group, and each new deployment (any branch, any state) cancelled the run in flight.
-  # This job resolves the branch from the SHA so the e2e job can group on it, and looks
-  # up the PR for the email at the same time.
+  # This job maps the SHA to its PR so the e2e job can group on the PR number, and
+  # returns the PR details for the email at the same time.
   resolve:
     # https://vercel.com/guides/how-can-i-run-end-to-end-tests-after-my-vercel-preview-deployment
     if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
@@ -30,9 +30,12 @@ jobs:
       # group it with that PR's runs. With no PR outputs, the email subject and body
       # fall back to the repository name.
       #
-      # Previews use the PR's head branch, then a branch whose head is the SHA (pushed
-      # without a PR), and finally the SHA itself, which only means that run cannot be
-      # cancelled by a later one.
+      # Previews use the PR number, not its head branch: a fork PR picks its own branch
+      # name, so a fork branch named like another PR's branch would share that PR's group
+      # and cancel its run. Nobody chooses a PR number. Without a PR, the key falls back to
+      # a branch in this repo whose head is the SHA (only people with push access create
+      # those), and finally to the SHA itself, which only means that run cannot be
+      # cancelled by a later one. Each kind of key has its own prefix so they cannot collide.
       - name: 🔍 Resolve branch and PR
         id: resolve
         env:
@@ -48,24 +51,28 @@ jobs:
 
           # `gh api` prints the error body to stdout on failure, so a failed lookup is reset to empty.
           PR_JSON=$(gh api "repos/$GH_REPOSITORY/commits/$GH_SHA/pulls" --jq '.[0] // empty') || PR_JSON=""
-          BRANCH=$(jq -r '.head.ref // empty' <<<"${PR_JSON:-null}")
-          if [ -z "$BRANCH" ]; then
+          PR_NUMBER=$(jq -r '.number // empty' <<<"${PR_JSON:-null}")
+
+          if [ -n "$PR_NUMBER" ]; then
+            KEY="preview-pr-$PR_NUMBER"
+          else
             BRANCH=$(gh api "repos/$GH_REPOSITORY/commits/$GH_SHA/branches-where-head" --jq '.[0].name // empty') || BRANCH=""
+            KEY=$([ -n "$BRANCH" ] && echo "preview-branch-$BRANCH" || echo "preview-sha-$GH_SHA")
           fi
 
           # The title is user-controlled: newlines are stripped so it cannot inject extra outputs.
           {
-            echo "concurrency_key=preview-${BRANCH:-$GH_SHA}"
+            echo "concurrency_key=$KEY"
             echo "pr_url=$(jq -r '.html_url // empty' <<<"${PR_JSON:-null}")"
-            echo "pr_number=$(jq -r '.number // empty' <<<"${PR_JSON:-null}")"
+            echo "pr_number=$PR_NUMBER"
             echo "pr_title=$(jq -r '.title // empty | gsub("[\\r\\n]"; " ")' <<<"${PR_JSON:-null}")"
           } >> "$GITHUB_OUTPUT"
 
   e2e:
     needs: resolve
 
-    # One run per branch: a new deployment of the same branch cancels the superseded run,
-    # while deployments of other branches no longer touch it. See the `resolve` job.
+    # One run per PR: a new deployment of the same PR cancels the superseded run, while
+    # deployments of other PRs no longer touch it. See the `resolve` job.
     concurrency:
       group: e2e-${{ needs.resolve.outputs.concurrency_key }}
       cancel-in-progress: true
