@@ -27,36 +27,35 @@ const ITEM_PDF_VISIBILITY_FLAG_KEYS = Object.keys(
   ITEM_PDF_VISIBILITY_FLAGS,
 ) as ItemPdfVisibilityFlag[];
 
-interface RemoveInvoiceItemOptions {
-  /** The invoice's items, in order. */
+interface GetColumnSwitchesToCarryOptions {
+  /** The invoice's items, in order, before the removal. */
   items: InvoiceItemData[];
-  /** Position of the item to remove. */
+  /** Position of the item being removed. */
   index: number;
 }
 
 /**
- * Removes one item. The PDF column switches live on the first item, so removing it hands
- * them to the item that becomes first, and the PDF keeps the columns the user chose.
+ * The PDF column switches to hand on when an item is removed. They live on the first item,
+ * so removing it passes them to the item that becomes first, and the PDF keeps the columns
+ * the user chose. Null when nothing needs carrying: a later item, or the last one left.
+ *
+ * Only the switches, not a rebuilt list: the caller removes the one row with the field
+ * array's `remove`, which keeps the other cards' keys, and so their open editors.
  */
-export function removeInvoiceItem({
+export function getColumnSwitchesToCarry({
   items,
   index,
-}: RemoveInvoiceItemOptions): InvoiceItemData[] {
-  const remaining = items.filter((_, i) => {
-    return i !== index;
-  });
+}: GetColumnSwitchesToCarryOptions): Pick<
+  InvoiceItemData,
+  ItemPdfVisibilityFlag
+> | null {
+  const [removedFirst, nextFirst] = items;
 
-  const [removedFirst] = items;
+  if (index !== 0 || !removedFirst || !nextFirst) return null;
 
-  const [nextFirst] = remaining;
-
-  if (index !== 0 || !removedFirst || !nextFirst) return remaining;
-
-  const carriedFlags = Object.fromEntries(
+  return Object.fromEntries(
     ITEM_PDF_VISIBILITY_FLAG_KEYS.map((key) => {
       return [key, removedFirst[key]];
     }),
-  );
-
-  return [{ ...nextFirst, ...carriedFlags }, ...remaining.slice(1)];
+  ) as Pick<InvoiceItemData, ItemPdfVisibilityFlag>;
 }

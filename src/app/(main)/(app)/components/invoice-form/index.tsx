@@ -39,7 +39,7 @@ import { InvoiceClosing } from "./sections/invoice-closing";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
 import { formErrorsToToast } from "./utils/form-errors-to-toast";
-import { removeInvoiceItem } from "./utils/remove-invoice-item";
+import { getColumnSwitchesToCarry } from "./utils/get-column-switches-to-carry";
 
 /**
  * Time in milliseconds to debounce updates in the invoice form,
@@ -109,7 +109,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   const dateOfIssue = useWatch({ control, name: "dateOfIssue" });
   const language = useWatch({ control, name: "language" });
 
-  const { fields, append, insert } = useFieldArray({
+  const { fields, append, insert, remove } = useFieldArray({
     control,
     name: "items",
   });
@@ -256,15 +256,24 @@ export const InvoiceForm = memo(function InvoiceForm({
   const handleRemoveInvoiceItem = useCallback(
     (index: number) => {
       // read at click time rather than watched, so item edits don't re-render the form
-      setValue(
-        "items",
-        removeInvoiceItem({ items: getValues("items"), index }),
-        {
-          shouldValidate: true,
-          shouldTouch: true,
-          shouldDirty: true,
-        },
-      );
+      const carriedSwitches = getColumnSwitchesToCarry({
+        items: getValues("items"),
+        index,
+      });
+
+      // the one row only: rewriting the whole `items` array would re-key every card, and
+      // a card with an open, still-empty editor (a discount) would remount and close it
+      remove(index);
+
+      if (carriedSwitches) {
+        for (const [key, isVisible] of Object.entries(carriedSwitches)) {
+          setValue(
+            `items.0.${key as keyof typeof carriedSwitches}`,
+            isVisible,
+            { shouldDirty: true },
+          );
+        }
+      }
 
       toast.success("Invoice item removed successfully", {
         id: "invoice-item-removed-success",
@@ -276,7 +285,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       // analytics track event
       trackEvent({ event: "remove_invoice_item" });
     },
-    [getValues, setValue, isMobile],
+    [getValues, setValue, remove, isMobile],
   );
 
   const onSubmit = (data: InvoiceData) => {

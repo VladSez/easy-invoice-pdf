@@ -98,6 +98,50 @@ test.describe("Item discounts", () => {
     ).toContainText("10,000.00");
   });
 
+  test("deleting item 1 keeps the next item's open discount and the PDF column choices", async ({
+    page,
+  }) => {
+    const invoiceItemsSection = page.getByTestId("invoice-items-section");
+
+    await invoiceItemsSection
+      .getByRole("button", { name: "Add invoice item" })
+      .click();
+
+    // item 1 carries the PDF column switches: turn one off
+    const unitColumnSwitch = invoiceItemsSection.getByRole("switch", {
+      name: UNIT_COLUMN_SWITCH_NAME,
+    });
+    await unitColumnSwitch.click();
+    await expect(unitColumnSwitch).not.toBeChecked();
+
+    // open item 2's discount and leave it empty
+    await invoiceItemsSection.getByTestId("addItemDiscount1").click();
+    await expect(
+      invoiceItemsSection.getByTestId("itemDiscount1"),
+    ).toBeVisible();
+
+    await invoiceItemsSection
+      .getByRole("button", { name: "Delete Invoice Item 1" })
+      .click();
+    await page.getByRole("button", { name: "Delete Item 1" }).click();
+
+    await expect(
+      invoiceItemsSection.getByRole("group", { name: /^Item \d+$/ }),
+    ).toHaveCount(1);
+
+    // the surviving item, now item 1, still has its discount editor open
+    await expect(
+      invoiceItemsSection.getByTestId("itemDiscount0"),
+    ).toBeVisible();
+
+    // and the Unit column stays off, now on the new item 1
+    await expect(
+      invoiceItemsSection.getByRole("switch", {
+        name: UNIT_COLUMN_SWITCH_NAME,
+      }),
+    ).not.toBeChecked();
+  });
+
   test("shows a discount column in the default template PDF", async ({
     page,
     browserName,
@@ -217,3 +261,6 @@ async function fillDiscountedItems(page: Page) {
       .fill("1000");
   });
 }
+
+/** Item 1 holds the PDF column switches; this one hides the Unit column for every item. */
+const UNIT_COLUMN_SWITCH_NAME = "Show the 'Unit' Column in the PDF for item 1";
