@@ -29,4 +29,5 @@ jobs:
       - name: 🛑 Cancel e2e run
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: echo "Joined the e2e concurrency group of PR #$PR_NUMBER, which cancels its e2e run."
+        run: |
+          echo "Joined the e2e concurrency group of PR #$PR_NUMBER, which cancels its e2e run."
