@@ -614,6 +614,21 @@ describe("InvoiceItems quantity and unit", () => {
     expect(quantity).toHaveValue(2.5);
   });
 
+  it("stops stepping the quantity up before it passes the largest quantity allowed", () => {
+    renderInvoiceItems({ itemCount: 1, itemOverrides: { amount: 999_999.5 } });
+
+    expect(
+      screen.getByRole("button", { name: "Increase quantity of item 1" }),
+    ).toBeDisabled();
+    cleanup();
+
+    renderInvoiceItems({ itemCount: 1, itemOverrides: { amount: 999_998.99 } });
+
+    expect(
+      screen.getByRole("button", { name: "Increase quantity of item 1" }),
+    ).toBeEnabled();
+  });
+
   it("does not step the quantity below zero", async () => {
     const user = userEvent.setup();
 
@@ -806,7 +821,11 @@ describe("InvoiceItems calculated amounts", () => {
 
     renderInvoiceItems({
       itemCount: 1,
-      itemOverrides: { discountValue: 10, discountAmount: 20.1 },
+      itemOverrides: {
+        discountValue: 10,
+        discountAmount: 20.1,
+        netAmount: 180.9,
+      },
     });
 
     expect(getAmountText("itemDiscountSummary0")).toBe(
@@ -820,6 +839,8 @@ describe("InvoiceItems calculated amounts", () => {
       itemOverrides: {
         discountValue: 10,
         discountAmount: 20.1,
+        // what the totals sync writes: the line after its discount
+        netAmount: 180.9,
         discountLabel: "Loyalty discount",
       },
     });
@@ -836,11 +857,33 @@ describe("InvoiceItems calculated amounts", () => {
         discountType: "amount",
         discountValue: 25,
         discountAmount: 25,
+        netAmount: 176,
       },
     });
 
     expect(getAmountText("itemDiscountSummary0")).toBe(
       "Discountof 201.00 EUR subtotal−25.00 EUR",
+    );
+  });
+
+  // while the price is invalid (cleared to retype it), the totals sync keeps the last valid
+  // amounts; a subtotal from the live fields would read "0.00 EUR subtotal −20.10 EUR"
+  it("keeps the discount line's subtotal and savings from the same calculation", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: {
+        discountValue: 10,
+        discountAmount: 20.1,
+        netAmount: 180.9,
+      },
+    });
+
+    await user.clear(screen.getByRole("spinbutton", { name: "Unit price" }));
+
+    expect(getAmountText("itemDiscountSummary0")).toBe(
+      "Discount 10%of 201.00 EUR subtotal−20.10 EUR",
     );
   });
 });

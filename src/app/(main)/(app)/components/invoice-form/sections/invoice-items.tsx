@@ -33,6 +33,7 @@ import {
   type SupportedLanguages,
   type SupportedNumberFormatLocale,
   MAX_INVOICE_ITEMS,
+  MAX_ITEM_QUANTITY,
 } from "@/app/schema";
 import { Legend } from "@/components/legend";
 import { Button } from "@/components/ui/button";
@@ -594,6 +595,9 @@ function QuantityStepper({ control, index, hasError }: QuantityStepperProps) {
               variant="outline"
               size="icon"
               aria-label={`Increase quantity of item ${index + 1}`}
+              // a step past the limit would write a quantity the schema rejects, and the
+              // totals would stop updating until it was fixed by hand
+              disabled={quantity + 1 > MAX_ITEM_QUANTITY}
               onClick={() => {
                 stepBy(1);
               }}

@@ -1053,6 +1053,9 @@ export function parseDiscountValue(raw: unknown) {
 /** Longest custom discount label, e.g. "Charitable donation". */
 export const MAX_ITEM_DISCOUNT_LABEL_LENGTH = 100;
 
+/** The largest quantity an item takes; the quantity stepper stops below it too. */
+export const MAX_ITEM_QUANTITY = 999_999.99;
+
 export const invoiceItemSchema = z
   .object({
     // Show/hide Number column on PDF
@@ -1100,7 +1103,7 @@ export const invoiceItemSchema = z
       )
       .refine(
         (val) => {
-          return val <= 999_999.99;
+          return val <= MAX_ITEM_QUANTITY;
         },
         {
           message: "Amount must not exceed 999 999.99",

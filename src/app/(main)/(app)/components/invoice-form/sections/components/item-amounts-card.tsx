@@ -3,6 +3,7 @@ import { type Control, useWatch } from "react-hook-form";
 import { PdfColumnSwitch } from "@/app/(main)/(app)/components/invoice-form/sections/components/pdf-column-switch";
 import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
 import { formatMoneyForTemplate } from "@/app/(main)/(app)/utils/format-money-for-template";
+import { getItemAmountBeforeDiscount } from "@/app/(main)/(app)/utils/item-discount";
 import type {
   InvoiceData,
   InvoiceItemData,
@@ -27,8 +28,6 @@ export function ItemAmountsCard({
   hiddenColumns,
 }: ItemAmountsCardProps) {
   const [
-    amount,
-    netPrice,
     discountType,
     discountValue,
     discountAmount,
@@ -39,8 +38,6 @@ export function ItemAmountsCard({
   ] = useWatch({
     control,
     name: [
-      `items.${index}.amount`,
-      `items.${index}.netPrice`,
       `items.${index}.discountType`,
       `items.${index}.discountValue`,
       `items.${index}.discountAmount`,
@@ -60,10 +57,12 @@ export function ItemAmountsCard({
     });
   };
 
-  // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- `<Input type="number">` gives back strings at runtime, the schema types say number
-  const subtotal = (Number(amount) || 0) * (Number(netPrice) || 0);
+  // from the amounts `ItemTotalsSync` last wrote, not the live qty and price: while either
+  // is invalid (a cleared price) the sync holds the old amounts, and a subtotal from the
+  // live fields would show beside a discount from that older calculation
+  const subtotal = getItemAmountBeforeDiscount({ netAmount, discountAmount });
 
-  // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- see above
+  // oxlint-disable-next-line typescript/no-unnecessary-type-conversion -- `<Input type="number">` gives back strings at runtime, the schema types say number
   const discountNumber = Number(discountValue) || 0;
 
   // named as the PDF names it: the item's own label, or "Discount", plus the rate when

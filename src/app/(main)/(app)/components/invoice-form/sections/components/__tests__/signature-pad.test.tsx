@@ -30,6 +30,59 @@ function renderPad() {
   };
 }
 
+const SAVED_SIGNATURE = "data:image/png;base64,iVBORw0KGgo=";
+
+/** Images that load only when a test says so, so a load can land after a change. */
+function mockSlowImages() {
+  const images: FakeImage[] = [];
+
+  class FakeImage {
+    width = 120;
+    height = 40;
+    src = "";
+    private onLoad: (() => void) | null = null;
+
+    constructor() {
+      images.push(this);
+    }
+
+    addEventListener(type: string, listener: () => void) {
+      if (type === "load") this.onLoad = listener;
+    }
+
+    finishLoading() {
+      this.onLoad?.();
+    }
+  }
+
+  vi.stubGlobal("Image", FakeImage);
+
+  // a 2D context that records what gets drawn
+  const drawImage = vi.fn();
+  vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(() => {
+    return new Proxy(
+      { drawImage },
+      {
+        get(target, property) {
+          return property in target
+            ? target[property as keyof typeof target]
+            : vi.fn();
+        },
+      },
+    ) as unknown as CanvasRenderingContext2D;
+  });
+
+  return {
+    images,
+    /** Whether the saved signature's image was drawn onto a canvas. */
+    wasImageDrawn: () => {
+      return drawImage.mock.calls.some(([source]) => {
+        return source instanceof FakeImage;
+      });
+    },
+  };
+}
+
 describe("SignaturePad", () => {
   afterEach(() => {
     cleanup();
@@ -80,5 +133,84 @@ describe("SignaturePad", () => {
     fireEvent.click(pad);
 
     expect(screen.queryByText("Tap outside when done")).not.toBeInTheDocument();
+  });
+
+  it("keeps a stroke to the pointer that started it", () => {
+    mockPointer("touch");
+    const { pad } = renderPad();
+
+    // arm the pad with a tap, as on a phone
+    fireEvent.pointerDown(pad, {
+      pointerId: 9,
+      pointerType: "touch",
+      button: 0,
+    });
+    fireEvent.click(pad);
+
+    fireEvent.pointerDown(pad, {
+      pointerId: 1,
+      pointerType: "touch",
+      button: 0,
+    });
+
+    // drawing: the empty pad's prompt is gone
+    expect(screen.queryByText("Draw signature")).not.toBeInTheDocument();
+
+    // a second finger, or a palm, lands and lifts mid-stroke
+    fireEvent.pointerDown(pad, {
+      pointerId: 2,
+      pointerType: "touch",
+      button: 0,
+    });
+    fireEvent.pointerUp(pad, { pointerId: 2, pointerType: "touch" });
+
+    expect(screen.queryByText("Draw signature")).not.toBeInTheDocument();
+
+    fireEvent.pointerUp(pad, { pointerId: 1, pointerType: "touch" });
+
+    expect(screen.getByText("Draw signature")).toBeInTheDocument();
+  });
+
+  describe("restoring a saved signature", () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("draws the saved signature once its image loads", () => {
+      mockPointer("mouse");
+      const { images, wasImageDrawn } = mockSlowImages();
+
+      render(
+        <SignaturePad
+          value={SAVED_SIGNATURE}
+          onChange={vi.fn()}
+          label="Issued by"
+        />,
+      );
+
+      for (const image of images) image.finishLoading();
+
+      expect(wasImageDrawn()).toBe(true);
+    });
+
+    it("doesn't paint a signature back when its image loads after Clear", () => {
+      mockPointer("mouse");
+      const { images, wasImageDrawn } = mockSlowImages();
+
+      const { rerender } = render(
+        <SignaturePad
+          value={SAVED_SIGNATURE}
+          onChange={vi.fn()}
+          label="Issued by"
+        />,
+      );
+
+      // Clear empties the value before the saved image has loaded
+      rerender(<SignaturePad value="" onChange={vi.fn()} label="Issued by" />);
+
+      for (const image of images) image.finishLoading();
+
+      expect(wasImageDrawn()).toBe(false);
+    });
   });
 });

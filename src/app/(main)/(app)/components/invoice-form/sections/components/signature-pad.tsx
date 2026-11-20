@@ -29,6 +29,10 @@ export function SignaturePad({
   // the stroke in progress, as [x, y, pressure] in CSS pixels; null between strokes
   const strokeRef = useRef<StrokePoint[] | null>(null);
 
+  // the pointer drawing that stroke: a second finger or a resting palm neither starts a
+  // new stroke over it nor adds points to it
+  const activePointerIdRef = useRef<number | null>(null);
+
   // a pen reports real pressure; a mouse, trackpad or finger gets it simulated from speed
   const simulatePressureRef = useRef(true);
 
@@ -82,6 +86,10 @@ export function SignaturePad({
     inkLayerRef.current ??= document.createElement("canvas");
     const inkLayer = inkLayerRef.current;
 
+    // the saved signature loads asynchronously; a load that lands after Clear, Remove or a
+    // newer redraw would paint stale ink back, and the next stroke would save it again
+    let cancelPendingDraw: (() => void) | null = null;
+
     function redraw() {
       if (!canvas) return;
 
@@ -96,8 +104,11 @@ export function SignaturePad({
       inkLayer.height = canvas.height;
       paint({ canvas, inkLayer, stroke: null });
 
+      cancelPendingDraw?.();
+      cancelPendingDraw = null;
+
       if (value) {
-        drawSavedSignature({
+        cancelPendingDraw = drawSavedSignature({
           inkLayer,
           dataUrl: value,
           onDrawn: (bounds) => {
@@ -115,6 +126,7 @@ export function SignaturePad({
 
     return () => {
       observer.disconnect();
+      cancelPendingDraw?.();
     };
   }, [value]);
 
@@ -167,6 +179,7 @@ export function SignaturePad({
     const inkLayer = inkLayerRef.current;
 
     strokeRef.current = null;
+    activePointerIdRef.current = null;
     setIsDrawing(false);
 
     if (!stroke || !inkLayer) return;
@@ -225,6 +238,9 @@ export function SignaturePad({
           // an unarmed pad ignores a finger, which may be scrolling past
           if (event.pointerType === "touch" && !isArmedRef.current) return;
 
+          // one stroke at a time, owned by the pointer that started it
+          if (activePointerIdRef.current !== null) return;
+
           // a drag that starts here draws; it must not start a text selection
           event.preventDefault();
 
@@ -238,6 +254,7 @@ export function SignaturePad({
             // nothing to capture
           }
 
+          activePointerIdRef.current = event.pointerId;
           strokeRef.current = [];
           simulatePressureRef.current = event.pointerType !== "pen";
           setIsDrawing(true);
@@ -250,6 +267,8 @@ export function SignaturePad({
           });
         }}
         onPointerMove={(event) => {
+          if (event.pointerId !== activePointerIdRef.current) return;
+
           if (!strokeRef.current || !inkLayerRef.current) return;
 
           addPoints(event);
@@ -261,9 +280,13 @@ export function SignaturePad({
           });
         }}
         onPointerUp={(event) => {
+          if (event.pointerId !== activePointerIdRef.current) return;
+
           finishStroke(event.currentTarget);
         }}
         onPointerCancel={(event) => {
+          if (event.pointerId !== activePointerIdRef.current) return;
+
           finishStroke(event.currentTarget);
         }}
       />
@@ -505,12 +528,16 @@ function exportInk({ canvas, bounds }: ExportInkArgs) {
 
 /**
  * Draws a saved signature back onto the ink layer, centred, at the size it was drawn (or
- * smaller, if the pad has since become narrower), and reports where it landed.
+ * smaller, if the pad has since become narrower), and reports where it landed. Returns a
+ * function that cancels the draw if the image hasn't loaded yet.
  */
 function drawSavedSignature({ inkLayer, dataUrl, onDrawn }: DrawSavedArgs) {
   const image = new Image();
+  let isCancelled = false;
 
   image.addEventListener("load", () => {
+    if (isCancelled) return;
+
     const context = inkLayer.getContext("2d");
 
     if (!context) return;
@@ -537,6 +564,10 @@ function drawSavedSignature({ inkLayer, dataUrl, onDrawn }: DrawSavedArgs) {
   });
 
   image.src = dataUrl;
+
+  return () => {
+    isCancelled = true;
+  };
 }
 
 interface SignaturePadProps {
