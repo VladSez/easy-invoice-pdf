@@ -1,0 +1,33 @@
+name: 🛑 Cancel e2e of closed PRs
+# `pull_request_target`, not `pull_request`: GitHub skips `pull_request` workflows for a PR
+# with a merge conflict, so closing a conflicting PR would leave its e2e run going.
+# `pull_request_target` runs regardless. It is safe here because the job has no token
+# permissions, checks out nothing and runs no PR code; it only reads the PR number.
+# Because the workflow file is read from `main`, edits to it take effect only once merged.
+on:
+  pull_request_target: # zizmor: ignore[dangerous-triggers] -- no permissions, no checkout, no PR code
+    types: [closed]
+
+permissions: {}
+
+jobs:
+  # Concurrency groups are shared by every workflow in the repository, so joining the
+  # e2e job's group with `cancel-in-progress` cancels that PR's running (and queued) e2e
+  # run. No token or API call is involved, which is why this works for fork PRs too.
+  #
+  # The group must match the e2e job's group in `e2e.yml`: `e2e-${concurrency_key}`,
+  # where the key for a PR deployment is `preview-pr-<number>`. If that prefix changes,
+  # this job stops cancelling anything without failing.
+  cancel-e2e:
+    name: Cancel e2e run
+    concurrency:
+      group: e2e-preview-pr-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: 🛑 Cancel e2e run
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          echo "Joined the e2e concurrency group of PR #$PR_NUMBER, which cancels its e2e run."

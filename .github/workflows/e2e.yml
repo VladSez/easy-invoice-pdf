@@ -73,6 +73,8 @@ jobs:
 
     # One run per PR: a new deployment of the same PR cancels the superseded run, while
     # deployments of other PRs no longer touch it. See the `resolve` job.
+    # `cancel-e2e-on-pr-close.yml` joins the `e2e-preview-pr-<number>` group to cancel the
+    # run when the PR closes, so keep the two in sync.
     concurrency:
       group: e2e-${{ needs.resolve.outputs.concurrency_key }}
       cancel-in-progress: true
