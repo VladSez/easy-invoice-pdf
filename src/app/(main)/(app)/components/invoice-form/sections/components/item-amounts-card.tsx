@@ -176,6 +176,14 @@ export function ItemAmountsCard({
           );
         })}
       </dl>
+
+      {/* the switches sit on item 1 alone yet act on the whole table, which they don't
+          say by themselves */}
+      {showColumnSwitches ? (
+        <p className="border-t border-slate-200 px-3 py-2 text-xs text-slate-500">
+          Each switch shows or hides that column in the PDF, for every item.
+        </p>
+      ) : null}
     </div>
   );
 }
