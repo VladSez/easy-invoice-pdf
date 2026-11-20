@@ -19,6 +19,36 @@ export const VIDEO_DEMO_URL = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-dem
  */
 export const VIDEO_DEMO_FALLBACK_IMG = `${STATIC_ASSETS_URL}/demo-videos/easy-invoice-demo-01-2026-fallback-img-v1.png`;
 
+/*
+ * og:videos: 8-second silent loops, 1200×630 H.264, rendered from
+ * `scripts/og-video/<name>-og-video.html` by `pnpm og-video`, which names each MP4
+ * after the URL below. Re-render and upload under the next version suffix rather than
+ * overwriting, since social platforms and the CDN cache by URL.
+ */
+const OG_VIDEO_URL = `${STATIC_ASSETS_URL}/easy-invoice-og-video-v2.mp4`;
+const STRIPE_OG_VIDEO_URL = `${STATIC_ASSETS_URL}/easy-invoice-stripe-og-video-v1.mp4`;
+
+/**
+ * The `openGraph.videos` entry for every page except the Stripe ones. Platforms that
+ * play og:video (Facebook, Discord, ...) show it in place of the image; the rest keep
+ * using `openGraph.images`.
+ */
+export const OG_VIDEO = {
+  url: OG_VIDEO_URL,
+  type: "video/mp4",
+  width: 1200,
+  height: 630,
+} as const;
+
+/**
+ * The `openGraph.videos` entry for `/stripe-template` and the Stripe landing page,
+ * showing the Stripe template.
+ */
+export const STRIPE_OG_VIDEO = {
+  ...OG_VIDEO,
+  url: STRIPE_OG_VIDEO_URL,
+} as const;
+
 /**
  * YouTube URL for main demo video on "How it works" dialog
  */
