@@ -322,6 +322,16 @@ export const SEO_LANDING_DEFINITIONS = {
           "Press Download PDF. The file is in your downloads folder, ready to send.",
         ],
       },
+      {
+        title: "Send the invoice to your client by email",
+        lead: "The generator does not send email for you, so there is no mail account to connect. You send the invoice yourself, from the inbox your client already knows.",
+        bullets: [
+          "Press Download PDF and attach the file to an email in Gmail, Outlook or any other mail app",
+          "The file name carries the invoice number, so the attachment is easy to find later",
+          "Or press Get link and paste the link into the email. It opens the same invoice in the browser, with nothing to download",
+          "Share links cannot hold a logo, so for an invoice with a logo, attach the PDF instead",
+        ],
+      },
     ],
     comparisonTable: {
       heading: "Against a typical invoicing tool",
@@ -1224,7 +1234,7 @@ export const SEO_LANDING_DEFINITIONS = {
   "swedish-invoice-generator": {
     slug: "swedish-invoice-generator",
     metadata: {
-      title: "Swedish Invoice Generator - Free PDF in SEK",
+      title: "Swedish Invoice Template (Svenska) - Free PDF in SEK",
       description:
         "Create a Swedish invoice PDF with SEK amounts, moms wording and Swedish labels on every field. The total is written out in Swedish. Free, no account.",
       keywords:
