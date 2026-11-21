@@ -184,6 +184,19 @@ export const InvoiceClosing = memo(function InvoiceClosing({
               return (
                 <Input
                   {...field}
+                  onChange={(event) => {
+                    const wasEmpty = !field.value;
+
+                    field.onChange(event);
+
+                    // once per QR code, when it first gets data, not on every keystroke
+                    if (wasEmpty && event.target.value) {
+                      trackEvent({
+                        event: "qr_code_data_added",
+                        data: { invoice_template: template },
+                      });
+                    }
+                  }}
                   id="qrCodeData"
                   aria-label="QR code link or text"
                   type="text"
@@ -481,7 +494,25 @@ function SignerField({ control, signer, error }: SignerFieldProps) {
             return (
               <SignaturePad
                 value={field.value ?? ""}
-                onChange={field.onChange}
+                onChange={(signature) => {
+                  const hadSignature = Boolean(field.value);
+
+                  field.onChange(signature);
+
+                  // the pad saves after every pause in drawing, so only the first save of
+                  // a signature and the Clear that empties it count
+                  if (!hadSignature && signature) {
+                    trackEvent({
+                      event: "signature_drawn",
+                      data: { signer: signer.analyticsKey },
+                    });
+                  } else if (hadSignature && !signature) {
+                    trackEvent({
+                      event: "signature_cleared",
+                      data: { signer: signer.analyticsKey },
+                    });
+                  }
+                }}
                 label={signer.label}
                 testId={signer.signatureField}
               />
@@ -553,6 +584,7 @@ const SIGNERS = [
     signatureField: "personAuthorizedToReceiveSignature",
     visibilityField: "personAuthorizedToReceiveFieldIsVisible",
     switchLabel: "Show Person Authorized to Receive in PDF",
+    analyticsKey: "received_by",
   },
   {
     label: "Issued by",
@@ -560,6 +592,7 @@ const SIGNERS = [
     signatureField: "personAuthorizedToIssueSignature",
     visibilityField: "personAuthorizedToIssueFieldIsVisible",
     switchLabel: "Show Person Authorized to Issue in PDF",
+    analyticsKey: "issued_by",
   },
 ] as const;
 

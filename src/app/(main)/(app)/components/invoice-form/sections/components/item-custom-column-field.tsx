@@ -66,7 +66,8 @@ export function ItemCustomColumnField({
         ref={pillRef}
         testId={`addItemCustomColumn${index}`}
         onClick={() => {
-          const isUnnamed = !getValues("customColumnLabel")?.trim();
+          const existingName = getValues("customColumnLabel")?.trim();
+          const isUnnamed = !existingName;
           const willAskForName = index === 0 || isUnnamed;
 
           setIsOpen(true);
@@ -75,7 +76,12 @@ export function ItemCustomColumnField({
           setValue("items.0.typeOfGTUFieldIsVisible", true, {
             shouldDirty: true,
           });
-          trackEvent({ event: "add_item_custom_column" });
+          // the name the column already has; the first card to open asks for it, so
+          // adding a column that is still unnamed reports none
+          trackEvent({
+            event: "add_item_custom_column",
+            data: { column_name: existingName || undefined },
+          });
 
           // the card mounts in this click's render, so focus its first field on the next
           // frame: the name while the column has none, otherwise the value

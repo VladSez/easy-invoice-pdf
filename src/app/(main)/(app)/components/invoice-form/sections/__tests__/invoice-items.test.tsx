@@ -230,6 +230,32 @@ describe("InvoiceItems max invoice items", () => {
     expect(trackEvent).not.toHaveBeenCalled();
   });
 
+  it("reports each flip of the number column and tax summary switches", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1 });
+
+    await user.click(screen.getByRole("switch", { name: /^Number column/ }));
+    await user.click(
+      screen.getByRole("switch", { name: /^VAT summary table/ }),
+    );
+
+    expect(vi.mocked(trackEvent).mock.calls).toEqual([
+      [
+        {
+          event: "item_number_column_toggle",
+          data: { is_visible: false },
+        },
+      ],
+      [
+        {
+          event: "vat_summary_table_toggle",
+          data: { is_visible: false },
+        },
+      ],
+    ]);
+  });
+
   it("shows the max items tooltip when the limit is reached", async () => {
     const user = userEvent.setup();
 
@@ -972,8 +998,10 @@ describe("InvoiceItems custom column", () => {
     });
     expect(screen.getByRole("textbox", { name: "Value" })).toBeInTheDocument();
     expect(getCustomColumnSwitch()).toBeChecked();
+    // the column has no name yet, so the event has none to report
     expect(trackEvent).toHaveBeenCalledWith({
       event: "add_item_custom_column",
+      data: { column_name: undefined },
     });
   });
 
@@ -1002,6 +1030,10 @@ describe("InvoiceItems custom column", () => {
       expect(
         screen.getByRole("textbox", { name: "Project code" }),
       ).toHaveFocus();
+    });
+    expect(trackEvent).toHaveBeenLastCalledWith({
+      event: "add_item_custom_column",
+      data: { column_name: "Project code" },
     });
   });
 

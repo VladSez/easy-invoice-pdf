@@ -822,7 +822,13 @@ function PdfOptionRow({
               {...field}
               id={id}
               checked={value}
-              onCheckedChange={onChange}
+              onCheckedChange={(checked) => {
+                onChange(checked);
+                trackEvent({
+                  event: PDF_OPTION_TOGGLE_EVENT[name],
+                  data: { is_visible: checked },
+                });
+              }}
               size="sm"
             />
           );
@@ -846,6 +852,12 @@ const COMMON_TAX_RATES = [
   label: string;
   value: InvoiceItemData["vat"];
 }>;
+
+/** The event each invoice-wide switch reports a flip under. */
+const PDF_OPTION_TOGGLE_EVENT = {
+  "items.0.invoiceItemNumberIsVisible": "item_number_column_toggle",
+  vatTableSummaryIsVisible: "vat_summary_table_toggle",
+} as const satisfies Record<PdfOptionRowProps["name"], string>;
 
 const COMMON_UNITS = ["service", "hours", "days", "pcs"] as const;
 

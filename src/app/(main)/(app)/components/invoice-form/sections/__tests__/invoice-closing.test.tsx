@@ -236,6 +236,34 @@ describe("InvoiceClosing", () => {
 
     expect(readForm().personAuthorizedToIssueSignature).toBe("");
     expect(screen.getAllByText("Draw signature")).toHaveLength(2);
+    expect(trackEvent).toHaveBeenCalledWith({
+      event: "signature_cleared",
+      data: { signer: "issued_by" },
+    });
+  });
+
+  it("reports a QR code's data once, when the empty field first gets some", async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+
+    await user.click(getPill("QR code"));
+    await user.type(
+      screen.getByRole("textbox", { name: "QR code link or text" }),
+      "https://pay.example.com",
+    );
+
+    const dataEvents = vi.mocked(trackEvent).mock.calls.filter(([call]) => {
+      return call.event === "qr_code_data_added";
+    });
+
+    expect(dataEvents).toEqual([
+      [
+        {
+          event: "qr_code_data_added",
+          data: { invoice_template: "default" },
+        },
+      ],
+    ]);
   });
 
   it("opens the signatures for an invoice that only has a drawn signature", () => {
