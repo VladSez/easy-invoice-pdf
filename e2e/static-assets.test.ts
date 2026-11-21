@@ -8,80 +8,86 @@ import {
   VIDEO_DEMO_URL,
 } from "@/config";
 
-test.describe("Static assets (fonts, images, videos) should be accessible", () => {
-  test("should load static assets successfully", async ({ page }) => {
-    // Test video demo URL
-    const videoResponse = await page.request.get(VIDEO_DEMO_URL);
-
-    expect(videoResponse.status()).toBe(200);
-    expect(videoResponse.headers()["content-type"]).toContain("video/mp4");
-
-    // Test video fallback image
-    const fallbackImageResponse = await page.request.get(
-      VIDEO_DEMO_FALLBACK_IMG,
-    );
-    expect(fallbackImageResponse.status()).toBe(200);
-    expect(fallbackImageResponse.headers()["content-type"]).toContain(
-      "image/png",
-    );
-
-    /**
-     * Test PDF fonts
-     */
-    for (const [, fonts] of Object.entries(INVOICE_PDF_FONTS)) {
-      for (const [, fontUrl] of Object.entries(fonts)) {
-        const fontResponse = await page.request.get(fontUrl);
-
-        expect(fontResponse.status()).toBe(200);
-        expect(fontResponse.headers()["content-type"]).toContain("font/ttf");
-      }
-    }
-
-    /**
-     * Test marketing features cards
-     */
-    for (const { videoSrc, videoFallbackImg } of MARKETING_FEATURES_CARDS) {
-      const videoResponse = await page.request.get(videoSrc);
+test.describe(
+  "Static assets (fonts, images, videos) should be accessible",
+  { tag: "@desktop-only" },
+  () => {
+    test("should load static assets successfully", async ({ page }) => {
+      // Test video demo URL
+      const videoResponse = await page.request.get(VIDEO_DEMO_URL);
 
       expect(videoResponse.status()).toBe(200);
       expect(videoResponse.headers()["content-type"]).toContain("video/mp4");
 
-      const fallbackResponse = await page.request.get(videoFallbackImg);
+      // Test video fallback image
+      const fallbackImageResponse = await page.request.get(
+        VIDEO_DEMO_FALLBACK_IMG,
+      );
+      expect(fallbackImageResponse.status()).toBe(200);
+      expect(fallbackImageResponse.headers()["content-type"]).toContain(
+        "image/png",
+      );
 
-      expect(fallbackResponse.status()).toBe(200);
-      expect(fallbackResponse.headers()["content-type"]).toContain("image/png");
-    }
-  });
+      /**
+       * Test PDF fonts
+       */
+      for (const [, fonts] of Object.entries(INVOICE_PDF_FONTS)) {
+        for (const [, fontUrl] of Object.entries(fonts)) {
+          const fontResponse = await page.request.get(fontUrl);
 
-  test("no CDN assets fail on app page", async ({ page }) => {
-    const failed: string[] = [];
+          expect(fontResponse.status()).toBe(200);
+          expect(fontResponse.headers()["content-type"]).toContain("font/ttf");
+        }
+      }
 
-    // register a response listener to check for failed assets
-    page.on("response", (res) => {
-      if (res.url().startsWith(STATIC_ASSETS_URL) && !res.ok()) {
-        failed.push(`${res.status()} ${res.url()}`);
+      /**
+       * Test marketing features cards
+       */
+      for (const { videoSrc, videoFallbackImg } of MARKETING_FEATURES_CARDS) {
+        const videoResponse = await page.request.get(videoSrc);
+
+        expect(videoResponse.status()).toBe(200);
+        expect(videoResponse.headers()["content-type"]).toContain("video/mp4");
+
+        const fallbackResponse = await page.request.get(videoFallbackImg);
+
+        expect(fallbackResponse.status()).toBe(200);
+        expect(fallbackResponse.headers()["content-type"]).toContain(
+          "image/png",
+        );
       }
     });
 
-    await page.goto("/");
-    await expect(page).toHaveURL("/");
+    test("no CDN assets fail on app page", async ({ page }) => {
+      const failed: string[] = [];
 
-    expect(failed).toEqual([]);
-  });
+      // register a response listener to check for failed assets
+      page.on("response", (res) => {
+        if (res.url().startsWith(STATIC_ASSETS_URL) && !res.ok()) {
+          failed.push(`${res.status()} ${res.url()}`);
+        }
+      });
 
-  test("no CDN assets fail on about page", async ({ page }) => {
-    const failed: string[] = [];
+      await page.goto("/");
+      await expect(page).toHaveURL("/");
 
-    // register a response listener to check for failed assets
-    page.on("response", (res) => {
-      if (res.url().startsWith(STATIC_ASSETS_URL) && !res.ok()) {
-        failed.push(`${res.status()} ${res.url()}`);
-      }
+      expect(failed).toEqual([]);
     });
 
-    await page.goto("/en/about");
-    await expect(page).toHaveURL("/en/about");
+    test("no CDN assets fail on about page", async ({ page }) => {
+      const failed: string[] = [];
 
-    expect(failed).toEqual([]);
-  });
-});
+      // register a response listener to check for failed assets
+      page.on("response", (res) => {
+        if (res.url().startsWith(STATIC_ASSETS_URL) && !res.ok()) {
+          failed.push(`${res.status()} ${res.url()}`);
+        }
+      });
+
+      await page.goto("/en/about");
+      await expect(page).toHaveURL("/en/about");
+
+      expect(failed).toEqual([]);
+    });
+  },
+);

@@ -24,7 +24,7 @@ function readMessages(locale: string): Messages {
   return JSON.parse(fs.readFileSync(messagesPath, "utf8")) as Messages;
 }
 
-test.describe("Localized about page", () => {
+test.describe("Localized about page", { tag: "@desktop-only" }, () => {
   // the localized pages are server rendered, the result does not depend on the
   // browser, so we don't re-run the whole locale matrix on every project
   test.beforeEach(({}, testInfo) => {

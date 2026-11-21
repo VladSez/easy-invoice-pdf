@@ -50,7 +50,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     {
       // the URL encoded/compressed invoice state round trip, a likely place for a
       // Gecko or WebKit vs Chromium divergence to hide
-      tag: ["@firefox-smoke", "@webkit-desktop-smoke"],
+      tag: ["@firefox-smoke", "@webkit-desktop-smoke", "@mobile-chrome"],
     },
     async ({ page, context }) => {
       // Verify shared invoice badge is NOT visible before sharing

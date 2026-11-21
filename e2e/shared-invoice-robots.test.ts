@@ -44,60 +44,66 @@ const APP_URLS = [
   "/?template=default",
 ] as const;
 
-test.describe("Shared invoice links are kept out of search engines", () => {
-  // plain HTTP requests, no need to run them once per browser project
-  test.beforeEach(({}, testInfo) => {
-    // eslint-disable-next-line playwright/no-skipped-test -- HTTP only test, Desktop Chrome only
-    test.skip(
-      testInfo.project.name !== "Desktop Chrome",
-      "robots directives do not depend on the browser",
-    );
-  });
-
-  for (const url of SHARED_INVOICE_URLS) {
-    test(`${url.replace(DATA, "<data>")} is served with noindex, nofollow`, async ({
-      request,
-    }) => {
-      const response = await request.get(url, {
-        headers: { "User-Agent": GOOGLEBOT_USER_AGENT },
-      });
-
-      expect(response.status()).toBe(200);
-      // the data survives any redirect, so the directives are checked on the page that has it
-      expect(new URL(response.url()).searchParams.get("data")).toBe(DATA);
-
-      // the header alone is enough, whatever the (prerendered) meta tags say
-      expect(parseDirectives(response.headers()["x-robots-tag"])).toEqual(
-        expect.arrayContaining(["noindex", "nofollow"]),
+test.describe(
+  "Shared invoice links are kept out of search engines",
+  { tag: "@desktop-only" },
+  () => {
+    // plain HTTP requests, no need to run them once per browser project
+    test.beforeEach(({}, testInfo) => {
+      // eslint-disable-next-line playwright/no-skipped-test -- HTTP only test, Desktop Chrome only
+      test.skip(
+        testInfo.project.name !== "Desktop Chrome",
+        "robots directives do not depend on the browser",
       );
-
-      const directives = await getEffectiveRobotsDirectives(response);
-      expect(directives).toContain("noindex");
-      expect(directives).toContain("nofollow");
     });
-  }
 
-  for (const url of APP_URLS) {
-    test(`${url} does not get the shared-link header`, async ({ request }) => {
-      const response = await request.get(url, {
-        headers: { "User-Agent": GOOGLEBOT_USER_AGENT },
+    for (const url of SHARED_INVOICE_URLS) {
+      test(`${url.replace(DATA, "<data>")} is served with noindex, nofollow`, async ({
+        request,
+      }) => {
+        const response = await request.get(url, {
+          headers: { "User-Agent": GOOGLEBOT_USER_AGENT },
+        });
+
+        expect(response.status()).toBe(200);
+        // the data survives any redirect, so the directives are checked on the page that has it
+        expect(new URL(response.url()).searchParams.get("data")).toBe(DATA);
+
+        // the header alone is enough, whatever the (prerendered) meta tags say
+        expect(parseDirectives(response.headers()["x-robots-tag"])).toEqual(
+          expect.arrayContaining(["noindex", "nofollow"]),
+        );
+
+        const directives = await getEffectiveRobotsDirectives(response);
+        expect(directives).toContain("noindex");
+        expect(directives).toContain("nofollow");
       });
+    }
 
-      expect(response.status()).toBe(200);
+    for (const url of APP_URLS) {
+      test(`${url} does not get the shared-link header`, async ({
+        request,
+      }) => {
+        const response = await request.get(url, {
+          headers: { "User-Agent": GOOGLEBOT_USER_AGENT },
+        });
 
-      // Guards against the `?data=` rule in `next.config.mjs` matching every request, which
-      // would take the whole app out of the index. Not a plain "no header" check: Vercel
-      // sends its own `X-Robots-Tag: noindex` on preview deployments, which is where this
-      // suite runs in CI -- but never `nofollow`, which only the shared-link rule adds.
-      expect(parseDirectives(response.headers()["x-robots-tag"])).not.toContain(
-        "nofollow",
-      );
+        expect(response.status()).toBe(200);
 
-      // The meta tags are not checked here either: they are `index, follow` on production
-      // but `noindex, nofollow` on preview deployments.
-    });
-  }
-});
+        // Guards against the `?data=` rule in `next.config.mjs` matching every request, which
+        // would take the whole app out of the index. Not a plain "no header" check: Vercel
+        // sends its own `X-Robots-Tag: noindex` on preview deployments, which is where this
+        // suite runs in CI -- but never `nofollow`, which only the shared-link rule adds.
+        expect(
+          parseDirectives(response.headers()["x-robots-tag"]),
+        ).not.toContain("nofollow");
+
+        // The meta tags are not checked here either: they are `index, follow` on production
+        // but `noindex, nofollow` on preview deployments.
+      });
+    }
+  },
+);
 
 /**
  * Collects every robots directive a crawler reads from a response: the `X-Robots-Tag`

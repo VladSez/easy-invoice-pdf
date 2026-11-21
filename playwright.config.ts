@@ -196,8 +196,18 @@ export default defineConfig({
     },
 
     // /* Test against mobile viewports. */
+    /**
+     * Phone-only coverage on Chromium.
+     *
+     * `Mobile Safari` already runs the whole suite at the same phone layout (a Pixel 5 is
+     * 393px wide, an iPhone 13 Pro 390px) and `Desktop Chrome` already covers the engine,
+     * so running everything here repeated both. Scoped with `grep` to the tests tagged
+     * `@mobile-chrome`: the flows that only exist on a phone (the edit and preview tabs)
+     * and the core smoke flows (download, local storage, a shared link round trip).
+     */
     {
       name: "Mobile Chrome",
+      grep: /@mobile-chrome/,
       use: {
         ...devices["Pixel 5"],
         channel: "chromium",
@@ -209,8 +219,16 @@ export default defineConfig({
         storageState: STORAGE_STATE,
       },
     },
+    /**
+     * The full suite on a phone, minus the tests tagged `@desktop-only`: the content,
+     * SEO and plain HTTP checks, where the browser makes no difference, and the PDF
+     * snapshot tests, which only compare their screenshot on `Desktop Chrome` (see
+     * DEFAULT_SNAPSHOT_PROJECT in `e2e/utils/pdf-download.ts`). On a phone those only
+     * re-checked that a valid PDF downloads, which the smoke tests already cover.
+     */
     {
       name: "Mobile Safari",
+      grepInvert: /@desktop-only/,
       use: {
         ...devices["iPhone 13 Pro"],
         // on iOS we don't need to grant clipboard permissions

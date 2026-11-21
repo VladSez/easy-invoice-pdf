@@ -27,7 +27,7 @@ const SEO_LANDING_CASES = SLUGS.map((slug) => {
   };
 });
 
-test.describe("SEO landing pages", () => {
+test.describe("SEO landing pages", { tag: "@desktop-only" }, () => {
   for (const { path, h1, subheading, ctaName, ctaHref } of SEO_LANDING_CASES) {
     test(`should render ${path}`, async ({ page }) => {
       await page.goto(path);
@@ -154,7 +154,7 @@ const VIDEO_HERO_CASES = SEO_LANDING_CASES.filter(
   },
 );
 
-test.describe("SEO landing hero art", () => {
+test.describe("SEO landing hero art", { tag: "@desktop-only" }, () => {
   for (const { path, h1, heroImage } of IMAGE_HERO_CASES) {
     test(`shows the hero image on ${path}`, async ({ page }) => {
       await page.goto(path);
