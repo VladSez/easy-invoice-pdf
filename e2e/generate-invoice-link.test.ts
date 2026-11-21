@@ -1010,4 +1010,36 @@ test.describe("Generate Invoice Link (Get link)", () => {
       ),
     ).toBeVisible();
   });
+
+  test("blocks sharing for a signature drawn just before the click", async ({
+    page,
+  }) => {
+    const pad = page.getByTestId("personAuthorizedToIssueSignature");
+
+    await pad.scrollIntoViewIfNeeded();
+
+    const box = await pad.boundingBox();
+
+    if (!box) throw new Error("the signature pad is not on screen");
+
+    // one stroke, then straight to Get link: the page's copy of the invoice only catches up
+    // with the form after the debounce, so the share check must read the form itself
+    await page.mouse.move(box.x + 40, box.y + 70);
+    await page.mouse.down();
+
+    for (let step = 0; step < 20; step++) {
+      await page.mouse.move(
+        box.x + 40 + step * 8,
+        box.y + 70 + Math.sin(step) * 20,
+      );
+    }
+
+    await page.mouse.up();
+    await page.getByRole("button", { name: "Get link" }).first().click();
+
+    await expect(
+      page.getByText(/drawn signatures cannot be shared/).first(),
+    ).toBeVisible();
+    await expect(page).not.toHaveURL(/[?&]data=/);
+  });
 });

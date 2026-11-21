@@ -634,16 +634,20 @@ export function AppPageClient({
 
   /** Generate a shareable invoice link */
   const handleShareInvoice = useCallback(async () => {
-    if (cannotShareReason) {
+    const showCannotShareToast = (reason: string) => {
       toast.error("Unable to Share Invoice", {
         id: "unable-to-share-invoice-error-toast",
         duration: 10_000,
         description: (
           <p className="text-pretty text-xs leading-relaxed text-red-700">
-            {cannotShareReason}
+            {reason}
           </p>
         ),
       });
+    };
+
+    if (cannotShareReason) {
+      showCannotShareToast(cannotShareReason);
 
       return;
     }
@@ -670,6 +674,17 @@ export function AppPageClient({
           </p>
         ),
       });
+
+      return;
+    }
+
+    // the same check on what's in the form now: `cannotShareReason` comes from the debounced
+    // state, which lags the form, so a signature drawn just before the click isn't in it yet
+    const currentCannotShareReason =
+      getCannotShareInvoiceReason(currentInvoiceData);
+
+    if (currentCannotShareReason) {
+      showCannotShareToast(currentCannotShareReason);
 
       return;
     }
