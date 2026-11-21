@@ -1053,6 +1053,9 @@ export function parseDiscountValue(raw: unknown) {
 /** Longest custom discount label, e.g. "Charitable donation". */
 export const MAX_ITEM_DISCOUNT_LABEL_LENGTH = 100;
 
+/** The largest quantity an item takes; the quantity stepper stops below it too. */
+export const MAX_ITEM_QUANTITY = 999_999.99;
+
 export const invoiceItemSchema = z
   .object({
     // Show/hide Number column on PDF
@@ -1065,12 +1068,18 @@ export const invoiceItemSchema = z
       .optional(),
     nameFieldIsVisible: z.boolean().default(true),
 
+    /**
+     * The item's value in the custom column, named by the invoice's `customColumnLabel`.
+     * Still called `typeOfGTU` because the column started out as the Polish Type of GTU,
+     * and saved invoices, share links and the API all use this name.
+     */
     typeOfGTU: z
       .string()
-      .max(50, "Type of GTU must not exceed 50 characters")
+      .max(50, "Value must not exceed 50 characters")
       .trim()
       .optional()
       .default(""),
+    /** The custom column's "In PDF" switch, read from the first item. */
     typeOfGTUFieldIsVisible: z.boolean().default(true),
 
     amount: z
@@ -1094,7 +1103,7 @@ export const invoiceItemSchema = z
       )
       .refine(
         (val) => {
-          return val <= 999_999.99;
+          return val <= MAX_ITEM_QUANTITY;
         },
         {
           message: "Amount must not exceed 999 999.99",
@@ -1399,6 +1408,21 @@ export const BUYERS_LOCAL_STORAGE_KEY = "EASY_INVOICE_PDF_BUYERS";
  *
  * Exported for tests that need access to `.shape` (e.g. URL compression key map).
  */
+/**
+ * A signature drawn on the form's signature pad, stored as a PNG data URL. It lives only in
+ * this browser: share links leave it out (see `compressInvoiceData`), since a link can't
+ * hold an image and a signature shouldn't travel in a URL.
+ */
+const drawnSignatureSchema = z
+  .string()
+  .trim()
+  .max(300_000, "Signature image is too large")
+  .refine((val) => {
+    return !val || val.startsWith("data:image/png;base64,");
+  }, "Signature must be a PNG image in base64 format")
+  .optional()
+  .default("");
+
 export const invoiceObjectSchema = z.object({
   language: z.enum(SUPPORTED_INVOICE_PDF_LANGUAGES).default("en"),
   dateFormat: z.enum(SUPPORTED_DATE_FORMATS).default("YYYY-MM-DD"),
@@ -1489,6 +1513,18 @@ export const invoiceObjectSchema = z.object({
     .describe(
       "Customizable tax label. Defaults to ‘VAT’, but you can change it to any text (e.g. Sales Tax, GST, IVA, etc.)",
     ),
+
+  /**
+   * The name of the items table's custom column, printed as its header; each item's value
+   * is its `typeOfGTU`. Empty prints the PDF language's "Type of GTU", which is what the
+   * column was before it could be named, so older invoices keep their header.
+   */
+  customColumnLabel: z
+    .string()
+    .max(30, "Column name must not exceed 30 characters")
+    .trim()
+    .optional()
+    .default(""),
 
   dateOfIssue: z
     .string()
@@ -1700,6 +1736,7 @@ export const invoiceObjectSchema = z.object({
     .optional()
     .default(""),
   personAuthorizedToReceiveFieldIsVisible: z.boolean().default(true),
+  personAuthorizedToReceiveSignature: drawnSignatureSchema,
 
   personAuthorizedToIssueName: z
     .string()
@@ -1708,6 +1745,7 @@ export const invoiceObjectSchema = z.object({
     .optional()
     .default(""),
   personAuthorizedToIssueFieldIsVisible: z.boolean().default(true),
+  personAuthorizedToIssueSignature: drawnSignatureSchema,
 });
 
 /**

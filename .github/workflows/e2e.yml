@@ -80,7 +80,7 @@ jobs:
       cancel-in-progress: true
 
     name: Run e2e tests via ${{ github.event_name == 'deployment_status' && 'Vercel deployment' }}
-    timeout-minutes: 65
+    timeout-minutes: 85
     # We pin a macOS runner because the PDF snapshots (screenshots) are generated locally on
     # macOS, so CI has to rasterize on the same OS family to match them.
     # https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job#choosing-github-hosted-runners

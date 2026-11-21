@@ -26,6 +26,7 @@ import {
 } from "@/config";
 
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
+import { invoiceTotalText } from "./utils/invoice-total";
 import { expectYouTubeEmbedToShow } from "./utils/youtube-embed";
 
 test.describe("Invoice Generator Page", () => {
@@ -587,12 +588,12 @@ test.describe("Invoice Generator Page", () => {
       name: "Tax Number",
     });
     await expect(
-      sellerVatFieldset.getByRole("textbox", { name: "Value" }),
+      sellerVatFieldset.getByRole("textbox", { name: "Number" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.seller.vatNo);
 
     await expect(
       sellerSection.getByRole("switch", {
-        name: `Show the 'Seller Tax Number' Field in the PDF`,
+        name: `Show the 'Tax Number' field in the PDF`,
       }),
     ).toBeChecked();
 
@@ -649,7 +650,7 @@ test.describe("Invoice Generator Page", () => {
       name: "Tax Number",
     });
     await expect(
-      buyerVatFieldset.getByRole("textbox", { name: "Value" }),
+      buyerVatFieldset.getByRole("textbox", { name: "Number" }),
     ).toHaveValue(INITIAL_INVOICE_DATA.buyer.vatNo);
 
     const buyerVatNoFieldIsVisibleSwitch = buyerSection.getByTestId(
@@ -678,13 +679,13 @@ test.describe("Invoice Generator Page", () => {
     // Check visibility toggles in settings
     await expect(
       invoiceItemsSection.getByRole("switch", {
-        name: /Show "Number" Column/i,
+        name: /Number column/i,
       }),
     ).toBeChecked();
 
     await expect(
       invoiceItemsSection.getByRole("switch", {
-        name: /Show "VAT Table Summary"/i,
+        name: /VAT summary table/i,
       }),
     ).toBeChecked();
 
@@ -701,20 +702,21 @@ test.describe("Invoice Generator Page", () => {
       }),
     ).toBeChecked();
 
-    // Type of GTU field and visibility toggle
+    // the custom column starts collapsed behind a pill: no fields and no switch until added
     await expect(
-      invoiceItemsSection.getByRole("textbox", { name: "Type of GTU" }),
-    ).toHaveValue(firstItem.typeOfGTU);
-    await expect(
-      invoiceItemsSection.getByRole("switch", {
-        name: "Show the 'Type of GTU' Column in the PDF for item 1",
+      invoiceItemsSection.getByRole("button", {
+        name: "Custom column",
+        exact: true,
       }),
-    ).not.toBeChecked(); // we don't want to show this in PDF by default
+    ).toBeVisible();
+    await expect(
+      invoiceItemsSection.getByRole("textbox", { name: "Column name" }),
+    ).toBeHidden();
 
     // Amount field and visibility toggle
     await expect(
       invoiceItemsSection.getByRole("spinbutton", {
-        name: "Amount (Quantity)",
+        name: "Qty",
       }),
     ).toHaveValue(firstItem.amount.toString());
     await expect(
@@ -736,7 +738,7 @@ test.describe("Invoice Generator Page", () => {
     // Net Price field and visibility toggle
     await expect(
       invoiceItemsSection.getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       }),
     ).toHaveValue(firstItem.netPrice.toString());
     await expect(
@@ -748,7 +750,7 @@ test.describe("Invoice Generator Page", () => {
     // VAT field and visibility toggle
     await expect(
       invoiceItemsSection.getByRole("textbox", {
-        name: "VAT Rate",
+        name: "VAT rate",
         exact: true,
       }),
     ).toHaveValue(firstItem.vat);
@@ -758,20 +760,17 @@ test.describe("Invoice Generator Page", () => {
       }),
     ).toBeChecked();
 
-    // Verify VAT helper text is displayed
+    // Verify the tax helper text is displayed
     await expect(
-      invoiceItemsSection
-        .getByTestId(`itemVat0`)
-        .getByText("Enter a number (0-100) or text (e.g., NP, OO, etc)."),
+      invoiceItemsSection.getByText(
+        /The rate takes 0–100 or text such as NP\./,
+      ),
     ).toBeVisible();
 
     // Net Amount field (read-only) and visibility toggle
     await expect(
-      invoiceItemsSection.getByRole("textbox", {
-        name: "Net Amount",
-        exact: true,
-      }),
-    ).toHaveValue(
+      invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/),
+    ).toContainText(
       firstItem.netAmount.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
@@ -785,11 +784,8 @@ test.describe("Invoice Generator Page", () => {
 
     // VAT Amount field (read-only) and visibility toggle
     await expect(
-      invoiceItemsSection.getByRole("textbox", {
-        name: "VAT Amount",
-        exact: true,
-      }),
-    ).toHaveValue(
+      invoiceItemsSection.getByTestId(/^itemVatAmount\d+$/),
+    ).toContainText(
       firstItem.vatAmount.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
@@ -803,11 +799,8 @@ test.describe("Invoice Generator Page", () => {
 
     // Pre-tax Amount field (read-only) and visibility toggle
     await expect(
-      invoiceItemsSection.getByRole("textbox", {
-        name: "Pre-tax Amount",
-        exact: true,
-      }),
-    ).toHaveValue(
+      invoiceItemsSection.getByTestId(/^itemPreTaxAmount\d+$/),
+    ).toContainText(
       firstItem.preTaxAmount.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
@@ -899,34 +892,34 @@ test.describe("Invoice Generator Page", () => {
     // Fill in net price for Item 1 (5000)
     await invoiceItemsSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
         exact: true,
       })
       .nth(0)
       .fill("5000");
 
     // Verify total reflects Item 1 only (1 * 5000 = 5000, vat is "NP")
-    await expect(
-      finalSection.getByRole("textbox", { name: "Total", exact: true }),
-    ).toHaveValue("5,000.00");
+    await expect(finalSection.getByTestId("total")).toHaveText(
+      invoiceTotalText("5,000.00"),
+    );
 
     // Fill in amount and net price for Item 2 (3 * 10000 = 30000)
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
+      .getByRole("spinbutton", { name: "Qty", exact: true })
       .nth(1)
       .fill("3");
     await invoiceItemsSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
         exact: true,
       })
       .nth(1)
       .fill("10000");
 
     // Verify total is updated (5000 + 3*10000 = 35000, vat is "NP" so no tax)
-    await expect(
-      finalSection.getByRole("textbox", { name: "Total", exact: true }),
-    ).toHaveValue("35,000.00");
+    await expect(finalSection.getByTestId("total")).toHaveText(
+      invoiceTotalText("35,000.00"),
+    );
 
     // Click delete button to open confirmation dialog
     await invoiceItemsSection
@@ -1005,9 +998,9 @@ test.describe("Invoice Generator Page", () => {
     ).toBeHidden();
 
     // Verify total reverts to Item 1 only after deletion (5000)
-    await expect(
-      finalSection.getByRole("textbox", { name: "Total", exact: true }),
-    ).toHaveValue("5,000.00");
+    await expect(finalSection.getByTestId("total")).toHaveText(
+      invoiceTotalText("5,000.00"),
+    );
   });
 
   test("calculates totals correctly", async ({ page }) => {
@@ -1016,31 +1009,27 @@ test.describe("Invoice Generator Page", () => {
 
     // Item 1: qty=2, price=500, VAT=23% → net=1000, vat=230
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
+      .getByRole("spinbutton", { name: "Qty", exact: true })
       .nth(0)
       .fill("2");
     await invoiceItemsSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
         exact: true,
       })
       .nth(0)
       .fill("500");
     await invoiceItemsSection
-      .getByRole("textbox", { name: "VAT Rate", exact: true })
+      .getByRole("textbox", { name: "VAT rate", exact: true })
       .nth(0)
       .fill("23");
 
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "Net Amount", exact: true })
-        .nth(0),
-    ).toHaveValue("1,000.00");
+      invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/).nth(0),
+    ).toContainText("1,000.00");
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "VAT Amount", exact: true })
-        .nth(0),
-    ).toHaveValue("230.00");
+      invoiceItemsSection.getByTestId(/^itemVatAmount\d+$/).nth(0),
+    ).toContainText("230.00");
 
     // Add Item 2: qty=5, price=1000, VAT=NP → net=5000, vat=0
     await invoiceItemsSection
@@ -1051,27 +1040,23 @@ test.describe("Invoice Generator Page", () => {
     ).toBeVisible();
 
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
+      .getByRole("spinbutton", { name: "Qty", exact: true })
       .nth(1)
       .fill("5");
     await invoiceItemsSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
         exact: true,
       })
       .nth(1)
       .fill("1000");
 
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "Net Amount", exact: true })
-        .nth(1),
-    ).toHaveValue("5,000.00");
+      invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/).nth(1),
+    ).toContainText("5,000.00");
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "VAT Amount", exact: true })
-        .nth(1),
-    ).toHaveValue("0.00");
+      invoiceItemsSection.getByTestId(/^itemVatAmount\d+$/).nth(1),
+    ).toContainText("0.00");
 
     // Add Item 3: qty=1, price=10000, VAT=10% → net=10000, vat=1000
     await invoiceItemsSection
@@ -1083,34 +1068,27 @@ test.describe("Invoice Generator Page", () => {
 
     await invoiceItemsSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
         exact: true,
       })
       .nth(2)
       .fill("10000");
     await invoiceItemsSection
-      .getByRole("textbox", { name: "VAT Rate", exact: true })
+      .getByRole("textbox", { name: "VAT rate", exact: true })
       .nth(2)
       .fill("10");
 
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "Net Amount", exact: true })
-        .nth(2),
-    ).toHaveValue("10,000.00");
+      invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/).nth(2),
+    ).toContainText("10,000.00");
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "VAT Amount", exact: true })
-        .nth(2),
-    ).toHaveValue("1,000.00");
+      invoiceItemsSection.getByTestId(/^itemVatAmount\d+$/).nth(2),
+    ).toContainText("1,000.00");
 
     // Grand total = 1230 + 5000 + 11000 = 17,230.00
-    await expect(
-      finalSection.getByRole("textbox", {
-        name: "Total",
-        exact: true,
-      }),
-    ).toHaveValue("17,230.00");
+    await expect(finalSection.getByTestId("total")).toHaveText(
+      invoiceTotalText("17,230.00"),
+    );
   });
 
   // Field rules and their messages are unit-tested (src/app/schema/__tests__/form-field-validation.test.ts,
@@ -1126,7 +1104,7 @@ test.describe("Invoice Generator Page", () => {
 
     const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
     const amountInput = invoiceItemsSection.getByRole("spinbutton", {
-      name: "Amount (Quantity)",
+      name: "Qty",
     });
 
     await sellerName.clear();
@@ -1238,11 +1216,7 @@ test.describe("Invoice Generator Page", () => {
 
     // Verify initial currency
     await expect(netPriceFormElement).toHaveText("€EUR");
-    await expect(netAmountFormElement).toHaveText("€EUR");
-
-    await expect(
-      invoiceItemsSection.getByText("Preview: 0.00 EUR (zero EUR 00/100)"),
-    ).toBeVisible();
+    await expect(netAmountFormElement).toHaveText("0.00 EUR");
 
     const currencyCombobox = page.getByRole("combobox", { name: "Currency" });
 
@@ -1257,34 +1231,22 @@ test.describe("Invoice Generator Page", () => {
 
     // Verify calculations with new currency
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
+      .getByRole("spinbutton", { name: "Qty", exact: true })
       .fill("2");
     await invoiceItemsSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
         exact: true,
       })
       .fill("100.75");
 
     await expect(netPriceFormElement).toHaveText("$USD");
-    await expect(netAmountFormElement).toHaveText("$USD");
-
-    await expect(
-      invoiceItemsSection.getByText(
-        "Preview: 100.75 USD (one hundred USD 75/100)",
-        {
-          exact: true,
-        },
-      ),
-    ).toBeVisible();
+    await expect(netAmountFormElement).toHaveText("201.50 USD");
 
     const finalSection = page.getByTestId(`final-section`);
-    await expect(
-      finalSection.getByRole("textbox", {
-        name: "Total",
-        exact: true,
-      }),
-    ).toHaveValue("201.50");
+    await expect(finalSection.getByTestId("total")).toHaveText(
+      invoiceTotalText("201.50"),
+    );
   });
 
   test("accordion items are visible, collapsible and saved in the local storage", async ({
@@ -1491,15 +1453,15 @@ test.describe("Invoice Generator Page", () => {
 
     const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
     const amountInput = invoiceItemsSection.getByRole("spinbutton", {
-      name: "Amount (Quantity)",
+      name: "Qty",
       exact: true,
     });
     const netPriceInput = invoiceItemsSection.getByRole("spinbutton", {
-      name: "Net Price (Rate or Unit Price)",
+      name: "Unit price",
       exact: true,
     });
     const vatInput = invoiceItemsSection.getByRole("textbox", {
-      name: "VAT Rate",
+      name: "VAT rate",
       exact: true,
     });
 
@@ -1511,32 +1473,20 @@ test.describe("Invoice Generator Page", () => {
 
       // Check calculations
       await expect(
-        invoiceItemsSection.getByRole("textbox", {
-          name: "Net Amount",
-          exact: true,
-        }),
-      ).toHaveValue(testCase.expected.net);
+        invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/),
+      ).toContainText(testCase.expected.net);
 
       await expect(
-        invoiceItemsSection.getByRole("textbox", {
-          name: "VAT Amount",
-          exact: true,
-        }),
-      ).toHaveValue(testCase.expected.vatAmount);
+        invoiceItemsSection.getByTestId(/^itemVatAmount\d+$/),
+      ).toContainText(testCase.expected.vatAmount);
 
       await expect(
-        invoiceItemsSection.getByRole("textbox", {
-          name: "Pre-tax Amount",
-          exact: true,
-        }),
-      ).toHaveValue(testCase.expected.total);
+        invoiceItemsSection.getByTestId(/^itemPreTaxAmount\d+$/),
+      ).toContainText(testCase.expected.total);
 
-      await expect(
-        page.getByRole("textbox", {
-          name: "Total",
-          exact: true,
-        }),
-      ).toHaveValue(testCase.expected.total);
+      await expect(page.getByTestId("total")).toHaveText(
+        invoiceTotalText(testCase.expected.total),
+      );
     }
   });
 

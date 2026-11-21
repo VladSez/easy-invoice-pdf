@@ -3,7 +3,7 @@
 import * as Sentry from "@sentry/nextjs";
 import dayjs from "dayjs";
 import { memo, useCallback, useEffect, useState, type RefObject } from "react";
-import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -11,7 +11,6 @@ import {
   getAppStorageItem,
   setAppStorageItem,
 } from "@/app/(main)/(app)/utils/app-local-storage";
-import { formatAmount } from "@/app/(main)/(app)/utils/format-amount";
 import { updateAppMetadata } from "@/app/(main)/(app)/utils/get-app-metadata";
 import {
   ACCORDION_STATE_LOCAL_STORAGE_KEY,
@@ -29,31 +28,30 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Input } from "@/components/ui/input";
-import { InputHelperMessage } from "@/components/ui/input-helper-message";
-import { Label } from "@/components/ui/label";
-import { ReadOnlyMoneyInput } from "@/components/ui/money-input";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { CustomTooltip } from "@/components/ui/tooltip";
 import { trackEvent } from "@/lib/analytics/track-event";
-import { cn } from "@/lib/utils";
 import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
 import type { NonReadonly, Prettify } from "@/types";
 
-import { ErrorMessage, FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME } from "./common";
 import { ItemTotalsSync } from "./item-totals-sync";
 import { BuyerInformation } from "./sections/buyer-information";
 import { GeneralInformation } from "./sections/general-information";
+import { InvoiceClosing } from "./sections/invoice-closing";
 import { InvoiceItems } from "./sections/invoice-items";
 import { SellerInformation } from "./sections/seller-information";
 import { formErrorsToToast } from "./utils/form-errors-to-toast";
+import { getColumnSwitchesToCarry } from "./utils/get-column-switches-to-carry";
 
 /**
  * Time in milliseconds to debounce updates in the invoice form,
  * e.g. for delayed applying of changes before persisting/syncing.
  */
 const DEBOUNCE_TIMEOUT = 500;
+
+/** Fields the signature pad writes, already debounced by the pad's own pause. */
+const SIGNATURE_FIELDS: ReadonlySet<string> = new Set([
+  "personAuthorizedToReceiveSignature",
+  "personAuthorizedToIssueSignature",
+] satisfies Array<keyof InvoiceData>);
 
 /**
  * Default values for the invoice form's accordion sections.
@@ -117,7 +115,7 @@ export const InvoiceForm = memo(function InvoiceForm({
   const dateOfIssue = useWatch({ control, name: "dateOfIssue" });
   const language = useWatch({ control, name: "language" });
 
-  const { fields, append } = useFieldArray({
+  const { fields, append, insert, remove } = useFieldArray({
     control,
     name: "items",
   });
@@ -218,8 +216,13 @@ export const InvoiceForm = memo(function InvoiceForm({
   // subscribe to form changes to regenerate pdf on every input change
   useEffect(() => {
     // oxlint-disable-next-line react/incompatible-library
-    const subscription = watch((value) => {
+    const subscription = watch((value, { name }) => {
       void debouncedRegeneratePdfOnFormChange(value as unknown as InvoiceData);
+
+      // the signature pad already waited for the signer to pause, so don't wait again
+      if (name && SIGNATURE_FIELDS.has(name)) {
+        void debouncedRegeneratePdfOnFormChange.flush();
+      }
     });
 
     return () => {
@@ -264,17 +267,24 @@ export const InvoiceForm = memo(function InvoiceForm({
   const handleRemoveInvoiceItem = useCallback(
     (index: number) => {
       // read at click time rather than watched, so item edits don't re-render the form
-      setValue(
-        "items",
-        getValues("items").filter((_, i) => {
-          return i !== index;
-        }),
-        {
-          shouldValidate: true,
-          shouldTouch: true,
-          shouldDirty: true,
-        },
-      );
+      const carriedSwitches = getColumnSwitchesToCarry({
+        items: getValues("items"),
+        index,
+      });
+
+      // the one row only: rewriting the whole `items` array would re-key every card, and
+      // a card with an open, still-empty editor (a discount) would remount and close it
+      remove(index);
+
+      if (carriedSwitches) {
+        for (const [key, isVisible] of Object.entries(carriedSwitches)) {
+          setValue(
+            `items.0.${key as keyof typeof carriedSwitches}`,
+            isVisible,
+            { shouldDirty: true },
+          );
+        }
+      }
 
       toast.success("Invoice item removed successfully", {
         id: "invoice-item-removed-success",
@@ -286,7 +296,7 @@ export const InvoiceForm = memo(function InvoiceForm({
       // analytics track event
       trackEvent({ event: "remove_invoice_item" });
     },
-    [getValues, setValue, isMobile],
+    [getValues, setValue, remove, isMobile],
   );
 
   const onSubmit = (data: InvoiceData) => {
@@ -415,7 +425,6 @@ export const InvoiceForm = memo(function InvoiceForm({
           <div className="px-4 pb-4">
             <SellerInformation
               control={control}
-              errors={errors}
               setValue={setValue}
               invoiceData={invoiceData}
               isMobile={isMobile}
@@ -437,7 +446,6 @@ export const InvoiceForm = memo(function InvoiceForm({
           <div className="px-4 pb-4">
             <BuyerInformation
               control={control}
-              errors={errors}
               setValue={setValue}
               invoiceData={invoiceData}
               isMobile={isMobile}
@@ -461,11 +469,12 @@ export const InvoiceForm = memo(function InvoiceForm({
               handleRemoveInvoiceItem={handleRemoveInvoiceItem}
               errors={errors}
               currency={currency}
-              language={language}
               append={append}
+              insert={insert}
               template={template}
               taxLabelText={taxLabelText}
               numberFormatLocale={numberFormatLocale}
+              language={language}
               getValues={getValues}
               setValue={setValue}
             />
@@ -473,400 +482,18 @@ export const InvoiceForm = memo(function InvoiceForm({
         </AccordionItem>
       </Accordion>
 
-      {/* Final section */}
-      <div className="space-y-4" data-testid={`final-section`}>
-        <div className="">
-          {/* Total field (with currency) (calculated automatically - read only field in the UI) */}
-          <div className="mt-5" />
-          <Label htmlFor={`total`} className="mb-1">
-            Total
-          </Label>
-          <div className="relative mt-1 rounded-md shadow-sm">
-            <Controller
-              name="total"
-              control={control}
-              render={({ field }) => {
-                return (
-                  <ReadOnlyMoneyInput
-                    {...field}
-                    id={`total`}
-                    currency={currency}
-                    value={formatAmount({
-                      amount: field.value,
-                      numberFormatLocale,
-                    })}
-                  />
-                );
-              }}
-            />
-          </div>
-          {errors.total ? (
-            <ErrorMessage>{errors.total.message}</ErrorMessage>
-          ) : (
-            <InputHelperMessage>
-              Calculated automatically as the sum of each line item&apos;s
-              pre-tax amount (Net Amount + VAT Amount)
-            </InputHelperMessage>
-          )}
-        </div>
-
-        {/* Payment Method (Only show for default template) */}
-        {template === "default" ? (
-          <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
-            <div className="relative mb-2 mt-6 flex items-center justify-between">
-              <Label htmlFor={`paymentMethod`} className="">
-                Payment Method
-              </Label>
-
-              {/* Show Payment Method field in PDF switch */}
-              <div className="inline-flex items-center gap-2">
-                <Controller
-                  name={`paymentMethodFieldIsVisible`}
-                  control={control}
-                  render={({ field: { value, onChange, ...field } }) => {
-                    return (
-                      <Switch
-                        {...field}
-                        id={`paymentMethodFieldIsVisible`}
-                        checked={value}
-                        onCheckedChange={onChange}
-                        size="sm"
-                        data-testid="paymentMethodFieldIsVisible"
-                      />
-                    );
-                  }}
-                />
-                <CustomTooltip
-                  trigger={
-                    <Label htmlFor={`paymentMethodFieldIsVisible`}>
-                      Show in PDF
-                    </Label>
-                  }
-                  content='Show the "Payment Method" Field in the PDF'
-                />
-              </div>
-            </div>
-
-            <Controller
-              name="paymentMethod"
-              control={control}
-              render={({ field }) => {
-                return (
-                  <Input
-                    {...field}
-                    id={`paymentMethod`}
-                    type="text"
-                    className="mt-1"
-                  />
-                );
-              }}
-            />
-            {errors.paymentMethod ? (
-              <ErrorMessage>{errors.paymentMethod.message}</ErrorMessage>
-            ) : null}
-          </div>
-        ) : null}
-
-        {/* Notes */}
-        <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
-          <div className="relative mb-2 flex items-center justify-between">
-            <Label htmlFor={`notes`} className="">
-              Notes
-            </Label>
-
-            {/* Show Notes field in PDF switch */}
-            <div className="inline-flex items-center gap-2">
-              <Controller
-                name={`notesFieldIsVisible`}
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => {
-                  return (
-                    <Switch
-                      {...field}
-                      id={`notesFieldIsVisible`}
-                      checked={value}
-                      onCheckedChange={onChange}
-                      size="sm"
-                    />
-                  );
-                }}
-              />
-              <CustomTooltip
-                trigger={
-                  <Label htmlFor={`notesFieldIsVisible`}>Show in PDF</Label>
-                }
-                content='Show the "Notes" Field in the PDF'
-              />
-            </div>
-          </div>
-          <Controller
-            name="notes"
-            control={control}
-            render={({ field }) => {
-              return (
-                <Textarea
-                  {...field}
-                  id={`notes`}
-                  rows={3}
-                  className=""
-                  data-testid="notes"
-                />
-              );
-            }}
-          />
-          {errors?.notes ? (
-            <ErrorMessage>{errors?.notes?.message}</ErrorMessage>
-          ) : null}
-        </div>
-
-        {/* QR Code */}
-        <fieldset
-          className={cn(
-            "rounded-md border px-4 pb-4",
-            FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME,
-          )}
-        >
-          <legend className="text-base font-semibold lg:text-lg">
-            QR Code
-          </legend>
-
-          <div className="mb-2 flex items-center justify-end">
-            {/* Show QR Code in PDF switch */}
-            <div className="inline-flex items-center gap-2">
-              <Controller
-                name={`qrCodeIsVisible`}
-                control={control}
-                render={({ field: { value, onChange, ...field } }) => {
-                  return (
-                    <Switch
-                      {...field}
-                      id={`qrCodeIsVisible`}
-                      checked={value}
-                      onCheckedChange={onChange}
-                      size="sm"
-                      aria-label="Show QR Code in PDF"
-                    />
-                  );
-                }}
-              />
-              <CustomTooltip
-                trigger={<Label htmlFor={`qrCodeIsVisible`}>Show in PDF</Label>}
-                content="Show the QR Code in the PDF"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            {/* QR Code Data */}
-            <div>
-              <Label htmlFor={`qrCodeData`} className="mb-2 block">
-                Data
-              </Label>
-              <Controller
-                name="qrCodeData"
-                control={control}
-                render={({ field }) => {
-                  return (
-                    <Input
-                      {...field}
-                      id={`qrCodeData`}
-                      type="text"
-                      placeholder="Enter URL or text to encode"
-                      data-testid="qrCodeData"
-                    />
-                  );
-                }}
-              />
-              <InputHelperMessage>
-                Enter any text or URL to generate a QR code. The QR code will
-                appear in the bottom section of the invoice PDF.
-              </InputHelperMessage>
-              {errors.qrCodeData ? (
-                <ErrorMessage>{errors.qrCodeData.message}</ErrorMessage>
-              ) : null}
-            </div>
-
-            {/* QR Code Description */}
-            <div>
-              <Label htmlFor={`qrCodeDescription`} className="mb-2 block">
-                Description (optional)
-              </Label>
-              <Controller
-                name="qrCodeDescription"
-                control={control}
-                render={({ field }) => {
-                  return (
-                    <Input
-                      {...field}
-                      id={`qrCodeDescription`}
-                      type="text"
-                      placeholder="Enter a description for the QR code"
-                      data-testid="qrCodeDescription"
-                    />
-                  );
-                }}
-              />
-              <InputHelperMessage>
-                Optional text that will be displayed below the QR code in the
-                PDF.
-              </InputHelperMessage>
-              {errors.qrCodeDescription ? (
-                <ErrorMessage>{errors.qrCodeDescription.message}</ErrorMessage>
-              ) : null}
-            </div>
-          </div>
-        </fieldset>
-
-        {/*
-            Stripe template doesn't have these fields
-        */}
-        {invoiceData.template === "default" ? (
-          <>
-            <fieldset
-              className={cn(
-                "rounded-md border px-4 pb-4",
-                FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME,
-              )}
-            >
-              <legend className="text-base font-semibold lg:text-lg">
-                Person Authorized to Receive
-              </legend>
-
-              <div className="mb-2 mt-2 flex items-center justify-end">
-                <div className="inline-flex items-center gap-2">
-                  <Controller
-                    name="personAuthorizedToReceiveFieldIsVisible"
-                    control={control}
-                    render={({ field: { value, onChange, ...field } }) => {
-                      return (
-                        <Switch
-                          {...field}
-                          id="personAuthorizedToReceiveFieldIsVisible"
-                          checked={value}
-                          onCheckedChange={onChange}
-                          size="sm"
-                          aria-label="Show Person Authorized to Receive in PDF"
-                        />
-                      );
-                    }}
-                  />
-                  <CustomTooltip
-                    trigger={
-                      <Label htmlFor="personAuthorizedToReceiveFieldIsVisible">
-                        Show in PDF
-                      </Label>
-                    }
-                    content="Show the Person Authorized to Receive signature field in the PDF"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label
-                  htmlFor="personAuthorizedToReceiveName"
-                  className="mb-2 block"
-                >
-                  Name
-                </Label>
-                <Controller
-                  name="personAuthorizedToReceiveName"
-                  control={control}
-                  render={({ field }) => {
-                    return (
-                      <Input
-                        {...field}
-                        id="personAuthorizedToReceiveName"
-                        type="text"
-                        placeholder="Enter name of person authorized to receive"
-                        data-testid="personAuthorizedToReceiveName"
-                      />
-                    );
-                  }}
-                />
-                <InputHelperMessage>
-                  Name displayed above the signature line in the PDF.
-                </InputHelperMessage>
-                {errors.personAuthorizedToReceiveName ? (
-                  <ErrorMessage>
-                    {errors.personAuthorizedToReceiveName.message}
-                  </ErrorMessage>
-                ) : null}
-              </div>
-            </fieldset>
-
-            <fieldset
-              className={cn(
-                "rounded-md border px-4 pb-4",
-                FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME,
-              )}
-            >
-              <legend className="text-base font-semibold lg:text-lg">
-                Person Authorized to Issue
-              </legend>
-
-              <div className="mb-2 mt-2 flex items-center justify-end">
-                <div className="inline-flex items-center gap-2">
-                  <Controller
-                    name="personAuthorizedToIssueFieldIsVisible"
-                    control={control}
-                    render={({ field: { value, onChange, ...field } }) => {
-                      return (
-                        <Switch
-                          {...field}
-                          id="personAuthorizedToIssueFieldIsVisible"
-                          checked={value}
-                          onCheckedChange={onChange}
-                          size="sm"
-                          aria-label="Show Person Authorized to Issue in PDF"
-                        />
-                      );
-                    }}
-                  />
-                  <CustomTooltip
-                    trigger={
-                      <Label htmlFor="personAuthorizedToIssueFieldIsVisible">
-                        Show in PDF
-                      </Label>
-                    }
-                    content="Show the Person Authorized to Issue signature field in the PDF"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label
-                  htmlFor="personAuthorizedToIssueName"
-                  className="mb-2 block"
-                >
-                  Name
-                </Label>
-                <Controller
-                  name="personAuthorizedToIssueName"
-                  control={control}
-                  render={({ field }) => {
-                    return (
-                      <Input
-                        {...field}
-                        id="personAuthorizedToIssueName"
-                        type="text"
-                        placeholder="Enter name of person authorized to issue"
-                        data-testid="personAuthorizedToIssueName"
-                      />
-                    );
-                  }}
-                />
-                <InputHelperMessage>
-                  Name displayed above the signature line in the PDF.
-                </InputHelperMessage>
-                {errors.personAuthorizedToIssueName ? (
-                  <ErrorMessage>
-                    {errors.personAuthorizedToIssueName.message}
-                  </ErrorMessage>
-                ) : null}
-              </div>
-            </fieldset>
-          </>
-        ) : null}
+      {/* Totals, notes and the optional parts of the PDF footer */}
+      <div className="mt-5">
+        <InvoiceClosing
+          control={control}
+          errors={errors}
+          getValues={getValues}
+          setValue={setValue}
+          currency={currency}
+          template={template}
+          numberFormatLocale={numberFormatLocale}
+          taxLabelText={taxLabelText}
+        />
       </div>
     </form>
   );

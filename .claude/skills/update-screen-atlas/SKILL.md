@@ -50,7 +50,7 @@ Run it in the background if it may exceed two minutes. When it finishes:
 
 | Key       | Contents                            |
 | --------- | ----------------------------------- |
-| `changed` | Shots written by this run           |
+| `changed` | Shots this run changed (by look)    |
 | `removed` | Shots of states that left the model |
 | `all`     | Every shot the model uses           |
 

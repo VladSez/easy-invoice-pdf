@@ -122,12 +122,22 @@ const APP_STATES = {
   "editor/item-discount": { title: "Item with a discount" },
   "editor/item-discount-error": { title: "Discount above 100%" },
   "editor/item-deleted": { title: "Item removed" },
+  "editor/custom-column": { title: "Custom column named on item 1" },
+  "editor/custom-column-second": {
+    title: "Custom column value on item 2",
+  },
+  "editor/closing": { title: "Totals, notes, payment and signatures" },
+  "editor/closing-qr": { title: "QR code added" },
+  "editor/signature-drawn": { title: "Signature drawn" },
   "editor/validation-error": { title: "Seller name missing" },
   "editor/validation-fixed": { title: "Seller name filled in again" },
   "editor/link-copied": { title: "Share link copied" },
   "editor/shared": { title: "Opened from a share link" },
   "editor/shared-edited": { title: "Shared invoice edited" },
   "editor/share-blocked-logo": { title: "Sharing blocked by a logo" },
+  "editor/share-blocked-signature": {
+    title: "Sharing blocked by a drawn signature",
+  },
   "editor/share-too-large": { title: "Invoice too large to share" },
   "editor/corrupt-link": { title: "Corrupted share link" },
   "editor/corrupt-link-cleared": { title: "Corrupted link cleared by an edit" },
@@ -145,6 +155,7 @@ const APP_STATES = {
   "editor/contacts-imported": { title: "Sellers & buyers imported" },
   "stripe/default": { title: "Stripe template" },
   "stripe/indigo": { title: "Indigo top line" },
+  "stripe/custom-column": { title: "Custom column on the Stripe template" },
   "how-it-works/default": { title: "Video dialog" },
   "seller-dialog/empty": { title: "New seller, empty" },
   "seller-dialog/filled": { title: "New seller, filled in" },
@@ -406,6 +417,52 @@ export const FLOWS = [
     ],
   },
   {
+    id: "custom-column",
+    title: "Custom column",
+    area: "items",
+    summary:
+      'A column the user names (a project code, a SKU) in place of Type of GTU: named once on the first card, then a value per item. Both templates print it; unnamed, it prints "Type of GTU".',
+    roots: [
+      {
+        state: "editor/items",
+        next: [
+          {
+            state: "editor/custom-column",
+            via: "Add custom column, name it Project code",
+            next: [
+              {
+                state: "editor/custom-column-second",
+                via: "Add item 2, then + Project code",
+                next: [
+                  { state: "stripe/custom-column", via: "Template: Stripe" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "closing",
+    title: "Below the items",
+    area: "items",
+    summary:
+      "The totals, the notes, then the PDF's optional footer parts: payment method, QR code and signatures, each behind a pill until added.",
+    roots: [
+      {
+        state: "editor/closing",
+        next: [
+          { state: "editor/closing-qr", via: "Add QR code" },
+          {
+            state: "editor/signature-drawn",
+            via: "Draw an Issued by signature",
+          },
+        ],
+      },
+    ],
+  },
+  {
     id: "validation",
     title: "Validation errors",
     area: "editor",
@@ -431,7 +488,7 @@ export const FLOWS = [
     title: "Share a link",
     area: "sharing",
     summary:
-      "Get link compresses the invoice into ?data=. Logos never fit in a URL, and URLs over 4096 characters are refused.",
+      "Get link compresses the invoice into ?data=. Logos and drawn signatures never fit in a URL, and URLs over 4096 characters are refused.",
     roots: [
       {
         state: "editor/default",
@@ -450,6 +507,10 @@ export const FLOWS = [
             ],
           },
           { state: "editor/share-blocked-logo", via: "Get link with a logo" },
+          {
+            state: "editor/share-blocked-signature",
+            via: "Get link with a drawn signature",
+          },
           {
             state: "editor/share-too-large",
             via: "Get link with 24 long items",

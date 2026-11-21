@@ -25,8 +25,19 @@ export function hiddenInPdfClassName(isHidden: boolean) {
     : "";
 }
 
-export const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
-  return <p className="mt-1 text-xs text-red-600">{children}</p>;
+export const ErrorMessage = ({
+  children,
+  id,
+}: {
+  children: React.ReactNode;
+  /** Lets the field point at it with `aria-describedby`. */
+  id?: string;
+}) => {
+  return (
+    <p id={id} className="mt-1 text-xs text-red-600">
+      {children}
+    </p>
+  );
 };
 
 export const AlertIcon = () => {

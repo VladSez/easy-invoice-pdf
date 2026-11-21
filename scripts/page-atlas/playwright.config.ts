@@ -8,6 +8,10 @@ import { defineConfig, devices } from "@playwright/test";
  */
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 
+// One id for this capture run. The config is loaded by the runner before it starts the
+// workers, which inherit the variable, so every worker stamps its changes with the same run.
+process.env.ATLAS_RUN_ID ??= new Date().toISOString();
+
 export default defineConfig({
   // Starts `pnpm dev` when nothing answers on port 3000, and reuses a running one.
   // With BASE_URL set, the capture runs against that server as is.
