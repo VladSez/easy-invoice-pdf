@@ -412,9 +412,15 @@ export function SignaturePad({
         </div>
       )}
 
+      {/* on a touch screen, the before and after of arming, in the same spot: a signed pad
+          otherwise gives no hint that a tap lets you keep drawing */}
       {isArmed ? (
         <span className="pointer-events-none absolute bottom-1.5 left-2.5 text-xs text-indigo-600">
           Tap outside when done
+        </span>
+      ) : isTouchScreen && hasInk ? (
+        <span className="pointer-events-none absolute bottom-1.5 left-2.5 text-xs text-slate-500">
+          Tap to add more
         </span>
       ) : null}
 

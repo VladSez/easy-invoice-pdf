@@ -170,6 +170,41 @@ describe("SignaturePad", () => {
     expect(screen.queryByText("Tap outside when done")).not.toBeInTheDocument();
   });
 
+  it("tells a touch screen that a signed pad can be tapped to add more", () => {
+    mockPointer("touch");
+    render(
+      <SignaturePad
+        value="data:image/png;base64,SAVED"
+        onChange={vi.fn()}
+        label="Issued by"
+      />,
+    );
+
+    const pad = screen.getByRole("img", { name: "Issued by signature pad" });
+
+    expect(screen.getByText("Tap to add more")).toBeInTheDocument();
+
+    // armed, the same spot says how to finish instead
+    fireEvent.pointerDown(pad, { pointerType: "touch", button: 0 });
+    fireEvent.click(pad);
+
+    expect(screen.queryByText("Tap to add more")).not.toBeInTheDocument();
+    expect(screen.getByText("Tap outside when done")).toBeInTheDocument();
+  });
+
+  it("gives a mouse no tap hint on a signed pad: it draws straight away", () => {
+    mockPointer("mouse");
+    render(
+      <SignaturePad
+        value="data:image/png;base64,SAVED"
+        onChange={vi.fn()}
+        label="Issued by"
+      />,
+    );
+
+    expect(screen.queryByText("Tap to add more")).not.toBeInTheDocument();
+  });
+
   it("keeps a stroke to the pointer that started it", () => {
     mockPointer("touch");
     const { pad } = renderPad();
