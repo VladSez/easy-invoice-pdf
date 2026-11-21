@@ -371,6 +371,31 @@
     text-transform: uppercase;
     white-space: nowrap;
   }
+  /* a shot that changed in the latest capture to change anything */
+  .changed-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    background: var(--warn);
+    color: #fff;
+    font: 600 10.5px/1.2 var(--font-body);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .shot.changed {
+    border-color: var(--warn);
+    border-width: 2px;
+  }
+  .node.dim {
+    opacity: 0.35;
+  }
+  .node.dim:hover,
+  .node.dim:focus-visible {
+    opacity: 1;
+  }
   .card:hover .shot,
   .card:focus-visible .shot {
     transform: translateY(-2px);
@@ -674,6 +699,7 @@
   <div class="tools gutter">
     <select id="flow-select" aria-label="Flow"></select>
     <select id="area-select" aria-label="Area"></select>
+    <select id="change-select" aria-label="Changes"></select>
     <input
       id="search"
       type="search"
@@ -769,8 +795,55 @@
       viewport: store.get("atlas.viewport") === "phone" ? "phone" : "desktop",
       flow: "all",
       area: "all",
+      changes: ["latest", "week"].includes(store.get("atlas.changes"))
+        ? store.get("atlas.changes")
+        : "all",
       query: "",
     };
+
+    /* ---------- changes ---------- */
+    const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+    // the latest capture run that changed any screen: its changes are "the latest changes"
+    const latestRun = DATA.states
+      .flatMap((s) => Object.values(s.shots))
+      .map((shot) => shot.changedInRun)
+      .filter(Boolean)
+      .sort()
+      .at(-1);
+    const latestRunDate = latestRun
+      ? new Date(latestRun).toLocaleString(undefined, {
+          day: "numeric",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : null;
+
+    /** The shot a state shows in this viewport: its own, or the one layout it exists in. */
+    function shownShot(state, viewport) {
+      return state.shots[existsIn(state, viewport) ? viewport : state.only];
+    }
+    function isInLatestRun(shot) {
+      return Boolean(latestRun && shot && shot.changedInRun === latestRun);
+    }
+    /** Whether a state's shot passes a "changes" filter mode. */
+    function changedFor(state, mode, viewport = ui.viewport) {
+      if (mode === "all") return true;
+      const shot = shownShot(state, viewport);
+      if (!shot) return false;
+      if (mode === "latest") return isInLatestRun(shot);
+      // a baseline (recorded when history began) is not a change anyone made
+      if (!shot.changedInRun) return false;
+      // measured from the build, so a shared copy reads the same next week
+      return Date.parse(shot.changedAt) >= Date.parse(DATA.builtAt) - WEEK_MS;
+    }
+    function flowHasChange(flow, mode) {
+      let found = false;
+      walk(flow.roots, (step) => {
+        if (changedFor(statesById.get(step.state), mode)) found = true;
+      });
+      return found;
+    }
 
     function walk(steps, fn) {
       for (const step of steps) {
@@ -841,6 +914,14 @@
           )
           .join("");
       $("area-select").value = ui.area;
+
+      const count = (mode) =>
+        DATA.states.filter((s) => changedFor(s, mode)).length;
+      $("change-select").innerHTML =
+        `<option value="all">All screens</option>` +
+        `<option value="latest"${latestRun ? "" : " disabled"}>Latest changes${latestRunDate ? `, ${esc(latestRunDate)}` : ""} (${count("latest")})</option>` +
+        `<option value="week">Changed in the last 7 days (${count("week")})</option>`;
+      $("change-select").value = ui.changes;
     }
 
     function syncChrome() {
@@ -890,7 +971,9 @@
       }
       const shot = state.shots[viewport];
       if (!shot) return `<div class="shot missing">Not captured</div>`;
-      return `<div class="shot">${imgHtml(shot, eager)}</div>`;
+      return isInLatestRun(shot)
+        ? `<div class="shot changed" title="Changed in the latest capture">${imgHtml(shot, eager)}<span class="changed-badge">${shot.isNew ? "New" : "Changed"}</span></div>`
+        : `<div class="shot">${imgHtml(shot, eager)}</div>`;
     }
 
     /* ---------- pages view ---------- */
@@ -902,6 +985,7 @@
           const states = DATA.states.filter(
             (s) =>
               s.page === pageId &&
+              changedFor(s, ui.changes) &&
               (!q ||
                 `${s.title} ${s.id} ${page.title}`.toLowerCase().includes(q)),
           );
@@ -921,7 +1005,10 @@
         })
         .join("");
       $("pages-view").innerHTML =
-        blocks || `<p class="empty">No states match “${esc(ui.query)}”.</p>`;
+        blocks ||
+        (q
+          ? `<p class="empty">No states match “${esc(ui.query)}”.</p>`
+          : `<p class="empty">No screens changed ${ui.changes === "week" ? "in the last 7 days" : "in the latest capture"} for this viewport and area.</p>`);
     }
 
     /* ---------- flows view: layout ---------- */
@@ -988,7 +1075,8 @@
         (f) =>
           (ui.area === "all" || f.area === ui.area) &&
           (ui.flow === "all" || f.id === ui.flow) &&
-          flowExistsIn(f, ui.viewport),
+          flowExistsIn(f, ui.viewport) &&
+          (ui.changes === "all" || flowHasChange(f, ui.changes)),
       );
 
       let top = 0,
@@ -1012,7 +1100,8 @@
         for (const { step, x, y } of nodes) {
           const state = statesById.get(step.state);
           // a div, not a button: browsers do not let you select text inside a button
-          html += `<div role="button" tabindex="0" class="node" data-state="${esc(state.id)}" style="left:${x}px;top:${y}px;width:${w}px">
+          const dim = !changedFor(state, ui.changes);
+          html += `<div role="button" tabindex="0" class="node${dim ? " dim" : ""}" data-state="${esc(state.id)}" style="left:${x}px;top:${y}px;width:${w}px">
           <div style="width:${w}px;height:${h}px">${shotHtml(state, ui.viewport)}</div>
           <span class="t">${esc(state.title)}</span><span class="id">${esc(state.id)}</span></div>`;
         }
@@ -1049,7 +1138,7 @@
         `<svg width="${width}" height="${height}" aria-hidden="true">${paths}</svg>${html}` +
         (flows.length
           ? ""
-          : `<p class="empty" style="width:600px">No flows for this viewport and area.</p>`);
+          : `<p class="empty" style="width:600px">${ui.changes === "all" ? "No flows for this viewport and area." : "No flows with changed screens for this viewport and area."}</p>`);
       camera.world = {
         width: Math.max(width, 600),
         height: Math.max(height, 100),
@@ -1254,7 +1343,15 @@
         `<dt>Route</dt><dd><code>${esc(page.route)}</code></dd>` +
         `<dt>Area</dt><dd>${esc(DATA.areas[page.area])}</dd>` +
         `<dt>Layouts</dt><dd>${state.only ? esc(ONLY_LABELS[state.only].why) : "Desktop and phone"}</dd>` +
-        `<dt>Captured</dt><dd>${esc(captured)}</dd>`;
+        `<dt>Captured</dt><dd>${esc(captured)}</dd>` +
+        (shot
+          ? `<dt>Last changed</dt><dd>${esc(
+              new Date(shot.changedAt).toLocaleString(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short",
+              }),
+            )}${isInLatestRun(shot) ? (shot.isNew ? " (new)" : " (latest changes)") : ""}</dd>`
+          : "");
       const flows = flowsByState.get(state.id) ?? [];
       $("state-flows").innerHTML = flows.length
         ? flows
@@ -1314,6 +1411,11 @@
     });
     $("area-select").addEventListener("change", (event) => {
       ui.area = event.target.value;
+      render();
+    });
+    $("change-select").addEventListener("change", (event) => {
+      ui.changes = event.target.value;
+      store.set("atlas.changes", ui.changes);
       render();
     });
     $("search").addEventListener("input", (event) => {

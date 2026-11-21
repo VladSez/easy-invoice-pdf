@@ -16,8 +16,8 @@ import type {
  * Type that extracts all possible keys from InvoiceData and its nested objects
  */
 type AllInvoiceKeys =
-  // Root level InvoiceData keys
-  | keyof InvoiceData
+  // Root level InvoiceData keys, less the drawn signatures no link carries
+  | Exclude<keyof InvoiceData, DrawnSignatureKey>
   // Invoice number object keys
   | keyof NonNullable<InvoiceData["invoiceNumberObject"]>
   // Seller data keys
@@ -26,6 +26,16 @@ type AllInvoiceKeys =
   | keyof BuyerData
   // Invoice item keys
   | keyof InvoiceItemData;
+
+/**
+ * The drawn signature images. `compressInvoiceData` drops them, so they need no short key.
+ */
+export const DRAWN_SIGNATURE_KEYS = [
+  "personAuthorizedToReceiveSignature",
+  "personAuthorizedToIssueSignature",
+] as const satisfies readonly (keyof InvoiceData)[];
+
+type DrawnSignatureKey = (typeof DRAWN_SIGNATURE_KEYS)[number];
 
 /**
  * Mapping of full invoice property names to short keys for URL compression
@@ -79,6 +89,7 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   personAuthorizedToIssueName: "7",
   personAuthorizedToIssueFieldIsVisible: "w",
   taxLabelText: "1",
+  customColumnLabel: "-",
 
   // Invoice number object properties
   label: "x",
@@ -254,7 +265,7 @@ export function compressInvoiceData(invoiceData: InvoiceData) {
   const res = remapKeys(
     hasItems
       ? {
-          ...invoiceData,
+          ...omitDrawnSignatures(invoiceData),
           items: invoiceData.items.map((item) => {
             return omitDefaultDiscount(item);
           }),
@@ -263,6 +274,23 @@ export function compressInvoiceData(invoiceData: InvoiceData) {
   );
 
   return res;
+}
+
+/**
+ * The invoice without its drawn signatures. A link can't hold the images (URLs are capped at
+ * a few kilobytes) and a signature shouldn't travel in one anyway, so links never carry them;
+ * the default template refuses to share while one is drawn, see `getCannotShareInvoiceReason`.
+ */
+function omitDrawnSignatures(
+  invoiceData: InvoiceData,
+): Omit<InvoiceData, DrawnSignatureKey> {
+  const rest: Partial<InvoiceData> = { ...invoiceData };
+
+  for (const key of DRAWN_SIGNATURE_KEYS) {
+    delete rest[key];
+  }
+
+  return rest as Omit<InvoiceData, DrawnSignatureKey>;
 }
 
 /**
@@ -282,6 +310,11 @@ export function decompressInvoiceData(compressedData: Record<string, unknown>) {
     res.items = res.items.map((item: unknown) => {
       return withDefaultDiscount(item);
     });
+  }
+
+  // a link never carries the drawn signatures, see `omitDrawnSignatures`
+  for (const key of DRAWN_SIGNATURE_KEYS) {
+    res[key] = "";
   }
 
   return res;

@@ -158,7 +158,7 @@ async function fillFirstItemTaxLabel(
 const MULTI_PAGE_ITEMS = {
   default: {
     taxLabel: "Sales Tax",
-    taxRateFieldName: "Sales Tax Rate",
+    taxRateFieldName: "Sales Tax rate",
     itemName: (itemNumber: number) => {
       return `Item ${itemNumber}. Some long item name that should be wrapped to the next line. Some long item name that should be wrapped to the next line. Some long item name that should be wrapped to the next line.`;
     },
@@ -168,7 +168,7 @@ const MULTI_PAGE_ITEMS = {
   },
   stripe: {
     taxLabel: null,
-    taxRateFieldName: "VAT Rate",
+    taxRateFieldName: "VAT rate",
     // Add longer descriptions only to odd-numbered items to test mixed content layout
     // This verifies that the PDF template handles varying text lengths correctly
     // and maintains proper spacing between short and long item descriptions
@@ -243,16 +243,16 @@ async function fillLargeFirstItem({
   quantity,
 }: FillLargeFirstItemArgs) {
   await invoiceItemsSection
-    .getByRole("spinbutton", { name: "Amount (Quantity)" })
+    .getByRole("spinbutton", { name: "Qty" })
     .fill(quantity);
 
   await invoiceItemsSection
-    .getByRole("spinbutton", { name: "Net Price (Rate or Unit Price)" })
+    .getByRole("spinbutton", { name: "Unit price" })
     .fill(LARGE_NET_PRICE);
 
   await invoiceItemsSection
     .getByRole("group", { name: "Tax Settings" })
-    .getByRole("textbox", { name: "VAT Rate", exact: true })
+    .getByRole("textbox", { name: "VAT rate", exact: true })
     .fill(LARGE_AMOUNTS_TAX_RATE);
 }
 
@@ -283,12 +283,15 @@ test.describe("Invoice Template shared features", () => {
 
       const finalSection = page.getByTestId("final-section");
 
-      const qrCodeFieldset = finalSection.getByRole("group", {
-        name: "QR Code",
+      // A new invoice keeps the QR code behind its pill; adding it opens its card
+      await finalSection.getByRole("button", { name: "QR code" }).click();
+
+      const qrCodeFieldset = finalSection.getByRole("region", {
+        name: "QR code",
       });
       await expect(qrCodeFieldset).toBeVisible();
 
-      // Verify that "Show QR Code in PDF" switch is on by default
+      // Verify that adding the QR code turned its "Show QR Code in PDF" switch on
       const showQrCodeSwitch = qrCodeFieldset.getByRole("switch", {
         name: "Show QR Code in PDF",
       });
@@ -298,7 +301,7 @@ test.describe("Invoice Template shared features", () => {
 
       // Verify QR Code Data field is empty by default
       const qrCodeDataTextarea = qrCodeFieldset.getByRole("textbox", {
-        name: "Data",
+        name: "QR code link or text",
       });
       await expect(qrCodeDataTextarea).toBeVisible();
       await expect(qrCodeDataTextarea).toHaveValue("");
@@ -308,7 +311,7 @@ test.describe("Invoice Template shared features", () => {
 
       // Verify QR Code Description field is empty by default
       const qrCodeDescriptionTextarea = qrCodeFieldset.getByRole("textbox", {
-        name: "Description (optional)",
+        name: "QR code caption",
       });
       await expect(qrCodeDescriptionTextarea).toBeVisible();
       await expect(qrCodeDescriptionTextarea).toHaveValue("");
@@ -333,12 +336,13 @@ test.describe("Invoice Template shared features", () => {
 
       const newFinalSection = page.getByTestId("final-section");
 
-      const newQrCodeFieldset = newFinalSection.getByRole("group", {
-        name: "QR Code",
+      // the card opens by itself now that the invoice has a QR code
+      const newQrCodeFieldset = newFinalSection.getByRole("region", {
+        name: "QR code",
       });
       await expect(newQrCodeFieldset).toBeVisible();
 
-      // Verify that "Show QR Code in PDF" switch is on by default
+      // Verify that "Show QR Code in PDF" switch is still on
       const newShowQrCodeSwitch = newQrCodeFieldset.getByRole("switch", {
         name: "Show QR Code in PDF",
       });
@@ -355,7 +359,7 @@ test.describe("Invoice Template shared features", () => {
 
       // Verify QR Code Data field retains its value after toggling visibility off
       const newQrCodeDataTextarea = newQrCodeFieldset.getByRole("textbox", {
-        name: "Data",
+        name: "QR code link or text",
       });
       await expect(newQrCodeDataTextarea).toBeVisible();
       await expect(newQrCodeDataTextarea).toHaveValue(QR_CODE_TEST_DATA.data);
@@ -364,7 +368,7 @@ test.describe("Invoice Template shared features", () => {
       const newQrCodeDescriptionTextarea = newQrCodeFieldset.getByRole(
         "textbox",
         {
-          name: "Description (optional)",
+          name: "QR code caption",
         },
       );
       await expect(newQrCodeDescriptionTextarea).toBeVisible();
@@ -558,7 +562,7 @@ test.describe("Invoice Template shared features", () => {
 
         await itemFieldset
           .getByRole("spinbutton", {
-            name: "Net Price (Rate or Unit Price)",
+            name: "Unit price",
           })
           .fill(itemsConfig.netPrice(itemNumber));
       }

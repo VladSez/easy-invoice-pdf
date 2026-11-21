@@ -132,6 +132,7 @@ export const PDF_DEFAULT_TEMPLATE_STYLES = StyleSheet.create({
   colName: { flex: 4.8 }, // larger width for text
   colNameWithDiscount: { flex: 3.2 }, // gives up exactly the discount column's width, so no other column narrows
   colGTU: { flex: 0.9 }, // small width for codes
+  colCustomNamed: { flex: 1.6 }, // a custom column the user named, see InvoiceItemsTable
   colAmount: { flex: 1.2 }, // medium width for numbers
   colUnit: { flex: 1 }, // medium width for text
   colNetPrice: { flex: 1.5 }, // medium-large for prices

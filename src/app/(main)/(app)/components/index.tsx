@@ -150,7 +150,7 @@ export function InvoiceClientPage({
   handleInvoiceDataChange,
   handleShareInvoice,
   isMobile,
-  canShareInvoice,
+  cannotShareReason,
   currentInvoiceFormDataRef,
   isUnmodifiedInvoiceFromLink,
 }: {
@@ -158,7 +158,8 @@ export function InvoiceClientPage({
   handleInvoiceDataChange: (invoiceData: InvoiceData) => void;
   handleShareInvoice: () => void;
   isMobile: boolean;
-  canShareInvoice: boolean;
+  /** Why the invoice can't be shared, or `null` when it can. */
+  cannotShareReason: string | null;
   currentInvoiceFormDataRef: RefObject<(() => InvoiceData | null) | null>;
   /**
    * The invoice is still the one opened from a shared link. "Invoice last updated" is
@@ -273,7 +274,11 @@ export function InvoiceClientPage({
                 <PdfViewer isMobile={isMobile} />
               </div>
             </TabsContent>
-            <div className="sticky bottom-0 z-50 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]">
+            <div
+              // the form box above measures how far this covers it, see MobileFormScrollContainer
+              data-mobile-dock
+              className="sticky bottom-0 z-50 flex flex-col items-center justify-center gap-3 rounded-lg border border-t border-gray-200 bg-white px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-2px_rgba(0,0,0,0.05)]"
+            >
               {/*
                 The switch lives in the dock rather than at the top of the page, so it sits
                 in the same thumb zone as the two buttons it belongs with.
@@ -340,7 +345,7 @@ export function InvoiceClientPage({
                 </TabsTrigger>
               </TabsList>
               <ShareInvoiceButton
-                canShareInvoice={canShareInvoice}
+                cannotShareReason={cannotShareReason}
                 handleShareInvoice={handleShareInvoice}
                 className="mx-2 w-full"
               />

@@ -92,18 +92,18 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     const finalSection = newPage.getByTestId(`final-section`);
 
     /** TEST PERSON AUTHORIZED TO RECEIVE FIELD TO BE HIDDEN (there are only for default template)*/
-    const personAuthorizedToReceiveFieldset = finalSection.getByRole("group", {
-      name: "Person Authorized to Receive",
+    const personAuthorizedToReceiveGroup = finalSection.getByRole("group", {
+      name: "Received by",
     });
 
-    await expect(personAuthorizedToReceiveFieldset).toBeHidden();
+    await expect(personAuthorizedToReceiveGroup).toBeHidden();
 
     /** TEST PERSON AUTHORIZED TO ISSUE FIELD TO BE HIDDEN (there are only for default template)*/
-    const personAuthorizedToIssueFieldset = finalSection.getByRole("group", {
-      name: "Person Authorized to Issue",
+    const personAuthorizedToIssueGroup = finalSection.getByRole("group", {
+      name: "Issued by",
     });
 
-    await expect(personAuthorizedToIssueFieldset).toBeHidden();
+    await expect(personAuthorizedToIssueGroup).toBeHidden();
 
     // Close the new page
     await newPage.close();

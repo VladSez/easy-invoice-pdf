@@ -11,7 +11,9 @@ import {
   STATES,
   VIEWPORTS,
   type StateId,
+  type Viewport,
 } from "./atlas-model";
+import { readShotHistory } from "./shot-history";
 
 const OUTPUT_DIR = path.join(__dirname, "output");
 const SHOTS_DIR = path.join(OUTPUT_DIR, "shots");
@@ -45,12 +47,22 @@ export default function buildAtlas() {
           return [];
         }
 
+        const history = readShotHistory({
+          viewport,
+          fileName: getShotFileName(id),
+        });
+
         return [
           [
             viewport,
             {
               src: `shots/${viewport}/${getShotFileName(id)}`,
               capturedAt: fs.statSync(file).mtime.toISOString(),
+              // shots from before history was kept count as unchanged since their capture
+              changedAt:
+                history?.changedAt ?? fs.statSync(file).mtime.toISOString(),
+              changedInRun: history?.changedInRun ?? null,
+              isNew: history?.isNew ?? false,
             },
           ],
         ];
@@ -108,7 +120,7 @@ export default function buildAtlas() {
 
 /**
  * `output/publish.json`, for republishing the artifact: `changed` lists the shots this
- * run wrote, `all` every shot the model still uses, and `removed` the shots on disk
+ * run changed (by look, see `shot-history.ts`), `all` every shot the model still uses, and `removed` the shots on disk
  * whose state left the model, to delete from the artifact.
  */
 function writePublishManifest() {
@@ -133,7 +145,17 @@ function writePublishManifest() {
     return used.has(file);
   });
   const changed = all.filter((file) => {
-    return fs.statSync(path.join(OUTPUT_DIR, file)).mtimeMs >= RUN_STARTED_AT;
+    const [, viewport, fileName] = file.split("/") as [
+      string,
+      Viewport,
+      string,
+    ];
+    const history = readShotHistory({ viewport, fileName });
+
+    // a shot this run rewrote but that looks the same needs no upload
+    return history
+      ? history.changedInRun === process.env.ATLAS_RUN_ID
+      : fs.statSync(path.join(OUTPUT_DIR, file)).mtimeMs >= RUN_STARTED_AT;
   });
   const removed = onDisk.filter((file) => {
     return !used.has(file);

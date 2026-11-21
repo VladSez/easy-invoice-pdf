@@ -2,6 +2,7 @@ import {
   atlasStorageState,
   expect,
   getDownloadPdfLink,
+  getToasts,
   test,
 } from "./atlas-test";
 
@@ -65,7 +66,10 @@ test("preview tab on a phone", async ({ page, atlas }) => {
 
   await atlas.openEditor();
   await page.getByRole("tab", { name: "Preview PDF" }).click();
-  await expect(page.locator("canvas").first()).toBeVisible();
+  // the PDF's canvas, in the open tab: the form's signature pads are canvases too
+  await expect(
+    page.getByRole("tabpanel").locator("canvas").first(),
+  ).toBeVisible();
   await atlas.snap("editor/mobile-preview");
 });
 
@@ -78,6 +82,10 @@ test("validation errors", async ({ page, atlas }) => {
   await nameInput.clear();
   await expect(
     sellerSection.getByText("Seller name is required", { exact: true }),
+  ).toBeVisible();
+  // the toast that lists every error follows the form's debounce
+  await expect(
+    getToasts(page).getByText("Please fix the following errors:"),
   ).toBeVisible();
   await atlas.snap("editor/validation-error", { scrollTo: sellerSection });
 

@@ -18,6 +18,8 @@ Package manager is **pnpm** (pinned via corepack). `save-exact=true` and a 5-day
 - Merge only when every check is green, with a squash merge (the only method the repo allows). Never force-push and never rewrite pushed history.
 - Leave staging you did not cause alone: don't `git reset` or unstage files to tidy up.
 
+**Summarize what you did in simple terms.** When you finish a feature or fix a bug (anything beyond a minor tweak), end with a short plain-language summary: what changed from the user's point of view, and why. Skip the jargon and file-by-file detail; those can follow the summary if they matter.
+
 **Clean up after a merge.** Once a PR opened from a worktree session is merged, delete that worktree and archive the session. Stop any dev server the session started first, and land any lasting change (like this file) through a commit, because the worktree goes with the session.
 
 **Follow the repo's own guidelines and skills.** Before writing code, load what applies:
@@ -56,7 +58,7 @@ pnpm vitest --run src/utils/__tests__/url-compression.test.ts -t "round trips"
 pnpm e2e e2e/invoice-form.test.ts --project="Desktop Chrome" -g "adds an item"
 ```
 
-**Run as few e2e tests as possible.** The full suite is slow (CI budgets 65 minutes across four browser projects) and most of that time is spent generating and rasterizing PDFs. Always narrow to the file you touched, and add `--project="Desktop Chrome"` plus `-g "<test name>"` on top of it. Run the whole suite only when a change is broad enough to warrant it, or when the user asks.
+**Run as few e2e tests as possible.** The full suite is slow (CI budgets 85 minutes across four browser projects) and most of that time is spent generating and rasterizing PDFs. Always narrow to the file you touched, and add `--project="Desktop Chrome"` plus `-g "<test name>"` on top of it. Run the whole suite only when a change is broad enough to warrant it, or when the user asks.
 
 The pre-commit hook (`lint-staged.config.js`) runs `type-check:fast`, `lint`, `zizmor`, `knip`, `vitest --run` and `format` on _any_ staged change, so keep all of those green.
 
@@ -118,6 +120,8 @@ There are **two root layouts**, both rendering the shared `<html>`/`<body>` shel
 `scripts/page-atlas/` captures every screen, state and user flow of `/`, `/stripe-template` and `/[locale]/about` at desktop and phone width with Playwright. It is local-first: `pnpm atlas` captures (starting `pnpm dev` if needed) and `pnpm atlas:view` opens the result on http://localhost:6007. A shared copy is published as a private artifact, https://claude.ai/artifact/3RSwfQhmcoDq7aZVSreHak.
 
 **Keep it current.** When a task changes what those routes show (layout, copy, a dialog, a toast, a state added or removed), run the `update-screen-atlas` skill as the task's last step: update `scripts/page-atlas/atlas-model.ts` for new or removed states, recapture the affected flows, and republish the shared copy. Skip it for changes nobody can see (types, tests, server-only code, the PDF templates' internals with no visible effect).
+
+**New UI gets its own states and flow.** Recapturing the existing flows only refreshes screens the atlas already has. When a change adds something a user can reach (a card, a pill that opens a form, a dialog, a mode such as tap-to-sign, a new column in the PDF), add its states to `APP_STATES`, add a flow for how they're reached (or a branch in an existing one), and capture them in a spec. Ask "which new screens does this add?" before recapturing, not after.
 
 ## Conventions
 
