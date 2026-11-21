@@ -25,7 +25,7 @@ const ROUTES = [
   },
 ] as const;
 
-test.describe("Invoice app SEO content", { tag: "@desktop-only" }, () => {
+test.describe("Invoice app SEO content @desktop-only", () => {
   for (const { pathname, testId, otherTestId, heading } of ROUTES) {
     test(`${pathname} serves its own SEO block in the prerendered HTML`, async ({
       request,

@@ -6,7 +6,7 @@ import { expect, test } from "@playwright/test";
  * **rejected** paths here — the happy path has real side effects (emails, uploads)
  * and is covered by unit tests instead.
  */
-test.describe("Generate invoice API route", { tag: "@desktop-only" }, () => {
+test.describe("Generate invoice API route @desktop-only", () => {
   // this is a plain HTTP test, no need to run it once per browser project
   test.beforeEach(({}, testInfo) => {
     // eslint-disable-next-line playwright/no-skipped-test -- HTTP only test, Desktop Chrome only

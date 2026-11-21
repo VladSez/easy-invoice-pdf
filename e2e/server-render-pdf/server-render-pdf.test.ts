@@ -36,7 +36,7 @@ function renderServerPdf(language: "en" | "pl"): Buffer {
   return result.stdout;
 }
 
-test.describe("Server-side PDF rendering", { tag: "@desktop-only" }, () => {
+test.describe("Server-side PDF rendering @desktop-only", () => {
   test.describe.configure({ mode: "serial" });
 
   test.beforeEach(({}, testInfo) => {
@@ -69,75 +69,71 @@ test.describe("Server-side PDF rendering", { tag: "@desktop-only" }, () => {
   }
 });
 
-test.describe(
-  "GET /api/generate-invoice/preview",
-  { tag: "@desktop-only" },
-  () => {
-    test("rejects a request without a valid bearer token", async ({
-      request,
-    }) => {
-      const response = await request.get("/api/generate-invoice/preview", {
-        headers: { Authorization: "Bearer not-the-real-token" },
-      });
-
-      expect(response.status()).toBe(401);
+test.describe("GET /api/generate-invoice/preview @desktop-only", () => {
+  test("rejects a request without a valid bearer token", async ({
+    request,
+  }) => {
+    const response = await request.get("/api/generate-invoice/preview", {
+      headers: { Authorization: "Bearer not-the-real-token" },
     });
 
-    // Safe to snapshot into a public repo: the endpoint renders only the fictional
-    // SAMPLE_INVOICE_DATA, never the real env-driven invoice. Its fixed dates and
-    // invoice number are also what keep these baselines stable over time.
-    test.describe("returns a real PDF over HTTP", () => {
-      test.describe.configure({ mode: "serial" });
+    expect(response.status()).toBe(401);
+  });
 
-      test.beforeEach(({}, testInfo) => {
-        /* eslint-disable playwright/no-skipped-test -- snapshots are Desktop Chrome only, and the endpoint needs a token */
-        test.skip(
-          testInfo.project.name !== "Desktop Chrome",
-          "Server PDF snapshots are Desktop Chrome only",
+  // Safe to snapshot into a public repo: the endpoint renders only the fictional
+  // SAMPLE_INVOICE_DATA, never the real env-driven invoice. Its fixed dates and
+  // invoice number are also what keep these baselines stable over time.
+  test.describe("returns a real PDF over HTTP", () => {
+    test.describe.configure({ mode: "serial" });
+
+    test.beforeEach(({}, testInfo) => {
+      /* eslint-disable playwright/no-skipped-test -- snapshots are Desktop Chrome only, and the endpoint needs a token */
+      test.skip(
+        testInfo.project.name !== "Desktop Chrome",
+        "Server PDF snapshots are Desktop Chrome only",
+      );
+      /* eslint-enable playwright/no-skipped-test */
+
+      if (!process.env.AUTH_TOKEN) {
+        throw new Error(
+          "AUTH_TOKEN is not set — cannot call the authenticated preview endpoint",
         );
-        /* eslint-enable playwright/no-skipped-test */
-
-        if (!process.env.AUTH_TOKEN) {
-          throw new Error(
-            "AUTH_TOKEN is not set — cannot call the authenticated preview endpoint",
-          );
-        }
-      });
-
-      for (const { code, label } of LANGUAGES) {
-        test(`serves a ${label} invoice PDF matching the snapshot`, async ({
-          page,
-          request,
-        }) => {
-          const response = await request.get("/api/generate-invoice/preview", {
-            headers: { Authorization: `Bearer ${process.env.AUTH_TOKEN}` },
-            params: { lang: code },
-          });
-
-          expect(response.status()).toBe(200);
-          expect(response.headers()["content-type"]).toBe("application/pdf");
-
-          const pdf = await response.body();
-          expect(pdf.subarray(0, 5).toString("ascii")).toBe("%PDF-");
-
-          await page.goto("about:blank");
-          await renderPdfOnCanvas(page, new Uint8Array(pdf));
-
-          await page.waitForFunction(() => {
-            return (window as unknown as { __PDF_RENDERED__: boolean })
-              .__PDF_RENDERED__;
-          });
-
-          await expect(page.locator("canvas")).toHaveScreenshot(
-            `preview-endpoint-${code}-invoice.png`,
-          );
-        });
       }
     });
-  },
-);
 
-test.describe("GET /api/generate-invoice", { tag: "@desktop-only" }, () => {
+    for (const { code, label } of LANGUAGES) {
+      test(`serves a ${label} invoice PDF matching the snapshot`, async ({
+        page,
+        request,
+      }) => {
+        const response = await request.get("/api/generate-invoice/preview", {
+          headers: { Authorization: `Bearer ${process.env.AUTH_TOKEN}` },
+          params: { lang: code },
+        });
+
+        expect(response.status()).toBe(200);
+        expect(response.headers()["content-type"]).toBe("application/pdf");
+
+        const pdf = await response.body();
+        expect(pdf.subarray(0, 5).toString("ascii")).toBe("%PDF-");
+
+        await page.goto("about:blank");
+        await renderPdfOnCanvas(page, new Uint8Array(pdf));
+
+        await page.waitForFunction(() => {
+          return (window as unknown as { __PDF_RENDERED__: boolean })
+            .__PDF_RENDERED__;
+        });
+
+        await expect(page.locator("canvas")).toHaveScreenshot(
+          `preview-endpoint-${code}-invoice.png`,
+        );
+      });
+    }
+  });
+});
+
+test.describe("GET /api/generate-invoice @desktop-only", () => {
   // Only the auth guard is exercised over HTTP: it rejects before the route
   // renders anything, so no Telegram message / Drive upload / email is sent.
   test("rejects a request without a valid bearer token", async ({

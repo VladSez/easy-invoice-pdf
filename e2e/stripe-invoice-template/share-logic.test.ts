@@ -381,64 +381,60 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await expect(shareButton).toHaveAttribute("data-disabled", "true");
   });
 
-  test(
-    "sharing functionality works correctly in mobile view (mobile UI is a bit different)",
-    { tag: "@mobile-chrome" },
-    async ({ page }, testInfo) => {
-      // the mobile sharing UI is what this test is about, so we run it on a real
-      // mobile project instead of re-running the same flow on every project
-      // eslint-disable-next-line playwright/no-skipped-test -- mobile UI flow, Mobile Chrome only
-      test.skip(
-        testInfo.project.name !== "Mobile Chrome",
-        "mobile only flow, runs on the Mobile Chrome project",
-      );
+  test("sharing functionality works correctly in mobile view (mobile UI is a bit different) @mobile-chrome", async ({
+    page,
+  }, testInfo) => {
+    // the mobile sharing UI is what this test is about, so we run it on a real
+    // mobile project instead of re-running the same flow on every project
+    // eslint-disable-next-line playwright/no-skipped-test -- mobile UI flow, Mobile Chrome only
+    test.skip(
+      testInfo.project.name !== "Mobile Chrome",
+      "mobile only flow, runs on the Mobile Chrome project",
+    );
 
-      // Verify default template is selected by default
-      await expect(page).toHaveURL("/");
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/");
 
-      // Verify share button is visible and enabled in mobile
-      const shareButton = page.getByRole("button", {
-        name: "Get link",
-      });
-      await expect(shareButton).toBeVisible();
-      await expect(shareButton).toBeEnabled();
+    // Verify share button is visible and enabled in mobile
+    const shareButton = page.getByRole("button", {
+      name: "Get link",
+    });
+    await expect(shareButton).toBeVisible();
+    await expect(shareButton).toBeEnabled();
 
-      // Switch to Stripe template
-      await page
-        .getByRole("combobox", { name: "Template" })
-        .selectOption("stripe");
+    // Switch to Stripe template
+    await page
+      .getByRole("combobox", { name: "Template" })
+      .selectOption("stripe");
 
-      // Upload logo
-      await waitForPdfRegeneration(page, async () => {
-        await uploadLogoFile(page);
-      });
+    // Upload logo
+    await waitForPdfRegeneration(page, async () => {
+      await uploadLogoFile(page);
+    });
 
-      // Verify share button is disabled in mobile view too
-      await expect(shareButton).toHaveAttribute("data-disabled", "true");
+    // Verify share button is disabled in mobile view too
+    await expect(shareButton).toHaveAttribute("data-disabled", "true");
 
-      // Click share button to verify toast is shown
-      await shareButton.click();
+    // Click share button to verify toast is shown
+    await shareButton.click();
 
-      await expect(page.getByText("Unable to Share Invoice")).toBeVisible();
+    await expect(page.getByText("Unable to Share Invoice")).toBeVisible();
 
-      await expect(
-        page.getByText(
-          "Invoices with logos cannot be shared. Please remove the logo to generate a shareable link. You can still download the invoice as PDF and share it.",
-        ),
-      ).toBeVisible();
+    await expect(
+      page.getByText(
+        "Invoices with logos cannot be shared. Please remove the logo to generate a shareable link. You can still download the invoice as PDF and share it.",
+      ),
+    ).toBeVisible();
 
-      // Remove logo and verify sharing works again
-      const generalInfoSection = page.getByTestId(
-        "general-information-section",
-      );
-      await generalInfoSection
-        .getByRole("button", { name: "Remove logo" })
-        .click();
+    // Remove logo and verify sharing works again
+    const generalInfoSection = page.getByTestId("general-information-section");
+    await generalInfoSection
+      .getByRole("button", { name: "Remove logo" })
+      .click();
 
-      await expect(shareButton).toHaveAttribute("data-disabled", "false");
-      await expect(shareButton).toBeEnabled();
-    },
-  );
+    await expect(shareButton).toHaveAttribute("data-disabled", "false");
+    await expect(shareButton).toBeEnabled();
+  });
 
   test("shows error toast when form has validation errors and generates link after fixing", async ({
     page,

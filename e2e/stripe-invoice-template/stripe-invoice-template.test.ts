@@ -803,252 +803,248 @@ test.describe("Stripe Invoice Template", () => {
     await expect(servicePeriodSwitch).not.toBeChecked();
   });
 
-  test(
-    "automatically sets date format when switching to Stripe template",
-    { tag: "@desktop-only" },
-    async ({ page, browserName, downloadDir }) => {
-      // Verify default template is selected by default
-      await expect(page).toHaveURL("/");
+  test("automatically sets date format when switching to Stripe template @desktop-only", async ({
+    page,
+    browserName,
+    downloadDir,
+  }) => {
+    // Verify default template is selected by default
+    await expect(page).toHaveURL("/");
 
-      const invoiceItemsSection = page.getByTestId("invoice-items-section");
+    const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
-      // Get the VAT field switch
-      const vatFieldSwitch = invoiceItemsSection.getByRole("switch", {
-        name: "Show the 'VAT' Column in the PDF for item 1",
-      });
+    // Get the VAT field switch
+    const vatFieldSwitch = invoiceItemsSection.getByRole("switch", {
+      name: "Show the 'VAT' Column in the PDF for item 1",
+    });
 
-      // Verify VAT switch is visible and checked by default
-      await expect(vatFieldSwitch).toBeVisible();
-      await expect(vatFieldSwitch).toBeEnabled();
-      await expect(vatFieldSwitch).toBeChecked();
+    // Verify VAT switch is visible and checked by default
+    await expect(vatFieldSwitch).toBeVisible();
+    await expect(vatFieldSwitch).toBeEnabled();
+    await expect(vatFieldSwitch).toBeChecked();
 
-      // SCENARIO: User disables VAT field visibility in default template
-      await vatFieldSwitch.click();
-      await expect(vatFieldSwitch).not.toBeChecked();
+    // SCENARIO: User disables VAT field visibility in default template
+    await vatFieldSwitch.click();
+    await expect(vatFieldSwitch).not.toBeChecked();
 
-      // Get the date format select and verify initial value
-      const dateFormatSelect = page.getByRole("combobox", {
-        name: "Date Format",
-      });
+    // Get the date format select and verify initial value
+    const dateFormatSelect = page.getByRole("combobox", {
+      name: "Date Format",
+    });
 
-      // Verify date format is set to default format (YYYY-MM-DD)
-      await expect(dateFormatSelect).toHaveValue(DEFAULT_DATE_FORMAT);
+    // Verify date format is set to default format (YYYY-MM-DD)
+    await expect(dateFormatSelect).toHaveValue(DEFAULT_DATE_FORMAT);
 
-      // Set VAT to a numeric value to make Tax column  visible in Stripe
-      const vatInput = invoiceItemsSection.getByRole("textbox", {
-        name: "VAT Rate",
-        exact: true,
-      });
-      await waitForPdfRegeneration(page, async () => {
-        await vatInput.clear();
-        await vatInput.fill("20");
-      });
+    // Set VAT to a numeric value to make Tax column  visible in Stripe
+    const vatInput = invoiceItemsSection.getByRole("textbox", {
+      name: "VAT Rate",
+      exact: true,
+    });
+    await waitForPdfRegeneration(page, async () => {
+      await vatInput.clear();
+      await vatInput.fill("20");
+    });
 
-      // Switch to Stripe template
-      await page
-        .getByRole("combobox", { name: "Template" })
-        .selectOption("stripe");
+    // Switch to Stripe template
+    await page
+      .getByRole("combobox", { name: "Template" })
+      .selectOption("stripe");
 
-      // Wait for URL to be updated
-      await page.waitForURL("/stripe-template");
+    // Wait for URL to be updated
+    await page.waitForURL("/stripe-template");
 
-      const newInvoiceItemsSection = page.getByTestId("invoice-items-section");
+    const newInvoiceItemsSection = page.getByTestId("invoice-items-section");
 
-      const newVatFieldSwitch = newInvoiceItemsSection.getByRole("switch", {
-        name: "Show the 'VAT' Column in the PDF for item 1",
-      });
+    const newVatFieldSwitch = newInvoiceItemsSection.getByRole("switch", {
+      name: "Show the 'VAT' Column in the PDF for item 1",
+    });
 
-      await expect(newVatFieldSwitch).toBeVisible();
-      // because we toggle VAT field visibility off in default template, it should be unchecked in Stripe template
-      await expect(newVatFieldSwitch).not.toBeChecked();
+    await expect(newVatFieldSwitch).toBeVisible();
+    // because we toggle VAT field visibility off in default template, it should be unchecked in Stripe template
+    await expect(newVatFieldSwitch).not.toBeChecked();
 
-      // Verify date format is set to Stripe default format (MMMM D, YYYY)
-      const newDateFormatSelect = page.getByRole("combobox", {
-        name: "Date Format",
-      });
-      await expect(newDateFormatSelect).toHaveValue(STRIPE_DEFAULT_DATE_FORMAT);
+    // Verify date format is set to Stripe default format (MMMM D, YYYY)
+    const newDateFormatSelect = page.getByRole("combobox", {
+      name: "Date Format",
+    });
+    await expect(newDateFormatSelect).toHaveValue(STRIPE_DEFAULT_DATE_FORMAT);
 
-      const storedData = (await page.evaluate((key) => {
-        return localStorage.getItem(key);
-      }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
+    const storedData = (await page.evaluate((key) => {
+      return localStorage.getItem(key);
+    }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
 
-      expect(storedData).toBeTruthy();
-      const parsedData = JSON.parse(storedData) as InvoiceData;
+    expect(storedData).toBeTruthy();
+    const parsedData = JSON.parse(storedData) as InvoiceData;
 
-      expect(parsedData.items[0].vatFieldIsVisible).toBe(false);
+    expect(parsedData.items[0].vatFieldIsVisible).toBe(false);
 
-      // The date format should be automatically set to Stripe default format
-      expect(parsedData.dateFormat).toBe(STRIPE_DEFAULT_DATE_FORMAT);
+    // The date format should be automatically set to Stripe default format
+    expect(parsedData.dateFormat).toBe(STRIPE_DEFAULT_DATE_FORMAT);
 
-      // Generate PDF to verify Tax column is visible
-      await expectPdfScreenshot(page, {
-        downloadDir,
-        browserName,
-        name: "automatically-sets-date-format-when-switching-to-Stripe-template.png",
-      });
+    // Generate PDF to verify Tax column is visible
+    await expectPdfScreenshot(page, {
+      downloadDir,
+      browserName,
+      name: "automatically-sets-date-format-when-switching-to-Stripe-template.png",
+    });
 
-      // navigate back to the previous page
-      await page.goto("/");
-      await expect(page).toHaveURL("/stripe-template");
+    // navigate back to the previous page
+    await page.goto("/");
+    await expect(page).toHaveURL("/stripe-template");
 
-      // verify that the stripe template is selected
-      const templateCombobox = page.getByRole("combobox", {
-        name: "Template",
-      });
-      await expect(templateCombobox).toHaveValue("stripe");
+    // verify that the stripe template is selected
+    const templateCombobox = page.getByRole("combobox", {
+      name: "Template",
+    });
+    await expect(templateCombobox).toHaveValue("stripe");
 
-      /**
-       * Switch back to default template
-       */
-      await page
-        .getByRole("combobox", { name: "Template" })
-        .selectOption("default");
+    /**
+     * Switch back to default template
+     */
+    await page
+      .getByRole("combobox", { name: "Template" })
+      .selectOption("default");
 
-      // Wait for URL to be updated
-      await page.waitForURL("/");
+    // Wait for URL to be updated
+    await page.waitForURL("/");
 
-      const newVatInput = page.getByRole("textbox", {
-        name: "VAT Rate",
-        exact: true,
-      });
+    const newVatInput = page.getByRole("textbox", {
+      name: "VAT Rate",
+      exact: true,
+    });
 
-      // Verify VAT input still has the numeric value
-      await expect(newVatInput).toHaveValue("20");
+    // Verify VAT input still has the numeric value
+    await expect(newVatInput).toHaveValue("20");
 
-      // Verify that date format is restored to default template format
-      const finalDateFormatSelect = page.getByRole("combobox", {
-        name: "Date Format",
-      });
-      await expect(finalDateFormatSelect).toHaveValue(DEFAULT_DATE_FORMAT);
+    // Verify that date format is restored to default template format
+    const finalDateFormatSelect = page.getByRole("combobox", {
+      name: "Date Format",
+    });
+    await expect(finalDateFormatSelect).toHaveValue(DEFAULT_DATE_FORMAT);
 
-      const finalStoredData = (await page.evaluate((key) => {
-        return localStorage.getItem(key);
-      }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
+    const finalStoredData = (await page.evaluate((key) => {
+      return localStorage.getItem(key);
+    }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
 
-      expect(finalStoredData).toBeTruthy();
-      const finalParsedData = JSON.parse(finalStoredData) as InvoiceData;
+    expect(finalStoredData).toBeTruthy();
+    const finalParsedData = JSON.parse(finalStoredData) as InvoiceData;
 
-      // The date format should be restored to default format
-      expect(finalParsedData.dateFormat).toBe(DEFAULT_DATE_FORMAT);
-    },
-  );
+    // The date format should be restored to default format
+    expect(finalParsedData.dateFormat).toBe(DEFAULT_DATE_FORMAT);
+  });
 
-  test(
-    "generates PDF with logo and payment URL when using Stripe template",
-    { tag: "@desktop-only" },
-    async ({ page, browserName, downloadDir }) => {
-      const generalInfoSection = page.getByTestId(
-        "general-information-section",
-      );
+  test("generates PDF with logo and payment URL when using Stripe template @desktop-only", async ({
+    page,
+    browserName,
+    downloadDir,
+  }) => {
+    const generalInfoSection = page.getByTestId("general-information-section");
 
-      // Switch to Stripe template
+    // Switch to Stripe template
+    await generalInfoSection
+      .getByRole("combobox", { name: "Template" })
+      .selectOption("stripe");
+
+    // Wait for URL to be updated
+    await expect(page).toHaveURL("/stripe-template");
+
+    // Upload a valid logo
+    await uploadLogoFile(page);
+
+    // Wait for logo to be uploaded and PDF to regenerate
+    await expect(page.getByText("Logo uploaded successfully!")).toBeVisible();
+
+    // Should show logo preview
+    await expect(
+      generalInfoSection.getByAltText("Company logo preview"),
+    ).toBeVisible();
+    await expect(
+      generalInfoSection.getByText(
+        "Logo uploaded successfully. Click the X to remove it.",
+      ),
+    ).toBeVisible();
+
+    // Add payment URL
+    await waitForPdfRegeneration(page, async () => {
       await generalInfoSection
-        .getByRole("combobox", { name: "Template" })
-        .selectOption("stripe");
+        .getByRole("textbox", { name: "Payment Link URL" })
+        .fill("https://buy.stripe.com/test_payment_link");
+    });
 
-      // Wait for URL to be updated
-      await expect(page).toHaveURL("/stripe-template");
+    // Verify data is actually saved in localStorage
+    const storedData = (await page.evaluate((key) => {
+      return localStorage.getItem(key);
+    }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
 
-      // Upload a valid logo
-      await uploadLogoFile(page);
+    expect(storedData).toBeTruthy();
 
-      // Wait for logo to be uploaded and PDF to regenerate
-      await expect(page.getByText("Logo uploaded successfully!")).toBeVisible();
+    const parsedData = JSON.parse(storedData) as InvoiceData;
 
-      // Should show logo preview
-      await expect(
-        generalInfoSection.getByAltText("Company logo preview"),
-      ).toBeVisible();
-      await expect(
-        generalInfoSection.getByText(
-          "Logo uploaded successfully. Click the X to remove it.",
-        ),
-      ).toBeVisible();
+    expect(parsedData.logo).toBeTruthy();
+    expect(parsedData.stripePayOnlineUrl).toBe(
+      "https://buy.stripe.com/test_payment_link",
+    );
 
-      // Add payment URL
-      await waitForPdfRegeneration(page, async () => {
-        await generalInfoSection
-          .getByRole("textbox", { name: "Payment Link URL" })
-          .fill("https://buy.stripe.com/test_payment_link");
-      });
+    await expectPdfScreenshot(page, {
+      downloadDir,
+      browserName,
+      name: "pdf-with-logo-and-payment-url-when-using-stripe-template.png",
+    });
+  });
 
-      // Verify data is actually saved in localStorage
-      const storedData = (await page.evaluate((key) => {
-        return localStorage.getItem(key);
-      }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
+  test("colors the top line with the picked color and keeps it across a reload @desktop-only", async ({
+    page,
+    browserName,
+    downloadDir,
+  }) => {
+    const generalInfoSection = page.getByTestId("general-information-section");
 
-      expect(storedData).toBeTruthy();
+    // the color only belongs to the Stripe template
+    await expect(generalInfoSection.getByText("Top line color")).toBeHidden();
 
-      const parsedData = JSON.parse(storedData) as InvoiceData;
+    await generalInfoSection
+      .getByRole("combobox", { name: "Template" })
+      .selectOption("stripe");
 
-      expect(parsedData.logo).toBeTruthy();
-      expect(parsedData.stripePayOnlineUrl).toBe(
-        "https://buy.stripe.com/test_payment_link",
-      );
+    await expect(page).toHaveURL("/stripe-template");
 
-      await expectPdfScreenshot(page, {
-        downloadDir,
-        browserName,
-        name: "pdf-with-logo-and-payment-url-when-using-stripe-template.png",
-      });
-    },
-  );
+    const topLineColor = generalInfoSection.getByTestId(
+      "stripe-top-line-color",
+    );
 
-  test(
-    "colors the top line with the picked color and keeps it across a reload",
-    { tag: "@desktop-only" },
-    async ({ page, browserName, downloadDir }) => {
-      const generalInfoSection = page.getByTestId(
-        "general-information-section",
-      );
+    await expect(
+      topLineColor.getByRole("button", { name: "Amber (default)" }),
+    ).toHaveAttribute("aria-pressed", "true");
 
-      // the color only belongs to the Stripe template
-      await expect(generalInfoSection.getByText("Top line color")).toBeHidden();
+    await waitForPdfRegeneration(page, async () => {
+      await topLineColor.getByRole("button", { name: "Indigo" }).click();
+    });
 
-      await generalInfoSection
-        .getByRole("combobox", { name: "Template" })
-        .selectOption("stripe");
+    await expect(
+      topLineColor.getByRole("button", { name: "Indigo" }),
+    ).toHaveAttribute("aria-pressed", "true");
 
-      await expect(page).toHaveURL("/stripe-template");
+    const storedData = (await page.evaluate((key) => {
+      return localStorage.getItem(key);
+    }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
 
-      const topLineColor = generalInfoSection.getByTestId(
-        "stripe-top-line-color",
-      );
+    expect((JSON.parse(storedData) as InvoiceData).stripeTopLineColor).toBe(
+      "#635bff",
+    );
 
-      await expect(
-        topLineColor.getByRole("button", { name: "Amber (default)" }),
-      ).toHaveAttribute("aria-pressed", "true");
+    await page.reload();
+    await expect(page).toHaveURL("/stripe-template");
 
-      await waitForPdfRegeneration(page, async () => {
-        await topLineColor.getByRole("button", { name: "Indigo" }).click();
-      });
+    await expect(
+      topLineColor.getByRole("button", { name: "Indigo" }),
+    ).toHaveAttribute("aria-pressed", "true");
 
-      await expect(
-        topLineColor.getByRole("button", { name: "Indigo" }),
-      ).toHaveAttribute("aria-pressed", "true");
-
-      const storedData = (await page.evaluate((key) => {
-        return localStorage.getItem(key);
-      }, PDF_DATA_LOCAL_STORAGE_KEY)) as string;
-
-      expect((JSON.parse(storedData) as InvoiceData).stripeTopLineColor).toBe(
-        "#635bff",
-      );
-
-      await page.reload();
-      await expect(page).toHaveURL("/stripe-template");
-
-      await expect(
-        topLineColor.getByRole("button", { name: "Indigo" }),
-      ).toHaveAttribute("aria-pressed", "true");
-
-      await expectPdfScreenshot(page, {
-        downloadDir,
-        browserName,
-        name: "pdf-with-indigo-top-line-stripe-template.png",
-      });
-    },
-  );
+    await expectPdfScreenshot(page, {
+      downloadDir,
+      browserName,
+      name: "pdf-with-indigo-top-line-stripe-template.png",
+    });
+  });
 
   /**
    * The Stripe template is the only one whose money cells carry a currency token, and some
@@ -1067,59 +1063,59 @@ test.describe("Stripe Invoice Template", () => {
    * column to wrap.
    */
   for (const language of ["it", "fr"] as const) {
-    test(
-      `wraps a wide amount without hyphenating it when ${language} renders the currency in several runs`,
-      { tag: "@desktop-only" },
-      async ({ page, browserName, downloadDir }) => {
-        await page.evaluate(
-          ({ invoiceData, storageKey }) => {
-            localStorage.setItem(storageKey, JSON.stringify(invoiceData));
-          },
-          {
-            storageKey: PDF_DATA_LOCAL_STORAGE_KEY,
-            invoiceData: {
-              ...INITIAL_INVOICE_DATA,
-              template: "stripe",
-              language,
-              // `INITIAL_INVOICE_DATA` takes its dates and invoice number from `dayjs()` at
-              // import time -- in the test runner, where `page.clock` does not reach -- so they
-              // are pinned here instead. Without this the screenshot changes every day.
-              invoiceNumberObject: { label: "Invoice", value: "1/12-2025" },
-              dateOfIssue: "2025-12-17",
-              dateOfServiceStart: "2025-12-01",
-              dateOfService: "2025-12-31",
-              paymentDue: "2025-12-31",
-              // the number format follows the language unless it is pinned, and it is the
-              // format -- not the language -- that decides how the currency is written
-              numberFormatLocale: language,
-              currency: "USD",
-              dateFormat: STRIPE_DEFAULT_DATE_FORMAT,
-              items: [
-                {
-                  ...INITIAL_INVOICE_DATA.items[0],
-                  amount: 100_000,
-                  netPrice: 123_400_000,
-                  netAmount: 12_340_000_000_000,
-                  vat: 20,
-                  vatAmount: 2_468_000_000_000,
-                  preTaxAmount: 14_808_000_000_000,
-                },
-              ],
-              total: 14_808_000_000_000,
-            } satisfies InvoiceData,
-          },
-        );
+    test(`wraps a wide amount without hyphenating it when ${language} renders the currency in several runs @desktop-only`, async ({
+      page,
+      browserName,
+      downloadDir,
+    }) => {
+      await page.evaluate(
+        ({ invoiceData, storageKey }) => {
+          localStorage.setItem(storageKey, JSON.stringify(invoiceData));
+        },
+        {
+          storageKey: PDF_DATA_LOCAL_STORAGE_KEY,
+          invoiceData: {
+            ...INITIAL_INVOICE_DATA,
+            template: "stripe",
+            language,
+            // `INITIAL_INVOICE_DATA` takes its dates and invoice number from `dayjs()` at
+            // import time -- in the test runner, where `page.clock` does not reach -- so they
+            // are pinned here instead. Without this the screenshot changes every day.
+            invoiceNumberObject: { label: "Invoice", value: "1/12-2025" },
+            dateOfIssue: "2025-12-17",
+            dateOfServiceStart: "2025-12-01",
+            dateOfService: "2025-12-31",
+            paymentDue: "2025-12-31",
+            // the number format follows the language unless it is pinned, and it is the
+            // format -- not the language -- that decides how the currency is written
+            numberFormatLocale: language,
+            currency: "USD",
+            dateFormat: STRIPE_DEFAULT_DATE_FORMAT,
+            items: [
+              {
+                ...INITIAL_INVOICE_DATA.items[0],
+                amount: 100_000,
+                netPrice: 123_400_000,
+                netAmount: 12_340_000_000_000,
+                vat: 20,
+                vatAmount: 2_468_000_000_000,
+                preTaxAmount: 14_808_000_000_000,
+              },
+            ],
+            total: 14_808_000_000_000,
+          } satisfies InvoiceData,
+        },
+      );
 
-        await page.goto("/stripe-template");
-        await expect(page).toHaveURL("/stripe-template");
+      await page.goto("/stripe-template");
+      await expect(page).toHaveURL("/stripe-template");
 
-        await expectPdfScreenshot(page, {
-          downloadDir,
-          browserName,
-          name: `wide-amount-with-multi-run-currency-${language}-stripe-template.png`,
-        });
-      },
-    );
+      await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        name: `wide-amount-with-multi-run-currency-${language}-stripe-template.png`,
+      });
+    });
   }
 
   test("'Open app' takes a returning visitor back to their last template", async ({

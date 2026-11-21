@@ -266,480 +266,475 @@ test.describe("Invoice Template shared features", () => {
   });
 
   for (const template of TEMPLATES) {
-    test(
-      `${QR_CODE_TITLE} (${template} template)`,
-      { tag: "@desktop-only" },
-      async ({ page, browserName, downloadDir }, testInfo) => {
-        const QR_CODE_TEST_DATA = {
-          data: "https://easyinvoicepdf.com",
-          description: "QR Code Description",
-        } as const satisfies {
-          data: string;
-          description: string;
-        };
+    test(`${QR_CODE_TITLE} (${template} template) @desktop-only`, async ({
+      page,
+      browserName,
+      downloadDir,
+    }, testInfo) => {
+      const QR_CODE_TEST_DATA = {
+        data: "https://easyinvoicepdf.com",
+        description: "QR Code Description",
+      } as const satisfies {
+        data: string;
+        description: string;
+      };
 
-        await selectTemplate(page, template);
+      await selectTemplate(page, template);
 
-        const finalSection = page.getByTestId("final-section");
+      const finalSection = page.getByTestId("final-section");
 
-        const qrCodeFieldset = finalSection.getByRole("group", {
-          name: "QR Code",
-        });
-        await expect(qrCodeFieldset).toBeVisible();
+      const qrCodeFieldset = finalSection.getByRole("group", {
+        name: "QR Code",
+      });
+      await expect(qrCodeFieldset).toBeVisible();
 
-        // Verify that "Show QR Code in PDF" switch is on by default
-        const showQrCodeSwitch = qrCodeFieldset.getByRole("switch", {
-          name: "Show QR Code in PDF",
-        });
-        await expect(showQrCodeSwitch).toBeVisible();
-        await expect(showQrCodeSwitch).toBeEnabled();
-        await expect(showQrCodeSwitch).toBeChecked();
+      // Verify that "Show QR Code in PDF" switch is on by default
+      const showQrCodeSwitch = qrCodeFieldset.getByRole("switch", {
+        name: "Show QR Code in PDF",
+      });
+      await expect(showQrCodeSwitch).toBeVisible();
+      await expect(showQrCodeSwitch).toBeEnabled();
+      await expect(showQrCodeSwitch).toBeChecked();
 
-        // Verify QR Code Data field is empty by default
-        const qrCodeDataTextarea = qrCodeFieldset.getByRole("textbox", {
-          name: "Data",
-        });
-        await expect(qrCodeDataTextarea).toBeVisible();
-        await expect(qrCodeDataTextarea).toHaveValue("");
+      // Verify QR Code Data field is empty by default
+      const qrCodeDataTextarea = qrCodeFieldset.getByRole("textbox", {
+        name: "Data",
+      });
+      await expect(qrCodeDataTextarea).toBeVisible();
+      await expect(qrCodeDataTextarea).toHaveValue("");
 
-        // Fill in the QR code data field
-        await qrCodeDataTextarea.fill(QR_CODE_TEST_DATA.data);
+      // Fill in the QR code data field
+      await qrCodeDataTextarea.fill(QR_CODE_TEST_DATA.data);
 
-        // Verify QR Code Description field is empty by default
-        const qrCodeDescriptionTextarea = qrCodeFieldset.getByRole("textbox", {
+      // Verify QR Code Description field is empty by default
+      const qrCodeDescriptionTextarea = qrCodeFieldset.getByRole("textbox", {
+        name: "Description (optional)",
+      });
+      await expect(qrCodeDescriptionTextarea).toBeVisible();
+      await expect(qrCodeDescriptionTextarea).toHaveValue("");
+
+      // Fill in the QR code description field
+      await qrCodeDescriptionTextarea.fill(QR_CODE_TEST_DATA.description);
+
+      await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        name: `displays-qr-code-in-pdf-${template}-template.png`,
+        notes: `Test: ${QR_CODE_TITLE} (${testInfo.project.name})`,
+      });
+
+      /**
+       * TURN OFF QR CODE IN PDF AND DOWNLOAD PDF AGAIN
+       */
+
+      // navigate back to the previous page
+      await page.goto("/");
+      await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
+
+      const newFinalSection = page.getByTestId("final-section");
+
+      const newQrCodeFieldset = newFinalSection.getByRole("group", {
+        name: "QR Code",
+      });
+      await expect(newQrCodeFieldset).toBeVisible();
+
+      // Verify that "Show QR Code in PDF" switch is on by default
+      const newShowQrCodeSwitch = newQrCodeFieldset.getByRole("switch", {
+        name: "Show QR Code in PDF",
+      });
+
+      await expect(newShowQrCodeSwitch).toBeVisible();
+      await expect(newShowQrCodeSwitch).toBeEnabled();
+      await expect(newShowQrCodeSwitch).toBeChecked();
+
+      // toggle the switch off
+      await newShowQrCodeSwitch.click();
+
+      // verify that the switch is off
+      await expect(newShowQrCodeSwitch).not.toBeChecked();
+
+      // Verify QR Code Data field retains its value after toggling visibility off
+      const newQrCodeDataTextarea = newQrCodeFieldset.getByRole("textbox", {
+        name: "Data",
+      });
+      await expect(newQrCodeDataTextarea).toBeVisible();
+      await expect(newQrCodeDataTextarea).toHaveValue(QR_CODE_TEST_DATA.data);
+
+      // Verify QR Code Description field retains its value after toggling visibility off
+      const newQrCodeDescriptionTextarea = newQrCodeFieldset.getByRole(
+        "textbox",
+        {
           name: "Description (optional)",
-        });
-        await expect(qrCodeDescriptionTextarea).toBeVisible();
-        await expect(qrCodeDescriptionTextarea).toHaveValue("");
+        },
+      );
+      await expect(newQrCodeDescriptionTextarea).toBeVisible();
+      await expect(newQrCodeDescriptionTextarea).toHaveValue(
+        QR_CODE_TEST_DATA.description,
+      );
 
-        // Fill in the QR code description field
-        await qrCodeDescriptionTextarea.fill(QR_CODE_TEST_DATA.description);
+      await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        name: `qr-code-hidden-in-pdf-${template}-template.png`,
+        notes: `Test: ${QR_CODE_TITLE} - QR code hidden in PDF (${testInfo.project.name})`,
+      });
+    });
 
-        await expectPdfScreenshot(page, {
-          downloadDir,
-          browserName,
-          name: `displays-qr-code-in-pdf-${template}-template.png`,
-          notes: `Test: ${QR_CODE_TITLE} (${testInfo.project.name})`,
-        });
+    test(`${SERVICE_PERIOD_TITLE} (${template} template) @desktop-only`, async ({
+      page,
+      browserName,
+      downloadDir,
+    }, testInfo) => {
+      const SERVICE_PERIOD_TEST_DATA = {
+        start: "2025-12-14",
+        end: "2025-12-20",
+      } as const;
 
-        /**
-         * TURN OFF QR CODE IN PDF AND DOWNLOAD PDF AGAIN
-         */
+      const CUSTOM_SERVICE_PERIOD_LABEL = "Billing period";
 
-        // navigate back to the previous page
-        await page.goto("/");
-        await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
+      await selectTemplate(page, template);
 
-        const newFinalSection = page.getByTestId("final-section");
+      const generalInfoSection = page.getByTestId(
+        "general-information-section",
+      );
+      const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+        name: "Service period",
+      });
+      await expect(servicePeriodFieldset).toBeVisible();
 
-        const newQrCodeFieldset = newFinalSection.getByRole("group", {
-          name: "QR Code",
-        });
-        await expect(newQrCodeFieldset).toBeVisible();
+      await expectServicePeriodPdfLabels(
+        servicePeriodFieldset,
+        template,
+        INVOICE_PDF_TRANSLATIONS.en.servicePeriod,
+      );
 
-        // Verify that "Show QR Code in PDF" switch is on by default
-        const newShowQrCodeSwitch = newQrCodeFieldset.getByRole("switch", {
-          name: "Show QR Code in PDF",
-        });
+      const servicePeriodSwitch = servicePeriodFieldset.getByRole("switch", {
+        name: 'Show the "Service period" (Service period start and end) field in the PDF',
+      });
 
-        await expect(newShowQrCodeSwitch).toBeVisible();
-        await expect(newShowQrCodeSwitch).toBeEnabled();
-        await expect(newShowQrCodeSwitch).toBeChecked();
+      // Service period start and end dates
+      await servicePeriodFieldset
+        .getByRole("textbox", { name: "Service period start" })
+        .fill(SERVICE_PERIOD_TEST_DATA.start);
 
-        // toggle the switch off
-        await newShowQrCodeSwitch.click();
+      await servicePeriodFieldset
+        .getByRole("textbox", { name: "Service period end" })
+        .fill(SERVICE_PERIOD_TEST_DATA.end);
 
-        // verify that the switch is off
-        await expect(newShowQrCodeSwitch).not.toBeChecked();
+      // Custom service period label
+      await fillCustomServicePeriodPdfLabel(
+        servicePeriodFieldset,
+        template,
+        CUSTOM_SERVICE_PERIOD_LABEL,
+      );
 
-        // Verify QR Code Data field retains its value after toggling visibility off
-        const newQrCodeDataTextarea = newQrCodeFieldset.getByRole("textbox", {
-          name: "Data",
-        });
-        await expect(newQrCodeDataTextarea).toBeVisible();
-        await expect(newQrCodeDataTextarea).toHaveValue(QR_CODE_TEST_DATA.data);
+      await expect(
+        servicePeriodFieldset.getByRole("textbox", {
+          name: "Service period start",
+        }),
+      ).toHaveValue(SERVICE_PERIOD_TEST_DATA.start);
+      await expect(
+        servicePeriodFieldset.getByRole("textbox", {
+          name: "Service period end",
+        }),
+      ).toHaveValue(SERVICE_PERIOD_TEST_DATA.end);
 
-        // Verify QR Code Description field retains its value after toggling visibility off
-        const newQrCodeDescriptionTextarea = newQrCodeFieldset.getByRole(
-          "textbox",
-          {
-            name: "Description (optional)",
-          },
-        );
-        await expect(newQrCodeDescriptionTextarea).toBeVisible();
-        await expect(newQrCodeDescriptionTextarea).toHaveValue(
-          QR_CODE_TEST_DATA.description,
-        );
+      await showServicePeriodInPdf(servicePeriodSwitch, template);
 
-        await expectPdfScreenshot(page, {
-          downloadDir,
-          browserName,
-          name: `qr-code-hidden-in-pdf-${template}-template.png`,
-          notes: `Test: ${QR_CODE_TITLE} - QR code hidden in PDF (${testInfo.project.name})`,
-        });
-      },
-    );
+      await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        name: `displays-service-period-in-pdf-${template}-template.png`,
+        notes: `Test: ${SERVICE_PERIOD_TITLE} (${testInfo.project.name})`,
+      });
 
-    test(
-      `${SERVICE_PERIOD_TITLE} (${template} template)`,
-      { tag: "@desktop-only" },
-      async ({ page, browserName, downloadDir }, testInfo) => {
-        const SERVICE_PERIOD_TEST_DATA = {
-          start: "2025-12-14",
-          end: "2025-12-20",
-        } as const;
+      await page.goto("/");
+      await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
 
-        const CUSTOM_SERVICE_PERIOD_LABEL = "Billing period";
-
-        await selectTemplate(page, template);
-
-        const generalInfoSection = page.getByTestId(
-          "general-information-section",
-        );
-        const servicePeriodFieldset = generalInfoSection.getByRole("group", {
+      const newGeneralInfoSection = page.getByTestId(
+        "general-information-section",
+      );
+      const newServicePeriodFieldset = newGeneralInfoSection.getByRole(
+        "group",
+        {
           name: "Service period",
-        });
-        await expect(servicePeriodFieldset).toBeVisible();
+        },
+      );
+      await expect(newServicePeriodFieldset).toBeVisible();
 
-        await expectServicePeriodPdfLabels(
-          servicePeriodFieldset,
-          template,
-          INVOICE_PDF_TRANSLATIONS.en.servicePeriod,
-        );
-
-        const servicePeriodSwitch = servicePeriodFieldset.getByRole("switch", {
+      const newServicePeriodSwitch = newServicePeriodFieldset.getByRole(
+        "switch",
+        {
           name: 'Show the "Service period" (Service period start and end) field in the PDF',
+        },
+      );
+
+      await expect(newServicePeriodSwitch).toBeChecked();
+
+      // the custom PDF label survives a page reload
+      await expectCustomServicePeriodPdfLabel(
+        newServicePeriodFieldset,
+        template,
+        CUSTOM_SERVICE_PERIOD_LABEL,
+      );
+
+      await newServicePeriodSwitch.click();
+      await expect(newServicePeriodSwitch).not.toBeChecked();
+
+      // the service period dates (and label) are kept when the field is hidden from the PDF
+      await expect(
+        newServicePeriodFieldset.getByRole("textbox", {
+          name: "Service period start",
+        }),
+      ).toHaveValue(SERVICE_PERIOD_TEST_DATA.start);
+      await expect(
+        newServicePeriodFieldset.getByRole("textbox", {
+          name: "Service period end",
+        }),
+      ).toHaveValue(SERVICE_PERIOD_TEST_DATA.end);
+
+      await expectCustomServicePeriodPdfLabel(
+        newServicePeriodFieldset,
+        template,
+        CUSTOM_SERVICE_PERIOD_LABEL,
+      );
+
+      await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        name: `service-period-hidden-in-pdf-${template}-template.png`,
+        notes: `Test: ${SERVICE_PERIOD_TITLE} - service period hidden in PDF (${testInfo.project.name})`,
+      });
+    });
+
+    test(`${MULTI_PAGE_TITLE} (${template} template) @desktop-only`, async ({
+      page,
+      browserName,
+      downloadDir,
+    }, testInfo) => {
+      const itemsConfig = MULTI_PAGE_ITEMS[template];
+
+      await selectTemplate(page, template);
+
+      const invoiceItemsSection = page.getByTestId("invoice-items-section");
+
+      // Update tax label for the first item
+      await fillFirstItemTaxLabel(invoiceItemsSection, itemsConfig.taxLabel);
+
+      // Add additional invoice items to trigger multiple-page PDF
+      for (let i = 0; i < 17; i++) {
+        await invoiceItemsSection
+          .getByRole("button", { name: "Add invoice item" })
+          .click();
+
+        // Item numbers start at 1
+        const itemNumber = i + 2;
+
+        // Fill minimal required fields for the new item
+        const itemFieldset = invoiceItemsSection.getByRole("group", {
+          name: `Item ${itemNumber}`,
         });
 
-        // Service period start and end dates
-        await servicePeriodFieldset
-          .getByRole("textbox", { name: "Service period start" })
-          .fill(SERVICE_PERIOD_TEST_DATA.start);
+        await itemFieldset
+          .getByRole("textbox", { name: "Name" })
+          .fill(itemsConfig.itemName(itemNumber));
 
-        await servicePeriodFieldset
-          .getByRole("textbox", { name: "Service period end" })
-          .fill(SERVICE_PERIOD_TEST_DATA.end);
-
-        // Custom service period label
-        await fillCustomServicePeriodPdfLabel(
-          servicePeriodFieldset,
-          template,
-          CUSTOM_SERVICE_PERIOD_LABEL,
-        );
-
-        await expect(
-          servicePeriodFieldset.getByRole("textbox", {
-            name: "Service period start",
-          }),
-        ).toHaveValue(SERVICE_PERIOD_TEST_DATA.start);
-        await expect(
-          servicePeriodFieldset.getByRole("textbox", {
-            name: "Service period end",
-          }),
-        ).toHaveValue(SERVICE_PERIOD_TEST_DATA.end);
-
-        await showServicePeriodInPdf(servicePeriodSwitch, template);
-
-        await expectPdfScreenshot(page, {
-          downloadDir,
-          browserName,
-          name: `displays-service-period-in-pdf-${template}-template.png`,
-          notes: `Test: ${SERVICE_PERIOD_TITLE} (${testInfo.project.name})`,
+        // Set the tax rate for each item
+        const taxSettingsFieldset = itemFieldset.getByRole("group", {
+          name: "Tax Settings",
         });
 
-        await page.goto("/");
-        await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
+        // Use different tax rates: 10%, 20%, or 50%
+        const taxRate =
+          // eslint-disable-next-line playwright/no-conditional-in-test
+          itemNumber % 3 === 0 ? "50" : itemNumber % 2 === 0 ? "20" : "10";
 
-        const newGeneralInfoSection = page.getByTestId(
-          "general-information-section",
-        );
-        const newServicePeriodFieldset = newGeneralInfoSection.getByRole(
-          "group",
-          {
-            name: "Service period",
-          },
-        );
-        await expect(newServicePeriodFieldset).toBeVisible();
+        await taxSettingsFieldset
+          .getByRole("textbox", {
+            name: itemsConfig.taxRateFieldName,
+            exact: true,
+          })
+          .fill(taxRate);
 
-        const newServicePeriodSwitch = newServicePeriodFieldset.getByRole(
-          "switch",
-          {
-            name: 'Show the "Service period" (Service period start and end) field in the PDF',
-          },
-        );
+        await itemFieldset
+          .getByRole("spinbutton", {
+            name: "Net Price (Rate or Unit Price)",
+          })
+          .fill(itemsConfig.netPrice(itemNumber));
+      }
 
-        await expect(newServicePeriodSwitch).toBeChecked();
+      /**
+       * RENDER ALL PDF PAGES ON A SINGLE CANVAS AND TAKE SCREENSHOT
+       */
+      const { numPages } = await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        name: `${template}-template-multi-pages.png`,
+        notes: `Test: ${MULTI_PAGE_TITLE} (${testInfo.project.name})`,
+        allPages: true,
+      });
 
-        // the custom PDF label survives a page reload
-        await expectCustomServicePeriodPdfLabel(
-          newServicePeriodFieldset,
-          template,
-          CUSTOM_SERVICE_PERIOD_LABEL,
-        );
+      // 18 items do not fit on a single page
+      expect(numPages).toBe(3);
+    });
 
-        await newServicePeriodSwitch.click();
-        await expect(newServicePeriodSwitch).not.toBeChecked();
+    test(`${EMAIL_VISIBILITY_TITLE} (${template} template) @desktop-only`, async ({
+      page,
+      browserName,
+      downloadDir,
+    }, testInfo) => {
+      await selectTemplate(page, template);
 
-        // the service period dates (and label) are kept when the field is hidden from the PDF
-        await expect(
-          newServicePeriodFieldset.getByRole("textbox", {
-            name: "Service period start",
-          }),
-        ).toHaveValue(SERVICE_PERIOD_TEST_DATA.start);
-        await expect(
-          newServicePeriodFieldset.getByRole("textbox", {
-            name: "Service period end",
-          }),
-        ).toHaveValue(SERVICE_PERIOD_TEST_DATA.end);
+      /*
+       * PHASE 1: Fill inline form with email switch OFF -> PDF screenshot (emails hidden)
+       */
 
-        await expectCustomServicePeriodPdfLabel(
-          newServicePeriodFieldset,
-          template,
-          CUSTOM_SERVICE_PERIOD_LABEL,
-        );
+      const sellerSection = page.getByTestId("seller-information-section");
+      const buyerSection = page.getByTestId("buyer-information-section");
 
-        await expectPdfScreenshot(page, {
-          downloadDir,
-          browserName,
-          name: `service-period-hidden-in-pdf-${template}-template.png`,
-          notes: `Test: ${SERVICE_PERIOD_TITLE} - service period hidden in PDF (${testInfo.project.name})`,
-        });
-      },
-    );
+      // Fill seller fields inline (no saved seller selected, so switch is enabled)
+      await sellerSection
+        .getByRole("textbox", { name: "Name (Required)" })
+        .fill("Email Visibility Test Seller");
 
-    test(
-      `${MULTI_PAGE_TITLE} (${template} template)`,
-      { tag: "@desktop-only" },
-      async ({ page, browserName, downloadDir }, testInfo) => {
-        const itemsConfig = MULTI_PAGE_ITEMS[template];
+      await sellerSection
+        .getByRole("textbox", { name: "Address (Required)" })
+        .fill("123 Seller Street\nSeller City, 10001");
 
-        await selectTemplate(page, template);
+      await sellerSection
+        .getByRole("textbox", { name: "Email" })
+        .fill("VISIBLE-SELLER@test.com");
 
-        const invoiceItemsSection = page.getByTestId("invoice-items-section");
+      // Toggle seller email switch OFF via inline form
+      const sellerEmailSwitch = sellerSection.getByRole("switch", {
+        name: "Show the 'Email' field in the PDF",
+      });
+      await expect(sellerEmailSwitch).toBeChecked();
+      await sellerEmailSwitch.click();
+      await expect(sellerEmailSwitch).not.toBeChecked();
 
-        // Update tax label for the first item
-        await fillFirstItemTaxLabel(invoiceItemsSection, itemsConfig.taxLabel);
+      // Fill buyer fields inline (no saved buyer selected, so switch is enabled)
+      await buyerSection
+        .getByRole("textbox", { name: "Name (Required)" })
+        .fill("Email Visibility Test Buyer");
 
-        // Add additional invoice items to trigger multiple-page PDF
-        for (let i = 0; i < 17; i++) {
-          await invoiceItemsSection
-            .getByRole("button", { name: "Add invoice item" })
-            .click();
+      await buyerSection
+        .getByRole("textbox", { name: "Address (Required)" })
+        .fill("456 Buyer Avenue\nBuyer City, 20002");
 
-          // Item numbers start at 1
-          const itemNumber = i + 2;
+      await buyerSection
+        .getByRole("textbox", { name: "Email" })
+        .fill("VISIBLE-BUYER@test.com");
 
-          // Fill minimal required fields for the new item
-          const itemFieldset = invoiceItemsSection.getByRole("group", {
-            name: `Item ${itemNumber}`,
-          });
+      // Toggle buyer email switch OFF via inline form
+      const buyerEmailSwitch = buyerSection.getByRole("switch", {
+        name: "Show the 'Email' field in the PDF",
+      });
+      await expect(buyerEmailSwitch).toBeChecked();
+      await buyerEmailSwitch.click();
+      await expect(buyerEmailSwitch).not.toBeChecked();
 
-          await itemFieldset
-            .getByRole("textbox", { name: "Name" })
-            .fill(itemsConfig.itemName(itemNumber));
+      // Download PDF with emails hidden (toggled off via inline form)
+      await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        name: `email-hidden-in-pdf-${template}-template.png`,
+        notes: `Test: ${EMAIL_VISIBILITY_TITLE} - emails hidden (${testInfo.project.name})`,
+      });
 
-          // Set the tax rate for each item
-          const taxSettingsFieldset = itemFieldset.getByRole("group", {
-            name: "Tax Settings",
-          });
+      /*
+       * PHASE 2: Save seller/buyer via dialog with email ON -> PDF screenshot (emails visible)
+       */
 
-          // Use different tax rates: 10%, 20%, or 50%
-          const taxRate =
-            // eslint-disable-next-line playwright/no-conditional-in-test
-            itemNumber % 3 === 0 ? "50" : itemNumber % 2 === 0 ? "20" : "10";
+      await page.goto("/");
+      await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
 
-          await taxSettingsFieldset
-            .getByRole("textbox", {
-              name: itemsConfig.taxRateFieldName,
-              exact: true,
-            })
-            .fill(taxRate);
+      // Create seller via dialog with email visible
+      await waitForPdfRegeneration(page, async () => {
+        await page.getByRole("button", { name: "New Seller" }).click();
 
-          await itemFieldset
-            .getByRole("spinbutton", {
-              name: "Net Price (Rate or Unit Price)",
-            })
-            .fill(itemsConfig.netPrice(itemNumber));
-        }
+        const manageSellerDialog = page.getByTestId("manage-seller-dialog");
 
-        /**
-         * RENDER ALL PDF PAGES ON A SINGLE CANVAS AND TAKE SCREENSHOT
-         */
-        const { numPages } = await expectPdfScreenshot(page, {
-          downloadDir,
-          browserName,
-          name: `${template}-template-multi-pages.png`,
-          notes: `Test: ${MULTI_PAGE_TITLE} (${testInfo.project.name})`,
-          allPages: true,
-        });
-
-        // 18 items do not fit on a single page
-        expect(numPages).toBe(3);
-      },
-    );
-
-    test(
-      `${EMAIL_VISIBILITY_TITLE} (${template} template)`,
-      { tag: "@desktop-only" },
-      async ({ page, browserName, downloadDir }, testInfo) => {
-        await selectTemplate(page, template);
-
-        /*
-         * PHASE 1: Fill inline form with email switch OFF -> PDF screenshot (emails hidden)
-         */
-
-        const sellerSection = page.getByTestId("seller-information-section");
-        const buyerSection = page.getByTestId("buyer-information-section");
-
-        // Fill seller fields inline (no saved seller selected, so switch is enabled)
-        await sellerSection
+        await manageSellerDialog
           .getByRole("textbox", { name: "Name (Required)" })
           .fill("Email Visibility Test Seller");
 
-        await sellerSection
+        await manageSellerDialog
           .getByRole("textbox", { name: "Address (Required)" })
           .fill("123 Seller Street\nSeller City, 10001");
 
-        await sellerSection
+        await manageSellerDialog
           .getByRole("textbox", { name: "Email" })
           .fill("VISIBLE-SELLER@test.com");
 
-        // Toggle seller email switch OFF via inline form
-        const sellerEmailSwitch = sellerSection.getByRole("switch", {
-          name: "Show the 'Email' field in the PDF",
-        });
-        await expect(sellerEmailSwitch).toBeChecked();
-        await sellerEmailSwitch.click();
-        await expect(sellerEmailSwitch).not.toBeChecked();
+        // Verify email visibility switch is checked by default in dialog
+        const sellerEmailSwitchInDialog = manageSellerDialog.getByRole(
+          "switch",
+          {
+            name: "Show the 'Email' field in the PDF",
+          },
+        );
+        await expect(sellerEmailSwitchInDialog).toBeVisible();
+        await expect(sellerEmailSwitchInDialog).toBeChecked();
 
-        // Fill buyer fields inline (no saved buyer selected, so switch is enabled)
-        await buyerSection
+        await manageSellerDialog
+          .getByRole("button", { name: "Save Seller" })
+          .click();
+
+        await expect(manageSellerDialog).toBeHidden();
+
+        await expect(
+          page.getByText("Seller added and applied to invoice", {
+            exact: true,
+          }),
+        ).toBeVisible();
+      });
+
+      // Create buyer via dialog with email visible
+      await waitForPdfRegeneration(page, async () => {
+        await page.getByRole("button", { name: "New Buyer" }).click();
+
+        const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
+
+        await manageBuyerDialog
           .getByRole("textbox", { name: "Name (Required)" })
           .fill("Email Visibility Test Buyer");
 
-        await buyerSection
+        await manageBuyerDialog
           .getByRole("textbox", { name: "Address (Required)" })
           .fill("456 Buyer Avenue\nBuyer City, 20002");
 
-        await buyerSection
+        await manageBuyerDialog
           .getByRole("textbox", { name: "Email" })
           .fill("VISIBLE-BUYER@test.com");
 
-        // Toggle buyer email switch OFF via inline form
-        const buyerEmailSwitch = buyerSection.getByRole("switch", {
+        // Verify email visibility switch is checked by default in dialog
+        const buyerEmailSwitchInDialog = manageBuyerDialog.getByRole("switch", {
           name: "Show the 'Email' field in the PDF",
         });
-        await expect(buyerEmailSwitch).toBeChecked();
-        await buyerEmailSwitch.click();
-        await expect(buyerEmailSwitch).not.toBeChecked();
+        await expect(buyerEmailSwitchInDialog).toBeVisible();
+        await expect(buyerEmailSwitchInDialog).toBeChecked();
 
-        // Download PDF with emails hidden (toggled off via inline form)
-        await expectPdfScreenshot(page, {
-          downloadDir,
-          browserName,
-          name: `email-hidden-in-pdf-${template}-template.png`,
-          notes: `Test: ${EMAIL_VISIBILITY_TITLE} - emails hidden (${testInfo.project.name})`,
-        });
+        await manageBuyerDialog
+          .getByRole("button", { name: "Save Buyer" })
+          .click();
 
-        /*
-         * PHASE 2: Save seller/buyer via dialog with email ON -> PDF screenshot (emails visible)
-         */
+        await expect(manageBuyerDialog).toBeHidden();
 
-        await page.goto("/");
-        await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
+        await expect(
+          page.getByText("Buyer added and applied to invoice", { exact: true }),
+        ).toBeVisible();
+      });
 
-        // Create seller via dialog with email visible
-        await waitForPdfRegeneration(page, async () => {
-          await page.getByRole("button", { name: "New Seller" }).click();
-
-          const manageSellerDialog = page.getByTestId("manage-seller-dialog");
-
-          await manageSellerDialog
-            .getByRole("textbox", { name: "Name (Required)" })
-            .fill("Email Visibility Test Seller");
-
-          await manageSellerDialog
-            .getByRole("textbox", { name: "Address (Required)" })
-            .fill("123 Seller Street\nSeller City, 10001");
-
-          await manageSellerDialog
-            .getByRole("textbox", { name: "Email" })
-            .fill("VISIBLE-SELLER@test.com");
-
-          // Verify email visibility switch is checked by default in dialog
-          const sellerEmailSwitchInDialog = manageSellerDialog.getByRole(
-            "switch",
-            {
-              name: "Show the 'Email' field in the PDF",
-            },
-          );
-          await expect(sellerEmailSwitchInDialog).toBeVisible();
-          await expect(sellerEmailSwitchInDialog).toBeChecked();
-
-          await manageSellerDialog
-            .getByRole("button", { name: "Save Seller" })
-            .click();
-
-          await expect(manageSellerDialog).toBeHidden();
-
-          await expect(
-            page.getByText("Seller added and applied to invoice", {
-              exact: true,
-            }),
-          ).toBeVisible();
-        });
-
-        // Create buyer via dialog with email visible
-        await waitForPdfRegeneration(page, async () => {
-          await page.getByRole("button", { name: "New Buyer" }).click();
-
-          const manageBuyerDialog = page.getByTestId("manage-buyer-dialog");
-
-          await manageBuyerDialog
-            .getByRole("textbox", { name: "Name (Required)" })
-            .fill("Email Visibility Test Buyer");
-
-          await manageBuyerDialog
-            .getByRole("textbox", { name: "Address (Required)" })
-            .fill("456 Buyer Avenue\nBuyer City, 20002");
-
-          await manageBuyerDialog
-            .getByRole("textbox", { name: "Email" })
-            .fill("VISIBLE-BUYER@test.com");
-
-          // Verify email visibility switch is checked by default in dialog
-          const buyerEmailSwitchInDialog = manageBuyerDialog.getByRole(
-            "switch",
-            {
-              name: "Show the 'Email' field in the PDF",
-            },
-          );
-          await expect(buyerEmailSwitchInDialog).toBeVisible();
-          await expect(buyerEmailSwitchInDialog).toBeChecked();
-
-          await manageBuyerDialog
-            .getByRole("button", { name: "Save Buyer" })
-            .click();
-
-          await expect(manageBuyerDialog).toBeHidden();
-
-          await expect(
-            page.getByText("Buyer added and applied to invoice", {
-              exact: true,
-            }),
-          ).toBeVisible();
-        });
-
-        // Download PDF with emails visible (saved via dialog)
-        await expectPdfScreenshot(page, {
-          downloadDir,
-          browserName,
-          filePrefix: "visible-",
-          name: `email-visible-in-pdf-${template}-template.png`,
-          notes: `Test: ${EMAIL_VISIBILITY_TITLE} - emails visible (${testInfo.project.name})`,
-        });
-      },
-    );
+      // Download PDF with emails visible (saved via dialog)
+      await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        filePrefix: "visible-",
+        name: `email-visible-in-pdf-${template}-template.png`,
+        notes: `Test: ${EMAIL_VISIBILITY_TITLE} - emails visible (${testInfo.project.name})`,
+      });
+    });
 
     /**
      * A number is one unbreakable word, so a column too narrow for `1,000,000,000.00` used to
@@ -751,52 +746,52 @@ test.describe("Invoice Template shared features", () => {
      * offers react-pdf no break at all, and `international`'s no-break space offers one it is
      * forbidden to take.
      */
-    test(
-      `${LARGE_AMOUNTS_TITLE} (${template} template)`,
-      { tag: "@desktop-only" },
-      async ({ page, browserName, downloadDir }, testInfo) => {
-        await selectTemplate(page, template);
+    test(`${LARGE_AMOUNTS_TITLE} (${template} template) @desktop-only`, async ({
+      page,
+      browserName,
+      downloadDir,
+    }, testInfo) => {
+      await selectTemplate(page, template);
 
-        await fillLargeFirstItem({
-          invoiceItemsSection: page.getByTestId("invoice-items-section"),
-          quantity: SMALL_QUANTITY,
-        });
+      await fillLargeFirstItem({
+        invoiceItemsSection: page.getByTestId("invoice-items-section"),
+        quantity: SMALL_QUANTITY,
+      });
 
-        await expectPdfScreenshot(page, {
-          downloadDir,
-          browserName,
-          name: `large-amounts-in-pdf-${template}-template.png`,
-          notes: `Test: ${LARGE_AMOUNTS_TITLE} (${testInfo.project.name})`,
-        });
+      await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        name: `large-amounts-in-pdf-${template}-template.png`,
+        notes: `Test: ${LARGE_AMOUNTS_TITLE} (${testInfo.project.name})`,
+      });
 
-        /**
-         * THE SAME INVOICE GROUPED WITH A NO-BREAK SPACE INSTEAD OF A COMMA
-         */
+      /**
+       * THE SAME INVOICE GROUPED WITH A NO-BREAK SPACE INSTEAD OF A COMMA
+       */
 
-        // the screenshot leaves the app on about:blank; the invoice comes back from localStorage
-        await page.goto("/");
-        await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
+      // the screenshot leaves the app on about:blank; the invoice comes back from localStorage
+      await page.goto("/");
+      await expect(page).toHaveURL(buildInvoiceAppUrl({ template }));
 
-        const numberFormatSelect = page.getByRole("combobox", {
-          name: "Number Format",
-          exact: true,
-        });
+      const numberFormatSelect = page.getByRole("combobox", {
+        name: "Number Format",
+        exact: true,
+      });
 
-        await waitForPdfRegeneration(page, async () => {
-          await numberFormatSelect.selectOption("international");
-        });
+      await waitForPdfRegeneration(page, async () => {
+        await numberFormatSelect.selectOption("international");
+      });
 
-        await expect(numberFormatSelect).toHaveValue("international");
+      await expect(numberFormatSelect).toHaveValue("international");
 
-        await expectPdfScreenshot(page, {
-          downloadDir,
-          browserName,
-          filePrefix: "international-",
-          name: `large-amounts-international-format-in-pdf-${template}-template.png`,
-          notes: `Test: ${LARGE_AMOUNTS_TITLE} - international number format (${testInfo.project.name})`,
-        });
-      },
-    );
+      await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        filePrefix: "international-",
+        name: `large-amounts-international-format-in-pdf-${template}-template.png`,
+        notes: `Test: ${LARGE_AMOUNTS_TITLE} - international number format (${testInfo.project.name})`,
+      });
+    });
 
     /**
      * The same billion, billed ten thousand times over. It is the widest thing either
@@ -811,27 +806,27 @@ test.describe("Invoice Template shared features", () => {
      * Only the default grouping is worth a picture here; the sibling test above is the one
      * that covers what changes when the separator does.
      */
-    test(
-      `${LARGE_QUANTITY_TITLE} (${template} template)`,
-      { tag: "@desktop-only" },
-      async ({ page, browserName, downloadDir }, testInfo) => {
-        await selectTemplate(page, template);
+    test(`${LARGE_QUANTITY_TITLE} (${template} template) @desktop-only`, async ({
+      page,
+      browserName,
+      downloadDir,
+    }, testInfo) => {
+      await selectTemplate(page, template);
 
-        await fillLargeFirstItem({
-          invoiceItemsSection: page.getByTestId("invoice-items-section"),
-          quantity: LARGE_QUANTITY,
-        });
+      await fillLargeFirstItem({
+        invoiceItemsSection: page.getByTestId("invoice-items-section"),
+        quantity: LARGE_QUANTITY,
+      });
 
-        const { numPages } = await expectPdfScreenshot(page, {
-          downloadDir,
-          browserName,
-          name: `large-amounts-with-quantity-in-pdf-${template}-template.png`,
-          notes: `Test: ${LARGE_QUANTITY_TITLE} (${testInfo.project.name})`,
-        });
+      const { numPages } = await expectPdfScreenshot(page, {
+        downloadDir,
+        browserName,
+        name: `large-amounts-with-quantity-in-pdf-${template}-template.png`,
+        notes: `Test: ${LARGE_QUANTITY_TITLE} (${testInfo.project.name})`,
+      });
 
-        // one item, however wide its amounts, still belongs on a single page
-        expect(numPages).toBe(1);
-      },
-    );
+      // one item, however wide its amounts, still belongs on a single page
+      expect(numPages).toBe(1);
+    });
   }
 });

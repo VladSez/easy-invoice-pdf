@@ -111,45 +111,45 @@ test.describe("Item discounts", () => {
     ).toHaveValue("10,000.00");
   });
 
-  test(
-    "shows a discount column in the default template PDF",
-    { tag: "@desktop-only" },
-    async ({ page, browserName, downloadDir }) => {
-      await fillDiscountedItems(page);
+  test("shows a discount column in the default template PDF @desktop-only", async ({
+    page,
+    browserName,
+    downloadDir,
+  }) => {
+    await fillDiscountedItems(page);
 
-      const { numPages } = await expectPdfScreenshot(page, {
-        downloadDir,
-        browserName,
-        name: "item-discounts-default-template.png",
-        notes: "Item discounts, default template",
-      });
+    const { numPages } = await expectPdfScreenshot(page, {
+      downloadDir,
+      browserName,
+      name: "item-discounts-default-template.png",
+      notes: "Item discounts, default template",
+    });
 
-      // the extra column does not push the invoice onto a second page
-      expect(numPages).toBe(1);
-    },
-  );
+    // the extra column does not push the invoice onto a second page
+    expect(numPages).toBe(1);
+  });
 
-  test(
-    "shows a discount row under each discounted item in the Stripe template PDF",
-    { tag: "@desktop-only" },
-    async ({ page, browserName, downloadDir }) => {
-      await page
-        .getByTestId("general-information-section")
-        .getByRole("combobox", { name: "Template" })
-        .selectOption("stripe");
+  test("shows a discount row under each discounted item in the Stripe template PDF @desktop-only", async ({
+    page,
+    browserName,
+    downloadDir,
+  }) => {
+    await page
+      .getByTestId("general-information-section")
+      .getByRole("combobox", { name: "Template" })
+      .selectOption("stripe");
 
-      await expect(page).toHaveURL("/stripe-template");
+    await expect(page).toHaveURL("/stripe-template");
 
-      await fillDiscountedItems(page);
+    await fillDiscountedItems(page);
 
-      await expectPdfScreenshot(page, {
-        downloadDir,
-        browserName,
-        name: "item-discounts-stripe-template.png",
-        notes: "Item discounts, Stripe template",
-      });
-    },
-  );
+    await expectPdfScreenshot(page, {
+      downloadDir,
+      browserName,
+      name: "item-discounts-stripe-template.png",
+      notes: "Item discounts, Stripe template",
+    });
+  });
 });
 
 /**
