@@ -97,6 +97,7 @@
     "next": "16.4.6",
     "next-intl": "4.13.7",
     "pdfjs-dist": "5.4.296",
+    "perfect-freehand": "1.2.3",
     "posthog-js": "1.444.0",
     "qrcode": "1.5.4",
     "react": "19.2.8",

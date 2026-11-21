@@ -24,14 +24,15 @@ import { trackEvent } from "@/lib/analytics/track-event";
  * @returns The rendered invoice page header with logo, description, and action buttons
  */
 export function InvoicePageHeader({
-  canShareInvoice,
+  cannotShareReason,
   handleShareInvoice,
   isDesktop,
   invoiceDataState,
   isMobile,
   isSharedInvoice,
 }: {
-  canShareInvoice: boolean;
+  /** Why the invoice can't be shared, or `null` when it can. */
+  cannotShareReason: string | null;
   handleShareInvoice: () => void;
   isDesktop: boolean;
   invoiceDataState: InvoiceData;
@@ -78,7 +79,7 @@ export function InvoicePageHeader({
           {isDesktop ? (
             <>
               <ShareInvoiceButton
-                canShareInvoice={canShareInvoice}
+                cannotShareReason={cannotShareReason}
                 handleShareInvoice={handleShareInvoice}
                 className="mx-2 mb-2 w-full lg:mx-0 lg:mb-0 lg:w-auto"
               />

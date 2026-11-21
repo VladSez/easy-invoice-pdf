@@ -785,7 +785,7 @@ for (const party of PARTIES) {
       await expect(
         partyForm
           .getByRole("group", { name: `${label} Tax Number` })
-          .getByRole("textbox", { name: "Value" }),
+          .getByRole("textbox", { name: "Number" }),
       ).toHaveValue(defaults.vatNo);
     });
 

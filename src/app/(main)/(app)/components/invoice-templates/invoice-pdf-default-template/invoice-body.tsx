@@ -1,4 +1,4 @@
-import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
+import { Image, Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import dayjs from "dayjs";
 
 import { InvoiceQRCode } from "@/app/(main)/(app)/components/invoice-templates/common/invoice-qr-code";
@@ -119,6 +119,14 @@ export const InvoiceBody = ({
         >
           {invoiceData.personAuthorizedToReceiveFieldIsVisible ? (
             <View style={styles.signatureColumn}>
+              {invoiceData.personAuthorizedToReceiveSignature ? (
+                <DrawnSignature
+                  src={invoiceData.personAuthorizedToReceiveSignature}
+                  hasNameBelow={Boolean(
+                    invoiceData.personAuthorizedToReceiveName,
+                  )}
+                />
+              ) : null}
               {invoiceData.personAuthorizedToReceiveName ? (
                 <Text style={[styles.signatureText, { marginTop: -13 }]}>
                   {invoiceData.personAuthorizedToReceiveName}
@@ -132,6 +140,14 @@ export const InvoiceBody = ({
           ) : null}
           {invoiceData.personAuthorizedToIssueFieldIsVisible ? (
             <View style={styles.signatureColumn}>
+              {invoiceData.personAuthorizedToIssueSignature ? (
+                <DrawnSignature
+                  src={invoiceData.personAuthorizedToIssueSignature}
+                  hasNameBelow={Boolean(
+                    invoiceData.personAuthorizedToIssueName,
+                  )}
+                />
+              ) : null}
               {invoiceData.personAuthorizedToIssueName ? (
                 <Text style={[styles.signatureText, { marginTop: -13 }]}>
                   {invoiceData.personAuthorizedToIssueName}
@@ -166,3 +182,38 @@ export const InvoiceBody = ({
     </>
   );
 };
+
+/** How tall a drawn signature prints, in points. */
+const SIGNATURE_HEIGHT = 40;
+
+/**
+ * A drawn signature, sitting just above the name (or the line, when there is no name). It is
+ * positioned absolutely in the space above the section, so signing never moves the layout.
+ */
+function DrawnSignature({ src, hasNameBelow }: DrawnSignatureProps) {
+  // the name is pulled 13pt above the line, see the signature columns above
+  const bottomOfSignature = hasNameBelow ? -13 : -2;
+
+  return (
+    // react-pdf images take no alt: the PDF has no accessible image text to give
+    // eslint-disable-next-line jsx-a11y/alt-text
+    <Image
+      src={src}
+      style={{
+        position: "absolute",
+        top: bottomOfSignature - SIGNATURE_HEIGHT,
+        left: 0,
+        right: 0,
+        height: SIGNATURE_HEIGHT,
+        objectFit: "contain",
+      }}
+    />
+  );
+}
+
+interface DrawnSignatureProps {
+  /** The signature as a PNG data URL. */
+  src: string;
+  /** A printed name sits between the signature and the line. */
+  hasNameBelow: boolean;
+}

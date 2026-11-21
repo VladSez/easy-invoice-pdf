@@ -163,6 +163,14 @@ export const STRIPE_TEMPLATE_STYLES = StyleSheet.create({
    */
   colDescription: { flex: 2.7, textAlign: "left" },
   /**
+   * With the custom column (a project code, a SKU...) the description hands it a slice of
+   * its width and gives up a little more: the two take 2.5 instead of 2.7, so the columns
+   * to the right widen slightly (about 3%) while the custom column shows.
+   */
+  colDescriptionWithCustom: { flex: 2, textAlign: "left" },
+  // a gap on the left keeps it clear of the description's text
+  colCustom: { flex: 0.5, textAlign: "left", paddingLeft: 8, paddingRight: 4 },
+  /**
    * Wide enough for a quantity with a thousands separator in it. At `flex: 0.3` the cell
    * came to 20.7pt, which `999` already fills, so `WrappableAmount` stacked every
    * four-digit quantity onto two lines (`1,` over `000`). `0.6` buys 42.7pt, which holds

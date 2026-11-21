@@ -1,36 +1,16 @@
 "use client";
 
 import { memo, useState } from "react";
-import {
-  type Control,
-  Controller,
-  type FieldErrors,
-  type UseFormSetValue,
-} from "react-hook-form";
+import { type Control, type UseFormSetValue } from "react-hook-form";
 
-import {
-  FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME,
-  inputErrorClassName,
-} from "@/app/(main)/(app)/components/invoice-form/common";
 import { BuyerManagement } from "@/app/(main)/(app)/components/invoice-form/sections/components/buyer/buyer-management";
 import { SavedContactCard } from "@/app/(main)/(app)/components/invoice-form/sections/components/contact-fields";
+import { PartyFields } from "@/app/(main)/(app)/components/invoice-form/sections/components/party-fields";
 import { type BuyerData, type InvoiceData } from "@/app/schema";
 import { AccordionContent } from "@/components/ui/accordion";
-import { Input } from "@/components/ui/input";
-import { InputHelperMessage } from "@/components/ui/input-helper-message";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { CustomTooltip } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
-
-const ErrorMessage = ({ children }: { children: React.ReactNode }) => {
-  return <p className="mt-1 text-xs text-red-600">{children}</p>;
-};
 
 interface BuyerInformationProps {
   control: Control<InvoiceData>;
-  errors: FieldErrors<InvoiceData>;
   setValue: UseFormSetValue<InvoiceData>;
   invoiceData: InvoiceData;
   isMobile: boolean;
@@ -38,7 +18,6 @@ interface BuyerInformationProps {
 
 export const BuyerInformation = memo(function BuyerInformation({
   control,
-  errors,
   setValue,
   invoiceData,
   isMobile,
@@ -76,257 +55,24 @@ export const BuyerInformation = memo(function BuyerInformation({
             <SavedContactCard control={control} party="buyer" />
           </div>
         ) : (
-          <fieldset className="mt-5 space-y-4">
-            <div>
-              <Label htmlFor="buyerName" className="mb-1">
-                Name (Required)
-              </Label>
-              <Controller
-                name="buyer.name"
-                control={control}
-                render={({ field }) => {
-                  return (
-                    <Textarea
-                      {...field}
-                      id="buyerName"
-                      rows={3}
-                      className={inputErrorClassName(!!errors.buyer?.name)}
-                    />
-                  );
-                }}
-              />
-              {errors.buyer?.name ? (
-                <ErrorMessage>{errors.buyer.name.message}</ErrorMessage>
-              ) : null}
-            </div>
-
-            <div>
-              <Label htmlFor="buyerAddress" className="mb-1">
-                Address (Required)
-              </Label>
-              <Controller
-                name="buyer.address"
-                control={control}
-                render={({ field }) => {
-                  return (
-                    <Textarea
-                      {...field}
-                      id="buyerAddress"
-                      rows={3}
-                      className={inputErrorClassName(!!errors.buyer?.address)}
-                    />
-                  );
-                }}
-              />
-              {errors.buyer?.address ? (
-                <ErrorMessage>{errors.buyer.address.message}</ErrorMessage>
-              ) : null}
-            </div>
-
-            <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
-              <fieldset className="rounded-md border px-4 pb-4">
-                <legend className="text-base font-semibold lg:text-lg">
-                  Buyer Tax Number
-                </legend>
-
-                <div className="mb-2 flex items-center justify-end">
-                  <div className="inline-flex items-center gap-2">
-                    <Controller
-                      name="buyer.vatNoFieldIsVisible"
-                      control={control}
-                      render={({ field: { value, onChange, ...field } }) => {
-                        return (
-                          <Switch
-                            {...field}
-                            id="buyerVatNoFieldIsVisible"
-                            checked={value}
-                            onCheckedChange={onChange}
-                            size="sm"
-                            data-testid="buyerVatNoFieldIsVisible"
-                            aria-label="Show the 'Buyer Tax Number' Field in the PDF"
-                          />
-                        );
-                      }}
-                    />
-                    <CustomTooltip
-                      trigger={
-                        <Label htmlFor="buyerVatNoFieldIsVisible">
-                          Show in PDF
-                        </Label>
-                      }
-                      content={"Show the 'Buyer Tax Number' Field in the PDF"}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="buyerVatNoLabel">Label</Label>
-                    <Controller
-                      name="buyer.vatNoLabelText"
-                      control={control}
-                      render={({ field }) => {
-                        return (
-                          <Input
-                            {...field}
-                            type="text"
-                            id="buyerVatNoLabel"
-                            placeholder="Enter Tax number label"
-                            className={cn(
-                              "mt-1 block w-full",
-                              inputErrorClassName(
-                                !!errors.buyer?.vatNoLabelText,
-                              ),
-                            )}
-                          />
-                        );
-                      }}
-                    />
-                    {errors.buyer?.vatNoLabelText ? (
-                      <ErrorMessage>
-                        {errors.buyer.vatNoLabelText.message}
-                      </ErrorMessage>
-                    ) : null}
-                    {!errors.buyer?.vatNoLabelText ? (
-                      <InputHelperMessage>
-                        Set a custom label (e.g. VAT no, Tax no, etc.)
-                      </InputHelperMessage>
-                    ) : null}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="buyerVatNo">Value</Label>
-                    <Controller
-                      name="buyer.vatNo"
-                      control={control}
-                      render={({ field }) => {
-                        return (
-                          <Input
-                            {...field}
-                            id="buyerVatNo"
-                            type="text"
-                            placeholder="Enter Tax number value"
-                            className={cn(
-                              "mt-1 block w-full",
-                              inputErrorClassName(!!errors.buyer?.vatNo),
-                            )}
-                          />
-                        );
-                      }}
-                    />
-                    {errors.buyer?.vatNo ? (
-                      <ErrorMessage>{errors.buyer.vatNo.message}</ErrorMessage>
-                    ) : null}
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-
-            {/* Email */}
-            <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
-              <div className="relative mb-2 flex items-center justify-between">
-                <Label htmlFor="buyerEmail">Email</Label>
-
-                <div className="inline-flex items-center gap-2">
-                  <Controller
-                    name="buyer.emailFieldIsVisible"
-                    control={control}
-                    render={({ field: { value, onChange, ...field } }) => {
-                      return (
-                        <Switch
-                          {...field}
-                          id="buyerEmailFieldIsVisible"
-                          checked={value}
-                          onCheckedChange={onChange}
-                          size="sm"
-                          data-testid="buyerEmailFieldIsVisible"
-                          aria-label="Show the 'Email' field in the PDF"
-                        />
-                      );
-                    }}
-                  />
-                  <CustomTooltip
-                    trigger={
-                      <Label htmlFor="buyerEmailFieldIsVisible">
-                        Show in PDF
-                      </Label>
-                    }
-                    content={"Show the 'Email' field in the PDF"}
-                  />
-                </div>
-              </div>
-              <Controller
-                name="buyer.email"
-                control={control}
-                render={({ field }) => {
-                  return (
-                    <Input
-                      {...field}
-                      id="buyerEmail"
-                      type="email"
-                      className={inputErrorClassName(!!errors.buyer?.email)}
-                    />
-                  );
-                }}
-              />
-              {errors.buyer?.email ? (
-                <ErrorMessage>{errors.buyer.email.message}</ErrorMessage>
-              ) : null}
-            </div>
-
-            {/* Notes */}
-            <div className={FADE_WHEN_HIDDEN_IN_PDF_CLASS_NAME}>
-              <div className="relative mb-2 flex items-center justify-between">
-                <Label htmlFor="buyerNotes">Notes</Label>
-
-                <div className="inline-flex items-center gap-2">
-                  <Controller
-                    name="buyer.notesFieldIsVisible"
-                    control={control}
-                    render={({ field: { value, onChange, ...field } }) => {
-                      return (
-                        <Switch
-                          {...field}
-                          id="buyerNotesFieldIsVisible"
-                          checked={value}
-                          onCheckedChange={onChange}
-                          size="sm"
-                          data-testid="buyerNotesInvoiceFormFieldVisibilitySwitch"
-                          aria-label="Show the 'Notes' field in the PDF"
-                        />
-                      );
-                    }}
-                  />
-                  <CustomTooltip
-                    trigger={
-                      <Label htmlFor="buyerNotesFieldIsVisible">
-                        Show in PDF
-                      </Label>
-                    }
-                    content={"Show the 'Notes' field in the PDF"}
-                  />
-                </div>
-              </div>
-
-              <Controller
-                name="buyer.notes"
-                control={control}
-                render={({ field }) => {
-                  return (
-                    <Textarea
-                      {...field}
-                      id="buyerNotes"
-                      rows={3}
-                      className={inputErrorClassName(!!errors.buyer?.notes)}
-                    />
-                  );
-                }}
-              />
-              {errors.buyer?.notes ? (
-                <ErrorMessage>{errors.buyer.notes.message}</ErrorMessage>
-              ) : null}
-            </div>
-          </fieldset>
+          <div className="mt-5">
+            <PartyFields
+              party="buyer"
+              placement="invoice"
+              control={control}
+              names={{
+                name: "buyer.name",
+                address: "buyer.address",
+                vatNoLabelText: "buyer.vatNoLabelText",
+                vatNo: "buyer.vatNo",
+                vatNoFieldIsVisible: "buyer.vatNoFieldIsVisible",
+                email: "buyer.email",
+                emailFieldIsVisible: "buyer.emailFieldIsVisible",
+                notes: "buyer.notes",
+                notesFieldIsVisible: "buyer.notesFieldIsVisible",
+              }}
+            />
+          </div>
         )}
       </AccordionContent>
     </div>

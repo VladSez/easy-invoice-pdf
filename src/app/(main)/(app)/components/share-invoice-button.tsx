@@ -2,6 +2,7 @@
 
 import { AlertCircleIcon, LinkIcon } from "lucide-react";
 
+import type { InvoiceData } from "@/app/schema";
 import { Button } from "@/components/ui/button";
 import { CustomTooltip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,32 @@ import { cn } from "@/lib/utils";
 export const CANNOT_SHARE_INVOICE_DESCRIPTION =
   "Invoices with logos cannot be shared. Please remove the logo to generate a shareable link. You can still download the invoice as PDF and share it.";
 
+const CANNOT_SHARE_SIGNED_INVOICE_DESCRIPTION =
+  "Invoices with drawn signatures cannot be shared. Please clear the signatures to generate a shareable link. You can still download the invoice as PDF and share it.";
+
+/**
+ * Why this invoice can't become a link, or `null` when it can. A link holds neither images
+ * nor drawn signatures; signatures only block the default template, the one that prints them
+ * (links leave them out, see `compressInvoiceData`).
+ */
+export function getCannotShareInvoiceReason(
+  invoiceData: InvoiceData | null,
+): string | null {
+  if (!invoiceData) return null;
+
+  if (invoiceData.logo) return CANNOT_SHARE_INVOICE_DESCRIPTION;
+
+  const hasDrawnSignature =
+    Boolean(invoiceData.personAuthorizedToReceiveSignature) ||
+    Boolean(invoiceData.personAuthorizedToIssueSignature);
+
+  if (invoiceData.template === "default" && hasDrawnSignature) {
+    return CANNOT_SHARE_SIGNED_INVOICE_DESCRIPTION;
+  }
+
+  return null;
+}
+
 /**
  * The "Get link" button and the tooltip explaining what it will (or will not) do.
  *
@@ -23,17 +50,19 @@ export const CANNOT_SHARE_INVOICE_DESCRIPTION =
  * changed. Only the button's own spacing actually differs between them.
  */
 export function ShareInvoiceButton({
-  canShareInvoice,
+  cannotShareReason,
   handleShareInvoice,
   className,
 }: {
-  /** `false` when the invoice carries a logo, which no share link can encode. */
-  canShareInvoice: boolean;
+  /** Why the invoice can't be shared, from `getCannotShareInvoiceReason`; `null` when it can. */
+  cannotShareReason: string | null;
   /** Generates the link and puts it on the clipboard (or into the native share sheet). */
   handleShareInvoice: () => void;
   /** Layout classes for the button itself: the header and the dock space it differently. */
   className?: string;
 }) {
+  const canShareInvoice = cannotShareReason === null;
+
   return (
     <CustomTooltip
       className={cn(!canShareInvoice && "bg-red-50")}
@@ -72,7 +101,7 @@ export function ShareInvoiceButton({
                 Unable to Share Invoice
               </p>
               <p className="text-pretty text-xs leading-relaxed text-red-700">
-                {CANNOT_SHARE_INVOICE_DESCRIPTION}
+                {cannotShareReason}
               </p>
             </div>
           </div>

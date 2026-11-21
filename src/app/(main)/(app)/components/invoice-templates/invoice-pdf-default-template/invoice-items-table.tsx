@@ -43,9 +43,26 @@ export function InvoiceItemsTable({
 
   // the name column has width to spare, so it pays for the discount column, rather than
   // the narrow numeric columns whose headers would start to hyphenate ("Cantid-ad")
-  const nameColumnStyle = hasDiscountColumn
-    ? styles.colNameWithDiscount
-    : styles.colName;
+  // A named custom column (a project code, a SKU...) is wider than the short GTU codes
+  // the column was made for, so words like "Project" don't break mid-word. The width comes
+  // out of the item name, like the discount column's, so no amount column narrows; an
+  // unnamed column keeps its old width, so older invoices print exactly as before.
+  const hasNamedCustomColumn = Boolean(invoiceData.customColumnLabel?.trim());
+  const customColumnStyle = hasNamedCustomColumn
+    ? styles.colCustomNamed
+    : styles.colGTU;
+  const nameColumnStyle = [
+    hasDiscountColumn ? styles.colNameWithDiscount : styles.colName,
+    hasNamedCustomColumn && isTypeOfGTUFieldVisible
+      ? {
+          flex:
+            (hasDiscountColumn
+              ? styles.colNameWithDiscount.flex
+              : styles.colName.flex) -
+            (styles.colCustomNamed.flex - styles.colGTU.flex),
+        }
+      : {},
+  ];
 
   /**
    * Custom tax label text i.e. "VAT", "Sales Tax", "IVA", "GST", etc.
@@ -84,21 +101,25 @@ export function InvoiceItemsTable({
 
           {/* Name of goods/service column */}
           {isNameFieldVisible ? (
-            <View style={[styles.tableCol, nameColumnStyle, styles.center]}>
+            <View style={[styles.tableCol, ...nameColumnStyle, styles.center]}>
               <Text style={styles.tableCellBold}>
                 {t.invoiceItemsTable.nameOfGoodsService}
               </Text>
             </View>
           ) : null}
 
-          {/* Type of GTU column */}
+          {/* Custom column: the name the user gave it, or "Type of GTU", which it was
+              before it could be named, so older invoices keep their header */}
           {isTypeOfGTUFieldVisible ? (
-            <View style={[styles.tableCol, styles.colGTU, styles.center]}>
+            <View style={[styles.tableCol, customColumnStyle, styles.center]}>
               <Text style={styles.tableCellBold}>
                 {/* .split("") is used for long text like "Type of Goods/Service" to wrap it in a new line
                 https://github.com/diegomura/react-pdf/issues/2243#issuecomment-1778554041
                 */}
-                {t.invoiceItemsTable.typeOfGTU.split("")}
+                {(
+                  invoiceData.customColumnLabel?.trim() ||
+                  t.invoiceItemsTable.typeOfGTU
+                ).split("")}
               </Text>
             </View>
           ) : null}
@@ -247,7 +268,7 @@ export function InvoiceItemsTable({
 
               {/* Name of goods/service */}
               {isNameFieldVisible ? (
-                <View style={[styles.tableCol, nameColumnStyle]}>
+                <View style={[styles.tableCol, ...nameColumnStyle]}>
                   <Text
                     style={[
                       styles.tableCell,
@@ -278,7 +299,7 @@ export function InvoiceItemsTable({
 
               {/* Type of GTU */}
               {isTypeOfGTUFieldVisible ? (
-                <View style={[styles.tableCol, styles.colGTU]}>
+                <View style={[styles.tableCol, customColumnStyle]}>
                   <Text style={[styles.tableCell]}>{item.typeOfGTU}</Text>
                 </View>
               ) : null}
