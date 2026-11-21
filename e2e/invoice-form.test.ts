@@ -1113,90 +1113,47 @@ test.describe("Invoice Generator Page", () => {
     ).toHaveValue("17,230.00");
   });
 
-  test("handles form validation", async ({ page }) => {
-    // Clear required fields
-    await page.getByRole("textbox", { name: "Date of Issue" }).clear();
+  // Field rules and their messages are unit-tested (src/app/schema/__tests__/form-field-validation.test.ts,
+  // invoice-items.test.tsx). This only checks the wiring: an invalid edit in two sections
+  // shows both inline errors and the notification, and fixing them clears all of it.
+  test("shows validation errors inline and as a notification, and clears them once fixed", async ({
+    page,
+  }) => {
+    const notifications = page.getByLabel("Notifications alt+T");
 
-    // Clear name field on the seller section
     const sellerSection = page.getByTestId(`seller-information-section`);
-    await sellerSection.getByRole("textbox", { name: "Name" }).clear();
+    const sellerName = sellerSection.getByRole("textbox", { name: "Name" });
 
-    const buyerSection = page.getByTestId(`buyer-information-section`);
-    await buyerSection.getByRole("textbox", { name: "Name" }).clear();
-
-    // Clear name field on the first invoice item
     const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
-    await invoiceItemsSection.getByRole("textbox", { name: "Name" }).clear();
-
-    await expect(
-      sellerSection.getByText("Seller name is required", { exact: true }),
-    ).toBeVisible();
-
-    // Check that notification is also visible
-    await expect(
-      page
-        .getByLabel("Notifications alt+T")
-        .getByText("Seller name is required"),
-    ).toBeVisible();
-
-    await expect(
-      buyerSection.getByText("Buyer name is required", { exact: true }),
-    ).toBeVisible();
-
-    // Check that notification is also visible
-    await expect(
-      page
-        .getByLabel("Notifications alt+T")
-        .getByText("Buyer name is required"),
-    ).toBeVisible();
-
-    const dateOfIssue = dayjs().format("YYYY-MM-DD");
-
-    const invoiceDetailsFieldset = page.getByRole("group", {
-      name: "Invoice details",
+    const amountInput = invoiceItemsSection.getByRole("spinbutton", {
+      name: "Amount (Quantity)",
     });
 
-    const invoiceNumberValueField = invoiceDetailsFieldset.getByRole(
-      "textbox",
-      { name: "Invoice number", exact: true },
-    );
+    await sellerName.clear();
+    await amountInput.fill("-1");
 
-    await invoiceNumberValueField.fill("1/03-2025");
-
-    await page
-      .getByRole("textbox", { name: "Date of Issue" })
-      .fill(dateOfIssue);
-
-    // Check if the date of issue is filled in correctly
     await expect(
-      page.getByRole("textbox", { name: "Date of Issue" }),
-    ).toHaveValue(dateOfIssue);
+      sellerSection.getByText("Seller name is required", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      invoiceItemsSection.getByText("Amount must be >= 0"),
+    ).toBeVisible();
 
-    // Fill in seller name
-    await sellerSection
-      .getByRole("textbox", { name: "Name" })
-      .fill("Test Seller");
+    await expect(
+      notifications.getByText("Seller name is required"),
+    ).toBeVisible();
+    await expect(notifications.getByText("Amount must be >= 0")).toBeVisible();
 
-    // Fill in buyer name
-    await buyerSection
-      .getByRole("textbox", { name: "Name" })
-      .fill("Test Buyer");
-
-    // Check for error messages to be hidden
+    await sellerName.fill("Test Seller");
+    await amountInput.fill("1");
 
     await expect(
       sellerSection.getByText("Seller name is required", { exact: true }),
     ).toBeHidden();
-
-    // Check that notification is also hidden
-    await expect(page.getByLabel("Notifications alt+T")).toBeHidden();
-
     await expect(
-      buyerSection.getByText("Buyer name is required", { exact: true }),
+      invoiceItemsSection.getByText("Amount must be >= 0"),
     ).toBeHidden();
-
-    // Check that notification is also hidden
-    await expect(page.getByLabel("Notifications alt+T")).toBeHidden();
+    await expect(notifications).toBeHidden();
   });
 
   test(
@@ -1480,154 +1437,6 @@ test.describe("Invoice Generator Page", () => {
       buyer: true,
       invoiceItems: false,
     } as const satisfies AccordionState);
-  });
-
-  test("validates amount, net price and VAT fields in invoice items section", async ({
-    page,
-  }) => {
-    const invoiceItemsSection = page.getByTestId(`invoice-items-section`);
-
-    // **AMOUNT FIELD**
-    const amountInput = invoiceItemsSection.getByRole("spinbutton", {
-      name: "Amount (Quantity)",
-    });
-
-    // Test invalid values
-    await amountInput.fill("-1");
-    await expect(
-      invoiceItemsSection.getByText("Amount must be >= 0"),
-    ).toBeVisible();
-
-    // Check that notification is also visible
-    await expect(
-      page.getByLabel("Notifications alt+T").getByText("Amount must be >= 0"),
-    ).toBeVisible();
-
-    await amountInput.fill("1000000"); // Exceeds max of 999 999.99
-    await expect(
-      invoiceItemsSection.getByText("Amount must not exceed 999 999.99"),
-    ).toBeVisible();
-
-    // Check that notification is also visible
-    await expect(
-      page
-        .getByLabel("Notifications alt+T")
-        .getByText("Amount must not exceed 999 999.99"),
-    ).toBeVisible();
-
-    // Test valid values
-    await amountInput.fill("0");
-    await expect(
-      invoiceItemsSection.getByText("Amount must be >= 0"),
-    ).toBeHidden();
-    await expect(
-      invoiceItemsSection.getByText("Amount must not exceed 999 999.99"),
-    ).toBeHidden();
-
-    await amountInput.fill("1");
-    await expect(
-      invoiceItemsSection.getByText("Amount must be >= 0"),
-    ).toBeHidden();
-    await expect(
-      invoiceItemsSection.getByText("Amount must not exceed 999 999.99"),
-    ).toBeHidden();
-
-    await amountInput.fill("999999.99"); // Maximum valid value
-    await expect(
-      invoiceItemsSection.getByText("Amount must be >= 0"),
-    ).toBeHidden();
-    await expect(
-      invoiceItemsSection.getByText("Amount must not exceed 999 999.99"),
-    ).toBeHidden();
-
-    // **NET PRICE FIELD**
-
-    const netPriceInput = invoiceItemsSection.getByRole("spinbutton", {
-      name: "Net Price",
-    });
-
-    // Test negative value
-    await netPriceInput.fill("-100");
-    await expect(
-      invoiceItemsSection.getByText("Net price must be >= 0"),
-    ).toBeVisible();
-
-    // Check that notification is also visible
-    await expect(
-      page
-        .getByLabel("Notifications alt+T")
-        .getByText("Net price must be >= 0"),
-    ).toBeVisible();
-
-    // Test exceeding maximum value
-    await netPriceInput.fill("1000000000000"); // 1 trillion
-    await expect(
-      invoiceItemsSection.getByText("Net price must not exceed 1 billion"),
-    ).toBeVisible();
-
-    // Check that notification is also visible
-    await expect(
-      page
-        .getByLabel("Notifications alt+T")
-        .getByText("Net price must not exceed 1 billion"),
-    ).toBeVisible();
-
-    // Test zero value
-    await netPriceInput.fill("0");
-    await expect(
-      invoiceItemsSection.getByText("Net price must be >= 0"),
-    ).toBeHidden();
-
-    // Test valid value
-    await netPriceInput.fill("1");
-    await expect(
-      invoiceItemsSection.getByText("Net price must be >= 0"),
-    ).toBeHidden();
-    await expect(
-      invoiceItemsSection.getByText("Net price must not exceed 1 billion"),
-    ).toBeHidden();
-
-    await netPriceInput.fill("1000000000"); // Maximum valid value
-    await expect(
-      invoiceItemsSection.getByText("Net price must be >= 0"),
-    ).toBeHidden();
-    await expect(
-      invoiceItemsSection.getByText("Net price must not exceed 1 billion"),
-    ).toBeHidden();
-
-    // **VAT FIELD**
-
-    const vatInput = invoiceItemsSection.getByRole("textbox", {
-      name: "VAT Rate",
-      exact: true,
-    });
-
-    const helperText = `Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).`;
-
-    // Try invalid values
-    await vatInput.fill("101");
-    await expect(invoiceItemsSection.getByText(helperText)).toBeVisible();
-
-    // Check that notification is also visible
-    await expect(
-      page.getByLabel("Notifications alt+T").getByText(helperText),
-    ).toBeVisible();
-
-    await vatInput.fill("-1");
-    await expect(invoiceItemsSection.getByText(helperText)).toBeVisible();
-
-    // Try valid values
-    await vatInput.fill("23");
-    await expect(invoiceItemsSection.getByText(helperText)).toBeHidden();
-
-    await vatInput.fill("NP");
-    await expect(invoiceItemsSection.getByText(helperText)).toBeHidden();
-
-    await vatInput.fill("OO");
-    await expect(invoiceItemsSection.getByText(helperText)).toBeHidden();
-
-    await vatInput.fill("CUSTOM");
-    await expect(invoiceItemsSection.getByText(helperText)).toBeHidden();
   });
 
   test("handles VAT calculations for different rates", async ({ page }) => {

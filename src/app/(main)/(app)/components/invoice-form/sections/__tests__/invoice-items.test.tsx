@@ -13,12 +13,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getInitialInvoiceData } from "@/app/constants";
 import type * as InvoiceSchema from "@/app/schema";
-import type {
-  InvoiceData,
-  InvoiceItemData,
-  SupportedNumberFormatLocale,
+import {
+  type InvoiceData,
+  type InvoiceItemData,
+  type SupportedNumberFormatLocale,
+  invoiceSchema,
 } from "@/app/schema";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { zodResolverForOutput } from "@/lib/zod-resolver-for-output";
 import { MOCK_INVOICE_ITEM_DATA } from "@/utils/__tests__/data";
 import "@testing-library/jest-dom/vitest";
 
@@ -67,6 +69,11 @@ interface InvoiceItemsTestHarnessProps {
   template?: InvoiceData["template"];
   /** Overrides applied to every item, e.g. to start with a discount. */
   itemOverrides?: Partial<InvoiceItemData>;
+  /**
+   * Validates against `invoiceSchema` on change and passes the errors down, the way the
+   * real form does. Off by default, so the other tests don't depend on validation.
+   */
+  validate?: boolean;
 }
 
 function InvoiceItemsTestHarness({
@@ -77,6 +84,7 @@ function InvoiceItemsTestHarness({
   numberFormatLocale = "en",
   template = "default",
   itemOverrides,
+  validate = false,
 }: InvoiceItemsTestHarnessProps) {
   const invoiceData = useMemo(() => {
     return {
@@ -91,8 +99,15 @@ function InvoiceItemsTestHarness({
     };
   }, [itemCount, itemNames, itemOverrides]);
 
-  const { control, getValues, setValue } = useForm<InvoiceData>({
+  const {
+    control,
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useForm<InvoiceData>({
     defaultValues: invoiceData,
+    resolver: validate ? zodResolverForOutput(invoiceSchema) : undefined,
+    mode: "onChange",
   });
 
   // A real field array, so confirming a delete actually drops the item and re-indexes the
@@ -113,7 +128,7 @@ function InvoiceItemsTestHarness({
           remove(index);
         }}
         append={append ?? appendField}
-        errors={{}}
+        errors={errors}
         currency="EUR"
         language="en"
         template={template}
@@ -793,5 +808,59 @@ describe("InvoiceItems discount", () => {
     // the cleared zero shows as the empty placeholder
     expect(screen.getByLabelText("Discount value")).toHaveValue(null);
     expect(screen.getByLabelText(/^Label/)).toHaveValue("");
+  });
+});
+
+describe("InvoiceItems validation errors", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it.each([
+    ["-1", "Amount must be >= 0", /^Amount/],
+    ["1000000", "Amount must not exceed 999 999.99", /^Amount/],
+    ["-100", "Net price must be >= 0", /^Net Price/],
+    ["1000000000000", "Net price must not exceed 1 billion", /^Net Price/],
+  ] as const)(
+    "shows %j's error %j under the field and clears it once the value is valid",
+    async (invalidValue, message, name) => {
+      const user = userEvent.setup();
+
+      renderInvoiceItems({ itemCount: 1, validate: true });
+
+      const input = screen.getByRole("spinbutton", { name });
+      await user.clear(input);
+      await user.type(input, invalidValue);
+
+      expect(await screen.findByText(message)).toBeInTheDocument();
+
+      await user.clear(input);
+      await user.type(input, "1");
+
+      await vi.waitFor(() => {
+        expect(screen.queryByText(message)).not.toBeInTheDocument();
+      });
+    },
+  );
+
+  it("shows the VAT error for an out-of-range rate and accepts text rates", async () => {
+    const user = userEvent.setup();
+    const message =
+      "Tax rate must be a number between 0-100 or any text (i.e. NP, OO, etc).";
+
+    renderInvoiceItems({ itemCount: 1, validate: true });
+
+    const vatInput = screen.getByRole("textbox", { name: /^VAT Rate$/ });
+    await user.clear(vatInput);
+    await user.type(vatInput, "101");
+
+    expect(await screen.findByText(message)).toBeInTheDocument();
+
+    await user.clear(vatInput);
+    await user.type(vatInput, "NP");
+
+    await vi.waitFor(() => {
+      expect(screen.queryByText(message)).not.toBeInTheDocument();
+    });
   });
 });
