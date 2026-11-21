@@ -2,6 +2,8 @@ import { expect, test } from "@playwright/test";
 
 import type { BuyerData, SellerData } from "@/app/schema";
 
+import { invoiceTotalText } from "./utils/invoice-total";
+
 const TEST_SELLER_DATA = {
   name: "TEST SELLER COMPANY",
   address: "123 Test St",
@@ -96,7 +98,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
         .fill(TEST_SELLER_DATA.vatNoLabelText);
 
       await sellerVatNumberFieldset
-        .getByRole("textbox", { name: "Value" })
+        .getByRole("textbox", { name: "Number" })
         .fill(TEST_SELLER_DATA.vatNo);
 
       // Fill in buyer information
@@ -121,19 +123,19 @@ test.describe("Generate Invoice Link (Get link)", () => {
         .fill(TEST_BUYER_DATA.vatNoLabelText);
 
       await buyerVatNumberFieldset
-        .getByRole("textbox", { name: "Value" })
+        .getByRole("textbox", { name: "Number" })
         .fill(TEST_BUYER_DATA.vatNo);
 
       // Fill in an invoice item
       const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
       await invoiceItemsSection
-        .getByRole("spinbutton", { name: "Amount (Quantity)" })
+        .getByRole("spinbutton", { name: "Qty" })
         .fill("5");
 
       await invoiceItemsSection
         .getByRole("spinbutton", {
-          name: "Net Price (Rate or Unit Price)",
+          name: "Unit price",
         })
         .fill("100");
 
@@ -147,31 +149,29 @@ test.describe("Generate Invoice Link (Get link)", () => {
         .fill("Custom VAT");
 
       await taxSettingsFieldset
-        .getByRole("textbox", { name: "VAT Rate" })
+        .getByRole("textbox", { name: "VAT rate" })
         .fill("23");
 
       // check total
-      const totalField = finalSection.getByRole("textbox", {
-        name: "Total",
-        exact: true,
-      });
-      await expect(totalField).toHaveValue("615.00");
+      const totalField = finalSection.getByTestId("total");
+      await expect(totalField).toHaveText(invoiceTotalText("615.00"));
 
-      // check QR code data field
-      const qrCodeFieldset = finalSection.getByRole("group", {
-        name: "QR Code",
+      // a new invoice keeps the QR code behind its pill
+      await finalSection.getByRole("button", { name: "QR code" }).click();
+      const qrCodeFieldset = finalSection.getByRole("region", {
+        name: "QR code",
       });
 
       // check QR code data field
       const qrCodeDataField = qrCodeFieldset.getByRole("textbox", {
-        name: "Data",
+        name: "QR code link or text",
       });
 
       await qrCodeDataField.fill("https://easyinvoicepdf.com");
 
       // check QR code description field
       const qrCodeDescriptionField = qrCodeFieldset.getByRole("textbox", {
-        name: "Description (optional)",
+        name: "QR code caption",
       });
 
       await qrCodeDescriptionField.fill("QR Code TEST Description");
@@ -249,7 +249,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
       ).toHaveValue(TEST_SELLER_DATA.vatNoLabelText);
 
       await expect(
-        newSellerVatNumberFieldset.getByRole("textbox", { name: "Value" }),
+        newSellerVatNumberFieldset.getByRole("textbox", { name: "Number" }),
       ).toHaveValue(TEST_SELLER_DATA.vatNo);
 
       // Verify buyer information
@@ -277,7 +277,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
       ).toHaveValue(TEST_BUYER_DATA.vatNoLabelText);
 
       await expect(
-        newBuyerVatNumberFieldset.getByRole("textbox", { name: "Value" }),
+        newBuyerVatNumberFieldset.getByRole("textbox", { name: "Number" }),
       ).toHaveValue(TEST_BUYER_DATA.vatNo);
 
       // Verify invoice item
@@ -287,12 +287,12 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
       await expect(
         newInvoiceItemsSection.getByRole("spinbutton", {
-          name: "Amount (Quantity)",
+          name: "Qty",
         }),
       ).toHaveValue("5");
       await expect(
         newInvoiceItemsSection.getByRole("spinbutton", {
-          name: "Net Price (Rate or Unit Price)",
+          name: "Unit price",
         }),
       ).toHaveValue("100");
 
@@ -305,22 +305,19 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
       await expect(
         newTaxSettingsFieldset.getByRole("textbox", {
-          name: "Custom VAT Rate",
+          name: "Custom VAT rate",
         }),
       ).toHaveValue("23");
 
       const newFinalSection = newPage.getByTestId(`final-section`);
 
-      await expect(
-        newFinalSection.getByRole("textbox", {
-          name: "Total",
-          exact: true,
-        }),
-      ).toHaveValue("615.00");
+      await expect(newFinalSection.getByTestId("total")).toHaveText(
+        invoiceTotalText("615.00"),
+      );
 
       // Verify QR code data field
       const newQrCodeDataField = newPageFinalSection.getByRole("textbox", {
-        name: "Data",
+        name: "QR code link or text",
       });
       await expect(newQrCodeDataField).toHaveValue(
         "https://easyinvoicepdf.com",
@@ -330,7 +327,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
       const newQrCodeDescriptionField = newPageFinalSection.getByRole(
         "textbox",
         {
-          name: "Description (optional)",
+          name: "QR code caption",
         },
       );
 
@@ -549,7 +546,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     // Verify invoice items are loaded
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
     const itemAmountField = invoiceItemsSection.getByRole("spinbutton", {
-      name: "Net Price (Rate or Unit Price)",
+      name: "Unit price",
     });
     await expect(itemAmountField).toHaveValue("15000");
 
@@ -621,7 +618,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     // Verify invoice items are loaded
     const newInvoiceItemsSection = page.getByTestId("invoice-items-section");
     const newItemAmountField = newInvoiceItemsSection.getByRole("spinbutton", {
-      name: "Net Price (Rate or Unit Price)",
+      name: "Unit price",
     });
     await expect(newItemAmountField).toHaveValue("15000");
 
@@ -678,12 +675,12 @@ test.describe("Generate Invoice Link (Get link)", () => {
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
 
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)" })
+      .getByRole("spinbutton", { name: "Qty" })
       .fill(INVOICE_TEST_DATA.invoiceItemQuantity);
 
     await invoiceItemsSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       })
       .fill(INVOICE_TEST_DATA.invoiceItemAmount);
 
@@ -760,13 +757,13 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
     await expect(
       newInvoiceItemsSection.getByRole("spinbutton", {
-        name: "Amount (Quantity)",
+        name: "Qty",
       }),
     ).toHaveValue(INVOICE_TEST_DATA.invoiceItemQuantity);
 
     await expect(
       newInvoiceItemsSection.getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       }),
     ).toHaveValue(INVOICE_TEST_DATA.invoiceItemAmount);
 
@@ -843,7 +840,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
       .fill("Seller Tax Identification Number");
 
     await sellerVatNumberFieldset
-      .getByRole("textbox", { name: "Value" })
+      .getByRole("textbox", { name: "Number" })
       .fill("SELLER-TAX-123456789-LONG-FORMAT");
 
     // Fill in seller account number
@@ -890,7 +887,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
       .fill("Buyer Tax Identification Number");
 
     await buyerVatNumberFieldset
-      .getByRole("textbox", { name: "Value" })
+      .getByRole("textbox", { name: "Number" })
       .fill("BUYER-TAX-987654321-LONG-FORMAT");
 
     // Generate many invoice items with long descriptions
@@ -917,12 +914,12 @@ test.describe("Generate Invoice Link (Get link)", () => {
       );
 
     await firstItemTaxSettingsFieldset
-      .getByRole("textbox", { name: "Sales Tax Rate", exact: true })
+      .getByRole("textbox", { name: "Sales Tax rate", exact: true })
       .fill("20");
 
     await firstItemFieldset
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       })
       .fill("5000");
 
@@ -944,20 +941,21 @@ test.describe("Generate Invoice Link (Get link)", () => {
 
       await itemFieldset
         .getByRole("spinbutton", {
-          name: "Net Price (Rate or Unit Price)",
+          name: "Unit price",
         })
         .fill(`${1000 * (i + 1)}`);
     }
 
     const finalSection = page.getByTestId("final-section");
 
-    // Add QR code data to increase data size
-    const qrCodeFieldset = finalSection.getByRole("group", {
-      name: "QR Code",
+    // Add QR code data to increase data size (a new invoice keeps it behind its pill)
+    await finalSection.getByRole("button", { name: "QR code" }).click();
+    const qrCodeFieldset = finalSection.getByRole("region", {
+      name: "QR code",
     });
 
     const qrCodeDataField = qrCodeFieldset.getByRole("textbox", {
-      name: "Data",
+      name: "QR code link or text",
     });
 
     await qrCodeDataField.fill(
@@ -965,7 +963,7 @@ test.describe("Generate Invoice Link (Get link)", () => {
     );
 
     const qrCodeDescriptionField = qrCodeFieldset.getByRole("textbox", {
-      name: "Description (optional)",
+      name: "QR code caption",
     });
 
     await qrCodeDescriptionField.fill(
@@ -1011,5 +1009,37 @@ test.describe("Generate Invoice Link (Get link)", () => {
         "Download the invoice as PDF instead or remove some invoice items and try again.",
       ),
     ).toBeVisible();
+  });
+
+  test("blocks sharing for a signature drawn just before the click", async ({
+    page,
+  }) => {
+    const pad = page.getByTestId("personAuthorizedToIssueSignature");
+
+    await pad.scrollIntoViewIfNeeded();
+
+    const box = await pad.boundingBox();
+
+    if (!box) throw new Error("the signature pad is not on screen");
+
+    // one stroke, then straight to Get link: the page's copy of the invoice only catches up
+    // with the form after the debounce, so the share check must read the form itself
+    await page.mouse.move(box.x + 40, box.y + 70);
+    await page.mouse.down();
+
+    for (let step = 0; step < 20; step++) {
+      await page.mouse.move(
+        box.x + 40 + step * 8,
+        box.y + 70 + Math.sin(step) * 20,
+      );
+    }
+
+    await page.mouse.up();
+    await page.getByRole("button", { name: "Get link" }).first().click();
+
+    await expect(
+      page.getByText(/drawn signatures cannot be shared/).first(),
+    ).toBeVisible();
+    await expect(page).not.toHaveURL(/[?&]data=/);
   });
 });

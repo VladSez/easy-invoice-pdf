@@ -1,3 +1,5 @@
+import type { Locator, Page } from "@playwright/test";
+
 import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema";
 
 import { ABOUT_LOCALES, type StateId } from "../atlas-model";
@@ -43,7 +45,7 @@ test("items and discounts", async ({ page, atlas }) => {
   await atlas.editAndWait(async () => {
     await discountValue.fill("10");
     await section
-      .getByRole("textbox", { name: "Label (optional)", exact: true })
+      .getByRole("textbox", { name: "Label in PDF (optional)", exact: true })
       .first()
       .fill("Returning client");
   });
@@ -54,6 +56,74 @@ test("items and discounts", async ({ page, atlas }) => {
     section.getByText("Discount must be between 0 and 100%"),
   ).toBeVisible();
   await atlas.snap("editor/item-discount-error", { scrollTo: discountValue });
+});
+
+test("custom column", async ({ page, atlas }) => {
+  await atlas.openEditor();
+
+  const section = page.getByTestId("invoice-items-section");
+
+  await atlas.editAndWait(async () => {
+    await section.getByTestId("addItemCustomColumn0").click();
+    await section.locator("#itemCustomColumnName0").fill("Project code");
+    await section.locator("#itemTypeOfGTU0").fill("ACME-24");
+  });
+
+  const firstCard = section.getByTestId("itemCustomColumn0");
+
+  await expect(firstCard).toBeVisible();
+  await atlas.snap("editor/custom-column", { scrollTo: firstCard });
+
+  await atlas.editAndWait(async () => {
+    await section.getByRole("button", { name: "Add invoice item" }).click();
+    // item 2's pill is named after the column
+    await section.getByTestId("addItemCustomColumn1").click();
+    await section.locator("#itemTypeOfGTU1").fill("ACME-OPS");
+  });
+
+  const secondCard = section.getByTestId("itemCustomColumn1");
+
+  await expect(secondCard).toBeVisible();
+  await atlas.snap("editor/custom-column-second", { scrollTo: secondCard });
+
+  await page.getByRole("combobox", { name: "Template" }).selectOption("stripe");
+  await page.waitForURL(/\/stripe-template/);
+  await atlas.waitForPdf();
+  await atlas.snap("stripe/custom-column", {
+    scrollTo: page.getByTestId("itemCustomColumn0"),
+  });
+});
+
+test("below the items", async ({ page, atlas }) => {
+  await atlas.openEditor();
+
+  const closing = page.getByTestId("final-section");
+
+  await atlas.snap("editor/closing", {
+    scrollTo: closing.getByRole("region", { name: "Signatures" }),
+  });
+
+  await atlas.editAndWait(async () => {
+    await closing.getByTestId("addClosingPart-qr").click();
+    await closing
+      .getByRole("textbox", { name: "QR code link or text" })
+      .fill("https://pay.example.com/invoice/1-2026");
+  });
+
+  const qrCard = closing.getByRole("region", { name: "QR code" });
+
+  await expect(qrCard).toBeVisible();
+  await atlas.snap("editor/closing-qr", { scrollTo: qrCard });
+
+  const pad = closing.getByTestId("personAuthorizedToIssueSignature");
+
+  await atlas.editAndWait(async () => {
+    await drawSignature({ page, pad });
+  });
+  await expect(
+    closing.getByRole("button", { name: "Clear Issued by signature" }),
+  ).toBeVisible();
+  await atlas.snap("editor/signature-drawn", { scrollTo: pad });
 });
 
 test.describe("share a link", () => {
@@ -113,6 +183,24 @@ test.describe("share a link", () => {
       getToasts(page).getByText("Unable to Share Invoice").first(),
     ).toBeVisible();
     await atlas.snap("editor/share-blocked-logo");
+  });
+
+  test("sharing blocked by a drawn signature", async ({ page, atlas }) => {
+    await atlas.openEditor();
+
+    const pad = page.getByTestId("personAuthorizedToIssueSignature");
+
+    await atlas.editAndWait(async () => {
+      await drawSignature({ page, pad });
+    });
+
+    await page.getByRole("button", { name: "Get link" }).first().click();
+    await expect(
+      getToasts(page)
+        .getByText(/drawn signatures cannot be shared/)
+        .first(),
+    ).toBeVisible();
+    await atlas.snap("editor/share-blocked-signature");
   });
 
   test("invoice too large to share", async ({ page, atlas }) => {
@@ -235,3 +323,44 @@ test.describe("about page", () => {
     await atlas.snap("about/language-menu");
   });
 });
+
+/** Signs the pad with a few loops, the way a mouse would. */
+async function drawSignature({ page, pad }: DrawSignatureArgs) {
+  await pad.scrollIntoViewIfNeeded();
+
+  const box = await pad.boundingBox();
+
+  if (!box) throw new Error("the signature pad is not on screen");
+
+  const startX = box.x + box.width * 0.2;
+  const midY = box.y + box.height * 0.55;
+
+  await page.mouse.move(startX, midY);
+  await page.mouse.down();
+
+  for (let step = 1; step <= 60; step++) {
+    const progress = step / 60;
+
+    await page.mouse.move(
+      startX +
+        box.width * 0.6 * progress +
+        8 * Math.sin(progress * Math.PI * 8),
+      midY - box.height * 0.25 * Math.sin(progress * Math.PI * 4),
+    );
+  }
+
+  await page.mouse.up();
+
+  // the pad sends the signature to the form once the signer pauses, shortly after the
+  // last stroke; wait that out so the PDF the caller waits for has the signature in it
+  await page.waitForTimeout(SIGNATURE_IDLE_SAVE_WAIT_MS);
+}
+
+/** A little over the pad's IDLE_SAVE_DELAY_MS. */
+const SIGNATURE_IDLE_SAVE_WAIT_MS = 700;
+
+interface DrawSignatureArgs {
+  page: Page;
+  /** The signature pad's canvas. */
+  pad: Locator;
+}

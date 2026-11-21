@@ -456,21 +456,19 @@ test.describe("Stripe Invoice Template", () => {
     const finalSection = page.getByTestId("final-section");
 
     /** TEST PERSON AUTHORIZED TO RECEIVE FIELD TO BE VISIBLE */
-    const personAuthorizedToReceiveFieldset = finalSection.getByRole("group", {
-      name: "Person Authorized to Receive",
+    const personAuthorizedToReceiveGroup = finalSection.getByRole("group", {
+      name: "Received by",
     });
 
-    await expect(personAuthorizedToReceiveFieldset).toBeVisible();
+    await expect(personAuthorizedToReceiveGroup).toBeVisible();
 
     const personAuthorizedToReceiveNameInput =
-      personAuthorizedToReceiveFieldset.getByRole("textbox", {
-        name: "Name",
-      });
+      personAuthorizedToReceiveGroup.getByRole("textbox");
 
     await expect(personAuthorizedToReceiveNameInput).toBeVisible();
 
     const personAuthorizedToReceiveSwitch =
-      personAuthorizedToReceiveFieldset.getByRole("switch", {
+      personAuthorizedToReceiveGroup.getByRole("switch", {
         name: "Show Person Authorized to Receive in PDF",
       });
 
@@ -479,21 +477,19 @@ test.describe("Stripe Invoice Template", () => {
     await expect(personAuthorizedToReceiveSwitch).toBeChecked();
 
     /** TEST PERSON AUTHORIZED TO ISSUE FIELD TO BE VISIBLE */
-    const personAuthorizedToIssueFieldset = finalSection.getByRole("group", {
-      name: "Person Authorized to Issue",
+    const personAuthorizedToIssueGroup = finalSection.getByRole("group", {
+      name: "Issued by",
     });
 
-    await expect(personAuthorizedToIssueFieldset).toBeVisible();
+    await expect(personAuthorizedToIssueGroup).toBeVisible();
 
     const personAuthorizedToIssueNameInput =
-      personAuthorizedToIssueFieldset.getByRole("textbox", {
-        name: "Name",
-      });
+      personAuthorizedToIssueGroup.getByRole("textbox");
 
     await expect(personAuthorizedToIssueNameInput).toBeVisible();
 
     const personAuthorizedToIssueSwitch =
-      personAuthorizedToIssueFieldset.getByRole("switch", {
+      personAuthorizedToIssueGroup.getByRole("switch", {
         name: "Show Person Authorized to Issue in PDF",
       });
 
@@ -510,21 +506,18 @@ test.describe("Stripe Invoice Template", () => {
 
     /** VERIFY SIGNATURE FIELDS ARE NOW HIDDEN */
 
-    const newPersonAuthorizedToReceiveFieldset = finalSection.getByRole(
-      "group",
-      {
-        name: "Person Authorized to Receive",
-      },
-    );
-
-    await expect(newPersonAuthorizedToReceiveFieldset).toBeHidden();
-
-    /** VERIFY PERSON AUTHORIZED TO ISSUE FIELD TO BE HIDDEN */
-    const newPersonAuthorizedToIssueFieldset = finalSection.getByRole("group", {
-      name: "Person Authorized to Issue",
+    const newPersonAuthorizedToReceiveGroup = finalSection.getByRole("group", {
+      name: "Received by",
     });
 
-    await expect(newPersonAuthorizedToIssueFieldset).toBeHidden();
+    await expect(newPersonAuthorizedToReceiveGroup).toBeHidden();
+
+    /** VERIFY PERSON AUTHORIZED TO ISSUE FIELD TO BE HIDDEN */
+    const newPersonAuthorizedToIssueGroup = finalSection.getByRole("group", {
+      name: "Issued by",
+    });
+
+    await expect(newPersonAuthorizedToIssueGroup).toBeHidden();
   });
 
   test("Items and pricing fields and switches only appear for default template (except for Tax Settings field)", async ({
@@ -539,7 +532,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // 1. Show Number Column switch
     const showNumberColumnSwitch = invoiceItemsSection.getByRole("switch", {
-      name: 'Show "Number" Column in the Items and pricing table',
+      name: "Number column",
     });
 
     await expect(showNumberColumnSwitch).toBeVisible();
@@ -548,7 +541,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // 2. Show VAT Table Summary switch
     const showVatTableSummarySwitch = invoiceItemsSection.getByRole("switch", {
-      name: 'Show "VAT Table Summary" in the PDF',
+      name: "VAT summary table",
     });
 
     await expect(showVatTableSummarySwitch).toBeVisible();
@@ -562,8 +555,8 @@ test.describe("Stripe Invoice Template", () => {
     const nameFieldSwitch = invoiceItemsSection.getByRole("switch", {
       name: "Show the 'Name of Goods/Service' Column in the PDF for item 1",
     });
-    const typeOfGTUFieldSwitch = invoiceItemsSection.getByRole("switch", {
-      name: "Show the 'Type of GTU' Column in the PDF for item 1",
+    const customColumnSwitch = invoiceItemsSection.getByRole("switch", {
+      name: "Show the custom column in the PDF for item 1",
     });
     const amountFieldSwitch = invoiceItemsSection.getByRole("switch", {
       name: "Show the 'Amount' Column in the PDF for item 1",
@@ -589,7 +582,6 @@ test.describe("Stripe Invoice Template", () => {
     // Verify all field switches are visible and enabled
     const fieldSwitches = [
       nameFieldSwitch,
-      typeOfGTUFieldSwitch,
       amountFieldSwitch,
       unitFieldSwitch,
       netPriceFieldSwitch,
@@ -606,7 +598,8 @@ test.describe("Stripe Invoice Template", () => {
 
     // Check initial states (some switches should be checked by default, some not)
     await expect(nameFieldSwitch).toBeChecked();
-    await expect(typeOfGTUFieldSwitch).not.toBeChecked(); // Type of GTU is not shown by default
+    // the custom column starts collapsed behind a pill, so its switch is not there yet
+    await expect(customColumnSwitch).toBeHidden();
     await expect(amountFieldSwitch).toBeChecked();
     await expect(unitFieldSwitch).toBeChecked();
     await expect(netPriceFieldSwitch).toBeChecked();
@@ -615,13 +608,27 @@ test.describe("Stripe Invoice Template", () => {
     await expect(vatAmountFieldSwitch).toBeChecked();
     await expect(preTaxAmountFieldSwitch).toBeChecked();
 
-    // =============== TYPE OF GTU FIELD TESTING ===============
+    // =============== CUSTOM COLUMN TESTING ===============
 
-    // Type of GTU field should be visible
-    const typeOfGTUField = invoiceItemsSection.getByRole("textbox", {
-      name: "Type of GTU",
+    const customColumnNameField = invoiceItemsSection.getByRole("textbox", {
+      name: "Column name",
     });
-    await expect(typeOfGTUField).toBeVisible();
+    const customColumnValueField = invoiceItemsSection.getByRole("textbox", {
+      name: "Value",
+      exact: true,
+    });
+    const addCustomColumnPill = invoiceItemsSection.getByRole("button", {
+      name: "Custom column",
+      exact: true,
+    });
+    await expect(customColumnNameField).toBeHidden();
+
+    // opening the pill asks for the column's name and turns the column on
+    await addCustomColumnPill.click();
+    await expect(customColumnNameField).toBeFocused();
+    await expect(customColumnSwitch).toBeChecked();
+    await customColumnNameField.fill("Project code");
+    await customColumnValueField.fill("ACME-24");
 
     // =============== TOGGLE TESTING ===============
 
@@ -637,10 +644,10 @@ test.describe("Stripe Invoice Template", () => {
     await expect(showVatTableSummarySwitch).toBeChecked();
 
     // Test toggling some field switches
-    await typeOfGTUFieldSwitch.click();
-    await expect(typeOfGTUFieldSwitch).toBeChecked();
-    await typeOfGTUFieldSwitch.click();
-    await expect(typeOfGTUFieldSwitch).not.toBeChecked();
+    await customColumnSwitch.click();
+    await expect(customColumnSwitch).not.toBeChecked();
+    await customColumnSwitch.click();
+    await expect(customColumnSwitch).toBeChecked();
 
     await nameFieldSwitch.click();
     await expect(nameFieldSwitch).not.toBeChecked();
@@ -657,13 +664,14 @@ test.describe("Stripe Invoice Template", () => {
     // Wait for URL to be updated
     await page.waitForURL("/stripe-template");
 
-    // All switches and Type of GTU field should now be hidden
+    // The column switches are hidden on the Stripe template, but the custom column is
+    // offered there too: the item has a value, so its card stays open with its switch
     await expect(showNumberColumnSwitch).toBeHidden();
     await expect(showVatTableSummarySwitch).toBeHidden();
-    await expect(typeOfGTUField).toBeHidden();
+    await expect(customColumnValueField).toHaveValue("ACME-24");
+    await expect(customColumnSwitch).toBeVisible();
 
     await expect(nameFieldSwitch).toBeHidden();
-    await expect(typeOfGTUFieldSwitch).toBeHidden();
     await expect(amountFieldSwitch).toBeHidden();
 
     // NOTE: Unit field switch is visible in stripe template
@@ -686,10 +694,12 @@ test.describe("Stripe Invoice Template", () => {
       .getByRole("combobox", { name: "Template" })
       .selectOption("default");
 
-    // All switches and Type of GTU field should be visible again
+    // All switches are visible again, and the custom column keeps its name and value
     await expect(showNumberColumnSwitch).toBeVisible();
     await expect(showVatTableSummarySwitch).toBeVisible();
-    await expect(typeOfGTUField).toBeVisible();
+    await expect(customColumnNameField).toHaveValue("Project code");
+    await expect(customColumnValueField).toHaveValue("ACME-24");
+    await expect(customColumnSwitch).toBeVisible();
 
     for (const switchElement of fieldSwitches) {
       await expect(switchElement).toBeVisible();
@@ -699,7 +709,7 @@ test.describe("Stripe Invoice Template", () => {
     await expect(showNumberColumnSwitch).toBeChecked();
     await expect(showVatTableSummarySwitch).toBeChecked();
     await expect(nameFieldSwitch).toBeChecked();
-    await expect(typeOfGTUFieldSwitch).not.toBeChecked();
+    await expect(customColumnSwitch).toBeChecked();
   });
 
   test("Payment Method field only appears for default template", async ({
@@ -837,7 +847,7 @@ test.describe("Stripe Invoice Template", () => {
 
     // Set VAT to a numeric value to make Tax column  visible in Stripe
     const vatInput = invoiceItemsSection.getByRole("textbox", {
-      name: "VAT Rate",
+      name: "VAT rate",
       exact: true,
     });
     await waitForPdfRegeneration(page, async () => {
@@ -909,7 +919,7 @@ test.describe("Stripe Invoice Template", () => {
     await page.waitForURL("/");
 
     const newVatInput = page.getByRole("textbox", {
-      name: "VAT Rate",
+      name: "VAT rate",
       exact: true,
     });
 

@@ -14,9 +14,15 @@ import {
 import {
   compressInvoiceData,
   decompressInvoiceData,
+  DRAWN_SIGNATURE_KEYS,
   INVOICE_KEY_COMPRESSION_MAP,
 } from "../url-compression";
 import { MOCK_INVOICE_DATA, MOCK_INVOICE_ITEM_DATA } from "./data";
+
+/** Drawn signatures never go into a link, so they have no short key. */
+function isDrawnSignatureKey(key: string) {
+  return (DRAWN_SIGNATURE_KEYS as readonly string[]).includes(key);
+}
 
 // Extract all keys recursively from the mock data. Declared at module scope so its
 // recursion guards are not conditionals inside `it`.
@@ -586,7 +592,9 @@ describe("URL Compression Utilities", () => {
         // Check that each key exists in INVOICE_KEY_COMPRESSION_MAP.
         // A failure prints the missing keys, so no extra logging is needed.
         const missingKeys = allKeys.filter((key) => {
-          return !(key in INVOICE_KEY_COMPRESSION_MAP);
+          return (
+            !(key in INVOICE_KEY_COMPRESSION_MAP) && !isDrawnSignatureKey(key)
+          );
         });
 
         expect(missingKeys).toEqual([]);
@@ -604,10 +612,46 @@ describe("URL Compression Utilities", () => {
       it("should have a INVOICE_KEY_COMPRESSION_MAP entry for every key used in MOCK_INVOICE_DATA", () => {
         const allKeysInMockData = getAllKeys(MOCK_INVOICE_DATA);
         const missingKeys = Array.from(allKeysInMockData).filter((key) => {
-          return !(key in INVOICE_KEY_COMPRESSION_MAP);
+          return (
+            !(key in INVOICE_KEY_COMPRESSION_MAP) && !isDrawnSignatureKey(key)
+          );
         });
 
         expect(missingKeys).toStrictEqual([]);
+      });
+    });
+  });
+
+  describe("drawn signatures", () => {
+    const SIGNATURE = "data:image/png;base64,iVBORw0KGgo=";
+
+    it("leaves them out of the link", () => {
+      const compressed = compressInvoiceData({
+        ...MOCK_INVOICE_DATA,
+        personAuthorizedToReceiveSignature: SIGNATURE,
+        personAuthorizedToIssueSignature: SIGNATURE,
+      });
+
+      expect(JSON.stringify(compressed)).not.toContain(SIGNATURE);
+      expect(Object.keys(compressed)).not.toContain(
+        "personAuthorizedToIssueSignature",
+      );
+    });
+
+    it("opens a link with no signatures drawn", () => {
+      const result = decompressInvoiceData(
+        compressInvoiceData({
+          ...MOCK_INVOICE_DATA,
+          personAuthorizedToIssueSignature: SIGNATURE,
+        }),
+      );
+
+      expect(result).toMatchObject({
+        personAuthorizedToReceiveSignature: "",
+        personAuthorizedToIssueSignature: "",
+        // the rest of the signature line still travels
+        personAuthorizedToIssueName:
+          MOCK_INVOICE_DATA.personAuthorizedToIssueName,
       });
     });
   });

@@ -4,6 +4,7 @@ import { type InvoiceData, PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { test, expect } from "./utils/extended-playwright-test";
+import { invoiceTotalText } from "./utils/invoice-total";
 import {
   expectPdfScreenshot,
   waitForPdfRegeneration,
@@ -27,44 +28,32 @@ test.describe("Item discounts", () => {
 
     // Item 1: 10,000.00 - 10% = 9,000.00, VAT 23% on it = 2,070.00
     await expect(
-      invoiceItemsSection.getByText(
-        "−1,000.00 EUR off. Net after discount: 9,000.00 EUR.",
-      ),
-    ).toBeVisible();
+      invoiceItemsSection.getByTestId("itemDiscountSummary0"),
+    ).toHaveText(
+      "Charitable donation 10%of 10,000.00 EUR subtotal−1,000.00 EUR",
+    );
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "Net Amount", exact: true })
-        .nth(0),
-    ).toHaveValue("9,000.00");
+      invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/).nth(0),
+    ).toContainText("9,000.00");
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "VAT Amount", exact: true })
-        .nth(0),
-    ).toHaveValue("2,070.00");
+      invoiceItemsSection.getByTestId(/^itemVatAmount\d+$/).nth(0),
+    ).toContainText("2,070.00");
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "Pre-tax Amount", exact: true })
-        .nth(0),
-    ).toHaveValue("11,070.00");
+      invoiceItemsSection.getByTestId(/^itemPreTaxAmount\d+$/).nth(0),
+    ).toContainText("11,070.00");
 
     // Item 2: 4 x 1,250.00 = 5,000.00, minus a fixed 1,000.00 off the whole line = 4,000.00
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "Net Amount", exact: true })
-        .nth(1),
-    ).toHaveValue("4,000.00");
+      invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/).nth(1),
+    ).toContainText("4,000.00");
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "VAT Amount", exact: true })
-        .nth(1),
-    ).toHaveValue("400.00");
+      invoiceItemsSection.getByTestId(/^itemVatAmount\d+$/).nth(1),
+    ).toContainText("400.00");
 
     // 11,070.00 + 4,400.00
     await expect(
-      page
-        .getByTestId("final-section")
-        .getByRole("textbox", { name: "Total", exact: true }),
-    ).toHaveValue("15,470.00");
+      page.getByTestId("final-section").getByTestId("total"),
+    ).toHaveText(invoiceTotalText("15,470.00"));
 
     const storedData = (await page.evaluate((key) => {
       return localStorage.getItem(key);
@@ -105,10 +94,52 @@ test.describe("Item discounts", () => {
       .click();
 
     await expect(
-      invoiceItemsSection
-        .getByRole("textbox", { name: "Net Amount", exact: true })
-        .nth(0),
-    ).toHaveValue("10,000.00");
+      invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/).nth(0),
+    ).toContainText("10,000.00");
+  });
+
+  test("deleting item 1 keeps the next item's open discount and the PDF column choices", async ({
+    page,
+  }) => {
+    const invoiceItemsSection = page.getByTestId("invoice-items-section");
+
+    await invoiceItemsSection
+      .getByRole("button", { name: "Add invoice item" })
+      .click();
+
+    // item 1 carries the PDF column switches: turn one off
+    const unitColumnSwitch = invoiceItemsSection.getByRole("switch", {
+      name: UNIT_COLUMN_SWITCH_NAME,
+    });
+    await unitColumnSwitch.click();
+    await expect(unitColumnSwitch).not.toBeChecked();
+
+    // open item 2's discount and leave it empty
+    await invoiceItemsSection.getByTestId("addItemDiscount1").click();
+    await expect(
+      invoiceItemsSection.getByTestId("itemDiscount1"),
+    ).toBeVisible();
+
+    await invoiceItemsSection
+      .getByRole("button", { name: "Delete Invoice Item 1" })
+      .click();
+    await page.getByRole("button", { name: "Delete Item 1" }).click();
+
+    await expect(
+      invoiceItemsSection.getByRole("group", { name: /^Item \d+$/ }),
+    ).toHaveCount(1);
+
+    // the surviving item, now item 1, still has its discount editor open
+    await expect(
+      invoiceItemsSection.getByTestId("itemDiscount0"),
+    ).toBeVisible();
+
+    // and the Unit column stays off, now on the new item 1
+    await expect(
+      invoiceItemsSection.getByRole("switch", {
+        name: UNIT_COLUMN_SWITCH_NAME,
+      }),
+    ).not.toBeChecked();
   });
 
   test("shows a discount column in the default template PDF @desktop-only", async ({
@@ -165,13 +196,13 @@ async function fillDiscountedItems(page: Page) {
     .fill("Frontend engineering");
   await invoiceItemsSection
     .getByRole("spinbutton", {
-      name: "Net Price (Rate or Unit Price)",
+      name: "Unit price",
       exact: true,
     })
     .nth(0)
     .fill("10000");
   await invoiceItemsSection
-    .getByRole("textbox", { name: "VAT Rate", exact: true })
+    .getByRole("textbox", { name: "VAT rate", exact: true })
     .nth(0)
     .fill("23");
 
@@ -184,7 +215,7 @@ async function fillDiscountedItems(page: Page) {
     .nth(0)
     .fill("10");
   await invoiceItemsSection
-    .getByRole("textbox", { name: "Label (optional)", exact: true })
+    .getByRole("textbox", { name: "Label in PDF (optional)", exact: true })
     .nth(0)
     .fill("Charitable donation");
 
@@ -200,18 +231,18 @@ async function fillDiscountedItems(page: Page) {
     .nth(1)
     .fill("Backend engineering");
   await invoiceItemsSection
-    .getByRole("spinbutton", { name: "Amount (Quantity)", exact: true })
+    .getByRole("spinbutton", { name: "Qty", exact: true })
     .nth(1)
     .fill("4");
   await invoiceItemsSection
     .getByRole("spinbutton", {
-      name: "Net Price (Rate or Unit Price)",
+      name: "Unit price",
       exact: true,
     })
     .nth(1)
     .fill("1250");
   await invoiceItemsSection
-    .getByRole("textbox", { name: "VAT Rate", exact: true })
+    .getByRole("textbox", { name: "VAT rate", exact: true })
     .nth(1)
     .fill("10");
 
@@ -230,3 +261,6 @@ async function fillDiscountedItems(page: Page) {
       .fill("1000");
   });
 }
+
+/** Item 1 holds the PDF column switches; this one hides the Unit column for every item. */
+const UNIT_COLUMN_SWITCH_NAME = "Show the 'Unit' Column in the PDF for item 1";

@@ -72,12 +72,12 @@ test.describe("Default Invoice Template", () => {
 
     // update price and quantity for the first invoice item
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)" })
+      .getByRole("spinbutton", { name: "Qty" })
       .fill("3");
 
     await invoiceItemsSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       })
       .fill("1000");
 
@@ -86,7 +86,7 @@ test.describe("Default Invoice Template", () => {
       name: "Tax Settings",
     });
     await taxSettingsFieldset
-      .getByRole("textbox", { name: "VAT Rate" })
+      .getByRole("textbox", { name: "VAT rate" })
       .fill("10");
 
     await taxSettingsFieldset
@@ -112,17 +112,17 @@ test.describe("Default Invoice Template", () => {
 
     // Check that the total is correct, written in the Polish number format the language
     // switch selected (the grouping space is a no-break one, which `\s` matches)
-    const totalTextbox = page.getByRole("textbox", { name: "Total" });
-    await expect(totalTextbox).toHaveValue(/^3\s300,00$/);
+    const totalText = finalSection.getByTestId("total");
+    await expect(totalText).toHaveText(/^3\s300,00\D*$/);
 
     /** TEST PERSON AUTHORIZED TO RECEIVE FIELD */
-    const personAuthorizedToReceiveFieldset = finalSection.getByRole("group", {
-      name: "Person Authorized to Receive",
+    const personAuthorizedToReceiveGroup = finalSection.getByRole("group", {
+      name: "Received by",
     });
 
     // Verify that "Show Person Authorized to Receive in PDF" switch is on by default
     const showPersonAuthorizedToReceiveSwitch =
-      personAuthorizedToReceiveFieldset.getByRole("switch", {
+      personAuthorizedToReceiveGroup.getByRole("switch", {
         name: "Show Person Authorized to Receive in PDF",
       });
     await expect(showPersonAuthorizedToReceiveSwitch).toBeVisible();
@@ -130,19 +130,17 @@ test.describe("Default Invoice Template", () => {
     await expect(showPersonAuthorizedToReceiveSwitch).toBeChecked();
 
     const personAuthorizedToReceiveNameInput =
-      personAuthorizedToReceiveFieldset.getByRole("textbox", {
-        name: "Name",
-      });
+      personAuthorizedToReceiveGroup.getByRole("textbox");
 
     await personAuthorizedToReceiveNameInput.fill("John Doe");
 
     /** TEST PERSON AUTHORIZED TO ISSUE FIELD */
-    const personAuthorizedToIssueFieldset = finalSection.getByRole("group", {
-      name: "Person Authorized to Issue",
+    const personAuthorizedToIssueGroup = finalSection.getByRole("group", {
+      name: "Issued by",
     });
 
     const showPersonAuthorizedToIssueSwitch =
-      personAuthorizedToIssueFieldset.getByRole("switch", {
+      personAuthorizedToIssueGroup.getByRole("switch", {
         name: "Show Person Authorized to Issue in PDF",
       });
     await expect(showPersonAuthorizedToIssueSwitch).toBeVisible();
@@ -150,9 +148,7 @@ test.describe("Default Invoice Template", () => {
     await expect(showPersonAuthorizedToIssueSwitch).toBeChecked();
 
     const personAuthorizedToIssueNameInput =
-      personAuthorizedToIssueFieldset.getByRole("textbox", {
-        name: "Name",
-      });
+      personAuthorizedToIssueGroup.getByRole("textbox");
     await personAuthorizedToIssueNameInput.fill("Adam Smith");
 
     await expectPdfScreenshot(page, {
@@ -209,7 +205,7 @@ test.describe("Default Invoice Template", () => {
     // left out of the generated PDF
     const sellerHiddenFieldSwitches = [
       sellerSection.getByRole("switch", {
-        name: `Show the 'Seller Tax Number' Field in the PDF`,
+        name: `Show the 'Tax Number' field in the PDF`,
       }),
       sellerSection.getByRole("switch", {
         name: `Show the 'Account Number' Field in the PDF`,
@@ -273,20 +269,18 @@ test.describe("Default Invoice Template", () => {
     const invoiceSection = page.getByTestId(`invoice-items-section`);
 
     // Amount field
-    await invoiceSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)" })
-      .fill("3");
+    await invoiceSection.getByRole("spinbutton", { name: "Qty" }).fill("3");
 
     // Net price field
     await invoiceSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       })
       .fill("1000");
 
     // Toggle VAT Table Summary visibility off
     const vatTableSummarySwitch = page.getByRole("switch", {
-      name: `Show "VAT Table Summary" in the PDF`,
+      name: "VAT summary table",
     });
 
     await expect(vatTableSummarySwitch).toBeChecked();
@@ -372,11 +366,11 @@ test.describe("Default Invoice Template", () => {
     // Fill in an invoice item
     const invoiceItemsSection = page.getByTestId("invoice-items-section");
     await invoiceItemsSection
-      .getByRole("spinbutton", { name: "Amount (Quantity)" })
+      .getByRole("spinbutton", { name: "Qty" })
       .fill("3");
     await invoiceItemsSection
       .getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       })
       .fill("50");
 
@@ -387,7 +381,7 @@ test.describe("Default Invoice Template", () => {
     // the VAT field is labelled "TVA" in French, so finding it proves the form
     // switched language
     await taxSettingsFieldset
-      .getByRole("textbox", { name: "TVA Rate", exact: true })
+      .getByRole("textbox", { name: "TVA rate", exact: true })
       .fill("23");
 
     const MOBILE_FLOW_NOTES = `Test: completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French (${testInfo.project.name})`;
@@ -476,41 +470,32 @@ test.describe("Default Invoice Template", () => {
     // Verify invoice item persists
     await expect(
       invoiceItemsSection.getByRole("spinbutton", {
-        name: "Amount (Quantity)",
+        name: "Qty",
       }),
     ).toHaveValue("3");
     await expect(
       invoiceItemsSection.getByRole("spinbutton", {
-        name: "Net Price (Rate or Unit Price)",
+        name: "Unit price",
       }),
     ).toHaveValue("50");
 
     await expect(
       taxSettingsFieldset.getByRole("textbox", {
-        name: "TVA Rate",
+        name: "TVA rate",
         exact: true,
       }),
     ).toHaveValue("23");
 
     // Verify calculations are correct, written in the French number format
     await expect(
-      invoiceItemsSection.getByRole("textbox", {
-        name: "Net Amount",
-        exact: true,
-      }),
-    ).toHaveValue("150,00");
+      invoiceItemsSection.getByTestId(/^itemNetAmount\d+$/),
+    ).toContainText("150,00");
     await expect(
-      invoiceItemsSection.getByRole("textbox", {
-        name: "TVA Amount",
-        exact: true,
-      }),
-    ).toHaveValue("34,50");
+      invoiceItemsSection.getByTestId(/^itemVatAmount\d+$/),
+    ).toContainText("34,50");
     await expect(
-      invoiceItemsSection.getByRole("textbox", {
-        name: "Pre-tax Amount",
-        exact: true,
-      }),
-    ).toHaveValue("184,50");
+      invoiceItemsSection.getByTestId(/^itemPreTaxAmount\d+$/),
+    ).toContainText("184,50");
   });
 
   test("should display and persist invoice number in different languages", async ({

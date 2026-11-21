@@ -48,6 +48,20 @@ export function StripeItemsTable({
   const servicePeriod = formatServicePeriodRange(invoiceData);
 
   const unitFieldIsVisible = invoiceData.items[0].unitFieldIsVisible;
+
+  // The custom column, once an item has a value for it. Its switch is on by default, so
+  // without the values check every existing Stripe invoice would gain an empty column.
+  const customColumnIsVisible =
+    invoiceData.items[0].typeOfGTUFieldIsVisible &&
+    invoiceData.items.some((item) => {
+      return Boolean(item.typeOfGTU?.trim());
+    });
+  // named by the user, or "Type of GTU" for a column from before it could be named
+  const customColumnName =
+    invoiceData.customColumnLabel?.trim() || t.invoiceItemsTable.typeOfGTU;
+  const descriptionColumnStyle = customColumnIsVisible
+    ? styles.colDescriptionWithCustom
+    : styles.colDescription;
   const vatAmountFieldIsVisible = invoiceData.items[0].vatFieldIsVisible;
   const taxColumnStyle = hasAnyItemDiscount(invoiceData.items)
     ? styles.colTaxWithDiscount
@@ -57,9 +71,15 @@ export function StripeItemsTable({
     <View style={[styles.table, styles.mt24]}>
       {/* Fixed Header — repeats on every page (for better layout on page breaks) */}
       <View style={styles.tableHeader} fixed>
-        <View style={styles.colDescription}>
+        <View style={descriptionColumnStyle}>
           <Text style={styles.fontSize8}>{t.stripe.description}</Text>
         </View>
+
+        {customColumnIsVisible ? (
+          <View style={styles.colCustom}>
+            <Text style={styles.fontSize8}>{customColumnName}</Text>
+          </View>
+        ) : null}
 
         <View style={styles.colQty}>
           <Text style={styles.fontSize8}>{t.stripe.qty}</Text>
@@ -166,7 +186,7 @@ export function StripeItemsTable({
                 isAfterDiscountRow ? styles.rowAfterDiscount : {},
               ]}
             >
-              <View style={styles.colDescription}>
+              <View style={descriptionColumnStyle}>
                 <Text style={[styles.fontSize10]}>{item.name}</Text>
                 {invoiceData.servicePeriodFieldIsVisible ? (
                   <Text style={[styles.fontSize9, styles.mt4]}>
@@ -174,6 +194,13 @@ export function StripeItemsTable({
                   </Text>
                 ) : null}
               </View>
+              {customColumnIsVisible ? (
+                <View style={styles.colCustom}>
+                  <Text style={[styles.fontSize10, styles.textDark]}>
+                    {item.typeOfGTU}
+                  </Text>
+                </View>
+              ) : null}
               <View style={styles.colQty}>
                 <WrappableAmount
                   chunks={amountChunks}
