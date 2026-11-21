@@ -47,6 +47,12 @@ import { getColumnSwitchesToCarry } from "./utils/get-column-switches-to-carry";
  */
 const DEBOUNCE_TIMEOUT = 500;
 
+/** Fields the signature pad writes, already debounced by the pad's own pause. */
+const SIGNATURE_FIELDS: ReadonlySet<string> = new Set([
+  "personAuthorizedToReceiveSignature",
+  "personAuthorizedToIssueSignature",
+] satisfies Array<keyof InvoiceData>);
+
 /**
  * Default values for the invoice form's accordion sections.
  * These correspond to the different sections of the form that can be expanded or collapsed.
@@ -210,8 +216,13 @@ export const InvoiceForm = memo(function InvoiceForm({
   // subscribe to form changes to regenerate pdf on every input change
   useEffect(() => {
     // oxlint-disable-next-line react/incompatible-library
-    const subscription = watch((value) => {
+    const subscription = watch((value, { name }) => {
       void debouncedRegeneratePdfOnFormChange(value as unknown as InvoiceData);
+
+      // the signature pad already waited for the signer to pause, so don't wait again
+      if (name && SIGNATURE_FIELDS.has(name)) {
+        void debouncedRegeneratePdfOnFormChange.flush();
+      }
     });
 
     return () => {

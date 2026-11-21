@@ -350,7 +350,14 @@ async function drawSignature({ page, pad }: DrawSignatureArgs) {
   }
 
   await page.mouse.up();
+
+  // the pad sends the signature to the form once the signer pauses, shortly after the
+  // last stroke; wait that out so the PDF the caller waits for has the signature in it
+  await page.waitForTimeout(SIGNATURE_IDLE_SAVE_WAIT_MS);
 }
+
+/** A little over the pad's IDLE_SAVE_DELAY_MS. */
+const SIGNATURE_IDLE_SAVE_WAIT_MS = 700;
 
 interface DrawSignatureArgs {
   page: Page;

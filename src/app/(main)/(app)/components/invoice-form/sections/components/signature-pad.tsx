@@ -1,6 +1,12 @@
 import { PenLine } from "lucide-react";
 import { getStroke, type StrokeOptions } from "perfect-freehand";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -10,9 +16,14 @@ import { cn } from "@/lib/utils";
  * with perfect-freehand, which also varies their width with speed (or pen pressure), so
  * they read as ink rather than a fixed-width line.
  *
- * Each finished stroke is saved as a PNG cropped to the ink, so the PDF can print it at full
- * size. A saved signature is drawn back onto the pad when the form opens, and further strokes
- * add to it.
+ * The ink is saved as a PNG cropped to it, so the PDF can print it at full size. A saved
+ * signature is drawn back onto the pad when the form opens, and further strokes add to it.
+ *
+ * The save waits for a short pause (`IDLE_SAVE_DELAY_MS` with no new stroke), so a signature
+ * reaches the form, and the PDF is rebuilt, once rather than after every stroke, and never in
+ * the middle of one: a rebuild blocks the main thread and would freeze the ink. The form
+ * skips its own debounce for it, so the PDF follows the pause directly. Anything that ends
+ * signing sends it at once: a tap or click outside the pad, a key press, the page hidden.
  */
 export function SignaturePad({
   value,
@@ -42,8 +53,52 @@ export function SignaturePad({
   // the value this pad saved last, so its own saves aren't drawn back over the strokes
   const savedValueRef = useRef(value);
 
+  // a restore that a cleanup cut short before its image loaded (Strict Mode's mount, unmount,
+  // mount in development, or a value change mid-load); the next run must draw again even
+  // though neither the size nor the value differs from what it saw
+  const isRestoreInterruptedRef = useRef(false);
+
+  // ink drawn but not yet sent to the form, waiting for the signer to pause
+  const pendingValueRef = useRef<string | null>(null);
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [hasPendingInk, setHasPendingInk] = useState(false);
+
+  // the latest onChange, for the timer and listeners that outlive a render
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  // stable: they touch only refs and a state setter, so effects can list them
+  const cancelIdleSave = useCallback(() => {
+    if (idleTimerRef.current !== null) clearTimeout(idleTimerRef.current);
+
+    idleTimerRef.current = null;
+  }, []);
+
+  /** Sends held ink to the form now. */
+  const flushPendingInk = useCallback(() => {
+    cancelIdleSave();
+
+    const pending = pendingValueRef.current;
+
+    if (pending === null) return;
+
+    pendingValueRef.current = null;
+    setHasPendingInk(false);
+    onChangeRef.current(pending);
+  }, [cancelIdleSave]);
+
+  /** Forgets held ink: Clear, Remove or a restored invoice replaced it. */
+  const discardPendingInk = useCallback(() => {
+    cancelIdleSave();
+    pendingValueRef.current = null;
+    setHasPendingInk(false);
+  }, [cancelIdleSave]);
+
   const [isDrawing, setIsDrawing] = useState(false);
-  const hasInk = Boolean(value) || isDrawing;
+  const hasInk = Boolean(value) || isDrawing || hasPendingInk;
 
   // On a touch screen a finger also scrolls, so the pad stays out of the way until it's
   // tapped: unarmed, a swipe across it scrolls the page; armed, it draws. A tap anywhere
@@ -76,6 +131,45 @@ export function SignaturePad({
     };
   }, [isArmed]);
 
+  // Held ink goes to the form as soon as signing is over. Every way off the pad (Remove,
+  // another field, the template switch, closing the tab) starts with one of these, so the
+  // pad drops, not sends, anything still held when it unmounts: sending then would write a
+  // signature back after Remove has cleared it.
+  useEffect(() => {
+    if (!hasPendingInk) return;
+
+    const flushOnPointerElsewhere = (event: PointerEvent) => {
+      if (padRef.current?.contains(event.target as Node)) return;
+
+      flushPendingInk();
+    };
+    const flushOnHidden = () => {
+      if (document.visibilityState === "hidden") flushPendingInk();
+    };
+
+    document.addEventListener("pointerdown", flushOnPointerElsewhere, true);
+    document.addEventListener("keydown", flushPendingInk, true);
+    document.addEventListener("visibilitychange", flushOnHidden);
+    window.addEventListener("pagehide", flushPendingInk);
+
+    return () => {
+      document.removeEventListener(
+        "pointerdown",
+        flushOnPointerElsewhere,
+        true,
+      );
+      document.removeEventListener("keydown", flushPendingInk, true);
+      document.removeEventListener("visibilitychange", flushOnHidden);
+      window.removeEventListener("pagehide", flushPendingInk);
+    };
+  }, [hasPendingInk, flushPendingInk]);
+
+  useEffect(() => {
+    return () => {
+      cancelIdleSave();
+    };
+  }, [cancelIdleSave]);
+
   // Size the bitmap to the pad, and redraw the saved signature whenever that size changes or
   // the value changes from outside (a restored invoice, Remove, Clear).
   useEffect(() => {
@@ -95,9 +189,14 @@ export function SignaturePad({
 
       const isResized = sizeCanvasToElement(canvas);
       const isExternalChange = savedValueRef.current !== value;
+      const isInterrupted = isRestoreInterruptedRef.current;
 
-      if (!isResized && !isExternalChange) return;
+      if (!isResized && !isExternalChange && !isInterrupted) return;
 
+      // a value from outside (Clear, Remove, a restored invoice) replaces any held ink
+      if (isExternalChange) discardPendingInk();
+
+      isRestoreInterruptedRef.current = false;
       savedValueRef.current = value;
       inkBoundsRef.current = null;
       inkLayer.width = canvas.width;
@@ -112,6 +211,7 @@ export function SignaturePad({
           inkLayer,
           dataUrl: value,
           onDrawn: (bounds) => {
+            cancelPendingDraw = null;
             inkBoundsRef.current = bounds;
             paint({ canvas, inkLayer, stroke: null });
           },
@@ -126,9 +226,15 @@ export function SignaturePad({
 
     return () => {
       observer.disconnect();
-      cancelPendingDraw?.();
+
+      // still loading: cancel it, so a stale image can't land later, and have the next run
+      // draw the current value instead (it always draws `value`, so a Clear stays cleared)
+      if (cancelPendingDraw) {
+        cancelPendingDraw();
+        isRestoreInterruptedRef.current = true;
+      }
     };
-  }, [value]);
+  }, [value, discardPendingInk]);
 
   // While armed, iOS would still treat a touch on the pad as a page gesture too: a double
   // tap zooms, a long press selects and opens the loupe, a pinch zooms. React's touch
@@ -198,8 +304,12 @@ export function SignaturePad({
 
     const dataUrl = exportInk({ canvas: inkLayer, bounds });
 
+    // held until the signer pauses; a stroke started before then restarts the wait
     savedValueRef.current = dataUrl;
-    onChange(dataUrl);
+    pendingValueRef.current = dataUrl;
+    setHasPendingInk(true);
+    cancelIdleSave();
+    idleTimerRef.current = setTimeout(flushPendingInk, IDLE_SAVE_DELAY_MS);
   }
 
   return (
@@ -255,6 +365,9 @@ export function SignaturePad({
           }
 
           activePointerIdRef.current = event.pointerId;
+          // still signing: wait for the next pause before saving
+          cancelIdleSave();
+
           strokeRef.current = [];
           simulatePressureRef.current = event.pointerType !== "pen";
           setIsDrawing(true);
@@ -305,13 +418,14 @@ export function SignaturePad({
         </span>
       ) : null}
 
-      {value ? (
+      {value || hasPendingInk ? (
         <Button
           variant="ghost"
           size="sm"
           className="absolute right-1 top-1 h-[26px] bg-white/90 px-2 text-[13px] font-normal text-slate-500 max-md:h-9"
           aria-label={`Clear ${label} signature`}
           onClick={() => {
+            discardPendingInk();
             onChange("");
           }}
         >
@@ -347,6 +461,13 @@ function subscribeToPointerQuery(onChange: () => void) {
 }
 
 const COARSE_POINTER_QUERY = "(pointer: coarse)";
+
+/**
+ * How long the pad waits after a stroke, with no new one, before saving the signature: long
+ * enough to span the quick pauses between a signature's strokes, short enough that the PDF
+ * updates right after the signer stops.
+ */
+export const IDLE_SAVE_DELAY_MS = 500;
 
 const INK_COLOR = "#000000";
 
