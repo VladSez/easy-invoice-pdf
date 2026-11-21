@@ -27,7 +27,7 @@ export const metadata = {
 ## ✨ Highlights
 
 - **Number format setting** - pick how amounts are grouped and punctuated in the PDF, separately from the invoice language. An English invoice can print `10 000,00 EUR`, and a new **International** format prints `321 200.00`, which reads the same in every country. Each option previews your invoice's own total, so you see exactly what the PDF will show
-- **Keep format when language changes** - a switch that pins the number format, so you can write an invoice in your client's language and keep your own number formatting
+- **Keep format when language changes** - a switch that pins the number format, so you can [write an invoice in your client's language](/multi-language-invoice-generator) and keep your own number formatting
 - **Brazilian Portuguese invoices** - a new `Portuguese (Brazil)` PDF language, with `CNPJ/CPF` for the tax number, `Imposto` for the tax column, and amounts in words counted the Brazilian way (`um bilhão`, not `mil milhões`)
 - **Large amounts fit their columns** - an amount too wide for its cell now wraps onto a second line at a thousands boundary, instead of painting over the column next to it
 
@@ -35,7 +35,7 @@ export const metadata = {
 
 ### Changed
 
-- **Amounts now follow the invoice language by default in the default template.** Before this release it printed every amount as `321 200.00`, whatever the language. It now punctuates them the way the language does: `321,200.00` in English, `321.200,00` in German, `321 200,00` in Polish. This also applies to invoices saved in your browser or shared by link before this release, so re-downloading one may print its numbers differently from the copy you sent. To keep the old look, pick **International** under **Number Format**. The Stripe template already followed the language
+- **Amounts now follow the invoice language by default in the default template.** Before this release it printed every amount as `321 200.00`, whatever the language. It now punctuates them the way the language does: `321,200.00` in English, `321.200,00` in [German](/german-invoice-generator), `321 200,00` in Polish. This also applies to invoices saved in your browser or shared by link before this release, so re-downloading one may print its numbers differently from the copy you sent. To keep the old look, pick **International** under **Number Format**. [The Stripe template](/stripe-template) already followed the language
 - Four-digit amounts are now grouped in Polish, Spanish and Italian (`8 111,00` rather than `8111,00`), so they line up with larger amounts in the same column
 - The default template's footer now writes the total the same way as the rest of the invoice, with the currency code rather than a symbol
 - The language pickers name the country for Portuguese: `Portuguese (Portugal)` and `Portuguese (Brazil)`
