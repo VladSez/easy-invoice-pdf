@@ -1131,7 +1131,13 @@ test.describe("Invoice Generator Page", () => {
     await expect(
       invoiceItemsSection.getByText("Amount must be >= 0"),
     ).toBeHidden();
-    await expect(notifications).toBeHidden();
+
+    // assert on the messages, not the container: Sonner's section has no in-flow size, so
+    // `toBeHidden()` on it would pass even with toasts on screen
+    await expect(
+      notifications.getByText("Seller name is required"),
+    ).toBeHidden();
+    await expect(notifications.getByText("Amount must be >= 0")).toBeHidden();
   });
 
   test(
