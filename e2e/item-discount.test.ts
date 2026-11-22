@@ -142,7 +142,7 @@ test.describe("Item discounts", () => {
     ).not.toBeChecked();
   });
 
-  test("shows a discount column in the default template PDF", async ({
+  test("shows a discount column in the default template PDF @desktop-only", async ({
     page,
     browserName,
     downloadDir,
@@ -160,7 +160,7 @@ test.describe("Item discounts", () => {
     expect(numPages).toBe(1);
   });
 
-  test("shows a discount row under each discounted item in the Stripe template PDF", async ({
+  test("shows a discount row under each discounted item in the Stripe template PDF @desktop-only", async ({
     page,
     browserName,
     downloadDir,

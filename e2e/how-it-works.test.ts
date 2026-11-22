@@ -10,7 +10,7 @@ import {
 
 import { expectYouTubeEmbedToShow } from "./utils/youtube-embed";
 
-test.describe("How it works page", () => {
+test.describe("How it works page @desktop-only", () => {
   test("should display page content and video tutorials", async ({ page }) => {
     await page.goto("/how-it-works");
 

@@ -26,7 +26,7 @@ test.describe("Default Invoice Template", () => {
       // client side PDF generation + download is the most engine sensitive path
       // we have, so it is part of both engine smoke runs. On `Desktop Safari` it is
       // also the only place the desktop preview pane renders on WebKit
-      tag: ["@firefox-smoke", "@webkit-desktop-smoke"],
+      tag: ["@firefox-smoke", "@webkit-desktop-smoke", "@mobile-chrome"],
     },
     async ({ page, browserName, downloadDir }) => {
       const { suggestedFilename, numPages } = await expectPdfScreenshot(page, {
@@ -43,7 +43,7 @@ test.describe("Default Invoice Template", () => {
     },
   );
 
-  test("downloads PDF in Polish and verifies content", async ({
+  test("downloads PDF in Polish and verifies content @desktop-only", async ({
     page,
     browserName,
     downloadDir,
@@ -159,7 +159,7 @@ test.describe("Default Invoice Template", () => {
     });
   });
 
-  test("update pdf when invoice data changes", async ({
+  test("update pdf when invoice data changes @desktop-only", async ({
     page,
     browserName,
     downloadDir,
@@ -295,7 +295,7 @@ test.describe("Default Invoice Template", () => {
     });
   });
 
-  test("completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French", async ({
+  test("completes full invoice flow on mobile: tabs navigation, form editing and PDF download in French @mobile-chrome", async ({
     page,
     browserName,
     downloadDir,
@@ -660,7 +660,7 @@ test.describe("Default Invoice Template", () => {
     await expect(page.locator('input[name="currency"]')).toHaveValue("CHF");
   });
 
-  test("generates PDF with logo when using default template", async ({
+  test("generates PDF with logo when using default template @desktop-only", async ({
     page,
     browserName,
     downloadDir,
@@ -734,7 +734,7 @@ test.describe("Default Invoice Template", () => {
     });
   });
 
-  test("displays date of sales in PDF when enabled and hides it when toggled off", async ({
+  test("displays date of sales in PDF when enabled and hides it when toggled off @desktop-only", async ({
     page,
     browserName,
     downloadDir,

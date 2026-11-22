@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Changelog page", () => {
+test.describe("Changelog page @desktop-only", () => {
   test("should display changelog page content", async ({ page }) => {
     await page.goto("/changelog");
 

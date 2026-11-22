@@ -381,7 +381,7 @@ test.describe("Stripe Invoice Sharing Logic", () => {
     await expect(shareButton).toHaveAttribute("data-disabled", "true");
   });
 
-  test("sharing functionality works correctly in mobile view (mobile UI is a bit different)", async ({
+  test("sharing functionality works correctly in mobile view (mobile UI is a bit different) @mobile-chrome", async ({
     page,
   }, testInfo) => {
     // the mobile sharing UI is what this test is about, so we run it on a real

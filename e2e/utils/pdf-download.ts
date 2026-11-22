@@ -54,13 +54,19 @@ export async function waitForPdfRegeneration(
  * Fills the notes field with a test note, so that the PDF screenshots are easier
  * to debug (you can tell which test produced a screenshot just by looking at it),
  * and waits until the PDF has been regenerated with it.
+ *
+ * Tags such as `@desktop-only` are stripped first. Notes are often built from
+ * `testInfo.title`, which keeps the tags, so tagging a test would otherwise change the
+ * PDF and break its snapshot.
  */
 export async function fillDebugNotes(page: Page, notes: string) {
+  const notesWithoutTags = notes.replaceAll(/\s@[\w-]+/g, "");
+
   await waitForPdfRegeneration(page, async () => {
     await page
       .getByTestId("final-section")
       .getByRole("textbox", { name: "Notes", exact: true })
-      .fill(notes);
+      .fill(notesWithoutTags);
   });
 }
 

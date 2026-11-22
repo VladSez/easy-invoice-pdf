@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Not Found page", () => {
+test.describe("Not Found page @desktop-only", () => {
   test("should display not found page in English (default locale) in root layout", async ({
     page,
   }) => {

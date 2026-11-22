@@ -8,7 +8,7 @@ import {
   VIDEO_DEMO_URL,
 } from "@/config";
 
-test.describe("Static assets (fonts, images, videos) should be accessible", () => {
+test.describe("Static assets (fonts, images, videos) should be accessible @desktop-only", () => {
   test("should load static assets successfully", async ({ page }) => {
     // Test video demo URL
     const videoResponse = await page.request.get(VIDEO_DEMO_URL);

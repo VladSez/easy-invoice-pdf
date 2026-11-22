@@ -266,7 +266,9 @@ test.describe("About page", () => {
     await expect(footer.getByText("Made by Vlad Sazonau")).toBeVisible();
   });
 
-  test("should display about page content in French", async ({ page }) => {
+  test("should display about page content in French @desktop-only", async ({
+    page,
+  }) => {
     await page.goto("/fr/about");
 
     // Verify the page is loaded with French locale
@@ -354,7 +356,9 @@ test.describe("About page", () => {
     await expect(termsOfServiceLinkFr).not.toHaveAttribute("target", "_blank");
   });
 
-  test("should display about page content in German", async ({ page }) => {
+  test("should display about page content in German @desktop-only", async ({
+    page,
+  }) => {
     await page.goto("/de/about");
 
     // Verify the page is loaded with German locale
@@ -453,7 +457,9 @@ test.describe("About page", () => {
     ).toBeVisible();
   });
 
-  test("should display footer about language links", async ({ page }) => {
+  test("should display footer about language links @desktop-only", async ({
+    page,
+  }) => {
     await page.goto("/en/about");
 
     const footer = page.getByRole("contentinfo");
@@ -479,7 +485,7 @@ test.describe("About page", () => {
     }
   });
 
-  test("should navigate to localized about page from footer language link", async ({
+  test("should navigate to localized about page from footer language link @desktop-only", async ({
     page,
   }) => {
     await page.goto("/en/about");
@@ -502,7 +508,7 @@ test.describe("About page", () => {
     ).toBeVisible();
   });
 
-  test("should navigate to app when clicking Go to App button", async ({
+  test("should navigate to app when clicking Go to App button @desktop-only", async ({
     page,
   }) => {
     await page.goto("/en/about");
@@ -522,7 +528,7 @@ test.describe("About page", () => {
 
   // we don't show nav links and language switcher in header on mobile
   // we test mobile menu separately
-  test("should show desktop nav links in header (ON MOBILE TEST WILL BE SKIPPED)", async ({
+  test("should show desktop nav links in header (ON MOBILE TEST WILL BE SKIPPED) @desktop-only", async ({
     page,
     isMobile,
   }) => {

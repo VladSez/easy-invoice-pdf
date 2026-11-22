@@ -36,7 +36,7 @@ function renderServerPdf(language: "en" | "pl"): Buffer {
   return result.stdout;
 }
 
-test.describe("Server-side PDF rendering", () => {
+test.describe("Server-side PDF rendering @desktop-only", () => {
   test.describe.configure({ mode: "serial" });
 
   test.beforeEach(({}, testInfo) => {
@@ -69,7 +69,7 @@ test.describe("Server-side PDF rendering", () => {
   }
 });
 
-test.describe("GET /api/generate-invoice/preview", () => {
+test.describe("GET /api/generate-invoice/preview @desktop-only", () => {
   test("rejects a request without a valid bearer token", async ({
     request,
   }) => {
@@ -133,7 +133,7 @@ test.describe("GET /api/generate-invoice/preview", () => {
   });
 });
 
-test.describe("GET /api/generate-invoice", () => {
+test.describe("GET /api/generate-invoice @desktop-only", () => {
   // Only the auth guard is exercised over HTTP: it rejects before the route
   // renders anything, so no Telegram message / Drive upload / email is sent.
   test("rejects a request without a valid bearer token", async ({

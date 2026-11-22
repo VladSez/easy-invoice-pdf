@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test.describe("Terms of Service page", () => {
+test.describe("Terms of Service page @desktop-only", () => {
   test("should display terms of service content", async ({ page }) => {
     await page.goto("/tos");
 

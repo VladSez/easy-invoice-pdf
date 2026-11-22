@@ -44,7 +44,7 @@ const APP_URLS = [
   "/?template=default",
 ] as const;
 
-test.describe("Shared invoice links are kept out of search engines", () => {
+test.describe("Shared invoice links are kept out of search engines @desktop-only", () => {
   // plain HTTP requests, no need to run them once per browser project
   test.beforeEach(({}, testInfo) => {
     // eslint-disable-next-line playwright/no-skipped-test -- HTTP only test, Desktop Chrome only

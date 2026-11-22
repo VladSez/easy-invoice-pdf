@@ -27,7 +27,7 @@ const SEO_LANDING_CASES = SLUGS.map((slug) => {
   };
 });
 
-test.describe("SEO landing pages", () => {
+test.describe("SEO landing pages @desktop-only", () => {
   for (const { path, h1, subheading, ctaName, ctaHref } of SEO_LANDING_CASES) {
     test(`should render ${path}`, async ({ page }) => {
       await page.goto(path);
@@ -92,6 +92,15 @@ test.describe("SEO landing pages", () => {
     });
   }
 
+  test("should 404 for unknown SEO slug", async ({ page }) => {
+    const response = await page.goto("/not-a-real-seo-landing-slug-xyz");
+
+    expect(response?.status()).toBe(404);
+  });
+});
+
+// Not `@desktop-only`: the sticky CTA's scroll behaviour is worth checking on a phone too.
+test.describe("SEO landing sticky CTA", () => {
   test("sticky CTA stays up once the hero CTA is behind you", async ({
     page,
   }) => {
@@ -129,12 +138,6 @@ test.describe("SEO landing pages", () => {
     });
     await expect(stickyRoot).toHaveAttribute("inert", "");
   });
-
-  test("should 404 for unknown SEO slug", async ({ page }) => {
-    const response = await page.goto("/not-a-real-seo-landing-slug-xyz");
-
-    expect(response?.status()).toBe(404);
-  });
 });
 
 /**
@@ -154,7 +157,7 @@ const VIDEO_HERO_CASES = SEO_LANDING_CASES.filter(
   },
 );
 
-test.describe("SEO landing hero art", () => {
+test.describe("SEO landing hero art @desktop-only", () => {
   for (const { path, h1, heroImage } of IMAGE_HERO_CASES) {
     test(`shows the hero image on ${path}`, async ({ page }) => {
       await page.goto(path);

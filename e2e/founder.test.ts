@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { LINKEDIN_URL, TWITTER_URL } from "@/config";
 
-test.describe("Founder page", () => {
+test.describe("Founder page @desktop-only", () => {
   test("renders the founder page and its links", async ({ page }) => {
     const response = await page.goto("/founder");
 

@@ -266,7 +266,7 @@ test.describe("Invoice Template shared features", () => {
   });
 
   for (const template of TEMPLATES) {
-    test(`${QR_CODE_TITLE} (${template} template)`, async ({
+    test(`${QR_CODE_TITLE} (${template} template) @desktop-only`, async ({
       page,
       browserName,
       downloadDir,
@@ -384,7 +384,7 @@ test.describe("Invoice Template shared features", () => {
       });
     });
 
-    test(`${SERVICE_PERIOD_TITLE} (${template} template)`, async ({
+    test(`${SERVICE_PERIOD_TITLE} (${template} template) @desktop-only`, async ({
       page,
       browserName,
       downloadDir,
@@ -511,7 +511,7 @@ test.describe("Invoice Template shared features", () => {
       });
     });
 
-    test(`${MULTI_PAGE_TITLE} (${template} template)`, async ({
+    test(`${MULTI_PAGE_TITLE} (${template} template) @desktop-only`, async ({
       page,
       browserName,
       downloadDir,
@@ -582,7 +582,7 @@ test.describe("Invoice Template shared features", () => {
       expect(numPages).toBe(3);
     });
 
-    test(`${EMAIL_VISIBILITY_TITLE} (${template} template)`, async ({
+    test(`${EMAIL_VISIBILITY_TITLE} (${template} template) @desktop-only`, async ({
       page,
       browserName,
       downloadDir,
@@ -750,7 +750,7 @@ test.describe("Invoice Template shared features", () => {
      * offers react-pdf no break at all, and `international`'s no-break space offers one it is
      * forbidden to take.
      */
-    test(`${LARGE_AMOUNTS_TITLE} (${template} template)`, async ({
+    test(`${LARGE_AMOUNTS_TITLE} (${template} template) @desktop-only`, async ({
       page,
       browserName,
       downloadDir,
@@ -810,7 +810,7 @@ test.describe("Invoice Template shared features", () => {
      * Only the default grouping is worth a picture here; the sibling test above is the one
      * that covers what changes when the separator does.
      */
-    test(`${LARGE_QUANTITY_TITLE} (${template} template)`, async ({
+    test(`${LARGE_QUANTITY_TITLE} (${template} template) @desktop-only`, async ({
       page,
       browserName,
       downloadDir,

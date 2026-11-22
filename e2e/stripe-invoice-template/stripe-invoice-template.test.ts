@@ -813,7 +813,7 @@ test.describe("Stripe Invoice Template", () => {
     await expect(servicePeriodSwitch).not.toBeChecked();
   });
 
-  test("automatically sets date format when switching to Stripe template", async ({
+  test("automatically sets date format when switching to Stripe template @desktop-only", async ({
     page,
     browserName,
     downloadDir,
@@ -943,7 +943,7 @@ test.describe("Stripe Invoice Template", () => {
     expect(finalParsedData.dateFormat).toBe(DEFAULT_DATE_FORMAT);
   });
 
-  test("generates PDF with logo and payment URL when using Stripe template", async ({
+  test("generates PDF with logo and payment URL when using Stripe template @desktop-only", async ({
     page,
     browserName,
     downloadDir,
@@ -1002,7 +1002,7 @@ test.describe("Stripe Invoice Template", () => {
     });
   });
 
-  test("colors the top line with the picked color and keeps it across a reload", async ({
+  test("colors the top line with the picked color and keeps it across a reload @desktop-only", async ({
     page,
     browserName,
     downloadDir,
@@ -1073,7 +1073,7 @@ test.describe("Stripe Invoice Template", () => {
    * column to wrap.
    */
   for (const language of ["it", "fr"] as const) {
-    test(`wraps a wide amount without hyphenating it when ${language} renders the currency in several runs`, async ({
+    test(`wraps a wide amount without hyphenating it when ${language} renders the currency in several runs @desktop-only`, async ({
       page,
       browserName,
       downloadDir,
