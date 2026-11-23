@@ -19,7 +19,11 @@ import { CTAToastProvider } from "@/app/(main)/(app)/contexts/cta-toast-context"
 import { InvoicePdfInstanceProvider } from "@/app/(main)/(app)/contexts/invoice-pdf-instance-context";
 import { updateAppMetadata } from "@/app/(main)/(app)/utils/get-app-metadata";
 import { getInitialInvoiceData } from "@/app/constants";
-import { CTA_TOAST_STORAGE_KEY, type InvoiceData } from "@/app/schema";
+import {
+  CTA_TOAST_STORAGE_KEY,
+  DEFAULT_STRIPE_TOP_LINE_COLOR,
+  type InvoiceData,
+} from "@/app/schema";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DeviceContextProvider } from "@/contexts/device-context";
 import { trackEvent } from "@/lib/analytics/track-event";
@@ -269,8 +273,13 @@ describe("InvoicePDFDownloadLink", () => {
         has_item_discount: false,
         has_logo: false,
         has_qr_code: false,
+        has_receiver_signature: false,
+        has_issuer_signature: false,
       },
     });
+    expect(vi.mocked(trackEvent).mock.lastCall?.[0].data).not.toHaveProperty(
+      "stripe_top_line_color",
+    );
     expect(updateAppMetadata).toHaveBeenCalledTimes(1);
     expect(toast.dismiss).toHaveBeenCalledTimes(1);
 
@@ -347,6 +356,72 @@ describe("InvoicePDFDownloadLink", () => {
     expect(vi.mocked(trackEvent).mock.lastCall?.[0]).toMatchObject({
       event: "download_invoice",
       data: { invoice_template: "default", has_logo: true },
+    });
+  });
+
+  it("should report drawn signatures only for visible rows", () => {
+    const invoiceData: InvoiceData = {
+      ...getInitialInvoiceData(),
+      template: "default",
+      personAuthorizedToReceiveSignature: "data:image/png;base64,abc",
+      personAuthorizedToReceiveFieldIsVisible: true,
+      personAuthorizedToIssueSignature: "data:image/png;base64,def",
+      personAuthorizedToIssueFieldIsVisible: false,
+    };
+
+    renderInvoicePDFDownloadLink({ invoiceData });
+
+    fireEvent.click(getDownloadLink());
+
+    expect(vi.mocked(trackEvent).mock.lastCall?.[0]).toMatchObject({
+      event: "download_invoice",
+      data: { has_receiver_signature: true, has_issuer_signature: false },
+    });
+  });
+
+  it("should not report signatures on the stripe template, which does not draw them", () => {
+    const invoiceData: InvoiceData = {
+      ...getInitialInvoiceData(),
+      template: "stripe",
+      personAuthorizedToReceiveSignature: "data:image/png;base64,abc",
+      personAuthorizedToIssueSignature: "data:image/png;base64,def",
+    };
+
+    renderInvoicePDFDownloadLink({ invoiceData });
+
+    fireEvent.click(getDownloadLink());
+
+    expect(vi.mocked(trackEvent).mock.lastCall?.[0]).toMatchObject({
+      event: "download_invoice",
+      data: { has_receiver_signature: false, has_issuer_signature: false },
+    });
+  });
+
+  it("should report the stripe top line color, falling back to the default amber", () => {
+    renderInvoicePDFDownloadLink({
+      invoiceData: { ...getInitialInvoiceData(), template: "stripe" },
+    });
+
+    fireEvent.click(getDownloadLink());
+
+    expect(vi.mocked(trackEvent).mock.lastCall?.[0]).toMatchObject({
+      data: { stripe_top_line_color: DEFAULT_STRIPE_TOP_LINE_COLOR },
+    });
+  });
+
+  it("should report a custom stripe top line color", () => {
+    renderInvoicePDFDownloadLink({
+      invoiceData: {
+        ...getInitialInvoiceData(),
+        template: "stripe",
+        stripeTopLineColor: "#6366f1",
+      },
+    });
+
+    fireEvent.click(getDownloadLink());
+
+    expect(vi.mocked(trackEvent).mock.lastCall?.[0]).toMatchObject({
+      data: { stripe_top_line_color: "#6366f1" },
     });
   });
 
