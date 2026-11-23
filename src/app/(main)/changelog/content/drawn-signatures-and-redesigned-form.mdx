@@ -1,0 +1,158 @@
+export const metadata = {
+  title: "EasyInvoicePDF v1.0.7 - Drawn Signatures, Redesigned Form",
+  description:
+    "Sign invoices with your mouse or finger, pick a top line color for the Stripe template, set payment terms in one click, and fill in a redesigned, more compact invoice form.",
+  date: "2026-11-23",
+  version: "1.0.7",
+  type: "minor",
+};
+
+![A signature drawn on the pad and printed in the PDF](https://github.com/user-attachments/assets/ee103d3e-f9fe-44fe-948e-6ff15fef0ebd)
+
+## ✨ Highlights
+
+- **Drawn signatures** - sign with a mouse, trackpad or finger, and the signature prints above the signature line on the default template. On phones, tap the pad to start signing, so swiping over it still scrolls the page
+- **Top line color for the [Stripe template](/stripe-template)** - pick one of six presets or any custom color for the line at the top of the PDF. **Reset to default** brings back amber
+- **Payment terms in one click** - **7 / 14 / 30 days** buttons under the dates set the due date. Moving the date of issue now moves the due date with it, instead of resetting it to 14 days
+- **A compact card per item** - each item reads like its line in the PDF, with chips for common units and tax rates, and **Duplicate** and **Delete** on every item
+- **Name your own column** - the "Type of GTU" column is now a custom column you name yourself, such as `Project code`, with a value per item. Both templates print it
+- **Totals and optional parts as cards** - a totals card shows net, tax and total. Payment method, QR code and signatures are cards you add with a button and remove in one click
+
+<video
+  src="https://github.com/user-attachments/assets/fcf7567a-5ca6-4227-96ea-97b94d7c11e2"
+  controls
+  style={{ width: "100%", borderRadius: "8px", marginTop: "1.5rem" }}
+/>
+
+---
+
+### Drawn signatures and compact item cards
+
+Totals, payment method, QR code and signatures are cards below the items: add one with its button, remove it in one click, and draw your signature right on the card. Each item is a compact card that reads like its line in the PDF, with chips for common units and tax rates.
+
+<div className="not-prose my-6 grid gap-4 grid-cols-2 items-start mx-auto max-w-2xl">
+  <img
+    src="https://github.com/user-attachments/assets/a364e986-d769-4091-b94e-74b47267ceff"
+    alt="Totals card, payment and signature cards with a drawn signature"
+    loading="lazy"
+    className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800"
+  />
+  <img
+    src="https://github.com/user-attachments/assets/1d08b5b9-0ed8-40d3-a977-f0d665680668"
+    alt="The compact item card on a phone"
+    loading="lazy"
+    className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800"
+  />
+</div>
+
+### Top line color
+
+Pick one of six presets or any custom color for the line at the top of the [Stripe template](/stripe-template).
+
+<div className="not-prose my-6 grid gap-4 grid-cols-1 sm:grid-cols-2 items-start">
+  <img
+    src="https://github.com/user-attachments/assets/2f7981ae-7d2f-460f-b1d4-9ba6e91aa9d4"
+    alt="Top line color picker"
+    loading="lazy"
+    className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800"
+  />
+  <img
+    src="https://github.com/user-attachments/assets/03379253-e0a4-4508-bb06-57a794465417"
+    alt="Stripe PDF with an indigo top line"
+    loading="lazy"
+    className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800"
+  />
+</div>
+
+### General Information and payment terms
+
+The section is split into **PDF settings**, **Invoice details** and **Header & Branding**. Payment due sits next to Date of issue, with **7 / 14 / 30 days** buttons under them. Out-of-date dates show a short warning under the field, with a **Use …** link that fills in the suggested value. **Template** and **PDF language** now sit side by side.
+
+<div className="not-prose my-6 grid gap-4 grid-cols-2 sm:grid-cols-3 items-start">
+  <img
+    src="https://github.com/user-attachments/assets/b50caa6e-70b7-4289-adef-830836558c44"
+    alt="General Information split into three groups"
+    loading="lazy"
+    className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800"
+  />
+  <img
+    src="https://github.com/user-attachments/assets/51480ad9-fdac-4c22-8b6f-e8e208b86e9e"
+    alt="Out-of-date warnings under each date field"
+    loading="lazy"
+    className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800"
+  />
+  <img
+    src="https://github.com/user-attachments/assets/9240fd94-64fc-4f07-8459-40942ec4a7a2"
+    alt="Template and PDF language selects side by side"
+    loading="lazy"
+    className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800"
+  />
+</div>
+
+### Sellers and buyers
+
+- **Saved card** - picking a saved seller or buyer shows a card with their details and a "Hidden on invoice" note on each field the PDF leaves out
+- **Clearer dialogs** - fields are grouped into Business, Tax number, Contact and Notes, and each optional field has its own **Show in PDF** switch
+- **Same sections in the form** - the seller and buyer forms now match the dialog, and fields switched off in the PDF are faded
+- **Import review in tabs** - **To add**, **Can't import** and **Already saved**, each with a count
+
+<div className="not-prose my-6 grid gap-4 grid-cols-2 sm:grid-cols-3 items-start">
+  <img
+    src="https://github.com/user-attachments/assets/c3f8e3a5-e518-4e71-803b-e8c879da71cf"
+    alt="Saved seller card"
+    loading="lazy"
+    className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800"
+  />
+  <img
+    src="https://github.com/user-attachments/assets/5788329e-5e8a-48b3-a8d1-f3e1be3ed418"
+    alt="New seller dialog with grouped fields"
+    loading="lazy"
+    className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800"
+  />
+  <img
+    src="https://github.com/user-attachments/assets/57f2ebc8-a7d3-48d6-9574-922b5a6930d0"
+    alt="Seller form with hidden fields faded"
+    loading="lazy"
+    className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800"
+  />
+</div>
+
+<div className="not-prose my-6 grid gap-4 grid-cols-1 items-start mx-auto max-w-xl">
+  <img
+    src="https://github.com/user-attachments/assets/7f0a0f5a-5a33-4a79-be00-6d4df76dc652"
+    alt="Import review with To add, Can't import and Already saved tabs"
+    loading="lazy"
+    className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800"
+  />
+</div>
+
+---
+
+### Changed
+
+- Portuguese shows as **Portuguese (PT)** and **Portuguese (BR)** in the language and number format pickers
+- The welcome and "What's new" popups are gone, so the form is the first thing you see. **How it works** is still in the header, and this changelog is still here
+- The first PDF preview loads faster, because the browser connects to the font server sooner
+- Invoices saved in your browser or shared by link before this release open as before
+
+### Good to know
+
+- Signatures stay in your browser and are never put in share links. While a signature is drawn on the default template, **Get link** explains why it can't share the invoice, as it does for a logo
+
+---
+
+<div className="rounded-lg border-2 border-blue-200 bg-blue-50 px-8 py-4 dark:border-blue-900 dark:bg-blue-950" data-testid="ready-to-start-invoicing-cta">
+<h2 className="!mt-4">Create your next invoice</h2>
+
+EasyInvoicePDF is free and open source. There's no sign-up, and you can go from blank form to downloaded PDF in under a minute.
+
+<div className="mt-6">
+  <a
+    href="https://easyinvoicepdf.com?ref=changelog"
+    className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-slate-900 px-8 text-lg font-medium no-underline transition-all hover:bg-slate-800 active:scale-[0.98]"
+  >
+    <span className="text-white">Start Invoicing</span>
+  </a>
+</div>
+
+</div>

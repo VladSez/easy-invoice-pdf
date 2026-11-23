@@ -1,5 +1,52 @@
 # Changelog
 
+## [1.0.7] - 2026-11-23
+
+### Added
+
+- Drawn signatures: sign with a mouse, trackpad or finger, and the default template prints the signature above the signature line. On touch screens the pad starts drawing only after a tap, so swiping over it still scrolls the page. Signatures stay in `localStorage` and are never put in share links; "Get link" explains why it can't share while one is drawn on the default template
+- Top line color for the Stripe template: six presets, a custom color picker with a hex input, and "Reset to default" (amber). The color is kept in share links
+- 7 / 14 / 30 days payment term buttons under the dates
+- Custom item column, named by you (e.g. "Project code"), in place of "Type of GTU". Both templates print it; unnamed, it still prints "Type of GTU"
+- Duplicate on every item
+- Saved seller/buyer card, showing which fields the PDF hides
+- Import review tabs: To add, Can't import and Already saved
+
+### Changed
+
+- Each item is a compact card with chips for units and tax rates and a card of calculated amounts
+- Below the items: a totals card, and payment method, QR code and signatures as cards added with a pill and removed in one click
+- General Information is split into PDF settings, Invoice details and Header & Branding; Payment due sits next to Date of issue
+- Moving the date of issue moves the due date with it and keeps the payment term, instead of resetting it to 14 days
+- Out-of-date fields show a warning under the input with a one-click fix, replacing the separate "Set payment due date" button
+- Seller and buyer form and dialogs share one set of sections (Business, Tax number, Contact, Notes), each optional field with its own "Show in PDF" switch; fields hidden in the PDF are faded
+- Template and PDF language selects sit side by side, labelled "Template" and "PDF language"
+- Portuguese is listed as "Portuguese (PT)" and "Portuguese (BR)"
+- The browser connects to the font host early, so the first PDF preview starts sooner; the server renders PDFs from bundled font files
+
+### Removed
+
+- The welcome and "What's new" popups. "How it works" stays in the header and the changelog at `/changelog`
+
+### Security
+
+- Upgraded Next.js to 16.4.6, including fixes for the Next.js RCE advisories
+
+## [1.0.6] - 2026-10-20
+
+### Added
+
+- Per-item discounts, as a percentage or a fixed amount, with an optional label. Tax is calculated on the discounted amount
+- Default template: a Discount column, shown only when an item has a discount. Stripe template: a discount row under the item, and the tax column names the amount it applies to
+- Seller and buyer import/export: back up saved contacts as one JSON file and import them into another browser, with a review step before anything changes
+- The Stripe template has its own route, `/stripe-template`; old links still work and the app reopens the last-used template
+- Blank fillable invoice PDFs (A4 and US Letter) and invoice generator landing pages for Spanish, German, contractor, freelance, proforma and export invoices
+
+### Changed
+
+- Item price previews in the form use the invoice's number format and the template's currency style
+- Invoice totals stay in sync with items while they are added and edited
+
 ## [1.0.5] - 2026-09-24
 
 ### Added
@@ -9,6 +56,8 @@
 - Brazilian Portuguese (`pt-BR`) as a PDF language, with `CNPJ/CPF` and `Imposto` labels and amounts in words on the short scale (`um bilhão`). The site itself stays translated into European Portuguese only: invoice PDF languages (`SUPPORTED_INVOICE_PDF_LANGUAGES`) and site locales (`SUPPORTED_I18N_LOCALES`) are now separate lists
 - `WrappableAmount` PDF component: amounts too wide for their cell wrap at a thousands boundary instead of overflowing into the next column, in both templates
 - "How to customize tax" video in the "How it works" guide
+- Swedish and Norwegian (Bokmål) as PDF languages, with amounts in words, and as site translations
+- Redesigned "How it works" page with tutorial videos, linked from the header
 
 ### Changed
 
@@ -19,6 +68,8 @@
 - Clearer Stripe-template "due" and "amount due" wording in German, Spanish, French, Italian and Portuguese
 - Wider quantity column in the Stripe template, so four- and five-digit quantities stay on one line
 - Seller and buyer visibility switches are now named by their visible labels instead of separate `aria-label`s
+- Date format options adapt to the selected invoice language and template
+- Upgraded to Next.js 16
 
 ### Fixed
 
