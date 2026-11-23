@@ -5,7 +5,20 @@ import {
   SEO_LANDING_DEFINITIONS,
   type SeoLandingSlug,
 } from "@/app/(main)/(seo-landings)/seo-landing-definitions";
-import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
+import {
+  APP_URL,
+  OG_VIDEO,
+  STATIC_ASSETS_URL,
+  STRIPE_OG_VIDEO,
+  TWITTER_CREATOR,
+} from "@/config";
+
+/** Landings about the Stripe template show its video; the rest show the default one. */
+const OG_VIDEO_BY_SLUG: Partial<
+  Record<SeoLandingSlug, typeof STRIPE_OG_VIDEO>
+> = {
+  "stripe-invoice-alternative": STRIPE_OG_VIDEO,
+};
 
 export function buildSeoLandingMetadata(slug: SeoLandingSlug): Metadata {
   const definition = SEO_LANDING_DEFINITIONS[slug];
@@ -43,6 +56,7 @@ export function buildSeoLandingMetadata(slug: SeoLandingSlug): Metadata {
           alt: "EasyInvoicePDF.com - Free Invoice PDF Generator",
         },
       ],
+      videos: [OG_VIDEO_BY_SLUG[slug] ?? OG_VIDEO],
     },
     twitter: {
       card: "summary_large_image",

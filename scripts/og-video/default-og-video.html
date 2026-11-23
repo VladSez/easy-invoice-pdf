@@ -1,0 +1,600 @@
+<!doctype html>
+<!--
+  Source of the `/` og:video (variant G1 of the design canvas: "Live PDF preview. No
+  sign-up." next to a live app). An 8-second loop at 1200×630; `render-og-video.ts`
+  seeks it frame by frame and encodes the MP4.
+  Every keyframe is a percentage of one shared 8s clock and nothing uses
+  animation-delay, so seeking every animation to the same time gives a coherent frame.
+  Repeating effects (caret, live dot) must divide 8s evenly, or the loop seam jumps.
+  The logo slot is filled from src/components/etc/final-project-logo.tsx at render time.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>EasyInvoicePDF og:video</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+      }
+
+      .stage {
+        width: 1200px;
+        height: 630px;
+        position: relative;
+        overflow: hidden;
+        box-sizing: border-box;
+        background: #f6f7f9;
+        font-family: Inter, system-ui, sans-serif;
+        color: #0b0b0f;
+        display: flex;
+        align-items: center;
+        gap: 36px;
+        padding-left: 72px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .copy {
+        width: 500px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+      }
+
+      .brand {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        font-size: 26px;
+        font-weight: 600;
+      }
+
+      .brand svg {
+        width: 40px;
+        height: 42px;
+        color: #0b0b0f;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 60px;
+        line-height: 1.08;
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sub {
+        margin: 0;
+        font-size: 22px;
+        line-height: 1.4;
+        color: #3f4654;
+      }
+
+      .app {
+        flex: 1;
+        height: 520px;
+        background: #ffffff;
+        border-radius: 16px 0 0 16px;
+        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.16);
+        display: flex;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .form {
+        width: 236px;
+        flex-shrink: 0;
+        padding: 22px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        border-right: 1px solid #e5e7eb;
+      }
+
+      .form-title {
+        font-size: 17px;
+        font-weight: 600;
+      }
+
+      .field {
+        font-size: 13px;
+        color: #4b5563;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .input {
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 9px 10px;
+        font-size: 15px;
+        color: #0b0b0f;
+        height: 20px;
+      }
+
+      .input.focused {
+        border: 2px solid #0b0b0f;
+        padding: 8px 9px;
+      }
+
+      .download {
+        margin-top: auto;
+        background: #0b0b0f;
+        color: #ffffff;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .viewer {
+        flex: 1;
+        background: #3a3d42;
+        padding: 18px 0 0 22px;
+        position: relative;
+      }
+
+      .live {
+        position: absolute;
+        right: 18px;
+        top: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .live-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #22c55e;
+      }
+
+      .page {
+        background: #ffffff;
+        height: 100%;
+        margin-top: 40px;
+        padding: 24px 26px;
+        box-sizing: border-box;
+        font-size: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .page-title {
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .parties {
+        display: flex;
+        gap: 24px;
+      }
+
+      .party {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .party b {
+        font-size: 14px;
+        border-bottom: 1px solid #9ca3af;
+        padding-bottom: 3px;
+      }
+
+      .table {
+        border: 1px solid #0b0b0f;
+      }
+
+      .table-row {
+        display: grid;
+        grid-template-columns: 26px 1fr 74px;
+      }
+
+      .table-row span {
+        padding: 5px;
+      }
+
+      .table-head {
+        font-weight: 700;
+        border-bottom: 1px solid #0b0b0f;
+      }
+
+      .total {
+        font-size: 17px;
+        font-weight: 700;
+        text-decoration: underline;
+      }
+
+      .total-value {
+        position: relative;
+        display: inline-block;
+      }
+
+      .pdf-badge {
+        position: absolute;
+        right: 36px;
+        bottom: 48px;
+        width: 84px;
+        height: 84px;
+        border-radius: 18px;
+        background: #0b0b0f;
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        font-weight: 800;
+        font-size: 18px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      /*
+        Motion, as % of the 8s clock: headline 0–0.9s, marker under "No sign-up."
+        1–1.6s, typing 1.2–2.7s, the PDF row lands and the total updates at 2.9s,
+        Download PDF is pressed at 5.3s and the PDF badge pops, then everything
+        fades out by 7.7s so the last frame matches the first.
+      */
+
+      .line-1 {
+        animation: line-1 8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+
+      @keyframes line-1 {
+        0% {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        7%,
+        90% {
+          opacity: 1;
+          transform: none;
+        }
+        96%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .line-2 {
+        animation: line-2 8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+
+      @keyframes line-2 {
+        0%,
+        4% {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        11%,
+        90% {
+          opacity: 1;
+          transform: none;
+        }
+        96%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .marker {
+        background-image: linear-gradient(#fde68a, #fde68a);
+        background-repeat: no-repeat;
+        background-position: 0 88%;
+        background-size: 0% 34%;
+        animation: marker 8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+      }
+
+      @keyframes marker {
+        0%,
+        12% {
+          background-size: 0% 34%;
+        }
+        20%,
+        100% {
+          background-size: 100% 34%;
+        }
+      }
+
+      .sub {
+        animation: sub 8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+
+      @keyframes sub {
+        0%,
+        10% {
+          opacity: 0;
+          transform: translateX(-14px);
+        }
+        17%,
+        90% {
+          opacity: 1;
+          transform: none;
+        }
+        96%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .app {
+        animation: app 8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+
+      @keyframes app {
+        0% {
+          opacity: 0;
+          transform: translateY(40px);
+        }
+        9%,
+        90% {
+          opacity: 1;
+          transform: none;
+        }
+        96%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .typed {
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        vertical-align: bottom;
+        max-width: 0;
+        animation: typed 8s steps(16, end) infinite;
+      }
+
+      @keyframes typed {
+        0%,
+        15% {
+          max-width: 0;
+        }
+        34%,
+        100% {
+          max-width: 170px;
+        }
+      }
+
+      .caret {
+        display: inline-block;
+        width: 2px;
+        height: 18px;
+        background: #0b0b0f;
+        vertical-align: middle;
+        margin-left: 1px;
+        animation: blink 1s steps(1) infinite;
+      }
+
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .new-row {
+        animation: new-row 8s infinite;
+      }
+
+      @keyframes new-row {
+        0%,
+        35% {
+          opacity: 0;
+          background: #fde68a;
+        }
+        38% {
+          opacity: 1;
+          background: #fde68a;
+        }
+        52%,
+        100% {
+          opacity: 1;
+          background: transparent;
+        }
+      }
+
+      .total-before {
+        animation: total-before 8s infinite;
+      }
+
+      .total-after {
+        position: absolute;
+        left: 0;
+        top: 0;
+        white-space: nowrap;
+        animation: total-after 8s infinite;
+      }
+
+      @keyframes total-before {
+        0%,
+        37% {
+          opacity: 1;
+        }
+        39%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes total-after {
+        0%,
+        37% {
+          opacity: 0;
+        }
+        39%,
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .live {
+        animation: live 8s infinite;
+      }
+
+      @keyframes live {
+        0%,
+        35% {
+          background: #e5e7eb;
+          color: #374151;
+        }
+        37%,
+        48% {
+          background: #0b0b0f;
+          color: #ffffff;
+        }
+        52%,
+        100% {
+          background: #e5e7eb;
+          color: #374151;
+        }
+      }
+
+      .live-dot {
+        animation: pulse 1.6s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        50% {
+          opacity: 0.25;
+        }
+      }
+
+      .download {
+        animation: press 8s infinite;
+      }
+
+      @keyframes press {
+        0%,
+        64% {
+          transform: scale(1);
+        }
+        66% {
+          transform: scale(0.94);
+        }
+        69%,
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .pdf-badge {
+        opacity: 0;
+        animation: badge 8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+
+      @keyframes badge {
+        0%,
+        67% {
+          opacity: 0;
+          transform: scale(0.6) translateY(10px);
+        }
+        72%,
+        90% {
+          opacity: 1;
+          transform: none;
+        }
+        96%,
+        100% {
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="copy">
+        <div class="brand"><!-- LOGO -->EasyInvoicePDF</div>
+        <h1>
+          <span class="line-1">Live PDF preview.</span>
+          <span class="line-2"><span class="marker">No sign-up.</span></span>
+        </h1>
+        <p class="sub">
+          Type your invoice and watch the PDF update. Free, open source, and
+          your data stays in your browser.
+        </p>
+      </div>
+      <div class="app">
+        <div class="form">
+          <div class="form-title">Invoice Items</div>
+          <div class="field">
+            Name
+            <span class="input focused"
+              ><span class="typed">Website redesign</span
+              ><span class="caret"></span
+            ></span>
+          </div>
+          <div class="field">Net price<span class="input">4 800.00</span></div>
+          <div class="field">Currency<span class="input">EUR € Euro</span></div>
+          <span class="download">Download PDF</span>
+        </div>
+        <div class="viewer">
+          <span class="live"><span class="live-dot"></span>Live preview</span>
+          <div class="page">
+            <div class="page-title">Invoice No. 1/11-2026</div>
+            <div class="parties">
+              <div class="party">
+                <b>Seller</b><span>John Doe</span><span>London, UK</span>
+              </div>
+              <div class="party">
+                <b>Buyer</b><span>Acme Ltd</span><span>Berlin, DE</span>
+              </div>
+            </div>
+            <div class="table">
+              <div class="table-head table-row">
+                <span>No</span><span>Name of goods/service</span
+                ><span>Net price</span>
+              </div>
+              <div class="new-row table-row">
+                <span>1.</span><span>Website redesign</span
+                ><span>4 800.00</span>
+              </div>
+            </div>
+            <div class="total">
+              To pay:
+              <span class="total-value"
+                ><span class="total-before">0.00 EUR</span
+                ><span class="total-after">4 800.00 EUR</span></span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="pdf-badge">
+          <svg
+            width="26"
+            height="26"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#FFFFFF"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 4v11" />
+            <path d="M7 10l5 5 5-5" />
+            <path d="M5 20h14" />
+          </svg>
+          PDF
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

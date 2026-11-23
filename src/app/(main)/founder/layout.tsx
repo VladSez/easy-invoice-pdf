@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Footer } from "@/app/(components)/footer";
 import { Header } from "@/app/(components)/header";
 import {
+  OG_VIDEO,
   PERSONAL_WEBSITE_URL,
   STATIC_ASSETS_URL,
   TWITTER_CREATOR,
@@ -60,6 +61,7 @@ export const metadata: Metadata = {
         alt: ogImageAlt,
       },
     ],
+    videos: [OG_VIDEO],
   },
   twitter: {
     card: "summary_large_image",
