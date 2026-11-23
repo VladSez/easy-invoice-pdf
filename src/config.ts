@@ -66,6 +66,9 @@ const YOUTUBE_VIDEO_HOW_TO_IMPORT_EXPORT_CONTACTS =
 const YOUTUBE_VIDEO_HOW_TO_CUSTOMIZE_NUMBER_FORMAT =
   "https://www.youtube.com/embed/hZM2DYXo63k";
 
+const YOUTUBE_VIDEO_HOW_TO_SIGN_AND_USE_NEW_FORM =
+  "https://www.youtube.com/embed/Gc4j3OGRIyA";
+
 /** A vertical YouTube Short; the 16:9 player pillarboxes it. */
 const YOUTUBE_VIDEO_MOBILE_DEMO = "https://www.youtube.com/embed/TKOegsmNnKM";
 
@@ -84,6 +87,19 @@ export const HOW_IT_WORKS_VIDEOS = [
     durationSeconds: 70,
     thumbnailUrl: "https://i.ytimg.com/vi/iAROeCIcZ40/maxresdefault.jpg",
     iframeTitle: "EasyInvoicePDF Demo Video",
+  },
+  {
+    id: "signatures-and-new-form",
+    title: "How to sign invoices and use the new form",
+    shortTitle: "Signatures & new form",
+    description:
+      "Draw your signature into the PDF, and fill in items with unit and tax chips, discounts and a custom column.",
+    embedUrl: YOUTUBE_VIDEO_HOW_TO_SIGN_AND_USE_NEW_FORM,
+    watchUrl: "https://www.youtube.com/watch?v=Gc4j3OGRIyA",
+    uploadDate: "2026-11-23T08:57:32-08:00",
+    durationSeconds: 60,
+    thumbnailUrl: "https://i.ytimg.com/vi/Gc4j3OGRIyA/maxresdefault.jpg",
+    iframeTitle: "How to sign invoices and use the new form - EasyInvoicePDF",
   },
   {
     id: "add-seller",
