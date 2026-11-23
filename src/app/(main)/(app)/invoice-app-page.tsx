@@ -15,6 +15,8 @@ import { getIsIndexableEnvironment } from "@/lib/seo/indexing-utils";
 import {
   HOME_PAGE_DESCRIPTION,
   HOME_PAGE_TITLE,
+  OG_IMAGE_URL,
+  STRIPE_OG_IMAGE_URL,
 } from "@/lib/seo/site-entities";
 import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
 
@@ -145,7 +147,7 @@ const TEMPLATE_META = {
     canonical: `${APP_URL}/`, // we use root URL as canonical for SEO purposes
     images: [
       {
-        url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
+        url: OG_IMAGE_URL,
         type: "image/png",
         width: 1200,
         height: 630,
@@ -161,7 +163,7 @@ const TEMPLATE_META = {
     canonical: `${APP_URL}${STRIPE_TEMPLATE_PATHNAME}`, // its own route, so the Stripe template is indexed as its own page
     images: [
       {
-        url: `${STATIC_ASSETS_URL}/stripe-og.png?v=1755773921680`,
+        url: STRIPE_OG_IMAGE_URL,
         type: "image/png",
         width: 1200,
         height: 630,

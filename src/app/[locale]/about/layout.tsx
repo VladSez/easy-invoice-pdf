@@ -3,12 +3,13 @@ import { hasLocale, type Locale } from "next-intl";
 import { notFound } from "next/navigation";
 import { locale as rootLocale } from "next/root-params";
 
-import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
+import { APP_URL, TWITTER_CREATOR } from "@/config";
 import { routing } from "@/i18n/routing";
 import {
   buildHreflangAlternates,
   OPEN_GRAPH_LOCALE_BY_LOCALE,
 } from "@/lib/seo/locale-utils";
+import { OG_IMAGE_URL } from "@/lib/seo/site-entities";
 
 import type EnMessages from "../../../../messages/en.json";
 import { AboutJsonLd } from "./about-json-ld";
@@ -46,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
         url: `${APP_URL}/${locale}/about`,
         images: [
           {
-            url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
+            url: OG_IMAGE_URL,
             width: 1200,
             height: 630,
             type: "image/png",
@@ -61,7 +62,7 @@ export async function generateMetadata(): Promise<Metadata> {
         creator: TWITTER_CREATOR,
         images: [
           {
-            url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
+            url: OG_IMAGE_URL,
             width: 1200,
             height: 630,
             type: "image/png",

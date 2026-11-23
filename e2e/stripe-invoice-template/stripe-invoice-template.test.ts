@@ -8,7 +8,7 @@ import {
   STRIPE_DEFAULT_DATE_FORMAT,
   type InvoiceData,
 } from "@/app/schema";
-import { STATIC_ASSETS_URL } from "@/config";
+import { STRIPE_OG_IMAGE_URL } from "@/lib/seo/site-entities";
 
 // IMPORTANT: we use custom extended test fixture that provides a temporary download directory for each test
 import { expect, test } from "../utils/extended-playwright-test";
@@ -89,7 +89,7 @@ test.describe("Stripe Invoice Template", () => {
     // Check that OG image changed to Stripe template
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
       "content",
-      `${STATIC_ASSETS_URL}/stripe-og.png?v=1755773921680`,
+      STRIPE_OG_IMAGE_URL,
     );
 
     // Check other meta tags for Stripe template

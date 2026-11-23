@@ -7,6 +7,7 @@ import {
   VIDEO_DEMO_FALLBACK_IMG,
   VIDEO_DEMO_URL,
 } from "@/config";
+import { OG_IMAGE_URL, STRIPE_OG_IMAGE_URL } from "@/lib/seo/site-entities";
 
 test.describe("Static assets (fonts, images, videos) should be accessible @desktop-only", () => {
   test("should load static assets successfully", async ({ page }) => {
@@ -24,6 +25,16 @@ test.describe("Static assets (fonts, images, videos) should be accessible @deskt
     expect(fallbackImageResponse.headers()["content-type"]).toContain(
       "image/png",
     );
+
+    /**
+     * Test share (Open Graph) images
+     */
+    for (const ogImageUrl of [OG_IMAGE_URL, STRIPE_OG_IMAGE_URL]) {
+      const ogImageResponse = await page.request.get(ogImageUrl);
+
+      expect(ogImageResponse.status()).toBe(200);
+      expect(ogImageResponse.headers()["content-type"]).toContain("image/png");
+    }
 
     /**
      * Test PDF fonts

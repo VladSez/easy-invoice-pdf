@@ -11,12 +11,8 @@ import {
   getNextChangelogEntry,
   getPreviousChangelogEntry,
 } from "@/app/(main)/changelog/utils";
-import {
-  APP_URL,
-  PERSONAL_WEBSITE_URL,
-  STATIC_ASSETS_URL,
-  TWITTER_CREATOR,
-} from "@/config";
+import { APP_URL, PERSONAL_WEBSITE_URL, TWITTER_CREATOR } from "@/config";
+import { OG_IMAGE_URL } from "@/lib/seo/site-entities";
 
 import { ChangelogPostJsonLd } from "../changelog-post-json-ld";
 import { ChangelogAuthorByline } from "../components/changelog-author-byline";
@@ -80,7 +76,7 @@ export async function generateMetadata({
       url: entryUrl,
       images: [
         {
-          url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
+          url: OG_IMAGE_URL,
           type: "image/png",
           width: 1200,
           height: 630,
@@ -95,7 +91,7 @@ export async function generateMetadata({
       creator: TWITTER_CREATOR,
       images: [
         {
-          url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
+          url: OG_IMAGE_URL,
           type: "image/png",
           width: 1200,
           height: 630,

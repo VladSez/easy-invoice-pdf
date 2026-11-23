@@ -20,10 +20,10 @@ import {
   DISCORD_COMMUNITY_URL,
   GITHUB_URL,
   REDDIT_COMMUNITY_URL,
-  STATIC_ASSETS_URL,
   VIDEO_DEMO_YOUTUBE_URL,
   YOUTUBE_VIDEO_HOW_TO_ADD_SELLER,
 } from "@/config";
+import { OG_IMAGE_URL } from "@/lib/seo/site-entities";
 
 import { INITIAL_INVOICE_DATA } from "../src/app/constants";
 import { invoiceTotalText } from "./utils/invoice-total";
@@ -62,7 +62,7 @@ test.describe("Invoice Generator Page", () => {
     // Check that OG image changed to Stripe template
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
       "content",
-      `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
+      OG_IMAGE_URL,
     );
 
     // Check other meta tags for Stripe template
