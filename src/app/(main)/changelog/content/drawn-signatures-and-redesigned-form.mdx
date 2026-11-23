@@ -1,0 +1,74 @@
+export const metadata = {
+  title: "EasyInvoicePDF v1.0.7 - Drawn Signatures, Redesigned Form",
+  description:
+    "Sign invoices with your mouse or finger, pick a top line color for the Stripe template, set payment terms in one click, and fill in a redesigned, more compact invoice form.",
+  date: "2026-11-23",
+  version: "1.0.7",
+  type: "minor",
+};
+
+![A signature drawn on the pad and printed in the PDF](https://github.com/user-attachments/assets/ee103d3e-f9fe-44fe-948e-6ff15fef0ebd)
+
+## ✨ Highlights
+
+- **Drawn signatures** - sign with a mouse, trackpad or finger, and the signature prints above the signature line on the default template. On phones, tap the pad to start signing, so swiping over it still scrolls the page
+- **Top line color for the [Stripe template](/stripe-template)** - pick one of six presets or any custom color for the line at the top of the PDF. **Reset to default** brings back amber
+- **Payment terms in one click** - **7 / 14 / 30 days** buttons under the dates set the due date. Moving the date of issue now moves the due date with it, instead of resetting it to 14 days
+- **A compact card per item** - each item reads like its line in the PDF, with chips for common units and tax rates, and **Duplicate** and **Delete** on every item
+- **Name your own column** - the "Type of GTU" column is now a custom column you name yourself, such as `Project code`, with a value per item. Both templates print it
+- **Totals and optional parts as cards** - a totals card shows net, tax and total. Payment method, QR code and signatures are cards you add with a button and remove in one click
+
+<video
+  src="https://github.com/user-attachments/assets/fcf7567a-5ca6-4227-96ea-97b94d7c11e2"
+  controls
+  style={{ width: "100%", borderRadius: "8px", marginTop: "1.5rem" }}
+/>
+
+---
+
+### Top line color
+
+![Top line color picker and a Stripe PDF with an indigo top line](https://github.com/user-attachments/assets/03379253-e0a4-4508-bb06-57a794465417)
+
+### Sellers and buyers
+
+- **Saved card** - picking a saved seller or buyer shows a card with their details and a "Hidden on invoice" note on each field the PDF leaves out
+- **Clearer dialogs** - fields are grouped into Business, Tax number, Contact and Notes, each optional field has its own **Show in PDF** switch, and the inline form now matches the dialog section for section
+- **Import review in tabs** - **To add**, **Can't import** and **Already saved**, each with a count
+
+![New seller dialog with grouped fields](https://github.com/user-attachments/assets/5788329e-5e8a-48b3-a8d1-f3e1be3ed418)
+
+---
+
+### Changed
+
+- General Information is split into **PDF settings**, **Invoice details** and **Header & Branding**, and Payment due sits next to Date of issue
+- Out-of-date dates now show a short warning under the field itself, with a **Use …** link that fills in the suggested value
+- Fields switched off with **Show in PDF** are faded, so you can see at a glance what the PDF leaves out
+- **Template** and **PDF language** now sit side by side in the sidebar
+- Portuguese shows as **Portuguese (PT)** and **Portuguese (BR)** in the language and number format pickers
+- The welcome and "What's new" popups are gone, so the form is the first thing you see. **How it works** is still in the header, and this changelog is still here
+- The first PDF preview loads faster, because the browser connects to the font server sooner
+- Invoices saved in your browser or shared by link before this release open as before
+
+### Good to know
+
+- Signatures stay in your browser and are never put in share links. While a signature is drawn on the default template, **Get link** explains why it can't share the invoice, as it does for a logo
+
+---
+
+<div className="rounded-lg border-2 border-blue-200 bg-blue-50 px-8 py-4 dark:border-blue-900 dark:bg-blue-950" data-testid="ready-to-start-invoicing-cta">
+<h2 className="!mt-4">Create your next invoice</h2>
+
+EasyInvoicePDF is free and open source. There's no sign-up, and you can go from blank form to downloaded PDF in under a minute.
+
+<div className="mt-6">
+  <a
+    href="https://easyinvoicepdf.com?ref=changelog"
+    className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-slate-900 px-8 text-lg font-medium no-underline transition-all hover:bg-slate-800 active:scale-[0.98]"
+  >
+    <span className="text-white">Start Invoicing</span>
+  </a>
+</div>
+
+</div>

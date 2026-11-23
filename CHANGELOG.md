@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.0.7] - 2026-11-23
+
+### Added
+
+- Drawn signatures: sign with a mouse, trackpad or finger, and the default template prints the signature above the signature line. On touch screens the pad starts drawing only after a tap, so swiping over it still scrolls the page. Signatures stay in `localStorage` and are never put in share links; "Get link" explains why it can't share while one is drawn on the default template
+- Top line color for the Stripe template: six presets, a custom color picker with a hex input, and "Reset to default" (amber). The color is kept in share links
+- 7 / 14 / 30 days payment term buttons under the dates
+- Custom item column, named by you (e.g. "Project code"), in place of "Type of GTU". Both templates print it; unnamed, it still prints "Type of GTU"
+- Duplicate on every item
+- Saved seller/buyer card, showing which fields the PDF hides
+- Import review tabs: To add, Can't import and Already saved
+
+### Changed
+
+- Each item is a compact card with chips for units and tax rates and a card of calculated amounts
+- Below the items: a totals card, and payment method, QR code and signatures as cards added with a pill and removed in one click
+- General Information is split into PDF settings, Invoice details and Header & Branding; Payment due sits next to Date of issue
+- Moving the date of issue moves the due date with it and keeps the payment term, instead of resetting it to 14 days
+- Out-of-date fields show a warning under the input with a one-click fix, replacing the separate "Set payment due date" button
+- Seller and buyer form and dialogs share one set of sections (Business, Tax number, Contact, Notes), each optional field with its own "Show in PDF" switch; fields hidden in the PDF are faded
+- Template and PDF language selects sit side by side, labelled "Template" and "PDF language"
+- Portuguese is listed as "Portuguese (PT)" and "Portuguese (BR)"
+- The browser connects to the font host early, so the first PDF preview starts sooner; the server renders PDFs from bundled font files
+
+### Removed
+
+- The welcome and "What's new" popups. "How it works" stays in the header and the changelog at `/changelog`
+
+### Security
+
+- Upgraded Next.js to 16.4.6, including fixes for the Next.js RCE advisories
+
+## [1.0.6] - 2026-10-20
+
+### Added
+
+- Per-item discounts, as a percentage or a fixed amount, with an optional label. Tax is calculated on the discounted amount
+- Default template: a Discount column, shown only when an item has a discount. Stripe template: a discount row under the item, and the tax column names the amount it applies to
+
 ## [1.0.5] - 2026-09-24
 
 ### Added
