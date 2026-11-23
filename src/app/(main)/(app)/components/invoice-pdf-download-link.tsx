@@ -252,6 +252,9 @@ function getDownloadInvoiceEventData(invoiceData: InvoiceData) {
 
   const isStripeTemplate = invoiceData.template === "stripe";
 
+  const stripeTopLineColor =
+    invoiceData.stripeTopLineColor ?? DEFAULT_STRIPE_TOP_LINE_COLOR;
+
   return {
     invoice_template: invoiceData.template,
     invoice_language: invoiceData.language,
@@ -279,8 +282,12 @@ function getDownloadInvoiceEventData(invoiceData: InvoiceData) {
     // left out on the default template, which has no top line
     ...(isStripeTemplate
       ? {
-          stripe_top_line_color:
-            invoiceData.stripeTopLineColor ?? DEFAULT_STRIPE_TOP_LINE_COLOR,
+          stripe_top_line_color: stripeTopLineColor,
+          // picking the amber preset by hand still counts as the default
+          stripe_top_line_color_type:
+            stripeTopLineColor === DEFAULT_STRIPE_TOP_LINE_COLOR
+              ? "default"
+              : "custom",
         }
       : {}),
   };

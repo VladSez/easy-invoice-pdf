@@ -280,6 +280,9 @@ describe("InvoicePDFDownloadLink", () => {
     expect(vi.mocked(trackEvent).mock.lastCall?.[0].data).not.toHaveProperty(
       "stripe_top_line_color",
     );
+    expect(vi.mocked(trackEvent).mock.lastCall?.[0].data).not.toHaveProperty(
+      "stripe_top_line_color_type",
+    );
     expect(updateAppMetadata).toHaveBeenCalledTimes(1);
     expect(toast.dismiss).toHaveBeenCalledTimes(1);
 
@@ -405,7 +408,26 @@ describe("InvoicePDFDownloadLink", () => {
     fireEvent.click(getDownloadLink());
 
     expect(vi.mocked(trackEvent).mock.lastCall?.[0]).toMatchObject({
-      data: { stripe_top_line_color: DEFAULT_STRIPE_TOP_LINE_COLOR },
+      data: {
+        stripe_top_line_color: DEFAULT_STRIPE_TOP_LINE_COLOR,
+        stripe_top_line_color_type: "default",
+      },
+    });
+  });
+
+  it("should report the amber picked by hand as the default color", () => {
+    renderInvoicePDFDownloadLink({
+      invoiceData: {
+        ...getInitialInvoiceData(),
+        template: "stripe",
+        stripeTopLineColor: DEFAULT_STRIPE_TOP_LINE_COLOR,
+      },
+    });
+
+    fireEvent.click(getDownloadLink());
+
+    expect(vi.mocked(trackEvent).mock.lastCall?.[0]).toMatchObject({
+      data: { stripe_top_line_color_type: "default" },
     });
   });
 
@@ -421,7 +443,10 @@ describe("InvoicePDFDownloadLink", () => {
     fireEvent.click(getDownloadLink());
 
     expect(vi.mocked(trackEvent).mock.lastCall?.[0]).toMatchObject({
-      data: { stripe_top_line_color: "#6366f1" },
+      data: {
+        stripe_top_line_color: "#6366f1",
+        stripe_top_line_color_type: "custom",
+      },
     });
   });
 
