@@ -26,26 +26,55 @@ export const metadata = {
 
 ---
 
+### Drawn signatures and compact item cards
+
+Totals, payment method, QR code and signatures are cards below the items: add one with its button, remove it in one click, and draw your signature right on the card. Each item is a compact card that reads like its line in the PDF, with chips for common units and tax rates.
+
+<div className="not-prose my-6 grid gap-4 grid-cols-2 items-start mx-auto max-w-2xl">
+  <img src="https://github.com/user-attachments/assets/a364e986-d769-4091-b94e-74b47267ceff" alt="Totals card, payment and signature cards with a drawn signature" loading="lazy" className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800" />
+  <img src="https://github.com/user-attachments/assets/1d08b5b9-0ed8-40d3-a977-f0d665680668" alt="The compact item card on a phone" loading="lazy" className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800" />
+</div>
+
 ### Top line color
 
-![Top line color picker and a Stripe PDF with an indigo top line](https://github.com/user-attachments/assets/03379253-e0a4-4508-bb06-57a794465417)
+Pick one of six presets or any custom color for the line at the top of the [Stripe template](/stripe-template).
+
+<div className="not-prose my-6 grid gap-4 grid-cols-1 sm:grid-cols-2 items-start">
+  <img src="https://github.com/user-attachments/assets/2f7981ae-7d2f-460f-b1d4-9ba6e91aa9d4" alt="Top line color picker" loading="lazy" className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800" />
+  <img src="https://github.com/user-attachments/assets/03379253-e0a4-4508-bb06-57a794465417" alt="Stripe PDF with an indigo top line" loading="lazy" className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800" />
+</div>
+
+### General Information and payment terms
+
+The section is split into **PDF settings**, **Invoice details** and **Header & Branding**. Payment due sits next to Date of issue, with **7 / 14 / 30 days** buttons under them. Out-of-date dates show a short warning under the field, with a **Use …** link that fills in the suggested value. **Template** and **PDF language** now sit side by side.
+
+<div className="not-prose my-6 grid gap-4 grid-cols-2 sm:grid-cols-3 items-start">
+  <img src="https://github.com/user-attachments/assets/b50caa6e-70b7-4289-adef-830836558c44" alt="General Information split into three groups" loading="lazy" className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800" />
+  <img src="https://github.com/user-attachments/assets/51480ad9-fdac-4c22-8b6f-e8e208b86e9e" alt="Out-of-date warnings under each date field" loading="lazy" className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800" />
+  <img src="https://github.com/user-attachments/assets/9240fd94-64fc-4f07-8459-40942ec4a7a2" alt="Template and PDF language selects side by side" loading="lazy" className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800" />
+</div>
 
 ### Sellers and buyers
 
 - **Saved card** - picking a saved seller or buyer shows a card with their details and a "Hidden on invoice" note on each field the PDF leaves out
-- **Clearer dialogs** - fields are grouped into Business, Tax number, Contact and Notes, each optional field has its own **Show in PDF** switch, and the inline form now matches the dialog section for section
+- **Clearer dialogs** - fields are grouped into Business, Tax number, Contact and Notes, and each optional field has its own **Show in PDF** switch
+- **Same sections in the form** - the seller and buyer forms now match the dialog, and fields switched off in the PDF are faded
 - **Import review in tabs** - **To add**, **Can't import** and **Already saved**, each with a count
 
-![New seller dialog with grouped fields](https://github.com/user-attachments/assets/5788329e-5e8a-48b3-a8d1-f3e1be3ed418)
+<div className="not-prose my-6 grid gap-4 grid-cols-2 sm:grid-cols-3 items-start">
+  <img src="https://github.com/user-attachments/assets/c3f8e3a5-e518-4e71-803b-e8c879da71cf" alt="Saved seller card" loading="lazy" className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800" />
+  <img src="https://github.com/user-attachments/assets/5788329e-5e8a-48b3-a8d1-f3e1be3ed418" alt="New seller dialog with grouped fields" loading="lazy" className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800" />
+  <img src="https://github.com/user-attachments/assets/57f2ebc8-a7d3-48d6-9574-922b5a6930d0" alt="Seller form with hidden fields faded" loading="lazy" className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800" />
+</div>
+
+<div className="not-prose my-6 grid gap-4 grid-cols-1 items-start mx-auto max-w-xl">
+  <img src="https://github.com/user-attachments/assets/7f0a0f5a-5a33-4a79-be00-6d4df76dc652" alt="Import review with To add, Can't import and Already saved tabs" loading="lazy" className="m-0 w-full rounded-lg border border-slate-200 dark:border-slate-800" />
+</div>
 
 ---
 
 ### Changed
 
-- General Information is split into **PDF settings**, **Invoice details** and **Header & Branding**, and Payment due sits next to Date of issue
-- Out-of-date dates now show a short warning under the field itself, with a **Use …** link that fills in the suggested value
-- Fields switched off with **Show in PDF** are faded, so you can see at a glance what the PDF leaves out
-- **Template** and **PDF language** now sit side by side in the sidebar
 - Portuguese shows as **Portuguese (PT)** and **Portuguese (BR)** in the language and number format pickers
 - The welcome and "What's new" popups are gone, so the form is the first thing you see. **How it works** is still in the header, and this changelog is still here
 - The first PDF preview loads faster, because the browser connects to the font server sooner
