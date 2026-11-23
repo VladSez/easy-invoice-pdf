@@ -179,6 +179,7 @@ describe("URL Compression Utilities", () => {
             nameFieldIsVisible: true,
             typeOfGTU: "",
             typeOfGTUFieldIsVisible: true,
+            extraCustomColumnValues: [],
             amount: 1,
             amountFieldIsVisible: true,
             unit: "pc",
@@ -693,6 +694,38 @@ describe("URL Compression Utilities", () => {
       const compressed = compressInvoiceData(invoiceData);
 
       expect(decompressInvoiceData(compressed)).toEqual(invoiceData);
+    });
+
+    it("round trips the custom columns after the first", () => {
+      const invoiceData = {
+        ...MOCK_INVOICE_DATA,
+        customColumnLabel: "Project code",
+        extraCustomColumns: [
+          { label: "SKU", isVisible: true },
+          { label: "PO line", isVisible: false },
+        ],
+        items: [
+          {
+            ...MOCK_INVOICE_DATA.items[0],
+            extraCustomColumnValues: ["SKU-1", "PO-9"],
+          },
+        ],
+      } satisfies InvoiceData;
+
+      expect(decompressInvoiceData(compressInvoiceData(invoiceData))).toEqual(
+        invoiceData,
+      );
+    });
+
+    it("gives links made before there could be several custom columns just the first", () => {
+      // An invoice without further columns leaves them out of its link, so its link is
+      // what links from before there could be several columns hold
+      const compressed = compressInvoiceData(MOCK_INVOICE_DATA);
+
+      expect(compressed).not.toHaveProperty("(");
+      expect(compressed.m).toEqual([expect.not.objectContaining({ ")": [] })]);
+
+      expect(decompressInvoiceData(compressed)).toEqual(MOCK_INVOICE_DATA);
     });
 
     it("gives items from links made before discounts existed no discount", () => {

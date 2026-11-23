@@ -4,13 +4,14 @@ import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translatio
 import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
-import { isCustomColumnInPdf } from "../../../utils/custom-column";
+import { getCustomColumnsInPdf } from "../../../utils/custom-column";
 import { formatAmountChunks } from "../../../utils/format-amount";
 import {
   formatDiscountPercent,
   hasAnyItemDiscount,
   hasItemDiscount,
 } from "../../../utils/item-discount";
+import { hyphenateCellWord } from "../common/hyphenate-cell-word";
 import { WrappableAmount } from "../common/wrappable-amount";
 
 export function InvoiceItemsTable({
@@ -30,8 +31,8 @@ export function InvoiceItemsTable({
   const isInvoiceItemNumberVisible =
     invoiceData.items[0].invoiceItemNumberIsVisible;
   const isNameFieldVisible = invoiceData.items[0].nameFieldIsVisible;
-  // on in the form is not enough: the column prints once it has a name or a value
-  const isTypeOfGTUFieldVisible = isCustomColumnInPdf(invoiceData);
+  // on in the form is not enough: a custom column prints once it has a name or a value
+  const customColumns = getCustomColumnsInPdf(invoiceData);
   const isAmountFieldVisible = invoiceData.items[0].amountFieldIsVisible;
   const isUnitFieldVisible = invoiceData.items[0].unitFieldIsVisible;
   const isNetPriceFieldVisible = invoiceData.items[0].netPriceFieldIsVisible;
@@ -46,22 +47,28 @@ export function InvoiceItemsTable({
   // the name column has width to spare, so it pays for the discount column, rather than
   // the narrow numeric columns whose headers would start to hyphenate ("Cantid-ad")
   // A named custom column (a project code, a SKU...) is wider than the short GTU codes
-  // the column was made for, so words like "Project" don't break mid-word. The width comes
-  // out of the item name, like the discount column's, so no amount column narrows; an
-  // unnamed column keeps its old width, so older invoices print exactly as before.
-  const hasNamedCustomColumn = Boolean(invoiceData.customColumnLabel?.trim());
-  const customColumnStyle = hasNamedCustomColumn
-    ? styles.colCustomNamed
-    : styles.colGTU;
+  // the first column was made for, so words like "Project" don't break mid-word. The width
+  // comes out of the item name, like the discount column's, so no amount column narrows,
+  // down to the narrowest name one named column with a discount leaves; past that, every
+  // column gives a little. An unnamed column keeps its old width, so older invoices print
+  // exactly as before.
+  const namedCustomColumnCount = customColumns.filter((column) => {
+    return Boolean(column.label);
+  }).length;
+  const baseNameFlex = hasDiscountColumn
+    ? styles.colNameWithDiscount.flex
+    : styles.colName.flex;
+  const namedColumnExtraFlex = styles.colCustomNamed.flex - styles.colGTU.flex;
+  // the narrowest name one named column leaves next to a discount
+  const minNameFlex = styles.colNameWithDiscount.flex - namedColumnExtraFlex;
   const nameColumnStyle = [
     hasDiscountColumn ? styles.colNameWithDiscount : styles.colName,
-    hasNamedCustomColumn && isTypeOfGTUFieldVisible
+    namedCustomColumnCount > 0
       ? {
-          flex:
-            (hasDiscountColumn
-              ? styles.colNameWithDiscount.flex
-              : styles.colName.flex) -
-            (styles.colCustomNamed.flex - styles.colGTU.flex),
+          flex: Math.max(
+            baseNameFlex - namedCustomColumnCount * namedColumnExtraFlex,
+            Math.min(baseNameFlex, minNameFlex),
+          ),
         }
       : {},
   ];
@@ -110,21 +117,42 @@ export function InvoiceItemsTable({
             </View>
           ) : null}
 
-          {/* Custom column: the name the user gave it, or "Type of GTU", which it was
-              before it could be named, so older invoices keep their header */}
-          {isTypeOfGTUFieldVisible ? (
-            <View style={[styles.tableCol, customColumnStyle, styles.center]}>
-              <Text style={styles.tableCellBold}>
-                {/* .split("") is used for long text like "Type of Goods/Service" to wrap it in a new line
-                https://github.com/diegomura/react-pdf/issues/2243#issuecomment-1778554041
-                */}
-                {(
-                  invoiceData.customColumnLabel?.trim() ||
-                  t.invoiceItemsTable.typeOfGTU
-                ).split("")}
-              </Text>
-            </View>
-          ) : null}
+          {/* Custom columns: the name the user gave each. The first one, unnamed, prints
+              "Type of GTU", which it was before it could be named, so older invoices keep
+              their header; a later one, unnamed, prints no header */}
+          {customColumns.map((column) => {
+            return (
+              <View
+                key={column.position}
+                style={[
+                  styles.tableCol,
+                  column.label ? styles.colCustomNamed : styles.colGTU,
+                  styles.center,
+                ]}
+              >
+                {column.label ? (
+                  // a name the user typed wraps like the values below it, at spaces and
+                  // syllables, so a short word ("of") never breaks, see `hyphenateCellWord`
+                  <Text
+                    style={styles.tableCellBold}
+                    hyphenationCallback={hyphenateCellWord}
+                  >
+                    {column.label}
+                  </Text>
+                ) : (
+                  <Text style={styles.tableCellBold}>
+                    {/* .split("") is used for long text like "Type of Goods/Service" to wrap it in a new line
+                    https://github.com/diegomura/react-pdf/issues/2243#issuecomment-1778554041
+                    */}
+                    {(column.position === 0
+                      ? t.invoiceItemsTable.typeOfGTU
+                      : ""
+                    ).split("")}
+                  </Text>
+                )}
+              </View>
+            );
+          })}
 
           {/* Amount column */}
           {isAmountFieldVisible ? (
@@ -299,12 +327,30 @@ export function InvoiceItemsTable({
                 </View>
               ) : null}
 
-              {/* Type of GTU */}
-              {isTypeOfGTUFieldVisible ? (
-                <View style={[styles.tableCol, customColumnStyle]}>
-                  <Text style={[styles.tableCell]}>{item.typeOfGTU}</Text>
-                </View>
-              ) : null}
+              {/* Custom columns */}
+              {customColumns.map((column) => {
+                return (
+                  <View
+                    key={column.position}
+                    style={[
+                      styles.tableCol,
+                      column.label ? styles.colCustomNamed : styles.colGTU,
+                    ]}
+                  >
+                    {/* a long code wraps inside its cell, see `hyphenateCellWord` */}
+                    {/* a little room each side, so wrapped text doesn't touch the borders */}
+                    <Text
+                      style={[
+                        styles.tableCell,
+                        { marginLeft: 3, marginRight: 3 },
+                      ]}
+                      hyphenationCallback={hyphenateCellWord}
+                    >
+                      {column.values[index]}
+                    </Text>
+                  </View>
+                );
+              })}
 
               {/* Amount */}
               {isAmountFieldVisible ? (

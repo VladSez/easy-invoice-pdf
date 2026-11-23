@@ -1056,6 +1056,15 @@ export const MAX_ITEM_DISCOUNT_LABEL_LENGTH = 100;
 /** The largest quantity an item takes; the quantity stepper stops below it too. */
 export const MAX_ITEM_QUANTITY = 999_999.99;
 
+/**
+ * How many custom columns the items table takes. The first is the original one
+ * (`customColumnLabel` and each item's `typeOfGTU`); the rest live in `extraCustomColumns`.
+ */
+export const MAX_CUSTOM_COLUMNS = 3;
+
+/** How many custom columns come on top of the first, see `MAX_CUSTOM_COLUMNS`. */
+export const MAX_EXTRA_CUSTOM_COLUMNS = MAX_CUSTOM_COLUMNS - 1;
+
 export const invoiceItemSchema = z
   .object({
     // Show/hide Number column on PDF
@@ -1081,6 +1090,26 @@ export const invoiceItemSchema = z
       .default(""),
     /** The custom column's "In PDF" switch, read from the first item. */
     typeOfGTUFieldIsVisible: z.boolean().default(true),
+
+    /**
+     * The item's values in the invoice's further custom columns, in the order of
+     * `extraCustomColumns`: entry 0 belongs to the second custom column. A missing entry
+     * (an item added after the column, or a hole a sparse array left) reads as empty.
+     */
+    extraCustomColumnValues: z
+      .array(
+        z
+          .string()
+          .max(50, "Value must not exceed 50 characters")
+          .trim()
+          .nullish()
+          .transform((value) => {
+            return value ?? "";
+          }),
+      )
+      .max(MAX_EXTRA_CUSTOM_COLUMNS)
+      .optional()
+      .default([]),
 
     amount: z
       .any()
@@ -1525,6 +1554,30 @@ export const invoiceObjectSchema = z.object({
     .trim()
     .optional()
     .default(""),
+
+  /**
+   * The custom columns after the first, printed in this order after it. Each item keeps
+   * its values for them in `extraCustomColumnValues`. They live apart from the first one
+   * (`customColumnLabel`, `typeOfGTU`) so saved invoices, share links and the API that
+   * know only that one keep working unchanged.
+   */
+  extraCustomColumns: z
+    .array(
+      z.object({
+        /** Heads the column in the PDF; an unnamed column prints an empty header. */
+        label: z
+          .string()
+          .max(30, "Column name must not exceed 30 characters")
+          .trim()
+          .optional()
+          .default(""),
+        /** The column's "In PDF" switch. */
+        isVisible: z.boolean().default(true),
+      }),
+    )
+    .max(MAX_EXTRA_CUSTOM_COLUMNS)
+    .optional()
+    .default([]),
 
   dateOfIssue: z
     .string()

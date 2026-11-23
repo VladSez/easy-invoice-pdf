@@ -150,6 +150,7 @@ export const INITIAL_INVOICE_DATA = {
 
       typeOfGTU: "",
       typeOfGTUFieldIsVisible: false, // we hide this field by default because it's not always needed
+      extraCustomColumnValues: [],
 
       amount: 1,
       amountFieldIsVisible: true,
@@ -203,6 +204,7 @@ export const INITIAL_INVOICE_DATA = {
   taxLabelText: "VAT",
 
   customColumnLabel: "",
+  extraCustomColumns: [],
 } as const satisfies InvoiceData;
 
 /**

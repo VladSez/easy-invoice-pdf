@@ -174,6 +174,7 @@ const ENGLISH_INVOICE_PROD_DATA_BASE = {
       nameFieldIsVisible: true,
       typeOfGTU: "",
       typeOfGTUFieldIsVisible: false,
+      extraCustomColumnValues: [],
       amount: 1,
       amountFieldIsVisible: true,
       unit: "service",
@@ -216,6 +217,7 @@ const ENGLISH_INVOICE_PROD_DATA_BASE = {
   template: "default",
   taxLabelText: "VAT",
   customColumnLabel: "",
+  extraCustomColumns: [],
 } satisfies Omit<
   InvoiceData,
   | "dateOfIssue"

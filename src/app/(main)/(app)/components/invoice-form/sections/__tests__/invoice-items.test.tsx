@@ -70,6 +70,8 @@ interface InvoiceItemsTestHarnessProps {
   template?: InvoiceData["template"];
   /** Overrides applied to every item, e.g. to start with a discount. */
   itemOverrides?: Partial<InvoiceItemData>;
+  /** Overrides applied to the invoice itself, e.g. to start with custom columns. */
+  formOverrides?: Partial<InvoiceData>;
   /** Validation errors to show, as the form would pass them down. */
   errors?: FieldErrors<InvoiceData>;
   /**
@@ -87,12 +89,14 @@ function InvoiceItemsTestHarness({
   numberFormatLocale = "en",
   template = "default",
   itemOverrides,
+  formOverrides,
   errors = {},
   validate = false,
 }: InvoiceItemsTestHarnessProps) {
   const invoiceData = useMemo(() => {
     return {
       ...getInitialInvoiceData(),
+      ...formOverrides,
       items: Array.from({ length: itemCount }, (_, index) => {
         return {
           ...MOCK_INVOICE_ITEM_DATA,
@@ -101,7 +105,7 @@ function InvoiceItemsTestHarness({
         };
       }),
     };
-  }, [itemCount, itemNames, itemOverrides]);
+  }, [itemCount, itemNames, itemOverrides, formOverrides]);
 
   const {
     control,
@@ -226,6 +230,7 @@ describe("InvoiceItems max invoice items", () => {
       discountAmount: 0,
       typeOfGTU: "",
       typeOfGTUFieldIsVisible: true,
+      extraCustomColumnValues: [],
     });
     expect(trackEvent).toHaveBeenCalledWith({ event: "add_invoice_item" });
   });
@@ -971,6 +976,11 @@ function getCustomColumnPill(name = "Custom column") {
   return screen.getByRole("button", { name });
 }
 
+/** The pill that adds another custom column on the item at `index`, or null. */
+function getAddAnotherColumnPill(index: number) {
+  return screen.queryByTestId(`addAnotherItemCustomColumn${index}`);
+}
+
 /** The column's shared "In PDF" switch, as an open card on item `itemNumber` shows it. */
 function getCustomColumnSwitch(itemNumber = 1) {
   return screen.getByRole("switch", {
@@ -1016,7 +1026,7 @@ describe("InvoiceItems custom column", () => {
     // the column has no name yet, so the event has none to report
     expect(trackEvent).toHaveBeenCalledWith({
       event: "add_item_custom_column",
-      data: { column_name: undefined },
+      data: { column_name: undefined, column_position: 1 },
     });
   });
 
@@ -1048,7 +1058,7 @@ describe("InvoiceItems custom column", () => {
     });
     expect(trackEvent).toHaveBeenLastCalledWith({
       event: "add_item_custom_column",
-      data: { column_name: "Project code" },
+      data: { column_name: "Project code", column_position: 1 },
     });
   });
 
@@ -1089,6 +1099,7 @@ describe("InvoiceItems custom column", () => {
     });
     expect(trackEvent).toHaveBeenCalledWith({
       event: "remove_item_custom_column",
+      data: { column_position: 1 },
     });
 
     await user.click(getCustomColumnPill());
@@ -1114,6 +1125,158 @@ describe("InvoiceItems custom column", () => {
     );
 
     expect(getCustomColumnSwitch()).toBeChecked();
+  });
+
+  it("offers another column once the first has a name, and names it separately", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 2, itemOverrides: { typeOfGTU: "" } });
+
+    // no second column while the first has no name: its pill already reads "Custom column"
+    expect(getAddAnotherColumnPill(0)).toBeNull();
+
+    await user.click(
+      screen.getAllByRole("button", { name: "Custom column" })[0],
+    );
+    await user.type(
+      screen.getByRole("textbox", { name: "Column name" }),
+      "Project code",
+    );
+    await user.click(getAddAnotherColumnPill(0)!);
+
+    // the new column's card opens on item 1, asking for its name
+    const secondCard = screen.getByTestId("itemCustomColumn0-1");
+
+    await vi.waitFor(() => {
+      expect(
+        within(secondCard).getByRole("textbox", { name: "Column name" }),
+      ).toHaveFocus();
+    });
+    expect(trackEvent).toHaveBeenLastCalledWith({
+      event: "add_item_custom_column",
+      data: { column_name: undefined, column_position: 2 },
+    });
+
+    await user.type(
+      within(secondCard).getByRole("textbox", { name: "Column name" }),
+      "SKU",
+    );
+
+    // item 2 offers both columns by name, and room for a third
+    const secondItem = screen
+      .getByTestId("addItemCustomColumn1")
+      .closest("fieldset")!;
+
+    expect(
+      within(secondItem).getByRole("button", { name: "Project code" }),
+    ).toBeInTheDocument();
+    expect(
+      within(secondItem).getByRole("button", { name: "SKU" }),
+    ).toBeInTheDocument();
+    expect(getAddAnotherColumnPill(1)).toBeInTheDocument();
+  });
+
+  it("stops offering another column at the limit", () => {
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: { typeOfGTU: "A", extraCustomColumnValues: ["B", "C"] },
+      formOverrides: {
+        customColumnLabel: "Project code",
+        extraCustomColumns: [
+          { label: "SKU", isVisible: true },
+          { label: "PO line", isVisible: true },
+        ],
+      },
+    });
+
+    expect(screen.getByDisplayValue("A")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("B")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("C")).toBeInTheDocument();
+    expect(getAddAnotherColumnPill(0)).toBeNull();
+  });
+
+  it("removes a later column altogether with its last value, keeping the next one's values", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: { typeOfGTU: "A", extraCustomColumnValues: ["B", "C"] },
+      formOverrides: {
+        customColumnLabel: "Project code",
+        extraCustomColumns: [
+          { label: "SKU", isVisible: true },
+          { label: "PO line", isVisible: true },
+        ],
+      },
+    });
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Remove custom column 2 value from item 1",
+      }),
+    );
+
+    // "PO line" moves up to the second column, its value with it
+    expect(screen.queryByDisplayValue("SKU")).not.toBeInTheDocument();
+    expect(screen.queryByDisplayValue("B")).not.toBeInTheDocument();
+    expect(
+      within(screen.getByTestId("itemCustomColumn0-1")).getByRole("textbox", {
+        name: "Column name",
+      }),
+    ).toHaveValue("PO line");
+    expect(screen.getByDisplayValue("C")).toBeInTheDocument();
+    expect(trackEvent).toHaveBeenCalledWith({
+      event: "remove_item_custom_column",
+      data: { column_position: 2 },
+    });
+    // there is room again, and focus lands on the pill that adds a column
+    await vi.waitFor(() => {
+      expect(getAddAnotherColumnPill(0)).toHaveFocus();
+    });
+  });
+
+  it("lets a name or value run past its limit, highlighting the field until it fits", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({
+      itemCount: 1,
+      validate: true,
+      itemOverrides: { typeOfGTU: "A", extraCustomColumnValues: ["B"] },
+      formOverrides: {
+        customColumnLabel: "Project code",
+        extraCustomColumns: [{ label: "SKU", isVisible: true }],
+      },
+    });
+
+    const firstName = screen.getByDisplayValue("Project code");
+
+    await user.clear(firstName);
+    await user.type(firstName, "x".repeat(31));
+
+    // typed in full, not cut off at the limit, and marked as wrong
+    expect(firstName).toHaveValue("x".repeat(31));
+    expect(
+      await screen.findByText("Column name must not exceed 30 characters"),
+    ).toBeInTheDocument();
+    expect(firstName).toHaveClass("border-red-500");
+
+    const secondValue = screen.getByDisplayValue("B");
+
+    await user.clear(secondValue);
+    await user.type(secondValue, "y".repeat(51));
+
+    expect(
+      await screen.findByText("Value must not exceed 50 characters"),
+    ).toBeInTheDocument();
+    expect(secondValue).toHaveClass("border-red-500");
+
+    await user.type(firstName, "{Backspace}");
+    await user.type(secondValue, "{Backspace}");
+
+    await vi.waitFor(() => {
+      expect(firstName).not.toHaveClass("border-red-500");
+      expect(secondValue).not.toHaveClass("border-red-500");
+    });
   });
 
   it("offers the custom column on the Stripe template too", () => {

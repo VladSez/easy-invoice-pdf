@@ -25,7 +25,9 @@ type AllInvoiceKeys =
   // Buyer data keys
   | keyof BuyerData
   // Invoice item keys
-  | keyof InvoiceItemData;
+  | keyof InvoiceItemData
+  // Further custom column keys
+  | keyof InvoiceData["extraCustomColumns"][number];
 
 /**
  * The drawn signature images. `compressInvoiceData` drops them, so they need no short key.
@@ -90,6 +92,10 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   personAuthorizedToIssueFieldIsVisible: "w",
   taxLabelText: "1",
   customColumnLabel: "-",
+  extraCustomColumns: "(",
+
+  // Further custom column properties (their `label` shares the invoice number's "x")
+  isVisible: "_",
 
   // Invoice number object properties
   label: "x",
@@ -132,6 +138,7 @@ export const INVOICE_KEY_COMPRESSION_MAP = {
   discountValue: "*",
   discountLabel: "~",
   discountAmount: "=",
+  extraCustomColumnValues: ")",
 } as const satisfies Record<AllInvoiceKeys, string>;
 
 /**
@@ -264,12 +271,12 @@ export function compressInvoiceData(invoiceData: InvoiceData) {
 
   const res = remapKeys(
     hasItems
-      ? {
+      ? omitEmptyExtraCustomColumns({
           ...omitDrawnSignatures(invoiceData),
           items: invoiceData.items.map((item) => {
-            return omitDefaultDiscount(item);
+            return omitEmptyExtraCustomColumnValues(omitDefaultDiscount(item));
           }),
-        }
+        })
       : invoiceData,
   );
 
@@ -308,9 +315,12 @@ export function decompressInvoiceData(compressedData: Record<string, unknown>) {
 
   if (Array.isArray(res.items)) {
     res.items = res.items.map((item: unknown) => {
-      return withDefaultDiscount(item);
+      return withDefaultExtraCustomColumnValues(withDefaultDiscount(item));
     });
   }
+
+  // left out while there are none, and by links from before there could be several
+  res.extraCustomColumns ??= [];
 
   // a link never carries the drawn signatures, see `omitDrawnSignatures`
   for (const key of DRAWN_SIGNATURE_KEYS) {
@@ -360,4 +370,56 @@ function withDefaultDiscount(item: unknown) {
   }
 
   return { ...NO_DISCOUNT, ...item };
+}
+
+/**
+ * Drops the invoice's list of further custom columns while it is empty, as it is on most
+ * invoices; {@link decompressInvoiceData} puts it back.
+ */
+function omitEmptyExtraCustomColumns<
+  T extends { extraCustomColumns?: readonly unknown[] },
+>(invoiceData: T) {
+  if (invoiceData.extraCustomColumns?.length) return invoiceData;
+
+  return omitKey({ object: invoiceData, key: "extraCustomColumns" });
+}
+
+/**
+ * Drops an item's values for the further custom columns while it has none, so items don't
+ * each pay for an empty list; {@link withDefaultExtraCustomColumnValues} puts it back.
+ */
+function omitEmptyExtraCustomColumnValues<
+  T extends { extraCustomColumnValues?: readonly unknown[] },
+>(item: T) {
+  if (item.extraCustomColumnValues?.length) return item;
+
+  return omitKey({ object: item, key: "extraCustomColumnValues" });
+}
+
+/**
+ * Puts back the empty list {@link omitEmptyExtraCustomColumnValues} left out. Links made
+ * before there could be several custom columns have none either.
+ */
+function withDefaultExtraCustomColumnValues(item: unknown) {
+  if (item === null || typeof item !== "object" || Array.isArray(item)) {
+    return item;
+  }
+
+  return { extraCustomColumnValues: [], ...item };
+}
+
+interface OmitKeyArgs<T extends object> {
+  /** The object to copy. */
+  object: T;
+  /** The key the copy leaves out. */
+  key: keyof T & string;
+}
+
+/** A copy of `object` without `key`. */
+function omitKey<T extends object>({ object, key }: OmitKeyArgs<T>) {
+  return Object.fromEntries(
+    Object.entries(object).filter(([entryKey]) => {
+      return entryKey !== key;
+    }),
+  ) as Partial<T>;
 }
