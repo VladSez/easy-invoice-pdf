@@ -4,6 +4,7 @@ import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translatio
 import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
+import { isCustomColumnInPdf } from "../../../utils/custom-column";
 import { formatAmountChunks } from "../../../utils/format-amount";
 import {
   formatDiscountPercent,
@@ -29,7 +30,8 @@ export function InvoiceItemsTable({
   const isInvoiceItemNumberVisible =
     invoiceData.items[0].invoiceItemNumberIsVisible;
   const isNameFieldVisible = invoiceData.items[0].nameFieldIsVisible;
-  const isTypeOfGTUFieldVisible = invoiceData.items[0].typeOfGTUFieldIsVisible;
+  // on in the form is not enough: the column prints once it has a name or a value
+  const isTypeOfGTUFieldVisible = isCustomColumnInPdf(invoiceData);
   const isAmountFieldVisible = invoiceData.items[0].amountFieldIsVisible;
   const isUnitFieldVisible = invoiceData.items[0].unitFieldIsVisible;
   const isNetPriceFieldVisible = invoiceData.items[0].netPriceFieldIsVisible;

@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import { WrappableAmount } from "@/app/(main)/(app)/components/invoice-templates/common/wrappable-amount";
 import type { STRIPE_TEMPLATE_STYLES } from "@/app/(main)/(app)/components/invoice-templates/invoice-pdf-stripe-template";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
+import { isCustomColumnInPdf } from "@/app/(main)/(app)/utils/custom-column";
 import { formatAmountChunks } from "@/app/(main)/(app)/utils/format-amount";
 import {
   formatCurrency,
@@ -49,13 +50,9 @@ export function StripeItemsTable({
 
   const unitFieldIsVisible = invoiceData.items[0].unitFieldIsVisible;
 
-  // The custom column, once an item has a value for it. Its switch is on by default, so
-  // without the values check every existing Stripe invoice would gain an empty column.
-  const customColumnIsVisible =
-    invoiceData.items[0].typeOfGTUFieldIsVisible &&
-    invoiceData.items.some((item) => {
-      return Boolean(item.typeOfGTU?.trim());
-    });
+  // The custom column, once it has a name or a value. Its switch is on by default, so
+  // without that check every existing Stripe invoice would gain an empty column.
+  const customColumnIsVisible = isCustomColumnInPdf(invoiceData);
   // named by the user, or "Type of GTU" for a column from before it could be named
   const customColumnName =
     invoiceData.customColumnLabel?.trim() || t.invoiceItemsTable.typeOfGTU;
