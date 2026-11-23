@@ -57,10 +57,10 @@ export const FOUNDER_PAGE_DESCRIPTION =
  * ground. Used by `/` and every page that has no image of its own.
  * Bump `?v=` when the file on the static host is replaced.
  */
-export const OG_IMAGE_URL = `${STATIC_ASSETS_URL}/og-default-2026.png?v=1795454301052`;
+export const OG_IMAGE_URL = `${STATIC_ASSETS_URL}/og-default-2026.png?v=1795466961871`;
 
 /** Share image (1200×630) for `/stripe-template`: a wall of Stripe-style invoices. */
-export const STRIPE_OG_IMAGE_URL = `${STATIC_ASSETS_URL}/og-stripe-2026.png?v=1795454301052`;
+export const STRIPE_OG_IMAGE_URL = `${STATIC_ASSETS_URL}/og-stripe-2026.png?v=1795466961871`;
 
 /** Square, 180×180: Google wants an Organization logo of at least 112×112. */
 const ORGANIZATION_LOGO_URL = `${STATIC_ASSETS_URL}/apple-icon.png`;
