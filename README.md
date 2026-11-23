@@ -121,6 +121,8 @@ https://github.com/user-attachments/assets/d46c6e4e-b78a-4aa1-ab44-d20d6485b682
 - **Name your own column**: the "Type of GTU" column is now a custom column, such as `Project code`, printed by both templates
 - **Totals and optional parts as cards**: payment method, QR code and signatures are cards you add with a button and remove in one click
 
+[![Drawn signatures and the redesigned invoice form](https://i.ytimg.com/vi/Gc4j3OGRIyA/maxresdefault.jpg)](https://www.youtube.com/watch?v=Gc4j3OGRIyA)
+
 https://github.com/user-attachments/assets/fcf7567a-5ca6-4227-96ea-97b94d7c11e2
 
 Read the [v1.0.7 release notes](https://easyinvoicepdf.com/changelog/drawn-signatures-and-redesigned-form?ref=github) or the [full changelog](https://easyinvoicepdf.com/changelog?ref=github).
