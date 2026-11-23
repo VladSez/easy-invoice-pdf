@@ -37,6 +37,7 @@ Everything happens in your browser. Invoices are saved to your browser's local s
 - **Item discounts**: take a percentage or a fixed amount off any line
 - **Saved seller and buyer profiles**: reuse your details across invoices
 - **Shareable links**: send an invoice as a link instead of an attachment
+- **Drawn signatures**: sign with a mouse, trackpad or finger, right in the form
 - **Payment QR codes**: add a payment link, UPI ID or any other text as a QR code
 - **Multi-page invoices**: long invoices paginate automatically
 - **10+ languages and 120+ currencies**, with number formats you choose separately from the language
@@ -111,6 +112,24 @@ https://github.com/user-attachments/assets/d46c6e4e-b78a-4aa1-ab44-d20d6485b682
 
 ## What's new
 
+### v1.0.7: drawn signatures and a redesigned form (November 23, 2026)
+
+- **Drawn signatures**: sign with a mouse, trackpad or finger, and the signature prints above the signature line on the default template
+- **Top line color for the Stripe template**: pick one of six presets or any custom color
+- **Payment terms in one click**: **7 / 14 / 30 days** buttons set the due date, and moving the date of issue moves the due date with it
+- **A compact card per item**: chips for common units and tax rates, with **Duplicate** and **Delete** on every item
+- **Name your own column**: the "Type of GTU" column is now a custom column, such as `Project code`, printed by both templates
+- **Totals and optional parts as cards**: payment method, QR code and signatures are cards you add with a button and remove in one click
+
+[![Drawn signatures and the redesigned invoice form](https://i.ytimg.com/vi/Gc4j3OGRIyA/maxresdefault.jpg)](https://www.youtube.com/watch?v=Gc4j3OGRIyA)
+
+https://github.com/user-attachments/assets/fcf7567a-5ca6-4227-96ea-97b94d7c11e2
+
+Read the [v1.0.7 release notes](https://easyinvoicepdf.com/changelog/drawn-signatures-and-redesigned-form?ref=github) or the [full changelog](https://easyinvoicepdf.com/changelog?ref=github).
+
+<details>
+<summary><strong>Earlier releases</strong></summary>
+
 ### v1.0.6: item discounts (October 20, 2026)
 
 - **Discounts on invoice items**: take a percentage (`10%`) or a fixed amount (`50.00 EUR`) off any line
@@ -120,10 +139,7 @@ https://github.com/user-attachments/assets/d46c6e4e-b78a-4aa1-ab44-d20d6485b682
 
 [![How to add discounts to invoice items](https://i.ytimg.com/vi/8lYei_9mo6o/maxresdefault.jpg)](https://www.youtube.com/watch?v=8lYei_9mo6o)
 
-Read the [v1.0.6 release notes](https://easyinvoicepdf.com/changelog/item-discounts) or the [full changelog](https://easyinvoicepdf.com/changelog?ref=github).
-
-<details>
-<summary><strong>Earlier releases</strong></summary>
+[v1.0.6 release notes](https://easyinvoicepdf.com/changelog/item-discounts)
 
 ### v1.0.5: number formats and Brazilian Portuguese (September 24, 2026)
 
