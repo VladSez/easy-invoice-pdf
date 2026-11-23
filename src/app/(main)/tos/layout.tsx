@@ -2,11 +2,8 @@ import type { Metadata } from "next";
 
 import { Footer } from "@/app/(components)/footer";
 import { Header } from "@/app/(components)/header";
-import {
-  PERSONAL_WEBSITE_URL,
-  STATIC_ASSETS_URL,
-  TWITTER_CREATOR,
-} from "@/config";
+import { PERSONAL_WEBSITE_URL, TWITTER_CREATOR } from "@/config";
+import { OG_IMAGE_URL } from "@/lib/seo/site-entities";
 
 export const metadata: Metadata = {
   title: "Terms of Service | EasyInvoicePDF",
@@ -45,7 +42,7 @@ export const metadata: Metadata = {
     url: "https://easyinvoicepdf.com/tos",
     images: [
       {
-        url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
+        url: OG_IMAGE_URL,
         type: "image/png",
         width: 1200,
         height: 630,
@@ -61,7 +58,7 @@ export const metadata: Metadata = {
     creator: TWITTER_CREATOR,
     images: [
       {
-        url: `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`,
+        url: OG_IMAGE_URL,
         type: "image/png",
         width: 1200,
         height: 630,

@@ -5,7 +5,8 @@ import {
   SEO_LANDING_DEFINITIONS,
   type SeoLandingSlug,
 } from "@/app/(main)/(seo-landings)/seo-landing-definitions";
-import { APP_URL, STATIC_ASSETS_URL, TWITTER_CREATOR } from "@/config";
+import { APP_URL, TWITTER_CREATOR } from "@/config";
+import { OG_IMAGE_URL } from "@/lib/seo/site-entities";
 
 export function buildSeoLandingMetadata(slug: SeoLandingSlug): Metadata {
   const definition = SEO_LANDING_DEFINITIONS[slug];
@@ -18,7 +19,7 @@ export function buildSeoLandingMetadata(slug: SeoLandingSlug): Metadata {
 
   const pageUrl = `${APP_URL}/${definition.slug}`;
 
-  const ogImage = `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`;
+  const ogImage = OG_IMAGE_URL;
 
   return {
     title: definition.metadata.title,

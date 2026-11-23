@@ -52,7 +52,15 @@ export const FOUNDER_PAGE_TITLE = "Vlad Sazonau | Founder of EasyInvoicePDF";
 export const FOUNDER_PAGE_DESCRIPTION =
   "Meet Vlad Sazonau, founder of EasyInvoicePDF, the free open-source invoice PDF generator with live preview. Product engineer and design enthusiast.";
 
-export const OG_IMAGE_URL = `${STATIC_ASSETS_URL}/easy-invoice-opengraph-image.png?v=1755773879597`;
+/**
+ * Site-wide share image (1200×630): the default template's invoice on a graphite
+ * ground. Used by `/` and every page that has no image of its own.
+ * Bump `?v=` when the file on the static host is replaced.
+ */
+export const OG_IMAGE_URL = `${STATIC_ASSETS_URL}/og-default-2026.png?v=1795454301052`;
+
+/** Share image (1200×630) for `/stripe-template`: a wall of Stripe-style invoices. */
+export const STRIPE_OG_IMAGE_URL = `${STATIC_ASSETS_URL}/og-stripe-2026.png?v=1795454301052`;
 
 /** Square, 180×180: Google wants an Organization logo of at least 112×112. */
 const ORGANIZATION_LOGO_URL = `${STATIC_ASSETS_URL}/apple-icon.png`;
