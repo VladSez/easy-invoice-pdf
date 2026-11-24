@@ -151,11 +151,29 @@ describe("InvoiceClosing", () => {
         name: "Show QR Code in PDF",
       }),
     ).toBeChecked();
-    expect(trackEvent).toHaveBeenCalledWith({
-      event: "add_invoice_closing_part",
-      data: { part: "qr" },
-    });
+    expect(trackEvent).toHaveBeenCalledWith({ event: "add_qr_code" });
   });
+
+  it.each([
+    ["Payment method", "payment method", "payment_method"],
+    ["Signatures", "signatures", "signatures"],
+  ])(
+    "reports removing and adding back the %s with events of their own",
+    async (label, removeLabel, eventSuffix) => {
+      const user = userEvent.setup();
+      render(<Harness />);
+
+      await user.click(
+        screen.getByRole("button", { name: `Remove ${removeLabel}` }),
+      );
+      await user.click(getPill(label));
+
+      expect(vi.mocked(trackEvent).mock.calls).toEqual([
+        [{ event: `remove_${eventSuffix}` }],
+        [{ event: `add_${eventSuffix}` }],
+      ]);
+    },
+  );
 
   it("adds a part after the ones already open, where its pill was", async () => {
     const user = userEvent.setup();
