@@ -156,7 +156,10 @@ export function useCustomColumns({
           values.filter((_value, valueIndex) => {
             return valueIndex !== extraIndex;
           }),
-          { shouldDirty: true },
+          // the later columns' values move left, so their errors have to move with
+          // them: re-validate, or an over-limit value would lose its red border and
+          // a stale error stay behind at the old index
+          { shouldDirty: true, shouldValidate: true },
         );
       });
 

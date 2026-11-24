@@ -44,4 +44,32 @@ describe("hyphenateCellWord", () => {
     expect(hyphenateCellWord("line")).toEqual(["line"]);
     expect(hyphenateCellWord("okie1233")).toHaveLength(8);
   });
+
+  it("keeps an accent typed as its own code point with its letter", () => {
+    // "é" written as "e" plus U+0301, as some pasted text stores it
+    const decomposedE = `e${String.fromCodePoint(0x03_01)}`;
+
+    expect(hyphenateCellWord(`Caf${decomposedE}-12`)).toEqual([
+      "C",
+      "a",
+      "f",
+      decomposedE,
+      "-",
+      "1",
+      "2",
+    ]);
+  });
+
+  it("keeps a character outside the Basic Multilingual Plane whole", () => {
+    // U+1F4E6, two UTF-16 code units
+    const packageEmoji = String.fromCodePoint(0x1_f4_e6);
+
+    expect(hyphenateCellWord(`SKU${packageEmoji}9`)).toEqual([
+      "S",
+      "K",
+      "U",
+      packageEmoji,
+      "9",
+    ]);
+  });
 });

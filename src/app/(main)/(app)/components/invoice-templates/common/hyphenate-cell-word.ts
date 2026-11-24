@@ -23,9 +23,24 @@ export function hyphenateCellWord(
     const isUnbreakable =
       /\d/.test(syllable) || syllable.length > MAX_WHOLE_SYLLABLE_LENGTH;
 
-    return isUnbreakable ? syllable.split("") : [syllable];
+    return isUnbreakable ? splitGraphemes(syllable) : [syllable];
   });
 }
+
+/**
+ * The text's characters as a reader sees them: an accent typed as its own code point stays
+ * with its letter ("é" as `e` + U+0301), and an emoji or other character outside the Basic
+ * Multilingual Plane isn't cut into its two UTF-16 halves, as `.split("")` would do.
+ */
+function splitGraphemes(text: string) {
+  return Array.from(GRAPHEME_SEGMENTER.segment(text), ({ segment }) => {
+    return segment;
+  });
+}
+
+const GRAPHEME_SEGMENTER = new Intl.Segmenter(undefined, {
+  granularity: "grapheme",
+});
 
 /** The longest syllable left whole; a longer one may break between any two characters. */
 const MAX_WHOLE_SYLLABLE_LENGTH = 5;
