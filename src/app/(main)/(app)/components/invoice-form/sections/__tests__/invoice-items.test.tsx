@@ -111,6 +111,7 @@ function InvoiceItemsTestHarness({
     control,
     getValues,
     setValue,
+    clearErrors,
     formState: { errors: formErrors },
   } = useForm<InvoiceData>({
     defaultValues: invoiceData,
@@ -146,6 +147,7 @@ function InvoiceItemsTestHarness({
         language="en"
         getValues={getValues}
         setValue={setValue}
+        clearErrors={clearErrors}
       />
     </TooltipProvider>
   );
@@ -1325,6 +1327,97 @@ describe("InvoiceItems custom column", () => {
     await vi.waitFor(() => {
       expect(firstName).not.toHaveClass("border-red-500");
       expect(secondValue).not.toHaveClass("border-red-500");
+    });
+  });
+
+  it("leaves no error behind for a column added where one was removed", async () => {
+    const user = userEvent.setup();
+    const tooLong = "y".repeat(51);
+
+    renderInvoiceItems({
+      itemCount: 1,
+      validate: true,
+      itemOverrides: { typeOfGTU: "A", extraCustomColumnValues: ["B", "C"] },
+      formOverrides: {
+        customColumnLabel: "Project code",
+        extraCustomColumns: [
+          { label: "SKU", isVisible: true },
+          { label: "PO line", isVisible: true },
+        ],
+      },
+    });
+
+    const thirdValue = screen.getByDisplayValue("C");
+
+    await user.clear(thirdValue);
+    await user.type(thirdValue, tooLong);
+
+    expect(
+      await screen.findByText("Value must not exceed 50 characters"),
+    ).toBeInTheDocument();
+
+    // the second column goes, the over-limit value moves into its place and is fixed
+    await user.click(
+      screen.getByRole("button", {
+        name: "Remove custom column 2 value from item 1",
+      }),
+    );
+
+    const movedValue = screen.getByDisplayValue(tooLong);
+
+    await user.clear(movedValue);
+    await user.type(movedValue, "PO-9");
+
+    await vi.waitFor(() => {
+      expect(
+        screen.queryByText("Value must not exceed 50 characters"),
+      ).not.toBeInTheDocument();
+    });
+
+    // a new third column opens empty, without the error its slot had before
+    await user.click(getAddAnotherColumnPill(0)!);
+
+    expect(
+      await screen.findByTestId("itemCustomColumn0-2"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Value must not exceed 50 characters"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("forgets a name's error along with the name when the last value goes", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({
+      itemCount: 1,
+      validate: true,
+      itemOverrides: { typeOfGTU: "A" },
+      formOverrides: { customColumnLabel: "Project code" },
+    });
+
+    const name = screen.getByDisplayValue("Project code");
+
+    await user.clear(name);
+    await user.type(name, "x".repeat(31));
+
+    expect(
+      await screen.findByText("Column name must not exceed 30 characters"),
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Remove the custom column value from item 1",
+      }),
+    );
+    await user.click(getCustomColumnPill());
+
+    expect(screen.getByRole("textbox", { name: "Column name" })).toHaveValue(
+      "",
+    );
+    await vi.waitFor(() => {
+      expect(
+        screen.queryByText("Column name must not exceed 30 characters"),
+      ).not.toBeInTheDocument();
     });
   });
 

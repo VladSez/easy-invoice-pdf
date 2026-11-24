@@ -4,6 +4,7 @@ import {
   Controller,
   type FieldArrayWithId,
   type FieldErrors,
+  type UseFormClearErrors,
   type UseFormGetValues,
   type UseFormSetValue,
   useFieldArray,
@@ -96,6 +97,7 @@ export function useCustomColumns({
   control,
   getValues,
   setValue,
+  clearErrors,
 }: UseCustomColumnsArgs) {
   const {
     fields: extraColumnFields,
@@ -150,6 +152,11 @@ export function useCustomColumns({
         if (values.length <= extraIndex) {
           return;
         }
+
+        // Validating the shifted values only writes the errors they have now, and an
+        // error at the old last index would outlive its value and land on the next
+        // column added there: drop this item's column errors first.
+        clearErrors(`items.${itemIndex}.extraCustomColumnValues`);
 
         setValue(
           `items.${itemIndex}.extraCustomColumnValues`,
@@ -299,7 +306,16 @@ function ItemCustomColumnField({
         if (!isAnyValueLeft) {
           if (position === 0) {
             setValue(paths.isVisible, false, { shouldDirty: true });
-            setValue(paths.label, "", { shouldDirty: true });
+            // re-checked, so a name over the limit doesn't leave its error behind on
+            // the empty name the card shows when it is opened again
+            setValue(paths.label, "", {
+              shouldDirty: true,
+              shouldValidate: Boolean(
+                position === 0
+                  ? errors.customColumnLabel
+                  : errors.extraCustomColumns?.[position - 1]?.label,
+              ),
+            });
           } else {
             onColumnEmptied?.();
 
@@ -602,6 +618,7 @@ interface UseCustomColumnsArgs {
   control: Control<InvoiceData>;
   getValues: UseFormGetValues<InvoiceData>;
   setValue: UseFormSetValue<InvoiceData>;
+  clearErrors: UseFormClearErrors<InvoiceData>;
 }
 
 interface CustomColumnsState {

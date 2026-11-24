@@ -108,6 +108,7 @@ export const InvoiceForm = memo(function InvoiceForm({
     formState: { errors },
     watch,
     trigger,
+    clearErrors,
   } = form;
 
   const currency = useWatch({ control, name: "currency" });
@@ -477,6 +478,7 @@ export const InvoiceForm = memo(function InvoiceForm({
               language={language}
               getValues={getValues}
               setValue={setValue}
+              clearErrors={clearErrors}
             />
           </AccordionContent>
         </AccordionItem>

@@ -7,6 +7,7 @@ import {
   type FieldErrors,
   type UseFieldArrayAppend,
   type UseFieldArrayInsert,
+  type UseFormClearErrors,
   type UseFormGetValues,
   type UseFormSetValue,
   useWatch,
@@ -68,6 +69,7 @@ export const InvoiceItems = memo(function InvoiceItems({
   language,
   getValues,
   setValue,
+  clearErrors,
 }: InvoiceItemsSettingsProps) {
   const [itemPendingDeletion, setItemPendingDeletion] =
     useState<ItemPendingDeletion | null>(null);
@@ -75,7 +77,12 @@ export const InvoiceItems = memo(function InvoiceItems({
   const deleteTriggerRef = useRef<HTMLButtonElement | null>(null);
   const hasReachedItemLimit = fields.length >= MAX_INVOICE_ITEMS;
   const canDeleteItems = fields.length > 1;
-  const customColumns = useCustomColumns({ control, getValues, setValue });
+  const customColumns = useCustomColumns({
+    control,
+    getValues,
+    setValue,
+    clearErrors,
+  });
 
   // the first item's switches show or hide a column for every item, so each item's field
   // is faded when its column is left out of the PDF
@@ -989,6 +996,8 @@ interface InvoiceItemsSettingsProps {
   language: SupportedLanguages;
   getValues: UseFormGetValues<InvoiceData>;
   setValue: UseFormSetValue<InvoiceData>;
+  /** Clears validation errors, for custom-column values that move or go away. */
+  clearErrors: UseFormClearErrors<InvoiceData>;
 }
 
 interface UnitPricePreviewProps {
