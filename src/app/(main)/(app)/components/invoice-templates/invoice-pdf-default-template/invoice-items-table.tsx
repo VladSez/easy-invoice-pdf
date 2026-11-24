@@ -11,7 +11,10 @@ import {
   hasAnyItemDiscount,
   hasItemDiscount,
 } from "../../../utils/item-discount";
-import { hyphenateCellWord } from "../common/hyphenate-cell-word";
+import {
+  CELL_HYPHENATION_PENALTY,
+  hyphenateCellWord,
+} from "../common/hyphenate-cell-word";
 import { WrappableAmount } from "../common/wrappable-amount";
 
 export function InvoiceItemsTable({
@@ -100,18 +103,31 @@ export function InvoiceItemsTable({
         {/*
           START: Table header row with columns
         */}
+        {/* Every header wraps at spaces and syllables, and breaks a long syllable or a
+            code between characters, so a narrow column neither overflows nor splits a
+            short word ("o-f"), see `hyphenateCellWord` */}
         <View style={[styles.tableRow, { borderTopWidth: 1 }]} fixed>
           {/* Number column */}
           {isInvoiceItemNumberVisible ? (
             <View style={[styles.tableCol, styles.colNo, styles.center]}>
-              <Text style={styles.tableCellBold}>{t.invoiceItemsTable.no}</Text>
+              <Text
+                style={styles.tableCellBold}
+                hyphenationCallback={hyphenateCellWord}
+                hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+              >
+                {t.invoiceItemsTable.no}
+              </Text>
             </View>
           ) : null}
 
           {/* Name of goods/service column */}
           {isNameFieldVisible ? (
             <View style={[styles.tableCol, ...nameColumnStyle, styles.center]}>
-              <Text style={styles.tableCellBold}>
+              <Text
+                style={styles.tableCellBold}
+                hyphenationCallback={hyphenateCellWord}
+                hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+              >
                 {t.invoiceItemsTable.nameOfGoodsService}
               </Text>
             </View>
@@ -130,26 +146,16 @@ export function InvoiceItemsTable({
                   styles.center,
                 ]}
               >
-                {column.label ? (
-                  // a name the user typed wraps like the values below it, at spaces and
-                  // syllables, so a short word ("of") never breaks, see `hyphenateCellWord`
-                  <Text
-                    style={styles.tableCellBold}
-                    hyphenationCallback={hyphenateCellWord}
-                  >
-                    {column.label}
-                  </Text>
-                ) : (
-                  <Text style={styles.tableCellBold}>
-                    {/* .split("") is used for long text like "Type of Goods/Service" to wrap it in a new line
-                    https://github.com/diegomura/react-pdf/issues/2243#issuecomment-1778554041
-                    */}
-                    {(column.position === 0
+                <Text
+                  style={styles.tableCellBold}
+                  hyphenationCallback={hyphenateCellWord}
+                  hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+                >
+                  {column.label ||
+                    (column.position === 0
                       ? t.invoiceItemsTable.typeOfGTU
-                      : ""
-                    ).split("")}
-                  </Text>
-                )}
+                      : "")}
+                </Text>
               </View>
             );
           })}
@@ -157,8 +163,12 @@ export function InvoiceItemsTable({
           {/* Amount column */}
           {isAmountFieldVisible ? (
             <View style={[styles.tableCol, styles.colAmount, styles.center]}>
-              <Text style={[styles.tableCellBold]}>
-                {t.invoiceItemsTable.amount.split("")}
+              <Text
+                style={styles.tableCellBold}
+                hyphenationCallback={hyphenateCellWord}
+                hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+              >
+                {t.invoiceItemsTable.amount}
               </Text>
             </View>
           ) : null}
@@ -166,8 +176,12 @@ export function InvoiceItemsTable({
           {/* Unit column */}
           {isUnitFieldVisible ? (
             <View style={[styles.tableCol, styles.colUnit, styles.center]}>
-              <Text style={styles.tableCellBold}>
-                {t.invoiceItemsTable.unit.split("")}
+              <Text
+                style={styles.tableCellBold}
+                hyphenationCallback={hyphenateCellWord}
+                hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+              >
+                {t.invoiceItemsTable.unit}
               </Text>
             </View>
           ) : null}
@@ -175,14 +189,24 @@ export function InvoiceItemsTable({
           {/* Net price column */}
           {isNetPriceFieldVisible ? (
             <View style={[styles.tableCol, styles.colNetPrice, styles.center]}>
-              <Text style={styles.tableCellBold}>{netPriceColumnLabel}</Text>
+              <Text
+                style={styles.tableCellBold}
+                hyphenationCallback={hyphenateCellWord}
+                hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+              >
+                {netPriceColumnLabel}
+              </Text>
             </View>
           ) : null}
 
           {/* Discount column */}
           {hasDiscountColumn ? (
             <View style={[styles.tableCol, styles.colDiscount, styles.center]}>
-              <Text style={styles.tableCellBold}>
+              <Text
+                style={styles.tableCellBold}
+                hyphenationCallback={hyphenateCellWord}
+                hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+              >
                 {t.invoiceItemsTable.discount}
               </Text>
             </View>
@@ -191,21 +215,39 @@ export function InvoiceItemsTable({
           {/* VAT column */}
           {isVATFieldVisible ? (
             <View style={[styles.tableCol, styles.colVAT, styles.center]}>
-              <Text style={styles.tableCellBold}>{taxLabelText.split("")}</Text>
+              <Text
+                style={styles.tableCellBold}
+                hyphenationCallback={hyphenateCellWord}
+                hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+              >
+                {taxLabelText}
+              </Text>
             </View>
           ) : null}
 
           {/* Net amount column */}
           {isNetAmountFieldVisible ? (
             <View style={[styles.tableCol, styles.colNetAmount, styles.center]}>
-              <Text style={styles.tableCellBold}>{netAmountColumnLabel}</Text>
+              <Text
+                style={styles.tableCellBold}
+                hyphenationCallback={hyphenateCellWord}
+                hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+              >
+                {netAmountColumnLabel}
+              </Text>
             </View>
           ) : null}
 
           {/* VAT amount column */}
           {isVATAmountFieldVisible ? (
             <View style={[styles.tableCol, styles.colVATAmount, styles.center]}>
-              <Text style={styles.tableCellBold}>{vatAmountColumnLabel}</Text>
+              <Text
+                style={styles.tableCellBold}
+                hyphenationCallback={hyphenateCellWord}
+                hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+              >
+                {vatAmountColumnLabel}
+              </Text>
             </View>
           ) : null}
 
@@ -214,7 +256,11 @@ export function InvoiceItemsTable({
             <View
               style={[styles.tableCol, styles.colPreTaxAmount, styles.center]}
             >
-              <Text style={[styles.tableCellBold]}>
+              <Text
+                style={styles.tableCellBold}
+                hyphenationCallback={hyphenateCellWord}
+                hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+              >
                 {preTaxAmountColumnLabel}
               </Text>
             </View>
@@ -345,6 +391,7 @@ export function InvoiceItemsTable({
                         { marginLeft: 3, marginRight: 3 },
                       ]}
                       hyphenationCallback={hyphenateCellWord}
+                      hyphenationPenalty={CELL_HYPHENATION_PENALTY}
                     >
                       {column.values[index]}
                     </Text>

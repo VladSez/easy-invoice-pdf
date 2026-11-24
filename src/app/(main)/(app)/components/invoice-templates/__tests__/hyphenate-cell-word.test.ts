@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { hyphenateCellWord } from "../common/hyphenate-cell-word";
+import { withBreaks } from "@/app/(main)/(app)/pdf-i18n-translations/with-breaks";
+
+import { SOFT_HYPHEN, hyphenateCellWord } from "../common/hyphenate-cell-word";
 
 /** Stands in for react-pdf's built-in hyphenator with fixed syllables. */
 function fakeHyphenate(word: string) {
   const syllables: Record<string, string[]> = {
+    Projektnummer: ["Pro", "jekt", "num", "mer"],
     Purchase: ["Pur", "chase"],
   };
 
@@ -12,37 +15,75 @@ function fakeHyphenate(word: string) {
 }
 
 describe("hyphenateCellWord", () => {
-  it("keeps the built-in syllables of an ordinary word", () => {
+  it("breaks a hinted word only at its hints, over react-pdf's syllables", () => {
+    expect(
+      hyphenateCellWord(withBreaks("Netto|preis"), () => {
+        return ["Net", "to", "preis"];
+      }),
+    ).toEqual(["Netto", "preis"]);
+  });
+
+  it("still lets a long hinted part break anywhere, so a hint never overflows", () => {
+    expect(
+      hyphenateCellWord(`Bezeichnungs${SOFT_HYPHEN}art`).slice(0, 3),
+    ).toEqual(["B", "e", "z"]);
+  });
+
+  it("keeps short syllables whole, so a word breaks between them", () => {
+    expect(hyphenateCellWord("Projektnummer", fakeHyphenate)).toEqual([
+      "Pro",
+      "jekt",
+      "num",
+      "mer",
+    ]);
+  });
+
+  it("lets a word with no syllables break anywhere once it is over three characters", () => {
+    expect(hyphenateCellWord("Moms", fakeHyphenate)).toEqual([
+      "M",
+      "o",
+      "m",
+      "s",
+    ]);
+  });
+
+  it("lets a long syllable break between any two characters", () => {
     expect(hyphenateCellWord("Purchase", fakeHyphenate)).toEqual([
       "Pur",
-      "chase",
+      "c",
+      "h",
+      "a",
+      "s",
+      "e",
     ]);
   });
 
-  it("leaves a short word whole", () => {
-    expect(hyphenateCellWord("line", fakeHyphenate)).toEqual(["line"]);
+  it("never breaks a word of three characters or fewer", () => {
+    expect(hyphenateCellWord("of")).toEqual(["of"]);
+    expect(hyphenateCellWord("VAT")).toEqual(["VAT"]);
   });
 
-  it("lets a long run with no syllables break anywhere", () => {
-    expect(hyphenateCellWord("aaaaaaaaaa", fakeHyphenate)).toEqual(
-      Array.from({ length: 10 }, () => {
-        return "a";
-      }),
-    );
+  it("lets a longer word break between any two characters", () => {
+    expect(hyphenateCellWord("MwSt.")).toEqual(["M", "w", "S", "t", "."]);
+    expect(hyphenateCellWord("aaaaaaaaaa")).toHaveLength(10);
   });
 
-  it("lets a code break anywhere, however short", () => {
-    expect(hyphenateCellWord("A-12", fakeHyphenate)).toEqual([
-      "A",
+  it("lets a code break anywhere", () => {
+    expect(hyphenateCellWord("SKU-881")).toEqual([
+      "S",
+      "K",
+      "U",
       "-",
+      "8",
+      "8",
       "1",
-      "2",
     ]);
   });
 
-  it("works without the built-in hyphenator, on the whole word", () => {
-    expect(hyphenateCellWord("line")).toEqual(["line"]);
-    expect(hyphenateCellWord("okie1233")).toHaveLength(8);
+  it("puts the word back together unchanged", () => {
+    expect(hyphenateCellWord("Швидкопричепляючийся").join("")).toBe(
+      "Швидкопричепляючийся",
+    );
   });
 
   it("keeps an accent typed as its own code point with its letter", () => {

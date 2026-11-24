@@ -1015,7 +1015,10 @@
     const GAP_X = 150,
       GAP_Y = 30,
       ENTRY_W = 140,
+      // room for the title and a two-line summary; a longer summary gets measured
       TITLE_H = 64,
+      TITLE_GAP = 16,
+      TITLE_MAX_W = 900,
       FLOW_GAP = 72,
       LABEL_H = 40;
 
@@ -1025,7 +1028,7 @@
         : { w: 200, h: 125 };
     }
 
-    function layoutFlow(flow, top) {
+    function layoutFlow(flow, top, titleH = TITLE_H) {
       const { w, h } = nodeSize();
       const rowH = h + LABEL_H + GAP_Y;
       const hasEntry = flow.roots.some((r) => r.via);
@@ -1033,7 +1036,7 @@
       const nodes = [],
         edges = [],
         entries = [];
-      let cursor = top + TITLE_H,
+      let cursor = top + titleH,
         maxX = 0;
 
       function place(step, depth) {
@@ -1069,7 +1072,37 @@
       };
     }
 
-    function renderFlows() {
+    function flowTitleHtml(flow, steps) {
+      return `<h3>${esc(flow.title)}</h3><p><b>${esc(DATA.areas[flow.area])}</b> · ${steps} steps${flow.only ? ` · ${flow.only} only` : ""} · ${esc(flow.summary)}</p>`;
+    }
+
+    let titleMeasurer = null;
+
+    /**
+     * The room a flow's title and summary take at the given width, so a long summary
+     * pushes its screenshots down instead of running over them.
+     */
+    function titleHeight(flow, steps, width) {
+      if (!titleMeasurer) {
+        titleMeasurer = document.createElement("div");
+        titleMeasurer.className = "flow-title";
+        titleMeasurer.setAttribute("aria-hidden", "true");
+        titleMeasurer.style.cssText =
+          "visibility:hidden;left:-10000px;top:0;pointer-events:none";
+        document.body.append(titleMeasurer);
+      }
+
+      titleMeasurer.style.width = `${Math.min(width, TITLE_MAX_W)}px`;
+      titleMeasurer.innerHTML = flowTitleHtml(flow, steps);
+
+      return Math.max(TITLE_H, titleMeasurer.offsetHeight + TITLE_GAP);
+    }
+
+    /**
+     * Draws the flows and fits them to the view; `keepCamera` keeps the reader's pan and
+     * zoom instead, for a redraw they didn't ask for.
+     */
+    function renderFlows({ keepCamera = false } = {}) {
       const { w, h } = nodeSize();
       const flows = DATA.flows.filter(
         (f) =>
@@ -1079,10 +1112,26 @@
           (ui.changes === "all" || flowHasChange(f, ui.changes)),
       );
 
+      // the summary wraps at the canvas width, which only the layout knows: lay every
+      // flow out once for its width and step count, then place each one under its title
+      const drafts = flows.map((flow) => {
+        return layoutFlow(flow, 0);
+      });
+      const titleWidth = Math.max(
+        ...drafts.map((draft) => {
+          return draft.width;
+        }),
+        600,
+      );
+
       let top = 0,
         width = 0;
-      const layouts = flows.map((flow) => {
-        const layout = layoutFlow(flow, top);
+      const layouts = flows.map((flow, index) => {
+        const layout = layoutFlow(
+          flow,
+          top,
+          titleHeight(flow, drafts[index].nodes.length, titleWidth),
+        );
         top = layout.bottom + FLOW_GAP;
         width = Math.max(width, layout.width);
         return layout;
@@ -1094,8 +1143,7 @@
 
       for (const { flow, top: t, nodes, edges, entries } of layouts) {
         const steps = nodes.length;
-        html += `<div class="flow-title" style="left:0;top:${t}px;width:${Math.max(width, 600)}px">
-        <h3>${esc(flow.title)}</h3><p><b>${esc(DATA.areas[flow.area])}</b> · ${steps} steps${flow.only ? ` · ${flow.only} only` : ""} · ${esc(flow.summary)}</p></div>`;
+        html += `<div class="flow-title" style="left:0;top:${t}px;width:${Math.max(width, 600)}px">${flowTitleHtml(flow, steps)}</div>`;
 
         for (const { step, x, y } of nodes) {
           const state = statesById.get(step.state);
@@ -1143,7 +1191,8 @@
         width: Math.max(width, 600),
         height: Math.max(height, 100),
       };
-      fit();
+      if (keepCamera) applyCamera();
+      else fit();
     }
 
     /* ---------- flows view: camera ---------- */
@@ -1456,5 +1505,11 @@
     });
     readHash();
     render();
+
+    // the titles were measured in the fallback font; measure again in IBM Plex, without
+    // undoing a pan or zoom made while the fonts loaded
+    document.fonts?.ready.then(() => {
+      if (ui.view === "flows") renderFlows({ keepCamera: true });
+    });
   })();
 </script>

@@ -86,7 +86,7 @@ export const InvoiceClosing = memo(function InvoiceClosing({
 
     PART_ON_ADD[part](setValue);
 
-    trackEvent({ event: "add_invoice_closing_part", data: { part } });
+    trackEvent({ event: PART_EVENTS[part].add });
 
     // the card mounts in this click's render, so focus its first field on the next frame.
     // By id: the card's switch renders a hidden checkbox that a generic query would find.
@@ -104,7 +104,7 @@ export const InvoiceClosing = memo(function InvoiceClosing({
 
     PART_ON_REMOVE[part](setValue);
 
-    trackEvent({ event: "remove_invoice_closing_part", data: { part } });
+    trackEvent({ event: PART_EVENTS[part].remove });
 
     // the card unmounts with the focused Remove button in it, so hand focus to its pill
     requestAnimationFrame(() => {
@@ -539,6 +539,16 @@ const FIRST_FIELD_ID = {
   qr: "qrCodeData",
   signatures: "personAuthorizedToReceiveName",
 } as const satisfies Record<ClosingPart, string>;
+
+/**
+ * One analytics event per part and action, so each shows up on its own in Umami and
+ * PostHog rather than behind a `part` property.
+ */
+const PART_EVENTS = {
+  payment: { add: "add_payment_method", remove: "remove_payment_method" },
+  qr: { add: "add_qr_code", remove: "remove_qr_code" },
+  signatures: { add: "add_signatures", remove: "remove_signatures" },
+} as const satisfies Record<ClosingPart, { add: string; remove: string }>;
 
 const DIRTY = { shouldDirty: true } as const;
 

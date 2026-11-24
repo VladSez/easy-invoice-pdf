@@ -3,6 +3,7 @@ import {
   type SupportedTemplates,
 } from "../../../schema/index";
 import type { TranslationSchema } from "./pdf-translations-schema";
+import { withBreaks } from "./with-breaks";
 
 /**
  * Join a tax label onto the Swedish noun it qualifies.
@@ -48,7 +49,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     invoiceItemsTable: {
       no: "No",
-      nameOfGoodsService: "Name of goods/service",
+      nameOfGoodsService: withBreaks("Name of goods/ser|vice"),
       typeOfGTU: "Type of GTU",
       amount: "Amount",
       unit: "Unit",
@@ -80,7 +81,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Pre-tax amount `;
       },
       sum: "SUM",
-      discount: "Discount",
+      discount: withBreaks("Dis|count"),
     },
     paymentInfo: {
       paymentMethod: "Payment method",
@@ -175,22 +176,22 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     invoiceItemsTable: {
       no: "lp.",
-      nameOfGoodsService: "Nazwa towaru/usługi",
+      nameOfGoodsService: withBreaks("Na|zwa to|wa|ru/usłu|gi"),
       typeOfGTU: "Typ\n GTU",
       amount: "Ilość",
       unit: "Jm",
       netPrice: () => {
-        return `Cena\n netto`;
+        return withBreaks(`Cena\n net|to`);
       },
       vat: "VAT",
       netAmount: () => {
-        return `Kwota\n netto`;
+        return withBreaks(`Kwo|ta\n net|to`);
       },
       vatAmount: ({ customTaxLabel }) => {
-        return `Kwota ${customTaxLabel || "VAT"}`;
+        return `${withBreaks("Kwo|ta")} ${customTaxLabel || "VAT"}`;
       },
       preTaxAmount: () => {
-        return `Kwota\n brutto`;
+        return withBreaks(`Kwo|ta\n brut|to`);
       },
       sum: "SUMA",
       discount: "Rabat",
@@ -201,7 +202,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     vatSummaryTable: {
       vatRate: ({ customTaxLabel }) => {
-        return `Stawka ${customTaxLabel || "VAT"}`;
+        return `${withBreaks("Staw|ka")} ${customTaxLabel || "VAT"}`;
       },
       net: () => {
         return `Netto`;
@@ -267,25 +268,25 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     invoiceItemsTable: {
       no: "Nr",
-      nameOfGoodsService: "Bezeichnung der Ware/Dienstleistung",
+      nameOfGoodsService: withBreaks("Bezeich|nung der Ware/Dienst|leis|tung"),
       typeOfGTU: "GTU-Typ",
-      amount: "Menge",
-      unit: "Einheit",
+      amount: withBreaks("Men|ge"),
+      unit: withBreaks("Ein|heit"),
       netPrice: () => {
-        return `Nettopreis`;
+        return withBreaks(`Netto|preis`);
       },
       vat: "MwSt.",
       netAmount: () => {
-        return `Nettobetrag`;
+        return withBreaks(`Netto|betrag`);
       },
       vatAmount: ({ customTaxLabel }) => {
-        return `${customTaxLabel || "MwSt."}-Betrag`;
+        return `${customTaxLabel || "MwSt."}-${withBreaks("Be|trag")}`;
       },
       preTaxAmount: () => {
-        return `Bruttobetrag`;
+        return withBreaks(`Brutto|betrag`);
       },
       sum: "SUMME",
-      discount: "Rabatt",
+      discount: withBreaks("Ra|batt"),
     },
     paymentInfo: {
       paymentMethod: "Zahlungsart",
@@ -302,7 +303,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
       preTax: () => {
         return `Brutto`;
       },
-      total: "Gesamt",
+      total: withBreaks("Ge|samt"),
     },
     paymentTotals: {
       toPay: "Zu zahlen",
@@ -359,25 +360,25 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     invoiceItemsTable: {
       no: "N.º",
-      nameOfGoodsService: "Descripción del producto/servicio",
+      nameOfGoodsService: withBreaks("Des|crip|ción del pro|duc|to/ser|vi|cio"),
       typeOfGTU: "Tipo\n GTU",
-      amount: "Cantidad",
-      unit: "Unidad",
+      amount: withBreaks("Can|ti|dad"),
+      unit: withBreaks("Uni|dad"),
       netPrice: () => {
-        return `Precio neto`;
+        return withBreaks(`Pre|cio neto`);
       },
       vat: "IVA",
       netAmount: () => {
-        return `Importe\n neto`;
+        return withBreaks(`Im|por|te\n neto`);
       },
       vatAmount: ({ customTaxLabel }) => {
-        return `Importe ${customTaxLabel || "IVA"}`;
+        return `${withBreaks("Im|por|te")} ${customTaxLabel || "IVA"}`;
       },
       preTaxAmount: () => {
-        return `Importe bruto`;
+        return withBreaks(`Im|por|te bruto`);
       },
       sum: "TOTAL",
-      discount: "Descuento",
+      discount: withBreaks("Des|cuen|to"),
     },
     paymentInfo: {
       paymentMethod: "Forma de pago",
@@ -451,25 +452,25 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     invoiceItemsTable: {
       no: "N.º",
-      nameOfGoodsService: "Descrição do produto/serviço",
+      nameOfGoodsService: withBreaks("Des|cri|ção do pro|du|to/ser|vi|ço"),
       typeOfGTU: "Tipo\n GTU",
-      amount: "Quantidade",
-      unit: "Unidade",
+      amount: withBreaks("Quan|ti|da|de"),
+      unit: withBreaks("Uni|da|de"),
       netPrice: () => {
-        return `Preço\n líquido`;
+        return withBreaks(`Pre|ço\n lí|qui|do`);
       },
       vat: "IVA",
       netAmount: () => {
-        return `Valor\n líquido`;
+        return withBreaks(`Va|lor\n lí|qui|do`);
       },
       vatAmount: ({ customTaxLabel }) => {
         return `Valor ${customTaxLabel || "IVA"}`;
       },
       preTaxAmount: () => {
-        return `Valor bruto`;
+        return withBreaks(`Va|lor bruto`);
       },
       sum: "TOTAL",
-      discount: "Desconto",
+      discount: withBreaks("Des|con|to"),
     },
     paymentInfo: {
       paymentMethod: "Forma de pagamento",
@@ -480,7 +481,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Taxa ${customTaxLabel || "IVA"}`;
       },
       net: () => {
-        return `Líquido`;
+        return withBreaks(`Lí|qui|do`);
       },
       vat: "IVA",
       preTax: () => {
@@ -550,25 +551,25 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     invoiceItemsTable: {
       no: "Nº",
-      nameOfGoodsService: "Descrição do produto/serviço",
+      nameOfGoodsService: withBreaks("Des|cri|ção do pro|du|to/ser|vi|ço"),
       typeOfGTU: "Tipo\n GTU",
-      amount: "Quantidade",
-      unit: "Unidade",
+      amount: withBreaks("Quan|ti|da|de"),
+      unit: withBreaks("Uni|da|de"),
       netPrice: () => {
-        return `Preço\n líquido`;
+        return withBreaks(`Pre|ço\n lí|qui|do`);
       },
       vat: "Imposto",
       netAmount: () => {
-        return `Valor\n líquido`;
+        return withBreaks(`Va|lor\n lí|qui|do`);
       },
       vatAmount: ({ customTaxLabel }) => {
-        return `Valor do ${customTaxLabel || "imposto"}`;
+        return `${withBreaks("Va|lor do")} ${customTaxLabel || withBreaks("im|pos|to")}`;
       },
       preTaxAmount: () => {
-        return `Valor bruto`;
+        return withBreaks(`Va|lor bruto`);
       },
       sum: "TOTAL",
-      discount: "Desconto",
+      discount: withBreaks("Des|con|to"),
     },
     paymentInfo: {
       paymentMethod: "Forma de pagamento",
@@ -576,10 +577,10 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     vatSummaryTable: {
       vatRate: ({ customTaxLabel }) => {
-        return `Alíquota do ${customTaxLabel || "imposto"}`;
+        return `${withBreaks("Alí|quo|ta do")} ${customTaxLabel || withBreaks("im|pos|to")}`;
       },
       net: () => {
-        return `Líquido`;
+        return withBreaks(`Lí|qui|do`);
       },
       vat: "Imposto",
       preTax: () => {
@@ -642,25 +643,25 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     invoiceItemsTable: {
       no: "№",
-      nameOfGoodsService: "Наименование товара/услуги",
+      nameOfGoodsService: withBreaks("Наи|ме|но|ва|ние то|ва|ра/ус|лу|ги"),
       typeOfGTU: "Тип\n GTU",
-      amount: "Количество",
+      amount: withBreaks("Ко|ли|чест|во"),
       unit: "Ед.\n изм.",
       netPrice: ({ customTaxLabel }) => {
-        return `Цена без ${customTaxLabel || "НДС"}`;
+        return `${withBreaks("Це|на без")} ${customTaxLabel || "НДС"}`;
       },
       vat: "НДС",
       netAmount: ({ customTaxLabel }) => {
-        return `Сумма без ${customTaxLabel || "НДС"}`;
+        return `${withBreaks("Сум|ма без")} ${customTaxLabel || "НДС"}`;
       },
       vatAmount: ({ customTaxLabel }) => {
-        return `Сумма ${customTaxLabel || "НДС"}`;
+        return `${withBreaks("Сум|ма")} ${customTaxLabel || "НДС"}`;
       },
       preTaxAmount: ({ customTaxLabel }) => {
-        return `Сумма с ${customTaxLabel || "НДС"}`;
+        return `${withBreaks("Сум|ма с")} ${customTaxLabel || "НДС"}`;
       },
       sum: "ИТОГО",
-      discount: "Скидка",
+      discount: withBreaks("Скид|ка"),
     },
     paymentInfo: {
       paymentMethod: "Способ оплаты",
@@ -668,7 +669,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     vatSummaryTable: {
       vatRate: ({ customTaxLabel }) => {
-        return `Ставка ${customTaxLabel || "НДС"}`;
+        return `${withBreaks("Став|ка")} ${customTaxLabel || "НДС"}`;
       },
       net: ({ customTaxLabel }) => {
         return `Без ${customTaxLabel || "НДС"}`;
@@ -734,16 +735,16 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     invoiceItemsTable: {
       no: "№",
-      nameOfGoodsService: "Найменування товару/послуги",
+      nameOfGoodsService: withBreaks("Най|ме|ну|ван|ня то|ва|ру/пос|лу|ги"),
       typeOfGTU: "Тип\n GTU",
-      amount: "Кількість",
+      amount: withBreaks("Кіль|кість"),
       unit: "Од.\n вим.",
       netPrice: ({ customTaxLabel }) => {
-        return `Ціна без ${customTaxLabel || "ПДВ"}`;
+        return `${withBreaks("Ці|на без")} ${customTaxLabel || "ПДВ"}`;
       },
       vat: "ПДВ",
       netAmount: ({ customTaxLabel }) => {
-        return `Сума без ${customTaxLabel || "ПДВ"}`;
+        return `${withBreaks("Су|ма без")} ${customTaxLabel || "ПДВ"}`;
       },
       vatAmount: ({ customTaxLabel }) => {
         return `Сума ${customTaxLabel || "ПДВ"}`;
@@ -752,7 +753,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `Сума з ${customTaxLabel || "ПДВ"}`;
       },
       sum: "РАЗОМ",
-      discount: "Знижка",
+      discount: withBreaks("Зниж|ка"),
     },
     paymentInfo: {
       paymentMethod: "Спосіб оплати",
@@ -760,7 +761,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     vatSummaryTable: {
       vatRate: ({ customTaxLabel }) => {
-        return `Ставка ${customTaxLabel || "ПДВ"}`;
+        return `${withBreaks("Став|ка")} ${customTaxLabel || "ПДВ"}`;
       },
       net: ({ customTaxLabel }) => {
         return `Без ${customTaxLabel || "ПДВ"}`;
@@ -826,25 +827,25 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     invoiceItemsTable: {
       no: "N°",
-      nameOfGoodsService: "Désignation du produit/service",
+      nameOfGoodsService: withBreaks("Dé|si|gna|tion du pro|duit/ser|vice"),
       typeOfGTU: "Type\n GTU",
-      amount: "Quantité",
+      amount: withBreaks("Quan|ti|té"),
       unit: "Unité",
       netPrice: () => {
         return `Prix HT`;
       },
       vat: "TVA",
       netAmount: () => {
-        return `Montant\n HT`;
+        return withBreaks(`Mon|tant\n HT`);
       },
       vatAmount: ({ customTaxLabel }) => {
-        return `Montant de la ${customTaxLabel || "TVA"}`;
+        return `${withBreaks("Mon|tant de la")} ${customTaxLabel || "TVA"}`;
       },
       preTaxAmount: () => {
         return `Total TTC`;
       },
       sum: "TOTAL",
-      discount: "Remise",
+      discount: withBreaks("Re|mise"),
     },
     paymentInfo: {
       paymentMethod: "Mode de paiement",
@@ -918,25 +919,27 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     invoiceItemsTable: {
       no: "N°",
-      nameOfGoodsService: "Descrizione del prodotto/servizio",
+      nameOfGoodsService: withBreaks(
+        "De|scri|zio|ne del pro|dot|to/ser|vi|zio",
+      ),
       typeOfGTU: "Tipo\n GTU",
-      amount: "Quantità",
+      amount: withBreaks("Quan|ti|tà"),
       unit: "Unità",
       netPrice: () => {
-        return `Prezzo netto`;
+        return withBreaks(`Prez|zo net|to`);
       },
       vat: "IVA",
       netAmount: () => {
-        return `Importo\n netto`;
+        return withBreaks(`Im|por|to\n net|to`);
       },
       vatAmount: ({ customTaxLabel }) => {
-        return `Importo ${customTaxLabel || "IVA"}`;
+        return `${withBreaks("Im|por|to")} ${customTaxLabel || "IVA"}`;
       },
       preTaxAmount: () => {
-        return `Importo lordo`;
+        return withBreaks(`Im|por|to lor|do`);
       },
       sum: "TOTALE",
-      discount: "Sconto",
+      discount: withBreaks("Scon|to"),
     },
     paymentInfo: {
       paymentMethod: "Metodo di pagamento",
@@ -944,7 +947,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     vatSummaryTable: {
       vatRate: ({ customTaxLabel }) => {
-        return `Aliquota ${customTaxLabel || "IVA"}`;
+        return `${withBreaks("Ali|quo|ta")} ${customTaxLabel || "IVA"}`;
       },
       net: () => {
         return `Netto`;
@@ -1010,25 +1013,25 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     invoiceItemsTable: {
       no: "Nr",
-      nameOfGoodsService: "Omschrijving product/dienst",
+      nameOfGoodsService: withBreaks("Om|schrij|ving pro|duct/dienst"),
       typeOfGTU: "GTU-type",
-      amount: "Aantal",
-      unit: "Eenheid",
+      amount: withBreaks("Aan|tal"),
+      unit: withBreaks("Een|heid"),
       netPrice: () => {
         return `Netto prijs`;
       },
       vat: "BTW",
       netAmount: () => {
-        return `Nettobedrag`;
+        return withBreaks(`Netto|bedrag`);
       },
       vatAmount: ({ customTaxLabel }) => {
-        return `${customTaxLabel || "BTW"}-bedrag`;
+        return `${customTaxLabel || "BTW"}-${withBreaks("be|drag")}`;
       },
       preTaxAmount: () => {
-        return `Brutobedrag`;
+        return withBreaks(`Bruto|bedrag`);
       },
       sum: "TOTAAL",
-      discount: "Korting",
+      discount: withBreaks("Kor|ting"),
     },
     paymentInfo: {
       paymentMethod: "Betaalmethode",
@@ -1036,7 +1039,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     vatSummaryTable: {
       vatRate: ({ customTaxLabel }) => {
-        return `${customTaxLabel || "BTW"}-tarief`;
+        return `${customTaxLabel || "BTW"}-${withBreaks("ta|rief")}`;
       },
       net: () => {
         return `Netto`;
@@ -1102,12 +1105,12 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     invoiceItemsTable: {
       no: "Nr",
-      nameOfGoodsService: "Benämning vara/tjänst",
+      nameOfGoodsService: withBreaks("Be|näm|ning vara/tjänst"),
       typeOfGTU: "GTU-typ",
       amount: "Antal",
       unit: "Enhet",
       netPrice: () => {
-        return `Nettopris`;
+        return withBreaks(`Netto|pris`);
       },
       vat: "Moms",
       /**
@@ -1116,16 +1119,16 @@ export const INVOICE_PDF_TRANSLATIONS = {
        * seam instead, the same way the other languages break their two-word labels.
        */
       netAmount: () => {
-        return `Netto\n belopp`;
+        return withBreaks(`Netto\n be|lopp`);
       },
       vatAmount: ({ customTaxLabel }) => {
         return swedishTaxCompound({ customTaxLabel, noun: `\n belopp` });
       },
       preTaxAmount: () => {
-        return `Brutto\n belopp`;
+        return withBreaks(`Brutto\n be|lopp`);
       },
       sum: "SUMMA",
-      discount: "Rabatt",
+      discount: withBreaks("Ra|batt"),
     },
     paymentInfo: {
       paymentMethod: "Betalningsmetod",
@@ -1199,12 +1202,12 @@ export const INVOICE_PDF_TRANSLATIONS = {
     },
     invoiceItemsTable: {
       no: "Nr",
-      nameOfGoodsService: "Beskrivelse vare/tjeneste",
+      nameOfGoodsService: withBreaks("Be|skri|vel|se vare/tje|nes|te"),
       typeOfGTU: "GTU-type",
-      amount: "Antall",
+      amount: withBreaks("An|tall"),
       unit: "Enhet",
       netPrice: () => {
-        return `Nettopris`;
+        return withBreaks(`Netto|pris`);
       },
       vat: "MVA",
       /**
@@ -1212,7 +1215,7 @@ export const INVOICE_PDF_TRANSLATIONS = {
        * hyphenate them mid-word. The break goes at the compound seam instead.
        */
       netAmount: () => {
-        return `Netto\n beløp`;
+        return withBreaks(`Netto\n be|løp`);
       },
       /**
        * "MVA" is an abbreviation, and Norwegian hyphenates a compound whose first part is
@@ -1222,10 +1225,10 @@ export const INVOICE_PDF_TRANSLATIONS = {
         return `${customTaxLabel || "MVA"}-\n beløp`;
       },
       preTaxAmount: () => {
-        return `Brutto\n beløp`;
+        return withBreaks(`Brutto\n be|løp`);
       },
       sum: "SUM",
-      discount: "Rabatt",
+      discount: withBreaks("Ra|batt"),
     },
     paymentInfo: {
       paymentMethod: "Betalingsmåte",

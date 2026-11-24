@@ -4,6 +4,7 @@ import {
   Controller,
   type FieldArrayWithId,
   type FieldErrors,
+  type UseFormClearErrors,
   type UseFormGetValues,
   type UseFormSetValue,
   useFieldArray,
@@ -96,6 +97,7 @@ export function useCustomColumns({
   control,
   getValues,
   setValue,
+  clearErrors,
 }: UseCustomColumnsArgs) {
   const {
     fields: extraColumnFields,
@@ -150,6 +152,11 @@ export function useCustomColumns({
         if (values.length <= extraIndex) {
           return;
         }
+
+        // Validating the shifted values only writes the errors they have now, and an
+        // error at the old last index would outlive its value and land on the next
+        // column added there: drop this item's column errors first.
+        clearErrors(`items.${itemIndex}.extraCustomColumnValues`);
 
         setValue(
           `items.${itemIndex}.extraCustomColumnValues`,
@@ -299,7 +306,16 @@ function ItemCustomColumnField({
         if (!isAnyValueLeft) {
           if (position === 0) {
             setValue(paths.isVisible, false, { shouldDirty: true });
-            setValue(paths.label, "", { shouldDirty: true });
+            // re-checked, so a name over the limit doesn't leave its error behind on
+            // the empty name the card shows when it is opened again
+            setValue(paths.label, "", {
+              shouldDirty: true,
+              shouldValidate: Boolean(
+                position === 0
+                  ? errors.customColumnLabel
+                  : errors.extraCustomColumns?.[position - 1]?.label,
+              ),
+            });
           } else {
             onColumnEmptied?.();
 
@@ -385,6 +401,8 @@ function OpenItemCustomColumnField({
 }: OpenItemCustomColumnFieldProps) {
   const switchId = useId();
   const headingId = useId();
+  // the name when its field got focus, to report only a name that changed
+  const nameAtFocusRef = useRef("");
   const paths = customColumnPaths({ index, position });
   const valueError = getValueError({ errors, index, position });
   const nameError =
@@ -479,6 +497,51 @@ function OpenItemCustomColumnField({
                   id={nameInputId}
                   type="text"
                   placeholder="e.g. Project code, SKU, PO line"
+                  onChange={(event) => {
+                    const wasWithinLimit =
+                      (field.value ?? "").length <= MAX_COLUMN_NAME_LENGTH;
+
+                    field.onChange(event);
+
+                    // the moment the name goes over the limit and its error shows: once
+                    // per crossing, not on every keystroke past it
+                    if (
+                      wasWithinLimit &&
+                      event.target.value.length > MAX_COLUMN_NAME_LENGTH
+                    ) {
+                      trackEvent({
+                        event: "custom_column_name_too_long",
+                        data: { column_position: position + 1 },
+                      });
+                    }
+                  }}
+                  onFocus={() => {
+                    nameAtFocusRef.current = (field.value ?? "").trim();
+                  }}
+                  onBlur={() => {
+                    field.onBlur();
+
+                    const name = (field.value ?? "").trim();
+                    const isNewName =
+                      Boolean(name) && name !== nameAtFocusRef.current;
+
+                    // the name the column got, once it is typed: `add_item_custom_column`
+                    // fires on the pill, before the column has one. A name over the limit
+                    // is rejected, so it isn't reported either; the schema measures it
+                    // before trimming, so this does too.
+                    const isWithinLimit =
+                      (field.value ?? "").length <= MAX_COLUMN_NAME_LENGTH;
+
+                    if (isNewName && isWithinLimit) {
+                      trackEvent({
+                        event: "name_item_custom_column",
+                        data: {
+                          column_name: name,
+                          column_position: position + 1,
+                        },
+                      });
+                    }
+                  }}
                   className={cn(
                     "h-[34px] max-md:h-11 max-md:text-base",
                     inputErrorClassName(!!nameError),
@@ -557,6 +620,9 @@ function customColumnPaths({ index, position }: CustomColumnLocation) {
   } as const;
 }
 
+/** Longest custom column name, as the schema allows it. */
+const MAX_COLUMN_NAME_LENGTH = 30;
+
 interface GetValueErrorArgs extends CustomColumnLocation {
   errors: FieldErrors<InvoiceData>;
 }
@@ -602,6 +668,7 @@ interface UseCustomColumnsArgs {
   control: Control<InvoiceData>;
   getValues: UseFormGetValues<InvoiceData>;
   setValue: UseFormSetValue<InvoiceData>;
+  clearErrors: UseFormClearErrors<InvoiceData>;
 }
 
 interface CustomColumnsState {
