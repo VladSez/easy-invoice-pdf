@@ -1421,6 +1421,63 @@ describe("InvoiceItems custom column", () => {
     });
   });
 
+  it("reports a column's name once it is typed, with the column's position", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({ itemCount: 1, itemOverrides: { typeOfGTU: "" } });
+
+    await user.click(getCustomColumnPill());
+    await user.type(
+      screen.getByRole("textbox", { name: "Column name" }),
+      "  Project code ",
+    );
+    await user.tab();
+
+    expect(trackEvent).toHaveBeenLastCalledWith({
+      event: "name_item_custom_column",
+      data: { column_name: "Project code", column_position: 1 },
+    });
+
+    // the second column is reported as such
+    await user.click(getAddAnotherColumnPill(0)!);
+
+    const secondName = within(
+      await screen.findByTestId("itemCustomColumn0-1"),
+    ).getByRole("textbox", { name: "Column name" });
+
+    await user.type(secondName, "SKU");
+    await user.tab();
+
+    expect(trackEvent).toHaveBeenLastCalledWith({
+      event: "name_item_custom_column",
+      data: { column_name: "SKU", column_position: 2 },
+    });
+  });
+
+  it("doesn't report a name left as it was, or one over the limit", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: { typeOfGTU: "A" },
+      formOverrides: { customColumnLabel: "Project code" },
+    });
+
+    const name = screen.getByDisplayValue("Project code");
+
+    // focused and left unchanged
+    await user.click(name);
+    await user.tab();
+
+    await user.clear(name);
+    await user.type(name, "x".repeat(31));
+    await user.tab();
+
+    expect(vi.mocked(trackEvent).mock.calls).not.toContainEqual([
+      expect.objectContaining({ event: "name_item_custom_column" }),
+    ]);
+  });
+
   it("offers the custom column on the Stripe template too", () => {
     renderInvoiceItems({
       itemCount: 1,

@@ -401,6 +401,8 @@ function OpenItemCustomColumnField({
 }: OpenItemCustomColumnFieldProps) {
   const switchId = useId();
   const headingId = useId();
+  // the name when its field got focus, to report only a name that changed
+  const nameAtFocusRef = useRef("");
   const paths = customColumnPaths({ index, position });
   const valueError = getValueError({ errors, index, position });
   const nameError =
@@ -495,6 +497,29 @@ function OpenItemCustomColumnField({
                   id={nameInputId}
                   type="text"
                   placeholder="e.g. Project code, SKU, PO line"
+                  onFocus={() => {
+                    nameAtFocusRef.current = (field.value ?? "").trim();
+                  }}
+                  onBlur={() => {
+                    field.onBlur();
+
+                    const name = (field.value ?? "").trim();
+                    const isNewName =
+                      Boolean(name) && name !== nameAtFocusRef.current;
+
+                    // the name the column got, once it is typed: `add_item_custom_column`
+                    // fires on the pill, before the column has one. A name over the limit
+                    // is rejected, so it isn't reported either.
+                    if (isNewName && name.length <= MAX_COLUMN_NAME_LENGTH) {
+                      trackEvent({
+                        event: "name_item_custom_column",
+                        data: {
+                          column_name: name,
+                          column_position: position + 1,
+                        },
+                      });
+                    }
+                  }}
                   className={cn(
                     "h-[34px] max-md:h-11 max-md:text-base",
                     inputErrorClassName(!!nameError),
@@ -572,6 +597,9 @@ function customColumnPaths({ index, position }: CustomColumnLocation) {
     isVisible: `extraCustomColumns.${extraIndex}.isVisible`,
   } as const;
 }
+
+/** Longest custom column name, as the schema allows it. */
+const MAX_COLUMN_NAME_LENGTH = 30;
 
 interface GetValueErrorArgs extends CustomColumnLocation {
   errors: FieldErrors<InvoiceData>;
