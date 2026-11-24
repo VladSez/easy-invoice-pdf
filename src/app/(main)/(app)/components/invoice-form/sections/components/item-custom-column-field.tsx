@@ -509,8 +509,12 @@ function OpenItemCustomColumnField({
 
                     // the name the column got, once it is typed: `add_item_custom_column`
                     // fires on the pill, before the column has one. A name over the limit
-                    // is rejected, so it isn't reported either.
-                    if (isNewName && name.length <= MAX_COLUMN_NAME_LENGTH) {
+                    // is rejected, so it isn't reported either; the schema measures it
+                    // before trimming, so this does too.
+                    const isWithinLimit =
+                      (field.value ?? "").length <= MAX_COLUMN_NAME_LENGTH;
+
+                    if (isNewName && isWithinLimit) {
                       trackEvent({
                         event: "name_item_custom_column",
                         data: {

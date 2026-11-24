@@ -1098,7 +1098,11 @@
       return Math.max(TITLE_H, titleMeasurer.offsetHeight + TITLE_GAP);
     }
 
-    function renderFlows() {
+    /**
+     * Draws the flows and fits them to the view; `keepCamera` keeps the reader's pan and
+     * zoom instead, for a redraw they didn't ask for.
+     */
+    function renderFlows({ keepCamera = false } = {}) {
       const { w, h } = nodeSize();
       const flows = DATA.flows.filter(
         (f) =>
@@ -1187,7 +1191,8 @@
         width: Math.max(width, 600),
         height: Math.max(height, 100),
       };
-      fit();
+      if (keepCamera) applyCamera();
+      else fit();
     }
 
     /* ---------- flows view: camera ---------- */
@@ -1501,9 +1506,10 @@
     readHash();
     render();
 
-    // the titles were measured in the fallback font; measure again in IBM Plex
+    // the titles were measured in the fallback font; measure again in IBM Plex, without
+    // undoing a pan or zoom made while the fonts loaded
     document.fonts?.ready.then(() => {
-      if (ui.view === "flows") renderFlows();
+      if (ui.view === "flows") renderFlows({ keepCamera: true });
     });
   })();
 </script>

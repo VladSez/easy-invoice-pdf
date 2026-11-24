@@ -1473,6 +1473,11 @@ describe("InvoiceItems custom column", () => {
     await user.type(name, "x".repeat(31));
     await user.tab();
 
+    // 30 letters fit once trimmed, but the schema counts the space and rejects it
+    await user.clear(name);
+    await user.type(name, ` ${"x".repeat(30)}`);
+    await user.tab();
+
     expect(vi.mocked(trackEvent).mock.calls).not.toContainEqual([
       expect.objectContaining({ event: "name_item_custom_column" }),
     ]);
