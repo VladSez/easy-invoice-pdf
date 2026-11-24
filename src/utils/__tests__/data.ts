@@ -42,6 +42,8 @@ export const MOCK_INVOICE_ITEM_DATA = {
   nameFieldIsVisible: true,
   typeOfGTU: "GTU_01",
   typeOfGTUFieldIsVisible: true,
+  // typed, or `as const` makes it a readonly tuple no item value fits
+  extraCustomColumnValues: [] as string[],
   amount: 2,
   amountFieldIsVisible: true,
   unit: "pcs",
@@ -106,4 +108,5 @@ export const MOCK_INVOICE_DATA = {
   personAuthorizedToIssueSignature: "",
   taxLabelText: "VAT",
   customColumnLabel: "",
+  extraCustomColumns: [],
 } as const satisfies InvoiceData;

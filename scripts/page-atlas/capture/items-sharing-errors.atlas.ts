@@ -94,6 +94,63 @@ test("custom column", async ({ page, atlas }) => {
   });
 });
 
+test("several custom columns", async ({ page, atlas }) => {
+  await atlas.openEditor();
+
+  const section = page.getByTestId("invoice-items-section");
+
+  await atlas.editAndWait(async () => {
+    await section.getByTestId("addItemCustomColumn0").click();
+    await section.locator("#itemCustomColumnName0").fill("Project code");
+    await section.locator("#itemTypeOfGTU0").fill("ACME-2024-PLATFORM");
+  });
+
+  // once every column has a name, "+ Custom column" adds another, asking for its name
+  await section.getByTestId("addAnotherItemCustomColumn0").click();
+
+  const secondCard = section.getByTestId("itemCustomColumn0-1");
+
+  await expect(secondCard.locator("#itemCustomColumnName0-1")).toBeFocused();
+  await atlas.snap("editor/custom-column-another", { scrollTo: secondCard });
+
+  await atlas.editAndWait(async () => {
+    await section.locator("#itemCustomColumnName0-1").fill("SKU");
+    await section.locator("#itemCustomColumnValue0-1").fill("SKU-88123456789");
+    await section.getByTestId("addAnotherItemCustomColumn0").click();
+    await section.locator("#itemCustomColumnName0-2").fill("PO line");
+    await section
+      .locator("#itemCustomColumnValue0-2")
+      .fill("Purchase order line 42");
+  });
+
+  const thirdCard = section.getByTestId("itemCustomColumn0-2");
+
+  // three is the most an invoice takes, so the pill that adds another is gone
+  await expect(section.getByTestId("addAnotherItemCustomColumn0")).toBeHidden();
+  await atlas.snap("editor/custom-columns-three", { scrollTo: thirdCard });
+
+  const firstName = section.locator("#itemCustomColumnName0");
+
+  await firstName.fill("Rechtsschutzversicherungsgesellschaften");
+  await expect(
+    section.getByText("Column name must not exceed 30 characters"),
+  ).toBeVisible();
+  await atlas.snap("editor/custom-column-name-too-long", {
+    scrollTo: firstName,
+  });
+
+  await atlas.editAndWait(async () => {
+    await firstName.fill("Project code");
+  });
+
+  await page.getByRole("combobox", { name: "Template" }).selectOption("stripe");
+  await page.waitForURL(/\/stripe-template/);
+  await atlas.waitForPdf();
+  await atlas.snap("stripe/custom-columns-three", {
+    scrollTo: page.getByTestId("itemCustomColumn0-2"),
+  });
+});
+
 test("below the items", async ({ page, atlas }) => {
   await atlas.openEditor();
 

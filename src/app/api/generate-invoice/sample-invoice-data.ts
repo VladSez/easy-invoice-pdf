@@ -73,6 +73,7 @@ export const SAMPLE_INVOICE_DATA = {
       nameFieldIsVisible: true,
       typeOfGTU: "",
       typeOfGTUFieldIsVisible: false,
+      extraCustomColumnValues: [],
       amount: 1,
       amountFieldIsVisible: true,
       unit: "service",
@@ -116,4 +117,5 @@ export const SAMPLE_INVOICE_DATA = {
   template: "default",
   taxLabelText: "VAT",
   customColumnLabel: "",
+  extraCustomColumns: [],
 } as const satisfies InvoiceData;

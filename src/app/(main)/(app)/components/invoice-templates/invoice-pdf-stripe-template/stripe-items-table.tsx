@@ -1,10 +1,11 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import dayjs from "dayjs";
 
+import { hyphenateCellWord } from "@/app/(main)/(app)/components/invoice-templates/common/hyphenate-cell-word";
 import { WrappableAmount } from "@/app/(main)/(app)/components/invoice-templates/common/wrappable-amount";
 import type { STRIPE_TEMPLATE_STYLES } from "@/app/(main)/(app)/components/invoice-templates/invoice-pdf-stripe-template";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
-import { isCustomColumnInPdf } from "@/app/(main)/(app)/utils/custom-column";
+import { getCustomColumnsInPdf } from "@/app/(main)/(app)/utils/custom-column";
 import { formatAmountChunks } from "@/app/(main)/(app)/utils/format-amount";
 import {
   formatCurrency,
@@ -50,15 +51,28 @@ export function StripeItemsTable({
 
   const unitFieldIsVisible = invoiceData.items[0].unitFieldIsVisible;
 
-  // The custom column, once it has a name or a value. Its switch is on by default, so
-  // without that check every existing Stripe invoice would gain an empty column.
-  const customColumnIsVisible = isCustomColumnInPdf(invoiceData);
-  // named by the user, or "Type of GTU" for a column from before it could be named
-  const customColumnName =
-    invoiceData.customColumnLabel?.trim() || t.invoiceItemsTable.typeOfGTU;
-  const descriptionColumnStyle = customColumnIsVisible
-    ? styles.colDescriptionWithCustom
-    : styles.colDescription;
+  // The custom columns, once each has a name or a value. The first one's switch is on by
+  // default, so without that check every existing Stripe invoice would gain an empty column.
+  const customColumns = getCustomColumnsInPdf(invoiceData);
+  // One custom column keeps the width it always had. With more, each is wider, so a code
+  // like "ACME-24" doesn't run into the next column's, and every column after the first
+  // takes more of the description's width.
+  const customColumnStyle =
+    customColumns.length > 1
+      ? [styles.colCustom, { flex: SEVERAL_CUSTOM_COLUMNS_FLEX }]
+      : styles.colCustom;
+  const descriptionColumnStyle =
+    customColumns.length > 0
+      ? [
+          styles.colDescriptionWithCustom,
+          {
+            flex:
+              styles.colDescriptionWithCustom.flex -
+              (customColumns.length - 1) *
+                EXTRA_CUSTOM_COLUMN_DESCRIPTION_SHARE,
+          },
+        ]
+      : styles.colDescription;
   const vatAmountFieldIsVisible = invoiceData.items[0].vatFieldIsVisible;
   const taxColumnStyle = hasAnyItemDiscount(invoiceData.items)
     ? styles.colTaxWithDiscount
@@ -72,11 +86,22 @@ export function StripeItemsTable({
           <Text style={styles.fontSize8}>{t.stripe.description}</Text>
         </View>
 
-        {customColumnIsVisible ? (
-          <View style={styles.colCustom}>
-            <Text style={styles.fontSize8}>{customColumnName}</Text>
-          </View>
-        ) : null}
+        {/* named by the user; the first one, unnamed, prints "Type of GTU", which it was
+            before it could be named, and a later one, unnamed, prints no header */}
+        {customColumns.map((column) => {
+          return (
+            <View key={column.position} style={customColumnStyle}>
+              {/* a long name wraps inside its cell, see `hyphenateCellWord` */}
+              <Text
+                style={styles.fontSize8}
+                hyphenationCallback={hyphenateCellWord}
+              >
+                {column.label ||
+                  (column.position === 0 ? t.invoiceItemsTable.typeOfGTU : "")}
+              </Text>
+            </View>
+          );
+        })}
 
         <View style={styles.colQty}>
           <Text style={styles.fontSize8}>{t.stripe.qty}</Text>
@@ -191,13 +216,18 @@ export function StripeItemsTable({
                   </Text>
                 ) : null}
               </View>
-              {customColumnIsVisible ? (
-                <View style={styles.colCustom}>
-                  <Text style={[styles.fontSize10, styles.textDark]}>
-                    {item.typeOfGTU}
-                  </Text>
-                </View>
-              ) : null}
+              {customColumns.map((column) => {
+                return (
+                  <View key={column.position} style={customColumnStyle}>
+                    <Text
+                      style={[styles.fontSize10, styles.textDark]}
+                      hyphenationCallback={hyphenateCellWord}
+                    >
+                      {column.values[index]}
+                    </Text>
+                  </View>
+                );
+              })}
               <View style={styles.colQty}>
                 <WrappableAmount
                   chunks={amountChunks}
@@ -273,3 +303,9 @@ export function StripeItemsTable({
     </View>
   );
 }
+
+/** The description width each custom column after the first takes from it. */
+const EXTRA_CUSTOM_COLUMN_DESCRIPTION_SHARE = 0.3;
+
+/** Each custom column's grow factor while there is more than one. */
+const SEVERAL_CUSTOM_COLUMNS_FLEX = 0.7;

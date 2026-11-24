@@ -126,6 +126,15 @@ const APP_STATES = {
   "editor/custom-column-second": {
     title: "Custom column value on item 2",
   },
+  "editor/custom-column-another": {
+    title: "Second custom column added",
+  },
+  "editor/custom-columns-three": {
+    title: "Three custom columns, the most an invoice takes",
+  },
+  "editor/custom-column-name-too-long": {
+    title: "Column name over 30 characters",
+  },
   "editor/closing": { title: "Totals, notes, payment and signatures" },
   "editor/closing-qr": { title: "QR code added" },
   "editor/signature-drawn": { title: "Signature drawn" },
@@ -156,6 +165,9 @@ const APP_STATES = {
   "stripe/default": { title: "Stripe template" },
   "stripe/indigo": { title: "Indigo top line" },
   "stripe/custom-column": { title: "Custom column on the Stripe template" },
+  "stripe/custom-columns-three": {
+    title: "Three custom columns on the Stripe template",
+  },
   "how-it-works/default": { title: "Video dialog" },
   "seller-dialog/empty": { title: "New seller, empty" },
   "seller-dialog/filled": { title: "New seller, filled in" },
@@ -421,7 +433,7 @@ export const FLOWS = [
     title: "Custom column",
     area: "items",
     summary:
-      'A column the user names (a project code, a SKU) in place of Type of GTU: named once on the first card, then a value per item. Both templates print it; unnamed, it prints "Type of GTU".',
+      'Up to three columns the user names (a project code, a SKU, a PO line), the first in place of Type of GTU: each named once on its first card, then a value per item. Once every column has a name, "+ Custom column" adds another. Both templates print them, wrapping long values inside their cells; an unnamed first column prints "Type of GTU".',
     roots: [
       {
         state: "editor/items",
@@ -435,6 +447,26 @@ export const FLOWS = [
                 via: "Add item 2, then + Project code",
                 next: [
                   { state: "stripe/custom-column", via: "Template: Stripe" },
+                ],
+              },
+              {
+                state: "editor/custom-column-another",
+                via: "+ Custom column",
+                next: [
+                  {
+                    state: "editor/custom-columns-three",
+                    via: "Name it SKU, then + Custom column for PO line",
+                    next: [
+                      {
+                        state: "editor/custom-column-name-too-long",
+                        via: "Type a name over 30 characters",
+                      },
+                      {
+                        state: "stripe/custom-columns-three",
+                        via: "Template: Stripe",
+                      },
+                    ],
+                  },
                 ],
               },
             ],

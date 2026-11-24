@@ -22,7 +22,10 @@ import {
   type ItemPendingDeletion,
 } from "@/app/(main)/(app)/components/invoice-form/sections/components/delete-invoice-item-dialog";
 import { ItemAmountsCard } from "@/app/(main)/(app)/components/invoice-form/sections/components/item-amounts-card";
-import { ItemCustomColumnField } from "@/app/(main)/(app)/components/invoice-form/sections/components/item-custom-column-field";
+import {
+  ItemCustomColumns,
+  useCustomColumns,
+} from "@/app/(main)/(app)/components/invoice-form/sections/components/item-custom-column-field";
 import { ItemDiscountFields } from "@/app/(main)/(app)/components/invoice-form/sections/components/item-discount-fields";
 import { PdfColumnSwitch } from "@/app/(main)/(app)/components/invoice-form/sections/components/pdf-column-switch";
 import { formatMoneyForTemplate } from "@/app/(main)/(app)/utils/format-money-for-template";
@@ -72,6 +75,7 @@ export const InvoiceItems = memo(function InvoiceItems({
   const deleteTriggerRef = useRef<HTMLButtonElement | null>(null);
   const hasReachedItemLimit = fields.length >= MAX_INVOICE_ITEMS;
   const canDeleteItems = fields.length > 1;
+  const customColumns = useCustomColumns({ control, getValues, setValue });
 
   // the first item's switches show or hide a column for every item, so each item's field
   // is faded when its column is left out of the PDF
@@ -459,12 +463,13 @@ export const InvoiceItems = memo(function InvoiceItems({
                   getValues={getValues}
                   setValue={setValue}
                 />
-                <ItemCustomColumnField
+                <ItemCustomColumns
                   control={control}
                   index={index}
                   errors={errors}
                   getValues={getValues}
                   setValue={setValue}
+                  customColumns={customColumns}
                 />
               </div>
 
@@ -885,6 +890,7 @@ const NEW_INVOICE_ITEM = {
   discountAmount: 0,
   typeOfGTU: "",
   typeOfGTUFieldIsVisible: true,
+  extraCustomColumnValues: [],
 } as const satisfies InvoiceItemData;
 
 /**

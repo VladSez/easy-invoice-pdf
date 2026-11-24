@@ -1,28 +1,67 @@
 import type { InvoiceData } from "@/app/schema";
 
 /**
- * Whether the PDF prints the custom column (the one the user names themselves, stored as
- * `typeOfGTU` because it began as the Polish Type of GTU).
+ * The custom columns the PDF prints, in order: the original one first (its name is
+ * `customColumnLabel`, its values each item's `typeOfGTU`, as it began as the Polish Type
+ * of GTU), then the ones in `extraCustomColumns`.
  *
- * Its switch is on, and the column has something to show: a name or a value on some item.
- * Adding the column in the form turns the switch on before anything is typed, so without
- * the content check the PDF would gain an empty column headed "Type of GTU" the moment the
- * pill is clicked.
+ * A column prints when its switch is on and it has something to show: a name or a value
+ * on some item. Adding a column in the form turns the switch on before anything is typed,
+ * so without the content check the PDF would gain an empty column the moment the pill is
+ * clicked.
  */
-export function isCustomColumnInPdf(
-  invoiceData: Pick<InvoiceData, "items" | "customColumnLabel">,
+export function getCustomColumnsInPdf(
+  invoiceData: Pick<
+    InvoiceData,
+    "items" | "customColumnLabel" | "extraCustomColumns"
+  >,
 ) {
-  const isSwitchedOn = Boolean(invoiceData.items[0]?.typeOfGTUFieldIsVisible);
+  const { items } = invoiceData;
 
-  if (!isSwitchedOn) {
-    return false;
-  }
+  const firstColumn: CustomColumnInPdf = {
+    position: 0,
+    label: invoiceData.customColumnLabel?.trim() ?? "",
+    values: items.map((item) => {
+      return item.typeOfGTU?.trim() ?? "";
+    }),
+  };
 
-  const hasName = Boolean(invoiceData.customColumnLabel?.trim());
+  const isFirstColumnSwitchedOn = Boolean(items[0]?.typeOfGTUFieldIsVisible);
 
-  const hasValue = invoiceData.items.some((item) => {
-    return Boolean(item.typeOfGTU?.trim());
-  });
+  const extraColumns = (invoiceData.extraCustomColumns ?? []).map(
+    (column, extraIndex): CustomColumnInPdf & { isSwitchedOn: boolean } => {
+      return {
+        position: extraIndex + 1,
+        label: column.label?.trim() ?? "",
+        values: items.map((item) => {
+          return item.extraCustomColumnValues?.[extraIndex]?.trim() ?? "";
+        }),
+        isSwitchedOn: column.isVisible,
+      };
+    },
+  );
 
-  return hasName || hasValue;
+  const columns = [
+    { ...firstColumn, isSwitchedOn: isFirstColumnSwitchedOn },
+    ...extraColumns,
+  ];
+
+  return columns
+    .filter((column) => {
+      const hasValue = column.values.some(Boolean);
+
+      return column.isSwitchedOn && (Boolean(column.label) || hasValue);
+    })
+    .map(({ isSwitchedOn: _isSwitchedOn, ...column }) => {
+      return column;
+    });
+}
+
+interface CustomColumnInPdf {
+  /** Where the column sits among all custom columns; 0 is the original one. */
+  position: number;
+  /** The column's name, trimmed; "" while it has none. */
+  label: string;
+  /** Each item's value in the column, trimmed, in item order. */
+  values: string[];
 }
