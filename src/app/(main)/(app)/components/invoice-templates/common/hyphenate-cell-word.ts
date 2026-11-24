@@ -48,9 +48,24 @@ export function hyphenateCellWord(
   return parts.flatMap((part) => {
     const isTooLongToKeep = /\d/.test(part) || part.length > longestWholePart;
 
-    return isTooLongToKeep ? part.split("") : [part];
+    return isTooLongToKeep ? splitGraphemes(part) : [part];
   });
 }
+
+/**
+ * The text's characters as a reader sees them: an accent typed as its own code point stays
+ * with its letter ("é" as `e` + U+0301), and an emoji or other character outside the Basic
+ * Multilingual Plane isn't cut into its two UTF-16 halves, as `.split("")` would do.
+ */
+function splitGraphemes(text: string) {
+  return Array.from(GRAPHEME_SEGMENTER.segment(text), ({ segment }) => {
+    return segment;
+  });
+}
+
+const GRAPHEME_SEGMENTER = new Intl.Segmenter(undefined, {
+  granularity: "grapheme",
+});
 
 /** U+00AD: an invisible break point, drawn as a hyphen only where the line breaks. */
 export const SOFT_HYPHEN = String.fromCodePoint(0x00_ad);

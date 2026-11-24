@@ -1195,6 +1195,55 @@ describe("InvoiceItems custom column", () => {
     expect(getAddAnotherColumnPill(0)).toBeNull();
   });
 
+  it("moves a value's error along with it when an earlier column is removed", async () => {
+    const user = userEvent.setup();
+    const tooLong = "y".repeat(51);
+
+    renderInvoiceItems({
+      itemCount: 1,
+      validate: true,
+      itemOverrides: { typeOfGTU: "A", extraCustomColumnValues: ["B", "C"] },
+      formOverrides: {
+        customColumnLabel: "Project code",
+        extraCustomColumns: [
+          { label: "SKU", isVisible: true },
+          { label: "PO line", isVisible: true },
+        ],
+      },
+    });
+
+    // the third column's value goes over the limit
+    const thirdValue = screen.getByDisplayValue("C");
+
+    await user.clear(thirdValue);
+    await user.type(thirdValue, tooLong);
+
+    expect(
+      await screen.findByText("Value must not exceed 50 characters"),
+    ).toBeInTheDocument();
+
+    // removing the second column moves it into the second column's place
+    await user.click(
+      screen.getByRole("button", {
+        name: "Remove custom column 2 value from item 1",
+      }),
+    );
+
+    const movedValue = screen.getByDisplayValue(tooLong);
+
+    await vi.waitFor(() => {
+      expect(movedValue).toHaveClass("border-red-500");
+    });
+    expect(
+      within(screen.getByTestId("itemCustomColumn0-1")).getByText(
+        "Value must not exceed 50 characters",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText("Value must not exceed 50 characters"),
+    ).toHaveLength(1);
+  });
+
   it("removes a later column altogether with its last value, keeping the next one's values", async () => {
     const user = userEvent.setup();
 
