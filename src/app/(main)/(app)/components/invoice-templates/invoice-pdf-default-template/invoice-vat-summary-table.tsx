@@ -5,6 +5,10 @@ import { type InvoiceData, resolveNumberFormatLocale } from "@/app/schema";
 
 import type { PDF_DEFAULT_TEMPLATE_STYLES } from ".";
 import { formatAmountChunks } from "../../../utils/format-amount";
+import {
+  CELL_HYPHENATION_PENALTY,
+  hyphenateCellWord,
+} from "../common/hyphenate-cell-word";
 import { WrappableAmount } from "../common/wrappable-amount";
 
 /**
@@ -93,16 +97,40 @@ export function InvoiceVATSummaryTable({
       */}
       <View style={[styles.tableRow, { borderTopWidth: 1 }]} fixed>
         <View style={[styles.tableCol, VAT_RATE_COLUMN_WIDTH]}>
-          <Text style={styles.tableCellBold}>{vatRateColumnLabel}</Text>
+          <Text
+            style={styles.tableCellBold}
+            hyphenationCallback={hyphenateCellWord}
+            hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+          >
+            {vatRateColumnLabel}
+          </Text>
         </View>
         <View style={[styles.tableCol, VAT_AMOUNT_COLUMN_WIDTH]}>
-          <Text style={styles.tableCellBold}>{netColumnLabel}</Text>
+          <Text
+            style={styles.tableCellBold}
+            hyphenationCallback={hyphenateCellWord}
+            hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+          >
+            {netColumnLabel}
+          </Text>
         </View>
         <View style={[styles.tableCol, VAT_AMOUNT_COLUMN_WIDTH]}>
-          <Text style={styles.tableCellBold}>{taxLabelText}</Text>
+          <Text
+            style={styles.tableCellBold}
+            hyphenationCallback={hyphenateCellWord}
+            hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+          >
+            {taxLabelText}
+          </Text>
         </View>
         <View style={[styles.tableCol, VAT_AMOUNT_COLUMN_WIDTH]}>
-          <Text style={styles.tableCellBold}>{preTaxColumnLabel}</Text>
+          <Text
+            style={styles.tableCellBold}
+            hyphenationCallback={hyphenateCellWord}
+            hyphenationPenalty={CELL_HYPHENATION_PENALTY}
+          >
+            {preTaxColumnLabel}
+          </Text>
         </View>
       </View>
       {/*

@@ -1,7 +1,10 @@
 import { Text, View } from "@react-pdf/renderer/lib/react-pdf.browser";
 import dayjs from "dayjs";
 
-import { hyphenateCellWord } from "@/app/(main)/(app)/components/invoice-templates/common/hyphenate-cell-word";
+import {
+  CELL_HYPHENATION_PENALTY,
+  hyphenateCellWord,
+} from "@/app/(main)/(app)/components/invoice-templates/common/hyphenate-cell-word";
 import { WrappableAmount } from "@/app/(main)/(app)/components/invoice-templates/common/wrappable-amount";
 import type { STRIPE_TEMPLATE_STYLES } from "@/app/(main)/(app)/components/invoice-templates/invoice-pdf-stripe-template";
 import { INVOICE_PDF_TRANSLATIONS } from "@/app/(main)/(app)/pdf-i18n-translations/pdf-translations";
@@ -95,6 +98,7 @@ export function StripeItemsTable({
               <Text
                 style={styles.fontSize8}
                 hyphenationCallback={hyphenateCellWord}
+                hyphenationPenalty={CELL_HYPHENATION_PENALTY}
               >
                 {column.label ||
                   (column.position === 0 ? t.invoiceItemsTable.typeOfGTU : "")}
@@ -222,6 +226,7 @@ export function StripeItemsTable({
                     <Text
                       style={[styles.fontSize10, styles.textDark]}
                       hyphenationCallback={hyphenateCellWord}
+                      hyphenationPenalty={CELL_HYPHENATION_PENALTY}
                     >
                       {column.values[index]}
                     </Text>
