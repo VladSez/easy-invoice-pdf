@@ -497,6 +497,24 @@ function OpenItemCustomColumnField({
                   id={nameInputId}
                   type="text"
                   placeholder="e.g. Project code, SKU, PO line"
+                  onChange={(event) => {
+                    const wasWithinLimit =
+                      (field.value ?? "").length <= MAX_COLUMN_NAME_LENGTH;
+
+                    field.onChange(event);
+
+                    // the moment the name goes over the limit and its error shows: once
+                    // per crossing, not on every keystroke past it
+                    if (
+                      wasWithinLimit &&
+                      event.target.value.length > MAX_COLUMN_NAME_LENGTH
+                    ) {
+                      trackEvent({
+                        event: "custom_column_name_too_long",
+                        data: { column_position: position + 1 },
+                      });
+                    }
+                  }}
                   onFocus={() => {
                     nameAtFocusRef.current = (field.value ?? "").trim();
                   }}

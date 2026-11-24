@@ -1483,6 +1483,34 @@ describe("InvoiceItems custom column", () => {
     ]);
   });
 
+  it("reports a name going over the limit once each time it crosses it", async () => {
+    const user = userEvent.setup();
+
+    renderInvoiceItems({
+      itemCount: 1,
+      itemOverrides: { typeOfGTU: "A" },
+      formOverrides: { customColumnLabel: "Project code" },
+    });
+
+    const name = screen.getByDisplayValue("Project code");
+
+    await user.clear(name);
+    // 30 characters fit; the 31st crosses the limit, the 32nd stays over it
+    await user.type(name, "x".repeat(32));
+    // back under, then over again
+    await user.type(name, "{Backspace}{Backspace}");
+    await user.type(name, "y");
+
+    const tooLongCalls = vi.mocked(trackEvent).mock.calls.filter(([call]) => {
+      return call.event === "custom_column_name_too_long";
+    });
+
+    expect(tooLongCalls).toEqual([
+      [{ event: "custom_column_name_too_long", data: { column_position: 1 } }],
+      [{ event: "custom_column_name_too_long", data: { column_position: 1 } }],
+    ]);
+  });
+
   it("offers the custom column on the Stripe template too", () => {
     renderInvoiceItems({
       itemCount: 1,
