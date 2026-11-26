@@ -34,7 +34,8 @@ export function HeroAppScene({ appHref }: { appHref: string }) {
       </figcaption>
       <div
         aria-hidden="true"
-        className="flex h-[30px] items-center gap-[18px] bg-white/70 px-[22px] text-[13px] text-neutral-900 shadow-[inset_0_-1px_0_rgba(0,0,0,.06)]">
+        className="flex h-[30px] items-center gap-[18px] bg-white/70 px-[22px] text-[13px] text-neutral-900 shadow-[inset_0_-1px_0_rgba(0,0,0,.06)]"
+      >
         <FinalProjectLogo className="size-3.5 md:size-3.5" />
         <b>EasyInvoicePDF</b>
         {MENU_ITEMS.map((item) => {
@@ -86,7 +87,8 @@ export function HeroAppScene({ appHref }: { appHref: string }) {
 
             <div
               aria-hidden="true"
-              className="mt-4 grid gap-3.5 md:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)]">
+              className="mt-4 grid gap-3.5 md:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)]"
+            >
               <div className="hidden flex-col gap-3 rounded-lg border border-gray-200 p-4 md:flex">
                 <MockSectionTitle title="Seller Information" isOpen />
                 <div className="text-[10px] font-semibold tracking-[0.08em] text-slate-500">
@@ -178,7 +180,8 @@ export function HeroAppScene({ appHref }: { appHref: string }) {
 
       <div
         aria-hidden="true"
-        className="absolute bottom-7 right-7 hidden w-[270px] rounded-xl bg-white p-3.5 text-[13px] shadow-[inset_0_0_0_1px_rgba(0,0,0,.08),0_16px_36px_-14px_rgba(0,0,0,.25)] md:block">
+        className="absolute bottom-7 right-7 hidden w-[270px] rounded-xl bg-white p-3.5 text-[13px] shadow-[inset_0_0_0_1px_rgba(0,0,0,.08),0_16px_36px_-14px_rgba(0,0,0,.25)] md:block"
+      >
         <div className="flex items-center gap-2.5">
           <span className="flex size-[30px] flex-none items-center justify-center rounded-full bg-[#f1f1ef]">
             <Check className="size-3.5" strokeWidth={2.4} />
@@ -317,7 +320,8 @@ function DownloadOrShareArt({ appHref }: { appHref: string }) {
       />
       <div
         aria-hidden="true"
-        className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-[9px] text-xs text-slate-600 shadow-[inset_0_0_0_1px_#e5e7eb]">
+        className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-[9px] text-xs text-slate-600 shadow-[inset_0_0_0_1px_#e5e7eb]"
+      >
         <Link2 className="size-[13px] flex-none" />
         <span className="min-w-0 truncate">
           easyinvoicepdf.com/?data=N4IgjCBcIGoIIBUQBoQGYohSALFAL…
