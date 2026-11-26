@@ -457,6 +457,5 @@ const PRIVACY_FACTS = [
   { label: "Invoice data uploaded", value: "None" },
   { label: "Where the PDF is made", value: "In your browser" },
   { label: "Where your draft is saved", value: "This browser" },
-  { label: "Ads and tracking pixels", value: "None" },
   { label: "Source code", value: "Public on GitHub" },
 ] as const;
