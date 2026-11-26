@@ -355,12 +355,7 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     story: {
       secondaryCtaLabel: "See how it works",
-      proofPoints: [
-        "AGPL-3.0",
-        "13 languages",
-        "122 currencies",
-        "No tracking pixels",
-      ],
+      proofPoints: ["AGPL-3.0", "13 languages", "122 currencies"],
       steps: {
         heading: "From empty form to finished PDF in about a minute",
         lead: "There's no account to make first. This is the whole process.",
