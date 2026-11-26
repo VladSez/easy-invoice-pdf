@@ -2,7 +2,6 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
-  Download,
   FileText,
   Link2,
   Lock,
@@ -10,6 +9,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { SceneActionButtons } from "@/app/(main)/(seo-landings)/components/seo-story-scene-actions";
 import { FinalProjectLogo } from "@/components/etc/final-project-logo";
 import { GITHUB_URL } from "@/config";
 import { cn } from "@/lib/utils";
@@ -24,13 +24,17 @@ import type { SeoStoryStepArt } from "../seo-landing-definitions";
  * On a phone the form and most of the chrome drop away and the PDF is left on its own,
  * which is also what the app itself shows first there.
  */
-export function HeroAppScene() {
+export function HeroAppScene({ appHref }: { appHref: string }) {
   return (
-    <figure
-      className="relative m-0 overflow-hidden rounded-2xl bg-[#eeeeec] shadow-[inset_0_0_0_1px_rgba(0,0,0,.06)]"
-      aria-hidden="true"
-    >
-      <div className="flex h-[30px] items-center gap-[18px] bg-white/70 px-[22px] text-[13px] text-neutral-900 shadow-[inset_0_-1px_0_rgba(0,0,0,.06)]">
+    <figure className="relative m-0 overflow-hidden rounded-2xl bg-[#eeeeec] shadow-[inset_0_0_0_1px_rgba(0,0,0,.06)]">
+      {/* the drawing itself is hidden from screen readers piece by piece, so that its
+          two buttons, which do respond, stay reachable */}
+      <figcaption className="sr-only">
+        A drawing of the invoice generator: the form beside the PDF it makes.
+      </figcaption>
+      <div
+        aria-hidden="true"
+        className="flex h-[30px] items-center gap-[18px] bg-white/70 px-[22px] text-[13px] text-neutral-900 shadow-[inset_0_-1px_0_rgba(0,0,0,.06)]">
         <FinalProjectLogo className="size-3.5 md:size-3.5" />
         <b>EasyInvoicePDF</b>
         {MENU_ITEMS.map((item) => {
@@ -51,7 +55,7 @@ export function HeroAppScene() {
 
       <div className="flex justify-center px-3 pb-7 pt-6 md:px-12 md:pb-16 md:pt-14">
         <div className="w-full max-w-[960px] overflow-hidden rounded-[14px] bg-neutral-50 shadow-[inset_0_0_0_1px_rgba(0,0,0,.08),0_40px_80px_-40px_rgba(0,0,0,.35)]">
-          <div className="flex h-11 items-center gap-3 px-4">
+          <div className="flex h-11 items-center gap-3 px-4" aria-hidden="true">
             <span className="flex gap-2">
               <span className="size-3 rounded-full bg-[#ff5f57]" />
               <span className="size-3 rounded-full bg-[#febc2e]" />
@@ -66,7 +70,7 @@ export function HeroAppScene() {
 
           <div className="bg-white px-3 pt-4 shadow-[inset_0_1px_0_rgba(0,0,0,.06)] md:h-[470px] md:overflow-hidden md:px-5 md:pt-[18px]">
             <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2" aria-hidden="true">
                 <FinalProjectLogo className="h-7 w-[27px] md:h-7 md:w-[27px]" />
                 <div className="leading-[1.15]">
                   <div className="text-lg font-bold text-slate-800">
@@ -77,19 +81,12 @@ export function HeroAppScene() {
                   </div>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <span className="hidden h-8 items-center gap-1.5 rounded-[7px] border border-gray-200 px-3 text-[13px] text-slate-900 sm:inline-flex">
-                  <Link2 className="size-[13px]" />
-                  Get link
-                </span>
-                <span className="inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-[7px] bg-slate-900 px-3.5 text-[13px] text-white">
-                  <Download className="size-[13px]" />
-                  Download PDF
-                </span>
-              </div>
+              <SceneActionButtons appHref={appHref} />
             </div>
 
-            <div className="mt-4 grid gap-3.5 md:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)]">
+            <div
+              aria-hidden="true"
+              className="mt-4 grid gap-3.5 md:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)]">
               <div className="hidden flex-col gap-3 rounded-lg border border-gray-200 p-4 md:flex">
                 <MockSectionTitle title="Seller Information" isOpen />
                 <div className="text-[10px] font-semibold tracking-[0.08em] text-slate-500">
@@ -179,7 +176,9 @@ export function HeroAppScene() {
         </div>
       </div>
 
-      <div className="absolute bottom-7 right-7 hidden w-[270px] rounded-xl bg-white p-3.5 text-[13px] shadow-[inset_0_0_0_1px_rgba(0,0,0,.08),0_16px_36px_-14px_rgba(0,0,0,.25)] md:block">
+      <div
+        aria-hidden="true"
+        className="absolute bottom-7 right-7 hidden w-[270px] rounded-xl bg-white p-3.5 text-[13px] shadow-[inset_0_0_0_1px_rgba(0,0,0,.08),0_16px_36px_-14px_rgba(0,0,0,.25)] md:block">
         <div className="flex items-center gap-2.5">
           <span className="flex size-[30px] flex-none items-center justify-center rounded-full bg-[#f1f1ef]">
             <Check className="size-3.5" strokeWidth={2.4} />
@@ -197,7 +196,14 @@ export function HeroAppScene() {
 }
 
 /** The drawing beside one step, on the grey panel every step shares. */
-export function StoryStepArt({ art }: { art: SeoStoryStepArt }) {
+export function StoryStepArt({
+  art,
+  appHref,
+}: {
+  art: SeoStoryStepArt;
+  /** Where the drawn buttons' toast offers to go. The landing's `hero.ctaHref`. */
+  appHref: string;
+}) {
   return (
     <div className="flex justify-center rounded-3xl bg-[#eeeeec] p-5 sm:p-8 md:p-10">
       {art === "blank-invoice" ? (
@@ -205,7 +211,7 @@ export function StoryStepArt({ art }: { art: SeoStoryStepArt }) {
       ) : art === "live-preview" ? (
         <LivePreviewArt />
       ) : art === "download-or-share" ? (
-        <DownloadOrShareArt />
+        <DownloadOrShareArt appHref={appHref} />
       ) : (
         <PrivacyFactsArt />
       )}
@@ -296,26 +302,22 @@ function LivePreviewArt() {
 }
 
 /** The two ways out of the app: the PDF, and a link that was just copied. */
-function DownloadOrShareArt() {
+function DownloadOrShareArt({ appHref }: { appHref: string }) {
   return (
     <div
       className={cn(
         CARD,
         "my-2 flex max-w-[440px] flex-col gap-3.5 p-5 md:my-4",
       )}
-      aria-hidden="true"
     >
-      <div className="flex flex-wrap gap-2">
-        <span className="inline-flex h-[38px] items-center gap-1.5 rounded-lg border border-gray-200 px-3.5 text-sm text-slate-900">
-          <Link2 className="size-3.5" />
-          Get link
-        </span>
-        <span className="inline-flex h-[38px] min-w-0 flex-1 items-center justify-center gap-1.5 truncate rounded-lg bg-slate-900 px-3.5 text-sm text-white">
-          <Download className="size-3.5" />
-          Download PDF in English
-        </span>
-      </div>
-      <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-[9px] text-xs text-slate-600 shadow-[inset_0_0_0_1px_#e5e7eb]">
+      <SceneActionButtons
+        appHref={appHref}
+        size="md"
+        downloadLabel="Download PDF in English"
+      />
+      <div
+        aria-hidden="true"
+        className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-[9px] text-xs text-slate-600 shadow-[inset_0_0_0_1px_#e5e7eb]">
         <Link2 className="size-[13px] flex-none" />
         <span className="min-w-0 truncate">
           easyinvoicepdf.com/?data=N4IgjCBcIGoIIBUQBoQGYohSALFAL…

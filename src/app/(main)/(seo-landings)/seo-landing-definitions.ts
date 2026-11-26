@@ -155,8 +155,6 @@ interface SeoStoryLandingHero {
 
 /** The copy of a story landing beyond its hero, top to bottom. */
 interface SeoLandingStory {
-  /** The small label above the h1. */
-  eyebrow: string;
   /** The hero's second button, which scrolls down to the steps. */
   secondaryCtaLabel: string;
   /**
@@ -356,7 +354,6 @@ export const SEO_LANDING_DEFINITIONS = {
       },
     },
     story: {
-      eyebrow: "Free · Open source · No ads",
       secondaryCtaLabel: "See how it works",
       proofPoints: [
         "AGPL-3.0",

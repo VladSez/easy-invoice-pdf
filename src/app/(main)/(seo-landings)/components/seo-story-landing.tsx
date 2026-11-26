@@ -62,10 +62,7 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
         <Header />
         <main className="flex flex-1 flex-col pb-16 md:pb-20">
           <section className={`${WRAP} pt-12 md:pt-20`}>
-            <span className="inline-block rounded-lg border border-neutral-200 px-2.5 py-1 text-[13px] text-neutral-800">
-              {story.eyebrow}
-            </span>
-            <h1 className="mt-5 max-w-[820px] text-balance text-[44px] font-extrabold leading-[1] tracking-[-0.04em] md:text-[72px] md:leading-[0.98]">
+            <h1 className="max-w-[820px] text-balance text-[44px] font-extrabold leading-[1] tracking-[-0.04em] md:text-[72px] md:leading-[0.98]">
               {hero.h1}
             </h1>
             {/* the hero's opener is a paragraph, so the section titles stay the page's h2s */}
@@ -100,7 +97,7 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
           </section>
 
           <section className={`${WRAP} pt-10 md:pt-14`}>
-            <HeroAppScene />
+            <HeroAppScene appHref={hero.ctaHref} />
             <p className="mt-6 text-pretty text-center text-[13px] text-neutral-500">
               {proofPoints.join(" · ")}
             </p>
@@ -140,7 +137,7 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
                         {step.body}
                       </p>
                     </div>
-                    <StoryStepArt art={step.art} />
+                    <StoryStepArt art={step.art} appHref={hero.ctaHref} />
                   </li>
                 );
               })}
