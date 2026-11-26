@@ -13,6 +13,7 @@ import {
 } from "@/app/(main)/(seo-landings)/components/seo-story-art";
 import { StickySeoCta } from "@/app/(main)/(seo-landings)/components/sticky-seo-cta";
 import { GithubIcon } from "@/components/etc/github-logo";
+import { RoughAnnotation } from "@/components/rough-annotation";
 import { TrackClick } from "@/components/track-click";
 import { Button } from "@/components/ui/button";
 import { YouTubeEmbed } from "@/components/youtube-embed";
@@ -64,11 +65,19 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
         <main className="flex flex-1 flex-col pb-16 md:pb-20">
           <section className={`${WRAP} pt-12 md:pt-20`}>
             <h1 className="max-w-[820px] text-balance text-[44px] font-extrabold leading-[1] tracking-[-0.04em] md:text-[72px] md:leading-[0.98]">
-              {hero.h1}
+              <MarkedText
+                text={hero.h1}
+                mark={hero.h1Mark}
+                delayMs={H1_MARK_DELAY_MS}
+              />
             </h1>
             {/* the hero's opener is a paragraph, so the section titles stay the page's h2s */}
             <p className="mt-6 max-w-[540px] text-pretty text-lg leading-relaxed text-neutral-700 md:text-[19px]">
-              {hero.subheading}
+              <MarkedText
+                text={hero.subheading}
+                mark={hero.subheadingMark}
+                delayMs={SUBHEADING_MARK_DELAY_MS}
+              />
             </p>
             <div
               className="mt-7 flex flex-col gap-2 sm:flex-row"
@@ -299,6 +308,62 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
     </>
   );
 }
+
+interface MarkedTextProps {
+  /** The text to render, unchanged whether or not it carries a mark. */
+  text: string;
+  /** The phrase to mark. A phrase missing from `text` renders the plain text. */
+  mark: SeoStoryLandingDefinition["hero"]["h1Mark"];
+  /** Wait after the text comes into view before drawing, to sequence the hero's marks. */
+  delayMs: number;
+}
+
+/**
+ * The text with a hand-drawn mark on one phrase. Only the phrase is wrapped, so the
+ * text, and the heading's accessible name, read the same with or without the mark.
+ */
+function MarkedText({ text, mark, delayMs }: MarkedTextProps) {
+  const start = mark ? text.indexOf(mark.phrase) : -1;
+
+  if (!mark || start === -1) {
+    return text;
+  }
+
+  const style = MARK_STYLES[mark.type];
+
+  return (
+    <>
+      {text.slice(0, start)}
+      <RoughAnnotation
+        type={mark.type}
+        color={mark.color}
+        delayMs={delayMs}
+        animationDuration={style.animationDuration}
+        strokeWidth={style.strokeWidth}
+        padding={style.padding}
+      >
+        {mark.phrase}
+      </RoughAnnotation>
+      {text.slice(start + mark.phrase.length)}
+    </>
+  );
+}
+
+/**
+ * How each mark is drawn. The highlight keeps a small padding because the subheading's
+ * lines sit close together, and a wider one would reach into the next line.
+ */
+const MARK_STYLES = {
+  circle: { animationDuration: 900, strokeWidth: 2.5, padding: 10 },
+  highlight: { animationDuration: 800, strokeWidth: undefined, padding: 2 },
+} as const;
+
+/** After the hero has painted, so the circle is seen being drawn rather than missed. */
+const H1_MARK_DELAY_MS = 300;
+
+/** Once the circle is done, so the two marks read as one gesture after the other. */
+const SUBHEADING_MARK_DELAY_MS =
+  H1_MARK_DELAY_MS + MARK_STYLES.circle.animationDuration;
 
 /** The steps' anchor, which the hero's second button scrolls to. */
 const STEPS_ID = "how-it-works";

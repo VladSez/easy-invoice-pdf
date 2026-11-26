@@ -146,11 +146,31 @@ type SeoArticleLandingHero = {
  */
 interface SeoStoryLandingHero {
   h1: string;
+  /** A hand-drawn mark on one phrase of `h1`, drawn first. */
+  h1Mark?: SeoStoryHeroMark;
   subheading: string;
+  /** A hand-drawn mark on one phrase of `subheading`, drawn after `h1Mark`. */
+  subheadingMark?: SeoStoryHeroMark;
   ctaLabel: string;
   ctaHref: string;
   heroImage?: never;
   heroVideo: SeoLandingHeroVideo;
+}
+
+/** A rough-notation mark on one phrase of a story landing's hero. */
+interface SeoStoryHeroMark {
+  /**
+   * Text to annotate, matched exactly.
+   *
+   * The mark's SVG is inserted before a highlight and after any other mark, and counts as
+   * a word break in the text's accessible name. So a highlight's phrase must follow a
+   * space or open the text, and any other phrase must precede a space or end it
+   * (`seo-landing-h1-marks.test.ts` checks both).
+   */
+  phrase: string;
+  type: Extract<RoughAnnotationType, "circle" | "highlight">;
+  /** Any CSS colour; highlights sit behind the text, so keep them light. */
+  color: string;
 }
 
 /** The copy of a story landing beyond its hero, top to bottom. */
@@ -340,8 +360,16 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     hero: {
       h1: "Free invoice generator. No sign up, no login.",
+      // yellow-300
+      h1Mark: { phrase: "Free", type: "circle", color: "rgb(253 224 71)" },
       subheading:
         "Fill in the form, watch the PDF update next to it, and download. Your invoice is made in your browser and never uploaded.",
+      // yellow-300
+      subheadingMark: {
+        phrase: "Your invoice is made in your browser and never uploaded.",
+        type: "highlight",
+        color: "rgb(253 224 71)",
+      },
       ctaLabel: "Create an invoice",
       ctaHref: APP_HREF,
       heroVideo: {
