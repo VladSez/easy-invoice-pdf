@@ -1,5 +1,5 @@
 import {
-  Check,
+  Download,
   ChevronDown,
   ChevronUp,
   FileText,
@@ -9,7 +9,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import { SceneActionButtons } from "@/app/(main)/(seo-landings)/components/seo-story-scene-actions";
+import {
+  SceneActionButtons,
+  SceneToast,
+  SceneToastProvider,
+} from "@/app/(main)/(seo-landings)/components/seo-story-scene-actions";
 import { FinalProjectLogo } from "@/components/etc/final-project-logo";
 import { GITHUB_URL } from "@/config";
 import { cn } from "@/lib/utils";
@@ -26,187 +30,177 @@ import type { SeoStoryStepArt } from "../seo-landing-definitions";
  */
 export function HeroAppScene({ appHref }: { appHref: string }) {
   return (
-    <figure className="relative m-0 overflow-hidden rounded-2xl bg-[#eeeeec] shadow-[inset_0_0_0_1px_rgba(0,0,0,.06)]">
-      {/* the drawing itself is hidden from screen readers piece by piece, so that its
+    <SceneToastProvider>
+      <figure className="relative m-0 overflow-hidden rounded-2xl bg-[#eeeeec] shadow-[inset_0_0_0_1px_rgba(0,0,0,.06)]">
+        {/* the drawing itself is hidden from screen readers piece by piece, so that its
           two buttons, which do respond, stay reachable */}
-      <figcaption className="sr-only">
-        A drawing of the invoice generator: the form beside the PDF it makes.
-      </figcaption>
-      <div
-        aria-hidden="true"
-        className="flex h-[30px] items-center gap-[18px] bg-white/70 px-[22px] text-[13px] text-neutral-900 shadow-[inset_0_-1px_0_rgba(0,0,0,.06)]"
-      >
-        <FinalProjectLogo className="size-3.5 md:size-3.5" />
-        <b>EasyInvoicePDF</b>
-        {MENU_ITEMS.map((item) => {
-          return (
-            <span key={item} className="hidden md:inline">
-              {item}
+        <figcaption className="sr-only">
+          A drawing of the invoice generator: the form beside the PDF it makes.
+        </figcaption>
+        <div
+          aria-hidden="true"
+          className="flex h-[30px] items-center gap-[18px] bg-white/70 px-[22px] text-[13px] text-neutral-900 shadow-[inset_0_-1px_0_rgba(0,0,0,.06)]"
+        >
+          <FinalProjectLogo className="size-3.5 md:size-3.5" />
+          <b>EasyInvoicePDF</b>
+          {MENU_ITEMS.map((item) => {
+            return (
+              <span key={item} className="hidden md:inline">
+                {item}
+              </span>
+            );
+          })}
+          <span className="ml-auto flex items-center gap-3.5">
+            <span className="hidden items-center gap-1.5 md:inline-flex">
+              <FileText className="size-[13px]" strokeWidth={2} />
+              Invoice due Friday
             </span>
-          );
-        })}
-        <span className="ml-auto flex items-center gap-3.5">
-          <span className="hidden items-center gap-1.5 md:inline-flex">
-            <FileText className="size-[13px]" strokeWidth={2} />
-            Invoice due Friday
+            <Wifi className="size-4" strokeWidth={2.2} />
           </span>
-          <Wifi className="size-4" strokeWidth={2.2} />
-        </span>
-      </div>
+        </div>
 
-      <div className="flex justify-center px-3 pb-7 pt-6 md:px-12 md:pb-16 md:pt-14">
-        <div className="w-full max-w-[960px] overflow-hidden rounded-[14px] bg-neutral-50 shadow-[inset_0_0_0_1px_rgba(0,0,0,.08),0_40px_80px_-40px_rgba(0,0,0,.35)]">
-          <div className="flex h-11 items-center gap-3 px-4" aria-hidden="true">
-            <span className="flex gap-2">
-              <span className="size-3 rounded-full bg-[#ff5f57]" />
-              <span className="size-3 rounded-full bg-[#febc2e]" />
-              <span className="size-3 rounded-full bg-[#28c840]" />
-            </span>
-            <span className="mx-auto flex h-[26px] w-3/5 max-w-[380px] items-center justify-center gap-1.5 rounded-lg bg-black/5 text-xs text-neutral-800">
-              <Lock className="size-[11px]" strokeWidth={2.2} />
-              easyinvoicepdf.com
-            </span>
-            <span className="w-[52px]" />
-          </div>
-
-          <div className="bg-white px-3 pt-4 shadow-[inset_0_1px_0_rgba(0,0,0,.06)] md:h-[470px] md:overflow-hidden md:px-5 md:pt-[18px]">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2" aria-hidden="true">
-                <FinalProjectLogo className="h-7 w-[27px] md:h-7 md:w-[27px]" />
-                <div className="leading-[1.15]">
-                  <div className="text-lg font-bold text-slate-800">
-                    EasyInvoicePDF
-                  </div>
-                  <div className="hidden text-[11px] text-slate-700 sm:block">
-                    Free &amp; Open-Source Invoice Generator
-                  </div>
-                </div>
-              </div>
-              <SceneActionButtons appHref={appHref} />
-            </div>
-
+        <div className="flex justify-center px-3 pb-7 pt-6 md:px-12 md:pb-16 md:pt-14">
+          <div className="w-full max-w-[960px] overflow-hidden rounded-[14px] bg-neutral-50 shadow-[inset_0_0_0_1px_rgba(0,0,0,.08),0_40px_80px_-40px_rgba(0,0,0,.35)]">
             <div
+              className="flex h-11 items-center gap-3 px-4"
               aria-hidden="true"
-              className="mt-4 grid gap-3.5 md:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)]"
             >
-              <div className="hidden flex-col gap-3 rounded-lg border border-gray-200 p-4 md:flex">
-                <MockSectionTitle title="Seller Information" isOpen />
-                <div className="text-[10px] font-semibold tracking-[0.08em] text-slate-500">
-                  BUSINESS
+              <span className="flex gap-2">
+                <span className="size-3 rounded-full bg-[#ff5f57]" />
+                <span className="size-3 rounded-full bg-[#febc2e]" />
+                <span className="size-3 rounded-full bg-[#28c840]" />
+              </span>
+              <span className="mx-auto flex h-[26px] w-3/5 max-w-[380px] items-center justify-center gap-1.5 rounded-lg bg-black/5 text-xs text-neutral-800">
+                <Lock className="size-[11px]" strokeWidth={2.2} />
+                easyinvoicepdf.com
+              </span>
+              <span className="w-[52px]" />
+            </div>
+
+            <div className="bg-white px-3 pt-4 shadow-[inset_0_1px_0_rgba(0,0,0,.06)] md:h-[470px] md:overflow-hidden md:px-5 md:pt-[18px]">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2" aria-hidden="true">
+                  <FinalProjectLogo className="h-7 w-[27px] md:h-7 md:w-[27px]" />
+                  <div className="leading-[1.15]">
+                    <div className="text-lg font-bold text-slate-800">
+                      EasyInvoicePDF
+                    </div>
+                    <div className="hidden text-[11px] text-slate-700 sm:block">
+                      Free &amp; Open-Source Invoice Generator
+                    </div>
+                  </div>
                 </div>
-                <MockField label="Name" value="Alex Morgan Design" />
-                <MockField label="Address" value="12 High Street, London" />
-                <MockField label="Email" value="hello@example.com" />
-                <div className="my-0.5 h-px bg-gray-200" />
-                <MockSectionTitle title="Buyer Information" isOpen={false} />
+                <SceneActionButtons />
               </div>
 
-              <div className="overflow-hidden rounded-lg bg-slate-100 px-3.5 pt-3.5">
-                <div className="bg-white px-[22px] pb-[30px] pt-[22px] text-[8.5px] leading-[1.45] text-neutral-900 shadow-[0_1px_3px_rgba(0,0,0,.12)]">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="text-[15px] font-bold">
-                      Invoice No. of: 1/11-2026
+              <div
+                aria-hidden="true"
+                className="mt-4 grid gap-3.5 md:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)]"
+              >
+                <div className="hidden flex-col gap-3 rounded-lg border border-gray-200 p-4 md:flex">
+                  <MockSectionTitle title="Seller Information" isOpen />
+                  <div className="text-[10px] font-semibold tracking-[0.08em] text-slate-500">
+                    BUSINESS
+                  </div>
+                  <MockField label="Name" value="Alex Morgan Design" />
+                  <MockField label="Address" value="12 High Street, London" />
+                  <MockField label="Email" value="hello@example.com" />
+                  <div className="my-0.5 h-px bg-gray-200" />
+                  <MockSectionTitle title="Buyer Information" isOpen={false} />
+                </div>
+
+                <div className="overflow-hidden rounded-lg bg-slate-100 px-3.5 pt-3.5">
+                  <div className="bg-white px-[22px] pb-[30px] pt-[22px] text-[8.5px] leading-[1.45] text-neutral-900 shadow-[0_1px_3px_rgba(0,0,0,.12)]">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="text-[15px] font-bold">
+                        Invoice No. of: 1/11-2026
+                      </div>
+                      <div className="text-right text-[7.5px]">
+                        Date of issue: <b>2026-11-25</b>
+                        <br />
+                        Date of service: <b>2026-11-30</b>
+                      </div>
                     </div>
-                    <div className="text-right text-[7.5px]">
-                      Date of issue: <b>2026-11-25</b>
-                      <br />
-                      Date of service: <b>2026-11-30</b>
+                    <div className="mt-3 grid grid-cols-2 gap-[18px]">
+                      <MockParty
+                        heading="Seller"
+                        name="Alex Morgan Design"
+                        address="12 High Street, London"
+                        email="hello@example.com"
+                      />
+                      <MockParty
+                        heading="Buyer"
+                        name="Client Company Ltd"
+                        address="45 Market Road, Manchester"
+                        email="accounts@example.com"
+                      />
                     </div>
-                  </div>
-                  <div className="mt-3 grid grid-cols-2 gap-[18px]">
-                    <MockParty
-                      heading="Seller"
-                      name="Alex Morgan Design"
-                      address="12 High Street, London"
-                      email="hello@example.com"
-                    />
-                    <MockParty
-                      heading="Buyer"
-                      name="Client Company Ltd"
-                      address="45 Market Road, Manchester"
-                      email="accounts@example.com"
-                    />
-                  </div>
-                  <table className="mt-3.5 w-full border-collapse text-[7.5px]">
-                    <thead>
-                      <tr className="text-center font-bold">
-                        {[
-                          "No",
-                          "Name of goods/service",
-                          "Qty",
-                          "Net price",
-                          "VAT",
-                          "VAT amount",
-                          "Pre-tax amount",
-                        ].map((heading) => {
-                          return (
-                            <th key={heading} className={PDF_CELL}>
-                              {heading}
-                            </th>
-                          );
-                        })}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className={PDF_CELL}>1.</td>
-                        <td className={PDF_CELL}>Website design</td>
-                        <td className={cn(PDF_CELL, "text-right")}>1</td>
-                        <td className={cn(PDF_CELL, "text-right")}>2,400.00</td>
-                        <td className={cn(PDF_CELL, "text-center")}>20%</td>
-                        <td className={cn(PDF_CELL, "text-right")}>480.00</td>
-                        <td className={cn(PDF_CELL, "text-right")}>2,880.00</td>
-                      </tr>
-                      <tr>
-                        <td colSpan={7} className={cn(PDF_CELL, "text-right")}>
-                          SUM: <b>2,880.00</b>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div className="mt-3.5 text-[11px] font-bold underline">
-                    To pay: 2,880.00 EUR
-                  </div>
-                  <div className="mt-[3px]">
-                    Amount in words:{" "}
-                    <b>two thousand eight hundred and eighty EUR 00/100</b>
+                    <table className="mt-3.5 w-full border-collapse text-[7.5px]">
+                      <thead>
+                        <tr className="text-center font-bold">
+                          {[
+                            "No",
+                            "Name of goods/service",
+                            "Qty",
+                            "Net price",
+                            "VAT",
+                            "VAT amount",
+                            "Pre-tax amount",
+                          ].map((heading) => {
+                            return (
+                              <th key={heading} className={PDF_CELL}>
+                                {heading}
+                              </th>
+                            );
+                          })}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className={PDF_CELL}>1.</td>
+                          <td className={PDF_CELL}>Website design</td>
+                          <td className={cn(PDF_CELL, "text-right")}>1</td>
+                          <td className={cn(PDF_CELL, "text-right")}>
+                            2,400.00
+                          </td>
+                          <td className={cn(PDF_CELL, "text-center")}>20%</td>
+                          <td className={cn(PDF_CELL, "text-right")}>480.00</td>
+                          <td className={cn(PDF_CELL, "text-right")}>
+                            2,880.00
+                          </td>
+                        </tr>
+                        <tr>
+                          <td
+                            colSpan={7}
+                            className={cn(PDF_CELL, "text-right")}
+                          >
+                            SUM: <b>2,880.00</b>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div className="mt-3.5 text-[11px] font-bold underline">
+                      To pay: 2,880.00 EUR
+                    </div>
+                    <div className="mt-[3px]">
+                      Amount in words:{" "}
+                      <b>two thousand eight hundred and eighty EUR 00/100</b>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div
-        aria-hidden="true"
-        className="absolute bottom-7 right-7 hidden w-[270px] rounded-xl bg-white p-3.5 text-[13px] shadow-[inset_0_0_0_1px_rgba(0,0,0,.08),0_16px_36px_-14px_rgba(0,0,0,.25)] md:block"
-      >
-        <div className="flex items-center gap-2.5">
-          <span className="flex size-[30px] flex-none items-center justify-center rounded-full bg-[#f1f1ef]">
-            <Check className="size-3.5" strokeWidth={2.4} />
-          </span>
-          <div className="min-w-0">
-            <div className="font-semibold">Invoice 1/11-2026.pdf</div>
-            <div className="text-xs text-neutral-500">
-              Made in this browser. Nothing uploaded.
-            </div>
-          </div>
-        </div>
-      </div>
-    </figure>
+        <SceneToast appHref={appHref} />
+      </figure>
+    </SceneToastProvider>
   );
 }
 
 /** The drawing beside one step, on the grey panel every step shares. */
-export function StoryStepArt({
-  art,
-  appHref,
-}: {
-  art: SeoStoryStepArt;
-  /** Where the drawn buttons' toast offers to go. The landing's `hero.ctaHref`. */
-  appHref: string;
-}) {
+export function StoryStepArt({ art }: { art: SeoStoryStepArt }) {
   return (
     <div className="flex justify-center rounded-3xl bg-[#eeeeec] p-5 sm:p-8 md:p-10">
       {art === "blank-invoice" ? (
@@ -214,7 +208,7 @@ export function StoryStepArt({
       ) : art === "live-preview" ? (
         <LivePreviewArt />
       ) : art === "download-or-share" ? (
-        <DownloadOrShareArt appHref={appHref} />
+        <DownloadOrShareArt />
       ) : (
         <PrivacyFactsArt />
       )}
@@ -305,23 +299,26 @@ function LivePreviewArt() {
 }
 
 /** The two ways out of the app: the PDF, and a link that was just copied. */
-function DownloadOrShareArt({ appHref }: { appHref: string }) {
+function DownloadOrShareArt() {
   return (
     <div
       className={cn(
         CARD,
         "my-2 flex max-w-[440px] flex-col gap-3.5 p-5 md:my-4",
       )}
+      aria-hidden="true"
     >
-      <SceneActionButtons
-        appHref={appHref}
-        size="md"
-        downloadLabel="Download PDF in English"
-      />
-      <div
-        aria-hidden="true"
-        className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-[9px] text-xs text-slate-600 shadow-[inset_0_0_0_1px_#e5e7eb]"
-      >
+      <div className="flex flex-wrap gap-2">
+        <span className="inline-flex h-[38px] items-center gap-1.5 rounded-lg border border-gray-200 px-3.5 text-sm text-slate-900">
+          <Link2 className="size-3.5" />
+          Get link
+        </span>
+        <span className="inline-flex h-[38px] min-w-0 flex-1 items-center justify-center gap-1.5 truncate rounded-lg bg-slate-900 px-3.5 text-sm text-white">
+          <Download className="size-3.5" />
+          Download PDF in English
+        </span>
+      </div>
+      <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-[9px] text-xs text-slate-600 shadow-[inset_0_0_0_1px_#e5e7eb]">
         <Link2 className="size-[13px] flex-none" />
         <span className="min-w-0 truncate">
           easyinvoicepdf.com/?data=N4IgjCBcIGoIIBUQBoQGYohSALFAL…

@@ -137,7 +137,7 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
                         {step.body}
                       </p>
                     </div>
-                    <StoryStepArt art={step.art} appHref={hero.ctaHref} />
+                    <StoryStepArt art={step.art} />
                   </li>
                 );
               })}
