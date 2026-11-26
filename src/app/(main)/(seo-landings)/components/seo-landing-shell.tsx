@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Footer } from "@/app/(components)/footer";
 import { Header } from "@/app/(components)/header";
 import { BlackGoToAppButton } from "@/app/(components)/header/go-to-app-button-cta";
+import { seoCtaClickEvent } from "@/app/(main)/(seo-landings)/components/seo-cta-click-event";
 import { seoHeroCtaMarker } from "@/app/(main)/(seo-landings)/components/seo-cta-marker";
 import { StickySeoCta } from "@/app/(main)/(seo-landings)/components/sticky-seo-cta";
 import { GithubIcon } from "@/components/etc/github-logo";
@@ -18,7 +19,7 @@ import { GITHUB_URL } from "@/config";
 
 import {
   type ComparisonTable,
-  type SeoLandingDefinition,
+  type SeoArticleLandingDefinition,
   type SeoLandingSlug,
   type SeoSection,
 } from "../seo-landing-definitions";
@@ -26,7 +27,7 @@ import { SEO_FOOTER_SOLUTION_LINKS } from "../seo-landing-footer-links";
 import { SeoLandingJsonLd } from "./seo-landing-json-ld";
 
 interface SeoLandingShellProps {
-  definition: SeoLandingDefinition;
+  definition: SeoArticleLandingDefinition;
 }
 
 /**
@@ -42,7 +43,7 @@ const INLINE_CTA_AFTER_SECTION_INDEX = 1;
  * Renders a complete SEO landing page shell with hero section, CTA buttons, and layout structure.
  *
  * @param {SeoLandingShellProps} props - Component props
- * @param {SeoLandingDefinition} props.definition - SEO landing page definition
+ * @param {SeoArticleLandingDefinition} props.definition - SEO landing page definition
  */
 export function SeoLandingShell({ definition }: SeoLandingShellProps) {
   return (
@@ -79,7 +80,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
                 {...seoHeroCtaMarker}
               >
                 <TrackClick
-                  {...ctaClickEvent({
+                  {...seoCtaClickEvent({
                     slug: definition.slug,
                     position: "hero",
                   })}
@@ -285,7 +286,7 @@ export function SeoLandingShell({ definition }: SeoLandingShellProps) {
 
             <div className="flex justify-center py-6 md:py-12">
               <TrackClick
-                {...ctaClickEvent({
+                {...seoCtaClickEvent({
                   slug: definition.slug,
                   position: "bottom",
                 })}
@@ -366,7 +367,7 @@ function MarkedHeading({
   mark,
 }: {
   text: string;
-  mark: SeoLandingDefinition["hero"]["h1Mark"];
+  mark: SeoArticleLandingDefinition["hero"]["h1Mark"];
 }) {
   const start = text.indexOf(mark.phrase);
 
@@ -396,23 +397,6 @@ function MarkedHeading({
 
 const H1_MARK_DELAY_MS = 300;
 
-/**
- * The analytics event for a click on one of the landing's in-page CTAs, which open the app.
- *
- * `seo_sticky_cta_clicked` covers the sticky bar; together they show how many readers of a
- * landing go on to the generator, to set against `seo_landing_file_downloaded` on pages
- * that offer a file.
- */
-function ctaClickEvent({
-  slug,
-  position,
-}: {
-  slug: SeoLandingSlug;
-  position: "hero" | "inline" | "bottom";
-}) {
-  return { event: "seo_landing_cta_clicked", data: { slug, position } };
-}
-
 /** Mid-page prompt to open the app, shown once between the sections. */
 function SeoInlineCta({
   href,
@@ -437,7 +421,7 @@ function SeoInlineCta({
           No account needed.
         </p>
       </div>
-      <TrackClick {...ctaClickEvent({ slug, position: "inline" })}>
+      <TrackClick {...seoCtaClickEvent({ slug, position: "inline" })}>
         <BlackGoToAppButton
           className="w-full shrink-0 px-6 py-5 text-base sm:w-auto"
           href={href}

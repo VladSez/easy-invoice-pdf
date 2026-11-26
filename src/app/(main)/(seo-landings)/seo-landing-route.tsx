@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { SeoLandingShell } from "@/app/(main)/(seo-landings)/components/seo-landing-shell";
+import { SeoStoryLanding } from "@/app/(main)/(seo-landings)/components/seo-story-landing";
 import {
   SEO_LANDING_DEFINITIONS,
   type SeoLandingSlug,
@@ -80,5 +81,9 @@ export function SeoLandingRoutePage({ slug }: { slug: SeoLandingSlug }) {
     );
   }
 
-  return <SeoLandingShell definition={definition} />;
+  return "story" in definition ? (
+    <SeoStoryLanding definition={definition} />
+  ) : (
+    <SeoLandingShell definition={definition} />
+  );
 }
