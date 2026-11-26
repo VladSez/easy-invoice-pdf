@@ -418,12 +418,17 @@ export const SEO_LANDING_DEFINITIONS = {
           "Yes. There's no paywall, no premium tier and no card on file. The code is open source on GitHub under AGPL-3.0.",
       },
       {
+        question: "How do I create a free invoice?",
+        answer:
+          "Open the app, fill in who is billing whom, add your line items and press Download PDF. Totals and tax calculate themselves, and a typical invoice takes about a minute.",
+      },
+      {
         question: "Where does my invoice data go?",
         answer:
           "Nowhere. The form and the PDF both run in your browser, and your draft is kept in this browser so it survives a refresh.",
       },
       {
-        question: "Does it work on a phone?",
+        question: "Does the invoice maker work on a phone?",
         answer:
           "Yes. It runs in any modern mobile browser with no app to install, and you can check the PDF before you download it.",
       },
@@ -433,9 +438,28 @@ export const SEO_LANDING_DEFINITIONS = {
           "Yes. Upload a JPEG, PNG or WebP up to 3MB. It appears on both templates and stays in your browser.",
       },
       {
+        question: "Can I call the tax VAT or GST?",
+        answer:
+          "Yes. Rename the tax label to VAT, GST, Sales Tax or whatever applies to you. Pick from two templates, a plain one and a Stripe-style one, and the total is also written out in words.",
+      },
+      {
+        question: "How do I send the invoice to my client?",
+        answer:
+          "Download the PDF and attach it to an email, or copy a share link. The link holds the whole invoice in the URL, so your client opens the same invoice without an account.",
+      },
+      {
+        question: "How is this different from QuickBooks, Zoho or Wave?",
+        answer:
+          "Those are accounting platforms with a subscription: they track, reconcile and file. Use this when the invoice is the whole task, and keep the accounting suite for the books.",
+      },
+      {
         question: "Can I use it to write a receipt?",
         answer:
           "It makes invoices. Set the Paid field to the full amount and the invoice reads as a record of payment. There's no separate receipt document.",
+      },
+      {
+        question: "Does it have ads?",
+        answer: "No. There are no ads anywhere on the site.",
       },
     ],
   },

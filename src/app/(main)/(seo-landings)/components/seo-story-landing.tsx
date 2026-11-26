@@ -166,6 +166,7 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
                   src={hero.heroVideo.embedUrl}
                   title={hero.heroVideo.title}
                   testId="seo-landing-hero-video"
+                  lazy
                 />
               </div>
             </div>

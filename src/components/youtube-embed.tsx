@@ -24,6 +24,11 @@ interface YouTubeEmbedProps {
    * fullscreen, which is only acceptable for decoration.
    */
   showControls?: boolean;
+  /**
+   * Wait to load the player until it nears the viewport. Use it for embeds below the
+   * fold, where an eager player would compete with the page's first paint.
+   */
+  lazy?: boolean;
   className?: string;
   testId?: string;
 }
@@ -41,6 +46,7 @@ export function YouTubeEmbed({
   title,
   autoPlay = false,
   showControls = true,
+  lazy = false,
   className,
   testId,
 }: YouTubeEmbedProps) {
@@ -53,6 +59,7 @@ export function YouTubeEmbed({
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
       referrerPolicy="strict-origin-when-cross-origin"
       allowFullScreen
+      loading={lazy ? "lazy" : "eager"}
       className={cn("h-full w-full border-0", className)}
       data-testid={testId}
     />
