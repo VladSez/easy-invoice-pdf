@@ -138,16 +138,6 @@ describe("ImportContactsDialog preview", () => {
   });
 
   it("opens another file on its first tab, not the one picked for the last file", () => {
-    function previewState(reviewId: string): ImportContactsDialogState {
-      return {
-        step: "preview",
-        reviewId,
-        fileName: "backup.json",
-        sellers: emptyResult({ added: [ACME] }),
-        buyers: emptyResult({ duplicates: [GLOBEX] }),
-      };
-    }
-
     const props = {
       isOpen: true,
       onOpenChange: vi.fn(),
@@ -552,4 +542,15 @@ function getDropZone() {
   }
 
   return label;
+}
+
+/** A dialog state that previews `backup.json`, under the given review id. */
+function previewState(reviewId: string): ImportContactsDialogState {
+  return {
+    step: "preview",
+    reviewId,
+    fileName: "backup.json",
+    sellers: emptyResult({ added: [ACME] }),
+    buyers: emptyResult({ duplicates: [GLOBEX] }),
+  };
 }

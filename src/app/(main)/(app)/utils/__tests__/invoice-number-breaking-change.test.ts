@@ -339,7 +339,7 @@ describe("handleInvoiceNumberBreakingChange", () => {
 
     it("should handle special characters in invoiceNumber", () => {
       const input = {
-        invoiceNumber: "INV/2024\\001-#@!",
+        invoiceNumber: String.raw`INV/2024\001-#@!`,
         language: "en",
       };
 

@@ -78,7 +78,7 @@ Where an icon makes symmetric padding look unbalanced, use slightly less on the 
 
 ```tsx
 // Tailwind
-<button className="ps-4 pe-3.5 flex items-center gap-2">
+<button className="flex items-center gap-2 pe-3.5 ps-4">
   <span>Continue</span>
   <ArrowRightIcon />
 </button>

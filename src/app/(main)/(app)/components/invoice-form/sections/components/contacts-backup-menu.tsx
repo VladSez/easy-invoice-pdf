@@ -203,26 +203,23 @@ export function ContactsBackupMenu({ isMobile }: ContactsBackupMenuProps) {
     }
   };
 
+  const showImportError = ({ description, reason }: ShowImportErrorOptions) => {
+    trackEvent({ event: "import_contacts_error", data: { reason } });
+
+    toast.error("Could not import sellers & buyers", {
+      id: "import_contacts_error_toast",
+      description,
+      closeButton: true,
+      position: toastPosition,
+    });
+  };
+
   const handleConfirmImport = () => {
     if (importState.step !== "preview") {
       return;
     }
 
     const { sellers, buyers } = importState;
-
-    const showImportError = ({
-      description,
-      reason,
-    }: ShowImportErrorOptions) => {
-      trackEvent({ event: "import_contacts_error", data: { reason } });
-
-      toast.error("Could not import sellers & buyers", {
-        id: "import_contacts_error_toast",
-        description,
-        closeButton: true,
-        position: toastPosition,
-      });
-    };
 
     try {
       const previousSellersJson = getAppStorageItem(SELLERS_LOCAL_STORAGE_KEY);

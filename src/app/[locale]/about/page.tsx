@@ -122,37 +122,9 @@ function HeroSection() {
 
               <div className="flex justify-center xl:justify-start">
                 <p className="text-pretty px-4 text-center text-base text-slate-600 md:max-w-[500px] md:text-lg lg:px-0 xl:text-left xl:text-lg">
-                  {(() => {
-                    let colorIndex = 0;
-
-                    return t.rich("hero.description", {
-                      span: (chunks) => {
-                        // Cycle through the marks: colorIndex increments with each <span>
-                        const mark =
-                          HERO_DESCRIPTION_MARKS[
-                            colorIndex % HERO_DESCRIPTION_MARKS.length
-                          ];
-                        // Each mark starts once the previous one has finished drawing
-                        const delayMs =
-                          HERO_MARKS_START_MS +
-                          colorIndex * HERO_MARK_DURATION_MS;
-                        colorIndex++;
-
-                        return (
-                          <RoughAnnotation
-                            type={mark.type}
-                            color={mark.color}
-                            strokeWidth={mark.strokeWidth}
-                            delayMs={delayMs}
-                            animationDuration={HERO_MARK_DURATION_MS}
-                            className="font-bold text-slate-900"
-                          >
-                            {chunks}
-                          </RoughAnnotation>
-                        );
-                      },
-                    });
-                  })()}
+                  {t.rich("hero.description", {
+                    span: createHeroMarkRenderer(),
+                  })}
                 </p>
               </div>
             </div>
@@ -347,6 +319,40 @@ function CtaSection() {
       </div>
     </section>
   );
+}
+
+/**
+ * Renders the hero description's `<span>`s, cycling through the marks in order, each one
+ * starting when the previous has finished drawing.
+ *
+ * `t.rich` hands every `<span>` to the same callback, in order, without its position, so
+ * the callback counts them itself. The count lives here rather than in the component, so
+ * rendering never reassigns a variable of the component's own.
+ */
+function createHeroMarkRenderer() {
+  let spanIndex = 0;
+
+  return function renderHeroMark(chunks: React.ReactNode) {
+    const mark =
+      HERO_DESCRIPTION_MARKS[spanIndex % HERO_DESCRIPTION_MARKS.length];
+
+    const delayMs = HERO_MARKS_START_MS + spanIndex * HERO_MARK_DURATION_MS;
+
+    spanIndex++;
+
+    return (
+      <RoughAnnotation
+        type={mark.type}
+        color={mark.color}
+        strokeWidth={mark.strokeWidth}
+        delayMs={delayMs}
+        animationDuration={HERO_MARK_DURATION_MS}
+        className="font-bold text-slate-900"
+      >
+        {chunks}
+      </RoughAnnotation>
+    );
+  };
 }
 
 /** When the first hero mark starts drawing, after the page has settled. */

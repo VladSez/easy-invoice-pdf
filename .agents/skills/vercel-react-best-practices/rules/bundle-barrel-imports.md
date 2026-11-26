@@ -16,11 +16,10 @@ Popular icon and component libraries can have **up to 10,000 re-exports** in the
 **Incorrect (imports entire library):**
 
 ```tsx
-import { Check, X, Menu } from "lucide-react";
+import { Button, TextField } from "@mui/material";
 // Loads 1,583 modules, takes ~2.8s extra in dev
 // Runtime cost: 200-800ms on every cold start
-
-import { Button, TextField } from "@mui/material";
+import { Check, X, Menu } from "lucide-react";
 // Loads 2,225 modules, takes ~4.2s extra in dev
 ```
 
