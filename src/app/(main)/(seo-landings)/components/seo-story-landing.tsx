@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
@@ -189,14 +190,15 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
                       href={`/${card.slug}`}
                       className="group flex h-full flex-col gap-1.5 rounded-2xl border border-neutral-200/80 p-[18px] transition-colors hover:border-neutral-300 hover:bg-neutral-50"
                     >
-                      <span className="flex justify-between text-xs text-neutral-500">
+                      <span className="flex items-center justify-between text-xs text-neutral-500">
                         {card.eyebrow}
-                        <span
+                        {/* an icon, not the "↗" character, which each platform's
+                            font draws differently and iOS can turn into an emoji */}
+                        <ArrowUpRight
                           aria-hidden="true"
-                          className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                        >
-                          ↗
-                        </span>
+                          className="size-4 flex-none transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                          strokeWidth={1.75}
+                        />
                       </span>
                       <span className="text-base font-semibold">
                         {card.title}
