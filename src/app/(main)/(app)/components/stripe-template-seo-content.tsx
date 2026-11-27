@@ -284,7 +284,8 @@ const HOW_TO_STEPS = [
   "Download the PDF, or copy a link that opens the same invoice",
 ] as const;
 
-// no "no watermark": every PDF prints a "Created with easyinvoicepdf.com" footer credit
+// "no watermark" only with the footer credit next to it: every PDF prints a small
+// "Created with easyinvoicepdf.com" line (`invoice-footer.tsx`, `stripe-footer.tsx`)
 const FAQ = [
   {
     question: "Do I need a Stripe account to use this template?",
@@ -299,7 +300,7 @@ const FAQ = [
   {
     question: "Is the Stripe invoice template free?",
     answer:
-      "Yes. There is no paid plan and no limit on how many invoices you download.",
+      'Yes. There is no paid plan and no limit on how many invoices you download. There is no watermark across the invoice, only a small "Created with easyinvoicepdf.com" line in the footer.',
   },
   {
     question: "Can I add my logo?",

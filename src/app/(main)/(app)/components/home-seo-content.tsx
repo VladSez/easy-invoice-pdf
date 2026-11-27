@@ -294,12 +294,13 @@ const USE_CASE_LINKS = [
   },
 ] as const;
 
-// no "no watermark": every PDF prints a "Created with easyinvoicepdf.com" footer credit
+// "no watermark" only with the footer credit next to it: every PDF prints a small
+// "Created with easyinvoicepdf.com" line (`invoice-footer.tsx`, `stripe-footer.tsx`)
 const FAQ = [
   {
     question: "Is EasyInvoicePDF really free?",
     answer:
-      "Yes. There is no paid plan and no limit on how many invoices you make.",
+      'Yes. There is no paid plan and no limit on how many invoices you make. There is no watermark across the invoice, only a small "Created with easyinvoicepdf.com" line in the footer.',
   },
   {
     question: "Do I need an account?",
