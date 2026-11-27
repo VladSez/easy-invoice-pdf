@@ -248,7 +248,7 @@ const FEATURES = [
     Sketch: DateFormatsSketch,
   },
   {
-    title: "Your tax label",
+    title: "Custom tax labels",
     text: "VAT, GST, Sales Tax or your own, or no tax columns at all",
     Sketch: TaxLabelSketch,
   },
@@ -258,7 +258,7 @@ const FEATURES = [
     Sketch: LogoBankQrSketch,
   },
   {
-    title: "Saved and shareable",
+    title: "Saved in your browser, shared by link",
     text: "Your details stay saved in your browser, so the next invoice starts filled in. Send the PDF, or a link that opens the same invoice",
     Sketch: ShareLinkSketch,
   },

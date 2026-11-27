@@ -84,7 +84,7 @@ test.describe("Invoice app SEO content @desktop-only", () => {
     const section = page.getByTestId("home-seo-content");
 
     await expect(
-      section.getByRole("link", { name: "Stripe-style invoice template" }),
+      section.getByRole("link", { name: "Use the Stripe invoice template" }),
     ).toHaveAttribute("href", STRIPE_TEMPLATE_PATHNAME);
     await expect(
       section.getByRole("link", { name: "no login and no signup" }),
@@ -117,7 +117,7 @@ test.describe("Invoice app SEO content @desktop-only", () => {
     ).toHaveCount(0);
   });
 
-  test("/stripe-template 'Switch to classic' opens the default template for a visitor whose invoice uses Stripe", async ({
+  test("/stripe-template 'Use the classic invoice template' opens the default template for a visitor whose invoice uses Stripe", async ({
     page,
   }) => {
     await page.goto(STRIPE_TEMPLATE_PATHNAME);
@@ -137,7 +137,7 @@ test.describe("Invoice app SEO content @desktop-only", () => {
     // scrolls the preview back into view, so a real click can land on the preview
     await page
       .getByTestId("stripe-template-seo-content")
-      .getByRole("link", { name: "Switch to classic" })
+      .getByRole("link", { name: "Use the classic invoice template" })
       .dispatchEvent("click");
 
     await expect(page).toHaveURL("/");
@@ -180,7 +180,7 @@ test.describe("Invoice app SEO content @desktop-only", () => {
     await expect(
       homeSection
         .getByRole("article", { name: "Stripe" })
-        .getByRole("link", { name: "Switch to Stripe" }),
+        .getByRole("link", { name: "Use the Stripe invoice template" }),
     ).toHaveAttribute("href", STRIPE_TEMPLATE_PATHNAME);
 
     // and back: the route's own server-rendered copy returns

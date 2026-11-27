@@ -168,7 +168,9 @@ const APP_STATES = {
   "stripe/indigo": { title: "Indigo top line" },
   "stripe/seo-content": { title: "About the template, below the editor" },
   "stripe/seo-template-chooser": { title: "Stripe or classic?" },
-  "stripe/seo-template-parts": { title: "What's on the template" },
+  "stripe/seo-template-parts": {
+    title: "What's on the Stripe invoice template",
+  },
   "stripe/custom-column": { title: "Custom column on the Stripe template" },
   "stripe/custom-columns-three": {
     title: "Three custom columns on the Stripe template",
@@ -629,7 +631,7 @@ export const FLOWS = [
                 next: [
                   {
                     state: "stripe/seo-template-parts",
-                    via: "Scroll to What's on the template",
+                    via: "Scroll to What's on the Stripe invoice template",
                     next: [
                       {
                         state: "stripe/seo-template-chooser",

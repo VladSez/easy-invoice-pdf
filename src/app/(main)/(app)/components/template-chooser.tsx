@@ -121,32 +121,20 @@ function TemplateOptionCard({ option, isCurrent }: TemplateOptionCardProps) {
           })}
         </ul>
 
-        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-2">
+        <div className="mt-auto pt-2">
           {isCurrent ? (
             <ScrollToEditorButton label="Keep editing this one" />
           ) : (
-            <>
-              {/* a full page load: the app keeps the template it was opened on during
-                  client-side navigation */}
-              <a
-                href={option.switchHref}
-                className="inline-flex h-11 items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 text-[15px] font-medium text-slate-900 transition-colors hover:border-slate-900"
-              >
-                {option.switchLabel}
-                <ArrowRightIcon className="size-4" aria-hidden="true" />
-              </a>
-              {option.aboutLabel ? (
-                <span className="text-sm text-slate-600">
-                  More on the{" "}
-                  <a
-                    href={option.switchHref}
-                    className="font-medium text-slate-900 underline decoration-slate-400 underline-offset-4 transition-colors hover:decoration-slate-900"
-                  >
-                    {option.aboutLabel}
-                  </a>
-                </span>
-              ) : null}
-            </>
+            // a full page load: the app keeps the template it was opened on during
+            // client-side navigation. The text names the template's page, since it is
+            // the anchor text search engines read for that route
+            <a
+              href={option.switchHref}
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-[15px] font-medium text-slate-900 transition-colors hover:border-slate-900"
+            >
+              {option.switchLabel}
+              <ArrowRightIcon className="size-4 shrink-0" aria-hidden="true" />
+            </a>
           )}
         </div>
       </div>
@@ -164,7 +152,7 @@ const TEMPLATE_OPTIONS = [
     pageSize: "US Letter",
     previewSrc: "/template-previews/stripe-invoice-template.png",
     previewWidth: 618,
-    previewAlt: "First page of an invoice in the Stripe template",
+    previewAlt: "Example PDF made with the Stripe invoice template",
     traits: [
       "The amount due and due date in bold, above the items",
       "One plain table, then subtotal, tax and amount due",
@@ -172,9 +160,7 @@ const TEMPLATE_OPTIONS = [
       "A colored line across the top, in a color you pick",
     ],
     switchHref: STRIPE_TEMPLATE_PATHNAME,
-    switchLabel: "Switch to Stripe",
-    // the route is indexed as its own page: anchor text that names it, from `/`
-    aboutLabel: "Stripe-style invoice template",
+    switchLabel: "Use the Stripe invoice template",
   },
   {
     template: "default",
@@ -182,7 +168,7 @@ const TEMPLATE_OPTIONS = [
     pageSize: "A4",
     previewSrc: "/template-previews/classic-invoice-template.png",
     previewWidth: 565,
-    previewAlt: "First page of an invoice in the classic template",
+    previewAlt: "Example PDF made with the classic invoice template",
     traits: [
       "A numbered table with net price, VAT amount and pre-tax amount",
       "A VAT summary by rate",
@@ -192,7 +178,7 @@ const TEMPLATE_OPTIONS = [
     // an explicit template: a bare `/` sends a visitor whose saved invoice uses the
     // Stripe template straight back to `/stripe-template`
     switchHref: "/?template=default",
-    switchLabel: "Switch to classic",
+    switchLabel: "Use the classic invoice template",
   },
 ] as const satisfies readonly TemplateOption[];
 
@@ -211,11 +197,6 @@ interface TemplateOption {
   /** Opens this template, with a full page load. */
   switchHref: string;
   switchLabel: string;
-  /**
-   * Names the template's own page in a "More on the …" link beside the switch button,
-   * shown while the other template is in use.
-   */
-  aboutLabel?: string;
 }
 
 interface TemplateOptionCardProps {

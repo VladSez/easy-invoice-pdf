@@ -172,7 +172,7 @@ test("stripe template page", async ({ page, atlas }) => {
   });
   await atlas.snap("stripe/seo-template-parts", {
     scrollTo: seoContent.getByRole("heading", {
-      name: "What's on the template",
+      name: "What's on the Stripe invoice template",
     }),
   });
   await atlas.snap("stripe/seo-template-chooser", {

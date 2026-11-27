@@ -70,7 +70,9 @@ export function StripeTemplateSeoContent() {
       </SeoContentIntro>
 
       <div>
-        <SeoContentHeading>What&apos;s on the template</SeoContentHeading>
+        <SeoContentHeading>
+          What&apos;s on the Stripe invoice template
+        </SeoContentHeading>
         {/* six parts that make the case for this template: the amount due and US
             Letter are left out because the intro, the facts and the template chooser
             already say both */}
@@ -268,7 +270,7 @@ const TEMPLATE_PARTS = [
     Sketch: ItemsTableSketch,
   },
   {
-    title: "Logo and details",
+    title: "Your logo and business details",
     text: "Your logo beside the invoice title, your details next to your client's",
     Sketch: LogoAndPartiesSketch,
   },
