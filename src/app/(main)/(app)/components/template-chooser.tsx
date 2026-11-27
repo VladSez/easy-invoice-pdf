@@ -36,7 +36,7 @@ export function TemplateChooser() {
   });
 
   return (
-    <div className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-3">
+    <div className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-3">
       {options.map((option) => {
         return (
           <TemplateOptionCard
@@ -130,6 +130,12 @@ function TemplateOptionCard({ option, isCurrent }: TemplateOptionCardProps) {
             // the anchor text search engines read for that route
             <a
               href={option.switchHref}
+              onPointerDown={(event) => {
+                event.currentTarget.href = withSharedInvoice(option.switchHref);
+              }}
+              onFocus={(event) => {
+                event.currentTarget.href = withSharedInvoice(option.switchHref);
+              }}
               className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-[15px] font-medium text-slate-900 transition-colors hover:border-slate-900"
             >
               {option.switchLabel}
@@ -140,6 +146,32 @@ function TemplateOptionCard({ option, isCurrent }: TemplateOptionCardProps) {
       </div>
     </article>
   );
+}
+
+/**
+ * Carries a shared invoice (`?data=`) over to the other template's link, so a visitor
+ * who opened a shared link switches templates on that invoice, not on their saved one.
+ *
+ * Applied when the link is pressed or focused rather than while rendering: reading the
+ * query during render (`useSearchParams()`) would drop this server-rendered block out of
+ * the prerendered HTML, and the HTML a crawler reads should keep the bare link anyway.
+ * Pointer-down covers plain, middle and modified clicks (new tab) and the context menu;
+ * focus covers the keyboard.
+ *
+ * @param switchHref - The template's link without the shared invoice.
+ * @returns The link with the current `data` param added, or `switchHref` when there is none.
+ */
+function withSharedInvoice(switchHref: string): string {
+  const sharedInvoice = new URLSearchParams(window.location.search).get("data");
+
+  if (!sharedInvoice) {
+    return switchHref;
+  }
+
+  const url = new URL(switchHref, window.location.origin);
+  url.searchParams.set("data", sharedInvoice);
+
+  return `${url.pathname}${url.search}`;
 }
 
 /** Both previews are page 1 of the default invoice, rendered at this height. */

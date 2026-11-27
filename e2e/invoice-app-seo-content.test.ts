@@ -1,8 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { compressToEncodedURIComponent } from "lz-string";
 
 import { INITIAL_INVOICE_DATA } from "@/app/constants";
 import { PDF_DATA_LOCAL_STORAGE_KEY } from "@/app/schema";
 import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
+import { compressInvoiceData } from "@/utils/url-compression";
 
 /**
  * Each invoice app route has its own crawlable copy below the editor: `HomeSeoContent` on
@@ -145,6 +147,63 @@ test.describe("Invoice app SEO content @desktop-only", () => {
       "default",
     );
     await expect(page.getByTestId("home-seo-content")).toBeVisible();
+  });
+
+  // A shared link's invoice is not saved until it is edited, so a switch link without
+  // `?data=` would open the visitor's own saved invoice instead of the shared one.
+  test("/stripe-template 'Use the classic invoice template' keeps a shared invoice", async ({
+    page,
+  }) => {
+    // built the way the app builds a share link: short keys, then lz-string
+    const sharedData = compressToEncodedURIComponent(
+      JSON.stringify(
+        compressInvoiceData({
+          ...INITIAL_INVOICE_DATA,
+          template: "stripe",
+          seller: { ...INITIAL_INVOICE_DATA.seller, name: "Shared Seller Ltd" },
+        }),
+      ),
+    );
+
+    // the visitor's own saved invoice, which the switch must not fall back to
+    await page.goto(STRIPE_TEMPLATE_PATHNAME);
+    await page.evaluate(
+      ({ invoiceData, storageKey }) => {
+        localStorage.setItem(storageKey, JSON.stringify(invoiceData));
+      },
+      {
+        storageKey: PDF_DATA_LOCAL_STORAGE_KEY,
+        invoiceData: {
+          ...INITIAL_INVOICE_DATA,
+          seller: { ...INITIAL_INVOICE_DATA.seller, name: "Saved Seller Ltd" },
+        },
+      },
+    );
+
+    await page.goto(`${STRIPE_TEMPLATE_PATHNAME}?data=${sharedData}`);
+
+    const sellerName = page
+      .getByTestId("seller-information-section")
+      .getByRole("textbox", { name: "Name" });
+    await expect(sellerName).toHaveValue("Shared Seller Ltd");
+
+    const classicLink = page
+      .getByTestId("stripe-template-seo-content")
+      .getByRole("link", { name: "Use the classic invoice template" });
+
+    // the link is rewritten on press; `dispatchEvent` for the PDF viewer focus reason above
+    await classicLink.dispatchEvent("pointerdown");
+    await expect(classicLink).toHaveAttribute(
+      "href",
+      `/?template=default&data=${sharedData}`,
+    );
+    await classicLink.dispatchEvent("click");
+
+    await expect(page).toHaveURL(/^[^?]*\/\?(.*&)?data=/);
+    await expect(page.getByRole("combobox", { name: "Template" })).toHaveValue(
+      "default",
+    );
+    await expect(sellerName).toHaveValue("Shared Seller Ltd");
   });
 
   // A template switch rewrites the address bar in place, without a navigation, so the

@@ -99,7 +99,7 @@ export function SeoContentIntro({
  */
 export function SeoContentFeatureGrid({ children }: SeoContentChildrenProps) {
   return (
-    <ul className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-3">
+    <ul className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-3">
       {children}
     </ul>
   );
@@ -147,7 +147,7 @@ export function SeoContentStepsCard({
   return (
     <div className={cn(SEO_CARD_CLASS_NAME, "p-6 sm:p-8")}>
       <SeoContentBlockHeader withEditorButton>{heading}</SeoContentBlockHeader>
-      <ol className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-x-10 gap-y-4">
+      <ol className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-x-10 gap-y-4">
         {steps.map((step, index) => {
           return (
             <li key={step} className="flex items-start gap-3.5">
