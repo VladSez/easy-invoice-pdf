@@ -5,16 +5,46 @@ import {
   SEO_LANDING_SLUGS,
 } from "../seo-landing-definitions";
 
-describe("h1 marks on the SEO landings", () => {
-  it.each(SEO_LANDING_SLUGS)("%s marks a phrase that is in its h1", (slug) => {
-    const { h1, h1Mark } = SEO_LANDING_DEFINITIONS[slug].hero;
+/** The landings whose h1 carries a mark. */
+const MARKED_HEROES = SEO_LANDING_SLUGS.flatMap((slug) => {
+  const { hero } = SEO_LANDING_DEFINITIONS[slug];
 
-    expect(h1).toContain(h1Mark.phrase);
+  return "h1Mark" in hero ? [{ slug, h1: hero.h1, h1Mark: hero.h1Mark }] : [];
+});
+
+/**
+ * Every marked text on the landings, as `[label, text, mark]` rows: the heroes' h1s and
+ * the section headings of story landings.
+ */
+const MARKED_TEXTS = SEO_LANDING_SLUGS.flatMap((slug) => {
+  const definition = SEO_LANDING_DEFINITIONS[slug];
+
+  const { hero } = definition;
+
+  const rows: [string, string, { phrase: string; type: string }][] = [];
+
+  if ("h1Mark" in hero) {
+    rows.push([`${slug} h1`, hero.h1, hero.h1Mark]);
+  }
+
+  if ("story" in definition) {
+    for (const [section, copy] of Object.entries(definition.story)) {
+      if (typeof copy === "object" && "headingMark" in copy) {
+        rows.push([`${slug} ${section}`, copy.heading, copy.headingMark]);
+      }
+    }
+  }
+
+  return rows;
+});
+
+describe("hero marks on the SEO landings", () => {
+  it.each(MARKED_TEXTS)("%s marks a phrase that is in it", (_, text, mark) => {
+    expect(text).toContain(mark.phrase);
   });
 
-  it("gives every landing its own mark type and colour pairing", () => {
-    const pairings = SEO_LANDING_SLUGS.map((slug) => {
-      const { type, color } = SEO_LANDING_DEFINITIONS[slug].hero.h1Mark;
+  it("gives every landing its own h1 mark type and colour pairing", () => {
+    const pairings = MARKED_HEROES.map(({ h1Mark: { type, color } }) => {
       return `${type} ${color}`;
     });
 
@@ -23,32 +53,19 @@ describe("h1 marks on the SEO landings", () => {
 });
 
 /**
- * See `h1Mark.phrase`: the mark's SVG sits before a highlight and after an underline, and
- * counts as a word break in the heading's accessible name there, so that side of the
- * phrase must already be whitespace (or the edge of the heading).
+ * See `h1Mark.phrase`: the mark's SVG sits before a highlight and after any other mark,
+ * and counts as a word break in the text's accessible name there, so that side of the
+ * phrase must already be whitespace (or the edge of the text).
  */
-describe("h1 mark phrases keep the heading's accessible name intact", () => {
-  it.each(slugsMarkedWith("highlight"))(
-    "%s: a space or the start of the heading comes before the highlight",
-    (slug) => {
-      const { h1, h1Mark } = SEO_LANDING_DEFINITIONS[slug].hero;
-
-      expect(` ${h1}`).toContain(` ${h1Mark.phrase}`);
-    },
-  );
-
-  it.each(slugsMarkedWith("underline"))(
-    "%s: a space or the end of the heading comes after the underline",
-    (slug) => {
-      const { h1, h1Mark } = SEO_LANDING_DEFINITIONS[slug].hero;
-
-      expect(`${h1} `).toContain(`${h1Mark.phrase} `);
+describe("hero mark phrases keep the text's accessible name intact", () => {
+  it.each(MARKED_TEXTS)(
+    "%s: whitespace or the edge of the text sits where the mark's SVG goes",
+    (_, text, mark) => {
+      if (mark.type === "highlight") {
+        expect(` ${text}`).toContain(` ${mark.phrase}`);
+      } else {
+        expect(`${text} `).toContain(`${mark.phrase} `);
+      }
     },
   );
 });
-
-function slugsMarkedWith(type: "highlight" | "underline") {
-  return SEO_LANDING_SLUGS.filter((slug) => {
-    return SEO_LANDING_DEFINITIONS[slug].hero.h1Mark.type === type;
-  });
-}

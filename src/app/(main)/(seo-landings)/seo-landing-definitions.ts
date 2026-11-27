@@ -50,53 +50,35 @@ export interface ComparisonTable {
   rows: { feature: string; thisTool: string; other: string }[];
 }
 
-export interface SeoLandingDefinition {
+/**
+ * One landing page. Most are articles, rendered by `SeoLandingShell`: a hero, then
+ * titled sections of prose. A landing with `story` set is rendered by
+ * `SeoStoryLanding` instead: a product scene, a few illustrated steps and an open FAQ.
+ */
+export type SeoLandingDefinition =
+  | SeoArticleLandingDefinition
+  | SeoStoryLandingDefinition;
+
+interface SeoLandingDefinitionBase {
   slug: SeoLandingSlug;
   metadata: {
     title: string;
     description: string;
     keywords: string;
   };
-  hero: {
-    h1: string;
-    /**
-     * The hand-drawn mark drawn on one phrase of the h1 once the page loads.
-     *
-     * A phrase, so the mark points at the reason to read on (No Sign Up, Factura, SEK)
-     * rather than painting the whole heading. Only highlight and underline: they draw one
-     * stroke per line if the phrase wraps, where a box or circle around a wide word cuts
-     * through its corners. Each landing gets its own type and colour pairing (checked in
-     * `seo-landing-h1-marks.test.ts`).
-     */
-    h1Mark: {
-      /**
-       * Text inside `h1` to annotate, matched exactly.
-       *
-       * rough-notation inserts its SVG beside the phrase (before a highlight, after an
-       * underline), and that absolutely positioned SVG counts as a word break in the
-       * heading's accessible name. So a highlight's phrase must follow a space or open the
-       * heading, and an underline's must precede a space or end it; otherwise the name
-       * reads "Spanish ( Factura)". Hence "(Factura)" with its parentheses.
-       */
-      phrase: string;
-      type: Extract<RoughAnnotationType, "highlight" | "underline">;
-      /** Any CSS colour; highlights sit behind the text, so keep them light. */
-      color: string;
-    };
-    subheading: string;
-    bullets: string[];
-    ctaLabel: string;
-    ctaHref: string;
-    /**
-     * Files to download straight from the hero, under the CTA. For queries where the
-     * searcher wants a file rather than a tool ("invoice template pdf").
-     */
-    downloads?: {
-      /** Lead-in before the links, e.g. "Prefer a blank PDF?" */
-      label: string;
-      files: { label: string; href: string }[];
-    };
-  } & SeoLandingHeroMedia;
+  faq: SeoFaqItem[];
+  /**
+   * Other landings this one links to, in a block under the FAQ.
+   *
+   * Before this the landings reached each other only through the footer list, which
+   * search engines weigh less than links in the body. Pick pages a reader of this one
+   * plausibly needs next, not a fixed set.
+   */
+  relatedSlugs: readonly SeoLandingSlug[];
+}
+
+export interface SeoArticleLandingDefinition extends SeoLandingDefinitionBase {
+  hero: SeoArticleLandingHero;
   sections: SeoSection[];
   /**
    * A short table of plain facts, shown directly under the hero.
@@ -109,15 +91,146 @@ export interface SeoLandingDefinition {
     rows: { label: string; value: string }[];
   };
   comparisonTable?: ComparisonTable;
-  faq: SeoFaqItem[];
+  story?: never;
+}
+
+export interface SeoStoryLandingDefinition extends SeoLandingDefinitionBase {
+  hero: SeoStoryLandingHero;
+  story: SeoLandingStory;
+}
+
+type SeoArticleLandingHero = {
+  h1: string;
   /**
-   * Other landings this one links to, in a block under the FAQ.
+   * The hand-drawn mark drawn on one phrase of the h1 once the page loads.
    *
-   * Before this the landings reached each other only through the footer list, which
-   * search engines weigh less than links in the body. Pick pages a reader of this one
-   * plausibly needs next, not a fixed set.
+   * A phrase, so the mark points at the reason to read on (No Sign Up, Factura, SEK)
+   * rather than painting the whole heading. Only highlight and underline: they draw one
+   * stroke per line if the phrase wraps, where a box or circle around a wide word cuts
+   * through its corners. Each landing gets its own type and colour pairing (checked in
+   * `seo-landing-h1-marks.test.ts`).
    */
-  relatedSlugs: readonly SeoLandingSlug[];
+  h1Mark: {
+    /**
+     * Text inside `h1` to annotate, matched exactly.
+     *
+     * rough-notation inserts its SVG beside the phrase (before a highlight, after an
+     * underline), and that absolutely positioned SVG counts as a word break in the
+     * heading's accessible name. So a highlight's phrase must follow a space or open the
+     * heading, and an underline's must precede a space or end it; otherwise the name
+     * reads "Spanish ( Factura)". Hence "(Factura)" with its parentheses.
+     */
+    phrase: string;
+    type: Extract<RoughAnnotationType, "highlight" | "underline">;
+    /** Any CSS colour; highlights sit behind the text, so keep them light. */
+    color: string;
+  };
+  subheading: string;
+  bullets: string[];
+  ctaLabel: string;
+  ctaHref: string;
+  /**
+   * Files to download straight from the hero, under the CTA. For queries where the
+   * searcher wants a file rather than a tool ("invoice template pdf").
+   */
+  downloads?: {
+    /** Lead-in before the links, e.g. "Prefer a blank PDF?" */
+    label: string;
+    files: { label: string; href: string }[];
+  };
+} & SeoLandingHeroMedia;
+
+/**
+ * The story layout's hero. Its art is a drawn scene of the app rather than an image,
+ * and the demo clip plays further down, under the steps.
+ */
+interface SeoStoryLandingHero {
+  h1: string;
+  /** A hand-drawn mark on one phrase of `h1`, drawn first. */
+  h1Mark?: SeoStoryMark;
+  subheading: string;
+  ctaLabel: string;
+  ctaHref: string;
+  /** A hand-drawn frame around the hero's CTA button, drawn after `h1Mark`. */
+  ctaMark?: {
+    type: Extract<RoughAnnotationType, "box" | "circle">;
+    /** Any CSS colour. */
+    color: string;
+  };
+  heroImage?: never;
+  heroVideo: SeoLandingHeroVideo;
+}
+
+/** A rough-notation mark on one phrase of a story landing's hero or section headings. */
+interface SeoStoryMark {
+  /**
+   * Text to annotate, matched exactly.
+   *
+   * The mark's SVG is inserted before a highlight and after any other mark, and counts as
+   * a word break in the text's accessible name. So a highlight's phrase must follow a
+   * space or open the text, and any other phrase must precede a space or end it
+   * (`seo-landing-h1-marks.test.ts` checks both).
+   */
+  phrase: string;
+  type: Extract<RoughAnnotationType, "circle" | "highlight" | "underline">;
+  /** Any CSS colour; highlights sit behind the text, so keep them light. */
+  color: string;
+}
+
+/** The copy of a story landing beyond its hero, top to bottom. */
+interface SeoLandingStory {
+  /** The hero's second button, which scrolls down to the steps. */
+  secondaryCtaLabel: string;
+  /**
+   * Short facts in one line under the hero scene. The live GitHub star count is put in
+   * front of them.
+   */
+  proofPoints: string[];
+  steps: SeoStoryHeading & { items: SeoStoryStep[] };
+  /**
+   * The card right after the steps, which asks readers who have just seen the whole flow
+   * to try it.
+   */
+  stepsCta: SeoStoryHeading;
+  /** Copy beside the demo clip, which is `hero.heroVideo`. */
+  video: SeoStoryHeading;
+  related: Omit<SeoStoryHeading, "lead"> & {
+    /** One card per entry of `relatedSlugs`, in the same order. */
+    cards: readonly SeoStoryRelatedCard[];
+  };
+  faq: SeoStoryHeading;
+  closing: SeoStoryHeading;
+}
+
+/** A story section's title and the line under it. */
+interface SeoStoryHeading {
+  heading: string;
+  /** A hand-drawn mark on one phrase of `heading`, drawn when the section scrolls in. */
+  headingMark?: SeoStoryMark;
+  lead: string;
+}
+
+interface SeoStoryStep {
+  /** The short label above the step's title, e.g. "No sign up". */
+  label: string;
+  title: string;
+  body: string;
+  /** Which drawing of the app sits beside the step. */
+  art: SeoStoryStepArt;
+}
+
+export type SeoStoryStepArt =
+  | "blank-invoice"
+  | "live-preview"
+  | "download-or-share"
+  | "privacy-facts";
+
+interface SeoStoryRelatedCard {
+  slug: SeoLandingSlug;
+  /** Small label above the title, e.g. "Template". */
+  eyebrow: string;
+  title: string;
+  description: string;
 }
 
 /**
@@ -204,6 +317,49 @@ const BLANK_INVOICE_PDF_HREFS = {
   letter: "/invoice-template-pdf/blank-invoice-template-letter.pdf",
 } as const;
 
+/**
+ * The related landings on `/invoice-generator-no-login`, as cards. Its `relatedSlugs`
+ * are read off this list, so the two cannot disagree.
+ */
+const NO_LOGIN_RELATED_CARDS = [
+  {
+    slug: "stripe-invoice-alternative",
+    eyebrow: "Template",
+    title: "Stripe-style invoice",
+    description: "A layout your clients already know.",
+  },
+  {
+    slug: "multi-language-invoice-generator",
+    eyebrow: "Languages",
+    title: "Invoices in 13 languages",
+    description: "Pick the language and currency separately.",
+  },
+  {
+    slug: "open-source-invoice-generator",
+    eyebrow: "Open source",
+    title: "Read or self-host the code",
+    description: "AGPL-3.0 on GitHub.",
+  },
+  {
+    slug: "invoice-template-pdf",
+    eyebrow: "Download",
+    title: "Blank invoice template PDF",
+    description: "A4 or Letter, to print and fill in.",
+  },
+  {
+    slug: "freelance-invoice-template",
+    eyebrow: "Freelancers",
+    title: "Freelance invoice template",
+    description: "Hours, rates and a clear total.",
+  },
+  {
+    slug: "proforma-invoice-generator",
+    eyebrow: "Before the work",
+    title: "Proforma invoice",
+    description: "Quote the job before you bill it.",
+  },
+] as const satisfies readonly SeoStoryRelatedCard[];
+
 export const SEO_LANDING_DEFINITIONS = {
   "invoice-generator-no-login": {
     slug: "invoice-generator-no-login",
@@ -215,23 +371,14 @@ export const SEO_LANDING_DEFINITIONS = {
         "invoice generator, free invoice generator, invoice generator tool, invoice maker, invoice builder, create invoice free, free bill generator, invoice generator no login, no signup invoice maker, free invoice forms, bill template, browser invoice generator, ad-free invoice generator",
     },
     hero: {
-      h1: "Free Invoice Generator - No Sign Up, No Login",
+      h1: "Free invoice generator. No sign up, no login.",
       // yellow-300
-      h1Mark: {
-        phrase: "No Sign Up",
-        type: "highlight",
-        color: "rgb(253 224 71)",
-      },
+      h1Mark: { phrase: "Free", type: "circle", color: "rgb(253 224 71)" },
       subheading:
-        "Fill in the form, watch the PDF redraw beside it, then download the file. No account, no email, no credit card. The invoice is rendered on your own machine, so nothing you type is uploaded.",
-      bullets: [
-        "A finished PDF in about a minute",
-        "No account, no email, no credit card",
-        "13 languages and 122 currencies",
-        "Free and open source under AGPL-3.0",
-        "No ads and no tracking pixels",
-      ],
-      ctaLabel: "Create and Download a PDF",
+        "Fill in the form, watch the PDF update next to it, and download. Your invoice is made in your browser and never uploaded.",
+      ctaLabel: "Create an invoice",
+      // blue-500, the same as the steps heading's underline
+      ctaMark: { type: "box", color: "rgb(59 130 246)" },
       ctaHref: APP_HREF,
       heroVideo: {
         embedUrl: VIDEO_DEMO_HERO_YOUTUBE_URL,
@@ -242,176 +389,153 @@ export const SEO_LANDING_DEFINITIONS = {
         thumbnailUrl: "https://i.ytimg.com/vi/wkecHuXWLSQ/maxresdefault.jpg",
       },
     },
-    factsTable: {
-      heading: "The generator at a glance",
-      rows: [
-        { label: "Account required", value: "No email, no password, no card" },
-        {
-          label: "Time to a finished PDF",
-          value: "About a minute for a typical invoice",
+    story: {
+      secondaryCtaLabel: "See how it works",
+      proofPoints: ["13 languages", "122 currencies"],
+      steps: {
+        heading: "From empty form to finished PDF in about a minute",
+        // blue-500
+        headingMark: {
+          phrase: "about a minute",
+          type: "underline",
+          color: "rgb(59 130 246)",
         },
-        {
-          label: "Where the PDF is built",
-          value: "In your browser. The invoice data never reaches a server.",
+        lead: "There's no account to make first. This is the whole process.",
+        items: [
+          {
+            label: "No sign up",
+            title: "Open the page and start typing",
+            body: "No signup form, no confirmation email, no trial. A blank invoice is already there, numbered and dated.",
+            art: "blank-invoice",
+          },
+          {
+            label: "Live preview",
+            title: "See every change in the PDF",
+            body: "Totals and VAT add up as you type. The preview next to the form is the exact file you'll download.",
+            art: "live-preview",
+          },
+          {
+            label: "Download or share",
+            title: "Download the PDF, or send a link",
+            body: "Attach the PDF to an email from your own inbox, or copy a link that opens the same invoice in your client's browser.",
+            art: "download-or-share",
+          },
+          {
+            label: "Private by design",
+            title: "Your invoice never leaves your browser",
+            body: "The PDF is made on your device, and your draft is saved in this browser, not on a server. No account is needed because there's nothing to store.",
+            art: "privacy-facts",
+          },
+        ],
+      },
+      stepsCta: {
+        heading: "Your turn. It takes about a minute.",
+        // yellow-300, which also reads on the card's near-black
+        headingMark: {
+          phrase: "Your turn.",
+          type: "underline",
+          color: "rgb(253 224 71)",
         },
-        {
-          label: "Templates",
-          value: "A default layout and a Stripe-style one",
+        lead: "No sign up, no login. Your invoice stays in your browser.",
+      },
+      video: {
+        heading: "Full demo",
+        // rose-300
+        headingMark: {
+          phrase: "Full demo",
+          type: "highlight",
+          color: "rgb(253 164 175)",
         },
-        { label: "Languages on the PDF", value: "13" },
-        {
-          label: "Currencies",
-          value: "122, picked separately from the language",
+        lead: "A whole invoice, filled in and downloaded, with no account.",
+      },
+      related: {
+        heading: "More you can do with it",
+        // emerald-500
+        headingMark: {
+          phrase: "More",
+          type: "underline",
+          color: "rgb(16 185 129)",
         },
-        { label: "Company logo", value: "JPEG, PNG or WebP, up to 3MB" },
-        { label: "Ads and trackers", value: "None" },
-        { label: "Price", value: "Free, and the source is on GitHub" },
-      ],
+        cards: NO_LOGIN_RELATED_CARDS,
+      },
+      faq: {
+        heading: "Questions about invoicing without an account",
+        // yellow-300
+        headingMark: {
+          phrase: "without an account",
+          type: "highlight",
+          color: "rgb(253 224 71)",
+        },
+        lead: "What's free, where your data goes, and what it doesn't do.",
+      },
+      closing: {
+        heading: "Make your invoice now",
+        // yellow-300
+        headingMark: {
+          phrase: "now",
+          type: "highlight",
+          color: "rgb(253 224 71)",
+        },
+        lead: "No signup. Free and open source.",
+      },
     },
-    sections: [
-      {
-        title: "What skipping the login saves you",
-        lead: "Most invoice generators want an email before they hand over the PDF. That is a signup form, a confirmation mail and one more password, all standing in front of a document you needed an hour ago.",
-        paragraphs: [
-          "Here there is no account to make. Open the page and an empty invoice is already in the form.",
-        ],
-        bullets: [
-          "No signup form, no confirmation email, no password to store",
-          "No trial that expires and locks the invoice you already wrote",
-          "No marketing list to unsubscribe from later",
-          "The invoice you last edited stays in your browser, so a refresh does not lose it",
-        ],
-      },
-      {
-        title: "The PDF is built on your own machine",
-        lead: "JavaScript in your browser renders the file. Your client's name, your rates and your bank details stay on your device, which is why no account is needed to hold them.",
-        bullets: [
-          "Nothing is uploaded during normal editing or PDF generation",
-          "Nothing to delete afterwards, because nothing was stored elsewhere",
-          "The share link packs the whole invoice into the URL rather than a database row",
-          "No tracking pixels and no third-party ad scripts on the page",
-        ],
-      },
-      {
-        title: "Make the invoice look like yours",
-        bullets: [
-          "Two layouts: a plain default one and a Stripe-style one",
-          "Upload a logo as JPEG, PNG or WebP up to 3MB, and it prints on either",
-          "Rename the tax label to VAT, GST, Sales Tax, Moms or whatever applies to you",
-          "Pick from 13 languages for the PDF and 122 currencies, independently",
-          "Line items total themselves as you type, tax included",
-          "The total is written out in words, following the grammar of the language you picked",
-        ],
-      },
-      {
-        title: "When an invoicing suite is more than you need",
-        showComparisonTable: true,
-        lead: "QuickBooks, Zoho and Wave are accounting platforms. They track, reconcile and file, and they charge a subscription for it.",
-        paragraphs: [
-          "That is worth the setup when the books are the job. It is a lot of software to sign up for when you owe one client one PDF this week.",
-          "Use this when the invoice is the whole task, and keep the accounting suite for the accounting.",
-        ],
-      },
-      {
-        title: "Create an invoice and download the PDF",
-        lead: "Four steps, and nothing to install.",
-        bullets: [
-          "Open the generator. An empty invoice is already loaded.",
-          "Fill in who is billing whom, then add your line items. The totals follow.",
-          "Watch the preview beside the form redraw with each change.",
-          "Press Download PDF. The file is in your downloads folder, ready to send.",
-        ],
-      },
-      {
-        title: "Send the invoice to your client by email",
-        lead: "The generator does not send email for you, so there is no mail account to connect. You send the invoice yourself, from the inbox your client already knows.",
-        bullets: [
-          "Press Download PDF and attach the file to an email in Gmail, Outlook or any other mail app",
-          "The file name carries the invoice number, so the attachment is easy to find later",
-          "Or press Get link and paste the link into the email. It opens the same invoice in the browser, with nothing to download",
-          "Share links cannot hold a logo, so for an invoice with a logo, attach the PDF instead",
-        ],
-      },
-    ],
-    comparisonTable: {
-      heading: "Against a typical invoicing tool",
-      intro:
-        "Most invoice tools are accounts first and documents second. This compares how long it takes to hold a finished PDF.",
-      columnLabels: ["", "EasyInvoicePDF.com", "Typical invoicing tool"],
-      rows: [
-        {
-          feature: "Works without an account",
-          thisTool: "✅ Yes",
-          other: "❌ No",
-        },
-        {
-          feature: "Finished PDF in about a minute",
-          thisTool: "✅ Yes",
-          other: "⚠️ After signup",
-        },
-        {
-          feature: "Invoice data stays on your device",
-          thisTool: "✅ Yes",
-          other: "❌ No",
-        },
-        {
-          feature: "Languages on the PDF",
-          thisTool: "✅ 13",
-          other: "⚠️ Usually one",
-        },
-        {
-          feature: "Ads or tracking pixels",
-          thisTool: "❌ None",
-          other: "⚠️ Varies",
-        },
-        { feature: "Price", thisTool: "✅ Free", other: "⚠️ Paid plans" },
-      ],
-    },
-    relatedSlugs: [
-      "open-source-invoice-generator",
-      "invoice-template-pdf",
-      "freelance-invoice-template",
-    ],
+    relatedSlugs: NO_LOGIN_RELATED_CARDS.map(({ slug }) => {
+      return slug;
+    }),
     faq: [
       {
         question: "Do I need to create an account?",
         answer:
-          "No. Open the app and the form is already there. There is no email step, no password and no credit card, and you can download the PDF or send a share link straight away.",
+          "No. Open the app and the form is already there. No email, no password, no credit card.",
       },
       {
         question: "Is it really free?",
         answer:
-          "Yes. There is no paywall, no premium tier and no card on file. The project is open source on GitHub under AGPL-3.0, so you can also read the code or run your own copy.",
-      },
-      {
-        question: "Where does my invoice data go?",
-        answer:
-          "Nowhere. The form and the PDF both run in your browser, and the invoice is kept in your browser's local storage so it survives a refresh. Normal editing and PDF generation upload nothing.",
+          "Yes. There's no paywall, no premium tier and no card on file. The code is open source on GitHub under AGPL-3.0.",
       },
       {
         question: "How do I create a free invoice?",
         answer:
-          "Open the app, fill in the bill-from and bill-to blocks, add your line items, and press Download PDF. The totals and tax calculate themselves, and a typical invoice takes about a minute.",
+          "Open the app, fill in who is billing whom, add your line items and press Download PDF. Totals and tax calculate themselves, and a typical invoice takes about a minute.",
+      },
+      {
+        question: "Where does my invoice data go?",
+        answer:
+          "Nowhere. The form and the PDF both run in your browser, and your draft is kept in this browser so it survives a refresh.",
       },
       {
         question: "Does the invoice maker work on a phone?",
         answer:
-          "Yes. It runs in any modern mobile browser with no app to install, and the PDF viewer opens on the same screen so you can check the file before downloading it.",
+          "Yes. It runs in any modern mobile browser with no app to install, and you can check the PDF before you download it.",
       },
       {
-        question: "Can I put my company logo on the invoice?",
+        question: "Can I put my logo on the invoice?",
         answer:
-          "Yes. Upload a JPEG, PNG or WebP up to 3MB and it appears on both the default and the Stripe-style template. Like everything else, the image stays in your browser.",
+          "Yes. Upload a JPEG, PNG or WebP up to 3MB. It appears on both templates and stays in your browser.",
+      },
+      {
+        question: "Can I call the tax VAT or GST?",
+        answer:
+          "Yes. Rename the tax label to VAT, GST, Sales Tax or whatever applies to you. Pick from two templates, a plain one and a Stripe-style one, and the total is also written out in words.",
+      },
+      {
+        question: "How do I send the invoice to my client?",
+        answer:
+          "Download the PDF and attach it to an email, or copy a share link. The link holds the whole invoice in the URL, so your client opens the same invoice without an account.",
+      },
+      {
+        question: "How is this different from QuickBooks, Zoho or Wave?",
+        answer:
+          "Those are accounting platforms with a subscription: they track, reconcile and file. Use this when the invoice is the whole task, and keep the accounting suite for the books.",
       },
       {
         question: "Can I use it to write a receipt?",
         answer:
-          "It builds invoices, and an invoice with the Paid field set to the full amount reads as a record of a completed payment. There is no separate receipt document, and no accounting or compliance guarantee comes with it.",
+          "It makes invoices. Set the Paid field to the full amount and the invoice reads as a record of payment. There's no separate receipt document.",
       },
       {
         question: "Does it have ads?",
-        answer:
-          "No. There are no ads, no tracking pixels and no third-party ad scripts, which is also why the page loads quickly.",
+        answer: "No. There are no ads anywhere on the site.",
       },
     ],
   },
