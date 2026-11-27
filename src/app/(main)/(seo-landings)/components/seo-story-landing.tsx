@@ -76,14 +76,11 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
             </h1>
             {/* the hero's opener is a paragraph, so the section titles stay the page's h2s */}
             <p className="mt-6 max-w-[540px] text-pretty text-lg leading-relaxed text-neutral-700 md:text-[19px]">
-              <MarkedText
-                text={hero.subheading}
-                mark={hero.subheadingMark}
-                delayMs={SUBHEADING_MARK_DELAY_MS}
-              />
+              {hero.subheading}
             </p>
             <div
-              className="mt-7 flex flex-col gap-2 sm:flex-row"
+              // room for the frame drawn around the first button
+              className="mt-7 flex flex-col gap-6 sm:flex-row"
               {...seoHeroCtaMarker}
             >
               <TrackClick
@@ -92,12 +89,14 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
                   position: "hero",
                 })}
               >
-                <BlackGoToAppButton
-                  className="h-11 w-full rounded-[10px] px-5 text-[15px] sm:w-auto"
-                  href={hero.ctaHref}
-                >
-                  {hero.ctaLabel}
-                </BlackGoToAppButton>
+                <MarkedCta mark={hero.ctaMark}>
+                  <BlackGoToAppButton
+                    className="h-11 w-full rounded-[10px] px-5 text-[15px] sm:w-auto"
+                    href={hero.ctaHref}
+                  >
+                    {hero.ctaLabel}
+                  </BlackGoToAppButton>
+                </MarkedCta>
               </TrackClick>
               <Button
                 variant="outline"
@@ -125,7 +124,11 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
               id="seo-story-steps-heading"
               className="max-w-[600px] text-balance text-[32px] font-bold leading-[1.08] tracking-[-0.03em] md:text-[44px] md:leading-[1.05]"
             >
-              {story.steps.heading}
+              <MarkedText
+                text={story.steps.heading}
+                mark={story.steps.headingMark}
+                delayMs={SECTION_MARK_DELAY_MS}
+              />
             </h2>
             <p className="mt-4 max-w-[520px] text-pretty text-[17px] leading-relaxed text-neutral-700">
               {story.steps.lead}
@@ -161,8 +164,12 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
                 Dark, so it doesn't run into the grey video card right below it. */}
             <div className="mt-14 flex flex-col gap-6 rounded-3xl bg-neutral-950 px-6 py-8 text-white md:mt-20 md:flex-row md:items-center md:justify-between md:gap-8 md:px-11 md:py-11">
               <div>
-                <h2 className="text-balance text-[30px] font-extrabold leading-[1.02] tracking-[-0.035em] md:text-[40px]">
-                  {story.stepsCta.heading}
+                <h2 className="text-balance text-[30px] font-extrabold leading-[1.15] tracking-[-0.035em] md:text-[40px]">
+                  <MarkedText
+                    text={story.stepsCta.heading}
+                    mark={story.stepsCta.headingMark}
+                    delayMs={SECTION_MARK_DELAY_MS}
+                  />
                 </h2>
                 <p className="mt-3 text-pretty text-base text-neutral-400 md:text-[17px]">
                   {story.stepsCta.lead}
@@ -210,7 +217,11 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
                   id="seo-story-video-heading"
                   className="text-[32px] font-bold leading-none tracking-[-0.035em] md:text-[44px]"
                 >
-                  {story.video.heading}
+                  <MarkedText
+                    text={story.video.heading}
+                    mark={story.video.headingMark}
+                    delayMs={SECTION_MARK_DELAY_MS}
+                  />
                 </h2>
                 <p className="text-pretty text-base text-neutral-700">
                   {story.video.lead}
@@ -236,7 +247,11 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
               id="seo-landing-related-heading"
               className="text-[28px] font-bold leading-[1.08] tracking-[-0.03em] md:text-4xl"
             >
-              {story.related.heading}
+              <MarkedText
+                text={story.related.heading}
+                mark={story.related.headingMark}
+                delayMs={SECTION_MARK_DELAY_MS}
+              />
             </h2>
             <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {story.related.cards.map((card) => {
@@ -280,7 +295,11 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
                   id="seo-landing-faq-heading"
                   className="text-balance text-[32px] font-bold leading-[1.05] tracking-[-0.035em] md:text-[40px]"
                 >
-                  {story.faq.heading}
+                  <MarkedText
+                    text={story.faq.heading}
+                    mark={story.faq.headingMark}
+                    delayMs={SECTION_MARK_DELAY_MS}
+                  />
                 </h2>
                 <p className="mt-3.5 text-pretty text-[17px] leading-relaxed text-neutral-700">
                   {story.faq.lead}
@@ -311,7 +330,11 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
           <section className={`${WRAP} pt-20 md:pt-28`}>
             <div className="rounded-3xl bg-[#eeeeec] px-6 py-12 text-center md:px-10 md:py-16">
               <h2 className="mx-auto max-w-[620px] text-balance text-[36px] font-extrabold leading-none tracking-[-0.04em] md:text-[52px]">
-                {story.closing.heading}
+                <MarkedText
+                  text={story.closing.heading}
+                  mark={story.closing.headingMark}
+                  delayMs={SECTION_MARK_DELAY_MS}
+                />
               </h2>
               <p className="mt-4 text-[17px] text-neutral-700">
                 {story.closing.lead}
@@ -359,7 +382,7 @@ interface MarkedTextProps {
   /** The text to render, unchanged whether or not it carries a mark. */
   text: string;
   /** The phrase to mark. A phrase missing from `text` renders the plain text. */
-  mark: SeoStoryLandingDefinition["hero"]["h1Mark"];
+  mark: SeoStoryLandingDefinition["hero"]["h1Mark"] | undefined;
   /** Wait after the text comes into view before drawing, to sequence the hero's marks. */
   delayMs: number;
 }
@@ -395,20 +418,59 @@ function MarkedText({ text, mark, delayMs }: MarkedTextProps) {
   );
 }
 
+interface MarkedCtaProps {
+  children: React.ReactNode;
+  /** The frame to draw around the button. Without one the button renders as it is. */
+  mark: SeoStoryLandingDefinition["hero"]["ctaMark"];
+}
+
 /**
- * How each mark is drawn. The highlight keeps a small padding because the subheading's
- * lines sit close together, and a wider one would reach into the next line.
+ * The hero's CTA button with a hand-drawn frame around it. The spans the frame is
+ * measured from are blocks, so on a phone, where the button is full width, the frame
+ * is too.
+ */
+function MarkedCta({ children, mark }: MarkedCtaProps) {
+  if (!mark) {
+    return children;
+  }
+
+  return (
+    <RoughAnnotation
+      type={mark.type}
+      color={mark.color}
+      delayMs={CTA_MARK_DELAY_MS}
+      animationDuration={800}
+      strokeWidth={2.5}
+      padding={8}
+      className="block sm:inline-block"
+      innerClassName="block"
+    >
+      {children}
+    </RoughAnnotation>
+  );
+}
+
+/**
+ * How each mark is drawn. Highlights and underlines keep a small padding because the
+ * headings' lines sit close together, and a wider one would reach into the next line.
  */
 const MARK_STYLES = {
   circle: { animationDuration: 900, strokeWidth: 2.5, padding: 10 },
   highlight: { animationDuration: 800, strokeWidth: undefined, padding: 2 },
+  underline: { animationDuration: 800, strokeWidth: 3, padding: 2 },
 } as const;
 
 /** After the hero has painted, so the circle is seen being drawn rather than missed. */
 const H1_MARK_DELAY_MS = 300;
 
+/**
+ * For the section headings, which draw as each one scrolls into view: a beat after it
+ * arrives, so the mark is seen being drawn rather than already there.
+ */
+const SECTION_MARK_DELAY_MS = 200;
+
 /** Once the circle is done, so the two marks read as one gesture after the other. */
-const SUBHEADING_MARK_DELAY_MS =
+const CTA_MARK_DELAY_MS =
   H1_MARK_DELAY_MS + MARK_STYLES.circle.animationDuration;
 
 /** The steps' anchor, which the hero's second button scrolls to. */

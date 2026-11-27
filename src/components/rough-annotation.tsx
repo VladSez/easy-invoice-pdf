@@ -25,6 +25,7 @@ export function RoughAnnotation({
   padding = 5,
   iterations = 2,
   className,
+  innerClassName,
 }: RoughAnnotationProps) {
   const ref = useRef<HTMLSpanElement>(null);
 
@@ -95,7 +96,9 @@ export function RoughAnnotation({
 
   return (
     <span className={cn("relative", className)}>
-      <span ref={ref}>{children}</span>
+      <span ref={ref} className={innerClassName}>
+        {children}
+      </span>
     </span>
   );
 }
@@ -120,4 +123,9 @@ interface RoughAnnotationProps {
   iterations?: number;
   /** Classes for the outer span, e.g. font weight or text colour. */
   className?: string;
+  /**
+   * Classes for the inner span, the one the mark is measured from. Set `block` (on both
+   * spans) to frame a block-level child such as a full-width button.
+   */
+  innerClassName?: string;
 }

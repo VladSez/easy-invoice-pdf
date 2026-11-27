@@ -147,18 +147,22 @@ type SeoArticleLandingHero = {
 interface SeoStoryLandingHero {
   h1: string;
   /** A hand-drawn mark on one phrase of `h1`, drawn first. */
-  h1Mark?: SeoStoryHeroMark;
+  h1Mark?: SeoStoryMark;
   subheading: string;
-  /** A hand-drawn mark on one phrase of `subheading`, drawn after `h1Mark`. */
-  subheadingMark?: SeoStoryHeroMark;
   ctaLabel: string;
   ctaHref: string;
+  /** A hand-drawn frame around the hero's CTA button, drawn after `h1Mark`. */
+  ctaMark?: {
+    type: Extract<RoughAnnotationType, "box" | "circle">;
+    /** Any CSS colour. */
+    color: string;
+  };
   heroImage?: never;
   heroVideo: SeoLandingHeroVideo;
 }
 
-/** A rough-notation mark on one phrase of a story landing's hero. */
-interface SeoStoryHeroMark {
+/** A rough-notation mark on one phrase of a story landing's hero or section headings. */
+interface SeoStoryMark {
   /**
    * Text to annotate, matched exactly.
    *
@@ -168,7 +172,7 @@ interface SeoStoryHeroMark {
    * (`seo-landing-h1-marks.test.ts` checks both).
    */
   phrase: string;
-  type: Extract<RoughAnnotationType, "circle" | "highlight">;
+  type: Extract<RoughAnnotationType, "circle" | "highlight" | "underline">;
   /** Any CSS colour; highlights sit behind the text, so keep them light. */
   color: string;
 }
@@ -182,25 +186,28 @@ interface SeoLandingStory {
    * front of them.
    */
   proofPoints: string[];
-  steps: {
-    heading: string;
-    lead: string;
-    items: SeoStoryStep[];
-  };
+  steps: SeoStoryHeading & { items: SeoStoryStep[] };
   /**
    * The card right after the steps, which asks readers who have just seen the whole flow
    * to try it.
    */
-  stepsCta: { heading: string; lead: string };
+  stepsCta: SeoStoryHeading;
   /** Copy beside the demo clip, which is `hero.heroVideo`. */
-  video: { heading: string; lead: string };
-  related: {
-    heading: string;
+  video: SeoStoryHeading;
+  related: Omit<SeoStoryHeading, "lead"> & {
     /** One card per entry of `relatedSlugs`, in the same order. */
     cards: readonly SeoStoryRelatedCard[];
   };
-  faq: { heading: string; lead: string };
-  closing: { heading: string; lead: string };
+  faq: SeoStoryHeading;
+  closing: SeoStoryHeading;
+}
+
+/** A story section's title and the line under it. */
+interface SeoStoryHeading {
+  heading: string;
+  /** A hand-drawn mark on one phrase of `heading`, drawn when the section scrolls in. */
+  headingMark?: SeoStoryMark;
+  lead: string;
 }
 
 interface SeoStoryStep {
@@ -369,13 +376,9 @@ export const SEO_LANDING_DEFINITIONS = {
       h1Mark: { phrase: "Free", type: "circle", color: "rgb(253 224 71)" },
       subheading:
         "Fill in the form, watch the PDF update next to it, and download. Your invoice is made in your browser and never uploaded.",
-      // yellow-300
-      subheadingMark: {
-        phrase: "Your invoice is made in your browser and never uploaded.",
-        type: "highlight",
-        color: "rgb(253 224 71)",
-      },
       ctaLabel: "Create an invoice",
+      // blue-500, the same as the steps heading's underline
+      ctaMark: { type: "box", color: "rgb(59 130 246)" },
       ctaHref: APP_HREF,
       heroVideo: {
         embedUrl: VIDEO_DEMO_HERO_YOUTUBE_URL,
@@ -391,6 +394,12 @@ export const SEO_LANDING_DEFINITIONS = {
       proofPoints: ["13 languages", "122 currencies"],
       steps: {
         heading: "From empty form to finished PDF in about a minute",
+        // blue-500
+        headingMark: {
+          phrase: "about a minute",
+          type: "underline",
+          color: "rgb(59 130 246)",
+        },
         lead: "There's no account to make first. This is the whole process.",
         items: [
           {
@@ -421,22 +430,52 @@ export const SEO_LANDING_DEFINITIONS = {
       },
       stepsCta: {
         heading: "Your turn. It takes about a minute.",
+        // yellow-300, which also reads on the card's near-black
+        headingMark: {
+          phrase: "Your turn.",
+          type: "underline",
+          color: "rgb(253 224 71)",
+        },
         lead: "No sign up, no login. Your invoice stays in your browser.",
       },
       video: {
         heading: "Full demo",
+        // rose-300
+        headingMark: {
+          phrase: "Full demo",
+          type: "highlight",
+          color: "rgb(253 164 175)",
+        },
         lead: "A whole invoice, filled in and downloaded, with no account.",
       },
       related: {
         heading: "More you can do with it",
+        // emerald-500
+        headingMark: {
+          phrase: "More",
+          type: "underline",
+          color: "rgb(16 185 129)",
+        },
         cards: NO_LOGIN_RELATED_CARDS,
       },
       faq: {
         heading: "Questions about invoicing without an account",
+        // yellow-300
+        headingMark: {
+          phrase: "without an account",
+          type: "highlight",
+          color: "rgb(253 224 71)",
+        },
         lead: "What's free, where your data goes, and what it doesn't do.",
       },
       closing: {
         heading: "Make your invoice now",
+        // yellow-300
+        headingMark: {
+          phrase: "now",
+          type: "highlight",
+          color: "rgb(253 224 71)",
+        },
         lead: "No signup. Free and open source.",
       },
     },

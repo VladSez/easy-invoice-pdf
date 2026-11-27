@@ -13,11 +13,13 @@ const MARKED_HEROES = SEO_LANDING_SLUGS.flatMap((slug) => {
 });
 
 /**
- * Every marked text on the landings' heroes, h1s and subheadings alike, as
- * `[label, text, mark]` rows.
+ * Every marked text on the landings, as `[label, text, mark]` rows: the heroes' h1s and
+ * the section headings of story landings.
  */
 const MARKED_TEXTS = SEO_LANDING_SLUGS.flatMap((slug) => {
-  const { hero } = SEO_LANDING_DEFINITIONS[slug];
+  const definition = SEO_LANDING_DEFINITIONS[slug];
+
+  const { hero } = definition;
 
   const rows: [string, string, { phrase: string; type: string }][] = [];
 
@@ -25,8 +27,12 @@ const MARKED_TEXTS = SEO_LANDING_SLUGS.flatMap((slug) => {
     rows.push([`${slug} h1`, hero.h1, hero.h1Mark]);
   }
 
-  if ("subheadingMark" in hero) {
-    rows.push([`${slug} subheading`, hero.subheading, hero.subheadingMark]);
+  if ("story" in definition) {
+    for (const [section, copy] of Object.entries(definition.story)) {
+      if (typeof copy === "object" && "headingMark" in copy) {
+        rows.push([`${slug} ${section}`, copy.heading, copy.headingMark]);
+      }
+    }
   }
 
   return rows;
