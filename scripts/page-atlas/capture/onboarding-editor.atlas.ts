@@ -58,6 +58,15 @@ test.describe("edit and download", () => {
       timeout: 10_000,
     });
     await atlas.snap("editor/cta-toast");
+
+    await atlas.snap("editor/seo-content", {
+      scrollTo: page.locator("#home-seo-content-heading"),
+    });
+    await atlas.snap("editor/seo-template-chooser", {
+      scrollTo: page
+        .getByTestId("home-seo-content")
+        .getByRole("article", { name: "Classic" }),
+    });
   });
 });
 
@@ -149,6 +158,26 @@ test("stripe template", async ({ page, atlas }) => {
     await topLine.getByRole("button", { name: "Indigo" }).click();
   });
   await atlas.snap("stripe/indigo", { scrollTo: topLine });
+});
+
+// The copy below the editor is server-rendered per route: switching the template in the
+// editor keeps `/`'s, so the Stripe copy needs a visit to `/stripe-template` itself.
+test("stripe template page", async ({ page, atlas }) => {
+  await atlas.openEditor({ path: "/stripe-template" });
+
+  const seoContent = page.getByTestId("stripe-template-seo-content");
+
+  await atlas.snap("stripe/seo-content", {
+    scrollTo: seoContent.locator("#stripe-template-seo-content-heading"),
+  });
+  await atlas.snap("stripe/seo-template-parts", {
+    scrollTo: seoContent.getByRole("heading", {
+      name: "What's on the template",
+    }),
+  });
+  await atlas.snap("stripe/seo-template-chooser", {
+    scrollTo: seoContent.getByRole("article", { name: "Stripe" }),
+  });
 });
 
 test("logo upload", async ({ page, atlas }) => {

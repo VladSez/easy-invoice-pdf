@@ -75,6 +75,14 @@ test.describe("Invoice app SEO content @desktop-only", () => {
     await expect(
       section.getByRole("link", { name: "no login and no signup" }),
     ).toHaveAttribute("href", "/invoice-generator-no-login");
+
+    // the template chooser marks the classic template as the one in use here
+    await expect(
+      section.getByRole("article", { name: "Classic" }),
+    ).toHaveAttribute("aria-current", "true");
+    await expect(
+      section.getByRole("article", { name: "Stripe" }),
+    ).not.toHaveAttribute("aria-current");
   });
 
   test("/stripe-template links to the Stripe invoice generator landing, not to itself", async ({
@@ -95,7 +103,7 @@ test.describe("Invoice app SEO content @desktop-only", () => {
     ).toHaveCount(0);
   });
 
-  test("/stripe-template 'classic invoice template' opens the default template for a visitor whose invoice uses Stripe", async ({
+  test("/stripe-template 'Switch to classic' opens the default template for a visitor whose invoice uses Stripe", async ({
     page,
   }) => {
     await page.goto(STRIPE_TEMPLATE_PATHNAME);
@@ -115,7 +123,7 @@ test.describe("Invoice app SEO content @desktop-only", () => {
     // scrolls the preview back into view, so a real click can land on the preview
     await page
       .getByTestId("stripe-template-seo-content")
-      .getByRole("link", { name: "classic invoice template" })
+      .getByRole("link", { name: "Switch to classic" })
       .dispatchEvent("click");
 
     await expect(page).toHaveURL("/");
@@ -126,15 +134,19 @@ test.describe("Invoice app SEO content @desktop-only", () => {
   });
 
   // A template switch rewrites the address bar in place and keeps the server-rendered
-  // block, so the one sentence of it that names a template follows the switch.
-  test("/stripe-template offers the Stripe template back after switching to the default one", async ({
+  // block, so the template chooser in it follows the switch.
+  test("/stripe-template's template chooser follows a switch to the default template", async ({
     page,
   }) => {
     await page.goto(STRIPE_TEMPLATE_PATHNAME);
 
     const section = page.getByTestId("stripe-template-seo-content");
+    const stripeCard = section.getByRole("article", { name: "Stripe" });
+    const classicCard = section.getByRole("article", { name: "Classic" });
+
+    await expect(stripeCard).toHaveAttribute("aria-current", "true");
     await expect(
-      section.getByRole("link", { name: "classic invoice template" }),
+      classicCard.getByRole("link", { name: "Switch to classic" }),
     ).toBeVisible();
 
     await page
@@ -142,15 +154,16 @@ test.describe("Invoice app SEO content @desktop-only", () => {
       .selectOption("default");
     await expect(page).toHaveURL("/");
 
-    // the block itself stays, only the sentence changes
+    // the block itself stays, only the chooser's current template changes
     await expect(section).toBeVisible();
+    await expect(classicCard).toHaveAttribute("aria-current", "true");
+    await expect(stripeCard).not.toHaveAttribute("aria-current");
     await expect(
-      section.getByRole("link", { name: "classic invoice template" }),
+      section.getByRole("link", { name: "Switch to classic" }),
     ).toHaveCount(0);
 
-    const stripeTemplateLink = section.getByRole("link", {
-      name: "Stripe invoice template",
-      exact: true,
+    const stripeTemplateLink = stripeCard.getByRole("link", {
+      name: "Switch to Stripe",
     });
     await expect(stripeTemplateLink).toHaveAttribute(
       "href",

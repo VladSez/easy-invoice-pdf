@@ -106,6 +106,8 @@ const APP_STATES = {
   "editor/loading": { title: "PDF still generating" },
   "editor/default": { title: "Default invoice" },
   "editor/edited": { title: "Edited invoice, PDF regenerated" },
+  "editor/seo-content": { title: "About the tool, below the editor" },
+  "editor/seo-template-chooser": { title: "Classic or Stripe?" },
   "editor/cta-toast": { title: "Support toast after a download" },
   "editor/mobile-preview": { title: "Preview PDF tab", only: "phone" },
   "editor/seller-saved": { title: "Seller saved and applied" },
@@ -164,6 +166,9 @@ const APP_STATES = {
   "editor/contacts-imported": { title: "Sellers & buyers imported" },
   "stripe/default": { title: "Stripe template" },
   "stripe/indigo": { title: "Indigo top line" },
+  "stripe/seo-content": { title: "About the template, below the editor" },
+  "stripe/seo-template-chooser": { title: "Stripe or classic?" },
+  "stripe/seo-template-parts": { title: "What's on the template" },
   "stripe/custom-column": { title: "Custom column on the Stripe template" },
   "stripe/custom-columns-three": {
     title: "Three custom columns on the Stripe template",
@@ -251,6 +256,16 @@ export const FLOWS = [
             state: "editor/default",
             via: "PDF ready",
             next: [
+              {
+                state: "editor/seo-content",
+                via: "Scroll below the editor",
+                next: [
+                  {
+                    state: "editor/seo-template-chooser",
+                    via: "Scroll to Classic or Stripe?",
+                  },
+                ],
+              },
               {
                 state: "editor/edited",
                 via: "Edit the seller name",
@@ -606,7 +621,25 @@ export const FLOWS = [
           {
             state: "stripe/default",
             via: "Template: Stripe",
-            next: [{ state: "stripe/indigo", via: "Top line color: Indigo" }],
+            next: [
+              { state: "stripe/indigo", via: "Top line color: Indigo" },
+              {
+                state: "stripe/seo-content",
+                via: "Open /stripe-template, scroll below the editor",
+                next: [
+                  {
+                    state: "stripe/seo-template-parts",
+                    via: "Scroll to What's on the template",
+                    next: [
+                      {
+                        state: "stripe/seo-template-chooser",
+                        via: "Scroll to Stripe or classic?",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
           },
           {
             state: "editor/logo",
