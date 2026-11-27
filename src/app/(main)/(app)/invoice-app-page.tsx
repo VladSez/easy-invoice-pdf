@@ -23,6 +23,7 @@ import { STRIPE_TEMPLATE_PATHNAME } from "@/utils/invoice-app-url";
 import { APP_PAGE_TITLE } from "./app-page-heading";
 import { HomeSeoContent } from "./components/home-seo-content";
 import { StripeTemplateSeoContent } from "./components/stripe-template-seo-content";
+import { TemplateSeoContentSwap } from "./components/template-seo-content-swap";
 import { CTAToastProvider } from "./contexts/cta-toast-context";
 import {
   HOME_WEB_PAGE,
@@ -70,7 +71,9 @@ export async function InvoiceAppPage({
       <Suspense fallback={<InvoicePageLoadingSkeleton template={template} />}>
         <AppPageClient githubStarsCount={githubStarsCount} />
       </Suspense>
-      {TEMPLATE_SEO_CONTENT[template]}
+      <TemplateSeoContentSwap routeTemplate={template}>
+        {TEMPLATE_SEO_CONTENT[template]}
+      </TemplateSeoContentSwap>
       <Footer />
     </CTAToastProvider>
   );
@@ -183,7 +186,8 @@ const TEMPLATE_META = {
 
 /**
  * The crawlable copy below the editor on each template's route. Each says something
- * different, so the two routes don't compete for the same queries.
+ * different, so the two routes don't compete for the same queries. The route's own copy is
+ * the one prerendered; `TemplateSeoContentSwap` shows the other after a template switch.
  */
 const TEMPLATE_SEO_CONTENT = {
   default: <HomeSeoContent />,

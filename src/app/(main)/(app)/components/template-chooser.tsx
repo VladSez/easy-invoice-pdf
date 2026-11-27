@@ -19,12 +19,10 @@ import { SEO_CARD_CLASS_NAME } from "./seo-content-cards";
  * apart, so a visitor can pick before filling anything in. The template in use comes
  * first: classic on `/`, Stripe on `/stripe-template`.
  *
- * Client-rendered only to follow the template in use: a template switch in the editor
- * rewrites the address bar with `history.replaceState` and keeps this server-rendered
- * block, so a static "current" badge would stay on the template that was left.
- * `usePathname()` follows those rewrites. Each route's prerender sees its own path, so the
- * served HTML -- what a crawler reads -- marks that route's template as current and links
- * to the other one.
+ * Reads the current template from `usePathname()`, which follows the address-bar rewrite
+ * of a template switch in the editor (`TemplateSeoContentSwap` swaps the copy around it on
+ * the same signal). Each route's prerender sees its own path, so the served HTML -- what a
+ * crawler reads -- marks that route's template as current and links to the other one.
  */
 export function TemplateChooser() {
   const pathname = usePathname();

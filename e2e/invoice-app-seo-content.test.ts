@@ -16,17 +16,26 @@ const ROUTES = [
     testId: "home-seo-content",
     otherTestId: "stripe-template-seo-content",
     heading: "A free invoice generator that runs in your browser",
+    // from the end of the block, so the whole of it has to be rendered
+    lastFaqQuestion: "Is this accounting software?",
   },
   {
     pathname: STRIPE_TEMPLATE_PATHNAME,
     testId: "stripe-template-seo-content",
     otherTestId: "home-seo-content",
     heading: "A free Stripe-style invoice template",
+    lastFaqQuestion: "Can I add my logo?",
   },
 ] as const;
 
 test.describe("Invoice app SEO content @desktop-only", () => {
-  for (const { pathname, testId, otherTestId, heading } of ROUTES) {
+  for (const {
+    pathname,
+    testId,
+    otherTestId,
+    heading,
+    lastFaqQuestion,
+  } of ROUTES) {
     test(`${pathname} serves its own SEO block in the prerendered HTML`, async ({
       request,
     }, testInfo) => {
@@ -41,8 +50,13 @@ test.describe("Invoice app SEO content @desktop-only", () => {
 
       // what a crawler gets before any JavaScript runs: the editor is client-only, this is not
       const html = await response.text();
-      expect(html).toContain(`data-testid="${testId}"`);
-      expect(html).toContain(heading);
+      // the markup itself, not the RSC payload in <script>s: copy that only reaches the
+      // page through JavaScript is not what this block is for
+      const markup = html.replaceAll(/<script[\s\S]*?<\/script>/g, "");
+
+      expect(markup).toContain(`data-testid="${testId}"`);
+      expect(markup).toContain(heading);
+      expect(markup).toContain(lastFaqQuestion);
       expect(html).not.toContain(`data-testid="${otherTestId}"`);
     });
 
@@ -133,49 +147,51 @@ test.describe("Invoice app SEO content @desktop-only", () => {
     await expect(page.getByTestId("home-seo-content")).toBeVisible();
   });
 
-  // A template switch rewrites the address bar in place and keeps the server-rendered
-  // block, so the template chooser in it follows the switch.
-  test("/stripe-template's template chooser follows a switch to the default template", async ({
+  // A template switch rewrites the address bar in place, without a navigation, so the
+  // page swaps the copy below the editor for the other route's on the client.
+  test("/stripe-template swaps the copy below the editor when the template is switched", async ({
     page,
   }) => {
     await page.goto(STRIPE_TEMPLATE_PATHNAME);
 
-    const section = page.getByTestId("stripe-template-seo-content");
-    const stripeCard = section.getByRole("article", { name: "Stripe" });
-    const classicCard = section.getByRole("article", { name: "Classic" });
+    const stripeSection = page.getByTestId("stripe-template-seo-content");
+    const homeSection = page.getByTestId("home-seo-content");
+    const templateSelect = page.getByRole("combobox", { name: "Template" });
 
-    await expect(stripeCard).toHaveAttribute("aria-current", "true");
+    await expect(stripeSection).toBeVisible();
     await expect(
-      classicCard.getByRole("link", { name: "Switch to classic" }),
-    ).toBeVisible();
+      stripeSection.getByRole("article", { name: "Stripe" }),
+    ).toHaveAttribute("aria-current", "true");
 
-    await page
-      .getByRole("combobox", { name: "Template" })
-      .selectOption("default");
+    await templateSelect.selectOption("default");
     await expect(page).toHaveURL("/");
 
-    // the block itself stays, only the chooser's current template changes
-    await expect(section).toBeVisible();
-    await expect(classicCard).toHaveAttribute("aria-current", "true");
-    await expect(stripeCard).not.toHaveAttribute("aria-current");
+    // `/`'s copy, with the classic template marked as the one in use
     await expect(
-      section.getByRole("link", { name: "Switch to classic" }),
-    ).toHaveCount(0);
+      homeSection.getByRole("heading", {
+        level: 2,
+        name: "A free invoice generator that runs in your browser",
+      }),
+    ).toBeVisible();
+    await expect(stripeSection).toHaveCount(0);
+    await expect(
+      homeSection.getByRole("article", { name: "Classic" }),
+    ).toHaveAttribute("aria-current", "true");
+    await expect(
+      homeSection
+        .getByRole("article", { name: "Stripe" })
+        .getByRole("link", { name: "Switch to Stripe" }),
+    ).toHaveAttribute("href", STRIPE_TEMPLATE_PATHNAME);
 
-    const stripeTemplateLink = stripeCard.getByRole("link", {
-      name: "Switch to Stripe",
-    });
-    await expect(stripeTemplateLink).toHaveAttribute(
-      "href",
-      STRIPE_TEMPLATE_PATHNAME,
-    );
-
-    // `dispatchEvent` for the same PDF viewer focus reason as above
-    await stripeTemplateLink.dispatchEvent("click");
-
+    // and back: the route's own server-rendered copy returns
+    await templateSelect.selectOption("stripe");
     await expect(page).toHaveURL(STRIPE_TEMPLATE_PATHNAME);
-    await expect(page.getByRole("combobox", { name: "Template" })).toHaveValue(
-      "stripe",
-    );
+    await expect(
+      stripeSection.getByRole("heading", {
+        level: 2,
+        name: "A free Stripe-style invoice template",
+      }),
+    ).toBeVisible();
+    await expect(homeSection).toHaveCount(0);
   });
 });
