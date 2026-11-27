@@ -18,7 +18,17 @@ import { FinalProjectLogo } from "@/components/etc/final-project-logo";
 import { GITHUB_URL } from "@/config";
 import { cn } from "@/lib/utils";
 
-import type { SeoStoryStepArt } from "../seo-landing-definitions";
+import type {
+  SeoLandingSlug,
+  SeoStoryStepArt,
+} from "../seo-landing-definitions";
+
+interface HeroAppSceneProps {
+  /** Where the toast's "Open app" link goes. */
+  appHref: string;
+  /** The landing the scene is on, sent with that link's click event. */
+  slug: SeoLandingSlug;
+}
 
 /**
  * The hero's picture: the generator open in a browser window on a desktop, drawn in
@@ -28,7 +38,7 @@ import type { SeoStoryStepArt } from "../seo-landing-definitions";
  * On a phone the form and most of the chrome drop away and the PDF is left on its own,
  * which is also what the app itself shows first there.
  */
-export function HeroAppScene({ appHref }: { appHref: string }) {
+export function HeroAppScene({ appHref, slug }: HeroAppSceneProps) {
   return (
     <SceneToastProvider>
       <figure className="relative m-0 overflow-hidden rounded-2xl bg-[#eeeeec] shadow-[inset_0_0_0_1px_rgba(0,0,0,.06)]">
@@ -193,7 +203,7 @@ export function HeroAppScene({ appHref }: { appHref: string }) {
           </div>
         </div>
 
-        <SceneToast appHref={appHref} />
+        <SceneToast appHref={appHref} slug={slug} />
       </figure>
     </SceneToastProvider>
   );

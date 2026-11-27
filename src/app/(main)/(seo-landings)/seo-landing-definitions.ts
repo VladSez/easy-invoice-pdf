@@ -187,6 +187,11 @@ interface SeoLandingStory {
     lead: string;
     items: SeoStoryStep[];
   };
+  /**
+   * The card right after the steps, which asks readers who have just seen the whole flow
+   * to try it.
+   */
+  stepsCta: { heading: string; lead: string };
   /** Copy beside the demo clip, which is `hero.heroVideo`. */
   video: { heading: string; lead: string };
   related: {
@@ -383,7 +388,7 @@ export const SEO_LANDING_DEFINITIONS = {
     },
     story: {
       secondaryCtaLabel: "See how it works",
-      proofPoints: ["AGPL-3.0", "13 languages", "122 currencies"],
+      proofPoints: ["13 languages", "122 currencies"],
       steps: {
         heading: "From empty form to finished PDF in about a minute",
         lead: "There's no account to make first. This is the whole process.",
@@ -413,6 +418,10 @@ export const SEO_LANDING_DEFINITIONS = {
             art: "privacy-facts",
           },
         ],
+      },
+      stepsCta: {
+        heading: "Your turn. It takes about a minute.",
+        lead: "No sign up, no login. Your invoice stays in your browser.",
       },
       video: {
         heading: "Full demo",

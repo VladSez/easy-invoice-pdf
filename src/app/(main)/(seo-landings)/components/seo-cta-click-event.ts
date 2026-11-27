@@ -3,8 +3,11 @@ import type { SeoLandingSlug } from "../seo-landing-definitions";
 interface SeoCtaClickEventParams {
   /** The landing the CTA is on. */
   slug: SeoLandingSlug;
-  /** Which of the landing's in-page CTAs was pressed. */
-  position: "hero" | "inline" | "bottom";
+  /**
+   * Which of the landing's in-page CTAs was pressed. `scene` is the "Open app" link in
+   * the card a story landing's hero drawing shows after its drawn buttons are pressed.
+   */
+  position: "hero" | "inline" | "bottom" | "scene";
 }
 
 /**

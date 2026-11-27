@@ -4,7 +4,10 @@ import Link from "next/link";
 import { fetchGithubStars } from "@/actions/fetch-github-stars";
 import { Footer } from "@/app/(components)/footer";
 import { Header } from "@/app/(components)/header";
-import { BlackGoToAppButton } from "@/app/(components)/header/go-to-app-button-cta";
+import {
+  BlackGoToAppButton,
+  GoToAppButton,
+} from "@/app/(components)/header/go-to-app-button-cta";
 import { seoCtaClickEvent } from "@/app/(main)/(seo-landings)/components/seo-cta-click-event";
 import { seoHeroCtaMarker } from "@/app/(main)/(seo-landings)/components/seo-cta-marker";
 import {
@@ -107,7 +110,7 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
           </section>
 
           <section className={`${WRAP} pt-10 md:pt-14`}>
-            <HeroAppScene appHref={hero.ctaHref} />
+            <HeroAppScene appHref={hero.ctaHref} slug={definition.slug} />
             <p className="mt-6 text-pretty text-center text-[13px] text-neutral-500">
               {proofPoints.join(" · ")}
             </p>
@@ -152,6 +155,49 @@ export async function SeoStoryLanding({ definition }: SeoStoryLandingProps) {
                 );
               })}
             </ol>
+
+            {/* readers who have just seen the whole flow are the likeliest to try it, and
+                the next CTA is otherwise past the video, the related pages and the FAQ.
+                Dark, so it doesn't run into the grey video card right below it. */}
+            <div className="mt-14 flex flex-col gap-6 rounded-3xl bg-neutral-950 px-6 py-8 text-white md:mt-20 md:flex-row md:items-center md:justify-between md:gap-8 md:px-11 md:py-11">
+              <div>
+                <h2 className="text-balance text-[30px] font-extrabold leading-[1.02] tracking-[-0.035em] md:text-[40px]">
+                  {story.stepsCta.heading}
+                </h2>
+                <p className="mt-3 text-pretty text-base text-neutral-400 md:text-[17px]">
+                  {story.stepsCta.lead}
+                </p>
+              </div>
+              <div className="flex flex-none flex-col gap-2 sm:flex-row">
+                <TrackClick
+                  {...seoCtaClickEvent({
+                    slug: definition.slug,
+                    position: "inline",
+                  })}
+                >
+                  <GoToAppButton
+                    className="h-[46px] w-full rounded-[10px] border-transparent bg-white px-5 text-[15px] text-neutral-950 shadow-none hover:bg-neutral-200 hover:shadow-none sm:w-auto"
+                    href={hero.ctaHref}
+                  >
+                    {hero.ctaLabel}
+                  </GoToAppButton>
+                </TrackClick>
+                <Button
+                  variant="outline"
+                  className="h-[46px] rounded-[10px] border-neutral-700 bg-transparent px-5 text-[15px] font-medium text-white shadow-none hover:bg-white/10 hover:text-white"
+                  asChild
+                >
+                  <Link
+                    href={GITHUB_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <GithubIcon className="mr-1.5 size-5 fill-white" />
+                    Star on GitHub
+                  </Link>
+                </Button>
+              </div>
+            </div>
           </section>
 
           <section

@@ -4,7 +4,11 @@ import { Check, Download, Link2 } from "lucide-react";
 import Link from "next/link";
 import { createContext, useContext, useState } from "react";
 
+import { seoCtaClickEvent } from "@/app/(main)/(seo-landings)/components/seo-cta-click-event";
+import { trackEvent } from "@/lib/analytics/track-event";
 import { cn } from "@/lib/utils";
+
+import type { SeoLandingSlug } from "../seo-landing-definitions";
 
 /**
  * Holds which message the hero scene's toast shows, so the drawn buttons and the drawn
@@ -77,7 +81,7 @@ export function SceneActionButtons() {
  * leaves it out. After a press it is the answer to that press, so it shows on every
  * width, slides in again on each press and is announced to screen readers.
  */
-export function SceneToast({ appHref }: { appHref: string }) {
+export function SceneToast({ appHref, slug }: SceneToastProps) {
   const { shown } = useSceneToast();
 
   const hasBeenPressed = shown.pressCount > 0;
@@ -115,6 +119,9 @@ export function SceneToast({ appHref }: { appHref: string }) {
           {hasBeenPressed ? (
             <Link
               href={appHref}
+              onClick={() => {
+                trackEvent(seoCtaClickEvent({ slug, position: "scene" }));
+              }}
               className="flex-none rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-slate-800"
             >
               Open app
@@ -124,6 +131,13 @@ export function SceneToast({ appHref }: { appHref: string }) {
       </div>
     </div>
   );
+}
+
+interface SceneToastProps {
+  /** Where the card's "Open app" link goes. */
+  appHref: string;
+  /** The landing the scene is on, sent with the link's click event. */
+  slug: SeoLandingSlug;
 }
 
 function useSceneToast() {
