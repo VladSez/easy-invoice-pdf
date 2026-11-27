@@ -39,7 +39,7 @@ const NARROW_SPACES_REGEX = new RegExp(
  * here covers. Any number that reaches a template goes through this.
  */
 function toPdfSafeSpaces(value: string) {
-  return value.replaceAll(NARROW_SPACES_REGEX, NO_BREAK_SPACE);
+  return value.replace(NARROW_SPACES_REGEX, NO_BREAK_SPACE);
 }
 
 /**

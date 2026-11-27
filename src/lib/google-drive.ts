@@ -53,10 +53,7 @@ export async function initializeGoogleDrive() {
     return cachedDrive;
   }
 
-  const googlePrivateKey = env.GOOGLE_DRIVE_PRIVATE_KEY.replaceAll(
-    String.raw`\n`,
-    "\n",
-  );
+  const googlePrivateKey = env.GOOGLE_DRIVE_PRIVATE_KEY.replace(/\\n/g, "\n");
 
   const auth = new google.auth.GoogleAuth({
     credentials: {

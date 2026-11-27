@@ -109,7 +109,6 @@ const BRAZILIAN_PORTUGUESE: CardLanguage = {
 
     for (const scale of DROP_E_AFTER) {
       if (new RegExp(`.*${scale} e \\w*entos? (?=.*e)`).test(out)) {
-        // oxlint-disable-next-line unicorn/prefer-string-replace-all -- `String#replaceAll` is Safari 13.1; `.browserslistrc` targets Safari 12, and SWC lowers syntax but never polyfills a built-in
         out = out.replace(new RegExp(`${scale} e`, "g"), scale);
       }
     }

@@ -1,11 +1,5 @@
 import { cardsToWords, type CardLanguage } from "./cards";
 
-/** `String.prototype.at` is Safari 15.4, which is newer than the browsers we target. */
-function lastCharacter(text: string): string {
-  // oxlint-disable-next-line unicorn/prefer-at -- `.at()` is Safari 15.4; `.browserslistrc` targets Safari 12, and SWC lowers syntax but never polyfills a built-in
-  return text.charAt(text.length - 1);
-}
-
 const FRENCH: CardLanguage = {
   cards: [
     [1_000_000_000, "milliard"],
@@ -53,7 +47,7 @@ const FRENCH: CardLanguage = {
         ((left.value - 80) % 100 === 0 ||
           (left.value % 100 === 0 && left.value < 1000)) &&
         right.value < 1_000_000 &&
-        lastCharacter(leftText) === "s"
+        leftText.endsWith("s")
       ) {
         leftText = leftText.slice(0, -1);
       }
@@ -62,7 +56,7 @@ const FRENCH: CardLanguage = {
       if (
         left.value < 1000 &&
         right.value !== 1000 &&
-        lastCharacter(rightText) !== "s" &&
+        !rightText.endsWith("s") &&
         right.value % 100 === 0
       ) {
         rightText += "s";

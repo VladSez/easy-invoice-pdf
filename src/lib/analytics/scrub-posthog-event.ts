@@ -51,5 +51,5 @@ function scrubValue<T>(value: T): T {
 }
 
 function scrubString(value: string) {
-  return value.replaceAll(SENSITIVE_PARAM_PATTERN, `$1${REDACTED_VALUE}`);
+  return value.replace(SENSITIVE_PARAM_PATTERN, `$1${REDACTED_VALUE}`);
 }

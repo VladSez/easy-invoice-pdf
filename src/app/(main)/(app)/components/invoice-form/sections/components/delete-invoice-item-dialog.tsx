@@ -143,7 +143,7 @@ export function DeleteInvoiceItemDialog({
  * Returns an empty string when the item has no usable name.
  */
 function toItemNamePreview(itemName: string | undefined) {
-  const collapsed = itemName?.replaceAll(/\s+/g, " ").trim() ?? "";
+  const collapsed = itemName?.replace(/\s+/g, " ").trim() ?? "";
 
   return collapsed.length > MAX_ITEM_NAME_PREVIEW_LENGTH
     ? `${collapsed.slice(0, MAX_ITEM_NAME_PREVIEW_LENGTH).trimEnd()}…`

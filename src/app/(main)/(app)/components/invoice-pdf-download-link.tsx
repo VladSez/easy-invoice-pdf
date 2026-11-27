@@ -162,7 +162,7 @@ export function InvoicePDFDownloadLink({
 
   // Replace all slashes with dashes (e.g. 01/2025 -> 01-2025)
   const formattedInvoiceNumber = invoiceNumberValue
-    ? invoiceNumberValue?.replaceAll("/", "-")
+    ? invoiceNumberValue?.replace(/\//g, "-")
     : dayjs().format("MM-YYYY"); // Fallback to current month and year if no invoice number
 
   const filename = `invoice-${invoiceData?.language?.toUpperCase()}-${formattedInvoiceNumber}.pdf`;

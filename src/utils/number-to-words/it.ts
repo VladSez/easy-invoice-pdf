@@ -1,5 +1,3 @@
-// oxlint-disable unicorn/prefer-string-replace-all -- `String#replaceAll` is Safari 13.1; `.browserslistrc` targets Safari 12, and SWC lowers syntax but never polyfills a built-in
-
 /**
  * Italian does not fit the card model the other European languages here share: it writes
  * numbers as one unbroken word and elides vowels where they collide, so it gets its own
