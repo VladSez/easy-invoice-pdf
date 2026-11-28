@@ -253,7 +253,7 @@ export async function generateInvoice(
   const invoiceNumber =
     englishInvoiceData?.invoiceNumberObject?.value?.trim() || "";
   const formattedInvoiceNumber = invoiceNumber
-    ? invoiceNumber.replaceAll("/", "-")
+    ? invoiceNumber.replace(/\//g, "-")
     : now.format("MM-YYYY");
 
   const attachments = fulfilledInvoices.map((doc) => {

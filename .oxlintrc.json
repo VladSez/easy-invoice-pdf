@@ -95,6 +95,12 @@
         "object": "globalThis",
         "property": "localStorage",
         "message": "Please use **getAppStorageItem / setAppStorageItem** from @/app/(main)/(app)/utils/app-local-storage instead - direct access throws in iOS in-app webviews and in Safari with cookies blocked, and those only accept a key declared in LOCAL_STORAGE_KEYS. To branch on availability during render, use **useIsLocalStorageAvailable** from @/lib/use-is-local-storage-available."
+      },
+      // No `object`, so this matches `.replaceAll` on any value. See the
+      // `unicorn/prefer-string-replace-all` note below for why.
+      {
+        "property": "replaceAll",
+        "message": "Please use **.replace(/.../g, ...)** instead - `String#replaceAll` is Safari 13.1 / iOS 13.4, `.browserslistrc` targets Safari 12 / iOS 12, and SWC lowers syntax but never polyfills a built-in, so it throws there. For a plain-string pattern, use `.split(x).join(y)` or escape it into a regex."
       }
     ],
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
@@ -167,7 +173,6 @@
     "unicorn/prefer-set-size": "error",
     "unicorn/prefer-single-call": "error",
     "unicorn/prefer-string-raw": "error",
-    "unicorn/prefer-string-replace-all": "error",
     "unicorn/prefer-string-slice": "error",
     "unicorn/prefer-structured-clone": "error",
     "unicorn/prefer-top-level-await": "error",
@@ -184,6 +189,12 @@
     // mutated; `toSorted`/`toReversed` are ES2023 and above our browser floor
     "unicorn/no-array-sort": "off",
     "unicorn/no-array-reverse": "off",
+    // `String#replaceAll` is Safari 13.1 / iOS 13.4, and `.browserslistrc` targets
+    // Safari 12 and iOS 12. SWC lowers syntax but never polyfills a built-in, so a
+    // `replaceAll` in client code throws on those devices. This rule pushes the other
+    // way (its autofix is how one slipped into `format-currency.tsx`), so it is off,
+    // and `no-restricted-properties` above bans `replaceAll` outright.
+    "unicorn/prefer-string-replace-all": "off",
 
     // --- the react-hooks rules, at the severities next/core-web-vitals used ---
     "react/rules-of-hooks": "error",

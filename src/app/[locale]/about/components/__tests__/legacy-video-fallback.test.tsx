@@ -140,15 +140,6 @@ describe("HeroDemoVideo", () => {
 });
 
 describe("FeaturesCarousel", () => {
-  function renderCarousel() {
-    return render(
-      <FeaturesCarousel
-        features={FEATURES}
-        translations={CAROUSEL_TRANSLATIONS}
-      />,
-    );
-  }
-
   it("plays the self-hosted demos on a wide screen that can play them", () => {
     setUserAgent(CHROME_141);
     setIsXlUp(true);
@@ -186,3 +177,12 @@ describe("FeaturesCarousel", () => {
     expect(screen.getByText("Every line of it is on GitHub.")).toBeDefined();
   });
 });
+
+function renderCarousel() {
+  return render(
+    <FeaturesCarousel
+      features={FEATURES}
+      translations={CAROUSEL_TRANSLATIONS}
+    />,
+  );
+}

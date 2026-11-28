@@ -64,7 +64,8 @@ function scrubQueryString(queryString: string) {
 
   const scrubbedQuery = params
     .toString()
-    .replaceAll(ENCODED_REDACTED_VALUE, REDACTED_VALUE);
+    .split(ENCODED_REDACTED_VALUE)
+    .join(REDACTED_VALUE);
 
   return hasLeadingQuestionMark ? `?${scrubbedQuery}` : scrubbedQuery;
 }

@@ -12,5 +12,5 @@ import { SOFT_HYPHEN } from "../components/invoice-templates/common/hyphenate-ce
  * label), where a `|` is meant to print.
  */
 export function withBreaks(label: string) {
-  return label.replaceAll("|", SOFT_HYPHEN);
+  return label.replace(/\|/g, SOFT_HYPHEN);
 }

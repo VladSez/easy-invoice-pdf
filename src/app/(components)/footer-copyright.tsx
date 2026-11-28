@@ -10,8 +10,13 @@
 export function FooterCopyright() {
   return (
     <p className="text-sm text-slate-700">
-      © <span suppressHydrationWarning>{new Date().getFullYear()}</span>{" "}
-      EasyInvoicePDF.com
+      © <span suppressHydrationWarning>{CURRENT_YEAR}</span> EasyInvoicePDF.com
     </p>
   );
 }
+
+/**
+ * Read once when the module loads rather than on every render, which keeps the
+ * component pure. A page is never open long enough for the year to go stale.
+ */
+const CURRENT_YEAR = new Date().getFullYear();

@@ -159,6 +159,7 @@ task code is never bundled into your app. Trigger by id, not by calling the task
 
 ```ts
 import { tasks } from "@trigger.dev/sdk";
+
 import type { helloWorld } from "@/trigger/example"; // type-only
 
 const handle = await tasks.trigger<typeof helloWorld>("hello-world", {

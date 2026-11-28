@@ -37,5 +37,5 @@ export const ESCAPED_LESS_THAN = `${String.fromCodePoint(0x5c)}u003c`;
 
 /** `JSON.stringify`, with every `<` written as its JSON escape so the output can't end the tag. */
 export function serializeJsonLd(data: Graph | WithContext<Thing>) {
-  return JSON.stringify(data).replaceAll("<", ESCAPED_LESS_THAN);
+  return JSON.stringify(data).replace(/</g, ESCAPED_LESS_THAN);
 }

@@ -228,7 +228,6 @@ function HexColorField({
       onChange={(event) => {
         const text = event.target.value
           .replace(/^#/, "")
-          // oxlint-disable-next-line unicorn/prefer-string-replace-all -- `String#replaceAll` is Safari 13.1; `.browserslistrc` targets Safari 12, and SWC lowers syntax but never polyfills a built-in
           .replace(/[^\da-f]/gi, "")
           .slice(0, 6)
           .toUpperCase();

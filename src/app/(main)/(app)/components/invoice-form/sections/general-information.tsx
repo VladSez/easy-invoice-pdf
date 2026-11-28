@@ -589,7 +589,6 @@ export const GeneralInformation = memo(function GeneralInformation({
 
                         // `[de]` is dayjs escape syntax for a literal. The brackets mean
                         // nothing to the reader, so the pattern is shown without them.
-                        // oxlint-disable-next-line unicorn/prefer-string-replace-all -- `String#replaceAll` is Safari 13.1; `.browserslistrc` targets Safari 12, and SWC lowers syntax but never polyfills a built-in
                         const patternLabel = format.replace(/[[\]]/g, "");
 
                         return (
