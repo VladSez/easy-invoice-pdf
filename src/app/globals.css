@@ -49,17 +49,18 @@ textarea {
     width: 500px;
     height: 500px;
     transform-origin: 0 0;
+    /* blue-600 with a blue-400 highlight: the pill's hover color */
     background: conic-gradient(
       transparent 0%,
-      rgba(125, 91, 255, 0.15) 4%,
-      rgba(180, 140, 255, 0.9) 7%,
-      rgba(125, 91, 255, 0.95) 9%,
-      rgba(125, 91, 255, 0.4) 13%,
+      rgba(37, 99, 235, 0.15) 4%,
+      rgba(96, 165, 250, 0.9) 7%,
+      rgba(37, 99, 235, 0.95) 9%,
+      rgba(37, 99, 235, 0.4) 13%,
       transparent 18%
     );
-    filter: drop-shadow(0 0 4px rgba(125, 91, 255, 0.9))
-      drop-shadow(0 0 12px rgba(125, 91, 255, 0.5))
-      drop-shadow(0 0 24px rgba(125, 91, 255, 0.2));
+    filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.9))
+      drop-shadow(0 0 12px rgba(37, 99, 235, 0.5))
+      drop-shadow(0 0 24px rgba(37, 99, 235, 0.2));
     will-change: transform;
   }
 }
